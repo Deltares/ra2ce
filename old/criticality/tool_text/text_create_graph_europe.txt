@@ -1,0 +1,8 @@
+This functionality relies on data from OSM that is on the N-drive, these paths are
+already filled in the Excel. You need a shapefile covering the area that should be
+analysed. Fill in the name of that shapefile in the excel that will open later.
+
+This data is linked with flood data in Europe, therefore this specific analysis can
+only be done for Europe. Also, the NUTS-3 regions that should be analysed can be
+selected. These can be viewed via the shapefile that is listed in the Excel that
+will open.

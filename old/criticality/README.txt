@@ -1,0 +1,2 @@
+Version of the Criticality Tool using GeoPandas instead of shapely LineStrings in combination with a Pandas DataFrame.
+This version might not work if MultiLinestrings are imported and the snapping functionality is used.
