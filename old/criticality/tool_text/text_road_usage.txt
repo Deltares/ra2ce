@@ -1,0 +1,14 @@
+For calculating the cost for road service disruption you need the following data:
+To start with, you must have:
+	- Annual Average Daily Traffic (AADT): the shapefile(s) that you use for analysis must have AADT attributes, one per vehicle type. There are 8 vehicle types and they must be named like 'AADT_TYPE1', 'AADT_TYPE2' ... 'AADT_TYPE8'.
+
+A) Must have for calculating cost of road service disruption of road segments with an alternative route:
+	- Operating cost per vehicle type (same as the types of the AADT) [cost / km / vehicle type]
+
+B) Must have for calculating cost of road service disruption of road segments without an alternative route:
+	- Number of passengers (including the driver) per vehicle type
+	- Daily losses due to road service disruption per person [cost / day / person]
+
+You can calculate the cost with A, B or both. After choosing which information you have an excel will open where you can input your data.
+Type 'A' for calculating with data from A), 'B' for calculating with data from B) and 'AB' for using both. If you do not have this information, do the analysis without calculating costs by typing 'exit'.
+Your input:
