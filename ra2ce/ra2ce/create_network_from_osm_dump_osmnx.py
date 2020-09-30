@@ -16,6 +16,11 @@ import geopandas as gpd
 from pathlib import Path
 import os
 import sys
+from numpy import object as np_object
+
+### Overrule the OSMNX default settings to get the additional metadata such as street lighting (lit)
+osmnx.config(log_console=True, use_cache=True,
+          useful_tags_path = osmnx.settings.useful_tags_path + ['lit'])
 
 def get_graph_from_polygon(PathShp, NetworkType, RoadTypes=None):
     """
@@ -166,6 +171,33 @@ def filter_osm(osm_filter_path, area_o5m, filtered_area_o5m):
     except:
         print('{} did not finish!'.format(filtered_area_o5m))
 
+def graph_to_shp(G, edge_shp, node_shp):
+    """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_shp and node_shp
+    Arguments:
+        G []: networkx graph object to be converted
+        edge_shp [str]: output path including extension for edges shapefile
+        node_shp [str]: output path including extension for nodes shapefile
+    Returns:
+        None
+    """
+    # now only multidigraphs and graphs are used
+    if type(G) == nx.classes.graph.Graph:
+        G = nx.MultiGraph(G)
+
+    nodes, edges = osmnx.graph_to_gdfs(G)
+
+    dfs = [edges, nodes]
+    for df in dfs:
+        for col in df.columns:
+            if df[col].dtype == np_object and col != df.geometry.name:
+                df[col] = df[col].astype(str)
+
+    print('\nSaving nodes as shapefile: {}'.format(node_shp))
+    print('\nSaving edges as shapefile: {}'.format(edge_shp))
+
+    nodes.to_file(node_shp, driver='ESRI Shapefile', encoding='utf-8')
+    edges.to_file(edge_shp, driver='ESRI Shapefile', encoding='utf-8')
+
 if __name__=='__main__':
     osm_filter_path = 'osmfilter.exe'
     osm_convert_path = 'osmconvert64.exe'
@@ -179,5 +211,12 @@ if __name__=='__main__':
 
     # create a graph
     G = graph_from_osm('sample_data/NL332_filtered.o5m', multidirectional=False)
+
+    #Creates two dataframes containing the nodes and edges
+    nodes,edges = osmnx.graph_to_gdfs(G)
+
+    graph_to_shp(G,'edges.shp','nodes.shp')
+
+    print(edges)
 
     print('don')
