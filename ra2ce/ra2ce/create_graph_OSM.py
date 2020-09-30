@@ -7,13 +7,6 @@ import numpy as np
 
 import time
 
-start = time.time()
-
-osm_dump_path = os.path.join('..','..',"sample_data")
-
-print(os.path.exists(osm_dump_path))
-
-
 def fetch_roads(osm_data, region, **kwargs):
     """
     Function to extract all roads from OpenStreetMap for the specified region.
@@ -109,9 +102,17 @@ def fetch_roads(osm_data, region, **kwargs):
             file.write('No roads in {}'.format(region))
             file.close()
 
-output = fetch_roads(osm_dump_path,'NL332')
-print(output)
+if __name__=='__main__':
+    start = time.time()
+    osm_dump_path = os.path.join('..', '..', "sample_data")
 
-end = time.time()
-print(end-start)
+    region = 'NL332'
+    print('Checking for region'.format(region))
+    print("File exists? ", os.path.exists(osm_dump_path))
+
+    output = fetch_roads(osm_dump_path,region)
+    print(output)
+
+    end = time.time()
+    print("Runtime: ",end-start,"seconds")
 
