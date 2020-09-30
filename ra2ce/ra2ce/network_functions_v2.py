@@ -10,27 +10,8 @@ Part of a general tool for criticality analysis of networks.
 ''' MODULES '''
 import networkx as nx
 import osmnx
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import warnings
-import geopandas as gpd
-import itertools
-import os, sys
-import logging
-import rtree
-import pickle
-import rasterio
 import fiona
-from fiona.crs import from_epsg
-from shapely.geometry import mapping, Point, LineString, shape, MultiLineString, Polygon, MultiPolygon
-from shapely.ops import linemerge, unary_union
-from shapely.wkt import loads
-from prettytable import PrettyTable
-from statistics import mean
-from numpy import object as np_object
-from geopy import distance
-
+from shapely.geometry import shape
 
 def get_graph_from_polygon(PathShp, NetworkType, RoadTypes=None):
     """
