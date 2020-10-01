@@ -200,7 +200,6 @@ def graph_to_shp(G, edge_shp, node_shp):
     edges.to_file(edge_shp, driver='ESRI Shapefile', encoding='utf-8')
 
 if __name__=='__main__':
-    begin_time = time.time()
     osm_filter_path = 'osmfilter.exe'
     osm_convert_path = 'osmconvert64.exe'
     pbf = r"sample_data/NL332.osm.pbf"
