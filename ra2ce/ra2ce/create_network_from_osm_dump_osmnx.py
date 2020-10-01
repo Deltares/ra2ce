@@ -216,7 +216,7 @@ if __name__=='__main__':
     #Creates two dataframes containing the nodes and edges
     nodes,edges = osmnx.graph_to_gdfs(G)
 
-    graph_to_shp(G,'edges.shp','nodes.shp')
+    graph_to_shp(G,'test_results/edges.shp','test_results/nodes.shp')
 
     print(edges)
 
