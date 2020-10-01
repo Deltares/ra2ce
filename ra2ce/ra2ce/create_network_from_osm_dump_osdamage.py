@@ -107,11 +107,14 @@ if __name__=='__main__':
     osm_dump_path = os.path.join('..', '..', "sample_data")
 
     region = 'NL332'
-    print('Checking for region'.format(region))
+    print('Checking for region {}'.format(region))
     print("File exists? ", os.path.exists(osm_dump_path))
 
     output = fetch_roads(osm_dump_path,region)
     print(output)
+
+    interesting = ['motorway','motorway_link','trunk','trunk_link','primary','primary_link','secondary','secondary_link']
+    selection = output[output['infra_type'].isin(interesting)]
 
     end = time.time()
     print("Runtime: ",end-start,"seconds")
