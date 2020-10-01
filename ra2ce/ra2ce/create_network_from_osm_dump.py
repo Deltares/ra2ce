@@ -14,6 +14,7 @@ import os
 import sys
 from numpy import object as np_object
 import time
+import filecmp
 
 ### Overrule the OSMNX default settings to get the additional metadata such as street lighting (lit)
 osmnx.config(log_console=True, use_cache=True, useful_tags_path = osmnx.settings.useful_tags_path + ['lit'])
@@ -114,34 +115,7 @@ def fetch_roads(region, osm_pbf_path, **kwargs):
             file.write('No roads in {}'.format(region))
             file.close()
 
-def get_graph_from_polygon(PathShp, NetworkType, RoadTypes=None):
-    """
-    Get an OSMnx graph from a shapefile (input = path to shapefile).
 
-    Args:
-        PathShp [string]: path to shapefile (polygon) used to download from OSMnx the roads in that polygon
-        NetworkType [string]: one of the network types from OSM, e.g. drive, drive_service, walk, bike, all
-        RoadTypes [string]: formatted like "motorway|primary", one or multiple road types from OSM (highway)
-
-    Returns:
-        G [networkx multidigraph]
-    """
-    with fiona.open(PathShp) as source:
-        for r in source:
-            if 'geometry' in r:  # added this line to not take into account "None" geometry
-                polygon = shape(r['geometry'])
-
-    if RoadTypes == RoadTypes:
-        # assuming the empty cell in the excel is a numpy.float64 nan value
-        G = osmnx.graph_from_polygon(polygon=polygon, network_type=NetworkType, infrastructure='way["highway"~"{}"]'.format(RoadTypes))
-    else:
-        G = osmnx.graph_from_polygon(polygon=polygon, network_type=NetworkType)
-
-    # we want to use undirected graphs, so turn into an undirected graph
-    if type(G) == nx.classes.multidigraph.MultiDiGraph:
-        G = G.to_undirected()
-
-    return G
 
 def graph_from_osm(osm_files, multidirectional=False):
     """
@@ -177,93 +151,29 @@ def graph_from_osm(osm_files, multidirectional=False):
 
     return G
 
-def poly_files_europe(output_path, area_shp):
-    # create the name of the output file
-    name_output = area_shp.split("\\")[-1].split(".")[0]
 
-    # TODO: write a function that if there is an area with small islands or other complicated shapes that the
-    # algorithm cannot handle, that it makes a convex hull. Don't know if this is the best option but the
-    # best option for now.
-
-    NUTS_poly = gpd.read_file(area_shp)
-    print("Current CRS:", NUTS_poly.crs['init'])
-    if NUTS_poly.crs['init'] != 'epsg:4326':
-        print("Changing CRS to EPSG:4326")
-        NUTS_poly = NUTS_poly.to_crs(epsg=4326)  # Change into the WGS84 = EPSG4326 coordinate system of OSM.
-
-    # start writing the .poly file (overwrites if the file exists)
-    f = open(output_path, 'w')
-    f.write(name_output + "\n")
-
-    try:
-        i = 0
-        # write the coordinates of the ring to the .poly file
-        polygon = NUTS_poly.geometry.exterior[0]
-
-        f.write(str(i) + "\n")
-
-        for geom in polygon.coords:
-            f.write("    " + str(geom[0]) + "     " + str(geom[1]) + "\n")
-
-        # close the ring of one subpolygon if done
-        f.write("END" + "\n")
-
-    except AttributeError as e:
-        print("No poly file for {} was created: {}".format(name_output, e))
-
-    # close the file when done
-    f.write("END" + "\n")
-    f.close()
-
-    print("Poly file saved to: {}".format(output_path))
-
-def clip_osm(osm_convert_path, planet_path, area_poly, area_o5m):
-    """ Clip the an area osm file from the larger continent (or planet) file and save to a new osm.pbf file.
-    This is much faster compared to clipping the osm.pbf file while extracting through ogr2ogr.
-
-    This function uses the osmconvert tool, which can be found at http://wiki.openstreetmap.org/wiki/Osmconvert.
-
-    Either add the directory where this executable is located to your environmental variables or just put it in the 'scripts' directory.
-
-    Arguments:
-        osm_convert_path: path string to the palce where the osm_convert executable is located
-        planet_path: path string to the .planet files containing the OSM Europe or OSM world file from which you want to crop
-        area_poly: path string to the .poly file, made through the 'create_poly_files' function.
-        area_o5m: path string indicating the final output dir and output name of the new .o5m file.
+def convert_osm(osm_convert_path, pbf, o5m):
+    """
+    Convers an osm PBF file to o5m
+    Args:
+        osm_convert_path:
+        pbf:
+        o5m:
 
     Returns:
-        a clipped and filtered .o5m file (saved as area_o5m .o5m)
 
-    Script from Kees van Ginkel, adjusted by Frederique de Groen
     """
-    print('{} started!'.format(area_o5m))
 
-    try:
-        if os.path.exists(area_o5m) is not True:
-            command = '""{}"  "{}" -B="{}" --complete-ways -o="{}""'.format(osm_convert_path, planet_path, area_poly, area_o5m)
-            print(command)
-            os.system(command)
-        print('{} finished!'.format(area_o5m))
+    command = '""{}"  "{}" --complete-ways -o="{}""'.format(osm_convert_path, pbf, o5m)
+    os.system(command)
 
-    except:
-        print('{} did not finish!'.format(area_o5m))
-
-def filter_osm(osm_filter_path, area_o5m, filtered_area_o5m):
+def filter_osm(osm_filter_path, o5m, filtered_o5m):
     """Filters an o5m OSM file to only motorways, trunks, primary and secondary roads
     """
-    print('{} started!'.format(filtered_area_o5m))
+    command = '""{}"  "{}" --keep="highway=motorway =motorway_link =primary =primary_link =secondary =secondary_link =trunk =trunk_link" > "{}""'.format(osm_filter_path, o5m, filtered_o5m)
+    os.system(command)
 
-    try:
-        if os.path.exists(filtered_area_o5m) is not True:
-            command = '""{}"  "{}" --keep="highway=motorway =motorway_link =primary =primary_link =secondary =secondary_link =trunk =trunk_link" > "{}""'.format(osm_filter_path, area_o5m, filtered_area_o5m)
-            print(command)
-            os.system(command)
-        print('{} finished!'.format(filtered_area_o5m))
-
-    except:
-        print('{} did not finish!'.format(filtered_area_o5m))
-
-def graph_to_shp(G, edge_shp, node_shp):
+def graph_to_gdf(G):
     """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_shp and node_shp
     Arguments:
         G []: networkx graph object to be converted
@@ -284,32 +194,66 @@ def graph_to_shp(G, edge_shp, node_shp):
             if df[col].dtype == np_object and col != df.geometry.name:
                 df[col] = df[col].astype(str)
 
-    print('\nSaving nodes as shapefile: {}'.format(node_shp))
-    print('\nSaving edges as shapefile: {}'.format(edge_shp))
+    return edges, nodes
 
-    nodes.to_file(node_shp, driver='ESRI Shapefile', encoding='utf-8')
-    edges.to_file(edge_shp, driver='ESRI Shapefile', encoding='utf-8')
+def create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, **kwargs):
+    """
+    Filters and generates a graph from an osm.pbf file
+    Args:
+        pbf: path object for .pbf file
+        o5m: path for o5m file function object for filtering infrastructure from osm pbf file
+        **kwargs: all kwargs to osmnx.graph_from_file method. Use simplify=False and retain_all=True to preserve max
+        complexity when generating graph
+
+    Returns:
+        G: graph object
+        nodes: geodataframe representing graph nodes
+        edges: geodataframe representing graph edges
+    """
+
+    filter_osm(osm_filter_exe, o5m, o5m_filtered)
+    G = osmnx.graph_from_file(o5m_filtered, **kwargs)
+    G = G.to_undirected()
+    nodes, edges = graph_to_gdf(G)
+
+    return G, nodes, edges
+
+def compare_files(ref_files, test_files):
+    for ref_file, test_file in zip(ref_files, test_files):
+        if str(test_file).endswith('nodes.geojson'):
+            pass
+        else:
+            assert filecmp.cmp(ref_file, test_file), '{} and {} do are not the same'.format(str(ref_file), str(test_file))
+        os.remove(test_file)
 
 if __name__=='__main__':
+
+    # run function
     root = Path(__file__).parents[2]
+    test_output_dir = root / 'tests/sample_output'
+    test_input_dir = root / 'tests/sample_data'
 
-    osm_filter_path = root / 'osmfilter.exe'
-    osm_convert_path = root / 'osmconvert64.exe'
-    pbf = root / r"sample_data/NL332.osm.pbf"
-    poly = root / r"sample_data/NL332.poly"
-    o5m = root / 'sample_data/NL332.o5m'
-    region = 'NL332'
-    command = '""{}"  "{}" --complete-ways -o="{}""'.format(osm_convert_path, pbf, o5m)
-    osm_dump_path = "sample_data"
+    osm_filter_exe = root / 'osmfilter.exe'
+    osm_convert_exe = root / 'osmconvert64.exe'
+    pbf = test_input_dir / 'sample_data_osm_dumps' / r"NL332.osm.pbf"
+    o5m = test_output_dir / 'sample_output_osm_dumps' / r"NL332.o5m"
+    o5m_filtered = test_output_dir / 'sample_output_osm_dumps/NL332_filtered.o5m'
 
-    os.system(command)
-    filter_osm(osm_filter_path, o5m,  root / 'sample_data/NL332_filtered.o5m')
-    G = osmnx.graph_from_file(root / 'sample_data/NL332_filtered.o5m', simplify=True, retain_all=True)
-    G = G.to_undirected()
-    #G = graph_from_osm(str(root / 'sample_data/NL332_filtered.o5m'), multidirectional=False)
-    nodes,edges = osmnx.graph_to_gdfs(G)
-    graph_to_shp(G,root / 'test_results/edges.shp',root / 'test_results/nodes.shp')
-    output = fetch_roads(region, str(pbf))
-    interesting = ['motorway','motorway_link','trunk','trunk_link','primary','primary_link','secondary','secondary_link']
-    selection = output[output['infra_type'].isin(interesting)]
-    selection.to_file(root / 'test_results/OSD_create_network_from_dump_temp.shp')
+    convert_osm(osm_convert_exe, pbf, o5m)
+    filter_osm(osm_filter_exe, o5m,  o5m_filtered)
+    G, nodes, edges = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, simplify=True, retain_all=True)
+
+    nodes.to_file(test_output_dir / 'sample_output_network_shp' / 'NL332_nodes.geojson', driver='GeoJSON')
+    edges.to_file(test_output_dir / 'sample_output_network_shp' / 'NL332_edges.geojson', driver='GeoJSON')
+
+    # testing
+    ref_files = list((test_output_dir / 'sample_output_network_shp/reference').glob('*.geojson'))
+    test_files = list((test_output_dir / 'sample_output_network_shp').glob('*.geojson'))
+
+    compare_files(ref_files, test_files)
+
+    ref_files = list((test_output_dir / 'sample_output_osm_dumps/reference').glob('*.o5m'))
+    test_files = list((test_output_dir / 'sample_output_osm_dumps').glob('*.o5m'))
+
+    compare_files(ref_files, test_files)
+    print('done')
