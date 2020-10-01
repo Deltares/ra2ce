@@ -2,9 +2,12 @@
 from collections import defaultdict
 import pickle
 import pandas as pd
+import geopandas as gpd
 import os
 from boltons.iterutils import pairwise
 from geopy.distance import vincenty
+
+from utils import load_config
 
 
 
@@ -72,13 +75,15 @@ if __name__ == '__main__':
 
 
     #LOAD SOME SAMPLE DATA
-    path = 'OSD_create_network_from_dump_temp.pkl'
+    folder = load_config()['paths']['test_temp']
+    path = os.path.join(folder,'OSD_create_network_from_dump_temp.pkl')
     pickle_in = open(path,"rb")
     road_gdf = pickle.load(pickle_in)
     pickle_in.close()
 
     #MAP OSM INFRA TYPES TO A SMALLER GROUP OF ROAD_TYPES
-    road_mapping_path = os.path.join('..','..','settings','OSM_infratype_to_roadtype_mapping.xlsx')
+    path_settings = load_config()['paths']['settings']
+    road_mapping_path = os.path.join(path_settings,'OSM_infratype_to_roadtype_mapping.xlsx')
     road_mapping_dict = import_road_mapping(road_mapping_path,'Mapping')
     road_gdf['road_type'] = road_gdf.infra_type.apply(
         lambda x: road_mapping_dict[x])  # add a new column 'road_type' with less categories
@@ -87,6 +92,14 @@ if __name__ == '__main__':
     road_gdf['length'] = road_gdf.geometry.apply(line_length)
     # SIMPLIFY ROAD GEOMETRIES
     road_gdf.geometry = road_gdf.geometry.simplify(tolerance=tolerance)
+
+    # LOAD SHAPEFILE TO CROP THE HAZARD MAP
+    regional_shapefile = load_config()['paths']['test_network_shp']
+    filename = 'NL332.shp'
+    complete_path = os.path.join(regional_shapefile,filename)
+    print(os.path.exists(complete_path))
+    NUTS_regions = gpd.read_file(os.path.join(input_path, load_config()['filenames']['NUTS3-shape']))
+
 
 
 
