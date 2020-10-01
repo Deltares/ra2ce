@@ -7,7 +7,7 @@ def load_config():
     NOTE: make sure your working directory is set to the highest level folder in the directory
 
     """
-    config_path = os.path.join('config.json')
+    config_path = os.path.join('test_config.json')
     with open(config_path, 'r') as config_fh:
         config = json.load(config_fh)
     return config
