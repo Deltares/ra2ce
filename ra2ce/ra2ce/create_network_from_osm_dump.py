@@ -17,6 +17,7 @@ import time
 
 ### Overrule the OSMNX default settings to get the additional metadata such as street lighting (lit)
 osmnx.config(log_console=True, use_cache=True, useful_tags_path = osmnx.settings.useful_tags_path + ['lit'])
+sys.setrecursionlimit(10**5)
 
 def fetch_roads(region, osm_pbf_path, **kwargs):
     """
@@ -303,7 +304,9 @@ if __name__=='__main__':
 
     os.system(command)
     filter_osm(osm_filter_path, o5m,  root / 'sample_data/NL332_filtered.o5m')
-    G = graph_from_osm(str(root / 'sample_data/NL332_filtered.o5m'), multidirectional=False)
+    G = osmnx.graph_from_file(root / 'sample_data/NL332_filtered.o5m', simplify=True, retain_all=True)
+    G = G.to_undirected()
+    #G = graph_from_osm(str(root / 'sample_data/NL332_filtered.o5m'), multidirectional=False)
     nodes,edges = osmnx.graph_to_gdfs(G)
     graph_to_shp(G,root / 'test_results/edges.shp',root / 'test_results/nodes.shp')
     output = fetch_roads(region, str(pbf))
