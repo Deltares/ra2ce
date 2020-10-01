@@ -116,7 +116,7 @@ if __name__=='__main__':
     interesting = ['motorway','motorway_link','trunk','trunk_link','primary','primary_link','secondary','secondary_link']
     selection = output[output['infra_type'].isin(interesting)]
 
-    selection.to_pickle('test_results/OSD_create_network_from_dump_temp.pkl')
+    selection.to_file('test_results/OSD_create_network_from_dump_temp.shp')
 
     end = time.time()
     print("Runtime: ",end-start,"seconds")
