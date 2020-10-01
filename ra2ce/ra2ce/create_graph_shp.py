@@ -3,7 +3,7 @@
 Created on 30-9-2020
 
 @authors:
-create_graph_from_shapefiles: Frederique de Groen (frederique.degroen@deltares.nl)
+create_network_from_shapefile: Frederique de Groen (frederique.degroen@deltares.nl)
 """
 
 # external modules
