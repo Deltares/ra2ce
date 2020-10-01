@@ -16,6 +16,7 @@ import geopandas as gpd
 from pathlib import Path
 import os
 import sys
+import time
 
 def get_graph_from_polygon(PathShp, NetworkType, RoadTypes=None):
     """
@@ -167,6 +168,7 @@ def filter_osm(osm_filter_path, area_o5m, filtered_area_o5m):
         print('{} did not finish!'.format(filtered_area_o5m))
 
 if __name__=='__main__':
+    begin_time = time.time()
     osm_filter_path = 'osmfilter.exe'
     osm_convert_path = 'osmconvert64.exe'
     pbf = r"sample_data/NL332.osm.pbf"
@@ -180,4 +182,4 @@ if __name__=='__main__':
     # create a graph
     G = graph_from_osm('sample_data/NL332_filtered.o5m', multidirectional=False)
 
-    print('don')
+    print(time.time() - begin_time)
