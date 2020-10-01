@@ -15,10 +15,40 @@ import sys
 from numpy import object as np_object
 import time
 import filecmp
+from ra2ce.ra2ce.utils import load_config
 
 ### Overrule the OSMNX default settings to get the additional metadata such as street lighting (lit)
 osmnx.config(log_console=True, use_cache=True, useful_tags_path = osmnx.settings.useful_tags_path + ['lit'])
 sys.setrecursionlimit(10**5)
+
+def get_graph_from_polygon(PathShp, NetworkType, RoadTypes=None):
+    """
+    Get an OSMnx graph from a shapefile (input = path to shapefile).
+
+    Args:
+        PathShp [string]: path to shapefile (polygon) used to download from OSMnx the roads in that polygon
+        NetworkType [string]: one of the network types from OSM, e.g. drive, drive_service, walk, bike, all
+        RoadTypes [string]: formatted like "motorway|primary", one or multiple road types from OSM (highway)
+
+    Returns:
+        G [networkx multidigraph]
+    """
+    with fiona.open(PathShp) as source:
+        for r in source:
+            if 'geometry' in r:  # added this line to not take into account "None" geometry
+                polygon = shape(r['geometry'])
+
+    if RoadTypes == RoadTypes:
+        # assuming the empty cell in the excel is a numpy.float64 nan value
+        G = osmnx.graph_from_polygon(polygon=polygon, network_type=NetworkType, infrastructure='way["highway"~"{}"]'.format(RoadTypes))
+    else:
+        G = osmnx.graph_from_polygon(polygon=polygon, network_type=NetworkType)
+
+    # we want to use undirected graphs, so turn into an undirected graph
+    if type(G) == nx.classes.multidigraph.MultiDiGraph:
+        G = G.to_undirected()
+
+    return G
 
 def fetch_roads(region, osm_pbf_path, **kwargs):
     """
@@ -115,43 +145,6 @@ def fetch_roads(region, osm_pbf_path, **kwargs):
             file.write('No roads in {}'.format(region))
             file.close()
 
-
-
-def graph_from_osm(osm_files, multidirectional=False):
-    """
-    Takes in a list of osmnx compatible files as strings, creates individual graph from each file then combines all
-    graphs using the compose_all function from networkx. Most suited for cases where each file represents part of the
-    same greater network.
-
-    Arguments:
-        list_of_osm_files [list or str]: list of osm xml filenames as strings, see osmnx documentation for compatible file
-        formats
-        multidirectional [bool]: if True, function returns a directional graph, if false, function returns an
-        undirected graph
-
-    Returns:
-        G []: A networkx ... or ... instance
-
-    From Kees van Ginkel
-    """
-    sys.setrecursionlimit(10**5)
-
-    graph_list = []
-
-    if isinstance(osm_files, str):
-        G = osmnx.graph_from_file(osm_files, simplify=True)
-    else:
-        for osm_file in osm_files:
-            graph_list.append(osmnx.graph_from_file(osm_file, simplify=True))
-
-        G = nx.compose_all(graph_list)
-
-    if not multidirectional:
-        G = G.to_undirected()
-
-    return G
-
-
 def convert_osm(osm_convert_path, pbf, o5m):
     """
     Convers an osm PBF file to o5m
@@ -230,6 +223,7 @@ if __name__=='__main__':
 
     # run function
     root = Path(__file__).parents[2]
+    load_config()[]
     test_output_dir = root / 'tests/sample_output'
     test_input_dir = root / 'tests/sample_data'
 
