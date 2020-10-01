@@ -1,0 +1,28 @@
+{
+    "comment": "TODO: EXPLAIN WHAT THIS FILE DOES",
+    "paths": {
+        "code" : "ra2ce\\ra2ce",
+		"settings" : "settings",
+		"input" : "input",
+		"hazard" : "input\\hazard",
+		"OSM_dumps" : "input\\OSM_dumps",
+		"area_of_interest" : "input\\area_of_interest",
+		"network_shp" : "input\\network_shp",
+		"vulnerability" : "input\\vulnerability",
+		"infra_usage" : "input\\infra_usage",
+		"output" : "output",
+		"exposure" : "output\\exposure",
+		"criticality" : "output\\criticality",
+		"test" : "test",
+		"test_input" : "test\\input",
+		"test_hazard" : "test\\input\\hazard_maps",
+		"test_OSM_dumps" : "test\\input\\OSM_dumps",
+		"test_area_of_interest" : "test\\input\\area_of_interest",
+		"test_network_shp" : "test\\input\\network_shp",
+		"test_temp" : "test\\temp",
+		"test_output" : "test\\output" },
+		
+    "filenames": {
+        "default_lanes" : "default_lanes_temp.pkl"
+    }
+}
