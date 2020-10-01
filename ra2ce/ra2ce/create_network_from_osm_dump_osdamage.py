@@ -104,7 +104,7 @@ def fetch_roads(osm_data, region, **kwargs):
 
 if __name__=='__main__':
     start = time.time()
-    osm_dump_path = os.path.join('..', '..', "sample_data")
+    osm_dump_path = "sample_data"
 
     region = 'NL332'
     print('Checking for region {}'.format(region))
@@ -115,6 +115,8 @@ if __name__=='__main__':
 
     interesting = ['motorway','motorway_link','trunk','trunk_link','primary','primary_link','secondary','secondary_link']
     selection = output[output['infra_type'].isin(interesting)]
+
+    selection.to_file('test_results/OSD_create_network_from_dump_temp.shp')
 
     end = time.time()
     print("Runtime: ",end-start,"seconds")
