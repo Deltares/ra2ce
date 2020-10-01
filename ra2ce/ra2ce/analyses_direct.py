@@ -6,8 +6,15 @@ import geopandas as gpd
 import os
 from boltons.iterutils import pairwise
 from geopy.distance import vincenty
-
+from natsort import natsorted
+import matplotlib.pyplot as plt
 from utils import load_config
+from shapely.geometry import mapping
+import rasterio
+from rasterio.mask import mask
+from rasterio.features import shapes
+import numpy as np
+from tqdm import tqdm
 
 
 
@@ -67,6 +74,100 @@ def line_length(line, ellipsoid='WGS-84', shipping=True):
             for a, b in pairwise(line.coords)
         )
 
+
+def create_hzd_df(geometry, hzd_list, hzd_names):
+    """
+    Arguments:
+
+        *geometry* (Shapely Polygon) -- shapely geometry of the region for which we do the calculation.
+        *hzd_list* (list) -- list of file paths to the hazard files.
+        *hzd_names* (list) -- list of names to the hazard files.
+
+    Returns:
+        *Geodataframe* -- GeoDataFrame where each row is a unique flood shape in the specified **region**.
+
+    """
+
+    ## MAKE GEOJSON GEOMETRY OF SHAPELY GEOMETRY FOR RASTERIO CLIP
+    geoms = [mapping(geometry)]
+
+    all_hzds = []
+
+    ## LOOP OVER ALL HAZARD FILES TO CREATE VECTOR FILES
+    for iter_, hzd_path in enumerate(hzd_list):
+        # extract the raster values values within the polygon
+        with rasterio.open(hzd_path) as src:
+            out_image, out_transform = mask(src, geoms, crop=True)
+
+            # change into centimeters and make any weird negative numbers -1 (will result in less polygons)
+            out_image[out_image <= 0] = -1
+            out_image = np.array(out_image * 100, dtype='int32')
+
+            # vectorize geotiff
+            results = (
+                {'properties': {'raster_val': v}, 'geometry': s}
+                for i, (s, v)
+                in enumerate(
+                shapes(out_image[0, :, :], mask=None, transform=out_transform)))
+
+            # save to geodataframe, this can take quite long if you have a big area
+            gdf = gpd.GeoDataFrame.from_features(list(results))
+
+
+            # this is specific to this calculation: change to WGS84 (anticipating intersect with OSM)
+            gdf.crs = {'init': 'epsg:28992'}
+            gdf.to_crs(epsg=4326,inplace=True) #convert to WGS84
+
+
+
+            gdf = gdf.loc[gdf.raster_val >= 0]
+            gdf = gdf.loc[gdf.raster_val < 5000]  # remove outliers with extreme flood depths (i.e. >50 m)
+            gdf['geometry'] = gdf.buffer(0)
+
+            gdf['hazard'] = hzd_names[iter_]
+            all_hzds.append(gdf)
+    return pd.concat(all_hzds)
+
+
+def intersect_hazard(x, hzd_reg_sindex, hzd_region):
+    """
+    Arguments:
+
+        *x* (road segment) -- a row from the region GeoDataFrame with all road segments.
+        *hzd_reg_sindex* (Spatial Index) -- spatial index of hazard GeoDataFrame
+        *hzd_region* (GeoDataFrame) -- hazard GeoDataFrame
+
+    Returns:
+        *geometry*,*depth* -- shapely LineString of flooded road segment and the average depth
+
+    """
+    matches = hzd_region.iloc[list(hzd_reg_sindex.intersection(x.geometry.bounds))].reset_index(drop=True)
+    try:
+        if len(matches) == 0:
+            return x.geometry, 0
+        else:
+            append_hits = []
+            for match in matches.itertuples():
+                inter = x.geometry.intersection(match.geometry)
+                if inter.is_empty == True:
+                    continue
+                else:
+                    if inter.geom_type == 'MultiLineString':
+                        for interin in inter:
+                            append_hits.append((interin, match.raster_val))
+                    else:
+                        append_hits.append((inter, match.raster_val))
+
+            if len(append_hits) == 0:
+                return x.geometry, 0
+            elif len(append_hits) == 1:
+                return append_hits[0][0], int(append_hits[0][1])
+            else:
+                return shapely.geometry.MultiLineString([x[0] for x in append_hits]), int(
+                    np.mean([x[1] for x in append_hits]))
+    except:
+        return x.geometry, 0
+
 if __name__ == '__main__':
 
     #UDI:
@@ -89,19 +190,57 @@ if __name__ == '__main__':
         lambda x: road_mapping_dict[x])  # add a new column 'road_type' with less categories
 
     # OPTIONALLY: CALCULATE LINE LENGTHS (IF THIS IS NOT ALREADY DONE!!!)
-    road_gdf['length'] = road_gdf.geometry.apply(line_length)
+
     # SIMPLIFY ROAD GEOMETRIES
     road_gdf.geometry = road_gdf.geometry.simplify(tolerance=tolerance)
+    road_gdf['length'] = road_gdf.geometry.apply(line_length)
 
     # LOAD SHAPEFILE TO CROP THE HAZARD MAP
-    regional_shapefile = load_config()['paths']['test_network_shp']
-    filename = 'NL332.shp'
+    regional_shapefile = load_config()['paths']['test_area_of_interest']
+    filename = 'NUTS332.shp'
     complete_path = os.path.join(regional_shapefile,filename)
+    print(complete_path)
     print(os.path.exists(complete_path))
-    NUTS_regions = gpd.read_file(os.path.join(input_path, load_config()['filenames']['NUTS3-shape']))
+    region_boundary = gpd.read_file(complete_path)
+    region_boundary
+    #region_boundary.to_crs(epsg=4326,inplace=True) #convert to WGS84 #region_boundary.to_crs(epsg=4326,inplace=True) #convert to WGS84
+    region_boundary.to_crs(epsg=28992, inplace=True)  # convert to Amersfoort / RD new
+    geometry = region_boundary['geometry'][0]
+
+
+    fig, ax = plt.subplots(1, 1)
+    region_boundary.plot(ax=ax)
+
+    plt.show()
 
 
 
+    hzd_path = load_config()['paths']['test_hazard']
+    hzd_list = natsorted([os.path.join(hzd_path, x) for x in os.listdir(hzd_path) if x.endswith(".tif")])
+    hzd_names = ['a','b']
 
+    hzds_data = create_hzd_df(geometry,hzd_list,hzd_names)
 
+    # PERFORM INTERSECTION BETWEEN ROAD SEGMENTS AND HAZARD MAPS
+    for iter_, hzd_name in enumerate(hzd_names):
+
+        try:
+            hzd_region = hzds_data.loc[hzds_data.hazard == hzd_name]
+            hzd_region.reset_index(inplace=True, drop=True)
+        except:
+            hzd_region == pd.DataFrame(columns=['hazard'])
+
+        if len(hzd_region) == 0:
+            road_gdf['length_{}'.format(hzd_name)] = 0
+            road_gdf['val_{}'.format(hzd_name)] = 0
+            continue
+
+        hzd_reg_sindex = hzd_region.sindex
+        tqdm.pandas(desc=hzd_name)
+        inb = road_gdf.progress_apply(lambda x: intersect_hazard(x, hzd_reg_sindex, hzd_region), axis=1).copy()
+        inb = inb.apply(pd.Series)
+        inb.columns = ['geometry', 'val_{}'.format(hzd_name)]
+        inb['length_{}'.format(hzd_name)] = inb.geometry.apply(line_length)
+        road_gdf[['length_{}'.format(hzd_name), 'val_{}'.format(hzd_name)]] = inb[['length_{}'.format(hzd_name),
+                                                                                   'val_{}'.format(hzd_name)]]
     print('einde')
