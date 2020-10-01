@@ -1,0 +1,18 @@
+{
+    "comment": "TODO: EXPLAIN WHAT THIS FILE DOES. Config file for tests.",
+    "paths": {
+        "code" : "ra2ce\\ra2ce",
+		"settings" : "settings",
+		"test" : "test",
+		"test_input" : "test\\input",
+		"test_hazard" : "test\\input\\hazard_maps",
+		"test_OSM_dumps" : "test\\input\\OSM_dumps",
+		"test_area_of_interest" : "test\\input\\area_of_interest",
+		"test_network_shp" : "test\\input\\network_shp",
+		"test_temp" : "test\\temp",
+		"test_output" : "test\\output" },
+		
+    "filenames": {
+        "default_lanes" : "default_lanes_temp.pkl"
+    }
+}

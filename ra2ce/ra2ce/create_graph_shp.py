@@ -3,39 +3,53 @@
 Created on 30-9-2020
 
 @authors:
-create_graph_from_shapefiles: Frederique de Groen (frederique.degroen@deltares.nl)
+create_network_from_shapefile: Frederique de Groen (frederique.degroen@deltares.nl)
 """
 
 # external modules
 import networkx as nx
 import osmnx
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import warnings
 import geopandas as gpd
 import itertools
 import os, sys
 import logging
 import rtree
-import pickle
-import rasterio
-import fiona
-from fiona.crs import from_epsg
-from shapely.geometry import mapping, Point, LineString, shape, MultiLineString, Polygon, MultiPolygon
-from shapely.ops import linemerge, unary_union
-from shapely.wkt import loads
+from shapely.geometry import Point, LineString, MultiLineString
+from shapely.ops import linemerge
 from prettytable import PrettyTable
 from statistics import mean
 from numpy import object as np_object
 from geopy import distance
 
+# local modules
+from utils import load_config
 
-def create_network_from_shapefile(name, AllOutput, InputDataDict, HazardDataDict, crs, snapping, SnappingThreshold,
-                                  pruning, PruningThreshold):
+LOG_FILENAME = './logs/log_create_network_from_shapefile.log'
+logging.basicConfig(format='%(asctime)s - %(message)s',
+                    datefmt='%d-%b-%y %H:%M:%S',
+                    filename=LOG_FILENAME,
+                    level=logging.INFO)
+
+
+def create_network_from_shapefile(name, AllOutput, InputDataDict, crs, snapping, SnappingThreshold, pruning,
+                                  PruningThreshold):
+    """Creates a (graph) network from a shapefile
+    Args:
+        name (string): name of the analysis given by user (will be part of the name of the output files)
+        AllOutput (string): path to the folder where the output should be saved
+        InputDataDict (dict): dictionairy with paths/input that is used to create the network
+        crs (int): the EPSG number of the coordinate reference system that is used
+        snapping (bool): True if snapping is required, False if not
+        SnappingThreshold (int/float): threshold to reach another vertice to connect the edge to
+        pruning (bool): True if pruning is required, False if not
+        PruningThreshold (int/float): edges smaller than this length (threshold) are removed
+    Returns:
+        G (networkX graph): The resulting network graph
+    """
     # initiate variables
     shapefile_diversion = 0
-    id_name_hazard = None
 
     # load the input files if they are there
     if 'id_name' in InputDataDict:
@@ -55,11 +69,6 @@ def create_network_from_shapefile(name, AllOutput, InputDataDict, HazardDataDict
         aadt_names = None
         road_usage_data = pd.DataFrame()
 
-    if HazardDataDict:
-        # there is hazard data available
-        if 'ID' in HazardDataDict:
-            id_name_hazard = HazardDataDict['ID']
-
     # Load shapefile
     lines = read_merge_shp(shapefileAnalyse=shapefile_analyse,
                            shapefileDiversion=shapefile_diversion,
@@ -76,7 +85,6 @@ def create_network_from_shapefile(name, AllOutput, InputDataDict, HazardDataDict
     if snapping:
         edges = snap_endpoints_lines(edges, SnappingThreshold, id_name, tolerance=1e-7)
         logging.info("Function [snap_endpoints_lines]: executed with threshold = {}".format(SnappingThreshold))
-        # TODO: when lines are added the properties cannot be saved well - this should be integrated
 
     # TODO
     #    if pruning:
@@ -99,28 +107,10 @@ def create_network_from_shapefile(name, AllOutput, InputDataDict, HazardDataDict
         nodes = create_nodes(edges, crs)
         logging.info("Function [cut_lines]: executed")
 
-    # save the merged lines (correct edges) as shapefile
-    edges.to_file(os.path.join(AllOutput, '{}_edges.shp'.format(name)))
-    logging.info("Function [edges_to_shp]: executed for '{}_edges'".format(name))
-
-    # save the intersection points as shapefile
-    nodes.to_file(os.path.join(AllOutput, '{}_nodes.shp'.format(name)))
-    logging.info("Function [nodes_to_shp]: executed for '{}_nodes'".format(name))
-
-    if id_name_hazard is not None:
-        # there is hazard data available
-        edges = hazard_join_id_shp(edges, HazardDataDict)
-
     # create tuples from the adjecent nodes and add as column in geodataframe
     resulting_network = join_nodes_edges(nodes, edges, id_name)
     logging.info("Function [join_nodes_edges]: executed")
-
-    # save geodataframe to shapefile
     resulting_network.crs = {'init': 'epsg:{}'.format(crs)}  # set the right CRS
-    resulting_network.to_file(os.path.join(AllOutput, '{}_resulting_network.shp'.format(name)))
-
-    # save geodataframe to pickle to use later
-    # ...
 
     # Create networkx graph from geodataframe
     G = graph_from_gdf(resulting_network, nodes)
@@ -132,9 +122,11 @@ def create_network_from_shapefile(name, AllOutput, InputDataDict, HazardDataDict
 def read_merge_shp(shapefileAnalyse, shapefileDiversion, idName, crs_):
     """Imports shapefile(s) and saves attributes in a pandas dataframe.
 
-    Parameters:
+    Args:
         shapefileAnalyse (string or list of strings): absolute path(s) to the shapefile(s) that will be used for analysis
         shapefileDiversion (string or list of strings): absolute path(s) to the shapefile(s) that will be used to calculate alternative routes but is not analysed
+        idName (string): the name of the Unique ID column
+        crs_ (int): the EPSG number of the coordinate reference system that is used
     Returns:
         lines (list of shapely LineStrings): full list of linestrings
         properties (pandas dataframe): attributes of shapefile(s), in order of the linestrings in lines
@@ -181,10 +173,24 @@ def read_merge_shp(shapefileAnalyse, shapefileDiversion, idName, crs_):
 
 
 def merge_lines_shpfiles(lines_gdf, idName, aadtNames, crs_):
+    """Asks the user for input and possibly merges the LineStrings in a geodataframe (network)
+    Args:
+        lines_gdf (geodataframe): the network with edges that can possibly be merged
+        idName (string): name of the Unique ID column in the lines_gdf
+        aadtNames (list of strings): names of the columns of the AADT (average annual daily traffic)
+        crs_ (int): the EPSG number of the coordinate reference system that is used
+    Returns:
+        lines_gdf (geodataframe): the network with edges that are (not) merged
+        lines_merged (geodataframe): the lines that are merged, if lines are merged. Otherwise it returns an empty GDF
+    """
     list_lines = list(lines_gdf['geometry'])
 
     # Multilinestring to linestring
-    merged_lines = linemerge(list_lines)  # merge the lines of both shapefiles
+    try:
+        merged_lines = linemerge(list_lines)  # merge the lines of both shapefiles
+    except NotImplementedError as e:
+        Exception("Your data contains Multi-part geometries, you cannot merge lines.", e)
+        return lines_gdf, gpd.GeoDataFrame()
 
     while True:
         try:
@@ -200,60 +206,61 @@ def merge_lines_shpfiles(lines_gdf, idName, aadtNames, crs_):
             print("\nTry again to fill in 'y' or 'n' and press enter.")
             continue
 
-    if merge_input == 'y':
-        if len(merged_lines.geoms) < len(list_lines) and aadtNames:
-            # the number of merged lines is smaller than the number of lines in the input, so lines can be merged
+    # continue
+    if len(merged_lines.geoms) < len(list_lines) and aadtNames:
+        # the number of merged lines is smaller than the number of lines in the input, so lines can be merged
+        while True:
+            try:
+                yes_to_all = str(input(
+                    """You can choose which AADT properties are chosen per road segment. Type 'all' if you want to treat all the cases the same or 'single' if you want to look at each case separately.\nYour input: """)).lower()
+            except ValueError:
+                print("\nTry again to fill in 'all' or 'single' and press enter.")
+                continue
+
+            if yes_to_all not in ['all', 'single']:
+                print("\nTry again to fill in 'all' or 'single' and press enter.")
+                continue
+            else:
+                print("\nYou successfully chose '{}'.".format(yes_to_all))
+                break  # successfully received input
+
+        if yes_to_all == 'all':
+            # ask the user if they want to take the max, min or average for all values
             while True:
                 try:
-                    yes_to_all = str(input(
-                        """You can choose which AADT properties are chosen per road segment. Type 'all' if you want to treat all the cases the same or 'single' if you want to look at each case separately.\nYour input: """)).lower()
+                    all_type = str(input(
+                        """Choose the maximum, minimum or mean for the traffic type count in each merged line. Type 'max', 'min' or 'mean'.\nYour input: """)).lower()
                 except ValueError:
-                    print("\nTry again to fill in 'all' or 'single' and press enter.")
+                    print("\nTry again to fill in 'max', 'min' or 'mean' and press enter.")
                     continue
 
-                if yes_to_all not in ['all', 'single']:
-                    print("\nTry again to fill in 'all' or 'single' and press enter.")
+                if all_type not in ['max', 'min', 'mean']:
+                    print("\nTry again to fill in 'max', 'min' or 'mean' and press enter.")
                     continue
                 else:
-                    print("\nYou successfully chose '{}'.".format(yes_to_all))
+                    print("\nYou successfully chose '{}'.\nCalculating for all merged segments...".format(all_type))
                     break  # successfully received input
-
-            if yes_to_all == 'all':
-                # ask the user if they want to take the max, min or average for all values
-                while True:
-                    try:
-                        all_type = str(input(
-                            """Choose the maximum, minimum or mean for the traffic type count in each merged line. Type 'max', 'min' or 'mean'.\nYour input: """)).lower()
-                    except ValueError:
-                        print("\nTry again to fill in 'max', 'min' or 'mean' and press enter.")
-                        continue
-
-                    if all_type not in ['max', 'min', 'mean']:
-                        print("\nTry again to fill in 'max', 'min' or 'mean' and press enter.")
-                        continue
-                    else:
-                        print("\nYou successfully chose '{}'.\nCalculating for all merged segments...".format(all_type))
-                        break  # successfully received input
-        elif len(merged_lines.geoms) < len(list_lines) and not aadtNames:
-            while True:
-                try:
-                    the_input = input(
-                        "\nDo you want to merge the lines on {}? Type 'y' for yes and 'n' for no.\nYour input: ".format(
-                            idName))
-                    if the_input == "y":
-                        # TODO
-                        print("This function is not implemented yet.")
-                        break  # successfully received input
-                    elif the_input == "n":
-                        break  # successfully received input
-                except ValueError:
-                    print("\nTry again to fill in the correct letter.")
-        elif len(merged_lines.geoms) == len(list_lines):
-            print("No lines are merged.")
-            return lines_gdf, gpd.GeoDataFrame()
-        else:
-            # The lines have no additional properties.
-            return lines_gdf, gpd.GeoDataFrame()
+    elif len(merged_lines.geoms) < len(list_lines) and not aadtNames:
+        while True:
+            try:
+                the_input = input(
+                    "\nDo you want to merge the lines on {}? Type 'y' for yes and 'n' for no.\nYour input: ".format(
+                        idName))
+                if the_input == "y":
+                    # merge by ID name
+                    lines_gdf = lines_gdf.dissolve(by=idName, aggfunc='max')
+                    lines_gdf.reset_index(inplace=True)
+                    break  # successfully received input
+                elif the_input == "n":
+                    break  # successfully received input
+            except ValueError:
+                print("\nTry again to fill in the correct letter.")
+    elif len(merged_lines.geoms) == len(list_lines):
+        print("No lines are merged.")
+        return lines_gdf, gpd.GeoDataFrame()
+    else:
+        # The lines have no additional properties.
+        return lines_gdf, gpd.GeoDataFrame()
 
     # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
     # The list of fid's is reduced by the fid's that are not anymore in the merged lines
@@ -297,79 +304,84 @@ def merge_lines_shpfiles(lines_gdf, idName, aadtNames, crs_):
                                                    ignore_index=True)  # the lines in this list are the same lines that make up the merged line
 
                 # check with the user the right traffic count for the merged lines
-                # if aadts_set_merged:  # check if the list is not empty
-                #     aadts_set_merged = [i for i in aadts_set_merged if not all(v is None for v in i)]
-                #     if len(aadts_set_merged) > 1 and isinstance(aadts_set_merged[0], list):
-                #         if yes_to_all == "all":
-                #             if all_type == "max":
-                #                 aadts_set_merged = [max(sublist) for sublist in list(map(list, zip(*aadts_set_merged)))]
-                #             elif all_type == "min":
-                #                 aadts_set_merged = [min(sublist) for sublist in list(map(list, zip(*aadts_set_merged)))]
-                #             elif all_type == "mean":
-                #                 aadts_set_merged = [mean(sublist) for sublist in
-                #                                     list(map(list, zip(*aadts_set_merged)))]
-                #         elif yes_to_all == "single":
-                #             t = PrettyTable()
-                #             t.add_column('index', list(range(1, len(aadts_set_merged) + 1)))
-                #             t.add_column('AADT vehicle types', aadts_set_merged)
-                #
-                #             while True:
-                #                 try:
-                #                     aadt_input = input(
-                #                         """Road segment with id's {} is merged. Choose the right values for the AADT by entering the number indicated before the list of AADT values and pressing enter.\nYou can also choose 'max', 'min' or 'mean' for all values of the merged road segment.\nThe options: \n {} \n Your input: """.format(
-                #                             fid_set_merged, t))
-                #                     if aadt_input.isdigit():
-                #                         aadts_set_merged = aadts_set_merged[int(aadt_input) - 1]
-                #                     elif aadt_input in ['max', 'min', 'mean']:
-                #                         first, second = aadts_set_merged
-                #                         if aadt_input == "max":
-                #                             aadts_set_merged = [max([i, j]) for i, j in list(zip(first, second))]
-                #                         elif aadt_input == "min":
-                #                             aadts_set_merged = [min([i, j]) for i, j in list(zip(first, second))]
-                #                         elif aadt_input == "mean":
-                #                             aadts_set_merged = [mean([i, j]) for i, j in list(zip(first, second))]
-                #                 except ValueError:
-                #                     print(
-                #                         "\nTry again to fill in one of the index values or 'max', 'min' or 'mean' and press enter.")
-                #                     continue
-                #                 else:
-                #                     print("\nYou successfully chose '{}': {}.".format(aadt_input, aadts_set_merged))
-                #                     break
-                # else:
-                #     aadts_set_merged = []
+                if aadts_set_merged:  # check if the list is not empty
+                    aadts_set_merged = [i for i in aadts_set_merged if not all(v is None for v in i)]
+                    if len(aadts_set_merged) > 1 and isinstance(aadts_set_merged[0], list):
+                        if yes_to_all == "all":
+                            if all_type == "max":
+                                aadts_set_merged = [max(sublist) for sublist in list(map(list, zip(*aadts_set_merged)))]
+                            elif all_type == "min":
+                                aadts_set_merged = [min(sublist) for sublist in list(map(list, zip(*aadts_set_merged)))]
+                            elif all_type == "mean":
+                                aadts_set_merged = [mean(sublist) for sublist in
+                                                    list(map(list, zip(*aadts_set_merged)))]
+                        elif yes_to_all == "single":
+                            t = PrettyTable()
+                            t.add_column('index', list(range(1, len(aadts_set_merged) + 1)))
+                            t.add_column('AADT vehicle types', aadts_set_merged)
 
-                # # check with the user the right road class for the merged lines
-                # if isinstance(class_set_merged, list):
-                #     if len(set(class_set_merged)) == 1:
-                #         class_set_merged = class_set_merged[0]
-                #     elif len(set(class_set_merged)) > 1:
-                #         class_input = input(
-                #             """Road segment with id {} is merged. Choose the right values for the road class by entering the right road class and pressing enter. The different classes: {} \n Your input: """.format(
-                #                 fid_set_merged, class_set_merged))
-                #         class_set_merged = int(class_input)
+                            while True:
+                                try:
+                                    aadt_input = input(
+                                        """Road segment with id's {} is merged. Choose the right values for the AADT by entering the number indicated before the list of AADT values and pressing enter.\nYou can also choose 'max', 'min' or 'mean' for all values of the merged road segment.\nThe options: \n {} \n Your input: """.format(
+                                            fid_set_merged, t))
+                                    if aadt_input.isdigit():
+                                        aadts_set_merged = aadts_set_merged[int(aadt_input) - 1]
+                                    elif aadt_input in ['max', 'min', 'mean']:
+                                        first, second = aadts_set_merged
+                                        if aadt_input == "max":
+                                            aadts_set_merged = [max([i, j]) for i, j in list(zip(first, second))]
+                                        elif aadt_input == "min":
+                                            aadts_set_merged = [min([i, j]) for i, j in list(zip(first, second))]
+                                        elif aadt_input == "mean":
+                                            aadts_set_merged = [mean([i, j]) for i, j in list(zip(first, second))]
+                                except ValueError:
+                                    print(
+                                        "\nTry again to fill in one of the index values or 'max', 'min' or 'mean' and press enter.")
+                                    continue
+                                else:
+                                    print("\nYou successfully chose '{}': {}.".format(aadt_input, aadts_set_merged))
+                                    break
 
-                # # add values to the dataframe
-                # this_fid = [x[0] if isinstance(x, list) else x for x in fid_set_merged][
-                #     0]  # take the first feature ID for the merged lines
-                # if isinstance(aadts_set_merged[0], list):
-                #     this_aadts = aadts_set_merged[0]
-                # else:
-                #     this_aadts = aadts_set_merged
+                # check with the user the right road class for the merged lines
+                if isinstance(class_set_merged, list):
+                    if len(set(class_set_merged)) == 1:
+                        class_set_merged = class_set_merged[0]
+                    elif len(set(class_set_merged)) > 1:
+                        class_input = input(
+                            """Road segment with id {} is merged. Choose the right values for the road class by entering the right road class and pressing enter. The different classes: {} \n Your input: """.format(
+                                fid_set_merged, class_set_merged))
+                        class_set_merged = int(class_input)
 
-                # if aadtNames:
-                #     properties_dict = {idName: this_fid, 'to_analyse': class_set_merged, 'geometry': mline}
-                #     properties_dict.update({a: aadt_val for a, aadt_val in zip(aadtNames, this_aadts)})
-                #     merged = merged.append(properties_dict, ignore_index=True)
+                # add values to the dataframe
+                this_fid = [x[0] if isinstance(x, list) else x for x in fid_set_merged][
+                    0]  # take the first feature ID for the merged lines
+
+                # initiate dict for new row in merged gdf
+                properties_dict = {idName: this_fid, 'to_analyse': class_set_merged, 'geometry': mline}
+
+                if aadtNames:
+                    if isinstance(aadts_set_merged[0], list):
+                        this_aadts = aadts_set_merged[0]
+                    else:
+                        this_aadts = aadts_set_merged
+
+                    # update dict for new row in merged gdf
+                    properties_dict.update({a: aadt_val for a, aadt_val in zip(aadtNames, this_aadts)})
+
+                # append row to merged gdf
+                merged = merged.append(properties_dict, ignore_index=True)
 
             elif line.equals(mline):
                 # this line is not merged
+                properties_dict = {idName: i,
+                                   'to_analyse': lines_gdf.loc[lines_gdf[idName] == i, 'to_analyse'].iloc[0],
+                                   'geometry': mline}
+
                 if aadtNames:
-                    properties_dict = {idName: i,
-                                       'to_analyse': lines_gdf.loc[lines_gdf[idName] == i, 'to_analyse'].iloc[0],
-                                       'geometry': mline}
                     properties_dict.update({a: aadt_val for a, aadt_val in
                                             zip(aadtNames, lines_gdf.loc[lines_gdf[idName] == i][aadtNames].iloc[0])})
-                    merged = merged.append(properties_dict, ignore_index=True)
+                merged = merged.append(properties_dict, ignore_index=True)
 
     merged['length'] = merged['geometry'].apply(lambda x: line_length(x))
 
@@ -494,7 +506,7 @@ def snap_endpoints_lines(lines_gdf, max_dist, idName, tolerance=1e-7):
 
 
 def drawProgressBar(percent, barLen=20):
-    """
+    """Draws a progress bar
     https://stackoverflow.com/questions/3002085/python-to-print-out-status-bar-and-percentage
     """
     # percent float from 0 to 1.
@@ -664,6 +676,14 @@ def create_nodes(merged_lines, crs_):
 
 def cut_lines(lines_gdf, nodes, idName, tolerance):
     """Cuts lines at the nodes, with a certain tolerance
+    Args:
+        lines_gdf (geodataframe): the network with edges that should be cut
+        nodes (geodataframe): points to use for cutting the edges
+        idName (string): name of the Unique ID column in the lines_gdf
+        tolerance: how far a point should be from the edge to cut the edge
+
+    Returns:
+        lines_gdf (geodataframe): the network with cut edges. The IDs of the new edges counting +1 on the maximum ID number
     """
     max_id = max(lines_gdf[idName])
     list_columns = list(lines_gdf.columns.values)
@@ -829,7 +849,7 @@ def join_nodes_edges(gdf_nodes, gdf_edges, idName):
         node_tuple = gdf.loc[gdf[idName] == edge, 'node_fid']
         if len(node_tuple) > 2:
             # if there are more than 2 nodes intersecting the linestring, choose the ones at the endpoints
-            # todo: check this section!!
+            # todo: check this section carefully!!
             incorrect_edges.append(edge)
             line_nodes = gdf.loc[gdf[idName] == edge, 'geometry'].iloc[0]
             if isinstance(line_nodes, LineString):
@@ -885,6 +905,10 @@ def join_nodes_edges(gdf_nodes, gdf_edges, idName):
 
     if incorrect_edges:
         warnings.warn('More than 2 nodes intersecting edges {}'.format(incorrect_edges))
+
+    # reset indices in case they are not unique
+    gdf_edges.reset_index(inplace=True, drop=True)
+    tuples_df.reset_index(inplace=True, drop=True)
 
     result = gpd.GeoDataFrame(pd.concat([gdf_edges, tuples_df], axis=1))
 
@@ -964,28 +988,85 @@ def delete_duplicates(all_points):
     return uniquepoints
 
 
-if __name__ == '__main__':
-    # test input
-    # test_shp = r"D:\ra2ce\sample_data\NL_ZuidHolland.shp"
-    test_shp = "./sample_data/NL_ZuidHolland.shp"
+def graph_to_shp(G, edge_shp, node_shp):
+    """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_shp and node_shp
 
-    input_AllOutput = "./test_results"
+    Arguments:
+
+        G []: networkx graph object to be converted
+
+        edge_shp [str]: output path including extension for edges shapefile
+
+        node_shp [str]: output path including extension for nodes shapefile
+
+    Returns:
+
+        None
+
+    """
+    # now only multidigraphs and graphs are used
+    if type(G) == nx.classes.graph.Graph:
+        G = nx.MultiGraph(G)
+
+    # The nodes should have a geometry attribute (perhaps on top of the x and y attributes)
+    nodes, edges = osmnx.graph_to_gdfs(G, node_geometry=False)
+
+    dfs = [edges, nodes]
+    for df in dfs:
+        for col in df.columns:
+            if df[col].dtype == np_object and col != df.geometry.name:
+                df[col] = df[col].astype(str)
+
+    print('\nSaving nodes as shapefile: {}'.format(node_shp))
+    print('\nSaving edges as shapefile: {}'.format(edge_shp))
+
+    nodes.to_file(node_shp, driver='ESRI Shapefile', encoding='utf-8')
+    edges.to_file(edge_shp, driver='ESRI Shapefile', encoding='utf-8')
+
+
+if __name__ == '__main__':
+    # General test input
+    input_AllOutput = load_config()["paths"]["test_output"]
     input_crs = 4326  # the Coordinate Reference System of the input shapefiles should be in EPSG:4326 because OSM always uses this CRS
 
-    # Test 1: Create a graph and GeoDataFrame from one shapefile (for analysis), with the road segmented in pieces of 100m.
-    input_name = 'test_ZH'
-    input_InputDataDict = {'shapefiles_for_analysis_path': test_shp, 'id_name': 'LinkNr'}
-    input_HazardDataDict = {}
-    input_snapping = False  # datatype = boolean: True/False
-    input_SnappingThreshold = 0  # datatype = int or float (threshold in meters that is used to snap road segments)
+    # Test specific test input
+    run_test = 3
+    if run_test == 1:
+        # Test 1: Create a graph and GeoDataFrame from one shapefile (for analysis), with the road segmented in pieces of 100m.
+        input_name = 'test_merge_lines'
+        input_InputDataDict = {'shapefiles_for_analysis_path': os.path.join(load_config()["paths"]["test_network_shp"], "part_of_DR_roads.shp"), 'id_name': 'fid'}
+        input_snapping = False  # datatype = boolean: True/False
+        input_SnappingThreshold = 0  # datatype = int or float (threshold in meters that is used to snap road segments)
+    elif run_test == 2:
+        # Test 2:
+        input_name = 'test_snapping'
+        input_InputDataDict = {'shapefiles_for_analysis_path': os.path.join(load_config()["paths"]["test_network_shp"], "part_of_DR_roads.shp"), 'id_name': 'fid'}
+        input_snapping = True  # datatype = boolean: True/False
+        input_SnappingThreshold = 0.00009  # = ~10m datatype = int or float (threshold in degrees (!!!) that is used to snap road segments)
+    elif run_test == 3:
+        # Test 3:
+        input_name = 'test_multiple_shp'
+        input_InputDataDict = {'shapefiles_for_analysis_path': os.path.join(load_config()["paths"]["test_network_shp"], "roads_category0.shp"),
+                               'shapefiles_for_diversion_path': [os.path.join(load_config()["paths"]["test_network_shp"], "roads_category1.shp"),
+                                                                 os.path.join(load_config()["paths"]["test_network_shp"], "roads_category2.shp")],
+                              'id_name': 'ET_ID'}
+        input_snapping = False  # datatype = boolean: True/False
+        input_SnappingThreshold = 0  # datatype = int or float (threshold in degrees (!!!) that is used to snap road segments)
 
     # TODO: implement pruning functionality?
     input_pruning = False  # datatype = boolean: True/False
-    input_PruningThreshold = 0  # datatype = int or float (threshold in meters that is used to prune road segments)
+    input_PruningThreshold = 0  # datatype = int or float (threshold in degrees (!!!) that is used to prune road segments)
 
     graph = create_network_from_shapefile(name=input_name, AllOutput=input_AllOutput, InputDataDict=input_InputDataDict,
-                                  HazardDataDict=input_HazardDataDict, crs=input_crs, snapping=input_snapping,
-                                  SnappingThreshold=input_SnappingThreshold, pruning=input_pruning,
-                                  PruningThreshold=input_PruningThreshold)
+                                    crs=input_crs, snapping=input_snapping, SnappingThreshold=input_SnappingThreshold,
+                                    pruning=input_pruning, PruningThreshold=input_PruningThreshold)
+
+    # Save graph to gpickle to use later for analysis
+    nx.write_gpickle(graph, os.path.join(input_AllOutput, '{}_graph.gpickle'.format(input_name)))
+    print("Saved graph to pickle in {}".format(os.path.join(input_AllOutput, '{}_graph.gpickle'.format(input_name))))
+
+    # Save graph to shapefile for visual inspection
+    graph_to_shp(graph, os.path.join(input_AllOutput, '{}_edges.shp'.format(input_name)),
+                 os.path.join(input_AllOutput, '{}_nodes.shp'.format(input_name)))
 
     print("Ran create_graph_shp.py successfully!")

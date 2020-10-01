@@ -15,7 +15,7 @@ import sys
 from numpy import object as np_object
 import time
 import filecmp
-from ra2ce.ra2ce.utils import load_config
+from utils import load_config
 
 ### Overrule the OSMNX default settings to get the additional metadata such as street lighting (lit)
 osmnx.config(log_console=True, use_cache=True, useful_tags_path = osmnx.settings.useful_tags_path + ['lit'])
@@ -223,22 +223,21 @@ if __name__=='__main__':
 
     # run function
     root = Path(__file__).parents[2]
-    load_config()[]
-    test_output_dir = root / 'tests/sample_output'
-    test_input_dir = root / 'tests/sample_data'
+    test_output_dir = Path(load_config()['paths']['test_output'])
+    test_input_osm_dumps_dir = Path(load_config()['paths']['test_OSM_dumps'])
 
     osm_filter_exe = root / 'osmfilter.exe'
     osm_convert_exe = root / 'osmconvert64.exe'
-    pbf = test_input_dir / 'sample_data_osm_dumps' / r"NL332.osm.pbf"
-    o5m = test_output_dir / 'sample_output_osm_dumps' / r"NL332.o5m"
-    o5m_filtered = test_output_dir / 'sample_output_osm_dumps/NL332_filtered.o5m'
+    pbf = test_input_osm_dumps_dir / r"NL332.osm.pbf"
+    o5m = test_output_dir / r"NL332.o5m"
+    o5m_filtered = test_output_dir / 'NL332_filtered.o5m'
 
     convert_osm(osm_convert_exe, pbf, o5m)
     filter_osm(osm_filter_exe, o5m,  o5m_filtered)
     G, nodes, edges = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, simplify=True, retain_all=True)
 
-    nodes.to_file(test_output_dir / 'sample_output_network_shp' / 'NL332_nodes.geojson', driver='GeoJSON')
-    edges.to_file(test_output_dir / 'sample_output_network_shp' / 'NL332_edges.geojson', driver='GeoJSON')
+    nodes.to_file(test_output_dir / 'NL332_nodes.geojson', driver='GeoJSON')
+    edges.to_file(test_output_dir / 'NL332_edges.geojson', driver='GeoJSON')
 
     # testing
     ref_files = list((test_output_dir / 'sample_output_network_shp/reference').glob('*.geojson'))
