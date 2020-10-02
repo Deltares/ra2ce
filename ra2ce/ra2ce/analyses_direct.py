@@ -249,7 +249,7 @@ def add_hazard_data_to_road_network(road_gdf,region_path,hazard_path,tolerance =
 
 
 if __name__ =='__main__':
-    road_gdf, road_gdf_graph = generate_damage_input()
+    road_gdf, road_gdf_graph = generate_damage_input(0.001)
     road_gdf.rename(columns={'highway': 'infra_type'}, inplace=True)
     assert 'infra_type' in road_gdf.columns
     #LOAD SOME SAMPLE DATA
