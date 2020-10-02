@@ -21,6 +21,7 @@ from utils import load_config
 osmnx.config(log_console=True, use_cache=True, useful_tags_path = osmnx.settings.useful_tags_path + ['lit'])
 sys.setrecursionlimit(10**5)
 
+
 def get_graph_from_polygon(PathShp, NetworkType, RoadTypes=None):
     """
     Get an OSMnx graph from a shapefile (input = path to shapefile).
@@ -49,6 +50,7 @@ def get_graph_from_polygon(PathShp, NetworkType, RoadTypes=None):
         G = G.to_undirected()
 
     return G
+
 
 def fetch_roads(region, osm_pbf_path, **kwargs):
     """
@@ -145,6 +147,7 @@ def fetch_roads(region, osm_pbf_path, **kwargs):
             file.write('No roads in {}'.format(region))
             file.close()
 
+
 def convert_osm(osm_convert_path, pbf, o5m):
     """
     Convers an osm PBF file to o5m
@@ -160,11 +163,13 @@ def convert_osm(osm_convert_path, pbf, o5m):
     command = '""{}"  "{}" --complete-ways -o="{}""'.format(osm_convert_path, pbf, o5m)
     os.system(command)
 
+
 def filter_osm(osm_filter_path, o5m, filtered_o5m):
     """Filters an o5m OSM file to only motorways, trunks, primary and secondary roads
     """
     command = '""{}"  "{}" --keep="highway=motorway =motorway_link =primary =primary_link =secondary =secondary_link =trunk =trunk_link" > "{}""'.format(osm_filter_path, o5m, filtered_o5m)
     os.system(command)
+
 
 def graph_to_gdf(G):
     """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_shp and node_shp
@@ -189,6 +194,7 @@ def graph_to_gdf(G):
 
     return edges, nodes
 
+
 def create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, **kwargs):
     """
     Filters and generates a graph from an osm.pbf file
@@ -211,6 +217,7 @@ def create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, **kwargs):
 
     return G, nodes, edges
 
+
 def compare_files(ref_files, test_files):
     for ref_file, test_file in zip(ref_files, test_files):
         if str(test_file).endswith('nodes.geojson'):
@@ -218,6 +225,7 @@ def compare_files(ref_files, test_files):
         else:
             assert filecmp.cmp(ref_file, test_file), '{} and {} do are not the same'.format(str(ref_file), str(test_file))
         os.remove(test_file)
+
 
 if __name__=='__main__':
 
