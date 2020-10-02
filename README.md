@@ -19,8 +19,10 @@ Both Direct damanges and Redundancy-based criticality have their own functionali
 
 ## Network Creation
 THe user needs to decide which type of input data will be used to create the infrastructure network. Currently the following 3 methods are implemented
-- Create a network based on OSM dump file (.osm.pbf)
-- Create a network based on a shapefile
+**Create a network based on OSM dump file (.osm.pbf)**
+The user needs to identify the name of the OSM dump and a shapefile containing the area of interest. 
+**Create a network based on a shapefile**
+
 
 (- Create a network based on OSM online download) - to be implemented
 
@@ -39,7 +41,7 @@ Multiple link disruption can be analyzed making use of a hazard map. This can be
 In this analysis, a group of multiple links are removed simultaneously. While the group disruption is in place, alternative routes connecting the end-points of each link of the group is identified. This is a redundancy analysis for each link of the network when multiple parts of the network are out of operation and can be used to simulate area covering events such as specific flooding or earthquakes. Also can be identified whether groups of the network are isolated.
 
 **3. Multi-link Disruption (2): Calculate the disruption for an Origin/Destination matrix**
-The user should provide Origin and Destination shapefiles.
+When origin and destination files are provided 
 
 When infrastructure usage data are available it is also possible to calculate the losses. THe user should provide these data in the excel file: <NAME excel fie>
 
@@ -54,4 +56,4 @@ When infrastructure usage data are available it is also possible to calculate th
 The data should be provided in the file format as mentioned in 
 
 # User input
-THe user needs to fill out the document to_fill_in.xlsx and has to choose for several options. See overview below.
+THe user needs to fill out the document to_fill_in.xlsx and has to choose for several options. See overview of options below.
