@@ -52,11 +52,14 @@ The user will need to identify the vulnerability curves for the hazard intensity
 
 ## Risk prioritization - to be implemented
 # Installation
+
 ## Config file
+
+## Testing
 
 # User input
 THe user needs to fill out the document to_fill_in.xlsx and has to choose for several options. Multiple analysis can be done: add another row with settings for the different calculations.
-Below is an overview of the user input variables
+Below is an overview of the user input variables. All relative paths are described in the Config file.
 
 ## analysis_name
 Name that you want to give to the analysis (output files will start with this name)
@@ -78,14 +81,27 @@ Choose from:
 ## network_source
 Choose how the network will be created. 
 Choose from:
-- *Network based on shapefile* - user needs to provide shapefile with network and indicate the attribute with unique_ID at **shp_inpu_data** and **shp_unique_ID** in input table
+- *Network based on shapefile* - user needs to provide shapefile with network and indicate the attribute with unique_ID at **shp_input_data** and **shp_unique_ID** in input table
 - *Network based on OSM dump* - user needs to provide .shp file with area of interest at **OSM_area_of_interest** in input table
 - *Network based on OSM online* - user needs to provide .shp file with area of interest at **OSM_area_of_interest** in input table
 
 ## OSM_area_of_interest
+When choosing **network_source** *Network based on OSM dump* or *Network based on OSM online* provide name of shapefile with region for OSM input. 
 
+## shp_input_data
+When choosing **network_source** *Network based on shapefile* provide name of shapefile with with the infrastructure network.
+
+## shp_unique_ID
+When choosing **network_source** *Network based on shapefile* provide name of shapefile at **shp_input_data** and indicate here the column of the shapefile with the Unique_ID. In case no unique ID exists, leave this cell empty and the tool will create a new one.
+
+## shp_for_diversion
+In case you would like to make use of the underlying network for diversions, add here the shapefile used for that.
 
 ## data_manipulation
+When choosing **network_source** *Network based on shapefile* indicate whether the shapefile should be fixed for unconnected lines. After performing this analysis, the user should check out the result via shapefile based on visual inspection. Choose from:
+- *snapping*
+- *pruning*
+- *snapping,pruning*
 
 
 
