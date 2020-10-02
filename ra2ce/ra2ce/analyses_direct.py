@@ -16,7 +16,8 @@ from rasterio.mask import mask
 from rasterio.features import shapes
 import numpy as np
 from tqdm import tqdm
-
+from pathlib import Path
+from create_network_from_osm_dump import generate_damage_input
 
 
 #### AT THIS POINT, YOU MAY WANT TO DO CLEANING OF YOUR NETWORK, FOR EXAMPLE USING THE cleanup_fetch_roads() in OSdaMage ####
@@ -241,20 +242,17 @@ def add_hazard_data_to_road_network(road_gdf,region_path,hazard_path,tolerance =
         road_gdf[['length_{}'.format(hzd_name), 'val_{}'.format(hzd_name)]] = inb[['length_{}'.format(hzd_name),
                                                                                    'val_{}'.format(hzd_name)]]
         output_path = load_config()['paths']['test_output']
-        filename = 'exposure.shp'
+        filename = 'exposure_from_dump.shp'
         road_gdf.to_file(os.path.join(output_path,filename))
 
         return road_gdf
 
 
-
 if __name__ =='__main__':
+    road_gdf = generate_damage_input()
+    road_gdf.rename(columns={'highway': 'infra_type'}, inplace=True)
+    assert 'infra_type' in road_gdf.columns
     #LOAD SOME SAMPLE DATA
-    path = os.path.join(load_config()['paths']['test_temp'],'OSD_create_network_from_dump_temp.pkl')
-    pickle_in = open(path,"rb")
-    road_gdf = pickle.load(pickle_in)
-    pickle_in.close()
-
     # LOAD SHAPEFILE TO CROP THE HAZARD MAP
     filename = 'NUTS332.shp'
     region_path = os.path.join(load_config()['paths']['test_area_of_interest'],filename)
