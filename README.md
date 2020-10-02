@@ -20,10 +20,8 @@ Both Direct damanges and Redundancy-based criticality have their own functionali
 
 ## Network Creation
 THe user needs to decide which type of input data will be used to create the infrastructure network. Currently the following 3 methods are implemented
-**Create a network based on OSM dump file (.osm.pbf)**
-The user needs to identify the name of the OSM dump and a shapefile containing the area of interest. 
-**Create a network based on a shapefile**
-
+- **Create a network based on OSM dump file (.osm.pbf)** The user needs to identify the name of the OSM dump and a shapefile containing the area of interest. 
+- **Create a network based on a shapefile** The user needs to deliver a shapefile and indicate the column of the unique identifier.
 
 (- Create a network based on OSM online download) - to be implemented
 
