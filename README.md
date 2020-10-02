@@ -164,7 +164,6 @@ name of the attribute that is the Unique ID in both origin shapefiles and destin
 ## infra_usage -> ik zag deze niet staan in het excel bestand @frederique
 file names where information on infrastructure usage is stored: the Average Annual Daily Traffic and costs per vehicle type
 
-# Pre-processing of data
-The data should be provided in the file format as mentioned in the input table.
+
 
 
