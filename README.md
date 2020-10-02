@@ -126,11 +126,18 @@ Anny option is valid, but these are some commmon types:
 - *add another option here*
 
 ## hazard_data
+When including hazard data, provide the specific filenames, separated by comma. The tool can handle both *.shp* and *.tif* files. By default, the tool uses all files in the hazard folder (see **config**) ending at *.tif*, or *.shp*
 
 ## hazard_attribute_name
+In case **hazard_data** of .shp hazard map indicate the column of the attribute that represents the hazard intensity.
+
 ## hazard_unique_ID
 ## hazard_unit
 ## hazard_aggregation
+- *max*
+- *min*
+- *mean*
+
 ## hazard_threshold
 ## origin_shp
 ## destination_shp
