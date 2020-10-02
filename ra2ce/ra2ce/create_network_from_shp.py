@@ -3,7 +3,7 @@
 Created on 30-9-2020
 
 @authors:
-create_network_from_shapefile: Frederique de Groen (frederique.degroen@deltares.nl)
+Frederique de Groen (frederique.degroen@deltares.nl)
 """
 
 # external modules
@@ -112,11 +112,23 @@ def create_network_from_shapefile(name, AllOutput, InputDataDict, crs, snapping,
     logging.info("Function [join_nodes_edges]: executed")
     resulting_network.crs = {'init': 'epsg:{}'.format(crs)}  # set the right CRS
 
+    # Save geodataframe of the resulting network to
+    resulting_network.to_pickle(os.path.join(load_config()["paths"]["code"], '{}_gdf.pkl'.format(name)))
+    print("Saved network to pickle in {}".format(os.path.join(load_config()["paths"]["code"], '{}_gdf.pkl'.format(name))))
+
     # Create networkx graph from geodataframe
     G = graph_from_gdf(resulting_network, nodes)
     logging.info("Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(name))
 
-    return G
+    # Save graph to gpickle to use later for analysis
+    nx.write_gpickle(G, os.path.join(AllOutput, '{}_graph.gpickle'.format(name)), protocol=4)
+    print("Saved graph to pickle in {}".format(os.path.join(load_config()["paths"]["code"], '{}_graph.gpickle'.format(name))))
+
+    # Save graph to shapefile for visual inspection
+    graph_to_shp(G, os.path.join(AllOutput, '{}_edges.shp'.format(name)),
+                 os.path.join(AllOutput, '{}_nodes.shp'.format(name)))
+
+    return G, resulting_network
 
 
 def read_merge_shp(shapefileAnalyse, shapefileDiversion, idName, crs_):
@@ -1030,9 +1042,9 @@ if __name__ == '__main__':
     input_crs = 4326  # the Coordinate Reference System of the input shapefiles should be in EPSG:4326 because OSM always uses this CRS
 
     # Test specific test input
-    run_test = 3
+    run_test = 1
     if run_test == 1:
-        # Test 1: Create a graph and GeoDataFrame from one shapefile (for analysis), with the road segmented in pieces of 100m.
+        # Test 1: Create a graph and GeoDataFrame from one shapefile (for analysis), with the road segmented in subsequent pieces
         input_name = 'test_merge_lines'
         input_InputDataDict = {'shapefiles_for_analysis_path': os.path.join(load_config()["paths"]["test_network_shp"], "part_of_DR_roads.shp"), 'id_name': 'fid'}
         input_snapping = False  # datatype = boolean: True/False
@@ -1057,16 +1069,8 @@ if __name__ == '__main__':
     input_pruning = False  # datatype = boolean: True/False
     input_PruningThreshold = 0  # datatype = int or float (threshold in degrees (!!!) that is used to prune road segments)
 
-    graph = create_network_from_shapefile(name=input_name, AllOutput=input_AllOutput, InputDataDict=input_InputDataDict,
+    graph, gdf = create_network_from_shapefile(name=input_name, AllOutput=input_AllOutput, InputDataDict=input_InputDataDict,
                                     crs=input_crs, snapping=input_snapping, SnappingThreshold=input_SnappingThreshold,
                                     pruning=input_pruning, PruningThreshold=input_PruningThreshold)
-
-    # Save graph to gpickle to use later for analysis
-    nx.write_gpickle(graph, os.path.join(input_AllOutput, '{}_graph.gpickle'.format(input_name)))
-    print("Saved graph to pickle in {}".format(os.path.join(input_AllOutput, '{}_graph.gpickle'.format(input_name))))
-
-    # Save graph to shapefile for visual inspection
-    graph_to_shp(graph, os.path.join(input_AllOutput, '{}_edges.shp'.format(input_name)),
-                 os.path.join(input_AllOutput, '{}_nodes.shp'.format(input_name)))
 
     print("Ran create_graph_shp.py successfully!")
