@@ -58,6 +58,7 @@ The user will need to identify the vulnerability curves for the hazard intensity
 # User input
 THe user needs to fill out the document to_fill_in.xlsx and has to choose for several options. Multiple analysis can be done: add another row with settings for the different calculations.
 Below is an overview of the user input variables. All relative paths are described in the Config file.
+All geospatial files should be projected in EPSG: 4326
 
 ## analysis_name
 Name that you want to give to the analysis (output files will start with this name)
