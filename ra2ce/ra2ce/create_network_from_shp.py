@@ -82,6 +82,8 @@ def create_network_from_shapefile(name, AllOutput, InputDataDict, crs, snapping,
     edges, lines_merged = merge_lines_shpfiles(lines, id_name, aadt_names, crs)
     logging.info("Function [merge_lines_shpfiles]: executed with properties {}".format(list(edges.columns)))
 
+    edges, id_name = gdf_check_create_unique_ids(edges, id_name)
+
     if snapping:
         edges = snap_endpoints_lines(edges, SnappingThreshold, id_name, tolerance=1e-7)
         logging.info("Function [snap_endpoints_lines]: executed with threshold = {}".format(SnappingThreshold))
@@ -1034,6 +1036,35 @@ def graph_to_shp(G, edge_shp, node_shp):
 
     nodes.to_file(node_shp, driver='ESRI Shapefile', encoding='utf-8')
     edges.to_file(edge_shp, driver='ESRI Shapefile', encoding='utf-8')
+
+
+def gdf_check_create_unique_ids(gdf, idName):
+    # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
+    if len(gdf.idName.unique()) < len(gdf.index):
+        new_id_name = 'fid'
+        gdf[new_id_name] = list(range(gdf.index))
+        print(
+            "Added a new unique identifier field {} because the original field '{}' did not contain unique values per road segment.".format(
+                new_id_name, idName))
+        return gdf, new_id_name
+    else:
+        return gdf, idName
+
+
+def graph_check_create_unique_ids(graph, idName):
+    # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
+    if len(set([str(e[-1][idName]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
+        new_id_name = 'fid'
+        i = 0
+        for u, v, k in graph.edges(keys=True):
+            graph[u][v][k][new_id_name] = i
+            i += 1
+        print(
+            "Added a new unique identifier field {} because the original field '{}' did not contain unique values per road segment.".format(
+                new_id_name, idName))
+        return graph, new_id_name
+    else:
+        return graph, idName
 
 
 if __name__ == '__main__':
