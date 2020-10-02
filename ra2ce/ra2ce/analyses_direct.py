@@ -115,8 +115,8 @@ def create_hzd_df(geometry, hzd_list, hzd_names):
             gdf = gpd.GeoDataFrame.from_features(list(results))
 
 
-            # this is specific to this calculation: change to WGS84 (anticipating intersect with OSM)
-            #gdf.crs = {'init': 'epsg:28992'}
+            # Confirm that it is WGS84
+            gdf.crs = {'init': 'epsg:4326'}
             #gdf.crs = {'init': 'epsg:3035'}
             #gdf.to_crs(epsg=4326,inplace=True) #convert to WGS84
 
@@ -171,68 +171,52 @@ def intersect_hazard(x, hzd_reg_sindex, hzd_region):
         print(e)
         return x.geometry, 0
 
-def add_hazard_data_to_road_network():
+def add_hazard_data_to_road_network(road_gdf,region_path,hazard_path,tolerance = 0.00005):
     """
     Adds the hazard data to the road network, i.e. creates an exposure map
 
-    Arguments
+    Arguments:
+        *road_gdf* (GeoPandas DataFrame) : The road network without hazard data
+        *region_path* (string) : Path to the shapefile describing the regional boundaries
+        *hazard_path* (string) : Path to file or folder containg the hazard maps
+           -> If this refers to a file: only run for this file
+           -> If this refers to a folder: run for all hazard maps in this folder
+        *tolerance* (float) : Simplification tolerance in degrees
+           ->  about 0.001 deg = 100 m; 0.00001 deg = 1 m in Europe
+
+    Returns:
+         *road_gdf* (GeoPandas DataFrame) : Similar to input gdf, but with hazard data
 
     """
+    #Evaluate the input arguments
+    if isinstance(hazard_path,str):
+        hazard_path = [hazard_path] #put the path in a list
+    elif isinstance(hazard_path,list):
+        pass
+    else:
+        raise ValueError('Invalid input argument')
 
-if __name__ == '__main__':
-
-    #UDI:
-    tolerance = 0.00005 # Tolerance for the simplification of linestrings, in degrees (WGS84)
-    #### #about 0.001 = 100 m; 0.00001 = 1 m ####
 
 
-    #LOAD SOME SAMPLE DATA
-    folder = load_config()['paths']['test_temp']
-    path = os.path.join(folder,'OSD_create_network_from_dump_temp.pkl')
-    pickle_in = open(path,"rb")
-    road_gdf = pickle.load(pickle_in)
-    pickle_in.close()
-
-    #MAP OSM INFRA TYPES TO A SMALLER GROUP OF ROAD_TYPES
+    #TODO: do this in a seperate function (can be useful for other functions as well)
+    # MAP OSM INFRA TYPES TO A SMALLER GROUP OF ROAD_TYPES
     path_settings = load_config()['paths']['settings']
-    road_mapping_path = os.path.join(path_settings,'OSM_infratype_to_roadtype_mapping.xlsx')
-    road_mapping_dict = import_road_mapping(road_mapping_path,'Mapping')
+    road_mapping_path = os.path.join(path_settings, 'OSM_infratype_to_roadtype_mapping.xlsx')
+    road_mapping_dict = import_road_mapping(road_mapping_path, 'Mapping')
     road_gdf['road_type'] = road_gdf.infra_type.apply(
         lambda x: road_mapping_dict[x])  # add a new column 'road_type' with less categories
-
-    # OPTIONALLY: CALCULATE LINE LENGTHS (IF THIS IS NOT ALREADY DONE!!!)
 
     # SIMPLIFY ROAD GEOMETRIES
     road_gdf.geometry = road_gdf.geometry.simplify(tolerance=tolerance)
     road_gdf['length'] = road_gdf.geometry.apply(line_length)
 
-    # LOAD SHAPEFILE TO CROP THE HAZARD MAP
-    regional_shapefile = load_config()['paths']['test_area_of_interest']
-    filename = 'NUTS332.shp'
-    complete_path = os.path.join(regional_shapefile,filename)
-    print(complete_path)
-    print(os.path.exists(complete_path))
-    region_boundary = gpd.read_file(complete_path)
-    region_boundary
-    region_boundary.to_crs(epsg=4326,inplace=True) #convert to WGS84 #region_boundary.to_crs(epsg=4326,inplace=True) #convert to WGS84
-    #region_boundary.to_crs(epsg=28992, inplace=True)  # convert to Amersfoort / RD new
-    #region_boundary.to_crs(epsg=3035,inplace=True)
-    region_boundary.plot()
-    plt.show()
-
+    # Take the geometry from the region shapefile
+    region_boundary = gpd.read_file(region_path)
+    region_boundary.to_crs(epsg=4326, inplace=True)  # convert to WGS84
     geometry = region_boundary['geometry'][0]
 
-
-
-    hzd_path = load_config()['paths']['test_hazard']
-    #hzd_list = natsorted([os.path.join(hzd_path, x) for x in os.listdir(hzd_path) if x.endswith(".tif")])
-    #hzd_names = ['a','b']
-
-    hzd_list = [os.path.join(hzd_path,'Lizard_13942_wgs84.tif')]
-    hzd_names = ['Lizard_13942']
-
-    hzds_data = create_hzd_df(geometry,hzd_list,hzd_names)
-    hzds_data.to_file('hzds_data_vectorized.shp')
+    hzd_names = [os.path.split(p)[-1].split('.')[0] for p in hazard_path]
+    hzds_data = create_hzd_df(geometry,hazard_path,hzd_names)
 
     # PERFORM INTERSECTION BETWEEN ROAD SEGMENTS AND HAZARD MAPS
     for iter_, hzd_name in enumerate(hzd_names):
@@ -256,7 +240,27 @@ if __name__ == '__main__':
         inb['length_{}'.format(hzd_name)] = inb.geometry.apply(line_length)
         road_gdf[['length_{}'.format(hzd_name), 'val_{}'.format(hzd_name)]] = inb[['length_{}'.format(hzd_name),
                                                                                    'val_{}'.format(hzd_name)]]
+        output_path = load_config()['paths']['test_output']
+        filename = 'exposure.shp'
+        road_gdf.to_file(os.path.join(output_path,filename))
 
-    print(road_gdf)
-    road_gdf.to_file('anothertest4.shp')
-    print('einde')
+        return road_gdf
+
+
+
+if __name__ =='__main__':
+    #LOAD SOME SAMPLE DATA
+    path = os.path.join(load_config()['paths']['test_temp'],'OSD_create_network_from_dump_temp.pkl')
+    pickle_in = open(path,"rb")
+    road_gdf = pickle.load(pickle_in)
+    pickle_in.close()
+
+    # LOAD SHAPEFILE TO CROP THE HAZARD MAP
+    filename = 'NUTS332.shp'
+    region_path = os.path.join(load_config()['paths']['test_area_of_interest'],filename)
+
+    hzd_path = load_config()['paths']['test_hazard']
+    hzd_path = os.path.join(hzd_path,'efas_rp500_wgs84.tif')
+
+    road_gdf = add_hazard_data_to_road_network(road_gdf,region_path,hzd_path)
+    print(road_gdf.head())
