@@ -63,18 +63,29 @@ Name that you want to give to the analysis (output files will start with this na
 
 ## analysis
 Choose from: 
-*Direct Damages*
-*Redundancy-based criticality*
-*Both*
+- *Direct Damages*
+- *Redundancy-based criticality*
+- *Both*
 
 ## links_analysis
 Only when chosen for *Redundancy-based criticality* or *Both*
-Choose from:
-Single-link Disruption
-Multi-link Disruption (1): Calculate the disruption for all damaged roads
-Multi-link Disruption (2): Calculate the disruption for an Origin/Destination matrix
 
-##data_manipulation##
+Choose from:
+- *Single-link Disruption*
+- *Multi-link Disruption (1): Calculate the disruption for all damaged roads*
+- *Multi-link Disruption (2): Calculate the disruption for an Origin/Destination matrix*
+
+## network_source
+Choose how the network will be created. 
+Choose from:
+- *Network based on shapefile* - user needs to provide shapefile with network and indicate the attribute with unique_ID at **shp_inpu_data** and **shp_unique_ID** in input table
+- *Network based on OSM dump* - user needs to provide .shp file with area of interest at **OSM_area_of_interest** in input table
+- *Network based on OSM online* - user needs to provide .shp file with area of interest at **OSM_area_of_interest** in input table
+
+## OSM_area_of_interest
+
+
+## data_manipulation
 
 
 
