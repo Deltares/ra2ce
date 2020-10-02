@@ -32,14 +32,15 @@ logging.basicConfig(format='%(asctime)s - %(message)s',
                     filename=LOG_FILENAME,
                     level=logging.INFO)
 
+AllOutput = load_config()["paths"]["test_output"]
 
-def create_network_from_shapefile(name, AllOutput, InputDataDict, crs, snapping, SnappingThreshold, pruning,
-                                  PruningThreshold):
+
+def create_network_from_shapefile(InputDict, crs):
     """Creates a (graph) network from a shapefile
     Args:
         name (string): name of the analysis given by user (will be part of the name of the output files)
         AllOutput (string): path to the folder where the output should be saved
-        InputDataDict (dict): dictionairy with paths/input that is used to create the network
+        InputDict (dict): dictionairy with paths/input that is used to create the network
         crs (int): the EPSG number of the coordinate reference system that is used
         snapping (bool): True if snapping is required, False if not
         SnappingThreshold (int/float): threshold to reach another vertice to connect the edge to
@@ -49,44 +50,45 @@ def create_network_from_shapefile(name, AllOutput, InputDataDict, crs, snapping,
         G (networkX graph): The resulting network graph
     """
     # initiate variables
-    shapefile_diversion = 0
+    shapefile_diversion = []
 
     # load the input files if they are there
-    if 'id_name' in InputDataDict:
-        id_name = InputDataDict['id_name']
+    if 'shp_input_data' in InputDict:
+        shapefile_analyse = InputDict['shp_input_data']
 
-    if 'shapefiles_for_analysis_path' in InputDataDict:
-        shapefile_analyse = InputDataDict['shapefiles_for_analysis_path']
+    if 'shp_for_diversion' in InputDict:
+        shapefile_diversion = InputDict['shp_for_diversion']
 
-    if 'shapefiles_for_diversion_path' in InputDataDict:
-        shapefile_diversion = InputDataDict['shapefiles_for_diversion_path']
-
-    if 'road_usage_data_path' in InputDataDict:
-        road_usage_data = pd.read_excel(InputDataDict['road_usage_data_path'])
-        road_usage_data.dropna(axis=0, how='all', subset=['vehicle_type'], inplace=True)
-        aadt_names = [aadt_name for aadt_name in road_usage_data['attribute_name'] if aadt_name == aadt_name]
-    else:
-        aadt_names = None
-        road_usage_data = pd.DataFrame()
+    # TODO adjust to the right names of the RA2CE tool
+    # if 'infra_usage' in InputDict:
+    #     road_usage_data = pd.read_excel(InputDict['infra_usage'])
+    #     road_usage_data.dropna(axis=0, how='all', subset=['vehicle_type'], inplace=True)
+    #     aadt_names = [aadt_name for aadt_name in road_usage_data['attribute_name'] if aadt_name == aadt_name]
+    # else:
+    #     aadt_names = None
+    #     road_usage_data = pd.DataFrame()
+    road_usage_data = pd.DataFrame()  # can be removed if the above is fixed
+    aadt_names = None  # can be removed if the above is fixed
 
     # Load shapefile
     lines = read_merge_shp(shapefileAnalyse=shapefile_analyse,
                            shapefileDiversion=shapefile_diversion,
-                           idName=id_name,
+                           idName=InputDict['shp_unique_ID'],
                            crs_=crs)
     logging.info("Function [read_merge_shp]: executed with {} {}".format(shapefile_analyse, shapefile_diversion))
 
     # Multilinestring to linestring
     # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
     # The list of fid's is reduced by the fid's that are not anymore in the merged lines
-    edges, lines_merged = merge_lines_shpfiles(lines, id_name, aadt_names, crs)
+    edges, lines_merged = merge_lines_shpfiles(lines, InputDict['shp_unique_ID'], aadt_names, crs)
     logging.info("Function [merge_lines_shpfiles]: executed with properties {}".format(list(edges.columns)))
 
-    edges, id_name = gdf_check_create_unique_ids(edges, id_name)
+    edges, id_name = gdf_check_create_unique_ids(edges, InputDict['shp_unique_ID'])
 
-    if snapping:
-        edges = snap_endpoints_lines(edges, SnappingThreshold, id_name, tolerance=1e-7)
-        logging.info("Function [snap_endpoints_lines]: executed with threshold = {}".format(SnappingThreshold))
+    if 'data_manipulation' in InputDict:
+        if InputDict['data_manipulation'] == 'snapping':
+            edges = snap_endpoints_lines(edges, InputDict['snapping_threshold'], id_name, tolerance=1e-7)
+            logging.info("Function [snap_endpoints_lines]: executed with threshold = {}".format(InputDict['snapping_threshold']))
 
     # TODO
     #    if pruning:
@@ -95,19 +97,21 @@ def create_network_from_shapefile(name, AllOutput, InputDataDict, crs, snapping,
     # merge merged lines if there are any merged lines
     if not lines_merged.empty:
         # save the merged lines to a shapefile - CHECK if there are lines merged that should not be merged (e.g. main + secondary road)
-        lines_merged.to_file(os.path.join(AllOutput, "{}_lines_that_merged.shp".format(name)))
+        lines_merged.to_file(os.path.join(AllOutput, "{}_lines_that_merged.shp".format(InputDict['analysis_name'])))
         logging.info(
-            "Function [edges_to_shp]: saved at {}".format(os.path.join(AllOutput, "{}_lines_that_merged".format(name))))
+            "Function [edges_to_shp]: saved at {}".format(
+                os.path.join(AllOutput, "{}_lines_that_merged".format(InputDict['analysis_name']))))
 
     # Get the unique points at the end of lines and at intersections to create nodes
     nodes = create_nodes(edges, crs)
     logging.info("Function [create_nodes]: executed")
 
-    if snapping:
-        # merged lines may be updated when new nodes are created which makes a line cut in two
-        edges = cut_lines(edges, nodes, id_name, tolerance=1e-4)
-        nodes = create_nodes(edges, crs)
-        logging.info("Function [cut_lines]: executed")
+    if 'data_manipulation' in InputDict:
+        if InputDict['data_manipulation'] == 'snapping':
+            # merged lines may be updated when new nodes are created which makes a line cut in two
+            edges = cut_lines(edges, nodes, id_name, tolerance=1e-4)
+            nodes = create_nodes(edges, crs)
+            logging.info("Function [cut_lines]: executed")
 
     # create tuples from the adjecent nodes and add as column in geodataframe
     resulting_network = join_nodes_edges(nodes, edges, id_name)
@@ -115,20 +119,24 @@ def create_network_from_shapefile(name, AllOutput, InputDataDict, crs, snapping,
     resulting_network.crs = {'init': 'epsg:{}'.format(crs)}  # set the right CRS
 
     # Save geodataframe of the resulting network to
-    resulting_network.to_pickle(os.path.join(load_config()["paths"]["code"], '{}_gdf.pkl'.format(name)))
-    print("Saved network to pickle in {}".format(os.path.join(load_config()["paths"]["code"], '{}_gdf.pkl'.format(name))))
+    resulting_network.to_pickle(
+        os.path.join(load_config()["paths"]["code"], '{}_gdf.pkl'.format(InputDict['analysis_name'])))
+    print("Saved network to pickle in {}".format(
+        os.path.join(load_config()["paths"]["code"], '{}_gdf.pkl'.format(InputDict['analysis_name']))))
 
     # Create networkx graph from geodataframe
     G = graph_from_gdf(resulting_network, nodes)
-    logging.info("Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(name))
+    logging.info(
+        "Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(InputDict['analysis_name']))
 
     # Save graph to gpickle to use later for analysis
-    nx.write_gpickle(G, os.path.join(AllOutput, '{}_graph.gpickle'.format(name)), protocol=4)
-    print("Saved graph to pickle in {}".format(os.path.join(load_config()["paths"]["code"], '{}_graph.gpickle'.format(name))))
+    nx.write_gpickle(G, os.path.join(AllOutput, '{}_graph.gpickle'.format(InputDict['analysis_name'])), protocol=4)
+    print("Saved graph to pickle in {}".format(
+        os.path.join(load_config()["paths"]["code"], '{}_graph.gpickle'.format(InputDict['analysis_name']))))
 
     # Save graph to shapefile for visual inspection
-    graph_to_shp(G, os.path.join(AllOutput, '{}_edges.shp'.format(name)),
-                 os.path.join(AllOutput, '{}_nodes.shp'.format(name)))
+    graph_to_shp(G, os.path.join(AllOutput, '{}_edges.shp'.format(InputDict['analysis_name'])),
+                 os.path.join(AllOutput, '{}_nodes.shp'.format(InputDict['analysis_name'])))
 
     return G, resulting_network
 
@@ -151,6 +159,9 @@ def read_merge_shp(shapefileAnalyse, shapefileDiversion, idName, crs_):
         shapefileAnalyse = [shapefileAnalyse]
     if isinstance(shapefileDiversion, str) and shapefileDiversion != 0:
         shapefileDiversion = [shapefileDiversion]
+
+    shapefileAnalyse = [os.path.join(load_config()["paths"]["test_network_shp"], x) if x.endswith('.shp') else os.path.join(load_config()["paths"]["test_network_shp"], x + '.shp') for x in shapefileAnalyse]
+    shapefileDiversion = [os.path.join(load_config()["paths"]["test_network_shp"], x) if x.endswith('.shp') else os.path.join(load_config()["paths"]["test_network_shp"], x + '.shp') for x in shapefileDiversion]
 
     lines = []
 
@@ -1040,7 +1051,7 @@ def graph_to_shp(G, edge_shp, node_shp):
 
 def gdf_check_create_unique_ids(gdf, idName):
     # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
-    if len(gdf.idName.unique()) < len(gdf.index):
+    if len(gdf[idName].unique()) < len(gdf.index):
         new_id_name = 'fid'
         gdf[new_id_name] = list(range(gdf.index))
         print(
@@ -1069,39 +1080,16 @@ def graph_check_create_unique_ids(graph, idName):
 
 if __name__ == '__main__':
     # General test input
-    input_AllOutput = load_config()["paths"]["test_output"]
     input_crs = 4326  # the Coordinate Reference System of the input shapefiles should be in EPSG:4326 because OSM always uses this CRS
 
     # Test specific test input
-    run_test = 1
-    if run_test == 1:
-        # Test 1: Create a graph and GeoDataFrame from one shapefile (for analysis), with the road segmented in subsequent pieces
-        input_name = 'test_merge_lines'
-        input_InputDataDict = {'shapefiles_for_analysis_path': os.path.join(load_config()["paths"]["test_network_shp"], "part_of_DR_roads.shp"), 'id_name': 'fid'}
-        input_snapping = False  # datatype = boolean: True/False
-        input_SnappingThreshold = 0  # datatype = int or float (threshold in meters that is used to snap road segments)
-    elif run_test == 2:
-        # Test 2:
-        input_name = 'test_snapping'
-        input_InputDataDict = {'shapefiles_for_analysis_path': os.path.join(load_config()["paths"]["test_network_shp"], "part_of_DR_roads.shp"), 'id_name': 'fid'}
-        input_snapping = True  # datatype = boolean: True/False
-        input_SnappingThreshold = 0.00009  # = ~10m datatype = int or float (threshold in degrees (!!!) that is used to snap road segments)
-    elif run_test == 3:
-        # Test 3:
-        input_name = 'test_multiple_shp'
-        input_InputDataDict = {'shapefiles_for_analysis_path': os.path.join(load_config()["paths"]["test_network_shp"], "roads_category0.shp"),
-                               'shapefiles_for_diversion_path': [os.path.join(load_config()["paths"]["test_network_shp"], "roads_category1.shp"),
-                                                                 os.path.join(load_config()["paths"]["test_network_shp"], "roads_category2.shp")],
-                              'id_name': 'ET_ID'}
-        input_snapping = False  # datatype = boolean: True/False
-        input_SnappingThreshold = 0  # datatype = int or float (threshold in degrees (!!!) that is used to snap road segments)
+    input_InputDict = {0: {'analysis_name': 'test1',
+                      'analysis': 'Redundancy-based criticality',
+                      'links_analysis': 'Single-link Disruption',
+                      'network_source': 'Network based on shapefile',
+                      'shp_input_data': 'part_of_DR_roads',
+                      'shp_unique_ID': 'fid'}}
 
-    # TODO: implement pruning functionality?
-    input_pruning = False  # datatype = boolean: True/False
-    input_PruningThreshold = 0  # datatype = int or float (threshold in degrees (!!!) that is used to prune road segments)
-
-    graph, gdf = create_network_from_shapefile(name=input_name, AllOutput=input_AllOutput, InputDataDict=input_InputDataDict,
-                                    crs=input_crs, snapping=input_snapping, SnappingThreshold=input_SnappingThreshold,
-                                    pruning=input_pruning, PruningThreshold=input_PruningThreshold)
+    graph, gdf = create_network_from_shapefile(InputDict=input_InputDict, crs=input_crs)
 
     print("Ran create_graph_shp.py successfully!")
