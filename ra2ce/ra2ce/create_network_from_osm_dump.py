@@ -311,10 +311,10 @@ def cut_gdf(gdf, length):
 
     columns = gdf.columns
     data = {}
-    data['new_id'] = []
+    data['split_id'] = []
+
     for column in columns:
         data[column] = []
-
 
     for i, row in gdf.iterrows():
         geom = row['geometry']
@@ -327,7 +327,7 @@ def cut_gdf(gdf, length):
                     data[key].append(linestring)
                 else:
                     data[key].append(value)
-            data['new_id'].append('{}_{}'.format(i, j))
+            data['split_id'].append(i+j)
 
     return gpd.GeoDataFrame(data)
 
@@ -375,8 +375,36 @@ def test_create_network_from_osm_dump():
     edges.to_file(test_output_dir / 'NL332_edges_simplified.shp')
     nodes.to_file(test_output_dir / 'NL332_nodes_simplified.shp')
 
+def test_bookkeeping():
+    root = Path(__file__).parents[2]
+    test_output_dir = Path(load_config()['paths']['test_output'])
+    test_input_osm_dumps_dir = Path(load_config()['paths']['test_OSM_dumps'])
 
+    osm_filter_exe = root / 'osmfilter.exe'
+    osm_convert_exe = root / 'osmconvert64.exe'
+    pbf = test_input_osm_dumps_dir / r"NL332.osm.pbf"
+    o5m = test_output_dir / r"NL332.o5m"
+    o5m_filtered = test_output_dir / 'NL332_filtered.o5m'
+
+    convert_osm(osm_convert_exe, pbf, o5m)
+    filter_osm(osm_filter_exe, o5m, o5m_filtered)
+
+    G_complex, edges_complex, nodes_complex = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe,
+                                                                           simplify=False, retain_all=True)
+
+    G_simple, edges_simple, nodes_simple = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe,
+                                                                        simplify=True, retain_all=True)
+
+    edges_simple['simplified_graph_id'] = edges_simple.index
+    print(len(edges_simple))
+
+    edges_simple_split = cut_gdf(edges_simple, 0.001)
+    print(len(edges_simple_split))
+    edges_simple_split.to_file(test_output_dir / 'NL332_edges_simplified_retained_split.shp')
+
+    print('done')
 
 if __name__=='__main__':
-    test_cut_gdf()
+
+    test_bookkeeping()
 
