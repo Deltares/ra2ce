@@ -159,10 +159,15 @@ def convert_osm(osm_convert_path, pbf, o5m):
     os.system(command)
 
 
-def filter_osm(osm_filter_path, o5m, filtered_o5m):
+def filter_osm(osm_filter_path, o5m, filtered_o5m, tags=None):
+
     """Filters an o5m OSM file to only motorways, trunks, primary and secondary roads
     """
-    command = '""{}"  "{}" --keep="highway=motorway =motorway_link =primary =primary_link =secondary =secondary_link =trunk =trunk_link" > "{}""'.format(osm_filter_path, o5m, filtered_o5m)
+    if tags is None:
+        tags = ['motorway', 'motorway_link', 'primary', 'primary_link',
+                'secondary', 'secondary_link', 'trunk', 'trunk_link']
+
+    command = '""{}"  "{}" --keep="highway={}" > "{}""'.format(osm_filter_path, o5m, " =".join(tags), filtered_o5m)
     os.system(command)
 
 
@@ -407,5 +412,5 @@ def test_bookkeeping():
 
 if __name__=='__main__':
 
-    test_bookkeeping()
+    test_create_network_from_osm_dump()
 
