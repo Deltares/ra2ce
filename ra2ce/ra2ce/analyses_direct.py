@@ -117,8 +117,8 @@ def create_hzd_df(geometry, hzd_list, hzd_names):
 
             # this is specific to this calculation: change to WGS84 (anticipating intersect with OSM)
             #gdf.crs = {'init': 'epsg:28992'}
-            gdf.crs = {'init': 'epsg:3035'}
-            gdf.to_crs(epsg=4326,inplace=True) #convert to WGS84
+            #gdf.crs = {'init': 'epsg:3035'}
+            #gdf.to_crs(epsg=4326,inplace=True) #convert to WGS84
 
 
 
@@ -171,6 +171,14 @@ def intersect_hazard(x, hzd_reg_sindex, hzd_region):
         print(e)
         return x.geometry, 0
 
+def add_hazard_data_to_road_network():
+    """
+    Adds the hazard data to the road network, i.e. creates an exposure map
+
+    Arguments
+
+    """
+
 if __name__ == '__main__':
 
     #UDI:
@@ -206,9 +214,9 @@ if __name__ == '__main__':
     print(os.path.exists(complete_path))
     region_boundary = gpd.read_file(complete_path)
     region_boundary
-    #region_boundary.to_crs(epsg=4326,inplace=True) #convert to WGS84 #region_boundary.to_crs(epsg=4326,inplace=True) #convert to WGS84
+    region_boundary.to_crs(epsg=4326,inplace=True) #convert to WGS84 #region_boundary.to_crs(epsg=4326,inplace=True) #convert to WGS84
     #region_boundary.to_crs(epsg=28992, inplace=True)  # convert to Amersfoort / RD new
-    region_boundary.to_crs(epsg=3035,inplace=True)
+    #region_boundary.to_crs(epsg=3035,inplace=True)
     region_boundary.plot()
     plt.show()
 
@@ -220,8 +228,8 @@ if __name__ == '__main__':
     #hzd_list = natsorted([os.path.join(hzd_path, x) for x in os.listdir(hzd_path) if x.endswith(".tif")])
     #hzd_names = ['a','b']
 
-    hzd_list = [os.path.join(hzd_path,'efas_rp500.tif')]
-    hzd_names = ['efas_rp500']
+    hzd_list = [os.path.join(hzd_path,'Lizard_13942_wgs84.tif')]
+    hzd_names = ['Lizard_13942']
 
     hzds_data = create_hzd_df(geometry,hzd_list,hzd_names)
     hzds_data.to_file('hzds_data_vectorized.shp')
@@ -250,5 +258,5 @@ if __name__ == '__main__':
                                                                                    'val_{}'.format(hzd_name)]]
 
     print(road_gdf)
-    road_gdf.to_file('anothertest2.shp')
+    road_gdf.to_file('anothertest4.shp')
     print('einde')
