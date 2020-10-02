@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from utils import load_config
 from shapely.geometry import mapping
 import rasterio
+import shapely
 from rasterio.mask import mask
 from rasterio.features import shapes
 import numpy as np
@@ -115,7 +116,8 @@ def create_hzd_df(geometry, hzd_list, hzd_names):
 
 
             # this is specific to this calculation: change to WGS84 (anticipating intersect with OSM)
-            gdf.crs = {'init': 'epsg:28992'}
+            #gdf.crs = {'init': 'epsg:28992'}
+            gdf.crs = {'init': 'epsg:3035'}
             gdf.to_crs(epsg=4326,inplace=True) #convert to WGS84
 
 
@@ -165,7 +167,8 @@ def intersect_hazard(x, hzd_reg_sindex, hzd_region):
             else:
                 return shapely.geometry.MultiLineString([x[0] for x in append_hits]), int(
                     np.mean([x[1] for x in append_hits]))
-    except:
+    except Exception as e:
+        print(e)
         return x.geometry, 0
 
 if __name__ == '__main__':
@@ -204,22 +207,24 @@ if __name__ == '__main__':
     region_boundary = gpd.read_file(complete_path)
     region_boundary
     #region_boundary.to_crs(epsg=4326,inplace=True) #convert to WGS84 #region_boundary.to_crs(epsg=4326,inplace=True) #convert to WGS84
-    region_boundary.to_crs(epsg=28992, inplace=True)  # convert to Amersfoort / RD new
-    geometry = region_boundary['geometry'][0]
-
-
-    fig, ax = plt.subplots(1, 1)
-    region_boundary.plot(ax=ax)
-
+    #region_boundary.to_crs(epsg=28992, inplace=True)  # convert to Amersfoort / RD new
+    region_boundary.to_crs(epsg=3035,inplace=True)
+    region_boundary.plot()
     plt.show()
+
+    geometry = region_boundary['geometry'][0]
 
 
 
     hzd_path = load_config()['paths']['test_hazard']
-    hzd_list = natsorted([os.path.join(hzd_path, x) for x in os.listdir(hzd_path) if x.endswith(".tif")])
-    hzd_names = ['a','b']
+    #hzd_list = natsorted([os.path.join(hzd_path, x) for x in os.listdir(hzd_path) if x.endswith(".tif")])
+    #hzd_names = ['a','b']
+
+    hzd_list = [os.path.join(hzd_path,'efas_rp500.tif')]
+    hzd_names = ['efas_rp500']
 
     hzds_data = create_hzd_df(geometry,hzd_list,hzd_names)
+    hzds_data.to_file('hzds_data_vectorized.shp')
 
     # PERFORM INTERSECTION BETWEEN ROAD SEGMENTS AND HAZARD MAPS
     for iter_, hzd_name in enumerate(hzd_names):
@@ -243,4 +248,7 @@ if __name__ == '__main__':
         inb['length_{}'.format(hzd_name)] = inb.geometry.apply(line_length)
         road_gdf[['length_{}'.format(hzd_name), 'val_{}'.format(hzd_name)]] = inb[['length_{}'.format(hzd_name),
                                                                                    'val_{}'.format(hzd_name)]]
+
+    print(road_gdf)
+    road_gdf.to_file('anothertest2.shp')
     print('einde')
