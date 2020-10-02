@@ -207,9 +207,9 @@ def create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, **kwargs):
     filter_osm(osm_filter_exe, o5m, o5m_filtered)
     G = osmnx.graph_from_file(o5m_filtered, **kwargs)
     G = G.to_undirected()
-    nodes, edges = graph_to_gdf(G)
+    edges, nodes = graph_to_gdf(G)
 
-    return G, nodes, edges
+    return G, edges, nodes
 
 def compare_files(ref_files, test_files):
     for ref_file, test_file in zip(ref_files, test_files):
@@ -234,19 +234,22 @@ if __name__=='__main__':
 
     convert_osm(osm_convert_exe, pbf, o5m)
     filter_osm(osm_filter_exe, o5m,  o5m_filtered)
-    G, nodes, edges = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, simplify=True, retain_all=True)
+    G, edges, nodes = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, simplify=True, retain_all=True)
 
-    nodes.to_file(test_output_dir / 'NL332_nodes.geojson', driver='GeoJSON')
-    edges.to_file(test_output_dir / 'NL332_edges.geojson', driver='GeoJSON')
+    edges.to_file(test_output_dir / 'NL332_edges_simplified_retained.shp')
+    nodes.to_file(test_output_dir / 'NL332_nodes_simplified_retained.shp')
 
-    # testing
-    ref_files = list((test_output_dir / 'sample_output_network_shp/reference').glob('*.geojson'))
-    test_files = list((test_output_dir / 'sample_output_network_shp').glob('*.geojson'))
+    G, edges, nodes = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, simplify=False, retain_all=False)
 
-    compare_files(ref_files, test_files)
+    edges.to_file(test_output_dir / 'NL332_edges.shp')
+    nodes.to_file(test_output_dir / 'NL332_nodes.shp')
 
-    ref_files = list((test_output_dir / 'sample_output_osm_dumps/reference').glob('*.o5m'))
-    test_files = list((test_output_dir / 'sample_output_osm_dumps').glob('*.o5m'))
+    G, edges, nodes = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, simplify=False, retain_all=True)
 
-    compare_files(ref_files, test_files)
-    print('done')
+    edges.to_file(test_output_dir / 'NL332_edges_retained.shp')
+    nodes.to_file(test_output_dir / 'NL332_nodes_retained.shp')
+
+    G, edges, nodes = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, simplify=True, retain_all=False)
+
+    edges.to_file(test_output_dir / 'NL332_edges_simplified.shp')
+    nodes.to_file(test_output_dir / 'NL332_nodes_simplified.shp')
