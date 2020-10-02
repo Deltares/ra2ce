@@ -396,11 +396,12 @@ def test_bookkeeping():
                                                                         simplify=True, retain_all=True)
 
     edges_simple['simplified_graph_id'] = edges_simple.index
-    print(len(edges_simple))
-
     edges_simple_split = cut_gdf(edges_simple, 0.001)
-    print(len(edges_simple_split))
     edges_simple_split.to_file(test_output_dir / 'NL332_edges_simplified_retained_split.shp')
+
+    edges_complex['complex_graph_id'] = edges_complex.index
+    edges_simple_split = cut_gdf(edges_complex, 0.001)
+    edges_simple_split.to_file(test_output_dir / 'NL332_edges_retained_split.shp')
 
     print('done')
 
