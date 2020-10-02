@@ -132,17 +132,36 @@ When including hazard data, provide the specific filenames, separated by comma. 
 In case **hazard_data** of .shp hazard map indicate the column of the attribute that represents the hazard intensity.
 
 ## hazard_unique_ID
+In case the **hazard_data** can be linked to the infrastructure network by unique_ID similar to **shp_unique_id** indicate here the column of the unique ID in the hazard shapefile .
+
 ## hazard_unit
+Indicate here the units for the hazard intensity described in **hazard_attribute_name**
+
 ## hazard_aggregation
+When translating the hazard intensity to the infrastructure network, indicate how the hazard intensity should be determined in case of crossing multiple hazard intensities. It can include the following options 
 - *max*
 - *min*
 - *mean*
 
-## hazard_threshold
-## origin_shp
-## destination_shp
-## id_name_origin_destination
+in case of multiple analyses, separate by comma.
+
 ## segmentation
+When translating the hazard intensity to the infrastructure network, indicate at which length of infrastructure lines the direct damages should be projected. The length of the segments should be given in degree.By default a node-to-node value will be determined based on the given input in **hazard_aggregation**.
+
+## hazard_threshold
+in the unit of the hazard map
+
+## origin_shp
+**add text on origin and destination analysis** name of the file(s) for the point data that can be used as origins (must be shapefiles) - do not add file extension
+
+## destination_shp
+name of the file(s) for the point data that can be used as destinations (must be shapefiles) - do not add file extension
+
+## id_name_origin_destination
+name of the attribute that is the Unique ID in both origin shapefiles and destination shapefiles
+
+## infra_usage -> ik zag deze niet staan in het excel bestand @frederique
+file names where information on infrastructure usage is stored: the Average Annual Daily Traffic and costs per vehicle type
 
 # Pre-processing of data
 The data should be provided in the file format as mentioned in the input table.
