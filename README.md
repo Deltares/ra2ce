@@ -10,12 +10,12 @@ The tool consists currently of four components:
 
 (-Prioritization to be implemented)
 
-THe user needs to decide which analysis should be performed:
+The user needs to decide which analysis should be performed:
 - Direct damages 
 - Redundancy-based criticality
 - Both
 
-Both Direct damanges and Redundancy-based criticality have their own functionalities.
+Both Direct damanges and Redundancy-based criticality have their own functionalities. See for more detail below.
 
 ## Network Creation
 THe user needs to decide which type of input data will be used to create the infrastructure network. Currently the following 3 methods are implemented
@@ -24,7 +24,7 @@ THe user needs to decide which type of input data will be used to create the inf
 - Create a network based on a shapefile
 
 ## Exposure
-For every hazard map an exposure map will be created, where exposure is defined as the overlay between the infrastructure network and the hazard map. In case of a flooding on road-infrastructure this will for example result in a map with the waterdepth projected on the road.
+For every hazard map an exposure map will be created, where exposure is defined as the overlay between the infrastructure network and the hazard map. In case of a flooding on road-infrastructure this will for example result in a map with the waterdepth projected on the road. The exposure value is based on the average value of the hazard data intersecting with the infrastructure element. The user can choose 
 
 ## Criticality
 This module calculated the redundancy based criticality. There are three possible analyses.
@@ -37,7 +37,9 @@ When infrastructure usage data are available it is also possible to calculate th
 
 ## Risk prioritization
 
-# Pre-processing
+# Installation
+
+# Pre-processing of data
 
 # User input
-THe user needs to fill out the document to_fill_in.xlsx and has to choose between the following options
+THe user needs to fill out the document to_fill_in.xlsx and has to choose for several options. See overview below.
