@@ -101,7 +101,40 @@ When choosing **network_source** *Network based on shapefile* indicate whether t
 - *pruning*
 - *snapping,pruning*
 
+## snapping_threshold
+When choosing **network_source** *Network based on shapefile* and **data_manipulation** *snapping* or *snapping,pruning* please indicate the threshold for snapping. This value should be given in degree.
 
+## network_type
+Choose from:
+- *walk*
+- *bike*
+- *drive*
+- *drive_service*
+- *all*
+When left empty default is: XXXXX
+
+## road_types -> **change to infrastructure_type?**
+Here the user can specify which network_types are included in the network. These can be used for creation of the vulnerability curve input sheets. **andere dingen ook nog?**
+When left empty default is **XXXXXX**
+Anny option is valid, but these are some commmon types:
+- *motorway, trunk, primary, secondary, tertiary*
+- *motorway, trunk, primary, secondary*
+- *motorway, trunk, primary*
+- *motorway, trunk*
+- *motorway*
+- *<add another option here>*
+
+## hazard_data
+
+## hazard_attribute_name
+## hazard_unique_ID
+## hazard_unit
+## hazard_aggregation
+## hazard_threshold
+## origin_shp
+## destination_shp
+## id_name_origin_destination
+## segmentation
 
 # Pre-processing of data
 The data should be provided in the file format as mentioned in the input table.
