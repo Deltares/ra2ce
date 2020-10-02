@@ -12,16 +12,7 @@
 		"infra_usage" : "input\\infra_usage",
 		"output" : "output",
 		"exposure" : "output\\exposure",
-		"criticality" : "output\\criticality",
-		"test" : "test",
-		"test_input" : "test\\input",
-		"test_hazard" : "test\\input\\hazard_maps",
-		"test_OSM_dumps" : "test\\input\\OSM_dumps",
-		"test_area_of_interest" : "test\\input\\area_of_interest",
-		"test_network_shp" : "test\\input\\network_shp",
-		"test_temp" : "test\\temp",
-		"test_output" : "test\\output" },
-		
+		"criticality" : "output\\criticality"},		
     "filenames": {
         "default_lanes" : "default_lanes_temp.pkl"
     }
