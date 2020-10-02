@@ -404,7 +404,7 @@ def test_create_network_from_osm_dump():
     edges.to_file(test_output_dir / 'NL332_edges_simplified.shp')
     nodes.to_file(test_output_dir / 'NL332_nodes_simplified.shp')
 
-def generate_damage_input():
+def generate_damage_input(split_length):
     root = Path(__file__).parents[2]
     test_output_dir = Path(load_config()['paths']['test_output'])
     test_input_osm_dumps_dir = Path(load_config()['paths']['test_OSM_dumps'])
@@ -427,7 +427,7 @@ def generate_damage_input():
     edges_simple['grph_id'] = edges_simple.index
     edges_complex['gdf_id'] = edges_complex.index
     edges_complex['grph_id'] = -9999
-    edges_complex_split = cut_gdf(edges_complex, 0.001)
+    edges_complex_split = cut_gdf(edges_complex, split_length)
 
     assert edges_complex_split['splt_id'].is_unique
 
@@ -445,7 +445,7 @@ if __name__=='__main__':
     root = Path(__file__).parents[2]
     test_output_dir = Path(load_config()['paths']['test_output'])
 
-    edges_complex_split, edges_simple = generate_damage_input()
+    edges_complex_split, edges_simple = generate_damage_input(0.001)
 
     edges_complex_split.to_file(test_output_dir / 'edges_complex_split.shp')
     edges_simple.to_file(test_output_dir / 'edges_simplified_graph.shp')
