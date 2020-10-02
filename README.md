@@ -8,7 +8,8 @@ The tool consists currently of four components:
 - Criticality
 - Damages
 
-(-Prioritization to be implemented)
+-Prioritization - to be implemented
+-Adaptation - to be implemented
 
 The user needs to decide which analysis should be performed:
 - Direct damages 
@@ -43,17 +44,18 @@ In this analysis, a group of multiple links are removed simultaneously. While th
 **3. Multi-link Disruption (2): Calculate the disruption for an Origin/Destination matrix**
 When origin and destination files are provided 
 
-When infrastructure usage data are available it is also possible to calculate the losses. THe user should provide these data in the excel file: <NAME excel fie>
+When infrastructure usage data are available it is also possible to calculate the losses. The user should provide these data in the excel file: <NAME excel fie>
 
 ## Damages - to be implemented
-
+**vulnerability curves**
+The user will need to identify the vulnerability curves for the hazard intensity and damage based on the following table: .xlsx
 
 ## Risk prioritization - to be implemented
-
 # Installation
-
-# Pre-processing of data
-The data should be provided in the file format as mentioned in 
 
 # User input
 THe user needs to fill out the document to_fill_in.xlsx and has to choose for several options. See overview of options below.
+
+# Pre-processing of data
+The data should be provided in the file format as mentioned in the input table.
+
