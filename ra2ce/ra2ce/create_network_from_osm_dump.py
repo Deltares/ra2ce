@@ -159,10 +159,15 @@ def convert_osm(osm_convert_path, pbf, o5m):
     os.system(command)
 
 
-def filter_osm(osm_filter_path, o5m, filtered_o5m):
+def filter_osm(osm_filter_path, o5m, filtered_o5m, tags=None):
+
     """Filters an o5m OSM file to only motorways, trunks, primary and secondary roads
     """
-    command = '""{}"  "{}" --keep="highway=motorway =motorway_link =primary =primary_link =secondary =secondary_link =trunk =trunk_link" > "{}""'.format(osm_filter_path, o5m, filtered_o5m)
+    if tags is None:
+        tags = ['motorway', 'motorway_link', 'primary', 'primary_link',
+                'secondary', 'secondary_link', 'trunk', 'trunk_link']
+
+    command = '""{}"  "{}" --keep="highway={}" > "{}""'.format(osm_filter_path, o5m, " =".join(tags), filtered_o5m)
     os.system(command)
 
 
@@ -332,6 +337,27 @@ def cut_gdf(gdf, length):
     return gpd.GeoDataFrame(data)
 
 
+def generate_damage_input():
+    root = Path(__file__).parents[2]
+    test_output_dir = Path(load_config()['paths']['test_output'])
+    test_input_osm_dumps_dir = Path(load_config()['paths']['test_OSM_dumps'])
+
+    osm_filter_exe = root / 'osmfilter.exe'
+    osm_convert_exe = root / 'osmconvert64.exe'
+    pbf = test_input_osm_dumps_dir / r"NL332.osm.pbf"
+    o5m = test_output_dir / r"NL332.o5m"
+    o5m_filtered = test_output_dir / 'NL332_filtered.o5m'
+
+    convert_osm(osm_convert_exe, pbf, o5m)
+    filter_osm(osm_filter_exe, o5m, o5m_filtered)
+
+    G_complex, edges_complex, nodes_complex = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe,
+                                                                           simplify=False, retain_all=True)
+
+    edges_complex['complex_graph_id'] = edges_complex.index
+
+    return cut_gdf(edges_complex, 0.001)
+
 def test_cut_gdf():
     test_output_dir = Path(load_config()['paths']['test_output'])
     shapefile =  test_output_dir / 'NL332_edges_simplified.shp'
@@ -407,5 +433,5 @@ def test_bookkeeping():
 
 if __name__=='__main__':
 
-    test_bookkeeping()
+    test_create_network_from_osm_dump()
 
