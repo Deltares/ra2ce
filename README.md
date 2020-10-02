@@ -52,10 +52,33 @@ The user will need to identify the vulnerability curves for the hazard intensity
 
 ## Risk prioritization - to be implemented
 # Installation
+## Config file
 
 # User input
-THe user needs to fill out the document to_fill_in.xlsx and has to choose for several options. See overview of options below.
+THe user needs to fill out the document to_fill_in.xlsx and has to choose for several options. Multiple analysis can be done: add another row with settings for the different calculations.
+Below is an overview of the user input variables
+
+## analysis_name
+Name that you want to give to the analysis (output files will start with this name)
+
+## analysis
+Choose from: 
+*Direct Damages*
+*Redundancy-based criticality*
+*Both*
+
+## links_analysis
+Only when chosen for *Redundancy-based criticality* or *Both*
+Choose from:
+Single-link Disruption
+Multi-link Disruption (1): Calculate the disruption for all damaged roads
+Multi-link Disruption (2): Calculate the disruption for an Origin/Destination matrix
+
+##data_manipulation##
+
+
 
 # Pre-processing of data
 The data should be provided in the file format as mentioned in the input table.
+
 
