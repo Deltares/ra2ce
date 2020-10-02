@@ -16,6 +16,8 @@ from numpy import object as np_object
 import time
 import filecmp
 from utils import load_config
+from shapely.geometry import LineString, MultiLineString, Point
+from decimal import Decimal
 
 ### Overrule the OSMNX default settings to get the additional metadata such as street lighting (lit)
 osmnx.config(log_console=True, use_cache=True, useful_tags_path = osmnx.settings.useful_tags_path + ['lit'])
@@ -148,13 +150,6 @@ def fetch_roads(region, osm_pbf_path, **kwargs):
 def convert_osm(osm_convert_path, pbf, o5m):
     """
     Convers an osm PBF file to o5m
-    Args:
-        osm_convert_path:
-        pbf:
-        o5m:
-
-    Returns:
-
     """
 
     command = '""{}"  "{}" --complete-ways -o="{}""'.format(osm_convert_path, pbf, o5m)
@@ -219,8 +214,127 @@ def compare_files(ref_files, test_files):
             assert filecmp.cmp(ref_file, test_file), '{} and {} do are not the same'.format(str(ref_file), str(test_file))
         os.remove(test_file)
 
-if __name__=='__main__':
+def cut(line, distance):
+    """Cuts a line in two at a distance from its starting point
 
+    :param line: a shapely geometry line object (shapely.geometry.linestring.LineString)
+    :param distance: distance from starting point of linestring (float)
+    :return: a list containing two shapely linestring objects.
+    """
+
+    if distance <= 0.0 or distance >= line.length:
+        return [LineString(line)]
+    coords = list(line.coords)
+    for i, p in enumerate(coords):
+        pd = line.project(Point(p))
+        if pd == distance:
+            return [
+                LineString(coords[:i+1]),
+                LineString(coords[i:])]
+        if pd > distance:
+            cp = line.interpolate(distance)
+            return [
+                LineString(coords[:i] + [(cp.x, cp.y)]),
+                LineString([(cp.x, cp.y)] + coords[i:])]
+
+def check_divisibility(dividend, divisor):
+    """Checks if the dividend is a multiple of the divisor and outputs a
+    boolean value
+
+    :param dividend: the number which is divided (float)
+    :param divisor: the number which divides (float)
+    :return: bool: True if the dividend is a multiple of the divisor, False if not (bool)
+    """
+
+    dividend = Decimal(str(dividend))
+    divisor = Decimal(str(divisor))
+    remainder = dividend % divisor
+
+    if remainder == Decimal('0'):
+        is_multiple = True
+        return is_multiple
+    else:
+        is_multiple = False
+        return is_multiple
+
+def number_of_segments(linestring, split_length):
+    """returns the integer number of segments which will result from chopping up a linestring with split_length
+
+    :param linestring: a shapely linestring object. (shapely.geometry.multilinestring.MultiLineString)
+    :param split_length: the length by which to divide the linestring object. (float)
+    :return: n: integer number of segments which will result from splitting linestring with split_length. (int)
+    """
+
+    divisible = check_divisibility(linestring.length, split_length)
+    if divisible:
+        n = int(linestring.length/split_length)
+    else:
+        n = int(linestring.length/split_length)+1
+    return n
+
+def split_linestring(linestring, split_length):
+    """cuts a linestring in equivalent segments of length split_length
+
+    :param linestring: linestring object. (shapely.geometry.linestring.LineString)
+    :param split_length: length by which to split the linestring into equal segments. (float)
+    :return: result_list: list of linestring objects all having the same length. (list)
+    """
+
+    n_segments = number_of_segments(linestring, split_length)
+    if n_segments != 1:
+        result_list = [None]*n_segments
+        current_right_linestring = linestring
+
+        for i in range(0, n_segments-1):
+            r = cut(current_right_linestring, split_length)
+            current_left_linestring = r[0]
+            current_right_linestring = r[1]
+            result_list[i] = current_left_linestring
+            result_list[i+1] = current_right_linestring
+    else:
+        result_list = [linestring]
+
+    return result_list
+
+
+def cut_gdf(gdf, length):
+    """
+    Cuts every linestring or multilinestring feature in a gdf to equal length segments. Assumes only linestrings for now.
+    """
+
+    columns = gdf.columns
+    data = {}
+    data['new_id'] = []
+    for column in columns:
+        data[column] = []
+
+
+    for i, row in gdf.iterrows():
+        geom = row['geometry']
+        assert type(geom)==LineString
+        linestrings = split_linestring(geom, length)
+
+        for j, linestring in enumerate(linestrings):
+            for key, value in row.items():
+                if key=='geometry':
+                    data[key].append(linestring)
+                else:
+                    data[key].append(value)
+            data['new_id'].append('{}_{}'.format(i, j))
+
+    return gpd.GeoDataFrame(data)
+
+
+def test_cut_gdf():
+    test_output_dir = Path(load_config()['paths']['test_output'])
+    shapefile =  test_output_dir / 'NL332_edges_simplified.shp'
+    gdf = gpd.read_file(shapefile)
+    gdf = cut_gdf(gdf, 0.006)
+    gdf.to_file(test_output_dir / 'NL221_edges_simplified_split.shp')
+    print('done')
+
+
+def test_create_network_from_osm_dump():
     # run function
     root = Path(__file__).parents[2]
     test_output_dir = Path(load_config()['paths']['test_output'])
@@ -253,3 +367,9 @@ if __name__=='__main__':
 
     edges.to_file(test_output_dir / 'NL332_edges_simplified.shp')
     nodes.to_file(test_output_dir / 'NL332_nodes_simplified.shp')
+
+
+
+if __name__=='__main__':
+    test_create_network_from_osm_dump()
+
