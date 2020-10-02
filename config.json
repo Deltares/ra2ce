@@ -14,6 +14,7 @@
 		"exposure" : "output\\exposure",
 		"criticality" : "output\\criticality"},		
     "filenames": {
-        "default_lanes" : "default_lanes_temp.pkl"
+        "default_lanes" : "default_lanes_temp.pkl",
+	"user_input" : "input\\user_input.xlsx"
     }
 }
