@@ -111,6 +111,7 @@ Choose from:
 - *drive*
 - *drive_service*
 - *all*
+
 When left empty default is: XXXXX
 
 ## road_types -> **change to infrastructure_type?**
@@ -122,7 +123,7 @@ Anny option is valid, but these are some commmon types:
 - *motorway, trunk, primary*
 - *motorway, trunk*
 - *motorway*
-- <add another option here>
+- *add another option here*
 
 ## hazard_data
 
