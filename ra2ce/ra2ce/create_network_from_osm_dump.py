@@ -16,10 +16,14 @@ from numpy import object as np_object
 import time
 import filecmp
 from utils import load_config
+from shapely.geometry import LineString, MultiLineString, Point
+from decimal import Decimal
+import numpy as np
 
 ### Overrule the OSMNX default settings to get the additional metadata such as street lighting (lit)
 osmnx.config(log_console=True, use_cache=True, useful_tags_path = osmnx.settings.useful_tags_path + ['lit'])
 sys.setrecursionlimit(10**5)
+
 
 def get_graph_from_polygon(PathShp, NetworkType, RoadTypes=None):
     """
@@ -49,6 +53,7 @@ def get_graph_from_polygon(PathShp, NetworkType, RoadTypes=None):
         G = G.to_undirected()
 
     return G
+
 
 def fetch_roads(region, osm_pbf_path, **kwargs):
     """
@@ -145,26 +150,27 @@ def fetch_roads(region, osm_pbf_path, **kwargs):
             file.write('No roads in {}'.format(region))
             file.close()
 
+
 def convert_osm(osm_convert_path, pbf, o5m):
     """
     Convers an osm PBF file to o5m
-    Args:
-        osm_convert_path:
-        pbf:
-        o5m:
-
-    Returns:
-
     """
 
     command = '""{}"  "{}" --complete-ways -o="{}""'.format(osm_convert_path, pbf, o5m)
     os.system(command)
 
-def filter_osm(osm_filter_path, o5m, filtered_o5m):
+
+def filter_osm(osm_filter_path, o5m, filtered_o5m, tags=None):
+
     """Filters an o5m OSM file to only motorways, trunks, primary and secondary roads
     """
-    command = '""{}"  "{}" --keep="highway=motorway =motorway_link =primary =primary_link =secondary =secondary_link =trunk =trunk_link" > "{}""'.format(osm_filter_path, o5m, filtered_o5m)
+    if tags is None:
+        tags = ['motorway', 'motorway_link', 'primary', 'primary_link',
+                'secondary', 'secondary_link', 'trunk', 'trunk_link']
+
+    command = '""{}"  "{}" --keep="highway={}" > "{}""'.format(osm_filter_path, o5m, " =".join(tags), filtered_o5m)
     os.system(command)
+
 
 def graph_to_gdf(G):
     """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_shp and node_shp
@@ -189,6 +195,7 @@ def graph_to_gdf(G):
 
     return edges, nodes
 
+
 def create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, **kwargs):
     """
     Filters and generates a graph from an osm.pbf file
@@ -207,9 +214,10 @@ def create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, **kwargs):
     filter_osm(osm_filter_exe, o5m, o5m_filtered)
     G = osmnx.graph_from_file(o5m_filtered, **kwargs)
     G = G.to_undirected()
-    nodes, edges = graph_to_gdf(G)
+    edges, nodes = graph_to_gdf(G)
 
-    return G, nodes, edges
+    return G, edges, nodes
+
 
 def compare_files(ref_files, test_files):
     for ref_file, test_file in zip(ref_files, test_files):
@@ -219,8 +227,150 @@ def compare_files(ref_files, test_files):
             assert filecmp.cmp(ref_file, test_file), '{} and {} do are not the same'.format(str(ref_file), str(test_file))
         os.remove(test_file)
 
-if __name__=='__main__':
+def cut(line, distance):
+    """Cuts a line in two at a distance from its starting point
 
+    :param line: a shapely geometry line object (shapely.geometry.linestring.LineString)
+    :param distance: distance from starting point of linestring (float)
+    :return: a list containing two shapely linestring objects.
+    """
+
+    if distance <= 0.0 or distance >= line.length:
+        return [LineString(line)]
+    coords = list(line.coords)
+    for i, p in enumerate(coords):
+        pd = line.project(Point(p))
+        if pd == distance:
+            return [
+                LineString(coords[:i+1]),
+                LineString(coords[i:])]
+        if pd > distance:
+            cp = line.interpolate(distance)
+            return [
+                LineString(coords[:i] + [(cp.x, cp.y)]),
+                LineString([(cp.x, cp.y)] + coords[i:])]
+
+def check_divisibility(dividend, divisor):
+    """Checks if the dividend is a multiple of the divisor and outputs a
+    boolean value
+
+    :param dividend: the number which is divided (float)
+    :param divisor: the number which divides (float)
+    :return: bool: True if the dividend is a multiple of the divisor, False if not (bool)
+    """
+
+    dividend = Decimal(str(dividend))
+    divisor = Decimal(str(divisor))
+    remainder = dividend % divisor
+
+    if remainder == Decimal('0'):
+        is_multiple = True
+        return is_multiple
+    else:
+        is_multiple = False
+        return is_multiple
+
+def number_of_segments(linestring, split_length):
+    """returns the integer number of segments which will result from chopping up a linestring with split_length
+
+    :param linestring: a shapely linestring object. (shapely.geometry.multilinestring.MultiLineString)
+    :param split_length: the length by which to divide the linestring object. (float)
+    :return: n: integer number of segments which will result from splitting linestring with split_length. (int)
+    """
+
+    divisible = check_divisibility(linestring.length, split_length)
+    if divisible:
+        n = int(linestring.length/split_length)
+    else:
+        n = int(linestring.length/split_length)+1
+    return n
+
+def split_linestring(linestring, split_length):
+    """cuts a linestring in equivalent segments of length split_length
+
+    :param linestring: linestring object. (shapely.geometry.linestring.LineString)
+    :param split_length: length by which to split the linestring into equal segments. (float)
+    :return: result_list: list of linestring objects all having the same length. (list)
+    """
+
+    n_segments = number_of_segments(linestring, split_length)
+    if n_segments != 1:
+        result_list = [None]*n_segments
+        current_right_linestring = linestring
+
+        for i in range(0, n_segments-1):
+            r = cut(current_right_linestring, split_length)
+            current_left_linestring = r[0]
+            current_right_linestring = r[1]
+            result_list[i] = current_left_linestring
+            result_list[i+1] = current_right_linestring
+    else:
+        result_list = [linestring]
+
+    return result_list
+
+
+def cut_gdf(gdf, length):
+    """
+    Cuts every linestring or multilinestring feature in a gdf to equal length segments. Assumes only linestrings for now.
+    """
+
+    columns = gdf.columns
+    data = {}
+    data['splt_id'] = []
+
+    for column in columns:
+        data[column] = []
+
+    count = 0
+    for i, row in gdf.iterrows():
+        geom = row['geometry']
+        assert type(geom)==LineString
+        linestrings = split_linestring(geom, length)
+
+        for j, linestring in enumerate(linestrings):
+            for key, value in row.items():
+                if key=='geometry':
+                    data[key].append(linestring)
+                else:
+                    data[key].append(value)
+            data['splt_id'].append(count)
+            count += 1
+
+    return gpd.GeoDataFrame(data)
+
+
+def test_bookkeeping():
+    root = Path(__file__).parents[2]
+    test_output_dir = Path(load_config()['paths']['test_output'])
+    test_input_osm_dumps_dir = Path(load_config()['paths']['test_OSM_dumps'])
+
+    osm_filter_exe = root / 'osmfilter.exe'
+    osm_convert_exe = root / 'osmconvert64.exe'
+    pbf = test_input_osm_dumps_dir / r"NL332.osm.pbf"
+    o5m = test_output_dir / r"NL332.o5m"
+    o5m_filtered = test_output_dir / 'NL332_filtered.o5m'
+
+    convert_osm(osm_convert_exe, pbf, o5m)
+    filter_osm(osm_filter_exe, o5m, o5m_filtered)
+
+    G_complex, edges_complex, nodes_complex = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe,
+                                                                           simplify=False, retain_all=True)
+
+    edges_complex['complex_graph_id'] = edges_complex.index
+
+    return cut_gdf(edges_complex, 0.001)
+
+def test_cut_gdf():
+    test_output_dir = Path(load_config()['paths']['test_output'])
+    shapefile =  test_output_dir / 'NL332_edges_simplified.shp'
+    gdf = gpd.read_file(shapefile)
+    gdf = cut_gdf(gdf, 0.006)
+    gdf.to_file(test_output_dir / 'NL221_edges_simplified_split.shp')
+    print('done')
+
+
+def test_create_network_from_osm_dump():
     # run function
     root = Path(__file__).parents[2]
     test_output_dir = Path(load_config()['paths']['test_output'])
@@ -234,19 +384,69 @@ if __name__=='__main__':
 
     convert_osm(osm_convert_exe, pbf, o5m)
     filter_osm(osm_filter_exe, o5m,  o5m_filtered)
-    G, nodes, edges = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, simplify=True, retain_all=True)
+    G, edges, nodes = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, simplify=True, retain_all=True)
 
-    nodes.to_file(test_output_dir / 'NL332_nodes.geojson', driver='GeoJSON')
-    edges.to_file(test_output_dir / 'NL332_edges.geojson', driver='GeoJSON')
+    edges.to_file(test_output_dir / 'NL332_edges_simplified_retained.shp')
+    nodes.to_file(test_output_dir / 'NL332_nodes_simplified_retained.shp')
 
-    # testing
-    ref_files = list((test_output_dir / 'sample_output_network_shp/reference').glob('*.geojson'))
-    test_files = list((test_output_dir / 'sample_output_network_shp').glob('*.geojson'))
+    G, edges, nodes = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, simplify=False, retain_all=False)
 
-    compare_files(ref_files, test_files)
+    edges.to_file(test_output_dir / 'NL332_edges.shp')
+    nodes.to_file(test_output_dir / 'NL332_nodes.shp')
 
-    ref_files = list((test_output_dir / 'sample_output_osm_dumps/reference').glob('*.o5m'))
-    test_files = list((test_output_dir / 'sample_output_osm_dumps').glob('*.o5m'))
+    G, edges, nodes = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, simplify=False, retain_all=True)
 
-    compare_files(ref_files, test_files)
-    print('done')
+    edges.to_file(test_output_dir / 'NL332_edges_retained.shp')
+    nodes.to_file(test_output_dir / 'NL332_nodes_retained.shp')
+
+    G, edges, nodes = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, simplify=True, retain_all=False)
+
+    edges.to_file(test_output_dir / 'NL332_edges_simplified.shp')
+    nodes.to_file(test_output_dir / 'NL332_nodes_simplified.shp')
+
+def generate_damage_input(split_length):
+    root = Path(__file__).parents[2]
+    test_output_dir = Path(load_config()['paths']['test_output'])
+    test_input_osm_dumps_dir = Path(load_config()['paths']['test_OSM_dumps'])
+
+    osm_filter_exe = root / 'osmfilter.exe'
+    osm_convert_exe = root / 'osmconvert64.exe'
+    pbf = test_input_osm_dumps_dir / r"NL332.osm.pbf"
+    o5m = test_output_dir / r"NL332.o5m"
+    o5m_filtered = test_output_dir / 'NL332_filtered.o5m'
+
+    convert_osm(osm_convert_exe, pbf, o5m)
+    filter_osm(osm_filter_exe, o5m, o5m_filtered)
+
+    G_complex, edges_complex, nodes_complex = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe,
+                                                                           simplify=False, retain_all=True)
+
+    G_simple, edges_simple, nodes_simple = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe,
+                                                                        simplify=True, retain_all=True)
+
+    edges_simple['grph_id'] = edges_simple.index
+    edges_complex['gdf_id'] = edges_complex.index
+    edges_complex['grph_id'] = -9999
+    edges_complex_split = cut_gdf(edges_complex, split_length)
+
+    assert edges_complex_split['splt_id'].is_unique
+
+    for i, row in edges_simple.iterrows():
+        osmids = eval(row['osmid'])
+        if isinstance(osmids, list):
+            for osmid in osmids:
+                edges_complex_split.loc[edges_complex_split['osmid']==osmid, 'grph_id'] = row['grph_id']
+        else:
+            edges_complex_split.loc[edges_complex_split['osmid'] == int(osmids), 'grph_id'] = row['grph_id']
+
+    return edges_complex_split, edges_simple
+
+if __name__=='__main__':
+    root = Path(__file__).parents[2]
+    test_output_dir = Path(load_config()['paths']['test_output'])
+
+    edges_complex_split, edges_simple = generate_damage_input(0.001)
+
+    edges_complex_split.to_file(test_output_dir / 'edges_complex_split.shp')
+    edges_simple.to_file(test_output_dir / 'edges_simplified_graph.shp')
+
