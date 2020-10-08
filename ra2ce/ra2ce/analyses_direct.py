@@ -1,5 +1,5 @@
 # Direct analyses
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 import pickle
 import pandas as pd
 import geopandas as gpd
@@ -246,6 +246,286 @@ def add_hazard_data_to_road_network(road_gdf,region_path,hazard_path,tolerance =
 
         return road_gdf
 
+def add_default_lanes(x, default_lanes_dict):
+    """
+    Add the default number of lanes if the lane data is missing.
+
+    Arguments:
+    *x* (Geopandas Series) -- a row from the region GeoDataFrame with all road segment; needs to have the columns 'NUTS-0' (the country) and 'road_type'
+    TODO: applied quickfix here: hardcoded 'NL'as region name
+    *default_lanes_dict (OrderedDict) - keys: NUTS-0 country codes; values:
+        OrderedDicts with keys: road types and values: default number of lanes
+
+    Returns:
+    *x* with the updated number of lanes
+    """
+
+    if np.isnan(x.lanes):
+        x.lanes = default_lanes_dict['NL'][x['road_type']]
+    return x
+
+
+def load_lane_damage_correction(filename, sheet_name, usecols):
+    """
+    Loads the maximum damage correction from an Excel file into an ordered dict.
+
+    Argument:
+        *filename* (string) - name of the Excel file (should be located in the input_path dir)
+        *sheet_name* (string) - name of the excel sheet name
+        *usecols* (string) - the columns which have the data (first column should have the road_type keys)
+
+    Returns:
+        *lane_corr* (OrderedDict) - keys are road_types; values are dicts with key: lane, value = correction factor
+            Use like: lane_corr['motorway'][4] -> 1.25 (i.e. correct max damage by +25%)
+    """
+
+    input_path = load_config()['paths']['settings']  # folder containing the Excel_file
+    lane_corr_df = pd.read_excel(os.path.join(input_path, filename),
+                                 sheet_name=sheet_name, header=3, usecols=usecols, index_col=0)
+    odf = OrderedDict()  # initialize OrderedDict
+    lane_corr = lane_corr_df.to_dict(orient='index', into=odf)
+    return lane_corr
+
+
+def import_flood_curves(filename, sheet_name, usecols):
+    """
+    Imports the flood curves from a predefined path
+
+    Arguments:
+        *filename* (string) : name of the Excel file (should be located in the input_path folder) e.g. "Costs_curves_Europe.xlsx"
+        *sheet_name* (string) : name of the Excel sheet containing the damage curves (e.g. 'curves')
+        *usecols* (string) : string with the columns of the Excel sheet you want to import, e.g. "B:AA"
+
+    Returns:
+        *OrderedDict* : keys are the names of the damage curves
+                        values are scipy interpolators
+    """
+    from scipy.interpolate import interp1d  # import Scipy interpolator function
+    from collections import \
+        OrderedDict  # Use an ordered dict so that the damage curves will remain in the order of the Excel sheet
+
+    input_path = load_config()['paths']['settings']  # this is where the other inputs (such as damage curves) are located
+    flood_curves = pd.read_excel(os.path.join(input_path, filename),
+                                 sheet_name=sheet_name, header=[2], index_col=None,
+                                 usecols=usecols)  # removed skip-footer; gave unexpected results
+    headers = flood_curves.columns
+    curve_name = [0] * int(len(headers) / 2)  # create empty arrays
+    interpolators = [0] * int(len(headers) / 2)
+    for i in range(0, int(len(headers) / 2)):  # iterate over the damage curves in the Excel file
+        curve_name[i] = headers[i * 2]
+        curve = flood_curves.iloc[:, 2 * i:2 * i + 2].dropna()
+        # curve x-values in the even; and y-values in the uneven columns
+        interpolators[i] = interp1d(curve.values[1:, 0], curve.values[1:, 1],
+                                    fill_value=(curve.values[1, 1], curve.values[-1, 1]), bounds_error=False)
+    return OrderedDict(zip(curve_name, interpolators))
+
+
+def load_HZ_max_dam(filename, sheet_name, usecols):
+    """
+    Loads the maximum damages according to Huizinga from an Excel file
+
+    Argument:
+        *filename* (string) - name of the Excel file (should be located in the input_path dir)
+        *sheet_name* (string) - name of the excel sheet name
+        *usecols* (string) - the columns which have the data (first column should have the road_type keys)
+
+    Returns:
+        *HZ_max_dam* (OrderedDict) - keys are road_types; values are dicts with key: lane, value = correction factor
+            Use like: lane_corr['motorway'][4] -> 1.25 (i.e. correct max damage by +25%)
+    """
+
+    input_path = load_config()['paths']['settings']  # folder containing the Excel_file
+    lane_corr_df = pd.read_excel(os.path.join(input_path, filename),
+                                 sheet_name=sheet_name, header=0, usecols=usecols, index_col=0)
+    odf = OrderedDict()  # initialize OrderedDict
+    HZ_max_dam = lane_corr_df.to_dict(orient='index', into=odf)
+    return HZ_max_dam
+
+def import_damage(file_name, sheet_name, usecols):
+    """
+    Imports the maximum damage data from an Excel file in the input_path folder
+
+    Arguments:
+        *file_name* (string) : name of the Excel file (should be located in the input_path folder)
+        *sheet_name* (string) : name of the Excel sheet containing the data
+        *usecols* (string) : columns containing the data you want to read, including the column with the road_types e.g. "C:F"
+
+    Returns:
+        *dict* (Ordered Dictionary) : An ordered dictionary with a group of damage estimates as keys;
+             each value contains another ordered dictionary with as keys the types of roads and as values the damages in Euros
+                So you call the output as: dict['Worldbank'] to get a dict with all the damages in WorldBank
+                And dict['Worldbank']['motorway'] to get the damage for a motorway according to the worldbank
+
+                #From version 0.7 and higher, this structure maybe does not make much sense, because we use upper and lower bounds
+
+    """
+    input_path = load_config()['paths'][
+        'settings']  # this is where the other inputs (such as damage curves) are located
+    df = pd.read_excel(os.path.join(input_path, file_name),
+                       sheet_name=sheet_name, header=[3], usecols=usecols, index_col=0)
+    df = df.iloc[df.index.notna(), :]  # Drop the empty cells
+    odf = OrderedDict()  # initialize OrderedDict
+    return df.to_dict(into=odf)
+
+def apply_lane_damage_correction(lane_damage_correction,road_type,lanes):
+    """See load_lane_damage_correction; this function only avoids malbehaviour for weird lane numbers"""
+    if lanes < 1: #if smaller than the mapped value -> correct with minimum value
+        lanes = 1
+    if lanes > 6: #if larger than largest mapped value -> use maximum value (i.e. 6 lanes)
+        lanes = 6
+    return lane_damage_correction[road_type][lanes]
+
+def apply_HZ_max_dam(max_damages_HZ,road_type,lanes):
+    """See load_lane_damage_correction; this function only avoids malbehaviour for weird lane numbers"""
+    if lanes < 1: #if smaller than the mapped value -> correct with minimum value
+        lanes = 1
+    if lanes > 6: #if larger than largest mapped value -> use maximum value (i.e. 6 lanes)
+        lanes = 6
+    return max_damages_HZ[road_type][lanes]
+
+def road_loss_estimation(x, interpolator, events, max_damages, max_damages_HZ, curve_name, lane_damage_correction,
+                         **kwargs):
+    """
+    Carries out the damage estimation for a road segment using various damage curves
+
+    Arguments:
+        *x* (Geopandas Series) -- a row from the region GeoDataFrame with all road segments
+        *interpolator* (SciPy interpolator object) -- the interpolator function that belongs to the damage curve
+        *events* (List of strings) -- containing the names of the events: e.g. [rp10,...,rp500]
+            scripts expects that x has the columns length_{events} and val_{events} which it needs to do the computation
+        *max_damages* (dictionary) -- dictionary containing the max_damages per road-type; not yet corrected for the number of lanes
+        *max_damages_HZ* (dictionary) -- dictionary containing the max_damages per road-type and number of lanes, for the Huizinga damage curves specifically
+        *name_interpolator* (string) -- name of the max_damage dictionary; to save as column names in the output pandas DataFrame -> becomes the name of the interpolator = damage curve
+        *lane_damage_correction (OrderedDict) -- the max_dam correction factors (see load_lane_damage_correction)
+
+    Returns:
+        *x* (GeoPandas Series) -- the input row, but with new elements: the waterdepths and inundated lengths per RP, and associated damages for different damage curves
+
+    """
+    try:
+        # GET THE EVENT-INDEPENDENT METADATA FROM X
+        road_type = x["road_type"]  # get the right road_type to lookup ...
+
+        # abort the script for not-matching combinations of road_types and damage curves
+        if ((road_type in ['motorway', 'trunk'] and curve_name not in ["C1", "C2", "C3", "C4", "HZ"]) or
+            (road_type not in ['motorway', 'trunk'] and curve_name not in ["C5", "C6",
+                                                                           "HZ"])):  # if combination is not applicable
+            for event in events:  # generate (0,0,0,0,0) output for each event
+                x["dam_{}_{}".format(curve_name, event)] = tuple([0] * 5)
+            return x
+
+        lanes = x["lanes"]  # ... and the right number of lanes
+
+        # DO THE HUIZINGA COMPARISON CALCULATION
+        if curve_name == "HZ":  # only for Huizinga
+            # load max damages huizinga
+            max_damage = apply_HZ_max_dam(max_damages_HZ, road_type, lanes)  # dict lookup: [road_type][lanes]
+            for event in events:
+                depth = x["val_{}".format(event)]
+                length = x["length_{}".format(event)]  # inundated length in km
+                x["dam_{}_{}".format(curve_name, event)] = round(max_damage * interpolator(depth) * length, 2)
+
+        # DO THE MAIN COMPUTATION FOR ALL THE OTHER CURVES
+        else:  # all the other curves
+            # LOWER AN UPPER DAMAGE ESTIMATE FOR THIS ROAD TYPE BEFORE LANE CORRECTION
+            lower = max_damages["Lower"][road_type]  # ... the corresponding lower max damage estimate ...
+            upper = max_damages["Upper"][road_type]  # ... and the upper max damage estimate
+
+            # CORRECT THE MAXIMUM DAMAGE BASED ON NUMBER OF LANES
+            lower = lower * apply_lane_damage_correction(lane_damage_correction, road_type, lanes)
+            upper = upper * apply_lane_damage_correction(lane_damage_correction, road_type, lanes)
+
+            max_damages_interpolated = [lower, (3 * lower + upper) / 4, (lower + upper) / 2, (lower + 3 * upper) / 4,
+                                        upper]  # interpolate between upper and lower: upper, 25%, 50%, 75% and higher
+            # if you change this, don't forget to change the length of the exception output as well!
+            for event in events:
+                depth = x["val_{}".format(event)]  # average water depth in cm
+                length = x["length_{}".format(event)]  # inundated length in km
+
+                results = [None] * len(
+                    max_damages_interpolated)  # create empty list, which will later be coverted to a tuple
+                for index, key in enumerate(
+                    max_damages_interpolated):  # loop over all different damage functions; the key are the max_damage percentile
+                    results[index] = round(interpolator(depth) * key * length,
+                                           2)  # calculate damage using interpolator and round to eurocents
+                x["dam_{}_{}".format(curve_name, event)] = tuple(results)  # save results as a new column to series x
+
+    # HANDLE EXCEPTIONS BY RETURNING ZERO DAMAGE IN THE APPROPRIATE FORMAT
+    except Exception as e:
+        errorstring = "Issue with road_loss_estimation, for  x = {} \n exception = {} \n Damages set to zero. \n \n".format(
+            str(x), e)
+        log_file = kwargs.get('log_file', None)  # get the name of the log file from the keyword arguments
+        if log_file is not None:  # write to log file
+            file = open(log_file, mode="a")
+            file.write(errorstring)
+            file.close()
+        else:  # If no log file is provided, print the string instead
+            print(errorstring)
+
+        for event in events:
+            if curve_name == "HZ":
+                x["dam_{}_{}".format(curve_name, event)] = 0
+            else:
+                x["dam_{}_{}".format(curve_name, event)] = tuple([0] * 5)  # save empty tuple (0,0,0,0,0)
+
+    return x
+
+def calculate_direct_damage(road_gdf):
+    """
+    Calculates the direct damage for all road segments with exposure data using a depth-damage curve
+
+    Arguments:
+        *road_gdf* (GeoPandas DataFrame) :
+
+    Returns:
+        *road_gdf* () :
+
+
+    """
+
+    #todo: currently reads from the OSdaMage pickle containing European Road statistics (and takes values for 'NL')
+    #whereas it should read from an Excel file instead.
+    lane_file = os.path.join(load_config()['paths']['settings'],
+                            'default_lanes_temp.pkl') # import the pickle containing the default lane data
+
+    with open(lane_file, 'rb') as handle:
+        default_lanes_dict = pickle.load(handle)
+
+    road_gdf = road_gdf.apply(lambda x: add_default_lanes(x, default_lanes_dict),
+                  axis=1).copy()  # apply the add_default_lanes function
+    # This should also work with a default dict, because now seems to raise an exception also when it is an unused road type
+
+    # LOAD THE DICT REQUIRED FOR CORRECTING THE MAXIMUM DAMAGE BASED ON THE NUMBER OF LANES
+    lane_damage_correction = load_lane_damage_correction('OSdaMage_functions.xlsx', "Max_damages", "G:M")
+    # actual correction is done within the road_loss_estimation function
+
+    dict_max_damages = import_damage('OSdaMage_functions.xlsx', "Max_damages", usecols="C:E")
+    max_damages_HZ = load_HZ_max_dam('OSdaMage_functions.xlsx', "Huizinga_max_dam", "A:G")
+
+    # LOAD THE DAMAGE FUNCTIONS
+    interpolators = import_flood_curves(filename = 'OSdaMage_functions.xlsx', sheet_name='All_curves', usecols="B:O")
+
+    # PERFORM LOSS CALCULATION FOR ALL ROAD SEGMENTS
+    val_cols = [x for x in list(road_gdf.columns) if 'val' in x]
+    # Remove all rows from the dataframe containing roads that don't intersect with floods
+    df = road_gdf.loc[~(road_gdf[val_cols] == 0).all(axis=1)]
+
+    hzd_names = [i.split('val_')[1] for i in val_cols]
+
+    for curve_name in interpolators:
+        interpolator = interpolators[curve_name]  # select the right interpolator
+        df = df.progress_apply(
+            lambda x: road_loss_estimation(x, interpolator, hzd_names, dict_max_damages, max_damages_HZ, curve_name,
+                                           lane_damage_correction), axis=1)
+
+    output_path = load_config()['paths']['test_output']
+    filename = 'damage.shp'
+    #df.to_file(os.path.join(output_path, filename))
+    #Does not yet work, because the results are stored in tuples
+
+    return df
+
+
 
 
 if __name__ =='__main__':
@@ -262,5 +542,8 @@ if __name__ =='__main__':
     hzd_path = load_config()['paths']['test_hazard']
     hzd_path = os.path.join(hzd_path,'efas_rp500_wgs84.tif')
 
-    road_gdf = add_hazard_data_to_road_network(road_gdf,region_path,hzd_path)
-    print(road_gdf.head())
+    road_gdf_exposure = add_hazard_data_to_road_network(road_gdf,region_path,hzd_path)
+
+    road_gdf_damage = calculate_direct_damage(road_gdf)
+
+    print(road_gdf_damage.head)
