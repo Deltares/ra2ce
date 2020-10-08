@@ -13,6 +13,8 @@
 		"test_output" : "test\\output" },
 		
     "filenames": {
-        "default_lanes" : "default_lanes_temp.pkl"
+        "default_lanes" : "default_lanes_temp.pkl",
+	"user_input" : "input\\user_input.xlsx",
+	"user_input_tests" : "input\\user_input_tests.xlsx"
     }
 }
