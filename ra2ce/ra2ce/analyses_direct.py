@@ -172,6 +172,29 @@ def intersect_hazard(x, hzd_reg_sindex, hzd_region):
         print(e)
         return x.geometry, 0
 
+def apply_road_mapping(road_gdf):
+    """
+    Apply a road mapping from a larger set of infra_types
+    (e.g. [motorway, motorway_link, ..., X, X_link] to a
+    smaller set of types, called road_types
+    (e.g. [motorway, ..., X]
+
+    Arguments:
+        *road_gdf* (GeoPandas Dataframe) : should have a column 'infra_types'
+
+    Returns:
+        *road_gdf* (GeoPandas Dataframe): the same gdf, with an extra column 'road_types'
+    """
+    # TODO: the stuff in this function is now split over to many different functions, which can be merged
+    # MAP OSM INFRA TYPES TO A SMALLER GROUP OF ROAD_TYPES
+    path_settings = load_config()['paths']['settings']
+    road_mapping_path = os.path.join(path_settings, 'OSM_infratype_to_roadtype_mapping.xlsx')
+    road_mapping_dict = import_road_mapping(road_mapping_path, 'Mapping')
+    road_gdf['road_type'] = road_gdf.infra_type.apply( \
+        lambda x: road_mapping_dict[x])  # add a new column 'road_type' with less categories
+    return road_gdf
+
+
 def add_hazard_data_to_road_network(road_gdf,region_path,hazard_path,tolerance = 0.00005):
     """
     Adds the hazard data to the road network, i.e. creates an exposure map
@@ -201,11 +224,13 @@ def add_hazard_data_to_road_network(road_gdf,region_path,hazard_path,tolerance =
 
     #TODO: do this in a seperate function (can be useful for other functions as well)
     # MAP OSM INFRA TYPES TO A SMALLER GROUP OF ROAD_TYPES
-    path_settings = load_config()['paths']['settings']
-    road_mapping_path = os.path.join(path_settings, 'OSM_infratype_to_roadtype_mapping.xlsx')
-    road_mapping_dict = import_road_mapping(road_mapping_path, 'Mapping')
-    road_gdf['road_type'] = road_gdf.infra_type.apply(
-        lambda x: road_mapping_dict[x])  # add a new column 'road_type' with less categories
+    road_gdf = apply_road_mapping(road_gdf)
+
+    #path_settings = load_config()['paths']['settings']
+    #road_mapping_path = os.path.join(path_settings, 'OSM_infratype_to_roadtype_mapping.xlsx')
+    #road_mapping_dict = import_road_mapping(road_mapping_path, 'Mapping')
+    #road_gdf['road_type'] = road_gdf.infra_type.apply(
+    #    lambda x: road_mapping_dict[x])  # add a new column 'road_type' with less categories
 
     # SIMPLIFY ROAD GEOMETRIES
     road_gdf.geometry = road_gdf.geometry.simplify(tolerance=tolerance)
@@ -532,6 +557,10 @@ if __name__ =='__main__':
     road_gdf, road_gdf_graph = generate_damage_input(0.001)
     road_gdf.rename(columns={'highway': 'infra_type'}, inplace=True)
     assert 'infra_type' in road_gdf.columns
+
+    road_gdf= apply_road_mapping(road_gdf)  # Map the infra_types (many) to road_types (a few)
+
+
     #LOAD SOME SAMPLE DATA
     # LOAD SHAPEFILE TO CROP THE HAZARD MAP
     filename = 'NUTS332.shp'
