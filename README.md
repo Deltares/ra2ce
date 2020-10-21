@@ -18,6 +18,8 @@ The user needs to decide which analysis should be performed:
 
 Both Direct damanges and Redundancy-based criticality have their own functionalities. See for more detail below.
 
+Contact details: RA2CE Margreet van Marle (Margreet.vanMarle@Deltares.nl), Direct Damages: Kees van Ginkel (Kees.vanGinkel@Deltares.nl, Criticality: Frederique de Groen (Frederique.deGroen@Deltares.nl)
+
 ## Network Creation
 THe user needs to decide which type of input data will be used to create the infrastructure network. Currently the following 3 methods are implemented
 - *Create a network based on OSM dump file* (.osm.pbf) -  The user needs to identify the name of the OSM dump and a shapefile containing the area of interest. 
@@ -50,10 +52,14 @@ The user will need to identify the vulnerability curves for the hazard intensity
 
 ## Risk prioritization - to be implemented
 # Installation
-
-## Config file
+in PYcharm use the ra2ce.yml file to set up an environment. This is running on Python 3.7. The python interpreter should be based on ra2ce.
+Furthermore the user should set the working directory to the main ra2ce folder: not ra2ce/ra2ce/ra2ce (where the ra2ce script is located).
 
 ## Testing
+Test files are standard refered to in the ra2ce.py (main script). This will perform a multi-link diruption based on a map in the dominican republic.
+
+## Config file
+Standard the utils.py directs to the test_config.json file. When the test is exiting without errors, the user should change this to config.json to perform their own analysis.
 
 # User input
 THe user needs to fill out the document to_fill_in.xlsx and has to choose for several options. Multiple analysis can be done: add another row with settings for the different calculations.
