@@ -285,6 +285,15 @@ def add_default_lanes(x, default_lanes_dict):
     Returns:
     *x* with the updated number of lanes
     """
+    #print(x)
+    #print(x.lanes)
+
+
+    #Note: fetch_roads delivers numpy nans for roads without lane data;
+    #      create_network_from_osm_dump() delivers string nans
+    #if np.isnan(x.lanes) or  x.lanes == 'nan':
+    #TODO: BETTER TO MAKE SURE EACH INPUT SCRIPT DELIVERS THE SAME TYPE OF NAN!!!
+    #if x.lanes == 'nan':
 
     if np.isnan(x.lanes):
         x.lanes = default_lanes_dict['NL'][x['road_type']]
@@ -428,7 +437,8 @@ def road_loss_estimation(x, interpolator, events, max_damages, max_damages_HZ, c
         *x* (GeoPandas Series) -- the input row, but with new elements: the waterdepths and inundated lengths per RP, and associated damages for different damage curves
 
     """
-    try:
+    #try:
+    if True:
         # GET THE EVENT-INDEPENDENT METADATA FROM X
         road_type = x["road_type"]  # get the right road_type to lookup ...
 
@@ -477,22 +487,22 @@ def road_loss_estimation(x, interpolator, events, max_damages, max_damages_HZ, c
                 x["dam_{}_{}".format(curve_name, event)] = tuple(results)  # save results as a new column to series x
 
     # HANDLE EXCEPTIONS BY RETURNING ZERO DAMAGE IN THE APPROPRIATE FORMAT
-    except Exception as e:
-        errorstring = "Issue with road_loss_estimation, for  x = {} \n exception = {} \n Damages set to zero. \n \n".format(
-            str(x), e)
-        log_file = kwargs.get('log_file', None)  # get the name of the log file from the keyword arguments
-        if log_file is not None:  # write to log file
-            file = open(log_file, mode="a")
-            file.write(errorstring)
-            file.close()
-        else:  # If no log file is provided, print the string instead
-            print(errorstring)
-
-        for event in events:
-            if curve_name == "HZ":
-                x["dam_{}_{}".format(curve_name, event)] = 0
-            else:
-                x["dam_{}_{}".format(curve_name, event)] = tuple([0] * 5)  # save empty tuple (0,0,0,0,0)
+    # except Exception as e:
+    #     errorstring = "Issue with road_loss_estimation, for  x = {} \n exception = {} \n Damages set to zero. \n \n".format(
+    #         str(x), e)
+    #     log_file = kwargs.get('log_file', None)  # get the name of the log file from the keyword arguments
+    #     if log_file is not None:  # write to log file
+    #         file = open(log_file, mode="a")
+    #         file.write(errorstring)
+    #         file.close()
+    #     else:  # If no log file is provided, print the string instead
+    #         print(errorstring)
+    #
+    #     for event in events:
+    #         if curve_name == "HZ":
+    #             x["dam_{}_{}".format(curve_name, event)] = 0
+    #         else:
+    #             x["dam_{}_{}".format(curve_name, event)] = tuple([0] * 5)  # save empty tuple (0,0,0,0,0)
 
     return x
 
@@ -538,6 +548,7 @@ def calculate_direct_damage(road_gdf):
 
     hzd_names = [i.split('val_')[1] for i in val_cols]
 
+    #TODO: DIT LIJKT ME EEN BEETJE OMSLACHTIG, KAN MISSCHIEN NOG WAT OVERZICHTELIJKER
     for curve_name in interpolators:
         interpolator = interpolators[curve_name]  # select the right interpolator
         df = df.progress_apply(
@@ -558,11 +569,17 @@ if __name__ =='__main__':
     road_gdf.rename(columns={'highway': 'infra_type'}, inplace=True)
     assert 'infra_type' in road_gdf.columns
 
-    road_gdf= apply_road_mapping(road_gdf)  # Map the infra_types (many) to road_types (a few)
+    #PLEASE NOTE THAT THE LINE BELOW CRIES FOR AN OBJECT-BASED APPROACH (OOP) :)
+    #OOP would make it:
+    #road_gdf.apply_road_mapping()
+    road_gdf = apply_road_mapping(road_gdf)  # Map the infra_types (many) to road_types (a few)
 
+    #TODO: THIS SHOULD NOT BE DONE HERE, BUT ALREADY IN THE GENERATE_DAMAGE_INPUT
+    road_gdf.loc[road_gdf.lanes == 'nan','lanes'] = np.nan #replace string nans with numpy nans
+    road_gdf.lanes = road_gdf.lanes.astype('float') #convert strings to floats (not int, because int cant have nan)
 
     #LOAD SOME SAMPLE DATA
-    # LOAD SHAPEFILE TO CROP THE HAZARD MAP
+    #LOAD SHAPEFILE TO CROP THE HAZARD MAP
     filename = 'NUTS332.shp'
     region_path = os.path.join(load_config()['paths']['test_area_of_interest'],filename)
 
