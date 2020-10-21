@@ -18,7 +18,7 @@ The user needs to decide which analysis should be performed:
 
 Both Direct damanges and Redundancy-based criticality have their own functionalities. See for more detail below.
 
-Contact details: Margreet van Marle (Margreet.vanMarle@Deltares.nl), Kees van Ginkel (Kees.vanGinkel@Deltares.nl, Frederique de Groen (Frederique.deGroen@Deltares.nl)
+Contact details: RA2CE Margreet van Marle (Margreet.vanMarle@Deltares.nl), Direct Damages: Kees van Ginkel (Kees.vanGinkel@Deltares.nl, Criticality: Frederique de Groen (Frederique.deGroen@Deltares.nl)
 
 ## Network Creation
 THe user needs to decide which type of input data will be used to create the infrastructure network. Currently the following 3 methods are implemented
