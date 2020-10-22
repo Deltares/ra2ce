@@ -1,9 +1,13 @@
+import os
+import sys
+folder = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(folder)
+
 # Direct analyses
 from collections import defaultdict, OrderedDict
 import pickle
 import pandas as pd
 import geopandas as gpd
-import os
 from boltons.iterutils import pairwise
 from geopy.distance import vincenty
 from natsort import natsorted
