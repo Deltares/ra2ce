@@ -32,18 +32,18 @@ RA2CE
 Risk Assessment and Adaptation for Critical InfrastructurE (RA2CE) is a tool developed by Deltares for calculating damages and losses for infrastructure networks resulting from hazards.
 
 The tool consists currently of four components:
-- Network creation
-- Exposure
-- Criticality
-- Damages
+* Network creation
+* Exposure
+* Criticality
+* Damages
 
-- Prioritization - to be implemented
-- Adaptation - to be implemented
+* Prioritization - to be implemented
+* Adaptation - to be implemented
 
 The user needs to decide which analysis should be performed:
-- Direct damages 
-- Redundancy-based criticality
-- Both
+* Direct damages 
+* Redundancy-based criticality
+* Both
 
 Both Direct damanges and Redundancy-based criticality have their own functionalities. See for more detail below.
 
@@ -52,8 +52,8 @@ Contact details: RA2CE Margreet van Marle (Margreet.vanMarle@Deltares.nl), Direc
 Network Creation
 --------
 The user needs to decide which type of input data will be used to create the infrastructure network. Currently the following 3 methods are implemented
-- *Create a network based on OSM dump file* (.osm.pbf) -  The user needs to identify the name of the OSM dump and a shapefile containing the area of interest. 
-- *Create a network based on a shapefile*  - The user needs to deliver a shapefile and indicate the column of the unique identifier.
+* *Create a network based on OSM dump file* (.osm.pbf) -  The user needs to identify the name of the OSM dump and a shapefile containing the area of interest. 
+* *Create a network based on a shapefile*  - The user needs to deliver a shapefile and indicate the column of the unique identifier.
 
 (- Create a network based on OSM online download) - to be implemented
 
@@ -110,26 +110,26 @@ Name that you want to give to the analysis (output files will start with this na
 analysis
 --------
 Choose from: 
-- *Direct Damages*
-- *Redundancy-based criticality*
-- *Both*
+* *Direct Damages*
+* *Redundancy-based criticality*
+* *Both*
 
 links_analysis
 --------
 Only when chosen for *Redundancy-based criticality* or *Both*
 
 Choose from:
-- *Single-link Disruption*
-- *Multi-link Disruption (1): Calculate the disruption for all damaged roads*
-- *Multi-link Disruption (2): Calculate the disruption for an Origin/Destination matrix*
+* *Single-link Disruption*
+* *Multi-link Disruption (1): Calculate the disruption for all damaged roads*
+* *Multi-link Disruption (2): Calculate the disruption for an Origin/Destination matrix*
 
 network_source
 --------
 Choose how the network will be created. 
 Choose from:
-- *Network based on shapefile* - user needs to provide shapefile with network and indicate the attribute with unique_ID at **shp_input_data** and **shp_unique_ID** in input table
-- *Network based on OSM dump* - user needs to provide .shp file with area of interest at **OSM_area_of_interest** in input table
-- *Network based on OSM online* - user needs to provide .shp file with area of interest at **OSM_area_of_interest** in input table
+* *Network based on shapefile* - user needs to provide shapefile with network and indicate the attribute with unique_ID at **shp_input_data** and **shp_unique_ID** in input table
+* *Network based on OSM dump* - user needs to provide .shp file with area of interest at **OSM_area_of_interest** in input table
+* *Network based on OSM online* - user needs to provide .shp file with area of interest at **OSM_area_of_interest** in input table
 
 OSM_area_of_interest
 --------
@@ -150,9 +150,9 @@ In case you would like to make use of the underlying network for diversions, add
 data_manipulation
 --------
 When choosing **network_source** *Network based on shapefile* indicate whether the shapefile should be fixed for unconnected lines. After performing this analysis, the user should check out the result via shapefile based on visual inspection. Choose from:
-- *snapping*
-- *pruning*
-- *snapping,pruning*
+* *snapping*
+* *pruning*
+* *snapping,pruning*
 
 snapping_threshold
 --------
@@ -161,11 +161,11 @@ When choosing **network_source** *Network based on shapefile* and **data_manipul
 network_type
 --------
 Choose from:
-- *walk*
-- *bike*
-- *drive*
-- *drive_service*
-- *all*
+* *walk*
+* *bike*
+* *drive*
+* *drive_service*
+* *all*
 
 When left empty default is: XXXXX
 
@@ -174,12 +174,12 @@ road_types -> **change to infrastructure_type?**
 Here the user can specify which network_types are included in the network. These can be used for creation of the vulnerability curve input sheets. **andere dingen ook nog?**
 When left empty default is **XXXXXX**
 Anny option is valid, but these are some commmon types:
-- *motorway, trunk, primary, secondary, tertiary*
-- *motorway, trunk, primary, secondary*
-- *motorway, trunk, primary*
-- *motorway, trunk*
-- *motorway*
-- *add another option here*
+* *motorway, trunk, primary, secondary, tertiary*
+* *motorway, trunk, primary, secondary*
+* *motorway, trunk, primary*
+* *motorway, trunk*
+* *motorway*
+* *add another option here*
 
 hazard_data
 --------
@@ -200,9 +200,9 @@ Indicate here the units for the hazard intensity described in **hazard_attribute
 hazard_aggregation
 --------
 When translating the hazard intensity to the infrastructure network, indicate how the hazard intensity should be determined in case of crossing multiple hazard intensities. It can include the following options 
-- *max*
-- *min*
-- *mean*
+* *max*
+* *min*
+* *mean*
 
 in case of multiple analyses, separate by comma.
 
