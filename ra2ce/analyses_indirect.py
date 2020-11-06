@@ -7,8 +7,11 @@ Frederique de Groen (frederique.degroen@deltares.nl)
 """
 
 # external modules
-import pandas as pd
 import os, sys
+folder = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(folder)
+
+import pandas as pd
 import time
 import logging
 import networkx as nx
@@ -27,7 +30,7 @@ from geopy import distance
 # local modules
 from utils import load_config
 
-LOG_FILENAME = './logs/log_file.log'
+LOG_FILENAME = './logs/log_analyses_indirect.log'
 logging.basicConfig(format='%(asctime)s - %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S',
                     filename=LOG_FILENAME,
