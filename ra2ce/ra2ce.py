@@ -14,7 +14,7 @@ import pandas as pd
 from utils import load_config, create_path
 from create_network_from_shp import create_network_from_shapefile
 from create_network_from_osm_dump import from_dump_tool_workflow
-from create_network_from_polygon import get_graph_from_polygon
+from create_network_from_polygon import from_polygon_tool_workflow
 import analyses_indirect as indirect
 import analyses_direct as direct
 
@@ -66,9 +66,9 @@ def create_network(inputDict):
         roadTypes = inputDict['road_types'].lower().replace(' ', '').split(',')
         G, edge_gdf = from_dump_tool_workflow(inputDict["name_of_pbf"], roadTypes)
     elif inputDict['network_source'] == 'Network based on OSM online':
-        networkType = inputDict['network_type'].lower().replace(' ', '')  # decapitalize and remove all whitespaces
-        roadTypes = inputDict['road_types'].lower().replace(',', '|')
-        G, edge_gdf = get_graph_from_polygon(inputDict["area_of_interest"], networkType, roadTypes)
+        inputDict['network_type'] = inputDict['network_type'].lower().replace(' ', '')  # decapitalize and remove all whitespaces
+        inputDict['road_types'] = inputDict['road_types'].lower().replace(',', '|')
+        G, edge_gdf = from_polygon_tool_workflow(inputDict)
     else:
         Exception("Check your user_input.xlsx, the input under 'network_source' is not one of the given options.")
 

@@ -29,15 +29,6 @@ from utils import load_config
 from create_network_from_osm_dump import graph_create_unique_ids
 from create_network_from_osm_dump import graph_to_gdf
 
-LOG_FILENAME = './logs/log_create_network_from_poly.log'
-logging.basicConfig(format='%(asctime)s - %(message)s',
-                    datefmt='%d-%b-%y %H:%M:%S',
-                    filename=LOG_FILENAME,
-                    level=logging.INFO)
-
-root = Path(__file__).parents[2]
-AllOutput = root / Path(load_config()['paths']['test_output'])
-AllInput = root / Path(load_config()['paths']['test_area_of_interest'])
 
 def graph_to_shp(G, edge_shp, node_shp):
     """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_shp and node_shp
@@ -188,7 +179,7 @@ def graph_from_polygon(polygon, network_type='all_private',
     return G
 
 
-def get_graph_from_polygon(InputDict, undirected=True, simplify=True, save_shapes=False):
+def get_graph_from_polygon(InputDict, undirected=True, simplify=True, save_shapes=''):
     """
     Get an OSMnx graph from a polygon shapefile .
 
@@ -209,7 +200,7 @@ def get_graph_from_polygon(InputDict, undirected=True, simplify=True, save_shape
 
 
     if 'OSM_area_of_interest' in InputDict:
-        PathShp = AllInput / InputDict['OSM_area_of_interest']
+        PathShp = InputDict['OSM_area_of_interest']
 
     if 'network_type' in InputDict:
         NetworkType = InputDict['network_type']
@@ -247,12 +238,12 @@ def get_graph_from_polygon(InputDict, undirected=True, simplify=True, save_shape
         print('Did not create a simplified version of the graph')
 
     if save_shapes:
-        graph_to_shp(G_complex, Path(AllOutput).joinpath('{}_edges.shp'.format('G_complex')),
-                 Path(AllOutput).joinpath('{}_nodes.shp'.format('G_complex')))
+        graph_to_shp(G_complex, Path(save_shapes).joinpath('{}_edges.shp'.format('G_complex')),
+                 Path(save_shapes).joinpath('{}_nodes.shp'.format('G_complex')))
 
         if simplify:
-            graph_to_shp(G_simple, Path(AllOutput).joinpath('{}_edges.shp'.format('G_simple')),
-                 Path(AllOutput).joinpath('{}_nodes.shp'.format('G_simple')))
+            graph_to_shp(G_simple, Path(save_shapes).joinpath('{}_edges.shp'.format('G_simple')),
+                 Path(save_shapes).joinpath('{}_nodes.shp'.format('G_simple')))
 
     return G_complex, G_simple
 
@@ -274,7 +265,7 @@ def from_polygon_tool_workflow(InputDict):
         G_complex_edges (GeoDataFrame : Complex graph (for use in the direct analyses)
     """
     ra2ce_main_path = Path(__file__).parents[1]
-    G_complex, G_simple =get_graph_from_polygon(InputDict, save_shapes=True)
+    G_complex, G_simple =get_graph_from_polygon(InputDict, save_shapes=False)
 
     #CONVERT GRAPHS TO GEODATAFRAMES
     print('Start converting the graphs to geodataframes')
