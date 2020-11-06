@@ -29,7 +29,7 @@ from geopy import distance
 # local modules
 from utils import load_config
 
-LOG_FILENAME = os.path.join(folder, './logs/log_create_network_from_shapefile.log')
+LOG_FILENAME = os.path.join(folder, './logs/log_ra2ce.log')
 logging.basicConfig(format='%(asctime)s - %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S',
                     filename=LOG_FILENAME,
