@@ -625,7 +625,7 @@ if __name__ == '__main__':
 
     #testje voor Frederique
     pbf_path = Path(__file__).parents[1] / 'test/input/OSM_dumps/NL332.osm.pbf'
-    tags = ['motorway', 'motorway_link', 'primary', 'primary_link',
+    tags = ['motorway', 'mogittorway_link', 'primary', 'primary_link',
                 'secondary', 'secondary_link', 'trunk', 'trunk_link']
     G_simple, G_complex = from_dump_tool_workflow(pbf_path,road_types=tags)
     print('kiekeboe')
