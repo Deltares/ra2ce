@@ -100,8 +100,9 @@ Damages - to be implemented
 vulnerability curves for the hazard intensity and damage based on the
 following table: .xlsx
 
-Risk prioritization - to be implemented
+Risk prioritization
 ---------------------------------------
+Yet to be implemented.
 
 Installation
 ============
@@ -125,20 +126,21 @@ Standard the utils.py directs to the test\_config.json file. When the
 test is exiting without errors, the user should change this to
 config.json to perform their own analysis.
 
+
 User input
 ==========
 
-THe user needs to fill out the document to\_fill\_in.xlsx and has to
+The user needs to fill out the document to\_fill\_in.xlsx and has to
 choose for several options. Multiple analysis can be done: add another
 row with settings for the different calculations. Below is an overview
 of the user input variables. All relative paths are described in the
-Config file. All geospatial files should be projected in EPSG: 4326
+*config* file. All geospatial files should be projected in *EPSG:4326*.
 
 analysis\_name
 --------------
 
-Name that you want to give to the analysis (output files will start with
-this name)
+Name that you want to give to the analysis. All output files will start with
+this name.
 
 analysis
 --------
@@ -163,27 +165,31 @@ Choose from:
 network\_source
 ---------------
 
-Choose how the network will be created. Choose from: - *Network based on
-shapefile* - user needs to provide shapefile with network and indicate
+Choose how the network will be created. Choose from:
+
+- *Network based on shapefile* - user needs to provide shapefile with network and indicate
 the attribute with unique\_ID at **shp\_input\_data** and
-**shp\_unique\_ID** in input table - *Network based on OSM dump* - user
-needs to provide .shp file with area of interest at
-**OSM\_area\_of\_interest** in input table - *Network based on OSM
-online* - user needs to provide .shp file with area of interest at
+**shp\_unique\_ID** in input table
+- *Network based on OSM dump* - user needs to provide .shp file with area of interest at
+**OSM\_area\_of\_interest** in input table
+- *Network based on OSM online* - user needs to provide .shp file with area of interest at
 **OSM\_area\_of\_interest** in input table
 
 OSM\_area\_of\_interest
 -----------------------
 
-When choosing **network\_source** *Network based on OSM dump* or
-*Network based on OSM online* provide name of shapefile with region for
-OSM input.
+When choosing **network\_source** *Network based on OSM online* provide name of shapefile with region for
+OSM input. No extension needed.
+
+path\_to\_pbf
+----------------
+When choosing **network\_source** *Network based on OSM dump* based on OSM dump. Provide name of *.pbf dump. No extension needed.
 
 shp\_input\_data
 ----------------
 
 When choosing **network\_source** *Network based on shapefile* provide
-name of shapefile with with the infrastructure network.
+name of shapefile with with the infrastructure network.  No extension needed.
 
 shp\_unique\_ID
 ---------------
@@ -231,10 +237,10 @@ Choose from:
 
 When left empty default is: XXXXX
 
-road\_types -> **change to infrastructure\_type?**
+road\_types
 --------------------------------------------------
 
-Here the user can specify which network\_types are included in the
+Here the user can specify which road\_types are included in the
 network. These can be used for creation of the vulnerability curve input
 sheets. **andere dingen ook nog?** When left empty default is **XXXXXX**
 Anny option is valid, but these are some commmon types:
@@ -320,11 +326,11 @@ id\_name\_origin\_destination
 name of the attribute that is the Unique ID in both origin shapefiles
 and destination shapefiles
 
-infra\_usage -> ik zag deze niet staan in het excel bestand @frederique
+infra\_usage
 -----------------------------------------------------------------------
 
-file names where information on infrastructure usage is stored: the
-Average Annual Daily Traffic and costs per vehicle type
+File names where information on infrastructure usage is stored: the
+Average Annual Daily Traffic and costs per vehicle type. **This should be tested still!!**
 
 vulnerability\_functions --> deze moet nog toegevoegd!
 ------------------------------------------------------
