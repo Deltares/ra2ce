@@ -21,7 +21,7 @@ import numpy as np
 import logging
 from networkx import set_edge_attributes
 
-LOG_FILENAME = './logs/log_create_network_from_osm_dump.log'
+LOG_FILENAME = os.path.join(os.path.dirname(folder), './logs/log_ra2ce.log')
 logging.basicConfig(format='%(asctime)s - %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S',
                     filename=LOG_FILENAME,
@@ -30,6 +30,7 @@ logging.basicConfig(format='%(asctime)s - %(message)s',
 ### Overrule the OSMNX default settings to get the additional metadata such as street lighting (lit)
 osmnx.config(log_console=True, use_cache=True, useful_tags_path = osmnx.settings.useful_tags_path + ['lit'])
 sys.setrecursionlimit(10**5)
+
 
 def fetch_roads(region, osm_pbf_path, **kwargs):
     """

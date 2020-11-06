@@ -181,7 +181,7 @@ OSM\_area\_of\_interest
 When choosing **network\_source** *Network based on OSM online* provide name of shapefile with region for
 OSM input. No extension needed.
 
-path\_to\_pbf
+name\_of\_pbf
 ----------------
 When choosing **network\_source** *Network based on OSM dump* based on OSM dump. Provide name of *.pbf dump. No extension needed.
 
