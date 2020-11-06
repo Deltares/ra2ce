@@ -25,6 +25,7 @@ from networkx import set_edge_attributes
 osmnx.config(log_console=True, use_cache=True, useful_tags_path = osmnx.settings.useful_tags_path + ['lit'])
 sys.setrecursionlimit(10**5)
 
+# todo clean file: do we need the tests here as well or in a general test file?
 
 def fetch_roads(region, osm_pbf_path, **kwargs):
     """

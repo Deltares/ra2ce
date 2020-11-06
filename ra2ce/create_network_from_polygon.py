@@ -23,9 +23,9 @@ from osmnx.core import osm_net_download
 from osmnx.simplify import simplify_graph
 from osmnx.projection import project_geometry
 from osmnx.utils import count_streets_per_node
+import osmnx.settings as settings
 
 # local modules
-from utils import load_config
 from create_network_from_osm_dump import graph_create_unique_ids
 from create_network_from_osm_dump import graph_to_gdf
 
@@ -71,7 +71,7 @@ def graph_from_polygon(polygon, network_type='all_private',
                        timeout=180, memory=None,
                        max_query_area_size=50*1000*50*1000,
                        clean_periphery=True, infrastructure='way["highway"]',
-                       custom_filter=None):
+                       custom_filter=None, simplify=False):
     """
     Create a networkx graph from OSM data within the spatial boundaries of the
     passed-in shapely polygon.
@@ -175,7 +175,7 @@ def graph_from_polygon(polygon, network_type='all_private',
         # add unique identifier for the complex graph
         G = graph_create_unique_ids(G, 'G_complex_fid')
 
-    log('graph_from_polygon() returning graph with {:,} nodes and {:,} edges'.format(len(list(G.nodes())), len(list(G.edges()))))
+    logging.info('graph_from_polygon() returning graph with {:,} nodes and {:,} edges'.format(len(list(G.nodes())), len(list(G.edges()))))
     return G
 
 
@@ -217,15 +217,15 @@ def get_graph_from_polygon(InputDict, undirected=True, simplify=True, save_shape
         # assuming the empty cell in the excel is a numpy.float64 nan value
         #osmnx 0.16
         #G = osmnx.graph_from_polygon(polygon=polygon, network_type=NetworkType, custom_filter='["highway"~"{}"]'.format(RoadTypes))
-        G_complex = graph_from_polygon(polygon=polygon, network_type=NetworkType,infrastructure='way["highway"~"{}"]'.format(RoadTypes))
+        G_complex = graph_from_polygon(polygon=polygon, network_type=NetworkType,infrastructure='way["highway"~"{}"]'.format(RoadTypes), simplify=False)
     else:
-        G_complex = graph_from_polygon(polygon=polygon, network_type=NetworkType)
+        G_complex = graph_from_polygon(polygon=polygon, network_type=NetworkType, simplify=False)
 
 
     # we want to use undirected graphs, so turn into an undirected graph
-    if undirected:
-        if type(G_complex) == nx.classes.multidigraph.MultiDiGraph:
-            G_complex = G_complex.to_undirected()
+    # if undirected:
+    #     if type(G_complex) == nx.classes.multidigraph.MultiDiGraph:
+    #         G_complex = G_complex.to_undirected()
 
     # simplify the graph topology as the last step.
     if simplify:

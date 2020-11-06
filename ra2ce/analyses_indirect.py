@@ -28,10 +28,7 @@ from numpy import object as np_object
 from geopy import distance
 
 # local modules
-from utils import load_config
-
-
-AllOutput = load_config()["paths"]["output"]
+# todo change os to pathlib
 
 
 def single_link_alternative_routes(G, InputDict, crs=4326):
@@ -40,7 +37,6 @@ def single_link_alternative_routes(G, InputDict, crs=4326):
     an alternative route.
 
     Arguments:
-        AllOutput [string] = path where the output shapefiles should be saved
         InputDict [dictionary] = dictionary of input data used for calculating
             the costs for taking alternative routes
         ParameterNamesDict [dictionary] = names of the parameters used for calculating
@@ -72,7 +68,7 @@ def single_link_alternative_routes(G, InputDict, crs=4326):
 
     # save to shapefile
     gdf.crs = {'init': 'epsg:{}'.format(crs)}
-    save_name = os.path.join(AllOutput, '{}_criticality.shp'.format(InputDict['analysis_name']))
+    save_name = os.path.join(InputDict['output'], '{}_criticality.shp'.format(InputDict['analysis_name']))
     gdf_to_shp(gdf, save_name)
 
     print("\nThe shapefile with calculated criticality can be found here:\n{}".format(save_name))
@@ -123,7 +119,7 @@ def multi_link_alternative_routes(G, InputDict, crs=4326):
 
     # save to shapefile
     gdf.crs = {'init': 'epsg:{}'.format(crs)}
-    save_name = os.path.join(AllOutput, '{}_criticality.shp'.format(InputDict['analysis_name']))
+    save_name = os.path.join(InputDict['output'], '{}_criticality.shp'.format(InputDict['analysis_name']))
     gdf_to_shp(gdf, save_name)
 
     print("\nThe shapefile with calculated criticality can be found here:\n{}".format(save_name))
@@ -140,7 +136,6 @@ def multi_link_od_matrix(G, InputDict, crs=4326):
 
     Arguments:
         graph [networkx graph] = the graph with at least the columns that you use in group en sort
-        AllOutput [string] = path where the output shapefiles should be saved
         InputDict [dictionary] = dictionary of input data used for calculating
             the costs for taking alternative routes
     """
@@ -180,14 +175,14 @@ def multi_link_od_matrix(G, InputDict, crs=4326):
                         InputDict['id_od'], crs)
 
     ods = create_OD_pairs(ods, G, id_name)
-    G = add_od_nodes(G, ods, id_name, name=InputDict['analysis_name'], file_output=AllOutput, save_shp=True)
+    G = add_od_nodes(G, ods, id_name, name=InputDict['analysis_name'], file_output=InputDict['output'], save_shp=True)
 
     if weighing == 'time':
         # not yet possible for input with shapefiles, except when a max speed attribute is attached to the shapefile
         # calculate the time it takes per road segment
         avg_speeds = calc_avg_speed(G, 'highway', save_csv=True,
-                                    save_path=os.path.join(AllOutput, 'avg_speeds_{}.csv'.format(name)))
-        avg_speeds = pd.read_csv(os.path.join(AllOutput, 'avg_speeds_{}.csv'.format(name)))
+                                    save_path=os.path.join(InputDict['output'], 'avg_speeds_{}.csv'.format(InputDict['analysis_name'])))
+        avg_speeds = pd.read_csv(os.path.join(InputDict['output'], 'avg_speeds_{}.csv'.format(InputDict['analysis_name'])))
         if len(avg_speeds.loc[avg_speeds['avg_speed'] == 0]) > 0:
             logging.info("An average speed of 50 is used in locations where the maximum speed limit is 0 in OSM data.")
             avg_speeds.loc[avg_speeds['avg_speed'] == 0, 'avg_speed'] = 50  # this is assumed
@@ -201,14 +196,14 @@ def multi_link_od_matrix(G, InputDict, crs=4326):
     # Calculate the preferred routes
     pref_routes = preferred_routes_od(G, weighing, id_name, ods, crs, InputDict, shortest_route=True,
                                       save_shp=True, save_pickle=False,
-                                      file_output=AllOutput, name=InputDict['analysis_name'])
+                                      file_output=InputDict['output'], name=InputDict['analysis_name'])
 
     # Calculate the criticality
     gdf = criticality_multi_link_hazard_OD(G, pref_routes, weighing, InputDict['attribute_name'][0],
                                            InputDict['threshold'], crs)
 
     # save graph
-    save_name = os.path.join(AllOutput, '{}_criticality.shp'.format(InputDict['analysis_name']))
+    save_name = os.path.join(InputDict['output'], '{}_criticality.shp'.format(InputDict['analysis_name']))
     gdf_to_shp(gdf, save_name)
 
     print("\nThe shapefile with calculated criticality can be found here:\n{}".format(save_name))
