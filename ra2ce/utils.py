@@ -16,6 +16,11 @@ def load_config(test=False):
     return config
 
 
+def create_path(in_names, out_folder, extension):
+    return [os.path.join(out_folder, x) if x.endswith('.shp') else os.path.join(out_folder, x + '.shp') for x in
+        in_names.split(',')]
+
+
 if __name__=='__main__':
     print("Testing if the paths in the config file already exist")
     cfg = load_config()

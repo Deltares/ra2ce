@@ -8,6 +8,7 @@
 		"hazard" : "test\\input\\hazard_maps",
 		"OSM_dumps" : "test\\input\\OSM_dumps",
 		"area_of_interest" : "test\\input\\area_of_interest",
+		"origin_destination" : "test\\input\\origin_destination",
 		"network_shp" : "test\\input\\network_shp",
 		"temp" : "test\\temp",
 		"output" : "test\\output" },
