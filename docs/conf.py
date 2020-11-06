@@ -20,11 +20,10 @@
 import os
 import sys
 # This is not needed
-print('current dir', os.getcwd())
-print('list', os.listdir('.'))
-# sys.path.insert(0, os.path.abspath('..'))
-
+sys.path.insert(0, os.path.abspath('..'))
 import ra2ce
+print('ra2ce', ra2ce)
+print('dir', dir(ra2ce))
 
 # -- General configuration ---------------------------------------------
 
