@@ -23,11 +23,6 @@ from pathlib import Path
 from create_network_from_osm_dump import generate_damage_input
 import logging
 
-LOG_FILENAME = os.path.join(os.path.dirname(folder), './log_ra2ce.log')
-logging.basicConfig(format='%(asctime)s - %(message)s',
-                    datefmt='%d-%b-%y %H:%M:%S',
-                    filename=LOG_FILENAME,
-                    level=logging.INFO)
 
 #### AT THIS POINT, YOU MAY WANT TO DO CLEANING OF YOUR NETWORK, FOR EXAMPLE USING THE cleanup_fetch_roads() in OSdaMage ####
 
