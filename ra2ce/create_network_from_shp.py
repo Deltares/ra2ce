@@ -35,7 +35,7 @@ logging.basicConfig(format='%(asctime)s - %(message)s',
                     filename=LOG_FILENAME,
                     level=logging.INFO)
 
-AllOutput = load_config()["paths"]["test_output"]
+AllOutput = load_config()["paths"]["output"]
 
 
 def create_network_from_shapefile(InputDict, crs):
