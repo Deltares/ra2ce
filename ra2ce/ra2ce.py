@@ -3,14 +3,17 @@ Connecting to creating a network and/or graph, the analysis and the visualisatio
 """
 
 # external modules
-import os
+import os, sys
+folder = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(folder)
+
 import pandas as pd
 
 # local modules
 from utils import load_config
 from create_network_from_shp import create_network_from_shapefile
 import analyses_indirect as indir
-# from create_network_from_osm_dump import get_graph_from_polygon
+from create_network_from_osm_dump import get_graph_from_polygon
 # import from direct analyses file
 
 crs_ = 4326
@@ -19,7 +22,7 @@ crs_ = 4326
 def configure_user_input():
     """Configures the user input into a dictionary.
     """
-    df = pd.read_excel(load_config()["filenames"]["user_input_tests"])
+    df = pd.read_excel(load_config()["filenames"]["user_input"])
     # clean up dataframe: remove rows and columns that only contain nan values
     df.dropna(axis=1, how='all', inplace=True)
     input_dict = df.to_dict(orient='index')
@@ -34,6 +37,7 @@ def configure_user_input():
 
     return input_dict
 
+
 def create_network(inputDict):
     """Depending on the user input, a network/graph is created.
     """
@@ -44,7 +48,10 @@ def create_network(inputDict):
     elif inputDict['network_source'] == 'Network based on OSM dump':
         print("Script not yet connected")
     elif inputDict['network_source'] == 'Network based on OSM online':
-        print("Script not yet connected")
+        areaOfInterest = os.path.join(load_config()["paths"]["area_of_interest"], inputDict['OSM_area_of_interest'] + '.shp')
+        networkType = inputDict['network_type'].lower().replace(' ', '')  # decapitalize and remove all whitespaces
+        roadTypes = inputDict['road_types'].lower().replace(',', '|')
+        graph, gdf = get_graph_from_polygon(areaOfInterest, networkType, roadTypes)
     else:
         Exception("Check your user_input.xlsx, the input under 'network_source' is not one of the given options.")
 
@@ -79,11 +86,11 @@ def start_analysis(inputDict, G, network):
         # ...
         # The indirect analysis
         if inputDict['links_analysis'] == 'Single-link Disruption':
-            indir.single_link_alternative_routes(G, inputDict, crs_)
+            indir.single_link_alternative_routes(G, inputDict)
         elif inputDict['links_analysis'] == 'Multi-link Disruption (1): Calculate the disruption for all damaged roads':
-            indir.multi_link_alternative_routes(G, inputDict, crs_)
+            indir.multi_link_alternative_routes(G, inputDict)
         elif inputDict['links_analysis'] == 'Multi-link Disruption (2): Calculate the disruption for an Origin/Destination matrix':
-            indir.multi_link_od_matrix(G, inputDict, crs_)
+            indir.multi_link_od_matrix(G, inputDict)
         else:
             Exception("Check your user_input.xlsx, the input under 'links_analysis' is not one of the given options.")
 

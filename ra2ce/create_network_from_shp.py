@@ -29,13 +29,13 @@ from geopy import distance
 # local modules
 from utils import load_config
 
-LOG_FILENAME = './logs/log_create_network_from_shapefile.log'
+LOG_FILENAME = os.path.join(folder, './logs/log_create_network_from_shapefile.log')
 logging.basicConfig(format='%(asctime)s - %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S',
                     filename=LOG_FILENAME,
                     level=logging.INFO)
 
-AllOutput = load_config()["paths"]["test_output"]
+AllOutput = load_config()["paths"]["output"]
 
 
 def create_network_from_shapefile(InputDict, crs):
