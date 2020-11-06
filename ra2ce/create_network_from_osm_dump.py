@@ -20,7 +20,7 @@ from decimal import Decimal
 import numpy as np
 import logging
 
-LOG_FILENAME = './logs/log_create_network_from_osm_dump.log'
+LOG_FILENAME = os.path.join(folder, './logs/log_create_network_from_osm_dump.log')
 logging.basicConfig(format='%(asctime)s - %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S',
                     filename=LOG_FILENAME,
