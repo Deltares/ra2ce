@@ -26,7 +26,7 @@ functionalities. See for more detail below.
 
 Contact details: RA2CE Margreet van Marle
 (Margreet.vanMarle@Deltares.nl), Direct Damages: Kees van Ginkel
-(Kees.vanGinkel@Deltares.nl, Criticality: Frederique de Groen
+(Kees.vanGinkel@Deltares.nl), Criticality: Frederique de Groen
 (Frederique.deGroen@Deltares.nl)
 
 Network Creation
