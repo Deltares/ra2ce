@@ -13,7 +13,8 @@ import pandas as pd
 # local modules
 from utils import load_config, create_path
 from create_network_from_shp import create_network_from_shapefile
-from create_network_from_osm_dump import get_graph_from_polygon, generate_damage_input
+from create_network_from_osm_dump import from_dump_tool_workflow
+from create_network_from_polygon import get_graph_from_polygon
 import analyses_indirect as indirect
 import analyses_direct as direct
 
@@ -63,12 +64,11 @@ def create_network(inputDict):
         G, edge_gdf = create_network_from_shapefile(inputDict, crs_)
     elif inputDict['network_source'] == 'Network based on OSM dump':
         roadTypes = inputDict['road_types'].lower().replace(' ', '').split(',')
-        G, edge_gdf = generate_damage_input(0.001)  # TODO should be updated with new version @Margreet
+        G, edge_gdf = from_dump_tool_workflow(inputDict["path_to_pbf"], roadTypes)
     elif inputDict['network_source'] == 'Network based on OSM online':
-        areaOfInterest = os.path.join(cfg["paths"]["area_of_interest"], inputDict['OSM_area_of_interest'] + '.shp')
         networkType = inputDict['network_type'].lower().replace(' ', '')  # decapitalize and remove all whitespaces
         roadTypes = inputDict['road_types'].lower().replace(',', '|')
-        G, edge_gdf = get_graph_from_polygon(areaOfInterest, networkType, roadTypes)
+        G, edge_gdf = get_graph_from_polygon(inputDict["area_of_interest"], networkType, roadTypes)
     else:
         Exception("Check your user_input.xlsx, the input under 'network_source' is not one of the given options.")
 
