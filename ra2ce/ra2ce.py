@@ -12,9 +12,9 @@ import pandas as pd
 # local modules
 from utils import load_config
 from create_network_from_shp import create_network_from_shapefile
-import analyses_indirect as indir
-from create_network_from_osm_dump import get_graph_from_polygon
-# import from direct analyses file
+from create_network_from_osm_dump import get_graph_from_polygon, generate_damage_input
+import analyses_indirect as indirect
+import analyses_direct as direct
 
 crs_ = 4326
 
@@ -29,11 +29,11 @@ def configure_user_input():
 
     # TODO: implement function to map all the right values in the dict to a list
     #  (the filenames and things that belong to those files)
-    for analysis in input_dict.keys():
-        if 'hazard_data' in input_dict[analysis]:
-            input_dict[analysis]['hazard_data'] = [os.path.join(load_config()["paths"]["test_hazard"], x) for x in
-                                 input_dict[analysis]['hazard_data'].replace(" ", "").split(',')]
-            input_dict[analysis]['hazard_attribute_name'] = [x.strip() for x in input_dict[analysis]['hazard_attribute_name'].split(',')]
+    for theAnalysis in input_dict.keys():
+        if 'hazard_data' in input_dict[theAnalysis]:
+            input_dict[theAnalysis]['hazard_data'] = [os.path.join(load_config()["paths"]["hazard"], x) for x in
+                                 input_dict[theAnalysis]['hazard_data'].replace(" ", "").split(',')]
+            input_dict[theAnalysis]['hazard_attribute_name'] = [x.strip() for x in input_dict[theAnalysis]['hazard_attribute_name'].split(',')]
 
     return input_dict
 
@@ -44,14 +44,14 @@ def create_network(inputDict):
 
     # Create the network from the network source
     if inputDict['network_source'] == 'Network based on shapefile':
-        graph, gdf = create_network_from_shapefile(inputDict, crs_)
+        G, edge_gdf = create_network_from_shapefile(inputDict, crs_)
     elif inputDict['network_source'] == 'Network based on OSM dump':
-        print("Script not yet connected")
+        G, edge_gdf = generate_damage_input(0.001)  # TODO should be updated with new version @Margreet
     elif inputDict['network_source'] == 'Network based on OSM online':
         areaOfInterest = os.path.join(load_config()["paths"]["area_of_interest"], inputDict['OSM_area_of_interest'] + '.shp')
         networkType = inputDict['network_type'].lower().replace(' ', '')  # decapitalize and remove all whitespaces
         roadTypes = inputDict['road_types'].lower().replace(',', '|')
-        graph, gdf = get_graph_from_polygon(areaOfInterest, networkType, roadTypes)
+        G, edge_gdf = get_graph_from_polygon(areaOfInterest, networkType, roadTypes)
     else:
         Exception("Check your user_input.xlsx, the input under 'network_source' is not one of the given options.")
 
@@ -63,7 +63,7 @@ def create_network(inputDict):
     # elif inputDict['analysis'] == 'Both':
     #     # create gdf and graph
 
-    return graph, gdf
+    return G, edge_gdf
 
 
 def start_analysis(inputDict, G, network):
@@ -73,11 +73,11 @@ def start_analysis(inputDict, G, network):
         print("Script not yet connected")
     elif inputDict['analysis'] == 'Redundancy-based criticality':
         if inputDict['links_analysis'] == 'Single-link Disruption':
-            indir.single_link_alternative_routes(G, inputDict, crs_)
+            indirect.single_link_alternative_routes(G, inputDict, crs_)
         elif inputDict['links_analysis'] == 'Multi-link Disruption (1): Calculate the disruption for all damaged roads':
-            indir.multi_link_alternative_routes(G, inputDict, crs_)
+            indirect.multi_link_alternative_routes(G, inputDict, crs_)
         elif inputDict['links_analysis'] == 'Multi-link Disruption (2): Calculate the disruption for an Origin/Destination matrix':
-            indir.multi_link_od_matrix(G, inputDict, crs_)
+            indirect.multi_link_od_matrix(G, inputDict, crs_)
         else:
             Exception("Check your user_input.xlsx, the input under 'links_analysis' is not one of the given options.")
 
@@ -86,23 +86,23 @@ def start_analysis(inputDict, G, network):
         # ...
         # The indirect analysis
         if inputDict['links_analysis'] == 'Single-link Disruption':
-            indir.single_link_alternative_routes(G, inputDict)
+            indirect.single_link_alternative_routes(G, inputDict)
         elif inputDict['links_analysis'] == 'Multi-link Disruption (1): Calculate the disruption for all damaged roads':
-            indir.multi_link_alternative_routes(G, inputDict)
+            indirect.multi_link_alternative_routes(G, inputDict)
         elif inputDict['links_analysis'] == 'Multi-link Disruption (2): Calculate the disruption for an Origin/Destination matrix':
-            indir.multi_link_od_matrix(G, inputDict)
+            indirect.multi_link_od_matrix(G, inputDict)
         else:
             Exception("Check your user_input.xlsx, the input under 'links_analysis' is not one of the given options.")
 
 
 if __name__ == '__main__':
     # configure excel user input in the right format
-    input_dict = configure_user_input()
+    input_dict = configure_user_input(test=True)
 
     for analysis in input_dict.keys():
         # create the network: a geodataframe and/or graph is created depending on the user input
-        graph, gdf = create_network(input_dict[analysis])
-        start_analysis(input_dict[analysis], graph, gdf)
+        graph, edgeGdf = create_network(input_dict[analysis])
+        start_analysis(input_dict[analysis], graph, edgeGdf)
         print("Finished run", input_dict[analysis]['analysis_name'])
 
     print("Done.")
