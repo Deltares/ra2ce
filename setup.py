@@ -17,7 +17,7 @@ setup_requirements = ['pytest-runner', ]
 test_requirements = ['pytest>=3', ]
 
 setup(
-    author="Margreet van Marle",
+    author="Frederique de Groen, Kees van Ginkel, Margreet van Marle, Amine Aboufirass",
     author_email='Margreet.vanMarle@deltares.nl',
     python_requires='>=3.5',
     classifiers=[
@@ -47,7 +47,7 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/mjevanmarle/ra2ce',
-    version='0.1.0',
+    url='https://github.com/Deltares/ra2ce',
+    version='0.0.1',
     zip_safe=False,
 )
