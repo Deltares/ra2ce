@@ -4,17 +4,16 @@
         "code" : "ra2ce\\ra2ce",
 		"settings" : "settings",
 		"test" : "test",
-		"test_input" : "test\\input",
-		"test_hazard" : "test\\input\\hazard_maps",
-		"test_OSM_dumps" : "test\\input\\OSM_dumps",
-		"test_area_of_interest" : "test\\input\\area_of_interest",
-		"test_network_shp" : "test\\input\\network_shp",
-		"test_temp" : "test\\temp",
-		"test_output" : "test\\output" },
+		"input" : "test\\input",
+		"hazard" : "test\\input\\hazard_maps",
+		"OSM_dumps" : "test\\input\\OSM_dumps",
+		"area_of_interest" : "test\\input\\area_of_interest",
+		"network_shp" : "test\\input\\network_shp",
+		"temp" : "test\\temp",
+		"output" : "test\\output" },
 		
     "filenames": {
         "default_lanes" : "default_lanes_temp.pkl",
-	"user_input" : "input\\user_input.xlsx",
-	"user_input_tests" : "input\\user_input_tests.xlsx"
+	"user_input" : "input\\user_input_tests.xlsx"
     }
 }
