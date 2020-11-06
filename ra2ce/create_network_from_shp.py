@@ -7,13 +7,16 @@ Frederique de Groen (frederique.degroen@deltares.nl)
 """
 
 # external modules
+import os, sys
+folder = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(folder)
+
 import networkx as nx
 import osmnx
 import pandas as pd
 import warnings
 import geopandas as gpd
 import itertools
-import os, sys
 import logging
 import rtree
 from shapely.geometry import Point, LineString, MultiLineString

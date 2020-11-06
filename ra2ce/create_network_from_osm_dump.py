@@ -1,24 +1,30 @@
 # create graph from OSM
-import os as os
-import geopandas as gpd
+import os, sys
+folder = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(folder)
+
 from shapely.wkb import loads
 import ogr
-import numpy as np
 import networkx as nx
 import osmnx
 import fiona
 from shapely.geometry import shape
 import geopandas as gpd
 from pathlib import Path
-import os
-import sys
 from numpy import object as np_object
 import time
 import filecmp
 from utils import load_config
-from shapely.geometry import LineString, MultiLineString, Point
+from shapely.geometry import LineString, Point
 from decimal import Decimal
 import numpy as np
+import logging
+
+LOG_FILENAME = './logs/log_create_network_from_osm_dump.log'
+logging.basicConfig(format='%(asctime)s - %(message)s',
+                    datefmt='%d-%b-%y %H:%M:%S',
+                    filename=LOG_FILENAME,
+                    level=logging.INFO)
 
 ### Overrule the OSMNX default settings to get the additional metadata such as street lighting (lit)
 osmnx.config(log_console=True, use_cache=True, useful_tags_path = osmnx.settings.useful_tags_path + ['lit'])
@@ -38,6 +44,7 @@ def get_graph_from_polygon(PathShp, NetworkType, RoadTypes=None):
         G [networkx multidigraph]
     """
     with fiona.open(PathShp) as source:
+        logging.info("Shapefile from {} loaded with CRS: {}".format(PathShp, source.crs))
         for r in source:
             if 'geometry' in r:  # added this line to not take into account "None" geometry
                 polygon = shape(r['geometry'])
@@ -71,7 +78,6 @@ def fetch_roads(region, osm_pbf_path, **kwargs):
     """
 
     ## LOAD FILE
-
     driver = ogr.GetDriverByName('OSM')
     data = driver.Open(osm_pbf_path)
 
