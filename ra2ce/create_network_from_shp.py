@@ -31,7 +31,7 @@ from utils import load_config
 
 cfg = load_config(test=True)     # get config file
 
-LOG_FILENAME = os.path.join(os.path.dirname(folder), './logs/log_ra2ce.log')
+LOG_FILENAME = os.path.join(os.path.dirname(folder), './log_ra2ce.log')
 logging.basicConfig(format='%(asctime)s - %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S',
                     filename=LOG_FILENAME,

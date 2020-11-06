@@ -44,7 +44,7 @@ def configure_user_input(cfg):
             input_dict[theAnalysis]['OSM_area_of_interest'] = create_path(input_dict[theAnalysis]['OSM_area_of_interest'],
                                                                     cfg["paths"]["area_of_interest"], '.shp')
         if 'path_to_pbf' in input_dict[theAnalysis]:
-            input_dict[theAnalysis]['path_to_pbf'] = create_path(input_dict[theAnalysis]['path_to_pbf'],
+            input_dict[theAnalysis]['name_of_pbf'] = create_path(input_dict[theAnalysis]['name_of_pbf'],
                                                                     cfg["paths"]["OSM_dumps"], '.pbf')
         if 'origin_shp' in input_dict[theAnalysis]:
             input_dict[theAnalysis]['origin_shp'] = create_path(input_dict[theAnalysis]['origin_shp'],
@@ -64,7 +64,7 @@ def create_network(inputDict):
         G, edge_gdf = create_network_from_shapefile(inputDict, crs_)
     elif inputDict['network_source'] == 'Network based on OSM dump':
         roadTypes = inputDict['road_types'].lower().replace(' ', '').split(',')
-        G, edge_gdf = from_dump_tool_workflow(inputDict["path_to_pbf"], roadTypes)
+        G, edge_gdf = from_dump_tool_workflow(inputDict["name_of_pbf"], roadTypes)
     elif inputDict['network_source'] == 'Network based on OSM online':
         networkType = inputDict['network_type'].lower().replace(' ', '')  # decapitalize and remove all whitespaces
         roadTypes = inputDict['road_types'].lower().replace(',', '|')
@@ -117,12 +117,12 @@ def main(argv):
     config = load_config(test=argv[0])  # get config file
     # configure excel user input in the right format
     input_dict = configure_user_input(config)
-    #
-    # for analysis in input_dict.keys():
-    #     # create the network: a geodataframe and/or graph is created depending on the user input
-    #     graph, edgeGdf = create_network(input_dict[analysis])
-    #     start_analysis(input_dict[analysis], graph, edgeGdf)
-    #     print("Finished run", input_dict[analysis]['analysis_name'])
+
+    for analysis in input_dict.keys():
+        # create the network: a geodataframe and/or graph is created depending on the user input
+        graph, edgeGdf = create_network(input_dict[analysis])
+        start_analysis(input_dict[analysis], graph, edgeGdf)
+        print("Finished run", input_dict[analysis]['analysis_name'])
 
     print("Done.")
 
