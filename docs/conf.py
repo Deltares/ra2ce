@@ -19,7 +19,8 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
+# This is not needed
+# sys.path.insert(0, os.path.abspath('..'))
 
 import ra2ce
 
@@ -157,6 +158,3 @@ texinfo_documents = [
      'One line description of project.',
      'Miscellaneous'),
 ]
-
-
-
