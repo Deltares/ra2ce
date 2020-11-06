@@ -417,8 +417,8 @@ def test_create_network_from_osm_dump():
 
 def generate_damage_input(split_length):
     root = Path(__file__).parents[2]
-    test_output_dir = Path(load_config()['paths']['test_output'])
-    test_input_osm_dumps_dir = Path(load_config()['paths']['test_OSM_dumps'])
+    test_output_dir = Path(load_config()['paths']['output'])
+    test_input_osm_dumps_dir = Path(load_config()['paths']['OSM_dumps'])
 
     osm_filter_exe = root / 'osmfilter.exe'
     osm_convert_exe = root / 'osmconvert64.exe'
