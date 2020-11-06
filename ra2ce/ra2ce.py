@@ -30,6 +30,7 @@ def configure_user_input(cfg):
     input_dict = df.to_dict(orient='index')
 
     for theAnalysis in input_dict.keys():
+        input_dict[theAnalysis]['output'] = cfg["paths"]["output"]
         if 'hazard_data' in input_dict[theAnalysis]:
             input_dict[theAnalysis]['hazard_data'] = [os.path.join(cfg["paths"]["hazard"], x) for x in
                                  input_dict[theAnalysis]['hazard_data'].replace(" ", "").split(',')]
@@ -43,6 +44,7 @@ def configure_user_input(cfg):
         if 'OSM_area_of_interest' in input_dict[theAnalysis]:
             input_dict[theAnalysis]['OSM_area_of_interest'] = create_path(input_dict[theAnalysis]['OSM_area_of_interest'],
                                                                     cfg["paths"]["area_of_interest"], '.shp')
+            input_dict[theAnalysis]['shp_unique_ID'] = 'G_simple_fid'
         if 'path_to_pbf' in input_dict[theAnalysis]:
             input_dict[theAnalysis]['name_of_pbf'] = create_path(input_dict[theAnalysis]['name_of_pbf'],
                                                                     cfg["paths"]["OSM_dumps"], '.pbf')

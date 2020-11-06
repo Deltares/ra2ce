@@ -27,18 +27,13 @@ from numpy import object as np_object
 from geopy import distance
 
 # local modules
-from utils import load_config
 
-cfg = load_config(test=True)     # get config file
-
-AllOutput = load_config()["paths"]["output"]
-
+# todo replace os.path by pathlib
 
 def create_network_from_shapefile(InputDict, crs):
     """Creates a (graph) network from a shapefile
     Args:
         name (string): name of the analysis given by user (will be part of the name of the output files)
-        AllOutput (string): path to the folder where the output should be saved
         InputDict (dict): dictionairy with paths/input that is used to create the network
         crs (int): the EPSG number of the coordinate reference system that is used
         snapping (bool): True if snapping is required, False if not
@@ -96,10 +91,10 @@ def create_network_from_shapefile(InputDict, crs):
     # merge merged lines if there are any merged lines
     if not lines_merged.empty:
         # save the merged lines to a shapefile - CHECK if there are lines merged that should not be merged (e.g. main + secondary road)
-        lines_merged.to_file(os.path.join(AllOutput, "{}_lines_that_merged.shp".format(InputDict['analysis_name'])))
+        lines_merged.to_file(os.path.join(InputDict["output"], "{}_lines_that_merged.shp".format(InputDict['analysis_name'])))
         logging.info(
             "Function [edges_to_shp]: saved at {}".format(
-                os.path.join(AllOutput, "{}_lines_that_merged".format(InputDict['analysis_name']))))
+                os.path.join(InputDict["output"], "{}_lines_that_merged".format(InputDict['analysis_name']))))
 
     # Get the unique points at the end of lines and at intersections to create nodes
     nodes = create_nodes(edges, crs)
@@ -119,9 +114,9 @@ def create_network_from_shapefile(InputDict, crs):
 
     # Save geodataframe of the resulting network to
     resulting_network.to_pickle(
-        os.path.join(load_config()["paths"]["code"], '{}_gdf.pkl'.format(InputDict['analysis_name'])))
+        os.path.join(InputDict["output"], '{}_gdf.pkl'.format(InputDict['analysis_name'])))
     print("Saved network to pickle in {}".format(
-        os.path.join(load_config()["paths"]["code"], '{}_gdf.pkl'.format(InputDict['analysis_name']))))
+        os.path.join(InputDict["output"], '{}_gdf.pkl'.format(InputDict['analysis_name']))))
 
     # Create networkx graph from geodataframe
     G = graph_from_gdf(resulting_network, nodes)
@@ -129,13 +124,13 @@ def create_network_from_shapefile(InputDict, crs):
         "Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(InputDict['analysis_name']))
 
     # Save graph to gpickle to use later for analysis
-    nx.write_gpickle(G, os.path.join(AllOutput, '{}_graph.gpickle'.format(InputDict['analysis_name'])), protocol=4)
+    nx.write_gpickle(G, os.path.join(InputDict["output"], '{}_graph.gpickle'.format(InputDict['analysis_name'])), protocol=4)
     print("Saved graph to pickle in {}".format(
-        os.path.join(load_config()["paths"]["code"], '{}_graph.gpickle'.format(InputDict['analysis_name']))))
+        os.path.join(InputDict["output"], '{}_graph.gpickle'.format(InputDict['analysis_name']))))
 
     # Save graph to shapefile for visual inspection
-    graph_to_shp(G, os.path.join(AllOutput, '{}_edges.shp'.format(InputDict['analysis_name'])),
-                 os.path.join(AllOutput, '{}_nodes.shp'.format(InputDict['analysis_name'])))
+    graph_to_shp(G, os.path.join(InputDict["output"], '{}_edges.shp'.format(InputDict['analysis_name'])),
+                 os.path.join(InputDict["output"], '{}_nodes.shp'.format(InputDict['analysis_name'])))
 
     return G, resulting_network
 

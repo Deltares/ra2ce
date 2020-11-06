@@ -18,7 +18,7 @@ def load_config(test=False):
 
 def create_path(in_names, out_folder, extension):
     return [os.path.join(out_folder, x) if x.endswith('.shp') else os.path.join(out_folder, x + '.shp') for x in
-        in_names.split(',')]
+        in_names.split(',')][0]  # todo: quick fix, look into this
 
 
 if __name__=='__main__':
