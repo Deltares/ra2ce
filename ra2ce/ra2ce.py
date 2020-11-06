@@ -22,7 +22,7 @@ crs_ = 4326
 def configure_user_input():
     """Configures the user input into a dictionary.
     """
-    df = pd.read_excel(load_config()["filenames"]["user_input_tests"])
+    df = pd.read_excel(load_config()["filenames"]["user_input"])
     # clean up dataframe: remove rows and columns that only contain nan values
     df.dropna(axis=1, how='all', inplace=True)
     input_dict = df.to_dict(orient='index')
@@ -36,6 +36,7 @@ def configure_user_input():
             input_dict[analysis]['hazard_attribute_name'] = [x.strip() for x in input_dict[analysis]['hazard_attribute_name'].split(',')]
 
     return input_dict
+
 
 def create_network(inputDict):
     """Depending on the user input, a network/graph is created.

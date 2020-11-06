@@ -45,6 +45,7 @@ def get_graph_from_polygon(PathShp, NetworkType, RoadTypes=None):
     """
     with fiona.open(PathShp) as source:
         logging.info("Shapefile from {} loaded with CRS: {}".format(PathShp, source.crs))
+        # add warning if CRS is not epsg 4326
         for r in source:
             if 'geometry' in r:  # added this line to not take into account "None" geometry
                 polygon = shape(r['geometry'])
