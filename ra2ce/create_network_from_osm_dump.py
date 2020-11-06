@@ -3,6 +3,7 @@ import os, sys
 folder = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(folder)
 
+import warnings
 from shapely.wkb import loads
 import ogr
 import networkx as nx
@@ -21,7 +22,7 @@ import numpy as np
 import logging
 from networkx import set_edge_attributes
 
-LOG_FILENAME = './logs/log_create_network_from_osm_dump.log'
+LOG_FILENAME = os.path.join(folder, './logs/log_create_network_from_osm_dump.log')
 logging.basicConfig(format='%(asctime)s - %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S',
                     filename=LOG_FILENAME,
@@ -46,6 +47,9 @@ def get_graph_from_polygon(PathShp, NetworkType, RoadTypes=None):
     """
     with fiona.open(PathShp) as source:
         logging.info("Shapefile from {} loaded with CRS: {}".format(PathShp, source.crs))
+        # warning if CRS is not epsg 4326
+        if source.crs['init'] != 'epsg:4326':
+            warnings.warn('Your shapefile is not references with CRS EPSG:4326. Please reproject to this CRS and run the tool again.')
         for r in source:
             if 'geometry' in r:  # added this line to not take into account "None" geometry
                 polygon = shape(r['geometry'])

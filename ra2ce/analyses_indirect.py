@@ -30,16 +30,16 @@ from geopy import distance
 # local modules
 from utils import load_config
 
-LOG_FILENAME = './logs/log_analyses_indirect.log'
+LOG_FILENAME = os.path.join(folder, './logs/log_analyses_indirect.log')
 logging.basicConfig(format='%(asctime)s - %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S',
                     filename=LOG_FILENAME,
                     level=logging.INFO)
 
-AllOutput = load_config()["paths"]["test_output"]
+AllOutput = load_config()["paths"]["output"]
 
 
-def single_link_alternative_routes(G, InputDict, crs):
+def single_link_alternative_routes(G, InputDict, crs=4326):
     """
     This is the function to analyse roads with a single link disruption and
     an alternative route.
@@ -86,7 +86,7 @@ def single_link_alternative_routes(G, InputDict, crs):
     logging.info("Full analysis [single_link_alternative_routes]: {}".format(timer(startstart, end)))
 
 
-def multi_link_alternative_routes(G, InputDict, crs):
+def multi_link_alternative_routes(G, InputDict, crs=4326):
     """Calculates if road segments that are disrupted have an alternative route from node to node
     Args:
 
@@ -137,7 +137,7 @@ def multi_link_alternative_routes(G, InputDict, crs):
     logging.info("Full analysis [multi_link_alternative_routes]: {}".format(timer(startstart, end)))
 
 
-def multi_link_od_matrix(G, InputDict, crs):
+def multi_link_od_matrix(G, InputDict, crs=4326):
     """
     Removes all links that are disrupted by a hazard. It takes
     an Origin/Destination matrix as input and calculates the alternative routes for
