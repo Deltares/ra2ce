@@ -3,7 +3,6 @@ import os, sys
 folder = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(folder)
 
-import warnings
 from shapely.wkb import loads
 import ogr
 import networkx as nx
@@ -22,7 +21,7 @@ import numpy as np
 import logging
 from networkx import set_edge_attributes
 
-LOG_FILENAME = os.path.join(os.path.dirname(folder), './logs/log_ra2ce.log')
+LOG_FILENAME = './logs/log_create_network_from_osm_dump.log'
 logging.basicConfig(format='%(asctime)s - %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S',
                     filename=LOG_FILENAME,
@@ -47,9 +46,6 @@ def get_graph_from_polygon(PathShp, NetworkType, RoadTypes=None):
     """
     with fiona.open(PathShp) as source:
         logging.info("Shapefile from {} loaded with CRS: {}".format(PathShp, source.crs))
-        # warning if CRS is not epsg 4326
-        if source.crs['init'] != 'epsg:4326':
-            warnings.warn('Your shapefile is not references with CRS EPSG:4326. Please reproject to this CRS and run the tool again.')
         for r in source:
             if 'geometry' in r:  # added this line to not take into account "None" geometry
                 polygon = shape(r['geometry'])
@@ -167,7 +163,7 @@ def convert_osm(osm_convert_path, pbf, o5m):
     Convers an osm PBF file to o5m
     """
 
-    command = '""{}"  "{}" --complete-ways -o="{}""'.format(osm_convert_path, pbf, o5m)
+    command = '""{}"  "{}" --complete-ways --drop-broken-refs -o="{}""'.format(osm_convert_path, pbf, o5m)
     os.system(command)
 
 
@@ -353,8 +349,8 @@ def cut_gdf(gdf, length):
 
 def test_bookkeeping():
     root = Path(__file__).parents[2]
-    test_output_dir = Path(load_config()['paths']['output'])
-    test_input_osm_dumps_dir = Path(load_config()['paths']['OSM_dumps'])
+    test_output_dir = Path(load_config()['paths']['test_output'])
+    test_input_osm_dumps_dir = Path(load_config()['paths']['test_OSM_dumps'])
 
     osm_filter_exe = root / 'osmfilter.exe'
     osm_convert_exe = root / 'osmconvert64.exe'
@@ -373,7 +369,7 @@ def test_bookkeeping():
     return cut_gdf(edges_complex, 0.001)
 
 def test_cut_gdf():
-    test_output_dir = Path(load_config()['paths']['output'])
+    test_output_dir = Path(load_config()['paths']['test_output'])
     shapefile =  test_output_dir / 'NL332_edges_simplified.shp'
     gdf = gpd.read_file(shapefile)
     gdf = cut_gdf(gdf, 0.006)
@@ -384,8 +380,8 @@ def test_cut_gdf():
 def test_create_network_from_osm_dump():
     # run function
     root = Path(__file__).parents[2]
-    test_output_dir = Path(load_config()['paths']['output'])
-    test_input_osm_dumps_dir = Path(load_config()['paths']['OSM_dumps'])
+    test_output_dir = Path(load_config()['paths']['test_output'])
+    test_input_osm_dumps_dir = Path(load_config()['paths']['test_OSM_dumps'])
 
     osm_filter_exe = root / 'osmfilter.exe'
     osm_convert_exe = root / 'osmconvert64.exe'
@@ -417,8 +413,8 @@ def test_create_network_from_osm_dump():
 
 def generate_damage_input(split_length):
     root = Path(__file__).parents[2]
-    test_output_dir = Path(load_config()['paths']['output'])
-    test_input_osm_dumps_dir = Path(load_config()['paths']['OSM_dumps'])
+    test_output_dir = Path(load_config()['paths']['test_output'])
+    test_input_osm_dumps_dir = Path(load_config()['paths']['test_OSM_dumps'])
 
     osm_filter_exe = root / 'osmfilter.exe'
     osm_convert_exe = root / 'osmconvert64.exe'
@@ -452,13 +448,18 @@ def generate_damage_input(split_length):
 
     return edges_complex_split, edges_simple
 
-def graphs_from_o5m(o5m_path,AllOutput,bidirectional=False, simplify=True,
-                    retain_all=False, name='unnamed'):
+def graphs_from_o5m(o5m_path,AllOutput=None,bidirectional=False, simplify=True,
+                    retain_all=False, save_shapes=False):
     """
     Generates a complex and simplified graph from an o5m file.
     This function is based on the osmnx.graph_from_file function.
+
     Arguments:
         *o5m_path* (Pathlib Path object) : path to the o5m file (probably you want to use the filtered one!)
+        *simplify* (Boolean) : should the graph be simplified?
+        *save_shapes* (Boolean) : save the graphs as geodataframes
+        *output_path* (Pathlib Path object) : the path where the outputs are to be saved
+
     Returns:
         *G_complex* (Graph object) : unsimplified graph
         *G_simple* (Graph object) : simplified graph
@@ -466,32 +467,39 @@ def graphs_from_o5m(o5m_path,AllOutput,bidirectional=False, simplify=True,
     from osmnx.utils import overpass_json_from_file
     from osmnx.core import create_graph
     from osmnx.simplify import simplify_graph
+
     # transmogrify file of OSM XML data into JSON
     filename = o5m_path
     response_jsons = [overpass_json_from_file(filename)]
-    # create graph using this response JSON
-    G = create_graph(response_jsons, bidirectional=bidirectional,
-                     retain_all=retain_all, name=name)
 
-    G=graph_create_unique_ids(G, 'G00_fid')
+    # create graph using this response JSON
+    G_complex = create_graph(response_jsons, bidirectional=bidirectional,
+                     retain_all=retain_all, name='unnamed')
+
+    G_complex = graph_create_unique_ids(G_complex, 'G_complex_fid')
+
+    print('graphs_from_o5m() returning graph with {:,} nodes and {:,} edges'.format(len(list(G_complex.nodes())),
+                                                                                    len(list(G_complex.edges()))))
     # simplify the graph topology as the last step.
     if simplify:
-        H = simplify_graph(G)
-    H=graph_create_unique_ids(H, 'G10_fid')
+        G_simple = simplify_graph(G_complex)
+        G_simple = graph_create_unique_ids(G_simple, 'G_simple_fid')
+        print('graphs_from_o5m() returning graph with {:,} nodes and {:,} edges'.format(len(list(G_simple.nodes())),
+                                                                                        len(list(G_simple.edges()))))
+    else:
+        G_simple = None
+        print('Did not create a simplified version of the graph')
 
-    print('graphs_from_o5m() returning graph with {:,} nodes and {:,} edges'.format(len(list(G.nodes())),
-                                                                                  len(list(G.edges()))))
-    if simplify:
-        print('graphs_from_o5m() returning graph with {:,} nodes and {:,} edges'.format(len(list(H.nodes())),
-                                                                                    len(list(H.edges()))))
 
-    graph_to_shp(G, Path(AllOutput).joinpath('{}_edges.shp'.format('G00')),
-                 Path(AllOutput).joinpath('{}_nodes.shp'.format('G00')))
+    if save_shapes:
+        graph_to_shp(G_complex, Path(AllOutput).joinpath('{}_edges.shp'.format('G_complex')),
+                 Path(AllOutput).joinpath('{}_nodes.shp'.format('G_complex')))
 
-    graph_to_shp(H, Path(AllOutput).joinpath('{}_edges.shp'.format('G10')),
-                 Path(AllOutput).joinpath('{}_nodes.shp'.format('G10')))
+        if simplify:
+            graph_to_shp(G_simple, Path(AllOutput).joinpath('{}_edges.shp'.format('G_simple')),
+                 Path(AllOutput).joinpath('{}_nodes.shp'.format('G_simple')))
 
-    return G,H
+    return G_complex,G_simple
 
 def graph_create_unique_ids(graph,new_id_name):
     # Check if new_id_name exists and if unique
@@ -545,8 +553,79 @@ def graph_to_shp(G, edge_shp, node_shp):
     nodes.to_file(node_shp, driver='ESRI Shapefile', encoding='utf-8')
     edges.to_file(edge_shp, driver='ESRI Shapefile', encoding='utf-8')
 
-if __name__ == '__main__':
-    o5m_path = Path(r'C:\Users\Marle\RA2CE_Sprint\ra2ce\test\input\OSM_dumps\NL332_filtered.o5m')
-    output_path = Path(r'C:\Users\Marle\RA2CE_Sprint\ra2ce\test\output')
-    G00,G10 = graphs_from_o5m(o5m_path,output_path)
+def from_dump_tool_workflow(path_to_pbf,road_types):
+    """
+    Example workflow for use in the tool version of RA2CE
 
+    Arguments:
+        *path_to_pbf* (Path) : Path to the osm_dump from which the road network is to be fetched
+        *road_types* (list of strings) : The road types to fetch from the dump e.g. ['motorway', 'motorway_link']
+
+    Returns:
+        G_simple (Graph) : Simplified graph (for use in the indirect analyses)
+        G_complex_edges (GeoDataFrame : Complex graph (for use in the direct analyses)
+    """
+    ra2ce_main_path = Path(__file__).parents[1]
+    osm_convert_exe = ra2ce_main_path / 'osmconvert64.exe'
+    osm_filter_exe = ra2ce_main_path / 'osmfilter.exe'
+    assert osm_convert_exe.exists() and osm_filter_exe.exists()
+
+    # Prepare the making of a new o5m in the same folder as the pbf
+    o5m_path = path_to_pbf.parents[0] / '{}.o5m'.format(path_to_pbf.stem.split('.')[0])
+    o5m_filtered_path = path_to_pbf.parents[0] / '{}_filtered.o5m'.format(path_to_pbf.stem.split('.')[0])
+
+    # CONVERT FROM PBF TO O5M
+    if not o5m_path.exists():
+        assert not o5m_filtered_path.exists()
+        print('Start conversion from pbf to o5m')
+        convert_osm(osm_convert_exe, path_to_pbf, o5m_path)
+        print('Converted osm.pbf to o5m, created: {}'.format(o5m_path))
+    else:
+        print('O5m path already exists, uses the existing one!: {}'.format(o5m_path))
+
+    if not o5m_filtered_path.exists():
+        print('Start filtering')
+        filter_osm(osm_filter_exe, o5m_path, o5m_filtered_path,tags=road_types)
+        print('Filtering finished')
+    else:
+        print('filtered o5m path already exists: {}'.format(o5m_filtered_path))
+
+    assert o5m_path.exists() and o5m_filtered_path.exists()
+
+    G_complex, G_simple = graphs_from_o5m(o5m_filtered_path, AllOutput=None, bidirectional=False, simplify=True,
+                    retain_all=False, save_shapes=False)
+
+    #CONVERT GRAPHS TO GEODATAFRAMES
+    print('Start converting the graphs to geodataframes')
+    edges_complex, nodes_complex = graph_to_gdf(G_complex)
+    edges_simple, nodes_simple = graph_to_gdf(G_simple)
+    print('Finished converting the graphs to geodataframes')
+
+    #return G_complex, G_simple,edges_simple,nodes_simple,edges_complex,nodes_complex
+    return G_simple, edges_complex
+
+
+
+
+
+
+
+# if __name__ == '__main__':
+#
+#     o5m_path = Path(__file__).parents[1] / 'test/input/OSM_dumps/NL332_filtered.o5m'
+#     assert o5m_path.exists()
+#     output_path = Path(r'C:\Users\Marle\RA2CE_Sprint\ra2ce\test\output')
+#     G_complex, G_simple = graphs_from_o5m(o5m_path,output_path)
+#
+#
+#     #convert_osm()
+#     print('hallootjes')
+
+if __name__ == '__main__':
+
+    #testje voor Frederique
+    pbf_path = Path(__file__).parents[1] / 'test/input/OSM_dumps/NL332.osm.pbf'
+    tags = ['motorway', 'motorway_link', 'primary', 'primary_link',
+                'secondary', 'secondary_link', 'trunk', 'trunk_link']
+    G_simple, G_complex = from_dump_tool_workflow(pbf_path,road_types=tags)
+    print('kiekeboe')
