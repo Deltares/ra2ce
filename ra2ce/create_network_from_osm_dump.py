@@ -353,8 +353,8 @@ def cut_gdf(gdf, length):
 
 def test_bookkeeping():
     root = Path(__file__).parents[2]
-    test_output_dir = Path(load_config()['paths']['test_output'])
-    test_input_osm_dumps_dir = Path(load_config()['paths']['test_OSM_dumps'])
+    test_output_dir = Path(load_config()['paths']['output'])
+    test_input_osm_dumps_dir = Path(load_config()['paths']['OSM_dumps'])
 
     osm_filter_exe = root / 'osmfilter.exe'
     osm_convert_exe = root / 'osmconvert64.exe'
@@ -373,7 +373,7 @@ def test_bookkeeping():
     return cut_gdf(edges_complex, 0.001)
 
 def test_cut_gdf():
-    test_output_dir = Path(load_config()['paths']['test_output'])
+    test_output_dir = Path(load_config()['paths']['output'])
     shapefile =  test_output_dir / 'NL332_edges_simplified.shp'
     gdf = gpd.read_file(shapefile)
     gdf = cut_gdf(gdf, 0.006)
@@ -384,8 +384,8 @@ def test_cut_gdf():
 def test_create_network_from_osm_dump():
     # run function
     root = Path(__file__).parents[2]
-    test_output_dir = Path(load_config()['paths']['test_output'])
-    test_input_osm_dumps_dir = Path(load_config()['paths']['test_OSM_dumps'])
+    test_output_dir = Path(load_config()['paths']['output'])
+    test_input_osm_dumps_dir = Path(load_config()['paths']['OSM_dumps'])
 
     osm_filter_exe = root / 'osmfilter.exe'
     osm_convert_exe = root / 'osmconvert64.exe'
