@@ -29,6 +29,8 @@ from geopy import distance
 # local modules
 from utils import load_config
 
+cfg = load_config(test=True)     # get config file
+
 LOG_FILENAME = os.path.join(os.path.dirname(folder), './logs/log_ra2ce.log')
 logging.basicConfig(format='%(asctime)s - %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S',
@@ -158,13 +160,10 @@ def read_merge_shp(shapefileAnalyse, shapefileDiversion, idName, crs_):
     """
 
     # convert shapefile names to a list if it was not already a list
-    if isinstance(shapefileAnalyse, str) and shapefileAnalyse != 0:
+    if isinstance(shapefileAnalyse, str):
         shapefileAnalyse = [shapefileAnalyse]
-    if isinstance(shapefileDiversion, str) and shapefileDiversion != 0:
+    if isinstance(shapefileDiversion, str):
         shapefileDiversion = [shapefileDiversion]
-
-    shapefileAnalyse = [os.path.join(load_config()["paths"]["test_network_shp"], x) if x.endswith('.shp') else os.path.join(load_config()["paths"]["test_network_shp"], x + '.shp') for x in shapefileAnalyse]
-    shapefileDiversion = [os.path.join(load_config()["paths"]["test_network_shp"], x) if x.endswith('.shp') else os.path.join(load_config()["paths"]["test_network_shp"], x + '.shp') for x in shapefileDiversion]
 
     lines = []
 
