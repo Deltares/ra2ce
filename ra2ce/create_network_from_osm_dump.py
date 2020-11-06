@@ -31,38 +31,6 @@ logging.basicConfig(format='%(asctime)s - %(message)s',
 osmnx.config(log_console=True, use_cache=True, useful_tags_path = osmnx.settings.useful_tags_path + ['lit'])
 sys.setrecursionlimit(10**5)
 
-
-def get_graph_from_polygon(PathShp, NetworkType, RoadTypes=None):
-    """
-    Get an OSMnx graph from a shapefile (input = path to shapefile).
-
-    Args:
-        PathShp [string]: path to shapefile (polygon) used to download from OSMnx the roads in that polygon
-        NetworkType [string]: one of the network types from OSM, e.g. drive, drive_service, walk, bike, all
-        RoadTypes [string]: formatted like "motorway|primary", one or multiple road types from OSM (highway)
-
-    Returns:
-        G [networkx multidigraph]
-    """
-    with fiona.open(PathShp) as source:
-        logging.info("Shapefile from {} loaded with CRS: {}".format(PathShp, source.crs))
-        for r in source:
-            if 'geometry' in r:  # added this line to not take into account "None" geometry
-                polygon = shape(r['geometry'])
-
-    if RoadTypes == RoadTypes:
-        # assuming the empty cell in the excel is a numpy.float64 nan value
-        G = osmnx.graph_from_polygon(polygon=polygon, network_type=NetworkType, infrastructure='way["highway"~"{}"]'.format(RoadTypes))
-    else:
-        G = osmnx.graph_from_polygon(polygon=polygon, network_type=NetworkType)
-
-    # we want to use undirected graphs, so turn into an undirected graph
-    if type(G) == nx.classes.multidigraph.MultiDiGraph:
-        G = G.to_undirected()
-
-    return G
-
-
 def fetch_roads(region, osm_pbf_path, **kwargs):
     """
     Function to extract all roads from OpenStreetMap for the specified region.
@@ -157,7 +125,6 @@ def fetch_roads(region, osm_pbf_path, **kwargs):
             file.write('No roads in {}'.format(region))
             file.close()
 
-
 def convert_osm(osm_convert_path, pbf, o5m):
     """
     Convers an osm PBF file to o5m
@@ -203,27 +170,27 @@ def graph_to_gdf(G):
     return edges, nodes
 
 
-def create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, **kwargs):
-    """
-    Filters and generates a graph from an osm.pbf file
-    Args:
-        pbf: path object for .pbf file
-        o5m: path for o5m file function object for filtering infrastructure from osm pbf file
-        **kwargs: all kwargs to osmnx.graph_from_file method. Use simplify=False and retain_all=True to preserve max
-        complexity when generating graph
-
-    Returns:
-        G: graph object
-        nodes: geodataframe representing graph nodes
-        edges: geodataframe representing graph edges
-    """
-
-    filter_osm(osm_filter_exe, o5m, o5m_filtered)
-    G = osmnx.graph_from_file(o5m_filtered, **kwargs)
-    G = G.to_undirected()
-    edges, nodes = graph_to_gdf(G)
-
-    return G, edges, nodes
+# def create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe, **kwargs):
+#     """
+#     Filters and generates a graph from an osm.pbf file
+#     Args:
+#         pbf: path object for .pbf file
+#         o5m: path for o5m file function object for filtering infrastructure from osm pbf file
+#         **kwargs: all kwargs to osmnx.graph_from_file method. Use simplify=False and retain_all=True to preserve max
+#         complexity when generating graph
+#
+#     Returns:
+#         G: graph object
+#         nodes: geodataframe representing graph nodes
+#         edges: geodataframe representing graph edges
+#     """
+#
+#     filter_osm(osm_filter_exe, o5m, o5m_filtered)
+#     G = osmnx.graph_from_file(o5m_filtered, **kwargs)
+#     G = G.to_undirected()
+#     edges, nodes = graph_to_gdf(G)
+#
+#     return G, edges, nodes
 
 
 def compare_files(ref_files, test_files):
@@ -605,27 +572,13 @@ def from_dump_tool_workflow(path_to_pbf,road_types):
     return G_simple, edges_complex
 
 
-
-
-
-
-
-# if __name__ == '__main__':
-#
-#     o5m_path = Path(__file__).parents[1] / 'test/input/OSM_dumps/NL332_filtered.o5m'
-#     assert o5m_path.exists()
-#     output_path = Path(r'C:\Users\Marle\RA2CE_Sprint\ra2ce\test\output')
-#     G_complex, G_simple = graphs_from_o5m(o5m_path,output_path)
-#
-#
-#     #convert_osm()
-#     print('hallootjes')
-
 if __name__ == '__main__':
 
-    #testje voor Frederique
+    #Uses the from_tool_workflow as a test procedure; that works well :)
     pbf_path = Path(__file__).parents[1] / 'test/input/OSM_dumps/NL332.osm.pbf'
-    tags = ['motorway', 'mogittorway_link', 'primary', 'primary_link',
+    tags = ['motorway', 'motorway_link', 'primary', 'primary_link',
                 'secondary', 'secondary_link', 'trunk', 'trunk_link']
     G_simple, G_complex = from_dump_tool_workflow(pbf_path,road_types=tags)
-    print('kiekeboe')
+    print('finished')
+
+    #TODO: THE CUT_GDF IS NOT YET TESTED
