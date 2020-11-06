@@ -30,7 +30,7 @@ from geopy import distance
 # local modules
 from utils import load_config
 
-LOG_FILENAME = os.path.join(os.path.dirname(folder), './logs/log_ra2ce.log')
+LOG_FILENAME = os.path.join(os.path.dirname(folder), './log_ra2ce.log')
 logging.basicConfig(format='%(asctime)s - %(message)s',
                     datefmt='%d-%b-%y %H:%M:%S',
                     filename=LOG_FILENAME,
@@ -65,7 +65,7 @@ def single_link_alternative_routes(G, InputDict, crs=4326):
     # else:
     #     aadt_names = None
     #     road_usage_data = pd.DataFrame()
-    road_usage_data = pd.DataFrame()  # can be removed if the above is fixed
+    road_usage_data = None  # can be removed if the above is fixed
     aadt_names = None  # can be removed if the above is fixed
 
     # CALCULATE CRITICALITY
@@ -1384,7 +1384,7 @@ def hazard_join_id_shp(roads, HazardDataDict):
 
 
 # CRITICALITY FUNCTION
-def criticality_single_link(graph, IdName, roadUsageData, aadtNames):
+def criticality_single_link(graph, IdName, roadUsageData=None, aadtNames=None):
     """Calculates the alternative detour distance for each road segment if that road segement is blocked.
     Args:
         graph [networkX graph]
@@ -1435,7 +1435,7 @@ def criticality_single_link(graph, IdName, roadUsageData, aadtNames):
         gdf.loc[gdf[IdName] == the_id, 'alt_nodes'] = alt_nodes
         gdf.loc[gdf[IdName] == the_id, 'dif_dist_m'] = dif_dist
 
-    if not roadUsageData.empty:
+    if roadUsageData:
         if 'operating_cost' in roadUsageData.columns:
             # for now: all missing values for the AADT counts are replaced by 0. TODO: change?
             for aadt in aadtNames:
