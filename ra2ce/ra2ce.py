@@ -46,6 +46,7 @@ def create_network(inputDict):
     if inputDict['network_source'] == 'Network based on shapefile':
         G, edge_gdf = create_network_from_shapefile(inputDict, crs_)
     elif inputDict['network_source'] == 'Network based on OSM dump':
+        roadTypes = inputDict['road_types'].lower().replace(' ', '').split(',')
         G, edge_gdf = generate_damage_input(0.001)  # TODO should be updated with new version @Margreet
     elif inputDict['network_source'] == 'Network based on OSM online':
         areaOfInterest = os.path.join(load_config()["paths"]["area_of_interest"], inputDict['OSM_area_of_interest'] + '.shp')
@@ -73,11 +74,11 @@ def start_analysis(inputDict, G, network):
         print("Script not yet connected")
     elif inputDict['analysis'] == 'Redundancy-based criticality':
         if inputDict['links_analysis'] == 'Single-link Disruption':
-            indirect.single_link_alternative_routes(G, inputDict, crs_)
+            indirect.single_link_alternative_routes(G, inputDict)
         elif inputDict['links_analysis'] == 'Multi-link Disruption (1): Calculate the disruption for all damaged roads':
-            indirect.multi_link_alternative_routes(G, inputDict, crs_)
+            indirect.multi_link_alternative_routes(G, inputDict)
         elif inputDict['links_analysis'] == 'Multi-link Disruption (2): Calculate the disruption for an Origin/Destination matrix':
-            indirect.multi_link_od_matrix(G, inputDict, crs_)
+            indirect.multi_link_od_matrix(G, inputDict)
         else:
             Exception("Check your user_input.xlsx, the input under 'links_analysis' is not one of the given options.")
 
@@ -97,12 +98,12 @@ def start_analysis(inputDict, G, network):
 
 if __name__ == '__main__':
     # configure excel user input in the right format
-    input_dict = configure_user_input(test=True)
+    input_dict = configure_user_input()
 
     for analysis in input_dict.keys():
         # create the network: a geodataframe and/or graph is created depending on the user input
         graph, edgeGdf = create_network(input_dict[analysis])
-        start_analysis(input_dict[analysis], graph, edgeGdf)
+        # start_analysis(input_dict[analysis], graph, edgeGdf)
         print("Finished run", input_dict[analysis]['analysis_name'])
 
     print("Done.")
