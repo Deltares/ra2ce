@@ -7,6 +7,7 @@
 		"hazard" : "input\\hazard",
 		"OSM_dumps" : "input\\OSM_dumps",
 		"area_of_interest" : "input\\area_of_interest",
+		"origin_destination" : "input\\origin_destination",
 		"network_shp" : "input\\network_shp",
 		"vulnerability" : "input\\vulnerability",
 		"infra_usage" : "input\\infra_usage",
