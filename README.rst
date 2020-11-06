@@ -5,13 +5,21 @@ Risk Assessment and Adaptation for Critical InfrastructurE (RA2CE) is a
 tool developed by Deltares for calculating damages and losses for
 infrastructure networks resulting from hazards.
 
-The tool consists currently of four components: - Network creation -
-Exposure - Criticality - Damages
+The tool consists currently of four components:
 
--Prioritization - to be implemented -Adaptation - to be implemented
+- Network creation
+- Exposure
+- Criticality
+- Damages
 
-The user needs to decide which analysis should be performed: - Direct
-damages - Redundancy-based criticality - Both
+- Prioritization - to be implemented
+- Adaptation - to be implemented
+
+The user needs to decide which analysis should be performed:
+
+- Direct damages
+- Redundancy-based criticality
+- Both
 
 Both Direct damanges and Redundancy-based criticality have their own
 functionalities. See for more detail below.
@@ -26,13 +34,16 @@ Network Creation
 
 THe user needs to decide which type of input data will be used to create
 the infrastructure network. Currently the following 3 methods are
-implemented - *Create a network based on OSM dump file* (.osm.pbf) - The
-user needs to identify the name of the OSM dump and a shapefile
-containing the area of interest. - *Create a network based on a
-shapefile* - The user needs to deliver a shapefile and indicate the
+implemented:
+
+- *Create a network based on OSM dump file* (.osm.pbf)
+- The user needs to identify the name of the OSM dump and a shapefile
+containing the area of interest.
+- *Create a network based on a shapefile*
+- The user needs to deliver a shapefile and indicate the
 column of the unique identifier.
 
-(- Create a network based on OSM online download) - to be implemented
+- (Create a network based on OSM online download) - to be implemented
 
 Exposure
 --------
@@ -98,7 +109,7 @@ Installation
 in PYcharm use the ra2ce.yml file to set up an environment. This is
 running on Python 3.7. The python interpreter should be based on ra2ce.
 Furthermore the user should set the working directory to the main ra2ce
-folder: not ra2ce/ra2ce/ra2ce (where the ra2ce script is located).
+folder: ra2ce/ra2ce (where the ra2ce script is located).
 
 Testing
 -------
@@ -132,17 +143,22 @@ this name)
 analysis
 --------
 
-Choose from: - *Direct Damages* - *Redundancy-based criticality* -
-*Both*
+Choose from:
+
+- *Direct Damages*
+- *Redundancy-based criticality*
+- *Both*
 
 links\_analysis
 ---------------
 
 Only when chosen for *Redundancy-based criticality* or *Both*
 
-Choose from: - *Single-link Disruption* - *Multi-link Disruption (1):
-Calculate the disruption for all damaged roads* - *Multi-link Disruption
-(2): Calculate the disruption for an Origin/Destination matrix*
+Choose from:
+
+- *Single-link Disruption*
+- *Multi-link Disruption (1): Calculate the disruption for all damaged roads*
+- *Multi-link Disruption (2): Calculate the disruption for an Origin/Destination matrix*
 
 network\_source
 ---------------
@@ -189,8 +205,11 @@ data\_manipulation
 When choosing **network\_source** *Network based on shapefile* indicate
 whether the shapefile should be fixed for unconnected lines. After
 performing this analysis, the user should check out the result via
-shapefile based on visual inspection. Choose from: - *snapping* -
-*pruning* - *snapping,pruning*
+shapefile based on visual inspection. Choose from:
+
+- *snapping*
+- *pruning*
+- *snapping,pruning*
 
 snapping\_threshold
 -------------------
@@ -202,7 +221,13 @@ the threshold for snapping. This value should be given in degree.
 network\_type
 -------------
 
-Choose from: - *walk* - *bike* - *drive* - *drive\_service* - *all*
+Choose from:
+
+- *walk*
+- *bike*
+- *drive*
+- *drive\_service*
+- *all*
 
 When left empty default is: XXXXX
 
@@ -212,9 +237,13 @@ road\_types -> **change to infrastructure\_type?**
 Here the user can specify which network\_types are included in the
 network. These can be used for creation of the vulnerability curve input
 sheets. **andere dingen ook nog?** When left empty default is **XXXXXX**
-Anny option is valid, but these are some commmon types: - *motorway,
-trunk, primary, secondary, tertiary* - *motorway, trunk, primary,
-secondary* - *motorway, trunk, primary* - *motorway, trunk* - *motorway*
+Anny option is valid, but these are some commmon types:
+
+- *motorway, trunk, primary, secondary, tertiary*
+- *motorway, trunk, primary, secondary*
+- *motorway, trunk, primary*
+- *motorway, trunk* 
+- *motorway*
 - *add another option here*
 
 hazard\_data
@@ -250,9 +279,13 @@ hazard\_aggregation
 When translating the hazard intensity to the infrastructure network,
 indicate how the hazard intensity should be determined in case of
 crossing multiple hazard intensities. It can include the following
-options - *max* - *min* - *mean*
+options:
 
-in case of multiple analyses, separate by comma.
+- *max*
+- *min*
+- *mean*
+
+In case of multiple analyses, separate by comma.
 
 segmentation
 ------------
@@ -266,7 +299,7 @@ given input in **hazard\_aggregation**.
 hazard\_threshold
 -----------------
 
-in the unit of the hazard map
+Should be in the unit of the hazard map.
 
 origin\_shp
 -----------
