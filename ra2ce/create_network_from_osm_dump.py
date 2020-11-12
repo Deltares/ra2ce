@@ -18,6 +18,7 @@ from utils import load_config
 from shapely.geometry import LineString, Point
 from decimal import Decimal
 import numpy as np
+import pickle
 import logging
 from networkx import set_edge_attributes
 
@@ -411,8 +412,8 @@ def generate_damage_input(split_length):
 
     return edges_complex_split, edges_simple
 
-def graphs_from_o5m(o5m_path,AllOutput=None,bidirectional=False, simplify=True,
-                    retain_all=False, save_shapes=False):
+def graphs_from_o5m(o5m_path,save_shapes=None,bidirectional=False, simplify=True,
+                    retain_all=False):
     """
     Generates a complex and simplified graph from an o5m file.
     This function is based on the osmnx.graph_from_file function.
@@ -439,28 +440,32 @@ def graphs_from_o5m(o5m_path,AllOutput=None,bidirectional=False, simplify=True,
     G_complex = create_graph(response_jsons, bidirectional=bidirectional,
                      retain_all=retain_all, name='unnamed')
 
-    G_complex = graph_create_unique_ids(G_complex, 'G_complex_fid')
+    G_complex = graph_create_unique_ids(G_complex, 'G_fid_complex')
 
     print('graphs_from_o5m() returning graph with {:,} nodes and {:,} edges'.format(len(list(G_complex.nodes())),
                                                                                     len(list(G_complex.edges()))))
     # simplify the graph topology as the last step.
     if simplify:
         G_simple = simplify_graph(G_complex)
-        G_simple = graph_create_unique_ids(G_simple, 'G_simple_fid')
+        G_simple = graph_create_unique_ids(G_simple, 'G_fid_simple')
         print('graphs_from_o5m() returning graph with {:,} nodes and {:,} edges'.format(len(list(G_simple.nodes())),
                                                                                         len(list(G_simple.edges()))))
     else:
         G_simple = None
         print('Did not create a simplified version of the graph')
 
+    #TODO add FID_G_Simple to G_complex. Add attribute G_complex -> G_fid_simple. Iterate over edges of G_simple, select per edge G_fid_complex (could be a list) per G_fid_simple, add G_fid_simple for the list of G_fid_complex
 
-    if save_shapes:
-        graph_to_shp(G_complex, Path(AllOutput).joinpath('{}_edges.shp'.format('G_complex')),
-                 Path(AllOutput).joinpath('{}_nodes.shp'.format('G_complex')))
+
+
+
+    if save_shapes is not None:
+        graph_to_shp(G_complex, Path(save_shapes).joinpath('{}_edges.shp'.format('G_complex')),
+                 Path(save_shapes).joinpath('{}_nodes.shp'.format('G_complex')))
 
         if simplify:
-            graph_to_shp(G_simple, Path(AllOutput).joinpath('{}_edges.shp'.format('G_simple')),
-                 Path(AllOutput).joinpath('{}_nodes.shp'.format('G_simple')))
+            graph_to_shp(G_simple, Path(save_shapes).joinpath('{}_edges.shp'.format('G_simple')),
+                 Path(save_shapes).joinpath('{}_nodes.shp'.format('G_simple')))
 
     return G_complex,G_simple
 
@@ -480,6 +485,9 @@ def graph_create_unique_ids(graph,new_id_name):
         return graph
     # else:
     #     return graph, new_id_name
+
+
+
 
 def graph_to_shp(G, edge_shp, node_shp):
     """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_shp and node_shp
@@ -516,13 +524,16 @@ def graph_to_shp(G, edge_shp, node_shp):
     nodes.to_file(node_shp, driver='ESRI Shapefile', encoding='utf-8')
     edges.to_file(edge_shp, driver='ESRI Shapefile', encoding='utf-8')
 
-def from_dump_tool_workflow(path_to_pbf,road_types):
+def from_dump_tool_workflow(path_to_pbf,road_types,save_files=None, segmentation=None,save_shapes=None):
     """
     Example workflow for use in the tool version of RA2CE
 
     Arguments:
         *path_to_pbf* (Path) : Path to the osm_dump from which the road network is to be fetched
         *road_types* (list of strings) : The road types to fetch from the dump e.g. ['motorway', 'motorway_link']
+        *save_files* (Path): Path where the output should be saved. Default: None
+        *segmentation* (segment length): define lenghts of the cut segments. Default: None
+        *save_shapes* (Path): Path where shapefiles should be saved. Default: None
 
     Returns:
         G_simple (Graph) : Simplified graph (for use in the indirect analyses)
@@ -555,26 +566,87 @@ def from_dump_tool_workflow(path_to_pbf,road_types):
 
     assert o5m_path.exists() and o5m_filtered_path.exists()
 
-    G_complex, G_simple = graphs_from_o5m(o5m_filtered_path, AllOutput=None, bidirectional=False, simplify=True,
-                    retain_all=False, save_shapes=False)
+    G_complex, G_simple = graphs_from_o5m(o5m_filtered_path, save_shapes=save_shapes, bidirectional=False, simplify=True,
+                    retain_all=False)
+
+
 
     #CONVERT GRAPHS TO GEODATAFRAMES
     print('Start converting the graphs to geodataframes')
-    edges_complex, nodes_complex = graph_to_gdf(G_complex)
-    edges_simple, nodes_simple = graph_to_gdf(G_simple)
+    edges_complex, node_complex = graph_to_gdf(G_complex)
+    # edges_simple, nodes_simple = graph_to_gdf(G_simple)
     print('Finished converting the graphs to geodataframes')
 
+    # cut the edges in the complex geodataframe to segments of equal lengths or smaller
+    if segmentation is not None:
+        edges_complex = cut_gdf(edges_complex, segmentation)
+        print('Finished segmenting the geodataframe with split length: {} km'.format(segmentation))
+
+    if save_files:
+        output_path = Path(__file__).parents[1] / 'test/output/'
+
+        path = output_path / 'G_simple.gpickle'
+        nx.write_gpickle(G_simple, path, protocol=4)
+        path = output_path / 'G_complex.gpickle'
+        nx.write_gpickle(G_complex, path, protocol=4)
+        with open((output_path / 'edges_complex.p'), 'wb') as handle:
+            pickle.dump(edges_complex, handle)
     #return G_complex, G_simple,edges_simple,nodes_simple,edges_complex,nodes_complex
     return G_simple, edges_complex
 
 
 if __name__ == '__main__':
-
     #Uses the from_tool_workflow as a test procedure; that works well :)
-    pbf_path = Path(__file__).parents[1] / 'test/input/OSM_dumps/NL332.osm.pbf'
+    pbf_path = Path(__file__).parents[1] / 'test/input/OSM_dumps/NL_with_margin_from_EU_dump.osm.pbf'
     tags = ['motorway', 'motorway_link', 'primary', 'primary_link',
                 'secondary', 'secondary_link', 'trunk', 'trunk_link']
-    G_simple, G_complex = from_dump_tool_workflow(pbf_path,road_types=tags)
+    AllOutput = Path(__file__).parents[1] / 'test/output/'
+    # G_simple, edges_complex = from_dump_tool_workflow(pbf_path,road_types=tags, save_files=True, segmentation=0.001)
+
+
+
+    #TODO: link G_fid_simple to G_complex
+    #test procedure
+    G_simple = nx.read_gpickle(AllOutput / 'G_simple.gpickle')
+    G_complex = nx.read_gpickle(AllOutput / 'G_complex.gpickle')
+
+    def graph_link_simpleid_to_complex(G_complex, G_simple):
+
+         # TODO: -> done
+         #  create function that
+         #  2. loops over attributes in G_simple
+
+         for u,v,k in G_simple.edges(keys=True):
+             G_fid_simple = G_simple[u][v][k]['G_fid_simple']
+             # TODO: -> done
+             #  3. for every G_simple[G_fid_simple] select G_simple[G_fid_simple=i][G_fid_complex] (can be a list of G_fid_complex values)
+             G_fid_complex = G_simple[u][v][k]['G_fid_complex'] #can be a list
+             # TODO: -> done
+             #  4. Run over list G_simple[G_fid_simple=i][G_fid_complex] (can be a list of G_fid_complex values)
+             for j in G_fid_complex:
+                 print(j)
+                 #TODO -> done
+                 # 5. select the G_complex elements where G_complex[G_fid_complex]=j
+                 selected = [(r,c) for r,c,e in G_complex.edges(data=True) if e['G_fid_complex'] == j]
+                 r=selected[0][0]
+                 c=selected[0][1]
+                 #TODO -> done
+                 # 6. add to G_complex[selected_complex_edges]['G_fid_simple']=G_fid_simple
+                 G_complex[r][c][0]['G_fid_simple'] = G_fid_simple
+                 print('G_complex[G_fid_simple]= ', G_complex[r][c][0]['G_fid_simple'], 'G_complex[G_fid_complex]= ', G_complex[r][c][0]['G_fid_complex'])
+                 print('G_simple[G_fid_simple]= ',G_simple[u][v][k]['G_fid_simple'],'G_simple[G_fid_complex]= ', j)
+         return G_complex #geeft G_complex met attribute ['G_fid_simple']
+    # TODO -> moet  nog!
+    #  7. link to the function to in def graphs_from_o5m (line 457 is a comment made) Next time this will then be done automatically when creating both G_complex and G_simple
+
+
+    with open((AllOutput / 'edges_complex.p'), 'rb') as f:
+        edges_complex = pickle.load(f)
+    print('saving edges complex gdf to shapefile..')
+    edges_complex.to_file(Path(AllOutput).joinpath('{}_edges.shp'.format('G_complex_split')), driver='ESRI Shapefile', encoding='utf-8')
+    print('saved to shp')
     print('finished')
 
-    #TODO: THE CUT_GDF IS NOT YET TESTED
+    # #TODO: THE CUT_GDF IS NOT YET TESTED 2020-11-10 the cut_gdf is implemented as extra variable segmentation=None or value
+
+
