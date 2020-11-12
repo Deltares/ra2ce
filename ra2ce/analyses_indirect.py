@@ -60,7 +60,10 @@ def single_link_alternative_routes(G, InputDict, crs=4326):
     aadt_names = None  # can be removed if the above is fixed
 
     # CALCULATE CRITICALITY
-    gdf = criticality_single_link(G, InputDict['shp_unique_ID'], roadUsageData=road_usage_data, aadtNames=aadt_names)
+    #TODO return back to criticality_single_link. Now temporarily changed for RWS project
+
+    # gdf = criticality_single_link(G, InputDict['shp_unique_ID'], roadUsageData=road_usage_data, aadtNames=aadt_names)
+    gdf = criticality_single_link_osm_rws(G)
     logging.info("Function [criticality_single_link]: executing")
 
     # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
@@ -1488,6 +1491,84 @@ def criticality_single_link_osm(graph):
 
         # add edge again to the graph
         graph.add_edge(u, v, k, **data)
+
+    # Add the new columns to the geodataframe
+    gdf['alt_dist'] = alt_dist_list
+    gdf['alt_nodes'] = alt_nodes_list
+    gdf['diff_dist'] = dif_dist_list
+
+    return gdf
+
+
+def common_member(a, b):
+    #Determine if two sequences have at least one common member
+    #from https://www.geeksforgeeks.org/python-check-two-lists-least-one-element-common/
+    a_set = set(a)
+    b_set = set(b)
+    if (a_set & b_set):
+        return True
+    else:
+        return False
+
+def criticality_single_link_osm_rws(graph,gdf=None):
+    """
+    :param graph: graph on which to run analysis (MultiDiGraph)
+    :return: df with dijkstra detour distance and path results
+    """
+    # TODO look at differences between this function and the criticality_single_link above and merge/remove one
+    # TODO added because of RWS project to test only the main highway network for redundancy
+
+    #### new stuff by kees ####
+    import tqdm
+    to_filter_out = ['motorway', 'motorway_link']
+    graph = graph.to_undirected()
+    # create a geodataframe from the graph
+    if gdf is None:
+        gdf = osmnx.graph_to_gdfs(graph, nodes=False)
+
+    # list for the length of the alternative routes
+    alt_dist_list = []
+    alt_nodes_list = []
+    dif_dist_list = []
+    print('Start removing edges')
+    for e_remove in tqdm.tqdm(list(graph.edges.data(keys=True))):
+        u, v, k, data = e_remove
+
+        data_highway = data['highway'] #can be string or list of strings
+        if isinstance(data_highway,str): data_highway = [data_highway]
+
+        if common_member(data_highway,to_filter_out):
+            #Use common_mber, because in the simplified graph, the highway tag can be a list instead of a string
+            #Remove the edge
+            graph.remove_edge(u, v, k)
+
+            if nx.has_path(graph, u, v):
+                # calculate the alternative distance if that edge is unavailable
+                alt_dist = nx.dijkstra_path_length(graph, u, v, weight='length')
+                alt_dist_list.append(alt_dist)
+
+                # append alternative route nodes
+                alt_nodes = nx.dijkstra_path(graph, u, v)
+                alt_nodes_list.append(alt_nodes)
+
+                # #to Use Dijkstra's algoritme for bidirectional networks.
+                # alt_dist, alt_nodes =  nx.bidirectional_dijkstra(graph, u, v, weight='length')
+                # alt_dist_list.append(alt_dist)
+                # alt_nodes_list.append(alt_nodes)
+                # calculate the difference in distance
+                dif_dist_list.append(alt_dist - data['length'])
+            else:
+                alt_dist_list.append(np.NaN)
+                alt_nodes_list.append(np.NaN)
+                dif_dist_list.append(np.NaN)
+
+            # add edge again to the graph
+            graph.add_edge(u, v, k, **data)
+
+        else:
+            alt_dist_list.append(None)
+            alt_nodes_list.append(None)
+            dif_dist_list.append(None)
 
     # Add the new columns to the geodataframe
     gdf['alt_dist'] = alt_dist_list

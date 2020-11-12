@@ -4,18 +4,25 @@ Connecting to creating a network and/or graph, the analysis and the visualisatio
 
 # external modules
 import os, sys
+import networkx as nx
+import pickle
+
 folder = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(folder)
 os.chdir(os.path.dirname(folder))  # set working directory to top folder
 
 import pandas as pd
+from pathlib import Path
 
 # local modules
 from utils import load_config, create_path
 from create_network_from_shp import create_network_from_shapefile
 from create_network_from_osm_dump import from_dump_tool_workflow
+from create_network_from_osm_dump import graph_to_gdf
 from create_network_from_polygon import from_polygon_tool_workflow
 import analyses_indirect as indirect
+
+
 import analyses_direct as direct
 
 crs_ = 4326
@@ -60,13 +67,31 @@ def configure_user_input(cfg):
 def create_network(inputDict):
     """Depending on the user input, a network/graph is created.
     """
+    ra2ce_main_path = Path(__file__).parents[1]
+    output_path = ra2ce_main_path /  inputDict['output']
+
 
     # Create the network from the network source
     if inputDict['network_source'] == 'Network based on shapefile':
         G, edge_gdf = create_network_from_shapefile(inputDict, crs_)
     elif inputDict['network_source'] == 'Network based on OSM dump':
-        roadTypes = inputDict['road_types'].lower().replace(' ', '').split(',')
-        G, edge_gdf = from_dump_tool_workflow(inputDict["name_of_pbf"], roadTypes)
+        #TODO check this tree of exists. Could consider moving upward at the beginning of the function
+        #when G_simple and edges_complex already exist no need to create new graph and gdf
+        G_simple_path = output_path / 'G_simple.gpickle'
+        edges_complex_path = output_path / 'edges_complex.p'
+        if not (G_simple_path.exists() and edges_complex_path.exists()):
+                print('start creating network from osm_dump')
+                roadTypes = inputDict['road_types'].lower().replace(' ', '').split(',')
+                G, edge_gdf = from_dump_tool_workflow(inputDict["name_of_pbf"], roadTypes, save_files=False, segmentation=None)
+        else:
+            print('G_simple already exists, uses the existing one!: {}'.format(G_simple_path))
+            print('edge_complex already exists, uses the existing one!: {}'.format(edges_complex_path))
+            # CONVERT GRAPHS TO GEODATAFRAMES
+            G = nx.read_gpickle(G_simple_path)
+            with open(edges_complex_path, 'rb') as f:
+                edge_gdf = pickle.load(f)
+
+
     elif inputDict['network_source'] == 'Network based on OSM online':
         inputDict['network_type'] = inputDict['network_type'].lower().replace(' ', '')  # decapitalize and remove all whitespaces
         inputDict['road_types'] = inputDict['road_types'].lower().replace(',', '|')
@@ -130,4 +155,6 @@ def main(argv):
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])  # reads from the 2nd argument, the first argument is calling the script itself: ra2ce.py test
+    # main(sys.argv[1:])  # reads from the 2nd argument, the first argument is calling the script itself: ra2ce.py test
+    main('True')
+    print('test done')
