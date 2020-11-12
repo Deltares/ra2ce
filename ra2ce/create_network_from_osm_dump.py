@@ -605,7 +605,7 @@ if __name__ == '__main__':
 
 
 
-    #TODO: link G_fid_simple to G_complex
+    #TODO: link G_fid_simple to G_complex-> done
     #test procedure
     G_simple = nx.read_gpickle(AllOutput / 'G_simple.gpickle')
     G_complex = nx.read_gpickle(AllOutput / 'G_complex.gpickle')
@@ -615,7 +615,7 @@ if __name__ == '__main__':
          # TODO: -> done
          #  create function that
          #  2. loops over attributes in G_simple
-
+         print('matching G_fid_simple to G_fid_complex and adding to G_complex')
          for u,v,k in G_simple.edges(keys=True):
              G_fid_simple = G_simple[u][v][k]['G_fid_simple']
              # TODO: -> done
@@ -624,7 +624,7 @@ if __name__ == '__main__':
              # TODO: -> done
              #  4. Run over list G_simple[G_fid_simple=i][G_fid_complex] (can be a list of G_fid_complex values)
              for j in G_fid_complex:
-                 print(j)
+                 # print(j)
                  #TODO -> done
                  # 5. select the G_complex elements where G_complex[G_fid_complex]=j
                  selected = [(r,c) for r,c,e in G_complex.edges(data=True) if e['G_fid_complex'] == j]
@@ -633,11 +633,20 @@ if __name__ == '__main__':
                  #TODO -> done
                  # 6. add to G_complex[selected_complex_edges]['G_fid_simple']=G_fid_simple
                  G_complex[r][c][0]['G_fid_simple'] = G_fid_simple
-                 print('G_complex[G_fid_simple]= ', G_complex[r][c][0]['G_fid_simple'], 'G_complex[G_fid_complex]= ', G_complex[r][c][0]['G_fid_complex'])
-                 print('G_simple[G_fid_simple]= ',G_simple[u][v][k]['G_fid_simple'],'G_simple[G_fid_complex]= ', j)
+                 # print('G_complex[G_fid_simple]= ', G_complex[r][c][0]['G_fid_simple'], 'G_complex[G_fid_complex]= ', G_complex[r][c][0]['G_fid_complex'])
+                 # print('G_simple[G_fid_simple]= ',G_simple[u][v][k]['G_fid_simple'],'G_simple[G_fid_complex]= ', j)
+         print('matching G_fid_simple to G_fid_complex and adding to G_complex done!')
+
          return G_complex #geeft G_complex met attribute ['G_fid_simple']
+
+
+    G_complex = graph_link_simpleid_to_complex(G_complex, G_simple)
+    path = AllOutput / 'G_complex_withsimpleid.gpickle'
+    nx.write_gpickle(G_complex, path, protocol=4)
+    print('C_complex with simple id saved!')
     # TODO -> moet  nog!
     #  7. link to the function to in def graphs_from_o5m (line 457 is a comment made) Next time this will then be done automatically when creating both G_complex and G_simple
+    #  8. save to shapefiles and inspect!!
 
 
     with open((AllOutput / 'edges_complex.p'), 'rb') as f:
