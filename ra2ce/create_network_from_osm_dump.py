@@ -21,6 +21,7 @@ import numpy as np
 import pickle
 import logging
 from networkx import set_edge_attributes
+from analyses_indirect import timer
 
 ### Overrule the OSMNX default settings to get the additional metadata such as street lighting (lit)
 osmnx.config(log_console=True, use_cache=True, useful_tags_path = osmnx.settings.useful_tags_path + ['lit'])
@@ -606,23 +607,34 @@ if __name__ == '__main__':
 
 
     #TODO: link G_fid_simple to G_complex-> done
+    # Deze oplossing is wel heel langzaam.
+    # het is waarschijnlijk veel handiger om een nieuwe geodataframe te maken met als basis 'splt_id' en 'g_fid-complex' en daar dan aan toe te voegen 'g_fid_simple'.
+    # dan hebebn we gewoon 1 grote look-up table. en dan vanuit daar de attribute toe tevoegen aan G_complex
+
     #test procedure
     G_simple = nx.read_gpickle(AllOutput / 'G_simple.gpickle')
     G_complex = nx.read_gpickle(AllOutput / 'G_complex.gpickle')
 
     def graph_link_simpleid_to_complex(G_complex, G_simple):
+         startstart = time.time()
 
          # TODO: -> done
          #  create function that
          #  2. loops over attributes in G_simple
          print('matching G_fid_simple to G_fid_complex and adding to G_complex')
+         length=len(G_simple.edges())
          for u,v,k in G_simple.edges(keys=True):
              G_fid_simple = G_simple[u][v][k]['G_fid_simple']
+
              # TODO: -> done
              #  3. for every G_simple[G_fid_simple] select G_simple[G_fid_simple=i][G_fid_complex] (can be a list of G_fid_complex values)
-             G_fid_complex = G_simple[u][v][k]['G_fid_complex'] #can be a list
+             G_fid_complex = list(G_simple[u][v][k]['G_fid_complex'])#can be a list
+
+             print(G_fid_simple,'/',length,'  |   ', G_fid_complex)
              # TODO: -> done
              #  4. Run over list G_simple[G_fid_simple=i][G_fid_complex] (can be a list of G_fid_complex values)
+             #  Dit kan veel sneller denk ik. Hier een dictionary maken met G_fid_simple, en G_fid_complex
+             #  daarna 1x door G.complex.edges e['G_fid_complex'] heen lopen en elke keer juiste toevoegen.
              for j in G_fid_complex:
                  # print(j)
                  #TODO -> done
@@ -635,8 +647,8 @@ if __name__ == '__main__':
                  G_complex[r][c][0]['G_fid_simple'] = G_fid_simple
                  # print('G_complex[G_fid_simple]= ', G_complex[r][c][0]['G_fid_simple'], 'G_complex[G_fid_complex]= ', G_complex[r][c][0]['G_fid_complex'])
                  # print('G_simple[G_fid_simple]= ',G_simple[u][v][k]['G_fid_simple'],'G_simple[G_fid_complex]= ', j)
-         print('matching G_fid_simple to G_fid_complex and adding to G_complex done!')
-
+         end = time.time()
+         print("Matching G_fid_simple to G_fid_complex and adding to G_complex done: {}".format(timer(startstart, end)))
          return G_complex #geeft G_complex met attribute ['G_fid_simple']
 
 
@@ -646,7 +658,7 @@ if __name__ == '__main__':
     print('C_complex with simple id saved!')
     # TODO -> moet  nog!
     #  7. link to the function to in def graphs_from_o5m (line 457 is a comment made) Next time this will then be done automatically when creating both G_complex and G_simple
-    #  8. save to shapefiles and inspect!!
+    #  8. run cut_gdf, save edges_complex.p and save to shapefiles and inspect!!
 
 
     with open((AllOutput / 'edges_complex.p'), 'rb') as f:
