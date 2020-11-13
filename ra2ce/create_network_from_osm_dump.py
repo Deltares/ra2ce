@@ -631,6 +631,8 @@ if __name__ == '__main__':
              G_fid_complex = list(G_simple[u][v][k]['G_fid_complex'])#can be a list
 
              print(G_fid_simple,'/',length,'  |   ', G_fid_complex)
+
+             # tot hier gaat het snel
              # TODO: -> done
              #  4. Run over list G_simple[G_fid_simple=i][G_fid_complex] (can be a list of G_fid_complex values)
              #  Dit kan veel sneller denk ik. Hier een dictionary maken met G_fid_simple, en G_fid_complex
