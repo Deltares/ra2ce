@@ -286,6 +286,9 @@ def split_linestring(linestring, split_length):
 def cut_gdf(gdf, length):
     """
     Cuts every linestring or multilinestring feature in a gdf to equal length segments. Assumes only linestrings for now.
+
+        *gdf* (GeoDataFrame) : GeoDataFrame to split
+        *length* (units of the projection) : Typically in degrees, 0.001 degrees ~ 111 m in Europe
     """
 
     columns = gdf.columns
@@ -432,7 +435,7 @@ def graphs_from_o5m(o5m_path,save_shapes=None,bidirectional=False, simplify=True
     Returns:
         *G_complex* (Graph object) : unsimplified graph
         *G_simple* (Graph object) : simplified graph
-        *ID_table* () : ID table to link IDs of simplified to unsimplified graph and vice versa.
+        *ID_tables* (tuple with dicts) : (simple_to_complex, complex_to_simple)
     """
     from osmnx.utils import overpass_json_from_file
     from osmnx.core import create_graph
@@ -460,12 +463,19 @@ def graphs_from_o5m(o5m_path,save_shapes=None,bidirectional=False, simplify=True
         G_simple = None
         print('Did not create a simplified version of the graph')
 
-    #TODO add FID_G_Simple to G_complex. Add attribute G_complex -> G_fid_simple. Iterate over edges of G_simple,
-    # select per edge G_fid_complex (could be a list) per G_fid_simple, add G_fid_simple for the list of G_fid_complex
+    # Create look_up_tables between graphs
+    simple_to_complex, complex_to_simple = graph_link_simpleid_to_complex(G_simple, save_json_folder=None)
+    ID_tables = (simple_to_complex,complex_to_simple)
+    print('Lookup tables from complex to simple and vice versa were created')
 
+    # ... and add this info
+    G_complex = add_simple_ID_to_G_complex(G_complex, complex_to_simple)
+    print('Simple IDs were added to the complex Graph')
 
-
-
+    #TODO: (Kees' opinion): we should not save the shapes WITHIN this function, to keep the length of the function
+    #TODO: Managable, better to just return the objects, and have a seperate function that saves the shapes,
+    # for the case you want to do that
+    #If it would save something, it would save the graphs
     if save_shapes is not None:
         graph_to_shp(G_complex, Path(save_shapes).joinpath('{}_edges.shp'.format('G_complex')),
                  Path(save_shapes).joinpath('{}_nodes.shp'.format('G_complex')))
@@ -474,7 +484,7 @@ def graphs_from_o5m(o5m_path,save_shapes=None,bidirectional=False, simplify=True
             graph_to_shp(G_simple, Path(save_shapes).joinpath('{}_edges.shp'.format('G_simple')),
                  Path(save_shapes).joinpath('{}_nodes.shp'.format('G_simple')))
 
-    return G_complex,G_simple,ID_table
+    return G_complex,G_simple,ID_tables
 
 def graph_create_unique_ids(graph,new_id_name):
     #Todo for Margreet, clean this function and add docstring
@@ -592,8 +602,12 @@ def from_dump_tool_workflow(path_to_pbf,road_types,save_files=None, segmentation
 
     # cut the edges in the complex geodataframe to segments of equal lengths or smaller
     if segmentation is not None:
-        edges_complex = cut_gdf(edges_complex, segmentation)
-        print('Finished segmenting the geodataframe with split length: {} km'.format(segmentation))
+        edges_complex_cut = cut_gdf(edges_complex, segmentation)
+        print('Finished segmenting the geodataframe with split length: {} degree'.format(segmentation))
+
+        path = output_path / 'edges_complex_cut.shp'
+        #Todo: make saving conditional
+        edges_complex_cut.to_file(path, driver='ESRI Shapefile', encoding='utf-8')
 
     if save_files:
         output_path = Path(__file__).parents[1] / 'test/output/'
@@ -690,7 +704,8 @@ def add_simple_ID_to_G_complex(G_complex,complex_to_simple):
 
     return G_complex
 
-if __name__ == '__main__':
+if False:
+    #preferred testing procedure
     pbf_path = Path(__file__).parents[1] / 'test/input/OSM_dumps/NL_with_margin_from_EU_dump.osm.pbf'
     assert pbf_path.exists()
     tags = ['motorway', 'motorway_link', 'primary', 'primary_link',
@@ -701,7 +716,14 @@ if __name__ == '__main__':
     # Can use the from_dump_tool_workflow as a test procedure
     # G_simple, edges_complex = from_dump_tool_workflow(pbf_path,road_types=tags, save_files=True, segmentation=0.001)
 
-    #test procedure
+if __name__ == '__main__':
+    #THIS IS A TEMP TEST PROCEDURE, SO THAT WE DON'T HAVE TO RUN THE ENTIRE GRAPHS_FROM_O5M SCRIPT
+    pbf_path = Path(__file__).parents[1] / 'test/input/OSM_dumps/NL_with_margin_from_EU_dump.osm.pbf'
+    assert pbf_path.exists()
+    tags = ['motorway', 'motorway_link', 'primary', 'primary_link',
+                'secondary', 'secondary_link', 'trunk', 'trunk_link']
+    AllOutput = Path(__file__).parents[1] / 'test/output/'
+
     if (AllOutput / 'G_simple.gpickle').exists():
         print('simple pickle was already created, we loaded existing one')
         G_simple = nx.read_gpickle(AllOutput / 'G_simple.gpickle')
@@ -726,15 +748,21 @@ if __name__ == '__main__':
         print('G_complex with simple id saved!')
     else: print(G_complex_new_path, ' already exists')
 
+    edges_complex_withid, node_complex_withid = graph_to_gdf(G_complex)
+    edges_complex_split_cut = cut_gdf(edges_complex_withid,0.001) #0.001 degrees ~ 111 m
+
+    path = AllOutput / 'edges_complex_split_cut.shp'
+    if not path.exists():
+        edges_complex_split_cut.to_file(path, driver='ESRI Shapefile', encoding='utf-8')
+        print('Saved the split shapefile to: {}'.format(path))
+    else: print('{} Already exists'.format(path))
+
     print('stop')
     #graph_to_shp(G_complex, (AllOutput / 'G_complex_simpleids_edges.shp'), (AllOutput / 'G_complex_simpleids_nodes.shp'))
-    print('Correspond shapefiles for G_complex with simple id saved!')
+    #print('Correspond shapefiles for G_complex with simple id saved!')
 
-    #IF WE RERUN CUT_GDF NOW, IT SHOULD ALSO TAKE THE SIMPLE ID INFORMATION TO THE SHAPEFILE!!!
-    #new_edges_complex =
-
-    edges_complex_cut = cut_gdf(edges_complex, segmentation)
-    print('Finished segmenting the geodataframe with split length: {} km'.format(segmentation))
+    #edges_complex_cut = cut_gdf(edges_complex, segmentation)
+    #print('Finished segmenting the geodataframe with split length: {} degrees'.format(segmentation))
 
 
     #G_complex = graph_link_simpleid_to_complex(G_complex, G_simple)
