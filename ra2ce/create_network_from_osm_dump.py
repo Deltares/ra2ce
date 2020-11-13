@@ -146,13 +146,13 @@ def filter_osm(osm_filter_path, o5m, filtered_o5m, tags=None):
 
 
 def graph_to_gdf(G):
-    """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_shp and node_shp
+    """Takes in a networkx graph object and returns edges and nodes as geodataframes
     Arguments:
-        G []: networkx graph object to be converted
-        edge_shp [str]: output path including extension for edges shapefile
-        node_shp [str]: output path including extension for nodes shapefile
+        G (Graph): networkx graph object to be converted
+
     Returns:
-        None
+        edges (GeoDataFrame) : containes the edges
+        nodes (GeoDataFrame) :
     """
     # now only multidigraphs and graphs are used
     if type(G) == nx.classes.graph.Graph:
@@ -460,7 +460,8 @@ def graphs_from_o5m(o5m_path,save_shapes=None,bidirectional=False, simplify=True
         G_simple = None
         print('Did not create a simplified version of the graph')
 
-    #TODO add FID_G_Simple to G_complex. Add attribute G_complex -> G_fid_simple. Iterate over edges of G_simple, select per edge G_fid_complex (could be a list) per G_fid_simple, add G_fid_simple for the list of G_fid_complex
+    #TODO add FID_G_Simple to G_complex. Add attribute G_complex -> G_fid_simple. Iterate over edges of G_simple,
+    # select per edge G_fid_complex (could be a list) per G_fid_simple, add G_fid_simple for the list of G_fid_complex
 
 
 
@@ -476,6 +477,10 @@ def graphs_from_o5m(o5m_path,save_shapes=None,bidirectional=False, simplify=True
     return G_complex,G_simple,ID_table
 
 def graph_create_unique_ids(graph,new_id_name):
+    #Todo for Margreet, clean this function and add docstring
+    #Tip: if you use enumerate(), you don't have to make a seperate i-counter
+
+
     # Check if new_id_name exists and if unique
     #else  create new_id_name
     # if len(set([str(e[-1][new_id_name]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
@@ -538,8 +543,8 @@ def from_dump_tool_workflow(path_to_pbf,road_types,save_files=None, segmentation
         *path_to_pbf* (Path) : Path to the osm_dump from which the road network is to be fetched
         *road_types* (list of strings) : The road types to fetch from the dump e.g. ['motorway', 'motorway_link']
         *save_files* (Path): Path where the output should be saved. Default: None
-        *segmentation* (segment length): define lenghts of the cut segments. Default: None
-        *save_shapes* (Path): Path where shapefiles should be saved. Default: None
+        *segmentation* (float): define lenghts of the cut segments. Default: None
+        *save_shapes* (Path): Folder path where shapefiles should be saved. Default: None
 
     Returns:
         G_simple (Graph) : Simplified graph (for use in the indirect analyses)
@@ -603,14 +608,15 @@ def from_dump_tool_workflow(path_to_pbf,road_types,save_files=None, segmentation
     return G_simple, edges_complex
 
 
-def graph_link_simpleid_to_complex(G_simple,G_complex):
+def graph_link_simpleid_to_complex(G_simple,save_json_folder=None):
     """
 
     Create lookup tables (dicts) to match edges_ids of the complex and simple graph
+    Optionally, saves these lookup tables as json files.
 
     Arguments:
         *G_simple* (Graph) : Graph, containing attribute 'G_fid_simple' and 'G_fid_complex'
-        *G_complex* (Graph) : Graph, only containing
+        *save_json_folder* (Path) : Path to folder in which the json files should be generated (default None)
 
     Returns:
         *simple_to_complex* (dict) : keys are ids of the simple graph, values are lists with all matching complex ids
@@ -640,6 +646,17 @@ def graph_link_simpleid_to_complex(G_simple,G_complex):
 
     simple_to_complex = lookup_dict
     complex_to_simple = inverted_lookup_dict
+
+    if save_json_folder is not None:
+        assert isinstance(save_json_folder,Path)
+        import json
+        with open((save_json_folder / 'simple_to_complex.json'),'w') as fp:
+            json.dump(simple_to_complex,fp)
+            print('saved (or overwrote) simple_to_complex.json')
+        with open((save_json_folder / 'complex_to_simple.json'),'w') as fp:
+            json.dump(complex_to_simple,fp)
+            print('saved (or overwrote) complex_to_simple.json')
+
     return simple_to_complex, complex_to_simple
 
 def add_simple_ID_to_G_complex(G_complex,complex_to_simple):
@@ -680,6 +697,7 @@ if __name__ == '__main__':
                 'secondary', 'secondary_link', 'trunk', 'trunk_link']
     AllOutput = Path(__file__).parents[1] / 'test/output/'
 
+    #THIS IS THE PREFERRED TESTING PROCEDURE
     # Can use the from_dump_tool_workflow as a test procedure
     # G_simple, edges_complex = from_dump_tool_workflow(pbf_path,road_types=tags, save_files=True, segmentation=0.001)
 
@@ -695,7 +713,7 @@ if __name__ == '__main__':
     else: pass #replace with creating this file
 
     #Create look_up_tables between graphs (Todo: make sure that next time this is already done when creating simple from complex graph)
-    simple_to_complex, complex_to_simple = graph_link_simpleid_to_complex(G_simple,G_complex)
+    simple_to_complex, complex_to_simple = graph_link_simpleid_to_complex(G_simple,save_json_folder=AllOutput)
     print('Lookup tables from complex to simple and vice versa were created')
 
     # ... and add this info (Todo: make sure that next time this is already done when creating simple from complex graph)
@@ -712,45 +730,11 @@ if __name__ == '__main__':
     #graph_to_shp(G_complex, (AllOutput / 'G_complex_simpleids_edges.shp'), (AllOutput / 'G_complex_simpleids_nodes.shp'))
     print('Correspond shapefiles for G_complex with simple id saved!')
 
+    #IF WE RERUN CUT_GDF NOW, IT SHOULD ALSO TAKE THE SIMPLE ID INFORMATION TO THE SHAPEFILE!!!
+    #new_edges_complex =
 
-
-    print('hoi')
-         # startstart = time.time()
-         #
-         # # TODO: -> done
-         # #  create function that
-         # #  2. loops over attributes in G_simple
-         # print('matching G_fid_simple to G_fid_complex and adding to G_complex')
-         # length=len(G_simple.edges())
-         # for u,v,k in G_simple.edges(keys=True):
-         #     G_fid_simple = G_simple[u][v][k]['G_fid_simple']
-         #
-         #     # TODO: -> done
-         #     #  3. for every G_simple[G_fid_simple] select G_simple[G_fid_simple=i][G_fid_complex] (can be a list of G_fid_complex values)
-         #     G_fid_complex = list(G_simple[u][v][k]['G_fid_complex'])#can be a list
-         #
-         #     print(G_fid_simple,'/',length,'  |   ', G_fid_complex)
-         #
-         #     # tot hier gaat het snel
-         #     # TODO: -> done
-         #     #  4. Run over list G_simple[G_fid_simple=i][G_fid_complex] (can be a list of G_fid_complex values)
-         #     #  Dit kan veel sneller denk ik. Hier een dictionary maken met G_fid_simple, en G_fid_complex
-         #     #  daarna 1x door G.complex.edges e['G_fid_complex'] heen lopen en elke keer juiste toevoegen.
-         #     for j in G_fid_complex:
-         #         # print(j)
-         #         #TODO -> done
-         #         # 5. select the G_complex elements where G_complex[G_fid_complex]=j
-         #         selected = [(r,c) for r,c,e in G_complex.edges(data=True) if e['G_fid_complex'] == j]
-         #         r=selected[0][0]
-         #         c=selected[0][1]
-         #         #TODO -> done
-         #         # 6. add to G_complex[selected_complex_edges]['G_fid_simple']=G_fid_simple
-         #         G_complex[r][c][0]['G_fid_simple'] = G_fid_simple
-         #         # print('G_complex[G_fid_simple]= ', G_complex[r][c][0]['G_fid_simple'], 'G_complex[G_fid_complex]= ', G_complex[r][c][0]['G_fid_complex'])
-         #         # print('G_simple[G_fid_simple]= ',G_simple[u][v][k]['G_fid_simple'],'G_simple[G_fid_complex]= ', j)
-         # end = time.time()
-         # print("Matching G_fid_simple to G_fid_complex and adding to G_complex done: {}".format(timer(startstart, end)))
-         # return G_complex #geeft G_complex met attribute ['G_fid_simple']
+    edges_complex_cut = cut_gdf(edges_complex, segmentation)
+    print('Finished segmenting the geodataframe with split length: {} km'.format(segmentation))
 
 
     #G_complex = graph_link_simpleid_to_complex(G_complex, G_simple)
