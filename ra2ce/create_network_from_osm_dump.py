@@ -22,6 +22,7 @@ import pickle
 import logging
 from networkx import set_edge_attributes
 from analyses_indirect import timer
+import tqdm
 
 ### Overrule the OSMNX default settings to get the additional metadata such as street lighting (lit)
 osmnx.config(log_console=True, use_cache=True, useful_tags_path = osmnx.settings.useful_tags_path + ['lit'])
@@ -377,41 +378,44 @@ def test_create_network_from_osm_dump():
     nodes.to_file(test_output_dir / 'NL332_nodes_simplified.shp')
 
 def generate_damage_input(split_length):
-    root = Path(__file__).parents[2]
-    test_output_dir = Path(load_config()['paths']['test_output'])
-    test_input_osm_dumps_dir = Path(load_config()['paths']['test_OSM_dumps'])
+    print("Function deprececiated, use graphs_from_o5m instead")
 
-    osm_filter_exe = root / 'osmfilter.exe'
-    osm_convert_exe = root / 'osmconvert64.exe'
-    pbf = test_input_osm_dumps_dir / r"NL332.osm.pbf"
-    o5m = test_output_dir / r"NL332.o5m"
-    o5m_filtered = test_output_dir / 'NL332_filtered.o5m'
-
-    convert_osm(osm_convert_exe, pbf, o5m)
-    filter_osm(osm_filter_exe, o5m, o5m_filtered)
-
-    G_complex, edges_complex, nodes_complex = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe,
-                                                                           simplify=False, retain_all=True)
-
-    G_simple, edges_simple, nodes_simple = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe,
-                                                                        simplify=True, retain_all=True)
-
-    edges_simple['grph_id'] = edges_simple.index
-    edges_complex['gdf_id'] = edges_complex.index
-    edges_complex['grph_id'] = -9999
-    edges_complex_split = cut_gdf(edges_complex, split_length)
-
-    assert edges_complex_split['splt_id'].is_unique
-
-    for i, row in edges_simple.iterrows():
-        osmids = eval(row['osmid'])
-        if isinstance(osmids, list):
-            for osmid in osmids:
-                edges_complex_split.loc[edges_complex_split['osmid']==osmid, 'grph_id'] = row['grph_id']
-        else:
-            edges_complex_split.loc[edges_complex_split['osmid'] == int(osmids), 'grph_id'] = row['grph_id']
-
-    return edges_complex_split, edges_simple
+    # root = Path(__file__).parents[2]
+    # test_output_dir = Path(load_config()['paths']['test_output'])
+    # test_input_osm_dumps_dir = Path(load_config()['paths']['test_OSM_dumps'])
+    #
+    # osm_filter_exe = root / 'osmfilter.exe'
+    # osm_convert_exe = root / 'osmconvert64.exe'
+    # pbf = test_input_osm_dumps_dir / r"NL332.osm.pbf"
+    # o5m = test_output_dir / r"NL332.o5m"
+    # o5m_filtered = test_output_dir / 'NL332_filtered.o5m'
+    #
+    # convert_osm(osm_convert_exe, pbf, o5m)
+    # filter_osm(osm_filter_exe, o5m, o5m_filtered)
+    #
+    # G_complex, edges_complex, nodes_complex = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe,
+    #                                                                        simplify=False, retain_all=True)
+    #
+    # G_simple, edges_simple, nodes_simple = create_network_from_osm_dump(o5m, o5m_filtered, osm_filter_exe,
+    #                                                                     simplify=True, retain_all=True)
+    #
+    # edges_simple['grph_id'] = edges_simple.index
+    # edges_complex['gdf_id'] = edges_complex.index
+    # edges_complex['grph_id'] = -9999
+    # edges_complex_split = cut_gdf(edges_complex, split_length)
+    #
+    # assert edges_complex_split['splt_id'].is_unique
+    #
+    # for i, row in edges_simple.iterrows():
+    #     osmids = eval(row['osmid'])
+    #     if isinstance(osmids, list):
+    #         for osmid in osmids:
+    #             edges_complex_split.loc[edges_complex_split['osmid']==osmid, 'grph_id'] = row['grph_id']
+    #     else:
+    #         edges_complex_split.loc[edges_complex_split['osmid'] == int(osmids), 'grph_id'] = row['grph_id']
+    #
+    # return edges_complex_split, edges_simple
+    return None
 
 def graphs_from_o5m(o5m_path,save_shapes=None,bidirectional=False, simplify=True,
                     retain_all=False):
@@ -428,6 +432,7 @@ def graphs_from_o5m(o5m_path,save_shapes=None,bidirectional=False, simplify=True
     Returns:
         *G_complex* (Graph object) : unsimplified graph
         *G_simple* (Graph object) : simplified graph
+        *ID_table* () : ID table to link IDs of simplified to unsimplified graph and vice versa.
     """
     from osmnx.utils import overpass_json_from_file
     from osmnx.core import create_graph
@@ -468,7 +473,7 @@ def graphs_from_o5m(o5m_path,save_shapes=None,bidirectional=False, simplify=True
             graph_to_shp(G_simple, Path(save_shapes).joinpath('{}_edges.shp'.format('G_simple')),
                  Path(save_shapes).joinpath('{}_nodes.shp'.format('G_simple')))
 
-    return G_complex,G_simple
+    return G_complex,G_simple,ID_table
 
 def graph_create_unique_ids(graph,new_id_name):
     # Check if new_id_name exists and if unique
@@ -539,6 +544,8 @@ def from_dump_tool_workflow(path_to_pbf,road_types,save_files=None, segmentation
     Returns:
         G_simple (Graph) : Simplified graph (for use in the indirect analyses)
         G_complex_edges (GeoDataFrame : Complex graph (for use in the direct analyses)
+
+    @author: Kees van Ginkel and Amine Aboufirass
     """
     ra2ce_main_path = Path(__file__).parents[1]
     osm_convert_exe = ra2ce_main_path / 'osmconvert64.exe'
@@ -596,79 +603,171 @@ def from_dump_tool_workflow(path_to_pbf,road_types,save_files=None, segmentation
     return G_simple, edges_complex
 
 
+def graph_link_simpleid_to_complex(G_simple,G_complex):
+    """
+
+    Create lookup tables (dicts) to match edges_ids of the complex and simple graph
+
+    Arguments:
+        *G_simple* (Graph) : Graph, containing attribute 'G_fid_simple' and 'G_fid_complex'
+        *G_complex* (Graph) : Graph, only containing
+
+    Returns:
+        *simple_to_complex* (dict) : keys are ids of the simple graph, values are lists with all matching complex ids
+        *complex_to_simple* (dict) : keys are the ids of the complex graph, value is the matching simple_ID
+
+    We need this because the simple graph is derived from the complex graph, and therefore initially only the
+    simple graph knows from which complex edges it was created. To assign this information also to the complex
+    graph we invert the look-up dictionary
+    @author: Kees van Ginkel en Margreet van Marle
+    """
+    # Iterate over the simple, because this already has the corresponding complex information
+    lookup_dict = {}
+    # keys are the ids of the simple graph, values are lists with all matching complex id's
+    for u, v, k in tqdm.tqdm(G_simple.edges(keys=True)):
+        KEY = G_simple[u][v][k]['G_fid_simple']
+        VALUE = G_simple[u][v][k]['G_fid_complex']
+        lookup_dict[KEY] = VALUE
+
+    inverted_lookup_dict = {}
+    # keys are the ids of the complex graph, value is the matching simple_ID
+    for key, value in lookup_dict.items():
+        if isinstance(value, list):
+            for subvalue in value:
+                inverted_lookup_dict[subvalue] = key
+        elif isinstance(value, int):
+            inverted_lookup_dict[value] = key
+
+    simple_to_complex = lookup_dict
+    complex_to_simple = inverted_lookup_dict
+    return simple_to_complex, complex_to_simple
+
+def add_simple_ID_to_G_complex(G_complex,complex_to_simple):
+    """
+    Adds the appropriate ID of the simple graph to each edge of the complex graph as a new attribute 'G_fid_simple'
+
+    Arguments:
+        G_complex (Graph) : The complex graph, still lacking 'G_fid_simple'
+        complex_to_simple (dict) : lookup table linking complex to simple graphs
+
+    Returns:
+         G_complex (Graph) : Same object, with added attribute 'G_fid_simple'
+
+    @author: Kees van Ginkel
+    #COOLNESS: THIS FUNCTION IS READY FOR OOP IMPLEMENTATION, AS METHOD FOR GRAPH OBJECT.
+    # e.g. G.add_simple_ID_to_G_complex(self,complex_to_simple)
+    """
+    #ADD THE IDS OF THE SIMPLE GRAPH ALSO TO THE COMPLEX GRAPH
+    obtained_complex_ids = nx.get_edge_attributes(G_complex, 'G_fid_complex') # {(u,v,k) : 'G_fid_complex'}
+    simple_ids_per_complex_id = obtained_complex_ids #start with a copy
+    for key, value in obtained_complex_ids.items(): # {(u,v,k) : 'G_fid_complex'}
+        try:
+            new_value = complex_to_simple[value] #find simple id belonging to the complex id
+            simple_ids_per_complex_id[key] = new_value
+        except KeyError as e:
+            print('KeyError occurs!!!')
+            print('Could not find the simple ID belonging to complex ID {}; value set to None'.format(key))
+            simple_ids_per_complex_id[key] = None
+    #Now the format of simple_ids_per_complex_id is: {(u,v,k) : 'G_fid_simple}
+    set_edge_attributes(G_complex,simple_ids_per_complex_id,'G_fid_simple')
+
+    return G_complex
+
 if __name__ == '__main__':
-    #Uses the from_tool_workflow as a test procedure; that works well :)
     pbf_path = Path(__file__).parents[1] / 'test/input/OSM_dumps/NL_with_margin_from_EU_dump.osm.pbf'
+    assert pbf_path.exists()
     tags = ['motorway', 'motorway_link', 'primary', 'primary_link',
                 'secondary', 'secondary_link', 'trunk', 'trunk_link']
     AllOutput = Path(__file__).parents[1] / 'test/output/'
+
+    # Can use the from_dump_tool_workflow as a test procedure
     # G_simple, edges_complex = from_dump_tool_workflow(pbf_path,road_types=tags, save_files=True, segmentation=0.001)
 
-
-
-    #TODO: link G_fid_simple to G_complex-> done
-    # Deze oplossing is wel heel langzaam.
-    # het is waarschijnlijk veel handiger om een nieuwe geodataframe te maken met als basis 'splt_id' en 'g_fid-complex' en daar dan aan toe te voegen 'g_fid_simple'.
-    # dan hebebn we gewoon 1 grote look-up table. en dan vanuit daar de attribute toe tevoegen aan G_complex
-
     #test procedure
-    G_simple = nx.read_gpickle(AllOutput / 'G_simple.gpickle')
-    G_complex = nx.read_gpickle(AllOutput / 'G_complex.gpickle')
+    if (AllOutput / 'G_simple.gpickle').exists():
+        print('simple pickle was already created, we loaded existing one')
+        G_simple = nx.read_gpickle(AllOutput / 'G_simple.gpickle')
+    else:  pass #replace with creating this file
 
-    def graph_link_simpleid_to_complex(G_complex, G_simple):
-         startstart = time.time()
+    if (AllOutput / 'G_complex.gpickle').exists():
+        print('complex pickle was already created, we loaded existing one')
+        G_complex = nx.read_gpickle(AllOutput / 'G_complex.gpickle')
+    else: pass #replace with creating this file
 
-         # TODO: -> done
-         #  create function that
-         #  2. loops over attributes in G_simple
-         print('matching G_fid_simple to G_fid_complex and adding to G_complex')
-         length=len(G_simple.edges())
-         for u,v,k in G_simple.edges(keys=True):
-             G_fid_simple = G_simple[u][v][k]['G_fid_simple']
+    #Create look_up_tables between graphs (Todo: make sure that next time this is already done when creating simple from complex graph)
+    simple_to_complex, complex_to_simple = graph_link_simpleid_to_complex(G_simple,G_complex)
+    print('Lookup tables from complex to simple and vice versa were created')
 
-             # TODO: -> done
-             #  3. for every G_simple[G_fid_simple] select G_simple[G_fid_simple=i][G_fid_complex] (can be a list of G_fid_complex values)
-             G_fid_complex = list(G_simple[u][v][k]['G_fid_complex'])#can be a list
+    # ... and add this info (Todo: make sure that next time this is already done when creating simple from complex graph)
+    G_complex = add_simple_ID_to_G_complex(G_complex,complex_to_simple)
+    print('Simple IDs were added to the complex Graph')
 
-             print(G_fid_simple,'/',length,'  |   ', G_fid_complex)
+    G_complex_new_path = AllOutput / 'G_complex_withsimpleid.gpickle'
+    if not G_complex_new_path.exists():
+        nx.write_gpickle(G_complex, G_complex_new_path, protocol=4)
+        print('G_complex with simple id saved!')
+    else: print(G_complex_new_path, ' already exists')
 
-             # tot hier gaat het snel
-             # TODO: -> done
-             #  4. Run over list G_simple[G_fid_simple=i][G_fid_complex] (can be a list of G_fid_complex values)
-             #  Dit kan veel sneller denk ik. Hier een dictionary maken met G_fid_simple, en G_fid_complex
-             #  daarna 1x door G.complex.edges e['G_fid_complex'] heen lopen en elke keer juiste toevoegen.
-             for j in G_fid_complex:
-                 # print(j)
-                 #TODO -> done
-                 # 5. select the G_complex elements where G_complex[G_fid_complex]=j
-                 selected = [(r,c) for r,c,e in G_complex.edges(data=True) if e['G_fid_complex'] == j]
-                 r=selected[0][0]
-                 c=selected[0][1]
-                 #TODO -> done
-                 # 6. add to G_complex[selected_complex_edges]['G_fid_simple']=G_fid_simple
-                 G_complex[r][c][0]['G_fid_simple'] = G_fid_simple
-                 # print('G_complex[G_fid_simple]= ', G_complex[r][c][0]['G_fid_simple'], 'G_complex[G_fid_complex]= ', G_complex[r][c][0]['G_fid_complex'])
-                 # print('G_simple[G_fid_simple]= ',G_simple[u][v][k]['G_fid_simple'],'G_simple[G_fid_complex]= ', j)
-         end = time.time()
-         print("Matching G_fid_simple to G_fid_complex and adding to G_complex done: {}".format(timer(startstart, end)))
-         return G_complex #geeft G_complex met attribute ['G_fid_simple']
+    print('stop')
+    #graph_to_shp(G_complex, (AllOutput / 'G_complex_simpleids_edges.shp'), (AllOutput / 'G_complex_simpleids_nodes.shp'))
+    print('Correspond shapefiles for G_complex with simple id saved!')
 
 
-    G_complex = graph_link_simpleid_to_complex(G_complex, G_simple)
-    path = AllOutput / 'G_complex_withsimpleid.gpickle'
-    nx.write_gpickle(G_complex, path, protocol=4)
-    print('C_complex with simple id saved!')
+
+    print('hoi')
+         # startstart = time.time()
+         #
+         # # TODO: -> done
+         # #  create function that
+         # #  2. loops over attributes in G_simple
+         # print('matching G_fid_simple to G_fid_complex and adding to G_complex')
+         # length=len(G_simple.edges())
+         # for u,v,k in G_simple.edges(keys=True):
+         #     G_fid_simple = G_simple[u][v][k]['G_fid_simple']
+         #
+         #     # TODO: -> done
+         #     #  3. for every G_simple[G_fid_simple] select G_simple[G_fid_simple=i][G_fid_complex] (can be a list of G_fid_complex values)
+         #     G_fid_complex = list(G_simple[u][v][k]['G_fid_complex'])#can be a list
+         #
+         #     print(G_fid_simple,'/',length,'  |   ', G_fid_complex)
+         #
+         #     # tot hier gaat het snel
+         #     # TODO: -> done
+         #     #  4. Run over list G_simple[G_fid_simple=i][G_fid_complex] (can be a list of G_fid_complex values)
+         #     #  Dit kan veel sneller denk ik. Hier een dictionary maken met G_fid_simple, en G_fid_complex
+         #     #  daarna 1x door G.complex.edges e['G_fid_complex'] heen lopen en elke keer juiste toevoegen.
+         #     for j in G_fid_complex:
+         #         # print(j)
+         #         #TODO -> done
+         #         # 5. select the G_complex elements where G_complex[G_fid_complex]=j
+         #         selected = [(r,c) for r,c,e in G_complex.edges(data=True) if e['G_fid_complex'] == j]
+         #         r=selected[0][0]
+         #         c=selected[0][1]
+         #         #TODO -> done
+         #         # 6. add to G_complex[selected_complex_edges]['G_fid_simple']=G_fid_simple
+         #         G_complex[r][c][0]['G_fid_simple'] = G_fid_simple
+         #         # print('G_complex[G_fid_simple]= ', G_complex[r][c][0]['G_fid_simple'], 'G_complex[G_fid_complex]= ', G_complex[r][c][0]['G_fid_complex'])
+         #         # print('G_simple[G_fid_simple]= ',G_simple[u][v][k]['G_fid_simple'],'G_simple[G_fid_complex]= ', j)
+         # end = time.time()
+         # print("Matching G_fid_simple to G_fid_complex and adding to G_complex done: {}".format(timer(startstart, end)))
+         # return G_complex #geeft G_complex met attribute ['G_fid_simple']
+
+
+    #G_complex = graph_link_simpleid_to_complex(G_complex, G_simple)
+    #path = AllOutput / 'G_complex_withsimpleid.gpickle'
+    #nx.write_gpickle(G_complex, path, protocol=4)
+    #print('C_complex with simple id saved!')
     # TODO -> moet  nog!
     #  7. link to the function to in def graphs_from_o5m (line 457 is a comment made) Next time this will then be done automatically when creating both G_complex and G_simple
     #  8. run cut_gdf, save edges_complex.p and save to shapefiles and inspect!!
 
 
-    with open((AllOutput / 'edges_complex.p'), 'rb') as f:
-        edges_complex = pickle.load(f)
-    print('saving edges complex gdf to shapefile..')
-    edges_complex.to_file(Path(AllOutput).joinpath('{}_edges.shp'.format('G_complex_split')), driver='ESRI Shapefile', encoding='utf-8')
-    print('saved to shp')
-    print('finished')
+    #with open((AllOutput / 'edges_complex.p'), 'rb') as f:
+    #    edges_complex = pickle.load(f)
+    #print('saving edges complex gdf to shapefile..')
+    #edges_complex.to_file(Path(AllOutput).joinpath('{}_edges.shp'.format('G_complex_split')), driver='ESRI Shapefile', encoding='utf-8')
+    #print('saved to shp')
+    #print('finished')
 
     # #TODO: THE CUT_GDF IS NOT YET TESTED 2020-11-10 the cut_gdf is implemented as extra variable segmentation=None or value
 
