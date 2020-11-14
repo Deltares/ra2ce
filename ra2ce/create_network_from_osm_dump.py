@@ -421,7 +421,7 @@ def generate_damage_input(split_length):
     return None
 
 def graphs_from_o5m(o5m_path,save_shapes=None,bidirectional=False, simplify=True,
-                    retain_all=False):
+                    retain_all=False,ouput_path=None):
     """
     Generates a complex and simplified graph from an o5m file.
     This function is based on the osmnx.graph_from_file function.
@@ -560,7 +560,7 @@ def from_dump_tool_workflow(path_to_pbf,road_types,save_files=None, segmentation
         G_simple (Graph) : Simplified graph (for use in the indirect analyses)
         G_complex_edges (GeoDataFrame : Complex graph (for use in the direct analyses)
 
-    @author: Kees van Ginkel and Amine Aboufirass
+    @author: Kees van Ginkel, Margreet van Marle, and Amine Aboufirass
     """
     ra2ce_main_path = Path(__file__).parents[1]
     osm_convert_exe = ra2ce_main_path / 'osmconvert64.exe'
@@ -589,7 +589,7 @@ def from_dump_tool_workflow(path_to_pbf,road_types,save_files=None, segmentation
 
     assert o5m_path.exists() and o5m_filtered_path.exists()
 
-    G_complex, G_simple = graphs_from_o5m(o5m_filtered_path, save_shapes=save_shapes, bidirectional=False, simplify=True,
+    G_complex, G_simple, ID_tables = graphs_from_o5m(o5m_filtered_path, save_shapes=save_shapes, bidirectional=False, simplify=True,
                     retain_all=False)
 
 
@@ -600,24 +600,37 @@ def from_dump_tool_workflow(path_to_pbf,road_types,save_files=None, segmentation
     # edges_simple, nodes_simple = graph_to_gdf(G_simple)
     print('Finished converting the graphs to geodataframes')
 
-    # cut the edges in the complex geodataframe to segments of equal lengths or smaller
-    if segmentation is not None:
-        edges_complex_cut = cut_gdf(edges_complex, segmentation)
-        print('Finished segmenting the geodataframe with split length: {} degree'.format(segmentation))
-
-        path = output_path / 'edges_complex_cut.shp'
-        #Todo: make saving conditional
-        edges_complex_cut.to_file(path, driver='ESRI Shapefile', encoding='utf-8')
-
+    #first save the G_complex, G_simple and edges_complex (when not cut yet!).
+    # When segmentation is yes, the edges_complex will be overwritten with the cut version and given as output
+    # Todo: check what needs to be output for damage? edges_complex or edges_complex_cut!
     if save_files:
         output_path = Path(__file__).parents[1] / 'test/output/'
 
         path = output_path / 'G_simple.gpickle'
         nx.write_gpickle(G_simple, path, protocol=4)
+        print(path, 'saved')
         path = output_path / 'G_complex.gpickle'
         nx.write_gpickle(G_complex, path, protocol=4)
+        print(path, 'saved')
         with open((output_path / 'edges_complex.p'), 'wb') as handle:
             pickle.dump(edges_complex, handle)
+            print(output_path, 'edges_complex.p saved')
+
+    # cut the edges in the complex geodataframe to segments of equal lengths or smaller
+    # output will be the cut edges_complex
+    if segmentation is not None:
+        edges_complex = cut_gdf(edges_complex, segmentation)
+        print('Finished segmenting the geodataframe with split length: {} degree'.format(segmentation))
+        if save_files:
+            output_path = Path(__file__).parents[1] / 'test/output/'
+            path = output_path / 'edges_complex_cut.shp'
+            edges_complex.to_file(path, driver='ESRI Shapefile', encoding='utf-8')
+            print(path, 'saved')
+            #also save edges_complex_cut.p
+            with open((output_path / 'edges_complex_cut.p'), 'wb') as handle:
+                pickle.dump(edges_complex, handle)
+                print(output_path, 'edges_complex_cut.p saved')
+
     #return G_complex, G_simple,edges_simple,nodes_simple,edges_complex,nodes_complex
     return G_simple, edges_complex
 
@@ -704,7 +717,9 @@ def add_simple_ID_to_G_complex(G_complex,complex_to_simple):
 
     return G_complex
 
-if False:
+
+
+if __name__ == '__main__':
     #preferred testing procedure
     pbf_path = Path(__file__).parents[1] / 'test/input/OSM_dumps/NL_with_margin_from_EU_dump.osm.pbf'
     assert pbf_path.exists()
@@ -714,9 +729,16 @@ if False:
 
     #THIS IS THE PREFERRED TESTING PROCEDURE
     # Can use the from_dump_tool_workflow as a test procedure
-    # G_simple, edges_complex = from_dump_tool_workflow(pbf_path,road_types=tags, save_files=True, segmentation=0.001)
+    G_simple, edges_complex = from_dump_tool_workflow(pbf_path,road_types=tags, save_files=True, segmentation=0.001)
+    print('done!')
 
-if __name__ == '__main__':
+
+
+
+
+
+
+
     #THIS IS A TEMP TEST PROCEDURE, SO THAT WE DON'T HAVE TO RUN THE ENTIRE GRAPHS_FROM_O5M SCRIPT
     pbf_path = Path(__file__).parents[1] / 'test/input/OSM_dumps/NL_with_margin_from_EU_dump.osm.pbf'
     assert pbf_path.exists()
