@@ -1,7 +1,7 @@
 {
     "comment": "TODO: EXPLAIN WHAT THIS FILE DOES",
     "paths": {
-        "code" : "ra2ce\\ra2ce",
+        "code" : "ra2ce\\",
 		"settings" : "settings",
 		"input" : "input",
 		"hazard" : "input\\hazard",

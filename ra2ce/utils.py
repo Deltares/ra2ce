@@ -1,5 +1,6 @@
 import os
 import json
+from pathlib import Path
 
 
 def load_config(test=False):
@@ -7,15 +8,24 @@ def load_config(test=False):
     Read config.json
     NOTE: make sure your working directory is set to the highest level folder in the directory
 
+    Arguments:
+        *test* (Boolean) : Should the test config be used instead of the default config? (default False)
+
+    @author: Kees van Ginkel
     """
-    config_path = './config.json'
+    config_path = Path(__file__).parents[1] / 'config.json'
     if test:
-        config_path = './test_config.json'
+        config_path = Path(__file__).parents[1] / 'test_config.json'
     with open(config_path, 'r') as config_fh:
         config = json.load(config_fh)
+
+    #Convert to pathlib objects
+    for key in ['paths','filenames']:
+        for key2, value in config[key].items():
+            config[key][key2] = Path(__file__).parents[1] / Path(value)
     return config
 
-
+#TODO AVOID USING OS
 def create_path(in_names, out_folder, extension):
     return [os.path.join(out_folder, x) if x.endswith('.shp') else os.path.join(out_folder, x + '.shp') for x in
         in_names.split(',')][0]  # todo: quick fix, look into this
@@ -27,7 +37,7 @@ if __name__=='__main__':
     for key in cfg['paths']:
         path = cfg['paths'][key]
         print('{} : "{}"'.format(key, path))
-        print(os.path.exists(path), end="\n\n")
+        print(path.exists(), end="\n\n")
 
     print("This is a demo of how to use the load_config: ")
     demo_path = load_config()['paths']['network_shp']
