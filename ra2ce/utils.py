@@ -11,6 +11,13 @@ def load_config(test=False):
     Arguments:
         *test* (Boolean) : Should the test config be used instead of the default config? (default False)
 
+    Returns:
+        *config* (dict) : Dict with structure:
+            ['comment'] : 'String with info about the config"
+            ['paths'] [key] : Pathlib path to folders
+                      [another key]
+            ['filenames'][key] : Pathlib path to files
+            ['print_upon_init'] : (optionally) : text to print when RA2CE is initialised in use as a module
     @author: Kees van Ginkel
     """
     config_path = Path(__file__).parents[1] / 'config.json'
@@ -25,7 +32,7 @@ def load_config(test=False):
             config[key][key2] = Path(__file__).parents[1] / Path(value)
     return config
 
-#TODO AVOID USING OS
+#TODO repalce os with path
 def create_path(in_names, out_folder, extension):
     return [os.path.join(out_folder, x) if x.endswith('.shp') else os.path.join(out_folder, x + '.shp') for x in
         in_names.split(',')][0]  # todo: quick fix, look into this
