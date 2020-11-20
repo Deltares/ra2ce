@@ -60,7 +60,7 @@ def line_length(line, ellipsoid='WGS-84', shipping=True):
             http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
 
     Returns:
-        Length of line in meters
+        Length of line in kilometers
     """
     if shipping == True:
         if line.geometryType() == 'MultiLineString':
@@ -194,6 +194,7 @@ def apply_road_mapping(road_gdf):
     path_settings = load_config()['paths']['settings']
     road_mapping_path = os.path.join(path_settings, 'OSM_infratype_to_roadtype_mapping.xlsx')
     road_mapping_dict = import_road_mapping(road_mapping_path, 'Mapping')
+    # TODO: THIS SYNTAX RAISES A WARNING (but works fine)
     road_gdf['road_type'] = road_gdf.infra_type.apply( \
         lambda x: road_mapping_dict[x])  # add a new column 'road_type' with less categories
     return road_gdf
@@ -523,12 +524,12 @@ def calculate_direct_damage(road_gdf):
 
     """
 
+    config = load_config()
+
     #todo: currently reads from the OSdaMage pickle containing European Road statistics (and takes values for 'NL')
     #whereas it should read from an Excel file instead.
-    lane_file = os.path.join(load_config()['paths']['settings'],
-                            'default_lanes_temp.pkl') # import the pickle containing the default lane data
-
-    with open(lane_file, 'rb') as handle:
+    #TODO: FOR THE RWS PROJECT, YOU WANT TO THIS EARLIER IN THE ANALYSIS
+    with open(config['filenames']['default_lanes'], 'rb') as handle:
         default_lanes_dict = pickle.load(handle)
 
     road_gdf = road_gdf.apply(lambda x: add_default_lanes(x, default_lanes_dict),
@@ -536,18 +537,22 @@ def calculate_direct_damage(road_gdf):
     # This should also work with a default dict, because now seems to raise an exception also when it is an unused road type
 
     # LOAD THE DICT REQUIRED FOR CORRECTING THE MAXIMUM DAMAGE BASED ON THE NUMBER OF LANES
-    lane_damage_correction = load_lane_damage_correction('OSdaMage_functions.xlsx', "Max_damages", "G:M")
+
+    #TODO: This is a quick work-around, better to give the whole path to the underlying functions
+    damage_functions_file = config['filenames']['damage_functions'].name
+    lane_damage_correction = load_lane_damage_correction(damage_functions_file, "Max_damages", "G:M")
     # actual correction is done within the road_loss_estimation function
 
-    dict_max_damages = import_damage('OSdaMage_functions.xlsx', "Max_damages", usecols="C:E")
-    max_damages_HZ = load_HZ_max_dam('OSdaMage_functions.xlsx', "Huizinga_max_dam", "A:G")
+    dict_max_damages = import_damage(damage_functions_file, "Max_damages", usecols="C:E")
+    max_damages_HZ = load_HZ_max_dam(damage_functions_file, "Huizinga_max_dam", "A:G")
 
     # LOAD THE DAMAGE FUNCTIONS
-    interpolators = import_flood_curves(filename = 'OSdaMage_functions.xlsx', sheet_name='All_curves', usecols="B:O")
+    interpolators = import_flood_curves(filename = damage_functions_file, sheet_name='All_curves', usecols="B:O")
 
     # PERFORM LOSS CALCULATION FOR ALL ROAD SEGMENTS
     val_cols = [x for x in list(road_gdf.columns) if 'val' in x]
     # Remove all rows from the dataframe containing roads that don't intersect with floods
+    # TODO: also remove nans ?
     df = road_gdf.loc[~(road_gdf[val_cols] == 0).all(axis=1)]
 
     hzd_names = [i.split('val_')[1] for i in val_cols]
@@ -555,14 +560,9 @@ def calculate_direct_damage(road_gdf):
     #TODO: DIT LIJKT ME EEN BEETJE OMSLACHTIG, KAN MISSCHIEN NOG WAT OVERZICHTELIJKER
     for curve_name in interpolators:
         interpolator = interpolators[curve_name]  # select the right interpolator
-        df = df.progress_apply(
+        df = df.apply(
             lambda x: road_loss_estimation(x, interpolator, hzd_names, dict_max_damages, max_damages_HZ, curve_name,
                                            lane_damage_correction), axis=1)
-
-    output_path = load_config()['paths']['test_output']
-    filename = 'damage.shp'
-    #df.to_file(os.path.join(output_path, filename))
-    #Does not yet work, because the results are stored in tuples
 
     return df
 
