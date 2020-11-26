@@ -19,8 +19,8 @@ class road_hazard():
         """
         Initiate a road_hazard object from an .json file
         Key 0 indicates that the ground is property of RWS, but not embankment or road pavement
-        Key 1 indicates road_pavement
-        Key 2 indicates embankment
+        Key 1 indicates embankment
+        Key 2 indicates road pavement
 
         Arguments:
             *json_path* (Path) : Path to the json file
@@ -64,25 +64,25 @@ class road_hazard():
             osm_id = int(osm_id)
 
             #Create results for embankments
-            df.at[osm_id,'Embankment_area'] = values['2']['count'] * self.cellsize
-            if values['2']['count'] != 0: #Has pixels with embanked area
-                if len(values['2']['wd']) != 0: #Has flooded pixels
+            df.at[osm_id,'Embankment_area'] = values['1']['count'] * self.cellsize
+            if values['1']['count'] != 0: #Has pixels with embanked area
+                if len(values['1']['wd']) != 0: #Has flooded pixels
                     df.at[osm_id, 'Embankment_perc_flooded'] = \
-                        100 * (len(values['2']['wd']) / values['2']['count'])
-                    df.at[osm_id, 'Embankment_avg_depth'] = np.mean((values['2']['wd']))
-                    df.at[osm_id, 'Embankment_max_depth'] = np.max((values['2']['wd']))
+                        100 * (len(values['1']['wd']) / values['1']['count'])
+                    df.at[osm_id, 'Embankment_avg_depth'] = np.mean((values['1']['wd']))
+                    df.at[osm_id, 'Embankment_max_depth'] = np.max((values['1']['wd']))
                 else: #Has no flooded pixels
                     df.at[osm_id, 'Embankment_perc_flooded'] = 0
                     #other values will remain np.NaN
 
             #Create results for pavements
-            df.at[osm_id, 'Pavement_area'] = values['1']['count'] * self.cellsize
-            if values['1']['count'] != 0: #Has pixels with pavement
-                if len(values['1']['wd']) != 0:  # Has flooded pixels
+            df.at[osm_id, 'Pavement_area'] = values['2']['count'] * self.cellsize
+            if values['2']['count'] != 0: #Has pixels with pavement
+                if len(values['2']['wd']) != 0:  # Has flooded pixels
                     df.at[osm_id, 'Pavement_perc_flooded'] = \
-                        100 * (len(values['1']['wd']) / values['1']['count'])
-                    df.at[osm_id, 'Pavement_avg_depth'] = np.mean((values['1']['wd']))
-                    df.at[osm_id, 'Pavement_max_depth'] = np.max((values['1']['wd']))
+                        100 * (len(values['2']['wd']) / values['2']['count'])
+                    df.at[osm_id, 'Pavement_avg_depth'] = np.mean((values['2']['wd']))
+                    df.at[osm_id, 'Pavement_max_depth'] = np.max((values['2']['wd']))
                 else: #Has no flooded pixels
                     df.at[osm_id, 'Pavement_perc_flooded'] = 0
                     #other values will remain np.NaN
@@ -134,6 +134,69 @@ def RWS_blend(r,correction_factor=1.72):
 
     for col in to_correct:
         r[col] = correction_factor * r[col]
+
+    return r
+
+def RWS_blend_sep_dam(r,correction_factor=1.72):
+    """
+    Blends from the default OSdaMage functions with seperate damage functions for pavements and embankments
+    Water depth on embankments are HAZARD 1, for which damage curves C3 and C4 are applicable
+    Water depth on pavements are the HAZARD 2, for which damage curves C1 and C2 are applicable
+
+    Note that this is to be combined with the appropriate RA2CE configuration with seperate damage functions!!!!
+
+    Args:
+        *r* (road segment) -- a row from the merged results dataframe;
+                should have columns dam_C1_01, ..C2.., C3, C4, C5, C5 and HZ
+        *correction_factor (float) -- correction factor for inflation and NL-pricelevel
+
+    Returns:
+        *r* (road segment) -- the road segment with some new columns
+    """
+
+  #Drop columns C3 and C4, who apply on simple road designs
+
+  # MIX THE MOST FITTING MAXIMUM DAMAGE
+    if r['road_type'] in ['motorway', 'trunk']:
+      r['EM_lf_50'] = r['dam_C3_01'][2]
+      r['EM_lf_75'] = r['dam_C3_01'][3]
+      r['EM_lf_100'] = r['dam_C3_01'][4]
+      r['EM_hf_50'] = r['dam_C4_01'][2]
+      r['EM_hf_75'] = r['dam_C4_01'][3]
+      r['EM_hf_100'] = r['dam_C4_01'][4]
+      r['PV_lf_50'] = r['dam_C1_02'][2]
+      r['PV_lf_75'] = r['dam_C1_02'][3]
+      r['PV_lf_100'] = r['dam_C1_02'][4]
+      r['PV_hf_50'] = r['dam_C2_02'][2]
+      r['PV_hf_75'] = r['dam_C2_02'][3]
+      r['PV_hf_100'] = r['dam_C2_02'][4]
+
+    elif r['road_type'] in ['primary', 'secondary','tertiary']:
+      r['lf_50'] = r['dam_C5_01'][2]
+      r['lf_75'] = r['dam_C5_01'][3]
+      r['lf_100'] = r['dam_C5_01'][4]
+      r['hf_50'] = r['dam_C6_01'][2]
+      r['hf_75'] = r['dam_C6_01'][3]
+      r['hf_100'] = r['dam_C6_01'][4]
+
+    r['HZ_corr'] = r['dam_HZ_01']
+
+    #select columns to correct values for
+    to_correct = []
+    for a in ['EM', 'PV']:
+        for b in ['lf', 'hf']:
+            for c in ['50', '75', '100']:
+                to_correct.append("{}_{}_{}".format(a, b, c))
+
+    for b in ['lf', 'hf']:
+        for c in ['50', '75', '100']:
+            to_correct.append("{}_{}".format(b, c))
+
+    to_correct.append('HZ_corr')
+
+    for col in to_correct:
+        if col in r:
+            r[col] = correction_factor * r[col]
 
     return r
 
