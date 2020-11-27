@@ -26,6 +26,7 @@ from shapely.geometry import Point, LineString, MultiLineString
 from statistics import mean
 from numpy import object as np_object
 from geopy import distance
+from pathlib import Path
 
 # local modules
 # todo change os to pathlib
@@ -130,6 +131,124 @@ def multi_link_alternative_routes(G, InputDict, crs=4326):
     end = time.time()
     logging.info("Full analysis [multi_link_alternative_routes]: {}".format(timer(startstart, end)))
 
+
+def multi_link_alternative_routes_rws(G, InputDict, crs=4326):
+    """Calculates if road segments that are disrupted have an alternative route from node to node
+    copy of multi_link_alternative_routes, adjusted for RWS, because the hazard intersect is not done within the script.
+    Args:
+
+    Returns:
+
+    """
+
+    logging.info("----------------------------- {} -----------------------------".format(InputDict['analysis_name']))
+    startstart = time.time()
+
+    print(
+        "\nYou have chosen the Multi-link Disruption (1) _RWS: Calculate the disruption for all damaged roads. Starting to calculate now...\n")
+
+    # load the input files if they are there
+    if 'shp_unique_ID' in InputDict:
+        id_name = InputDict['shp_unique_ID']
+    else:
+        id_name = 'G_fid_simple'
+
+
+    #add part where the simple_IDs are matched with the flood data from the exposure part.
+    GDF_Path = AllOutput = Path(__file__).parents[1] / 'test/input/hazard_maps/road_gdf_sel_13794.p'
+    with open(GDF_Path, 'rb') as f:
+        gdf = pickle.load(f)
+    print('flood data loaded')
+    gdf[id_name] = gdf[id_name].astype('int64')
+    G = match_simple_ids(G, gdf, 'Pavement_avg_depth', 'Embankment_avg_depth')
+
+    # CALCULATE CRITICALITY
+    gdf = criticality_multi_link_hazard(G, InputDict['hazard_attribute_name'], InputDict['hazard_threshold'],
+                                        id_name)
+    logging.info("Function [criticality_single_link]: executing")
+
+    # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
+    # todo: input here this option
+
+    # save to shapefile
+    gdf.crs = {'init': 'epsg:{}'.format(crs)}
+    save_name = os.path.join(InputDict['output'], '{}_criticality.shp'.format(InputDict['analysis_name']))
+    gdf_to_shp(gdf, save_name)
+
+    print("\nThe shapefile with calculated criticality can be found here:\n{}".format(save_name))
+
+    end = time.time()
+    logging.info("Full analysis [multi_link_alternative_routes]: {}".format(timer(startstart, end)))
+    print('Done')
+
+
+
+def match_simple_ids(G,gdf, value_col1, value_col2):
+    """Matches hazard intensity of an existing gdf with the simple_id's of the graph.
+    Args:
+        G [networkx graph]: networkx graph with at least simple_id
+        gdf with simple_ids, complex ids and hazard attribute
+        value_col [string] the attribute of the hazard within the gdf
+
+    Returns:
+        Graph with an additional columns indicating which simple_ids are disrupted by the hazard
+
+    Created by Margreet van Marle and based on network_functions.match_ids (@Frederique de Groen) and create_network_from_osm_dump.add_simple_ID_to_G_complex (@Kees van Ginkel)
+    """
+    print('matching by simple_IDs')
+    df1 = gdf.groupby('G_fid_simple')[value_col1, value_col2].mean()
+    dict_df1=dict(df1)
+    obtained_simple_ids = nx.get_edge_attributes(G, 'G_fid_simple') # {(u,v,k) : 'G_fid_complex'}
+    values_col1 = obtained_simple_ids #start with a copy
+    values_col2 = obtained_simple_ids #start with a copy
+    analysis_col1 = obtained_simple_ids #start with a copy
+    analysis_col2 = obtained_simple_ids #start with a copy
+
+    for key, value in obtained_simple_ids.items(): # {(u,v,k) : 'G_fid_complex'}
+        try:
+            # print(dict_df1[value_col1][value], dict_df1[value_col2][value])
+            new_value = dict_df1[value_col1][value] #find simple id belonging to the complex id
+            values_col1[key] = new_value
+            analysis_col1[key] = 1
+            new_value = dict_df1[value_col2][value] #find simple id belonging to the complex id
+            values_col2[key] = new_value
+            analysis_col2[key] = 1
+
+        except KeyError as e:
+            # print('KeyError occurs!!!')
+            # print('Could not find the simple ID belonging to complex ID {}; value set to None'.format(key))
+            values_col1[key] = 0
+            values_col2[key] = 0
+            analysis_col1[key] = 0
+            analysis_col2[key] = 0
+
+    #Now the format of simple_ids_per_complex_id is: {(u,v,k) : 'G_fid_simple}
+    nx.set_edge_attributes(G,values_col1,value_col1)
+    nx.set_edge_attributes(G,values_col2,value_col2)
+    nx.set_edge_attributes(G,analysis_col1,'analysis_PV')
+    nx.set_edge_attributes(G,analysis_col2,'analysis_EM')
+
+
+    # dit is een tragere manier om hetzelfde te doen!
+    # for u, v, k, edata in G.edges(data=True, keys=True):
+    #     values_dict = {'match_id': [0], value_col1: [0], value_col2: [0], 'analysis_PV': [0], 'analysis_EM': [0]}
+    #     values_dict['match_id'] = edata['G_fid_simple']
+    #     print(values_dict['match_id'])
+    #     if not df1[df1['G_fid_simple'] == edata['G_fid_simple']][value_col1].empty:
+    #         values_dict[value_col1] = [df1[df1['G_fid_simple'] == edata['G_fid_simple']].iloc[0][value_col1]]
+    #         values_dict['analysis_PV']=1
+    #     if not df1[df1['G_fid_simple'] == edata['G_fid_simple']][value_col2].empty:
+    #         values_dict[value_col2] = [df1[df1['G_fid_simple'] == edata['G_fid_simple']].iloc[0][value_col2]]
+    #         values_dict['analysis_EM'] = 1
+    #
+    #     attrs = {(u, v, k): {'match_id': values_dict['match_id'],
+    #              value_col1: values_dict[value_col1],
+    #              value_col2: values_dict[value_col2],
+    #              'analysis_PV': values_dict['analysis_PV'],
+    #              'analysis_EM': values_dict['analysis_EM'],
+    #                          }}
+    #     nx.set_edge_attributes(G, attrs)
+    return G
 
 def multi_link_od_matrix(G, InputDict, crs=4326):
     """
@@ -1240,6 +1359,8 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name, save_path=None, 
     return graph
 
 
+
+
 def hazard_intersect_graph(graph, hazard, hazard_name, name, agg='max', save_path=None, save_shp=False,
                            save_pickle=False):
     """adds hazard values (flood/earthquake/etc) to the roads in a graph
@@ -1252,6 +1373,8 @@ def hazard_intersect_graph(graph, hazard, hazard_name, name, agg='max', save_pat
         Graph with the added hazard data, when there is no hazard, the values is 0
     """
     # import and append the hazard data
+    #TODO: check size of .tif file or whether it runs over all edges.
+
     for h, hn in zip(hazard, hazard_name):
         if h.endswith('.tif'):
             # GeoTIFF

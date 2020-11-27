@@ -739,70 +739,70 @@ if __name__ == '__main__':
 
 
 
-    #THIS IS A TEMP TEST PROCEDURE, SO THAT WE DON'T HAVE TO RUN THE ENTIRE GRAPHS_FROM_O5M SCRIPT
-    pbf_path = Path(__file__).parents[1] / 'test/input/OSM_dumps/NL_with_margin_from_EU_dump.osm.pbf'
-    assert pbf_path.exists()
-    tags = ['motorway', 'motorway_link', 'primary', 'primary_link',
-                'secondary', 'secondary_link', 'trunk', 'trunk_link']
-    AllOutput = Path(__file__).parents[1] / 'test/output/'
-
-    if (AllOutput / 'G_simple.gpickle').exists():
-        print('simple pickle was already created, we loaded existing one')
-        G_simple = nx.read_gpickle(AllOutput / 'G_simple.gpickle')
-    else:  pass #replace with creating this file
-
-    if (AllOutput / 'G_complex.gpickle').exists():
-        print('complex pickle was already created, we loaded existing one')
-        G_complex = nx.read_gpickle(AllOutput / 'G_complex.gpickle')
-    else: pass #replace with creating this file
-
-    #Create look_up_tables between graphs (Todo: make sure that next time this is already done when creating simple from complex graph)
-    simple_to_complex, complex_to_simple = graph_link_simpleid_to_complex(G_simple,save_json_folder=AllOutput)
-    print('Lookup tables from complex to simple and vice versa were created')
-
-    # ... and add this info (Todo: make sure that next time this is already done when creating simple from complex graph)
-    G_complex = add_simple_ID_to_G_complex(G_complex,complex_to_simple)
-    print('Simple IDs were added to the complex Graph')
-
-    G_complex_new_path = AllOutput / 'G_complex_withsimpleid.gpickle'
-    if not G_complex_new_path.exists():
-        nx.write_gpickle(G_complex, G_complex_new_path, protocol=4)
-        print('G_complex with simple id saved!')
-    else: print(G_complex_new_path, ' already exists')
-
-    edges_complex_withid, node_complex_withid = graph_to_gdf(G_complex)
-    edges_complex_split_cut = cut_gdf(edges_complex_withid,0.001) #0.001 degrees ~ 111 m
-
-    path = AllOutput / 'edges_complex_split_cut.shp'
-    if not path.exists():
-        edges_complex_split_cut.to_file(path, driver='ESRI Shapefile', encoding='utf-8')
-        print('Saved the split shapefile to: {}'.format(path))
-    else: print('{} Already exists'.format(path))
-
-    print('stop')
-    #graph_to_shp(G_complex, (AllOutput / 'G_complex_simpleids_edges.shp'), (AllOutput / 'G_complex_simpleids_nodes.shp'))
-    #print('Correspond shapefiles for G_complex with simple id saved!')
-
-    #edges_complex_cut = cut_gdf(edges_complex, segmentation)
-    #print('Finished segmenting the geodataframe with split length: {} degrees'.format(segmentation))
-
-
-    #G_complex = graph_link_simpleid_to_complex(G_complex, G_simple)
-    #path = AllOutput / 'G_complex_withsimpleid.gpickle'
-    #nx.write_gpickle(G_complex, path, protocol=4)
-    #print('C_complex with simple id saved!')
-    # TODO -> moet  nog!
-    #  7. link to the function to in def graphs_from_o5m (line 457 is a comment made) Next time this will then be done automatically when creating both G_complex and G_simple
-    #  8. run cut_gdf, save edges_complex.p and save to shapefiles and inspect!!
-
-
-    #with open((AllOutput / 'edges_complex.p'), 'rb') as f:
-    #    edges_complex = pickle.load(f)
-    #print('saving edges complex gdf to shapefile..')
-    #edges_complex.to_file(Path(AllOutput).joinpath('{}_edges.shp'.format('G_complex_split')), driver='ESRI Shapefile', encoding='utf-8')
-    #print('saved to shp')
-    #print('finished')
-
-    # #TODO: THE CUT_GDF IS NOT YET TESTED 2020-11-10 the cut_gdf is implemented as extra variable segmentation=None or value
-
+    # #THIS IS A TEMP TEST PROCEDURE, SO THAT WE DON'T HAVE TO RUN THE ENTIRE GRAPHS_FROM_O5M SCRIPT
+    # pbf_path = Path(__file__).parents[1] / 'test/input/OSM_dumps/NL_with_margin_from_EU_dump.osm.pbf'
+    # assert pbf_path.exists()
+    # tags = ['motorway', 'motorway_link', 'primary', 'primary_link',
+    #             'secondary', 'secondary_link', 'trunk', 'trunk_link']
+    # AllOutput = Path(__file__).parents[1] / 'test/output/'
+    #
+    # if (AllOutput / 'G_simple.gpickle').exists():
+    #     print('simple pickle was already created, we loaded existing one')
+    #     G_simple = nx.read_gpickle(AllOutput / 'G_simple.gpickle')
+    # else:  pass #replace with creating this file
+    #
+    # if (AllOutput / 'G_complex.gpickle').exists():
+    #     print('complex pickle was already created, we loaded existing one')
+    #     G_complex = nx.read_gpickle(AllOutput / 'G_complex.gpickle')
+    # else: pass #replace with creating this file
+    #
+    # #Create look_up_tables between graphs (Todo: make sure that next time this is already done when creating simple from complex graph)
+    # simple_to_complex, complex_to_simple = graph_link_simpleid_to_complex(G_simple,save_json_folder=AllOutput)
+    # print('Lookup tables from complex to simple and vice versa were created')
+    #
+    # # ... and add this info (Todo: make sure that next time this is already done when creating simple from complex graph)
+    # G_complex = add_simple_ID_to_G_complex(G_complex,complex_to_simple)
+    # print('Simple IDs were added to the complex Graph')
+    #
+    # G_complex_new_path = AllOutput / 'G_complex_withsimpleid.gpickle'
+    # if not G_complex_new_path.exists():
+    #     nx.write_gpickle(G_complex, G_complex_new_path, protocol=4)
+    #     print('G_complex with simple id saved!')
+    # else: print(G_complex_new_path, ' already exists')
+    #
+    # edges_complex_withid, node_complex_withid = graph_to_gdf(G_complex)
+    # edges_complex_split_cut = cut_gdf(edges_complex_withid,0.001) #0.001 degrees ~ 111 m
+    #
+    # path = AllOutput / 'edges_complex_split_cut.shp'
+    # if not path.exists():
+    #     edges_complex_split_cut.to_file(path, driver='ESRI Shapefile', encoding='utf-8')
+    #     print('Saved the split shapefile to: {}'.format(path))
+    # else: print('{} Already exists'.format(path))
+    #
+    # print('stop')
+    # #graph_to_shp(G_complex, (AllOutput / 'G_complex_simpleids_edges.shp'), (AllOutput / 'G_complex_simpleids_nodes.shp'))
+    # #print('Correspond shapefiles for G_complex with simple id saved!')
+    #
+    # #edges_complex_cut = cut_gdf(edges_complex, segmentation)
+    # #print('Finished segmenting the geodataframe with split length: {} degrees'.format(segmentation))
+    #
+    #
+    # #G_complex = graph_link_simpleid_to_complex(G_complex, G_simple)
+    # #path = AllOutput / 'G_complex_withsimpleid.gpickle'
+    # #nx.write_gpickle(G_complex, path, protocol=4)
+    # #print('C_complex with simple id saved!')
+    # # TODO -> moet  nog!
+    # #  7. link to the function to in def graphs_from_o5m (line 457 is a comment made) Next time this will then be done automatically when creating both G_complex and G_simple
+    # #  8. run cut_gdf, save edges_complex.p and save to shapefiles and inspect!!
+    #
+    #
+    # #with open((AllOutput / 'edges_complex.p'), 'rb') as f:
+    # #    edges_complex = pickle.load(f)
+    # #print('saving edges complex gdf to shapefile..')
+    # #edges_complex.to_file(Path(AllOutput).joinpath('{}_edges.shp'.format('G_complex_split')), driver='ESRI Shapefile', encoding='utf-8')
+    # #print('saved to shp')
+    # #print('finished')
+    #
+    # # #TODO: THE CUT_GDF IS NOT YET TESTED 2020-11-10 the cut_gdf is implemented as extra variable segmentation=None or value
+    #
 
