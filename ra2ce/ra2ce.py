@@ -42,6 +42,8 @@ def configure_user_input(cfg):
             input_dict[theAnalysis]['hazard_data'] = [os.path.join(cfg["paths"]["hazard"], x) for x in
                                  input_dict[theAnalysis]['hazard_data'].replace(" ", "").split(',')]
             input_dict[theAnalysis]['hazard_attribute_name'] = [x.strip() for x in input_dict[theAnalysis]['hazard_attribute_name'].split(',')]
+        if 'hazard_pickle' in input_dict[theAnalysis]:
+            input_dict[theAnalysis]['hazard_pickle'] = Path(cfg["paths"]["hazard"] / input_dict[theAnalysis]['hazard_pickle'])
         if 'shp_input_data' in input_dict[theAnalysis]:
             input_dict[theAnalysis]['shp_input_data'] = create_path(input_dict[theAnalysis]['shp_input_data'],
                                                                     cfg["paths"]["network_shp"], '.shp')
@@ -151,10 +153,11 @@ def main(argv):
     config = load_config(test=argv[0])  # get config file
     # configure excel user input in the right format
     input_dict = configure_user_input(config)
-
+    #todo: for rws all the same graph and edgegdf. delete and uncomment below
+    graph, edgeGdf = create_network(input_dict[analysis])
     for analysis in input_dict.keys():
         # create the network: a geodataframe and/or graph is created depending on the user input
-        graph, edgeGdf = create_network(input_dict[analysis])
+        # graph, edgeGdf = create_network(input_dict[analysis])
         start_analysis(input_dict[analysis], graph, edgeGdf)
         print("Finished run", input_dict[analysis]['analysis_name'])
     print("Done.")
@@ -163,4 +166,4 @@ def main(argv):
 if __name__ == '__main__':
     # main(sys.argv[1:])  # reads from the 2nd argument, the first argument is calling the script itself: ra2ce.py test
     main('True')
-    print('test done')
+
