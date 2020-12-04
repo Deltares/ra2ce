@@ -10,7 +10,7 @@ Frederique de Groen (frederique.degroen@deltares.nl)
 import os, sys
 folder = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(folder)
-
+import copy
 import pandas as pd
 import time
 import logging
@@ -26,6 +26,7 @@ from shapely.geometry import Point, LineString, MultiLineString
 from statistics import mean
 from numpy import object as np_object
 from geopy import distance
+from pathlib import Path
 
 # local modules
 # todo change os to pathlib
@@ -131,6 +132,111 @@ def multi_link_alternative_routes(G, InputDict, crs=4326):
     logging.info("Full analysis [multi_link_alternative_routes]: {}".format(timer(startstart, end)))
 
 
+def multi_link_alternative_routes_rws(G, InputDict, crs=4326):
+    """Calculates if road segments that are disrupted have an alternative route from node to node
+    copy of multi_link_alternative_routes, adjusted for RWS, because the hazard intersect is not done within the script.
+    Args:
+
+    Returns:
+
+    """
+
+    logging.info("----------------------------- {} -----------------------------".format(InputDict['analysis_name']))
+    startstart = time.time()
+
+    print(
+        "\nYou have chosen the Multi-link Disruption (1) _RWS: Calculate the disruption for all damaged roads. Starting to calculate now...\n")
+
+    # load the input files if they are there
+    if 'shp_unique_ID' in InputDict:
+        id_name = InputDict['shp_unique_ID']
+    else:
+        id_name = 'G_fid_simple'
+
+
+    #add part where the simple_IDs are matched with the flood data from the exposure part.
+    gdf_pickle = InputDict['hazard_pickle']
+    with open(gdf_pickle, 'rb') as f:
+        gdf = pickle.load(f)
+    print('flood data loaded')
+    #in e pickle is de simple_id als float
+    gdf[id_name] = gdf[id_name].astype('int64')
+    #TODO: nu tweede hazard hard coded, match dit met de input table
+    #add values of hazard to the simple IDs
+    G = match_simple_ids(G, gdf, InputDict['hazard_attribute_name'][0])
+
+    # Create Origins and Destinations
+    #TODO: uni- of bi-directioneel
+    gdf = multi_link_od_matrix_rws(G, InputDict, crs=4326)
+
+    logging.info("Function [criticality_single_link]: executing")
+
+    print('Done')
+
+
+
+def match_simple_ids(G,gdf, value_col1):
+    """Matches hazard intensity of an existing gdf with the simple_id's of the graph.
+    Args:
+        G [networkx graph]: networkx graph with at least simple_id
+        gdf with simple_ids, complex ids and hazard attribute
+        value_col [string] the attribute of the hazard within the gdf
+
+    Returns:
+        Graph with an additional columns indicating which simple_ids are disrupted by the hazard
+
+    Created by Margreet van Marle and based on network_functions.match_ids (@Frederique de Groen) and create_network_from_osm_dump.add_simple_ID_to_G_complex (@Kees van Ginkel)
+    """
+    print('matching by simple_IDs')
+    #todo check if nan values are used or not
+    df1 = gdf.groupby('G_fid_simple')[value_col1].mean()
+    dict_df1=dict(df1)
+    obtained_simple_ids = nx.get_edge_attributes(G, 'G_fid_simple') # {(u,v,k) : 'G_fid_complex'}
+    values_col1 = obtained_simple_ids #start with a copy
+    analysis_col1 = obtained_simple_ids #start with a copy
+
+    for key, value in obtained_simple_ids.items(): # {(u,v,k) : 'G_fid_complex'}
+        try:
+            # print(dict_df1[value])
+            new_value = dict_df1[value] #find simple id belonging to the complex id
+            values_col1[key] = new_value
+            analysis_col1[key] = 1
+
+
+        except KeyError as e:
+            # print('KeyError occurs!!!')
+            # print('Could not find the simple ID belonging to complex ID {}; value set to None'.format(key))
+            values_col1[key] = 0
+            analysis_col1[key] = 0
+
+
+    #Now the format of simple_ids_per_complex_id is: {(u,v,k) : 'G_fid_simple}
+    nx.set_edge_attributes(G,values_col1,value_col1)
+    nx.set_edge_attributes(G,analysis_col1,'analysis_'+value_col1)
+
+
+
+    # dit is een tragere manier om hetzelfde te doen!
+    # for u, v, k, edata in G.edges(data=True, keys=True):
+    #     values_dict = {'match_id': [0], value_col1: [0], value_col2: [0], 'analysis_PV': [0], 'analysis_EM': [0]}
+    #     values_dict['match_id'] = edata['G_fid_simple']
+    #     print(values_dict['match_id'])
+    #     if not df1[df1['G_fid_simple'] == edata['G_fid_simple']][value_col1].empty:
+    #         values_dict[value_col1] = [df1[df1['G_fid_simple'] == edata['G_fid_simple']].iloc[0][value_col1]]
+    #         values_dict['analysis_PV']=1
+    #     if not df1[df1['G_fid_simple'] == edata['G_fid_simple']][value_col2].empty:
+    #         values_dict[value_col2] = [df1[df1['G_fid_simple'] == edata['G_fid_simple']].iloc[0][value_col2]]
+    #         values_dict['analysis_EM'] = 1
+    #
+    #     attrs = {(u, v, k): {'match_id': values_dict['match_id'],
+    #              value_col1: values_dict[value_col1],
+    #              value_col2: values_dict[value_col2],
+    #              'analysis_PV': values_dict['analysis_PV'],
+    #              'analysis_EM': values_dict['analysis_EM'],
+    #                          }}
+    #     nx.set_edge_attributes(G, attrs)
+    return G
+
 def multi_link_od_matrix(G, InputDict, crs=4326):
     """
     Removes all links that are disrupted by a hazard. It takes
@@ -151,7 +257,7 @@ def multi_link_od_matrix(G, InputDict, crs=4326):
 
     # initiate variables
     id_name_hazard = None
-    weighing = 'distance'  # TODO: make this variable
+    weighing = 'time'  # TODO: make this variable
 
     # load the input files if they are there
     if 'id_name' in InputDict:
@@ -178,7 +284,8 @@ def multi_link_od_matrix(G, InputDict, crs=4326):
                         InputDict['id_od'], crs)
 
     ods = create_OD_pairs(ods, G, id_name)
-    G = add_od_nodes(G, ods, id_name, name=InputDict['analysis_name'], file_output=InputDict['output'], save_shp=True)
+
+
 
     if weighing == 'time':
         # not yet possible for input with shapefiles, except when a max speed attribute is attached to the shapefile
@@ -213,6 +320,210 @@ def multi_link_od_matrix(G, InputDict, crs=4326):
 
     end = time.time()
     logging.info("Full analysis [multi_link_od_matrix]: {}".format(timer(startstart, end)))
+
+def multi_link_od_matrix_rws(G, InputDict, crs=4326):
+    """
+    Removes all links that are disrupted by a hazard. It takes
+    an Origin/Destination matrix as input and calculates the alternative routes for
+    each O/D pair, if links are removed between the fastest route from O to D.
+
+    Arguments:
+        graph [networkx graph] = the graph with at least the columns that you use in group en sort
+        InputDict [dictionary] = dictionary of input data used for calculating
+            the costs for taking alternative routes
+
+    Created by Margreet van Marle and Frederique de Groen
+    """
+
+    logging.info("----------------------------- {} -----------------------------".format(InputDict['analysis_name']))
+    startstart = time.time()
+
+    print(
+        "\nYou have chosen the Multi-link Disruption Analysis - to calculate the disruption for an Origin/Destination. You might need to give a bit more input later. Starting to calculate now...\n")
+
+    # initiate variables
+    id_name_hazard = None
+    weighing = 'length'  # TODO: make this variable
+
+    # load the input files if they are there
+    if 'id_name' in InputDict:
+        id_name = InputDict['id_name']
+    else:
+        id_name = 'osmid'
+
+    if InputDict:
+        # there is hazard data available
+        if 'ID' in InputDict:
+            id_name_hazard = InputDict['ID']
+
+    # not all edges contain the attribute 'geometry' - because of geometry simplification these are streets that are straight and can be computed
+    # TODO check if this is necessary
+    G = add_missing_geoms_graph(G)
+
+
+    # Add the origin/destination nodes to the network
+    G2=copy.deepcopy(G)
+
+    edges_remove = [e for e in G2.edges.data(keys=True) if InputDict['hazard_attribute_name'][0] in e[-1]]
+    edges_remove = [e for e in edges_remove if (e[-1][InputDict['hazard_attribute_name'][0]] <= InputDict['hazard_threshold'])]
+    G2.remove_edges_from(edges_remove)
+    o = [x for x in G2.nodes() if G2.in_degree(x)==0 and G2.out_degree(x)==1]
+    print('these nodes are the origins: ',o)
+    d = [x for x in G2.nodes() if G2.out_degree(x)==0 and G2.in_degree(x)==1]
+    print('these nodes are the destinations: ',o)
+    ods=[(x,y) for x in o for y in d]
+    # ods=pd.DataFrame(data=ODs,columns=['o_id','d_id'])
+
+    for oo in o:
+        G.nodes[oo]['od_id'] = str(oo)
+
+    for dd in d:
+        G.nodes[dd]['od_id'] = str(dd)
+
+
+
+    #TODO need check
+    if weighing == 'time':
+        # not yet possible for input with shapefiles, except when a max speed attribute is attached to the shapefile
+        # calculate the time it takes per road segment
+        avg_speeds = calc_avg_speed(G, 'highway', save_csv=True,
+                                    save_path=os.path.join(InputDict['output'], 'avg_speeds_{}.csv'.format(InputDict['analysis_name'])))
+        avg_speeds = pd.read_csv(os.path.join(InputDict['output'], 'avg_speeds_{}.csv'.format(InputDict['analysis_name'])))
+        if len(avg_speeds.loc[avg_speeds['avg_speed'] == 0]) > 0:
+            logging.info("An average speed of 50 is used in locations where the maximum speed limit is 0 in OSM data.")
+            avg_speeds.loc[avg_speeds['avg_speed'] == 0, 'avg_speed'] = 50  # this is assumed
+        G = assign_avg_speed(G, avg_speeds, 'highway')
+
+        # make a time value of seconds, length of road streches is in meters
+        for u, v, k, edata in G.edges.data(keys=True):
+            hours = (edata['length'] / 1000) / edata['avgspeed']
+            G[u][v][k][weighing] = hours * 3600
+
+
+
+
+    # G=G.to_undirected()
+    # Calculate the preferred routes
+    pref_routes = preferred_routes_rws(G, weighing, id_name, ods, crs, InputDict, shortest_route=True,
+                                      save_shp=True, save_pickle=False,
+                                      file_output=InputDict['output'], name=InputDict['analysis_name'])
+
+
+    G=G.to_undirected()
+
+    # Calculate the criticality
+    gdf = criticality_multi_link_hazard_OD(G, pref_routes, weighing, InputDict['hazard_attribute_name'][0],
+                                           InputDict['hazard_threshold'], crs)
+
+    # save graph
+    save_name = os.path.join(InputDict['output'], '{}_criticality.shp'.format(InputDict['analysis_name']))
+    gdf_to_shp(gdf, save_name)
+
+    print("\nThe shapefile with calculated criticality can be found here:\n{}".format(save_name))
+
+
+
+    end = time.time()
+    logging.info("Full analysis [multi_link_od_matrix]: {}".format(timer(startstart, end)))
+    print('Done')
+
+def preferred_routes_rws(graph, weighing_name, idName, od, crs, hazard_data, shortest_route, save_shp, save_pickle,
+                        file_output, name):
+    """Computes the quikest/shortest routes between Origin/Destination nodes
+    Args:
+        graph [networkX graph]: graph for which the preferred routes should be computed
+        weighing_name [string]: name of the attribute to weigh with (e.g. length, time, etc.)
+        name [string]: name of the analysis
+        file_output [string]: path to folder where the geodataframe and/or pickle should be stored
+        save_shp [bool]: True/False to save the OD pairs to a shapefile in the folder 'file_output'
+        crs [int]: CRS EPSG, like 4326
+    Returns:
+        pref_routes [geodataframe]: dataframe with all O/D pairs, their preferred route and the weighing of that route
+    """
+    # dataframe to save the preferred routes
+    pref_routes = gpd.GeoDataFrame(columns=['o_node', 'd_node', 'origin', 'destination',
+                                            'pref_path', weighing_name, 'match_ids', 'geometry'],
+                                   geometry='geometry', crs={'init': 'epsg:{}'.format(crs)})
+
+
+
+    # create the routes between all OD pairs
+    for o, d in od:
+        if nx.has_path(graph, o, d):
+            # calculate the length of the preferred route
+            pref_route = nx.dijkstra_path_length(graph, o, d, weight=weighing_name)
+
+            # save preferred route nodes
+            pref_nodes = nx.dijkstra_path(graph, o, d, weight=weighing_name)
+
+            # found out which edges belong to the preferred path
+            edgesinpath = list(zip(pref_nodes[0:], pref_nodes[1:]))
+
+            pref_edges = []
+            match_list = []
+            for u, v in edgesinpath:
+                # get edge with the lowest weighing if there are multiple edges that connect u and v
+                edge_key = sorted(graph[u][v], key=lambda x: graph[u][v][x][weighing_name])[0]
+                if 'geometry' in graph[u][v][edge_key]:
+                    pref_edges.append(graph[u][v][edge_key]['geometry'])
+                else:
+                    pref_edges.append(LineString([graph.nodes[u]['geometry'], graph.nodes[v]['geometry']]))
+                if idName in graph[u][v][edge_key]:
+                    match_list.append(graph[u][v][edge_key][idName])
+
+            # compile the road segments into one geometry
+            pref_edges = MultiLineString(pref_edges)
+            pref_routes = pref_routes.append({'o_node': o, 'd_node': d, 'origin': str(o),
+                                              'destination': str(d), 'pref_path': pref_nodes,
+                                              weighing_name: pref_route, 'match_ids': match_list,
+                                              'geometry': pref_edges}, ignore_index=True)
+
+    if shortest_route:
+        pref_routes = pref_routes.loc[pref_routes.sort_values('length').groupby('o_node').head(3).index]
+
+    # # intersect the origin and destination nodes with the hazard map (now only geotiff possible)
+    # pref_routes['d_disrupt'] = None
+    # pref_routes['o_disrupt'] = None
+    # pref_routes['d_{}'.format(hazard_data['attribute_name'][0])] = None
+    # pref_routes['o_{}'.format(hazard_data['attribute_name'][0])] = None
+    # src = rasterio.open(hazard_data['path'][0])
+    # for i in range(len(pref_routes.index)):
+    #     dest = graph.nodes[int(pref_routes.d_node.iloc[i])]['geometry']
+    #     if (src.bounds.left < dest.coords[0][0] < src.bounds.right) and (
+    #         src.bounds.bottom < dest.coords[0][1] < src.bounds.top):
+    #         hzrd = [x.item(0) for x in src.sample(dest.coords)][0]
+    #         pref_routes['d_{}'.format(hazard_data['attribute_name'][0])].iloc[i] = hzrd
+    #         if hzrd > hazard_data['threshold']:
+    #             pref_routes['d_disrupt'].iloc[i] = 'disrupted'
+    #         else:
+    #             pref_routes['d_disrupt'].iloc[i] = 'not disrupted'
+    #     else:
+    #         pref_routes['d_{}'.format(hazard_data['attribute_name'][0])].iloc[i] = 0
+    #         pref_routes['d_disrupt'].iloc[i] = 'unknown'
+    #     orig = graph.nodes[int(pref_routes.o_node.iloc[i])]['geometry']
+    #     if (src.bounds.left < orig.coords[0][0] < src.bounds.right) and (
+    #         src.bounds.bottom < orig.coords[0][1] < src.bounds.top):
+    #         hzrd = [x.item(0) for x in src.sample(orig.coords)][0]
+    #         pref_routes['o_{}'.format(hazard_data['attribute_name'][0])].iloc[i] = hzrd
+    #         if hzrd > hazard_data['threshold']:
+    #             pref_routes['o_disrupt'].iloc[i] = 'disrupted'
+    #         else:
+    #             pref_routes['o_disrupt'].iloc[i] = 'not disrupted'
+    #     else:
+    #         pref_routes['o_{}'.format(hazard_data['attribute_name'][0])].iloc[i] = 0
+    #         pref_routes['o_disrupt'].iloc[i] = 'unknown'
+
+    if save_shp:
+        gdf_to_shp(pref_routes, os.path.join(file_output, '{}_pref_routes.shp'.format(name)))
+        print("Preferred routes saved to {}".format(os.path.join(file_output, '{}_pref_routes.shp'.format(name))))
+
+    if save_pickle:
+        pref_routes[['origin', 'destination', 'AoIs', 'pref_path', weighing_name,
+                     'match_ids']].to_pickle(os.path.join(file_output, '{}_pref_routes.pkl'.format(name)))
+        print("Preferred routes saved to {}".format(os.path.join(file_output, '{}_pref_routes.pkl'.format(name))))
+
+    return pref_routes
+
 
 
 # HELPER FUNCTIONS
@@ -1240,6 +1551,8 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name, save_path=None, 
     return graph
 
 
+
+
 def hazard_intersect_graph(graph, hazard, hazard_name, name, agg='max', save_path=None, save_shp=False,
                            save_pickle=False):
     """adds hazard values (flood/earthquake/etc) to the roads in a graph
@@ -1252,6 +1565,8 @@ def hazard_intersect_graph(graph, hazard, hazard_name, name, agg='max', save_pat
         Graph with the added hazard data, when there is no hazard, the values is 0
     """
     # import and append the hazard data
+    #TODO: check size of .tif file or whether it runs over all edges.
+
     for h, hn in zip(hazard, hazard_name):
         if h.endswith('.tif'):
             # GeoTIFF
@@ -1612,7 +1927,6 @@ def criticality_multi_link_hazard_OD(graph, prefRoutes, weighingName, hazardName
                 # the alternative route is different from the optimal route
                 disrupted = 1
                 detour = "alt_route"
-
                 # found out which edges belong to the preferred path
                 edgesinpath = list(zip(pref_nodes[0:], pref_nodes[1:]))
 
@@ -1643,13 +1957,16 @@ def criticality_multi_link_hazard_OD(graph, prefRoutes, weighingName, hazardName
                           'destination': str(prefRoutes.iloc[ii]['destination']),
                           'odpair': str(prefRoutes.iloc[ii]['origin']) + ' to ' + str(
                               prefRoutes.iloc[ii]['destination']),
-                          'd_disrupt': prefRoutes.iloc[ii]['d_disrupt'],
-                          'o_disrupt': prefRoutes.iloc[ii]['o_disrupt'],
-                          'd_{}'.format(hazardName): prefRoutes.iloc[ii]['d_{}'.format(hazardName)],
-                          'o_{}'.format(hazardName): prefRoutes.iloc[ii]['o_{}'.format(hazardName)],
+                          #TODO: change for RWS
+                          # 'd_disrupt': prefRoutes.iloc[ii]['d_disrupt'],
+                          # 'o_disrupt': prefRoutes.iloc[ii]['o_disrupt'],
+                          # 'd_{}'.format(hazardName): prefRoutes.iloc[ii]['d_{}'.format(hazardName)],
+                          # 'o_{}'.format(hazardName): prefRoutes.iloc[ii]['o_{}'.format(hazardName)],
                           'geometry': pref_edges}, ignore_index=True)
 
     return gdf
+
+
 
 
 def criticality_multi_link_hazard(graph, attribute_name, min_threshold, idName):
