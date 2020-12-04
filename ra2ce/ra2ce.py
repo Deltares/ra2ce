@@ -42,6 +42,8 @@ def configure_user_input(cfg):
             input_dict[theAnalysis]['hazard_data'] = [os.path.join(cfg["paths"]["hazard"], x) for x in
                                  input_dict[theAnalysis]['hazard_data'].replace(" ", "").split(',')]
             input_dict[theAnalysis]['hazard_attribute_name'] = [x.strip() for x in input_dict[theAnalysis]['hazard_attribute_name'].split(',')]
+        if 'hazard_pickle' in input_dict[theAnalysis]:
+            input_dict[theAnalysis]['hazard_pickle'] = Path(cfg["paths"]["hazard"] / input_dict[theAnalysis]['hazard_pickle'])
         if 'shp_input_data' in input_dict[theAnalysis]:
             input_dict[theAnalysis]['shp_input_data'] = create_path(input_dict[theAnalysis]['shp_input_data'],
                                                                     cfg["paths"]["network_shp"], '.shp')
@@ -70,34 +72,38 @@ def create_network(inputDict):
     ra2ce_main_path = Path(__file__).parents[1]
     output_path = ra2ce_main_path /  inputDict['output']
 
+    # when G_simple and edges_complex already exist no need to create new graph and gdf
+    G_simple_path = output_path / 'G_simple.gpickle'
+    edges_complex_path = output_path / 'edges_complex.p'
 
-    # Create the network from the network source
-    if inputDict['network_source'] == 'Network based on shapefile':
-        G, edge_gdf = create_network_from_shapefile(inputDict, crs_)
-    elif inputDict['network_source'] == 'Network based on OSM dump':
-        #TODO check this tree of exists. Could consider moving upward at the beginning of the function
-        #when G_simple and edges_complex already exist no need to create new graph and gdf
-        G_simple_path = output_path / 'G_simple.gpickle'
-        edges_complex_path = output_path / 'edges_complex.p'
-        if not (G_simple_path.exists() and edges_complex_path.exists()):
-                print('start creating network from osm_dump')
-                roadTypes = inputDict['road_types'].lower().replace(' ', '').split(',')
-                G, edge_gdf = from_dump_tool_workflow(inputDict["name_of_pbf"], roadTypes, save_files=False, segmentation=None)
+    #check whether the paths exist
+    if not (G_simple_path.exists() and edges_complex_path.exists()):
+        # Create the network from the network source
+        if inputDict['network_source'] == 'Network based on shapefile':
+            print('start creating network from shapefile')
+            G, edge_gdf = create_network_from_shapefile(inputDict, crs_)
+        elif inputDict['network_source'] == 'Network based on OSM dump':
+            print('start creating network from osm_dump')
+            roadTypes = inputDict['road_types'].lower().replace(' ', '').split(',')
+            G, edge_gdf = from_dump_tool_workflow(inputDict["name_of_pbf"], roadTypes, save_files=False, segmentation=None)
+        elif inputDict['network_source'] == 'Network based on OSM online':
+            print('start creating network from osm_online')
+            inputDict['network_type'] = inputDict['network_type'].lower().replace(' ',
+                                                                                  '')  # decapitalize and remove all whitespaces
+            inputDict['road_types'] = inputDict['road_types'].lower().replace(',', '|')
+            G, edge_gdf = from_polygon_tool_workflow(inputDict)
         else:
-            print('G_simple already exists, uses the existing one!: {}'.format(G_simple_path))
-            print('edge_complex already exists, uses the existing one!: {}'.format(edges_complex_path))
-            # CONVERT GRAPHS TO GEODATAFRAMES
-            G = nx.read_gpickle(G_simple_path)
-            with open(edges_complex_path, 'rb') as f:
-                edge_gdf = pickle.load(f)
-
-
-    elif inputDict['network_source'] == 'Network based on OSM online':
-        inputDict['network_type'] = inputDict['network_type'].lower().replace(' ', '')  # decapitalize and remove all whitespaces
-        inputDict['road_types'] = inputDict['road_types'].lower().replace(',', '|')
-        G, edge_gdf = from_polygon_tool_workflow(inputDict)
+            Exception("Check your user_input.xlsx, the input under 'network_source' is not one of the given options.")
     else:
-        Exception("Check your user_input.xlsx, the input under 'network_source' is not one of the given options.")
+        print('G_simple already exists, uses the existing one!: {}'.format(G_simple_path))
+        print('edge_complex already exists, uses the existing one!: {}'.format(edges_complex_path))
+        # CONVERT GRAPHS TO GEODATAFRAMES
+        G = nx.read_gpickle(G_simple_path)
+        with open(edges_complex_path, 'rb') as f:
+            edge_gdf = pickle.load(f)
+
+
+
 
     # # TODO: only create the graph/gdf if that one is needed
     # if inputDict['analysis'] == 'Direct Damages':
@@ -122,6 +128,9 @@ def start_analysis(inputDict, G, network):
             indirect.multi_link_alternative_routes(G, inputDict)
         elif inputDict['links_analysis'] == 'Multi-link Disruption (2): Calculate the disruption for an Origin/Destination matrix':
             indirect.multi_link_od_matrix(G, inputDict)
+        #TODO DONE FOR RWS Project, should be removed in ra2ce.
+        elif inputDict['links_analysis'] == 'Multi-link Disruption_RWS':
+            indirect.multi_link_alternative_routes_rws(G, inputDict)
         else:
             Exception("Check your user_input.xlsx, the input under 'links_analysis' is not one of the given options.")
 
@@ -144,17 +153,17 @@ def main(argv):
     config = load_config(test=argv[0])  # get config file
     # configure excel user input in the right format
     input_dict = configure_user_input(config)
-
+    #todo: for rws all the same graph and edgegdf. delete and uncomment below
+    graph, edgeGdf = create_network(input_dict[analysis])
     for analysis in input_dict.keys():
         # create the network: a geodataframe and/or graph is created depending on the user input
-        graph, edgeGdf = create_network(input_dict[analysis])
+        # graph, edgeGdf = create_network(input_dict[analysis])
         start_analysis(input_dict[analysis], graph, edgeGdf)
         print("Finished run", input_dict[analysis]['analysis_name'])
-
     print("Done.")
 
 
 if __name__ == '__main__':
     # main(sys.argv[1:])  # reads from the 2nd argument, the first argument is calling the script itself: ra2ce.py test
     main('True')
-    print('test done')
+
