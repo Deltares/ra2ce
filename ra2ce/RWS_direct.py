@@ -45,9 +45,17 @@ class road_hazard():
         self.osm_split_id = list(self.results.index)
 
 
-    def calculate_area(self):
+    def calculate_area(self,underlying_network = False):
         """
         The road_hazard.results DataFrame has al the results that should be fed to the RA2CE tool.
+
+        Arguments:
+            *underlying_network* (Boolean) : Also calculate areas for roads not owned by RWS (default = False)
+            # This was added as a kwarg to guarantee backward compatability
+
+        Effect:
+            Adds columns for pavement_*, Embankment_*, and optionally: Underlying_*
+            ... *_area, *_perc_flooded, *_avg_depth, *max_depth
         """
 
         df = self.results
@@ -59,6 +67,12 @@ class road_hazard():
         df['Embankment_perc_flooded'] = np.NaN
         df['Embankment_avg_depth'] = np.NaN
         df['Embankment_max_depth'] = np.NaN
+
+        if underlying_network:
+            df['Underlying_area'] = np.NaN
+            df['Underlying_perc_flooded'] = np.NaN
+            df['Underlying_avg_depth'] = np.NaN
+            df['Pavement_max_depth'] = np.NaN
 
         for osm_id,values in self.data.items():
             osm_id = int(osm_id)
@@ -87,11 +101,22 @@ class road_hazard():
                     df.at[osm_id, 'Pavement_perc_flooded'] = 0
                     #other values will remain np.NaN
 
+            if underlying_network: #Only execute if also information about non_RWS should be stored
+                # Create results for RWS_network
+                df.at[osm_id, 'Underlying_area'] = values['3']['count'] * self.cellsize
+                if values['3']['count'] != 0:  # Has pixels with underlying network data
+                    if len(values['3']['wd']) != 0:  # Has flooded pixels
+                        df.at[osm_id, 'Underlying_perc_flooded'] = \
+                            100 * (len(values['3']['wd']) / values['3']['count'])
+                        df.at[osm_id, 'Underlying_avg_depth'] = np.mean((values['3']['wd']))
+                        df.at[osm_id, 'Underlying_max_depth'] = np.max((values['3']['wd']))
+                    else:  # Has no flooded pixels
+                        df.at[osm_id, 'Underlying_perc_flooded'] = 0
+                        # other values will remain np.NaN
+
     def OSdaMage_test(self):
         "Prepare some sample data for the OSdaMage code (now in ra2ce)"
-
-        df = self.results
-        df['val_0000'] = df['Pavement_avg_depth']
+        ### TODO
 
 def RWS_blend(r,correction_factor=1.72):
     """
