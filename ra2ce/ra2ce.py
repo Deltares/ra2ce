@@ -153,8 +153,8 @@ def main(argv):
     config = load_config(test=argv[0])  # get config file
     # configure excel user input in the right format
     input_dict = configure_user_input(config)
-    #todo: for rws all the same graph and edgegdf. delete and uncomment below
-    graph, edgeGdf = create_network(input_dict[analysis])
+    #todo: for rws all the same graph and edgegdf therefore outside the for loop (for speed) delete and uncomment below
+    graph, edgeGdf = create_network(input_dict[0])
     for analysis in input_dict.keys():
         # create the network: a geodataframe and/or graph is created depending on the user input
         # graph, edgeGdf = create_network(input_dict[analysis])
