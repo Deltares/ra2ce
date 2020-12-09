@@ -130,7 +130,8 @@ def start_analysis(inputDict, G, network):
             indirect.multi_link_od_matrix(G, inputDict)
         #TODO DONE FOR RWS Project, should be removed in ra2ce.
         elif inputDict['links_analysis'] == 'Multi-link Disruption_RWS':
-            indirect.multi_link_alternative_routes_rws(G, inputDict)
+            costs = indirect.multi_link_alternative_routes_rws(G, inputDict)
+            return costs
         else:
             Exception("Check your user_input.xlsx, the input under 'links_analysis' is not one of the given options.")
 
@@ -153,17 +154,33 @@ def main(argv):
     config = load_config(test=argv[0])  # get config file
     # configure excel user input in the right format
     input_dict = configure_user_input(config)
-    #todo: for rws all the same graph and edgegdf therefore outside the for loop (for speed) delete and uncomment below
-    graph, edgeGdf = create_network(input_dict[0])
     for analysis in input_dict.keys():
         # create the network: a geodataframe and/or graph is created depending on the user input
-        # graph, edgeGdf = create_network(input_dict[analysis])
+        graph, edgeGdf = create_network(input_dict[analysis])
         start_analysis(input_dict[analysis], graph, edgeGdf)
         print("Finished run", input_dict[analysis]['analysis_name'])
     print("Done.")
 
+def main_rws(argv):
+    # argv should be True or False
+    config = load_config(test=argv[0])  # get config file
+    # configure excel user input in the right format
+    input_dict = configure_user_input(config)
+
+    # create the network: a geodataframe and/or graph is created depending on the user input
+    graph, edgeGdf = create_network(input_dict[0])
+    #create empty DF for the output
+    summary_costs = pd.DataFrame({'extra_time': [], 'detour_Euro_ET_Hr': [], 'detour_Euro_AS_Hr': [], 'TNO_ET_Euro_Hr': [], 'TNO_AS_Euro_Hr': []})
+    for analysis in input_dict.keys():
+        # graph, edgeGdf = create_network(input_dict[analysis])
+        costs = start_analysis(input_dict[analysis], graph, edgeGdf)
+        summary_costs=summary_costs.append(costs)
+        summary_costs.to_pickle(input_dict[analysis]['output'] / 'summary_costs.p')
+        summary_costs.to_csv(input_dict[analysis]['output'] / 'summary_costs.csv')
+        print("Finished run", input_dict[analysis]['analysis_name'])
 
 if __name__ == '__main__':
     # main(sys.argv[1:])  # reads from the 2nd argument, the first argument is calling the script itself: ra2ce.py test
-    main('True')
+    main_rws('True')
+    print('Done')
 

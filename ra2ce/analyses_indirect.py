@@ -17,6 +17,7 @@ import logging
 import networkx as nx
 import osmnx
 import numpy as np
+from numpy import nanmean
 import warnings
 import geopandas as gpd
 import rtree
@@ -192,22 +193,51 @@ def multi_link_alternative_routes_rws(G, InputDict, crs=4326):
 
     # Create Origins and Destinations
     #TODO: uni- of bi-directioneel
-    gdf = multi_link_od_matrix_rws(G, InputDict, crs=4326)
-
+    gdf, df_origin = multi_link_od_matrix_rws(G, InputDict, crs=4326)
+    output = assign_traffic_data(gdf, df_origin, InputDict)
 
 
     logging.info("Function [criticality_single_link]: executing")
-
+    return output
     print('Done')
+
 # TODO: add the traffic data
-# def assign_traffic_data(gdf):
-# summarize the average extra time (excluding negative values and same) based on origin.
-# this should result in 1 value per origin with an average extra time.
-# find corresponding simple_IDs with the origin nodes
+def assign_traffic_data(gdf, df, InputDict):
+    # summarize the average extra time (excluding negative values and same) based on origin.
+    # crate gdf with columns: ['origin', 'avg_extra_time', 'G_fid_simple_in', 'LinkNr', 'ET_VTG', 'VOT_Etm', 'Euro_Etm_Hr'. 'Euro_AS_Hr']
+    #load traffic data
+    AllInput = Path(__file__).parents[1] / 'test/input/origin_destination'
+    traffic_data = pd.read_csv(AllInput / 'G_fid_simple_LinkNr_dissolved.csv')
+    traffic_data.G_fid_simp=traffic_data.G_fid_simp.astype('int')
+    extra_time=gdf.groupby('origin'). agg({'extra_time': [nanmean]})['extra_time']['nanmean']
 
-# add the traffic data based on csv
-# multiply the average extra time with the total traffic * average VOT * duration of event.
+    #add column to origin_list_id
+    df['extra_time'] = ''
+    df['Euro_AS_Hr'] = ''
+    df['Euro_ET_Hr'] = ''
+    # TODO: consider adding the extra traveltimes based on TNO single link redundancy
+    df['extra_time_AS_TNO'] = ''
+    df['extra_time_ET_TNO'] = ''
+    x = [x for x in df.index]
+    for xx in x:
+        df['extra_time'][xx]=extra_time[str(xx)]/3600 #convert to hours, since the traffic data is also in hours
+        ids = df['G_fid_simple'][xx]
+        sel = traffic_data.loc[traffic_data['G_fid_simp'].isin(ids)]
+        df['Euro_AS_Hr'][xx] = np.nansum(sel['Euro_AS_Hr'])
+        df['Euro_ET_Hr'][xx] = np.nansum(sel['Euro_ET_Hr'])
+        df['extra_time_AS_TNO'][xx] = np.nanmean(sel['VA_AV_HWN']) / 60 #average extra traveltime based on TNO data in minutes -> hours
+        df['extra_time_ET_TNO'][xx] = np.nanmean(sel['VA_Etm_HWN']) / 60 #average extra traveltime based on TNO data in minutes -> hours
 
+    #multiply the costs for the traffic per hour with the extra average travel time
+    df['detour_Euro_AS_Hr'] = np.where(df['extra_time'].isna(), df['extra_time'], df['extra_time'] * df['Euro_AS_Hr'])
+    df['detour_Euro_ET_Hr'] = np.where(df['extra_time'].isna(), df['extra_time'], df['extra_time'] * df['Euro_ET_Hr'])
+    df['TNO_AS_Euro_Hr'] = np.where(df['extra_time_AS_TNO'].isna(), df['extra_time_AS_TNO'], df['extra_time_AS_TNO'] * df['Euro_AS_Hr'])
+    df['TNO_ET_Euro_Hr'] = np.where(df['extra_time_ET_TNO'].isna(), df['extra_time_ET_TNO'], df['extra_time_ET_TNO'] * df['Euro_ET_Hr'])
+
+    df.to_pickle(InputDict['output']/'traffic'/(str(InputDict['analysis_name'])+'_traffic.p'))
+    sums = df.sum()
+    output = pd.Series({'extra_time': sums['extra_time'], 'detour_Euro_ET_Hr': sums['detour_Euro_ET_Hr'], 'detour_Euro_AS_Hr': sums['detour_Euro_AS_Hr'],'TNO_ET_Euro_Hr': sums['TNO_ET_Euro_Hr'], 'TNO_AS_Euro_Hr': sums['TNO_AS_Euro_Hr']}, name=str(InputDict['analysis_name']))
+    return output
 
 def match_simple_ids(G,gdf, value_col1, threshold):
     """Matches hazard intensity of an existing gdf with the simple_id's of the graph.
@@ -351,7 +381,7 @@ def multi_link_od_matrix(G, InputDict, crs=4326):
     end = time.time()
     logging.info("Full analysis [multi_link_od_matrix]: {}".format(timer(startstart, end)))
 
-def multi_link_od_matrix_rws(G, InputDict, save_file=False, crs=4326):
+def multi_link_od_matrix_rws(G, InputDict, save_file=True, crs=4326):
     """
     Removes all links that are disrupted by a hazard. It takes
     an Origin/Destination matrix as input and calculates the alternative routes for
@@ -410,67 +440,22 @@ def multi_link_od_matrix_rws(G, InputDict, save_file=False, crs=4326):
     o = [x for x in G2.nodes() if G2.in_degree(x)==0 and G2.out_degree(x)==1]
     print('these nodes are the origins: ',o)
     d = [x for x in G2.nodes() if G2.out_degree(x)==0 and G2.in_degree(x)==1]
-    print('these nodes are the destinations: ',o)
+    print('these nodes are the destinations: ',d)
     ods=[(x,y) for x in o for y in d]
 
+    #create empty dataframe with origins and list with corresponding edges, used for the coupling of traffic data later on.
+    list_id = pd.DataFrame(index=o, columns=['G_fid_simple'])
     for oo in o:
         G.nodes[oo]['od_id'] = str(oo)
-
+        list_id['G_fid_simple'][oo] = [data['G_fid_simple'] for u, v, data in G.in_edges(oo, data=True)]
     for dd in d:
         G.nodes[dd]['od_id'] = str(dd)
 
-
-
-    # TODO: check if it works. moved up before matching hazard data.
-    # if weighing == 'time':
-    #     # not yet possible for input with shapefiles, except when a max speed attribute is attached to the shapefile
-    #     # calculate the time it takes per road segment
-    #     # avg_speeds = calc_avg_speed(G, 'highway', save_csv=True,
-    #     #                            save_path=os.path.join(InputDict['output'], 'avg_speeds_{}.csv'.format(InputDict['analysis_name'])))
-    #     # # avg_speeds = pd.read_csv(Path(InputDict['output']/ 'avg_speeds.csv')
-    #
-    #     #define path where to save csv with average speeds or to load when it already exists
-    #     avg_speed_path = InputDict['output'] / 'avg_speeds.csv'
-    #     avg_speeds = calc_avg_speed(G, 'highway', existing_path=avg_speed_path)
-    #
-    #     # TODO move following section before the matching of the hazard data! Then it can be automated quicker!
-    #     # path = InputDict['output'] / 'G_simple_avg_speed.gpickle'
-    #     # if path.exists():
-    #     #     print('simple pickle with average speeds was already created, we load the existing one')
-    #     #     G = nx.read_gpickle(path)
-    #     # else:
-    #     #     if len(avg_speeds.loc[avg_speeds['avg_speed'] == 0]) > 0:
-    #     #         logging.info("An average speed of 50 is used in locations where the maximum speed limit is 0 in OSM data.")
-    #     #         avg_speeds.loc[avg_speeds['avg_speed'] == 0, 'avg_speed'] = 50  # this is assumed
-    #     #     G = assign_avg_speed(G, avg_speeds, 'highway', save_path=InputDict['output'], save_pickle=True)
-    #     #
-    #     #     # make a time value of seconds, length of road streches is in meters
-    #     #     for u, v, k, edata in G.edges.data(keys=True):
-    #     #         hours = (edata['length'] / 1000) / edata['avgspeed']
-    #     #         G[u][v][k][weighing] = hours * 3600
-    #     #     nx.write_gpickle(G, path, protocol=4)
-    #     #     # G = copy.deepcopy(G)
-    #     #     print("Saving graph with avgspeed to .gpickle")
-    #
-    #     if len(avg_speeds.loc[avg_speeds['avg_speed'] == 0]) > 0:
-    #         logging.info("An average speed of 50 is used in locations where the maximum speed limit is 0 in OSM data.")
-    #         avg_speeds.loc[avg_speeds['avg_speed'] == 0, 'avg_speed'] = 50  # this is assumed
-    #     G = assign_avg_speed(G, avg_speeds, 'highway', save_path=InputDict['output'], save_pickle=False)
-    #
-    #     # make a time value of seconds, length of road streches is in meters
-    #     for u, v, k, edata in G.edges.data(keys=True):
-    #         hours = (edata['length'] / 1000) / edata['avgspeed']
-    #         G[u][v][k][weighing] = hours * 3600
-
-
-
-    # G=G.to_undirected()
-    # Calculate the preferred routes
+    # Calculate the preferred routes.
     pref_routes = preferred_routes_rws(G, weighing, id_name, ods, crs, InputDict, shortest_route=False,
                                       save_shp=True, save_pickle=False,
                                       file_output=InputDict['output'], name=InputDict['analysis_name'])
-
-
+    # TODO: add nodes so this to_undirected action is not necessary!
     G=G.to_undirected()
 
     # Calculate the criticality
@@ -483,12 +468,10 @@ def multi_link_od_matrix_rws(G, InputDict, save_file=False, crs=4326):
 
     print("\nThe shapefile with calculated criticality can be found here:\n{}".format(save_name))
 
-
-
     end = time.time()
     logging.info("Full analysis [multi_link_od_matrix]: {}".format(timer(startstart, end)))
     print('Done')
-    return gdf
+    return gdf, list_id
 
 def preferred_routes_rws(graph, weighing_name, idName, od, crs, hazard_data, shortest_route, save_shp, save_pickle,
                         file_output, name):
@@ -2133,8 +2116,8 @@ def criticality_multi_link_hazard_OD_RWS(graph, prefRoutes, weighingName, hazard
     to_remove2 = [(e[0], e[1], e[2]) for e in graph.edges.data(keys=True) if (e[-1]['Underlying_avg_depth'] > threshold)]
     graph.remove_edges_from(to_remove2)
 
-    # graph_to_shp(graph, Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G3_edges.shp')),
-    #              Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G3_nodes.shp')))
+    graph_to_shp(graph, Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G3_edges.shp')),
+                 Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G3_nodes.shp')))
 
     for ii in range(len(prefRoutes.index)):
         o, d = prefRoutes.iloc[ii][['o_node', 'd_node']]
@@ -2153,6 +2136,9 @@ def criticality_multi_link_hazard_OD_RWS(graph, prefRoutes, weighingName, hazard
 
             # subtract the length/time of the optimal route from the alternative route
             extra_time = alt_route - prefRoutes.iloc[ii][weighingName]
+            #put negative values to
+            if extra_time < 0:
+                extra_time = np.nan
 
             if prefRoutes.iloc[ii][weighingName] != alt_route:
                 # the alternative route is different from the optimal route
