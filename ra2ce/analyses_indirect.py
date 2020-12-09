@@ -437,9 +437,9 @@ def multi_link_od_matrix_rws(G, InputDict, save_file=True, crs=4326):
     e_id = [edata['G_fid_simple'] for u,v,edata in G2.edges(data=True)]
 
     #find outer nodes that define origins and destinations
-    o = [x for x in G2.nodes() if G2.in_degree(x)==0 and G2.out_degree(x)==1]
+    o = [x for x in G2.nodes() if G2.in_degree(x)==0 and G2.out_degree(x)>=1]
     print('these nodes are the origins: ',o)
-    d = [x for x in G2.nodes() if G2.out_degree(x)==0 and G2.in_degree(x)==1]
+    d = [x for x in G2.nodes() if G2.out_degree(x)==0 and G2.in_degree(x)>=1]
     print('these nodes are the destinations: ',d)
     ods=[(x,y) for x in o for y in d]
 
