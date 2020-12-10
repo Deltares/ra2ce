@@ -86,7 +86,7 @@ def multi_link_alternative_routes(G, InputDict, crs=4326):
     """Calculates if road segments that are disrupted have an alternative route from node to node
     Args:
 
-    Returns:
+    Returns:+
 
     """
 
@@ -381,7 +381,7 @@ def multi_link_od_matrix(G, InputDict, crs=4326):
     end = time.time()
     logging.info("Full analysis [multi_link_od_matrix]: {}".format(timer(startstart, end)))
 
-def multi_link_od_matrix_rws(G, InputDict, save_file=True, crs=4326):
+def multi_link_od_matrix_rws(G, InputDict, save_file=False, crs=4326):
     """
     Removes all links that are disrupted by a hazard. It takes
     an Origin/Destination matrix as input and calculates the alternative routes for
@@ -453,7 +453,7 @@ def multi_link_od_matrix_rws(G, InputDict, save_file=True, crs=4326):
 
     # Calculate the preferred routes.
     pref_routes = preferred_routes_rws(G, weighing, id_name, ods, crs, InputDict, shortest_route=False,
-                                      save_shp=True, save_pickle=False,
+                                      save_shp=False, save_pickle=True,
                                       file_output=InputDict['output'], name=InputDict['analysis_name'])
     # TODO: add nodes so this to_undirected action is not necessary!
     G=G.to_undirected()
@@ -462,11 +462,14 @@ def multi_link_od_matrix_rws(G, InputDict, save_file=True, crs=4326):
     gdf = criticality_multi_link_hazard_OD_RWS(G, pref_routes, weighing, 'analysis',
                                            InputDict['hazard_threshold'],InputDict, crs)
 
-    # save graph
-    save_name = os.path.join(InputDict['output'], '{}_criticality.shp'.format(InputDict['analysis_name']))
-    gdf_to_shp(gdf, save_name)
+    #save pickle
+    gdf.to_pickle(InputDict['output']/'criticality'/(str(InputDict['analysis_name']) + '_criticality.p'))
 
-    print("\nThe shapefile with calculated criticality can be found here:\n{}".format(save_name))
+    # # save graph
+    # save_name = InputDict['output']/'criticality'/(str(InputDict['analysis_name'])+'_criticality.shp')
+    # gdf_to_shp(gdf, save_name)
+
+    # print("\nThe shapefile with calculated criticality can be found here:\n{}".format(save_name))
 
     end = time.time()
     logging.info("Full analysis [multi_link_od_matrix]: {}".format(timer(startstart, end)))
@@ -564,9 +567,8 @@ def preferred_routes_rws(graph, weighing_name, idName, od, crs, hazard_data, sho
         print("Preferred routes saved to {}".format(os.path.join(file_output, '{}_pref_routes.shp'.format(name))))
 
     if save_pickle:
-        pref_routes[['origin', 'destination', 'AoIs', 'pref_path', weighing_name,
-                     'match_ids']].to_pickle(os.path.join(file_output, '{}_pref_routes.pkl'.format(name)))
-        print("Preferred routes saved to {}".format(os.path.join(file_output, '{}_pref_routes.pkl'.format(name))))
+        pref_routes.to_pickle(file_output / 'pref_routes' / (str(name) + '_pref_routes.p'))
+        print('Preferred routes saved to: ', str(file_output / 'pref_routes' / (str(name) + '_pref_routes.p')))
 
     return pref_routes
 
@@ -2116,8 +2118,8 @@ def criticality_multi_link_hazard_OD_RWS(graph, prefRoutes, weighingName, hazard
     to_remove2 = [(e[0], e[1], e[2]) for e in graph.edges.data(keys=True) if (e[-1]['Underlying_avg_depth'] > threshold)]
     graph.remove_edges_from(to_remove2)
 
-    graph_to_shp(graph, Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G3_edges.shp')),
-                 Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G3_nodes.shp')))
+    # graph_to_shp(graph, Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G3_edges.shp')),
+    #              Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G3_nodes.shp')))
 
     for ii in range(len(prefRoutes.index)):
         o, d = prefRoutes.iloc[ii][['o_node', 'd_node']]
