@@ -6,6 +6,9 @@ Connecting to creating a network and/or graph, the analysis and the visualisatio
 import os, sys
 import networkx as nx
 import pickle
+import logging
+import numpy as np
+
 
 folder = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(folder)
@@ -171,16 +174,38 @@ def main_rws(argv):
     graph, edgeGdf = create_network(input_dict[0])
     #create empty DF for the output
     summary_costs = pd.DataFrame({'extra_time': [], 'detour_Euro_ET_Hr': [], 'detour_Euro_AS_Hr': [], 'TNO_ET_Euro_Hr': [], 'TNO_AS_Euro_Hr': []})
+
     for analysis in input_dict.keys():
-        # graph, edgeGdf = create_network(input_dict[analysis])
-        costs = start_analysis(input_dict[analysis], graph, edgeGdf)
-        summary_costs=summary_costs.append(costs)
-        summary_costs.to_pickle(input_dict[analysis]['output'] / 'summary_costs.p')
-        summary_costs.to_csv(input_dict[analysis]['output'] / 'summary_costs.csv')
-        print("Finished run", input_dict[analysis]['analysis_name'])
+        input_dict[analysis]['output'] = Path(input_dict[analysis]['output'] / input_dict[analysis]['hazard_unique_ID'])
+        try:
+            costs = start_analysis(input_dict[analysis], graph, edgeGdf)
+            summary_costs=summary_costs.append(costs)
+            summary_costs.to_pickle(input_dict[analysis]['output'] / 'summary_cost' / str('summary_costs_'+(str(input_dict[analysis]['analysis_name'])+'.p')))
+            # summary_costs.to_csv(input_dict[analysis]['output'] / 'summary_cost' / 'summary_costs.csv')
+            print("Finished run", input_dict[analysis]['analysis_name'])
+        except:
+            print("Calculation of indirect damages failed: {}".format(input_dict[analysis]['analysis_name']))
+            costs = pd.Series({'extra_time': np.nan, 'detour_Euro_ET_Hr': np.nan,'detour_Euro_AS_Hr': np.nan,'TNO_ET_Euro_Hr': np.nan, 'TNO_AS_Euro_Hr': np.nan},name=str(input_dict[analysis]['analysis_name']))
+            summary_costs=summary_costs.append(costs)
+            # summary_costs.to_csv(input_dict[analysis]['output'] / 'summary_cost' / 'summary_costs.csv')
+            summary_costs.to_pickle(input_dict[analysis]['output'] / 'summary_cost' / str('summary_costs_'+(str(input_dict[analysis]['analysis_name'])+'.p')))
+            logging.info("Calculation of indirect damages failed: {}".format(input_dict[analysis]['analysis_name']))
+            print("Finished run", input_dict[analysis]['analysis_name'])
+
+    summary_costs.to_csv(input_dict[analysis]['output'] / 'summary_cost' / 'summary_costs.csv')
 
 if __name__ == '__main__':
     # main(sys.argv[1:])  # reads from the 2nd argument, the first argument is calling the script itself: ra2ce.py test
     main_rws('True')
+    # pickles_path = Path('C:/Users/Marle/RA2CE_Sprint/ra2ce/test/input/hazard_maps/including_underlying_prio2')
+    # pickles_paths = {x for x in pickles_path.iterdir() if
+    #                 x.suffix == '.p' and x.stem.startswith('road_gdf_sel_incl_underl')}
+    # to_ignore = [20609, 20610, 20633, 20635, 20636, 20638, 20639, 20640, 70001, 70002, 70003, 70004, 70005, 70006, 70007, 70008]
+    # pickles_names = [str('including_underlying_prio2/')+str(p.name) for p in pickles_paths if int(p.stem[24:] not in to_ignore)]
+    # pickles_stems = [p.stem[24:] for p in pickles_paths]
+    # df = pd.DataFrame([pickles_names, pickles_stems]).T
+    # df.to_csv(pickles_path / 'pickles_names_prio2.csv')
     print('Done')
+
+
 
