@@ -453,36 +453,35 @@ def graphs_from_o5m(o5m_path,save_shapes=None,bidirectional=False, simplify=True
 
     print('graphs_from_o5m() returning graph with {:,} nodes and {:,} edges'.format(len(list(G_complex.nodes())),
                                                                                     len(list(G_complex.edges()))))
+    if save_shapes is not None:
+        graph_to_shp(G_complex, Path(save_shapes).joinpath('{}_edges.shp'.format('G_complex')),
+             Path(save_shapes).joinpath('{}_nodes.shp'.format('G_complex')))
     # simplify the graph topology as the last step.
-    if simplify:
-        G_simple = simplify_graph(G_complex)
-        G_simple = graph_create_unique_ids(G_simple, 'G_fid_simple')
-        print('graphs_from_o5m() returning graph with {:,} nodes and {:,} edges'.format(len(list(G_simple.nodes())),
-                                                                                        len(list(G_simple.edges()))))
-    else:
-        G_simple = None
-        print('Did not create a simplified version of the graph')
-
-    # Create look_up_tables between graphs
-    simple_to_complex, complex_to_simple = graph_link_simpleid_to_complex(G_simple, save_json_folder=None)
-    ID_tables = (simple_to_complex,complex_to_simple)
-    print('Lookup tables from complex to simple and vice versa were created')
-
-    # ... and add this info
-    G_complex = add_simple_ID_to_G_complex(G_complex, complex_to_simple)
-    print('Simple IDs were added to the complex Graph')
-
     #TODO: (Kees' opinion): we should not save the shapes WITHIN this function, to keep the length of the function
     #TODO: Managable, better to just return the objects, and have a seperate function that saves the shapes,
     # for the case you want to do that
     #If it would save something, it would save the graphs
-    if save_shapes is not None:
-        graph_to_shp(G_complex, Path(save_shapes).joinpath('{}_edges.shp'.format('G_complex')),
-                 Path(save_shapes).joinpath('{}_nodes.shp'.format('G_complex')))
-
-        if simplify:
-            graph_to_shp(G_simple, Path(save_shapes).joinpath('{}_edges.shp'.format('G_simple')),
-                 Path(save_shapes).joinpath('{}_nodes.shp'.format('G_simple')))
+    if simplify:
+        try:
+            G_simple = simplify_graph(G_complex)
+            G_simple = graph_create_unique_ids(G_simple, 'G_fid_simple')
+            print('graphs_from_o5m() returning graph with {:,} nodes and {:,} edges'.format(len(list(G_simple.nodes())),
+                                                                                            len(list(G_simple.edges()))))
+            
+        #   Create look_up_tables between graphs
+            simple_to_complex, complex_to_simple = graph_link_simpleid_to_complex(G_simple, save_json_folder=None)
+            ID_tables = (simple_to_complex,complex_to_simple)
+            print('Lookup tables from complex to simple and vice versa were created')
+        
+            # ... and add this info
+            G_complex = add_simple_ID_to_G_complex(G_complex, complex_to_simple)
+            print('Simple IDs were added to the complex Graph')
+            if save_shapes is not None:
+                graph_to_shp(G_simple, Path(save_shapes).joinpath('{}_edges.shp'.format('G_simple')),
+                     Path(save_shapes).joinpath('{}_nodes.shp'.format('G_simple')))
+        except:
+            G_simple = None
+            print('Did not create a simplified version of the graph')
 
     return G_complex,G_simple,ID_tables
 
@@ -568,8 +567,8 @@ def from_dump_tool_workflow(path_to_pbf,road_types,save_files=None, segmentation
     assert osm_convert_exe.exists() and osm_filter_exe.exists()
 
     # Prepare the making of a new o5m in the same folder as the pbf
-    o5m_path = path_to_pbf.parents[0] / '{}.o5m'.format(path_to_pbf.stem.split('.')[0])
-    o5m_filtered_path = path_to_pbf.parents[0] / '{}_filtered.o5m'.format(path_to_pbf.stem.split('.')[0])
+    o5m_path= Path(str(os.path.splitext(os.path.splitext(path_to_pbf)[0])[0])+'.o5m')
+    o5m_filtered_path= Path(str(os.path.splitext(os.path.splitext(path_to_pbf)[0])[0])+'_filtered.o5m')
 
     # CONVERT FROM PBF TO O5M
     if not o5m_path.exists():
