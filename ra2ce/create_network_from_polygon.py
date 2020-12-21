@@ -67,7 +67,7 @@ def graph_to_shp(G, edge_shp, node_shp):
 
 
 def graph_from_polygon(polygon, network_type='all_private',
-                       retain_all=False, truncate_by_edge=False, name='unnamed',
+                       retain_all=True, truncate_by_edge=False, name='unnamed',
                        timeout=180, memory=None,
                        max_query_area_size=50*1000*50*1000,
                        clean_periphery=True, infrastructure='way["highway"]',
@@ -142,6 +142,7 @@ def graph_from_polygon(polygon, network_type='all_private',
                                           infrastructure=infrastructure, custom_filter=custom_filter)
         G_buffered = create_graph(response_jsons, name=name, retain_all=True,
                                   bidirectional=network_type in settings.bidirectional_network_types)
+
         G_buffered = truncate_graph_polygon(G_buffered, polygon_buffered, retain_all=True, truncate_by_edge=truncate_by_edge)
 
         # simplify the graph topology
@@ -238,12 +239,12 @@ def get_graph_from_polygon(InputDict, undirected=True, simplify=True, save_shape
         print('Did not create a simplified version of the graph')
 
     if save_shapes:
-        graph_to_shp(G_complex, Path(save_shapes).joinpath('{}_edges.shp'.format('G_complex')),
-                 Path(save_shapes).joinpath('{}_nodes.shp'.format('G_complex')))
+        graph_to_shp(G_complex, Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G_complex_edges.shp')),
+                     Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G_complex_nodes.shp')))
 
         if simplify:
-            graph_to_shp(G_simple, Path(save_shapes).joinpath('{}_edges.shp'.format('G_simple')),
-                 Path(save_shapes).joinpath('{}_nodes.shp'.format('G_simple')))
+            graph_to_shp(G_simple, Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G_simple_edges.shp')),
+                     Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G_simple_nodes.shp')))
 
     return G_complex, G_simple
 
@@ -265,7 +266,7 @@ def from_polygon_tool_workflow(InputDict):
         G_complex_edges (GeoDataFrame : Complex graph (for use in the direct analyses)
     """
     ra2ce_main_path = Path(__file__).parents[1]
-    G_complex, G_simple =get_graph_from_polygon(InputDict, save_shapes=False)
+    G_complex, G_simple =get_graph_from_polygon(InputDict, save_shapes=True)
 
     #CONVERT GRAPHS TO GEODATAFRAMES
     print('Start converting the graphs to geodataframes')

@@ -64,8 +64,8 @@ def single_link_alternative_routes(G, InputDict, crs=4326):
     # CALCULATE CRITICALITY
     #TODO return back to criticality_single_link. Now temporarily changed for RWS project
 
-    # gdf = criticality_single_link(G, InputDict['shp_unique_ID'], roadUsageData=road_usage_data, aadtNames=aadt_names)
-    gdf = criticality_single_link_osm_rws(G)
+    gdf = criticality_single_link(G, InputDict['shp_unique_ID'], roadUsageData=road_usage_data, aadtNames=aadt_names)
+    # gdf = criticality_single_link_osm_rws(G)
     logging.info("Function [criticality_single_link]: executing")
 
     # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
@@ -133,7 +133,7 @@ def multi_link_alternative_routes(G, InputDict, crs=4326):
     logging.info("Full analysis [multi_link_alternative_routes]: {}".format(timer(startstart, end)))
 
 
-def multi_link_alternative_routes_rws(G, InputDict, crs=4326):
+def multi_link_alternative_routes_rws(G, InputDict, save_file=False, crs=4326):
     """Calculates if road segments that are disrupted have an alternative route from node to node
     copy of multi_link_alternative_routes, adjusted for RWS, because the hazard intersect is not done within the script.
     Args:
@@ -189,20 +189,27 @@ def multi_link_alternative_routes_rws(G, InputDict, crs=4326):
     #in e pickle is de simple_id als float
     gdf[id_name] = gdf[id_name].astype('int64')
     #add values of hazard to the simple IDs and identify which edges are excluded when performing the multi-link disruption
-    G = match_simple_ids(G, gdf, InputDict['hazard_attribute_name'][0],InputDict['hazard_threshold'])
+    if InputDict['hazard_attribute_name'][0] == 'Embankment_avg_depth':
+        G, count = match_simple_ids2(G, gdf, InputDict['hazard_attribute_name'][0],InputDict['hazard_threshold'])
+    else:
+        G, count = match_simple_ids(G, gdf, InputDict['hazard_attribute_name'][0],InputDict['hazard_threshold'])
 
-    # Create Origins and Destinations
-    #TODO: uni- of bi-directioneel
-    gdf, df_origin = multi_link_od_matrix_rws(G, InputDict, crs=4326)
-    output = assign_traffic_data(gdf, df_origin, InputDict)
-
-
-    logging.info("Function [criticality_single_link]: executing")
+    #check if the main network is failing. If count >0 do the whole analysis. otherwise return np.nan output.
+    if count > 0:
+        # Create Origins and Destinations
+        #TODO: add edges for directed graphs
+        gdf, df_origin = multi_link_od_matrix_rws(G, InputDict,save_file=True, crs=4326)
+        output = assign_traffic_data(gdf, df_origin, InputDict)
+        logging.info("Function [criticality_single_link]: executing")
+    if count == 0:
+        print('main network is not disrupted')
+        output = pd.Series({'extra_time': np.nan, 'detour_Euro_ET_Hr': np.nan, 'detour_Euro_AS_Hr': np.nan, 'TNO_ET_Euro_Hr': np.nan,
+             'TNO_AS_Euro_Hr': np.nan}, name=str(input_dict[analysis]['analysis_name']))
     return output
-    print('Done')
 
-# TODO: add the traffic data
+
 def assign_traffic_data(gdf, df, InputDict):
+    # TODO: assign the values to the affected road segments based on the preferred routes
     # summarize the average extra time (excluding negative values and same) based on origin.
     # crate gdf with columns: ['origin', 'avg_extra_time', 'G_fid_simple_in', 'LinkNr', 'ET_VTG', 'VOT_Etm', 'Euro_Etm_Hr'. 'Euro_AS_Hr']
     #load traffic data
@@ -237,6 +244,7 @@ def assign_traffic_data(gdf, df, InputDict):
     df.to_pickle(InputDict['output']/'traffic'/(str(InputDict['analysis_name'])+'_traffic.p'))
     sums = df.sum()
     output = pd.Series({'extra_time': sums['extra_time'], 'detour_Euro_ET_Hr': sums['detour_Euro_ET_Hr'], 'detour_Euro_AS_Hr': sums['detour_Euro_AS_Hr'],'TNO_ET_Euro_Hr': sums['TNO_ET_Euro_Hr'], 'TNO_AS_Euro_Hr': sums['TNO_AS_Euro_Hr']}, name=str(InputDict['analysis_name']))
+    print(output)
     return output
 
 def match_simple_ids(G,gdf, value_col1, threshold):
@@ -261,7 +269,7 @@ def match_simple_ids(G,gdf, value_col1, threshold):
     values_col1 = obtained_simple_ids.copy() #start with a copy
     values_col2 = obtained_simple_ids.copy() #start with a copy
     values_col3 = obtained_simple_ids.copy()
-
+    count=0
     for key, value in obtained_simple_ids.items(): # {(u,v,k) : 'G_fid_complex'}
         values_col3[key] = 0
         try:
@@ -272,6 +280,7 @@ def match_simple_ids(G,gdf, value_col1, threshold):
                 values_col1[key] = new_value
                 if values_col1[key] > threshold:
                     values_col3[key] = 1
+                    count = count + 1.
 
         except KeyError as e:
             # print('Could not find the simple ID belonging to complex ID {}; value set to None'.format(key))
@@ -295,7 +304,75 @@ def match_simple_ids(G,gdf, value_col1, threshold):
     nx.set_edge_attributes(G,values_col1,value_col1)
     nx.set_edge_attributes(G,values_col2,'Underlying_avg_depth')
     nx.set_edge_attributes(G,values_col3,'analysis')
-    return G
+    return G, count
+
+def match_simple_ids2(G,gdf, value_col1, threshold):
+    """Matches hazard intensity of an existing gdf with the simple_id's of the graph.
+    Args:
+        G [networkx graph]: networkx graph with at least simple_id
+        gdf with simple_ids, complex ids and hazard attribute
+        value_col [string] the attribute of the hazard within the gdf
+
+    Returns:
+        Graph with an additional columns indicating which simple_ids are disrupted by the hazard
+
+    Created by Margreet van Marle and based on network_functions.match_ids (@Frederique de Groen) and create_network_from_osm_dump.add_simple_ID_to_G_complex (@Kees van Ginkel)
+    """
+    print('matching by simple_IDs')
+    #when there is an embankment failure included. both the pavement as well as the embankment fail.
+
+    temp1 = gdf.groupby('G_fid_simple')[value_col1,'Pavement_avg_depth' ].mean()
+    df1 = temp1.max(axis=1)
+    dict_df1 = dict(df1)
+
+    df2 = gdf.groupby('G_fid_simple')['Underlying_avg_depth'].mean()
+    dict_df2=dict(df2)
+
+    obtained_simple_ids = nx.get_edge_attributes(G, 'G_fid_simple') # {(u,v,k) : 'G_fid_complex'}
+    values_col1 = obtained_simple_ids.copy() #start with a copy -> these values determine the average waterdepth
+    values_col2 = obtained_simple_ids.copy() #start with a copy -> these values determine the waterdepth on the underlying network
+    values_col3 = obtained_simple_ids.copy() #start with a copy -> this one gives y/n for failing network (including underlying).
+
+    count=0
+    for key, value in obtained_simple_ids.items(): # {(u,v,k) : 'G_fid_complex'}
+        values_col3[key] = 0
+        try:
+            new_value = dict_df1[value] #find simple id belonging to the complex id
+            if np.isnan(new_value)==True:
+                values_col1[key]=0
+            else:
+                values_col1[key] = new_value
+                if values_col1[key] > threshold:
+                    values_col3[key] = 1
+                    count = count + 1
+
+        except KeyError as e:
+            # print('Could not find the simple ID belonging to complex ID {}; value set to None'.format(key))
+            values_col1[key] = 0
+
+    for key, value in obtained_simple_ids.items(): # {(u,v,k) : 'G_fid_complex'}
+        try:
+            new_value2 = dict_df2[value]
+            if np.isnan(new_value2)==True:
+                values_col2[key] = 0
+            else:
+                values_col2[key] = new_value2
+                if values_col2[key] > threshold:
+                    values_col3[key] = 1
+        except KeyError as e:
+            # print('Could not find the simple ID belonging to complex ID {}; value set to None'.format(key))
+            values_col2[key] = 0
+
+    #check for failing road segments. count number of times
+
+    #Now the format of simple_ids_per_complex_id is: {(u,v,k) : 'G_fid_simple}
+    nx.set_edge_attributes(G,values_col1,value_col1)
+    nx.set_edge_attributes(G,values_col2,'Underlying_avg_depth')
+    nx.set_edge_attributes(G,values_col3,'analysis')
+
+    #check
+    return G, count
+
 
 def multi_link_od_matrix(G, InputDict, crs=4326):
     """
@@ -381,7 +458,7 @@ def multi_link_od_matrix(G, InputDict, crs=4326):
     end = time.time()
     logging.info("Full analysis [multi_link_od_matrix]: {}".format(timer(startstart, end)))
 
-def multi_link_od_matrix_rws(G, InputDict, save_file=False, crs=4326):
+def multi_link_od_matrix_rws(G, InputDict, save_file=True, crs=4326):
     """
     Removes all links that are disrupted by a hazard. It takes
     an Origin/Destination matrix as input and calculates the alternative routes for
@@ -429,31 +506,44 @@ def multi_link_od_matrix_rws(G, InputDict, save_file=False, crs=4326):
     edges_remove = [e for e in edges_remove if (e[-1][InputDict['hazard_attribute_name'][0]] <= InputDict['hazard_threshold'])]
     G2.remove_edges_from(edges_remove)
 
+
     #save G2 to check out nodes and edges that were removed
     if save_file:
         graph_to_shp(G2, Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G2_edges.shp')),
                      Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G2_nodes.shp')))
+        print(Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G2_edges.shp')))
 
     e_id = [edata['G_fid_simple'] for u,v,edata in G2.edges(data=True)]
-
-    #find outer nodes that define origins and destinations
-    o = [x for x in G2.nodes() if G2.in_degree(x)==0 and G2.out_degree(x)>=1]
-    print('these nodes are the origins: ',o)
-    d = [x for x in G2.nodes() if G2.out_degree(x)==0 and G2.in_degree(x)>=1]
-    print('these nodes are the destinations: ',d)
-    ods=[(x,y) for x in o for y in d]
+    ods=[]
+    os=[]
+    ds=[]
+    for subg in list(nx.weakly_connected_component_subgraphs(G2)):
+            if subg.number_of_edges() == 0:
+                continue  # not a cycle
+            else:
+        #todo add the island every origin and destinat ion is connected voor edges remove
+                #find outer nodes that define origins and destinations
+                o = [x for x in subg.nodes() if subg.in_degree(x)==0 and subg.out_degree(x)>=1]
+                d = [x for x in subg.nodes() if subg.out_degree(x)==0 and subg.in_degree(x)>=1]
+                od=[(x,y) for x in o for y in d]
+                if len(od)>=1:
+                    ods.extend(od)
+                    os.extend(o)
+                    ds.extend(d)
+    print('these nodes are the origins: ', os)
+    print('these nodes are the destinations: ', ds)
 
     #create empty dataframe with origins and list with corresponding edges, used for the coupling of traffic data later on.
-    list_id = pd.DataFrame(index=o, columns=['G_fid_simple'])
-    for oo in o:
+    list_id = pd.DataFrame(index=list(os), columns=['G_fid_simple'])
+    for oo in os:
         G.nodes[oo]['od_id'] = str(oo)
         list_id['G_fid_simple'][oo] = [data['G_fid_simple'] for u, v, data in G.in_edges(oo, data=True)]
-    for dd in d:
+    for dd in ds:
         G.nodes[dd]['od_id'] = str(dd)
 
     # Calculate the preferred routes.
     pref_routes = preferred_routes_rws(G, weighing, id_name, ods, crs, InputDict, shortest_route=False,
-                                      save_shp=False, save_pickle=True,
+                                      save_shp=True, save_pickle=True,
                                       file_output=InputDict['output'], name=InputDict['analysis_name'])
     # TODO: add nodes so this to_undirected action is not necessary!
     G=G.to_undirected()
@@ -465,11 +555,11 @@ def multi_link_od_matrix_rws(G, InputDict, save_file=False, crs=4326):
     #save pickle
     gdf.to_pickle(InputDict['output']/'criticality'/(str(InputDict['analysis_name']) + '_criticality.p'))
 
-    # # save graph
-    # save_name = InputDict['output']/'criticality'/(str(InputDict['analysis_name'])+'_criticality.shp')
-    # gdf_to_shp(gdf, save_name)
+    # save graph
+    save_name = InputDict['output']/'criticality'/(str(InputDict['analysis_name'])+'_criticality_emb.shp')
+    gdf_to_shp(gdf, save_name)
 
-    # print("\nThe shapefile with calculated criticality can be found here:\n{}".format(save_name))
+    print("\nThe shapefile with calculated criticality can be found here:\n{}".format(save_name))
 
     end = time.time()
     logging.info("Full analysis [multi_link_od_matrix]: {}".format(timer(startstart, end)))
@@ -1914,7 +2004,8 @@ def criticality_single_link_osm_rws(graph,gdf=None):
         u, v, k, data = e_remove
 
         data_highway = data['highway'] #can be string or list of strings
-        if isinstance(data_highway,str): data_highway = [data_highway]
+        if isinstance(data_highway,str):
+            data_highway = [data_highway]
 
         if common_member(data_highway,to_filter_out):
             #Use common_mber, because in the simplified graph, the highway tag can be a list instead of a string
@@ -2039,8 +2130,7 @@ def criticality_multi_link_hazard_OD(graph, prefRoutes, weighingName, hazardName
                  'd_disrupt', 'o_disrupt', 'd_{}'.format(hazardName), 'o_{}'.format(hazardName), 'geometry'],
         geometry='geometry', crs={'init': 'epsg:{}'.format(crs_)})
 
-    to_remove = [(e[0], e[1], e[2]) for e in graph.edges.data(keys=True) if (e[-1][hazardName] > threshold) & (
-        'bridge' not in e[-1])]
+    to_remove = [(e[0], e[1], e[2]) for e in graph.edges.data(keys=True) if (e[-1][hazardName] > threshold) & ('bridge' not in e[-1])]
     graph.remove_edges_from(to_remove)
 
     for ii in range(len(prefRoutes.index)):

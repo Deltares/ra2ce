@@ -38,7 +38,6 @@ def configure_user_input(cfg):
     # clean up dataframe: remove rows and columns that only contain nan values
     df.dropna(axis=1, how='all', inplace=True)
     input_dict = df.to_dict(orient='index')
-
     for theAnalysis in input_dict.keys():
         input_dict[theAnalysis]['output'] = cfg["paths"]["output"]
         if 'hazard_data' in input_dict[theAnalysis]:
@@ -57,9 +56,8 @@ def configure_user_input(cfg):
             input_dict[theAnalysis]['OSM_area_of_interest'] = create_path(input_dict[theAnalysis]['OSM_area_of_interest'],
                                                                     cfg["paths"]["area_of_interest"], '.shp')
             input_dict[theAnalysis]['shp_unique_ID'] = 'G_simple_fid'
-        if 'path_to_pbf' in input_dict[theAnalysis]:
-            input_dict[theAnalysis]['name_of_pbf'] = create_path(input_dict[theAnalysis]['name_of_pbf'],
-                                                                    cfg["paths"]["OSM_dumps"], '.pbf')
+        if 'name_of_pbf' in input_dict[theAnalysis]:
+            input_dict[theAnalysis]['name_of_pbf'] = Path(cfg["paths"]["OSM_dumps"] / input_dict[theAnalysis]['name_of_pbf'])
         if 'origin_shp' in input_dict[theAnalysis]:
             input_dict[theAnalysis]['origin_shp'] = create_path(input_dict[theAnalysis]['origin_shp'],
                                                                     cfg["paths"]["OSM_dumps"], '.pbf')
@@ -72,8 +70,7 @@ def configure_user_input(cfg):
 def create_network(inputDict):
     """Depending on the user input, a network/graph is created.
     """
-    ra2ce_main_path = Path(__file__).parents[1]
-    output_path = ra2ce_main_path /  inputDict['output']
+    output_path = inputDict['output']
 
     # when G_simple and edges_complex already exist no need to create new graph and gdf
     G_simple_path = output_path / 'G_simple.gpickle'
@@ -88,7 +85,7 @@ def create_network(inputDict):
         elif inputDict['network_source'] == 'Network based on OSM dump':
             print('start creating network from osm_dump')
             roadTypes = inputDict['road_types'].lower().replace(' ', '').split(',')
-            G, edge_gdf = from_dump_tool_workflow(inputDict["name_of_pbf"], roadTypes, save_files=False, segmentation=None)
+            G, edge_gdf = from_dump_tool_workflow(inputDict["name_of_pbf"], roadTypes, save_files=True,segmentation=None)
         elif inputDict['network_source'] == 'Network based on OSM online':
             print('start creating network from osm_online')
             inputDict['network_type'] = inputDict['network_type'].lower().replace(' ',
@@ -195,16 +192,10 @@ def main_rws(argv):
     summary_costs.to_csv(input_dict[analysis]['output'] / 'summary_cost' / 'summary_costs.csv')
 
 if __name__ == '__main__':
+
     # main(sys.argv[1:])  # reads from the 2nd argument, the first argument is calling the script itself: ra2ce.py test
-    main_rws('True')
-    # pickles_path = Path('C:/Users/Marle/RA2CE_Sprint/ra2ce/test/input/hazard_maps/including_underlying_prio2')
-    # pickles_paths = {x for x in pickles_path.iterdir() if
-    #                 x.suffix == '.p' and x.stem.startswith('road_gdf_sel_incl_underl')}
-    # to_ignore = [20609, 20610, 20633, 20635, 20636, 20638, 20639, 20640, 70001, 70002, 70003, 70004, 70005, 70006, 70007, 70008]
-    # pickles_names = [str('including_underlying_prio2/')+str(p.name) for p in pickles_paths if int(p.stem[24:] not in to_ignore)]
-    # pickles_stems = [p.stem[24:] for p in pickles_paths]
-    # df = pd.DataFrame([pickles_names, pickles_stems]).T
-    # df.to_csv(pickles_path / 'pickles_names_prio2.csv')
+    main('True')
+    # main_rws('True')
     print('Done')
 
 
