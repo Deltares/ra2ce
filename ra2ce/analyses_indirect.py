@@ -64,8 +64,8 @@ def single_link_alternative_routes(G, InputDict, crs=4326):
     # CALCULATE CRITICALITY
     #TODO return back to criticality_single_link. Now temporarily changed for RWS project
 
-    gdf = criticality_single_link(G, InputDict['shp_unique_ID'], roadUsageData=road_usage_data, aadtNames=aadt_names)
-    # gdf = criticality_single_link_osm_rws(G)
+    # gdf = criticality_single_link(G, InputDict['shp_unique_ID'], roadUsageData=road_usage_data, aadtNames=aadt_names)
+    gdf = criticality_single_link_osm(G)
     logging.info("Function [criticality_single_link]: executing")
 
     # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
