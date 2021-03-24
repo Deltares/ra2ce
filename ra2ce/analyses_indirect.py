@@ -421,7 +421,6 @@ def multi_link_od_matrix(G, InputDict, crs=4326):
                         InputDict['id_name_origin_destination'], crs)
 
     ods = create_OD_pairs(ods, G, id_name)
-    print(ods)
     G = add_od_nodes(G, ods, id_name, name=InputDict['analysis_name'], file_output=InputDict['output'], save_shp=True)
 
 
@@ -1369,7 +1368,6 @@ def add_od_nodes(graph, od, id_name, name=None, file_output=None, save_shp=False
         if len(all_matches) > 1:
             all_matches = [am for am in all_matches if
                            match_OD in [Point(p) for p in set(list(am[-1]['geometry'].coords))]]
-        print(all_matches)
         m = all_matches[0]
 
         if 'geometry' in m[-1]:
