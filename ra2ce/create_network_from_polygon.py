@@ -206,27 +206,23 @@ def get_graph_from_polygon(InputDict, undirected=True, simplify=True, save_shape
     if 'network_type' in InputDict:
         NetworkType = InputDict['network_type']
 
-    if 'road_types' in InputDict:
-          RoadTypes = InputDict['road_types']
+
 
     with fiona.open(PathShp) as source:
         for r in source:
             if 'geometry' in r:  # added this line to not take into account "None" geometry
                 polygon = shape(r['geometry'])
 
-    if RoadTypes == RoadTypes:
+    if 'road_types' in InputDict:
+        RoadTypes = InputDict['road_types']
+        print(RoadTypes)
         # assuming the empty cell in the excel is a numpy.float64 nan value
         #osmnx 0.16
         #G = osmnx.graph_from_polygon(polygon=polygon, network_type=NetworkType, custom_filter='["highway"~"{}"]'.format(RoadTypes))
-        G_complex = graph_from_polygon(polygon=polygon, network_type=NetworkType,infrastructure='way["highway"~"{}"]'.format(RoadTypes), simplify=False)
+        G_complex = graph_from_polygon(polygon=polygon, network_type=NetworkType,infrastructure='way["highway"~"motorway|trunk|primary"]', simplify=False)
     else:
         G_complex = graph_from_polygon(polygon=polygon, network_type=NetworkType, simplify=False)
 
-
-    # we want to use undirected graphs, so turn into an undirected graph
-    # if undirected:
-    #     if type(G_complex) == nx.classes.multidigraph.MultiDiGraph:
-    #         G_complex = G_complex.to_undirected()
 
     # simplify the graph topology as the last step.
     if simplify:
@@ -237,6 +233,13 @@ def get_graph_from_polygon(InputDict, undirected=True, simplify=True, save_shape
     else:
         G_simple = None
         print('Did not create a simplified version of the graph')
+
+    # we want to use undirected graphs, so turn into an undirected graph
+    if undirected:
+        if type(G_complex) == nx.classes.multidigraph.MultiDiGraph:
+            G_complex = G_complex.to_undirected()
+        if type(G_simple) == nx.classes.multidigraph.MultiDiGraph:
+            G_simple = G_simple.to_undirected()
 
     if save_shapes:
         graph_to_shp(G_complex, Path(InputDict['output']/(str(InputDict['analysis_name'])+'_G_complex_edges.shp')),
