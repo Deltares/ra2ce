@@ -59,11 +59,14 @@ def configure_user_input(cfg):
         if 'name_of_pbf' in input_dict[theAnalysis]:
             input_dict[theAnalysis]['name_of_pbf'] = Path(cfg["paths"]["OSM_dumps"] / input_dict[theAnalysis]['name_of_pbf'])
         if 'origin_shp' in input_dict[theAnalysis]:
+            input_dict[theAnalysis]['o_names'] = input_dict[theAnalysis]['origin_shp']
             input_dict[theAnalysis]['origin_shp'] = create_path(input_dict[theAnalysis]['origin_shp'],
-                                                                    cfg["paths"]["OSM_dumps"], '.pbf')
+                                                                    cfg["paths"]["origin_destination"], '.shp')
         if 'destination_shp' in input_dict[theAnalysis]:
+            input_dict[theAnalysis]['d_names'] = input_dict[theAnalysis]['destination_shp']
             input_dict[theAnalysis]['destination_shp'] = create_path(input_dict[theAnalysis]['destination_shp'],
-                                                                 cfg["paths"]["OSM_dumps"], '.pbf')
+                                                                 cfg["paths"]["origin_destination"], '.shp')
+
     return input_dict
 
 
@@ -84,13 +87,14 @@ def create_network(inputDict):
             G, edge_gdf = create_network_from_shapefile(inputDict, crs_)
         elif inputDict['network_source'] == 'Network based on OSM dump':
             print('start creating network from osm_dump')
-            roadTypes = inputDict['road_types'].lower().replace(' ', '').split(',')
+            roadTypes = inputDict['road_types'].lower().replace(' ', ' ').split(',')
             G, edge_gdf = from_dump_tool_workflow(inputDict["name_of_pbf"], roadTypes, save_files=True,segmentation=None)
         elif inputDict['network_source'] == 'Network based on OSM online':
             print('start creating network from osm_online')
             inputDict['network_type'] = inputDict['network_type'].lower().replace(' ',
                                                                                   '')  # decapitalize and remove all whitespaces
-            inputDict['road_types'] = inputDict['road_types'].lower().replace(',', '|')
+            if 'road_types' in inputDict:
+                inputDict['road_types'] = inputDict['road_types'].lower().replace(',', '|')
             G, edge_gdf = from_polygon_tool_workflow(inputDict)
         else:
             Exception("Check your user_input.xlsx, the input under 'network_source' is not one of the given options.")

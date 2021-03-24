@@ -64,8 +64,8 @@ def single_link_alternative_routes(G, InputDict, crs=4326):
     # CALCULATE CRITICALITY
     #TODO return back to criticality_single_link. Now temporarily changed for RWS project
 
-    gdf = criticality_single_link(G, InputDict['shp_unique_ID'], roadUsageData=road_usage_data, aadtNames=aadt_names)
-    # gdf = criticality_single_link_osm_rws(G)
+    # gdf = criticality_single_link_osm(G, InputDict['shp_unique_ID'], roadUsageData=road_usage_data, aadtNames=aadt_names)
+    gdf = criticality_single_link_osm(G)
     logging.info("Function [criticality_single_link]: executing")
 
     # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
@@ -416,11 +416,12 @@ def multi_link_od_matrix(G, InputDict, crs=4326):
                                    agg=InputDict['hazard_aggregation'])
 
     # Add the origin/destination nodes to the network
-    ods = read_OD_files(InputDict['origin_shapefiles_path'], InputDict['o_names'],
-                        InputDict['destination_shapefiles_path'], InputDict['d_names'],
-                        InputDict['id_od'], crs)
+    ods = read_OD_files(InputDict['origin_shp'], InputDict['o_names'],
+                        InputDict['destination_shp'], InputDict['d_names'],
+                        InputDict['id_name_origin_destination'], crs)
 
     ods = create_OD_pairs(ods, G, id_name)
+    G = add_od_nodes(G, ods, id_name, name=InputDict['analysis_name'], file_output=InputDict['output'], save_shp=True)
 
 
 
@@ -446,7 +447,7 @@ def multi_link_od_matrix(G, InputDict, crs=4326):
                                       file_output=InputDict['output'], name=InputDict['analysis_name'])
 
     # Calculate the criticality
-    gdf = criticality_multi_link_hazard_OD(G, pref_routes, weighing, InputDict['attribute_name'][0],
+    gdf = criticality_multi_link_hazard_OD(G, pref_routes, weighing, InputDict['hazard_attribute_name'][0],
                                            InputDict['hazard_threshold'], crs)
 
     # save graph
@@ -1520,38 +1521,38 @@ def preferred_routes_od(graph, weighing_name, idName, od, crs, hazard_data, shor
                                               'geometry': pref_edges}, ignore_index=True)
 
     if shortest_route:
-        pref_routes = pref_routes.loc[pref_routes.sort_values('length').groupby('o_node').head(3).index]
+        pref_routes = pref_routes.loc[pref_routes.sort_values(weighing_name).groupby('o_node').head(3).index]
 
     # intersect the origin and destination nodes with the hazard map (now only geotiff possible)
     pref_routes['d_disrupt'] = None
     pref_routes['o_disrupt'] = None
-    pref_routes['d_{}'.format(hazard_data['attribute_name'][0])] = None
-    pref_routes['o_{}'.format(hazard_data['attribute_name'][0])] = None
-    src = rasterio.open(hazard_data['path'][0])
+    pref_routes['d_{}'.format(hazard_data['hazard_attribute_name'][0])] = None
+    pref_routes['o_{}'.format(hazard_data['hazard_attribute_name'][0])] = None
+    src = rasterio.open(hazard_data['hazard_data'][0])
     for i in range(len(pref_routes.index)):
         dest = graph.nodes[int(pref_routes.d_node.iloc[i])]['geometry']
         if (src.bounds.left < dest.coords[0][0] < src.bounds.right) and (
             src.bounds.bottom < dest.coords[0][1] < src.bounds.top):
             hzrd = [x.item(0) for x in src.sample(dest.coords)][0]
-            pref_routes['d_{}'.format(hazard_data['attribute_name'][0])].iloc[i] = hzrd
-            if hzrd > hazard_data['threshold']:
+            pref_routes['d_{}'.format(hazard_data['hazard_attribute_name'][0])].iloc[i] = hzrd
+            if hzrd > hazard_data['hazard_threshold']:
                 pref_routes['d_disrupt'].iloc[i] = 'disrupted'
             else:
                 pref_routes['d_disrupt'].iloc[i] = 'not disrupted'
         else:
-            pref_routes['d_{}'.format(hazard_data['attribute_name'][0])].iloc[i] = 0
+            pref_routes['d_{}'.format(hazard_data['hazard_attribute_name'][0])].iloc[i] = 0
             pref_routes['d_disrupt'].iloc[i] = 'unknown'
         orig = graph.nodes[int(pref_routes.o_node.iloc[i])]['geometry']
         if (src.bounds.left < orig.coords[0][0] < src.bounds.right) and (
             src.bounds.bottom < orig.coords[0][1] < src.bounds.top):
             hzrd = [x.item(0) for x in src.sample(orig.coords)][0]
-            pref_routes['o_{}'.format(hazard_data['attribute_name'][0])].iloc[i] = hzrd
-            if hzrd > hazard_data['threshold']:
+            pref_routes['o_{}'.format(hazard_data['hazard_attribute_name'][0])].iloc[i] = hzrd
+            if hzrd > hazard_data['hazard_threshold']:
                 pref_routes['o_disrupt'].iloc[i] = 'disrupted'
             else:
                 pref_routes['o_disrupt'].iloc[i] = 'not disrupted'
         else:
-            pref_routes['o_{}'.format(hazard_data['attribute_name'][0])].iloc[i] = 0
+            pref_routes['o_{}'.format(hazard_data['hazard_attribute_name'][0])].iloc[i] = 0
             pref_routes['o_disrupt'].iloc[i] = 'unknown'
 
     if save_shp:
@@ -2048,78 +2049,78 @@ def criticality_single_link_osm_rws(graph,gdf=None):
     return gdf
 
 
-def criticality_multi_link_hazard_OD(graph, prefRoutes, weighingName, hazardName, threshold, crs_):
-    """Calculates the criticality of origins and destinations"""
-    # Check if the o/d pairs are still connected while some links are disrupted by the hazard(s)
-    gdf = gpd.GeoDataFrame(
-        columns=['disrupted', 'extra_{}'.format(weighingName), 'no detour', 'origin', 'destination', 'odpair',
-                 'd_disrupt', 'o_disrupt', 'd_{}'.format(hazardName), 'o_{}'.format(hazardName), 'geometry'],
-        geometry='geometry', crs={'init': 'epsg:{}'.format(crs_)})
-
-    to_remove = [(e[0], e[1], e[2]) for e in graph.edges.data(keys=True) if (e[-1][hazardName] > threshold) & (
-        'bridge' not in e[-1])]
-    graph.remove_edges_from(to_remove)
-
-    for ii in range(len(prefRoutes.index)):
-        o, d = prefRoutes.iloc[ii][['o_node', 'd_node']]
-        o = int(o)
-        d = int(d)
-
-        extra_time = np.NaN
-
-        # check if the nodes are still connected
-        if nx.has_path(graph, o, d):
-            # calculate the alternative distance if that edge is unavailable
-            alt_route = nx.dijkstra_path_length(graph, o, d, weight=weighingName)
-
-            # save preferred route nodes
-            pref_nodes = nx.dijkstra_path(graph, o, d, weight=weighingName)
-
-            # subtract the length/time of the optimal route from the alternative route
-            extra_time = alt_route - prefRoutes.iloc[ii][weighingName]
-
-            if prefRoutes.iloc[ii][weighingName] != alt_route:
-                # the alternative route is different from the optimal route
-                disrupted = 1
-                detour = "alt_route"
-                # found out which edges belong to the preferred path
-                edgesinpath = list(zip(pref_nodes[0:], pref_nodes[1:]))
-
-                pref_edges = []
-                for u, v in edgesinpath:
-                    # get edge with the lowest weighing if there are multiple edges that connect u and v
-                    edge_key = sorted(graph[u][v], key=lambda x: graph[u][v][x][weighingName])[0]
-                    if 'geometry' in graph[u][v][edge_key]:
-                        pref_edges.append(graph[u][v][edge_key]['geometry'])
-                    else:
-                        pref_edges.append(LineString([graph.nodes[u]['geometry'], graph.nodes[v]['geometry']]))
-
-                # compile the road segments into one geometry
-                pref_edges = MultiLineString(pref_edges)
-            else:
-                # the alternative route is the same as the optimal route
-                disrupted = 0
-                detour = "same"
-                pref_edges = prefRoutes.iloc[ii]['geometry']
-        else:
-            # append to calculation dataframe
-            disrupted = 1
-            detour = "no_detour"
-            pref_edges = prefRoutes.iloc[ii]['geometry']
-
-        gdf = gdf.append({'disrupted': disrupted, 'extra_{}'.format(weighingName): extra_time, 'no detour': detour,
-                          'origin': str(prefRoutes.iloc[ii]['origin']),
-                          'destination': str(prefRoutes.iloc[ii]['destination']),
-                          'odpair': str(prefRoutes.iloc[ii]['origin']) + ' to ' + str(
-                              prefRoutes.iloc[ii]['destination']),
-                          #TODO: change for RWS
-                          # 'd_disrupt': prefRoutes.iloc[ii]['d_disrupt'],
-                          # 'o_disrupt': prefRoutes.iloc[ii]['o_disrupt'],
-                          # 'd_{}'.format(hazardName): prefRoutes.iloc[ii]['d_{}'.format(hazardName)],
-                          # 'o_{}'.format(hazardName): prefRoutes.iloc[ii]['o_{}'.format(hazardName)],
-                          'geometry': pref_edges}, ignore_index=True)
-
-    return gdf
+# def criticality_multi_link_hazard_OD(graph, prefRoutes, weighingName, hazardName, threshold, crs_):
+#     """Calculates the criticality of origins and destinations"""
+#     # Check if the o/d pairs are still connected while some links are disrupted by the hazard(s)
+#     gdf = gpd.GeoDataFrame(
+#         columns=['disrupted', 'extra_{}'.format(weighingName), 'no detour', 'origin', 'destination', 'odpair',
+#                  'd_disrupt', 'o_disrupt', 'd_{}'.format(hazardName), 'o_{}'.format(hazardName), 'geometry'],
+#         geometry='geometry', crs={'init': 'epsg:{}'.format(crs_)})
+#
+#     to_remove = [(e[0], e[1], e[2]) for e in graph.edges.data(keys=True) if (e[-1][hazardName] > threshold) & (
+#         'bridge' not in e[-1])]
+#     graph.remove_edges_from(to_remove)
+#
+#     for ii in range(len(prefRoutes.index)):
+#         o, d = prefRoutes.iloc[ii][['o_node', 'd_node']]
+#         o = int(o)
+#         d = int(d)
+#
+#         extra_time = np.NaN
+#
+#         # check if the nodes are still connected
+#         if nx.has_path(graph, o, d):
+#             # calculate the alternative distance if that edge is unavailable
+#             alt_route = nx.dijkstra_path_length(graph, o, d, weight=weighingName)
+#
+#             # save preferred route nodes
+#             pref_nodes = nx.dijkstra_path(graph, o, d, weight=weighingName)
+#
+#             # subtract the length/time of the optimal route from the alternative route
+#             extra_time = alt_route - prefRoutes.iloc[ii][weighingName]
+#
+#             if prefRoutes.iloc[ii][weighingName] != alt_route:
+#                 # the alternative route is different from the optimal route
+#                 disrupted = 1
+#                 detour = "alt_route"
+#                 # found out which edges belong to the preferred path
+#                 edgesinpath = list(zip(pref_nodes[0:], pref_nodes[1:]))
+#
+#                 pref_edges = []
+#                 for u, v in edgesinpath:
+#                     # get edge with the lowest weighing if there are multiple edges that connect u and v
+#                     edge_key = sorted(graph[u][v], key=lambda x: graph[u][v][x][weighingName])[0]
+#                     if 'geometry' in graph[u][v][edge_key]:
+#                         pref_edges.append(graph[u][v][edge_key]['geometry'])
+#                     else:
+#                         pref_edges.append(LineString([graph.nodes[u]['geometry'], graph.nodes[v]['geometry']]))
+#
+#                 # compile the road segments into one geometry
+#                 pref_edges = MultiLineString(pref_edges)
+#             else:
+#                 # the alternative route is the same as the optimal route
+#                 disrupted = 0
+#                 detour = "same"
+#                 pref_edges = prefRoutes.iloc[ii]['geometry']
+#         else:
+#             # append to calculation dataframe
+#             disrupted = 1
+#             detour = "no_detour"
+#             pref_edges = prefRoutes.iloc[ii]['geometry']
+#
+#         gdf = gdf.append({'disrupted': disrupted, 'extra_{}'.format(weighingName): extra_time, 'no detour': detour,
+#                           'origin': str(prefRoutes.iloc[ii]['origin']),
+#                           'destination': str(prefRoutes.iloc[ii]['destination']),
+#                           'odpair': str(prefRoutes.iloc[ii]['origin']) + ' to ' + str(
+#                               prefRoutes.iloc[ii]['destination']),
+#                           #TODO: change for RWS
+#                           # 'd_disrupt': prefRoutes.iloc[ii]['d_disrupt'],
+#                           # 'o_disrupt': prefRoutes.iloc[ii]['o_disrupt'],
+#                           # 'd_{}'.format(hazardName): prefRoutes.iloc[ii]['d_{}'.format(hazardName)],
+#                           # 'o_{}'.format(hazardName): prefRoutes.iloc[ii]['o_{}'.format(hazardName)],
+#                           'geometry': pref_edges}, ignore_index=True)
+#
+#     return gdf
 
 
 def criticality_multi_link_hazard_OD(graph, prefRoutes, weighingName, hazardName, threshold, crs_):
@@ -2149,8 +2150,8 @@ def criticality_multi_link_hazard_OD(graph, prefRoutes, weighingName, hazardName
             pref_nodes = nx.dijkstra_path(graph, o, d, weight=weighingName)
 
             # subtract the length/time of the optimal route from the alternative route
-            extra_time = alt_route - prefRoutes.iloc[ii][weighingName]
-
+            extra_time = alt_route - float(prefRoutes.iloc[ii][weighingName])
+            print(extra_time)
             if prefRoutes.iloc[ii][weighingName] != alt_route:
                 # the alternative route is different from the optimal route
                 disrupted = 1

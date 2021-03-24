@@ -467,12 +467,12 @@ def graphs_from_o5m(o5m_path,save_shapes=None,bidirectional=False, simplify=True
             G_simple = graph_create_unique_ids(G_simple, 'G_fid_simple')
             print('graphs_from_o5m() returning graph with {:,} nodes and {:,} edges'.format(len(list(G_simple.nodes())),
                                                                                             len(list(G_simple.edges()))))
-            
+
         #   Create look_up_tables between graphs
             simple_to_complex, complex_to_simple = graph_link_simpleid_to_complex(G_simple, save_json_folder=None)
             ID_tables = (simple_to_complex,complex_to_simple)
             print('Lookup tables from complex to simple and vice versa were created')
-        
+
             # ... and add this info
             G_complex = add_simple_ID_to_G_complex(G_complex, complex_to_simple)
             print('Simple IDs were added to the complex Graph')
@@ -486,7 +486,6 @@ def graphs_from_o5m(o5m_path,save_shapes=None,bidirectional=False, simplify=True
     return G_complex,G_simple,ID_tables
 
 def graph_create_unique_ids(graph,new_id_name):
-    #Todo for Margreet, clean this function and add docstring
     #Tip: if you use enumerate(), you don't have to make a seperate i-counter
 
 
