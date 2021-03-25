@@ -25,7 +25,7 @@ from analyses_indirect import timer
 import tqdm
 
 ### Overrule the OSMNX default settings to get the additional metadata such as street lighting (lit)
-osmnx.config(log_console=True, use_cache=True, useful_tags_path = osmnx.settings.useful_tags_path + ['lit'])
+osmnx.config(log_console=True, use_cache=True, useful_tags_way = osmnx.settings.useful_tags_way + ['lit'])
 sys.setrecursionlimit(10**5)
 
 # todo clean file: do we need the tests here as well or in a general test file?
