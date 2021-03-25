@@ -17,12 +17,10 @@ import fiona
 from shapely.geometry import MultiPolygon
 from shapely.geometry import Polygon
 
-from osmnx.core import create_graph
-from osmnx.core import truncate_graph_polygon
-from osmnx.core import osm_net_download
-from osmnx.simplify import simplify_graph
+from osmnx.truncate import truncate_graph_polygon
+from osmnx.simplification import simplify_graph
 from osmnx.projection import project_geometry
-from osmnx.utils import count_streets_per_node
+from osmnx.utils_graph import count_streets_per_node
 import osmnx.settings as settings
 
 # local modules
@@ -136,11 +134,11 @@ def graph_from_polygon(polygon, network_type='all_private',
 
         # get the network data from OSM,  create the buffered graph, then
         # truncate it to the buffered polygon
-        response_jsons = osm_net_download(polygon=polygon_buffered, network_type=network_type,
+        response_jsons = osmnx.downloader._osm_network_download(polygon=polygon_buffered, network_type=network_type,
                                           timeout=timeout, memory=memory,
                                           max_query_area_size=max_query_area_size,
                                           infrastructure=infrastructure, custom_filter=custom_filter)
-        G_buffered = create_graph(response_jsons, name=name, retain_all=True,
+        G_buffered = osmnx.graph._create_graph(response_jsons, name=name, retain_all=True,
                                   bidirectional=network_type in settings.bidirectional_network_types)
 
         G_buffered = truncate_graph_polygon(G_buffered, polygon_buffered, retain_all=True, truncate_by_edge=truncate_by_edge)
@@ -215,13 +213,15 @@ def get_graph_from_polygon(InputDict, undirected=True, simplify=True, save_shape
 
     if 'road_types' in InputDict:
         RoadTypes = InputDict['road_types']
-        print(RoadTypes)
+        cf = ('["highway"~"{}"]'.format(RoadTypes))
+        print(cf)
         # assuming the empty cell in the excel is a numpy.float64 nan value
-        #osmnx 0.16
-        #G = osmnx.graph_from_polygon(polygon=polygon, network_type=NetworkType, custom_filter='["highway"~"{}"]'.format(RoadTypes))
-        G_complex = graph_from_polygon(polygon=polygon, network_type=NetworkType,infrastructure='way["highway"~"motorway|trunk|primary"]', simplify=False)
+        #osmnx 0.16/1.01
+        G_complex = osmnx.graph_from_polygon(polygon=polygon, custom_filter=cf, simplify=False, retain_all=True)
+        # osmnx OLD
+        # G_complex = graph_from_polygon(polygon=polygon, network_type=NetworkType,infrastructure='way["highway"~"motorway|trunk|primary"]', simplify=False)
     else:
-        G_complex = graph_from_polygon(polygon=polygon, network_type=NetworkType, simplify=False)
+        G_complex = osmnx.graph_from_polygon(polygon=polygon, network_type=NetworkType, simplify=False, retain_all=True)
 
 
     # simplify the graph topology as the last step.

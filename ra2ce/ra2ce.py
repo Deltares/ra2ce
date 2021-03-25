@@ -94,7 +94,7 @@ def create_network(inputDict):
             inputDict['network_type'] = inputDict['network_type'].lower().replace(' ',
                                                                                   '')  # decapitalize and remove all whitespaces
             if 'road_types' in inputDict:
-                inputDict['road_types'] = inputDict['road_types'].lower().replace(',', '|')
+                inputDict['road_types'] = inputDict['road_types'].lower().replace(', ', '|')
             G, edge_gdf = from_polygon_tool_workflow(inputDict)
         else:
             Exception("Check your user_input.xlsx, the input under 'network_source' is not one of the given options.")
