@@ -126,7 +126,7 @@ def fetch_roads(region, osm_pbf_path, **kwargs):
 
 def convert_osm(osm_convert_path, pbf, o5m):
     """
-    Convers an osm PBF file to o5m
+    Converse an osm PBF file to o5m
     """
 
     command = '""{}"  "{}" --complete-ways --drop-broken-refs -o="{}""'.format(osm_convert_path, pbf, o5m)
@@ -437,30 +437,30 @@ def graphs_from_o5m(o5m_path,save_shapes=None,bidirectional=False, simplify=True
         *G_simple* (Graph object) : simplified graph
         *ID_tables* (tuple with dicts) : (simple_to_complex, complex_to_simple)
     """
-    from osmnx.utils import overpass_json_from_file
-    from osmnx.core import create_graph
-    from osmnx.simplify import simplify_graph
+    # from osmnx.utils import overpass_json_from_file
+    from osmnx.geometries import geometries_from_xml
+    from osmnx.graph import _create_graph
+    from osmnx.graph import graph_from_xml
+    from osmnx.simplification import simplify_graph
 
     # transmogrify file of OSM XML data into JSON
     filename = o5m_path
-    response_jsons = [overpass_json_from_file(filename)]
+    #TODO: check outcomes
+    # from old osmnx. why did we do this? This had to do something with the unique IDs therefore we split this.
+    # response_jsons = [overpass_json_from_file(filename)]
+    # G_complex = _create_graph(response_jsons, bidirectional=bidirectional,
+    #                  retain_all=retain_all)
 
-    # create graph using this response JSON
-    G_complex = create_graph(response_jsons, bidirectional=bidirectional,
-                     retain_all=retain_all, name='unnamed')
+    G_complex = graph_from_xml(filename, bidirectional=bidirectional,simplify=False,
+                     retain_all=retain_all)
 
     G_complex = graph_create_unique_ids(G_complex, 'G_fid_complex')
 
     print('graphs_from_o5m() returning graph with {:,} nodes and {:,} edges'.format(len(list(G_complex.nodes())),
                                                                                     len(list(G_complex.edges()))))
-    if save_shapes is not None:
-        graph_to_shp(G_complex, Path(save_shapes).joinpath('{}_edges.shp'.format('G_complex')),
-             Path(save_shapes).joinpath('{}_nodes.shp'.format('G_complex')))
+
     # simplify the graph topology as the last step.
-    #TODO: (Kees' opinion): we should not save the shapes WITHIN this function, to keep the length of the function
-    #TODO: Managable, better to just return the objects, and have a seperate function that saves the shapes,
-    # for the case you want to do that
-    #If it would save something, it would save the graphs
+
     if simplify:
         try:
             G_simple = simplify_graph(G_complex)
@@ -476,11 +476,10 @@ def graphs_from_o5m(o5m_path,save_shapes=None,bidirectional=False, simplify=True
             # ... and add this info
             G_complex = add_simple_ID_to_G_complex(G_complex, complex_to_simple)
             print('Simple IDs were added to the complex Graph')
-            if save_shapes is not None:
-                graph_to_shp(G_simple, Path(save_shapes).joinpath('{}_edges.shp'.format('G_simple')),
-                     Path(save_shapes).joinpath('{}_nodes.shp'.format('G_simple')))
+
         except:
             G_simple = None
+            ID_tables = None
             print('Did not create a simplified version of the graph')
 
     return G_complex,G_simple,ID_tables
@@ -543,7 +542,7 @@ def graph_to_shp(G, edge_shp, node_shp):
     nodes.to_file(node_shp, driver='ESRI Shapefile', encoding='utf-8')
     edges.to_file(edge_shp, driver='ESRI Shapefile', encoding='utf-8')
 
-def from_dump_tool_workflow(path_to_pbf,road_types,save_files=None, segmentation=None,save_shapes=None):
+def from_dump_tool_workflow(InputDict,road_types,save_files=None, segmentation=None,save_shapes=None,simplify=True):
     """
     Example workflow for use in the tool version of RA2CE
 
@@ -564,16 +563,15 @@ def from_dump_tool_workflow(path_to_pbf,road_types,save_files=None, segmentation
     osm_convert_exe = ra2ce_main_path / 'osmconvert64.exe'
     osm_filter_exe = ra2ce_main_path / 'osmfilter.exe'
     assert osm_convert_exe.exists() and osm_filter_exe.exists()
-
+    o5m_path = Path(str(os.path.splitext(os.path.splitext(InputDict["name_of_pbf"])[0])[0])+'.o5m')
     # Prepare the making of a new o5m in the same folder as the pbf
-    o5m_path= Path(str(os.path.splitext(os.path.splitext(path_to_pbf)[0])[0])+'.o5m')
-    o5m_filtered_path= Path(str(os.path.splitext(os.path.splitext(path_to_pbf)[0])[0])+'_filtered.o5m')
+    o5m_filtered_path= Path(str(os.path.splitext(os.path.splitext(InputDict["name_of_pbf"])[0])[0])+'_filtered.o5m')
 
     # CONVERT FROM PBF TO O5M
     if not o5m_path.exists():
         assert not o5m_filtered_path.exists()
         print('Start conversion from pbf to o5m')
-        convert_osm(osm_convert_exe, path_to_pbf, o5m_path)
+        convert_osm(osm_convert_exe, InputDict["name_of_pbf"], o5m_path)
         print('Converted osm.pbf to o5m, created: {}'.format(o5m_path))
     else:
         print('O5m path already exists, uses the existing one!: {}'.format(o5m_path))
@@ -587,7 +585,7 @@ def from_dump_tool_workflow(path_to_pbf,road_types,save_files=None, segmentation
 
     assert o5m_path.exists() and o5m_filtered_path.exists()
 
-    G_complex, G_simple, ID_tables = graphs_from_o5m(o5m_filtered_path, save_shapes=save_shapes, bidirectional=False, simplify=True,
+    G_complex, G_simple,ID_tables = graphs_from_o5m(o5m_filtered_path, save_shapes=save_shapes, bidirectional=False, simplify=simplify,
                     retain_all=False)
 
 
@@ -595,27 +593,33 @@ def from_dump_tool_workflow(path_to_pbf,road_types,save_files=None, segmentation
     #CONVERT GRAPHS TO GEODATAFRAMES
     print('Start converting the graphs to geodataframes')
     edges_complex, node_complex = graph_to_gdf(G_complex)
-    # edges_simple, nodes_simple = graph_to_gdf(G_simple)
-    print('Finished converting the graphs to geodataframes')
+    print('Finished converting G_complex to geodataframes')
 
     #first save the G_complex, G_simple and edges_complex (when not cut yet!).
     # When segmentation is yes, the edges_complex will be overwritten with the cut version and given as output
     # Todo: check what needs to be output for damage? edges_complex or edges_complex_cut!
     if save_files:
-        output_path = Path(__file__).parents[1] / 'test/output/'
-
-        path = output_path / 'G_simple.gpickle'
+        path = Path(InputDict['output'] / (str(InputDict['analysis_name'])+'_G_simple.gpickle'))
         nx.write_gpickle(G_simple, path, protocol=4)
         print(path, 'saved')
-        path = output_path / 'G_complex.gpickle'
+        path = Path(InputDict['output'] / (str(InputDict['analysis_name'])+'_G_complex.gpickle'))
         nx.write_gpickle(G_complex, path, protocol=4)
         print(path, 'saved')
-        with open((output_path / 'edges_complex.p'), 'wb') as handle:
+        edges_complex, node_complex = graph_to_gdf(G_complex)
+        with open(str((InputDict['output']) / (str(InputDict['analysis_name'])+'_edges_complex.p')), 'wb') as handle:
             pickle.dump(edges_complex, handle)
-            print(output_path, 'edges_complex.p saved')
+            print(str((InputDict['output']) / (str(InputDict['analysis_name'])+'_edges_complex.p saved')))
+
+    if save_shapes is not None:
+        graph_to_shp(G_complex,Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_complex_edges.shp')),
+                     Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_complex_nodes.shp')))
+        if simplify:
+            graph_to_shp(G_simple, Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_simple_edges.shp')),
+                         Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_simple_nodes.shp')))
 
     # cut the edges in the complex geodataframe to segments of equal lengths or smaller
     # output will be the cut edges_complex
+    #TODO change save shapes names which starts with analysis name similar to save_files (above)
     if segmentation is not None:
         edges_complex = cut_gdf(edges_complex, segmentation)
         print('Finished segmenting the geodataframe with split length: {} degree'.format(segmentation))

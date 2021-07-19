@@ -76,8 +76,8 @@ def create_network(inputDict):
     output_path = inputDict['output']
 
     # when G_simple and edges_complex already exist no need to create new graph and gdf
-    G_simple_path = output_path / 'G_simple.gpickle'
-    edges_complex_path = output_path / 'edges_complex.p'
+    G_simple_path = Path(inputDict['output'] / (str(inputDict['analysis_name'])+'_G_simple.gpickle'))
+    edges_complex_path = Path(inputDict['output'] / (str(inputDict['analysis_name'])+'_edges_complex.p'))
 
     #check whether the paths exist
     if not (G_simple_path.exists() and edges_complex_path.exists()):
@@ -88,14 +88,15 @@ def create_network(inputDict):
         elif inputDict['network_source'] == 'Network based on OSM dump':
             print('start creating network from osm_dump')
             roadTypes = inputDict['road_types'].lower().replace(' ', ' ').split(',')
-            G, edge_gdf = from_dump_tool_workflow(inputDict["name_of_pbf"], roadTypes, save_files=True,segmentation=None)
+            #todo: built in that save_shp is automatically None based on input table
+            G, edge_gdf = from_dump_tool_workflow(inputDict, roadTypes, save_files=True, segmentation=None, save_shapes=inputDict["output"],simplify=True) #in case of save shapes add here path
         elif inputDict['network_source'] == 'Network based on OSM online':
             print('start creating network from osm_online')
             inputDict['network_type'] = inputDict['network_type'].lower().replace(' ',
                                                                                   '')  # decapitalize and remove all whitespaces
             if 'road_types' in inputDict:
                 inputDict['road_types'] = inputDict['road_types'].lower().replace(', ', '|')
-            G, edge_gdf = from_polygon_tool_workflow(inputDict)
+            G, edge_gdf = from_polygon_tool_workflow(inputDict,save_shapes=True,save_files=True)
         else:
             Exception("Check your user_input.xlsx, the input under 'network_source' is not one of the given options.")
     else:

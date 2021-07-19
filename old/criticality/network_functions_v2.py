@@ -1636,7 +1636,7 @@ def add_od_nodes(graph, od, id_name, name=None, file_output=None, save_shp=False
         # Check which roads belong to the centroids closest vertices
         all_matches = [e for e in graph.edges(data=True, keys=True) if str(e[-1][id_name]) == od.iloc[i]['match_ids']]
         if len(all_matches) > 1:
-            all_matches = [am for am in all_matches if match_OD in [Point(p) for p in set(list(am[-1]['geometry'].coords))]]
+            all_matches = [am for am in all_matches if match_OD in [(Point(p) for p in set(list(am[-1]['geometry'].coords)))]]
         m = all_matches[0]
 
         if 'geometry' in m[-1]:
