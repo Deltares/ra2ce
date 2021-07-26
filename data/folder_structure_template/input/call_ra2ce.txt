@@ -1,0 +1,1 @@
+python ra2ce.py --project myanmar --input settings.ini
