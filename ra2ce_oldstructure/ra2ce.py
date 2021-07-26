@@ -196,6 +196,7 @@ def main_rws(argv):
 
     summary_costs.to_csv(input_dict[analysis]['output'] / 'summary_cost' / 'summary_costs.csv')
 
+
 if __name__ == '__main__':
 
     # main(sys.argv[1:])  # reads from the 2nd argument, the first argument is calling the script itself: ra2ce.py test
