@@ -10,6 +10,7 @@ from pathlib import Path
 import numpy as np
 from ast import literal_eval
 import codecs
+import logging
 
 
 def parse_config(path=None, opt_cli=None):
@@ -17,13 +18,13 @@ def parse_config(path=None, opt_cli=None):
     source: https://github.com/Deltares/hydromt/blob/af4e5d858b0ac0883719ca59e522053053c21b82/hydromt/cli/cli_utils.py"""
     opt = {}
     if path is not None and path.is_file():
-        opt = configread(path, abs_path=True)
+        opt = configread(path, abs_path=False)  # Set from True to False 29-7-2021 by Frederique
         # make sure paths in config section are not abs paths
-        if "setup_config" in opt:
+        if "setup_config" in opt: # BELOW IS CURRENTLY NOT USED IN RA2CE BUT COULD BE GOOD FOR FUTURE LINKAGE WITH HYDROMT
             opt["setup_config"].update(configread(path).get("config", {}))
     elif path is not None:
         raise IOError(f"Config not found at {path}")
-    if opt_cli is not None:
+    if opt_cli is not None:  # BELOW IS CURRENTLY NOT USED IN RA2CE BUT COULD BE GOOD FOR FUTURE LINKAGE WITH HYDROMT
         for section in opt_cli:
             if not isinstance(opt_cli[section], dict):
                 raise ValueError(
@@ -74,3 +75,43 @@ def configread(config_fn, encoding="utf-8", cf=None, defaults=dict(), noheader=F
     if noheader and "dummy" in cfdict:
         cfdict = cfdict["dummy"]
     return cfdict
+
+
+def initiate_root_logger(filename):
+    # Create a root logger and set the minimum logging level.
+    logging.getLogger('').setLevel(logging.INFO)
+
+    # Create a file handler and set the required logging level.
+    fh = logging.FileHandler(filename=filename, mode='w')
+    fh.setLevel(logging.DEBUG)
+
+    # Create a console handler and set the required logging level.
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.WARNING)  # Can be also set to WARNING
+
+    # Create a formatter and add to the file and console handlers.
+    formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+
+    # Add the file and console handlers to the root logger.
+    logging.getLogger('').addHandler(fh)
+    logging.getLogger('').addHandler(ch)
+
+
+def configure_analyses(config):
+    analyses_names = [a for a in config.keys() if 'analysis' in a]
+    for a in analyses_names:
+        if config[a]['analysis'] == 'direct':
+            if 'direct' in config:
+                (config['direct']).append(config[a])
+            else:
+                config['direct'] = [config[a]]
+        elif any(t in config[a]['analysis'] for t in ['single_link_redundancy', 'multi_link_redundancy', 'multi_link_origin_destination']):
+            if 'indirect' in config:
+                (config['indirect']).append(config[a])
+            else:
+                config['indirect'] = [config[a]]
+        del config[a]
+
+    return config
