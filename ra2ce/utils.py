@@ -87,7 +87,7 @@ def initiate_root_logger(filename):
 
     # Create a console handler and set the required logging level.
     ch = logging.StreamHandler()
-    ch.setLevel(logging.WARNING)  # Can be also set to WARNING
+    ch.setLevel(logging.INFO)  # Can be also set to WARNING
 
     # Create a formatter and add to the file and console handlers.
     formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p')

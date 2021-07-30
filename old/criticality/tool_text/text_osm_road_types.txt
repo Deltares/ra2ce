@@ -1,8 +1,0 @@
-Within the drivable roads, you can choose to include one or multiple of these road types:
-	- Motorway - A restricted access major divided highway, normally with 2 or more running lanes plus emergency hard shoulder. Equivalent to the Freeway, Autobahn, etc..
-	- Trunk - The most important roads in a country's system that aren't motorways. (Need not necessarily be a divided highway.)
-	- Primary - The next most important roads in a country's system. (Often link larger towns.)
-	- Secondary - The next most important roads in a country's system. (Often link towns.)
-	- Tertiary - The next most important roads in a country's system. (Often link smaller towns and villages)
-
-Source: https://wiki.openstreetmap.org/wiki/Key:highway

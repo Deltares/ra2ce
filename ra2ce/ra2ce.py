@@ -33,9 +33,16 @@ def main():
     config = input_validation(config)
     config = configure_analyses(config)
 
+    # Set the output paths in the configuration Dict for ease of saving to those folders.
+    config['input'] = config['root_path'] / 'data' / config['project']['name'] / 'input'
+    config['static'] = config['root_path'] / 'data' / config['project']['name'] / 'static'
+    config['output'] = config['root_path'] / 'data' / config['project']['name'] / 'output'
+
+    # Create the network
     network = Network(config)
     g_indirect, g_direct = network.create()
 
+    # Do the analyses
     if 'direct' in config:
         analyses_direct.DirectAnalyses(config, g_direct).execute()
 

@@ -1,9 +1,0 @@
-You can also specify several different network types:
-	- Drive: get drivable public streets (but not service roads)
-	- Drive_service: get drivable streets, including service roads
-	- Walk: get all streets and paths that pedestrians can use (this network type ignores one-way directionality)
-	- Bike: get all streets and paths that cyclists can use
-	- All: download all non-private OSM streets and paths
-	- All_private: download all OSM streets and paths, including private-access ones
-
-Source: https://github.com/gboeing/osmnx

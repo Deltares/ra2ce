@@ -1,5 +1,0 @@
-input_data;file_names
-path to hazard data (multiple separated by comma);<full name(s) + extension(s) of the hazard data (that is in ./GIS/input)>
-attribute name(s) of hazard data (name of shapefile attribute or name that you want to give);<e.g. flood_depth>
-aggregation method;<max, min or mean>
-threshold value;<e.g. 0.5 (> 0.5 the road is out of service)>

@@ -1,6 +1,0 @@
-input_data;path_to_data;nuts_3_regions_to_include;country_codes_to_include
-clip_polygon_europe;<name of the shapefile in GIS/input (no extension)>;<names of the NUTS-3 regions to include, one per row>;<country codes to include, one per row>
-flood_data_europe;N:\Projects\11202000\11202067\F. Other information\Flooding and transport disruptions\EuropeFloodResults\Model08_VMs\postproc\baseline;;
-osm_data_europe;N:\Projects\11202000\11202067\F. Other information\Flooding and transport disruptions\OSM_extracts\europe_regions_pbf_VM;;
-pdf_europe;N:\Projects\11202000\11202067\F. Other information\Flooding and transport disruptions\OSM_extracts\europe.osm.pbf;;
-nuts_3_regions;N:\Projects\11202000\11202067\F. Other information\Flooding and transport disruptions\Input_data\NUTS_RG_01M_2016_3035_LEVL_3.shp;;

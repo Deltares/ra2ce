@@ -118,7 +118,7 @@ class IndirectAnalyses:
             elif analysis['analysis'] == 'multi_link_origin_destination':
                 self.multi_link_origin_destination()
 
-            output_path = self.config['root_path'] / 'data' / self.config['project']['name'] / 'output' / analysis['analysis']
+            output_path = self.config['output'] / analysis['analysis']
             output_path.mkdir(parents=True, exist_ok=True)
             if analysis['save_shp'] == 'true':
                 shp_path = output_path / (analysis['name'].replace(' ', '_') + '.shp')
@@ -128,6 +128,10 @@ class IndirectAnalyses:
                 del gdf['geometry']
                 gdf.to_csv(csv_path, index=False)
 
+            # Save the configuration for this analysis to the output folder.
+            with open(output_path / 'settings.txt', 'w') as f:
+                for key in analysis:
+                    print(key + ' = ' + analysis[key], file=f)
         return
 
 
