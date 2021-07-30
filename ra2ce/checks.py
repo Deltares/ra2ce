@@ -24,19 +24,23 @@ def input_validation(config):
     # check if properties have correct input
     # TODO: Decide whether also the non-used properties must be checked or those are not checked
     # TODO: Decide how to check for multiple analyses (analysis1, analysis2, etc)
-    check_answer = {'source': ['OSM PBF', 'OSM download', 'shapefile', 'gpickle'],
+    check_answer = {'source': ['OSM PBF', 'OSM download', 'shapefile', 'pickle'],
                     'polygon': ['link', 'none'],
                     'directed': ['true', 'false'],
                     'network_type': ['walk', 'bike', 'drive', 'drive_service', 'all'],
                     'road_types': ['motorway', 'motorway_link', 'trunk', 'trunk_link', 'primary', 'primary_link', 'secondary',
                                    'secondary_link', 'tertiary', 'tertiary_link', 'none'],  # TODO: add the lower types as well
-                    'origin_destination': ['link', 'none'],
+                    'origins': ['link', 'none'],
+                    'destinations': ['link', 'none'],
                     'save_shp': ['true', 'false'],
                     'save_csv': ['true', 'false'],
                     'analysis': ['direct', 'single_link_redundancy', 'multi_link_redundancy', 'multi_link_origin_destination'],
-                    'hazard_map': ['link', 'none']}
-    input_dirs = {'polygon': 'static/network', 'hazard_map': 'static/hazard'}
+                    'hazard_map': ['link', 'none'],
+                    'aggregate_wl': ['max', 'min', 'mean']}
+    input_dirs = {'polygon': 'static/network', 'hazard_map': 'static/hazard', 'origins': 'static/network',
+                  'destinations': 'static/network'}
 
+    error = False
     for key in config:
         # First check the headers.
         if key in check_headers:
@@ -45,23 +49,29 @@ def input_validation(config):
                 if item in check_answer:
                     if ('link' in check_answer[item]) and (config[key][item] != 'none'):
                         # Check if the path is an absolute path or a file name that is placed in the right folder
-                        config[key][item] = check_paths(config, key, item, input_dirs)
+                        config[key][item], error = check_paths(config, key, item, input_dirs, error)
                         continue
 
                     if item == 'road_types':
                         for road_type in config[key][item].replace(' ', '').split(','):
                             if road_type not in check_answer['road_types']:
                                 logging.error('Wrong road type is configured ({}), has to be one or multiple of: {}'.format(road_type, check_answer['road_types']))
+                                error = True
                         continue
 
                     if config[key][item] not in check_answer[item]:
                         logging.error('Wrong input to property [ {} ], has to be one of: {}'.format(item, check_answer[item]))
-                        quit()
+                        error = True
+
+    # Quit if error
+    if error:
+        logging.error("There are inconsistencies in the settings.ini file. Please consult the log file for more information: {}".format(config['root_path'] / 'data' / config['project']['name'] / 'output' / 'RA2CE.log'))
+        exit()
 
     return config
 
 
-def check_paths(config, key, item, input_dirs):
+def check_paths(config, key, item, input_dirs, error):
     # Check if the path is an absolute path or a file name that is placed in the right folder
     list_paths = []
     for p in config[key][item].split(','):
@@ -75,8 +85,9 @@ def check_paths(config, key, item, input_dirs):
                         item, p,
                         config['root_path'] / 'data' / config['project']['name'] / input_dirs[
                             item]))
+                error = True
             else:
                 list_paths.append(abs_path)
         else:
             list_paths.append(p)
-    return list_paths
+    return list_paths, error

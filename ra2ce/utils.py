@@ -83,7 +83,7 @@ def initiate_root_logger(filename):
 
     # Create a file handler and set the required logging level.
     fh = logging.FileHandler(filename=filename, mode='w')
-    fh.setLevel(logging.DEBUG)
+    fh.setLevel(logging.INFO)
 
     # Create a console handler and set the required logging level.
     ch = logging.StreamHandler()

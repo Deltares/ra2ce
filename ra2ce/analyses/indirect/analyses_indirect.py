@@ -11,6 +11,7 @@ import osmnx
 import numpy as np
 from numpy import object as np_object
 import geopandas as gpd
+import pandas as pd
 
 
 class IndirectAnalyses:
@@ -19,16 +20,11 @@ class IndirectAnalyses:
         self.g = graph
 
     def single_link_redundancy(self):
+        """This is the function to analyse roads with a single link disruption and an alternative route.
+        :param graph: graph on which to run analysis (MultiDiGraph)
+        :return: df with dijkstra detour distance and path results
         """
-        This is the function to analyse roads with a single link disruption and
-        an alternative route.
-
-        Arguments:
-            InputDict [dictionary] = dictionary of input data used for calculating
-                the costs for taking alternative routes
-            ParameterNamesDict [dictionary] = names of the parameters used for calculating
-                the costs for taking alternative routes
-        """
+        logging.info("Function [single_link_redundancy]: executing.")
 
         # TODO adjust to the right names of the RA2CE tool
         # if 'road_usage_data_path' in InputDict:
@@ -41,25 +37,6 @@ class IndirectAnalyses:
         road_usage_data = None  # can be removed if the above is fixed
         aadt_names = None  # can be removed if the above is fixed
 
-        # CALCULATE CRITICALITY
-        # TODO return back to criticality_single_link. Now temporarily changed for RWS project
-
-        # gdf = criticality_single_link_osm(G, InputDict['shp_unique_ID'], roadUsageData=road_usage_data, aadtNames=aadt_names)
-        logging.info("Function [single_link_redundancy]: executing")
-        gdf = self.criticality_single_link_osm()
-
-        # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
-        # todo: input here this option
-
-        logging.info("Full analysis [single_link_redundancy] finished.")
-        return gdf
-
-    def criticality_single_link_osm(self):
-        """
-        :param graph: graph on which to run analysis (MultiDiGraph)
-        :return: df with dijkstra detour distance and path results
-        """
-        # TODO look at differences between this function and the criticality_single_link above and merge/remove one
         # create a geodataframe from the graph
         gdf = osmnx.graph_to_gdfs(self.g, nodes=False)
 
@@ -98,11 +75,78 @@ class IndirectAnalyses:
         gdf['alt_nodes'] = alt_nodes_list
         gdf['diff_dist'] = dif_dist_list
 
+        logging.info("Full analysis [single_link_redundancy] finished.")
+
+        # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
+        # todo: input here this option
+
         return gdf
 
-    def multi_link_redundancy(self):
-        print("multi_link_redundancy")
-        return gpd.GeoDataFrame()
+    def multi_link_redundancy(self, analysis):
+        """
+        The function removes all links of a variable that have a minimum value
+        of min_threshold. For each link it calculates the alternative path, af
+        any available. This function only removes one group at the time and saves the data from removing that group.
+
+        Arguments:
+            graph [networkx graph] = the graph with at least the columns that you use in group en sort
+            attribute_name [string] = name of the attribute that indicates whether a road segment should be removed
+            min_threshold [numeric] = the minimum value of the attribute by which the roads should be removed
+        Returns:
+            gdf [geopandas dataframe]
+        """
+        results = []
+        for hz in analysis['hazard_map']:
+            attribute_name = hz.stem
+
+            # Create a geodataframe from the full graph
+            gdf = osmnx.graph_to_gdfs(self.g, nodes=False)
+            gdf['unique_fid'] = gdf['unique_fid'].astype(str)
+
+            # Create the edgelist that consist of edges that should be removed
+            edges_remove = [e for e in self.g.edges.data(keys=True) if attribute_name in e[-1]]
+            edges_remove = [e for e in edges_remove if
+                            (e[-1][attribute_name] > float(analysis['threshold'])) & ('bridge' not in e[-1])]
+
+            self.g.remove_edges_from(edges_remove)
+
+            # dataframe for saving the calculations of the alternative routes
+            df_calculated = pd.DataFrame(columns=['u', 'v', 'unique_fid', 'alt_dist', 'alt_nodes', 'connected'])
+
+            for i, edges in enumerate(edges_remove):
+                u, v, k, edata = edges
+
+                # check if the nodes are still connected
+                if nx.has_path(self.g, u, v):
+                    # calculate the alternative distance if that edge is unavailable
+                    alt_dist = nx.dijkstra_path_length(self.g, u, v, weight='length')
+
+                    # save alternative route nodes
+                    alt_nodes = nx.dijkstra_path(self.g, u, v)
+
+                    # append to calculation dataframe
+                    df_calculated = df_calculated.append(
+                        {'u': u, 'v': v, 'unique_fid': str(edata['unique_fid']), 'alt_dist': alt_dist,
+                         'alt_nodes': alt_nodes, 'connected': 1}, ignore_index=True)
+                else:
+                    # append to calculation dataframe
+                    df_calculated = df_calculated.append(
+                        {'u': u, 'v': v, 'unique_fid': str(edata['unique_fid']), 'alt_dist': np.NaN,
+                         'alt_nodes': np.NaN, 'connected': 0}, ignore_index=True)
+
+            # Merge the dataframes
+            gdf = gdf.merge(df_calculated, how='left', on=['u', 'v', 'unique_fid'])
+
+            # calculate the difference in distance
+            gdf['diff_dist'] = [dist - length if dist == dist else np.NaN for (dist, length) in
+                                zip(gdf['alt_dist'], gdf['length'])]
+
+            gdf['hazard'] = attribute_name
+
+            results.append(gdf)
+
+        aggregated_results = pd.concat(results, ignore_index=True)
+        return aggregated_results
 
     def multi_link_origin_destination(self):
         return gpd.GeoDataFrame()
@@ -112,11 +156,11 @@ class IndirectAnalyses:
         for analysis in self.config['indirect']:
             logging.info(f"----------------------------- Started analyzing '{analysis['name']}'  -----------------------------")
             if analysis['analysis'] == 'single_link_redundancy':
-                gdf = self.single_link_redundancy()
+                gdf = self.single_link_redundancy(analysis)
             elif analysis['analysis'] == 'multi_link_redundancy':
-                self.multi_link_redundancy()
+                gdf = self.multi_link_redundancy(analysis)
             elif analysis['analysis'] == 'multi_link_origin_destination':
-                self.multi_link_origin_destination()
+                gdf = self.multi_link_origin_destination(analysis)
 
             output_path = self.config['output'] / analysis['analysis']
             output_path.mkdir(parents=True, exist_ok=True)
