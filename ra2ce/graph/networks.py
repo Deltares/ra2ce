@@ -12,6 +12,7 @@ from numpy import object as np_object
 from shapely.geometry import shape
 import geojson
 import logging
+import geopandas as gpd
 from shapely.geometry import Point, LineString
 import pickle
 from osmnx.simplification import simplify_graph
@@ -92,29 +93,25 @@ class Network:
         """Adds origins and destinations nodes from shapefiles to the graph."""
         return
 
-    def save_network(self):
-        # if save_shapes:
-        #     graph_to_shp(G_complex,
-        #                  Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_complex_edges.shp')),
-        #                  Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_complex_nodes.shp')))
-        #
-        #     if simplify:
-        #         graph_to_shp(G_simple,
-        #                      Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_simple_edges.shp')),
-        #                      Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_simple_nodes.shp')))
-        #
-        # if save_files:
-        #     path = Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_simple.gpickle'))
-        #     nx.write_gpickle(G_simple, path, protocol=4)
-        #     print(path, 'saved')
-        #     path = Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_complex.gpickle'))
-        #     nx.write_gpickle(G_complex, path, protocol=4)
-        #     print(path, 'saved')
-        #     edges_complex, node_complex = graph_to_gdf(G_complex)
-        #     with open(str((InputDict['output']) / (str(InputDict['analysis_name']) + '_edges_complex.p')),
-        #               'wb') as handle:
-        #         pickle.dump(edges_complex, handle)
-        #         print(str((InputDict['output']) / (str(InputDict['analysis_name']) + '_edges_complex.p saved')))
+    def save_network(self, to_save, name, types=['pickle']):
+        """Saves a geodataframe or graph to output_path"""
+        if type(to_save) == gpd.GeoDataFrame:
+            # The file that needs to be saved is a geodataframe
+            if 'pickle' in types:
+                with open(str(self.config['static'] / 'output_graph' / (name + '_base_network.p')), 'wb') as handle:
+                    pickle.dump(to_save, handle)
+
+                logging.info(f"Saved {name + '_base_network.p'} as pickle in {self.config['static'] / 'output_graph'}.")
+        elif type(to_save) == nx.classes.multidigraph.MultiDiGraph:
+            # The file that needs to be saved is a graph
+            if 'shp' in types:
+                graph_to_shp(to_save, self.config['static'] / 'output_graph' / (name + '_edges.shp'),
+                             self.config['static'] / 'output_graph' / (name + '_nodes.shp'))
+                logging.info(f"Saved {name + '_edges.shp'} and {name + '_nodes.shp'} as shapefiles in {self.config['static'] / 'output_graph'}.")
+            if 'pickle' in types:
+                nx.write_gpickle(to_save, self.config['static'] / 'output_graph' / (name + '_base_graph.gpickle'), protocol=4)
+                logging.info(f"Saved {name + '_base_graph.gpickle'} as gpickle in {self.config['static'] / 'output_graph'}.")
+
         return
 
     def create(self):
@@ -131,13 +128,21 @@ class Network:
         elif self.config['network']['source'] == 'OSM download':
             logging.info('Start downloading a network from OSM.')
             G, edge_gdf = self.network_osm_download()
-        elif self.config['network']['source'] == 'gpickle':
+        elif self.config['network']['source'] == 'pickle':
             logging.info('G_simple already exists, uses the existing one!: {}'.format(G_simple_path))
             logging.info('edge_complex already exists, uses the existing one!: {}'.format(edges_complex_path))
             # CONVERT GRAPHS TO GEODATAFRAMES
             G = nx.read_gpickle(G_simple_path)
             with open(edges_complex_path, 'rb') as f:
                 edge_gdf = pickle.load(f)
+
+        # Save the 'base' network as gpickle.
+        if G:
+            # Check if all geometries between nodes are there, if not, add them as a straight line.
+            G = add_missing_geoms_graph(G, geom_name='geometry')
+            self.save_network(G, self.config['network']['name'], types=['pickle'])
+        if edge_gdf:
+            self.save_network(edge_gdf, self.config['network']['name'], types=['pickle'])
 
         return G, edge_gdf
 
@@ -149,6 +154,7 @@ class Hazard:
 
     def overlay_hazard_raster(self):
         """Overlays the hazard raster over the road segments."""
+
         return
 
     def overlay_hazard_shp(self):
@@ -200,9 +206,7 @@ def graph_to_gdf(G, save_nodes=False, save_edges=True, to_save=False):
         edges (GeoDataFrame) : containes the edges
         nodes (GeoDataFrame) :
     """
-    # # now only multidigraphs and graphs are used  #TODO check why this is here
-    # if type(G) == nx.classes.graph.Graph:
-    #     G = nx.MultiGraph(G)
+
     nodes, edges = None, None
 
     if save_nodes and save_edges:
@@ -237,6 +241,39 @@ def simplify_graph_count(G_complex):
         'Graph simplified from {:,} to {:,} nodes and {:,} to {:,} edges.'.format(old_len_nodes, new_len_nodes, old_len_edges, new_len_edges))
 
     return G_simple
+
+
+def graph_to_shp(G, edge_shp, node_shp):
+    """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_shp and node_shp
+
+    Arguments:
+
+        G []: networkx graph object to be converted
+
+        edge_shp [str]: output path including extension for edges shapefile
+
+        node_shp [str]: output path including extension for nodes shapefile
+
+    Returns:
+
+        None
+
+    """
+
+    # The nodes should have a geometry attribute (perhaps on top of the x and y attributes)
+    nodes, edges = osmnx.graph_to_gdfs(G, node_geometry=False)
+
+    dfs = [edges, nodes]
+    for df in dfs:
+        for col in df.columns:
+            if df[col].dtype == np_object and col != df.geometry.name:
+                df[col] = df[col].astype(str)
+
+    print('\nSaving nodes as shapefile: {}'.format(node_shp))
+    print('\nSaving edges as shapefile: {}'.format(edge_shp))
+
+    nodes.to_file(node_shp, driver='ESRI Shapefile', encoding='utf-8')
+    edges.to_file(edge_shp, driver='ESRI Shapefile', encoding='utf-8')
 
 
 def read_geojson(geojson_file):

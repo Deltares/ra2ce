@@ -1,4 +1,0 @@
-input_data;file_names
-origin shapefiles;<full name(s) of the origin data (that is in ./GIS/input), no extension needed, multiple separated by comma>
-destination shapefiles;<full name(s) of the destination data (that is in ./GIS/input), no extension needed, multiple separated by comma>
-ID name of both origin and destination files;<name of the ID column, fill on only one name (they should be the same for each file>

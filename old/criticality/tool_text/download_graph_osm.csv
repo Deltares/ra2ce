@@ -1,2 +1,0 @@
-shapefile_for_OSM;network_type;road_types
-<name of the shapefile to download the graph from OSM>;<network type>;<road types, separated with a comma>
