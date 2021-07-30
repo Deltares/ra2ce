@@ -765,7 +765,7 @@ def line_length(line):
         Length of line in m
     """
     # check if the projection is EPSG:4326
-    distance.VincentyDistance.ELLIPSOID = 'WGS-84'
+    distance.geodesic.ELLIPSOID = 'WGS-84'
     try:
         # Swap shapely (lonlat) to geopy (latlon) points
         latlon = lambda lonlat: (lonlat[1], lonlat[0])
@@ -775,9 +775,9 @@ def line_length(line):
             total_length = sum(
                 [sum(distance.distance(latlon(a), latlon(b)).meters for (a, b) in pairs(l.coords)) for l in line])
         else:
-            warnings.warn("Something went wrong while calculating the length of the road stretches.")
+            logging.warning("Something went wrong while calculating the length of the road stretches.")
     except:
-        warnings.warn(
+        logging.warning(
             "The CRS is not EPSG:4326. Quit the analysis, reproject the layer to EPSG:4326 and try again to run the tool.")
     return round(total_length, 0)
 

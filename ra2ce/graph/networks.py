@@ -6,23 +6,26 @@ Created on 26-7-2021
 """
 
 # external modules
+import logging
+from pathlib import Path
 import networkx as nx
 import osmnx
-from numpy import object as np_object
-from shapely.geometry import shape
-import geojson
-import logging
-import geopandas as gpd
-from shapely.geometry import Point, LineString
-import pickle
 from osmnx.simplification import simplify_graph
+from numpy import object as np_object
+import geopandas as gpd
+import pandas as pd
+import numpy as np
+from statistics import mean
+from shapely.geometry import shape, Point, LineString
+import geojson
+import pickle
 
 
 class Network:
     def __init__(self, config):
         self.config = config
         self.save_shp = True if config['network']['save_shp'] == 'true' else False
-        self.save_csv = True if config['network']['save_csv'] == 'true' else False
+        self.network_name = self.config['network']['name'].replace(' ', '_')
 
     def network_shp(self):
         """Creates a network from a shapefile."""
@@ -89,9 +92,26 @@ class Network:
 
         return G_simple, edges_complex
 
-    def add_od_nodes(self):
+    def add_od_nodes(self, G):
         """Adds origins and destinations nodes from shapefiles to the graph."""
-        return
+        from .origins_destinations import read_OD_files, create_OD_pairs, add_od_nodes
+
+        # Check which analyses need Origin-Destination nodes.
+        od_analyses = [a for a in self.config['indirect'] if a['analysis'] == 'multi_link_origin_destination']
+
+        graphs = {}
+        for od_analysis in od_analyses:
+            # Add the origin/destination nodes to the network
+            ods = read_OD_files(od_analysis['origins'], od_analysis['origins_names'],
+                                od_analysis['destinations'], od_analysis['destinations_names'],
+                                od_analysis['id_name_origin_destination'], 'epsg:4326')  # TODO: decide if change CRS to flexible instead of just epsg:4326
+
+            ods = create_OD_pairs(ods, G, id_name='unique_fid')
+            G = add_od_nodes(G, ods, id_name='unique_fid')
+
+            graphs[od_analysis['name'].replace(' ', '_')] = G
+
+        return graphs
 
     def save_network(self, to_save, name, types=['pickle']):
         """Saves a geodataframe or graph to output_path"""
@@ -101,21 +121,24 @@ class Network:
                 with open(str(self.config['static'] / 'output_graph' / (name + '_base_network.p')), 'wb') as handle:
                     pickle.dump(to_save, handle)
 
-                logging.info(f"Saved {name + '_base_network.p'} as pickle in {self.config['static'] / 'output_graph'}.")
-        elif type(to_save) == nx.classes.multidigraph.MultiDiGraph:
+                logging.info(f"Saved {name + '_base_network.p'} in {self.config['static'] / 'output_graph'}.")
+            if 'shp' in types:
+                to_save.to_file(self.config['static'] / 'output_graph' / (name + '_base_network.shp'))
+                logging.info(f"Saved {name + '_base_network.shp'} in {self.config['static'] / 'output_graph'}.")
+        elif type(to_save) == nx.classes.multigraph.MultiGraph:
             # The file that needs to be saved is a graph
             if 'shp' in types:
                 graph_to_shp(to_save, self.config['static'] / 'output_graph' / (name + '_edges.shp'),
                              self.config['static'] / 'output_graph' / (name + '_nodes.shp'))
-                logging.info(f"Saved {name + '_edges.shp'} and {name + '_nodes.shp'} as shapefiles in {self.config['static'] / 'output_graph'}.")
+                logging.info(f"Saved {name + '_edges.shp'} and {name + '_nodes.shp'} in {self.config['static'] / 'output_graph'}.")
             if 'pickle' in types:
                 nx.write_gpickle(to_save, self.config['static'] / 'output_graph' / (name + '_base_graph.gpickle'), protocol=4)
-                logging.info(f"Saved {name + '_base_graph.gpickle'} as gpickle in {self.config['static'] / 'output_graph'}.")
-
-        return
+                logging.info(f"Saved {name + '_base_graph.gpickle'} in {self.config['static'] / 'output_graph'}.")
 
     def create(self):
         """Function with the logic to call the right analyses."""
+        # Initialize the variables for the graph and network.
+        G, edge_gdf = None, None
 
         # Create the network from the network source
         if self.config['network']['source'] == 'shapefile':
@@ -124,41 +147,171 @@ class Network:
         elif self.config['network']['source'] == 'OSM PBF':
             logging.info('Start creating a network from an OSM PBF file.')
             roadTypes = self.config['network']['road_types'].lower().replace(' ', ' ').split(',')
-            G, edge_gdf = self.network_osm_pbf()  # in case of save shapes add here path
+            G, edge_gdf = self.network_osm_pbf()
         elif self.config['network']['source'] == 'OSM download':
             logging.info('Start downloading a network from OSM.')
             G, edge_gdf = self.network_osm_download()
         elif self.config['network']['source'] == 'pickle':
-            logging.info('G_simple already exists, uses the existing one!: {}'.format(G_simple_path))
-            logging.info('edge_complex already exists, uses the existing one!: {}'.format(edges_complex_path))
-            # CONVERT GRAPHS TO GEODATAFRAMES
-            G = nx.read_gpickle(G_simple_path)
-            with open(edges_complex_path, 'rb') as f:
-                edge_gdf = pickle.load(f)
+            edges_complex_path = self.config['static'] / 'output_graph' / (self.network_name + '_base_network.p')
+            G_simple_path = self.config['static'] / 'output_graph' / (self.network_name + '_base_graph.gpickle')
 
-        # Save the 'base' network as gpickle.
+            logging.info(f"Using an existing graph: {self.network_name + '_base_graph.gpickle'}")
+            logging.info(f"Using an existing network: {self.network_name + '_base_network.p'}")
+            if 'direct' in self.config:
+                try:
+                    with open(edges_complex_path, 'rb') as f:
+                        edge_gdf = pickle.load(f)
+                except FileNotFoundError as e:
+                    logging.error(f"The network cannot be found in {edges_complex_path}.", e)
+                    exit()
+            if 'indirect' in self.config:
+                try:
+                    G = nx.read_gpickle(G_simple_path)
+                except FileNotFoundError as e:
+                    logging.error(f"The graph cannot be found in {G_simple_path}.", e)
+                    exit()
+
+        # Create a dictionary of graphs per (indirect) analysis
+        graph_dict = {}
+
+        # Save the 'base' network as gpickle and if the user requested, also as shapefile.
+        to_save = ['pickle'] if not self.save_shp else ['pickle', 'shp']
         if G:
             # Check if all geometries between nodes are there, if not, add them as a straight line.
             G = add_missing_geoms_graph(G, geom_name='geometry')
-            self.save_network(G, self.config['network']['name'], types=['pickle'])
+            self.save_network(G, self.network_name, types=to_save)
+            graph_dict['base'] = G
         if edge_gdf:
-            self.save_network(edge_gdf, self.config['network']['name'], types=['pickle'])
+            self.save_network(edge_gdf, self.network_name, types=to_save)
 
+        if 'indirect' in self.config:
+            if any('multi_link_origin_destination' in a['analysis'] for a in self.config['indirect']):
+                # Check which analyses require origin and destination nodes to be added to the graph and which ones already have been created.
+                use_existing_od = [a for a in self.config['indirect'] if (a['analysis'] == 'multi_link_origin_destination') and ('origins' not in a['analysis'])]
+                if len(use_existing_od) > 0:
+                    for existing in use_existing_od:
+                        read_existing = self.config['static'] / 'output_graph' / (existing['name'].replace(' ', '_') + '_base_graph.gpickle')
+                        try:
+                            graph_dict[existing['name']] = nx.read_gpickle(read_existing)
+                            logging.info(f"Existing graph found in {read_existing}.")
+                        except FileNotFoundError as e:
+                            logging.error(f"The graph cannot be found in {read_existing}.", e)
+                            exit()
+
+                create_new_od = [a for a in self.config['indirect'] if (a['analysis'] == 'multi_link_origin_destination') and ('origins' in a['analysis'])]
+                if len(create_new_od) > 0:
+                    # Origin and destination nodes should be added to the graph.
+                    od_graphs = self.add_od_nodes(G)
+                    for n in od_graphs.keys():
+                        self.save_network(od_graphs[n], n, types=to_save)
+                    graph_dict.update(od_graphs)
+            if any('hazard_map' in a for a in self.config['indirect']):
+                # There is a hazard map or multiple hazard maps that should be intersected with the graph.
+                to_overlay_hazard = [(a['name'], a['analysis'], a['hazard_map'], a['aggregate_wl']) for a in self.config['indirect'] if ('hazard_map' in a)]
+
+                for n, a, h, wl in to_overlay_hazard:
+                    if a == 'multi_link_redundancy':
+                        haz = Hazard(graph_dict['base'], h, wl)
+                        graph_dict[n + '_hazard'] = haz.hazard_intersect()
+                    if a == 'multi_link_origin_destination':
+                        haz = Hazard(graph_dict[n], h, wl)
+                        graph_dict[n + '_hazard'] = haz.hazard_intersect()
+
+        if 'direct' in self.config:
+            haz = Hazard(edge_gdf, h)
         return G, edge_gdf
 
 
 class Hazard:
-    def __init__(self, graph):
-        self.something = 'bla'
-        self.g = graph
+    def __init__(self, graph_gdf, list_hazard_files, aggregate_wl):
+        self.list_hazard_files = list_hazard_files
+        self.aggregate_wl = aggregate_wl
+        if type(graph_gdf) == gpd.GeoDataFrame:
+            self.gdf = graph_gdf
+            self.g = None
+        else:
+            self.gdf = None
+            self.g = graph_gdf
 
-    def overlay_hazard_raster(self):
+    def overlay_hazard_raster(self, hf):
         """Overlays the hazard raster over the road segments."""
+        # GeoTIFF
+        import rasterio
+        src = rasterio.open(hf)
 
-        return
+        # Name the attribute name the name of the hazard file
+        hn = hf.stem
 
-    def overlay_hazard_shp(self):
+        # check which road is overlapping with the flood and append the flood depth to the graph
+        for u, v, k, edata in self.g.edges.data(keys=True):
+            if 'geometry' in edata:
+                # check how long the road stretch is and make a point every other meter
+                nr_points = round(edata['length'])
+                if nr_points == 1:
+                    coords_to_check = list(edata['geometry'].boundary)
+                else:
+                    coords_to_check = [edata['geometry'].interpolate(i / float(nr_points - 1), normalized=True) for
+                                       i in range(nr_points)]
+                crds = []
+                for c in coords_to_check:
+                    # check if part of the linestring is inside the flood extent
+                    if (src.bounds.left < c.coords[0][0] < src.bounds.right) and (
+                            src.bounds.bottom < c.coords[0][1] < src.bounds.top):
+                        crds.append(c.coords[0])
+                if crds:
+                    # the road lays inside the flood extent
+                    if self.aggregate_wl == 'max':
+                        if (max([x.item(0) for x in src.sample(crds)]) > 999999) | (
+                                max([x.item(0) for x in src.sample(crds)]) < -999999):
+                            # the road is most probably in the 'no data' area of the raster (usually a very large or small number is used as 'no data' value)
+                            self.g[u][v][k][hn] = 0
+                        else:
+                            self.g[u][v][k][hn] = max([x.item(0) for x in src.sample(crds)])
+                    elif self.aggregate_wl == 'min':
+                        if (min([x.item(0) for x in src.sample(crds)]) > 999999) | (
+                                min([x.item(0) for x in src.sample(crds)]) < -999999):
+                            # the road is most probably in the 'no data' area of the raster (usually a very large or small number is used as 'no data' value)
+                            self.g[u][v][k][hn] = 0
+                        else:
+                            self.g[u][v][k][hn] = min([x.item(0) for x in src.sample(crds)])
+                    elif self.aggregate_wl == 'mean':
+                        if (mean([x.item(0) for x in src.sample(crds)]) > 999999) | (
+                                mean([x.item(0) for x in src.sample(crds)]) < -999999):
+                            # the road is most probably in the 'no data' area of the raster (usually a very large or small number is used as 'no data' value)
+                            self.g[u][v][k][hn] = 0
+                        else:
+                            self.g[u][v][k][hn] = mean([x.item(0) for x in src.sample(crds)])
+                    else:
+                        logging.warning("No aggregation method is chosen ('max', 'min' or 'mean).")
+                else:
+                    self.g[u][v][k][hn] = 0
+            else:
+                self.g[u][v][k][hn] = 0
+
+    def overlay_hazard_shp(self, hf):
         """Overlays the hazard shapefile over the road segments."""
+        # Shapefile
+        gdf = gpd.read_file(hf)
+        spatial_index = gdf.sindex
+
+        for u, v, k, edata in self.g.edges.data(keys=True):
+            if 'geometry' in edata:
+                possible_matches_index = list(spatial_index.intersection(edata['geometry'].bounds))
+                possible_matches = gdf.iloc[possible_matches_index]
+                precise_matches = possible_matches[possible_matches.intersects(edata['geometry'])]
+                # TODO REQUEST USER TO INPUT THE COLUMN NAME OF THE HAZARD COLUMN
+                hn='TODO'
+                if not precise_matches.empty:
+                    if self.aggregate_wl == 'max':
+                        self.g[u][v][k][hn] = precise_matches[hn].max()
+                    if self.aggregate_wl == 'min':
+                        self.g[u][v][k][hn] = precise_matches[hn].min()
+                    if self.aggregate_wl == 'mean':
+                        self.g[u][v][k][hn] = precise_matches[hn].mean()
+                else:
+                    self.g[u][v][k][hn] = 0
+            else:
+                self.g[u][v][k][hn] = 0
         return
 
     def join_hazard_table(self):
@@ -166,7 +319,15 @@ class Hazard:
         return
 
     def hazard_intersect(self):
-        self.g = add_missing_geoms_graph(self.g, geom_name='geometry')  # CHECK THE FUNCTION
+        for hf in self.list_hazard_files:
+            if hf.suffix == '.tif':
+                self.overlay_hazard_raster(hf)
+            elif hf.suffix == '.shp':
+                self.overlay_hazard_shp(hf)
+            elif hf.suffix in ['.csv', '.json']:
+                self.join_hazard_table(hf)
+
+        return self.g
 
 
 def graph_create_unique_ids(graph, new_id_name):
@@ -177,7 +338,7 @@ def graph_create_unique_ids(graph, new_id_name):
         # if len(set([str(e[-1][new_id_name]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
         for i, (u, v, k) in enumerate(graph.edges(keys=True)):
             graph[u][v][k][new_id_name] = i + 1
-        print("Added a new unique identifier field '{}'.".format(new_id_name))
+        logging.info("Added a new unique identifier field '{}'.".format(new_id_name))
         return graph
     else:
         return graph
