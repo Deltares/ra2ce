@@ -148,7 +148,7 @@ class IndirectAnalyses:
         aggregated_results = pd.concat(results, ignore_index=True)
         return aggregated_results
 
-    def multi_link_origin_destination(self):
+    def multi_link_origin_destination(self, analysis):
         return gpd.GeoDataFrame()
 
     def execute(self):
@@ -156,7 +156,7 @@ class IndirectAnalyses:
         for analysis in self.config['indirect']:
             logging.info(f"----------------------------- Started analyzing '{analysis['name']}'  -----------------------------")
             if analysis['analysis'] == 'single_link_redundancy':
-                gdf = self.single_link_redundancy(analysis)
+                gdf = self.single_link_redundancy()
             elif analysis['analysis'] == 'multi_link_redundancy':
                 gdf = self.multi_link_redundancy(analysis)
             elif analysis['analysis'] == 'multi_link_origin_destination':

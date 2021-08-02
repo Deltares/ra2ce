@@ -14,8 +14,6 @@ from graph.networks import Network
 from analyses.direct import analyses_direct
 from analyses.indirect import analyses_indirect
 
-possible_analyses = []
-
 
 def main():
     # Find the settings.ini file,
