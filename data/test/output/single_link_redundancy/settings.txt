@@ -1,0 +1,4 @@
+name = single link redundancy test
+analysis = single_link_redundancy
+save_shp = true
+save_csv = true
