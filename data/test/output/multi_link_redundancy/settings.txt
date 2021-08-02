@@ -1,0 +1,2 @@
+name = multi link redundancy test
+analysis = multi_link_redundancy
