@@ -11,6 +11,7 @@ import numpy as np
 from ast import literal_eval
 import codecs
 import logging
+import geojson
 
 list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination', 'multi_link_origin_destination']
 
@@ -117,3 +118,4 @@ def configure_analyses(config):
         del config[a]
 
     return config
+
