@@ -1,4 +1,5 @@
 name = single link redundancy test
 analysis = single_link_redundancy
+weighing = distance
 save_shp = true
 save_csv = true

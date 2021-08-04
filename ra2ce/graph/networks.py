@@ -92,21 +92,30 @@ class Network:
 
         return G_simple, edges_complex
 
-    def add_od_nodes(self, G):
+    def add_od_nodes(self, G, od_analyses):
         """Adds origins and destinations nodes from shapefiles to the graph."""
         from .origins_destinations import read_OD_files, create_OD_pairs, add_od_nodes
 
-        # Check which analyses need Origin-Destination nodes.
-        od_analyses = [a for a in self.config['indirect'] if a['analysis'] == 'multi_link_origin_destination']
-
         graphs = {}
         for od_analysis in od_analyses:
+            name = od_analysis['name'].replace(' ', '_')
             # Add the origin/destination nodes to the network
             ods = read_OD_files(od_analysis['origins'], od_analysis['origins_names'],
                                 od_analysis['destinations'], od_analysis['destinations_names'],
                                 od_analysis['id_name_origin_destination'], 'epsg:4326')  # TODO: decide if change CRS to flexible instead of just epsg:4326
 
             ods = create_OD_pairs(ods, G, id_name='unique_fid')
+
+            # Save the OD pairs (GeoDataFrame) as pickle
+            with open(str(self.config['output'] / od_analysis['analysis'] / (name + '_origins_destinations.p')), 'wb') as handle:
+                pickle.dump(ods, handle)
+            logging.info(f"Saved {name + '_origins_destinations.p'} in {self.config['output'] / od_analysis['analysis']}.")
+
+            # Save the OD pairs (GeoDataFrame) as shapefile
+            if od_analysis['save_shp'] == 'true':
+                ods.to_file(self.config['static'] / od_analysis['analysis'] / (name + '_origins_destinations.shp'))
+                logging.info(f"Saved {name + '_origins_destinations.shp'} in {self.config['output'] / od_analysis['analysis']}.")
+
             G = add_od_nodes(G, ods, id_name='unique_fid')
 
             graphs[od_analysis['name'].replace(' ', '_')] = G
@@ -155,18 +164,18 @@ class Network:
             edges_complex_path = self.config['static'] / 'output_graph' / (self.network_name + '_base_network.p')
             G_simple_path = self.config['static'] / 'output_graph' / (self.network_name + '_base_graph.gpickle')
 
-            logging.info(f"Using an existing graph: {self.network_name + '_base_graph.gpickle'}")
-            logging.info(f"Using an existing network: {self.network_name + '_base_network.p'}")
             if 'direct' in self.config:
                 try:
                     with open(edges_complex_path, 'rb') as f:
                         edge_gdf = pickle.load(f)
+                        logging.info(f"Using an existing network: {self.network_name + '_base_network.p'}")
                 except FileNotFoundError as e:
                     logging.error(f"The network cannot be found in {edges_complex_path}.", e)
                     exit()
             if 'indirect' in self.config:
                 try:
                     G = nx.read_gpickle(G_simple_path)
+                    logging.info(f"Using an existing graph: {self.network_name + '_base_graph.gpickle'}")
                 except FileNotFoundError as e:
                     logging.error(f"The graph cannot be found in {G_simple_path}.", e)
                     exit()
@@ -187,7 +196,7 @@ class Network:
         if 'indirect' in self.config:
             if any('multi_link_origin_destination' in a['analysis'] for a in self.config['indirect']):
                 # Check which analyses require origin and destination nodes to be added to the graph and which ones already have been created.
-                use_existing_od = [a for a in self.config['indirect'] if (a['analysis'] == 'multi_link_origin_destination') and ('origins' not in a['analysis'])]
+                use_existing_od = [a for a in self.config['indirect'] if (a['analysis'] in ['optimal_route_origin_destination', 'multi_link_origin_destination']) and ('origins' not in a) and ('destinations' not in a)]
                 if len(use_existing_od) > 0:
                     for existing in use_existing_od:
                         read_existing = self.config['static'] / 'output_graph' / (existing['name'].replace(' ', '_') + '_base_graph.gpickle')
@@ -198,10 +207,10 @@ class Network:
                             logging.error(f"The graph cannot be found in {read_existing}.", e)
                             exit()
 
-                create_new_od = [a for a in self.config['indirect'] if (a['analysis'] == 'multi_link_origin_destination') and ('origins' in a['analysis'])]
+                create_new_od = [a for a in self.config['indirect'] if (a['analysis'] in ['optimal_route_origin_destination', 'multi_link_origin_destination']) and ('origins' in a) and ('destinations' in a)]
                 if len(create_new_od) > 0:
                     # Origin and destination nodes should be added to the graph.
-                    od_graphs = self.add_od_nodes(G)
+                    od_graphs = self.add_od_nodes(G, create_new_od)
                     for n in od_graphs.keys():
                         self.save_network(od_graphs[n], n, types=to_save)
                     graph_dict.update(od_graphs)
