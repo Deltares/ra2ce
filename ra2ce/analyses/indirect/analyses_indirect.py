@@ -152,17 +152,16 @@ class IndirectAnalyses:
 
     def optimal_route_origin_destination(self, analysis):
         # Calculate the preferred routes
-        optimal_routes = optimal_routes_od(G, weighing, id_name, ods, crs, InputDict, shortest_route=True,
-                                          save_shp=True, save_pickle=False,
-                                          file_output=InputDict['output'], name=InputDict['analysis_name'])
+        name = analysis['name'].replace(' ', '_')
+
         # dataframe to save the preferred routes
         pref_routes = gpd.GeoDataFrame(columns=['o_node', 'd_node', 'origin', 'destination',
                                                 'pref_path', analysis['weighing'], 'match_ids', 'geometry'],
                                        geometry='geometry', crs='epsg:4326')
 
         # create list of origin-destination pairs
-        self.config['output'] / od_analysis['analysis'] / (name + '_origins_destinations.p')
-        od = od.replace('nan', np.nan)
+        od_path = self.config['output'] / analysis['analysis'] / (name + '_origins_destinations.feather')
+        od = gpd.read_feather(od_path)
         od_pairs = [(a, b) for a in od.loc[od['o_id'].notnull(), 'o_id'] for b in od.loc[od['d_id'].notnull(), 'd_id']]
         all_nodes = [(n, v['od_id']) for n, v in self.g.nodes(data=True) if 'od_id' in v]
         od_nodes = []
@@ -172,8 +171,7 @@ class IndirectAnalyses:
                              [(n, n_name) for n, n_name in all_nodes if (n_name == bb) | (bb in n_name)][0]))
 
         # create the routes between all OD pairs
-        i = 0
-        for o, d in tqdm(od_nodes):
+        for o, d in tqdm(od_nodes, desc='Finding optimal routes.'):
             if nx.has_path(self.g, o[0], d[0]):
                 # calculate the length of the preferred route
                 pref_route = nx.dijkstra_path_length(self.g, o[0], d[0], weight=analysis['weighing'])
@@ -193,8 +191,8 @@ class IndirectAnalyses:
                         pref_edges.append(self.g[u][v][edge_key]['geometry'])
                     else:
                         pref_edges.append(LineString([self.g.nodes[u]['geometry'], self.g.nodes[v]['geometry']]))
-                    if idName in self.g[u][v][edge_key]:
-                        match_list.append(self.g[u][v][edge_key][idName])
+                    if 'unique_fid' in self.g[u][v][edge_key]:
+                        match_list.append(self.g[u][v][edge_key]['unique_fid'])
 
                 # compile the road segments into one geometry
                 pref_edges = MultiLineString(pref_edges)
@@ -202,52 +200,95 @@ class IndirectAnalyses:
                                                   'destination': d[1], 'pref_path': pref_nodes,
                                                   analysis['weighing']: pref_route, 'match_ids': match_list,
                                                   'geometry': pref_edges}, ignore_index=True)
-                i = i + 1
 
         # if shortest_route:
         #     pref_routes = pref_routes.loc[pref_routes.sort_values(analysis['weighing']).groupby('o_node').head(3).index]
 
-        # intersect the origin and destination nodes with the hazard map (now only geotiff possible)
-        pref_routes['d_disrupt'] = None
-        pref_routes['o_disrupt'] = None
-        pref_routes['d_{}'.format(hazard_data['hazard_attribute_name'][0])] = None
-        pref_routes['o_{}'.format(hazard_data['hazard_attribute_name'][0])] = None
-        src = rasterio.open(hazard_data['hazard_data'][0])
-        for i in range(len(pref_routes.index)):
-            dest = graph.nodes[int(pref_routes.d_node.iloc[i])]['geometry']
-            if (src.bounds.left < dest.coords[0][0] < src.bounds.right) and (
-                    src.bounds.bottom < dest.coords[0][1] < src.bounds.top):
-                hzrd = [x.item(0) for x in src.sample(dest.coords)][0]
-                pref_routes['d_{}'.format(hazard_data['hazard_attribute_name'][0])].iloc[i] = hzrd
-                if hzrd > hazard_data['hazard_threshold']:
-                    pref_routes['d_disrupt'].iloc[i] = 'disrupted'
-                else:
-                    pref_routes['d_disrupt'].iloc[i] = 'not disrupted'
-            else:
-                pref_routes['d_{}'.format(hazard_data['hazard_attribute_name'][0])].iloc[i] = 0
-                pref_routes['d_disrupt'].iloc[i] = 'unknown'
-            orig = graph.nodes[int(pref_routes.o_node.iloc[i])]['geometry']
-            if (src.bounds.left < orig.coords[0][0] < src.bounds.right) and (
-                    src.bounds.bottom < orig.coords[0][1] < src.bounds.top):
-                hzrd = [x.item(0) for x in src.sample(orig.coords)][0]
-                pref_routes['o_{}'.format(hazard_data['hazard_attribute_name'][0])].iloc[i] = hzrd
-                if hzrd > hazard_data['hazard_threshold']:
-                    pref_routes['o_disrupt'].iloc[i] = 'disrupted'
-                else:
-                    pref_routes['o_disrupt'].iloc[i] = 'not disrupted'
-            else:
-                pref_routes['o_{}'.format(hazard_data['hazard_attribute_name'][0])].iloc[i] = 0
-                pref_routes['o_disrupt'].iloc[i] = 'unknown'
-
-        return gpd.GeoDataFrame()
+        return pref_routes
 
     def multi_link_origin_destination(self, analysis):
+        """Calculates the connectivity between origins and destinations"""
+        # Check if the o/d pairs are still connected while some links are disrupted by the hazard(s)
+        gdf = gpd.GeoDataFrame(
+            columns=['disrupted', 'extra_{}'.format(analysis['weighing']), 'no detour', 'origin', 'destination', 'odpair',
+                     'd_disrupt', 'o_disrupt', 'd_{}'.format(hazardName), 'o_{}'.format(hazardName), 'geometry'],
+            geometry='geometry', crs={'init': 'epsg:{}'.format(crs_)})
+
+        to_remove = [(e[0], e[1], e[2]) for e in self.g.edges.data(keys=True) if
+                     (e[-1][hazardName] > threshold) & ('bridge' not in e[-1])]
+        # to_remove = [(e[0], e[1], e[2]) for e in self.g.edges.data(keys=True) if (e[-1][hazardName] > threshold)]
+        self.g.remove_edges_from(to_remove)
+
+        for ii in range(len(prefRoutes.index)):
+            o, d = prefRoutes.iloc[ii][['o_node', 'd_node']]
+            o = int(o)
+            d = int(d)
+
+            extra_time = np.NaN
+
+            # check if the nodes are still connected
+            if nx.has_path(self.g, o, d):
+                # calculate the alternative distance if that edge is unavailable
+                alt_route = nx.dijkstra_path_length(self.g, o, d, weight=analysis['weighing'])
+
+                # save preferred route nodes
+                pref_nodes = nx.dijkstra_path(self.g, o, d, weight=analysis['weighing'])
+
+                # subtract the length/time of the optimal route from the alternative route
+                extra_time = alt_route - float(prefRoutes.iloc[ii][analysis['weighing']])
+                print(extra_time)
+                if prefRoutes.iloc[ii][analysis['weighing']] != alt_route:
+                    # the alternative route is different from the optimal route
+                    print('yes')
+                    disrupted = 1
+                    detour = "alt_route"
+                    # found out which edges belong to the preferred path
+                    edgesinpath = list(zip(pref_nodes[0:], pref_nodes[1:]))
+
+                    pref_edges = []
+                    for u, v in edgesinpath:
+                        # get edge with the lowest weighing if there are multiple edges that connect u and v
+                        edge_key = sorted(self.g[u][v], key=lambda x: self.g[u][v][x][analysis['weighing']])[0]
+                        if 'geometry' in self.g[u][v][edge_key]:
+                            pref_edges.append(self.g[u][v][edge_key]['geometry'])
+                        else:
+                            pref_edges.append(LineString([self.g.nodes[u]['geometry'], self.g.nodes[v]['geometry']]))
+
+                    # compile the road segments into one geometry
+                    pref_edges = MultiLineString(pref_edges)
+                else:
+                    # the alternative route is the same as the optimal route
+                    disrupted = 0
+                    detour = "same"
+                    pref_edges = prefRoutes.iloc[ii]['geometry']
+            else:
+                # append to calculation dataframe
+                disrupted = 1
+                detour = "no_detour"
+                pref_edges = prefRoutes.iloc[ii]['geometry']
+
+            gdf = gdf.append({'disrupted': disrupted, 'extra_{}'.format(analysis['weighing']): extra_time, 'no detour': detour,
+                              'origin': str(prefRoutes.iloc[ii]['origin']),
+                              'destination': str(prefRoutes.iloc[ii]['destination']),
+                              'odpair': str(prefRoutes.iloc[ii]['origin']) + ' to ' + str(
+                                  prefRoutes.iloc[ii]['destination']),
+                              # TODO: change for RWS
+                              # 'd_disrupt': prefRoutes.iloc[ii]['d_disrupt'],
+                              # 'o_disrupt': prefRoutes.iloc[ii]['o_disrupt'],
+                              # 'd_{}'.format(hazardName): prefRoutes.iloc[ii]['d_{}'.format(hazardName)],
+                              # 'o_{}'.format(hazardName): prefRoutes.iloc[ii]['o_{}'.format(hazardName)],
+                              'geometry': pref_edges}, ignore_index=True)
+
         return gpd.GeoDataFrame()
 
     def execute(self):
         """Executes the indirect analysis."""
         for analysis in self.config['indirect']:
             logging.info(f"----------------------------- Started analyzing '{analysis['name']}'  -----------------------------")
+            if 'weighing' in analysis:
+                if analysis['weighing'] == 'distance':
+                    # The name is different in the graph.
+                    analysis['weighing'] = 'length'
             if analysis['analysis'] == 'single_link_redundancy':
                 gdf = self.single_link_redundancy()
             elif analysis['analysis'] == 'multi_link_redundancy':
