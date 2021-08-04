@@ -275,17 +275,17 @@ class Network:
         G, edge_gdf = None, None
 
         # Create the network from the network source
-        if self.config['network']['source'] == 'shapefile':
+        if self.primary_files == 'shapefile':
             logging.info('Start creating a network from the submitted shapefile.')
             G, edge_gdf = self.network_shp()
-        elif self.config['network']['source'] == 'OSM PBF':
+        elif self.primary_files == 'OSM PBF':
             logging.info('Start creating a network from an OSM PBF file.')
             roadTypes = self.config['network']['road_types'].lower().replace(' ', ' ').split(',')
             G, edge_gdf = self.network_osm_pbf()
-        elif self.config['network']['source'] == 'OSM download':
+        elif self.primary_files == 'OSM download':
             logging.info('Start downloading a network from OSM.')
             G, edge_gdf = self.network_osm_download()
-        elif self.config['network']['source'] == 'pickle':
+        elif self.primary_files == 'pickle':
             edges_complex_path = self.config['static'] / 'output_graph' / (self.network_name + '_base_network.p')
             G_simple_path = self.config['static'] / 'output_graph' / (self.network_name + '_base_graph.gpickle')
 
