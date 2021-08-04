@@ -16,8 +16,9 @@ def input_validation(config):
     """ Check if input properties are correct and exist"""
 
     # check if properties exist in settings.ini file
-    check_headers = ['project', 'network']
+    check_headers = ['project']
     check_headers.extend([a for a in config.keys() if 'analysis' in a])
+    check_headers.extend([a for a in config.keys() if 'network' in a])
 
     for k in check_headers:
         if k not in config.keys():
@@ -29,17 +30,17 @@ def input_validation(config):
     # TODO: Decide how to check for multiple analyses (analysis1, analysis2, etc)
     list_analyses = list_direct_analyses + list_indirect_analyses
     check_answer = {'source': ['OSM PBF', 'OSM download', 'shapefile', 'pickle'],
-                    'polygon': ['link', 'none'],
-                    'directed': ['true', 'false'],
+                    'polygon': ['link', None],
+                    'directed': [True, False],
                     'network_type': ['walk', 'bike', 'drive', 'drive_service', 'all'],
                     'road_types': ['motorway', 'motorway_link', 'trunk', 'trunk_link', 'primary', 'primary_link', 'secondary',
-                                   'secondary_link', 'tertiary', 'tertiary_link', 'none'],  # TODO: add the lower types as well
-                    'origins': ['link', 'none'],
-                    'destinations': ['link', 'none'],
-                    'save_shp': ['true', 'false'],
-                    'save_csv': ['true', 'false'],
+                                   'secondary_link', 'tertiary', 'tertiary_link', None],  # TODO: add the lower types as well
+                    'origins': ['link', None],
+                    'destinations': ['link', None],
+                    'save_shp': [True, False],
+                    'save_csv': [True, False],
                     'analysis': list_analyses,
-                    'hazard_map': ['link', 'none'],
+                    'hazard_map': ['link', None],
                     'aggregate_wl': ['max', 'min', 'mean'],
                     'weighing': ['distance', 'time']}
     input_dirs = {'polygon': 'static/network', 'hazard_map': 'static/hazard', 'origins': 'static/network',
@@ -52,7 +53,7 @@ def input_validation(config):
             # Now check the parameters per configured item.
             for item in config[key]:
                 if item in check_answer:
-                    if ('link' in check_answer[item]) and (config[key][item] != 'none'):
+                    if ('link' in check_answer[item]) and (config[key][item] is not None):
                         # Check if the path is an absolute path or a file name that is placed in the right folder
                         config[key][item], error = check_paths(config, key, item, input_dirs, error)
                         continue
