@@ -36,6 +36,17 @@ def main():
     config['static'] = config['root_path'] / 'data' / config['project']['name'] / 'static'
     config['output'] = config['root_path'] / 'data' / config['project']['name'] / 'output'
 
+    # Create the output folders
+    if 'direct' in config:
+        for a in config['direct']:
+            output_path = config['output'] / a['analysis']
+            output_path.mkdir(parents=True, exist_ok=True)
+
+    if 'indirect' in config:
+        for a in config['indirect']:
+            output_path = config['output'] / a['analysis']
+            output_path.mkdir(parents=True, exist_ok=True)
+
     # Create the network
     network = Network(config)
     g_indirect, g_direct = network.create()
