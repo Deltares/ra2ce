@@ -12,6 +12,7 @@ import geopandas as gpd
 import rtree
 import logging
 from tqdm import tqdm, trange
+from .networks_utils import pairs, line_length
 
 
 def read_OD_files(origin_paths, origin_names, destination_paths, destination_names, od_id, crs_):
@@ -187,52 +188,7 @@ def cut(line, distance):
                             LineString([(cp.x, cp.y)] + [xy[0:2] for xy in coords[i:]])]
 
 
-def pairs(lst):
-    """Iterate over a list in overlapping pairs without wrap-around.
-    Args:
-        lst: an iterable/list
 
-    Returns:
-        Yields a pair of consecutive elements (lst[k], lst[k+1]) of lst. Last
-        call yields the last two elements.
-
-    Example:
-        lst = [4, 7, 11, 2]
-        pairs(lst) yields (4, 7), (7, 11), (11, 2)
-
-    Source:
-        https://stackoverflow.com/questions/1257413/1257446#1257446
-    """
-    i = iter(lst)
-    prev = next(i)
-    for item in i:
-        yield prev, item
-        prev = item
-
-
-def line_length(line):
-    """Calculate length of a line in meters, given in geographic coordinates.
-    Args:
-        line: a shapely LineString object with WGS 84 coordinates
-    Returns:
-        Length of line in m
-    """
-    # check if the projection is EPSG:4326
-    distance.geodesic.ELLIPSOID = 'WGS-84'
-    try:
-        # Swap shapely (lonlat) to geopy (latlon) points
-        latlon = lambda lonlat: (lonlat[1], lonlat[0])
-        if isinstance(line, LineString):
-            total_length = sum(distance.distance(latlon(a), latlon(b)).meters for (a, b) in pairs(line.coords))
-        elif isinstance(line, MultiLineString):
-            total_length = sum(
-                [sum(distance.distance(latlon(a), latlon(b)).meters for (a, b) in pairs(l.coords)) for l in line])
-        else:
-            logging.warning("Something went wrong while calculating the length of the road stretches.")
-    except:
-        logging.warning(
-            "The CRS is not EPSG:4326. Quit the analysis, reproject the layer to EPSG:4326 and try again to run the tool.")
-    return round(total_length, 0)
 
 
 def getKeysByValue(dictOfElements, value):
