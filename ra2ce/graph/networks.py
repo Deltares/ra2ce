@@ -7,18 +7,20 @@ Created on 26-7-2021
 
 # external modules
 import logging
-from pathlib import Path
-import networkx as nx
-import osmnx
-from osmnx.simplification import simplify_graph
-from numpy import object as np_object
 import geopandas as gpd
 import pandas as pd
 import numpy as np
-from statistics import mean
-from shapely.geometry import shape, Point, LineString
+import networkx as nx
+import osmnx
 import geojson
 import pickle
+import os
+from pathlib import Path
+from osmnx.simplification import simplify_graph
+from numpy import object as np_object
+from statistics import mean
+from shapely.geometry import shape, Point, LineString
+from .networks_utils import *
 
 
 class Network:
@@ -26,10 +28,133 @@ class Network:
         self.config = config
         self.save_shp = True if config['network']['save_shp'] == 'true' else False
         self.network_name = self.config['network']['name'].replace(' ', '_')
+        self.primary_files = config['network']['primary_file']
+        self.diversion_files = config['network']['diversion_file']
+        self.file_id = config['network']['file_id']
 
     def network_shp(self):
-        """Creates a network from a shapefile."""
-        return
+        """Creates a (graph) network from a shapefile
+        Args:
+            name (string): name of the analysis given by user (will be part of the name of the output files)
+            InputDict (dict): dictionairy with paths/input that is used to create the network
+            crs (int): the EPSG number of the coordinate reference system that is used
+            snapping (bool): True if snapping is required, False if not
+            SnappingThreshold (int/float): threshold to reach another vertice to connect the edge to
+            pruning (bool): True if pruning is required, False if not
+            PruningThreshold (int/float): edges smaller than this length (threshold) are removed
+        Returns:
+            G (networkX graph): The resulting network graph
+        """
+
+        lines = self.read_merge_shp()
+        logging.info("Function [read_merge_shp]: executed with {} {}".format(self.primary_files, self.diversion_files))
+        aadt_names = None  # can be removed if the above is fixed
+
+
+        # Multilinestring to linestring
+        # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
+        # The list of fid's is reduced by the fid's that are not anymore in the merged lines
+        edges, lines_merged = merge_lines_shpfiles(lines, self.config['shp_unique_ID'], aadt_names, crs)
+        logging.info("Function [merge_lines_shpfiles]: executed with properties {}".format(list(edges.columns)))
+
+        edges, id_name = gdf_check_create_unique_ids(edges, self.config['shp_unique_ID'])
+
+        if 'data_manipulation' in self.config:
+            if self.config['data_manipulation'] == 'snapping':
+                edges = snap_endpoints_lines(edges, self.config['snapping_threshold'], id_name, tolerance=1e-7)
+                logging.info("Function [snap_endpoints_lines]: executed with threshold = {}".format(self.config['snapping_threshold']))
+
+        # merge merged lines if there are any merged lines
+        if not lines_merged.empty:
+            # save the merged lines to a shapefile - CHECK if there are lines merged that should not be merged (e.g. main + secondary road)
+            lines_merged.to_file(os.path.join(self.config["output"], "{}_lines_that_merged.shp".format(self.config['analysis_name'])))
+            logging.info(
+                "Function [edges_to_shp]: saved at {}".format(
+                    os.path.join(self.config["output"], "{}_lines_that_merged".format(self.config['analysis_name']))))
+
+        # Get the unique points at the end of lines and at intersections to create nodes
+        nodes = create_nodes(edges, crs)
+        logging.info("Function [create_nodes]: executed")
+
+        if 'data_manipulation' in self.config:
+            if self.config['data_manipulation'] == 'snapping':
+                # merged lines may be updated when new nodes are created which makes a line cut in two
+                edges = cut_lines(edges, nodes, id_name, tolerance=1e-4)
+                nodes = create_nodes(edges, crs)
+                logging.info("Function [cut_lines]: executed")
+
+        # create tuples from the adjecent nodes and add as column in geodataframe
+        resulting_network = join_nodes_edges(nodes, edges, id_name)
+        logging.info("Function [join_nodes_edges]: executed")
+        resulting_network.crs = {'init': 'epsg:{}'.format(crs)}  # set the right CRS
+
+        # Save geodataframe of the resulting network to
+        resulting_network.to_pickle(
+            os.path.join(self.config["output"], '{}_gdf.pkl'.format(self.config['analysis_name'])))
+        print("Saved network to pickle in {}".format(
+            os.path.join(self.config["output"], '{}_gdf.pkl'.format(self.config['analysis_name']))))
+
+        # Create networkx graph from geodataframe
+        G = graph_from_gdf(resulting_network, nodes)
+        logging.info(
+            "Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(self.config['analysis_name']))
+
+        # Save graph to gpickle to use later for analysis
+        nx.write_gpickle(G, os.path.join(self.config["output"], '{}_graph.gpickle'.format(self.config['analysis_name'])), protocol=4)
+        print("Saved graph to pickle in {}".format(
+            os.path.join(self.config["output"], '{}_graph.gpickle'.format(self.config['analysis_name']))))
+
+        # Save graph to shapefile for visual inspection
+        graph_to_shp(G, os.path.join(self.config["output"], '{}_edges.shp'.format(self.config['analysis_name'])),
+                     os.path.join(self.config["output"], '{}_nodes.shp'.format(self.config['analysis_name'])))
+
+        return G, resulting_network
+
+    def read_merge_shp(self, crs_=4326):
+        """Imports shapefile(s) and saves attributes in a pandas dataframe.
+
+        Args:
+            shapefileAnalyse (string or list of strings): absolute path(s) to the shapefile(s) that will be used for analysis
+            shapefileDiversion (string or list of strings): absolute path(s) to the shapefile(s) that will be used to calculate alternative routes but is not analysed
+            idName (string): the name of the Unique ID column
+            crs_ (int): the EPSG number of the coordinate reference system that is used
+        Returns:
+            lines (list of shapely LineStrings): full list of linestrings
+            properties (pandas dataframe): attributes of shapefile(s), in order of the linestrings in lines
+        """
+
+        # read shapefiles and add to list with path
+        if isinstance(self.primary_files, str):
+            shapefiles_analysis = [self.config['static'] / "network" / shp for shp in self.primary_files.split(',')]
+        if isinstance(self.diversion_files, str):
+            shapefiles_diversion = [self.config['static'] / "network" / shp for shp in self.diversion_files.split(',')]
+
+        def read_file(file, analyse=1):
+            """"Set analysis to 1 for main analysis and 0 for diversion network"""
+            shp = gpd.read_file(file)
+            shp['to_analyse'] = analyse
+            return shp
+
+        # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
+        lines = [read_file(shp) for shp in shapefiles_analysis]
+        if isinstance(self.diversion_files, str):
+            [lines.append(read_file(shp, 0)) for shp in shapefiles_diversion]
+        lines = pd.concat(lines)
+
+        lines.crs = {'init': 'epsg:{}'.format(crs_)}
+
+        # append the length of the road stretches
+        lines['length'] = lines['geometry'].apply(lambda x: line_length(x))
+
+        if lines['geometry'].apply(lambda row: isinstance(row, MultiLineString)).any():
+            for line in lines.loc[lines['geometry'].apply(lambda row: isinstance(row, MultiLineString))].iterrows():
+                if len(linemerge(line[1].geometry)) > 1:
+                    warnings.warn("Edge with {} = {} is a MultiLineString, which cannot be merged to one line. Check this part.".format(
+                            idName, line[1][idName]))
+
+        print('Shapefile(s) loaded with attributes: {}.'.format(list(lines.columns.values)))  # fill in parameter names
+
+        return lines
 
     def network_osm_pbf(self):
         """Creates a network from an OSM PBF file."""
@@ -48,49 +173,49 @@ class Network:
             save_shapes is False, unless you would like to save shapes of both graphs
 
         Returns:
-            G_simple (Graph) : Simplified graph (for use in the indirect analyses)
-            G_complex_edges (GeoDataFrame : Complex graph (for use in the direct analyses)
+            graph_simple (Graph) : Simplified graph (for use in the indirect analyses)
+            graph_complex_edges (GeoDataFrame : Complex graph (for use in the direct analyses)
         """
         poly_dict = read_geojson(self.config['network']['polygon'][0])  # It can only read in one geojson
         poly = geojson_to_shp(poly_dict)
 
         if self.config['network']['road_types'] == 'none':
             # The user specified only the network type.
-            G_complex = osmnx.graph_from_polygon(polygon=poly, network_type=self.config['network']['network_type'],
+            graph_complex = osmnx.graph_from_polygon(polygon=poly, network_type=self.config['network']['network_type'],
                                                  simplify=False, retain_all=True)
         elif self.config['network']['network_type'] == 'none':
             # The user specified only the road types.
             cf = ('["highway"~"{}"]'.format(self.config['network']['road_types'].replace(',', '|')))
-            G_complex = osmnx.graph_from_polygon(polygon=poly, custom_filter=cf, simplify=False, retain_all=True)
+            graph_complex = osmnx.graph_from_polygon(polygon=poly, custom_filter=cf, simplify=False, retain_all=True)
         else:
             # The user specified the network type and road types.
             cf = ('["highway"~"{}"]'.format(self.config['network']['road_types'].replace(',', '|')))
-            G_complex = osmnx.graph_from_polygon(polygon=poly, network_type=self.config['network']['network_type'],
+            graph_complex = osmnx.graph_from_polygon(polygon=poly, network_type=self.config['network']['network_type'],
                                                  custom_filter=cf, simplify=False, retain_all=True)
 
-        logging.info('Graph downloaded from OSM with {:,} nodes and {:,} edges'.format(len(list(G_complex.nodes())),
-                                                                                       len(list(G_complex.edges()))))
+        logging.info('graph downloaded from OSM with {:,} nodes and {:,} edges'.format(len(list(graph_complex.nodes())),
+                                                                                       len(list(graph_complex.edges()))))
 
         # Depending on the types of analyses the user want to execute, it creates different kinds of graphs.
-        G_simple, edges_complex = None, None
+        graph_simple, edges_complex = None, None
         if 'direct' in self.config:
             # Create 'edges_complex', convert complex graph to geodataframe
             logging.info('Start converting the graph to a geodataframe')
-            edges_complex, _ = graph_to_gdf(G_complex)
-            # edges_simple, nodes_simple = graph_to_gdf(G_simple)
+            edges_complex, _ = graph_to_gdf(graph_complex)
+            # edges_simple, nodes_simple = graph_to_gdf(graph_simple)
             logging.info('Finished converting the graph to a geodataframe')
 
         if 'indirect' in self.config:
-            # Create 'G_simple'
-            G_simple = simplify_graph_count(G_complex)
-            G_simple = graph_create_unique_ids(G_simple, 'unique_fid')
+            # Create 'graph_simple'
+            graph_simple = simplify_graph_count(graph_complex)
+            graph_simple = graph_create_unique_ids(graph_simple, 'unique_fid')
 
             # If the user wants to use undirected graphs, turn into an undirected graph (default).
             if self.config['network']['directed'] == 'false':
-                if type(G_simple) == nx.classes.multidigraph.MultiDiGraph:
-                    G_simple = G_simple.to_undirected()
+                if type(graph_simple) == nx.classes.multidigraph.MultiDiGraph:
+                    graph_simple = graph_simple.to_undirected()
 
-        return G_simple, edges_complex
+        return graph_simple, edges_complex
 
     def add_od_nodes(self, G, od_analyses):
         """Adds origins and destinations nodes from shapefiles to the graph."""
@@ -503,3 +628,57 @@ def geojson_to_shp(geojson_obj, feature_number=0):
     # Create a shapely polygon from the coordinates.
     poly = shape(geometry).buffer(0)
     return poly
+
+
+def read_merge_shp(shapefileAnalyse,  idName, shapefileDiversion=[], crs_=4326):
+    """Imports shapefile(s) and saves attributes in a pandas dataframe.
+
+    Args:
+        shapefileAnalyse (string or list of strings): absolute path(s) to the shapefile(s) that will be used for analysis
+        shapefileDiversion (string or list of strings): absolute path(s) to the shapefile(s) that will be used to calculate alternative routes but is not analysed
+        idName (string): the name of the Unique ID column
+        crs_ (int): the EPSG number of the coordinate reference system that is used
+    Returns:
+        lines (list of shapely LineStrings): full list of linestrings
+        properties (pandas dataframe): attributes of shapefile(s), in order of the linestrings in lines
+    """
+
+    # convert shapefile names to a list if it was not already a list
+    if isinstance(shapefileAnalyse, str):
+        shapefileAnalyse = [shapefileAnalyse]
+    if isinstance(shapefileDiversion, str):
+        shapefileDiversion = [shapefileDiversion]
+
+    lines = []
+
+    # read the shapefile(s) for analysis
+    for shp in shapefileAnalyse:
+        lines_shp = gpd.read_file(shp)
+        lines_shp['to_analyse'] = 1
+        lines.append(lines_shp)
+
+    # read the shapefile(s) for only diversion
+    if isinstance(shapefileDiversion, list):
+        for shp2 in shapefileDiversion:
+            lines_shp = gpd.read_file(shp2)
+            lines_shp['to_analyse'] = 0
+            lines.append(lines_shp)
+
+    # concatenate all shapefiles into one geodataframe
+    lines = pd.concat(lines)
+    lines.crs = {'init': 'epsg:{}'.format(crs_)}
+
+    # append the length of the road stretches
+    lines['length'] = lines['geometry'].apply(lambda x: line_length(x))
+
+    if lines['geometry'].apply(lambda row: isinstance(row, MultiLineString)).any():
+        for line in lines.loc[lines['geometry'].apply(lambda row: isinstance(row, MultiLineString))].iterrows():
+            if len(linemerge(line[1].geometry)) > 1:
+                warnings.warn(
+                    "Edge with {} = {} is a MultiLineString, which cannot be merged to one line. Check this part.".format(
+                        idName, line[1][idName]))
+
+    print('Shapefile(s) loaded with attributes: {}.'.format(list(lines.columns.values)))  # fill in parameter names
+
+    return lines
+
