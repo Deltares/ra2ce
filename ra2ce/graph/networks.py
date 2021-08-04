@@ -31,8 +31,13 @@ class Network:
         self.primary_files = config['network']['primary_file']
         self.diversion_files = config['network']['diversion_file']
         self.file_id = config['network']['file_id']
+        self.snapping = config['network']['snapping_threshold']
+        self.pruning = config['network']['pruning_threshold']
+        self.name = config['project']['name']
+        self.output_path = config['static'] / "output_graph"
 
-    def network_shp(self):
+
+    def network_shp(self, crs=4326):
         """Creates a (graph) network from a shapefile
         Args:
             name (string): name of the analysis given by user (will be part of the name of the output files)
@@ -48,36 +53,34 @@ class Network:
 
         lines = self.read_merge_shp()
         logging.info("Function [read_merge_shp]: executed with {} {}".format(self.primary_files, self.diversion_files))
-        aadt_names = None  # can be removed if the above is fixed
-
+        aadt_names = None
 
         # Multilinestring to linestring
         # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
         # The list of fid's is reduced by the fid's that are not anymore in the merged lines
-        edges, lines_merged = merge_lines_shpfiles(lines, self.config['shp_unique_ID'], aadt_names, crs)
+        edges, lines_merged = merge_lines_shpfiles(lines, self.file_id, aadt_names, crs)
         logging.info("Function [merge_lines_shpfiles]: executed with properties {}".format(list(edges.columns)))
 
-        edges, id_name = gdf_check_create_unique_ids(edges, self.config['shp_unique_ID'])
+        edges, id_name = gdf_check_create_unique_ids(edges, self.file_id)
 
-        if 'data_manipulation' in self.config:
-            if self.config['data_manipulation'] == 'snapping':
-                edges = snap_endpoints_lines(edges, self.config['snapping_threshold'], id_name, tolerance=1e-7)
-                logging.info("Function [snap_endpoints_lines]: executed with threshold = {}".format(self.config['snapping_threshold']))
+        if self.snapping is not None or self.pruning is not None:
+            if self.snapping is not None:
+                edges = snap_endpoints_lines(edges, self.snapping, id_name, tolerance=1e-7)
+                logging.info("Function [snap_endpoints_lines]: executed with threshold = {}".format(self.snapping))
 
         # merge merged lines if there are any merged lines
         if not lines_merged.empty:
             # save the merged lines to a shapefile - CHECK if there are lines merged that should not be merged (e.g. main + secondary road)
-            lines_merged.to_file(os.path.join(self.config["output"], "{}_lines_that_merged.shp".format(self.config['analysis_name'])))
-            logging.info(
-                "Function [edges_to_shp]: saved at {}".format(
-                    os.path.join(self.config["output"], "{}_lines_that_merged".format(self.config['analysis_name']))))
+            lines_merged.to_file(os.path.join(self.output_path, "{}_lines_that_merged.shp".format(self.name)))
+            logging.info("Function [edges_to_shp]: saved at ".format(os.path.join(self.output_path, '{}_lines_that_merged'.format(self.name))))
+
 
         # Get the unique points at the end of lines and at intersections to create nodes
         nodes = create_nodes(edges, crs)
         logging.info("Function [create_nodes]: executed")
 
-        if 'data_manipulation' in self.config:
-            if self.config['data_manipulation'] == 'snapping':
+        if self.snapping is not None or self.pruning is not None:
+            if self.snapping is not None:
                 # merged lines may be updated when new nodes are created which makes a line cut in two
                 edges = cut_lines(edges, nodes, id_name, tolerance=1e-4)
                 nodes = create_nodes(edges, crs)
@@ -85,28 +88,26 @@ class Network:
 
         # create tuples from the adjecent nodes and add as column in geodataframe
         resulting_network = join_nodes_edges(nodes, edges, id_name)
-        logging.info("Function [join_nodes_edges]: executed")
         resulting_network.crs = {'init': 'epsg:{}'.format(crs)}  # set the right CRS
 
         # Save geodataframe of the resulting network to
         resulting_network.to_pickle(
-            os.path.join(self.config["output"], '{}_gdf.pkl'.format(self.config['analysis_name'])))
-        print("Saved network to pickle in {}".format(
-            os.path.join(self.config["output"], '{}_gdf.pkl'.format(self.config['analysis_name']))))
+            os.path.join(self.output_path, '{}_gdf.pkl'.format(self.name)))
+        logging.info("Saved network to pickle in ".format(os.path.join(self.output_path, '{}_gdf.pkl'.format(self.name))))
+
+
 
         # Create networkx graph from geodataframe
         G = graph_from_gdf(resulting_network, nodes)
-        logging.info(
-            "Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(self.config['analysis_name']))
+        logging.info("Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(self.name))
 
         # Save graph to gpickle to use later for analysis
-        nx.write_gpickle(G, os.path.join(self.config["output"], '{}_graph.gpickle'.format(self.config['analysis_name'])), protocol=4)
-        print("Saved graph to pickle in {}".format(
-            os.path.join(self.config["output"], '{}_graph.gpickle'.format(self.config['analysis_name']))))
+        nx.write_gpickle(G, os.path.join(self.output_path, '{}_graph.gpickle'.format(self.name)), protocol=4)
+        logging.info("Saved graph to pickle in {}".format(os.path.join(self.output_path, '{}_graph.gpickle'.format(self.name))))
 
         # Save graph to shapefile for visual inspection
-        graph_to_shp(G, os.path.join(self.config["output"], '{}_edges.shp'.format(self.config['analysis_name'])),
-                     os.path.join(self.config["output"], '{}_nodes.shp'.format(self.config['analysis_name'])))
+        graph_to_shp(G, os.path.join(self.output_path, '{}_edges.shp'.format(self.name)),
+                     os.path.join(self.output_path, '{}_nodes.shp'.format(self.name)))
 
         return G, resulting_network
 
@@ -150,7 +151,7 @@ class Network:
             for line in lines.loc[lines['geometry'].apply(lambda row: isinstance(row, MultiLineString))].iterrows():
                 if len(linemerge(line[1].geometry)) > 1:
                     warnings.warn("Edge with {} = {} is a MultiLineString, which cannot be merged to one line. Check this part.".format(
-                            idName, line[1][idName]))
+                            self.file_id, line[1][self.file_id]))
 
         print('Shapefile(s) loaded with attributes: {}.'.format(list(lines.columns.values)))  # fill in parameter names
 
@@ -242,7 +243,6 @@ class Network:
                 logging.info(f"Saved {name + '_origins_destinations.shp'} in {self.config['output'] / od_analysis['analysis']}.")
 
             G = add_od_nodes(G, ods, id_name='unique_fid')
-
             graphs[od_analysis['name'].replace(' ', '_')] = G
 
         return graphs
