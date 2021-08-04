@@ -12,6 +12,8 @@ from ast import literal_eval
 import codecs
 import logging
 
+list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination', 'multi_link_origin_destination']
+
 
 def parse_config(path=None, opt_cli=None):
     """Ajusted from HydroMT
@@ -107,7 +109,7 @@ def configure_analyses(config):
                 (config['direct']).append(config[a])
             else:
                 config['direct'] = [config[a]]
-        elif any(t in config[a]['analysis'] for t in ['single_link_redundancy', 'multi_link_redundancy', 'multi_link_origin_destination']):
+        elif any(t in config[a]['analysis'] for t in list_indirect_analyses):
             if 'indirect' in config:
                 (config['indirect']).append(config[a])
             else:

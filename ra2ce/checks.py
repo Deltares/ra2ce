@@ -8,6 +8,9 @@ Created on 26-7-2021
 from pathlib import Path
 import logging
 
+list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination', 'multi_link_origin_destination']
+list_direct_analyses = ['direct']
+
 
 def input_validation(config):
     """ Check if input properties are correct and exist"""
@@ -24,6 +27,7 @@ def input_validation(config):
     # check if properties have correct input
     # TODO: Decide whether also the non-used properties must be checked or those are not checked
     # TODO: Decide how to check for multiple analyses (analysis1, analysis2, etc)
+    list_analyses = list_direct_analyses + list_indirect_analyses
     check_answer = {'source': ['OSM PBF', 'OSM download', 'shapefile', 'pickle'],
                     'polygon': ['link', 'none'],
                     'directed': ['true', 'false'],
@@ -34,9 +38,10 @@ def input_validation(config):
                     'destinations': ['link', 'none'],
                     'save_shp': ['true', 'false'],
                     'save_csv': ['true', 'false'],
-                    'analysis': ['direct', 'single_link_redundancy', 'multi_link_redundancy', 'multi_link_origin_destination'],
+                    'analysis': list_analyses,
                     'hazard_map': ['link', 'none'],
-                    'aggregate_wl': ['max', 'min', 'mean']}
+                    'aggregate_wl': ['max', 'min', 'mean'],
+                    'weighing': ['distance', 'time']}
     input_dirs = {'polygon': 'static/network', 'hazard_map': 'static/hazard', 'origins': 'static/network',
                   'destinations': 'static/network'}
 
