@@ -18,7 +18,7 @@ from analyses.indirect import analyses_indirect
 def main():
     # Find the settings.ini file,
     root_path = Path(__file__).resolve().parent.parent
-    setting_file = root_path / "data\\test_shp\settings.ini"
+    setting_file = root_path / "settings.ini"
 
     # Read the configurations in settings.ini and add the root path to the configuration dictionary.
     config = parse_config(path=setting_file)

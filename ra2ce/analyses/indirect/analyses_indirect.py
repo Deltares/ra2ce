@@ -152,16 +152,17 @@ class IndirectAnalyses:
 
     def optimal_route_origin_destination(self, analysis):
         # Calculate the preferred routes
-        optimal_routes = optimal_routes_od(G, weighing, id_name, ods, crs, InputDict, shortest_route=True,
-                                          save_shp=True, save_pickle=False,
-                                          file_output=InputDict['output'], name=InputDict['analysis_name'])
+        name = analysis['name'].replace(' ', '_')
+
         # dataframe to save the preferred routes
         pref_routes = gpd.GeoDataFrame(columns=['o_node', 'd_node', 'origin', 'destination',
                                                 'pref_path', analysis['weighing'], 'match_ids', 'geometry'],
                                        geometry='geometry', crs='epsg:4326')
 
         # create list of origin-destination pairs
-        self.config['output'] / od_analysis['analysis'] / (name + '_origins_destinations.p')
+        od_path = self.config['output'] / analysis['analysis'] / (name + '_origins_destinations.feather')
+        od = gpd.read_feather(od_path)
+        od.rename(columns={'geometry': 'OD'}, inplace=True)
         od = od.replace('nan', np.nan)
         od_pairs = [(a, b) for a in od.loc[od['o_id'].notnull(), 'o_id'] for b in od.loc[od['d_id'].notnull(), 'd_id']]
         all_nodes = [(n, v['od_id']) for n, v in self.g.nodes(data=True) if 'od_id' in v]
@@ -172,7 +173,6 @@ class IndirectAnalyses:
                              [(n, n_name) for n, n_name in all_nodes if (n_name == bb) | (bb in n_name)][0]))
 
         # create the routes between all OD pairs
-        i = 0
         for o, d in tqdm(od_nodes):
             if nx.has_path(self.g, o[0], d[0]):
                 # calculate the length of the preferred route
@@ -193,8 +193,8 @@ class IndirectAnalyses:
                         pref_edges.append(self.g[u][v][edge_key]['geometry'])
                     else:
                         pref_edges.append(LineString([self.g.nodes[u]['geometry'], self.g.nodes[v]['geometry']]))
-                    if idName in self.g[u][v][edge_key]:
-                        match_list.append(self.g[u][v][edge_key][idName])
+                    if 'unique_fid' in self.g[u][v][edge_key]:
+                        match_list.append(self.g[u][v][edge_key]['unique_fid'])
 
                 # compile the road segments into one geometry
                 pref_edges = MultiLineString(pref_edges)
@@ -202,44 +202,11 @@ class IndirectAnalyses:
                                                   'destination': d[1], 'pref_path': pref_nodes,
                                                   analysis['weighing']: pref_route, 'match_ids': match_list,
                                                   'geometry': pref_edges}, ignore_index=True)
-                i = i + 1
 
         # if shortest_route:
         #     pref_routes = pref_routes.loc[pref_routes.sort_values(analysis['weighing']).groupby('o_node').head(3).index]
 
-        # intersect the origin and destination nodes with the hazard map (now only geotiff possible)
-        pref_routes['d_disrupt'] = None
-        pref_routes['o_disrupt'] = None
-        pref_routes['d_{}'.format(hazard_data['hazard_attribute_name'][0])] = None
-        pref_routes['o_{}'.format(hazard_data['hazard_attribute_name'][0])] = None
-        src = rasterio.open(hazard_data['hazard_data'][0])
-        for i in range(len(pref_routes.index)):
-            dest = graph.nodes[int(pref_routes.d_node.iloc[i])]['geometry']
-            if (src.bounds.left < dest.coords[0][0] < src.bounds.right) and (
-                    src.bounds.bottom < dest.coords[0][1] < src.bounds.top):
-                hzrd = [x.item(0) for x in src.sample(dest.coords)][0]
-                pref_routes['d_{}'.format(hazard_data['hazard_attribute_name'][0])].iloc[i] = hzrd
-                if hzrd > hazard_data['hazard_threshold']:
-                    pref_routes['d_disrupt'].iloc[i] = 'disrupted'
-                else:
-                    pref_routes['d_disrupt'].iloc[i] = 'not disrupted'
-            else:
-                pref_routes['d_{}'.format(hazard_data['hazard_attribute_name'][0])].iloc[i] = 0
-                pref_routes['d_disrupt'].iloc[i] = 'unknown'
-            orig = graph.nodes[int(pref_routes.o_node.iloc[i])]['geometry']
-            if (src.bounds.left < orig.coords[0][0] < src.bounds.right) and (
-                    src.bounds.bottom < orig.coords[0][1] < src.bounds.top):
-                hzrd = [x.item(0) for x in src.sample(orig.coords)][0]
-                pref_routes['o_{}'.format(hazard_data['hazard_attribute_name'][0])].iloc[i] = hzrd
-                if hzrd > hazard_data['hazard_threshold']:
-                    pref_routes['o_disrupt'].iloc[i] = 'disrupted'
-                else:
-                    pref_routes['o_disrupt'].iloc[i] = 'not disrupted'
-            else:
-                pref_routes['o_{}'.format(hazard_data['hazard_attribute_name'][0])].iloc[i] = 0
-                pref_routes['o_disrupt'].iloc[i] = 'unknown'
-
-        return gpd.GeoDataFrame()
+        return pref_routes
 
     def multi_link_origin_destination(self, analysis):
         return gpd.GeoDataFrame()

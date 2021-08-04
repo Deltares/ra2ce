@@ -230,15 +230,15 @@ class Network:
                                 od_analysis['id_name_origin_destination'], 'epsg:4326')  # TODO: decide if change CRS to flexible instead of just epsg:4326
 
             ods = create_OD_pairs(ods, G, id_name='unique_fid')
+            ods.crs = 'epsg:4326'  # TODO: decide if change CRS to flexible instead of just epsg:4326
 
             # Save the OD pairs (GeoDataFrame) as pickle
-            with open(str(self.config['output'] / od_analysis['analysis'] / (name + '_origins_destinations.p')), 'wb') as handle:
-                pickle.dump(ods, handle)
-            logging.info(f"Saved {name + '_origins_destinations.p'} in {self.config['output'] / od_analysis['analysis']}.")
+            ods.to_feather(self.config['output'] / od_analysis['analysis'] / (name + '_origins_destinations.feather'), index=False)
+            logging.info(f"Saved {name + '_origins_destinations.feather'} in {self.config['output'] / od_analysis['analysis']}.")
 
             # Save the OD pairs (GeoDataFrame) as shapefile
             if od_analysis['save_shp'] == 'true':
-                ods.to_file(self.config['static'] / od_analysis['analysis'] / (name + '_origins_destinations.shp'))
+                ods.to_file(self.config['output'] / od_analysis['analysis'] / (name + '_origins_destinations.shp'))
                 logging.info(f"Saved {name + '_origins_destinations.shp'} in {self.config['output'] / od_analysis['analysis']}.")
 
             G = add_od_nodes(G, ods, id_name='unique_fid')
@@ -252,10 +252,8 @@ class Network:
         if type(to_save) == gpd.GeoDataFrame:
             # The file that needs to be saved is a geodataframe
             if 'pickle' in types:
-                with open(str(self.config['static'] / 'output_graph' / (name + '_base_network.p')), 'wb') as handle:
-                    pickle.dump(to_save, handle)
-
-                logging.info(f"Saved {name + '_base_network.p'} in {self.config['static'] / 'output_graph'}.")
+                to_save.to_feather(self.config['static'] / 'output_graph' / (name + '_base_network.feather'), index=False)
+                logging.info(f"Saved {name + '_base_network.feather'} in {self.config['static'] / 'output_graph'}.")
             if 'shp' in types:
                 to_save.to_file(self.config['static'] / 'output_graph' / (name + '_base_network.shp'))
                 logging.info(f"Saved {name + '_base_network.shp'} in {self.config['static'] / 'output_graph'}.")
