@@ -776,6 +776,8 @@ def join_nodes_edges(gdf_nodes, gdf_edges, idName):
         to_drop = result.columns[result.isnull().all()]
         result.drop(to_drop, axis=1, inplace=True)
 
+    logging.info("Function [join_nodes_edges]: executed")
+
     return result
 
 
@@ -883,17 +885,17 @@ def graph_to_shp(G, edge_shp, node_shp):
     edges.to_file(edge_shp, driver='ESRI Shapefile', encoding='utf-8')
 
 
-def gdf_check_create_unique_ids(gdf, idName):
+def gdf_check_create_unique_ids(gdf, id_name):
     # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
-    if len(gdf[idName].unique()) < len(gdf.index):
+    check=gdf.index
+    if len(gdf[id_name].unique()) < len(gdf.index):
         new_id_name = 'fid'
-        gdf[new_id_name] = list(range(gdf.index))
-        print(
-            "Added a new unique identifier field {} because the original field '{}' did not contain unique values per road segment.".format(
-                new_id_name, idName))
+        gdf[new_id_name] = list(gdf.index)
+        print("Added a new unique identifier field {} because the original field '{}' "
+              "did not contain unique values per road segment.".format(new_id_name, id_name))
         return gdf, new_id_name
     else:
-        return gdf, idName
+        return gdf, id_name
 
 
 def graph_check_create_unique_ids(graph, idName):
