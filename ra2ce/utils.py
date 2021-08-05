@@ -16,12 +16,12 @@ import geojson
 list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination', 'multi_link_origin_destination']
 
 
-def parse_config(path=None, opt_cli=None):
+def parse_config(root, path=None, opt_cli=None):
     """Ajusted from HydroMT
     source: https://github.com/Deltares/hydromt/blob/af4e5d858b0ac0883719ca59e522053053c21b82/hydromt/cli/cli_utils.py"""
     opt = {}
     if path is not None and path.is_file():
-        opt = configread(path, abs_path=False)  # Set from True to False 29-7-2021 by Frederique
+        opt = configread(path, root, abs_path=False)  # Set from True to False 29-7-2021 by Frederique
         # make sure paths in config section are not abs paths
         if "setup_config" in opt: # BELOW IS CURRENTLY NOT USED IN RA2CE BUT COULD BE GOOD FOR FUTURE LINKAGE WITH HYDROMT
             opt["setup_config"].update(configread(path).get("config", {}))
@@ -42,7 +42,7 @@ def parse_config(path=None, opt_cli=None):
     return opt
 
 
-def configread(config_fn, encoding="utf-8", cf=None, defaults=dict(), noheader=False, abs_path=False):
+def configread(config_fn, root, encoding="utf-8", cf=None, defaults=dict(), noheader=False, abs_path=False):
     """read model configuration from file and parse to dictionary
 
     Ajusted from HydroMT
@@ -77,6 +77,7 @@ def configread(config_fn, encoding="utf-8", cf=None, defaults=dict(), noheader=F
         cfdict[section].update(**sdict)
     if noheader and "dummy" in cfdict:
         cfdict = cfdict["dummy"]
+
     return cfdict
 
 
