@@ -6,7 +6,11 @@ Created on 26-7-2021
 """
 
 # external modules
-import pickle
+from osgeo import gdal
+import numpy as np
+import time
+
+# local modules
 from .networks_utils import *
 
 
@@ -346,61 +350,71 @@ class Hazard:
 
     def overlay_hazard_raster(self, hf):
         """Overlays the hazard raster over the road segments."""
-        # GeoTIFF
-        import rasterio
-        src = rasterio.open(hf)
-
+        # TODO differentiate between graph and geodataframe input
         # Name the attribute name the name of the hazard file
-        hn = hf.stem
+        hazard_names = [f.stem for f in hf]
 
-        # check which road is overlapping with the flood and append the flood depth to the graph
-        for u, v, k, edata in self.g.edges.data(keys=True):
-            if 'geometry' in edata:
-                # check how long the road stretch is and make a point every other meter
-                nr_points = round(edata['length'])
-                if nr_points == 1:
-                    coords_to_check = list(edata['geometry'].boundary)
-                else:
-                    coords_to_check = [edata['geometry'].interpolate(i / float(nr_points - 1), normalized=True) for
-                                       i in range(nr_points)]
-                crds = []
-                for c in coords_to_check:
-                    # check if part of the linestring is inside the flood extent
-                    if (src.bounds.left < c.coords[0][0] < src.bounds.right) and (
-                            src.bounds.bottom < c.coords[0][1] < src.bounds.top):
-                        crds.append(c.coords[0])
-                if crds:
-                    # the road lays inside the flood extent
-                    if self.aggregate_wl == 'max':
-                        if (max([x.item(0) for x in src.sample(crds)]) > 999999) | (
-                                max([x.item(0) for x in src.sample(crds)]) < -999999):
-                            # the road is most probably in the 'no data' area of the raster (usually a very large or small number is used as 'no data' value)
-                            self.g[u][v][k][hn] = 0
-                        else:
-                            self.g[u][v][k][hn] = max([x.item(0) for x in src.sample(crds)])
-                    elif self.aggregate_wl == 'min':
-                        if (min([x.item(0) for x in src.sample(crds)]) > 999999) | (
-                                min([x.item(0) for x in src.sample(crds)]) < -999999):
-                            # the road is most probably in the 'no data' area of the raster (usually a very large or small number is used as 'no data' value)
-                            self.g[u][v][k][hn] = 0
-                        else:
-                            self.g[u][v][k][hn] = min([x.item(0) for x in src.sample(crds)])
-                    elif self.aggregate_wl == 'mean':
-                        if (mean([x.item(0) for x in src.sample(crds)]) > 999999) | (
-                                mean([x.item(0) for x in src.sample(crds)]) < -999999):
-                            # the road is most probably in the 'no data' area of the raster (usually a very large or small number is used as 'no data' value)
-                            self.g[u][v][k][hn] = 0
-                        else:
-                            self.g[u][v][k][hn] = mean([x.item(0) for x in src.sample(crds)])
+        # Check if the extent and resolution of the different hazard maps are the same.
+        same_extent = check_hazard_extent_resolution(hf)
+        if same_extent:
+            extent = get_extent(gdal.Open(str(hf[0])))
+            logging.info("The flood maps have the same extent. Flood maps used: {}".format(", ".join(hazard_names)))
+
+        for i, hn in enumerate(hazard_names):
+            src = gdal.Open(str(hf[i]))
+            if not same_extent:
+                extent = get_extent(src)
+            raster_band = src.GetRasterBand(1)
+
+            try:
+                raster = raster_band.ReadAsArray()
+                size_array = raster.shape
+                logging.info("Getting water depth or surface water elevation values from {}".format(hn))
+            except MemoryError as e:
+                logging.warning(
+                    "The raster is too large to read as a whole and will be sampled point by point. MemoryError: {}".format(
+                        e))
+                size_array = None
+                nodatavalue = raster_band.GetNoDataValue()
+
+            # check which road is overlapping with the flood and append the flood depth to the graph
+            for u, v, k, edata in self.g.edges.data(keys=True):
+                if 'geometry' in edata:
+                    # check how long the road stretch is and make a point every other meter
+                    nr_points = round(edata['length'])
+                    if nr_points == 1:
+                        coords_to_check = list(edata['geometry'].boundary)
                     else:
-                        logging.warning("No aggregation method is chosen ('max', 'min' or 'mean).")
-                else:
-                    self.g[u][v][k][hn] = 0
-            else:
-                self.g[u][v][k][hn] = 0
+                        coords_to_check = [edata['geometry'].interpolate(i / float(nr_points - 1), normalized=True) for
+                                           i in range(nr_points)]
+
+                    x_objects = np.array([c.coords[0][0] for c in coords_to_check])
+                    y_objects = np.array([c.coords[0][1] for c in coords_to_check])
+
+                    if size_array:
+                        # Fastest method but be aware of out of memory errors!
+                        water_level = sample_raster_full(raster, x_objects, y_objects, size_array, extent)
+                    else:
+                        # Slower method but no issues with memory errors
+                        water_level = sample_raster(raster_band, nodatavalue, x_objects, y_objects, extent['minX'], extent['pixelWidth'], extent['maxY'], extent['pixelHeight'])
+
+                    print(edata['unique_fid'])
+                    if len(water_level) > 0:
+                        if self.aggregate_wl == 'max':
+                            self.g[u][v][k][hn] = water_level.max()
+                        elif self.aggregate_wl == 'min':
+                            self.g[u][v][k][hn] = water_level.min()
+                        elif self.aggregate_wl == 'mean':
+                            self.g[u][v][k][hn] = mean(water_level)
+                        else:
+                            logging.warning("No aggregation method is chosen ('max', 'min' or 'mean).")
+                    else:
+                        self.g[u][v][k][hn] = np.nan
 
     def overlay_hazard_shp(self, hf):
         """Overlays the hazard shapefile over the road segments."""
+        #TODO differentiate between graph and geodataframe input
+
         # Shapefile
         gdf = gpd.read_file(hf)
         spatial_index = gdf.sindex
@@ -427,15 +441,91 @@ class Hazard:
 
     def join_hazard_table(self):
         """Joins a table with IDs and hazard information with the road segments with corresponding IDs."""
+        # TODO differentiate between graph and geodataframe input
         return
 
     def hazard_intersect(self):
-        for hf in self.list_hazard_files:
-            if hf.suffix == '.tif':
-                self.overlay_hazard_raster(hf)
-            elif hf.suffix == '.shp':
-                self.overlay_hazard_shp(hf)
-            elif hf.suffix in ['.csv', '.json']:
-                self.join_hazard_table(hf)
+        hazards_tif = [haz for haz in self.list_hazard_files if haz.suffix == '.tif']
+        hazards_shp = [haz for haz in self.list_hazard_files if haz.suffix == '.shp']
+        hazards_table = [haz for haz in self.list_hazard_files if haz.suffix in ['.csv', '.json']]
+
+        if len(hazards_tif) > 0:
+            start = time.time()
+            self.overlay_hazard_raster(hazards_tif)
+            end = time.time()
+            print(end - start)
+        elif len(hazards_shp) > 0:
+            self.overlay_hazard_shp(hazards_shp)
+        elif len(hazards_table) > 0:
+            self.join_hazard_table(hazards_table)
 
         return self.g
+
+
+def check_hazard_extent_resolution(list_hazards):
+    if len(list_hazards) == 1:
+        return True
+    check_hazard_extent = [gdal.Open(str(haz)).GetGeoTransform() for haz in list_hazards]
+    if len(set(check_hazard_extent)) == 1:
+        # All hazard have the exact same extents and resolution
+        return True
+    else:
+        return False
+
+
+def get_extent(dataset):
+    cols = dataset.RasterXSize
+    rows = dataset.RasterYSize
+    transform = dataset.GetGeoTransform()
+    minx = transform[0]
+    maxx = transform[0] + cols * transform[1] + rows * transform[2]
+
+    miny = transform[3] + cols * transform[4] + rows * transform[5]
+    maxy = transform[3]
+
+    width = maxx - minx
+    height = maxy - miny
+
+    return {"minX": minx, "maxX": maxx, "minY": miny, "maxY": maxy, "cols": cols, "rows": rows,
+            "width": width, "height": height, "pixelWidth": transform[1], "pixelHeight": transform[5]}
+
+
+def sample_raster_full(raster, x_objects, y_objects, size_array, extent):
+    index_x_objects = np.int64(np.floor((x_objects - extent['minX']) / extent['pixelWidth']))
+    index_y_objects = np.int64(np.floor((y_objects - extent['maxY']) / extent['pixelHeight']))
+
+    fltr = np.logical_and(index_x_objects < size_array[1], index_y_objects < size_array[0])
+    index_x_objects = index_x_objects[fltr]
+    index_y_objects = index_y_objects[fltr]
+
+    water_level = raster[tuple([index_y_objects, index_x_objects])]
+    return water_level
+
+
+def find_cell(x_y_coord, ll_corner, x_y_res):
+    return np.int64(np.floor((x_y_coord - ll_corner) / x_y_res))
+
+
+def find_cell_array_y(y_coord, ul_corner, y_res):
+    return np.int64(np.floor((ul_corner - y_coord) / y_res))
+
+
+def sample_raster(raster_band, nodatavalue, x_obj, y_obj, ulx, xres, uly, yres):
+    water_levels = list()
+    for x, y in zip(x_obj, y_obj):
+        index_x_objects = find_cell(x, ulx, xres)
+        index_y_objects = find_cell_array_y(y, uly, -yres)
+
+        try:
+            # It's possible that a part of some of the polygons is outside of the hazard extent.
+            value = raster_band.ReadAsArray(index_x_objects, index_y_objects, 1, 1)
+            if value[0, 0] == nodatavalue:
+                water_levels.append(0)
+            else:
+                water_levels.append(value[0, 0])
+        except TypeError as e:
+            # The polygon that is partially outside of the hazard extent is skipped.
+            logging.info(e)
+            water_levels.append(0)
+
+    return np.array(water_levels)
