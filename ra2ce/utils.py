@@ -4,14 +4,17 @@ Created on 26-7-2021
 
 @author: F.C. de Groen, Deltares
 """
-
+# External modules
 from configparser import ConfigParser
 from pathlib import Path
 import numpy as np
 from ast import literal_eval
 import codecs
 import logging
-import geojson
+from shutil import copyfile
+
+# Local modules
+from .checks import input_validation
 
 list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination', 'multi_link_origin_destination']
 
@@ -120,3 +123,23 @@ def configure_analyses(config):
 
     return config
 
+
+def load_config(root_path, config_type):
+    # Read the configurations in network.ini and add the root path to the configuration dictionary.
+    settings = root_path / "{}.ini".format(config_type)
+    config = parse_config(root_path, path=settings)
+    config['root_path'] = root_path
+
+    # Validate the configuration input.
+    config = input_validation(config)
+
+    if config_type == 'analyses':
+        # Create a dictionary with direct and indirect analyses separately.
+        config = configure_analyses(config)
+
+    # Set the output paths in the configuration Dict for ease of saving to those folders.
+    config['input'] = config['root_path'] / 'data' / config['project']['name'] / 'input'
+    config['static'] = config['root_path'] / 'data' / config['project']['name'] / 'static'
+    config['output'] = config['root_path'] / 'data' / config['project']['name'] / 'output'
+    copyfile(settings, config['output'] / '{}.ini'.format(config_type))
+    return config
