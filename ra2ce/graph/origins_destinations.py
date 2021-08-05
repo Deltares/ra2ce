@@ -46,7 +46,7 @@ def read_OD_files(origin_paths, origin_names, destination_paths, destination_nam
     return od
 
 
-def create_OD_pairs(od, graph, id_name):
+def create_OD_pairs(od, graph, id_name='ra2ce_fid'):
     """Get centroids of the selected NUTS-3 regions and gets closest vertice on the road of a graph.
     Args:
         origins [string]: file path of shapefile of the NUTS-3 regions in Europe
@@ -204,7 +204,7 @@ def getKeysByValue(dictOfElements, value):
     return theKey
 
 
-def add_od_nodes(graph, od, id_name):
+def add_od_nodes(graph, od, id_name='ra2ce_fid'):
     """From a geodataframe of vertices on a graph, adds nodes on that graph.
     Args:
         graph [networkX graph]: graph of the roads of a or multiple European countries
