@@ -30,7 +30,7 @@ def main():
     config_analyses['root_path'] = root_path
 
     # Initiate the log file, save in the output folder.
-    initiate_root_logger(str(config_analyses['root_path'] / 'data' / config_analyses['project']['name'] / 'output' / 'RA2CE.log'))
+    initiate_root_logger(str(config_network['root_path'] / 'data' / config_network['project']['name'] / 'output' / 'RA2CE.log'))
 
     # Validate the configuration input.
     config_network = input_validation(config_network)
