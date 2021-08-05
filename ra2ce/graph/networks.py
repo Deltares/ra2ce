@@ -18,6 +18,7 @@ class Network:
     def __init__(self, config):
         self.config = config
         self.network_config = config['network']
+        self.source = config['network']['source']
         self.save_shp = config['network']['save_shp']
         self.primary_files = config['network']['primary_file']
         self.diversion_files = config['network']['diversion_file']
@@ -41,6 +42,7 @@ class Network:
         Returns:
             G (networkX graph): The resulting network graph
         """
+
 
         lines = self.read_merge_shp()
         logging.info("Function [read_merge_shp]: executed with {} {}".format(self.primary_files, self.diversion_files))
@@ -90,11 +92,8 @@ class Network:
         graph_complex = graph_from_gdf(edges_complex, nodes)
         logging.info("Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(self.name))
 
-        # Create 'graph_simple'
-        graph_simple = simplify_graph_count(graph_complex)
-        graph_simple = graph_create_unique_ids(graph_simple, 'unique_fid')
-
-        return graph_simple, edges_complex
+        #exporting complex graph because simple graph is not needed.
+        return graph_complex, edges_complex
 
     def read_merge_shp(self, crs_=4326):
         """Imports shapefile(s) and saves attributes in a pandas dataframe.
@@ -191,7 +190,7 @@ class Network:
 
         # Create 'graph_simple'
         graph_simple = simplify_graph_count(graph_complex)
-        graph_simple = graph_create_unique_ids(graph_simple, 'unique_fid')
+        graph_simple = graph_create_unique_ids(graph_simple)
 
         # If the user wants to use undirected graphs, turn into an undirected graph (default).
         if not self.network_config['directed']:
@@ -209,9 +208,10 @@ class Network:
         # Add the origin/destination nodes to the network
         ods = read_OD_files(self.network_config['origins'], self.network_config['origins_names'],
                             self.network_config['destinations'], self.network_config['destinations_names'],
-                            self.network_config['id_name_origin_destination'], 'epsg:4326')  # TODO: decide if change CRS to flexible instead of just epsg:4326
+                            self.network_config['id_name_origin_destination'], 'epsg:4326')
 
-        ods = create_OD_pairs(ods, graph, id_name='unique_fid')
+
+        ods = create_OD_pairs(ods, graph, id_name='ra2ce_fid')
         ods.crs = 'epsg:4326'  # TODO: decide if change CRS to flexible instead of just epsg:4326
 
         # Save the OD pairs (GeoDataFrame) as pickle
@@ -224,7 +224,7 @@ class Network:
             ods.to_file(ods_path, index=False)
             logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
 
-        graph = add_od_nodes(graph, ods, id_name='unique_fid')
+        graph = add_od_nodes(graph, ods, id_name='ra2ce_fid')
 
         return graph
 
@@ -268,16 +268,16 @@ class Network:
             logging.info(f"Existing network found: {base_network_path}.")
         else:
             # Create the network from the network source
-            if self.primary_files == 'shapefile':
+            if self.source == 'shapefile':
                 logging.info('Start creating a network from the submitted shapefile.')
                 base_graph, edge_gdf = self.network_shp()
 
-            elif self.primary_files == 'OSM PBF':
+            elif self.source == 'OSM PBF':
                 logging.info('Start creating a network from an OSM PBF file.')
                 roadTypes = self.network_config['road_types'].lower().replace(' ', ' ').split(',')
                 base_graph, edge_gdf = self.network_osm_pbf()
 
-            elif self.primary_files == 'OSM download':
+            elif self.source == 'OSM download':
                 logging.info('Start downloading a network from OSM.')
                 base_graph, edge_gdf = self.network_osm_download()
 
