@@ -2,6 +2,8 @@
 
 """Tests for `ra2ce` package."""
 
+import pathlib
+
 import pytest
 
 from click.testing import CliRunner
@@ -9,21 +11,24 @@ from click.testing import CliRunner
 from ra2ce import ra2ce
 from ra2ce import cli
 
-
-@pytest.fixture
-def response():
-    """Sample pytest fixture.
-
-    See more at: http://doc.pytest.org/en/latest/fixture.html
-    """
-    # import requests
-    # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
+import pandas as pd
 
 
-def test_content(response):
-    """Sample pytest test function with the pytest fixture as an argument."""
-    # from bs4 import BeautifulSoup
-    # assert 'GitHub' in BeautifulSoup(response.content).title.string
+def lookup_output(case='single_link_redundancy'):
+    """Read an output file"""
+    output_path = pathlib.Path('data/test/output')
+    test_path = output_path / case / f'{case}_test.csv'
+    return pd.read_csv(test_path)
+
+
+@pytest.mark.skip(reason="work in progress")
+def test_output():
+    """Sample pytest test function for output"""
+    case = 'single_link_redundancy'
+    input_path = pathlib.Path('data/test/input') / case / 'network.ini'
+    outputs_run = ra2ce.run(input_path)
+    outputs_correct = lookup_output(case)
+    assert outputs_run == outputs_correct, 'output should  be equal'
 
 
 def test_command_line_interface():
