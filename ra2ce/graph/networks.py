@@ -398,7 +398,6 @@ class Hazard:
                         # Slower method but no issues with memory errors
                         water_level = sample_raster(raster_band, nodatavalue, x_objects, y_objects, extent['minX'], extent['pixelWidth'], extent['maxY'], extent['pixelHeight'])
 
-                    print(edata['unique_fid'])
                     if len(water_level) > 0:
                         if self.aggregate_wl == 'max':
                             self.g[u][v][k][hn] = water_level.max()
