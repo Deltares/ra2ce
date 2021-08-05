@@ -322,6 +322,7 @@ class Network:
                     od_graph_hazard = haz.hazard_intersect()
                     config_analyses['origins_destinations_hazard_graph'] = self.save_network(od_graph_hazard, 'origins_destinations_hazard', types=to_save)
                 else:
+                    logging.warning("No base graph found to intersect the hazard with. Check ")
 
         return config_analyses
 
