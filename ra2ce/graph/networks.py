@@ -83,8 +83,6 @@ class Network:
             os.path.join(self.output_path, '{}_gdf.pkl'.format(self.name)))
         logging.info("Saved network to pickle in ".format(os.path.join(self.output_path, '{}_gdf.pkl'.format(self.name))))
 
-
-
         # Create networkx graph from geodataframe
         G = graph_from_gdf(resulting_network, nodes)
         logging.info("Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(self.name))
@@ -242,6 +240,7 @@ class Network:
                 output_path = self.config['static'] / 'output_graph' / (name + '_network.shp')
                 to_save.to_file(output_path, index=False)
                 logging.info(f"Saved {output_path.stem} in {output_path.resolve().parent}.")
+
         elif type(to_save) == nx.classes.multigraph.MultiGraph:
             # The file that needs to be saved is a graph
             if 'shp' in types:
@@ -263,10 +262,12 @@ class Network:
         if self.primary_files == 'shapefile':
             logging.info('Start creating a network from the submitted shapefile.')
             base_graph, edge_gdf = self.network_shp()
+
         elif self.primary_files == 'OSM PBF':
             logging.info('Start creating a network from an OSM PBF file.')
             roadTypes = self.network_config['road_types'].lower().replace(' ', ' ').split(',')
             base_graph, edge_gdf = self.network_osm_pbf()
+
         elif self.primary_files == 'OSM download':
             logging.info('Start downloading a network from OSM.')
             base_graph, edge_gdf = self.network_osm_download()
