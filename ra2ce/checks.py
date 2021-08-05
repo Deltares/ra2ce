@@ -20,6 +20,10 @@ def input_validation(config):
     check_headers.extend([a for a in config.keys() if 'analysis' in a])
     check_headers.extend([a for a in config.keys() if 'network' in a])
 
+    if 'network' in config.keys():
+        check_shp_input(config['network'])
+
+
     for k in check_headers:
         if k not in config.keys():
             logging.error('Property [ {} ] is not configured. Add property [ {} ] to the settings.ini file. '.format(k, k))
@@ -30,17 +34,17 @@ def input_validation(config):
     # TODO: Decide how to check for multiple analyses (analysis1, analysis2, etc)
     list_analyses = list_direct_analyses + list_indirect_analyses
     check_answer = {'source': ['OSM PBF', 'OSM download', 'shapefile', 'pickle'],
-                    'polygon': ['link', None],
+                    'polygon': ['file', None],
                     'directed': [True, False],
                     'network_type': ['walk', 'bike', 'drive', 'drive_service', 'all'],
                     'road_types': ['motorway', 'motorway_link', 'trunk', 'trunk_link', 'primary', 'primary_link', 'secondary',
                                    'secondary_link', 'tertiary', 'tertiary_link', None],  # TODO: add the lower types as well
-                    'origins': ['link', None],
-                    'destinations': ['link', None],
+                    'origins': ['file', None],
+                    'destinations': ['file', None],
                     'save_shp': [True, False],
                     'save_csv': [True, False],
                     'analysis': list_analyses,
-                    'hazard_map': ['link', None],
+                    'hazard_map': ['file', None],
                     'aggregate_wl': ['max', 'min', 'mean'],
                     'weighing': ['distance', 'time']}
     input_dirs = {'polygon': 'static/network', 'hazard_map': 'static/hazard', 'origins': 'static/network',
@@ -53,7 +57,7 @@ def input_validation(config):
             # Now check the parameters per configured item.
             for item in config[key]:
                 if item in check_answer:
-                    if ('link' in check_answer[item]) and (config[key][item] is not None):
+                    if ('file' in check_answer[item]) and (config[key][item] is not None):
                         # Check if the path is an absolute path or a file name that is placed in the right folder
                         config[key][item], error = check_paths(config, key, item, input_dirs, error)
                         continue
@@ -97,3 +101,10 @@ def check_paths(config, key, item, input_dirs, error):
         else:
             list_paths.append(p)
     return list_paths, error
+
+
+def check_shp_input(config):
+    """Checks if a file id is configured when using the option to create network from shapefile """
+    if config['source'] == 'shapefile' and config['file_id'] == None:
+        logging.error('Not possible to create network - Shapefile used as source, but no file_id configured in .ini file')
+        quit()

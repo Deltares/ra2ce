@@ -835,11 +835,10 @@ def delete_duplicates(all_points):
     return uniquepoints
 
 
-def gdf_check_create_unique_ids(gdf, id_name):
+def gdf_check_create_unique_ids(gdf, id_name, new_id_name='ra2ce_fid'):
     # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
     check=gdf.index
     if len(gdf[id_name].unique()) < len(gdf.index):
-        new_id_name = 'fid'
         gdf[new_id_name] = list(gdf.index)
         print("Added a new unique identifier field {} because the original field '{}' "
               "did not contain unique values per road segment.".format(new_id_name, id_name))
@@ -848,23 +847,23 @@ def gdf_check_create_unique_ids(gdf, id_name):
         return gdf, id_name
 
 
-def graph_check_create_unique_ids(graph, idName):
+def graph_check_create_unique_ids(graph, idname, new_id_name='ra2ce_fid'):
     # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
-    if len(set([str(e[-1][idName]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
-        new_id_name = 'fid'
+    if len(set([str(e[-1][idname]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
+
         i = 0
         for u, v, k in graph.edges(keys=True):
             graph[u][v][k][new_id_name] = i
             i += 1
         print(
             "Added a new unique identifier field {} because the original field '{}' did not contain unique values per road segment.".format(
-                new_id_name, idName))
+                new_id_name, idname))
         return graph, new_id_name
     else:
-        return graph, idName
+        return graph, idname
 
 
-def graph_create_unique_ids(graph, new_id_name):
+def graph_create_unique_ids(graph, new_id_name='ra2ce_fid'):
     # Check if new_id_name exists and if unique
     u, v, k = list(graph.edges)[0]
     if new_id_name not in graph.edges[u, v, k]:
