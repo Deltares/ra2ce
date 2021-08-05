@@ -64,39 +64,6 @@ def main():
     network = Network(config_network)
     config_analyses = network.create(config_analyses)
 
-    # def get_existing_networks(self):
-    #
-    #     # if any('multi_link_origin_destination' in a['analysis'] for a in self.config['indirect']):
-    #     #     # Check which analyses require origin and destination nodes to be added to the graph and which ones already have been created.
-    #     #     use_existing_od = [a for a in self.config['indirect'] if (a['analysis'] in ['optimal_route_origin_destination', 'multi_link_origin_destination']) and ('origins' not in a) and ('destinations' not in a)]
-    #     #     if len(use_existing_od) > 0:
-    #     #         for existing in use_existing_od:
-    #     #             read_existing = self.config['static'] / 'output_graph' / (existing['name'].replace(' ', '_') + '_graph.gpickle')
-    #     #             try:
-    #     #                 graph_dict_indirect[existing['name']] = nx.read_gpickle(read_existing)
-    #     #                 logging.info(f"Existing graph found in {read_existing}.")
-    #     #             except FileNotFoundError as e:
-    #     #                 logging.error(f"The graph cannot be found in {read_existing}.", e)
-    #     #                 exit()
-    #     edges_complex_path = self.network_config['static'] / 'output_graph' / (self.network_name + '_network.p')
-    #     G_simple_path = self.network_config['static'] / 'output_graph' / (self.network_name + '_graph.gpickle')
-    #
-    #     if 'direct' in self.network_config:
-    #         try:
-    #             with open(edges_complex_path, 'rb') as f:
-    #                 edge_gdf = pickle.load(f)
-    #                 logging.info(f"Using an existing network: {self.network_name + '_network.p'}")
-    #         except FileNotFoundError as e:
-    #             logging.error(f"The network cannot be found in {edges_complex_path}.", e)
-    #             exit()
-    #     if 'indirect' in self.network_config:
-    #         try:
-    #             G = nx.read_gpickle(G_simple_path)
-    #             logging.info(f"Using an existing graph: {self.network_name + '_graph.gpickle'}")
-    #         except FileNotFoundError as e:
-    #             logging.error(f"The graph cannot be found in {G_simple_path}.", e)
-    #             exit()
-
     # Do the analyses
     if 'direct' in config_analyses:
         analyses_direct.DirectAnalyses(config_analyses).execute()
