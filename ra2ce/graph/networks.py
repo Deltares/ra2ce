@@ -75,27 +75,23 @@ class Network:
                 logging.info("Function [cut_lines]: executed")
 
         # create tuples from the adjecent nodes and add as column in geodataframe
-        resulting_network = join_nodes_edges(nodes, edges, id_name)
-        resulting_network.crs = {'init': 'epsg:{}'.format(crs)}  # set the right CRS
+        edges_complex = join_nodes_edges(nodes, edges, id_name)
+        edges_complex.crs = {'init': 'epsg:{}'.format(crs)}  # set the right CRS
 
         # Save geodataframe of the resulting network to
-        resulting_network.to_pickle(
+        edges_complex.to_pickle(
             os.path.join(self.output_path, '{}_gdf.pkl'.format(self.name)))
         logging.info("Saved network to pickle in ".format(os.path.join(self.output_path, '{}_gdf.pkl'.format(self.name))))
 
         # Create networkx graph from geodataframe
-        G = graph_from_gdf(resulting_network, nodes)
+        graph_complex = graph_from_gdf(edges_complex, nodes)
         logging.info("Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(self.name))
 
-        # Save graph to gpickle to use later for analysis
-        nx.write_gpickle(G, os.path.join(self.output_path, '{}_graph.gpickle'.format(self.name)), protocol=4)
-        logging.info("Saved graph to pickle in {}".format(os.path.join(self.output_path, '{}_graph.gpickle'.format(self.name))))
+        # Create 'graph_simple'
+        graph_simple = simplify_graph_count(graph_complex)
+        graph_simple = graph_create_unique_ids(graph_simple, 'unique_fid')
 
-        # Save graph to shapefile for visual inspection
-        graph_to_shp(G, os.path.join(self.output_path, '{}_edges.shp'.format(self.name)),
-                     os.path.join(self.output_path, '{}_nodes.shp'.format(self.name)))
-
-        return G, resulting_network
+        return graph_simple, edges_complex
 
     def read_merge_shp(self, crs_=4326):
         """Imports shapefile(s) and saves attributes in a pandas dataframe.
@@ -185,7 +181,8 @@ class Network:
 
         # Create 'edges_complex', convert complex graph to geodataframe
         logging.info('Start converting the graph to a geodataframe')
-        edges_complex, _ = graph_to_gdf(graph_complex)
+        edges_complex, nodes = graph_to_gdf(graph_complex)
+
         # edges_simple, nodes_simple = graph_to_gdf(graph_simple)
         logging.info('Finished converting the graph to a geodataframe')
 
@@ -408,223 +405,3 @@ class Hazard:
                 self.join_hazard_table(hf)
 
         return self.g
-
-
-def graph_create_unique_ids(graph, new_id_name):
-    # Check if new_id_name exists and if unique
-    u, v, k = list(graph.edges)[0]
-    if new_id_name not in graph.edges[u, v, k]:
-        # TODO: decide if we always add a new ID (in iGraph this is different)
-        # if len(set([str(e[-1][new_id_name]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
-        for i, (u, v, k) in enumerate(graph.edges(keys=True)):
-            graph[u][v][k][new_id_name] = i + 1
-        logging.info("Added a new unique identifier field '{}'.".format(new_id_name))
-        return graph
-    else:
-        return graph
-
-
-def add_missing_geoms_graph(graph, geom_name='geometry'):
-    # Not all nodes have geometry attributed (some only x and y coordinates) so add a geometry columns
-    nodes_without_geom = [n[0] for n in graph.nodes(data=True) if geom_name not in n[-1]]
-    for nd in nodes_without_geom:
-        graph.nodes[nd][geom_name] = Point(graph.nodes[nd]['x'], graph.nodes[nd]['y'])
-
-    edges_without_geom = [e for e in graph.edges.data(keys=True) if geom_name not in e[-1]]
-    for ed in edges_without_geom:
-        graph[ed[0]][ed[1]][ed[2]][geom_name] = LineString(
-            [graph.nodes[ed[0]][geom_name], graph.nodes[ed[1]][geom_name]])
-
-    return graph
-
-
-def graph_to_gdf(G, save_nodes=False, save_edges=True, to_save=False):
-    """Takes in a networkx graph object and returns edges and nodes as geodataframes
-    Arguments:
-        G (Graph): networkx graph object to be converted
-
-    Returns:
-        edges (GeoDataFrame) : containes the edges
-        nodes (GeoDataFrame) :
-    """
-
-    nodes, edges = None, None
-
-    if save_nodes and save_edges:
-        nodes, edges = osmnx.graph_to_gdfs(G, nodes=save_nodes, edges=save_edges)
-
-        if to_save:
-            dfs = [edges, nodes]
-            for df in dfs:
-                for col in df.columns:
-                    if df[col].dtype == np_object and col != df.geometry.name:
-                        df[col] = df[col].astype(str)
-
-    elif not save_nodes and save_edges:
-        edges = osmnx.graph_to_gdfs(G, nodes=save_nodes, edges=save_edges)
-    elif save_nodes and not save_edges:
-        nodes = osmnx.graph_to_gdfs(G, nodes=save_nodes, edges=save_edges)
-
-    return edges, nodes
-
-
-def simplify_graph_count(G_complex):
-    # Simplify the graph topology and log the change in nr of nodes and edges.
-    old_len_nodes = G_complex.number_of_nodes()
-    old_len_edges = G_complex.number_of_edges()
-
-    G_simple = simplify_graph(G_complex)
-
-    new_len_nodes = G_simple.number_of_nodes()
-    new_len_edges = G_simple.number_of_edges()
-
-    logging.info(
-        'Graph simplified from {:,} to {:,} nodes and {:,} to {:,} edges.'.format(old_len_nodes, new_len_nodes, old_len_edges, new_len_edges))
-
-    return G_simple
-
-
-def graph_to_shp(G, edge_shp, node_shp):
-    """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_shp and node_shp
-
-    Arguments:
-
-        G []: networkx graph object to be converted
-
-        edge_shp [str]: output path including extension for edges shapefile
-
-        node_shp [str]: output path including extension for nodes shapefile
-
-    Returns:
-
-        None
-
-    """
-
-    # The nodes should have a geometry attribute (perhaps on top of the x and y attributes)
-    nodes, edges = osmnx.graph_to_gdfs(G, node_geometry=False)
-
-    dfs = [edges, nodes]
-    for df in dfs:
-        for col in df.columns:
-            if df[col].dtype == np_object and col != df.geometry.name:
-                df[col] = df[col].astype(str)
-
-    print('\nSaving nodes as shapefile: {}'.format(node_shp))
-    print('\nSaving edges as shapefile: {}'.format(edge_shp))
-
-    nodes.to_file(node_shp, driver='ESRI Shapefile', encoding='utf-8')
-    edges.to_file(edge_shp, driver='ESRI Shapefile', encoding='utf-8')
-
-
-def read_geojson(geojson_file):
-    """Read a GeoJSON file into a GeoJSON object.
-    From the script get_rcm.py from Martijn Kwant.
-    """
-    with open(geojson_file) as f:
-        return geojson.load(f)
-
-
-def geojson_to_shp(geojson_obj, feature_number=0):
-    """Convert a GeoJSON object to a Shapely Polygon.
-    Adjusted from the script get_rcm.py from Martijn Kwant.
-
-    In case of FeatureCollection, only one of the features is used (the first by default).
-    3D points are converted to 2D.
-
-    Parameters
-    ----------
-    geojson_obj : dict
-        a GeoJSON object
-    feature_number : int, optional
-        Feature to extract polygon from (in case of MultiPolygon
-        FeatureCollection), defaults to first Feature
-
-    Returns
-    -------
-    polygon coordinates
-        string of comma separated coordinate tuples (lon, lat) to be used by SentinelAPI
-    """
-    if 'coordinates' in geojson_obj:
-        geometry = geojson_obj
-    elif 'geometry' in geojson_obj:
-        geometry = geojson_obj['geometry']
-    else:
-        geometry = geojson_obj['features'][feature_number]['geometry']
-
-    def ensure_2d(geometry):
-        if isinstance(geometry[0], (list, tuple)):
-            return list(map(ensure_2d, geometry))
-        else:
-            return geometry[:2]
-
-    def check_bounds(geometry):
-        if isinstance(geometry[0], (list, tuple)):
-            return list(map(check_bounds, geometry))
-        else:
-            if geometry[0] > 180 or geometry[0] < -180:
-                raise ValueError('Longitude is out of bounds, check your JSON format or data. The Coordinate Reference System should be in EPSG:4326.')
-            if geometry[1] > 90 or geometry[1] < -90:
-                raise ValueError('Latitude is out of bounds, check your JSON format or data. The Coordinate Reference System should be in EPSG:4326.')
-
-    # Discard z-coordinate, if it exists
-    geometry['coordinates'] = ensure_2d(geometry['coordinates'])
-    check_bounds(geometry['coordinates'])
-
-    # Create a shapely polygon from the coordinates.
-    poly = shape(geometry).buffer(0)
-    return poly
-
-
-def read_merge_shp(shapefileAnalyse,  idName, shapefileDiversion=[], crs_=4326):
-    """Imports shapefile(s) and saves attributes in a pandas dataframe.
-
-    Args:
-        shapefileAnalyse (string or list of strings): absolute path(s) to the shapefile(s) that will be used for analysis
-        shapefileDiversion (string or list of strings): absolute path(s) to the shapefile(s) that will be used to calculate alternative routes but is not analysed
-        idName (string): the name of the Unique ID column
-        crs_ (int): the EPSG number of the coordinate reference system that is used
-    Returns:
-        lines (list of shapely LineStrings): full list of linestrings
-        properties (pandas dataframe): attributes of shapefile(s), in order of the linestrings in lines
-    """
-
-    # convert shapefile names to a list if it was not already a list
-    if isinstance(shapefileAnalyse, str):
-        shapefileAnalyse = [shapefileAnalyse]
-    if isinstance(shapefileDiversion, str):
-        shapefileDiversion = [shapefileDiversion]
-
-    lines = []
-
-    # read the shapefile(s) for analysis
-    for shp in shapefileAnalyse:
-        lines_shp = gpd.read_file(shp)
-        lines_shp['to_analyse'] = 1
-        lines.append(lines_shp)
-
-    # read the shapefile(s) for only diversion
-    if isinstance(shapefileDiversion, list):
-        for shp2 in shapefileDiversion:
-            lines_shp = gpd.read_file(shp2)
-            lines_shp['to_analyse'] = 0
-            lines.append(lines_shp)
-
-    # concatenate all shapefiles into one geodataframe
-    lines = pd.concat(lines)
-    lines.crs = {'init': 'epsg:{}'.format(crs_)}
-
-    # append the length of the road stretches
-    lines['length'] = lines['geometry'].apply(lambda x: line_length(x))
-
-    if lines['geometry'].apply(lambda row: isinstance(row, MultiLineString)).any():
-        for line in lines.loc[lines['geometry'].apply(lambda row: isinstance(row, MultiLineString))].iterrows():
-            if len(linemerge(line[1].geometry)) > 1:
-                warnings.warn(
-                    "Edge with {} = {} is a MultiLineString, which cannot be merged to one line. Check this part.".format(
-                        idName, line[1][idName]))
-
-    print('Shapefile(s) loaded with attributes: {}.'.format(list(lines.columns.values)))  # fill in parameter names
-
-    return lines
-
