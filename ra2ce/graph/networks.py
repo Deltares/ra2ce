@@ -14,6 +14,7 @@ class Network:
     def __init__(self, config):
         self.config = config
         self.network_config = config['network']
+        self.source = config['network']['source']
         self.save_shp = config['network']['save_shp']
         self.primary_files = config['network']['primary_file']
         self.diversion_files = config['network']['diversion_file']
@@ -37,6 +38,7 @@ class Network:
         Returns:
             G (networkX graph): The resulting network graph
         """
+
 
         lines = self.read_merge_shp()
         logging.info("Function [read_merge_shp]: executed with {} {}".format(self.primary_files, self.diversion_files))
@@ -86,11 +88,8 @@ class Network:
         graph_complex = graph_from_gdf(edges_complex, nodes)
         logging.info("Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(self.name))
 
-        # Create 'graph_simple'
-        graph_simple = simplify_graph_count(graph_complex)
-        graph_simple = graph_create_unique_ids(graph_simple, 'unique_fid')
-
-        return graph_simple, edges_complex
+        #exporting complex graph because simple graph is not needed.
+        return graph_complex, edges_complex
 
     def read_merge_shp(self, crs_=4326):
         """Imports shapefile(s) and saves attributes in a pandas dataframe.
@@ -264,16 +263,16 @@ class Network:
             logging.info(f"Existing network found: {base_network_path}.")
         else:
             # Create the network from the network source
-            if self.primary_files == 'shapefile':
+            if self.source == 'shapefile':
                 logging.info('Start creating a network from the submitted shapefile.')
                 base_graph, edge_gdf = self.network_shp()
 
-            elif self.primary_files == 'OSM PBF':
+            elif self.source == 'OSM PBF':
                 logging.info('Start creating a network from an OSM PBF file.')
                 roadTypes = self.network_config['road_types'].lower().replace(' ', ' ').split(',')
                 base_graph, edge_gdf = self.network_osm_pbf()
 
-            elif self.primary_files == 'OSM download':
+            elif self.source == 'OSM download':
                 logging.info('Start downloading a network from OSM.')
                 base_graph, edge_gdf = self.network_osm_download()
 
