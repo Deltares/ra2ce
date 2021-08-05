@@ -251,6 +251,9 @@ class Network:
 
     def create(self, config_analyses):
         """Function with the logic to call the right analyses."""
+        # Save the 'base' network as gpickle and if the user requested, also as shapefile.
+        to_save = ['pickle'] if not self.save_shp else ['pickle', 'shp']
+
         # For all graph and networks - check if it exists, otherwise, make the graph and/or network.
         base_graph_path = self.config['static'] / 'output_graph' / 'base_graph.gpickle'
         base_network_path = self.config['static'] / 'output_graph' / 'base_network.feather'
@@ -273,9 +276,6 @@ class Network:
             elif self.primary_files == 'OSM download':
                 logging.info('Start downloading a network from OSM.')
                 base_graph, edge_gdf = self.network_osm_download()
-
-            # Save the 'base' network as gpickle and if the user requested, also as shapefile.
-            to_save = ['pickle'] if not self.save_shp else ['pickle', 'shp']
 
             # Check if all geometries between nodes are there, if not, add them as a straight line.
             base_graph = add_missing_geoms_graph(base_graph, geom_name='geometry')
