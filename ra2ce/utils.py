@@ -14,7 +14,7 @@ import logging
 from shutil import copyfile
 
 # Local modules
-from .checks import input_validation
+from checks import input_validation
 
 list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination', 'multi_link_origin_destination']
 

@@ -23,8 +23,8 @@ class Network:
         self.primary_files = config['network']['primary_file']
         self.diversion_files = config['network']['diversion_file']
         self.file_id = config['network']['file_id']
-        self.snapping = config['network']['snapping_threshold']
-        self.pruning = config['network']['pruning_threshold']
+        self.snapping = config['cleanup']['snapping_threshold']
+        self.pruning = config['cleanup']['pruning_threshold']
         self.name = config['project']['name']
         self.output_path = config['static'] / "output_graph"
 
@@ -42,7 +42,6 @@ class Network:
         Returns:
             G (networkX graph): The resulting network graph
         """
-
 
         lines = self.read_merge_shp()
         logging.info("Function [read_merge_shp]: executed with {} {}".format(self.primary_files, self.diversion_files))
@@ -92,58 +91,105 @@ class Network:
         graph_complex = graph_from_gdf(edges_complex, nodes)
         logging.info("Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(self.name))
 
-        #exporting complex graph because simple graph is not needed.
+        #exporting complex graph because simple graph is not needed
         return graph_complex, edges_complex
 
-    def read_merge_shp(self, crs_=4326):
-        """Imports shapefile(s) and saves attributes in a pandas dataframe.
-
-        Args:
-            shapefileAnalyse (string or list of strings): absolute path(s) to the shapefile(s) that will be used for analysis
-            shapefileDiversion (string or list of strings): absolute path(s) to the shapefile(s) that will be used to calculate alternative routes but is not analysed
-            idName (string): the name of the Unique ID column
-            crs_ (int): the EPSG number of the coordinate reference system that is used
-        Returns:
-            lines (list of shapely LineStrings): full list of linestrings
-            properties (pandas dataframe): attributes of shapefile(s), in order of the linestrings in lines
-        """
-
-        # read shapefiles and add to list with path
-        if isinstance(self.primary_files, str):
-            shapefiles_analysis = [self.config['static'] / "network" / shp for shp in self.primary_files.split(',')]
-        if isinstance(self.diversion_files, str):
-            shapefiles_diversion = [self.config['static'] / "network" / shp for shp in self.diversion_files.split(',')]
-
-        def read_file(file, analyse=1):
-            """"Set analysis to 1 for main analysis and 0 for diversion network"""
-            shp = gpd.read_file(file)
-            shp['to_analyse'] = analyse
-            return shp
-
-        # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
-        lines = [read_file(shp) for shp in shapefiles_analysis]
-        if isinstance(self.diversion_files, str):
-            [lines.append(read_file(shp, 0)) for shp in shapefiles_diversion]
-        lines = pd.concat(lines)
-
-        lines.crs = {'init': 'epsg:{}'.format(crs_)}
-
-        # append the length of the road stretches
-        lines['length'] = lines['geometry'].apply(lambda x: line_length(x))
-
-        if lines['geometry'].apply(lambda row: isinstance(row, MultiLineString)).any():
-            for line in lines.loc[lines['geometry'].apply(lambda row: isinstance(row, MultiLineString))].iterrows():
-                if len(linemerge(line[1].geometry)) > 1:
-                    warnings.warn("Edge with {} = {} is a MultiLineString, which cannot be merged to one line. Check this part.".format(
-                            self.file_id, line[1][self.file_id]))
-
-        print('Shapefile(s) loaded with attributes: {}.'.format(list(lines.columns.values)))  # fill in parameter names
-
-        return lines
-
     def network_osm_pbf(self):
-        """Creates a network from an OSM PBF file."""
-        return
+        """Creates a network from an OSM PBF file.
+
+        Arguments:
+            *path_to_pbf* (Path) : Path to the osm_dump from which the road network is to be fetched
+            *road_types* (list of strings) : The road types to fetch from the dump e.g. ['motorway', 'motorway_link']
+            *save_files* (Path): Path where the output should be saved. Default: None
+            *segmentation* (float): define lenghts of the cut segments. Default: None
+            *save_shapes* (Path): Folder path where shapefiles should be saved. Default: None
+
+        Returns:
+            G_simple (Graph) : Simplified graph (for use in the indirect analyses)
+            G_complex_edges (GeoDataFrame : Complex graph (for use in the direct analyses)
+
+        """
+        roadTypes = self.network_config['road_types'].lower().replace(' ', ' ').split(',')
+
+        input_path = self.config['static'] / "network"
+        osm_convert_exe = self.config['root_path'] / "executables" / 'osmconvert64.exe'
+        osm_filter_exe = self.config['root_path'] / "executables" / 'osmfilter.exe'
+        assert osm_convert_exe.exists() and osm_filter_exe.exists()
+
+        pbf_file = input_path / self.primary_files
+        o5m_path = str(pbf_file).replace('.pbf', '.o5m')
+        o5m_filtered_path = str(pbf_file).replace('.pbf', '_filtered.o5m')
+        o5m_path = Path(str(os.path.splitext(os.path.splitext(InputDict["name_of_pbf"])[0])[0]) + '.o5m')
+        # Prepare the making of a new o5m in the same folder as the pbf
+        o5m_filtered_path = Path(str(os.path.splitext(os.path.splitext(InputDict["name_of_pbf"])[0])[0]) + '_filtered.o5m')
+
+        # CONVERT FROM PBF TO O5M
+        if not o5m_path.exists():
+            assert not o5m_filtered_path.exists()
+            print('Start conversion from pbf to o5m')
+            convert_osm(osm_convert_exe, InputDict["name_of_pbf"], o5m_path)
+            print('Converted osm.pbf to o5m, created: {}'.format(o5m_path))
+        else:
+            print('O5m path already exists, uses the existing one!: {}'.format(o5m_path))
+
+        if not o5m_filtered_path.exists():
+            print('Start filtering')
+            filter_osm(osm_filter_exe, o5m_path, o5m_filtered_path, tags=road_types)
+            print('Filtering finished')
+        else:
+            print('filtered o5m path already exists: {}'.format(o5m_filtered_path))
+
+        assert o5m_path.exists() and o5m_filtered_path.exists()
+
+        G_complex, G_simple, ID_tables = graphs_from_o5m(o5m_filtered_path, save_shapes=save_shapes, bidirectional=False,
+                                                         simplify=simplify,
+                                                         retain_all=False)
+
+        # CONVERT GRAPHS TO GEODATAFRAMES
+        print('Start converting the graphs to geodataframes')
+        edges_complex, node_complex = graph_to_gdf(G_complex)
+        print('Finished converting G_complex to geodataframes')
+
+        # first save the G_complex, G_simple and edges_complex (when not cut yet!).
+        # When segmentation is yes, the edges_complex will be overwritten with the cut version and given as output
+        # Todo: check what needs to be output for damage? edges_complex or edges_complex_cut!
+        if save_files:
+            path = Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_simple.gpickle'))
+            nx.write_gpickle(G_simple, path, protocol=4)
+            print(path, 'saved')
+            path = Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_complex.gpickle'))
+            nx.write_gpickle(G_complex, path, protocol=4)
+            print(path, 'saved')
+            edges_complex, node_complex = graph_to_gdf(G_complex)
+            with open(str((InputDict['output']) / (str(InputDict['analysis_name']) + '_edges_complex.p')), 'wb') as handle:
+                pickle.dump(edges_complex, handle)
+                print(str((InputDict['output']) / (str(InputDict['analysis_name']) + '_edges_complex.p saved')))
+
+        if save_shapes is not None:
+            graph_to_shp(G_complex, Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_complex_edges.shp')),
+                         Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_complex_nodes.shp')))
+            if simplify:
+                graph_to_shp(G_simple, Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_simple_edges.shp')),
+                             Path(InputDict['output'] / (str(InputDict['analysis_name']) + '_G_simple_nodes.shp')))
+
+        # cut the edges in the complex geodataframe to segments of equal lengths or smaller
+        # output will be the cut edges_complex
+        # TODO change save shapes names which starts with analysis name similar to save_files (above)
+        if segmentation is not None:
+            edges_complex = cut_gdf(edges_complex, segmentation)
+            print('Finished segmenting the geodataframe with split length: {} degree'.format(segmentation))
+            if save_files:
+                output_path = Path(__file__).parents[1] / 'test/output/'
+                path = output_path / 'edges_complex_cut.shp'
+                edges_complex.to_file(path, driver='ESRI Shapefile', encoding='utf-8')
+                print(path, 'saved')
+                # also save edges_complex_cut.p
+                with open((output_path / 'edges_complex_cut.p'), 'wb') as handle:
+                    pickle.dump(edges_complex, handle)
+                    print(output_path, 'edges_complex_cut.p saved')
+
+        # return G_complex, G_simple,edges_simple,nodes_simple,edges_complex,nodes_complex
+        return G_simple, edges_complex
 
     def network_osm_download(self):
         """Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
@@ -228,6 +274,52 @@ class Network:
 
         return graph
 
+    def read_merge_shp(self, crs_=4326):
+        """Imports shapefile(s) and saves attributes in a pandas dataframe.
+
+        Args:
+            shapefileAnalyse (string or list of strings): absolute path(s) to the shapefile(s) that will be used for analysis
+            shapefileDiversion (string or list of strings): absolute path(s) to the shapefile(s) that will be used to calculate alternative routes but is not analysed
+            idName (string): the name of the Unique ID column
+            crs_ (int): the EPSG number of the coordinate reference system that is used
+        Returns:
+            lines (list of shapely LineStrings): full list of linestrings
+            properties (pandas dataframe): attributes of shapefile(s), in order of the linestrings in lines
+        """
+
+        # read shapefiles and add to list with path
+        if isinstance(self.primary_files, str):
+            shapefiles_analysis = [self.config['static'] / "network" / shp for shp in self.primary_files.split(',')]
+        if isinstance(self.diversion_files, str):
+            shapefiles_diversion = [self.config['static'] / "network" / shp for shp in self.diversion_files.split(',')]
+
+        def read_file(file, analyse=1):
+            """"Set analysis to 1 for main analysis and 0 for diversion network"""
+            shp = gpd.read_file(file)
+            shp['to_analyse'] = analyse
+            return shp
+
+        # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
+        lines = [read_file(shp) for shp in shapefiles_analysis]
+        if isinstance(self.diversion_files, str):
+            [lines.append(read_file(shp, 0)) for shp in shapefiles_diversion]
+        lines = pd.concat(lines)
+
+        lines.crs = {'init': 'epsg:{}'.format(crs_)}
+
+        # append the length of the road stretches
+        lines['length'] = lines['geometry'].apply(lambda x: line_length(x))
+
+        if lines['geometry'].apply(lambda row: isinstance(row, MultiLineString)).any():
+            for line in lines.loc[lines['geometry'].apply(lambda row: isinstance(row, MultiLineString))].iterrows():
+                if len(linemerge(line[1].geometry)) > 1:
+                    warnings.warn("Edge with {} = {} is a MultiLineString, which cannot be merged to one line. Check this part.".format(
+                            self.file_id, line[1][self.file_id]))
+
+        print('Shapefile(s) loaded with attributes: {}.'.format(list(lines.columns.values)))  # fill in parameter names
+
+        return lines
+
     def save_network(self, to_save, name, types=['pickle']):
         """Saves a geodataframe or graph to output_path"""
         if type(to_save) == gpd.GeoDataFrame:
@@ -274,7 +366,7 @@ class Network:
 
             elif self.source == 'OSM PBF':
                 logging.info('Start creating a network from an OSM PBF file.')
-                roadTypes = self.network_config['road_types'].lower().replace(' ', ' ').split(',')
+
                 base_graph, edge_gdf = self.network_osm_pbf()
 
             elif self.source == 'OSM download':

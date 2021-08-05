@@ -18,8 +18,8 @@ def main():
     # Find the settings.ini file
     root_path = Path(__file__).resolve().parent.parent
 
-    config_network = load_config(root_path, type='network')
-    config_analyses = load_config(root_path, type='analyses')
+    config_network = load_config(root_path, config_type='network')
+    config_analyses = load_config(root_path, config_type='analyses')
 
     # Initiate the log file, save in the output folder.
     initiate_root_logger(str(config_network['output'] / 'RA2CE.log'))
