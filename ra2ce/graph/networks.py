@@ -284,42 +284,51 @@ class Network:
             config_analyses['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
             config_analyses['base_network'] = self.save_network(edge_gdf, 'base', types=to_save)
 
-        if ('origins' in self.network_config) and ('destinations' in self.network_config):
+        if (self.network_config['origins'] is not None) and (self.network_config['destinations'] is not None):
             od_graph_path = self.config['static'] / 'output_graph' / 'origins_destinations_graph.gpickle'
             if od_graph_path.is_file():
                 config_analyses['origins_destinations_graph'] = od_graph_path
                 logging.info(f"Existing graph found: {od_graph_path}.")
             else:
                 # Origin and destination nodes should be added to the graph.
-                od_graph = self.add_od_nodes(base_graph)
-                config_analyses['origins_destinations_graph'] = self.save_network(od_graph, 'origins_destinations', types=to_save)
+                if (base_graph_path.is_file()) or base_graph:
+                    if base_graph_path.is_file():
+                        base_graph = nx.read_gpickle(base_graph_path)
+                    od_graph = self.add_od_nodes(base_graph)
+                    config_analyses['origins_destinations_graph'] = self.save_network(od_graph, 'origins_destinations', types=to_save)
 
-        if 'hazard_map' in self.network_config:
+        if self.network_config['hazard_map'] is not None:
+            # There is a hazard map or multiple hazard maps that should be intersected with the graph.
+            # Overlay the hazard on the geodataframe as well (todo: combine with graph overlay if both need to be done?)
             base_graph_hazard_path = self.config['static'] / 'output_graph' / 'base_hazard_graph.gpickle'
             if base_graph_hazard_path.is_file():
                 config_analyses['base_hazard_graph'] = base_graph_hazard_path
                 logging.info(f"Existing graph found: {base_graph_hazard_path}.")
             else:
-                if base_graph:
-                    # There is a hazard map or multiple hazard maps that should be intersected with the graph.
-                    # Overlay the hazard on the geodataframe as well (todo: combine with graph overlay if both need to be done?)
+                if (base_graph_path.is_file()) or base_graph:
+                    if base_graph_path.is_file():
+                        base_graph = nx.read_gpickle(base_graph_path)
                     haz = Hazard(base_graph, self.network_config['hazard_map'], self.network_config['aggregate_wl'])
                     base_graph_hazard = haz.hazard_intersect()
                     config_analyses['base_hazard_graph'] = self.save_network(base_graph_hazard, 'base_hazard', types=to_save)
                 else:
-                    logging.warning("No base graph found to intersect the hazard with. Check ")
+                    logging.warning("No base graph found to intersect the hazard with. Check your network.ini file.")
 
             od_graph_hazard_path = self.config['static'] / 'output_graph' / 'origins_destinations_hazard_graph.gpickle'
             if od_graph_hazard_path.is_file():
                 config_analyses['origins_destinations_hazard_graph'] = od_graph_hazard_path
                 logging.info(f"Existing graph found: {od_graph_hazard_path}.")
             else:
-                if od_graph:
+                if (od_graph_path.is_file()) or od_graph:
+                    if od_graph_path.is_file():
+                        od_graph = nx.read_gpickle(od_graph_path)
                     haz = Hazard(od_graph, self.network_config['hazard_map'], self.network_config['aggregate_wl'])
                     od_graph_hazard = haz.hazard_intersect()
-                    config_analyses['origins_destinations_hazard_graph'] = self.save_network(od_graph_hazard, 'origins_destinations_hazard', types=to_save)
+                    config_analyses['origins_destinations_hazard_graph'] = self.save_network(od_graph_hazard,
+                                                                                             'origins_destinations_hazard',
+                                                                                             types=to_save)
                 else:
-                    logging.warning("No base graph found to intersect the hazard with. Check ")
+                    logging.warning("No base graph found to intersect the hazard with. Check your network.ini file.")
 
         return config_analyses
 
