@@ -16,10 +16,11 @@ from analyses.indirect import analyses_indirect
 
 
 def main():
-    # Find the settings.ini file,
+    # Find the settings.ini file,c:\Python\RACE\ra2ce\data\test_shp\
     root_path = Path(__file__).resolve().parent.parent
-    network_settings = root_path / "network.ini"
-    analyses_settings = root_path / "analyses.ini"
+    #network_settings = root_path / "network.ini"
+    network_settings = root_path / 'data' / 'test_shp' / "settings.ini"
+    analyses_settings = root_path / "settings.ini"
 
     # Read the configurations in network.ini and add the root path to the configuration dictionary.
     config_network = parse_config(path=network_settings)
@@ -33,8 +34,9 @@ def main():
     initiate_root_logger(str(config_analyses['root_path'] / 'data' / config_analyses['project']['name'] / 'output' / 'RA2CE.log'))
 
     # Validate the configuration input.
-    config_network = input_validation(config_network)
-    config_analyses = input_validation(config_analyses)
+    #config_network = input_validation(config_network)
+    #config_analyses = input_validation(config_analyses)
+
 
     # Create a dictionary with direct and indirect analyses separately.
     config_analyses = configure_analyses(config_analyses)
