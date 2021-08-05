@@ -2,6 +2,7 @@
 import os, sys
 folder = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(folder)
+sys.setrecursionlimit(10**5)
 
 from shapely.wkb import loads
 import ogr
@@ -26,9 +27,7 @@ import tqdm
 
 ### Overrule the OSMNX default settings to get the additional metadata such as street lighting (lit)
 osmnx.config(log_console=True, use_cache=True, useful_tags_way = osmnx.settings.useful_tags_way + ['lit'])
-sys.setrecursionlimit(10**5)
 
-# todo clean file: do we need the tests here as well or in a general test file?
 
 def fetch_roads(region, osm_pbf_path, **kwargs):
     """

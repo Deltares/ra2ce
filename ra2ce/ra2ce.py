@@ -16,10 +16,10 @@ from analyses.indirect import analyses_indirect
 
 
 def main():
-    # Find the settings.ini file,
+    # Find the settings.ini file
     root_path = Path(__file__).resolve().parent.parent
     network_settings = root_path / "network.ini"
-    analyses_settings = root_path / "analyses.ini"
+    analyses_settings = root_path / "settings.ini"
 
     # Read the configurations in network.ini and add the root path to the configuration dictionary.
     config_network = parse_config(path=network_settings)
@@ -35,6 +35,7 @@ def main():
     # Validate the configuration input.
     config_network = input_validation(config_network)
     config_analyses = input_validation(config_analyses)
+
 
     # Create a dictionary with direct and indirect analyses separately.
     config_analyses = configure_analyses(config_analyses)
