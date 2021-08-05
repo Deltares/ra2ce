@@ -63,7 +63,7 @@ def main():
     # Create the network if not yet created
     network = Network(config_network)
     config_analyses = network.create(config_analyses)
-    exit()
+
     # Do the analyses
     if 'direct' in config_analyses:
         analyses_direct.DirectAnalyses(config_analyses).execute()

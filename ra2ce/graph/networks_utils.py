@@ -25,8 +25,10 @@ from shapely.ops import linemerge
 from geopy import distance
 from osmnx.simplification import simplify_graph
 from numpy import object as np_object
+import numpy as np
 from statistics import mean
 from shapely.geometry import shape, Point, LineString
+import matplotlib.path as mpltPath
 
 # local modules
 
@@ -1102,3 +1104,125 @@ def read_merge_shp(shapefileAnalyse,  idName, shapefileDiversion=[], crs_=4326):
     print('Shapefile(s) loaded with attributes: {}.'.format(list(lines.columns.values)))  # fill in parameter names
 
     return lines
+
+
+def check_hazard_extent_resolution(list_hazards):
+    if len(list_hazards) == 1:
+        return True
+    check_hazard_extent = [gdal.Open(str(haz)).GetGeoTransform() for haz in list_hazards]
+    if len(set(check_hazard_extent)) == 1:
+        # All hazard have the exact same extents and resolution
+        return True
+    else:
+        return False
+
+
+def get_extent(dataset):
+    cols = dataset.RasterXSize
+    rows = dataset.RasterYSize
+    transform = dataset.GetGeoTransform()
+    minx = transform[0]
+    maxx = transform[0] + cols * transform[1] + rows * transform[2]
+
+    miny = transform[3] + cols * transform[4] + rows * transform[5]
+    maxy = transform[3]
+
+    width = maxx - minx
+    height = maxy - miny
+
+    return {"minX": minx, "maxX": maxx, "minY": miny, "maxY": maxy, "cols": cols, "rows": rows,
+            "width": width, "height": height, "pixelWidth": transform[1], "pixelHeight": transform[5]}
+
+
+def sample_raster_full(raster, x_objects, y_objects, size_array, extent):
+    index_x_objects = np.int64(np.floor((x_objects - extent['minX']) / extent['pixelWidth']))
+    index_y_objects = np.int64(np.floor((y_objects - extent['maxY']) / extent['pixelHeight']))
+
+    fltr = np.logical_and(index_x_objects < size_array[1], index_y_objects < size_array[0])
+    index_x_objects = index_x_objects[fltr]
+    index_y_objects = index_y_objects[fltr]
+
+    water_level = raster[tuple([index_y_objects, index_x_objects])]
+    return water_level
+
+
+def find_cell(x_y_coord, ll_corner, x_y_res):
+    return np.int64(np.floor((x_y_coord - ll_corner) / x_y_res))
+
+
+def find_cell_array_y(y_coord, ul_corner, y_res):
+    return np.int64(np.floor((ul_corner - y_coord) / y_res))
+
+
+def sample_raster(raster_band, nodatavalue, x_obj, y_obj, ulx, xres, uly, yres):
+    water_levels = list()
+    for x, y in zip(x_obj, y_obj):
+        index_x_objects = find_cell(x, ulx, xres)
+        index_y_objects = find_cell_array_y(y, uly, -yres)
+
+        try:
+            # It's possible that a part of some of the polygons is outside of the hazard extent.
+            value = raster_band.ReadAsArray(index_x_objects, index_y_objects, 1, 1)
+            if value[0, 0] == nodatavalue:
+                water_levels.append(0)
+            else:
+                water_levels.append(value[0, 0])
+        except TypeError as e:
+            # The polygon that is partially outside of the hazard extent is skipped.
+            logging.info(e)
+            water_levels.append(0)
+
+    return np.array(water_levels)
+
+
+def find_points_in_polygon(geometries, extent_resolution):
+    polygons_grid_coords = list()
+    for geometry in geometries:
+        # Derive the geometry boundaries.
+        minx, miny, maxx, maxy = geometry.bounds
+
+        # Select the grid cells related to the geometry boundaries.
+        col_off = find_cell(minx, extent_resolution["minX"], extent_resolution["pixelWidth"])
+        width = abs(find_cell(maxx, extent_resolution["minX"], extent_resolution["pixelWidth"]) - col_off)
+        row_off = find_cell(miny, extent_resolution["minY"], extent_resolution["pixelHeight"])
+        height = abs(find_cell(maxy, extent_resolution["minY"], extent_resolution["pixelHeight"]) - row_off)
+        grid = np.zeros((width * height, 2), dtype=np.float64)
+
+        # Determine the grid cells that are located within the geometry (https://stackoverflow.com/questions/36399381/whats-the-fastest-way-of-checking-if-a-point-is-inside-a-polygon-in-python).
+        grid_coords = grid_to_coords(grid, width, height, extent_resolution["minX"] + col_off * extent_resolution["pixelWidth"],
+                                     extent_resolution["pixelWidth"], extent_resolution["minY"] + row_off * extent_resolution["pixelHeight"], extent_resolution["pixelHeight"])
+
+        if grid_coords.size > 0:
+            # In case any grid cell centroid is located within the geometry, extract the water levels at the grid cell centroids.
+            polygon_grid_coords = grid_coords[mpltPath.Path(list(geometry.exterior.coords)).contains_points(grid_coords)]
+
+            if polygon_grid_coords.size == 0:
+                polygon_grid_coords = list(geometry.exterior.coords)
+        else:
+            # In case no grid cell centroid is located within the geometry, extract the water level at the exterior coords of the geometry.
+            polygon_grid_coords = list(geometry.exterior.coords)
+
+        polygons_grid_coords.append(polygon_grid_coords)
+
+    return polygons_grid_coords
+
+
+def grid_to_coords(array, width, heigth, minx, resx, miny, resy):
+    i = 0
+    for x in range(width):
+        for y in range(heigth):
+            array[i] = [minx + (np.float64(x) * resx) + (0.5 * resx), miny + (np.float64(y) * -resy) + (0.5 * -resy)]
+            i += 1
+    return array
+
+
+def water_level_at_points(points_in_polygons, extent_resolution, raster_band, nodatavalue):
+    total_water_levels = list()
+    for pnts in points_in_polygons:
+        x_objects = np.transpose(pnts)[0]
+        y_objects = np.transpose(pnts)[1]
+
+        water_level = sample_raster(raster_band, nodatavalue, x_objects, y_objects, extent_resolution['minX'], extent_resolution['pixelWidth'], extent_resolution['maxY'], extent_resolution['pixelHeight'])
+        total_water_levels.append(list(np.where(water_level <= 0, np.nan, water_level)))
+
+    return total_water_levels
