@@ -79,7 +79,7 @@ dependencies:
   - importlib_metadata=3.1.1=hd8ed1ab_0
   - intel-openmp=2020.3=h57928b3_311
   - ipykernel=5.3.4=py38h7b7c402_1
-  - ipython=7.19.0=py38hc5df569_0
+  - ipython=7.19.0=py38hc5df569_1
   - ipython_genutils=0.2.0=py_1
   - ipywidgets=7.5.1=pyh9f0ad1d_1
   - jdcal=1.4.1=py_0
