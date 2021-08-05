@@ -13,41 +13,38 @@ from checks import input_validation
 from graph.networks import Network
 from analyses.direct import analyses_direct
 from analyses.indirect import analyses_indirect
-
+from shutil import copyfile
 
 def main():
     # Find the settings.ini file
     root_path = Path(__file__).resolve().parent.parent
-    network_settings = root_path / "network.ini"
-    analyses_settings = root_path / "analyses.ini"
 
-    # Read the configurations in network.ini and add the root path to the configuration dictionary.
-    config_network = parse_config(path=network_settings)
-    config_network['root_path'] = root_path
 
-    # Read the configurations in analyses.ini and add the root path to the configuration dictionary.
-    config_analyses = parse_config(path=analyses_settings)
-    config_analyses['root_path'] = root_path
+    def load_config(root_path, type):
+        # Read the configurations in network.ini and add the root path to the configuration dictionary.
+        settings = root_path / "{}.ini".format(type)
+        config = parse_config(root_path, path=settings)
+        config['root_path'] = root_path
+
+        # Validate the configuration input.
+        config = input_validation(config)
+
+        if type == 'analyses':
+            # Create a dictionary with direct and indirect analyses separately.
+            config = configure_analyses(config)
+
+        # Set the output paths in the configuration Dict for ease of saving to those folders.
+        config['input'] = config['root_path'] / 'data' / config['project']['name'] / 'input'
+        config['static'] = config['root_path'] / 'data' / config['project']['name'] / 'static'
+        config['output'] = config['root_path'] / 'data' / config['project']['name'] / 'output'
+        copyfile(settings, config['output'] / '{}.ini'.format(type))
+        return config
+
+    config_network = load_config(root_path, type='network')
+    config_analyses = load_config(root_path, type='analyses')
 
     # Initiate the log file, save in the output folder.
-    initiate_root_logger(str(config_network['root_path'] / 'data' / config_network['project']['name'] / 'output' / 'RA2CE.log'))
-
-    # Validate the configuration input.
-    config_network = input_validation(config_network)
-    config_analyses = input_validation(config_analyses)
-
-    # Create a dictionary with direct and indirect analyses separately.
-    config_analyses = configure_analyses(config_analyses)
-
-    # Set the output paths in the configuration Dict for ease of saving to those folders.
-    config_network['input'] = config_network['root_path'] / 'data' / config_network['project']['name'] / 'input'
-    config_network['static'] = config_network['root_path'] / 'data' / config_network['project']['name'] / 'static'
-    config_network['output'] = config_network['root_path'] / 'data' / config_network['project']['name'] / 'output'
-
-    # Set the output paths in the configuration Dict for ease of saving to those folders.
-    config_analyses['input'] = config_analyses['root_path'] / 'data' / config_analyses['project']['name'] / 'input'
-    config_analyses['static'] = config_analyses['root_path'] / 'data' / config_analyses['project']['name'] / 'static'
-    config_analyses['output'] = config_analyses['root_path'] / 'data' / config_analyses['project']['name'] / 'output'
+    initiate_root_logger(str(config_network['output'] / 'RA2CE.log'))
 
     # Create the output folders
     if 'direct' in config_analyses:
