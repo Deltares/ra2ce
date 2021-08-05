@@ -64,7 +64,8 @@ def create_OD_pairs(od, graph, id_name):
     # create dictionary of the roads geometries
     edge_list = [e for e in graph.edges.data() if 'geometry' in e[-1]]
     vertices_dict = {}
-    for line in edge_list:
+    for i, line in enumerate(edge_list):
+        print(type(line[-1]['geometry']), i, line[-1]['ID'])
         vertices_dict[(line[0], line[1])] = [Point(p) for p in set(list(line[-1]['geometry'].coords))]
 
     # create list of all points to search in
