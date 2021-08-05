@@ -186,7 +186,7 @@ class Network:
 
         # Create 'graph_simple'
         graph_simple = simplify_graph_count(graph_complex)
-        graph_simple = graph_create_unique_ids(graph_simple, 'unique_fid')
+        graph_simple = graph_create_unique_ids(graph_simple)
 
         # If the user wants to use undirected graphs, turn into an undirected graph (default).
         if not self.network_config['directed']:
@@ -204,9 +204,10 @@ class Network:
         # Add the origin/destination nodes to the network
         ods = read_OD_files(self.network_config['origins'], self.network_config['origins_names'],
                             self.network_config['destinations'], self.network_config['destinations_names'],
-                            self.network_config['id_name_origin_destination'], 'epsg:4326')  # TODO: decide if change CRS to flexible instead of just epsg:4326
+                            self.network_config['id_name_origin_destination'], 'epsg:4326')
 
-        ods = create_OD_pairs(ods, graph, id_name='unique_fid')
+
+        ods = create_OD_pairs(ods, graph, id_name='ra2ce_fid')
         ods.crs = 'epsg:4326'  # TODO: decide if change CRS to flexible instead of just epsg:4326
 
         # Save the OD pairs (GeoDataFrame) as pickle
@@ -219,7 +220,7 @@ class Network:
             ods.to_file(ods_path, index=False)
             logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
 
-        graph = add_od_nodes(graph, ods, id_name='unique_fid')
+        graph = add_od_nodes(graph, ods, id_name='ra2ce_fid')
 
         return graph
 
