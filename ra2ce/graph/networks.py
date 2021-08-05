@@ -352,7 +352,16 @@ class Hazard:
             self.g = graph_gdf
 
     def overlay_hazard_raster(self, hf):
-        """Overlays the hazard raster over the road segments."""
+        """Overlays the hazard raster over the road segments.
+
+        :param [ParamName]: [ParamDescription], defaults to [DefaultParamVal]
+        :type [ParamName]: [ParamType](, optional)
+        ...
+        :raises [ErrorType]: [ErrorDescription]
+        ...
+        :return: [ReturnDescription]
+        :rtype: [ReturnType]
+        """
         # Name the attribute name the name of the hazard file
         hazard_names = [f.stem for f in hf]
 
@@ -448,7 +457,16 @@ class Hazard:
             #         self.g[u][v][k][hn] = np.nan
 
     def overlay_hazard_shp(self, hf):
-        """Overlays the hazard shapefile over the road segments."""
+        """Overlays the hazard shapefile over the road segments.
+
+        :param [ParamName]: [ParamDescription], defaults to [DefaultParamVal]
+        :type [ParamName]: [ParamType](, optional)
+        ...
+        :raises [ErrorType]: [ErrorDescription]
+        ...
+        :return: [ReturnDescription]
+        :rtype: [ReturnType]
+        """
         #TODO differentiate between graph and geodataframe input
 
         # Shapefile
@@ -476,7 +494,16 @@ class Hazard:
         return
 
     def join_hazard_table(self):
-        """Joins a table with IDs and hazard information with the road segments with corresponding IDs."""
+        """Joins a table with IDs and hazard information with the road segments with corresponding IDs.
+
+        :param [ParamName]: [ParamDescription], defaults to [DefaultParamVal]
+        :type [ParamName]: [ParamType](, optional)
+        ...
+        :raises [ErrorType]: [ErrorDescription]
+        ...
+        :return: [ReturnDescription]
+        :rtype: [ReturnType]
+        """
         # TODO differentiate between graph and geodataframe input
         return
 
