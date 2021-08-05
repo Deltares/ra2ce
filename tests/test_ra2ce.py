@@ -15,9 +15,7 @@ import pandas as pd
 
 
 def lookup_output(case='single_link_redundancy'):
-    """
-    Read an output file
-    """
+    """Read an output file"""
     output_path = pathlib.Path('data/test/output')
     test_path = output_path / case / f'{case}_test.csv'
     return pd.read_csv(test_path)
