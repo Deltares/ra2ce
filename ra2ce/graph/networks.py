@@ -207,7 +207,7 @@ class Network:
                             self.network_config['id_name_origin_destination'], 'epsg:4326')
 
 
-        ods = create_OD_pairs(ods, graph, id_name='ra2ce_fid')
+        ods = create_OD_pairs(ods, graph)
         ods.crs = 'epsg:4326'  # TODO: decide if change CRS to flexible instead of just epsg:4326
 
         # Save the OD pairs (GeoDataFrame) as pickle
@@ -220,7 +220,7 @@ class Network:
             ods.to_file(ods_path, index=False)
             logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
 
-        graph = add_od_nodes(graph, ods, id_name='ra2ce_fid')
+        graph = add_od_nodes(graph, ods)
 
         return graph
 
