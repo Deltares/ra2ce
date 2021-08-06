@@ -124,16 +124,16 @@ def configure_analyses(config):
     return config
 
 
-def load_config(root_path, config_type):
+def load_config(root_path, config_path):
     # Read the configurations in network.ini and add the root path to the configuration dictionary.
-    settings = root_path / "{}.ini".format(config_type)
-    config = parse_config(root_path, path=settings)
+    config_path = Path(config_path)
+    config = parse_config(root_path, path=config_path)
     config['root_path'] = root_path
 
     # Validate the configuration input.
     config = input_validation(config)
 
-    if config_type == 'analyses':
+    if config_path.stem == 'analyses':
         # Create a dictionary with direct and indirect analyses separately.
         config = configure_analyses(config)
 
@@ -141,5 +141,5 @@ def load_config(root_path, config_type):
     config['input'] = config['root_path'] / 'data' / config['project']['name'] / 'input'
     config['static'] = config['root_path'] / 'data' / config['project']['name'] / 'static'
     config['output'] = config['root_path'] / 'data' / config['project']['name'] / 'output'
-    copyfile(settings, config['output'] / '{}.ini'.format(config_type))
+    copyfile(config_path, config['output'] / '{}.ini'.format(config_path.stem))
     return config

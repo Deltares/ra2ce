@@ -14,10 +14,12 @@ from analyses.direct import analyses_direct
 from analyses.indirect import analyses_indirect
 
 
-def main(root_path):
+def main(network_ini, analyses_ini):
     # Find the network.ini and analysis.ini files
-    config_network = load_config(root_path, config_type='network')
-    config_analyses = load_config(root_path, config_type='analyses')
+    root_path = Path(__file__).resolve().parent.parent
+
+    config_network = load_config(root_path, config_path=network_ini)
+    config_analyses = load_config(root_path, config_path=analyses_ini)
 
     # Initiate the log file, save in the output folder.
     initiate_root_logger(str(config_network['output'] / 'RA2CE.log'))
@@ -46,4 +48,4 @@ def main(root_path):
 
 
 if __name__ == '__main__':
-    main(r'D:\ra2ceMaster\ra2ce')
+    main(r"D:\ra2ceMaster\ra2ce\data\test\network.ini", r"D:\ra2ceMaster\ra2ce\data\test\analyses.ini")
