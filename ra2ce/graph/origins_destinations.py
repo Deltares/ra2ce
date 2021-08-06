@@ -13,6 +13,7 @@ import rtree
 import logging
 from tqdm import tqdm, trange
 from .networks_utils import pairs, line_length
+import numpy as np
 
 
 def read_OD_files(origin_paths, origin_names, destination_paths, destination_names, od_id, crs_):

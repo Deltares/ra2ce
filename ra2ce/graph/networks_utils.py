@@ -19,6 +19,7 @@ import geopandas as gpd
 import itertools
 import logging
 import rtree
+from osgeo import gdal
 import geojson
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.ops import linemerge
