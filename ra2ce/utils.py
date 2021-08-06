@@ -3,6 +3,7 @@
 Created on 26-7-2021
 
 @author: F.C. de Groen, Deltares
+@author: M. Kwant, Deltares
 """
 # External modules
 from configparser import ConfigParser
@@ -127,6 +128,8 @@ def configure_analyses(config):
 def load_config(root_path, config_path):
     # Read the configurations in network.ini and add the root path to the configuration dictionary.
     config_path = Path(config_path)
+    if not config_path.is_file():
+        config_path = root_path / config_path
     config = parse_config(root_path, path=config_path)
     config['root_path'] = root_path
 
