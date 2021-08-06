@@ -13,9 +13,8 @@ from ra2ce import ra2ce
 import pandas as pd
 
 
-def lookup_output(case='single_link_redundancy'):
+def lookup_output(output_path=Path('data/test/output/correct'), case='single_link_redundancy'):
     """Read an output file"""
-    output_path = Path('data/test/output')
     test_path = output_path / case / f'{case}_test.csv'
     return pd.read_csv(test_path)
 
@@ -23,12 +22,18 @@ def lookup_output(case='single_link_redundancy'):
 # @pytest.mark.skip(reason="work in progress")
 def test_output():
     """Sample pytest test function for output"""
-    case = 'single_link_redundancy'
+    cases = ['single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination',
+             'multi_link_origin_destination']
     input_network_path = Path('data/test/network.ini')
     input_analyses_path = Path('data/test/analyses.ini')
-    outputs_run = ra2ce.main(input_network_path, input_analyses_path)
-    outputs_correct = lookup_output(case)
-    assert outputs_run == outputs_correct, 'output should  be equal'
+    ra2ce.main(input_network_path, input_analyses_path)
+
+    for case in cases:
+        outputs_correct = lookup_output(case)
+        outputs_test = lookup_output(Path('data/test/output'), case)
+
+        # Check if the pandas dataframes are equal in all aspects
+        pd.testing.assert_frame_equal(outputs_test, outputs_correct)
 
 
 @pytest.mark.skip(reason="work in progress")
