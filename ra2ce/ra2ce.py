@@ -14,10 +14,8 @@ from analyses.direct import analyses_direct
 from analyses.indirect import analyses_indirect
 
 
-def main():
-    # Find the settings.ini file
-    root_path = Path(__file__).resolve().parent.parent
-
+def main(root_path):
+    # Find the network.ini and analysis.ini files
     config_network = load_config(root_path, config_type='network')
     config_analyses = load_config(root_path, config_type='analyses')
 
@@ -48,4 +46,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    main(r'D:\ra2ceMaster\ra2ce')
