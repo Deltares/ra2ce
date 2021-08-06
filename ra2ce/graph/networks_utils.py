@@ -1440,7 +1440,6 @@ class Segmentation:
             n = int(linestring.length/split_length)+1
         return n
 
-
     def split_linestring(self, linestring, split_length):
         """cuts a linestring in equivalent segments of length split_length
 
@@ -1464,7 +1463,6 @@ class Segmentation:
             result_list = [linestring]
 
         return result_list
-
 
     def cut_gdf(self):
         """
