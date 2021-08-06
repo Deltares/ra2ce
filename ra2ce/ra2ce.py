@@ -10,10 +10,10 @@ from pathlib import Path
 import click
 
 # Local modules
-from .utils import initiate_root_logger, load_config
-from .graph.networks import Network
-from .analyses.direct import analyses_direct
-from .analyses.indirect import analyses_indirect
+from utils import initiate_root_logger, load_config
+from graph.networks import Network
+from analyses.direct import analyses_direct
+from analyses.indirect import analyses_indirect
 
 
 def main(network_ini=None, analyses_ini=None):
@@ -63,5 +63,5 @@ def cli(network_ini, analyses_ini):
 
 if __name__ == '__main__':
     # cli()
-    rootpath = r'c:\Python\RACE\ra2ce\data\test_pbf'
+    rootpath = r'c:\Python\RACE\ra2ce\data\test'
     main(rootpath + r"\network.ini", rootpath + r"\analyses.ini")
