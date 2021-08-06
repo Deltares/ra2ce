@@ -478,15 +478,18 @@ class Hazard:
 
                         if len(water_level) > 0:
                             if self.aggregate_wl == 'max':
-                                self.g[u][v][k][hn+'_max'] = water_level.max()
+                                self.g[u][v][k][hn+'_'+self.aggregate_wl] = water_level.max()
                             elif self.aggregate_wl == 'min':
-                                self.g[u][v][k][hn+'_min'] = water_level.min()
+                                self.g[u][v][k][hn+'_'+self.aggregate_wl] = water_level.min()
                             elif self.aggregate_wl == 'mean':
-                                self.g[u][v][k][hn+'_mean'] = mean(water_level)
+                                self.g[u][v][k][hn+'_'+self.aggregate_wl] = mean(water_level)
                             else:
                                 logging.warning("No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'.")
                         else:
-                            self.g[u][v][k][hn] = np.nan
+                            self.g[u][v][k][hn+'_'+self.aggregate_wl] = np.nan
+
+                    else:
+                        self.g[u][v][k][hn+'_'+self.aggregate_wl] = np.nan
 
             if self.gdf:
                 print("Raster hazard overlay with gdf should be adjusted to how it should work with Kees' model")

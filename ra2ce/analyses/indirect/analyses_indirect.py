@@ -101,9 +101,9 @@ class IndirectAnalyses:
             gdf['ra2ce_fid'] = gdf['ra2ce_fid'].astype(str)
 
             # Create the edgelist that consist of edges that should be removed
-            edges_remove = [e for e in graph.edges.data(keys=True) if hz in e[-1]]
+            edges_remove = [e for e in graph.edges.data(keys=True) if hz+'_'+analysis['aggregate_wl'] in e[-1]]
             edges_remove = [e for e in edges_remove if
-                            (e[-1][hz] > float(analysis['threshold'])) & ('bridge' not in e[-1])]
+                            (e[-1][hz+'_'+analysis['aggregate_wl']] > float(analysis['threshold'])) & ('bridge' not in e[-1])]
 
             graph.remove_edges_from(edges_remove)
 
@@ -138,7 +138,7 @@ class IndirectAnalyses:
             gdf['diff_dist'] = [dist - length if dist == dist else np.NaN for (dist, length) in
                                 zip(gdf['alt_dist'], gdf[analysis['weighing']])]
 
-            gdf['hazard'] = hz
+            gdf['hazard'] = hz+'_'+analysis['aggregate_wl']
 
             results.append(gdf)
 
@@ -186,8 +186,8 @@ class IndirectAnalyses:
 
             # Check if the o/d pairs are still connected while some links are disrupted by the hazard(s)
             to_remove = [(e[0], e[1], e[2]) for e in graph_hz.edges.data(keys=True) if
-                         (e[-1][hz] > float(analysis['threshold'])) & ('bridge' not in e[-1])]
-            # to_remove = [(e[0], e[1], e[2]) for e in graph.edges.data(keys=True) if (e[-1][hz] > float(analysis['threshold']))]
+                         (e[-1][hz+'_'+analysis['aggregate_wl']] > float(analysis['threshold'])) & ('bridge' not in e[-1])]
+            # to_remove = [(e[0], e[1], e[2]) for e in graph.edges.data(keys=True) if (e[-1][hz+'_'+analysis['aggregate_wl']] > float(analysis['threshold']))]
             graph_hz.remove_edges_from(to_remove)
 
             # Find the routes
