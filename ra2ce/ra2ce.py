@@ -14,12 +14,15 @@ from analyses.direct import analyses_direct
 from analyses.indirect import analyses_indirect
 
 
-def main(network_ini, analyses_ini):
+def main(network_ini=None, analyses_ini=None):
     # Find the network.ini and analysis.ini files
     root_path = Path(__file__).resolve().parent.parent
 
-    config_network = load_config(root_path, config_path=network_ini)
-    config_analyses = load_config(root_path, config_path=analyses_ini)
+    if network_ini:
+        config_network = load_config(root_path, config_path=network_ini)
+
+    if analyses_ini:
+        config_analyses = load_config(root_path, config_path=analyses_ini)
 
     # Initiate the log file, save in the output folder.
     initiate_root_logger(str(config_network['output'] / 'RA2CE.log'))
@@ -36,15 +39,17 @@ def main(network_ini, analyses_ini):
             output_path.mkdir(parents=True, exist_ok=True)
 
     # Create the network if not yet created
-    network = Network(config_network)
-    config_analyses = network.create(config_analyses)
+    if network_ini:
+        network = Network(config_network)
+        config_analyses = network.create(config_analyses)
 
     # Do the analyses
-    if 'direct' in config_analyses:
-        analyses_direct.DirectAnalyses(config_analyses).execute()
+    if analyses_ini:
+        if 'direct' in config_analyses:
+            analyses_direct.DirectAnalyses(config_analyses).execute()
 
-    if 'indirect' in config_analyses:
-        analyses_indirect.IndirectAnalyses(config_analyses).execute()
+        if 'indirect' in config_analyses:
+            analyses_indirect.IndirectAnalyses(config_analyses).execute()
 
 
 if __name__ == '__main__':

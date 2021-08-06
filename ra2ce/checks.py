@@ -18,11 +18,10 @@ def input_validation(config):
     # check if properties exist in settings.ini file
     check_headers = ['project']
     check_headers.extend([a for a in config.keys() if 'analysis' in a])
-    check_headers.extend([a for a in config.keys() if 'network' in a])
 
     if 'network' in config.keys():
         check_shp_input(config['network'])
-
+        check_headers.extend(['network', 'origins_destinations', 'hazard', 'cleanup'])
 
     for k in check_headers:
         if k not in config.keys():
@@ -105,6 +104,6 @@ def check_paths(config, key, item, input_dirs, error):
 
 def check_shp_input(config):
     """Checks if a file id is configured when using the option to create network from shapefile """
-    if config['source'] == 'shapefile' and config['file_id'] == None:
+    if (config['source'] == 'shapefile') and (config['file_id'] is None):
         logging.error('Not possible to create network - Shapefile used as source, but no file_id configured in .ini file')
         quit()
