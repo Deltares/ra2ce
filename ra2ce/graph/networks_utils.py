@@ -845,22 +845,22 @@ def create_simplified_graph(graph_complex, new_id='ra2ce_fid'):
     try:
         graph_complex = graph_create_unique_ids(graph_complex, '{}_complex'.format(new_id))
 
-        #create simplified graph and add unique ids
+        # Create simplified graph and add unique ids
         graph_simple = simplify_graph_count(graph_complex)
         graph_simple = graph_create_unique_ids(graph_simple, '{}_simple'.format(new_id))
 
-        #   Create look_up_tables between graphs with unique ids
+        # Create look_up_tables between graphs with unique ids
         simple_to_complex, complex_to_simple = graph_link_simple_id_to_complex(graph_simple, new_id=new_id, save_json_folder=None)
 
-        #store id table and add simple ids to complex graph
+        # Store id table and add simple ids to complex graph
         id_tables = (simple_to_complex, complex_to_simple)
-        graph_complex = add_simple_id_to_graph_complex(graph_complex, complex_to_simple)
+        graph_complex = add_simple_id_to_graph_complex(graph_complex, complex_to_simple, new_id)
         logging.info('simplified graph succesfully created')
     except:
         graph_simple = None
         id_tables = None
         logging.error('Did not create a simplified version of the graph')
-    return graph_simple, graph_complex, id_tables
+    return graph_simple, graph_complex  #, id_tables
 
 
 def gdf_check_create_unique_ids(gdf, id_name, new_id_name='ra2ce_fid'):
