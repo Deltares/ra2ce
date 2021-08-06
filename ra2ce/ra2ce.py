@@ -63,4 +63,5 @@ def cli(network_ini, analyses_ini):
 
 if __name__ == '__main__':
     # cli()
-    main(r"D:\ra2ceMaster\ra2ce\data\test\network.ini", r"D:\ra2ceMaster\ra2ce\data\test\analyses.ini")
+    rootpath = r'c:\Python\RACE\ra2ce\data\test_pbf'
+    main(rootpath + r"\network.ini", rootpath + r"\analyses.ini")

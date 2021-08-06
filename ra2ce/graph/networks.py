@@ -153,19 +153,18 @@ class Network:
             filter_osm(osm_filter_exe, o5m_path, o5m_filtered_path, tags=road_types)
             logging.info('Converted and filtered osm.pbf to o5m, created: {}'.format(o5m_path))
 
-        G_complex = graph_from_xml(o5m_filtered_path, bidirectional=False, simplify=False, retain_all=False)
+        graph_complex = graph_from_xml(o5m_filtered_path, bidirectional=False, simplify=False, retain_all=False)
 
         print('Start converting the graphs to geodataframes')
-        edges_complex, node_complex = graph_to_gdf(G_complex)
+        edges_complex, node_complex = graph_to_gdf(graph_complex)
 
-        G_simple, G_complex = create_simplified_graph(G_complex)
+        graph_simple, graph_complex = create_simplified_graph(graph_complex)
 
         if self.segmentation_length is not None:
             graph = Segmentation(edges_complex, self.segmentation_length)
             graph.apply_segmentation()
 
-
-        return G_simple, edges_complex
+        return graph_simple, edges_complex
 
     def network_osm_download(self):
         """Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
