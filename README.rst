@@ -27,7 +27,8 @@ functionalities. See for more detail below.
 Contact details: RA2CE Margreet van Marle
 (Margreet.vanMarle@Deltares.nl), Direct Damages: Kees van Ginkel
 (Kees.vanGinkel@Deltares.nl), Criticality: Frederique de Groen
-(Frederique.deGroen@Deltares.nl)
+(Frederique.deGroen@Deltares.nl), Martijn Kwant
+(Martijn.Kwant@Deltares.nl).
 
 Network Creation
 ----------------
@@ -107,10 +108,9 @@ Yet to be implemented.
 Installation
 ============
 
-in PYcharm use the ra2ce.yml file to set up an environment. This is
-running on Python 3.7. The python interpreter should be based on ra2ce.
-Furthermore the user should set the working directory to the main ra2ce
-folder: ra2ce/ra2ce (where the ra2ce script is located).
+In PyCharm use the environment.yml file to set up an environment called 
+ra2ce. This is running on Python 3.8. The python interpreter should be 
+based on ra2ce.
 
 Testing
 -------

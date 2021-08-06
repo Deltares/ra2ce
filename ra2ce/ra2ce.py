@@ -10,10 +10,10 @@ from pathlib import Path
 import click
 
 # Local modules
-from .utils import initiate_root_logger, load_config
-from .graph.networks import Network
-from .analyses.direct import analyses_direct
-from .analyses.indirect import analyses_indirect
+from utils import initiate_root_logger, load_config
+from graph.networks import Network
+from analyses.direct import analyses_direct
+from analyses.indirect import analyses_indirect
 
 
 def main(network_ini=None, analyses_ini=None):
