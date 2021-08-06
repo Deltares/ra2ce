@@ -27,6 +27,7 @@ import logging
 import time
 import networkx as nx
 import osmnx
+from .ra2ce_lookup import lookup_road_mapping
 
 class DirectAnalyses:
     def __init__(self, config):
@@ -44,41 +45,46 @@ class DirectAnalyses:
 
             gdf = osmnx.graph_to_gdfs(graph, nodes=False)
 
-
-            # TODO Start removing stuff from here
-            # edges_complex_split, edges_simple
-
+            # TODO: This should probably not be done here, but at the create network function
+            # apply road mapping to fewer types
+            road_mapping_dict = lookup_road_mapping()
             gdf.rename(columns={'highway': 'infra_type'}, inplace=True)
-            assert 'infra_type' in road_gdf.columns
+            gdf['road_type'] = gdf['infra_type']
+            gdf = gdf.replace({"road_type": road_mapping_dict})
+            # TODO sometimes there are edges with multiple mappings
 
-            # PLEASE NOTE THAT THE LINE BELOW CRIES FOR AN OBJECT-BASED APPROACH (OOP) :)
-            # OOP would make it:
-            # road_gdf.apply_road_mapping()
-            road_gdf = apply_road_mapping(road_gdf)  # Map the infra_types (many) to road_types (a few)
+            # cleanup of gdf
+            gdf.loc[gdf.lanes == 'nan', 'lanes'] = np.nan  # replace string nans with numpy nans
+            gdf.lanes = gdf.lanes.astype('float')  # convert strings to floats (not int, because int cant have nan)
 
-            # TODO: THIS SHOULD NOT BE DONE HERE, BUT ALREADY IN THE GENERATE_DAMAGE_INPUT
-            road_gdf.loc[road_gdf.lanes == 'nan', 'lanes'] = np.nan  # replace string nans with numpy nans
-            road_gdf.lanes = road_gdf.lanes.astype('float')  # convert strings to floats (not int, because int cant have nan)
-
-            # LOAD SOME SAMPLE DATA
-            # LOAD SHAPEFILE TO CROP THE HAZARD MAP
-            filename = 'NUTS332.shp'
-            region_path = os.path.join(load_config()['paths']['test_area_of_interest'], filename)
-
-            hzd_path = load_config()['paths']['test_hazard']
-            hzd_path = os.path.join(hzd_path, 'efas_rp500_wgs84.tif')
-
-            road_gdf_exposure = add_hazard_data_to_road_network(road_gdf, region_path, hzd_path)
-
-            road_gdf_damage = calculate_direct_damage(road_gdf)
-
-            print(road_gdf_damage.head)
+            # calculate direct damage
+            road_gdf_damage = calculate_direct_damage(gdf)
 
             endtime = time.time()
-            logging.info(
-                f"----------------------------- Analysis '{analysis['name']}' finished. Time: {str(round(endtime - starttime, 2))}s  -----------------------------")
+            logging.info(f"----------------------------- Analysis '{analysis['name']}' finished. "
+                         f"Time: {str(round(endtime - starttime, 2))}s  -----------------------------")
 
         return
+
+    def apply_road_mapping(self, gdf):
+        """        Apply a road mapping from a larger set of infra_types
+        (e.g. [motorway, motorway_link, ..., X, X_link] to a
+        smaller set of types, called road_types
+        (e.g. [motorway, ..., X]        """
+
+
+
+        gdf.rename(columns={'highway': 'infra_type'}, inplace=True)
+
+        # TODO: the stuff in this function is now split over to many different functions, which can be merged
+        # MAP OSM INFRA TYPES TO A SMALLER GROUP OF ROAD_TYPES
+        path_settings = load_config()['paths']['settings']
+        road_mapping_path = os.path.join(path_settings, 'OSM_infratype_to_roadtype_mapping.xlsx')
+        road_mapping_dict = import_road_mapping(road_mapping_path, 'Mapping')
+        # TODO: THIS SYNTAX RAISES A WARNING (but works fine)
+        road_gdf['road_type'] = road_gdf.infra_type.apply( \
+            lambda x: road_mapping_dict[x])  # add a new column 'road_type' with less categories
+        return road_gdf
 
 def import_road_mapping(file_path, sheet_name):
     """
@@ -229,28 +235,8 @@ def intersect_hazard(x, hzd_reg_sindex, hzd_region):
         print(e)
         return x.geometry, 0
 
-def apply_road_mapping(road_gdf):
-    """
-    Apply a road mapping from a larger set of infra_types
-    (e.g. [motorway, motorway_link, ..., X, X_link] to a
-    smaller set of types, called road_types
-    (e.g. [motorway, ..., X]
 
-    Arguments:
-        *road_gdf* (GeoPandas Dataframe) : should have a column 'infra_types'
 
-    Returns:
-        *road_gdf* (GeoPandas Dataframe): the same gdf, with an extra column 'road_types'
-    """
-    # TODO: the stuff in this function is now split over to many different functions, which can be merged
-    # MAP OSM INFRA TYPES TO A SMALLER GROUP OF ROAD_TYPES
-    path_settings = load_config()['paths']['settings']
-    road_mapping_path = os.path.join(path_settings, 'OSM_infratype_to_roadtype_mapping.xlsx')
-    road_mapping_dict = import_road_mapping(road_mapping_path, 'Mapping')
-    # TODO: THIS SYNTAX RAISES A WARNING (but works fine)
-    road_gdf['road_type'] = road_gdf.infra_type.apply( \
-        lambda x: road_mapping_dict[x])  # add a new column 'road_type' with less categories
-    return road_gdf
 
 
 def add_hazard_data_to_road_network(road_gdf,region_path,hazard_path,tolerance = 0.00005):
