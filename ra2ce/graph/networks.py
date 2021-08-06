@@ -16,18 +16,36 @@ from .networks_utils import *
 
 class Network:
     def __init__(self, config):
+        # General
         self.config = config
-        self.network_config = config['network']
-        self.source = config['network']['source']
-        self.save_shp = config['network']['save_shp']
-        self.primary_files = config['network']['primary_file']
-        self.diversion_files = config['network']['diversion_file']
-        self.file_id = config['network']['file_id']
-        self.snapping = config['cleanup']['snapping_threshold']
-        self.pruning = config['cleanup']['pruning_threshold']
         self.name = config['project']['name']
         self.output_path = config['static'] / "output_graph"
 
+        # Network
+        self.directed = config['network']['directed']
+        self.source = config['network']['source']
+        self.primary_files = config['network']['primary_file']
+        self.diversion_files = config['network']['diversion_file']
+        self.file_id = config['network']['file_id']
+        self.polygon_file = config['network']['polygon']
+        self.network_type = config['network']['network_type']
+        self.road_types = config['network']['road_types']
+        self.save_shp = config['network']['save_shp']
+
+        # Origins and destinations
+        self.origins = config['origins_destinations']['origins']
+        self.destinations = config['origins_destinations']['destinations']
+        self.origins_names = config['origins_destinations']['origins_names']
+        self.destinations_names = config['origins_destinations']['destinations_names']
+        self.id_name_origin_destination = config['origins_destinations']['id_name_origin_destination']
+
+        # Hazard
+        self.hazard_map = config['hazard']['hazard_map']
+        self.aggregate_wl = config['hazard']['aggregate_wl']
+
+        # Cleanup
+        self.snapping = config['cleanup']['snapping_threshold']
+        self.pruning = config['cleanup']['pruning_threshold']
 
     def network_shp(self, crs=4326):
         """Creates a (graph) network from a shapefile
@@ -109,7 +127,7 @@ class Network:
             G_complex_edges (GeoDataFrame : Complex graph (for use in the direct analyses)
 
         """
-        roadTypes = self.network_config['road_types'].lower().replace(' ', ' ').split(',')
+        roadTypes = self.road_types.lower().replace(' ', ' ').split(',')
 
         input_path = self.config['static'] / "network"
         osm_convert_exe = self.config['root_path'] / "executables" / 'osmconvert64.exe'
@@ -207,21 +225,21 @@ class Network:
             graph_simple (Graph) : Simplified graph (for use in the indirect analyses)
             graph_complex_edges (GeoDataFrame : Complex graph (for use in the direct analyses)
         """
-        poly_dict = read_geojson(self.network_config['polygon'][0])  # It can only read in one geojson
+        poly_dict = read_geojson(self.polygon_file[0])  # It can only read in one geojson
         poly = geojson_to_shp(poly_dict)
 
-        if not self.network_config['road_types']:
+        if not self.road_types:
             # The user specified only the network type.
-            graph_complex = osmnx.graph_from_polygon(polygon=poly, network_type=self.network_config['network']['network_type'],
+            graph_complex = osmnx.graph_from_polygon(polygon=poly, network_type=self.network_type,
                                                  simplify=False, retain_all=True)
-        elif not self.network_config['network_type']:
+        elif not self.network_type:
             # The user specified only the road types.
-            cf = ('["highway"~"{}"]'.format(self.network_config['road_types'].replace(',', '|')))
+            cf = ('["highway"~"{}"]'.format(self.road_types.replace(',', '|')))
             graph_complex = osmnx.graph_from_polygon(polygon=poly, custom_filter=cf, simplify=False, retain_all=True)
         else:
             # The user specified the network type and road types.
-            cf = ('["highway"~"{}"]'.format(self.network_config['road_types'].replace(',', '|')))
-            graph_complex = osmnx.graph_from_polygon(polygon=poly, network_type=self.network_config['network_type'],
+            cf = ('["highway"~"{}"]'.format(self.road_types.replace(',', '|')))
+            graph_complex = osmnx.graph_from_polygon(polygon=poly, network_type=self.network_type,
                                                  custom_filter=cf, simplify=False, retain_all=True)
 
         logging.info('graph downloaded from OSM with {:,} nodes and {:,} edges'.format(len(list(graph_complex.nodes())),
@@ -239,7 +257,7 @@ class Network:
         graph_simple = graph_create_unique_ids(graph_simple)
 
         # If the user wants to use undirected graphs, turn into an undirected graph (default).
-        if not self.network_config['directed']:
+        if not self.directed:
             if type(graph_simple) == nx.classes.multidigraph.MultiDiGraph:
                 graph_simple = graph_simple.to_undirected()
 
@@ -252,10 +270,9 @@ class Network:
         name = 'origin_destination_table'
 
         # Add the origin/destination nodes to the network
-        ods = read_OD_files(self.network_config['origins'], self.network_config['origins_names'],
-                            self.network_config['destinations'], self.network_config['destinations_names'],
-                            self.network_config['id_name_origin_destination'], 'epsg:4326')
-
+        ods = read_OD_files(self.origins, self.origins_names,
+                            self.destinations, self.destinations_names,
+                            self.id_name_origin_destination, 'epsg:4326')
 
         ods = create_OD_pairs(ods, graph)
         ods.crs = 'epsg:4326'  # TODO: decide if change CRS to flexible instead of just epsg:4326
@@ -265,7 +282,7 @@ class Network:
         logging.info(f"Saved {name + '.feather'} in {self.config['static'] / 'output_graph'}.")
 
         # Save the OD pairs (GeoDataFrame) as shapefile
-        if self.network_config['save_shp']:
+        if self.save_shp:
             ods_path = self.config['static'] / 'output_graph' / (name + '.shp')
             ods.to_file(ods_path, index=False)
             logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
@@ -380,7 +397,7 @@ class Network:
             config_analyses['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
             config_analyses['base_network'] = self.save_network(edge_gdf, 'base', types=to_save)
 
-        if (self.network_config['origins'] is not None) and (self.network_config['destinations'] is not None):
+        if (self.origins is not None) and (self.destinations is not None):
             od_graph_path = self.config['static'] / 'output_graph' / 'origins_destinations_graph.gpickle'
             if od_graph_path.is_file():
                 config_analyses['origins_destinations_graph'] = od_graph_path
@@ -393,7 +410,7 @@ class Network:
                     od_graph = self.add_od_nodes(base_graph)
                     config_analyses['origins_destinations_graph'] = self.save_network(od_graph, 'origins_destinations', types=to_save)
 
-        if self.network_config['hazard_map'] is not None:
+        if self.hazard_map is not None:
             # There is a hazard map or multiple hazard maps that should be intersected with the graph.
             # Overlay the hazard on the geodataframe as well (todo: combine with graph overlay if both need to be done?)
             base_graph_hazard_path = self.config['static'] / 'output_graph' / 'base_hazard_graph.gpickle'
@@ -404,7 +421,7 @@ class Network:
                 if (base_graph_path.is_file()) or base_graph:
                     if base_graph_path.is_file():
                         base_graph = nx.read_gpickle(base_graph_path)
-                    haz = Hazard(base_graph, self.network_config['hazard_map'], self.network_config['aggregate_wl'])
+                    haz = Hazard(base_graph, self.hazard_map, self.aggregate_wl)
                     base_graph_hazard = haz.hazard_intersect()
                     config_analyses['base_hazard_graph'] = self.save_network(base_graph_hazard, 'base_hazard', types=to_save)
                 else:
@@ -418,7 +435,7 @@ class Network:
                 if (od_graph_path.is_file()) or od_graph:
                     if od_graph_path.is_file():
                         od_graph = nx.read_gpickle(od_graph_path)
-                    haz = Hazard(od_graph, self.network_config['hazard_map'], self.network_config['aggregate_wl'])
+                    haz = Hazard(od_graph, self.hazard_map, self.aggregate_wl)
                     od_graph_hazard = haz.hazard_intersect()
                     config_analyses['origins_destinations_hazard_graph'] = self.save_network(od_graph_hazard,
                                                                                              'origins_destinations_hazard',
@@ -427,7 +444,7 @@ class Network:
                     logging.warning("No base graph found to intersect the hazard with. Check your network.ini file.")
 
             # Add the names of the hazard files to the config_analyses
-            config_analyses['hazard_names'] = [haz.stem for haz in self.network_config['hazard_map']]
+            config_analyses['hazard_names'] = [haz.stem for haz in self.hazard_map]
 
         return config_analyses
 
