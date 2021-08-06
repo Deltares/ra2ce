@@ -3,6 +3,7 @@
 Created on 30-7-2021
 
 @author: F.C. de Groen, Deltares
+@author: M. Kwant, Deltares
 """
 
 from geopy import distance

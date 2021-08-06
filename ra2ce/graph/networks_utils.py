@@ -2,8 +2,8 @@
 """
 Created on 30-9-2020
 
-@authors:
-Frederique de Groen (frederique.degroen@deltares.nl)
+@author: F.C. de Groen, Deltares
+@author: M. Kwant, Deltares
 """
 
 # external modules
