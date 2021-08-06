@@ -6,7 +6,6 @@ from pathlib import Path
 import pytest
 from click.testing import CliRunner
 import pandas as pd
-
 from ra2ce import ra2ce
 
 
