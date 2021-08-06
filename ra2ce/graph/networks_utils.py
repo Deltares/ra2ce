@@ -8,9 +8,6 @@ Created on 30-9-2020
 
 # external modules
 import os, sys
-folder = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(folder)
-
 import networkx as nx
 import osmnx
 import pandas as pd
@@ -19,22 +16,26 @@ import geopandas as gpd
 import itertools
 import logging
 import rtree
-from osgeo import gdal
+import numpy as np
 import geojson
+import matplotlib.path as mpltPath
+import tqdm
+
+from osgeo import gdal
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.ops import linemerge
 from geopy import distance
 from osmnx.simplification import simplify_graph
+from networkx import set_edge_attributes
 from numpy import object as np_object
-import numpy as np
 from statistics import mean
 from shapely.geometry import shape, Point, LineString
-import matplotlib.path as mpltPath
-
-# local modules
+from pathlib import Path
+from decimal import Decimal
 
 # todo replace os.path by pathlib
-
+folder = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(folder)
 
 def drawProgressBar(percent, barLen=20):
     """Draws a progress bar
@@ -838,6 +839,30 @@ def delete_duplicates(all_points):
     return uniquepoints
 
 
+def create_simplified_graph(graph_complex, new_id='ra2ce_fid'):
+    """ Create a simplified graph with unique ids from a complex graph"""
+    logging.info('Simplifying graph')
+    try:
+        graph_complex = graph_create_unique_ids(graph_complex, '{}_complex'.format(new_id))
+
+        #create simplified graph and add unique ids
+        graph_simple = simplify_graph_count(graph_complex)
+        graph_simple = graph_create_unique_ids(graph_simple, '{}_simple'.format(new_id))
+
+        #   Create look_up_tables between graphs with unique ids
+        simple_to_complex, complex_to_simple = graph_link_simple_id_to_complex(graph_simple, new_id=new_id, save_json_folder=None)
+
+        #store id table and add simple ids to complex graph
+        id_tables = (simple_to_complex, complex_to_simple)
+        graph_complex = add_simple_id_to_graph_complex(graph_complex, complex_to_simple)
+        logging.info('simplified graph succesfully created')
+    except:
+        graph_simple = None
+        id_tables = None
+        logging.error('Did not create a simplified version of the graph')
+    return graph_simple, graph_complex, id_tables
+
+
 def gdf_check_create_unique_ids(gdf, id_name, new_id_name='ra2ce_fid'):
     # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
     check=gdf.index
@@ -1227,3 +1252,248 @@ def water_level_at_points(points_in_polygons, extent_resolution, raster_band, no
         total_water_levels.append(list(np.where(water_level <= 0, np.nan, water_level)))
 
     return total_water_levels
+
+
+def convert_osm(osm_convert_path, pbf, o5m):
+    """ Converse an osm PBF file to o5m  """
+    command = '""{}"  "{}" --complete-ways --drop-broken-refs -o="{}""'.format(osm_convert_path, pbf, o5m)
+    os.system(command)
+
+
+def filter_osm(osm_filter_path, o5m, filtered_o5m, tags=None):
+    """Filters an o5m OSM file to only motorways, trunks, primary and secondary roads  """
+    if tags is None:
+        tags = ['motorway', 'motorway_link', 'primary', 'primary_link',
+                'secondary', 'secondary_link', 'trunk', 'trunk_link']
+    command = '""{}"  "{}" --keep="highway={}" > "{}""'.format(osm_filter_path, o5m, " =".join(tags), filtered_o5m)
+    os.system(command)
+
+
+def graph_link_simple_id_to_complex(graph_simple, new_id, save_json_folder=None):
+    """
+
+    Create lookup tables (dicts) to match edges_ids of the complex and simple graph
+    Optionally, saves these lookup tables as json files.
+
+    Arguments:
+        *G_simple* (Graph) : Graph, containing attribute 'G_fid_simple' and 'G_fid_complex'
+        *save_json_folder* (Path) : Path to folder in which the json files should be generated (default None)
+
+    Returns:
+        *simple_to_complex* (dict) : keys are ids of the simple graph, values are lists with all matching complex ids
+        *complex_to_simple* (dict) : keys are the ids of the complex graph, value is the matching simple_ID
+
+    We need this because the simple graph is derived from the complex graph, and therefore initially only the
+    simple graph knows from which complex edges it was created. To assign this information also to the complex
+    graph we invert the look-up dictionary
+    @author: Kees van Ginkel en Margreet van Marle
+    """
+    # Iterate over the simple, because this already has the corresponding complex information
+    lookup_dict = {}
+    # keys are the ids of the simple graph, values are lists with all matching complex id's
+    for u, v, k in tqdm.tqdm(graph_simple.edges(keys=True)):
+        key_1 = graph_simple[u][v][k]['{}_simple'.format(new_id)]
+        value_1 = graph_simple[u][v][k]['{}_complex'.format(new_id)]
+        lookup_dict[key_1] = value_1
+
+    inverted_lookup_dict = {}
+    # keys are the ids of the complex graph, value is the matching simple_ID
+    for key, value in lookup_dict.items():
+        if isinstance(value, list):
+            for subvalue in value:
+                inverted_lookup_dict[subvalue] = key
+        elif isinstance(value, int):
+            inverted_lookup_dict[value] = key
+
+    simple_to_complex = lookup_dict
+    complex_to_simple = inverted_lookup_dict
+
+    # save lookup table if necessary
+    if save_json_folder is not None:
+        assert isinstance(save_json_folder, Path)
+        import json
+        with open((save_json_folder / 'simple_to_complex.json'),'w') as fp:
+            json.dump(simple_to_complex,fp)
+            logging.info('saved (or overwrote) simple_to_complex.json')
+        with open((save_json_folder / 'complex_to_simple.json'),'w') as fp:
+            json.dump(complex_to_simple,fp)
+            logging.info('saved (or overwrote) complex_to_simple.json')
+    logging.info('Lookup tables from complex to simple and vice versa were created')
+    return simple_to_complex, complex_to_simple
+
+
+def add_simple_id_to_graph_complex(G_complex, complex_to_simple, new_id):
+    """
+    Adds the appropriate ID of the simple graph to each edge of the complex graph as a new attribute 'G_fid_simple'
+
+    Arguments:
+        G_complex (Graph) : The complex graph, still lacking 'G_fid_simple'
+        complex_to_simple (dict) : lookup table linking complex to simple graphs
+
+    Returns:
+         G_complex (Graph) : Same object, with added attribute 'G_fid_simple'
+
+    """
+
+    obtained_complex_ids = nx.get_edge_attributes(G_complex, '{}_complex'.format(new_id)) # {(u,v,k) : 'G_fid_complex'}
+    simple_ids_per_complex_id = obtained_complex_ids #start with a copy
+
+    for key, value in obtained_complex_ids.items(): # {(u,v,k) : 'G_fid_complex'}
+        try:
+            new_value = complex_to_simple[value] #find simple id belonging to the complex id
+            simple_ids_per_complex_id[key] = new_value
+        except KeyError as e:
+            logging.error('Could not find the simple ID belonging to complex ID {}; value set to None'.format(key))
+            simple_ids_per_complex_id[key] = None
+
+    # Now the format of simple_ids_per_complex_id is: {(u,v,k) : 'G_fid_simple}
+    set_edge_attributes(G_complex, simple_ids_per_complex_id, 'G_fid_simple')
+
+    return G_complex
+
+
+class Segmentation:
+    """ cut the edges in the complex geodataframe to segments of equal lengths or smaller
+        # output will be the cut edges_complex  """
+
+    def __init__(self, edges_complex, segmentation_length, save_files=False):
+        # General
+        self.edges_complex = edges_complex
+        self.segmentation_length = segmentation_length
+        self.save_files = save_files
+
+    def apply_segmentation(self):
+        edges_complex = self.cut_gdf(self.edges_complex, self.segmentation_length)
+
+        print('Finished segmenting the geodataframe with split length: {} degree'.format(self.segmentation_length))
+
+        """ 
+        if self.save_files:
+            output_path = Path(__file__).parents[1] / 'test/output/'
+            path = output_path / 'edges_complex_cut.shp'
+            edges_complex.to_file(path, driver='ESRI Shapefile', encoding='utf-8')
+            print(path, 'saved')
+            # also save edges_complex_cut.p
+            with open((output_path / 'edges_complex_cut.p'), 'wb') as handle:
+                pickle.dump(edges_complex, handle)
+                print(output_path, 'edges_complex_cut.p saved')"""
+
+        return edges_complex
+
+
+    def cut(self, line, distance):
+        """Cuts a line in two at a distance from its starting point
+
+        :param line: a shapely geometry line object (shapely.geometry.linestring.LineString)
+        :param distance: distance from starting point of linestring (float)
+        :return: a list containing two shapely linestring objects.
+        """
+
+        if distance <= 0.0 or distance >= line.length:
+            return [LineString(line)]
+        coords = list(line.coords)
+        for i, p in enumerate(coords):
+            pd = line.project(Point(p))
+            if pd == distance:
+                return [
+                    LineString(coords[:i+1]),
+                    LineString(coords[i:])]
+            if pd > distance:
+                cp = line.interpolate(distance)
+                return [
+                    LineString(coords[:i] + [(cp.x, cp.y)]),
+                    LineString([(cp.x, cp.y)] + coords[i:])]
+
+    def check_divisibility(self, dividend, divisor):
+        """Checks if the dividend is a multiple of the divisor and outputs a
+        boolean value
+
+        :param dividend: the number which is divided (float)
+        :param divisor: the number which divides (float)
+        :return: bool: True if the dividend is a multiple of the divisor, False if not (bool)
+        """
+
+        dividend = Decimal(str(dividend))
+        divisor = Decimal(str(divisor))
+        remainder = dividend % divisor
+
+        if remainder == Decimal('0'):
+            is_multiple = True
+            return is_multiple
+        else:
+            is_multiple = False
+            return is_multiple
+
+
+    def number_of_segments(self, linestring, split_length):
+        """returns the integer number of segments which will result from chopping up a linestring with split_length
+
+        :param linestring: a shapely linestring object. (shapely.geometry.multilinestring.MultiLineString)
+        :param split_length: the length by which to divide the linestring object. (float)
+        :return: n: integer number of segments which will result from splitting linestring with split_length. (int)
+        """
+
+        divisible = self.check_divisibility(linestring.length, split_length)
+        if divisible:
+            n = int(linestring.length/split_length)
+        else:
+            n = int(linestring.length/split_length)+1
+        return n
+
+
+    def split_linestring(self, linestring, split_length):
+        """cuts a linestring in equivalent segments of length split_length
+
+        :param linestring: linestring object. (shapely.geometry.linestring.LineString)
+        :param split_length: length by which to split the linestring into equal segments. (float)
+        :return: result_list: list of linestring objects all having the same length. (list)
+        """
+
+        n_segments = self.number_of_segments(linestring, split_length)
+        if n_segments != 1:
+            result_list = [None]*n_segments
+            current_right_linestring = linestring
+
+            for i in range(0, n_segments-1):
+                r = cut(current_right_linestring, split_length)
+                current_left_linestring = r[0]
+                current_right_linestring = r[1]
+                result_list[i] = current_left_linestring
+                result_list[i+1] = current_right_linestring
+        else:
+            result_list = [linestring]
+
+        return result_list
+
+
+    def cut_gdf(self):
+        """
+        Cuts every linestring or multilinestring feature in a gdf to equal length segments. Assumes only linestrings for now.
+
+            *gdf* (GeoDataFrame) : GeoDataFrame to split
+            *length* (units of the projection) : Typically in degrees, 0.001 degrees ~ 111 m in Europe
+        """
+        gdf = self.edges_complex
+        columns = gdf.columns
+        data = {}
+        data['splt_id'] = []
+
+        for column in columns:
+            data[column] = []
+
+        count = 0
+        for i, row in gdf.iterrows():
+            geom = row['geometry']
+            assert type(geom)==LineString
+            linestrings = self.split_linestring(geom, self.segmentation_length)
+
+            for j, linestring in enumerate(linestrings):
+                for key, value in row.items():
+                    if key=='geometry':
+                        data[key].append(linestring)
+                    else:
+                        data[key].append(value)
+                data['splt_id'].append(count)
+                count += 1
+
+        return gpd.GeoDataFrame(data)
