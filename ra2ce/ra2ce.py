@@ -6,12 +6,13 @@ Created on 26-7-2021
 """
 
 from pathlib import Path
+import click
 
 # Local modules
-from utils import parse_config, initiate_root_logger, configure_analyses, load_config
-from graph.networks import Network
-from analyses.direct import analyses_direct
-from analyses.indirect import analyses_indirect
+from .utils import initiate_root_logger, load_config
+from .graph.networks import Network
+from .analyses.direct import analyses_direct
+from .analyses.indirect import analyses_indirect
 
 
 def main(network_ini=None, analyses_ini=None):
@@ -52,5 +53,13 @@ def main(network_ini=None, analyses_ini=None):
             analyses_indirect.IndirectAnalyses(config_analyses).execute()
 
 
+@click.command()
+@click.option("--network_ini", default=r"D:\ra2ceMaster\ra2ce\data\test\network.ini", help="Full path to the network.ini file.")
+@click.option("--analyses_ini", default=r"D:\ra2ceMaster\ra2ce\data\test\analyses.ini", help="Full path to the analyses.ini file.")
+def cli(network_ini, analyses_ini):
+    main(network_ini, analyses_ini)
+
+
 if __name__ == '__main__':
+    # cli()
     main(r"D:\ra2ceMaster\ra2ce\data\test\network.ini", r"D:\ra2ceMaster\ra2ce\data\test\analyses.ini")
