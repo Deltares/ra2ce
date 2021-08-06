@@ -35,6 +35,8 @@ def input_validation(config):
     list_analyses = list_direct_analyses + list_indirect_analyses
     check_answer = {'source': ['OSM PBF', 'OSM download', 'shapefile', 'pickle'],
                     'polygon': ['file', None],
+                    'primary_file': ['file', None],
+                    'diversion_file': ['file', None],
                     'directed': [True, False],
                     'network_type': ['walk', 'bike', 'drive', 'drive_service', 'all'],
                     'road_types': ['motorway', 'motorway_link', 'trunk', 'trunk_link', 'primary', 'primary_link', 'secondary',
@@ -48,7 +50,7 @@ def input_validation(config):
                     'aggregate_wl': ['max', 'min', 'mean'],
                     'weighing': ['distance', 'time']}
     input_dirs = {'polygon': 'static/network', 'hazard_map': 'static/hazard', 'origins': 'static/network',
-                  'destinations': 'static/network'}
+                  'destinations': 'static/network', 'primary_file': 'static/network', 'diversion_file': 'static/network'}
 
     error = False
     for key in config:

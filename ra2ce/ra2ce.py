@@ -8,12 +8,14 @@ Created on 26-7-2021
 
 from pathlib import Path
 import click
+import warnings
+warnings.filterwarnings('ignore', message='.*initial implementation of Parquet.*')
 
 # Local modules
-from utils import initiate_root_logger, load_config
-from graph.networks import Network
-from analyses.direct import analyses_direct
-from analyses.indirect import analyses_indirect
+from .utils import initiate_root_logger, load_config
+from .graph.networks import Network
+from .analyses.direct import analyses_direct
+from .analyses.indirect import analyses_indirect
 
 
 def main(network_ini=None, analyses_ini=None):
@@ -29,16 +31,17 @@ def main(network_ini=None, analyses_ini=None):
     # Initiate the log file, save in the output folder.
     initiate_root_logger(str(config_network['output'] / 'RA2CE.log'))
 
-    # Create the output folders
-    if 'direct' in config_analyses:
-        for a in config_analyses['direct']:
-            output_path = config_analyses['output'] / a['analysis']
-            output_path.mkdir(parents=True, exist_ok=True)
+    if analyses_ini:
+        # Create the output folders
+        if 'direct' in config_analyses:
+            for a in config_analyses['direct']:
+                output_path = config_analyses['output'] / a['analysis']
+                output_path.mkdir(parents=True, exist_ok=True)
 
-    if 'indirect' in config_analyses:
-        for a in config_analyses['indirect']:
-            output_path = config_analyses['output'] / a['analysis']
-            output_path.mkdir(parents=True, exist_ok=True)
+        if 'indirect' in config_analyses:
+            for a in config_analyses['indirect']:
+                output_path = config_analyses['output'] / a['analysis']
+                output_path.mkdir(parents=True, exist_ok=True)
 
     # Create the network if not yet created
     if network_ini:
@@ -61,6 +64,6 @@ def cli(network_ini, analyses_ini):
     main(network_ini, analyses_ini)
 
 
-if __name__ == '__main__':
-    # cli()
-    main(r"D:\ra2ceMaster\ra2ce\data\test\network.ini", r"D:\ra2ceMaster\ra2ce\data\test\analyses.ini")
+# if __name__ == '__main__':
+#     # cli()
+#     main(r"D:\ra2ceMaster\ra2ce\data\test\network.ini", r"D:\ra2ceMaster\ra2ce\data\test\analyses.ini")

@@ -5,14 +5,15 @@ Created on 26-7-2021
 @author: F.C. de Groen, Deltares
 @author: M. Kwant, Deltares
 """
+import sys
+sys.path.append(r"d:\ra2ceMaster\trails-master\src\trails")
 
 # external modules
 from osgeo import gdal
 import numpy as np
 import time
-from osmnx.geometries import geometries_from_xml
-from osmnx.graph import _create_graph
-from osmnx.graph import graph_from_xml
+from pyrosm import OSM, get_data
+import igraph as ig
 
 # local modules
 from .networks_utils import *
@@ -89,7 +90,6 @@ class Network:
             lines_merged.to_file(os.path.join(self.output_path, "{}_lines_that_merged.shp".format(self.name)))
             logging.info("Function [edges_to_shp]: saved at ".format(os.path.join(self.output_path, '{}_lines_that_merged'.format(self.name))))
 
-
         # Get the unique points at the end of lines and at intersections to create nodes
         nodes = create_nodes(edges, crs)
         logging.info("Function [create_nodes]: executed")
@@ -134,38 +134,30 @@ class Network:
         """
         road_types = self.road_types.lower().replace(' ', ' ').split(',')
 
-        input_path = self.config['static'] / "network"
-        osm_convert_exe = self.config['root_path'] / "executables" / 'osmconvert64.exe'
-        osm_filter_exe = self.config['root_path'] / "executables" / 'osmfilter.exe'
-        assert osm_convert_exe.exists() and osm_filter_exe.exists()
+        # Initialize reader
+        osm = OSM(str(self.primary_files[0]))
 
-        pbf_file = input_path / self.primary_files
-        o5m_path = input_path / self.primary_files.replace('.pbf', '.o5m')
-        o5m_filtered_path = input_path / self.primary_files.replace('.pbf', '_filtered.o5m')
+        # Read nodes and edges of the 'driving' network
+        nodes, edges = osm.get_network(nodes=True, network_type="driving")
 
-        if o5m_filtered_path.exists():
-            logging.info('filtered o5m path already exists: {}'.format(o5m_filtered_path))
-        elif o5m_path.exists():
-            filter_osm(osm_filter_exe, o5m_path, o5m_filtered_path, tags=road_types)
-            logging.info('filtered o5m pbf, created: {}'.format(o5m_path))
-        else:
-            convert_osm(osm_convert_exe, pbf_file, o5m_path)
-            filter_osm(osm_filter_exe, o5m_path, o5m_filtered_path, tags=road_types)
-            logging.info('Converted and filtered osm.pbf to o5m, created: {}'.format(o5m_path))
+        # Create a graph for igraph from nodes and edges
+        G_complex = osm.to_graph(nodes, edges, graph_type='igraph', force_bidirectional=True)
 
-        G_complex = graph_from_xml(o5m_filtered_path, bidirectional=False, simplify=False, retain_all=False)
+        # Create a GeoDataFrame from the graph
+        edges_complex = pd.DataFrame([list(G_complex.es[x]) for x in G_complex.es.attribute_names()]).T
+        edges_complex.columns = G_complex.es.attribute_names()
+        edges_complex.dropna(axis=1, how='all', inplace=True)
+        edges_complex = gpd.GeoDataFrame(edges_complex, geometry='geometry', crs='epsg:4326')
 
-        print('Start converting the graphs to geodataframes')
-        edges_complex, node_complex = graph_to_gdf(G_complex)
-
-        G_simple, G_complex = create_simplified_graph(G_complex)
+        #TODO: simplify graph with trails scripts!!
+        # G_simple, G_complex = create_simplified_graph(G_complex)
+        G_complex = graph_create_unique_ids(G_complex, new_id_name='ra2ce_fid')
 
         if self.segmentation_length is not None:
             graph = Segmentation(edges_complex, self.segmentation_length)
             graph.apply_segmentation()
 
-
-        return G_simple, edges_complex
+        return G_complex, edges_complex  #TODO: CHANGE TO G_simple when it is simplified
 
     def network_osm_download(self):
         """Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
@@ -307,15 +299,15 @@ class Network:
                 to_save.to_file(output_path, index=False)
                 logging.info(f"Saved {output_path.stem} in {output_path.resolve().parent}.")
 
-        elif type(to_save) == nx.classes.multigraph.MultiGraph:
+        elif type(to_save) == ig.Graph:
             # The file that needs to be saved is a graph
-            if 'shp' in types:
-                graph_to_shp(to_save, self.config['static'] / 'output_graph' / (name + '_edges.shp'),
-                             self.config['static'] / 'output_graph' / (name + '_nodes.shp'))
-                logging.info(f"Saved {name + '_edges.shp'} and {name + '_nodes.shp'} in {self.config['static'] / 'output_graph'}.")
+            # if 'shp' in types:  #TODO: just save the network geodataframe that is created to shp
+            #     graph_to_shp(to_save, self.config['static'] / 'output_graph' / (name + '_edges.shp'),
+            #                  self.config['static'] / 'output_graph' / (name + '_nodes.shp'))
+            #     logging.info(f"Saved {name + '_edges.shp'} and {name + '_nodes.shp'} in {self.config['static'] / 'output_graph'}.")
             if 'pickle' in types:
-                output_path_pickle = self.config['static'] / 'output_graph' / (name + '_graph.gpickle')
-                nx.write_gpickle(to_save, output_path_pickle, protocol=4)
+                output_path_pickle = self.config['static'] / 'output_graph' / (name + '_graph.pickle')
+                to_save.write_pickle(output_path_pickle, version=4)
                 logging.info(f"Saved {output_path_pickle.stem} in {output_path_pickle.resolve().parent}.")
         return output_path_pickle
 
@@ -325,7 +317,7 @@ class Network:
         to_save = ['pickle'] if not self.save_shp else ['pickle', 'shp']
 
         # For all graph and networks - check if it exists, otherwise, make the graph and/or network.
-        base_graph_path = self.config['static'] / 'output_graph' / 'base_graph.gpickle'
+        base_graph_path = self.config['static'] / 'output_graph' / 'base_graph.pickle'
         base_network_path = self.config['static'] / 'output_graph' / 'base_network.feather'
         if (base_graph_path.is_file()) and (base_network_path.is_file()):
             config_analyses['base_graph'] = base_graph_path
@@ -355,7 +347,7 @@ class Network:
             config_analyses['base_network'] = self.save_network(edge_gdf, 'base', types=to_save)
 
         if (self.origins is not None) and (self.destinations is not None):
-            od_graph_path = self.config['static'] / 'output_graph' / 'origins_destinations_graph.gpickle'
+            od_graph_path = self.config['static'] / 'output_graph' / 'origins_destinations_graph.pickle'
             if od_graph_path.is_file():
                 config_analyses['origins_destinations_graph'] = od_graph_path
                 logging.info(f"Existing graph found: {od_graph_path}.")
@@ -363,14 +355,15 @@ class Network:
                 # Origin and destination nodes should be added to the graph.
                 if (base_graph_path.is_file()) or base_graph:
                     if base_graph_path.is_file():
-                        base_graph = nx.read_gpickle(base_graph_path)
+                        base_graph = ig.Graph()
+                        base_graph = base_graph.Read_Pickle(base_graph_path)
                     od_graph = self.add_od_nodes(base_graph)
                     config_analyses['origins_destinations_graph'] = self.save_network(od_graph, 'origins_destinations', types=to_save)
 
         if self.hazard_map is not None:
             # There is a hazard map or multiple hazard maps that should be intersected with the graph.
             # Overlay the hazard on the geodataframe as well (todo: combine with graph overlay if both need to be done?)
-            base_graph_hazard_path = self.config['static'] / 'output_graph' / 'base_hazard_graph.gpickle'
+            base_graph_hazard_path = self.config['static'] / 'output_graph' / 'base_hazard_graph.pickle'
             if base_graph_hazard_path.is_file():
                 config_analyses['base_hazard_graph'] = base_graph_hazard_path
                 logging.info(f"Existing graph found: {base_graph_hazard_path}.")
@@ -384,7 +377,7 @@ class Network:
                 else:
                     logging.warning("No base graph found to intersect the hazard with. Check your network.ini file.")
 
-            od_graph_hazard_path = self.config['static'] / 'output_graph' / 'origins_destinations_hazard_graph.gpickle'
+            od_graph_hazard_path = self.config['static'] / 'output_graph' / 'origins_destinations_hazard_graph.pickle'
             if od_graph_hazard_path.is_file():
                 config_analyses['origins_destinations_hazard_graph'] = od_graph_hazard_path
                 logging.info(f"Existing graph found: {od_graph_hazard_path}.")

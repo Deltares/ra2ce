@@ -845,22 +845,22 @@ def create_simplified_graph(graph_complex, new_id='ra2ce_fid'):
     try:
         graph_complex = graph_create_unique_ids(graph_complex, '{}_complex'.format(new_id))
 
-        #create simplified graph and add unique ids
+        # Create simplified graph and add unique ids
         graph_simple = simplify_graph_count(graph_complex)
-        graph_simple = graph_create_unique_ids(graph_simple, '{}_simple'.format(new_id))
+        graph_simple = graph_create_unique_ids(graph_simple, new_id)
 
-        #   Create look_up_tables between graphs with unique ids
+        # Create look_up_tables between graphs with unique ids
         simple_to_complex, complex_to_simple = graph_link_simple_id_to_complex(graph_simple, new_id=new_id, save_json_folder=None)
 
-        #store id table and add simple ids to complex graph
+        # Store id table and add simple ids to complex graph
         id_tables = (simple_to_complex, complex_to_simple)
-        graph_complex = add_simple_id_to_graph_complex(graph_complex, complex_to_simple)
+        graph_complex = add_simple_id_to_graph_complex(graph_complex, complex_to_simple, new_id)
         logging.info('simplified graph succesfully created')
     except:
         graph_simple = None
         id_tables = None
         logging.error('Did not create a simplified version of the graph')
-    return graph_simple, graph_complex, id_tables
+    return graph_simple, graph_complex  #, id_tables
 
 
 def gdf_check_create_unique_ids(gdf, id_name, new_id_name='ra2ce_fid'):
@@ -893,12 +893,9 @@ def graph_check_create_unique_ids(graph, idname, new_id_name='ra2ce_fid'):
 
 def graph_create_unique_ids(graph, new_id_name='ra2ce_fid'):
     # Check if new_id_name exists and if unique
-    u, v, k = list(graph.edges)[0]
-    if new_id_name not in graph.edges[u, v, k]:
-        # TODO: decide if we always add a new ID (in iGraph this is different)
-        # if len(set([str(e[-1][new_id_name]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
-        for i, (u, v, k) in enumerate(graph.edges(keys=True)):
-            graph[u][v][k][new_id_name] = i + 1
+    if new_id_name not in graph.es.attributes():
+        for i in range(len(graph.es)):
+            graph.es[i][new_id_name] = i + 1
         logging.info("Added a new unique identifier field '{}'.".format(new_id_name))
         return graph
     else:
@@ -907,14 +904,14 @@ def graph_create_unique_ids(graph, new_id_name='ra2ce_fid'):
 
 def add_missing_geoms_graph(graph, geom_name='geometry'):
     # Not all nodes have geometry attributed (some only x and y coordinates) so add a geometry columns
-    nodes_without_geom = [n[0] for n in graph.nodes(data=True) if geom_name not in n[-1]]
+    #TODO: check if this is even necessary and how to correctly do it if necessary
+    nodes_without_geom = [n.index for n in graph.vs if geom_name not in n.attributes()]
     for nd in nodes_without_geom:
-        graph.nodes[nd][geom_name] = Point(graph.nodes[nd]['x'], graph.nodes[nd]['y'])
+        graph.vs[nd][geom_name] = Point(graph.vs[nd]['x'], graph.vs[nd]['y'])
 
-    edges_without_geom = [e for e in graph.edges.data(keys=True) if geom_name not in e[-1]]
-    for ed in edges_without_geom:
-        graph[ed[0]][ed[1]][ed[2]][geom_name] = LineString(
-            [graph.nodes[ed[0]][geom_name], graph.nodes[ed[1]][geom_name]])
+    edges_without_geom = [(e.index, e.attributes()['u_seq'], e.attributes()['v_seq']) for e in graph.es if geom_name not in e.attributes()]
+    for ed, u_seq, v_seq in edges_without_geom:
+        graph.es[ed][geom_name] = LineString([graph.vs[u_seq][geom_name], graph.vs[v_seq][geom_name]])
 
     return graph
 
@@ -1292,7 +1289,7 @@ def graph_link_simple_id_to_complex(graph_simple, new_id, save_json_folder=None)
     lookup_dict = {}
     # keys are the ids of the simple graph, values are lists with all matching complex id's
     for u, v, k in tqdm.tqdm(graph_simple.edges(keys=True)):
-        key_1 = graph_simple[u][v][k]['{}_simple'.format(new_id)]
+        key_1 = graph_simple[u][v][k]['{}'.format(new_id)]
         value_1 = graph_simple[u][v][k]['{}_complex'.format(new_id)]
         lookup_dict[key_1] = value_1
 
@@ -1347,7 +1344,7 @@ def add_simple_id_to_graph_complex(G_complex, complex_to_simple, new_id):
             simple_ids_per_complex_id[key] = None
 
     # Now the format of simple_ids_per_complex_id is: {(u,v,k) : 'G_fid_simple}
-    set_edge_attributes(G_complex, simple_ids_per_complex_id, 'G_fid_simple')
+    set_edge_attributes(G_complex, simple_ids_per_complex_id, new_id)
 
     return G_complex
 

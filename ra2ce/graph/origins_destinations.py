@@ -64,10 +64,10 @@ def create_OD_pairs(od, graph, id_name='ra2ce_fid'):
 
     # find closest vertice of road network to centroid
     # create dictionary of the roads geometries
-    edge_list = [e for e in graph.edges.data() if 'geometry' in e[-1]]
+    edge_list = [(e.attributes()['ra2ce_fid'], e.attributes()['geometry']) for e in graph.es if 'geometry' in e.attributes()]
     vertices_dict = {}
-    for i, line in enumerate(edge_list):
-        vertices_dict[(line[0], line[1])] = [Point(p) for p in set(list(line[-1]['geometry'].coords))]
+    for ids, geom in edge_list:
+        vertices_dict[ids] = [Point(p) for p in set(list(geom.coords))]
 
     # create list of all points to search in
     all_vertices = [p for sublist in list(vertices_dict.values()) for p in sublist]
@@ -100,7 +100,7 @@ def find_closest_vertice(origins_destinations, spatial_idx, search_vertices, ver
 
         # check on which road this point lays
         road_i = getKeysByValue(vertices_dict, points_list[0])
-        match_ids.append([i[-1][id_name] for i in edge_list if (road_i[0] == i[0]) and (road_i[1] == i[1])][0])
+        match_ids.append(road_i)
 
         # save in list
         ODs.append(points_list[0])
@@ -219,22 +219,21 @@ def add_od_nodes(graph, od, id_name='ra2ce_fid'):
     od['match_ids'] = od['match_ids'].astype(str)
 
     # Check the highest node id, to add on that
-    max_node_id = max([n for n in graph.nodes()])
+    max_node_id = max([n.index for n in graph.vs])
     logging.info('Adding Origin-Destination nodes to graph...')
 
     for i in trange(len(od.index), desc='Adding Origin-Destination nodes to graph', leave=True):
         # the vertice on the edge that is closest to the origin/destination point
         match_OD = od.iloc[i]['OD']
         # Check which roads belong to the centroids closest vertices
-        all_matches = [e for e in graph.edges(data=True, keys=True) if str(e[-1][id_name]) == od.iloc[i]['match_ids']]
+        all_matches = [e.attributes()[id_name] for e in graph.es if str(e.attributes()[id_name]) == od.iloc[i]['match_ids']]
         if len(all_matches) > 1:
             # all_matches = [am for am in all_matches if match_OD in [(Point(p) for p in set(list(am[-1]['geometry'].coords)))]]
-            all_matches = [am for am in all_matches if match_OD.coords[0] in [p for p in set(list(am[-1]['geometry'].coords))]]
+            all_matches = [am for am in all_matches if match_OD.coords[0] in [p for p in set(list(graph.es[am]['geometry'].coords))]]
             if len(all_matches) == 0:  # created to find nearest vertice when a new edge has already been created
                 #todo build this in in the other def find nearest vertice
-                edge_list = [e for e in graph.edges(data=True, keys=True) if
-                             str(e[-1][id_name]) == od.iloc[i]['match_ids']]
-                all_matches,match_OD = find_new_nearest_vertice(edge_list,graph, od, id_name, match_OD, i)
+                edge_list = [e for e in graph.edges(data=True, keys=True) if str(e[-1][id_name]) == od.iloc[i]['match_ids']]
+                all_matches, match_OD = find_new_nearest_vertice(edge_list, graph, od, id_name, match_OD, i)
         if len(all_matches) == 1:
             if [am for am in all_matches if match_OD.coords[0] in [p for p in set(list(am[-1]['geometry'].coords))]] == []:
                 edge_list = [e for e in graph.edges(data=True, keys=True) if
