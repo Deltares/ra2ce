@@ -349,6 +349,13 @@ class Network:
             # Check if all geometries between nodes are there, if not, add them as a straight line.
             base_graph = add_missing_geoms_graph(base_graph, geom_name='geometry')
 
+            # TODO combine so that merge lines always works currently only for shp files
+            # self.file_id = 'osmid'
+            # if self.config['cleanup']['merge_lines'] is True:
+            #     edge_gdf = merge_lines_automatic(edge_gdf, self.file_id, aadtNames=None, crs_=4326)
+            # edge_gdf = merge_lines_automatic(edge_gdf, self.file_id, aadtNames=None, crs_=4326)
+            # edge_gdf = merge_lines_shpfiles(edge_gdf, self.file_id, aadtNames=None, crs_=4326)
+
             # Save the graph and geodataframe
             config_analyses['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
             config_analyses['base_network'] = self.save_network(edge_gdf, 'base', types=to_save)

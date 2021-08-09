@@ -266,6 +266,148 @@ def merge_lines_shpfiles(lines_gdf, idName, aadtNames, crs_):
     return merged, lines_merged
 
 
+def merge_lines_automatic(lines_gdf, idName, aadtNames, crs_):
+    """Automatically merge lines based on a config file
+    Args:
+        lines_gdf (geodataframe): the network with edges that can possibly be merged
+        idName (string): name of the Unique ID column in the lines_gdf
+        aadtNames (list of strings): names of the columns of the AADT (average annual daily traffic)
+        crs_ (int): the EPSG number of the coordinate reference system that is used
+    Returns:
+        lines_gdf (geodataframe): the network with edges that are (not) merged
+        lines_merged (geodataframe): the lines that are merged, if lines are merged. Otherwise it returns an empty GDF
+    """
+    list_lines = list(lines_gdf['geometry'])
+
+    # Multilinestring to linestring
+    try:
+        merged_lines = linemerge(list_lines)  # merge the lines of both shapefiles
+    except NotImplementedError as e:
+        Exception("Your data contains Multi-part geometries, you cannot merge lines.", e)
+        return lines_gdf, gpd.GeoDataFrame()
+    # merge_input ='y'
+
+    # continue
+    if len(merged_lines.geoms) < len(list_lines) and aadtNames:
+        # the number of merged lines is smaller than the number of lines in the input, so lines can be merged
+        yes_to_all = 'all'  # or in ['all', 'single']
+        # ask the user if they want to take the max, min or average for all values
+        all_type = 'max' # or ['max', 'min', 'mean']
+
+    elif len(merged_lines.geoms) < len(list_lines) and not aadtNames:
+
+        # the_input = 'y'
+        lines_gdf = lines_gdf.dissolve(by=idName, aggfunc='max')
+        lines_gdf.reset_index(inplace=True)
+
+    elif len(merged_lines.geoms) == len(list_lines):
+        print("No lines are merged.")
+        return lines_gdf, gpd.GeoDataFrame()
+    else:
+        # The lines have no additional properties.
+        return lines_gdf, gpd.GeoDataFrame()
+
+    # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
+    # The list of fid's is reduced by the fid's that are not anymore in the merged lines
+    lines_fids = list(zip(list_lines, lines_gdf[idName]))  # create tuples from the list of lines and the list of fid's
+    lines_merged = gpd.GeoDataFrame(columns=[idName, 'geometry'], crs={'init': 'epsg:{}'.format(crs_)},
+                                    geometry='geometry')
+    merged = gpd.GeoDataFrame(columns=[idName, 'to_analyse', 'geometry'], crs={'init': 'epsg:{}'.format(crs_)},
+                              geometry='geometry')
+
+    for mline in merged_lines:
+        for line, i in lines_fids:
+            full_line = line
+            if line.within(mline) and not line.equals(mline):
+                # if the line is within the merged line but is not the same, the line is part of a merged line
+                line_set_merged = [line]
+                fid_set_merged = [i]
+
+                if aadtNames:
+                    aadts_set_merged = [lines_gdf[lines_gdf[idName] == i][aadtNames].iloc[0].tolist()]
+                else:
+                    aadts_set_merged = []
+
+                class_set_merged = lines_gdf[lines_gdf[idName] == i]['to_analyse'].tolist()
+
+                while not full_line.equals(mline):
+                    for line2, j in lines_fids:
+                        if line2.within(mline) and not line2.equals(mline) and line != line2:
+                            line_set_merged.append(line2)
+                            fid_set_merged.append(j)
+                            if aadtNames:
+                                aadts_set_merged.append(lines_gdf[lines_gdf[idName] == i][aadtNames].iloc[0].tolist())
+
+                            class_set_merged.append(int(lines_gdf[lines_gdf[idName] == i]['to_analyse'].iloc[0]))
+
+                            lines_fids.remove((line2,
+                                               j))  # remove the lines that have been through the iteration so there are no duplicates
+                    full_line = linemerge(line_set_merged)
+                lines_fids.remove(
+                    (line, i))  # remove the lines that have been through the iteration so there are no duplicates
+                lines_merged = lines_merged.append({idName: i, 'geometry': full_line},
+                                                   ignore_index=True)  # the lines in this list are the same lines that make up the merged line
+
+                # check with the user the right traffic count for the merged lines
+                if aadts_set_merged:  # check if the list is not empty
+                    aadts_set_merged = [i for i in aadts_set_merged if not all(v is None for v in i)]
+                    if len(aadts_set_merged) > 1 and isinstance(aadts_set_merged[0], list):
+                        if yes_to_all == "all":
+                            if all_type == "max":
+                                aadts_set_merged = [max(sublist) for sublist in list(map(list, zip(*aadts_set_merged)))]
+                            elif all_type == "min":
+                                aadts_set_merged = [min(sublist) for sublist in list(map(list, zip(*aadts_set_merged)))]
+                            elif all_type == "mean":
+                                aadts_set_merged = [mean(sublist) for sublist in
+                                                    list(map(list, zip(*aadts_set_merged)))]
+
+                # check with the user the right road class for the merged lines
+                if isinstance(class_set_merged, list):
+                    if len(set(class_set_merged)) == 1:
+                        class_set_merged = class_set_merged[0]
+                    elif len(set(class_set_merged)) > 1:
+                        # class_input = input(
+                        #    """Road segment with id {} is merged. Choose the right values for the road class
+                        #    by entering the right road class and pressing enter. The different classes: {} \n Your input: """.format(
+                        #        fid_set_merged, class_set_merged))
+                        # class_set_merged = int(class_input)
+                        class_set_merged = 1
+
+                # add values to the dataframe
+                this_fid = [x[0] if isinstance(x, list) else x for x in fid_set_merged][
+                    0]  # take the first feature ID for the merged lines
+
+                # initiate dict for new row in merged gdf
+                properties_dict = {idName: this_fid, 'to_analyse': class_set_merged, 'geometry': mline}
+
+                if aadtNames:
+                    if isinstance(aadts_set_merged[0], list):
+                        this_aadts = aadts_set_merged[0]
+                    else:
+                        this_aadts = aadts_set_merged
+
+                    # update dict for new row in merged gdf
+                    properties_dict.update({a: aadt_val for a, aadt_val in zip(aadtNames, this_aadts)})
+
+                # append row to merged gdf
+                merged = merged.append(properties_dict, ignore_index=True)
+
+            elif line.equals(mline):
+                # this line is not merged
+                properties_dict = {idName: i,
+                                   'to_analyse': lines_gdf.loc[lines_gdf[idName] == i, 'to_analyse'].iloc[0],
+                                   'geometry': mline}
+
+                if aadtNames:
+                    properties_dict.update({a: aadt_val for a, aadt_val in
+                                            zip(aadtNames, lines_gdf.loc[lines_gdf[idName] == i][aadtNames].iloc[0])})
+                merged = merged.append(properties_dict, ignore_index=True)
+
+    merged['length'] = merged['geometry'].apply(lambda x: line_length(x))
+
+    return merged, lines_merged
+
+
 def pairs(lst):
     """Iterate over a list in overlapping pairs without wrap-around.
     Args:
