@@ -26,11 +26,15 @@ class DirectAnalyses:
     def __init__(self, config):
         self.config = config
 
-    def road_damage(self):
-        graph = nx.read_gpickle(self.config['base_hazard_graph'])
-        # gdf = self.road_damage(g, analysis)
+    def road_damage(self, graph=None, analysis=None):
 
-        gdf = osmnx.graph_to_gdfs(graph, nodes=False)
+        if graph is None:
+            graph = nx.read_gpickle(self.config['base_hazard_graph'])
+            gdf = osmnx.graph_to_gdfs(graph, nodes=False)
+        else:
+            gdf = self.road_damage(graph, analysis)
+
+
 
         # TODO: This should probably not be done here, but at the create network function
         # apply road mapping to fewer types
