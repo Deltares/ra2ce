@@ -29,7 +29,7 @@ class DirectAnalyses:
     def road_damage(self, graph=None, analysis=None):
 
         if graph is None:
-            graph = nx.read_gpickle(self.config['base_hazard_graph'])
+            graph = nx.read_gpickle(self.config['files']['base_hazard_graph'])
             gdf = osmnx.graph_to_gdfs(graph, nodes=False)
         else:
             gdf = self.road_damage(graph, analysis)
@@ -228,7 +228,9 @@ def apply_cleanup(x):
 
 
 class HazardDirect:
-    def line_length(self, line, ellipsoid='WGS-84', shipping=True):
+
+    @staticmethod
+    def line_length(line, ellipsoid='WGS-84', shipping=True):
         """Length of a line in meters, given in geographic coordinates
 
         Adapted from https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
@@ -259,7 +261,8 @@ class HazardDirect:
                 for a, b in pairwise(line.coords)
             )
 
-    def create_hzd_df(self, geometry, hzd_list, hzd_names):
+    @staticmethod
+    def create_hzd_df(geometry, hzd_list, hzd_names):
         """
         Arguments:
 
@@ -310,7 +313,8 @@ class HazardDirect:
                 all_hzds.append(gdf)
         return pd.concat(all_hzds)
 
-    def intersect_hazard(self, x, hzd_reg_sindex, hzd_region):
+    @staticmethod
+    def intersect_hazard(x, hzd_reg_sindex, hzd_region):
         """
         Arguments:
 
@@ -350,7 +354,8 @@ class HazardDirect:
             print(e)
             return x.geometry, 0
 
-    def add_hazard_data_to_road_network(self, road_gdf, region_path, hazard_path, tolerance=0.00005):
+    @staticmethod
+    def add_hazard_data_to_road_network(road_gdf, region_path, hazard_path, tolerance=0.00005):
         """
         Adds the hazard data to the road network, i.e. creates an exposure map
 
