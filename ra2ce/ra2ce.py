@@ -43,7 +43,20 @@ def main(network_ini=None, analyses_ini=None):
     # Create the network if not yet created
     if network_ini:
         network = Network(config_network)
-        config_analyses = network.create(config_analyses)
+        base_graph, edge_gdf, od_graph = network.create()
+
+
+        test=1
+
+        if network.hazard_map is not None:
+            # There is a hazard map or multiple hazard maps that should be intersected with the graph.
+            # Overlay the hazard on the geodataframe as well (todo: combine with graph overlay if both need to be done?)
+
+            base_graph = nx.read_gpickle(self.base_graph_path)
+            haz = Hazard(self.config, base_graph, self.hazard_map, self.aggregate_wl)
+            haz.create(config_analyses)
+
+        config_analyses['files'] = network.config['files']
 
     # Do the analyses
     if analyses_ini:
@@ -55,8 +68,8 @@ def main(network_ini=None, analyses_ini=None):
 
 
 @click.command()
-@click.option("--network_ini", default=r"D:\ra2ceMaster\ra2ce\data\test\network.ini", help="Full path to the network.ini file.")
-@click.option("--analyses_ini", default=r"D:\ra2ceMaster\ra2ce\data\test\analyses.ini", help="Full path to the analyses.ini file.")
+@click.option("--network_ini", default=None, help="Full path to the network.ini file.")
+@click.option("--analyses_ini", default=None, help="Full path to the analyses.ini file.")
 def cli(network_ini, analyses_ini):
     main(network_ini, analyses_ini)
 

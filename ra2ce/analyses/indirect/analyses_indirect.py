@@ -206,6 +206,7 @@ class IndirectAnalyses:
                 if analysis['weighing'] == 'distance':
                     # The name is different in the graph.
                     analysis['weighing'] = 'length'
+
             if analysis['analysis'] == 'single_link_redundancy':
                 g = nx.read_gpickle(self.config['base_graph'])
                 gdf = self.single_link_redundancy(g, analysis)

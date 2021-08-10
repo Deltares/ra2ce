@@ -52,6 +52,13 @@ class Network:
         self.pruning = config['cleanup']['pruning_threshold']
         self.segmentation_length = config['cleanup']['segmentation_length']
 
+        # files
+        self.base_graph_path = config['files']['base_graph']
+        self.base_network_path = config['files']['base_network']
+        self.od_graph_path = config['files']['origins_destinations_graph']
+        self.base_hazard_path = config['files']['base_hazard_graph']
+        self.od_hazard_path = config['files']['origins_destinations_hazard_graph']
+
     def network_shp(self, crs=4326):
         """Creates a (graph) network from a shapefile
         Args:
@@ -318,20 +325,16 @@ class Network:
                 logging.info(f"Saved {output_path_pickle.stem} in {output_path_pickle.resolve().parent}.")
         return output_path_pickle
 
-    def create(self, config_analyses):
+    def create(self):
         """Function with the logic to call the right analyses."""
         # Save the 'base' network as gpickle and if the user requested, also as shapefile.
         to_save = ['pickle'] if not self.save_shp else ['pickle', 'shp']
+        od_graph = None
+        base_graph = None
+        edge_gdf = None
 
         # For all graph and networks - check if it exists, otherwise, make the graph and/or network.
-        base_graph_path = self.config['static'] / 'output_graph' / 'base_graph.gpickle'
-        base_network_path = self.config['static'] / 'output_graph' / 'base_network.feather'
-        if (base_graph_path.is_file()) and (base_network_path.is_file()):
-            config_analyses['base_graph'] = base_graph_path
-            config_analyses['base_network'] = base_network_path
-            logging.info(f"Existing graph found: {base_graph_path}.")
-            logging.info(f"Existing network found: {base_network_path}.")
-        else:
+        if self.base_graph_path is None and self.base_network_path is None:
             # Create the network from the network source
             if self.source == 'shapefile':
                 logging.info('Start creating a network from the submitted shapefile.')
@@ -349,71 +352,23 @@ class Network:
             # Check if all geometries between nodes are there, if not, add them as a straight line.
             base_graph = add_missing_geoms_graph(base_graph, geom_name='geometry')
 
-            # TODO combine so that merge lines always works currently only for shp files
-            # self.file_id = 'osmid'
-            # if self.config['cleanup']['merge_lines'] is True:
-            #     edge_gdf = merge_lines_automatic(edge_gdf, self.file_id, aadtNames=None, crs_=4326)
-            # edge_gdf = merge_lines_automatic(edge_gdf, self.file_id, aadtNames=None, crs_=4326)
-            # edge_gdf = merge_lines_shpfiles(edge_gdf, self.file_id, aadtNames=None, crs_=4326)
-
             # Save the graph and geodataframe
-            config_analyses['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
-            config_analyses['base_network'] = self.save_network(edge_gdf, 'base', types=to_save)
+            self.config['files']['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
+            self.config['files']['base_network'] = self.save_network(edge_gdf, 'base', types=to_save)
 
-        if (self.origins is not None) and (self.destinations is not None):
-            od_graph_path = self.config['static'] / 'output_graph' / 'origins_destinations_graph.gpickle'
-            if od_graph_path.is_file():
-                config_analyses['origins_destinations_graph'] = od_graph_path
-                logging.info(f"Existing graph found: {od_graph_path}.")
-            else:
-                # Origin and destination nodes should be added to the graph.
-                if (base_graph_path.is_file()) or base_graph:
-                    if base_graph_path.is_file():
-                        base_graph = nx.read_gpickle(base_graph_path)
-                    od_graph = self.add_od_nodes(base_graph)
-                    config_analyses['origins_destinations_graph'] = self.save_network(od_graph, 'origins_destinations', types=to_save)
+        # create origins destinations graph
+        if (self.origins is not None) and (self.destinations is not None) and self.od_graph_path is None:
+            if self.base_graph_path is not None:
+                base_graph = nx.read_gpickle(self.base_graph_path)
+            od_graph = self.add_od_nodes(base_graph)
+            self.config['files']['origins_destinations_graph'] = self.save_network(od_graph, 'origins_destinations', types=to_save)
 
-        if self.hazard_map is not None:
-            # There is a hazard map or multiple hazard maps that should be intersected with the graph.
-            # Overlay the hazard on the geodataframe as well (todo: combine with graph overlay if both need to be done?)
-            base_graph_hazard_path = self.config['static'] / 'output_graph' / 'base_hazard_graph.gpickle'
-            if base_graph_hazard_path.is_file():
-                config_analyses['base_hazard_graph'] = base_graph_hazard_path
-                logging.info(f"Existing graph found: {base_graph_hazard_path}.")
-            else:
-                if (base_graph_path.is_file()) or base_graph:
-                    if base_graph_path.is_file():
-                        base_graph = nx.read_gpickle(base_graph_path)
-                    haz = Hazard(base_graph, self.hazard_map, self.aggregate_wl)
-                    base_graph_hazard = haz.hazard_intersect()
-                    config_analyses['base_hazard_graph'] = self.save_network(base_graph_hazard, 'base_hazard', types=to_save)
-                else:
-                    logging.warning("No base graph found to intersect the hazard with. Check your network.ini file.")
-
-            od_graph_hazard_path = self.config['static'] / 'output_graph' / 'origins_destinations_hazard_graph.gpickle'
-            if od_graph_hazard_path.is_file():
-                config_analyses['origins_destinations_hazard_graph'] = od_graph_hazard_path
-                logging.info(f"Existing graph found: {od_graph_hazard_path}.")
-            else:
-                if (od_graph_path.is_file()) or od_graph:
-                    if od_graph_path.is_file():
-                        od_graph = nx.read_gpickle(od_graph_path)
-                    haz = Hazard(od_graph, self.hazard_map, self.aggregate_wl)
-                    od_graph_hazard = haz.hazard_intersect()
-                    config_analyses['origins_destinations_hazard_graph'] = self.save_network(od_graph_hazard,
-                                                                                             'origins_destinations_hazard',
-                                                                                             types=to_save)
-                else:
-                    logging.warning("No base graph found to intersect the hazard with. Check your network.ini file.")
-
-            # Add the names of the hazard files to the config_analyses
-            config_analyses['hazard_names'] = [haz.stem for haz in self.hazard_map]
-
-        return config_analyses
+        return base_graph, edge_gdf, od_graph
 
 
-class Hazard:
-    def __init__(self, graph_gdf, list_hazard_files, aggregate_wl):
+class Hazard():
+    def __init__(self, config, graph_gdf, list_hazard_files, aggregate_wl):
+
         self.list_hazard_files = list_hazard_files
         self.aggregate_wl = aggregate_wl
         if type(graph_gdf) == gpd.GeoDataFrame:
@@ -598,3 +553,30 @@ class Hazard:
             self.join_hazard_table(hazards_table)
 
         return self.g
+
+    def create(self, config_analyses):
+        """ creates the hazard overlay over a graph """
+
+        if self.base_hazard_path is None or self.od_graph_path is None:
+            logging.warning("Either a base graph or od graph is missing to intersect the hazard with. "
+                            "Check your network folder.")
+
+            # intersect hazard map with base graph
+        if self.base_hazard_path is None:
+            if self.base_graph_path is not None:
+                base_graph = nx.read_gpickle(self.base_graph_path)
+                haz = Hazard(base_graph, self.hazard_map, self.aggregate_wl)
+                base_graph_hazard = haz.hazard_intersect()
+                config_analyses['files']['base_hazard_graph'] = self.save_network(base_graph_hazard, 'base_hazard', types=to_save)
+
+            # intersect hazard map with od graph
+        if self.od_hazard_path is None and self.od_graph_path is not None:
+            od_graph = nx.read_gpickle(self.od_graph_path)
+            haz = Hazard(od_graph, self.hazard_map, self.aggregate_wl)
+            od_graph_hazard = haz.hazard_intersect()
+            config_analyses['files']['origins_destinations_hazard_graph'] = self.save_network(od_graph_hazard,
+                                                                                              'origins_destinations_hazard',
+                                                                                              types=to_save)
+
+            # Add the names of the hazard files to the config_analyses
+        config_analyses['hazard_names'] = [haz.stem for haz in self.hazard_map]
