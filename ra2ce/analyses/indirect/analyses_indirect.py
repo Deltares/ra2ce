@@ -164,7 +164,6 @@ class IndirectAnalyses:
 
         # if shortest_route:
         #     pref_routes = pref_routes.loc[pref_routes.sort_values(analysis['weighing']).groupby('o_node').head(3).index]
-
         return pref_routes
 
     def multi_link_origin_destination(self, graph, analysis):
@@ -208,16 +207,16 @@ class IndirectAnalyses:
                     analysis['weighing'] = 'length'
 
             if analysis['analysis'] == 'single_link_redundancy':
-                g = nx.read_gpickle(self.config['base_graph'])
+                g = nx.read_gpickle(self.config['files']['base_graph'])
                 gdf = self.single_link_redundancy(g, analysis)
             elif analysis['analysis'] == 'multi_link_redundancy':
-                g = nx.read_gpickle(self.config['base_hazard_graph'])
+                g = nx.read_gpickle(self.config['files']['base_graph_hazard'])
                 gdf = self.multi_link_redundancy(g, analysis)
             elif analysis['analysis'] == 'optimal_route_origin_destination':
-                g = nx.read_gpickle(self.config['origins_destinations_graph'])
+                g = nx.read_gpickle(self.config['files']['origins_destinations_graph'])
                 gdf = self.optimal_route_origin_destination(g, analysis)
             elif analysis['analysis'] == 'multi_link_origin_destination':
-                g = nx.read_gpickle(self.config['origins_destinations_hazard_graph'])
+                g = nx.read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
                 gdf = self.multi_link_origin_destination(g, analysis)
 
             output_path = self.config['output'] / analysis['analysis']
