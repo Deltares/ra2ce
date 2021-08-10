@@ -112,7 +112,7 @@ def check_shp_input(config):
 
 def check_files(config):
     """ Checks if file of graph exist in network folder and adds filename to config"""
-    file_list = ['base_graph', 'base_network', 'origins_destinations_graph', 'base_hazard_graph', 'origins_destinations_hazard_graph']
+    file_list = ['base_graph', 'base_network', 'origins_destinations_graph', 'base_graph_hazard', 'origins_destinations_graph_hazard', 'base_network_hazard']
     config['files'] = {}
     for file in file_list:
         # base network is stored as feather object

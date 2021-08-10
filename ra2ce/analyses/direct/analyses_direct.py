@@ -29,11 +29,10 @@ class DirectAnalyses:
     def road_damage(self, graph=None, analysis=None):
 
         if graph is None:
-            graph = nx.read_gpickle(self.config['files']['base_hazard_graph'])
+            graph = nx.read_gpickle(self.config['files']['base_graph_hazard'])
             gdf = osmnx.graph_to_gdfs(graph, nodes=False)
         else:
             gdf = self.road_damage(graph, analysis)
-
 
 
         # TODO: This should probably not be done here, but at the create network function

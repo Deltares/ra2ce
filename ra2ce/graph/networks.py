@@ -56,8 +56,6 @@ class Network:
         self.base_graph_path = config['files']['base_graph']
         self.base_network_path = config['files']['base_network']
         self.od_graph_path = config['files']['origins_destinations_graph']
-        self.base_hazard_path = config['files']['base_hazard_graph']
-        self.od_hazard_path = config['files']['origins_destinations_hazard_graph']
 
     def network_shp(self, crs=4326):
         """Creates a (graph) network from a shapefile
@@ -331,30 +329,30 @@ class Network:
         to_save = ['pickle'] if not self.save_shp else ['pickle', 'shp']
         od_graph = None
         base_graph = None
-        edge_gdf = None
+        network_gdf = None
 
         # For all graph and networks - check if it exists, otherwise, make the graph and/or network.
         if self.base_graph_path is None and self.base_network_path is None:
             # Create the network from the network source
             if self.source == 'shapefile':
                 logging.info('Start creating a network from the submitted shapefile.')
-                base_graph, edge_gdf = self.network_shp()
+                base_graph, network_gdf = self.network_shp()
 
             elif self.source == 'OSM PBF':
                 logging.info('Start creating a network from an OSM PBF file.')
 
-                base_graph, edge_gdf = self.network_osm_pbf()
+                base_graph, network_gdf = self.network_osm_pbf()
 
             elif self.source == 'OSM download':
                 logging.info('Start downloading a network from OSM.')
-                base_graph, edge_gdf = self.network_osm_download()
+                base_graph, network_gdf = self.network_osm_download()
 
             # Check if all geometries between nodes are there, if not, add them as a straight line.
             base_graph = add_missing_geoms_graph(base_graph, geom_name='geometry')
 
             # Save the graph and geodataframe
             self.config['files']['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
-            self.config['files']['base_network'] = self.save_network(edge_gdf, 'base', types=to_save)
+            self.config['files']['base_network'] = self.save_network(network_gdf, 'base', types=to_save)
 
         # create origins destinations graph
         if (self.origins is not None) and (self.destinations is not None) and self.od_graph_path is None:
@@ -363,22 +361,26 @@ class Network:
             od_graph = self.add_od_nodes(base_graph)
             self.config['files']['origins_destinations_graph'] = self.save_network(od_graph, 'origins_destinations', types=to_save)
 
-        return base_graph, edge_gdf, od_graph
+        return {'base_graph': base_graph, 'base_network':  network_gdf, 'origins_destinations_graph': od_graph}
 
 
-class Hazard():
-    def __init__(self, config, graph_gdf, list_hazard_files, aggregate_wl):
+class Hazard:
+    def __init__(self, network, graphs):
+        self.config = network.config
 
-        self.list_hazard_files = list_hazard_files
-        self.aggregate_wl = aggregate_wl
-        if type(graph_gdf) == gpd.GeoDataFrame:
-            self.gdf = graph_gdf
-            self.g = None
-        else:
-            self.gdf = None
-            self.g = graph_gdf
+        # graphs
+        self.graphs = graphs
 
-    def overlay_hazard_raster(self, hf):
+        # files
+        self.base_graph_path = self.config['files']['base_graph']
+        self.base_network_path = self.config['files']['base_network']
+        self.od_graph_path = self.config['files']['origins_destinations_graph']
+
+
+        self.list_hazard_files = self.config['hazard']['hazard_map']
+        self.aggregate_wl = self.config['hazard']['aggregate_wl']
+
+    def overlay_hazard_raster(self, hf, graph):
         """Overlays the hazard raster over the road segments.
 
         :param [ParamName]: [ParamDescription], defaults to [DefaultParamVal]
@@ -416,8 +418,8 @@ class Hazard():
                 nodatavalue = raster_band.GetNoDataValue()
 
             # check which road is overlapping with the flood and append the flood depth to the graph or geodataframe
-            if self.g:
-                for u, v, k, edata in self.g.edges.data(keys=True):
+            if type(graph) != gpd.GeoDataFrame:
+                for u, v, k, edata in graph.edges.data(keys=True):
                     if 'geometry' in edata:
                         # check how long the road stretch is and make a point every other meter
                         nr_points = round(edata['length'])
@@ -439,54 +441,57 @@ class Hazard():
 
                         if len(water_level) > 0:
                             if self.aggregate_wl == 'max':
-                                self.g[u][v][k][hn+'_'+self.aggregate_wl] = water_level.max()
+                                graph[u][v][k][hn+'_'+self.aggregate_wl] = water_level.max()
                             elif self.aggregate_wl == 'min':
-                                self.g[u][v][k][hn+'_'+self.aggregate_wl] = water_level.min()
+                                graph[u][v][k][hn+'_'+self.aggregate_wl] = water_level.min()
                             elif self.aggregate_wl == 'mean':
-                                self.g[u][v][k][hn+'_'+self.aggregate_wl] = mean(water_level)
+                                graph[u][v][k][hn+'_'+self.aggregate_wl] = mean(water_level)
                             else:
                                 logging.warning("No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'.")
                         else:
-                            self.g[u][v][k][hn+'_'+self.aggregate_wl] = np.nan
+                            graph[u][v][k][hn+'_'+self.aggregate_wl] = np.nan
 
                     else:
-                        self.g[u][v][k][hn+'_'+self.aggregate_wl] = np.nan
+                        graph[u][v][k][hn+'_'+self.aggregate_wl] = np.nan
 
-            if self.gdf:
+
+            if type(graph) == gpd.GeoDataFrame:
                 print("Raster hazard overlay with gdf should be adjusted to how it should work with Kees' model")
-            #     # The extent and resolution of the different hazard maps are the same, so the same points in polygons
-            #     # can be used for all hazard maps (saves time to not compute them again for each hazard map).
-            #     if not same_extent:
-            #         points_in_polygons = find_points_in_polygon(self.gdf.geometry.values, extent)
-            #     else:
-            #         if k == 0:
-            #             points_in_polygons = find_points_in_polygon(self.gdf.geometry.values, extent)
-            #
-            #     if size_array:
-            #         # Fastest method but be aware of out of memory errors!
-            #         total_water_levels = list()
-            #         for pnts in points_in_polygons:
-            #             x_objects = np.transpose(pnts)[0]
-            #             y_objects = np.transpose(pnts)[1]
-            #             water_level = sample_raster_full(raster, x_objects, y_objects, size_array, extent)
-            #             total_water_levels.append(list(np.where(water_level <= 0, np.nan, water_level)))
-            #     else:
-            #         # Slower method but no issues with memory errors
-            #         total_water_levels = water_level_at_points(points_in_polygons, extent, raster_band, nodatavalue)
-            #
-            #     if len(water_level) > 0:
-            #         if self.aggregate_wl == 'max':
-            #             self.gdf.loc[:, hn] = total_water_levels.max()
-            #         elif self.aggregate_wl == 'min':
-            #             self.g[u][v][k][hn] = water_level.min()
-            #         elif self.aggregate_wl == 'mean':
-            #             self.g[u][v][k][hn] = mean(water_level)
-            #         else:
-            #             logging.warning("No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'.")
-            #     else:
-            #         self.g[u][v][k][hn] = np.nan
+                return None
+                # The extent and resolution of the different hazard maps are the same, so the same points in polygons
+                # can be used for all hazard maps (saves time to not compute them again for each hazard map).
+                if not same_extent:
+                    points_in_polygons = find_points_in_polygon(graph.geometry.values, extent)
+                else:
+                    if k == 0:
+                        points_in_polygons = find_points_in_polygon(graph.geometry.values, extent)
 
-    def overlay_hazard_shp(self, hf):
+                if size_array:
+                    # Fastest method but be aware of out of memory errors!
+                    total_water_levels = list()
+                    for pnts in points_in_polygons:
+                        x_objects = np.transpose(pnts)[0]
+                        y_objects = np.transpose(pnts)[1]
+                        water_level = sample_raster_full(raster, x_objects, y_objects, size_array, extent)
+                        total_water_levels.append(list(np.where(water_level <= 0, np.nan, water_level)))
+                else:
+                    # Slower method but no issues with memory errors
+                    total_water_levels = water_level_at_points(points_in_polygons, extent, raster_band, nodatavalue)
+
+                if len(water_level) > 0:
+                    if self.aggregate_wl == 'max':
+                        graph.loc[:, hn] = total_water_levels.max()
+                    elif self.aggregate_wl == 'min':
+                        self.g[u][v][k][hn] = water_level.min()
+                    elif self.aggregate_wl == 'mean':
+                        self.g[u][v][k][hn] = mean(water_level)
+                    else:
+                        logging.warning("No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'.")
+                else:
+                    self.g[u][v][k][hn] = np.nan
+        return graph
+
+    def overlay_hazard_shp(self, hf, graph):
         """Overlays the hazard shapefile over the road segments.
 
         :param [ParamName]: [ParamDescription], defaults to [DefaultParamVal]
@@ -503,7 +508,7 @@ class Hazard():
         gdf = gpd.read_file(hf)
         spatial_index = gdf.sindex
 
-        for u, v, k, edata in self.g.edges.data(keys=True):
+        for u, v, k, edata in graph.edges.data(keys=True):
             if 'geometry' in edata:
                 possible_matches_index = list(spatial_index.intersection(edata['geometry'].bounds))
                 possible_matches = gdf.iloc[possible_matches_index]
@@ -512,18 +517,18 @@ class Hazard():
                 hn='TODO'
                 if not precise_matches.empty:
                     if self.aggregate_wl == 'max':
-                        self.g[u][v][k][hn+'_max'] = precise_matches[hn].max()
+                        graph[u][v][k][hn+'_max'] = precise_matches[hn].max()
                     if self.aggregate_wl == 'min':
-                        self.g[u][v][k][hn+'_min'] = precise_matches[hn].min()
+                        graph[u][v][k][hn+'_min'] = precise_matches[hn].min()
                     if self.aggregate_wl == 'mean':
-                        self.g[u][v][k][hn+'_mean'] = precise_matches[hn].mean()
+                        graph[u][v][k][hn+'_mean'] = precise_matches[hn].mean()
                 else:
-                    self.g[u][v][k][hn] = 0
+                    graph[u][v][k][hn] = 0
             else:
-                self.g[u][v][k][hn] = 0
-        return
+                graph[u][v][k][hn] = 0
+        return graph
 
-    def join_hazard_table(self):
+    def join_hazard_table(self, graph):
         """Joins a table with IDs and hazard information with the road segments with corresponding IDs.
 
         :param [ParamName]: [ParamDescription], defaults to [DefaultParamVal]
@@ -535,48 +540,82 @@ class Hazard():
         :rtype: [ReturnType]
         """
         # TODO differentiate between graph and geodataframe input
-        return
+        return graph
 
-    def hazard_intersect(self):
+    def hazard_intersect(self, graph):
         hazards_tif = [haz for haz in self.list_hazard_files if haz.suffix == '.tif']
         hazards_shp = [haz for haz in self.list_hazard_files if haz.suffix == '.shp']
         hazards_table = [haz for haz in self.list_hazard_files if haz.suffix in ['.csv', '.json']]
 
         if len(hazards_tif) > 0:
             start = time.time()
-            self.overlay_hazard_raster(hazards_tif)
+            graph = self.overlay_hazard_raster(hazards_tif, graph)
             end = time.time()
             logging.info(f"Hazard raster intersect time: {str(round(end - start, 2))}s")
+            return graph
+
         elif len(hazards_shp) > 0:
-            self.overlay_hazard_shp(hazards_shp)
+            graph = self.overlay_hazard_shp(hazards_shp, graph)
+            return graph
+
         elif len(hazards_table) > 0:
-            self.join_hazard_table(hazards_table)
+            graph = self.join_hazard_table(hazards_table, graph)
+            return graph
 
-        return self.g
+        return graph
 
-    def create(self, config_analyses):
+    def save_network(self, to_save, name, types=['pickle']):
+        """Saves a geodataframe or graph to output_path"""
+        if type(to_save) == gpd.GeoDataFrame:
+            # The file that needs to be saved is a geodataframe
+            if 'pickle' in types:
+                output_path_pickle = self.config['static'] / 'output_graph' / (name + '.feather')
+                to_save.to_feather(output_path_pickle, index=False)
+                logging.info(f"Saved {output_path_pickle.stem} in {output_path_pickle.resolve().parent}.")
+            if 'shp' in types:
+                output_path = self.config['static'] / 'output_graph' / (name + '_network.shp')
+                to_save.to_file(output_path, index=False)
+                logging.info(f"Saved {output_path.stem} in {output_path.resolve().parent}.")
+            return output_path_pickle
+
+        elif type(to_save) == nx.classes.multigraph.MultiGraph:
+            # The file that needs to be saved is a graph
+            if 'shp' in types:
+                graph_to_shp(to_save, self.config['static'] / 'output_graph' / (name + '_edges.shp'),
+                             self.config['static'] / 'output_graph' / (name + '_nodes.shp'))
+                logging.info(f"Saved {name + '_edges.shp'} and {name + '_nodes.shp'} in {self.config['static'] / 'output_graph'}.")
+            if 'pickle' in types:
+                output_path_pickle = self.config['static'] / 'output_graph' / (name + '.gpickle')
+                nx.write_gpickle(to_save, output_path_pickle, protocol=4)
+                logging.info(f"Saved {output_path_pickle.stem} in {output_path_pickle.resolve().parent}.")
+            return output_path_pickle
+
+        return None
+
+    def create(self):
         """ creates the hazard overlay over a graph """
+        to_save = ['pickle'] if not self.config['network']['save_shp'] else ['pickle', 'shp']
 
-        if self.base_hazard_path is None or self.od_graph_path is None:
+        if self.base_graph_path is None or self.od_graph_path is None:
             logging.warning("Either a base graph or od graph is missing to intersect the hazard with. "
                             "Check your network folder.")
 
-            # intersect hazard map with base graph
-        if self.base_hazard_path is None:
-            if self.base_graph_path is not None:
-                base_graph = nx.read_gpickle(self.base_graph_path)
-                haz = Hazard(base_graph, self.hazard_map, self.aggregate_wl)
-                base_graph_hazard = haz.hazard_intersect()
-                config_analyses['files']['base_hazard_graph'] = self.save_network(base_graph_hazard, 'base_hazard', types=to_save)
+        for input_graph in ['base_graph', 'base_network', 'origins_destinations_graph']:
 
-            # intersect hazard map with od graph
-        if self.od_hazard_path is None and self.od_graph_path is not None:
-            od_graph = nx.read_gpickle(self.od_graph_path)
-            haz = Hazard(od_graph, self.hazard_map, self.aggregate_wl)
-            od_graph_hazard = haz.hazard_intersect()
-            config_analyses['files']['origins_destinations_hazard_graph'] = self.save_network(od_graph_hazard,
-                                                                                              'origins_destinations_hazard',
-                                                                                              types=to_save)
+            file_path = self.config['files'][input_graph]
+            graph = self.graphs[input_graph]
+            hazard_path = self.config['files'][input_graph+'_hazard']
 
-            # Add the names of the hazard files to the config_analyses
-        config_analyses['hazard_names'] = [haz.stem for haz in self.hazard_map]
+            if hazard_path is None:
+                if file_path is not None or graph is not None:
+                    if graph is None and input_graph != 'base_network':
+                        graph = nx.read_gpickle(file_path)
+                    elif graph is None:
+                        graph = gpd.read_feather(file_path)
+                    base_graph_hazard = self.hazard_intersect(graph)
+                    self.graphs[input_graph + '_hazard'] = base_graph_hazard
+                    if base_graph_hazard is not None:
+                        self.config['files'][input_graph+'_hazard'] = self.save_network(base_graph_hazard, input_graph+'_hazard', types=to_save)
+
+        return self.graphs
+

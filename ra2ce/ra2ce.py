@@ -11,7 +11,7 @@ import click
 
 # Local modules
 from utils import initiate_root_logger, load_config
-from graph.networks import Network
+from graph.networks import Network, Hazard
 from analyses.direct import analyses_direct
 from analyses.indirect import analyses_indirect
 
@@ -43,23 +43,19 @@ def main(network_ini=None, analyses_ini=None):
     # Create the network if not yet created
     if network_ini:
         network = Network(config_network)
-        base_graph, edge_gdf, od_graph = network.create()
+        graph_dic = network.create()
 
-
-        test=1
-
-        if network.hazard_map is not None:
+        if config_network['hazard']['hazard_map'] is not None:
             # There is a hazard map or multiple hazard maps that should be intersected with the graph.
             # Overlay the hazard on the geodataframe as well (todo: combine with graph overlay if both need to be done?)
-
-            base_graph = nx.read_gpickle(self.base_graph_path)
-            haz = Hazard(self.config, base_graph, self.hazard_map, self.aggregate_wl)
-            haz.create(config_analyses)
+            hazard = Hazard(network, graph_dic)
+            graphs = hazard.create()
 
         config_analyses['files'] = network.config['files']
 
     # Do the analyses
     if analyses_ini:
+        config_analyses['hazard_names'] = [haz.stem for haz in config_network['hazard']['hazard_map']]
         if 'direct' in config_analyses:
             analyses_direct.DirectAnalyses(config_analyses).execute()
 
