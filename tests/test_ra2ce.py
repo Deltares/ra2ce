@@ -20,7 +20,7 @@ def lookup_output(output_path, case):
 
 def test_output():
     """Sample pytest test function for output"""
-    cases = ['single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination',
+    cases = ['direct', 'single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination',
              'multi_link_origin_destination']
     input_network_path = Path('data/test/network.ini')
     input_analyses_path = Path('data/test/analyses.ini')
