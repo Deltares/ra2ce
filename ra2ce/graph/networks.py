@@ -13,6 +13,7 @@ import time
 from osmnx.geometries import geometries_from_xml
 from osmnx.graph import _create_graph
 from osmnx.graph import graph_from_xml
+import geopandas as gpd
 
 # local modules
 from .networks_utils import *
@@ -376,7 +377,6 @@ class Hazard:
         self.base_network_path = self.config['files']['base_network']
         self.od_graph_path = self.config['files']['origins_destinations_graph']
 
-
         self.list_hazard_files = self.config['hazard']['hazard_map']
         self.aggregate_wl = self.config['hazard']['aggregate_wl']
 
@@ -455,40 +455,44 @@ class Hazard:
                         graph[u][v][k][hn+'_'+self.aggregate_wl] = np.nan
 
 
-            if type(graph) == gpd.GeoDataFrame:
-                print("Raster hazard overlay with gdf should be adjusted to how it should work with Kees' model")
-                return None
+            # if type(graph) == gpd.GeoDataFrame:
                 # The extent and resolution of the different hazard maps are the same, so the same points in polygons
                 # can be used for all hazard maps (saves time to not compute them again for each hazard map).
-                if not same_extent:
-                    points_in_polygons = find_points_in_polygon(graph.geometry.values, extent)
-                else:
-                    if k == 0:
-                        points_in_polygons = find_points_in_polygon(graph.geometry.values, extent)
+                # if not same_extent:
+                #     points_in_polygons = find_points_in_polygon(graph.geometry.values, extent)
+                # else:
+                #     if k == 0:
+                #         points_in_polygons = find_points_in_polygon(graph.geometry.values, extent)
+                #
+                # if size_array:
+                #     # Fastest method but be aware of out of memory errors!
+                #     total_water_levels = list()
+                #     for pnts in points_in_polygons:
+                #         x_objects = np.transpose(pnts)[0]
+                #         y_objects = np.transpose(pnts)[1]
+                #         water_level = sample_raster_full(raster, x_objects, y_objects, size_array, extent)
+                #         total_water_levels.append(list(np.where(water_level <= 0, np.nan, water_level)))
+                # else:
+                #     # Slower method but no issues with memory errors
+                #     total_water_levels = water_level_at_points(points_in_polygons, extent, raster_band, nodatavalue)
+                #
+                # if len(water_level) > 0:
+                #     if self.aggregate_wl == 'max':
+                #         graph.loc[:, hn] = total_water_levels.max()
+                #     elif self.aggregate_wl == 'min':
+                #         self.g[u][v][k][hn] = water_level.min()
+                #     elif self.aggregate_wl == 'mean':
+                #         self.g[u][v][k][hn] = mean(water_level)
+                #     else:
+                #         logging.warning("No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'.")
+                # else:
+                #     self.g[u][v][k][hn] = np.nan
+        return graph
 
-                if size_array:
-                    # Fastest method but be aware of out of memory errors!
-                    total_water_levels = list()
-                    for pnts in points_in_polygons:
-                        x_objects = np.transpose(pnts)[0]
-                        y_objects = np.transpose(pnts)[1]
-                        water_level = sample_raster_full(raster, x_objects, y_objects, size_array, extent)
-                        total_water_levels.append(list(np.where(water_level <= 0, np.nan, water_level)))
-                else:
-                    # Slower method but no issues with memory errors
-                    total_water_levels = water_level_at_points(points_in_polygons, extent, raster_band, nodatavalue)
-
-                if len(water_level) > 0:
-                    if self.aggregate_wl == 'max':
-                        graph.loc[:, hn] = total_water_levels.max()
-                    elif self.aggregate_wl == 'min':
-                        self.g[u][v][k][hn] = water_level.min()
-                    elif self.aggregate_wl == 'mean':
-                        self.g[u][v][k][hn] = mean(water_level)
-                    else:
-                        logging.warning("No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'.")
-                else:
-                    self.g[u][v][k][hn] = np.nan
+    def overlay_hazard_raster_gdf(self, hazards_tif, graph):
+        """ Overlays a raster with hazard data for a gdf """
+        poly_dict = read_geojson(self.config['network']['polygon'][0])
+        graph = HazardUtils.add_hazard_data_to_road_network(graph, self.config['hazard']['hazard_map'], poly_dict)
         return graph
 
     def overlay_hazard_shp(self, hf, graph):
@@ -546,6 +550,9 @@ class Hazard:
         hazards_tif = [haz for haz in self.list_hazard_files if haz.suffix == '.tif']
         hazards_shp = [haz for haz in self.list_hazard_files if haz.suffix == '.shp']
         hazards_table = [haz for haz in self.list_hazard_files if haz.suffix in ['.csv', '.json']]
+
+        if type(graph) == gpd.GeoDataFrame:
+            graph = self.overlay_hazard_raster_gdf(hazards_tif, graph)
 
         if len(hazards_tif) > 0:
             start = time.time()
@@ -605,6 +612,7 @@ class Hazard:
             file_path = self.config['files'][input_graph]
             graph = self.graphs[input_graph]
             hazard_path = self.config['files'][input_graph+'_hazard']
+            self.graphs[input_graph + '_hazard'] = None
 
             if hazard_path is None:
                 if file_path is not None or graph is not None:
@@ -613,8 +621,10 @@ class Hazard:
                     elif graph is None:
                         graph = gpd.read_feather(file_path)
                     base_graph_hazard = self.hazard_intersect(graph)
-                    self.graphs[input_graph + '_hazard'] = base_graph_hazard
+
+                    # save graph with hazard
                     if base_graph_hazard is not None:
+                        self.graphs[input_graph + '_hazard'] = base_graph_hazard
                         self.config['files'][input_graph+'_hazard'] = self.save_network(base_graph_hazard, input_graph+'_hazard', types=to_save)
 
         return self.graphs

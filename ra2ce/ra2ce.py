@@ -57,7 +57,7 @@ def main(network_ini=None, analyses_ini=None):
     if analyses_ini:
         config_analyses['hazard_names'] = [haz.stem for haz in config_network['hazard']['hazard_map']]
         if 'direct' in config_analyses:
-            analyses_direct.DirectAnalyses(config_analyses).execute()
+            analyses_direct.DirectAnalyses(config_analyses, graphs).execute()
 
         if 'indirect' in config_analyses:
             analyses_indirect.IndirectAnalyses(config_analyses).execute()

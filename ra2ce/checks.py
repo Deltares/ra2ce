@@ -116,7 +116,7 @@ def check_files(config):
     config['files'] = {}
     for file in file_list:
         # base network is stored as feather object
-        if file == 'base_network':
+        if file == 'base_network' or file == 'base_network_hazard':
             file_path = config['static'] / 'output_graph' / '{}.feather'.format(file)
         else:
             file_path = config['static'] / 'output_graph' / '{}.gpickle'.format(file)
