@@ -175,7 +175,7 @@ def lookup_max_damages():
 
 
 def lookup_max_damages_huizinga():
-    """ Lookup table for max damages calculated with huizinga """
+    """ Lookup table for max damages calculated with huizinga for number of lanes """
     
     lookup_dict = OrderedDict([('motorway', {1: 175000, 2: 350000, 3: 450000, 4: 550000, 5: 650000, 6: 750000}),
                                ('trunk', {1: 175000, 2: 300000, 3: 400000, 4: 475000, 5: 575000, 6: 650000}),
@@ -217,7 +217,7 @@ def lookup_flood_curves():
     curve_name = [0] * int(len(headers) / 2)  # create empty arrays
     interpolators = [0] * int(len(headers) / 2)
 
-    for i in range(0, int(len(headers) / 2)):  # iterate over the damage curves in the Excel file
+    for i in range(0, int(len(headers) / 2)):  # iterate over the damage curves
         curve_name[i] = headers[i * 2]
         curve = flood_curves.iloc[:, 2 * i:2 * i + 2].dropna()
         # curve x-values in the even; and y-values in the uneven columns
@@ -238,8 +238,11 @@ class CreateLookupTables:
         lane_damage_correction = self.load_lane_damage_correction("Max_damages", "G:M")
         dict_max_damages = self.import_damage("Max_damages", usecols="C:E")
         max_damages_hz = self.load_hz_max_dam("Huizinga_max_dam", "A:G")
-        # LOAD THE DAMAGE FUNCTIONS
         interpolators = self.import_flood_curves(sheet_name='All_curves', usecols="B:O")
+
+        # for copying:
+        put_debug_icon_here_for_copying = True
+
         return lane_damage_correction, dict_max_damages, dict_max_damages, max_damages_hz, interpolators
         
     def load_hz_max_dam(self, sheet_name, usecols):

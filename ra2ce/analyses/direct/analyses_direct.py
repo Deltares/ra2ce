@@ -23,16 +23,14 @@ from .direct_lookup import *
 
 
 class DirectAnalyses:
-    def __init__(self, config):
+    def __init__(self, config, graphs):
         self.config = config
+        self.graphs = graphs
 
-    def road_damage(self, graph=None, analysis=None):
-
-        if graph is None:
-            graph = nx.read_gpickle(self.config['files']['base_graph_hazard'])
-            gdf = osmnx.graph_to_gdfs(graph, nodes=False)
-        else:
-            gdf = self.road_damage(graph, analysis)
+    def road_damage(self):
+        gdf = self.graphs['base_network_hazard']
+        if self.graphs['base_network_hazard'] is None:
+            gdf = gpd.read_feather(self.config['files']['base_network_hazard'])
 
 
         # TODO: This should probably not be done here, but at the create network function
@@ -61,7 +59,16 @@ class DirectAnalyses:
             starttime = time.time()
 
             if analysis['analysis'] == 'direct':
-                road_gdf_damage = self.road_damage()
+                gdf = self.road_damage()
+
+            output_path = self.config['output'] / analysis['analysis']
+            if analysis['save_shp']:
+                shp_path = output_path / (analysis['name'].replace(' ', '_') + '.shp')
+                save_gdf(gdf, shp_path)
+            if analysis['save_csv']:
+                csv_path = output_path / (analysis['name'].replace(' ', '_') + '.csv')
+                del gdf['geometry']
+                gdf.to_csv(csv_path, index=False)
 
             endtime = time.time()
             logging.info(f"----------------------------- Analysis '{analysis['name']}' finished. "
@@ -96,12 +103,22 @@ def calculate_direct_damage(road_gdf):
     df = road_gdf.loc[~(road_gdf[val_cols] == 0).all(axis=1)]
     hzd_names = [i.split('val_')[1] for i in val_cols]
 
-    # TODO: DIT LIJKT ME EEN BEETJE OMSLACHTIG, KAN MISSCHIEN NOG WAT OVERZICHTELIJKER
-    for curve_name in interpolators:
-        interpolator = interpolators[curve_name]  # select the right interpolator
-        df = df.apply(
-            lambda x: road_loss_estimation(x, interpolator, hzd_names, dict_max_damages, max_damages_huizinga, curve_name,
-                                           lane_damage_correction), axis=1)
+    curve_names = [name for name in interpolators]
+
+    # TODO: remove the old calculation, it is redundant, but still in the code for reference.
+    use_old_calculation = False
+    if use_old_calculation is True:
+        for curve_name in interpolators:
+            interpolator = interpolators[curve_name]  # select the right interpolator
+            from tqdm import tqdm
+            tqdm.pandas(desc=curve_name)
+            df = df.progress_apply(lambda x: road_loss_estimation(x,   interpolator, hzd_names, dict_max_damages,
+                                                                  max_damages_huizinga, curve_name, lane_damage_correction), axis=1)
+
+    else:
+        # This calculation is 60 times faster:
+        df = road_loss_estimation2(df, interpolators, hzd_names, dict_max_damages, max_damages_huizinga, curve_names, lane_damage_correction)
+
     return df
 
 
@@ -193,6 +210,87 @@ def road_loss_estimation(x, interpolator, events, max_damages, max_damages_HZ, c
     return x
 
 
+def road_loss_estimation2(gdf, interpolators, events, max_damages, max_damages_huizinga, curve_names, lane_damage_correction):
+    """
+    Carries out the damage estimation for a road segment using various damage curves
+
+    Arguments:
+        *x* (Geopandas Series) -- a row from the region GeoDataFrame with all road segments
+        *interpolator* (SciPy interpolator object) -- the interpolator function that belongs to the damage curve
+        *events* (List of strings) -- containing the names of the events: e.g. [rp10,...,rp500]
+            scripts expects that x has the columns length_{events} and val_{events} which it needs to do the computation
+        *max_damages* (dictionary) -- dictionary containing the max_damages per road-type; not yet corrected for the number of lanes
+        *max_damages_HZ* (dictionary) -- dictionary containing the max_damages per road-type and number of lanes, for the Huizinga damage curves specifically
+        *name_interpolator* (string) -- name of the max_damage dictionary; to save as column names in the output pandas DataFrame -> becomes the name of the interpolator = damage curve
+        *lane_damage_correction (OrderedDict) -- the max_dam correction factors (see load_lane_damage_correction)
+
+    Returns:
+        *x* (GeoPandas Series) -- the input row, but with new elements: the waterdepths and inundated lengths per RP, and associated damages for different damage curves
+
+    """
+    # create dataframe from gdf
+    column_names = list(gdf.columns)
+    column_names.remove('geometry')
+    df = gdf[column_names]
+
+    # fixing lanes
+    df['lanes_copy'] = df['lanes'].copy()
+    df['lanes'] = df['lanes_copy'].where(df['lanes_copy'].astype(float) >= 1.0, other=1.0)
+    df['lanes'] = df['lanes_copy'].where(df['lanes_copy'].astype(float) <= 6.0, other=6.0)
+    df['tuple'] = [tuple([0] * 5)] * len(df['lanes'])
+
+    # pre-calculation of max damages per percentage (same for each C1-C6 category)
+    df['lower_damage'] = df['road_type'].copy().map(max_damages["Lower"])
+    df['upper_damage'] = df['road_type'].copy().map(max_damages["Upper"])
+    df['lower_dam'] = df.apply(lambda x: x.lower_damage * lane_damage_correction[x.road_type][x.lanes], axis=1)
+    df['upper_dam'] = df.apply(lambda x: x.upper_damage * lane_damage_correction[x.road_type][x.lanes], axis=1)
+
+    # create separate column for each percentage (is faster then tuple)
+    for percentage in [0, 25, 50, 75, 100]:
+        df['damage_{}'.format(percentage)] = (df['upper_dam'] * percentage / 100) + (df['lower_dam'] * (100 - percentage) / 100)
+
+    columns = []
+    for curve_name in curve_names:
+        for event in events:
+            interpolator = interpolators[curve_name]
+            if curve_name == 'HZ':
+                df['max_dam_hz'] = df.apply(lambda x: max_damages_huizinga[x.road_type][x.lanes], axis=1)
+                df['dam_{}_{}'.format(curve_name, event)] = round(df['max_dam_hz'].astype(float)
+                                                                  * interpolator(df['val_{}'.format(event)]).astype(float)
+                                                                  * df['length_{}'.format(event)].astype(float), 2)
+            else:
+                for percentage in [0, 25, 50, 75, 100]:
+                    df['dam_{}_{}_{}'.format(percentage, curve_name, event)] = round(df['damage_{}'.format(percentage)].astype(float) \
+                                                                               * interpolator(df['val_{}'.format(event)]).astype(float) \
+                                                                               * df['length_{}'.format(event)].astype(float), 2)
+
+                df['dam_{}_{}'.format(curve_name, event)] = tuple(zip(df['dam_0_{}_{}'.format(curve_name, event)],
+                                                                      df['dam_25_{}_{}'.format(curve_name, event)],
+                                                                      df['dam_50_{}_{}'.format(curve_name, event)],
+                                                                      df['dam_75_{}_{}'.format(curve_name, event)],
+                                                                      df['dam_100_{}_{}'.format(curve_name, event)]))
+
+                df = df.drop(columns=['dam_{}_{}_{}'.format(percentage, curve_name, event) for percentage in [0, 25, 50, 75, 100]])
+
+            # change back to 0's if the combination doesnt exist
+            if curve_name in ["C1", "C2", "C3", "C4"]:
+                # first copy values with trunk to temp column. Then replace everywhere
+                # except motorway with 0's, then copy files of trunk back
+                df.loc[df['road_type'] == 'trunk', 'temp'] = 'dam_{}_{}'.format(curve_name, event)
+                df.loc[df['road_type'] != 'motorway', 'dam_{}_{}'.format(curve_name, event)] = df['tuple']
+                df.loc[df['road_type'] == 'trunk', 'dam_{}_{}'.format(curve_name, event)] = df['temp']
+
+            if curve_name in ["C5", "C6"]:
+                df.loc[df['road_type'] == 'motorway', 'dam_{}_{}'.format(curve_name, event)] = df['tuple']
+                df.loc[df['road_type'] == 'trunk', 'dam_{}_{}'.format(curve_name, event)] = df['tuple']
+
+            columns.append('dam_{}_{}'.format(curve_name, event))
+
+    gdf = pd.concat([gdf, df[columns]], axis=1)
+
+    return gdf
+
+
 def apply_lane_damage_correction(lane_damage_correction, road_type, lanes):
     """See load_lane_damage_correction; this function only avoids malbehaviour for weird lane numbers"""
     if lanes < 1: # if smaller than the mapped value -> correct with minimum value
@@ -226,207 +324,24 @@ def apply_cleanup(x):
         return x
 
 
-class HazardDirect:
+def save_gdf(gdf, save_path):
+    """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp
 
-    @staticmethod
-    def line_length(line, ellipsoid='WGS-84', shipping=True):
-        """Length of a line in meters, given in geographic coordinates
+    Arguments:
+        gdf [geodataframe]: geodataframe object to be converted
+        edge_shp [str]: output path including extension for edges shapefile
+        node_shp [str]: output path including extension for nodes shapefile
+    Returns:
+        None
+    """
+    # save to shapefile
+    gdf.crs = 'epsg:4326'  # TODO: decide if this should be variable with e.g. an output_crs configured
+    from numpy import object as np_object
+    for col in gdf.columns:
+        if gdf[col].dtype == np_object and col != gdf.geometry.name:
+            gdf[col] = gdf[col].astype(str)
 
-        Adapted from https://gis.stackexchange.com/questions/4022/looking-for-a-pythonic-way-to-calculate-the-length-of-a-wkt-linestring#answer-115285
-
-        Arguments:
-            line {Shapely LineString} -- a shapely LineString object with WGS-84 coordinates
-            ellipsoid {String} -- string name of an ellipsoid that `geopy` understands (see
-                http://geopy.readthedocs.io/en/latest/#module-geopy.distance)
-
-        Returns:
-            Length of line in kilometers
-        """
-        if shipping == True:
-            if line.geometryType() == 'MultiLineString':
-                return sum(line_length(segment) for segment in line)
-
-            return sum(
-                vincenty(tuple(reversed(a)), tuple(reversed(b)), ellipsoid=ellipsoid).kilometers
-                for a, b in pairwise(line.coords)
-            )
-
-        else:
-            if line.geometryType() == 'MultiLineString':
-                return sum(line_length(segment) for segment in line)
-
-            return sum(
-                vincenty(a, b, ellipsoid=ellipsoid).kilometers  ###WARNING TODO: WILL BE DEPRECIATED ####
-                for a, b in pairwise(line.coords)
-            )
-
-    @staticmethod
-    def create_hzd_df(geometry, hzd_list, hzd_names):
-        """
-        Arguments:
-
-            *geometry* (Shapely Polygon) -- shapely geometry of the region for which we do the calculation.
-            *hzd_list* (list) -- list of file paths to the hazard files.
-            *hzd_names* (list) -- list of names to the hazard files.
-
-        Returns:
-            *Geodataframe* -- GeoDataFrame where each row is a unique flood shape in the specified **region**.
-
-        """
-
-        ## MAKE GEOJSON GEOMETRY OF SHAPELY GEOMETRY FOR RASTERIO CLIP
-        geoms = [mapping(geometry)]
-
-        all_hzds = []
-
-        ## LOOP OVER ALL HAZARD FILES TO CREATE VECTOR FILES
-        for iter_, hzd_path in enumerate(hzd_list):
-            # extract the raster values values within the polygon
-            with rasterio.open(hzd_path) as src:
-                out_image, out_transform = mask(src, geoms, crop=True)
-
-                # change into centimeters and make any weird negative numbers -1 (will result in less polygons)
-                out_image[out_image <= 0] = -1
-                out_image = np.array(out_image * 100, dtype='int32')
-
-                # vectorize geotiff
-                results = (
-                    {'properties': {'raster_val': v}, 'geometry': s}
-                    for i, (s, v)
-                    in enumerate(
-                    shapes(out_image[0, :, :], mask=None, transform=out_transform)))
-
-                # save to geodataframe, this can take quite long if you have a big area
-                gdf = gpd.GeoDataFrame.from_features(list(results))
-
-                # Confirm that it is WGS84
-                gdf.crs = {'init': 'epsg:4326'}
-                # gdf.crs = {'init': 'epsg:3035'}
-                # gdf.to_crs(epsg=4326,inplace=True) #convert to WGS84
-
-                gdf = gdf.loc[gdf.raster_val >= 0]
-                gdf = gdf.loc[gdf.raster_val < 5000]  # remove outliers with extreme flood depths (i.e. >50 m)
-                gdf['geometry'] = gdf.buffer(0)
-
-                gdf['hazard'] = hzd_names[iter_]
-                all_hzds.append(gdf)
-        return pd.concat(all_hzds)
-
-    @staticmethod
-    def intersect_hazard(x, hzd_reg_sindex, hzd_region):
-        """
-        Arguments:
-
-            *x* (road segment) -- a row from the region GeoDataFrame with all road segments.
-            *hzd_reg_sindex* (Spatial Index) -- spatial index of hazard GeoDataFrame
-            *hzd_region* (GeoDataFrame) -- hazard GeoDataFrame
-
-        Returns:
-            *geometry*,*depth* -- shapely LineString of flooded road segment and the average depth
-
-        """
-        matches = hzd_region.iloc[list(hzd_reg_sindex.intersection(x.geometry.bounds))].reset_index(drop=True)
-        try:
-            if len(matches) == 0:
-                return x.geometry, 0
-            else:
-                append_hits = []
-                for match in matches.itertuples():
-                    inter = x.geometry.intersection(match.geometry)
-                    if inter.is_empty == True:
-                        continue
-                    else:
-                        if inter.geom_type == 'MultiLineString':
-                            for interin in inter:
-                                append_hits.append((interin, match.raster_val))
-                        else:
-                            append_hits.append((inter, match.raster_val))
-
-                if len(append_hits) == 0:
-                    return x.geometry, 0
-                elif len(append_hits) == 1:
-                    return append_hits[0][0], int(append_hits[0][1])
-                else:
-                    return shapely.geometry.MultiLineString([x[0] for x in append_hits]), int(
-                        np.mean([x[1] for x in append_hits]))
-        except Exception as e:
-            print(e)
-            return x.geometry, 0
-
-    @staticmethod
-    def add_hazard_data_to_road_network(road_gdf, region_path, hazard_path, tolerance=0.00005):
-        """
-        Adds the hazard data to the road network, i.e. creates an exposure map
-
-        Arguments:
-            *road_gdf* (GeoPandas DataFrame) : The road network without hazard data
-            *region_path* (string) : Path to the shapefile describing the regional boundaries
-            *hazard_path* (string) : Path to file or folder containg the hazard maps
-               -> If this refers to a file: only run for this file
-               -> If this refers to a folder: run for all hazard maps in this folder
-            *tolerance* (float) : Simplification tolerance in degrees
-               ->  about 0.001 deg = 100 m; 0.00001 deg = 1 m in Europe
-
-        Returns:
-             *road_gdf* (GeoPandas DataFrame) : Similar to input gdf, but with hazard data
-
-        """
-        # Evaluate the input arguments
-        if isinstance(hazard_path, str):
-            hazard_path = [hazard_path]  # put the path in a list
-        elif isinstance(hazard_path, list):
-            pass
-        else:
-            raise ValueError('Invalid input argument')
-
-        # TODO: do this in a seperate function (can be useful for other functions as well)
-        # MAP OSM INFRA TYPES TO A SMALLER GROUP OF ROAD_TYPES
-        road_gdf = apply_road_mapping(road_gdf)
-
-        # path_settings = load_config()['paths']['settings']
-        # road_mapping_path = os.path.join(path_settings, 'OSM_infratype_to_roadtype_mapping.xlsx')
-        # road_mapping_dict = import_road_mapping(road_mapping_path, 'Mapping')
-        # road_gdf['road_type'] = road_gdf.infra_type.apply(
-        #    lambda x: road_mapping_dict[x])  # add a new column 'road_type' with less categories
-
-        # SIMPLIFY ROAD GEOMETRIES
-        road_gdf.geometry = road_gdf.geometry.simplify(tolerance=tolerance)
-        road_gdf['length'] = road_gdf.geometry.apply(line_length)
-
-        # Take the geometry from the region shapefile
-        region_boundary = gpd.read_file(region_path)
-        region_boundary.to_crs(epsg=4326, inplace=True)  # convert to WGS84
-        geometry = region_boundary['geometry'][0]
-
-        hzd_names = [os.path.split(p)[-1].split('.')[0] for p in hazard_path]
-        hzds_data = create_hzd_df(geometry, hazard_path, hzd_names)
-
-        # PERFORM INTERSECTION BETWEEN ROAD SEGMENTS AND HAZARD MAPS
-        for iter_, hzd_name in enumerate(hzd_names):
-
-            try:
-                hzd_region = hzds_data.loc[hzds_data.hazard == hzd_name]
-                hzd_region.reset_index(inplace=True, drop=True)
-            except:
-                hzd_region == pd.DataFrame(columns=['hazard'])
-
-            if len(hzd_region) == 0:
-                road_gdf['length_{}'.format(hzd_name)] = 0
-                road_gdf['val_{}'.format(hzd_name)] = 0
-                continue
-
-            hzd_reg_sindex = hzd_region.sindex
-            tqdm.pandas(desc=hzd_name)
-            inb = road_gdf.progress_apply(lambda x: intersect_hazard(x, hzd_reg_sindex, hzd_region), axis=1).copy()
-            inb = inb.apply(pd.Series)
-            inb.columns = ['geometry', 'val_{}'.format(hzd_name)]
-            inb['length_{}'.format(hzd_name)] = inb.geometry.apply(line_length)
-            road_gdf[['length_{}'.format(hzd_name), 'val_{}'.format(hzd_name)]] = inb[['length_{}'.format(hzd_name),
-                                                                                       'val_{}'.format(hzd_name)]]
-            output_path = load_config()['paths']['test_output']
-            filename = 'exposure_from_dump.shp'
-            road_gdf.to_file(os.path.join(output_path, filename))
-
-            return road_gdf
+    gdf.to_file(save_path, driver='ESRI Shapefile', encoding='utf-8')
+    logging.info("Results saved to: {}".format(save_path))
 
 
