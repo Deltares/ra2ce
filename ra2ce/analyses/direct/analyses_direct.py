@@ -84,11 +84,18 @@ def calculate_direct_damage(road_gdf):
         *road_gdf* () :
     """
 
+
     # apply the add_default_lanes function to add default number of lanes
-    country = 'NL'
     default_lanes_dict = lookup_road_lanes()
-    road_gdf.lanes = road_gdf.apply(lambda x: default_lanes_dict[country][x['road_type']] if pd.isnull(x['lanes']) else x['lanes'],
-                              axis=1).copy()
+    df_lookup = pd.DataFrame.from_dict(default_lanes_dict)
+
+    road_gdf['country'] = 'NL'
+    road_gdf['default_lanes'] = df_lookup.lookup(road_gdf['road_type'], road_gdf['country'])
+    road_gdf['lanes'].fillna(road_gdf['default_lanes'], inplace=True)
+    road_gdf = road_gdf.drop(columns=['default_lanes', 'country'])
+    # road_gdf.lanes = road_gdf.apply(lambda x: default_lanes_dict[country][x['road_type']] if pd.isnull(x['lanes']) else x['lanes'],
+    #                           axis=1).copy()
+
 
     # load lookup tables
     lane_damage_correction = lookup_road_damage_correction()
@@ -190,23 +197,6 @@ def road_loss_estimation(x, interpolator, events, max_damages, max_damages_HZ, c
                                            2)  # calculate damage using interpolator and round to eurocents
                 x["dam_{}_{}".format(curve_name, event)] = tuple(results)  # save results as a new column to series x
 
-    # HANDLE EXCEPTIONS BY RETURNING ZERO DAMAGE IN THE APPROPRIATE FORMAT
-    # except Exception as e:
-    #     errorstring = "Issue with road_loss_estimation, for  x = {} \n exception = {} \n Damages set to zero. \n \n".format(
-    #         str(x), e)
-    #     log_file = kwargs.get('log_file', None)  # get the name of the log file from the keyword arguments
-    #     if log_file is not None:  # write to log file
-    #         file = open(log_file, mode="a")
-    #         file.write(errorstring)
-    #         file.close()
-    #     else:  # If no log file is provided, print the string instead
-    #         print(errorstring)
-    #
-    #     for event in events:
-    #         if curve_name == "HZ":
-    #             x["dam_{}_{}".format(curve_name, event)] = 0
-    #         else:
-    #             x["dam_{}_{}".format(curve_name, event)] = tuple([0] * 5)  # save empty tuple (0,0,0,0,0)
     return x
 
 
@@ -242,8 +232,12 @@ def road_loss_estimation2(gdf, interpolators, events, max_damages, max_damages_h
     # pre-calculation of max damages per percentage (same for each C1-C6 category)
     df['lower_damage'] = df['road_type'].copy().map(max_damages["Lower"])
     df['upper_damage'] = df['road_type'].copy().map(max_damages["Upper"])
-    df['lower_dam'] = df.apply(lambda x: x.lower_damage * lane_damage_correction[x.road_type][x.lanes], axis=1)
-    df['upper_dam'] = df.apply(lambda x: x.upper_damage * lane_damage_correction[x.road_type][x.lanes], axis=1)
+
+    df_lane_damage_correction = pd.DataFrame.from_dict(lane_damage_correction)
+    df['lower_dam'] = df['lower_damage'] * df_lane_damage_correction.lookup(df['lanes'], df['road_type'])
+    df['upper_dam'] = df['upper_damage'] * df_lane_damage_correction.lookup(df['lanes'], df['road_type'])
+    # df['lower_dam'] = df.apply(lambda x: x.lower_damage * lane_damage_correction[x.road_type][x.lanes], axis=1)
+    # df['upper_dam'] = df.apply(lambda x: x.upper_damage * lane_damage_correction[x.road_type][x.lanes], axis=1)
 
     # create separate column for each percentage (is faster then tuple)
     for percentage in [0, 25, 50, 75, 100]:
@@ -254,7 +248,11 @@ def road_loss_estimation2(gdf, interpolators, events, max_damages, max_damages_h
         for event in events:
             interpolator = interpolators[curve_name]
             if curve_name == 'HZ':
-                df['max_dam_hz'] = df.apply(lambda x: max_damages_huizinga[x.road_type][x.lanes], axis=1)
+
+                df_max_damages_huizinga = pd.DataFrame.from_dict(max_damages_huizinga)
+                df['max_dam_hz'] = df_max_damages_huizinga.lookup(df['lanes'], df['road_type'])
+                # df['max_dam_hz'] = df.apply(lambda x: max_damages_huizinga[x.road_type][x.lanes], axis=1)
+
                 df['dam_{}_{}'.format(curve_name, event)] = round(df['max_dam_hz'].astype(float)
                                                                   * interpolator(df['val_{}'.format(event)]).astype(float)
                                                                   * df['length_{}'.format(event)].astype(float), 2)
