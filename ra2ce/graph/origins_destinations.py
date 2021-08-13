@@ -237,10 +237,9 @@ def add_od_nodes(graph, od, id_name='ra2ce_fid'):
 
         if 'geometry' in match.attributes():
             match_geom = match.attributes()['geometry']
-            match_edge = match.attributes()['node']
+            ns = match.source
+            nt = match.target
             match_name = od.iloc[i]['o_id']
-            if match_name == 'nan':
-                match_name = np.nan  # convert string nans to np.nans to be able to differentiate between origins and destinations in the next step.
             if not match_name == match_name:
                 # match_name is nan, the point is not an origin but a destination
                 match_name = od.iloc[i]['d_id']
@@ -250,19 +249,18 @@ def add_od_nodes(graph, od, id_name='ra2ce_fid'):
             else:
                 # if the vertice is at the end of the road; you don't have to add a new node
                 # but do add a new attribute to the node
-                if (graph.nodes[match_edge[0]]['geometry'].coords[0][1] == match_OD.coords[0][1]) & (graph.nodes[match_edge[0]]['geometry'].coords[0][0] == match_OD.coords[0][0]):
-                    if 'od_id' in graph.nodes[match_edge[0]]:
+                if (graph.vs[ns]['geometry'].coords[0][1] == match_OD.coords[0][1]) & (graph.vs[ns]['geometry'].coords[0][0] == match_OD.coords[0][0]):
+                    if 'od_id' in graph.vs[ns].attributes():
                         # the node already has a origin/destination attribute
-                        graph.nodes[match_edge[0]]['od_id'] = graph.nodes[match_edge[0]]['od_id'] + ',' + match_name
+                        graph.vs[ns]['od_id'] = graph.vs[ns]['od_id'] + ',' + match_name
                     else:
-                        graph.nodes[match_edge[0]]['od_id'] = match_name
-                elif (graph.nodes[match_edge[1]]['geometry'].coords[0][1] == match_OD.coords[0][1]) & (
-                    graph.nodes[match_edge[1]]['geometry'].coords[0][0] == match_OD.coords[0][0]):
-                    if 'od_id' in graph.nodes[match_edge[1]]:
-                        graph.nodes[match_edge[1]]['od_id'] = graph.nodes[match_edge[1]]['od_id'] + ',' + match_name
+                        graph.vs[ns]['od_id'] = match_name
+                elif (graph.vs[nt]['geometry'].coords[0][1] == match_OD.coords[0][1]) & (graph.vs[nt]['geometry'].coords[0][0] == match_OD.coords[0][0]):
+                    if 'od_id' in graph.vs[nt].attributes():
+                        graph.vs[nt]['od_id'] = graph.vs[nt]['od_id'] + ',' + match_name
                     else:
-                        graph.nodes[match_edge[1]]['od_id'] = match_name
-                elif (((graph.nodes[match_edge[0]]['geometry'].coords[0][1] == match_OD.coords[0][1]) & (graph.nodes[match_edge[0]]['geometry'].coords[0][0] == match_OD.coords[0][0])) == False) & (((graph.nodes[match_edge[1]]['geometry'].coords[0][1] == match_OD.coords[0][1]) & (graph.nodes[match_edge[1]]['geometry'].coords[0][0] == match_OD.coords[0][0])) == False):
+                        graph.vs[nt]['od_id'] = match_name
+                elif (((graph.vs[ns]['geometry'].coords[0][1] == match_OD.coords[0][1]) & (graph.vs[ns]['geometry'].coords[0][0] == match_OD.coords[0][0])) == False) & (((graph.vs[nt]['geometry'].coords[0][1] == match_OD.coords[0][1]) & (graph.vs[nt]['geometry'].coords[0][0] == match_OD.coords[0][0])) == False):
                      print(i)
                      print('continue')
                      continue
