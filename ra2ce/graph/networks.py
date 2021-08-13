@@ -19,6 +19,30 @@ import igraph as ig
 from .networks_utils import *
 
 
+# edge_attributes = dict(area="sum", bridge="concat", foot="ignore", 'highway'="concat",
+#                  'junction',
+#                  'lanes',
+#                  'name',
+#                  'oneway',
+#                  'ref',
+#                  'service',
+#                  'surface',
+#                  'tracktype',
+#                  'tunnel',
+#                  'width',
+#                  'id',
+#                  'timestamp',
+#                  'version',
+#                  'tags',
+#                  'osm_type',
+#                  'geometry',
+#                  'u',
+#                  'v',
+#                  'length',
+#                  'u_seq',
+#                  'v_seq']
+
+
 class Network:
     def __init__(self, config):
         # General
@@ -149,8 +173,8 @@ class Network:
         edges_complex.dropna(axis=1, how='all', inplace=True)
         edges_complex = gpd.GeoDataFrame(edges_complex, geometry='geometry', crs='epsg:4326')
 
-        #TODO: simplify graph with trails scripts!!
-        # G_simple, G_complex = create_simplified_graph(G_complex)
+        #TODO: maybe simplify graph with trails scripts!!
+        ## G_simple = G_complex.simplify(combine_edges=dict(weight=sum))
         G_complex = graph_create_unique_ids(G_complex, new_id_name='ra2ce_fid')
 
         if self.segmentation_length is not None:
@@ -205,11 +229,6 @@ class Network:
         # Create 'graph_simple'
         graph_simple, graph_complex = create_simplified_graph(graph_complex)
 
-        # If the user wants to use undirected graphs, turn into an undirected graph (default).
-        if not self.directed:
-            if type(graph_simple) == nx.classes.multidigraph.MultiDiGraph:
-                graph_simple = graph_simple.to_undirected()
-
         return graph_simple, edges_complex
 
     def add_od_nodes(self, graph):
@@ -218,17 +237,22 @@ class Network:
 
         name = 'origin_destination_table'
 
-        # Add the origin/destination nodes to the network
-        ods = read_OD_files(self.origins, self.origins_names,
-                            self.destinations, self.destinations_names,
-                            self.id_name_origin_destination, 'epsg:4326')
+        ods_file_path = self.config['static'] / 'output_graph' / (name + '.feather')
+        if ods_file_path.is_file():
+            ods = gpd.read_feather(ods_file_path)
+            logging.info(f"Existing Origin-Destination table found in {ods_file_path.parent}.")
+        else:
+            # Add the origin/destination nodes to the network
+            ods = read_OD_files(self.origins, self.origins_names,
+                                self.destinations, self.destinations_names,
+                                self.id_name_origin_destination, 'epsg:4326')
 
-        ods = create_OD_pairs(ods, graph)
-        ods.crs = 'epsg:4326'  # TODO: decide if change CRS to flexible instead of just epsg:4326
+            ods = create_OD_pairs(ods, graph)
+            ods.crs = 'epsg:4326'  # TODO: decide if change CRS to flexible instead of just epsg:4326
 
-        # Save the OD pairs (GeoDataFrame) as pickle
-        ods.to_feather(self.config['static'] / 'output_graph' / (name + '.feather'), index=False)
-        logging.info(f"Saved {name + '.feather'} in {self.config['static'] / 'output_graph'}.")
+            # Save the OD pairs (GeoDataFrame) as pickle
+            ods.to_feather(ods_file_path, index=False)
+            logging.info(f"Saved {ods_file_path.stem} in {ods_file_path.parent}.")
 
         # Save the OD pairs (GeoDataFrame) as shapefile
         if self.save_shp:
@@ -341,6 +365,19 @@ class Network:
 
             # Check if all geometries between nodes are there, if not, add them as a straight line.
             base_graph = add_missing_geoms_graph(base_graph, geom_name='geometry')
+
+            # Make the graph directed or undirected
+            if not self.directed:
+                # The graph should be undirected
+                if base_graph.is_directed():
+                    base_graph = base_graph.as_undirected(mode=False)
+                    # Change mode to 'collapse' and decide what to do with the attributes
+                    # https://igraph.org/python/doc/api/igraph._igraph.GraphBase.html#to_undirected
+                    # https://igraph.org/python/doc/api/igraph._igraph.GraphBase.html#simplify
+            else:
+                # The graph should be directed
+                if not base_graph.is_directed():
+                    base_graph = base_graph.as_directed()
 
             # Save the graph and geodataframe
             config_analyses['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
