@@ -52,6 +52,21 @@ class DirectAnalyses:
         road_gdf_damage = calculate_direct_damage(gdf)
         return road_gdf_damage
 
+    def effectivity_measurements(self):
+        gdf = self.graphs['base_graph_hazard']
+        if self.graphs['base_graph_hazard'] is None:
+            gdf = gpd.read_feather(self.config['files']['base_graph_hazard'])
+
+        dfnew = pd.DataFrame(gdf.drop(columns='geometry'))
+        # TODO: This should probably not be done here, but at the create network function
+        # apply road mapping to fewer types
+        road_mapping_dict = lookup_road_mapping()
+
+
+
+
+        return dfnew
+
     def execute(self):
         """Executes the direct analysis."""
         for analysis in self.config['direct']:
@@ -60,6 +75,9 @@ class DirectAnalyses:
 
             if analysis['analysis'] == 'direct':
                 gdf = self.road_damage()
+
+            if analysis['analysis'] == 'effectivity_measurements':
+                gdf = self.effectivity_measurements()
 
             output_path = self.config['output'] / analysis['analysis']
             if analysis['save_shp']:

@@ -1283,6 +1283,40 @@ def read_merge_shp(shapefileAnalyse,  idName, shapefileDiversion=[], crs_=4326):
     return lines
 
 
+def filter_link_ids(config, linkid='LinkNr', simple_id='G_fid_simp', hazard=None):
+    """ This function filters link IDS and removes doubles.
+     Sometimes a single graph_simple_id had multiple LinkIDs.
+     With this script you can change rows where multiple LinkIDS exist for a single graph Simple Id.
+     The ID with the highest frequency is selected and returned as a dataframe. """
+    df_original = pd.read_csv(config['static'] / 'LinkNR_FID_lookup2.csv')
+    out_list = []
+
+    df = df_original[[simple_id, linkid]]
+    for id in df[simple_id].drop_duplicates():
+        #select Ids from a single simple id
+        df_iter = df.loc[df[simple_id] == id].copy()
+        df_iter['freq'] = df_iter.groupby(linkid)[linkid].transform('count')
+        df_iter = df_iter.sort_values(['freq'], ascending=[0])
+        # select first row (highest frequency) and add to a list)
+        out_list.append([df_iter[simple_id].iloc[0], df_iter[linkid].iloc[0]])
+
+    columns = df_original.columns
+    #adding the column with new linkIds and remove the old one. Write as csv
+    df_original = df_original.rename(columns={linkid: linkid + 'old'})
+    df = pd.DataFrame(out_list, columns=[simple_id, linkid])
+    df_new = df_original.merge(df, how='left', on=simple_id)
+    df_new = df_new[columns]
+    df_new.to_csv(config['static'] / 'LinkNR_FID_lookup_new.csv', index=False)
+
+    if hazard is not None:
+        # join ids to hazard file
+        df_hazard = pd.read_csv(config['static'] / hazard)
+        df_hazard = df_hazard.merge(df, how='left', on=linkid)
+        df_hazard[simple_id] = df_hazard[simple_id].replace(np.nan, 9999999).astype(int)
+        new_name = hazard.replace('.csv', '_new.csv')
+        df_hazard.to_csv(config['static'] / new_name, index=False)
+
+
 def check_hazard_extent_resolution(list_hazards):
     if len(list_hazards) == 1:
         return True
@@ -1501,6 +1535,19 @@ def add_simple_id_to_graph_complex(G_complex, complex_to_simple, new_id):
     set_edge_attributes(G_complex, simple_ids_per_complex_id, new_id)
 
     return G_complex
+
+
+def read_pickle_file(file_loc):
+    import pickle
+    pickle_file = open(file_loc, "rb")
+    objects = []
+    while True:
+        try:
+            objects.append(pickle.load(pickle_file))
+        except EOFError:
+            break
+    pickle_file.close()
+    return gpd.GeoDataFrame(objects[0])
 
 
 class Segmentation:

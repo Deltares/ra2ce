@@ -18,7 +18,7 @@ from shutil import copyfile
 from checks import input_validation, check_files
 
 list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination', 'multi_link_origin_destination']
-
+list_direct_analyses = ['direct', 'effectivity_measurements']
 
 def parse_config(root, path=None, opt_cli=None):
     """Ajusted from HydroMT
@@ -110,7 +110,7 @@ def initiate_root_logger(filename):
 def configure_analyses(config):
     analyses_names = [a for a in config.keys() if 'analysis' in a]
     for a in analyses_names:
-        if config[a]['analysis'] == 'direct':
+        if any(t in config[a]['analysis'] for t in list_direct_analyses):
             if 'direct' in config:
                 (config['direct']).append(config[a])
             else:

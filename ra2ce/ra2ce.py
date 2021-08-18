@@ -22,26 +22,8 @@ def main(network_ini=None, analyses_ini=None):
 
     if network_ini:
         config_network = load_config(root_path, config_path=network_ini)
+        initiate_root_logger(str(config_network['output'] / 'RA2CE.log'))
 
-    if analyses_ini:
-        config_analyses = load_config(root_path, config_path=analyses_ini)
-
-    # Initiate the log file, save in the output folder.
-    initiate_root_logger(str(config_network['output'] / 'RA2CE.log'))
-
-    # Create the output folders
-    if 'direct' in config_analyses:
-        for a in config_analyses['direct']:
-            output_path = config_analyses['output'] / a['analysis']
-            output_path.mkdir(parents=True, exist_ok=True)
-
-    if 'indirect' in config_analyses:
-        for a in config_analyses['indirect']:
-            output_path = config_analyses['output'] / a['analysis']
-            output_path.mkdir(parents=True, exist_ok=True)
-
-    # Create the network if not yet created
-    if network_ini:
         network = Network(config_network)
         graph_dic = network.create()
 
@@ -51,16 +33,35 @@ def main(network_ini=None, analyses_ini=None):
             hazard = Hazard(network, graph_dic)
             graphs = hazard.create()
 
-        config_analyses['files'] = network.config['files']
-
-    # Do the analyses
     if analyses_ini:
-        config_analyses['hazard_names'] = [haz.stem for haz in config_network['hazard']['hazard_map']]
+        config_analyses = load_config(root_path, config_path=analyses_ini)
+        if network_ini:
+            config_analyses['files'] = network.config['files']
+        else:
+            initiate_root_logger(str(config_analyses['output'] / 'RA2CE.log'))
+
+
+        # Create the output folders
         if 'direct' in config_analyses:
-            analyses_direct.DirectAnalyses(config_analyses, graphs).execute()
+            for a in config_analyses['direct']:
+                output_path = config_analyses['output'] / a['analysis']
+                output_path.mkdir(parents=True, exist_ok=True)
 
         if 'indirect' in config_analyses:
-            analyses_indirect.IndirectAnalyses(config_analyses).execute()
+            for a in config_analyses['indirect']:
+                output_path = config_analyses['output'] / a['analysis']
+                output_path.mkdir(parents=True, exist_ok=True)
+
+        # Do the analyses
+            if network_ini:
+                if config_network['hazard']['hazard_map'] is not None:
+                    config_analyses['hazard_names'] = [haz.stem for haz in config_network['hazard']['hazard_map']]
+
+            if 'direct' in config_analyses:
+                analyses_direct.DirectAnalyses(config_analyses, graphs).execute()
+
+            if 'indirect' in config_analyses:
+                analyses_indirect.IndirectAnalyses(config_analyses).execute()
 
 
 @click.command()
@@ -72,5 +73,5 @@ def cli(network_ini, analyses_ini):
 
 if __name__ == '__main__':
     # cli()
-    rootpath = r'c:\Python\RACE\ra2ce\data\test'
-    main(rootpath + r"\network.ini", rootpath + r"\analyses.ini")
+    rootpath = r'c:\Python\RACE\ra2ce\data\KBN2'
+    main(rootpath + r"\network.ini")#, rootpath + r"\analyses.ini")

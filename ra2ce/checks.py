@@ -10,7 +10,7 @@ from pathlib import Path
 import logging
 
 list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination', 'multi_link_origin_destination']
-list_direct_analyses = ['direct']
+list_direct_analyses = ['direct', 'effectivity_measurements']
 
 
 def input_validation(config):
@@ -91,10 +91,9 @@ def check_paths(config, key, item, input_dirs, error):
                 item] / p
             if not abs_path.is_file():
                 logging.error(
-                    'Wrong input to property [ {} ], file {} does not exist in folder {}'.format(
-                        item, p,
-                        config['root_path'] / 'data' / config['project']['name'] / input_dirs[
-                            item]))
+                    'Wrong input to property [ {} ], file {} does not exist in folder {}'.format(item, p,
+                        config['root_path'] / 'data' / config['project']['name'] / input_dirs[item]))
+                logging.error('If no file is needed, please insert value - None - for property - {} -'.format(item))
                 error = True
             else:
                 list_paths.append(abs_path)
