@@ -275,6 +275,10 @@ class Network:
         def read_file(file, analyse=1):
             """"Set analysis to 1 for main analysis and 0 for diversion network"""
             shp = gpd.read_file(file)
+            print(shp.crs)
+            if shp.crs != 'epsg:{}'.format(crs_):
+                shp = shp.to_crs("EPSG:{}".format(crs_))
+            print(shp.crs)
             shp['to_analyse'] = analyse
             return shp
 
@@ -311,6 +315,7 @@ class Network:
                 output_path = self.config['static'] / 'output_graph' / (name + '_network.shp')
                 to_save.to_file(output_path, index=False)
                 logging.info(f"Saved {output_path.stem} in {output_path.resolve().parent}.")
+            return output_path_pickle
 
         elif type(to_save) == nx.classes.multigraph.MultiGraph:
             # The file that needs to be saved is a graph
@@ -322,7 +327,9 @@ class Network:
                 output_path_pickle = self.config['static'] / 'output_graph' / (name + '_graph.gpickle')
                 nx.write_gpickle(to_save, output_path_pickle, protocol=4)
                 logging.info(f"Saved {output_path_pickle.stem} in {output_path_pickle.resolve().parent}.")
-        return output_path_pickle
+            return output_path_pickle
+        else:
+            return None
 
     def create(self):
         """Function with the logic to call the right analyses."""
@@ -348,12 +355,21 @@ class Network:
                 logging.info('Start downloading a network from OSM.')
                 base_graph, network_gdf = self.network_osm_download()
 
-            # Check if all geometries between nodes are there, if not, add them as a straight line.
-            base_graph = add_missing_geoms_graph(base_graph, geom_name='geometry')
+            elif self.source == 'pickle':
+                logging.info('Start importing a network from pickle')
+                # base_graph = nx.read_gpickle(self.config['static'] / 'network' / 'base_graph.gpickle')
+                network_gdf = read_pickle_file(self.config['static'] / 'network' / 'base_network.p')
+
+            if self.source != 'pickle':
+                # Check if all geometries between nodes are there, if not, add them as a straight line.
+                base_graph = add_missing_geoms_graph(base_graph, geom_name='geometry')
 
             # Save the graph and geodataframe
             self.config['files']['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
             self.config['files']['base_network'] = self.save_network(network_gdf, 'base', types=to_save)
+        else:
+            # base_graph = nx.read_gpickle(self.config['files']['base_graph'])
+            network_gdf = gpd.read_feather(self.config['files']['base_network'])
 
         # create origins destinations graph
         if (self.origins is not None) and (self.destinations is not None) and self.od_graph_path is None:
@@ -532,7 +548,7 @@ class Hazard:
                 graph[u][v][k][hn] = 0
         return graph
 
-    def join_hazard_table(self, graph):
+    def join_hazard_table(self, hazards_table, graph):
         """Joins a table with IDs and hazard information with the road segments with corresponding IDs.
 
         :param [ParamName]: [ParamDescription], defaults to [DefaultParamVal]
@@ -544,6 +560,31 @@ class Hazard:
         :rtype: [ReturnType]
         """
         # TODO differentiate between graph and geodataframe input
+        if type(graph) == gpd.GeoDataFrame:
+            for haz in self.list_hazard_files:
+                if haz.suffix in ['.csv']:
+                    graph = self.join_table(graph, haz)
+            return graph
+
+        elif graph is not None:
+            graph = graph_to_gdf(graph, save_edges=True)[0]
+            for haz in self.list_hazard_files:
+                if haz.suffix in ['.csv']:
+                    graph = self.join_table(graph, haz)
+            # graph_check = pd.DataFrame(graph.drop(columns='geometry'))
+            # graph['osmid'] = graph['osmid'].astype(str)
+            # graph = graph.drop(columns=['osmid', 'oneway', 'lanes', 'bridge', 'highway', 'maxspeed', 'lit', 'G_fid_complex', 'name', 'ref', 'width', 'tunnel'])
+            # print(graph.dtypes)
+            #
+            # filter_link_ids(self.config, hazard='gwhwa_verhoger_slope0015_0010_hwa_afw_ho_dichtbij2_dissolved.csv')
+            return graph
+
+    def join_table(self, graph, hazard):
+        df = pd.read_csv(hazard)
+        graph = graph.merge(df,
+                            how='left',
+                            left_on=self.config['network']['file_id'],
+                            right_on=self.config['hazard']['hazard_id'])
         return graph
 
     def hazard_intersect(self, graph):
@@ -551,8 +592,8 @@ class Hazard:
         hazards_shp = [haz for haz in self.list_hazard_files if haz.suffix == '.shp']
         hazards_table = [haz for haz in self.list_hazard_files if haz.suffix in ['.csv', '.json']]
 
-        if type(graph) == gpd.GeoDataFrame:
-            graph = self.overlay_hazard_raster_gdf(hazards_tif, graph)
+        # if type(graph) == gpd.GeoDataFrame:
+        #     graph = self.overlay_hazard_raster_gdf(hazards_tif, graph)
 
         if len(hazards_tif) > 0:
             start = time.time()
@@ -603,7 +644,7 @@ class Hazard:
         """ creates the hazard overlay over a graph """
         to_save = ['pickle'] if not self.config['network']['save_shp'] else ['pickle', 'shp']
 
-        if self.base_graph_path is None or self.od_graph_path is None:
+        if self.base_graph_path is None and self.od_graph_path is None:
             logging.warning("Either a base graph or od graph is missing to intersect the hazard with. "
                             "Check your network folder.")
 
