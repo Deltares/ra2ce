@@ -460,8 +460,9 @@ def line_length(line):
         else:
             logging.warning("Something went wrong while calculating the length of the road stretches.")
     except:
-        logging.warning(
+        logging.error(
             "The CRS is not EPSG:4326. Quit the analysis, reproject the layer to EPSG:4326 and try again to run the tool.")
+        quit()
     return round(total_length, 0)
 
 
@@ -478,6 +479,7 @@ def snap_endpoints_lines(lines_gdf, max_dist, idName, tolerance=1e-7):
         Adjusted 15-10-2019: Frederique de Groen (frederique.degroen@deltares.nl)
         Build on library from https://github.com/ojdo/python-tools/blob/master/shapelytools.py
     """
+    logging.info('Started snapping endpoints of lines...')
     max_id = max(lines_gdf[idName])
 
     # initialize snapped lines with list of original lines
@@ -632,19 +634,20 @@ def vertices_from_lines(lines, listIds):
     return vertices_dict
 
 
-def create_nodes(merged_lines, crs_):
+def create_nodes(merged_lines, crs_, ignore_intersections):
     """Creates shapely points on intersections and endpoints of a list of shapely lines
     Args:
         merged_lines [list of shapely LineStrings]: the edges of a graph
     Returns:
         nodes [list of shapely Points]: the nodes of a graph
     """
+    logging.info('Started creating nodes...')
     list_lines = list(merged_lines['geometry'])
 
     # Get all endpoints of all linestrings
     endpts = [[Point(list(line.coords)[0]), Point(list(line.coords)[-1])] for line in list_lines if
               isinstance(line, LineString)]
-
+    #logging.info('{} Endpoints selected'.format(len(endpts)))
     # flatten the resulting list to a simple list of points
     endpts = [pt for sublist in endpts for pt in sublist]
 
@@ -654,41 +657,43 @@ def create_nodes(merged_lines, crs_):
     more_endpts = [pt for sublist in more_endpts for pt in sublist]
     endpts.extend(more_endpts)
 
-    # create nodes on intersections and on lines that should be snapped
-    inters = []
-    for line1, line2 in itertools.combinations(list_lines, 2):
-        # Make points at intersections of lines
-        if line1.intersects(line2):
-            inter = line1.intersection(line2)
-            if "Point" == inter.type:
-                inters.append(inter)
-            elif "MultiPoint" == inter.type:
-                inters.extend([pt for pt in inter])
-            elif "MultiLineString" == inter.type:
-                multiLine = [line for line in inter]
-                first_coords = multiLine[0].coords[0]
-                last_coords = multiLine[len(multiLine) - 1].coords[1]
-                inters.append(Point(first_coords[0], first_coords[1]))
-                inters.append(Point(last_coords[0], last_coords[1]))
-            elif "GeometryCollection" == inter.type:
-                for geom in inter:
-                    if "Point" == geom.type:
-                        inters.append(geom)
-                    elif "MultiPoint" == geom.type:
-                        inters.extend([pt for pt in geom])
-                    elif "MultiLineString" == geom.type:
-                        multiLine = [line for line in geom]
-                        first_coords = multiLine[0].coords[0]
-                        last_coords = multiLine[len(multiLine) - 1].coords[1]
-                        inters.append(Point(first_coords[0], first_coords[1]))
-                        inters.append(Point(last_coords[0], last_coords[1]))
+    if ignore_intersections is not True:
+        # create nodes on intersections and on lines that should be snapped
+        inters = []
+        for line1, line2 in itertools.combinations(list_lines, 2):
+            # Make points at intersections of lines
+            if line1.intersects(line2):
+                inter = line1.intersection(line2)
+                if "Point" == inter.type:
+                    inters.append(inter)
+                elif "MultiPoint" == inter.type:
+                    inters.extend([pt for pt in inter])
+                elif "MultiLineString" == inter.type:
+                    multiLine = [line for line in inter]
+                    first_coords = multiLine[0].coords[0]
+                    last_coords = multiLine[len(multiLine) - 1].coords[1]
+                    inters.append(Point(first_coords[0], first_coords[1]))
+                    inters.append(Point(last_coords[0], last_coords[1]))
+                elif "GeometryCollection" == inter.type:
+                    for geom in inter:
+                        if "Point" == geom.type:
+                            inters.append(geom)
+                        elif "MultiPoint" == geom.type:
+                            inters.extend([pt for pt in geom])
+                        elif "MultiLineString" == geom.type:
+                            multiLine = [line for line in geom]
+                            first_coords = multiLine[0].coords[0]
+                            last_coords = multiLine[len(multiLine) - 1].coords[1]
+                            inters.append(Point(first_coords[0], first_coords[1]))
+                            inters.append(Point(last_coords[0], last_coords[1]))
 
-    # Extend the endpoints with the intersection points that are not endpoints
-    endpts.extend([pt for pt in inters if pt not in endpts])
+        # Extend the endpoints with the intersection points that are not endpoints
+        endpts.extend([pt for pt in inters if pt not in endpts])
 
     # Add to GeoDataFrame and delete duplicate points
-    points_gdf = gpd.GeoDataFrame({'node_fid': range(len(delete_duplicates(endpts))),
-                                   'geometry': delete_duplicates(endpts)},
+    unique_points = delete_duplicates(endpts)
+    points_gdf = gpd.GeoDataFrame({'node_fid': range(len(unique_points)),
+                                   'geometry': unique_points},
                                   geometry='geometry', crs={'init': 'epsg:{}'.format(crs_)})
 
     return points_gdf
@@ -857,6 +862,7 @@ def join_nodes_edges(gdf_nodes, gdf_edges, idName):
     Returns:
         result [geodataframe]: geodataframe of adjecent nodes from edges
     """
+    logging.info('Started joining edges and nodes...')
     # list of the edges that are not topographically correct
     incorrect_edges = []
 
@@ -1017,12 +1023,15 @@ def create_simplified_graph(graph_complex, new_id='ra2ce_fid'):
 def gdf_check_create_unique_ids(gdf, id_name, new_id_name='ra2ce_fid'):
     # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
     check=gdf.index
+    logging.info('Started creating unique ids...')
     if len(gdf[id_name].unique()) < len(gdf.index):
         gdf[new_id_name] = list(gdf.index)
-        print("Added a new unique identifier field {} because the original field '{}' "
-              "did not contain unique values per road segment.".format(new_id_name, id_name))
+        logging.info("Added a new unique identifier field {}.".format(new_id_name, id_name))
         return gdf, new_id_name
     else:
+        gdf[new_id_name] = list(gdf.index)
+        logging.info("Added a new unique identifier field {} because the original field '{}' "
+              "did not contain unique values per road segment.".format(new_id_name, id_name))
         return gdf, id_name
 
 
@@ -1094,14 +1103,14 @@ def read_geojson(geojson_file):
         return geojson.load(f)
 
 
-def graph_from_gdf(gdf, gdf_nodes, name='network'):
+def graph_from_gdf(gdf, gdf_nodes, name='network', node_id = 'ID'):
     # create a Graph object
     G = nx.MultiGraph(crs=gdf.crs)
 
     # create nodes on the Graph
     for index, row in gdf_nodes.iterrows():
-        c = {'ID': row.node_fid, 'geometry': row.geometry}
-        G.add_node(row.node_fid, **c)
+        c = {'ID': row[node_id], 'geometry': row.geometry}
+        G.add_node(row[node_id], **c)
 
     # create edges on top of the nodes
     for index, row in gdf.iterrows():
@@ -1126,7 +1135,7 @@ def graph_to_gdf(G, save_nodes=False, save_edges=True, to_save=False):
 
     nodes, edges = None, None
     if save_nodes and save_edges:
-        nodes, edges = osmnx.graph_to_gdfs(G, nodes=save_nodes, edges=save_edges)
+        nodes, edges = osmnx.graph_to_gdfs(G, nodes=save_nodes, edges=save_edges, node_geometry=False)
 
         if to_save:
             dfs = [edges, nodes]

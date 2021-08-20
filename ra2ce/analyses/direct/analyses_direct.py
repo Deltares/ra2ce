@@ -53,11 +53,11 @@ class DirectAnalyses:
         return road_gdf_damage
 
     def effectivity_measurements(self):
-        gdf = self.graphs['base_graph_hazard']
-        if self.graphs['base_graph_hazard'] is None:
-            gdf = gpd.read_feather(self.config['files']['base_graph_hazard'])
+        gdf_path = self.graphs['base_network_hazard']
+        if self.graphs['base_network_hazard'] is None:
+            gdf_in = gpd.read_feather(self.config['files']['base_network_hazard'])
 
-        dfnew = pd.DataFrame(gdf.drop(columns='geometry'))
+        dfnew = pd.DataFrame(gdf_in.drop(columns='geometry'), copy=True)
         # TODO: This should probably not be done here, but at the create network function
         # apply road mapping to fewer types
         road_mapping_dict = lookup_road_mapping()
