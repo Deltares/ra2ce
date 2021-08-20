@@ -53,15 +53,15 @@ def main(network_ini=None, analyses_ini=None):
                 output_path.mkdir(parents=True, exist_ok=True)
 
         # Do the analyses
-            if network_ini:
-                if config_network['hazard']['hazard_map'] is not None:
-                    config_analyses['hazard_names'] = [haz.stem for haz in config_network['hazard']['hazard_map']]
+        if network_ini:
+            if config_network['hazard']['hazard_map'] is not None:
+                config_analyses['hazard_names'] = [haz.stem for haz in config_network['hazard']['hazard_map']]
 
-            if 'direct' in config_analyses:
-                analyses_direct.DirectAnalyses(config_analyses, graphs).execute()
+        if 'direct' in config_analyses:
+            analyses_direct.DirectAnalyses(config_analyses, graphs).execute()
 
-            if 'indirect' in config_analyses:
-                analyses_indirect.IndirectAnalyses(config_analyses).execute()
+        if 'indirect' in config_analyses:
+            analyses_indirect.IndirectAnalyses(config_analyses).execute()
 
 
 @click.command()
@@ -73,5 +73,5 @@ def cli(network_ini, analyses_ini):
 
 if __name__ == '__main__':
     # cli()
-    rootpath = r'c:\Python\RACE\ra2ce\data\KBN2'
-    main(rootpath + r"\network.ini")#, rootpath + r"\analyses.ini")
+    rootpath = r'c:\Python\ra2ce\data\KBN2'
+    main(rootpath + r"\network.ini", rootpath + r"\analyses.ini")

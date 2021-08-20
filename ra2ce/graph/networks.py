@@ -95,16 +95,15 @@ class Network:
             lines_merged.to_file(os.path.join(self.output_path, "{}_lines_that_merged.shp".format(self.name)))
             logging.info("Function [edges_to_shp]: saved at ".format(os.path.join(self.output_path, '{}_lines_that_merged'.format(self.name))))
 
-
         # Get the unique points at the end of lines and at intersections to create nodes
-        nodes = create_nodes(edges, crs)
+        nodes = create_nodes(edges, crs, self.config['cleanup']['ignore_intersections'])
         logging.info("Function [create_nodes]: executed")
 
         if self.snapping is not None or self.pruning is not None:
             if self.snapping is not None:
                 # merged lines may be updated when new nodes are created which makes a line cut in two
                 edges = cut_lines(edges, nodes, id_name, tolerance=1e-4)
-                nodes = create_nodes(edges, crs)
+                nodes = create_nodes(edges, crs, self.config['cleanup']['ignore_intersections'])
                 logging.info("Function [cut_lines]: executed")
 
         # create tuples from the adjecent nodes and add as column in geodataframe
@@ -277,9 +276,9 @@ class Network:
             shp = gpd.read_file(file)
             print(shp.crs)
             if shp.crs != 'epsg:{}'.format(crs_):
-                shp = shp.to_crs("EPSG:{}".format(crs_))
-            print(shp.crs)
-            shp['to_analyse'] = analyse
+                logging.error('Shape projection is epsg:{} - only projection epsg:{} is allowed. '
+                          'Please reproject the input file - {}'.format(shp.crs, crs_, file))
+                quit()
             return shp
 
         # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
@@ -288,7 +287,12 @@ class Network:
             [lines.append(read_file(shp, 0)) for shp in shapefiles_diversion]
         lines = pd.concat(lines)
 
+
         lines.crs = {'init': 'epsg:{}'.format(crs_)}
+
+        ods_path = self.config['static'] / 'output_graph' / ('test' + '.shp')
+        lines.to_file(ods_path, index=False)
+
 
         # append the length of the road stretches
         lines['length'] = lines['geometry'].apply(lambda x: line_length(x))
@@ -368,7 +372,7 @@ class Network:
             self.config['files']['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
             self.config['files']['base_network'] = self.save_network(network_gdf, 'base', types=to_save)
         else:
-            # base_graph = nx.read_gpickle(self.config['files']['base_graph'])
+            base_graph = nx.read_gpickle(self.config['files']['base_graph'])
             network_gdf = gpd.read_feather(self.config['files']['base_network'])
 
         # create origins destinations graph
@@ -566,17 +570,13 @@ class Hazard:
                     graph = self.join_table(graph, haz)
             return graph
 
-        elif graph is not None:
-            graph = graph_to_gdf(graph, save_edges=True)[0]
+        elif graph is not None and type(graph) != gpd.GeoDataFrame:
+            gdf, gdf_nodes = graph_to_gdf(graph, save_nodes=True)
             for haz in self.list_hazard_files:
                 if haz.suffix in ['.csv']:
-                    graph = self.join_table(graph, haz)
-            # graph_check = pd.DataFrame(graph.drop(columns='geometry'))
-            # graph['osmid'] = graph['osmid'].astype(str)
-            # graph = graph.drop(columns=['osmid', 'oneway', 'lanes', 'bridge', 'highway', 'maxspeed', 'lit', 'G_fid_complex', 'name', 'ref', 'width', 'tunnel'])
-            # print(graph.dtypes)
-            #
-            # filter_link_ids(self.config, hazard='gwhwa_verhoger_slope0015_0010_hwa_afw_ho_dichtbij2_dissolved.csv')
+                    gdf = self.join_table(gdf, haz)
+
+            graph = graph_from_gdf(gdf, gdf_nodes)
             return graph
 
     def join_table(self, graph, hazard):
