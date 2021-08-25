@@ -18,7 +18,8 @@ from shutil import copyfile
 from checks import input_validation, check_files
 
 list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination', 'multi_link_origin_destination']
-list_direct_analyses = ['direct', 'effectivity_measurements']
+list_direct_analyses = ['direct', 'effectiveness_measurements']
+
 
 def parse_config(root, path=None, opt_cli=None):
     """Ajusted from HydroMT
@@ -27,7 +28,7 @@ def parse_config(root, path=None, opt_cli=None):
     if path is not None and path.is_file():
         opt = configread(path, root, abs_path=False)  # Set from True to False 29-7-2021 by Frederique
         # make sure paths in config section are not abs paths
-        if "setup_config" in opt: # BELOW IS CURRENTLY NOT USED IN RA2CE BUT COULD BE GOOD FOR FUTURE LINKAGE WITH HYDROMT
+        if "setup_config" in opt:  # BELOW IS CURRENTLY NOT USED IN RA2CE BUT COULD BE GOOD FOR FUTURE LINKAGE WITH HYDROMT
             opt["setup_config"].update(configread(path).get("config", {}))
     elif path is not None:
         raise IOError(f"Config not found at {path}")

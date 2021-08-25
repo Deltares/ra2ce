@@ -12,218 +12,222 @@ import numpy as np
 from scipy.interpolate import interp1d
 
 
-def lookup_road_mapping():
-    """ Mapping of OSM road infrastructure types """
+class LookUp:
+    """" This namespace contains several lookup tables, used e.g. for road damage calculation."""
 
-    mapping_dict = {'disused': 'none',
-                    'dummy': 'none',
-                    'planned': 'none',
-                    'platform': 'none',
-                    'unsurfaced': 'track',
-                    'traffic_island': 'other',
-                    'razed': 'none',
-                    'abandoned': 'none',
-                    'services': 'none',
-                    'proposed': 'none',
-                    'corridor': 'track',
-                    'bus_guideway': 'other',
-                    'bus_stop': 'other',
-                    'rest_area': 'other',
-                    'yes': 'other',
-                    'trail': 'track',
-                    'escape': 'other',
-                    'raceway': 'other',
-                    'emergency_access_point': 'none',
-                    'emergency_bay': 'other',
-                    'construction': 'other',
-                    'bridleway': 'none',
-                    'cycleway': 'other',
-                    'footway': 'track',
-                    'living_street': 'other',
-                    'path': 'track',
-                    'pedestrian': 'other',
-                    'primary': 'primary',
-                    'primary_link': 'primary',
-                    'residential': 'other',
-                    'road': 'other',
-                    'secondary': 'secondary',
-                    'secondary_link': 'secondary',
-                    'service': 'other',
-                    'steps': 'none',
-                    'tertiary': 'tertiary',
-                    'tertiary_link': 'tertiary',
-                    'track': 'track',
-                    'unclassified': 'other',
-                    'trunk': 'trunk',
-                    'motorway': 'motorway',
-                    'trunk_link': 'trunk',
-                    'motorway_link': 'motorway',
-                    'elevator': 'none',
-                    'access': 'none',
-                    'crossing': 'other',
-                    'mini_roundabout': 'other',
-                    'passing_place': 'other',
-                    'turning_circle': 'other',
-                    'motorway_junction': 'motorway'}
-    return mapping_dict
+    @staticmethod
+    def road_mapping():
+        """ Mapping of OSM road infrastructure types """
 
+        mapping_dict = {'disused': 'none',
+                        'dummy': 'none',
+                        'planned': 'none',
+                        'platform': 'none',
+                        'unsurfaced': 'track',
+                        'traffic_island': 'other',
+                        'razed': 'none',
+                        'abandoned': 'none',
+                        'services': 'none',
+                        'proposed': 'none',
+                        'corridor': 'track',
+                        'bus_guideway': 'other',
+                        'bus_stop': 'other',
+                        'rest_area': 'other',
+                        'yes': 'other',
+                        'trail': 'track',
+                        'escape': 'other',
+                        'raceway': 'other',
+                        'emergency_access_point': 'none',
+                        'emergency_bay': 'other',
+                        'construction': 'other',
+                        'bridleway': 'none',
+                        'cycleway': 'other',
+                        'footway': 'track',
+                        'living_street': 'other',
+                        'path': 'track',
+                        'pedestrian': 'other',
+                        'primary': 'primary',
+                        'primary_link': 'primary',
+                        'residential': 'other',
+                        'road': 'other',
+                        'secondary': 'secondary',
+                        'secondary_link': 'secondary',
+                        'service': 'other',
+                        'steps': 'none',
+                        'tertiary': 'tertiary',
+                        'tertiary_link': 'tertiary',
+                        'track': 'track',
+                        'unclassified': 'other',
+                        'trunk': 'trunk',
+                        'motorway': 'motorway',
+                        'trunk_link': 'trunk',
+                        'motorway_link': 'motorway',
+                        'elevator': 'none',
+                        'access': 'none',
+                        'crossing': 'other',
+                        'mini_roundabout': 'other',
+                        'passing_place': 'other',
+                        'turning_circle': 'other',
+                        'motorway_junction': 'motorway'}
+        return mapping_dict
 
-def lookup_road_lanes():
-    """ Mapping of road lanes, this is used as a default in case of missings. Number of lanes differ per country. """
+    @staticmethod
+    def road_lanes():
+        """ Mapping of road lanes, this is used as a default in case of missings. Number of lanes differ per country. """
 
-    lanes_dict = OrderedDict([('AL', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 1), ('track', 1), ('other', 1),
-             ('none', 1)])), ('AT', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 1), ('track', 1), ('other', 1),
-             ('none', 1)])), ('BE', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('BG', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('CH', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 1), ('track', 1), ('other', 1),
-             ('none', 1)])), ('CZ', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('DE', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('DK', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('EE', OrderedDict(
-            [('motorway', 1), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('EL', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('ES', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('FI', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('FR', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('HR', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('HU', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('IE', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 1), ('track', 1), ('other', 1),
-             ('none', 1)])), ('IS', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 1), ('track', 1), ('other', 1),
-             ('none', 1)])), ('IT', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('LT', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('LU', OrderedDict(
-            [('motorway', 2), ('trunk', 3), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('LV', OrderedDict(
-            [('motorway', 1), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('LI', OrderedDict(
-            [('motorway', 1), ('trunk', 1), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('ME', OrderedDict(
-            [('motorway', 1), ('trunk', 1), ('primary', 2), ('secondary', 1), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('MK', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('NL', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 1), ('track', 1), ('other', 1),
-             ('none', 1)])), ('NO', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 1), ('track', 1), ('other', 1),
-             ('none', 1)])), ('PL', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('PT', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('RO', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('RS', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('SE', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('SI', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('SK', OrderedDict(
-            [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('TR', OrderedDict(
-            [('motorway', 3), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)])), ('UK', OrderedDict(
-            [('motorway', 3), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
-             ('none', 1)]))])
-    return lanes_dict
+        lanes_dict = OrderedDict([('AL', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 1), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('AT', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 1), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('BE', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('BG', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('CH', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 1), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('CZ', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('DE', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('DK', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('EE', OrderedDict(
+                [('motorway', 1), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('EL', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('ES', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('FI', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('FR', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('HR', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('HU', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('IE', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 1), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('IS', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 1), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('IT', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('LT', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('LU', OrderedDict(
+                [('motorway', 2), ('trunk', 3), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('LV', OrderedDict(
+                [('motorway', 1), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('LI', OrderedDict(
+                [('motorway', 1), ('trunk', 1), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('ME', OrderedDict(
+                [('motorway', 1), ('trunk', 1), ('primary', 2), ('secondary', 1), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('MK', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('NL', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 1), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('NO', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 1), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('PL', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('PT', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('RO', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('RS', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('SE', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('SI', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('SK', OrderedDict(
+                [('motorway', 2), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('TR', OrderedDict(
+                [('motorway', 3), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)])), ('UK', OrderedDict(
+                [('motorway', 3), ('trunk', 2), ('primary', 2), ('secondary', 2), ('tertiary', 2), ('track', 1), ('other', 1),
+                 ('none', 1)]))])
+        return lanes_dict
 
+    @staticmethod
+    def road_damage_correction():
+        """ Lookup table for correction factor of damage for lanes """
+        lookup_dict = OrderedDict(
+            [('motorway', {1: 0.75, 2: 1.0, 3: 1.25, 4: 1.5, 5: 1.75, 6: 2.0}),
+             ('trunk', {1: 0.75, 2: 1.0, 3: 1.25, 4: 1.5, 5: 1.75, 6: 2.0}),
+             ('primary', {1: 0.75, 2: 1.0, 3: 1.25, 4: 1.5, 5: 1.75, 6: 2.0}),
+             ('secondary', {1: 0.75, 2: 1.0, 3: 1.25, 4: 1.5, 5: 1.75, 6: 2.0}),
+             ('tertiary', {1: 0.75, 2: 1.0, 3: 1.5, 4: 1.75, 5: 2.0, 6: 2.25}),
+             ('other', {1: 1.0, 2: 1.25, 3: 1.5, 4: 1.75, 5: 2.0, 6: 2.25}),
+             ('track', {1: 1.0, 2: 1.25, 3: 1.5, 4: 1.75, 5: 2.0, 6: 2.25}),
+             ('none', {1: 1.0, 2: 1.25, 3: 1.5, 4: 1.75, 5: 2.0, 6: 2.25})])
 
-def lookup_road_damage_correction():
-    """ Lookup table for correction factor of damage for lanes """
-    lookup_dict = OrderedDict(
-        [('motorway', {1: 0.75, 2: 1.0, 3: 1.25, 4: 1.5, 5: 1.75, 6: 2.0}), 
-         ('trunk', {1: 0.75, 2: 1.0, 3: 1.25, 4: 1.5, 5: 1.75, 6: 2.0}),
-         ('primary', {1: 0.75, 2: 1.0, 3: 1.25, 4: 1.5, 5: 1.75, 6: 2.0}),
-         ('secondary', {1: 0.75, 2: 1.0, 3: 1.25, 4: 1.5, 5: 1.75, 6: 2.0}),
-         ('tertiary', {1: 0.75, 2: 1.0, 3: 1.5, 4: 1.75, 5: 2.0, 6: 2.25}), 
-         ('other', {1: 1.0, 2: 1.25, 3: 1.5, 4: 1.75, 5: 2.0, 6: 2.25}),
-         ('track', {1: 1.0, 2: 1.25, 3: 1.5, 4: 1.75, 5: 2.0, 6: 2.25}), 
-         ('none', {1: 1.0, 2: 1.25, 3: 1.5, 4: 1.75, 5: 2.0, 6: 2.25})])
-    
-    return lookup_dict
+        return lookup_dict
 
+    @staticmethod
+    def max_damages():
+        """ Lookup table for max damages """
+        lookup_dict = OrderedDict([('Lower', OrderedDict([('motorway', 1750000), ('trunk', 1250000),
+                                                          ('primary', 1000000), ('secondary', 500000),
+                                                          ('tertiary', 200000), ('other', 100000),
+                                                          ('track', 20000), ('none', 0)])),
+                                   ('Upper', OrderedDict([('motorway', 17500000), ('trunk', 3750000),
+                                                          ('primary', 3000000), ('secondary', 1500000),
+                                                          ('tertiary', 600000), ('other', 300000),
+                                                          ('track', 50000), ('none', 0)]))])
 
-def lookup_max_damages():
-    """ Lookup table for max damages """
-    lookup_dict = OrderedDict([('Lower', OrderedDict([('motorway', 1750000), ('trunk', 1250000), 
-                                                      ('primary', 1000000), ('secondary', 500000), 
-                                                      ('tertiary', 200000), ('other', 100000), 
-                                                      ('track', 20000), ('none', 0)])), 
-                               ('Upper', OrderedDict([('motorway', 17500000), ('trunk', 3750000), 
-                                                      ('primary', 3000000), ('secondary', 1500000), 
-                                                      ('tertiary', 600000), ('other', 300000), 
-                                                      ('track', 50000), ('none', 0)]))])
+        return lookup_dict
 
-    return lookup_dict
+    @staticmethod
+    def max_damages_huizinga():
+        """ Lookup table for max damages calculated with huizinga for number of lanes """
 
+        lookup_dict = OrderedDict([('motorway', {1: 175000, 2: 350000, 3: 450000, 4: 550000, 5: 650000, 6: 750000}),
+                                   ('trunk', {1: 175000, 2: 300000, 3: 400000, 4: 475000, 5: 575000, 6: 650000}),
+                                   ('primary', {1: 125000, 2: 250000, 3: 325000, 4: 425000, 5: 500000, 6: 575000}),
+                                   ('secondary', {1: 125000, 2: 225000, 3: 300000, 4: 400000, 5: 475000, 6: 550000}),
+                                   ('tertiary', {1: 100000, 2: 175000, 3: 250000, 4: 350000, 5: 425000, 6: 500000}),
+                                   ('track', {1: 75000, 2: 150000, 3: 225000, 4: 300000, 5: 375000, 6: 450000}),
+                                   ('other', {1: 75000, 2: 150000, 3: 225000, 4: 300000, 5: 375000, 6: 450000})])
 
-def lookup_max_damages_huizinga():
-    """ Lookup table for max damages calculated with huizinga for number of lanes """
-    
-    lookup_dict = OrderedDict([('motorway', {1: 175000, 2: 350000, 3: 450000, 4: 550000, 5: 650000, 6: 750000}),
-                               ('trunk', {1: 175000, 2: 300000, 3: 400000, 4: 475000, 5: 575000, 6: 650000}),
-                               ('primary', {1: 125000, 2: 250000, 3: 325000, 4: 425000, 5: 500000, 6: 575000}),
-                               ('secondary', {1: 125000, 2: 225000, 3: 300000, 4: 400000, 5: 475000, 6: 550000}),
-                               ('tertiary', {1: 100000, 2: 175000, 3: 250000, 4: 350000, 5: 425000, 6: 500000}),
-                               ('track', {1: 75000, 2: 150000, 3: 225000, 4: 300000, 5: 375000, 6: 450000}),
-                               ('other', {1: 75000, 2: 150000, 3: 225000, 4: 300000, 5: 375000, 6: 450000})])
+        return lookup_dict
 
-    return lookup_dict
+    @staticmethod
+    def flood_curves():
+        """ Lookup flood curve values and create interpolator around it """
 
-
-def lookup_flood_curves():
-    """ Lookup flood curve values and create interpolator around it """
-    
-    lookup_dict = {'C1': {0: 'depth (cm)', 1: 0, 2: 50, 3: 100, 4: 150, 5: 200, 6: 600, 7: np.nan, 8: np.nan, 9: np.nan},
-                   'Unnamed: 2': {0: 'damage (% of total construction costs)', 1: 0, 2: 0.01, 3: 0.03, 4: 0.075, 5: 0.1, 6: 0.2, 7: np.nan,
-                                  8: np.nan, 9: np.nan},
-                   'C2': {0: 'depth (cm)', 1: 0, 2: 50, 3: 100, 4: 150, 5: 200, 6: 600, 7: np.nan, 8: np.nan, 9: np.nan},
-                   'Unnamed: 4': {0: 'damage (% of total construction costs)', 1: 0, 2: 0.02, 3: 0.06, 4: 0.1, 5: 0.12, 6: 0.22, 7: np.nan,
-                               8: np.nan, 9: np.nan},
-                   'C3': {0: 'depth (cm)', 1: 0, 2: 50, 3: 100, 4: 150, 5: 200, 6: 600, 7: np.nan, 8: np.nan, 9: np.nan},
-                   'Unnamed: 6': {0: 'damage (% of total construction costs)', 1: 0, 2: 0.002, 3: 0.004, 4: 0.025, 5: 0.03, 6: 0.04,
-                                  7: np.nan, 8: np.nan, 9: np.nan},
-                   'C4': {0: 'depth (cm)', 1: 0, 2: 50, 3: 100, 4: 150, 5: 200, 6: 600, 7: np.nan, 8: np.nan, 9: np.nan},
-                   'Unnamed: 8': {0: 'damage (% of total construction costs)', 1: 0, 2: 0.015, 3: 0.04, 4: 0.2, 5: 0.25, 6: 0.35, 7: np.nan,
-                                  8: np.nan, 9: np.nan},
-                   'C5': {0: 'depth (cm)', 1: 0, 2: 50, 3: 100, 4: 200, 5: 600, 6: np.nan, 7: np.nan, 8: np.nan, 9: np.nan},
-                   'Unnamed: 10': {0: 'damage (% of total construction costs)', 1: 0, 2: 0.015, 3: 0.025, 4: 0.035, 5: 0.05, 6: np.nan,
-                                   7: np.nan, 8: np.nan, 9: np.nan},
-                   'C6': {0: 'depth (cm)', 1: 0, 2: 50, 3: 100, 4: 200, 5: 600, 6: np.nan, 7: np.nan, 8: np.nan, 9: np.nan},
-                   'Unnamed: 12': {0: 'damage (% of total construction costs)', 1: 0, 2: 0.12, 3: 0.2, 4: 0.28, 5: 0.35, 6: np.nan, 7: np.nan,
+        lookup_dict = {'C1': {0: 'depth (cm)', 1: 0, 2: 50, 3: 100, 4: 150, 5: 200, 6: 600, 7: np.nan, 8: np.nan, 9: np.nan},
+                       'Unnamed: 2': {0: 'damage (% of total construction costs)', 1: 0, 2: 0.01, 3: 0.03, 4: 0.075, 5: 0.1, 6: 0.2, 7: np.nan,
+                                      8: np.nan, 9: np.nan},
+                       'C2': {0: 'depth (cm)', 1: 0, 2: 50, 3: 100, 4: 150, 5: 200, 6: 600, 7: np.nan, 8: np.nan, 9: np.nan},
+                       'Unnamed: 4': {0: 'damage (% of total construction costs)', 1: 0, 2: 0.02, 3: 0.06, 4: 0.1, 5: 0.12, 6: 0.22, 7: np.nan,
                                    8: np.nan, 9: np.nan},
-                   'HZ': {0: np.nan, 1: 0.0, 2: 50.0, 3: 100.0, 4: 150.0, 5: 200.0, 6: 300.0, 7: 400.0, 8: 500.0, 9: 600.0},
-                   'Unnamed: 14': {0: np.nan, 1: 0.0, 2: 0.25, 3: 0.42, 4: 0.55, 5: 0.65, 6: 0.8, 7: 0.9, 8: 1.0, 9: 1.0}}
+                       'C3': {0: 'depth (cm)', 1: 0, 2: 50, 3: 100, 4: 150, 5: 200, 6: 600, 7: np.nan, 8: np.nan, 9: np.nan},
+                       'Unnamed: 6': {0: 'damage (% of total construction costs)', 1: 0, 2: 0.002, 3: 0.004, 4: 0.025, 5: 0.03, 6: 0.04,
+                                      7: np.nan, 8: np.nan, 9: np.nan},
+                       'C4': {0: 'depth (cm)', 1: 0, 2: 50, 3: 100, 4: 150, 5: 200, 6: 600, 7: np.nan, 8: np.nan, 9: np.nan},
+                       'Unnamed: 8': {0: 'damage (% of total construction costs)', 1: 0, 2: 0.015, 3: 0.04, 4: 0.2, 5: 0.25, 6: 0.35, 7: np.nan,
+                                      8: np.nan, 9: np.nan},
+                       'C5': {0: 'depth (cm)', 1: 0, 2: 50, 3: 100, 4: 200, 5: 600, 6: np.nan, 7: np.nan, 8: np.nan, 9: np.nan},
+                       'Unnamed: 10': {0: 'damage (% of total construction costs)', 1: 0, 2: 0.015, 3: 0.025, 4: 0.035, 5: 0.05, 6: np.nan,
+                                       7: np.nan, 8: np.nan, 9: np.nan},
+                       'C6': {0: 'depth (cm)', 1: 0, 2: 50, 3: 100, 4: 200, 5: 600, 6: np.nan, 7: np.nan, 8: np.nan, 9: np.nan},
+                       'Unnamed: 12': {0: 'damage (% of total construction costs)', 1: 0, 2: 0.12, 3: 0.2, 4: 0.28, 5: 0.35, 6: np.nan, 7: np.nan,
+                                       8: np.nan, 9: np.nan},
+                       'HZ': {0: np.nan, 1: 0.0, 2: 50.0, 3: 100.0, 4: 150.0, 5: 200.0, 6: 300.0, 7: 400.0, 8: 500.0, 9: 600.0},
+                       'Unnamed: 14': {0: np.nan, 1: 0.0, 2: 0.25, 3: 0.42, 4: 0.55, 5: 0.65, 6: 0.8, 7: 0.9, 8: 1.0, 9: 1.0}}
 
-    flood_curves = pd.DataFrame.from_dict(lookup_dict)
-    headers = flood_curves.columns
-    curve_name = [0] * int(len(headers) / 2)  # create empty arrays
-    interpolators = [0] * int(len(headers) / 2)
+        flood_curves = pd.DataFrame.from_dict(lookup_dict)
+        headers = flood_curves.columns
+        curve_name = [0] * int(len(headers) / 2)  # create empty arrays
+        interpolators = [0] * int(len(headers) / 2)
 
-    for i in range(0, int(len(headers) / 2)):  # iterate over the damage curves
-        curve_name[i] = headers[i * 2]
-        curve = flood_curves.iloc[:, 2 * i:2 * i + 2].dropna()
-        # curve x-values in the even; and y-values in the uneven columns
-        interpolators[i] = interp1d(curve.values[1:, 0], curve.values[1:, 1],
-                                    fill_value=(curve.values[1, 1], curve.values[-1, 1]), bounds_error=False)
-    return OrderedDict(zip(curve_name, interpolators))
+        for i in range(0, int(len(headers) / 2)):  # iterate over the damage curves
+            curve_name[i] = headers[i * 2]
+            curve = flood_curves.iloc[:, 2 * i:2 * i + 2].dropna()
+            # curve x-values in the even; and y-values in the uneven columns
+            interpolators[i] = interp1d(curve.values[1:, 0], curve.values[1:, 1],
+                                        fill_value=(curve.values[1, 1], curve.values[-1, 1]), bounds_error=False)
+        return OrderedDict(zip(curve_name, interpolators))
 
 
 class CreateLookupTables:
