@@ -18,7 +18,7 @@ from shutil import copyfile
 from checks import input_validation, check_files
 
 list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination', 'multi_link_origin_destination']
-list_direct_analyses = ['direct', 'effectiveness_measurements']
+list_direct_analyses = ['direct', 'effectiveness_measures']
 
 
 def parse_config(root, path=None, opt_cli=None):

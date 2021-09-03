@@ -10,7 +10,7 @@ from pathlib import Path
 import logging
 
 list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination', 'multi_link_origin_destination']
-list_direct_analyses = ['direct', 'effectiveness_measurements']
+list_direct_analyses = ['direct', 'effectiveness_measures']
 
 
 def input_validation(config):

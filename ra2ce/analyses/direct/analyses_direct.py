@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on 26-7-2021
-
 @author: F.C. de Groen, Deltares
 """
+
 import geopandas as gpd
 import logging
 import time
@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 import os, sys
 from numpy import object as np_object
+
 
 folder = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(folder)
@@ -47,12 +48,12 @@ class DirectAnalyses:
         road_gdf_damage = rd.calculate_direct_damage(gdf)
         return road_gdf_damage
 
-    def effectiveness_measurements(self, analysis):
-        """ This function calculated the efficiency of measurements. Input is a csv file with efficiency
+    def effectiveness_measures(self, analysis):
+        """ This function calculated the efficiency of measures. Input is a csv file with efficiency
         and a list of different aspects you want to check.
          """
-        em = EffectivenessMeasurements(self.config, analysis)
-        effectivity_dict = em.load_effectivity_table(self.config['input'] / 'direct')
+        em = EffectivenessMeasures(self.config, analysis)
+        effectiveness_dict = em.load_effectiveness_table(self.config['input'] / 'direct')
 
         if self.graphs['base_network_hazard'] is None:
             gdf_in = gpd.read_feather(self.config['files']['base_network_hazard'])
@@ -60,11 +61,16 @@ class DirectAnalyses:
         if analysis['create_table'] is True:
             df = em.create_feature_table(self.config['input'] / 'direct' / analysis['file_name'])
         else:
-            df = em.load_table(self.config['input'] / 'direct' / analysis['file_name'].replace('.shp', '.csv'))
+            df = em.load_table(self.config['input'] / 'direct', analysis['file_name'].replace('.shp', '.csv'))
 
-        df = em.calculate_strategy_effectivity(df, effectivity_dict)
-        df = em.knmi_length_correction(df)
-        df = em.calculate_costs(df, effectivity_dict)
+        df = em.calculate_strategy_effectiveness(df, effectiveness_dict)
+        df = em.knmi_correction(df)
+        df_cba, costs_dict = em.cost_benefit_analysis(effectiveness_dict)
+        df_cba.round(2).to_csv(self.config['output'] / analysis['analysis'] / 'cost_benefit_analysis.csv', decimal=',', sep=';', index=False, float_format='%.2f')
+        df = em.calculate_cost_reduction(df, effectiveness_dict)
+        df_costs = em.calculate_strategy_costs(df, costs_dict)
+        df_costs = df_costs.astype(float).round(2)
+        df_costs.to_csv(self.config['output'] / analysis['analysis'] / 'output_analysis.csv', decimal=',', sep=';', index=False, float_format='%.2f')
         gdf = gdf_in.merge(df, how='left', on='LinkNr')
         return gdf
 
@@ -77,8 +83,8 @@ class DirectAnalyses:
             if analysis['analysis'] == 'direct':
                 gdf = self.road_damage(analysis)
 
-            elif analysis['analysis'] == 'effectiveness_measurements':
-                gdf = self.effectiveness_measurements(analysis)
+            elif analysis['analysis'] == 'effectiveness_measures':
+                gdf = self.effectiveness_measures(analysis)
 
             else:
                 gdf = []
@@ -97,8 +103,8 @@ class DirectAnalyses:
                          f"Time: {str(round(endtime - starttime, 2))}s  -----------------------------")
 
 
-class EffectivenessMeasurements:
-    """ This is a namespace for methods to calculate effectivity of measurements """
+class EffectivenessMeasures:
+    """ This is a namespace for methods to calculate effectiveness of measures """
 
     def __init__(self, config, analysis):
         self.analysis = analysis
@@ -106,26 +112,26 @@ class EffectivenessMeasurements:
 
         # perform checks on input while initializing class
         if analysis['file_name'] is None:
-            logging.error('Effectiveness of measurements calculation:... No input file configured. '
+            logging.error('Effectiveness of measures calculation:... No input file configured. '
                           'Please define an input file in the analysis.ini file ')
             quit()
         elif analysis['file_name'].split('.')[1] != 'shp':
-            logging.error('Effectiveness of measurements calculation:... Wrong input file configured. '
+            logging.error('Effectiveness of measures calculation:... Wrong input file configured. '
                           'Extension of input file is -{}-, needs to be -shp- (shapefile)'.format(analysis['file_name'].split('.')[1]))
             quit()
         elif os.path.exists(config['input'] / 'direct' / analysis['file_name']) is False:
-            logging.error('Effectiveness of measurements calculation:... Input file doesnt exist...'
+            logging.error('Effectiveness of measures calculation:... Input file doesnt exist...'
                           ' please place file in the following folder: {}'.format(config['input'] / 'direct'))
             quit()
-        elif os.path.exists(config['input'] / 'direct' / 'effectiveness_measurements.csv') is False:
-            logging.error('Effectiveness of measurements calculation:... lookup table with effectivity of measurements doesnt exist...'
-                          ' Please place the effectiveness_measurements.csv file in the following folder: {}'.format(config['input'] / 'direct'))
+        elif os.path.exists(config['input'] / 'direct' / 'effectiveness_measures.csv') is False:
+            logging.error('Effectiveness of measures calculation:... lookup table with effectiveness of measures doesnt exist...'
+                          ' Please place the effectiveness_measures.csv file in the following folder: {}'.format(config['input'] / 'direct'))
             quit()
 
     @staticmethod
-    def load_effectivity_table(path):
-        """ This function loads a CSV table containing effectivity of the different aspects for a number of strategies"""
-        file_path = path / 'effectiveness_measurements.csv'
+    def load_effectiveness_table(path):
+        """ This function loads a CSV table containing effectiveness of the different aspects for a number of strategies"""
+        file_path = path / 'effectiveness_measures.csv'
         df_lookup = pd.read_csv(file_path, index_col='strategies')
         return df_lookup.transpose().to_dict()
 
@@ -153,17 +159,19 @@ class EffectivenessMeasurements:
         return df
 
     @staticmethod
-    def load_table(file_path):
+    def load_table(path, file):
         """ This method reads the dataframe created from  """
+        file_path = path / file
         df = pd.read_csv(file_path)
         return df
 
     @staticmethod
-    def knmi_length_correction(df, duration=10, calc_length=False):
+    def knmi_correction(df, duration=60):
         """ This function corrects the length of each segment depending on a KNMI factor.
             This factor is calculated using an exponential relation and was calculated using an analysis on all line elements
             a relation is establisched for a 10 minute or 60 minute rainfall period
             With a boolean you can decide to export length or the coefficient itself
+            max 0.26 en 0.17
             """
         if duration not in [10, 60]:
             logging.error('Wrong duration configured, has to be 10 or 60')
@@ -171,23 +179,20 @@ class EffectivenessMeasurements:
         logging.info('Applying knmi length correction with duration of rainfall of -{}- minutes'.format(duration))
 
         coefficients_lookup = {10: {'a': 1.004826523,
-                                    'b': -0.000220199},
+                                    'b': -0.000220199,
+                                    'max': 0.17},
                                60: {'a': 1.012786829,
-                                    'b': -0.000169182}}
+                                    'b': -0.000169182,
+                                    'max': 0.26}}
 
         coefficient = coefficients_lookup[duration]
-
-        df['original_length'] = df['length'].copy()
-
-        if calc_length is True:
-            df['length'] = coefficient['a'] * np.exp(coefficient['b'] * df['length']) * df['length']
-        else:
-            df['coefficient'] = coefficient['a'] * np.exp(coefficient['b'] * df['length'])
+        df['coefficient'] = coefficient['a'] * np.exp(coefficient['b'] * df['length'])
+        df['coefficient'] = df['coefficient'].where(df['length'].astype(float) <= 8000, other=coefficient['max'])
         return df
 
     @staticmethod
-    def calculate_effectivity(df, name='standard'):
-        """ This function calculates effectivity, based on a number of columns:
+    def calculate_effectiveness(df, name='standard'):
+        """ This function calculates effectiveness, based on a number of columns:
          'dichtbij_m', 'ver_hoger_m', 'hwa_afw_ho_m', 'gw_hwa_m', slope_0015_m' and 'slope_001_m'
          and contains the following steps:
          1. calculate the max of ver_hoger, hwa_afw_ho and gw_hwa columns --> verweg
@@ -206,69 +211,152 @@ class EffectivenessMeasurements:
         df['{}_gevoelig_sum'.format(name)] = df['verweg_max'] + df['verkant_max'] + df['dichtbij_m']
 
         # aggregate to link nr
-        new_df = df[['LinkNr', 'length', '{}_gevoelig_max'.format(name), '{}_gevoelig_sum'.format(name)]]
+        new_df = df[['LinkNr', 'length', 'dichtbij_m', 'ver_hoger_m', 'hwa_afw_ho_m', 'gw_hwa_m', 'verweg_max', 'verkant_max', '{}_gevoelig_max'.format(name), '{}_gevoelig_sum'.format(name)]]
         new_df = new_df.groupby(['LinkNr']).sum()
         new_df['LinkNr'] = new_df.index
         new_df = new_df.reset_index(drop=True)
 
-        return new_df[['LinkNr', 'length', '{}_gevoelig_max'.format(name), '{}_gevoelig_sum'.format(name)]]
+        return new_df[['LinkNr',  'length', 'dichtbij_m', 'ver_hoger_m', 'hwa_afw_ho_m', 'gw_hwa_m', 'verweg_max', 'verkant_max', '{}_gevoelig_max'.format(name), '{}_gevoelig_sum'.format(name)]]
 
-    def calculate_strategy_effectivity(self, df, effectivity_dict):
-        """ This function calculates the effectivity for each strategy  """
+    def calculate_strategy_effectiveness(self, df, effectiveness_dict):
+        """ This function calculates the efficacy for each strategy  """
 
         columns = ['dichtbij', 'ver_hoger', 'hwa_afw_ho', 'gw_hwa', 'slope_0015', 'slope_001']
 
-        # calculate standard effectivity without factors
-        df_total = self.calculate_effectivity(df, name='standard')
+        # calculate standard effectiveness without factors
+        df_total = self.calculate_effectiveness(df, name='standard')
+
+        df_blockage = pd.read_csv(self.config['input'] / 'direct' / 'blockage_costs.csv')
+        df_total = df_total.merge(df_blockage, how='left', on='LinkNr')
+        df_total['length'] = df_total['afstand'] # TODO Remove this line as this is probably incorrect, just as a check
 
         # start iterating over different strategies in lookup dictionary
-        for strategy in effectivity_dict:
-            logging.info('Calculating effectivity of strategy: {}'.format(strategy))
-            lookup_dict = effectivity_dict[strategy]
+        for strategy in effectiveness_dict:
+            logging.info('Calculating effectiveness of strategy: {}'.format(strategy))
+            lookup_dict = effectiveness_dict[strategy]
             df_temp = df.copy()
 
-            # apply the effectivity factor as read from the lookup table on each column:
+            # apply the effectiveness factor as read from the lookup table on each column:
             for col in columns:
                 df_temp[col+'_m'] = df_temp[col+'_m'] * (1 - lookup_dict[col])
 
-            # calculate the effectivity and add as a new column to total dataframe
-            df_new = self.calculate_effectivity(df_temp, name=strategy)
-            df_new = df_new.drop(columns={'length'})
+            # calculate the effectiveness and add as a new column to total dataframe
+            df_new = self.calculate_effectiveness(df_temp, name=strategy)
+            df_new = df_new.drop(columns={'length', 'dichtbij_m', 'ver_hoger_m', 'hwa_afw_ho_m', 'gw_hwa_m', 'verweg_max','verkant_max'})
             df_total = df_total.merge(df_new, how='left', on='LinkNr')
 
         return df_total
 
     @staticmethod
-    def calculate_costs(df, effectivity_dict):
+    def calculate_cost_reduction(df, effectiveness_dict):
         """ This function calculates the yearly costs and possible reduction """
 
         return_period = 50  # years
         event_length = 300  # meter
         event_repair_costs = 1000  # euro
 
-        strategies = [strategy for strategy in effectivity_dict]
+        strategies = [strategy for strategy in effectiveness_dict]
         strategies.insert(0, 'standard')
 
         # calculate costs
         for strategy in strategies:
             if strategy != 'standard':
-                df['max_effectivity_{}'.format(strategy)] = 1 - (df['{}_gevoelig_sum'.format(strategy)] / df['standard_gevoelig_sum'])
+                df['max_effectiveness_{}'.format(strategy)] = 1 - (df['{}_gevoelig_sum'.format(strategy)] / df['standard_gevoelig_sum'])
             df['return_period'] = return_period * df['coefficient']
             df['repair_costs_{}'.format(strategy)] = df['{}_gevoelig_max'.format(strategy)] * event_repair_costs / event_length
-            df['blockage_costs_{}'.format(strategy)] = 5  # TODO: check is this should be a column with values for every row
+            df['blockage_costs_{}'.format(strategy)] = df['blockage_costs']
             df['yearly_repair_costs_{}'.format(strategy)] = df['repair_costs_{}'.format(strategy)] / df['return_period']
             if strategy == 'standard':
                 df['yearly_blockage_costs_{}'.format(strategy)] = df['blockage_costs_{}'.format(strategy)] / df['return_period']
             else:
-                df['yearly_blockage_costs_{}'.format(strategy)] = df['blockage_costs_{}'.format(strategy)] / df['return_period'] * (1 - df['max_effectivity_{}'.format(strategy)])
+                df['yearly_blockage_costs_{}'.format(strategy)] = df['blockage_costs_{}'.format(strategy)] / df['return_period'] * (1 - df['max_effectiveness_{}'.format(strategy)])
             df['total_costs_{}'.format(strategy)] = df['yearly_repair_costs_{}'.format(strategy)] + df['yearly_blockage_costs_{}'.format(strategy)]
+            if strategy != 'standard':
+                df['reduction_repair_costs_{}'.format(strategy)] = df['yearly_repair_costs_standard'] - df['yearly_repair_costs_{}'.format(strategy)]
+                df['reduction_blockage_costs_{}'.format(strategy)] = df['yearly_blockage_costs_standard'] - df['yearly_blockage_costs_{}'.format(strategy)]
+                df['reduction_costs_{}'.format(strategy)] = df['total_costs_standard'] - df['total_costs_{}'.format(strategy)]
+                df['effectiveness_{}'.format(strategy)] = 1 - (df['total_costs_{}'.format(strategy)] / df['total_costs_standard'])
+        return df
 
-        # calculate effectivity
-        for strategy in effectivity_dict:
-            df['reduction_repair_costs_{}'.format(strategy)] = df['yearly_repair_costs_standard'] - df['yearly_repair_costs_{}'.format(strategy)]
-            df['reduction_blockage_costs_{}'.format(strategy)] = df['yearly_blockage_costs_standard'] - df['yearly_blockage_costs_{}'.format(strategy)]
-            df['reduction_costs_{}'.format(strategy)] = df['total_costs_standard'] - df['total_costs_{}'.format(strategy)]
-            df['effectivity_{}'.format(strategy)] = 1 - (df['total_costs_{}'.format(strategy)] / df['total_costs_standard'])
+    @staticmethod
+    def cost_benefit_analysis(effectiveness_dict):
+        """ This method performs cost benefit analysis """
+
+        analysis_length = 25  # years
+        interest_rate = 0.0225  # interest rate
+        btw = 1.21  # multiplication factor to include taxes
+
+        def calc_npv(x, cols):
+            pv = np.npv(interest_rate, [0] + list(x[cols]))
+            return pv
+
+        def calc_npv_factor(factor):
+            cols = np.linspace(1, 1 + (factor * analysis_length), analysis_length, endpoint=False)
+            return np.npv(interest_rate, [0] + list(cols))
+
+        def calc_cash_flow(x, cols):
+            cash_flow = x[cols].sum() + x['investment']
+            return cash_flow
+
+        df_cba = pd.DataFrame.from_dict(effectiveness_dict).transpose()
+        df_cba['strategy'] = df_cba.index
+        df_cba = df_cba.drop(columns=['dichtbij', 'ver_hoger', 'hwa_afw_ho', 'gw_hwa', 'slope_0015', 'slope_001',
+                                      'return_period', 'event_length', 'event_costs'])
+        df_cba['investment'] = df_cba['investment'] * -1
+
+        df_cba['lifespan'] = df_cba['lifespan'].astype(int)
+        for col in ['om_pv', 'pv', 'cash_flow']:
+            df_cba.insert(0, col, 0)
+
+        # add years
+        for year in range(1, analysis_length+1):
+            df_cba[str(year)] = df_cba['investment'].where(np.mod(year, df_cba['lifespan']) == 0, other=0)
+        year_cols = [str(year) for year in range(1, analysis_length+1)]
+
+        df_cba['om_pv'] = df_cba.apply(lambda x: calc_npv(x, year_cols), axis=1)
+        df_cba['pv'] = df_cba['om_pv'] + df_cba['investment']
+        df_cba['cash_flow'] = df_cba.apply(lambda x: calc_cash_flow(x, year_cols), axis=1)
+        df_cba['costs'] = df_cba['pv'] * btw
+        df_cba['costs_pmt'] = np.pmt(interest_rate, df_cba['lifespan'], df_cba['investment'], when='end') * btw
+        df_cba = df_cba.round(2)
+
+        costs_dict = df_cba[['costs', 'on_column']].to_dict()
+        costs_dict['npv_factor'] = calc_npv_factor(1/30)
+
+        return df_cba, costs_dict
+
+    @staticmethod
+    def calculate_strategy_costs(df, costs_dict):
+        """ Method to calculate costs, benefits with net present value """
+
+        costs = costs_dict['costs']
+        columns = costs_dict['on_column']
+
+        def columns_check(df, columns):
+            cols_check = []
+            for col in columns:
+                cols_check.extend(columns[col].split(';'))
+            df_cols = list(df.columns)
+
+            if any([True for col in cols_check if col not in df_cols]):
+                cols = [col for col in cols_check if col not in df_cols]
+                logging.error('Wrong column configured in effectiveness_measures csv file. column {} is not available in imported sheet.'.format(cols))
+                quit()
+            else:
+                return True
+
+        columns_check(df, columns)
+        strategies = {col: columns[col].split(';') for col in columns}
+
+        for strategy in strategies:
+            df['{}_benefits'.format(strategy)] = df['reduction_costs_{}'.format(strategy)] * costs_dict['npv_factor']
+            select_col = strategies[strategy]
+            if len(select_col) == 1:
+                df['{}_costs'.format(strategy)] = df[select_col[0]] * costs[strategy] * -1 / 1000
+            if len(select_col) > 1:
+                df['{}_costs'.format(strategy)] = (df[select_col[0]] - df[select_col[1]]) * costs[strategy] * -1 / 1000
+                df['{}_costs'.format(strategy)] = df['{}_costs'.format(strategy)].where(df['{}_costs'.format(strategy)] > 1, other=np.nan)
+            df['{}_bc_ratio'.format(strategy)] = df['{}_benefits'.format(strategy)] / df['{}_costs'.format(strategy)]
 
         return df
 
