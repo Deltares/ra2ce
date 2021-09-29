@@ -109,6 +109,12 @@ class EffectivenessMeasures:
     def __init__(self, config, analysis):
         self.analysis = analysis
         self.config = config
+        self.return_period = analysis['return_period']  # years
+        self.repair_costs = analysis['repair_costs']  # euro
+        self.evaluation_period = analysis['evaluation_period']  # years
+        self.interest_rate = analysis['interest_rate']/100  # interest rate
+        self.climate_factor = analysis['climate_factor'] / analysis['climate_period']
+        self.btw = 1.21  # VAT multiplication factor to include taxes
 
         # perform checks on input while initializing class
         if analysis['file_name'] is None:
@@ -247,13 +253,8 @@ class EffectivenessMeasures:
 
         return df_total
 
-    @staticmethod
-    def calculate_cost_reduction(df, effectiveness_dict):
+    def calculate_cost_reduction(self, df, effectiveness_dict):
         """ This function calculates the yearly costs and possible reduction """
-
-        return_period = 50  # years
-        event_length = 300  # meter
-        event_repair_costs = 1000  # euro
 
         strategies = [strategy for strategy in effectiveness_dict]
         strategies.insert(0, 'standard')
@@ -262,8 +263,8 @@ class EffectivenessMeasures:
         for strategy in strategies:
             if strategy != 'standard':
                 df['max_effectiveness_{}'.format(strategy)] = 1 - (df['{}_gevoelig_sum'.format(strategy)] / df['standard_gevoelig_sum'])
-            df['return_period'] = return_period * df['coefficient']
-            df['repair_costs_{}'.format(strategy)] = df['{}_gevoelig_max'.format(strategy)] * event_repair_costs / event_length
+            df['return_period'] = self.return_period * df['coefficient']
+            df['repair_costs_{}'.format(strategy)] = df['{}_gevoelig_max'.format(strategy)] * self.repair_costs
             df['blockage_costs_{}'.format(strategy)] = df['blockage_costs']
             df['yearly_repair_costs_{}'.format(strategy)] = df['repair_costs_{}'.format(strategy)] / df['return_period']
             if strategy == 'standard':
@@ -278,21 +279,16 @@ class EffectivenessMeasures:
                 df['effectiveness_{}'.format(strategy)] = 1 - (df['total_costs_{}'.format(strategy)] / df['total_costs_standard'])
         return df
 
-    @staticmethod
-    def cost_benefit_analysis(effectiveness_dict):
+    def cost_benefit_analysis(self, effectiveness_dict):
         """ This method performs cost benefit analysis """
 
-        analysis_length = 25  # years
-        interest_rate = 0.0225  # interest rate
-        btw = 1.21  # multiplication factor to include taxes
-
         def calc_npv(x, cols):
-            pv = np.npv(interest_rate, [0] + list(x[cols]))
+            pv = np.npv(self.interest_rate, [0] + list(x[cols]))
             return pv
 
         def calc_npv_factor(factor):
-            cols = np.linspace(1, 1 + (factor * analysis_length), analysis_length, endpoint=False)
-            return np.npv(interest_rate, [0] + list(cols))
+            cols = np.linspace(1, 1 + (factor * self.evaluation_period), self.evaluation_period, endpoint=False)
+            return np.npv(self.interest_rate, [0] + list(cols))
 
         def calc_cash_flow(x, cols):
             cash_flow = x[cols].sum() + x['investment']
@@ -309,19 +305,19 @@ class EffectivenessMeasures:
             df_cba.insert(0, col, 0)
 
         # add years
-        for year in range(1, analysis_length+1):
+        for year in range(1, self.evaluation_period+1):
             df_cba[str(year)] = df_cba['investment'].where(np.mod(year, df_cba['lifespan']) == 0, other=0)
-        year_cols = [str(year) for year in range(1, analysis_length+1)]
+        year_cols = [str(year) for year in range(1, self.evaluation_period+1)]
 
         df_cba['om_pv'] = df_cba.apply(lambda x: calc_npv(x, year_cols), axis=1)
         df_cba['pv'] = df_cba['om_pv'] + df_cba['investment']
         df_cba['cash_flow'] = df_cba.apply(lambda x: calc_cash_flow(x, year_cols), axis=1)
-        df_cba['costs'] = df_cba['pv'] * btw
-        df_cba['costs_pmt'] = np.pmt(interest_rate, df_cba['lifespan'], df_cba['investment'], when='end') * btw
+        df_cba['costs'] = df_cba['pv'] * self.btw
+        df_cba['costs_pmt'] = np.pmt(self.interest_rate, df_cba['lifespan'], df_cba['investment'], when='end') * self.btw
         df_cba = df_cba.round(2)
 
         costs_dict = df_cba[['costs', 'on_column']].to_dict()
-        costs_dict['npv_factor'] = calc_npv_factor(1/30)
+        costs_dict['npv_factor'] = calc_npv_factor(self.climate_factor)
 
         return df_cba, costs_dict
 
