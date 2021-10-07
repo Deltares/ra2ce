@@ -296,8 +296,7 @@ class EffectivenessMeasures:
 
         df_cba = pd.DataFrame.from_dict(effectiveness_dict).transpose()
         df_cba['strategy'] = df_cba.index
-        df_cba = df_cba.drop(columns=['dichtbij', 'ver_hoger', 'hwa_afw_ho', 'gw_hwa', 'slope_0015', 'slope_001',
-                                      'return_period', 'event_length', 'event_costs'])
+        df_cba = df_cba.drop(columns=['dichtbij', 'ver_hoger', 'hwa_afw_ho', 'gw_hwa', 'slope_0015', 'slope_001'])
         df_cba['investment'] = df_cba['investment'] * -1
 
         df_cba['lifespan'] = df_cba['lifespan'].astype(int)

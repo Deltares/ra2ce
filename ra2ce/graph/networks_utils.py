@@ -1587,7 +1587,6 @@ class Segmentation:
 
         return edges_complex
 
-
     def cut(self, line, distance):
         """Cuts a line in two at a distance from its starting point
 
@@ -1700,7 +1699,6 @@ class Segmentation:
                         data[key].append(value)
                 data['splt_id'].append(count)
                 count += 1
-
         return gpd.GeoDataFrame(data)
 
 
