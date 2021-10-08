@@ -33,6 +33,8 @@ def main(network_ini=None, analyses_ini=None):
             hazard = Hazard(network, graph_dict)
             graphs = hazard.create()
 
+
+
     if analyses_ini:
         config_analyses = load_config(root_path, config_path=analyses_ini)
         if network_ini:

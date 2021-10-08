@@ -22,6 +22,7 @@ class IndirectAnalyses:
     def __init__(self, config):
         self.config = config
 
+
     def single_link_redundancy(self, graph, analysis):
         """This is the function to analyse roads with a single link disruption and an alternative route.
         :param graph: graph on which to run analysis (MultiDiGraph)
