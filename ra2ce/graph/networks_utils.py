@@ -1156,15 +1156,11 @@ def graph_to_shp(G, edge_shp, node_shp):
     """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_shp and node_shp
 
     Arguments:
-
         G []: networkx graph object to be converted
-
         edge_shp [str]: output path including extension for edges shapefile
-
         node_shp [str]: output path including extension for nodes shapefile
 
     Returns:
-
         None
 
     """
