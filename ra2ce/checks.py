@@ -62,7 +62,7 @@ def input_validation(config):
                         config[key][item], error = check_paths(config, key, item, input_dirs, error)
                         continue
 
-                    if item == 'road_types':
+                    if item == 'road_types' and (config[key][item] is not None):
                         for road_type in config[key][item].replace(' ', '').split(','):
                             if road_type not in check_answer['road_types']:
                                 logging.error('Wrong road type is configured ({}), has to be one or multiple of: {}'.format(road_type, check_answer['road_types']))

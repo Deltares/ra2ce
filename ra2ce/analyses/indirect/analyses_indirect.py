@@ -192,6 +192,8 @@ class IndirectAnalyses:
 
             # Find the routes
             od_routes = find_route_ods(graph_hz, od_nodes, analysis['weighing'])
+            od_routes['hazard'] = hz+'_'+analysis['aggregate_wl']
+            
             all_results.append(od_routes)
 
         all_results = pd.concat(all_results, ignore_index=True)
