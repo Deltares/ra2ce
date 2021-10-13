@@ -16,6 +16,16 @@ from tqdm import tqdm, trange
 from .networks_utils import pairs, line_length
 import numpy as np
 
+import rasterio.mask
+from rasterio.warp import calculate_default_transform, reproject, Resampling
+from rasterio import Affine
+import rasterio.transform
+import rasterio
+import numpy as np
+from pathlib import Path 
+import os
+#from shapely.geometry.point import Point
+
 
 def read_OD_files(origin_paths, origin_names, destination_paths, destination_names, od_id, crs_):
     origin = gpd.GeoDataFrame(columns=[od_id, 'o_id', 'geometry'], crs=crs_)
@@ -32,12 +42,20 @@ def read_OD_files(origin_paths, origin_names, destination_paths, destination_nam
 
     for op, on in zip(origin_paths, origin_names):
         origin_new = gpd.read_file(op, crs=crs_)
+        try:
+            assert origin_new[od_id]
+        except:
+            origin_new[od_id] = origin_new.index
         origin_new = origin_new[[od_id, 'geometry']]
         origin_new['o_id'] = on + "_" + origin_new[od_id].astype(str)
         origin = origin.append(origin_new, ignore_index=True, sort=False)
 
     for dp, dn in zip(destination_paths, destination_names):
         destination_new = gpd.read_file(dp, crs=crs_)
+        try:
+            assert destination_new[od_id]
+        except:
+            destination_new[od_id] = destination_new.index
         destination_new = destination_new[[od_id, 'geometry']]
         destination_new['d_id'] = dn + "_" + destination_new[od_id].astype(str)
         destination = destination.append(destination_new, ignore_index=True, sort=False)
@@ -335,4 +353,104 @@ def add_od_nodes(graph, od, id_name='ra2ce_fid'):
 
     return graph
 
+#########################################################################################
+################### Code to generate origins points from raster #########################
+#########################################################################################
 
+def rescale_and_crop(path_name, gdf, outputFolderPath, res=500):
+
+    dst_crs = rasterio.crs.CRS.from_dict(gdf.crs.to_dict())
+    
+    #Rescale and reproject raster to gdf crs
+    with rasterio.open(path_name) as src:
+        
+        transform, width, height = calculate_default_transform(
+            src.crs, dst_crs, src.width, src.height, *src.bounds)
+        
+        m2degree = 1/111000 #approximate conversion from meter to 1 degree of EPSG:4326; TODO: make flexible depending on the input crs
+        transform = Affine(res*m2degree, transform.b, transform.c, transform.d, -res*m2degree, transform.f)
+        
+        #use scale, instead of absolute meter, for resolution
+        #scale = 2
+        #transform = Affine(transform.a * scale, transform.b, transform.c, transform.d, transform.e * scale, transform.f)
+        #height = height * scale
+        #width = width * scale
+        
+        kwargs = src.meta.copy()
+        kwargs.update({
+            'crs': dst_crs,
+            'transform': transform,
+            'width': width,
+            'height': height
+        })
+                
+        with rasterio.open(outputFolderPath / "origins_raster_reprojected.tif", 'w', **kwargs) as dst:
+            for i in range(1, src.count + 1):
+                reproject(
+                    source=rasterio.band(src, i),
+                    destination=rasterio.band(dst, i),
+                    src_transform=src.transform,
+                    src_crs=src.crs,
+                    dst_transform=transform,
+                    dst_crs=dst_crs,
+                    resampling=Resampling.nearest)
+    
+    raster = rasterio.open(outputFolderPath / "origins_raster_reprojected.tif")
+    
+    # Crop to shapefile
+    out_array, out_trans = rasterio.mask.mask(dataset=raster, shapes=gdf.geometry, crop=True)
+
+    out_meta = raster.meta.copy()
+    out_meta.update({"height": out_array.shape[1], 
+                      "width": out_array.shape[2],
+                      "transform": out_trans})
+    raster.close()                  
+    os.remove(outputFolderPath / "origins_raster_reprojected.tif")
+    
+    return out_array, out_meta
+    
+def export_raster_to_geotiff(array, meta, path, fileName):
+    Cropped_outputfile = path / fileName
+    with rasterio.open(Cropped_outputfile, 'w', **meta, compress = 'LZW', tiled=True) as dest:
+        dest.write(array)
+    return Cropped_outputfile
+    
+def generate_points_from_raster(fn, out_fn):
+    # Read raster coordinate centroid
+    with rasterio.open(fn) as src:
+        points = []
+        for col in range(src.width):
+            x_s, y_s = rasterio.transform.xy(src.transform, [row for row in range(src.height)], [col for _ in range(src.height)])            
+            points += [Point(x,y) for x,y in zip(x_s, y_s)]
+    
+    # Put raster coordinates into geodataframe
+    gdf = gpd.GeoDataFrame()
+    gdf['geometry'] = points        
+    gdf['id'] = [x for x in range(len(gdf))]
+    
+    # Get raster values
+    temp = [gdf['geometry'].x, gdf['geometry'].y]
+    coords = list(map(list, zip(*temp)))
+    with rasterio.open(fn) as src:
+        gdf.crs = src.crs
+        gdf['values'] = [sample[0] for sample in src.sample(coords)]
+    
+    # Save non-zero cells
+    gdf.loc[gdf['values']>0].to_file(out_fn)
+    
+    return out_fn
+    
+def origins_from_raster(outputFolderPath, mask_fn, raster_fn):
+    output_fn = outputFolderPath / "origins_raster.tif"
+    mask = gpd.read_file(mask_fn[0])
+    res = 1000 #in meter; TODO: put in config file or in network.ini
+    out_array, out_meta = rescale_and_crop(raster_fn, mask, outputFolderPath, res)
+    outputfile = export_raster_to_geotiff(out_array, out_meta, outputFolderPath, output_fn)
+    
+    out_array[out_array>0] = 1
+    print('There are ' + str(out_array[~np.isnan(out_array)].sum().sum()) + ' origin points.')
+    
+    out_fn = outputFolderPath / "origins_points.shp"
+    out_fn = generate_points_from_raster(outputfile, out_fn)
+    
+    return out_fn
