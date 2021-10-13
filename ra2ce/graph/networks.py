@@ -252,11 +252,13 @@ class Network:
 
         return graph
 
-    def add_od_nodes_raster(self, graph):
+    def generate_origins_from_raster(self):
         """Adds origins and destinations nodes from shapefiles to the graph."""
-        from .origins_destinations import read_OD_files, create_OD_pairs, add_od_nodes
+        from .origins_destinations import origins_from_raster
+        
+        out_fn = origins_from_raster(self.config['static'] / 'network', self.polygon_file, self.origins[0])
 
-        return graph
+        return out_fn
 
     def read_merge_shp(self, crs_=4326):
         """Imports shapefile(s) and saves attributes in a pandas dataframe.
@@ -387,10 +389,11 @@ class Network:
             if self.base_graph_path is not None:
                 base_graph = nx.read_gpickle(self.base_graph_path)
             # adding OD nodes
-            if self.origins.suffix == '.tif':
-                od_graph = self.add_od_nodes_raster(base_graph)
-            else:
-                od_graph = self.add_od_nodes(base_graph)
+            #if self.origins.suffix == '.tif':
+            #if '.tif' in self.origins:
+            if self.origins[0].suffix == '.tif':
+                self.origins[0] = self.generate_origins_from_raster()
+            od_graph = self.add_od_nodes(base_graph)
             self.config['files']['origins_destinations_graph'] = self.save_network(od_graph, 'origins_destinations', types=to_save)
 
         return {'base_graph': base_graph, 'base_network':  network_gdf, 'origins_destinations_graph': od_graph}
