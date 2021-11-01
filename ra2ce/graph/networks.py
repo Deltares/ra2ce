@@ -486,7 +486,10 @@ class Hazard:
 
             # check which road is overlapping with the flood and append the flood depth to the graph or geodataframe
             if self.g:
-                for u, v, k, edata in self.g.edges.data(keys=True):
+                for edge in self.g.es:
+                    edge_id = edge.index
+                    edata = edge.attributes()
+
                     if 'geometry' in edata:
                         # check how long the road stretch is and make a point every other meter
                         nr_points = round(edata['length'])
@@ -508,18 +511,18 @@ class Hazard:
 
                         if len(water_level) > 0:
                             if self.aggregate_wl == 'max':
-                                self.g[u][v][k][hn+'_'+self.aggregate_wl] = water_level.max()
+                                self.g.es[edge_id][hn+'_'+self.aggregate_wl] = water_level.max()
                             elif self.aggregate_wl == 'min':
-                                self.g[u][v][k][hn+'_'+self.aggregate_wl] = water_level.min()
+                                self.g.es[edge_id][hn+'_'+self.aggregate_wl] = water_level.min()
                             elif self.aggregate_wl == 'mean':
-                                self.g[u][v][k][hn+'_'+self.aggregate_wl] = mean(water_level)
+                                self.g.es[edge_id][hn+'_'+self.aggregate_wl] = mean(water_level)
                             else:
                                 logging.warning("No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'.")
                         else:
-                            self.g[u][v][k][hn+'_'+self.aggregate_wl] = np.nan
+                            self.g.es[edge_id][hn+'_'+self.aggregate_wl] = np.nan
 
                     else:
-                        self.g[u][v][k][hn+'_'+self.aggregate_wl] = np.nan
+                        self.g.es[edge_id][hn+'_'+self.aggregate_wl] = np.nan
 
             if self.gdf:
                 print("Raster hazard overlay with gdf should be adjusted to how it should work with Kees' model")
@@ -572,7 +575,10 @@ class Hazard:
         gdf = gpd.read_file(hf)
         spatial_index = gdf.sindex
 
-        for u, v, k, edata in self.g.edges.data(keys=True):
+        for edge in self.g.es:
+            edge_id = edge.index
+            edata = edge.attributes()
+
             if 'geometry' in edata:
                 possible_matches_index = list(spatial_index.intersection(edata['geometry'].bounds))
                 possible_matches = gdf.iloc[possible_matches_index]
@@ -581,15 +587,15 @@ class Hazard:
                 hn='TODO'
                 if not precise_matches.empty:
                     if self.aggregate_wl == 'max':
-                        self.g[u][v][k][hn+'_max'] = precise_matches[hn].max()
+                        self.g.es[edge_id][hn+'_max'] = precise_matches[hn].max()
                     if self.aggregate_wl == 'min':
-                        self.g[u][v][k][hn+'_min'] = precise_matches[hn].min()
+                        self.g.es[edge_id][hn+'_min'] = precise_matches[hn].min()
                     if self.aggregate_wl == 'mean':
-                        self.g[u][v][k][hn+'_mean'] = precise_matches[hn].mean()
+                        self.g.es[edge_id][hn+'_mean'] = precise_matches[hn].mean()
                 else:
-                    self.g[u][v][k][hn] = 0
+                    self.g.es[edge_id][hn] = 0
             else:
-                self.g[u][v][k][hn] = 0
+                self.g.es[edge_id][hn] = 0
         return
 
     def join_hazard_table(self):

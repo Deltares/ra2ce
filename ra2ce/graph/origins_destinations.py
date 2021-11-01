@@ -227,7 +227,7 @@ def add_od_nodes(graph, od, id_name='ra2ce_fid'):
         match_OD = od.iloc[i]['OD']
         # Check which roads belong to the centroids closest vertices
         try:
-            match = graph.es.find(ra2ce_fid=int(od.iloc[i]['match_ids']))
+            match = graph.es.find(ra2ce_fid=int(od.iloc[i]['match_ids']))  ## TODO CHECK HOW TO MAKE A STRING FROM ra2ce_fid (now as input variable 'id_name')
         except ValueError as e:
             # when the edge does not exist anymore in the adjusted graph. look over the full graph and find the nearest vertice
             edge_list = [(e.attributes()['ra2ce_fid'], e.attributes()['geometry']) for e in graph.es if
@@ -250,73 +250,64 @@ def add_od_nodes(graph, od, id_name='ra2ce_fid'):
                 # if the vertice is at the end of the road; you don't have to add a new node
                 # but do add a new attribute to the node
                 if (graph.vs[ns]['geometry'].coords[0][1] == match_OD.coords[0][1]) & (graph.vs[ns]['geometry'].coords[0][0] == match_OD.coords[0][0]):
-                    if 'od_id' in graph.vs[ns].attributes():
+                    if ('od_id' in graph.vs[ns].attributes()) and (graph.vs[ns]['od_id'] is not None):
                         # the node already has a origin/destination attribute
                         graph.vs[ns]['od_id'] = graph.vs[ns]['od_id'] + ',' + match_name
                     else:
                         graph.vs[ns]['od_id'] = match_name
                 elif (graph.vs[nt]['geometry'].coords[0][1] == match_OD.coords[0][1]) & (graph.vs[nt]['geometry'].coords[0][0] == match_OD.coords[0][0]):
-                    if 'od_id' in graph.vs[nt].attributes():
+                    if ('od_id' in graph.vs[nt].attributes()) and (graph.vs[nt]['od_id'] is not None):
                         graph.vs[nt]['od_id'] = graph.vs[nt]['od_id'] + ',' + match_name
                     else:
                         graph.vs[nt]['od_id'] = match_name
-                elif (((graph.vs[ns]['geometry'].coords[0][1] == match_OD.coords[0][1]) & (graph.vs[ns]['geometry'].coords[0][0] == match_OD.coords[0][0])) == False) & (((graph.vs[nt]['geometry'].coords[0][1] == match_OD.coords[0][1]) & (graph.vs[nt]['geometry'].coords[0][0] == match_OD.coords[0][0])) == False):
-                     print(i)
-                     print('continue')
-                     continue
-                continue
+                elif (((graph.vs[ns]['geometry'].coords[0][1] == match_OD.coords[0][1]) & (graph.vs[ns]['geometry'].coords[0][0] == match_OD.coords[0][0])) is False) & (((graph.vs[nt]['geometry'].coords[0][1] == match_OD.coords[0][1]) & (graph.vs[nt]['geometry'].coords[0][0] == match_OD.coords[0][0])) is False):
+                    logging.warning(f"No matching vertice found for Origin/Destination ID {match_OD}. Check your data carefully to make sure the origin/destination nodes are added correctly. Continuing...")
+                    continue
+                continue  # Continue - the linestring does not need to be cut because the origin/destination is already at an existing vertex.
+
             new_node_id = max_node_id + 1
             max_node_id = new_node_id
 
-            graph.add_node(new_node_id, y=match_OD.coords[0][1], x=match_OD.coords[0][0], geometry=match_OD,
-                           od_id=match_name)
+            graph.add_vertex(new_node_id, y=match_OD.coords[0][1], x=match_OD.coords[0][0], geometry=match_OD,
+                           od_id=match_name, node_id=new_node_id)
 
-            edge_data = graph.edges[match_edge]
+            edge_data = match.attributes()
 
             # Check which line is connected to which node. There can be 8 different combinations
-            if (graph.nodes[match_edge[0]]['geometry'].coords[0][1] == line2.coords[-1][1]) & (
-                graph.nodes[match_edge[0]]['geometry'].coords[0][0] == line2.coords[-1][0]):
+            if (graph.vs[ns]['geometry'].coords[0][1] == line2.coords[-1][1]) & (graph.vs[ns]['geometry'].coords[0][0] == line2.coords[-1][0]):
                 edge_data.update(length=line_length(line2), geometry=line2)
-                graph.add_edge(match_edge[0], new_node_id, match_edge[-1], **edge_data)
+                graph.add_edge(source=ns, target=new_node_id, **edge_data)
 
-            if (graph.nodes[match_edge[1]]['geometry'].coords[0][1] == line2.coords[0][1]) & (
-                graph.nodes[match_edge[1]]['geometry'].coords[0][0] == line2.coords[0][0]):
+            if (graph.vs[nt]['geometry'].coords[0][1] == line2.coords[0][1]) & (graph.vs[nt]['geometry'].coords[0][0] == line2.coords[0][0]):
                 edge_data.update(length=line_length(line2), geometry=line2)
-                graph.add_edge(match_edge[1], new_node_id, match_edge[-1], **edge_data)
+                graph.add_edge(source=nt, target=new_node_id, **edge_data)
 
-            if (graph.nodes[match_edge[0]]['geometry'].coords[0][1] == line2.coords[0][1]) & (
-                graph.nodes[match_edge[0]]['geometry'].coords[0][0] == line2.coords[0][0]):
+            if (graph.vs[ns]['geometry'].coords[0][1] == line2.coords[0][1]) & (graph.vs[ns]['geometry'].coords[0][0] == line2.coords[0][0]):
                 edge_data.update(length=line_length(line2), geometry=line2)
-                graph.add_edge(match_edge[0], new_node_id, match_edge[-1], **edge_data)
+                graph.add_edge(source=ns, target=new_node_id, **edge_data)
 
-            if (graph.nodes[match_edge[1]]['geometry'].coords[0][1] == line2.coords[-1][1]) & (
-                graph.nodes[match_edge[1]]['geometry'].coords[0][0] == line2.coords[-1][0]):
+            if (graph.vs[nt]['geometry'].coords[0][1] == line2.coords[-1][1]) & (graph.vs[nt]['geometry'].coords[0][0] == line2.coords[-1][0]):
                 edge_data.update(length=line_length(line2), geometry=line2)
-                graph.add_edge(match_edge[1], new_node_id, match_edge[-1], **edge_data)
+                graph.add_edge(source=nt, target=new_node_id, **edge_data)
 
-            if (graph.nodes[match_edge[1]]['geometry'].coords[0][1] == line1.coords[0][1]) & (
-                graph.nodes[match_edge[1]]['geometry'].coords[0][0] == line1.coords[0][0]):
+            if (graph.vs[nt]['geometry'].coords[0][1] == line1.coords[0][1]) & (graph.vs[nt]['geometry'].coords[0][0] == line1.coords[0][0]):
                 edge_data.update(length=line_length(line1), geometry=line1)
-                graph.add_edge(match_edge[1], new_node_id, match_edge[-1], **edge_data)
+                graph.add_edge(source=nt, target=new_node_id, **edge_data)
 
-            if (graph.nodes[match_edge[0]]['geometry'].coords[0][1] == line1.coords[-1][1]) & (
-                graph.nodes[match_edge[0]]['geometry'].coords[0][0] == line1.coords[-1][0]):
+            if (graph.vs[ns]['geometry'].coords[0][1] == line1.coords[-1][1]) & (graph.vs[ns]['geometry'].coords[0][0] == line1.coords[-1][0]):
                 edge_data.update(length=line_length(line1), geometry=line1)
-                graph.add_edge(match_edge[0], new_node_id, match_edge[-1], **edge_data)
+                graph.add_edge(source=ns, target=new_node_id, **edge_data)
 
-            if (graph.nodes[match_edge[1]]['geometry'].coords[0][1] == line1.coords[-1][1]) & (
-                graph.nodes[match_edge[1]]['geometry'].coords[0][0] == line1.coords[-1][0]):
+            if (graph.vs[nt]['geometry'].coords[0][1] == line1.coords[-1][1]) & (graph.vs[nt]['geometry'].coords[0][0] == line1.coords[-1][0]):
                 edge_data.update(length=line_length(line1), geometry=line1)
-                graph.add_edge(match_edge[1], new_node_id, match_edge[-1], **edge_data)
+                graph.add_edge(source=nt, target=new_node_id, **edge_data)
 
-            if (graph.nodes[match_edge[0]]['geometry'].coords[0][1] == line1.coords[0][1]) & (
-                graph.nodes[match_edge[0]]['geometry'].coords[0][0] == line1.coords[0][0]):
+            if (graph.vs[ns]['geometry'].coords[0][1] == line1.coords[0][1]) & (graph.vs[ns]['geometry'].coords[0][0] == line1.coords[0][0]):
                 edge_data.update(length=line_length(line1), geometry=line1)
-                graph.add_edge(match_edge[0], new_node_id, match_edge[-1], **edge_data)
+                graph.add_edge(source=ns, target=new_node_id, **edge_data)
 
             # remove the edge that is split in two
-            u, v, k = match_edge
-            graph.remove_edge(u, v, k)
+            graph.delete_edge(match)
 
     return graph
 
