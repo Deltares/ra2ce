@@ -265,16 +265,21 @@ class IndirectAnalyses:
                 g = nx.read_gpickle(self.config['files']['origins_destinations_graph'])
                 base_graph, opt_routes, destination = self.optimal_route_origin_closest_destination(g, analysis)
                 if analysis['save_shp']:
+                    # TODO MAKE ONE GDF FROM RESULTS?
                     shp_path = output_path / (analysis['name'].replace(' ', '_') + '_destinations.shp')
                     save_gdf(destination, shp_path)
 
-                    shp_path = output_path / (analysis['name'].replace(' ', '_') + '_destinations.shp')
-                    graph_to_shp
-                # TODO MAKE ONE GDF FROM RESULTS?
+                    shp_path_nodes = output_path / (analysis['name'].replace(' ', '_') + '_optimal_routes_nodes.shp')
+                    shp_path_edges = output_path / (analysis['name'].replace(' ', '_') + '_optimal_routes_edges.shp')
+                    graph_to_shp(opt_routes, shp_path_edges, shp_path_nodes)
+
+                    shp_path_nodes = output_path / (analysis['name'].replace(' ', '_') + '_results_nodes.shp')
+                    shp_path_edges = output_path / (analysis['name'].replace(' ', '_') + '_results_edges.shp')
+                    graph_to_shp(base_graph, shp_path_edges, shp_path_nodes)
             elif analysis['analysis'] == 'multi_link_origin_closest_destination':
+                # TODO MAKE ONE GDF FROM RESULTS?
                 g = nx.read_gpickle(self.config['files']['origins_destinations_graph'])
                 gdf = self.multi_link_origin_closest_destination(g, analysis)
-                # TODO MAKE ONE GDF FROM RESULTS?
             elif analysis['analysis'] == 'losses':
 
                 if self.graphs['base_network_hazard'] is None:
