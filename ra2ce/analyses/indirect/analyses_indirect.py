@@ -268,26 +268,6 @@ class Losses:
         file_path = path / 'vehicle_loss_hours.csv'
         df_lookup = pd.read_csv(file_path, index_col='transport_type')
         lookup_dict = df_lookup.transpose().to_dict()
-
-        # detour_data = pd.read_csv(path / 'detour_data_header.csv', names=['file', 'replace']).set_index('file')
-        # detour_dict = detour_data.to_dict()['replace']
-        # detour_data = pd.read_csv(path / 'traffic_intensities_header.csv', names=['file', 'replace']).set_index('file')
-        # dict2 = detour_data.to_dict()['replace']
-        # detour_data = pd.read_csv(path / 'vehicle_loss_hours_header.csv', names=['file', 'replace']).set_index('file')
-        # dict3 = detour_data.to_dict()['replace']
-        #
-        # dict1 = {'VA_AV_HWN': 'detour_time_evening', 'VA_RD_HWN': 'detour_time_remaining', 'VA_OS_HWN': 'detour_time_morning', 'VA_Etm_HWN': 'detour_time_day'}
-        # dict2 ={'AS_VTG': 'evening_total', 'AS_FRGT': 'evening_freight', 'AS_COMM': 'evening_commute', 'AS_BUSS': 'evening_business', 'AS_OTHR': 'evening_other', 'ET_FRGT': 'day_freight', 'ET_COMM': 'day_commute', 'ET_BUSS': 'day_business', 'ET_OTHR': 'day_other', 'ET_VTG': 'day_total', 'afstand': 'distance', 'H_Cap': 'capacity', 'H_Stroken': 'lanes'}
-        # dict3 ={'VOT_hour': 'value_of_time',
-        #         'Occupation': 'occupation',
-        #         'VoR': 'value_of_reliability',
-        #         'VVU (€/uur)': 'vehicle_loss_hour',
-        #         'Type of transport': 'transport_type',
-        #         'Vracht (FRG)': 'freight',
-        #         'Forens (COMM)': 'commute',
-        #         'Zakelijk (BUSS)': 'bussiness',
-        #         'Overig (OTHER)': 'other'}
-
         return lookup_dict
 
     @staticmethod
