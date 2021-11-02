@@ -17,7 +17,9 @@ from shutil import copyfile
 # Local modules
 from .checks import input_validation, check_files
 
-list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination', 'multi_link_origin_destination', 'losses']
+list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy',
+                          'optimal_route_origin_destination', 'multi_link_origin_destination', 'losses',
+                          'optimal_route_origin_closest_destination', 'multi_link_origin_closest_destination']
 list_direct_analyses = ['direct', 'effectiveness_measures']
 
 
@@ -140,7 +142,6 @@ def load_config(root_path, config_path):
     if config_path.stem == 'analyses':
         # Create a dictionary with direct and indirect analyses separately.
         config = configure_analyses(config)
-
 
     # Set the output paths in the configuration Dict for ease of saving to those folders.
     config['input'] = config['root_path'] / 'data' / config['project']['name'] / 'input'

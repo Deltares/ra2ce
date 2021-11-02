@@ -16,6 +16,7 @@ import pandas as pd
 from tqdm import tqdm
 import time
 import copy
+from ...graph.networks_utils import graph_to_shp
 
 
 class IndirectAnalyses:
@@ -197,11 +198,52 @@ class IndirectAnalyses:
         all_results = pd.concat(all_results, ignore_index=True)
         return all_results
 
+    def optimal_route_origin_closest_destination(self, graph, analysis):
+        crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGABLE
+
+        base_graph = copy.deepcopy(graph)
+        nx.set_edge_attributes(base_graph, 0, 'opt_cnt')
+
+        o_name = self.config['origins_destinations']['origins_names']
+        d_name = self.config['origins_destinations']['destinations_names']
+        od_id = self.config['origins_destinations']['id_name_origin_destination']
+        id_name = self.config['network']['file_id'] if self.config['network']['file_id'] is not None else 'ra2ce_fid'
+        count_col_name = self.config['origins_destinations']['origin_count']
+        weight_factor = self.config['origins_destinations']['origin_out_fraction']
+
+        od_path = self.config['static'] / 'output_graph' / 'origin_destination_table.feather'
+        od = gpd.read_feather(od_path)
+        origin = od.loc[od['o_id'].notna()]
+        del origin['d_id']
+        del origin['match_ids']
+
+        origin_closest_dest, other = find_closest_node_attr(graph, 'od_id', analysis['weighing'], o_name, d_name)
+        pref_routes, base_graph = calc_pref_routes_closest_dest(graph, base_graph, analysis['weighing'], crs, od_id, id_name,
+                                                                origin_closest_dest, origin, count_col_name,
+                                                                weight_factor)
+
+        destination = od.loc[od['d_id'].notna()]
+        del destination['o_id']
+        del destination['match_ids']
+
+        cnt_per_destination = pref_routes.groupby('destination')[['origin_cnt', 'cnt_weight']].sum().reset_index()
+        for hosp, origin_cnt, cnt_weight in zip(cnt_per_destination['destination'], cnt_per_destination['origin_cnt'],
+                                      cnt_per_destination['cnt_weight']):
+            destination.loc[destination[od_id] == int(hosp.split('_')[-1]), 'origin_cnt'] = origin_cnt
+            destination.loc[destination[od_id] == int(hosp.split('_')[-1]), 'cnt_weight'] = cnt_weight
+
+        return base_graph, pref_routes, destination
+
+    def multi_link_origin_closest_destination(self):
+        return
+
     def execute(self):
         """Executes the indirect analysis."""
         for analysis in self.config['indirect']:
             logging.info(f"----------------------------- Started analyzing '{analysis['name']}'  -----------------------------")
             starttime = time.time()
+            gdf = pd.DataFrame()
+
             if 'weighing' in analysis:
                 if analysis['weighing'] == 'distance':
                     # The name is different in the graph.
@@ -219,6 +261,20 @@ class IndirectAnalyses:
             elif analysis['analysis'] == 'multi_link_origin_destination':
                 g = nx.read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
                 gdf = self.multi_link_origin_destination(g, analysis)
+            elif analysis['analysis'] == 'optimal_route_origin_closest_destination':
+                g = nx.read_gpickle(self.config['files']['origins_destinations_graph'])
+                base_graph, opt_routes, destination = self.optimal_route_origin_closest_destination(g, analysis)
+                if analysis['save_shp']:
+                    shp_path = output_path / (analysis['name'].replace(' ', '_') + '_destinations.shp')
+                    save_gdf(destination, shp_path)
+
+                    shp_path = output_path / (analysis['name'].replace(' ', '_') + '_destinations.shp')
+                    graph_to_shp
+                # TODO MAKE ONE GDF FROM RESULTS?
+            elif analysis['analysis'] == 'multi_link_origin_closest_destination':
+                g = nx.read_gpickle(self.config['files']['origins_destinations_graph'])
+                gdf = self.multi_link_origin_closest_destination(g, analysis)
+                # TODO MAKE ONE GDF FROM RESULTS?
             elif analysis['analysis'] == 'losses':
 
                 if self.graphs['base_network_hazard'] is None:
@@ -228,14 +284,19 @@ class IndirectAnalyses:
                 df = losses.calculate_losses_from_table()
                 gdf = gdf_in.merge(df, how='left', on='LinkNr')
 
-            output_path = self.config['output'] / analysis['analysis']
-            if analysis['save_shp']:
-                shp_path = output_path / (analysis['name'].replace(' ', '_') + '.shp')
-                save_gdf(gdf, shp_path)
-            if analysis['save_csv']:
-                csv_path = output_path / (analysis['name'].replace(' ', '_') + '.csv')
-                del gdf['geometry']
-                gdf.to_csv(csv_path, index=False)
+            if not gdf.empty:
+                # Not for all analyses a gdf is created as output.
+                output_path = self.config['output'] / analysis['analysis']
+                if analysis['save_shp']:
+                    shp_path = output_path / (analysis['name'].replace(' ', '_') + '.shp')
+                    save_gdf(gdf, shp_path)
+                    if opt_routes:
+                        shp_path = output_path / (analysis['name'].replace(' ', '_') + '_optimal_routes.shp')
+                        save_gdf(gdf, shp_path)
+                if analysis['save_csv']:
+                    csv_path = output_path / (analysis['name'].replace(' ', '_') + '.csv')
+                    del gdf['geometry']
+                    gdf.to_csv(csv_path, index=False)
 
             # Save the configuration for this analysis to the output folder.
             with open(output_path / 'settings.txt', 'w') as f:
@@ -415,3 +476,147 @@ def find_route_ods(graph, od_nodes, weighing):
                                     'geometry': geometries_list}, geometry='geometry', crs='epsg:4326')
     return pref_routes
 
+
+def find_closest_node_attr(H, keyName, weighingName, originLabelContains, destLabelContains):
+    """Find the closest destination node with a certain attribute from all origin nodes
+
+    Returns:
+        originClosestDest [list of tuples]: list of the origin and destination node id and node name from the routes that are found
+        list_no_path [list of tuples]: list of the origin and destination node id and node name from the origins/nodes that do not have a route between them
+    """
+    H.add_node('special', speciallabel='special')
+
+    special_edges = []
+    for n, ndat in H.nodes.data():
+        if keyName in ndat:
+            if destLabelContains in ndat[keyName]:
+                special_edges.append((n, 'special', {weighingName: 0}))
+
+    H.add_edges_from(special_edges)
+
+    list_no_path = []
+    for n, ndat in H.nodes.data():
+        if keyName in ndat:
+            if originLabelContains in ndat[keyName]:
+                if nx.has_path(H, n, 'special'):
+                    path = nx.shortest_path(H, source=n, target='special', weight=weighingName)
+                    ndat['closest'] = path[-2]  # Closest node with destLabelContains in keyName
+                else:
+                    list_no_path.append((n, ndat[keyName]))
+
+    originClosestDest = [((nn[0], nn[-1][keyName]), (nn[-1]['closest'], H.nodes[nn[-1]['closest']][keyName])) for nn in H.nodes.data() if 'closest' in nn[-1]]
+    return originClosestDest, list_no_path
+
+
+def calc_pref_routes_closest_dest(graph, base_graph, weighing, crs, od_id, idName, origin_closest_dest, origins, nr_people_name, factor_hospital):
+    # dataframe to save the preferred routes
+    pref_routes = gpd.GeoDataFrame(columns=['o_node', 'd_node', 'origin', 'destination',
+                                            'opt_path', weighing, 'match_ids', 'origin_cnt', 'cnt_weight', 'tot_miles', 'geometry'],
+                                   geometry='geometry', crs='epsg:{}'.format(crs))
+
+    # find the optimal route without (hazard) disruption
+    for o, d in origin_closest_dest:
+        # calculate the length of the preferred route
+        pref_route = nx.dijkstra_path_length(graph, o[0], d[0], weight=weighing)
+
+        # save preferred route nodes
+        pref_nodes = nx.dijkstra_path(graph, o[0], d[0], weight=weighing)
+
+        # found out which edges belong to the preferred path
+        edgesinpath = list(zip(pref_nodes[0:], pref_nodes[1:]))
+
+        # Find the number of people per neighborhood
+        nr_people_per_route_total = origins.loc[origins[od_id] == int(o[1].split('_')[-1]), nr_people_name].iloc[0]
+        nr_patients_per_route = nr_people_per_route_total * factor_hospital
+
+        pref_edges = []
+        match_list = []
+        length_list = []
+        for u, v in edgesinpath:
+            # get edge with the lowest weighing if there are multiple edges that connect u and v
+            edge_key = sorted(graph[u][v], key=lambda x: graph[u][v][x][weighing])[0]
+            if 'geometry' in graph[u][v][edge_key]:
+                pref_edges.append(graph[u][v][edge_key]['geometry'])
+            else:
+                pref_edges.append(LineString([graph.nodes[u]['geometry'], graph.nodes[v]['geometry']]))
+            if idName in graph[u][v][edge_key]:
+                match_list.append(graph[u][v][edge_key][idName])
+            if 'length' in graph[u][v][edge_key]:
+                length_list.append(graph[u][v][edge_key]['length'])
+
+            # Add the number of people that need hospital care, to the road segments. For now, each road segment in a route
+            # gets attributed all the people that are taking that route.
+            base_graph[u][v][edge_key]['opt_cnt'] = base_graph[u][v][edge_key]['opt_cnt'] + nr_patients_per_route
+
+        # compile the road segments into one geometry
+        pref_edges = MultiLineString(pref_edges)
+        pref_routes = pref_routes.append({'o_node': o[0], 'd_node': d[0], 'origin': o[1],
+                                          'destination': d[1], 'opt_path': pref_nodes,
+                                          weighing: pref_route, 'match_ids': match_list,
+                                          'origin_cnt': nr_people_per_route_total, 'cnt_weight': nr_patients_per_route,
+                                          'tot_miles': sum(length_list) / 1609, 'geometry': pref_edges}, ignore_index=True)
+
+    return pref_routes, base_graph
+
+
+def calc_routes_closest_dest(graph, base_graph, list_closest, pref_routes, weighing, origin, dest, od_id, wd, threshold_hospitals, factor_hospital, nr_people_name):
+    pp_no_delay = [0]
+    pp_delayed = [0]
+    extra_weights = [0]
+    extra_miles_total = [0]
+    list_hospital_flooded = []
+
+    # find the optimal route with hazard disruption
+    for o, d in list_closest:
+        # Check if the hospital that is accessed, is flooded
+        if dest.loc[dest[od_id] == int(d[1].split('_')[-1]), wd[:-2] + 'WD'].iloc[0] > threshold_hospitals:
+            list_hospital_flooded.append((o,d))
+            continue
+
+        # calculate the length of the preferred route
+        alt_route = nx.dijkstra_path_length(graph, o[0], d[0], weight=weighing)
+
+        # save preferred route nodes
+        alt_nodes = nx.dijkstra_path(graph, o[0], d[0], weight=weighing)
+
+        # Find the number of people per neighborhood
+        nr_people_per_route_total = origin.loc[origin[od_id] == int(o[1].split('_')[-1]), nr_people_name].iloc[0]
+        nr_patients_per_route = nr_people_per_route_total * factor_hospital
+
+        # find out which edges belong to the preferred path
+        edgesinpath = list(zip(alt_nodes[0:], alt_nodes[1:]))
+
+        # calculate the total length of the alternative route (in miles)
+        # Find the road segments that are used for the detour to the same or another hospital
+        length_list = []
+        for u, v in edgesinpath:
+            # get edge with the lowest weighing if there are multiple edges that connect u and v
+            edge_key = sorted(graph[u][v], key=lambda x: graph[u][v][x][weighing])[0]
+
+            # Add the number of people that need hospital care, to the road segments. For now, each road segment in a route
+            # gets attributed all the people that are taking that route.
+            base_graph[u][v][edge_key][wd[:-2] + '_P'] = base_graph[u][v][edge_key][wd[:-2] + '_P'] + nr_patients_per_route
+
+            if 'length' in graph[u][v][edge_key]:
+                length_list.append(graph[u][v][edge_key]['length'])
+
+        alt_miles = sum(length_list) / 1609
+
+        # If the destination is different from the origin, the destination is further than without hazard disruption
+        if pref_routes.loc[(pref_routes['origin'] == o[1]) & (pref_routes['destination'] == d[1])].empty:
+            # subtract the length/time of the optimal route from the alternative route
+            extra_dist = alt_route - pref_routes.loc[pref_routes['origin'] == o[1], weighing].iloc[0]
+            extra_miles = alt_miles - pref_routes.loc[pref_routes['origin'] == o[1], 'tot_miles'].iloc[0]
+            pp_delayed.append(nr_patients_per_route)
+            extra_weights.append(extra_dist)
+            extra_miles_total.append(extra_miles)
+        else:
+            pp_no_delay.append(nr_patients_per_route)
+
+        # compile the road segments into one geometry
+        # alt_edges = MultiLineString(alt_edges)
+
+        # Add the number of patients to the total number of patients that go to that hospital
+        dest.loc[dest[od_id] == int(d[1].split('_')[-1]), wd[:-2] + '_P'] = dest.loc[dest[od_id] == int(d[1].split('_')[-1]), wd[:-2] + '_P'].iloc[0] + nr_patients_per_route
+
+    return base_graph, dest, list_hospital_flooded, pp_no_delay, pp_delayed, extra_weights, extra_miles_total

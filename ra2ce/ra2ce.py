@@ -55,6 +55,10 @@ def main(network_ini=None, analyses_ini=None):
 
         # Do the analyses
         if network_ini:
+            if config_network['network'] is not None:
+                config_analyses['network'] = config_network['network']
+            if config_network['origins_destinations'] is not None:
+                config_analyses['origins_destinations'] = config_network['origins_destinations']
             if config_network['hazard']['hazard_map'] is not None:
                 config_analyses['hazard_names'] = [haz.stem for haz in config_network['hazard']['hazard_map']]
 

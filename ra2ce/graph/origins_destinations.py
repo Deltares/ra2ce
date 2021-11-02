@@ -27,7 +27,7 @@ import os
 #from shapely.geometry.point import Point
 
 
-def read_OD_files(origin_paths, origin_names, destination_paths, destination_names, od_id, crs_):
+def read_OD_files(origin_paths, origin_names, destination_paths, destination_names, od_id, origin_count, crs_):
     origin = gpd.GeoDataFrame(columns=[od_id, 'o_id', 'geometry'], crs=crs_)
     destination = gpd.GeoDataFrame(columns=[od_id, 'd_id', 'geometry'], crs=crs_)
 
@@ -46,7 +46,7 @@ def read_OD_files(origin_paths, origin_names, destination_paths, destination_nam
             assert origin_new[od_id]
         except:
             origin_new[od_id] = origin_new.index
-        origin_new = origin_new[[od_id, 'geometry']]
+        origin_new = origin_new[[od_id, origin_count, 'geometry']]
         origin_new['o_id'] = on + "_" + origin_new[od_id].astype(str)
         origin = origin.append(origin_new, ignore_index=True, sort=False)
 
@@ -134,7 +134,7 @@ def find_closest_vertice(origins_destinations, spatial_idx, search_vertices, ver
     return origins_destinations
 
 
-def find_new_nearest_vertice(edge_list,graph, od, id_name, match_OD,i):
+def find_new_nearest_vertice(edge_list, graph, od, id_name, match_OD, i):
     vertices_dict = {}
     for line in edge_list:
         vertices_dict[(line[0], line[1])] = [Point(p) for p in set(list(line[-1]['geometry'].coords))]
@@ -206,9 +206,6 @@ def cut(line, distance):
                     # only use XY because otherwise the snapping functionality doesn't work
                     return [LineString([xy[0:2] for xy in coords[:i]] + [(cp.x, cp.y)]),
                             LineString([(cp.x, cp.y)] + [xy[0:2] for xy in coords[i:]])]
-
-
-
 
 
 def getKeysByValue(dictOfElements, value):
