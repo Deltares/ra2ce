@@ -233,7 +233,8 @@ class Network:
         # Add the origin/destination nodes to the network
         ods = read_OD_files(self.origins, self.origins_names,
                             self.destinations, self.destinations_names,
-                            self.id_name_origin_destination, 'epsg:4326')
+                            self.id_name_origin_destination, self.config['origins_destinations']['origin_count'],
+                            'epsg:4326')
 
         ods = create_OD_pairs(ods, graph)
         ods.crs = 'epsg:4326'  # TODO: decide if change CRS to flexible instead of just epsg:4326
