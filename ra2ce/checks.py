@@ -19,7 +19,9 @@ def available_checks():
                               'multi_link_origin_destination',
                               'optimal_route_origin_closest_destination',
                               'multi_link_origin_closest_destination',
-                              'losses']
+                              'losses',
+                              'single_link_losses',
+                              'multi_link_losses']
     list_direct_analyses = ['direct',
                             'effectiveness_measures']
 
