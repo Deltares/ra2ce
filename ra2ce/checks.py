@@ -22,6 +22,7 @@ def available_checks():
                               'losses']
     list_direct_analyses = ['direct',
                             'effectiveness_measures']
+
     return list_indirect_analyses, list_direct_analyses
 
 
