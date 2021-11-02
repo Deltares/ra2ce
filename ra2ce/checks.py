@@ -9,7 +9,8 @@ Created on 26-7-2021
 from pathlib import Path
 import logging
 
-list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination', 'multi_link_origin_destination']
+list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy',
+                          'optimal_route_origin_destination', 'multi_link_origin_destination', 'losses']
 list_direct_analyses = ['direct', 'effectiveness_measures']
 
 
