@@ -10,10 +10,25 @@ from pathlib import Path
 import logging
 import sys
 
-list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy',
-                          'optimal_route_origin_destination', 'multi_link_origin_destination', 'losses',
-                          'optimal_route_origin_closest_destination', 'multi_link_origin_closest_destination']
-list_direct_analyses = ['direct', 'effectiveness_measures']
+
+def available_checks():
+    """ List of available checks in Ra2ce """
+    list_indirect_analyses = ['single_link_redundancy',
+                              'multi_link_redundancy',
+                              'optimal_route_origin_destination',
+                              'multi_link_origin_destination',
+                              'optimal_route_origin_closest_destination',
+                              'multi_link_origin_closest_destination',
+                              'losses',
+                              'single_link_losses',
+                              'multi_link_losses']
+    list_direct_analyses = ['direct',
+                            'effectiveness_measures']
+
+    return list_indirect_analyses, list_direct_analyses
+
+
+list_indirect_analyses, list_direct_analyses = available_checks()
 
 
 def input_validation(config):
