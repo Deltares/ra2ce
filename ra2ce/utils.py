@@ -15,12 +15,10 @@ import logging
 from shutil import copyfile
 
 # Local modules
-from .checks import input_validation, check_files
+from .checks import input_validation, check_files, available_checks
 
-list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy',
-                          'optimal_route_origin_destination', 'multi_link_origin_destination', 'losses',
-                          'optimal_route_origin_closest_destination', 'multi_link_origin_closest_destination']
-list_direct_analyses = ['direct', 'effectiveness_measures']
+
+list_indirect_analyses, list_direct_analyses = available_checks()
 
 
 def parse_config(root, path=None, opt_cli=None):
@@ -134,6 +132,7 @@ def load_config(root_path, config_path):
     if not config_path.is_file():
         config_path = root_path / config_path
     config = parse_config(root_path, path=config_path)
+    config['project']['name'] = config_path.parts[-2]
     config['root_path'] = root_path
 
     # Validate the configuration input.

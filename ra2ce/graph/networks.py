@@ -108,15 +108,10 @@ class Network:
 
         # create tuples from the adjecent nodes and add as column in geodataframe
         edges_complex = join_nodes_edges(nodes, edges, id_name)
-        edges_complex.crs = {'init': 'epsg:{}'.format(crs)}  # set the right CRS
-
-        # Save geodataframe of the resulting network to
-        edges_complex.to_pickle(
-            os.path.join(self.output_path, '{}_gdf.pkl'.format(self.name)))
-        logging.info("Saved network to pickle in ".format(os.path.join(self.output_path, '{}_gdf.pkl'.format(self.name))))
+        edges_complex.crs = 'epsg:{}'.format(crs)  # set the right CRS
 
         # Create networkx graph from geodataframe
-        graph_complex = graph_from_gdf(edges_complex, nodes)
+        graph_complex = graph_from_gdf(edges_complex, nodes, node_id='node_fid')
         logging.info("Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(self.name))
 
         # exporting complex graph because simple graph is not needed
@@ -158,16 +153,17 @@ class Network:
             filter_osm(osm_filter_exe, o5m_path, o5m_filtered_path, tags=road_types)
             logging.info('Converted and filtered osm.pbf to o5m, created: {}'.format(o5m_path))
 
+        logging.info('Start reading graph from o5m...')
         graph_complex = graph_from_xml(o5m_filtered_path, bidirectional=False, simplify=False, retain_all=False)
 
-        print('Start converting the graphs to geodataframes')
+        logging.info('Start converting the graphs to GeoDataFrame...')
         edges_complex, node_complex = graph_to_gdf(graph_complex)
 
         graph_simple, graph_complex = create_simplified_graph(graph_complex)
 
         if self.segmentation_length is not None:
-            graph = Segmentation(edges_complex, self.segmentation_length)
-            graph.apply_segmentation()
+            graph_simple = Segmentation(edges_complex, self.segmentation_length)
+            graph_simple.apply_segmentation()
 
         return graph_simple, edges_complex
 
@@ -296,12 +292,7 @@ class Network:
             [lines.append(read_file(shp, 0)) for shp in shapefiles_diversion]
         lines = pd.concat(lines)
 
-
-        lines.crs = {'init': 'epsg:{}'.format(crs_)}
-
-        ods_path = self.config['static'] / 'output_graph' / ('test' + '.shp')
-        lines.to_file(ods_path, index=False)
-
+        lines.crs = 'EPSG:{}'.format(crs_)
 
         # append the length of the road stretches
         lines['length'] = lines['geometry'].apply(lambda x: line_length(x))
@@ -317,7 +308,8 @@ class Network:
         return lines
 
     def save_network(self, to_save, name, types=['pickle']):
-        """Saves a geodataframe or graph to output_path"""
+        """Saves a geodataframe or graph to output_path
+        TODO: add encoding to ini file to make output more flexible"""
         if type(to_save) == gpd.GeoDataFrame:
             # The file that needs to be saved is a geodataframe
             if 'pickle' in types:
@@ -326,11 +318,11 @@ class Network:
                 logging.info(f"Saved {output_path_pickle.stem} in {output_path_pickle.resolve().parent}.")
             if 'shp' in types:
                 output_path = self.config['static'] / 'output_graph' / (name + '_network.shp')
-                to_save.to_file(output_path, index=False)
+                to_save.to_file(output_path, index=False, encoding='utf-8')
                 logging.info(f"Saved {output_path.stem} in {output_path.resolve().parent}.")
             return output_path_pickle
 
-        elif type(to_save) == nx.classes.multigraph.MultiGraph:
+        elif type(to_save) == nx.classes.multigraph.MultiGraph or type(to_save) == nx.classes.multidigraph.MultiDiGraph:
             # The file that needs to be saved is a graph
             if 'shp' in types:
                 graph_to_shp(to_save, self.config['static'] / 'output_graph' / (name + '_edges.shp'),
