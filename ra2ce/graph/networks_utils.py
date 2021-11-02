@@ -150,9 +150,9 @@ def merge_lines_shpfiles(lines_gdf, idName, aadtNames, crs_):
     # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
     # The list of fid's is reduced by the fid's that are not anymore in the merged lines
     lines_fids = list(zip(list_lines, lines_gdf[idName]))  # create tuples from the list of lines and the list of fid's
-    lines_merged = gpd.GeoDataFrame(columns=[idName, 'geometry'], crs={'init': 'epsg:{}'.format(crs_)},
+    lines_merged = gpd.GeoDataFrame(columns=[idName, 'geometry'], crs='epsg:{}'.format(crs_),
                                     geometry='geometry')
-    merged = gpd.GeoDataFrame(columns=[idName, 'to_analyse', 'geometry'], crs={'init': 'epsg:{}'.format(crs_)},
+    merged = gpd.GeoDataFrame(columns=[idName, 'to_analyse', 'geometry'], crs='epsg:{}'.format(crs_),
                               geometry='geometry')
 
     for mline in merged_lines:
@@ -319,9 +319,9 @@ def merge_lines_automatic(lines_gdf, idName, aadtNames, crs_):
     # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
     # The list of fid's is reduced by the fid's that are not anymore in the merged lines
     lines_fids = list(zip(list_lines, lines_gdf[idName]))  # create tuples from the list of lines and the list of fid's
-    lines_merged = gpd.GeoDataFrame(columns=[idName, 'geometry'], crs={'init': 'epsg:{}'.format(crs_)},
+    lines_merged = gpd.GeoDataFrame(columns=[idName, 'geometry'], crs='epsg:{}'.format(crs_),
                                     geometry='geometry')
-    merged = gpd.GeoDataFrame(columns=[idName, 'to_analyse', 'geometry'], crs={'init': 'epsg:{}'.format(crs_)},
+    merged = gpd.GeoDataFrame(columns=[idName, 'to_analyse', 'geometry'], crs='epsg:{}'.format(crs_),
                               geometry='geometry')
 
     for mline in merged_lines:
@@ -694,7 +694,7 @@ def create_nodes(merged_lines, crs_, ignore_intersections):
     unique_points = delete_duplicates(endpts)
     points_gdf = gpd.GeoDataFrame({'node_fid': range(len(unique_points)),
                                    'geometry': unique_points},
-                                  geometry='geometry', crs={'init': 'epsg:{}'.format(crs_)})
+                                  geometry='geometry', crs='epsg:{}'.format(crs_))
 
     return points_gdf
 
@@ -905,7 +905,7 @@ def join_nodes_edges(gdf_nodes, gdf_edges, idName):
                         if any(p.equals(point) for p in point_coords):
                             special_tuple = special_tuple + (n.loc[n.geometry == point, 'node_fid'].iloc[
                                                                  0],)  # find the node id of the two endpoints of the linestring
-                    warnings.warn(
+                    logging.warning(
                         "More than two nodes are intersecting with edge {}: {}. The nodes that are intersecting are: {}".format(
                             idName, edge, list(n['node_fid'])))
                 try:
@@ -1103,13 +1103,13 @@ def read_geojson(geojson_file):
         return geojson.load(f)
 
 
-def graph_from_gdf(gdf, gdf_nodes, name='network', node_id = 'ID'):
+def graph_from_gdf(gdf, gdf_nodes, name='network', node_id='ID'):
     # create a Graph object
     G = nx.MultiGraph(crs=gdf.crs)
 
     # create nodes on the Graph
     for index, row in gdf_nodes.iterrows():
-        c = {'ID': row[node_id], 'geometry': row.geometry}
+        c = {node_id: row[node_id], 'geometry': row.geometry}
         G.add_node(row[node_id], **c)
 
     # create edges on top of the nodes
@@ -1271,7 +1271,7 @@ def read_merge_shp(shapefileAnalyse,  idName, shapefileDiversion=[], crs_=4326):
 
     # concatenate all shapefiles into one geodataframe
     lines = pd.concat(lines)
-    lines.crs = {'init': 'epsg:{}'.format(crs_)}
+    lines.crs = 'epsg:{}'.format(crs_)
 
     # append the length of the road stretches
     lines['length'] = lines['geometry'].apply(lambda x: line_length(x))
@@ -1796,7 +1796,7 @@ class HazardUtils:
                 gdf = gpd.GeoDataFrame.from_features(list(results))
 
                 # Confirm that it is WGS84
-                gdf.crs = {'init': 'epsg:4326'}
+                gdf.crs = 'epsg:4326'
                 # gdf.crs = {'init': 'epsg:3035'}
                 # gdf.to_crs(epsg=4326,inplace=True) #convert to WGS84
 
