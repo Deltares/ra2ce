@@ -16,6 +16,7 @@ import pandas as pd
 from tqdm import tqdm
 import time
 import copy
+import igraph as ig
 
 
 class IndirectAnalyses:
@@ -39,47 +40,56 @@ class IndirectAnalyses:
         aadt_names = None  # can be removed if the above is fixed
 
         # create a geodataframe from the graph
-        gdf = osmnx.graph_to_gdfs(graph, nodes=False)
+        df = pd.DataFrame({attr: graph.es[attr] for attr in graph.edge_attributes()})
+        edges = df.reindex(['u_seq', 'v_seq'] + [x for x in list(df.columns) if x not in ['u_seq', 'v_seq']], axis=1)
 
         # list for the length of the alternative routes
         alt_dist_list = []
         alt_nodes_list = []
         dif_dist_list = []
-        for e_remove in list(graph.edges.data(keys=True)):
-            u, v, k, data = e_remove
 
-            # if data['highway'] in attr_list:
-            # remove the edge
-            graph.remove_edge(u, v, k)
+        edge_list = list(graph.es)
+        for edge in edge_list:
+            edata = edge.attributes()
+            u = edge.source
+            v = edge.target
 
-            if nx.has_path(graph, u, v):
+            # Remove edge from dataframe - then make the graph
+            updated_edges = edges.loc[edges.index != edge.index, :]
+            h = ig.Graph.TupleList(updated_edges.itertuples(index=False), edge_attrs=list(updated_edges.columns)[2:],
+                                   directed=False)  # FOR DIRECTED GRAPH
+            h.vs['id'] = h.vs['name']
+
+            # calculate the (alternative) distance between two nodes
+            # Use ig.OUT to treat the graph as directed, make mode=ig.ALL to treat as undirected
+            alt_route = h.shortest_paths_dijkstra(source=u, target=v, mode=ig.ALL, weights=analysis['weighing'])
+            alt_dist = alt_route[0][0]
+
+            if alt_route != np.inf:
                 # calculate the alternative distance if that edge is unavailable
-                alt_dist = nx.dijkstra_path_length(graph, u, v, weight=analysis['weighing'])
+                # alt_route = inf if the route is not available
                 alt_dist_list.append(alt_dist)
 
                 # append alternative route nodes
-                alt_nodes = nx.dijkstra_path(graph, u, v)
-                alt_nodes_list.append(alt_nodes)
+                alt_nodes = h.get_shortest_paths(v=u, to=v, mode=ig.ALL, weights=analysis['weighing'], output='vpath')
+                alt_nodes_list.append(alt_nodes[0])
 
                 # calculate the difference in distance
-                dif_dist_list.append(alt_dist - data[analysis['weighing']])
+                dif_dist_list.append(alt_dist - edata[analysis['weighing']])
             else:
                 alt_dist_list.append(np.NaN)
                 alt_nodes_list.append(np.NaN)
                 dif_dist_list.append(np.NaN)
 
-            # add edge again to the graph
-            graph.add_edge(u, v, k, **data)
-
         # Add the new columns to the geodataframe
-        gdf['alt_dist'] = alt_dist_list
-        gdf['alt_nodes'] = alt_nodes_list
-        gdf['diff_dist'] = dif_dist_list
+        df['alt_dist'] = alt_dist_list
+        df['alt_nodes'] = alt_nodes_list
+        df['diff_dist'] = dif_dist_list
 
         # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
         # todo: input here this option
 
-        return gdf
+        return gpd.GeoDataFrame(df, geometry='geometry')
 
     def multi_link_redundancy(self, graph, analysis):
         """

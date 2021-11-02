@@ -276,7 +276,7 @@ def add_od_nodes(graph, od, id_name='ra2ce_fid'):
             # Check which line is connected to which node. There can be 8 different combinations
             if (graph.vs[ns]['geometry'].coords[0][1] == line2.coords[-1][1]) & (graph.vs[ns]['geometry'].coords[0][0] == line2.coords[-1][0]):
                 edge_data.update(length=line_length(line2), geometry=line2)
-                graph.add_edge(source=ns, target=new_node_id, **edge_data)
+                graph.add_edge(source=ns, target=new_node_id, **edge_data)  # TODO change to add_edges? (quicker)
 
             if (graph.vs[nt]['geometry'].coords[0][1] == line2.coords[0][1]) & (graph.vs[nt]['geometry'].coords[0][0] == line2.coords[0][0]):
                 edge_data.update(length=line_length(line2), geometry=line2)
