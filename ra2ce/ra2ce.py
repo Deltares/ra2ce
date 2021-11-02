@@ -8,6 +8,8 @@ Created on 26-7-2021
 
 from pathlib import Path
 import click
+import warnings
+warnings.filterwarnings('ignore', message='.*initial implementation of Parquet.*')
 
 # Local modules
 from .utils import initiate_root_logger, load_config
@@ -32,8 +34,6 @@ def main(network_ini=None, analyses_ini=None):
             # Overlay the hazard on the geodataframe as well (todo: combine with graph overlay if both need to be done?)
             hazard = Hazard(network, graph_dict)
             graphs = hazard.create()
-
-
 
     if analyses_ini:
         config_analyses = load_config(root_path, config_path=analyses_ini)

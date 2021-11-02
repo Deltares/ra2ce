@@ -8,6 +8,7 @@ Created on 26-7-2021
 
 from pathlib import Path
 import logging
+import sys
 
 list_indirect_analyses = ['single_link_redundancy', 'multi_link_redundancy',
                           'optimal_route_origin_destination', 'multi_link_origin_destination', 'losses']
@@ -28,7 +29,7 @@ def input_validation(config):
     for k in check_headers:
         if k not in config.keys():
             logging.error('Property [ {} ] is not configured. Add property [ {} ] to the settings.ini file. '.format(k, k))
-            quit()
+            sys.exit()
 
     # check if properties have correct input
     # TODO: Decide whether also the non-used properties must be checked or those are not checked
@@ -77,7 +78,7 @@ def input_validation(config):
     # Quit if error
     if error:
         logging.error("There are inconsistencies in the settings.ini file. Please consult the log file for more information: {}".format(config['root_path'] / 'data' / config['project']['name'] / 'output' / 'RA2CE.log'))
-        exit()
+        sys.exit()
 
     return config
 
@@ -107,7 +108,7 @@ def check_shp_input(config):
     """Checks if a file id is configured when using the option to create network from shapefile """
     if (config['source'] == 'shapefile') and (config['file_id'] is None):
         logging.error('Not possible to create network - Shapefile used as source, but no file_id configured in .ini file')
-        quit()
+        sys.exit()
 
 
 def check_files(config):
