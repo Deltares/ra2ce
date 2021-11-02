@@ -19,9 +19,9 @@ import copy
 
 
 class IndirectAnalyses:
-    def __init__(self, config):
+    def __init__(self, config, graphs):
         self.config = config
-
+        self.graphs = graphs
 
     def single_link_redundancy(self, graph, analysis):
         """This is the function to analyse roads with a single link disruption and an alternative route.
@@ -192,8 +192,6 @@ class IndirectAnalyses:
 
             # Find the routes
             od_routes = find_route_ods(graph_hz, od_nodes, analysis['weighing'])
-            od_routes['hazard'] = hz+'_'+analysis['aggregate_wl']
-            
             all_results.append(od_routes)
 
         all_results = pd.concat(all_results, ignore_index=True)
@@ -221,6 +219,14 @@ class IndirectAnalyses:
             elif analysis['analysis'] == 'multi_link_origin_destination':
                 g = nx.read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
                 gdf = self.multi_link_origin_destination(g, analysis)
+            elif analysis['analysis'] == 'losses':
+
+                if self.graphs['base_network_hazard'] is None:
+                    gdf_in = gpd.read_feather(self.config['files']['base_network_hazard'])
+
+                losses = Losses(self.config, analysis)
+                df = losses.calculate_losses_from_table()
+                gdf = gdf_in.merge(df, how='left', on='LinkNr')
 
             output_path = self.config['output'] / analysis['analysis']
             if analysis['save_shp']:
@@ -240,6 +246,126 @@ class IndirectAnalyses:
             logging.info(
                 f"----------------------------- Analysis '{analysis['name']}' finished. Time: {str(round(endtime - starttime, 2))}s  -----------------------------")
         return
+
+
+class Losses:
+    def __init__(self, config, analysis):
+        self.config = config
+        self.analysis = analysis
+        self.duration = analysis['duration_event']
+        self.duration_disr = analysis['duration_disruption']
+        self.detour_traffic = analysis['fraction_detour']
+        self.traffic_throughput = analysis['fraction_drivethrough']
+        self.rest_capacity = analysis['rest_capacity']
+        self.maximum = analysis['maximum_jam']
+        self.partofday = analysis['partofday']
+
+    @staticmethod
+    def vehicle_loss_hours(path):
+        """ This function is to calculate vehicle loss hours based on an input table
+        with value of time per type of transport, usage and value_of_reliability """
+
+        file_path = path / 'vehicle_loss_hours.csv'
+        df_lookup = pd.read_csv(file_path, index_col='transport_type')
+        lookup_dict = df_lookup.transpose().to_dict()
+
+        # detour_data = pd.read_csv(path / 'detour_data_header.csv', names=['file', 'replace']).set_index('file')
+        # detour_dict = detour_data.to_dict()['replace']
+        # detour_data = pd.read_csv(path / 'traffic_intensities_header.csv', names=['file', 'replace']).set_index('file')
+        # dict2 = detour_data.to_dict()['replace']
+        # detour_data = pd.read_csv(path / 'vehicle_loss_hours_header.csv', names=['file', 'replace']).set_index('file')
+        # dict3 = detour_data.to_dict()['replace']
+        #
+        # dict1 = {'VA_AV_HWN': 'detour_time_evening', 'VA_RD_HWN': 'detour_time_remaining', 'VA_OS_HWN': 'detour_time_morning', 'VA_Etm_HWN': 'detour_time_day'}
+        # dict2 ={'AS_VTG': 'evening_total', 'AS_FRGT': 'evening_freight', 'AS_COMM': 'evening_commute', 'AS_BUSS': 'evening_business', 'AS_OTHR': 'evening_other', 'ET_FRGT': 'day_freight', 'ET_COMM': 'day_commute', 'ET_BUSS': 'day_business', 'ET_OTHR': 'day_other', 'ET_VTG': 'day_total', 'afstand': 'distance', 'H_Cap': 'capacity', 'H_Stroken': 'lanes'}
+        # dict3 ={'VOT_hour': 'value_of_time',
+        #         'Occupation': 'occupation',
+        #         'VoR': 'value_of_reliability',
+        #         'VVU (€/uur)': 'vehicle_loss_hour',
+        #         'Type of transport': 'transport_type',
+        #         'Vracht (FRG)': 'freight',
+        #         'Forens (COMM)': 'commute',
+        #         'Zakelijk (BUSS)': 'bussiness',
+        #         'Overig (OTHER)': 'other'}
+
+        return lookup_dict
+
+    @staticmethod
+    def load_df(path, file):
+        """ This method reads the dataframe created from a .csv """
+        file_path = path / file
+        df = pd.read_csv(file_path, index_col='LinkNr')
+        return df
+
+    def traffic_shockwave(self, vlh, capacity, intensity):
+        vlh['vlh_traffic'] = (self.duration ** 2) * (self.rest_capacity - 1) * (self.rest_capacity * capacity - intensity / self.traffic_throughput) / (2 * (1 - ((intensity / self.traffic_throughput) / capacity)))
+        return vlh
+
+    def calc_vlh(self, traffic_data, vehicle_loss_hours, detour_data):
+        vlh = pd.DataFrame(index=traffic_data.index, columns=['vlh_traffic', 'vlh_detour', 'vlh_total', 'euro_per_hour', 'euro_vlh'])
+        capacity = traffic_data['capacity']
+        diff_event_disr = self.duration - self.duration_disr
+
+        if self.partofday == 'daily':
+            intensity = traffic_data['day_total'] / 24
+            detour_time = detour_data['detour_time_day']
+        if self.partofday == 'evening':
+            intensity = traffic_data['evening_total']
+            detour_time = detour_data['detour_time_evening']
+
+        vlh = self.traffic_shockwave(vlh, capacity, intensity)
+        vlh['vlh_traffic'] = vlh['vlh_traffic'].apply(lambda x: np.where(x < 0, 0, x))  # all values below 0 -> 0
+        vlh['vlh_traffic'] = vlh['vlh_traffic'].apply(lambda x: np.where(x > self.maximum, self.maximum, x))
+        # all values above maximum, limit to maximum
+        vlh['vlh_detour'] = (intensity * ((1 - self.traffic_throughput) * self.duration) * detour_time) / 60
+        vlh['vlh_detour'] = vlh['vlh_detour'].apply(lambda x: np.where(x < 0, 0, x))  # all values below 0 -> 0
+        
+        if diff_event_disr > 0:  # when the event is done, but the disruption continues after the event. Calculate extra detour times
+            temp = diff_event_disr * (detour_time * self.detour_traffic * detour_time) / 60
+            temp = temp.apply(lambda x: np.where(x < 0, 0, x))  # all values below 0 -> 0
+            vlh['vlh_detour'] = vlh['vlh_detour'] + temp
+
+        vlh['vlh_total'] = vlh['vlh_traffic'] + vlh['vlh_detour']
+
+        if self.partofday == 'daily':
+            vlh['euro_per_hour'] =(traffic_data['day_freight']/traffic_data['day_total']*vehicle_loss_hours['freight']['vehicle_loss_hour'])+\
+                                (traffic_data['day_commute']/traffic_data['day_total']*vehicle_loss_hours['commute']['vehicle_loss_hour'])+\
+                                (traffic_data['day_business']/traffic_data['day_total']*vehicle_loss_hours['business']['vehicle_loss_hour'])+\
+                                (traffic_data['day_other']/traffic_data['day_total']*vehicle_loss_hours['other']['vehicle_loss_hour'])
+            # to calculate costs per unit traffi per hour. This is weighted based on the traffic mix and value of each traffic type
+            
+        if self.partofday == 'evening':
+            vlh['euro_per_hour'] =(traffic_data['evening_freight']/traffic_data['evening_total']*vehicle_loss_hours['freight']['vehicle_loss_hour'])+\
+                                (traffic_data['evening_commute']/traffic_data['evening_total']*vehicle_loss_hours['commute']['vehicle_loss_hour'])+\
+                                (traffic_data['evening_business']/traffic_data['evening_total']*vehicle_loss_hours['business']['vehicle_loss_hour'])+\
+                                (traffic_data['evening_other']/traffic_data['evening_total']*vehicle_loss_hours['other']['vehicle_loss_hour'])
+            # to calculate costs per unit traffi per hour. This is weighted based on the traffic mix and value of each traffic type
+        vlh['euro_vlh'] = vlh['euro_per_hour'] * vlh['vlh_total']
+        return vlh
+
+    def calculate_losses_from_table(self):
+        """ This function opens an existing table with traffic data and value of time to calculate losses based on detouring values. It also includes
+        a traffic jam estimation.
+        #TODO: check if gdf already exists from effectiveness measures.
+        #TODO: If not: read feather file.
+        #TODO: if yes: read gdf
+        #TODO: koppelen van VVU aan de directe schade berekeningen
+         """
+
+        traffic_data = self.load_df(self.config['input'] / 'losses', 'traffic_intensities.csv')
+        dict1 = {'AS_VTG': 'evening_total', 'AS_FRGT': 'evening_freight', 'AS_COMM': 'evening_commute', 'AS_BUSS': 'evening_business',
+                 'AS_OTHR': 'evening_other', 'ET_FRGT': 'day_freight', 'ET_COMM': 'day_commute', 'ET_BUSS': 'day_business',
+                 'ET_OTHR': 'day_other', 'ET_VTG': 'day_total', 'afstand': 'distance', 'H_Cap': 'capacity', 'H_Stroken': 'lanes'}
+        traffic_data.rename(columns=dict1, inplace=True)
+
+        detour_data = self.load_df(self.config['input'] / 'losses', 'detour_data.csv')
+        dict2 = {'VA_AV_HWN': 'detour_time_evening', 'VA_RD_HWN': 'detour_time_remaining', 'VA_OS_HWN': 'detour_time_morning',
+                 'VA_Etm_HWN': 'detour_time_day'}
+        detour_data.rename(columns=dict2, inplace=True)
+
+        vehicle_loss_hours = self.vehicle_loss_hours(self.config['input'] / 'losses')
+        vlh = self.calc_vlh(traffic_data, vehicle_loss_hours, detour_data)
+        return vlh
 
 
 def save_gdf(gdf, save_path):
@@ -308,3 +434,4 @@ def find_route_ods(graph, od_nodes, weighing):
                                     weighing: weighing_list, 'match_ids': match_ids_list,
                                     'geometry': geometries_list}, geometry='geometry', crs='epsg:4326')
     return pref_routes
+
