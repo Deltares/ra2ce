@@ -76,5 +76,5 @@ if __name__ == '__main__':
     # cli()
     #rootpath = r'c:\Python\ra2ce\data\test_pbf'
     #rootpath = r'c:\Python\ra2ce\data\KBN2'
-    rootpath = r'c:\Python\ra2ce\data\KBN2_losses'
+    rootpath = r'c:\Python\ra2ce\data\1_test_network_shape'
     main(rootpath + r"\network.ini", rootpath + r"\analyses.ini")

@@ -8,4 +8,6 @@ Created on 6-8-2021
 from ra2ce.ra2ce import main
 
 if __name__ == '__main__':
-    main(r"D:\ra2ceMaster\ra2ce\data\test\network.ini", r"D:\ra2ceMaster\ra2ce\data\test\analyses.ini")
+
+    rootpath = r'c:\Python\ra2ce\data\1_test_network_shape'
+    main(rootpath + r"\network.ini", rootpath + r"\analyses.ini")
