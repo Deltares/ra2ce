@@ -375,6 +375,10 @@ class Network:
         else:
             base_graph = nx.read_gpickle(self.config['files']['base_graph'])
             network_gdf = gpd.read_feather(self.config['files']['base_network'])
+            if self.save_shp:
+                to_save = ['shp', 'pickle']
+                self.config['files']['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
+                self.config['files']['base_network'] = self.save_network(network_gdf, 'base', types=to_save)
 
         # create origins destinations graph
         if (self.origins is not None) and (self.destinations is not None) and self.od_graph_path is None:
@@ -482,38 +486,16 @@ class Hazard:
                         graph[u][v][k][hn+'_'+self.aggregate_wl] = np.nan
 
             if type(graph) == gpd.GeoDataFrame:
-                for ii in range(len(graph.index)):
-                    # check how long the road stretch is and make a point every other meter
-                    gdata = graph.iloc[ii, :]
-                    nr_points = round(gdata['length'])
-                    if nr_points == 1:
-                        coords_to_check = list(gdata['geometry'].boundary)
-                    else:
-                        coords_to_check = [gdata['geometry'].interpolate(j / float(nr_points - 1), normalized=True) for
-                                           j in range(nr_points)]
+                hazard = hf[i]
+                from tqdm import tqdm
+                from rasterstats import zonal_stats
+                tqdm.pandas(desc=hn)
+                flood_stats = graph.geometry.progress_apply(lambda x: zonal_stats(x, hazard, all_touched=True))
+                graph['{}_cells_intersect'.format(hn)] = [x[0]['count'] for x in flood_stats]
+                graph['{}_min_flood_depth'.format(hn)] = [x[0]['min'] for x in flood_stats]
+                graph['{}_max_flood_depth'.format(hn)] = [x[0]['max'] for x in flood_stats]
+                graph['{}_mean_flood_depth'.format(hn)] = [x[0]['mean'] for x in flood_stats]
 
-                    x_objects = np.array([c.coords[0][0] for c in coords_to_check])
-                    y_objects = np.array([c.coords[0][1] for c in coords_to_check])
-
-                    if size_array:
-                        # Fastest method but be aware of out of memory errors!
-                        water_level = sample_raster_full(raster, x_objects, y_objects, size_array, extent)
-                    else:
-                        # Slower method but no issues with memory errors
-                        water_level = sample_raster(raster_band, nodatavalue, x_objects, y_objects, extent['minX'],
-                                                    extent['pixelWidth'], extent['maxY'], extent['pixelHeight'])
-
-                    if len(water_level) > 0:
-                        if self.aggregate_wl == 'max':
-                            graph.loc[ii, hn] = water_level.max()
-                        elif self.aggregate_wl == 'min':
-                            graph.loc[ii, hn] = water_level.min()
-                        elif self.aggregate_wl == 'mean':
-                            graph.loc[ii, hn] = mean(water_level)
-                        else:
-                            logging.warning("No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'.")
-                    else:
-                        graph.loc[ii, hn] = np.nan
         return graph
 
     def overlay_hazard_shp(self, hf, graph):

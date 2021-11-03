@@ -27,12 +27,12 @@ def main(network_ini=None, analyses_ini=None):
         initiate_root_logger(str(config_network['output'] / 'RA2CE.log'))
 
         network = Network(config_network)
-        graph_dict = network.create()
+        graphs = network.create()
 
         if config_network['hazard']['hazard_map'] is not None:
             # There is a hazard map or multiple hazard maps that should be intersected with the graph.
             # Overlay the hazard on the geodataframe as well (todo: combine with graph overlay if both need to be done?)
-            hazard = Hazard(network, graph_dict)
+            hazard = Hazard(network, graphs)
             graphs = hazard.create()
 
     if analyses_ini:
