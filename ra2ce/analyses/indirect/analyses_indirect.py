@@ -47,61 +47,6 @@ class IndirectAnalyses:
         alt_dist_list = []
         alt_nodes_list = []
         dif_dist_list = []
-        for e_remove in list(graph.edges.data(keys=True)):
-            u, v, k, data = e_remove
-
-            # if data['highway'] in attr_list:
-            # remove the edge
-            graph.remove_edge(u, v, k)
-
-            if nx.has_path(graph, u, v):
-                # calculate the alternative distance if that edge is unavailable
-                alt_dist = nx.dijkstra_path_length(graph, u, v, weight=analysis['weighing'])
-                alt_dist_list.append(alt_dist)
-
-                # append alternative route nodes
-                alt_nodes = nx.dijkstra_path(graph, u, v)
-                alt_nodes_list.append(alt_nodes)
-
-                # calculate the difference in distance
-                dif_dist_list.append(alt_dist - data[analysis['weighing']])
-            else:
-                alt_dist_list.append(np.NaN)
-                alt_nodes_list.append(np.NaN)
-                dif_dist_list.append(np.NaN)
-
-            # add edge again to the graph
-            graph.add_edge(u, v, k, **data)
-
-        # Add the new columns to the geodataframe
-        gdf['alt_dist'] = alt_dist_list
-        gdf['alt_nodes'] = alt_nodes_list
-        gdf['diff_dist'] = dif_dist_list
-
-        # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
-        # todo: input here this option
-
-        return gdf
-
-    def single_link_losses(self, graph, analysis):
-        """This is the function to analyse roads with a single link disruption and an alternative route.
-        :param graph: graph on which to run analysis (MultiDiGraph)
-        :return: df with dijkstra detour distance and path results
-        """
-        losses_fn = self.config['static'] / 'hazard' / analysis['loss_per_distance']
-        losses_df = pd.read_excel(losses_fn, sheet_name='Sheet1')
-
-        if analysis['loss_type'] == 'categorized':
-            disruption_fn = self.config['static'] / 'hazard' / analysis['disruption_per_category']
-            disruption_df = pd.read_excel(disruption_fn, sheet_name='Sheet1')
-
-        # create a geodataframe from the graph
-        gdf = osmnx.graph_to_gdfs(graph, nodes=False)
-
-        # list for the length of the alternative routes
-        alt_dist_list = []
-        alt_nodes_list = []
-        dif_dist_list = []
         detour_exist_list = []
         for e_remove in list(graph.edges.data(keys=True)):
             u, v, k, data = e_remove
@@ -121,7 +66,7 @@ class IndirectAnalyses:
 
                 # calculate the difference in distance
                 dif_dist_list.append(alt_dist - data[analysis['weighing']])
-
+                
                 detour_exist_list.append(1)
             else:
                 alt_dist_list.append(np.NaN)
@@ -138,14 +83,39 @@ class IndirectAnalyses:
         gdf['diff_dist'] = dif_dist_list
         gdf['detour_exist'] = detour_exist_list
 
+        # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
+        # todo: input here this option
+
+        return gdf
+
+    def single_link_losses(self, gdf, analysis):
+        """This is the function to analyse roads with a single link disruption and an alternative route.
+        :param graph: graph on which to run analysis (MultiDiGraph)
+        :return: df with dijkstra detour distance and path results
+        """
+        losses_fn = self.config['static'] / 'hazard' / analysis['loss_per_distance']
+        losses_df = pd.read_excel(losses_fn, sheet_name='Sheet1')
+
+        if analysis['loss_type'] == 'categorized':
+            disruption_fn = self.config['static'] / 'hazard' / analysis['disruption_per_category']
+            disruption_df = pd.read_excel(disruption_fn, sheet_name='Sheet1')
+
+        gdf['total_losses'] = 0
+        
         if analysis['loss_type'] == 'uniform': #assume uniform threshold for disruption
-            for hz in self.config['hazard_names']:
+            for hz in self.config['hazard_names']:            
                 for col in analysis['traffic_cols'].split(","):
+                    try:
+                        assert gdf[col+'_detour_losses']
+                        assert gdf[col+'_nodetour_losses']
+                    except:
+                        gdf[col+'_detour_losses'] = 0
+                        gdf[col+'_nodetour_losses'] = 0
                     # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle]  * duration_disruption[hour] / 24[hour/day]
-                    gdf.loc[(gdf['detour_exist']==1) & (gdf[hz+'_'+analysis['aggregate_wl']] > analysis['threshold']), col+'_detour_losses'] = gdf[col] * gdf['diff_dist'] * losses_df.loc[losses_df['traffic_class']==col, 'cost'].values[0] * analysis['uniform_duration'] / 24
+                    gdf.loc[(gdf['detour_exist']==1) & (gdf[hz+'_'+analysis['aggregate_wl']] > analysis['threshold']), col+'_detour_losses'] += gdf[col] * gdf['diff_dist'] * losses_df.loc[losses_df['traffic_class']==col, 'cost'].values[0] * analysis['uniform_duration'] / 24
                     # no_detour_losses = traffic_per_day[veh/day] * occupancy[person/veh] * gdp_percapita_per_day[USD/person] * duration_disruption[hour] / 24[hour/day]
-                    gdf.loc[(gdf['detour_exist']==0) & (gdf[hz+'_'+analysis['aggregate_wl']] > analysis['threshold']), col+'_nodetour_losses'] = gdf[col] * losses_df.loc[losses_df['traffic_class']==col, 'occupancy'].values[0] * analysis['gdp_percapita'] * analysis['uniform_duration'] / 24
-                gdf['total_losses'] = np.nansum(gdf[[x for x in gdf.columns if 'losses' in x]], axis=1)
+                    gdf.loc[(gdf['detour_exist']==0) & (gdf[hz+'_'+analysis['aggregate_wl']] > analysis['threshold']), col+'_nodetour_losses'] += gdf[col] * losses_df.loc[losses_df['traffic_class']==col, 'occupancy'].values[0] * analysis['gdp_percapita'] * analysis['uniform_duration'] / 24
+                gdf['total_losses'] += np.nansum(gdf[[x for x in gdf.columns if 'losses' in x]], axis=1)
 
         if analysis['loss_type'] == 'categorized':
             for hz in self.config['hazard_names']:
@@ -171,11 +141,17 @@ class IndirectAnalyses:
                         gdf.loc[(gdf[hz+'_'+analysis['aggregate_wl']] > lb) & (gdf[hz+'_'+analysis['aggregate_wl']] <= ub) & (gdf['class_identifier'] == road_cat), 'duration_disruption'] = disruption_df_.loc[disruption_df_['class_identifier'] == road_cat, 'duration_disruption'].values[0]
 
                 for col in analysis['traffic_cols'].split(","):
+                    try:
+                        assert gdf[col+'_detour_losses']
+                        assert gdf[col+'_nodetour_losses']
+                    except:
+                        gdf[col+'_detour_losses'] = 0
+                        gdf[col+'_nodetour_losses'] = 0
                     # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle] * duration_disruption[hour] / 24[hour/day]
-                    gdf.loc[gdf['detour_exist']==1, col+'_detour_losses'] = gdf[col] * gdf['diff_dist'] * losses_df.loc[losses_df['traffic_class']==col, 'cost'].values[0] * gdf['duration_disruption'] / 24
+                    gdf.loc[gdf['detour_exist']==1, col+'_detour_losses'] += gdf[col] * gdf['diff_dist'] * losses_df.loc[losses_df['traffic_class']==col, 'cost'].values[0] * gdf['duration_disruption'] / 24
                     # no_detour_losses = traffic_per_day[veh/day] * occupancy[person/veh] * gdp_percapita[USD/person] * duration_disruption[hour] / 24[hour/day]
-                    gdf.loc[gdf['detour_exist']==0, col+'_nodetour_losses'] = gdf[col] * losses_df.loc[losses_df['traffic_class']==col, 'occupancy'].values[0] * analysis['gdp_percapita'] * gdf['duration_disruption'] / 24
-                gdf['total_losses'] = np.nansum(gdf[[x for x in gdf.columns if 'losses' in x]], axis=1)
+                    gdf.loc[gdf['detour_exist']==0, col+'_nodetour_losses'] += gdf[col] * losses_df.loc[losses_df['traffic_class']==col, 'occupancy'].values[0] * analysis['gdp_percapita'] * gdf['duration_disruption'] / 24
+                gdf['total_losses'] += np.nansum(gdf[[x for x in gdf.columns if 'losses' in x]], axis=1)
 
         return gdf
 
@@ -467,7 +443,8 @@ class IndirectAnalyses:
                 gdf = self.multi_link_origin_destination(g, analysis)
             elif analysis['analysis'] == 'single_link_losses':
                 g = nx.read_gpickle(self.config['files']['base_graph_hazard'])
-                gdf = self.single_link_losses(g, analysis)
+                gdf = self.single_link_redundancy(g, analysis)
+                gdf = self.single_link_losses(gdf, analysis)
             elif analysis['analysis'] == 'multi_link_losses':
                 g = nx.read_gpickle(self.config['files']['base_graph_hazard'])
                 gdf = self.multi_link_losses(g, analysis)
