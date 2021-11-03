@@ -516,12 +516,6 @@ class Hazard:
                         graph.loc[ii, hn] = np.nan
         return graph
 
-    def overlay_hazard_raster_gdf(self, hazards_tif, graph):
-        """ Overlays a raster with hazard data for a gdf """
-        poly_dict = read_geojson(self.config['network']['polygon'][0])
-        graph = HazardUtils.add_hazard_data_to_road_network(graph, self.config['hazard']['hazard_map'], poly_dict)
-        return graph
-
     def overlay_hazard_shp(self, hf, graph):
         """Overlays the hazard shapefile over the road segments.
 
