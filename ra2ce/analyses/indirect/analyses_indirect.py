@@ -329,11 +329,94 @@ class IndirectAnalyses:
 
             # Find the routes
             od_routes = find_route_ods(graph_hz, od_nodes, analysis['weighing'])
+            od_routes['hazard'] = hz+'_'+analysis['aggregate_wl']
             all_results.append(od_routes)
 
         all_results = pd.concat(all_results, ignore_index=True)
         return all_results
 
+    def multi_link_origin_destination_impact(self, gdf, gdf_ori):
+        """Calculates some default indicators that quantify the impacts of disruptions to origin-destination flows"""
+        hazard_list = np.unique(gdf['hazard'])
+        
+        #calculate number of disconnected origin, destination, and origin-destination pair
+        gdf['OD'] = gdf['origin'] + gdf['destination']
+        gdf_ori['OD'] = gdf_ori['origin'] + gdf_ori['destination']
+        init_od_pairs = len(np.unique(gdf_ori['OD']))
+        init_origins = len(np.unique(gdf_ori['origin']))
+        init_destinations = len(np.unique(gdf_ori['destination']))
+        abs_od_disconnected = []
+        share_od_disconnected = []
+        abs_origin_disconnected = []
+        share_origin_disconnected = []
+        abs_destination_disconnected = []
+        share_destination_disconnected = []
+        for hz in hazard_list:
+            gdf_ = gdf.loc[gdf['hazard']==hz]
+            
+            remaining_od_pairs = len(np.unique(gdf_['OD']))
+            diff_od_pairs = init_od_pairs - remaining_od_pairs
+            abs_od_disconnected.append(diff_od_pairs)
+            share_od_disconnected.append(100*diff_od_pairs/init_od_pairs)
+            
+            remaining_origins = len(np.unique(gdf_['origin']))
+            diff_origins = init_origins - remaining_origins
+            abs_origin_disconnected.append(diff_origins)
+            share_origin_disconnected.append(100*diff_origins/remaining_origins)
+            
+            remaining_destinations = len(np.unique(gdf_['destination']))
+            diff_destinations = init_destinations - remaining_destinations
+            abs_destination_disconnected.append(diff_destinations)
+            share_destination_disconnected.append(100*diff_destinations/remaining_destinations)
+            
+        #calculate change in travel time/distance
+        max_increase_abs = []
+        min_increase_abs = []
+        mean_increase_abs = []
+        median_increase_abs = []
+        max_increase_pc = []
+        min_increase_pc = []
+        mean_increase_pc = []
+        median_increase_pc = []
+        for hz in hazard_list:
+            gdf_ = gdf.loc[gdf['hazard']==hz][['OD', 'length']]
+            gdf_.columns = ['OD', 'length_'+hz]
+            gdf_ori = gdf_ori.merge(gdf_, how='left', on='OD')
+            gdf_ori.drop_duplicates(subset='OD', inplace=True)
+            gdf_ori['diff_length_'+hz] = gdf_ori['length_'+hz] - gdf_ori['length']
+            gdf_ori['diff_length_'+hz+'_pc'] = gdf_ori['diff_length_'+hz] / gdf_ori['length']
+            
+            max_increase_abs.append(np.nanmax(gdf_ori['diff_length_'+hz]))
+            min_increase_abs.append(np.nanmin(gdf_ori['diff_length_'+hz]))
+            mean_increase_abs.append(np.nanmean(gdf_ori['diff_length_'+hz]))
+            median_increase_abs.append(np.nanmedian(gdf_ori['diff_length_'+hz]))
+            
+            max_increase_pc.append(np.nanmax(100*gdf_ori['diff_length_'+hz+'_pc']))
+            min_increase_pc.append(np.nanmin(100*gdf_ori['diff_length_'+hz+'_pc']))
+            mean_increase_pc.append(np.nanmean(100*gdf_ori['diff_length_'+hz+'_pc']))
+            median_increase_pc.append(np.nanmedian(100*gdf_ori['diff_length_'+hz+'_pc']))
+            
+        diff_df = pd.DataFrame()
+        diff_df['hazard'] = hazard_list
+        
+        diff_df['od_disconnected_abs'] = abs_od_disconnected
+        diff_df['od_disconnected_pc (%)'] = share_od_disconnected
+        diff_df['origin_disconnected_abs'] = abs_origin_disconnected
+        diff_df['origin_disconnected_pc (%)'] = share_origin_disconnected
+        diff_df['destination_disconnected_abs'] = abs_destination_disconnected
+        diff_df['destination_disconnected_pc (%)'] = share_destination_disconnected
+        
+        diff_df['max_increase_abs'] = max_increase_abs
+        diff_df['min_increase_abs'] = min_increase_abs
+        diff_df['mean_increase_abs'] = mean_increase_abs
+        diff_df['median_increase_abs'] = median_increase_abs
+        diff_df['max_increase_pc (%)'] = max_increase_pc
+        diff_df['min_increase_pc (%)'] = min_increase_pc
+        diff_df['mean_increase_pc (%)'] = mean_increase_pc
+        diff_df['median_increase_pc (%)'] = median_increase_pc
+        
+        return diff_df, gdf_ori
+    
     def optimal_route_origin_closest_destination(self, graph, analysis):
         crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGABLE
 
@@ -477,6 +560,14 @@ class IndirectAnalyses:
             elif analysis['analysis'] == 'multi_link_origin_destination':
                 g = nx.read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
                 gdf = self.multi_link_origin_destination(g, analysis)
+                g_not_disrupted = nx.read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
+                gdf_not_disrupted = self.optimal_route_origin_destination(g_not_disrupted, analysis)
+                disruption_impact_df, gdf_ori = self.multi_link_origin_destination_impact(gdf, gdf_not_disrupted)
+                #impact_csv_path = self.config['output'] / analysis['analysis'] / (analysis['name'].replace(' ', '_') + '_impact.csv')
+                #del gdf_ori['geometry']
+                #gdf_ori.to_csv(impact_csv_path, index=False)
+                impact_csv_path = self.config['output'] / analysis['analysis'] / (analysis['name'].replace(' ', '_') + '_impact_summary.csv')
+                disruption_impact_df.to_csv(impact_csv_path, index=False)
             elif analysis['analysis'] == 'single_link_losses':
                 g = nx.read_gpickle(self.config['files']['base_graph_hazard'])
                 gdf = self.single_link_redundancy(g, analysis)
