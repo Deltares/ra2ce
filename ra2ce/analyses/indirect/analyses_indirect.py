@@ -563,9 +563,9 @@ class IndirectAnalyses:
                 g_not_disrupted = nx.read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
                 gdf_not_disrupted = self.optimal_route_origin_destination(g_not_disrupted, analysis)
                 disruption_impact_df, gdf_ori = self.multi_link_origin_destination_impact(gdf, gdf_not_disrupted)
-                #impact_csv_path = self.config['output'] / analysis['analysis'] / (analysis['name'].replace(' ', '_') + '_impact.csv')
-                #del gdf_ori['geometry']
-                #gdf_ori.to_csv(impact_csv_path, index=False)
+                impact_csv_path = self.config['output'] / analysis['analysis'] / (analysis['name'].replace(' ', '_') + '_impact.csv')
+                del gdf_ori['geometry']
+                gdf_ori.to_csv(impact_csv_path, index=False)
                 impact_csv_path = self.config['output'] / analysis['analysis'] / (analysis['name'].replace(' ', '_') + '_impact_summary.csv')
                 disruption_impact_df.to_csv(impact_csv_path, index=False)
             elif analysis['analysis'] == 'single_link_losses':
