@@ -390,10 +390,11 @@ class IndirectAnalyses:
             graph_hz = copy.deepcopy(graph)
 
             # Check if the o/d pairs are still connected while some links are disrupted by the hazard(s)
-            to_remove = [(e[0], e[1], e[2]) for e in graph_hz.edges.data(keys=True) if
-                         (e[-1][hz+'_'+analysis['aggregate_wl']] > float(analysis['threshold'])) & ('bridge' not in e[-1])]
+            edges_remove = [e for e in graph.edges.data(keys=True) if hz+'_'+analysis['aggregate_wl'] in e[-1]]
+            edges_remove = [e for e in edges_remove if
+                            (e[-1][hz+'_'+analysis['aggregate_wl']] > float(analysis['threshold'])) & ('bridge' not in e[-1])]
             # to_remove = [(e[0], e[1], e[2]) for e in graph.edges.data(keys=True) if (e[-1][hz+'_'+analysis['aggregate_wl']] > float(analysis['threshold']))]
-            graph_hz.remove_edges_from(to_remove)
+            graph_hz.remove_edges_from(edges_remove)
 
             # Find the routes
             od_routes = find_route_ods(graph_hz, od_nodes, analysis['weighing'])
@@ -415,20 +416,14 @@ class IndirectAnalyses:
         count_col_name = self.config['origins_destinations']['origin_count']
         weight_factor = self.config['origins_destinations']['origin_out_fraction']
 
-        od_path = self.config['static'] / 'output_graph' / 'origin_destination_table.feather'
-        od = gpd.read_feather(od_path)
-        origin = od.loc[od['o_id'].notna()]
-        del origin['d_id']
-        del origin['match_ids']
+        origin = load_origins(self.config)
 
         origin_closest_dest, other = find_closest_node_attr(graph, 'od_id', analysis['weighing'], o_name, d_name)
         pref_routes, base_graph = calc_pref_routes_closest_dest(graph, base_graph, analysis['weighing'], crs, od_id, id_name,
                                                                 origin_closest_dest, origin, count_col_name,
                                                                 weight_factor)
 
-        destination = od.loc[od['d_id'].notna()]
-        del destination['o_id']
-        del destination['match_ids']
+        destination = load_destinations(self.config)
 
         cnt_per_destination = pref_routes.groupby('destination')[['origin_cnt', 'cnt_weight']].sum().reset_index()
         for hosp, origin_cnt, cnt_weight in zip(cnt_per_destination['destination'], cnt_per_destination['origin_cnt'],
@@ -438,8 +433,93 @@ class IndirectAnalyses:
 
         return base_graph, pref_routes, destination
 
-    def multi_link_origin_closest_destination(self):
-        return
+    def multi_link_origin_closest_destination(self, graph, base_graph, destinations, analysis, opt_routes):
+        unit = 'km'
+        network_threshold = analysis['threshold']
+        weighing = analysis['weighing']
+        od_id = self.config['origins_destinations']['id_name_origin_destination']
+        o_name = self.config['origins_destinations']['origins_names']
+        d_name = self.config['origins_destinations']['destinations_names']
+        origin_out_fraction = self.config['origins_destinations']['origin_out_fraction']
+        origin_count = self.config['origins_destinations']['origin_count']
+
+        agg_patients = pd.DataFrame(columns=['Flood map', 'Nr. people no delay', 'Nr. people delayed',
+                                             'Nr. people no access', 'Total extra detour time (hours)',
+                                             f'Total extra detour distance ({unit})',
+                                             'Disruption by flooded road', 'Disruption by flooded destination'])
+
+        origins = load_origins(self.config)
+
+        threshold_destinations = 0
+
+        # Calculate the criticality
+        for hazard in self.config['hazard_names']:
+            hazard_name = '_'.join([h[0] if (h.upper() != 'RP') and not h.isdecimal() else h for h in hazard.split('_')])
+
+            # Add a column for the number of people that go to a certain destination, per flood map
+            destinations[hazard_name + '_P'] = 0
+            nx.set_edge_attributes(base_graph, 0, hazard_name + '_P')
+
+            # Add a column to the neighborhoods, to indicate if they have access to any hospital
+            origins[hazard_name + '_NA'] = 'access'
+
+            # Check if the o/d pairs are still connected while some links are disrupted by the hazard(s)
+            h = copy.deepcopy(graph)
+
+            edges_remove = [e for e in graph.edges.data(keys=True) if hazard+'_'+analysis['aggregate_wl'] in e[-1]]
+            edges_remove = [e for e in edges_remove if
+                            (e[-1][hazard+'_'+analysis['aggregate_wl']] > float(analysis['threshold'])) & ('bridge' not in e[-1])]
+            h.remove_edges_from(edges_remove)
+
+            # Find the closest hospitals
+            list_closest, other = find_closest_node_attr(h, 'od_id', weighing, o_name, d_name)
+
+            # Find the distance of the routes to the hospitals, see if those hospitals are flooded or not
+            base_graph, hospitals, list_hospital_flooded, pp_no_delay, pp_delayed, extra_dist_meters, extra_miles = calc_routes_closest_dest(
+                h, base_graph, list_closest, opt_routes, weighing, origins, destinations, od_id, hazard_name,
+                threshold_destinations, origin_out_fraction, origin_count)
+
+            # Calculate the number of people that cannot access any hospital
+            pp_no_access = [
+                origins.loc[origins[od_id] == int(oth[1].split('_')[-1]), origin_count].iloc[0] * origin_out_fraction
+                if len(other) > 0 else 0 for oth in other]
+
+            # Attribute to the neighborhoods that don't have access that they do not have any access
+            if len(other) > 0:
+                for oth in other:
+                    origins.loc[origins[od_id] == int(oth[1].split('_')[-1]), hazard_name + '_NA'] = 'no access'
+
+            # Now calculate for the routes that were going to a flooded destination, another non-flooded destination
+            # TODO THIS PART NEEDS TO BE CHECKED AND REVISED >>>
+            list_hospitals_flooded = [hosp[-1][-1] for hosp in list_hospital_flooded]
+
+            disr_by_flood = 0
+
+            if len(list_hospitals_flooded) > 0:
+                list_nodes_to_remove = [n for n in h.nodes.data() if 'od_id' in n[-1]]
+                list_nodes_to_remove = [n[0] for n in list_nodes_to_remove if n[-1]['od_id'] in list_hospitals_flooded]
+                graph.remove_nodes_from(list_nodes_to_remove)
+
+                disr_by_flood = 1
+                list_closest, other = find_closest_node_attr(h, 'od_id', analysis[''], o_name, d_name)
+
+            # The number of people that are disrupted because of a flooded road (and not because the or multiple hospitals are flooded)
+            # can be calculated by adding the people without any access (this is always because of flooded roads in the first place)
+            # and the people that are delayed. By subtracting the people that are disrupted by hospitals you get only the people
+            # disrupted by road flooding.
+            disr_by_flooded_road = round(sum(pp_no_access)) + round(sum(pp_delayed)) - disr_by_flood
+            # TODO THIS PART NEEDS TO BE CHECKED AND REVISED <<<
+
+            agg_patients = agg_patients.append(
+                {'Flood map': hazard_name, 'Nr. people no delay': round(sum(pp_no_delay)),
+                 'Nr. people delayed': round(sum(pp_delayed)), 'Nr. people no access': round(sum(pp_no_access)),
+                 'Total extra detour time (hours)': sum(extra_dist_meters),
+                 f'Total extra detour distance ({unit})': sum(extra_miles),
+                 'Disruption by flooded road': disr_by_flooded_road,
+                 'Disruption by flooded hospital': disr_by_flood},
+                ignore_index=True)
+
+        return base_graph, origins, agg_patients
 
     def execute(self):
         """Executes the indirect analysis."""
@@ -447,6 +527,7 @@ class IndirectAnalyses:
             logging.info(f"----------------------------- Started analyzing '{analysis['name']}'  -----------------------------")
             starttime = time.time()
             gdf = pd.DataFrame()
+            output_path = self.config['output'] / analysis['analysis']
 
             if 'weighing' in analysis:
                 if analysis['weighing'] == 'distance':
@@ -479,17 +560,49 @@ class IndirectAnalyses:
                     shp_path = output_path / (analysis['name'].replace(' ', '_') + '_destinations.shp')
                     save_gdf(destination, shp_path)
 
-                    shp_path_nodes = output_path / (analysis['name'].replace(' ', '_') + '_optimal_routes_nodes.shp')
-                    shp_path_edges = output_path / (analysis['name'].replace(' ', '_') + '_optimal_routes_edges.shp')
-                    graph_to_shp(opt_routes, shp_path_edges, shp_path_nodes)
+                    shp_path = output_path / (analysis['name'].replace(' ', '_') + '_optimal_routes.shp')
+                    save_gdf(opt_routes, shp_path)
 
                     shp_path_nodes = output_path / (analysis['name'].replace(' ', '_') + '_results_nodes.shp')
                     shp_path_edges = output_path / (analysis['name'].replace(' ', '_') + '_results_edges.shp')
                     graph_to_shp(base_graph, shp_path_edges, shp_path_nodes)
+                if analysis['save_csv']:
+                    csv_path = output_path / (analysis['name'].replace(' ', '_') + '_destinations.csv')
+                    del destination['geometry']
+                    destination.to_csv(csv_path, index=False)
+
+                    csv_path = output_path / (analysis['name'].replace(' ', '_') + '_optimal_routes.csv')
+                    del opt_routes['geometry']
+                    opt_routes.to_csv(csv_path, index=False)
             elif analysis['analysis'] == 'multi_link_origin_closest_destination':
                 # TODO MAKE ONE GDF FROM RESULTS?
-                g = nx.read_gpickle(self.config['files']['origins_destinations_graph'])
-                gdf = self.multi_link_origin_closest_destination(g, analysis)
+                g = nx.read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
+                base_graph, opt_routes, destination = self.optimal_route_origin_closest_destination(g, analysis)
+                base_graph, origins, agg_results = self.multi_link_origin_closest_destination(g, base_graph, destination, analysis, opt_routes)
+                if analysis['save_shp']:
+                    shp_path = output_path / (analysis['name'].replace(' ', '_') + '_origins.shp')
+                    save_gdf(origins, shp_path)
+
+                    shp_path = output_path / (analysis['name'].replace(' ', '_') + '_destinations.shp')
+                    save_gdf(destination, shp_path)
+
+                    shp_path = output_path / (analysis['name'].replace(' ', '_') + '_optimal_routes.shp')
+                    save_gdf(opt_routes, shp_path)
+
+                    shp_path_nodes = output_path / (analysis['name'].replace(' ', '_') + '_results_nodes.shp')
+                    shp_path_edges = output_path / (analysis['name'].replace(' ', '_') + '_results_edges.shp')
+                    graph_to_shp(base_graph, shp_path_edges, shp_path_nodes)
+                if analysis['save_csv']:
+                    csv_path = output_path / (analysis['name'].replace(' ', '_') + '_destinations.csv')
+                    del destination['geometry']
+                    destination.to_csv(csv_path, index=False)
+
+                    csv_path = output_path / (analysis['name'].replace(' ', '_') + '_optimal_routes.csv')
+                    del opt_routes['geometry']
+                    opt_routes.to_csv(csv_path, index=False)
+
+                agg_results.to_excel(output_path / (analysis['name'].replace(' ', '_') + '_results.xlsx'))
+
             elif analysis['analysis'] == 'losses':
 
                 if self.graphs['base_network_hazard'] is None:
@@ -501,7 +614,6 @@ class IndirectAnalyses:
 
             if not gdf.empty:
                 # Not for all analyses a gdf is created as output.
-                output_path = self.config['output'] / analysis['analysis']
                 if analysis['save_shp']:
                     shp_path = output_path / (analysis['name'].replace(' ', '_') + '.shp')
                     save_gdf(gdf, shp_path)
@@ -774,7 +886,7 @@ def calc_pref_routes_closest_dest(graph, base_graph, weighing, crs, od_id, idNam
     return pref_routes, base_graph
 
 
-def calc_routes_closest_dest(graph, base_graph, list_closest, pref_routes, weighing, origin, dest, od_id, wd, threshold_hospitals, factor_hospital, nr_people_name):
+def calc_routes_closest_dest(graph, base_graph, list_closest, pref_routes, weighing, origin, dest, od_id, hazname, threshold_hospitals, factor_hospital, nr_people_name):
     pp_no_delay = [0]
     pp_delayed = [0]
     extra_weights = [0]
@@ -784,8 +896,8 @@ def calc_routes_closest_dest(graph, base_graph, list_closest, pref_routes, weigh
     # find the optimal route with hazard disruption
     for o, d in list_closest:
         # Check if the hospital that is accessed, is flooded
-        if dest.loc[dest[od_id] == int(d[1].split('_')[-1]), wd[:-2] + 'WD'].iloc[0] > threshold_hospitals:
-            list_hospital_flooded.append((o,d))
+        if dest.loc[dest[od_id] == int(d[1].split('_')[-1]), hazname].iloc[0] > threshold_hospitals:
+            list_hospital_flooded.append((o, d))
             continue
 
         # calculate the length of the preferred route
@@ -810,18 +922,18 @@ def calc_routes_closest_dest(graph, base_graph, list_closest, pref_routes, weigh
 
             # Add the number of people that need hospital care, to the road segments. For now, each road segment in a route
             # gets attributed all the people that are taking that route.
-            base_graph[u][v][edge_key][wd[:-2] + '_P'] = base_graph[u][v][edge_key][wd[:-2] + '_P'] + nr_patients_per_route
+            base_graph[u][v][edge_key][hazname + '_P'] = base_graph[u][v][edge_key][hazname + '_P'] + nr_patients_per_route
 
             if 'length' in graph[u][v][edge_key]:
                 length_list.append(graph[u][v][edge_key]['length'])
 
-        alt_miles = sum(length_list) / 1609
+        alt_dist = sum(length_list)
 
         # If the destination is different from the origin, the destination is further than without hazard disruption
         if pref_routes.loc[(pref_routes['origin'] == o[1]) & (pref_routes['destination'] == d[1])].empty:
             # subtract the length/time of the optimal route from the alternative route
             extra_dist = alt_route - pref_routes.loc[pref_routes['origin'] == o[1], weighing].iloc[0]
-            extra_miles = alt_miles - pref_routes.loc[pref_routes['origin'] == o[1], 'tot_miles'].iloc[0]
+            extra_miles = alt_dist - pref_routes.loc[pref_routes['origin'] == o[1], 'tot_miles'].iloc[0]
             pp_delayed.append(nr_patients_per_route)
             extra_weights.append(extra_dist)
             extra_miles_total.append(extra_miles)
@@ -832,6 +944,24 @@ def calc_routes_closest_dest(graph, base_graph, list_closest, pref_routes, weigh
         # alt_edges = MultiLineString(alt_edges)
 
         # Add the number of patients to the total number of patients that go to that hospital
-        dest.loc[dest[od_id] == int(d[1].split('_')[-1]), wd[:-2] + '_P'] = dest.loc[dest[od_id] == int(d[1].split('_')[-1]), wd[:-2] + '_P'].iloc[0] + nr_patients_per_route
+        dest.loc[dest[od_id] == int(d[1].split('_')[-1]), hazname + '_P'] = dest.loc[dest[od_id] == int(d[1].split('_')[-1]), hazname + '_P'].iloc[0] + nr_patients_per_route
 
     return base_graph, dest, list_hospital_flooded, pp_no_delay, pp_delayed, extra_weights, extra_miles_total
+
+
+def load_origins(config):
+    od_path = config['static'] / 'output_graph' / 'origin_destination_table.feather'
+    od = gpd.read_feather(od_path)
+    origin = od.loc[od['o_id'].notna()]
+    del origin['d_id']
+    del origin['match_ids']
+    return origin
+
+
+def load_destinations(config):
+    od_path = config['static'] / 'output_graph' / 'origin_destination_table.feather'
+    od = gpd.read_feather(od_path)
+    destination = od.loc[od['d_id'].notna()]
+    del destination['o_id']
+    del destination['match_ids']
+    return destination
