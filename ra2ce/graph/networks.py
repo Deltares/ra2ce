@@ -481,39 +481,39 @@ class Hazard:
                     else:
                         graph[u][v][k][hn+'_'+self.aggregate_wl] = np.nan
 
+            if type(graph) == gpd.GeoDataFrame:
+                for ii in range(len(graph.index)):
+                    # check how long the road stretch is and make a point every other meter
+                    gdata = graph.iloc[ii, :]
+                    nr_points = round(gdata['length'])
+                    if nr_points == 1:
+                        coords_to_check = list(gdata['geometry'].boundary)
+                    else:
+                        coords_to_check = [gdata['geometry'].interpolate(j / float(nr_points - 1), normalized=True) for
+                                           j in range(nr_points)]
 
-            # if type(graph) == gpd.GeoDataFrame:
-                # The extent and resolution of the different hazard maps are the same, so the same points in polygons
-                # can be used for all hazard maps (saves time to not compute them again for each hazard map).
-                # if not same_extent:
-                #     points_in_polygons = find_points_in_polygon(graph.geometry.values, extent)
-                # else:
-                #     if k == 0:
-                #         points_in_polygons = find_points_in_polygon(graph.geometry.values, extent)
-                #
-                # if size_array:
-                #     # Fastest method but be aware of out of memory errors!
-                #     total_water_levels = list()
-                #     for pnts in points_in_polygons:
-                #         x_objects = np.transpose(pnts)[0]
-                #         y_objects = np.transpose(pnts)[1]
-                #         water_level = sample_raster_full(raster, x_objects, y_objects, size_array, extent)
-                #         total_water_levels.append(list(np.where(water_level <= 0, np.nan, water_level)))
-                # else:
-                #     # Slower method but no issues with memory errors
-                #     total_water_levels = water_level_at_points(points_in_polygons, extent, raster_band, nodatavalue)
-                #
-                # if len(water_level) > 0:
-                #     if self.aggregate_wl == 'max':
-                #         graph.loc[:, hn] = total_water_levels.max()
-                #     elif self.aggregate_wl == 'min':
-                #         self.g[u][v][k][hn] = water_level.min()
-                #     elif self.aggregate_wl == 'mean':
-                #         self.g[u][v][k][hn] = mean(water_level)
-                #     else:
-                #         logging.warning("No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'.")
-                # else:
-                #     self.g[u][v][k][hn] = np.nan
+                    x_objects = np.array([c.coords[0][0] for c in coords_to_check])
+                    y_objects = np.array([c.coords[0][1] for c in coords_to_check])
+
+                    if size_array:
+                        # Fastest method but be aware of out of memory errors!
+                        water_level = sample_raster_full(raster, x_objects, y_objects, size_array, extent)
+                    else:
+                        # Slower method but no issues with memory errors
+                        water_level = sample_raster(raster_band, nodatavalue, x_objects, y_objects, extent['minX'],
+                                                    extent['pixelWidth'], extent['maxY'], extent['pixelHeight'])
+
+                    if len(water_level) > 0:
+                        if self.aggregate_wl == 'max':
+                            graph.loc[ii, hn] = water_level.max()
+                        elif self.aggregate_wl == 'min':
+                            graph.loc[ii, hn] = water_level.min()
+                        elif self.aggregate_wl == 'mean':
+                            graph.loc[ii, hn] = mean(water_level)
+                        else:
+                            logging.warning("No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'.")
+                    else:
+                        graph.loc[ii, hn] = np.nan
         return graph
 
     def overlay_hazard_raster_gdf(self, hazards_tif, graph):
@@ -598,9 +598,6 @@ class Hazard:
         hazards_tif = [haz for haz in self.list_hazard_files if haz.suffix == '.tif']
         hazards_shp = [haz for haz in self.list_hazard_files if haz.suffix == '.shp']
         hazards_table = [haz for haz in self.list_hazard_files if haz.suffix in ['.csv', '.json']]
-
-        # if type(graph) == gpd.GeoDataFrame:
-        #     graph = self.overlay_hazard_raster_gdf(hazards_tif, graph)
 
         if len(hazards_tif) > 0:
             start = time.time()
