@@ -166,10 +166,11 @@ class IndirectAnalyses:
         Returns:
             gdf [geopandas dataframe]
         """
-        results = []
+        master_graph = copy.deepcopy(graph)
         for hz in self.config['hazard_names']:
+            graph = copy.deepcopy(master_graph)
             # Create a geodataframe from the full graph
-            gdf = osmnx.graph_to_gdfs(graph, nodes=False)
+            gdf = osmnx.graph_to_gdfs(master_graph, nodes=False)
             gdf['ra2ce_fid'] = gdf['ra2ce_fid'].astype(str)
 
             # Create the edgelist that consist of edges that should be removed
