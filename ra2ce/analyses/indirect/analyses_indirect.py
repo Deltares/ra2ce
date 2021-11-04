@@ -541,6 +541,7 @@ class IndirectAnalyses:
             logging.info(f"----------------------------- Started analyzing '{analysis['name']}'  -----------------------------")
             starttime = time.time()
             gdf = pd.DataFrame()
+            opt_routes = None
             output_path = self.config['output'] / analysis['analysis']
 
             if 'weighing' in analysis:
