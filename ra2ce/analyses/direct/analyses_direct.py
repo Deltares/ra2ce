@@ -81,6 +81,7 @@ class DirectAnalyses:
             starttime = time.time()
 
             if analysis['analysis'] == 'direct':
+
                 gdf = self.road_damage(analysis)
 
             elif analysis['analysis'] == 'effectiveness_measures':
@@ -402,7 +403,6 @@ class RoadDamage:
                 df = df.progress_apply(lambda x: self.road_loss_estimation(x,   interpolator, hzd_names, dict_max_damages,
                                                                            max_damages_huizinga, curve_name, lane_damage_correction),
                                        axis=1)
-
         else:
             # This calculation is 60 times faster:
             df = self.road_loss_estimation2(df, interpolators, hzd_names, dict_max_damages,
