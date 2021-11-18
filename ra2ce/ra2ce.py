@@ -9,6 +9,8 @@ Created on 26-7-2021
 from pathlib import Path
 import click
 import warnings
+import logging
+
 warnings.filterwarnings('ignore', message='.*initial implementation of Parquet.*')
 
 # Local modules
@@ -63,7 +65,10 @@ def main(network_ini=None, analyses_ini=None):
                 config_analyses['hazard_names'] = [haz.stem for haz in config_network['hazard']['hazard_map']]
 
         if 'direct' in config_analyses:
-            analyses_direct.DirectAnalyses(config_analyses, graphs).execute()
+            if config_network['hazard']['hazard_map'] is not None:
+                analyses_direct.DirectAnalyses(config_analyses, graphs).execute()
+            else:
+                logging.error('Please define a hazardmap in your network.ini file. Unable to calculate direct damages...')
 
         if 'indirect' in config_analyses:
             analyses_indirect.IndirectAnalyses(config_analyses, graphs).execute()
