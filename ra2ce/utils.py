@@ -13,6 +13,7 @@ from ast import literal_eval
 import codecs
 import logging
 from shutil import copyfile
+import os
 
 # Local modules
 from .checks import input_validation, check_files, available_checks
@@ -144,7 +145,10 @@ def load_config(root_path, config_path):
 
     # Set the output paths in the configuration Dict for ease of saving to those folders.
     config['input'] = config['root_path'] / 'data' / config['project']['name'] / 'input'
-    config['static'] = config['root_path'] / 'data' / config['project']['name'] / 'static'
+    if config['project']['static_folder'] is not None:
+        config['static'] = Path(config['project']['static_folder'])
+    else:
+        config['static'] = config['root_path'] / 'data' / config['project']['name'] / 'static'
     config['output'] = config['root_path'] / 'data' / config['project']['name'] / 'output'
 
     # check if files exist:
