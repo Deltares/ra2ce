@@ -65,8 +65,8 @@ def input_validation(config):
                     'hazard_map': ['file', None],
                     'aggregate_wl': ['max', 'min', 'mean'],
                     'weighing': ['distance', 'time']}
-    input_dirs = {'polygon': 'static/network', 'hazard_map': 'static/hazard', 'origins': 'static/network',
-                  'destinations': 'static/network'}
+    input_dirs = {'polygon': 'network', 'hazard_map': 'hazard', 'origins': 'network',
+                  'destinations': 'network'}
 
     error = False
     for key in config:
@@ -105,12 +105,11 @@ def check_paths(config, key, item, input_dirs, error):
     for p in config[key][item].split(','):
         p = Path(p)
         if not p.is_file():
-            abs_path = config['root_path'] / 'data' / config['project']['name'] / input_dirs[
-                item] / p
+            abs_path = Path(config['project']['static_folder']) / input_dirs[item] / p
             if not abs_path.is_file():
                 logging.error(
                     'Wrong input to property [ {} ], file {} does not exist in folder {}'.format(item, p,
-                        config['root_path'] / 'data' / config['project']['name'] / input_dirs[item]))
+                        Path(config['project']['static_folder']) / input_dirs[item]))
                 logging.error('If no file is needed, please insert value - None - for property - {} -'.format(item))
                 error = True
             else:
