@@ -64,14 +64,15 @@ def main(network_ini=None, analyses_ini=None):
             if config_network['hazard']['hazard_map'] is not None:
                 config_analyses['hazard_names'] = [haz.stem for haz in config_network['hazard']['hazard_map']]
 
+        if 'indirect' in config_analyses:
+            analyses_indirect.IndirectAnalyses(config_analyses, graphs).execute()
+
         if 'direct' in config_analyses:
             if config_network['hazard']['hazard_map'] is not None:
                 analyses_direct.DirectAnalyses(config_analyses, graphs).execute()
             else:
                 logging.error('Please define a hazardmap in your network.ini file. Unable to calculate direct damages...')
 
-        if 'indirect' in config_analyses:
-            analyses_indirect.IndirectAnalyses(config_analyses, graphs).execute()
 
 
 @click.command()
