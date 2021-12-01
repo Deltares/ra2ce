@@ -72,6 +72,12 @@ class DirectAnalyses:
         df_costs = df_costs.astype(float).round(2)
         df_costs.to_csv(self.config['output'] / analysis['analysis'] / 'output_analysis.csv', decimal=',', sep=';', index=False, float_format='%.2f')
         gdf = gdf_in.merge(df, how='left', on='LinkNr')
+
+        # filter columns
+        col_list = ['geometry', 'LinkNr']
+        x = [col_list.extend(['{}_benefits'.format(key), '{}_costs'.format(key), '{}_bc_ratio'.format(key)]) for key in costs_dict['costs']]
+        gdf = gdf[col_list]
+        gdf.replace([np.inf, -np.inf, 0], np.nan, inplace=True)
         return gdf
 
     def execute(self):
@@ -232,10 +238,13 @@ class EffectivenessMeasures:
 
         # calculate standard effectiveness without factors
         df_total = self.calculate_effectiveness(df, name='standard')
+        if self.analysis['input_analysis'] is not None:
+            df_blockage = pd.read_csv(self.config['output'] / 'losses' / 'road_losses.csv').drop(columns='length')
+            df_blockage['blockage_costs'] = df_blockage['euro_vlh']
+        else:
+            df_blockage = pd.read_csv(self.config['input'] / 'direct' / 'blockage_costs.csv').drop(columns='afstand')
 
-        df_blockage = pd.read_csv(self.config['input'] / 'direct' / 'blockage_costs.csv')
         df_total = df_total.merge(df_blockage, how='left', on='LinkNr')
-        df_total['length'] = df_total['afstand'] # TODO Remove this line as this is probably incorrect, just as a check
 
         # start iterating over different strategies in lookup dictionary
         for strategy in effectiveness_dict:

@@ -636,6 +636,7 @@ class IndirectAnalyses:
                 losses = Losses(self.config, analysis)
                 df = losses.calculate_losses_from_table()
                 gdf = gdf_in.merge(df, how='left', on='LinkNr')
+                gdf = gdf[['geometry', 'LinkNr', 'length', 'euro_vlh']]
 
             if not gdf.empty:
                 # Not for all analyses a gdf is created as output.
@@ -691,7 +692,9 @@ class Losses:
         return df
 
     def traffic_shockwave(self, vlh, capacity, intensity):
-        vlh['vlh_traffic'] = (self.duration ** 2) * (self.rest_capacity - 1) * (self.rest_capacity * capacity - intensity / self.traffic_throughput) / (2 * (1 - ((intensity / self.traffic_throughput) / capacity)))
+        vlh['vlh_traffic'] = (self.duration ** 2) * (self.rest_capacity - 1) * \
+                             (self.rest_capacity * capacity - intensity / self.traffic_throughput) \
+                             / (2 * (1 - ((intensity / self.traffic_throughput) / capacity)))
         return vlh
 
     def calc_vlh(self, traffic_data, vehicle_loss_hours, detour_data):
