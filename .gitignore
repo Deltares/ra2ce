@@ -129,3 +129,6 @@ dmypy.json
 .pyre/
 /.idea
 /logs
+
+# RAA2CE Git ignore
+data/*
