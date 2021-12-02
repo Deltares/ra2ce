@@ -166,6 +166,7 @@ class IndirectAnalyses:
         Returns:
             gdf [geopandas dataframe]
         """
+        results = []
         master_graph = copy.deepcopy(graph)
         for hz in self.config['hazard_names']:
             graph = copy.deepcopy(master_graph)
