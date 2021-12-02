@@ -8,7 +8,7 @@ Created on 6-8-2021
 from ra2ce.ra2ce import main
 
 if __name__ == '__main__':
-    rootpath = r'c:\Python\ra2ce\data\KBN2_losses'
+    rootpath = r'c:\Python\ra2ce\data\KBN2'
     main(rootpath + r"\network.ini", rootpath + r"\analyses.ini")
     # rootpath = r'c:\Python\ra2ce\data\8_test_shape_with_od_disruption'
     # main(rootpath + r"\network.ini", rootpath + r"\analyses.ini")

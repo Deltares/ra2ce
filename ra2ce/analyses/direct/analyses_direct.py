@@ -71,7 +71,7 @@ class DirectAnalyses:
         df_costs = em.calculate_strategy_costs(df, costs_dict)
         df_costs = df_costs.astype(float).round(2)
         df_costs.to_csv(self.config['output'] / analysis['analysis'] / 'output_analysis.csv', decimal=',', sep=';', index=False, float_format='%.2f')
-        gdf = gdf_in.merge(df, how='left', on='LinkNr')
+        gdf = gdf_in.merge(df, how='inner', on='LinkNr')
 
         # filter columns
         col_list = ['geometry', 'LinkNr']
@@ -325,7 +325,7 @@ class EffectivenessMeasures:
         df_cba['costs_pmt'] = np.pmt(self.interest_rate, df_cba['lifespan'], df_cba['investment'], when='end') * self.btw
         df_cba = df_cba.round(2)
 
-        costs_dict = df_cba[['costs', 'on_column']].to_dict()
+        costs_dict = df_cba[['costs', 'on_column', 'if_present']].to_dict()
         costs_dict['npv_factor'] = calc_npv_factor(self.climate_factor)
 
         return df_cba, costs_dict
@@ -336,6 +336,7 @@ class EffectivenessMeasures:
 
         costs = costs_dict['costs']
         columns = costs_dict['on_column']
+        columns2 = costs_dict['if_present']
 
         def columns_check(df, columns):
             cols_check = []
@@ -351,16 +352,24 @@ class EffectivenessMeasures:
                 return True
 
         columns_check(df, columns)
+        columns_check(df, columns2)
         strategies = {col: columns[col].split(';') for col in columns}
+        present_col = {col: columns2[col].split(';') for col in columns2}
 
         for strategy in strategies:
             df['{}_benefits'.format(strategy)] = df['reduction_costs_{}'.format(strategy)] * costs_dict['npv_factor']
             select_col = strategies[strategy]
+            select_col2 = present_col[strategy]
+
             if len(select_col) == 1:
+                df['{}_benefits'.format(strategy)] = df['{}_benefits'.format(strategy)].where(df[select_col2[0]] > 0, other=np.nan)
                 df['{}_costs'.format(strategy)] = df[select_col[0]] * costs[strategy] * -1 / 1000
+                df['{}_costs'.format(strategy)] = df['{}_costs'.format(strategy)].where(df[select_col2[0]] > 0, other=np.nan)
             if len(select_col) > 1:
+                df['{}_benefits'.format(strategy)] = df['{}_benefits'.format(strategy)].where((df[select_col2[0]] - df[select_col2[1]]) > 0, other=np.nan)
                 df['{}_costs'.format(strategy)] = (df[select_col[0]] - df[select_col[1]]) * costs[strategy] * -1 / 1000
-                df['{}_costs'.format(strategy)] = df['{}_costs'.format(strategy)].where(df['{}_costs'.format(strategy)] > 1, other=np.nan)
+                df['{}_costs'.format(strategy)] = df['{}_costs'.format(strategy)].where((df[select_col2[0]] - df[select_col2[1]]) > 0, other=np.nan)
+
             df['{}_bc_ratio'.format(strategy)] = df['{}_benefits'.format(strategy)] / df['{}_costs'.format(strategy)]
 
         return df
