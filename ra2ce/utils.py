@@ -14,6 +14,7 @@ import codecs
 import logging
 from shutil import copyfile
 import os
+import sys
 
 # Local modules
 from .checks import input_validation, check_files, available_checks
@@ -89,14 +90,15 @@ def configread(config_fn, root, encoding="utf-8", cf=None, defaults=dict(), nohe
 
 def initiate_root_logger(filename):
     # Create a root logger and set the minimum logging level.
+
     logging.getLogger('').setLevel(logging.INFO)
 
     # Create a file handler and set the required logging level.
     fh = logging.FileHandler(filename=filename, mode='w')
     fh.setLevel(logging.INFO)
-
+    
     # Create a console handler and set the required logging level.
-    ch = logging.StreamHandler()
+    ch = logging.StreamHandler(sys.stdout)
     ch.setLevel(logging.INFO)  # Can be also set to WARNING
 
     # Create a formatter and add to the file and console handlers.
@@ -135,7 +137,7 @@ def load_config(root_path, config_path):
     config = parse_config(root_path, path=config_path)
     config['project']['name'] = config_path.parts[-2]
     config['root_path'] = root_path
-
+    
     # Validate the configuration input.
     config = input_validation(config)
 
@@ -143,13 +145,29 @@ def load_config(root_path, config_path):
         # Create a dictionary with direct and indirect analyses separately.
         config = configure_analyses(config)
 
+    base_path = str(config_path)
+    base_path = base_path[0:base_path.rindex('\\')]
+    
     # Set the output paths in the configuration Dict for ease of saving to those folders.
-    config['input'] = config['root_path'] / 'data' / config['project']['name'] / 'input'
+    if config['project']['input_folder'] is not None:
+        config['input'] = Path(base_path + config['project']['input_folder'])
+    else:
+        config['input'] = config['root_path'] / 'data' / config['project']['name'] / 'input'
+    
+    if config['project']['output_folder'] is not None:
+        config['output'] = Path(base_path + config['project']['output_folder'])
+    else:
+        config['output'] = config['root_path'] / 'data' / config['project']['name'] / 'output'
+    
     if config['project']['static_folder'] is not None:
         config['static'] = Path(config['project']['static_folder'])
     else:
         config['static'] = config['root_path'] / 'data' / config['project']['name'] / 'static'
-    config['output'] = config['root_path'] / 'data' / config['project']['name'] / 'output'
+        
+    print('base path = '+ base_path)
+    print('input path = '+ str(config['input']))
+    print('output path = '+ str(config['output']))
+    print('static path = '+ str(config['static']))
 
     # check if files exist:
     config = check_files(config)
