@@ -344,9 +344,16 @@ class IndirectAnalyses:
         #calculate number of disconnected origin, destination, and origin-destination pair
         gdf['OD'] = gdf['origin'] + gdf['destination']
         gdf_ori['OD'] = gdf_ori['origin'] + gdf_ori['destination']
-        init_od_pairs = len(np.unique(gdf_ori['OD']))
-        init_origins = len(np.unique(gdf_ori['origin']))
-        init_destinations = len(np.unique(gdf_ori['destination']))
+        #origin
+        gdf_ori['origin_count'] = gdf_ori['origin'].apply(lambda x: len(x.split(',')))
+        init_origins = gdf_ori.groupby('origin').mean()['origin_count'].sum()
+        del gdf_ori['origin_count']
+        #destination
+        gdf_ori['destination_count'] = gdf_ori['destination'].apply(lambda x: len(x.split(',')))
+        init_destinations = gdf_ori.groupby('destination').mean()['destination_count'].sum()
+        del gdf_ori['destination_count']
+        #od pairs
+        init_od_pairs = init_origins*init_destinations
         abs_od_disconnected = []
         share_od_disconnected = []
         abs_origin_disconnected = []
@@ -355,21 +362,25 @@ class IndirectAnalyses:
         share_destination_disconnected = []
         for hz in hazard_list:
             gdf_ = gdf.loc[gdf['hazard']==hz]
-            
-            remaining_od_pairs = len(np.unique(gdf_['OD']))
-            diff_od_pairs = init_od_pairs - remaining_od_pairs
-            abs_od_disconnected.append(diff_od_pairs)
-            share_od_disconnected.append(100*diff_od_pairs/init_od_pairs)
-            
-            remaining_origins = len(np.unique(gdf_['origin']))
+                        
+            gdf_['origin_count'] = gdf_['origin'].apply(lambda x: len(x.split(',')))
+            remaining_origins = gdf_.groupby('origin').mean()['origin_count'].sum()
+            del gdf_['origin_count']
             diff_origins = init_origins - remaining_origins
             abs_origin_disconnected.append(diff_origins)
             share_origin_disconnected.append(100*diff_origins/init_origins)
             
-            remaining_destinations = len(np.unique(gdf_['destination']))
+            gdf_['destination_count'] = gdf_['destination'].apply(lambda x: len(x.split(',')))
+            remaining_destinations = gdf_.groupby('destination').mean()['destination_count'].sum()
+            del gdf_['destination_count']
             diff_destinations = init_destinations - remaining_destinations
             abs_destination_disconnected.append(diff_destinations)
             share_destination_disconnected.append(100*diff_destinations/init_destinations)
+            
+            remaining_od_pairs = remaining_origins * remaining_destinations
+            diff_od_pairs = init_od_pairs - remaining_od_pairs
+            abs_od_disconnected.append(diff_od_pairs)
+            share_od_disconnected.append(100*diff_od_pairs/init_od_pairs)
             
         #calculate change in travel time/distance
         max_increase_abs = []
