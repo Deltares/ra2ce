@@ -17,6 +17,7 @@ from tqdm import tqdm
 import time
 import copy
 from ...graph.networks_utils import graph_to_shp
+from pathlib import Path
 
 
 class IndirectAnalyses:
@@ -363,12 +364,12 @@ class IndirectAnalyses:
             remaining_origins = len(np.unique(gdf_['origin']))
             diff_origins = init_origins - remaining_origins
             abs_origin_disconnected.append(diff_origins)
-            share_origin_disconnected.append(100*diff_origins/remaining_origins)
+            share_origin_disconnected.append(100*diff_origins/init_origins)
             
             remaining_destinations = len(np.unique(gdf_['destination']))
             diff_destinations = init_destinations - remaining_destinations
             abs_destination_disconnected.append(diff_destinations)
-            share_destination_disconnected.append(100*diff_destinations/remaining_destinations)
+            share_destination_disconnected.append(100*diff_destinations/init_destinations)
             
         #calculate change in travel time/distance
         max_increase_abs = []
@@ -418,6 +419,56 @@ class IndirectAnalyses:
         
         return diff_df, gdf_ori
     
+    def multi_link_origin_destination_regional_impact(self, gdf_ori):
+    
+        gdf_ori_ = gdf_ori.copy()
+        
+        #read origin points
+        origin_fn = Path(self.config['static']) / 'output_graph' / 'origin_destination_table.shp'
+        origin = gpd.read_file(origin_fn)
+        index = [type(x)==str for x in origin['o_id']]
+        origin = origin[index]
+        origin.reset_index(inplace=True, drop=True)
+        
+        #record where each origin point resides
+        origin_mapping = {}
+        for o in np.unique(origin['o_id']):
+            r = origin.loc[origin['o_id']==o, 'region'].values[0]
+            origin_mapping.update({o : r})
+        
+        #record impact to each region
+        origin_impact_master = pd.DataFrame()
+        for r in np.unique(origin['region']):
+            origin_points = list(origin.loc[origin['region']==r,'o_id'].values)
+            for o in origin_points:
+                origin_impact_tosave = pd.DataFrame()
+                origin_impact_tosave.loc[0, 'o_id'] = o
+                origin_impact_tosave.loc[0, 'region'] = r
+                
+                origin_impact = gdf_ori_.loc[gdf_ori_['origin'].str.contains(o)]
+                
+                #initial condition
+                origin_impact_tosave.loc[0, 'init_length'] = np.mean(origin_impact['length'])
+                origin_impact_tosave.loc[0, 'init_destination'] = len(np.unique(origin_impact['destination']))
+                
+                #impact of each hazard
+                for col in origin_impact.columns:
+                    if '_pc' in col:
+                        delta = np.nanmean(origin_impact[col])
+                        if not delta >= 0:
+                            delta = 0
+                        origin_impact_tosave.loc[0, col[12:]+'_increase'] = delta
+                        
+                        disconnected = origin_impact[col].isna().sum()
+                        origin_impact_tosave.loc[0, col[12:]+'_disconnect'] = 100 * disconnected / origin_impact_tosave['init_destination'].values[0]
+                        
+                origin_impact_master = origin_impact_master.append(origin_impact_tosave)
+        
+        region_impact_master = origin_impact_master[origin_impact_master.columns[1:]]
+        region_impact_master = region_impact_master.groupby(by='region').mean()
+        
+        return origin_impact_master, region_impact_master
+        
     def optimal_route_origin_closest_destination(self, graph, analysis):
         crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGABLE
 
@@ -565,6 +616,17 @@ class IndirectAnalyses:
                 g_not_disrupted = nx.read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
                 gdf_not_disrupted = self.optimal_route_origin_destination(g_not_disrupted, analysis)
                 disruption_impact_df, gdf_ori = self.multi_link_origin_destination_impact(gdf, gdf_not_disrupted)
+                
+                try:
+                    assert self.config['origins_destinations']['region']
+                    regional_impact_df, regional_impact_summary_df = self.multi_link_origin_destination_regional_impact(gdf_ori)
+                    impact_csv_path = self.config['output'] / analysis['analysis'] / (analysis['name'].replace(' ', '_') + '_regional_impact.csv')
+                    regional_impact_df.to_csv(impact_csv_path, index=False)
+                    impact_csv_path = self.config['output'] / analysis['analysis'] / (analysis['name'].replace(' ', '_') + '_regional_impact_summary.csv')
+                    regional_impact_summary_df.to_csv(impact_csv_path)
+                except:
+                    pass
+                
                 impact_csv_path = self.config['output'] / analysis['analysis'] / (analysis['name'].replace(' ', '_') + '_impact.csv')
                 del gdf_ori['geometry']
                 gdf_ori.to_csv(impact_csv_path, index=False)
