@@ -338,7 +338,30 @@ class IndirectAnalyses:
         return all_results
 
     def multi_link_origin_destination_impact(self, gdf, gdf_ori):
-        """Calculates some default indicators that quantify the impacts of disruptions to origin-destination flows"""
+        """Calculates some default indicators that quantify the impacts of disruptions to origin-destination flows
+        The function outputs the following file:
+        
+        1. gdf_ori (multi_link_origin_destination_impact.csv), containing the following information:
+            - origin and destination node
+            - length: initial shortest path length before disruptions
+            - length_hazardName: shortest path length after disruption
+            - diff_length_hazardName: increase in shortest path length after disruption (length_hazardName - length)
+            - diff_length_hazardName_pc: same as above, but as a fraction of initial length
+            
+        2. diff_df (multi_link_origin_destination_impact_summary.csv), containing the following information:
+            - hazard: hazard name
+            - od_disconnected_abs: number of OD disconnected
+            - od_disconnected_pc (%): percentage of OD disconnected
+            - origin_disconnected_abs: number of origin points disconnected
+            - origin_disconnected_pc (%): percentage of origin points disconnected
+            - destination_disconnected_abs: number of destination points disconnected
+            - destination_disconnected_pc (%): percentage of destination points disconnected
+            - max_increase_abs: maximum increase in travel length across all OD pairs
+            - mean_increase_abs: mean increase in travel length across all OD pairs
+            - median_increase_abs: median increase in travel length across all OD pairs
+            - max_increase_pc, mean_increase_pc, median_increase_pc (%): same as above three, but as a percentage relative to no-hazard
+        """
+        
         hazard_list = np.unique(gdf['hazard'])
         
         #calculate number of disconnected origin, destination, and origin-destination pair
@@ -431,7 +454,25 @@ class IndirectAnalyses:
         return diff_df, gdf_ori
     
     def multi_link_origin_destination_regional_impact(self, gdf_ori):
-    
+        """
+        Aggregation of the impacts of disruptions at region level
+        Users need to specify 'region' and 'region_var' attributes in the network.ini file
+        See the Pontianak case study for an example
+        
+        The function outputs the following files:
+        1. multi_link_origin_destination_regional_impact.csv
+            Impacts of disruption aggregated for each origin node. Region information (to which region an origin node belongs) is retained
+            
+        2. multi_link_origin_destination_regional_impact_summary.csv
+            Impacts of disruption aggregated for each region.
+            
+        In both files, the following information is stored:
+            - init_length: initial average length to all destination nodes (for each origin node and for each region)
+            - init_destination: initial number of destination nodes
+            - hazardName_pc_increase: average increase in travel time to all destination nodes (percentage relative to initial travel time, for each origin node and for each region)
+            - hazardName_pc_disconnect: average number of OD pairs disconnected (relative to initial number of OD pairs, for each origin node and for each region)
+        """
+        
         gdf_ori_ = gdf_ori.copy()
         
         #read origin points
@@ -627,7 +668,6 @@ class IndirectAnalyses:
                 g_not_disrupted = nx.read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
                 gdf_not_disrupted = self.optimal_route_origin_destination(g_not_disrupted, analysis)
                 disruption_impact_df, gdf_ori = self.multi_link_origin_destination_impact(gdf, gdf_not_disrupted)
-                
                 try:
                     assert self.config['origins_destinations']['region']
                     regional_impact_df, regional_impact_summary_df = self.multi_link_origin_destination_regional_impact(gdf_ori)
@@ -637,7 +677,6 @@ class IndirectAnalyses:
                     regional_impact_summary_df.to_csv(impact_csv_path)
                 except:
                     pass
-                
                 impact_csv_path = self.config['output'] / analysis['analysis'] / (analysis['name'].replace(' ', '_') + '_impact.csv')
                 del gdf_ori['geometry']
                 gdf_ori.to_csv(impact_csv_path, index=False)
