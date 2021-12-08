@@ -43,6 +43,12 @@ class Network:
         self.origins_names = config['origins_destinations']['origins_names']
         self.destinations_names = config['origins_destinations']['destinations_names']
         self.id_name_origin_destination = config['origins_destinations']['id_name_origin_destination']
+        try:
+            self.region = config['static'] / 'network' / config['origins_destinations']['region']
+            self.region_var = config['origins_destinations']['region_var']
+        except:
+            self.region = None
+            self.region_var = None
 
         # Hazard
         self.hazard_map = config['hazard']['hazard_map']
@@ -230,7 +236,7 @@ class Network:
         ods = read_OD_files(self.origins, self.origins_names,
                             self.destinations, self.destinations_names,
                             self.id_name_origin_destination, self.config['origins_destinations']['origin_count'],
-                            'epsg:4326')
+                            'epsg:4326', self.region, self.region_var)
 
         ods = create_OD_pairs(ods, graph)
         ods.crs = 'epsg:4326'  # TODO: decide if change CRS to flexible instead of just epsg:4326

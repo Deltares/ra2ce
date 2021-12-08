@@ -27,8 +27,14 @@ import os
 #from shapely.geometry.point import Point
 
 
-def read_OD_files(origin_paths, origin_names, destination_paths, destination_names, od_id, origin_count, crs_):
-    origin = gpd.GeoDataFrame(columns=[od_id, 'o_id', 'geometry'], crs=crs_)
+def read_OD_files(origin_paths, origin_names, destination_paths, destination_names, od_id, origin_count, crs_, region_paths, region_var):
+
+    if region_paths:
+        origin = gpd.GeoDataFrame(columns=[od_id, 'o_id', 'geometry', 'region'], crs=crs_)
+        region = gpd.read_file(region_paths)
+        region = region[[region_var, 'geometry']]
+    else:
+        origin = gpd.GeoDataFrame(columns=[od_id, 'o_id', 'geometry'], crs=crs_)
     destination = gpd.GeoDataFrame(columns=[od_id, 'd_id', 'geometry'], crs=crs_)
 
     if isinstance(origin_paths, str):
@@ -43,10 +49,17 @@ def read_OD_files(origin_paths, origin_names, destination_paths, destination_nam
     for op, on in zip(origin_paths, origin_names):
         origin_new = gpd.read_file(op, crs=crs_)
         try:
-            assert origin_new[od_id]
+            origin_new[od_id] * 2 #just for checking
         except:
             origin_new[od_id] = origin_new.index
-        origin_new = origin_new[[od_id, origin_count, 'geometry']]
+            
+        if region_paths:
+            origin_new = gpd.sjoin(left_df=origin_new, right_df=region, how='left')
+            origin_new['region'] = origin_new[region_var]
+            origin_new = origin_new[[od_id, origin_count, 'geometry', 'region']]
+            origin_new['region'].fillna('Not assigned', inplace=True)
+        else:
+            origin_new = origin_new[[od_id, origin_count, 'geometry']]
         origin_new['o_id'] = on + "_" + origin_new[od_id].astype(str)
         origin = origin.append(origin_new, ignore_index=True, sort=False)
 
@@ -390,7 +403,7 @@ def rescale_and_crop(path_name, gdf, outputFolderPath, res=500):
                     src_crs=src.crs,
                     dst_transform=transform,
                     dst_crs=dst_crs,
-                    resampling=Resampling.nearest)
+                    resampling=Resampling.nearest) #Resampling.sum or Resampling.nearest
     
     raster = rasterio.open(outputFolderPath / "origins_raster_reprojected.tif")
     
@@ -423,7 +436,7 @@ def generate_points_from_raster(fn, out_fn):
     # Put raster coordinates into geodataframe
     gdf = gpd.GeoDataFrame()
     gdf['geometry'] = points        
-    gdf['id'] = [x for x in range(len(gdf))]
+    gdf['OBJECTID'] = [x for x in range(len(gdf))]
     
     # Get raster values
     temp = [gdf['geometry'].x, gdf['geometry'].y]
