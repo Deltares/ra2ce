@@ -667,9 +667,9 @@ class Losses:
         self.config = config
         self.analysis = analysis
         self.duration = analysis['duration_event']
-        self.duration_disr = analysis['duration_disruption']
-        self.detour_traffic = analysis['fraction_detour']
-        self.traffic_throughput = analysis['fraction_drivethrough']
+        self.duration_disr = analysis['duration_disruption'] #when disruption takes longer than event
+        self.fraction_detour = analysis['fraction_detour']
+        self.fraction_drivethrough = analysis['fraction_drivethrough']
         self.rest_capacity = analysis['rest_capacity']
         self.maximum = analysis['maximum_jam']
         self.partofday = analysis['partofday']
@@ -692,9 +692,7 @@ class Losses:
         return df
 
     def traffic_shockwave(self, vlh, capacity, intensity):
-        vlh['vlh_traffic'] = (self.duration ** 2) * (self.rest_capacity - 1) * \
-                             (self.rest_capacity * capacity - intensity / self.traffic_throughput) \
-                             / (2 * (1 - ((intensity / self.traffic_throughput) / capacity)))
+        vlh['vlh_traffic'] = (self.duration ** 2) * (self.rest_capacity - 1) * (self.rest_capacity * capacity - (intensity * self.fraction_drivethrough)) / (2 * (1 - ((intensity * self.fraction_drivethrough) / capacity)))
         return vlh
 
     def calc_vlh(self, traffic_data, vehicle_loss_hours, detour_data):
@@ -708,21 +706,23 @@ class Losses:
         if self.partofday == 'evening':
             intensity = traffic_data['evening_total']
             detour_time = detour_data['detour_time_evening']
-
+        '''Vehicle loss hours calculating for the part of the traffic that decides to end up in the traffic jam - fileterugslag'''
         vlh = self.traffic_shockwave(vlh, capacity, intensity)
-        vlh['vlh_traffic'] = vlh['vlh_traffic'].apply(lambda x: np.where(x < 0, 0, x))  # all values below 0 -> 0
+        vlh['vlh_traffic'] = vlh['vlh_traffic'].apply(lambda x: np.where(x < 0, 0, x))  # all values below 0 -> 0.
         vlh['vlh_traffic'] = vlh['vlh_traffic'].apply(lambda x: np.where(x > self.maximum, self.maximum, x))
         # all values above maximum, limit to maximum
-        vlh['vlh_detour'] = (intensity * ((1 - self.traffic_throughput) * self.duration) * detour_time) / 60
+        '''Vehicle loss hours calculating for the part of the traffic that decides to take a detour'''
+        vlh['vlh_detour'] = (intensity * ((1 - self.fraction_drivethrough) * self.duration) * detour_time) / 60
         vlh['vlh_detour'] = vlh['vlh_detour'].apply(lambda x: np.where(x < 0, 0, x))  # all values below 0 -> 0
         
         if diff_event_disr > 0:  # when the event is done, but the disruption continues after the event. Calculate extra detour times
-            temp = diff_event_disr * (detour_time * self.detour_traffic * detour_time) / 60
+            temp = diff_event_disr * (detour_time * self.fraction_detour * detour_time) / 60
             temp = temp.apply(lambda x: np.where(x < 0, 0, x))  # all values below 0 -> 0
             vlh['vlh_detour'] = vlh['vlh_detour'] + temp
 
         vlh['vlh_total'] = vlh['vlh_traffic'] + vlh['vlh_detour']
 
+        '''calculate the average value of the vehicles on each road segment'''
         if self.partofday == 'daily':
             vlh['euro_per_hour'] =(traffic_data['day_freight']/traffic_data['day_total']*vehicle_loss_hours['freight']['vehicle_loss_hour'])+\
                                 (traffic_data['day_commute']/traffic_data['day_total']*vehicle_loss_hours['commute']['vehicle_loss_hour'])+\
@@ -736,6 +736,8 @@ class Losses:
                                 (traffic_data['evening_business']/traffic_data['evening_total']*vehicle_loss_hours['business']['vehicle_loss_hour'])+\
                                 (traffic_data['evening_other']/traffic_data['evening_total']*vehicle_loss_hours['other']['vehicle_loss_hour'])
             # to calculate costs per unit traffi per hour. This is weighted based on the traffic mix and value of each traffic type
+
+        '''multiple vehicle loss hours with the value of the time (in euro's per hour) -> losses (euro's)'''
         vlh['euro_vlh'] = vlh['euro_per_hour'] * vlh['vlh_total']
         return vlh
 
@@ -753,7 +755,7 @@ class Losses:
                  'AS_OTHR': 'evening_other', 'ET_FRGT': 'day_freight', 'ET_COMM': 'day_commute', 'ET_BUSS': 'day_business',
                  'ET_OTHR': 'day_other', 'ET_VTG': 'day_total', 'afstand': 'distance', 'H_Cap': 'capacity', 'H_Stroken': 'lanes'}
         traffic_data.rename(columns=dict1, inplace=True)
-
+        # TODO: if made flexible: here single link redundancy instead of detour_time
         detour_data = self.load_df(self.config['input'] / 'losses', 'detour_data.csv')
         dict2 = {'VA_AV_HWN': 'detour_time_evening', 'VA_RD_HWN': 'detour_time_remaining', 'VA_OS_HWN': 'detour_time_morning',
                  'VA_Etm_HWN': 'detour_time_day'}
