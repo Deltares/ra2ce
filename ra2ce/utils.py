@@ -145,17 +145,16 @@ def load_config(root_path, config_path):
         # Create a dictionary with direct and indirect analyses separately.
         config = configure_analyses(config)
 
-    base_path = str(config_path)
-    base_path = base_path[0:base_path.rindex('\\')]
-    
+    base_path = config_path.parent
+
     # Set the output paths in the configuration Dict for ease of saving to those folders.
     if config['project']['input_folder'] is not None:
-        config['input'] = Path(base_path + config['project']['input_folder'])
+        config['input'] = base_path / config['project']['input_folder']
     else:
         config['input'] = config['root_path'] / 'data' / config['project']['name'] / 'input'
     
     if config['project']['output_folder'] is not None:
-        config['output'] = Path(base_path + config['project']['output_folder'])
+        config['output'] = base_path / config['project']['output_folder']
     else:
         config['output'] = config['root_path'] / 'data' / config['project']['name'] / 'output'
     
@@ -164,7 +163,7 @@ def load_config(root_path, config_path):
     else:
         config['static'] = config['root_path'] / 'data' / config['project']['name'] / 'static'
         
-    print('base path = '+ base_path)
+    print('base path = '+ str(base_path))
     print('input path = '+ str(config['input']))
     print('output path = '+ str(config['output']))
     print('static path = '+ str(config['static']))
