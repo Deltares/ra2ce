@@ -1,0 +1,125 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: ra2ce-ptk-
+  annotations:
+    title: RA2CE PTK
+    description: PTK - RA2CE - PTK
+spec:
+  entrypoint: complete
+  serviceAccountName: 
+  arguments:
+    parameters:
+      - name: s3bucket
+        value: ra2ce
+  imagePullSecrets:
+    - name: regcred
+  
+  templates:
+    - name: complete
+      steps:
+      - - name: ptk
+          template: ptk
+          arguments:
+            artifacts:
+            - name: ptk_input
+              s3:
+                key: "{{workflow.parameters.s3path}}"
+              archive:
+                tar: {}
+            parameters:
+            - name: ptk_arguments
+              value: ""
+      - - name: read_models
+          template: read_models
+      - - name: ra2ce
+          template: ra2ce
+          arguments:
+            parameters:
+            - name: run
+              value: "{{item}}"
+          withParam: "{{steps.read_models.outputs.result}}"
+      - - name: ra2ce
+          template: ra2ce
+      - - name: ptk
+          template: ptk
+          arguments:
+            artifacts:
+            - name: ptk_arguments
+              value: "-performed"
+
+    - name: ptk
+      nodeSelector:
+        kubernetes.io/os: windows
+      tolerations:
+        - key: os
+          operator: Equal
+          value: windows
+          effect: NoSchedule
+      container:
+        image: deltares/ptk
+        workingDir: C:/data 
+        command:
+          - 'powershell'
+        args:
+          - Deltares.Probabilistic.Console.exe {{inputs.parameters.ptk_arguments}} run_ra2ce.tkx
+      inputs:
+        parameters:
+        - name: ptk_arguments
+        artifacts:
+          - name: ptk_input
+            path: C:/data
+            archive:
+              tar: {}
+      outputs:
+        artifacts:
+        - name: ptk_output
+          path: /data
+          archive:
+            none: {}
+
+    - name: ra2ce
+      inputs:
+        parameters:
+          - name: run
+        artifacts:
+        - name: model-input
+          s3:
+            bucket: 
+            key: "{{inputs.parameters.run}}"
+          archive:
+            tar: {}
+          path: /data
+      outputs:
+        artifacts:
+        - name: model-output
+          s3:
+            bucket:
+            key: "{{inputs.parameters.run}}/output"
+      container:
+        image: deltares/ra2ce
+        command:
+          - python
+          - ra2ce
+
+      # Read all ra2ce input folders
+    - name: model-mapping
+      script:
+        image: python:alpine3.9
+        workingDir: /data
+        command: [python]
+        # TODO: replace with aws s3 ls without input artifacts?
+        source: |
+          import json
+          import glob
+          import sys
+          d = glob.glob('/opt/data[0-9]*')
+          json.dump(d, sys.stdout)
+      inputs:
+        artifacts:
+        - name: ptk_output
+          path: /data
+          archive:
+            none: {}
+
+        
