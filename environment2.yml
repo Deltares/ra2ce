@@ -1,0 +1,32 @@
+name: ra2ce2
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - osmnx
+  - scipy
+  - tqdm
+  - click
+  - geopy
+  - networkx
+  - numpy
+  - gdal
+  - bokeh
+  - cartopy
+  - fiona
+  - geojson
+  - geopandas
+  - geos
+  - matplotlib
+  - pandas
+  - python-igraph
+  - rasterio
+  - rioxarray
+  - rtree
+  - scikit-learn
+  - shapely
+  - setuptools
+  - shapely
+  - xarray
+  - xlrd
+  - pyarrow
