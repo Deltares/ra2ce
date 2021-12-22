@@ -403,7 +403,7 @@ def rescale_and_crop(path_name, gdf, outputFolderPath, res=500):
                     src_crs=src.crs,
                     dst_transform=transform,
                     dst_crs=dst_crs,
-                    resampling=Resampling.nearest) #Resampling.sum or Resampling.nearest
+                    resampling=Resampling.sum) #Resampling.sum or Resampling.nearest
     
     raster = rasterio.open(outputFolderPath / "origins_raster_reprojected.tif")
     
