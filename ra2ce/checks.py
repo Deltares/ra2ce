@@ -64,7 +64,8 @@ def input_validation(config):
                     'analysis': list_analyses,
                     'hazard_map': ['file', None],
                     'aggregate_wl': ['max', 'min', 'mean'],
-                    'weighing': ['distance', 'time']}
+                    'weighing': ['distance', 'time'],
+                    'save_traffic': [True, False]}
     input_dirs = {'polygon': 'network', 'hazard_map': 'hazard', 'origins': 'network',
                   'destinations': 'network'}
 
