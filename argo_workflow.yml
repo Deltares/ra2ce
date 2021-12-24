@@ -15,11 +15,7 @@ spec:
     - name: complete
       steps:
       - - name: ptk-preprocessing
-          template: ptk
-          arguments:
-            parameters:
-            - name: ptk_arguments
-              value: ""
+          template: ptk-preprocessing
       - - name: read-models
           template: read-models
       - - name: ra2ce
@@ -30,25 +26,14 @@ spec:
               value: "{{item}}"
           withParam: "{{steps.read-models.outputs.result}}"
       - - name: ptk-analyse
-          template: ptk
-          arguments:
-            parameters:
-            - name: ptk_arguments
-              value: "-performed"
+          template: ptk-analyse
 
     - name: only-ptk
       steps:
       - - name: ptk
-          template: ptk
-          arguments:
-            parameters:
-            - name: ptk_arguments
-              value: ""
+          template: ptk-preprocessing
 
-    - name: ptk
-      inputs:
-        parameters:
-          - name: ptk_arguments
+    - name: ptk-preprocessing
       nodeSelector:
         kubernetes.io/os: windows
       tolerations:
@@ -63,7 +48,24 @@ spec:
         # args:
         #   - Start-Sleep -Seconds 1000
         args:
-          - aws s3 sync s3://bucket-deltares-et/RA2CE-PTK c:/data/RA2CE-PTK; & cd C:\data\RA2CE-PTK\PTK_Cloud; & cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' {{inputs.parameters.ptk_arguments}} run_ra2ce.tkx; & aws s3 sync c:/data/RA2CE-PTK s3://bucket-deltares-et/RA2CE-PTK;
+          - aws s3 sync s3://bucket-deltares-et/RA2CE-PTK c:/data/RA2CE-PTK; & cd C:\data\RA2CE-PTK\PTK_Cloud; & cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' run_ra2ce.tkx; & aws s3 sync c:/data/RA2CE-PTK s3://bucket-deltares-et/RA2CE-PTK;
+
+    - name: ptk-analyse
+      nodeSelector:
+        kubernetes.io/os: windows
+      tolerations:
+        - key: os
+          operator: Equal
+          value: windows
+          effect: NoSchedule
+      container:
+        image: deltares/ptk:2-3-5
+        command:
+          - 'powershell'
+        # args:
+        #   - Start-Sleep -Seconds 1000
+        args:
+          - aws s3 sync s3://bucket-deltares-et/RA2CE-PTK c:/data/RA2CE-PTK; & cd C:\data\RA2CE-PTK\PTK_Cloud; & cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed run_ra2ce.tkx; & aws s3 sync c:/data/RA2CE-PTK s3://bucket-deltares-et/RA2CE-PTK;
 
     - name: ra2ce
       nodeSelector:
@@ -99,7 +101,12 @@ spec:
             none: {}
           path: /data/output
       container:
+        imagePullPolicy: Always
         image: deltares/ra2ce
+        # command:
+        #   - sleep
+        # args:
+        #   - "1000"
         command:
           - python
         args:
@@ -112,11 +119,28 @@ spec:
       nodeSelector:
         kubernetes.io/os: linux
       script:
-        image: "amazon/aws-cli:latest"
+        image: "deltares/boto3:0.0.1"
         command: [python]
         source: |
-          import json
-          data = ['data0']
-          print(json.dumps(data))
-        # aws s3 ls s3://bucket-deltares-et/RA2CE-PTK/Ra2ce/KBN2_losses/ | awk '{print $2}' | grep data[0-9]+* | sed 's:/*$::'
-        
+          from itertools import chain
+          from json import dumps
+          from functools import reduce
+          import boto3
+          bucket = 'bucket-deltares-et'
+          prefix = 'RA2CE-PTK/Ra2ce/KBN2_losses/'
+          exclude = ["data", "static"]
+          client = boto3.client('s3')
+          paginator = client.get_paginator("list_objects")
+          it = paginator.paginate(Bucket=bucket, Prefix=prefix, Delimiter="/")
+          def get_prefix(res, p):
+              prefix = p["Prefix"].split("/")[-2]
+              if prefix not in exclude:
+                  res += [prefix]
+              return res
+          result = list(reduce(
+              get_prefix,
+              chain.from_iterable(map(lambda i: i["CommonPrefixes"], it)),
+              []
+          ))
+          print(dumps(result))
+
