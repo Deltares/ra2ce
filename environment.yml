@@ -1,4 +1,4 @@
-name: ra2ce2
+name: ra2ce
 channels:
   - conda-forge
   - defaults
@@ -20,7 +20,7 @@ dependencies:
   - matplotlib=3.3.3
   - pandas=1.1.4
   - python-igraph=0.8.3
-  - rasterio=1.2.3
+  - rasterio=1.1.8
   - rioxarray=0.1.1
   - rtree=0.9.4
   - scikit-learn=0.24.0
