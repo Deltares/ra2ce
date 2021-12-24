@@ -304,6 +304,91 @@ class IndirectAnalyses:
         # if shortest_route:
         #     pref_routes = pref_routes.loc[pref_routes.sort_values(analysis['weighing']).groupby('o_node').head(3).index]
         return pref_routes
+        
+    def optimal_route_od_link(self, gdf, od_table, equity):
+        origin_nodes = np.unique(gdf['origin'])
+        destination_nodes = np.unique(gdf['destination'])
+        
+        unique_destination_nodes = np.unique(list(od_table['d_id'].fillna('0')))
+        count_destination_nodes = len([x for x in unique_destination_nodes if x != '0'])
+        
+        route_traffic = {}
+        route_traffic_equal = {}
+        if len(equity)>0:
+            route_traffic_prioritarian = {}
+            prioritarian_mapping = dict(zip(equity['region'], equity['weight']))
+            prioritarian_mapping.update({'Not assigned' : 1})
+            od_table['values_prioritarian'] = od_table['region'].map(prioritarian_mapping) * od_table['values']
+        for o_node in origin_nodes:
+            for d_node in destination_nodes:
+                opt_path = gdf.loc[(gdf['origin']==o_node) & (gdf['destination']==d_node), 'opt_path'].values[0]
+                for i, node in enumerate(range(len(opt_path))):
+                    if i < len(opt_path)-1:
+                        u, v = opt_path[i], opt_path[i+1]
+                        t = 1
+                        t_eq = 1
+                        if len(equity)>0:
+                            t_prioritarian = 1
+                        if ',' in o_node:
+                            o_nodes = o_node.split(',')
+                            o_num = len(o_nodes)
+                            j_ = 0
+                            for j, o_n in enumerate(o_nodes):
+                                if self.config['origins_destinations']['destinations_names'] in o_n:
+                                    o_num -= 1
+                                    j_ -= 1
+                                    continue
+                                else:
+                                    traffic = od_table.loc[od_table['o_id']==o_n, 'values'].values[0] / count_destination_nodes
+                                if j_ == 0:
+                                    t *= traffic
+                                else:
+                                    t += traffic
+                                if len(equity)>0:    
+                                    traffic_prioritarian = od_table.loc[od_table['o_id']==o_n, 'values_prioritarian'].values[0] / count_destination_nodes
+                                    if j_ == 0:
+                                        t_prioritarian *= traffic_prioritarian
+                                    else:
+                                        t_prioritarian += traffic_prioritarian
+                                j_ += 1
+                            t_eq *= o_num
+                        else:
+                            traffic = od_table.loc[od_table['o_id']==o_node, 'values'].values[0] / count_destination_nodes
+                            t *= traffic
+                            if len(equity)>0:
+                                traffic_prioritarian = od_table.loc[od_table['o_id']==o_node, 'values_prioritarian'].values[0] / count_destination_nodes
+                                t_prioritarian *= traffic_prioritarian
+                        if ',' in d_node:
+                            d_nodes = d_node.split(',')
+                            d_num = len(d_nodes)
+                            t_eq *= d_num
+                            t *= d_num
+                            if len(equity)>0:
+                                t_prioritarian *= d_num
+                        try:
+                            route_traffic[str(u) + '_' + str(v)] += t
+                            route_traffic_equal[str(u) + '_' + str(v)] += t_eq
+                            if len(equity)>0:
+                                route_traffic_prioritarian[str(u) + '_' + str(v)] += t_prioritarian
+                        except:
+                            route_traffic.update({ str(u) + '_' + str(v) : t })
+                            route_traffic_equal.update({ str(u) + '_' + str(v) : t_eq })
+                            if len(equity)>0:
+                                route_traffic_prioritarian.update({ str(u) + '_' + str(v) : t_prioritarian })
+                            
+        u_list = [x.split('_')[0] for x in route_traffic.keys()]
+        v_list = [x.split('_')[1] for x in route_traffic.keys()]
+        t_list = route_traffic.values()
+        teq_list = route_traffic_equal.values()
+        if len(equity)>0:
+            tprioritarian_list = route_traffic_prioritarian.values()
+            data_tuples = list(zip(u_list,v_list,t_list,teq_list,tprioritarian_list))
+            route_traffic_df = pd.DataFrame(data_tuples, columns = ['u', 'v', 'traffic', 'traffic_egalitarian', 'traffic_prioritarian'])
+        else:
+            data_tuples = list(zip(u_list,v_list,t_list,teq_list))
+            route_traffic_df = pd.DataFrame(data_tuples, columns = ['u', 'v', 'traffic', 'traffic_egalitarian'])
+        
+        return route_traffic_df
 
     def multi_link_origin_destination(self, graph, analysis):
         """Calculates the connectivity between origins and destinations"""
@@ -365,6 +450,7 @@ class IndirectAnalyses:
         hazard_list = np.unique(gdf['hazard'])
         
         #calculate number of disconnected origin, destination, and origin-destination pair
+        #TODO: there seems to be an issue in calculating origin_count and destination_count where origin and destination nodes are the same, e.g., A_25,B_1
         gdf['OD'] = gdf['origin'] + gdf['destination']
         gdf_ori['OD'] = gdf_ori['origin'] + gdf_ori['destination']
         #origin
@@ -420,17 +506,17 @@ class IndirectAnalyses:
             gdf_ori = gdf_ori.merge(gdf_, how='left', on='OD')
             gdf_ori.drop_duplicates(subset='OD', inplace=True)
             gdf_ori['diff_length_'+hz] = gdf_ori['length_'+hz] - gdf_ori['length']
-            gdf_ori['diff_length_'+hz+'_pc'] = gdf_ori['diff_length_'+hz] / gdf_ori['length']
+            gdf_ori['diff_length_'+hz+'_pc'] = 100 * gdf_ori['diff_length_'+hz] / gdf_ori['length']
             
             max_increase_abs.append(np.nanmax(gdf_ori['diff_length_'+hz]))
             min_increase_abs.append(np.nanmin(gdf_ori['diff_length_'+hz]))
             mean_increase_abs.append(np.nanmean(gdf_ori['diff_length_'+hz]))
             median_increase_abs.append(np.nanmedian(gdf_ori['diff_length_'+hz]))
             
-            max_increase_pc.append(np.nanmax(100*gdf_ori['diff_length_'+hz+'_pc']))
-            min_increase_pc.append(np.nanmin(100*gdf_ori['diff_length_'+hz+'_pc']))
-            mean_increase_pc.append(np.nanmean(100*gdf_ori['diff_length_'+hz+'_pc']))
-            median_increase_pc.append(np.nanmedian(100*gdf_ori['diff_length_'+hz+'_pc']))
+            max_increase_pc.append(np.nanmax(gdf_ori['diff_length_'+hz+'_pc']))
+            min_increase_pc.append(np.nanmin(gdf_ori['diff_length_'+hz+'_pc']))
+            mean_increase_pc.append(np.nanmean(gdf_ori['diff_length_'+hz+'_pc']))
+            median_increase_pc.append(np.nanmedian(gdf_ori['diff_length_'+hz+'_pc']))
             
         diff_df = pd.DataFrame()
         diff_df['hazard'] = hazard_list
@@ -662,6 +748,19 @@ class IndirectAnalyses:
             elif analysis['analysis'] == 'optimal_route_origin_destination':
                 g = nx.read_gpickle(self.config['files']['origins_destinations_graph'])
                 gdf = self.optimal_route_origin_destination(g, analysis)
+                if ('save_traffic' in analysis.keys()) & ('origin_count' in self.config['origins_destinations'].keys()):
+                        if analysis['save_traffic']:
+                            od_table = gpd.read_feather(self.config['static'] / 'output_graph' / 'origin_destination_table.feather')
+                            if 'equity_weight' in analysis.keys():
+                                try:
+                                    equity = pd.read_csv(self.config['static'] / 'network' / analysis['equity_weight'])
+                                except:
+                                    equity = pd.DataFrame()
+                            else:
+                                equity = pd.DataFrame()
+                            route_traffic_df = self.optimal_route_od_link(gdf, od_table, equity)
+                            impact_csv_path = self.config['output'] / analysis['analysis'] / (analysis['name'].replace(' ', '_') + '_link_traffic.csv')
+                            route_traffic_df.to_csv(impact_csv_path, index=False)
             elif analysis['analysis'] == 'multi_link_origin_destination':
                 g = nx.read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
                 gdf = self.multi_link_origin_destination(g, analysis)
