@@ -7,48 +7,48 @@ metadata:
     description: PTK - RA2CE - PTK
 spec:
   entrypoint: complete
-  serviceAccountName: 
-  arguments:
-    parameters:
-      - name: s3bucket
-        value: ra2ce
+  serviceAccountName: test
   imagePullSecrets:
     - name: regcred
-  
+
   templates:
     - name: complete
+      steps:
+      - - name: ptk-preprocessing
+          template: ptk
+          arguments:
+            parameters:
+            - name: ptk_arguments
+              value: ""
+      - - name: read-models
+          template: read-models
+      - - name: ra2ce
+          template: ra2ce
+          arguments:
+            parameters:
+            - name: model
+              value: "{{item}}"
+          withParam: "{{steps.read-models.outputs.result}}"
+      - - name: ptk-analyse
+          template: ptk
+          arguments:
+            parameters:
+            - name: ptk_arguments
+              value: "-performed"
+
+    - name: only-ptk
       steps:
       - - name: ptk
           template: ptk
           arguments:
-            artifacts:
-            - name: ptk_input
-              s3:
-                key: "{{workflow.parameters.s3path}}"
-              archive:
-                tar: {}
             parameters:
             - name: ptk_arguments
               value: ""
-      - - name: read_models
-          template: read_models
-      - - name: ra2ce
-          template: ra2ce
-          arguments:
-            parameters:
-            - name: run
-              value: "{{item}}"
-          withParam: "{{steps.read_models.outputs.result}}"
-      - - name: ra2ce
-          template: ra2ce
-      - - name: ptk
-          template: ptk
-          arguments:
-            artifacts:
-            - name: ptk_arguments
-              value: "-performed"
 
     - name: ptk
+      inputs:
+        parameters:
+          - name: ptk_arguments
       nodeSelector:
         kubernetes.io/os: windows
       tolerations:
@@ -57,69 +57,66 @@ spec:
           value: windows
           effect: NoSchedule
       container:
-        image: deltares/ptk
-        workingDir: C:/data 
+        image: deltares/ptk:2-3-5
         command:
           - 'powershell'
+        # args:
+        #   - Start-Sleep -Seconds 1000
         args:
-          - Deltares.Probabilistic.Console.exe {{inputs.parameters.ptk_arguments}} run_ra2ce.tkx
-      inputs:
-        parameters:
-        - name: ptk_arguments
-        artifacts:
-          - name: ptk_input
-            path: C:/data
-            archive:
-              tar: {}
-      outputs:
-        artifacts:
-        - name: ptk_output
-          path: /data
-          archive:
-            none: {}
+          - aws s3 sync s3://bucket-deltares-et/RA2CE-PTK c:/data/RA2CE-PTK; & cd C:\data\RA2CE-PTK\PTK_Cloud; & cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' {{inputs.parameters.ptk_arguments}} run_ra2ce.tkx; & aws s3 sync c:/data/RA2CE-PTK s3://bucket-deltares-et/RA2CE-PTK;
 
     - name: ra2ce
+      nodeSelector:
+        spot: "true"
       inputs:
         parameters:
-          - name: run
+        - name: model
         artifacts:
         - name: model-input
           s3:
-            bucket: 
-            key: "{{inputs.parameters.run}}"
+            bucket: bucket-deltares-et
+            endpoint: s3.amazonaws.com
+            key: "RA2CE-PTK/Ra2ce/KBN2_losses/{{inputs.parameters.model}}"
           archive:
-            tar: {}
+            none: {}
           path: /data
+        - name: static
+          s3:
+            bucket: bucket-deltares-et
+            endpoint: s3.amazonaws.com
+            key: "RA2CE-PTK/Ra2ce/KBN2_losses/static"
+          archive:
+            none: {}
+          path: /static
       outputs:
         artifacts:
         - name: model-output
           s3:
-            bucket:
-            key: "{{inputs.parameters.run}}/output"
+            bucket: bucket-deltares-et
+            endpoint: s3.amazonaws.com
+            key: "RA2CE-PTK/Ra2ce/KBN2_losses/{{inputs.parameters.model}}/output"
+          archive:
+            none: {}
+          path: /data/output
       container:
         image: deltares/ra2ce
         command:
           - python
-          - ra2ce
+        args:
+          - run_with_args.py
+          - /data/network.ini
+          - /data/analyses.ini
 
       # Read all ra2ce input folders
-    - name: model-mapping
+    - name: read-models
+      nodeSelector:
+        kubernetes.io/os: linux
       script:
-        image: python:alpine3.9
-        workingDir: /data
+        image: "amazon/aws-cli:latest"
         command: [python]
-        # TODO: replace with aws s3 ls without input artifacts?
         source: |
           import json
-          import glob
-          import sys
-          d = glob.glob('/opt/data[0-9]*')
-          json.dump(d, sys.stdout)
-      inputs:
-        artifacts:
-        - name: ptk_output
-          path: /data
-          archive:
-            none: {}
-
+          data = ['data0']
+          print(json.dumps(data))
+        # aws s3 ls s3://bucket-deltares-et/RA2CE-PTK/Ra2ce/KBN2_losses/ | awk '{print $2}' | grep data[0-9]+* | sed 's:/*$::'
         
