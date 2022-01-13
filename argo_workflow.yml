@@ -42,13 +42,13 @@ spec:
           value: windows
           effect: NoSchedule
       container:
-        image: deltares/ptk:2-3-5
+        image: deltares/ptk:2-3-6
         command:
           - 'powershell'
         # args:
         #   - Start-Sleep -Seconds 1000
         args:
-          - aws s3 sync s3://bucket-deltares-et/RA2CE-PTK c:/data/RA2CE-PTK; & cd C:\data\RA2CE-PTK\PTK_Cloud; & cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' run_ra2ce.tkx; & aws s3 sync c:/data/RA2CE-PTK s3://bucket-deltares-et/RA2CE-PTK;
+          - aws s3 sync s3://bucket-deltares-et/RA2CE-PTK c:/data/RA2CE-PTK; & cd C:\data\RA2CE-PTK\PTK_Cloud; & cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' model_unc_ra2ce.tkx; & aws s3 sync c:/data/RA2CE-PTK s3://bucket-deltares-et/RA2CE-PTK;
 
     - name: ptk-analyse
       nodeSelector:
@@ -59,13 +59,13 @@ spec:
           value: windows
           effect: NoSchedule
       container:
-        image: deltares/ptk:2-3-5
+        image: deltares/ptk:2-3-6
         command:
           - 'powershell'
         # args:
         #   - Start-Sleep -Seconds 1000
         args:
-          - aws s3 sync s3://bucket-deltares-et/RA2CE-PTK c:/data/RA2CE-PTK; & cd C:\data\RA2CE-PTK\PTK_Cloud; & cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed run_ra2ce.tkx; & aws s3 sync c:/data/RA2CE-PTK s3://bucket-deltares-et/RA2CE-PTK;
+          - aws s3 sync s3://bucket-deltares-et/RA2CE-PTK c:/data/RA2CE-PTK; & cd C:\data\RA2CE-PTK\PTK_Cloud; & cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed model_unc_ra2ce.tkx; & aws s3 sync c:/data/RA2CE-PTK s3://bucket-deltares-et/RA2CE-PTK;
 
     - name: ra2ce
       nodeSelector:
