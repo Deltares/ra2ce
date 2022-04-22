@@ -815,6 +815,7 @@ class IndirectAnalyses:
                 # TODO MAKE ONE GDF FROM RESULTS?
                 g = nx.read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
                 base_graph, opt_routes, destination = self.optimal_route_origin_closest_destination(g, analysis)
+
                 base_graph, origins, agg_results = self.multi_link_origin_closest_destination(g, base_graph, destination, analysis, opt_routes)
                 if analysis['save_shp']:
                     shp_path = output_path / (analysis['name'].replace(' ', '_') + '_origins.shp')
@@ -1091,7 +1092,7 @@ def calc_pref_routes_closest_dest(graph, base_graph, weighing, crs, od_id, idNam
 
         # Find the number of people per neighborhood
         nr_people_per_route_total = origins.loc[origins[od_id] == int(o[1].split('_')[-1]), nr_people_name].iloc[0]
-        nr_patients_per_route = nr_people_per_route_total * factor_hospital
+        nr_per_route = nr_people_per_route_total * factor_hospital
 
         pref_edges = []
         match_list = []
@@ -1110,20 +1111,20 @@ def calc_pref_routes_closest_dest(graph, base_graph, weighing, crs, od_id, idNam
 
             # Add the number of people that need hospital care, to the road segments. For now, each road segment in a route
             # gets attributed all the people that are taking that route.
-            base_graph[u][v][edge_key]['opt_cnt'] = base_graph[u][v][edge_key]['opt_cnt'] + nr_patients_per_route
+            base_graph[u][v][edge_key]['opt_cnt'] = base_graph[u][v][edge_key]['opt_cnt'] + nr_per_route
 
         # compile the road segments into one geometry
         pref_edges = MultiLineString(pref_edges)
         pref_routes = pref_routes.append({'o_node': o[0], 'd_node': d[0], 'origin': o[1],
                                           'destination': d[1], 'opt_path': pref_nodes,
                                           weighing: pref_route, 'match_ids': match_list,
-                                          'origin_cnt': nr_people_per_route_total, 'cnt_weight': nr_patients_per_route,
+                                          'origin_cnt': nr_people_per_route_total, 'cnt_weight': nr_per_route,
                                           'tot_miles': sum(length_list) / 1609, 'geometry': pref_edges}, ignore_index=True)
 
     return pref_routes, base_graph
 
 
-def calc_routes_closest_dest(graph, base_graph, list_closest, pref_routes, weighing, origin, dest, od_id, hazname, threshold_hospitals, factor_hospital, nr_people_name):
+def calc_routes_closest_dest(graph, base_graph, list_closest, pref_routes, weighing, origin, dest, od_id, hazname, threshold_destinations, factor_hospital, nr_people_name):
     pp_no_delay = [0]
     pp_delayed = [0]
     extra_weights = [0]
@@ -1132,8 +1133,8 @@ def calc_routes_closest_dest(graph, base_graph, list_closest, pref_routes, weigh
 
     # find the optimal route with hazard disruption
     for o, d in list_closest:
-        # Check if the hospital that is accessed, is flooded
-        if dest.loc[dest[od_id] == int(d[1].split('_')[-1]), hazname].iloc[0] > threshold_hospitals:
+        # Check if the destination that is accessed, is flooded
+        if graph.nodes[d[0]][hazname] > threshold_destinations:
             list_hospital_flooded.append((o, d))
             continue
 
@@ -1145,7 +1146,7 @@ def calc_routes_closest_dest(graph, base_graph, list_closest, pref_routes, weigh
 
         # Find the number of people per neighborhood
         nr_people_per_route_total = origin.loc[origin[od_id] == int(o[1].split('_')[-1]), nr_people_name].iloc[0]
-        nr_patients_per_route = nr_people_per_route_total * factor_hospital
+        nr_per_route = nr_people_per_route_total * factor_hospital
 
         # find out which edges belong to the preferred path
         edgesinpath = list(zip(alt_nodes[0:], alt_nodes[1:]))
@@ -1159,7 +1160,7 @@ def calc_routes_closest_dest(graph, base_graph, list_closest, pref_routes, weigh
 
             # Add the number of people that need hospital care, to the road segments. For now, each road segment in a route
             # gets attributed all the people that are taking that route.
-            base_graph[u][v][edge_key][hazname + '_P'] = base_graph[u][v][edge_key][hazname + '_P'] + nr_patients_per_route
+            base_graph[u][v][edge_key][hazname + '_P'] = base_graph[u][v][edge_key][hazname + '_P'] + nr_per_route
 
             if 'length' in graph[u][v][edge_key]:
                 length_list.append(graph[u][v][edge_key]['length'])
@@ -1171,17 +1172,17 @@ def calc_routes_closest_dest(graph, base_graph, list_closest, pref_routes, weigh
             # subtract the length/time of the optimal route from the alternative route
             extra_dist = alt_route - pref_routes.loc[pref_routes['origin'] == o[1], weighing].iloc[0]
             extra_miles = alt_dist - pref_routes.loc[pref_routes['origin'] == o[1], 'tot_miles'].iloc[0]
-            pp_delayed.append(nr_patients_per_route)
+            pp_delayed.append(nr_per_route)
             extra_weights.append(extra_dist)
             extra_miles_total.append(extra_miles)
         else:
-            pp_no_delay.append(nr_patients_per_route)
+            pp_no_delay.append(nr_per_route)
 
         # compile the road segments into one geometry
         # alt_edges = MultiLineString(alt_edges)
 
         # Add the number of patients to the total number of patients that go to that hospital
-        dest.loc[dest[od_id] == int(d[1].split('_')[-1]), hazname + '_P'] = dest.loc[dest[od_id] == int(d[1].split('_')[-1]), hazname + '_P'].iloc[0] + nr_patients_per_route
+        dest.loc[dest[od_id] == int(d[1].split('_')[-1]), hazname + '_P'] = dest.loc[dest[od_id] == int(d[1].split('_')[-1]), hazname + '_P'].iloc[0] + nr_per_route
 
     return base_graph, dest, list_hospital_flooded, pp_no_delay, pp_delayed, extra_weights, extra_miles_total
 
