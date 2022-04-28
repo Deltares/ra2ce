@@ -653,7 +653,6 @@ class IndirectAnalyses:
                                              'Disruption by flooded road', 'Disruption by flooded destination'])
 
         origins = load_origins(self.config)
-
         threshold_destinations = 0
 
         # Calculate the criticality
@@ -679,7 +678,7 @@ class IndirectAnalyses:
             list_closest, other = find_closest_node_attr(h, 'od_id', weighing, o_name, d_name)
 
             # Find the distance of the routes to the hospitals, see if those hospitals are flooded or not
-            base_graph, hospitals, list_hospital_flooded, pp_no_delay, pp_delayed, extra_dist_meters, extra_miles = calc_routes_closest_dest(
+            base_graph, hospitals, list_disrupted_dest, pp_no_delay, pp_delayed, extra_dist_meters, extra_miles = calc_routes_closest_dest(
                 h, base_graph, list_closest, opt_routes, weighing, origins, destinations, od_id, hazard_name,
                 threshold_destinations, origin_out_fraction, origin_count)
 
@@ -695,19 +694,19 @@ class IndirectAnalyses:
 
             # Now calculate for the routes that were going to a flooded destination, another non-flooded destination
             # TODO THIS PART NEEDS TO BE CHECKED AND REVISED >>>
-            list_hospitals_flooded = [hosp[-1][-1] for hosp in list_hospital_flooded]
+            list_hospitals_flooded = [hosp[-1][-1] for hosp in list_disrupted_dest]
 
             disr_by_flood = 0
 
             if len(list_hospitals_flooded) > 0:
                 list_nodes_to_remove = [n for n in h.nodes.data() if 'od_id' in n[-1]]
-                list_nodes_to_remove = [n[0] for n in list_nodes_to_remove if n[-1]['od_id'] in list_hospitals_flooded]
+                list_nodes_to_remove = [n[0] for n in list_nodes_to_remove if n[-1]['od_id'] in list_disrupted_dest]
                 graph.remove_nodes_from(list_nodes_to_remove)
 
                 disr_by_flood = 1
-                list_closest, other = find_closest_node_attr(h, 'od_id', analysis[''], o_name, d_name)
+                list_closest, other = find_closest_node_attr(h, 'od_id', weighing, o_name, d_name)
 
-            # The number of people that are disrupted because of a flooded road (and not because the or multiple hospitals are flooded)
+            # The number of people that are disrupted because of a flooded road (and not because the or multiple destinations are disrupted)
             # can be calculated by adding the people without any access (this is always because of flooded roads in the first place)
             # and the people that are delayed. By subtracting the people that are disrupted by hospitals you get only the people
             # disrupted by road flooding.
@@ -832,7 +831,8 @@ class IndirectAnalyses:
                     graph_to_shp(base_graph, shp_path_edges, shp_path_nodes)
                 if analysis['save_csv']:
                     csv_path = output_path / (analysis['name'].replace(' ', '_') + '_destinations.csv')
-                    del destination['geometry']
+                    if 'geometry' in destination.columns:
+                        del destination['geometry']
                     destination.to_csv(csv_path, index=False)
 
                     csv_path = output_path / (analysis['name'].replace(' ', '_') + '_optimal_routes.csv')
@@ -1070,6 +1070,15 @@ def find_closest_node_attr(H, keyName, weighingName, originLabelContains, destLa
                     list_no_path.append((n, ndat[keyName]))
 
     originClosestDest = [((nn[0], nn[-1][keyName]), (nn[-1]['closest'], H.nodes[nn[-1]['closest']][keyName])) for nn in H.nodes.data() if 'closest' in nn[-1]]
+
+    # Remove the special edges
+    H.remove_edges_from([(n[0], n[1]) for n in H.edges.data() if n[1] == 'special'])
+
+    # Remove the closest attribute
+    if originClosestDest:
+        for ((o, o_name), (d, d_name)) in originClosestDest:
+            del H.nodes[o]['closest']
+
     return originClosestDest, list_no_path
 
 
@@ -1129,13 +1138,13 @@ def calc_routes_closest_dest(graph, base_graph, list_closest, pref_routes, weigh
     pp_delayed = [0]
     extra_weights = [0]
     extra_miles_total = [0]
-    list_hospital_flooded = []
+    list_disrupted_destinations = []
 
     # find the optimal route with hazard disruption
     for o, d in list_closest:
         # Check if the destination that is accessed, is flooded
         if graph.nodes[d[0]][hazname] > threshold_destinations:
-            list_hospital_flooded.append((o, d))
+            list_disrupted_destinations.append((o, d))
             continue
 
         # calculate the length of the preferred route
@@ -1184,7 +1193,7 @@ def calc_routes_closest_dest(graph, base_graph, list_closest, pref_routes, weigh
         # Add the number of patients to the total number of patients that go to that hospital
         dest.loc[dest[od_id] == int(d[1].split('_')[-1]), hazname + '_P'] = dest.loc[dest[od_id] == int(d[1].split('_')[-1]), hazname + '_P'].iloc[0] + nr_per_route
 
-    return base_graph, dest, list_hospital_flooded, pp_no_delay, pp_delayed, extra_weights, extra_miles_total
+    return base_graph, dest, list_disrupted_destinations, pp_no_delay, pp_delayed, extra_weights, extra_miles_total
 
 
 def load_origins(config):
