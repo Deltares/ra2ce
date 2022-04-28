@@ -646,7 +646,7 @@ class Hazard:
             attribute_dict = {od: {hn: wl} for od, wl in zip(od_ids, water_level)}
             nx.set_node_attributes(graph, attribute_dict)
 
-            return graph
+        return graph
 
     def save_network(self, to_save, name, types=['pickle']):
         """Saves a geodataframe or graph to output_path"""
