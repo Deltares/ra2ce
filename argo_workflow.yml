@@ -1,3 +1,29 @@
+# This is a PTK - RA2CE - PTK workflow
+# The PTK is a windows container running on a windos node. Some Remarks about windows nodes:
+# - Autoscaling doesn't work so manually turn those nodes on and off
+# - For the analysis a larger disk than 20 GB is required. Attaching large EBS volume is not enough to have the disk als available in Docker.
+#   To fix this login on the windows machine via Amazon console and follow the next steps:
+#   # Update docker storage configuration on windows node
+
+#   # Install chocolatey
+#   powershell Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol-bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+#   # Install text editor
+#   choco install -y nano
+
+#   # Edit docker config file
+#   nano C:\programdata\docker\config\daemon.json
+
+#   {
+#   "storage-opts": [
+#   #   "size=150GB"
+#     ]
+#   }
+
+#   # Restart docker service
+#   restart-service *docker*
+
+
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
@@ -6,7 +32,7 @@ metadata:
     title: RA2CE PTK
     description: PTK - RA2CE - PTK
 spec:
-  entrypoint: complete
+  entrypoint: ptk-ra2ce
   serviceAccountName: test
   imagePullSecrets:
     - name: regcred
@@ -28,27 +54,43 @@ spec:
       - - name: ptk-analyse
           template: ptk-analyse
 
+
     - name: only-ptk
       steps:
       - - name: ptk
           template: ptk-preprocessing
 
+    - name: ptk-ra2ce
+      steps:
+      - - name: ptk
+          template: ptk-preprocessing
+      - - name: read-models
+          template: read-models
+      - - name: ra2ce
+          template: ra2ce
+          arguments:
+            parameters:
+            - name: model
+              value: "{{item}}"
+          withParam: "{{steps.read-models.outputs.result}}"
+      - - name: ptk-analyse
+          template: ptk-analyse
+
     - name: ptk-preprocessing
       nodeSelector:
         kubernetes.io/os: windows
       tolerations:
-        - key: os
-          operator: Equal
-          value: windows
-          effect: NoSchedule
+        - key: "os"
+          operator: "Equal"
+          value: "windows"
       container:
-        image: deltares/ptk:2-3-6
+        image: deltares/ptk:2-3-8
         command:
           - 'powershell'
-        # args:
-        #   - Start-Sleep -Seconds 1000
         args:
-          - aws s3 sync s3://bucket-deltares-et/RA2CE-PTK c:/data/RA2CE-PTK; & cd C:\data\RA2CE-PTK\PTK_Cloud; & cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' model_unc_ra2ce.tkx; & aws s3 sync c:/data/RA2CE-PTK s3://bucket-deltares-et/RA2CE-PTK;
+          - Start-Sleep -Seconds 4000
+        # args:
+        #   - aws s3 sync s3://bucket-deltares-et/RA2CE-PTK c:/data/RA2CE-PTK; & cd C:\data\RA2CE-PTK\PTK_Cloud2; & cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' landelijk-gevoeligheid.tkx; & aws s3 sync c:/data/RA2CE-PTK s3://bucket-deltares-et/RA2CE-PTK;
 
     - name: ptk-analyse
       nodeSelector:
@@ -57,19 +99,59 @@ spec:
         - key: os
           operator: Equal
           value: windows
-          effect: NoSchedule
       container:
-        image: deltares/ptk:2-3-6
+        image: deltares/ptk:2-3-8
         command:
           - 'powershell'
         # args:
-        #   - Start-Sleep -Seconds 1000
+        #   - Start-Sleep -Seconds 10000
         args:
-          - aws s3 sync s3://bucket-deltares-et/RA2CE-PTK c:/data/RA2CE-PTK; & cd C:\data\RA2CE-PTK\PTK_Cloud; & cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed model_unc_ra2ce.tkx; & aws s3 sync c:/data/RA2CE-PTK s3://bucket-deltares-et/RA2CE-PTK;
-
+          - aws s3 sync s3://bucket-deltares-et/RA2CE-PTK c:/data/RA2CE-PTK; & 
+          - cd C:\data\RA2CE-PTK\PTK_Cloud2; & 
+          - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "landelijk-gevoeligheid.tkx"; &         
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "landelijk-spreiding.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "0-geen-maatregelen-blockage-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "0-geen-maatregelen-repair-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "1-freq-schrapen-maatregelen-bc-ratio.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "1-freq-schrapen-maatregelen-benefits.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "1-freq-schrapen-maatregelen-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "1-freq-schrapen-reduction-blockage-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "1-freq-schrapen-reduction-repair-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "2-freq-schrapen-maatregelen-bc-ratio.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "2-freq-schrapen-maatregelen-benefits.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "2-freq-schrapen-maatregelen-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "2-freq-schrapen-reduction-blockage-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "2-freq-schrapen-reduction-repair-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "3-zoab-maatregelen-bc-ratio.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "3-zoab-maatregelen-benefits.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "3-zoab-maatregelen-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "3-zoab-reduction-blockage-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "3-zoab-reduction-repair-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "4-freq-kolk-maatregelen-bc-ratio.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "4-freq-kolk-maatregelen-benefits.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "4-freq-kolk-maatregelen-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "4-freq-kolk-reduction-blocking-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "4-freq-kolk-reduction-repair-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "5-insp-kolk-maatregelen-bc-ratio.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "5-insp-kolk-maatregelen-benefits.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "5-insp-kolk-maatregelen-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "5-insp-kolk-reduction-blockage-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "5-insp-kolk-reduction-repair-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "6-hwa-aanleggen-maatregelen-bc-ratio.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "6-hwa-aanleggen-maatregelen-benefits.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "6-hwa-aanleggen-maatregelen-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "6-hwa-aanleggen-reduction-blockage-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "6-hwa-aanleggen-reduction-repair-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "7-extra-kolken-maatregelen-bc-ratio.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "7-extra-kolken-maatregelen-benefits.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "7-extra-kolken-maatregelen-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "7-extra-kolken-reduction-blockage-costs.tkx"; &
+          # - cmd /c 'C:\Program Files (x86)\Deltares\Probabilistic toolkit\Deltares.Probabilistic.Console.exe' -performed "7-extra-kolken-reduction-repair-costs.tkx"; &
+          - aws s3 sync c:/data/RA2CE-PTK s3://bucket-deltares-et/RA2CE-PTK;
+ 
     - name: ra2ce
       nodeSelector:
-        spot: "true"
+        eks.amazonaws.com/nodegroup: c-xlarge-spot
       inputs:
         parameters:
         - name: model
@@ -103,16 +185,15 @@ spec:
       container:
         imagePullPolicy: Always
         image: deltares/ra2ce
-        # command:
-        #   - sleep
-        # args:
-        #   - "1000"
         command:
           - python
         args:
           - run_with_args.py
           - /data/network.ini
           - /data/analyses.ini
+        resources:
+          requests: 
+            cpu: 1
 
       # Read all ra2ce input folders
     - name: read-models
@@ -122,25 +203,30 @@ spec:
         image: "deltares/boto3:0.0.1"
         command: [python]
         source: |
-          from itertools import chain
+          # from itertools import chain
           from json import dumps
-          from functools import reduce
-          import boto3
-          bucket = 'bucket-deltares-et'
-          prefix = 'RA2CE-PTK/Ra2ce/KBN2_losses/'
-          exclude = ["data", "static"]
-          client = boto3.client('s3')
-          paginator = client.get_paginator("list_objects")
-          it = paginator.paginate(Bucket=bucket, Prefix=prefix, Delimiter="/")
-          def get_prefix(res, p):
-              prefix = p["Prefix"].split("/")[-2]
-              if prefix not in exclude:
-                  res += [prefix]
-              return res
-          result = list(reduce(
-              get_prefix,
-              chain.from_iterable(map(lambda i: i["CommonPrefixes"], it)),
-              []
-          ))
-          print(dumps(result))
+          # from functools import reduce
+          # import boto3
+          # bucket = 'bucket-deltares-et'
+          # prefix = 'RA2CE-PTK/Ra2ce/KBN2_losses/'
+          # exclude = ["data", "static"]
+          # client = boto3.client('s3')
+          # paginator = client.get_paginator("list_objects")
+          # it = paginator.paginate(Bucket=bucket, Prefix=prefix, Delimiter="/")
+          # def get_prefix(res, p):
+          #     prefix = p["Prefix"].split("/")[-2]
+          #     if prefix not in exclude:
+          #         res += [prefix]
+          #     return res
+          # result = list(reduce(
+          #     get_prefix,
+          #     chain.from_iterable(map(lambda i: i["CommonPrefixes"], it)),
+          #     []
+          # ))
+          # result = [result[0]]
 
+          # n = range(0,10)
+          # n = range(10, 100)
+          n = range(0, 38)
+          folders = [f"data{folder}" for folder in n]
+          print(dumps(folders))
