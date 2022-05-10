@@ -151,6 +151,8 @@ def load_config(root_path, config_path):
     # check if files exist:
     config = check_files(config)
 
+    #TODO: give warning when the path to the ini to copy to is not found (probably the project folder is not in the ra2ce/data folder)
+
     # copy ini file for future references to output folder
     copyfile(config_path, config['output'] / '{}.ini'.format(config_path.stem))
     return config

@@ -72,18 +72,3 @@ def main(network_ini=None, analyses_ini=None):
 
         if 'indirect' in config_analyses:
             analyses_indirect.IndirectAnalyses(config_analyses, graphs).execute()
-
-
-@click.command()
-@click.option("--network_ini", default=None, help="Full path to the network.ini file.")
-@click.option("--analyses_ini", default=None, help="Full path to the analyses.ini file.")
-def cli(network_ini, analyses_ini):
-    main(network_ini, analyses_ini)
-
-
-if __name__ == '__main__':
-    # cli()
-    #rootpath = r'c:\Python\ra2ce\data\test_pbf'
-    rootpath = r'c:\Python\ra2ce\data\KBN2'
-    #rootpath = r'c:\Python\ra2ce\data\1_test_network_shape'
-    main(rootpath + r"\network.ini", rootpath + r"\analyses1.ini")
