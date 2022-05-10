@@ -18,3 +18,4 @@ def cli(project):
 
 if __name__ == "__main__":
     cli()
+    # main(r"D:\ra2ceMaster\ra2ce\data\Nepal_shp_test\network.ini", r"D:\ra2ceMaster\ra2ce\data\Nepal_shp_test\analyses.ini")

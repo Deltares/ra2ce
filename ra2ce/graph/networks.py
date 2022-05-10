@@ -371,7 +371,7 @@ class Network:
                 # base_graph = nx.read_gpickle(self.config['static'] / 'network' / 'base_graph.gpickle')
                 network_gdf = read_pickle_file(self.config['static'] / 'network' / 'base_network.p')
 
-            if self.source != 'pickle':
+            if self.source != 'pickle' and self.source != 'shapefile':
                 # Check if all geometries between nodes are there, if not, add them as a straight line.
                 base_graph = add_missing_geoms_graph(base_graph, geom_name='geometry')
 
