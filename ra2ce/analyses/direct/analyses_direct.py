@@ -36,7 +36,7 @@ class DirectAnalyses:
         gdf['road_type'] = gdf['infra_type']
         gdf = gdf.replace({"road_type": road_mapping_dict})
 
-        # TODO sometimes there are edges with multiple mappings
+        # TODO sometimes there are edges with multiple mappings ?? To check this
         # cleanup of gdf
         for column in gdf.columns:
             gdf[column] = gdf[column].apply(rd.apply_cleanup)
@@ -371,7 +371,7 @@ class RoadDamage:
         default_lanes_dict = lookup.road_lanes()
         df_lookup = pd.DataFrame.from_dict(default_lanes_dict)
 
-        road_gdf['country'] = 'NL'
+        road_gdf['country'] = 'NL'  # TODO: make this general
         road_gdf['default_lanes'] = df_lookup.lookup(road_gdf['road_type'], road_gdf['country'])
         road_gdf['lanes'].fillna(road_gdf['default_lanes'], inplace=True)
         road_gdf = road_gdf.drop(columns=['default_lanes', 'country'])
