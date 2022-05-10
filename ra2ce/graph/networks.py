@@ -371,7 +371,7 @@ class Network:
                 # base_graph = nx.read_gpickle(self.config['static'] / 'network' / 'base_graph.gpickle')
                 network_gdf = read_pickle_file(self.config['static'] / 'network' / 'base_network.p')
 
-            if self.source != 'pickle':
+            if self.source != 'pickle' and self.source != 'shapefile':
                 # Check if all geometries between nodes are there, if not, add them as a straight line.
                 base_graph = add_missing_geoms_graph(base_graph, geom_name='geometry')
 
@@ -392,8 +392,6 @@ class Network:
             if self.base_graph_path is not None:
                 base_graph = nx.read_gpickle(self.base_graph_path)
             # adding OD nodes
-            #if self.origins.suffix == '.tif':
-            #if '.tif' in self.origins:
             if self.origins[0].suffix == '.tif':
                 self.origins[0] = self.generate_origins_from_raster()
             od_graph = self.add_od_nodes(base_graph)
@@ -598,6 +596,58 @@ class Hazard:
 
         return graph
 
+    def od_hazard_intersect(self, graph):
+        """Overlays the origin and destination locations with the hazard maps"""
+        # Intersect the origin and destination nodes with the hazard map (now only geotiff possible)
+        hf = [haz for haz in self.list_hazard_files if haz.suffix == '.tif']
+
+        # Name the attribute name the name of the hazard file
+        hazard_names = [f.stem for f in hf]
+        hazard_names = ['_'.join([h[0] if (h.upper() != 'RP') and not h.isdecimal() else h for h in hazard.split('_')]) for hazard in hazard_names]
+
+        # Check if the extent and resolution of the different hazard maps are the same.
+        same_extent = check_hazard_extent_resolution(hf)
+        if same_extent:
+            extent = get_extent(gdal.Open(str(hf[0])))
+            logging.info("The flood maps have the same extent. Flood maps used: {}".format(", ".join(hazard_names)))
+
+        for i, hn in enumerate(hazard_names):
+            src = gdal.Open(str(hf[i]))
+            if not same_extent:
+                extent = get_extent(src)
+            raster_band = src.GetRasterBand(1)
+
+            try:
+                raster = raster_band.ReadAsArray()
+                size_array = raster.shape
+                logging.info("Getting water depth or surface water elevation values from {}".format(hn))
+            except MemoryError as e:
+                logging.warning(
+                    "The raster is too large to read as a whole and will be sampled point by point. MemoryError: {}".format(
+                        e))
+                size_array = None
+                nodatavalue = raster_band.GetNoDataValue()
+
+            # check which road is overlapping with the flood and append the flood depth to the graph or geodataframe
+            od_nodes = [(n, ndata) for n, ndata in graph.nodes.data() if 'od_id' in ndata]
+            od_ids = [n[0] for n in od_nodes]
+            od_x = np.array([n[1]['geometry'].coords[0][0] for n in od_nodes])
+            od_y = np.array([n[1]['geometry'].coords[0][1] for n in od_nodes])
+
+            if size_array:
+                # Fastest method but be aware of out of memory errors!
+                water_level = sample_raster_full(raster, od_x, od_y, size_array, extent)
+            else:
+                # Slower method but no issues with memory errors
+                water_level = sample_raster(raster_band, nodatavalue, od_x, od_y,
+                                            extent['minX'], extent['pixelWidth'], extent['maxY'],
+                                            extent['pixelHeight'])
+
+            attribute_dict = {od: {hn: wl} for od, wl in zip(od_ids, water_level)}
+            nx.set_node_attributes(graph, attribute_dict)
+
+        return graph
+
     def save_network(self, to_save, name, types=['pickle']):
         """Saves a geodataframe or graph to output_path"""
         if type(to_save) == gpd.GeoDataFrame:
@@ -649,10 +699,13 @@ class Hazard:
                         graph = gpd.read_feather(file_path)
                     base_graph_hazard = self.hazard_intersect(graph)
 
+                    if input_graph == 'origins_destinations_graph':
+                        # Overlay the origins and destinations with the hazard maps
+                        self.graphs[input_graph + '_hazard'] = self.od_hazard_intersect(graph)
+
                     # save graph with hazard
                     if base_graph_hazard is not None:
                         self.graphs[input_graph + '_hazard'] = base_graph_hazard
                         self.config['files'][input_graph+'_hazard'] = self.save_network(base_graph_hazard, input_graph+'_hazard', types=to_save)
 
         return self.graphs
-
