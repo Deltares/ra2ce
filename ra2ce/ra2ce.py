@@ -21,6 +21,14 @@ from .analyses.indirect import analyses_indirect
 
 
 def main(network_ini=None, analyses_ini=None):
+    """Main function of RA2CE.
+
+    Reads the network and analyses ini files and chooses the right functions.
+
+    Args:
+        network_ini: An initialization file with the configuration for network creation.
+        analyses_ini: An initialization file with the configuration for the analyses.
+    """
     # Find the network.ini and analysis.ini files
     root_path = Path(__file__).resolve().parent.parent
 

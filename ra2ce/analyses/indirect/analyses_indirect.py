@@ -5,6 +5,7 @@ Created on 26-7-2021
 @author: F.C. de Groen, Deltares
 """
 
+import sys
 import logging
 import networkx as nx
 import osmnx
@@ -21,14 +22,23 @@ from pathlib import Path
 
 
 class IndirectAnalyses:
+    """Indirect analyses that can be done with NetworkX graphs.
+
+    Attributes:
+        config: A dictionary with the configuration details on how to create and adjust the network.
+        graphs: A dictionary with one or multiple NetworkX graphs.
+    """
+
     def __init__(self, config, graphs):
         self.config = config
         self.graphs = graphs
 
     def single_link_redundancy(self, graph, analysis):
         """This is the function to analyse roads with a single link disruption and an alternative route.
-        :param graph: graph on which to run analysis (MultiDiGraph)
-        :return: df with dijkstra detour distance and path results
+
+        Args:
+            graph: The NetworkX graph to calculate the single link redundancy on.
+            analysis: Dictionary of the configurations for the analysis.
         """
         # TODO adjust to the right names of the RA2CE tool
         # if 'road_usage_data_path' in InputDict:
@@ -90,9 +100,11 @@ class IndirectAnalyses:
         return gdf
 
     def single_link_losses(self, gdf, analysis):
-        """This is the function to analyse roads with a single link disruption and an alternative route.
-        :param graph: graph on which to run analysis (MultiDiGraph)
-        :return: df with dijkstra detour distance and path results
+        """Calculates single link disruption losses.
+
+        Args:
+            gdf: The network in GeoDataFrame format.
+            analysis: Dictionary of the configurations for the analysis.
         """
         losses_fn = self.config['static'] / 'hazard' / analysis['loss_per_distance']
         losses_df = pd.read_excel(losses_fn, sheet_name='Sheet1')
@@ -155,17 +167,18 @@ class IndirectAnalyses:
         return gdf
 
     def multi_link_redundancy(self, graph, analysis):
-        """
+        """Calculates the multi-link redundancy of a NetworkX graph.
+
         The function removes all links of a variable that have a minimum value
-        of min_threshold. For each link it calculates the alternative path, af
+        of min_threshold. For each link it calculates the alternative path, if
         any available. This function only removes one group at the time and saves the data from removing that group.
 
-        Arguments:
-            graph [networkx graph] = the graph with at least the columns that you use in group en sort
-            attribute_name [string] = name of the attribute that indicates whether a road segment should be removed
-            min_threshold [numeric] = the minimum value of the attribute by which the roads should be removed
+        Args:
+            graph: The NetworkX graph to calculate the single link redundancy on.
+            analysis: Dictionary of the configurations for the analysis.
+
         Returns:
-            gdf [geopandas dataframe]
+            aggregated_results (GeoDataFrame): The results of the analysis aggregated into a table.
         """
         results = []
         master_graph = copy.deepcopy(graph)
@@ -221,17 +234,18 @@ class IndirectAnalyses:
         return aggregated_results
 
     def multi_link_losses(self, gdf, analysis):
-        """
+        """Calculates the multi-link redundancy losses of a NetworkX graph.
+
         The function removes all links of a variable that have a minimum value
-        of min_threshold. For each link it calculates the alternative path, af
+        of min_threshold. For each link it calculates the alternative path, if
         any available. This function only removes one group at the time and saves the data from removing that group.
 
-        Arguments:
-            graph [networkx graph] = the graph with at least the columns that you use in group en sort
-            attribute_name [string] = name of the attribute that indicates whether a road segment should be removed
-            min_threshold [numeric] = the minimum value of the attribute by which the roads should be removed
+        Args:
+            graph: The NetworkX graph to calculate the single link redundancy on.
+            analysis: Dictionary of the configurations for the analysis.
+
         Returns:
-            gdf [geopandas dataframe]
+            aggregated_results (GeoDataFrame): The results of the analysis aggregated into a table.
         """
         losses_fn = self.config['static'] / 'hazard' / analysis['loss_per_distance']
         losses_df = pd.read_excel(losses_fn, sheet_name='Sheet1')
@@ -849,6 +863,9 @@ class IndirectAnalyses:
                 losses = Losses(self.config, analysis)
                 df = losses.calculate_losses_from_table()
                 gdf = gdf_in.merge(df, how='left', on='LinkNr')
+            else:
+                logging.error(f"Analysis {analysis['analysis']} does not exist in RA2CE. Please choose an existing analysis.")
+                sys.exit()
 
             if not gdf.empty:
                 # Not for all analyses a gdf is created as output.

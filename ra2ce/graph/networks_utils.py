@@ -150,9 +150,9 @@ def merge_lines_shpfiles(lines_gdf, idName, aadtNames, crs_):
     # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
     # The list of fid's is reduced by the fid's that are not anymore in the merged lines
     lines_fids = list(zip(list_lines, lines_gdf[idName]))  # create tuples from the list of lines and the list of fid's
-    lines_merged = gpd.GeoDataFrame(columns=[idName, 'geometry'], crs='epsg:{}'.format(crs_),
+    lines_merged = gpd.GeoDataFrame(columns=[idName, 'geometry'], crs=crs_,
                                     geometry='geometry')
-    merged = gpd.GeoDataFrame(columns=[idName, 'geometry'], crs='epsg:{}'.format(crs_),
+    merged = gpd.GeoDataFrame(columns=[idName, 'geometry'], crs=crs_,
                               geometry='geometry')
 
     for mline in merged_lines:
@@ -289,7 +289,6 @@ def merge_lines_automatic(lines_gdf, idName, aadtNames, crs_):
         all_type = 'max' # or ['max', 'min', 'mean']
 
     elif len(merged_lines.geoms) < len(list_lines) and not aadtNames:
-
         # the_input = 'y'
         lines_gdf = lines_gdf.dissolve(by=idName, aggfunc='max')
         lines_gdf.reset_index(inplace=True)
@@ -304,9 +303,9 @@ def merge_lines_automatic(lines_gdf, idName, aadtNames, crs_):
     # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
     # The list of fid's is reduced by the fid's that are not anymore in the merged lines
     lines_fids = list(zip(list_lines, lines_gdf[idName]))  # create tuples from the list of lines and the list of fid's
-    lines_merged = gpd.GeoDataFrame(columns=[idName, 'geometry'], crs='epsg:{}'.format(crs_),
+    lines_merged = gpd.GeoDataFrame(columns=[idName, 'geometry'], crs=crs_,
                                     geometry='geometry')
-    merged = gpd.GeoDataFrame(columns=[idName, 'geometry'], crs='epsg:{}'.format(crs_),
+    merged = gpd.GeoDataFrame(columns=[idName, 'geometry'], crs=crs_,
                               geometry='geometry')
 
     for mline in merged_lines:
@@ -661,7 +660,7 @@ def create_nodes(merged_lines, crs_, ignore_intersections):
     unique_points = delete_duplicates(endpts)
     points_gdf = gpd.GeoDataFrame({'node_fid': range(len(unique_points)),
                                    'geometry': unique_points},
-                                  geometry='geometry', crs='epsg:{}'.format(crs_))
+                                  geometry='geometry', crs=crs_)
 
     return points_gdf
 
@@ -989,14 +988,14 @@ def create_simplified_graph(graph_complex, new_id='ra2ce_fid'):
 
 def gdf_check_create_unique_ids(gdf, id_name, new_id_name='ra2ce_fid'):
     # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
-    check=gdf.index
+    check = list(gdf.index)
     logging.info('Started creating unique ids...')
-    if len(gdf[id_name].unique()) < len(gdf.index):
-        gdf[new_id_name] = list(gdf.index)
+    if len(gdf[id_name].unique()) < len(check):
+        gdf[new_id_name] = check
         logging.info("Added a new unique identifier field {}.".format(new_id_name, id_name))
         return gdf, new_id_name
     else:
-        gdf[new_id_name] = list(gdf.index)
+        gdf[new_id_name] = check
         logging.info("Added a new unique identifier field {} because the original field '{}' "
               "did not contain unique values per road segment.".format(new_id_name, id_name))
         return gdf, id_name
@@ -1238,7 +1237,7 @@ def read_merge_shp(shapefileAnalyse,  idName, shapefileDiversion=[], crs_=4326):
 
     # concatenate all shapefiles into one geodataframe
     lines = pd.concat(lines)
-    lines.crs = 'epsg:{}'.format(crs_)
+    lines.crs = crs_
 
     # append the length of the road stretches
     lines['length'] = lines['geometry'].apply(lambda x: line_length(x))
@@ -1763,7 +1762,7 @@ class HazardUtils:
                 gdf = gpd.GeoDataFrame.from_features(list(results))
 
                 # Confirm that it is WGS84
-                gdf.crs = 'epsg:4326'
+                gdf.crs = 4326
                 # gdf.crs = {'init': 'epsg:3035'}
                 # gdf.to_crs(epsg=4326,inplace=True) #convert to WGS84
 

@@ -12,7 +12,7 @@ import sys
 
 
 def available_checks():
-    """ List of available checks in Ra2ce """
+    """List of available analyses in RA2CE."""
     list_indirect_analyses = ['single_link_redundancy',
                               'multi_link_redundancy',
                               'optimal_route_origin_destination',
@@ -32,7 +32,7 @@ list_indirect_analyses, list_direct_analyses = available_checks()
 
 
 def input_validation(config):
-    """ Check if input properties are correct and exist"""
+    """Check if input properties are correct and exist."""
 
     # check if properties exist in settings.ini file
     check_headers = ['project']
@@ -56,7 +56,8 @@ def input_validation(config):
                     'directed': [True, False],
                     'network_type': ['walk', 'bike', 'drive', 'drive_service', 'all'],
                     'road_types': ['motorway', 'motorway_link', 'trunk', 'trunk_link', 'primary', 'primary_link', 'secondary',
-                                   'secondary_link', 'tertiary', 'tertiary_link', None],  # TODO: add the lower types as well
+                                   'secondary_link', 'tertiary', 'tertiary_link', 'unclassified', 'residential',
+                                   'road', None],
                     'origins': ['file', None],
                     'destinations': ['file', None],
                     'save_shp': [True, False],
