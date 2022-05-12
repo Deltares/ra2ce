@@ -20,6 +20,15 @@ from .networks_utils import *
 
 
 class Network:
+    """Network in GeoDataFrame or NetworkX format.
+
+    Networks can be created from shapefiles, OSM PBF files, can be downloaded from OSM online or can be loaded from
+    feather or gpickle files. Origin-destination nodes can be added.
+
+    Attributes:
+        config: A dictionary with the configuration details on how to create and adjust the network.
+    """
+
     def __init__(self, config):
         # General
         self.config = config
@@ -65,17 +74,17 @@ class Network:
         self.od_graph_path = config['files']['origins_destinations_graph']
 
     def network_shp(self, crs=4326):
-        """Creates a (graph) network from a shapefile
+        """Creates a (graph) network from a shapefile.
+
+        Returns the same geometries for the network (GeoDataFrame) as for the graph (NetworkX graph), because
+        it is assumed that the user wants to keep the same geometries as their shapefile input.
+
         Args:
-            name (string): name of the analysis given by user (will be part of the name of the output files)
-            InputDict (dict): dictionairy with paths/input that is used to create the network
             crs (int): the EPSG number of the coordinate reference system that is used
-            snapping (bool): True if snapping is required, False if not
-            SnappingThreshold (int/float): threshold to reach another vertice to connect the edge to
-            pruning (bool): True if pruning is required, False if not
-            PruningThreshold (int/float): edges smaller than this length (threshold) are removed
+
         Returns:
-            G (networkX graph): The resulting network graph
+            graph_complex (NetworkX graph): The resulting graph.
+            edges_complex (GeoDataFrame): The resulting network.
         """
 
         lines = self.read_merge_shp()
@@ -85,7 +94,7 @@ class Network:
         # Multilinestring to linestring
         # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
         # The list of fid's is reduced by the fid's that are not anymore in the merged lines
-        edges, lines_merged = merge_lines_shpfiles(lines, self.file_id, aadt_names, crs)
+        edges, lines_merged = merge_lines_automatic(lines, self.file_id, aadt_names, crs)
         logging.info("Function [merge_lines_shpfiles]: executed with properties {}".format(list(edges.columns)))
 
         edges, id_name = gdf_check_create_unique_ids(edges, self.file_id)
@@ -99,7 +108,7 @@ class Network:
         if not lines_merged.empty:
             # save the merged lines to a shapefile - CHECK if there are lines merged that should not be merged (e.g. main + secondary road)
             lines_merged.to_file(os.path.join(self.output_path, "{}_lines_that_merged.shp".format(self.name)))
-            logging.info("Function [edges_to_shp]: saved at ".format(os.path.join(self.output_path, '{}_lines_that_merged'.format(self.name))))
+            logging.info("Function [edges_to_shp]: saved at {}".format(os.path.join(self.output_path, '{}_lines_that_merged'.format(self.name))))
 
         # Get the unique points at the end of lines and at intersections to create nodes
         nodes = create_nodes(edges, crs, self.config['cleanup']['ignore_intersections'])
@@ -114,29 +123,21 @@ class Network:
 
         # create tuples from the adjecent nodes and add as column in geodataframe
         edges_complex = join_nodes_edges(nodes, edges, id_name)
-        edges_complex.crs = 'epsg:{}'.format(crs)  # set the right CRS
+        edges_complex.crs = crs  # set the right CRS
 
         # Create networkx graph from geodataframe
         graph_complex = graph_from_gdf(edges_complex, nodes, node_id='node_fid')
         logging.info("Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(self.name))
 
-        # exporting complex graph because simple graph is not needed
+        # Exporting complex graph because the shapefile should be kept the same as much as possible.
         return graph_complex, edges_complex
 
     def network_osm_pbf(self):
         """Creates a network from an OSM PBF file.
 
-        Arguments:
-            *path_to_pbf* (Path) : Path to the osm_dump from which the road network is to be fetched
-            *road_types* (list of strings) : The road types to fetch from the dump e.g. ['motorway', 'motorway_link']
-            *save_files* (Path): Path where the output should be saved. Default: None
-            *segmentation* (float): define lenghts of the cut segments. Default: None
-            *save_shapes* (Path): Folder path where shapefiles should be saved. Default: None
-
         Returns:
-            G_simple (Graph) : Simplified graph (for use in the indirect analyses)
-            G_complex_edges (GeoDataFrame : Complex graph (for use in the direct analyses)
-
+            G_simple (NetworkX graph): Simplified graph (for use in the indirect analyses).
+            G_complex_edges (GeoDataFrame): Complex graph (for use in the direct analyses).
         """
         road_types = self.road_types.lower().replace(' ', ' ').split(',')
 
@@ -176,18 +177,9 @@ class Network:
     def network_osm_download(self):
         """Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
 
-        Arguments:
-            *InputDict* (Path) with
-            PathShp [string]: path to shapefile (polygon) used to download from OSMnx the roads in that polygon
-            NetworkType [string]: one of the network types from OSM, e.g. drive, drive_service, walk, bike, all
-            RoadTypes [string]: formatted like "motorway|primary", one or multiple road types from OSM (highway)
-            undirected is True, unless specified as False
-            simplify graph is True, unless specified as False
-            save_shapes is False, unless you would like to save shapes of both graphs
-
         Returns:
-            graph_simple (Graph) : Simplified graph (for use in the indirect analyses)
-            graph_complex_edges (GeoDataFrame : Complex graph (for use in the direct analyses)
+            graph_simple (NetworkX graph): Simplified graph (for use in the indirect analyses).
+            complex_edges (GeoDataFrame): Complex graph (for use in the direct analyses).
         """
         poly_dict = read_geojson(self.polygon_file[0])  # It can only read in one geojson
         poly = geojson_to_shp(poly_dict)
@@ -282,23 +274,23 @@ class Network:
         if isinstance(self.diversion_files, str):
             shapefiles_diversion = [self.config['static'] / "network" / shp for shp in self.diversion_files.split(',')]
 
-        def read_file(file, analyse=1):
+        def read_file(file, crs, analyse=1):
             """"Set analysis to 1 for main analysis and 0 for diversion network"""
             shp = gpd.read_file(file)
-            print(shp.crs)
-            if shp.crs != 'epsg:{}'.format(crs_):
+            if shp.crs != crs:
                 logging.error('Shape projection is epsg:{} - only projection epsg:{} is allowed. '
-                          'Please reproject the input file - {}'.format(shp.crs, crs_, file))
-                quit()
+                          'Please reproject the input file - {}'.format(shp.crs, crs, file))
+                sys.exit()
+            shp['analyse'] = analyse
             return shp
 
         # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
-        lines = [read_file(shp) for shp in shapefiles_analysis]
+        lines = [read_file(shp, crs_) for shp in shapefiles_analysis]
         if isinstance(self.diversion_files, str):
-            [lines.append(read_file(shp, 0)) for shp in shapefiles_diversion]
+            [lines.append(read_file(shp, crs_, 0)) for shp in shapefiles_diversion]
         lines = pd.concat(lines)
 
-        lines.crs = 'EPSG:{}'.format(crs_)
+        lines.crs = crs_
 
         # append the length of the road stretches
         lines['length'] = lines['geometry'].apply(lambda x: line_length(x))
@@ -379,8 +371,15 @@ class Network:
             self.config['files']['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
             self.config['files']['base_network'] = self.save_network(network_gdf, 'base', types=to_save)
         else:
-            base_graph = nx.read_gpickle(self.config['files']['base_graph'])
-            network_gdf = gpd.read_feather(self.config['files']['base_network'])
+            if self.base_graph_path is not None:
+                base_graph = nx.read_gpickle(self.config['files']['base_graph'])
+            else:
+                base_graph = None
+            if self.base_network_path is not None:
+                network_gdf = gpd.read_feather(self.config['files']['base_network'])
+            else:
+                network_gdf = None
+
             if self.save_shp:
                 to_save = ['shp', 'pickle']
                 self.config['files']['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
@@ -389,7 +388,7 @@ class Network:
         # create origins destinations graph
         if (self.origins is not None) and (self.destinations is not None) and self.od_graph_path is None:
             # reading the base graphs
-            if self.base_graph_path is not None:
+            if (self.base_graph_path is not None) and (base_graph is not None):
                 base_graph = nx.read_gpickle(self.base_graph_path)
             # adding OD nodes
             if self.origins[0].suffix == '.tif':
@@ -401,6 +400,13 @@ class Network:
 
 
 class Hazard:
+    """Class where the hazard overlay happens.
+
+    Attributes:
+        network: GeoDataFrame of the network.
+        graphs: NetworkX graphs.
+    """
+
     def __init__(self, network, graphs):
         self.config = network.config
 
@@ -418,13 +424,10 @@ class Hazard:
     def overlay_hazard_raster(self, hf, graph):
         """Overlays the hazard raster over the road segments.
 
-        :param [ParamName]: [ParamDescription], defaults to [DefaultParamVal]
-        :type [ParamName]: [ParamType](, optional)
-        ...
-        :raises [ErrorType]: [ErrorDescription]
-        ...
-        :return: [ReturnDescription]
-        :rtype: [ReturnType]
+        Args:
+
+        Returns:
+
         """
         # Name the attribute name the name of the hazard file
         hazard_names = [f.stem for f in hf]
@@ -505,13 +508,10 @@ class Hazard:
     def overlay_hazard_shp(self, hf, graph):
         """Overlays the hazard shapefile over the road segments.
 
-        :param [ParamName]: [ParamDescription], defaults to [DefaultParamVal]
-        :type [ParamName]: [ParamType](, optional)
-        ...
-        :raises [ErrorType]: [ErrorDescription]
-        ...
-        :return: [ReturnDescription]
-        :rtype: [ReturnType]
+        Args:
+
+        Returns:
+
         """
         #TODO differentiate between graph and geodataframe input
 
@@ -542,13 +542,10 @@ class Hazard:
     def join_hazard_table(self, hazards_table, graph):
         """Joins a table with IDs and hazard information with the road segments with corresponding IDs.
 
-        :param [ParamName]: [ParamDescription], defaults to [DefaultParamVal]
-        :type [ParamName]: [ParamType](, optional)
-        ...
-        :raises [ErrorType]: [ErrorDescription]
-        ...
-        :return: [ReturnDescription]
-        :rtype: [ReturnType]
+        Args:
+
+        Returns:
+
         """
         # TODO differentiate between graph and geodataframe input
         if type(graph) == gpd.GeoDataFrame:
@@ -597,7 +594,13 @@ class Hazard:
         return graph
 
     def od_hazard_intersect(self, graph):
-        """Overlays the origin and destination locations with the hazard maps"""
+        """Overlays the origin and destination locations with the hazard maps
+
+        Args:
+
+        Returns:
+
+        """
         # Intersect the origin and destination nodes with the hazard map (now only geotiff possible)
         hf = [haz for haz in self.list_hazard_files if haz.suffix == '.tif']
 
@@ -649,7 +652,13 @@ class Hazard:
         return graph
 
     def save_network(self, to_save, name, types=['pickle']):
-        """Saves a geodataframe or graph to output_path"""
+        """Saves a geodataframe or graph to output_path
+
+        Args:
+
+        Returns:
+
+        """
         if type(to_save) == gpd.GeoDataFrame:
             # The file that needs to be saved is a geodataframe
             if 'pickle' in types:
