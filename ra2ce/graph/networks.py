@@ -129,6 +129,10 @@ class Network:
         graph_complex = graph_from_gdf(edges_complex, nodes, node_id='node_fid')
         logging.info("Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(self.name))
 
+        if self.segmentation_length is not None:
+            edges_complex = Segmentation(edges_complex, self.segmentation_length)
+            edges_complex.apply_segmentation()
+
         # Exporting complex graph because the shapefile should be kept the same as much as possible.
         return graph_complex, edges_complex
 
@@ -169,8 +173,8 @@ class Network:
         graph_simple, graph_complex = create_simplified_graph(graph_complex)
 
         if self.segmentation_length is not None:
-            graph_simple = Segmentation(edges_complex, self.segmentation_length)
-            graph_simple.apply_segmentation()
+            edges_complex = Segmentation(edges_complex, self.segmentation_length)
+            edges_complex.apply_segmentation()
 
         return graph_simple, edges_complex
 
@@ -215,6 +219,8 @@ class Network:
         if not self.directed:
             if type(graph_simple) == nx.classes.multidigraph.MultiDiGraph:
                 graph_simple = graph_simple.to_undirected()
+
+        # TODO: Check if segmentation is necessary (maybe the road segments are already small enough)
 
         return graph_simple, edges_complex
 
@@ -417,9 +423,11 @@ class Hazard:
         self.base_graph_path = self.config['files']['base_graph']
         self.base_network_path = self.config['files']['base_network']
         self.od_graph_path = self.config['files']['origins_destinations_graph']
-
         self.list_hazard_files = self.config['hazard']['hazard_map']
         self.aggregate_wl = self.config['hazard']['aggregate_wl']
+
+        # bookkeeping for the hazard map names
+        self.hazard_name_table = self.create_hazard_name_table()
 
     def overlay_hazard_raster(self, hf, graph):
         """Overlays the hazard raster over the road segments.
@@ -430,7 +438,7 @@ class Hazard:
 
         """
         # Name the attribute name the name of the hazard file
-        hazard_names = [f.stem for f in hf]
+        hazard_names = list(self.hazard_name_table['File name'])
 
         # Check if the extent and resolution of the different hazard maps are the same.
         same_extent = check_hazard_extent_resolution(hf)
@@ -539,7 +547,7 @@ class Hazard:
                 graph[u][v][k][hn] = 0
         return graph
 
-    def join_hazard_table(self, hazards_table, graph):
+    def join_hazard_table(self, graph):
         """Joins a table with IDs and hazard information with the road segments with corresponding IDs.
 
         Args:
@@ -571,6 +579,21 @@ class Hazard:
                             right_on=self.config['hazard']['hazard_id'])
         return graph
 
+    def create_hazard_name_table(self):
+        df = pd.DataFrame()
+        df['File name'] = [haz.stem for haz in self.list_hazard_files]
+        if all(['RP' in haz.stem for haz in self.list_hazard_files]):
+            # Return period hazard maps are used
+            # TODO: now it is assumed that there is a flood event, this should be made flexible
+            rps = [haz.stem.split('RP_')[-1].split('_')[0] for haz in self.list_hazard_files]
+            df['RA2CE name'] = ['F_' + 'RP' + rp for rp in rps]
+        else:
+            # Event hazard maps are used
+            # TODO: now it is assumed that there is a flood event, this should be made flexible
+            df['RA2CE name'] = ['F_' + 'EV' + str(i+1) for i in range(len(self.list_hazard_files))]
+        df['Full path'] = [haz for haz in self.list_hazard_files]
+        return df
+
     def hazard_intersect(self, graph):
         hazards_tif = [haz for haz in self.list_hazard_files if haz.suffix == '.tif']
         hazards_shp = [haz for haz in self.list_hazard_files if haz.suffix == '.shp']
@@ -584,14 +607,22 @@ class Hazard:
             return graph
 
         elif len(hazards_shp) > 0:
+            start = time.time()
             graph = self.overlay_hazard_shp(hazards_shp, graph)
+            end = time.time()
+            logging.info(f"Hazard shapefile intersect time: {str(round(end - start, 2))}s")
             return graph
 
         elif len(hazards_table) > 0:
+            start = time.time()
             graph = self.join_hazard_table(hazards_table, graph)
+            end = time.time()
+            logging.info(f"Hazard table intersect time: {str(round(end - start, 2))}s")
             return graph
 
-        return graph
+        else:
+            logging.warning("No hazard files found.")
+            return graph
 
     def od_hazard_intersect(self, graph):
         """Overlays the origin and destination locations with the hazard maps
@@ -716,5 +747,8 @@ class Hazard:
                     if base_graph_hazard is not None:
                         self.graphs[input_graph + '_hazard'] = base_graph_hazard
                         self.config['files'][input_graph+'_hazard'] = self.save_network(base_graph_hazard, input_graph+'_hazard', types=to_save)
+
+        # Save the hazard name bookkeeping table.
+        self.hazard_name_table.to_csv(self.config['output'] / 'hazard_names.csv')
 
         return self.graphs
