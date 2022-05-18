@@ -22,23 +22,20 @@ import matplotlib.path as mpltPath
 import tqdm
 import tqdm._tqdm_pandas
 from osgeo import gdal
-from shapely.geometry import Point, LineString, MultiLineString, Polygon
 from shapely.ops import linemerge
 from geopy import distance
 from osmnx.simplification import simplify_graph
 from networkx import set_edge_attributes
 from numpy import object as np_object
 from statistics import mean
-from shapely.geometry import shape, Point, LineString
+from shapely.geometry import shape, Point, LineString, MultiLineString
 from pathlib import Path
 from decimal import Decimal
 
 # Hazard overlay
 #from boltons.iterutils import pairwise
 #from geopy.distance import vincenty
-from shapely.geometry import mapping
 import rasterio
-import shapely
 from rasterio.mask import mask
 from rasterio.features import shapes
 
@@ -1146,6 +1143,7 @@ def graph_to_shp(G, edge_shp, node_shp):
     print('\nSaving nodes as shapefile: {}'.format(node_shp))
     print('\nSaving edges as shapefile: {}'.format(edge_shp))
 
+    # The encoding utf-8 might result in an empty shapefile if the wrong encoding is used.
     nodes.to_file(node_shp, driver='ESRI Shapefile', encoding='utf-8')
     edges.to_file(edge_shp, driver='ESRI Shapefile', encoding='utf-8')
 
@@ -1532,7 +1530,7 @@ class Segmentation:
         self.save_files = save_files
 
     def apply_segmentation(self):
-        edges_complex = self.cut_gdf(self.edges_complex, self.segmentation_length)
+        edges_complex = self.cut_gdf()
 
         print('Finished segmenting the geodataframe with split length: {} degree'.format(self.segmentation_length))
 
