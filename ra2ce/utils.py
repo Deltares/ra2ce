@@ -151,6 +151,11 @@ def load_config(root_path, config_path):
     # check if files exist:
     config = check_files(config)
 
+    if 'hazard' in config:
+        if 'hazard_field_name' in config['hazard']:
+            if config['hazard']['hazard_field_name']:
+                config['hazard']['hazard_field_name'] = config['hazard']['hazard_field_name'].split(',')
+
     #TODO: give warning when the path to the ini to copy to is not found (probably the project folder is not in the ra2ce/data folder)
 
     # copy ini file for future references to output folder

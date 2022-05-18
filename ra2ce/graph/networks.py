@@ -7,13 +7,14 @@ Created on 26-7-2021
 """
 
 # external modules
-from osgeo import gdal
-import numpy as np
+# TODO: remove the useless imports
+# from osgeo import gdal
+# import numpy as np
 import time
-from osmnx.geometries import geometries_from_xml
-from osmnx.graph import _create_graph
+# from osmnx.geometries import geometries_from_xml
+# from osmnx.graph import _create_graph
 from osmnx.graph import graph_from_xml
-import geopandas as gpd
+# import geopandas as gpd
 
 # local modules
 from .networks_utils import *
@@ -322,7 +323,7 @@ class Network:
                 logging.info(f"Saved {output_path_pickle.stem} in {output_path_pickle.resolve().parent}.")
             if 'shp' in types:
                 output_path = self.config['static'] / 'output_graph' / (name + '_network.shp')
-                to_save.to_file(output_path, index=False, encoding='utf-8')
+                to_save.to_file(output_path, index=False)  #, encoding='utf-8' -Removed the encoding type because this causes some shapefiles not to save.
                 logging.info(f"Saved {output_path.stem} in {output_path.resolve().parent}.")
             return output_path_pickle
 
@@ -439,6 +440,7 @@ class Hazard:
         """
         # Name the attribute name the name of the hazard file
         hazard_names = list(self.hazard_name_table['File name'])
+        ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
 
         # Check if the extent and resolution of the different hazard maps are the same.
         same_extent = check_hazard_extent_resolution(hf)
@@ -446,7 +448,7 @@ class Hazard:
             extent = get_extent(gdal.Open(str(hf[0])))
             logging.info("The flood maps have the same extent. Flood maps used: {}".format(", ".join(hazard_names)))
 
-        for i, hn in enumerate(hazard_names):
+        for i, (hn, rn) in enumerate(zip(hazard_names, ra2ce_names)):
             src = gdal.Open(str(hf[i]))
             if not same_extent:
                 extent = get_extent(src)
@@ -487,29 +489,71 @@ class Hazard:
 
                         if len(water_level) > 0:
                             if self.aggregate_wl == 'max':
-                                graph[u][v][k][hn+'_'+self.aggregate_wl] = water_level.max()
+                                graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = np.nanmax(water_level)
                             elif self.aggregate_wl == 'min':
-                                graph[u][v][k][hn+'_'+self.aggregate_wl] = water_level.min()
+                                graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = np.nanmin(water_level)
                             elif self.aggregate_wl == 'mean':
-                                graph[u][v][k][hn+'_'+self.aggregate_wl] = mean(water_level)
+                                graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = np.nanmean(water_level)
                             else:
                                 logging.warning("No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'.")
                         else:
-                            graph[u][v][k][hn+'_'+self.aggregate_wl] = np.nan
+                            graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = np.nan
 
                     else:
-                        graph[u][v][k][hn+'_'+self.aggregate_wl] = np.nan
+                        graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = np.nan
 
             if type(graph) == gpd.GeoDataFrame:
-                hazard = hf[i]
-                from tqdm import tqdm
-                from rasterstats import zonal_stats
-                tqdm.pandas(desc=hn)
-                flood_stats = graph.geometry.progress_apply(lambda x: zonal_stats(x, hazard, all_touched=True))
-                graph['{}_cells_intersect'.format(hn)] = [x[0]['count'] for x in flood_stats]
-                graph['{}_min_flood_depth'.format(hn)] = [x[0]['min'] for x in flood_stats]
-                graph['{}_max_flood_depth'.format(hn)] = [x[0]['max'] for x in flood_stats]
-                graph['{}_mean_flood_depth'.format(hn)] = [x[0]['mean'] for x in flood_stats]
+                # start = time.time()
+                for idx in range(len(graph.index)):
+                    # check how long the road stretch is and make a point every other meter
+                    nr_points = round(line_length(graph.iloc[idx]['geometry']))
+                    if nr_points == 1:
+                        coords_to_check = list(graph.iloc[idx]['geometry'].boundary)
+                    else:
+                        coords_to_check = [graph.iloc[idx]['geometry'].interpolate(i / float(nr_points - 1), normalized=True) for
+                                           i in range(nr_points)]
+
+                    x_objects = np.array([c.coords[0][0] for c in coords_to_check])
+                    y_objects = np.array([c.coords[0][1] for c in coords_to_check])
+
+                    if size_array:
+                        # Fastest method but be aware of out of memory errors!
+                        water_level = sample_raster_full(raster, x_objects, y_objects, size_array, extent)
+                    else:
+                        # Slower method but no issues with memory errors
+                        water_level = sample_raster(raster_band, nodatavalue, x_objects, y_objects, extent['minX'],
+                                                    extent['pixelWidth'], extent['maxY'], extent['pixelHeight'])
+
+                    if len(water_level) > 0:
+                        water_level = np.where(water_level <= 0, np.nan, water_level)
+                        number_nan = np.sum(np.isnan(water_level))
+                        factor_flooded = (len(water_level) - number_nan) / len(water_level)
+
+                        graph.loc[idx, rn + '_fr'] = factor_flooded
+                        graph.loc[idx, rn + '_mi'] = np.nanmin(water_level)
+                        graph.loc[idx, rn + '_ma'] = np.nanmax(water_level)
+                        graph.loc[idx, rn + '_me'] = np.nanmean(water_level)
+                    else:
+                        graph.loc[idx, rn+'_'+self.aggregate_wl[:2]] = np.nan
+                # end = time.time()
+                # logging.info(f"Hazard raster intersect time points method: {str(round(end - start, 2))}s")
+
+                ## OLD METHOD START ##
+                # start = time.time()
+                # hazard = str(hf[0])
+                # from tqdm import tqdm
+                # from rasterstats import zonal_stats
+                # tqdm.pandas(desc=hn)
+                # flood_stats = graph.geometry.progress_apply(lambda x: zonal_stats(x, hazard,
+                #                                                                   all_touched=True,
+                #                                                                   stats="count min max mean"))
+                # graph[rn + '_co'] = [x[0]['count'] for x in flood_stats]
+                # graph[rn + '_mi'] = [x[0]['min'] for x in flood_stats]
+                # graph[rn + '_ma'] = [x[0]['max'] for x in flood_stats]
+                # graph[rn + '_me'] = [x[0]['mean'] for x in flood_stats]
+                # end = time.time()
+                # logging.info(f"Hazard raster intersect time rasterstats method: {str(round(end - start, 2))}s")
+                ## OLD METHOD END ##
 
         return graph
 
@@ -521,30 +565,40 @@ class Hazard:
         Returns:
 
         """
-        #TODO differentiate between graph and geodataframe input
+        # TODO differentiate between graph and geodataframe input
 
-        # Shapefile
-        gdf = gpd.read_file(hf)
-        spatial_index = gdf.sindex
+        hazard_names = list(self.hazard_name_table['File name'])
+        ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
+        hfns = self.config['hazard']['hazard_field_name']
 
-        for u, v, k, edata in graph.edges.data(keys=True):
-            if 'geometry' in edata:
-                possible_matches_index = list(spatial_index.intersection(edata['geometry'].bounds))
-                possible_matches = gdf.iloc[possible_matches_index]
-                precise_matches = possible_matches[possible_matches.intersects(edata['geometry'])]
-                # TODO REQUEST USER TO INPUT THE COLUMN NAME OF THE HAZARD COLUMN
-                hn='TODO'
-                if not precise_matches.empty:
-                    if self.aggregate_wl == 'max':
-                        graph[u][v][k][hn+'_max'] = precise_matches[hn].max()
-                    if self.aggregate_wl == 'min':
-                        graph[u][v][k][hn+'_min'] = precise_matches[hn].min()
-                    if self.aggregate_wl == 'mean':
-                        graph[u][v][k][hn+'_mean'] = precise_matches[hn].mean()
-                else:
-                    graph[u][v][k][hn] = 0
-            else:
-                graph[u][v][k][hn] = 0
+        for i, (hn, rn, hfn) in enumerate(zip(hazard_names, ra2ce_names, hfns)):
+            gdf = gpd.read_file(str(hf[i]))
+            spatial_index = gdf.sindex
+
+            if type(graph) != gpd.GeoDataFrame:
+                for u, v, k, edata in graph.edges.data(keys=True):
+                    if 'geometry' in edata:
+                        possible_matches_index = list(spatial_index.intersection(edata['geometry'].bounds))
+                        possible_matches = gdf.iloc[possible_matches_index]
+                        precise_matches = possible_matches[possible_matches.intersects(edata['geometry'])]
+
+                        if not precise_matches.empty:
+                            if self.aggregate_wl == 'max':
+                                graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = precise_matches[hfn].max()
+                            if self.aggregate_wl == 'min':
+                                graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = precise_matches[hfn].min()
+                            if self.aggregate_wl == 'mean':
+                                graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = precise_matches[hfn].mean()
+                        else:
+                            graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = 0
+                    else:
+                        graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = 0
+
+            if type(graph) == gpd.GeoDataFrame:
+                # graph.sjoin(gdf, how="left")
+                print("THE OPTION OF SPATIALLY INTERSECTING A HAZARD SHAPEFILE WITH GDF IS NOT IMPLEMENTED YET.")
+                #TODO: add this option
+
         return graph
 
     def join_hazard_table(self, graph):
@@ -555,7 +609,6 @@ class Hazard:
         Returns:
 
         """
-        # TODO differentiate between graph and geodataframe input
         if type(graph) == gpd.GeoDataFrame:
             for haz in self.list_hazard_files:
                 if haz.suffix in ['.csv']:
@@ -568,30 +621,35 @@ class Hazard:
                 if haz.suffix in ['.csv']:
                     gdf = self.join_table(gdf, haz)
 
+            # TODO: Check if the graph is created again correctly.
             graph = graph_from_gdf(gdf, gdf_nodes)
             return graph
 
     def join_table(self, graph, hazard):
         df = pd.read_csv(hazard)
+        df = df[self.config['hazard']['hazard_field_name']]
         graph = graph.merge(df,
                             how='left',
                             left_on=self.config['network']['file_id'],
                             right_on=self.config['hazard']['hazard_id'])
+        #TODO: rename the hazard column names to RA2CE names.
         return graph
 
     def create_hazard_name_table(self):
+        agg_types = ['maximum', 'minimum', 'average', 'fraction of network segment impacted by hazard']
+
         df = pd.DataFrame()
-        df['File name'] = [haz.stem for haz in self.list_hazard_files]
+        df[['File name', 'Aggregation method']] = [(haz.stem, agg_type) for haz in self.list_hazard_files for agg_type in agg_types]
         if all(['RP' in haz.stem for haz in self.list_hazard_files]):
             # Return period hazard maps are used
             # TODO: now it is assumed that there is a flood event, this should be made flexible
             rps = [haz.stem.split('RP_')[-1].split('_')[0] for haz in self.list_hazard_files]
-            df['RA2CE name'] = ['F_' + 'RP' + rp for rp in rps]
+            df['RA2CE name'] = ['F_' + 'RP' + rp + '_' + agg_type[:2] for rp in rps for agg_type in agg_types]
         else:
             # Event hazard maps are used
             # TODO: now it is assumed that there is a flood event, this should be made flexible
-            df['RA2CE name'] = ['F_' + 'EV' + str(i+1) for i in range(len(self.list_hazard_files))]
-        df['Full path'] = [haz for haz in self.list_hazard_files]
+            df['RA2CE name'] = ['F_' + 'EV' + str(i+1) + '_' + agg_type[:2] for i in range(len(self.list_hazard_files)) for agg_type in agg_types]
+        df['Full path'] = [haz for haz in self.list_hazard_files for agg_type in agg_types]
         return df
 
     def hazard_intersect(self, graph):
@@ -749,6 +807,6 @@ class Hazard:
                         self.config['files'][input_graph+'_hazard'] = self.save_network(base_graph_hazard, input_graph+'_hazard', types=to_save)
 
         # Save the hazard name bookkeeping table.
-        self.hazard_name_table.to_csv(self.config['output'] / 'hazard_names.csv')
+        self.hazard_name_table.to_excel(self.config['output'] / 'hazard_names.xlsx', index=False)
 
         return self.graphs
