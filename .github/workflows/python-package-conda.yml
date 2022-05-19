@@ -23,7 +23,7 @@ jobs:
         conda install -c conda-forge mamba
     - name: Install dependencies
       run: |
-        mamba create --file environment.yml
+        mamba env create --file environment.yml
         conda activate ra2ce
     - name: Lint with flake8
       run: |
