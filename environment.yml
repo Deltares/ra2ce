@@ -17,7 +17,7 @@ dependencies:
   - pandas
   - pyarrow
   - pytest
-  - python
+  - python=3.8.*
   - rasterio
   - rasterstats
   - rtree
