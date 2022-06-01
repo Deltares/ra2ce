@@ -186,7 +186,7 @@ class IndirectAnalyses:
             graph = copy.deepcopy(master_graph)
             # Create a geodataframe from the full graph
             gdf = osmnx.graph_to_gdfs(master_graph, nodes=False)
-            gdf['ra2ce_fid'] = gdf['ra2ce_fid'].astype(str)
+            gdf['rfid'] = gdf['rfid'].astype(str)
 
             # Create the edgelist that consist of edges that should be removed
             edges_remove = [e for e in graph.edges.data(keys=True) if hz+'_'+analysis['aggregate_wl'] in e[-1]]
@@ -196,7 +196,7 @@ class IndirectAnalyses:
             graph.remove_edges_from(edges_remove)
 
             # dataframe for saving the calculations of the alternative routes
-            df_calculated = pd.DataFrame(columns=['u', 'v', 'ra2ce_fid', 'alt_dist', 'alt_nodes', 'connected'])
+            df_calculated = pd.DataFrame(columns=['u', 'v', 'rfid', 'alt_dist', 'alt_nodes', 'connected'])
 
             for i, edges in enumerate(edges_remove):
                 u, v, k, edata = edges
@@ -211,16 +211,16 @@ class IndirectAnalyses:
 
                     # append to calculation dataframe
                     df_calculated = df_calculated.append(
-                        {'u': u, 'v': v, 'ra2ce_fid': str(edata['ra2ce_fid']), 'alt_dist': alt_dist,
+                        {'u': u, 'v': v, 'rfid': str(edata['rfid']), 'alt_dist': alt_dist,
                          'alt_nodes': alt_nodes, 'connected': 1}, ignore_index=True)
                 else:
                     # append to calculation dataframe
                     df_calculated = df_calculated.append(
-                        {'u': u, 'v': v, 'ra2ce_fid': str(edata['ra2ce_fid']), 'alt_dist': np.NaN,
+                        {'u': u, 'v': v, 'rfid': str(edata['rfid']), 'alt_dist': np.NaN,
                          'alt_nodes': np.NaN, 'connected': 0}, ignore_index=True)
 
             # Merge the dataframes
-            gdf = gdf.merge(df_calculated, how='left', on=['u', 'v', 'ra2ce_fid'])
+            gdf = gdf.merge(df_calculated, how='left', on=['u', 'v', 'rfid'])
 
             # calculate the difference in distance
             gdf['diff_dist'] = [dist - length if dist == dist else np.NaN for (dist, length) in
@@ -630,7 +630,7 @@ class IndirectAnalyses:
         o_name = self.config['origins_destinations']['origins_names']
         d_name = self.config['origins_destinations']['destinations_names']
         od_id = self.config['origins_destinations']['id_name_origin_destination']
-        id_name = self.config['network']['file_id'] if self.config['network']['file_id'] is not None else 'ra2ce_fid'
+        id_name = self.config['network']['file_id'] if self.config['network']['file_id'] is not None else 'rfid'
         count_col_name = self.config['origins_destinations']['origin_count']
         weight_factor = self.config['origins_destinations']['origin_out_fraction']
 
@@ -1035,8 +1035,8 @@ def find_route_ods(graph, od_nodes, weighing):
                     pref_edges.append(graph[u][v][edge_key]['geometry'])
                 else:
                     pref_edges.append(LineString([graph.nodes[u]['geometry'], graph.nodes[v]['geometry']]))
-                if 'ra2ce_fid' in graph[u][v][edge_key]:
-                    match_list.append(graph[u][v][edge_key]['ra2ce_fid'])
+                if 'rfid' in graph[u][v][edge_key]:
+                    match_list.append(graph[u][v][edge_key]['rfid'])
 
             # compile the road segments into one geometry
             pref_edges = MultiLineString(pref_edges)

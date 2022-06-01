@@ -959,31 +959,31 @@ def delete_duplicates(all_points):
     return uniquepoints
 
 
-def create_simplified_graph(graph_complex, new_id='ra2ce_fid'):
+def create_simplified_graph(graph_complex, new_id='rfid'):
     """ Create a simplified graph with unique ids from a complex graph"""
     logging.info('Simplifying graph')
     try:
-        graph_complex = graph_create_unique_ids(graph_complex, '{}_complex'.format(new_id))
+        graph_complex = graph_create_unique_ids(graph_complex, '{}_c'.format(new_id))
 
         # Create simplified graph and add unique ids
         graph_simple = simplify_graph_count(graph_complex)
         graph_simple = graph_create_unique_ids(graph_simple, new_id)
 
         # Create look_up_tables between graphs with unique ids
-        simple_to_complex, complex_to_simple = graph_link_simple_id_to_complex(graph_simple, new_id=new_id, save_json_folder=None)
+        simple_to_complex, complex_to_simple = graph_link_simple_id_to_complex(graph_simple, new_id=new_id)
 
         # Store id table and add simple ids to complex graph
         id_tables = (simple_to_complex, complex_to_simple)
         graph_complex = add_simple_id_to_graph_complex(graph_complex, complex_to_simple, new_id)
-        logging.info('simplified graph succesfully created')
+        logging.info('Simplified graph succesfully created')
     except:
         graph_simple = None
         id_tables = None
         logging.error('Did not create a simplified version of the graph')
-    return graph_simple, graph_complex  #, id_tables
+    return graph_simple, graph_complex, id_tables
 
 
-def gdf_check_create_unique_ids(gdf, id_name, new_id_name='ra2ce_fid'):
+def gdf_check_create_unique_ids(gdf, id_name, new_id_name='rfid'):
     # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
     check = list(gdf.index)
     logging.info('Started creating unique ids...')
@@ -998,7 +998,7 @@ def gdf_check_create_unique_ids(gdf, id_name, new_id_name='ra2ce_fid'):
         return gdf, id_name
 
 
-def graph_check_create_unique_ids(graph, idname, new_id_name='ra2ce_fid'):
+def graph_check_create_unique_ids(graph, idname, new_id_name='rfid'):
     # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
     if len(set([str(e[-1][idname]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
 
@@ -1014,7 +1014,7 @@ def graph_check_create_unique_ids(graph, idname, new_id_name='ra2ce_fid'):
         return graph, idname
 
 
-def graph_create_unique_ids(graph, new_id_name='ra2ce_fid'):
+def graph_create_unique_ids(graph, new_id_name='rfid'):
     # Check if new_id_name exists and if unique
     u, v, k = list(graph.edges)[0]
     if new_id_name not in graph.edges[u, v, k]:
@@ -1139,6 +1139,10 @@ def graph_to_shp(G, edge_shp, node_shp):
         for col in df.columns:
             if df[col].dtype == np_object and col != df.geometry.name:
                 df[col] = df[col].astype(str)
+
+    # Add a CRS to the nodes
+    if nodes.crs is None and edges.crs is not None:
+        nodes.crs = edges.crs
 
     print('\nSaving nodes as shapefile: {}'.format(node_shp))
     print('\nSaving edges as shapefile: {}'.format(edge_shp))
@@ -1423,7 +1427,7 @@ def filter_osm(osm_filter_path, o5m, filtered_o5m, tags=None):
     os.system(command)
 
 
-def graph_link_simple_id_to_complex(graph_simple, new_id, save_json_folder=None):
+def graph_link_simple_id_to_complex(graph_simple, new_id):
     """
 
     Create lookup tables (dicts) to match edges_ids of the complex and simple graph
@@ -1447,7 +1451,7 @@ def graph_link_simple_id_to_complex(graph_simple, new_id, save_json_folder=None)
     # keys are the ids of the simple graph, values are lists with all matching complex id's
     for u, v, k in tqdm.tqdm(graph_simple.edges(keys=True)):
         key_1 = graph_simple[u][v][k]['{}'.format(new_id)]
-        value_1 = graph_simple[u][v][k]['{}_complex'.format(new_id)]
+        value_1 = graph_simple[u][v][k]['{}_c'.format(new_id)]
         lookup_dict[key_1] = value_1
 
     inverted_lookup_dict = {}
@@ -1462,45 +1466,35 @@ def graph_link_simple_id_to_complex(graph_simple, new_id, save_json_folder=None)
     simple_to_complex = lookup_dict
     complex_to_simple = inverted_lookup_dict
 
-    # save lookup table if necessary
-    if save_json_folder is not None:
-        assert isinstance(save_json_folder, Path)
-        import json
-        with open((save_json_folder / 'simple_to_complex.json'),'w') as fp:
-            json.dump(simple_to_complex,fp)
-            logging.info('saved (or overwrote) simple_to_complex.json')
-        with open((save_json_folder / 'complex_to_simple.json'),'w') as fp:
-            json.dump(complex_to_simple,fp)
-            logging.info('saved (or overwrote) complex_to_simple.json')
     logging.info('Lookup tables from complex to simple and vice versa were created')
     return simple_to_complex, complex_to_simple
 
 
 def add_simple_id_to_graph_complex(G_complex, complex_to_simple, new_id):
     """
-    Adds the appropriate ID of the simple graph to each edge of the complex graph as a new attribute 'G_fid_simple'
+    Adds the appropriate ID of the simple graph to each edge of the complex graph as a new attribute 'rfid'
 
     Arguments:
-        G_complex (Graph) : The complex graph, still lacking 'G_fid_simple'
+        G_complex (Graph) : The complex graph, still lacking 'rfid'
         complex_to_simple (dict) : lookup table linking complex to simple graphs
 
     Returns:
-         G_complex (Graph) : Same object, with added attribute 'G_fid_simple'
+         G_complex (Graph) : Same object, with added attribute 'rfid'
 
     """
 
-    obtained_complex_ids = nx.get_edge_attributes(G_complex, '{}_complex'.format(new_id)) # {(u,v,k) : 'G_fid_complex'}
-    simple_ids_per_complex_id = obtained_complex_ids #start with a copy
+    obtained_complex_ids = nx.get_edge_attributes(G_complex, '{}_c'.format(new_id))  # {(u,v,k) : 'rfid_c'}
+    simple_ids_per_complex_id = obtained_complex_ids  # start with a copy
 
-    for key, value in obtained_complex_ids.items(): # {(u,v,k) : 'G_fid_complex'}
+    for key, value in obtained_complex_ids.items():  # {(u,v,k) : 'rfid_c'}
         try:
-            new_value = complex_to_simple[value] #find simple id belonging to the complex id
+            new_value = complex_to_simple[value]  # find simple id belonging to the complex id
             simple_ids_per_complex_id[key] = new_value
         except KeyError as e:
             logging.error('Could not find the simple ID belonging to complex ID {}; value set to None'.format(key))
             simple_ids_per_complex_id[key] = None
 
-    # Now the format of simple_ids_per_complex_id is: {(u,v,k) : 'G_fid_simple}
+    # Now the format of simple_ids_per_complex_id is: {(u,v,k) : 'rfid}
     set_edge_attributes(G_complex, simple_ids_per_complex_id, new_id)
 
     return G_complex
