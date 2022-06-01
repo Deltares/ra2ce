@@ -168,10 +168,16 @@ class Network:
         logging.info('Start reading graph from o5m...')
         graph_complex = graph_from_xml(o5m_filtered_path, bidirectional=False, simplify=False, retain_all=False)
 
-        logging.info('Start converting the graphs to GeoDataFrame...')
-        edges_complex, node_complex = graph_to_gdf(graph_complex)
+        # Create 'graph_simple'
+        graph_simple, graph_complex, link_tables = create_simplified_graph(graph_complex)
 
-        graph_simple, graph_complex = create_simplified_graph(graph_complex)
+        # Create 'edges_complex', convert complex graph to geodataframe
+        logging.info('Start converting the graph to a geodataframe')
+        edges_complex, node_complex = graph_to_gdf(graph_complex)
+        logging.info('Finished converting the graph to a geodataframe')
+
+        # Save the link tables linking complex and simple IDs
+        self.save_linking_tables(link_tables[0], link_tables[1])
 
         if self.segmentation_length is not None:
             edges_complex = Segmentation(edges_complex, self.segmentation_length)
@@ -206,22 +212,23 @@ class Network:
         logging.info('graph downloaded from OSM with {:,} nodes and {:,} edges'.format(len(list(graph_complex.nodes())),
                                                                                        len(list(graph_complex.edges()))))
 
+        # Create 'graph_simple'
+        graph_simple, graph_complex, link_tables = create_simplified_graph(graph_complex)
+
         # Create 'edges_complex', convert complex graph to geodataframe
         logging.info('Start converting the graph to a geodataframe')
-        edges_complex, nodes = graph_to_gdf(graph_complex)
-
-        # edges_simple, nodes_simple = graph_to_gdf(graph_simple)
+        edges_complex, node_complex = graph_to_gdf(graph_complex)
         logging.info('Finished converting the graph to a geodataframe')
 
-        # Create 'graph_simple'
-        graph_simple, graph_complex = create_simplified_graph(graph_complex)
+        # Save the link tables linking complex and simple IDs
+        self.save_linking_tables(link_tables[0], link_tables[1])
 
         # If the user wants to use undirected graphs, turn into an undirected graph (default).
         if not self.directed:
             if type(graph_simple) == nx.classes.multidigraph.MultiDiGraph:
                 graph_simple = graph_simple.to_undirected()
 
-        # TODO: Check if segmentation is necessary (maybe the road segments are already small enough)
+        # No segmentation required, the non-simplified road segments from OSM are already small enough
 
         return graph_simple, edges_complex
 
@@ -340,6 +347,16 @@ class Network:
             return output_path_pickle
         else:
             return None
+
+    def save_linking_tables(self, simple_to_complex, complex_to_simple):
+        # save lookup table if necessary
+        import json
+        with open(self.config['static'] / 'output_graph' / 'simple_to_complex.json', 'w') as fp:
+            json.dump(simple_to_complex, fp)
+            logging.info('saved (or overwrote) simple_to_complex.json')
+        with open(self.config['static'] / 'output_graph' / 'complex_to_simple.json', 'w') as fp:
+            json.dump(complex_to_simple, fp)
+            logging.info('saved (or overwrote) complex_to_simple.json')
 
     def create(self):
         """Function with the logic to call the right analyses."""
