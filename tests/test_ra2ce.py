@@ -18,6 +18,7 @@ def lookup_output(output_path, case):
     return pd.read_csv(test_path)
 
 
+@pytest.mark.skip(reason="work in progress")
 def test_output():
     """Sample pytest test function for output"""
     cases = ['direct', 'single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination',
@@ -37,10 +38,10 @@ def test_output():
         pd.testing.assert_frame_equal(outputs_test, outputs_correct)
 
 
-@pytest.mark.skip(reason="work in progress")
+# @pytest.mark.skip(reason="work in progress")
 def test_command_line_interface():
     """Test the CLI."""
-    from ra2ce import cli
+    from run import cli
 
     runner = CliRunner()
     result = runner.invoke(cli.main)
