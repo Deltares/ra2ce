@@ -66,7 +66,7 @@ class Network:
 
         # Cleanup
         self.snapping = config['cleanup']['snapping_threshold']
-        self.pruning = config['cleanup']['pruning_threshold']
+        # self.pruning = config['cleanup']['pruning_threshold']  # NOT IMPLEMENTED CURRENTLY
         self.segmentation_length = config['cleanup']['segmentation_length']
 
         # files
@@ -100,10 +100,9 @@ class Network:
 
         edges, id_name = gdf_check_create_unique_ids(edges, self.file_id)
 
-        if self.snapping is not None or self.pruning is not None:
-            if self.snapping is not None:
-                edges = snap_endpoints_lines(edges, self.snapping, id_name, tolerance=1e-7)
-                logging.info("Function [snap_endpoints_lines]: executed with threshold = {}".format(self.snapping))
+        if self.snapping is not None:
+            edges = snap_endpoints_lines(edges, self.snapping, id_name, tolerance=1e-7)
+            logging.info("Function [snap_endpoints_lines]: executed with threshold = {}".format(self.snapping))
 
         # merge merged lines if there are any merged lines
         if not lines_merged.empty:
@@ -115,12 +114,11 @@ class Network:
         nodes = create_nodes(edges, crs, self.config['cleanup']['ignore_intersections'])
         logging.info("Function [create_nodes]: executed")
 
-        if self.snapping is not None or self.pruning is not None:
-            if self.snapping is not None:
-                # merged lines may be updated when new nodes are created which makes a line cut in two
-                edges = cut_lines(edges, nodes, id_name, tolerance=1e-4)
-                nodes = create_nodes(edges, crs, self.config['cleanup']['ignore_intersections'])
-                logging.info("Function [cut_lines]: executed")
+        if self.snapping is not None:
+            # merged lines may be updated when new nodes are created which makes a line cut in two
+            edges = cut_lines(edges, nodes, id_name, tolerance=1e-4)
+            nodes = create_nodes(edges, crs, self.config['cleanup']['ignore_intersections'])
+            logging.info("Function [cut_lines]: executed")
 
         # create tuples from the adjecent nodes and add as column in geodataframe
         edges_complex = join_nodes_edges(nodes, edges, id_name)
@@ -132,12 +130,14 @@ class Network:
 
         if self.segmentation_length is not None:
             edges_complex = Segmentation(edges_complex, self.segmentation_length)
-            edges_complex.apply_segmentation()
+            edges_complex = edges_complex.apply_segmentation()
+            if edges_complex.crs is None:  # The CRS might have dissapeared.
+                edges_complex.crs = crs  # set the right CRS
 
         # Exporting complex graph because the shapefile should be kept the same as much as possible.
         return graph_complex, edges_complex
 
-    def network_osm_pbf(self):
+    def network_osm_pbf(self, crs=4326):
         """Creates a network from an OSM PBF file.
 
         Returns:
@@ -181,7 +181,9 @@ class Network:
 
         if self.segmentation_length is not None:
             edges_complex = Segmentation(edges_complex, self.segmentation_length)
-            edges_complex.apply_segmentation()
+            edges_complex = edges_complex.apply_segmentation()
+            if edges_complex.crs is None:  # The CRS might have dissapeared.
+                edges_complex.crs = crs  # set the right CRS
 
         return graph_simple, edges_complex
 
@@ -312,10 +314,10 @@ class Network:
         if lines['geometry'].apply(lambda row: isinstance(row, MultiLineString)).any():
             for line in lines.loc[lines['geometry'].apply(lambda row: isinstance(row, MultiLineString))].iterrows():
                 if len(linemerge(line[1].geometry)) > 1:
-                    warnings.warn("Edge with {} = {} is a MultiLineString, which cannot be merged to one line. Check this part.".format(
+                    logging.warning("Edge with {} = {} is a MultiLineString, which cannot be merged to one line. Check this part.".format(
                             self.file_id, line[1][self.file_id]))
 
-        print('Shapefile(s) loaded with attributes: {}.'.format(list(lines.columns.values)))  # fill in parameter names
+        logging.info('Shapefile(s) loaded with attributes: {}.'.format(list(lines.columns.values)))  # fill in parameter names
 
         return lines
 
@@ -403,11 +405,6 @@ class Network:
                 network_gdf = gpd.read_feather(self.config['files']['base_network'])
             else:
                 network_gdf = None
-
-            if self.save_shp:
-                to_save = ['shp', 'pickle']
-                self.config['files']['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
-                self.config['files']['base_network'] = self.save_network(network_gdf, 'base', types=to_save)
 
         # create origins destinations graph
         if (self.origins is not None) and (self.destinations is not None) and self.od_graph_path is None:
