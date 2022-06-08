@@ -454,8 +454,8 @@ def snap_endpoints_lines(lines_gdf, max_dist, idName, tolerance=1e-7):
     # isolated endpoints are being snapped to the closest vertex
     isolated_endpoints = find_isolated_endpoints(list(lines_gdf[idName]), snapped_lines)
 
-    print("Number of isolated endpoints (points that probably need to be snapped): {} ".format(len(isolated_endpoints)))
-    print("Snapping lines.. Follow the progress:")
+    logging.info("Number of isolated endpoints (points that probably need to be snapped): {} ".format(len(isolated_endpoints)))
+    logging.info("Snapping lines.. Follow the progress:")
     # only snap isolated endpoints within max_dist of another vertice / endpoint
     for i, isolated_endpoint in enumerate(isolated_endpoints):
         ids, endpoint = isolated_endpoint
@@ -495,9 +495,6 @@ def snap_endpoints_lines(lines_gdf, max_dist, idName, tolerance=1e-7):
     # TODO: remove any lines that are overlapping?
 
     return lines_gdf
-
-
-
 
 
 def find_isolated_endpoints(linesIds, lines):
@@ -1144,8 +1141,8 @@ def graph_to_shp(G, edge_shp, node_shp):
     if nodes.crs is None and edges.crs is not None:
         nodes.crs = edges.crs
 
-    print('\nSaving nodes as shapefile: {}'.format(node_shp))
-    print('\nSaving edges as shapefile: {}'.format(edge_shp))
+    logging.info('Saving nodes as shapefile: {}'.format(node_shp))
+    logging.info('Saving edges as shapefile: {}'.format(edge_shp))
 
     # The encoding utf-8 might result in an empty shapefile if the wrong encoding is used.
     nodes.to_file(node_shp, driver='ESRI Shapefile', encoding='utf-8')
@@ -1524,22 +1521,9 @@ class Segmentation:
         self.save_files = save_files
 
     def apply_segmentation(self):
-        edges_complex = self.cut_gdf()
-
-        print('Finished segmenting the geodataframe with split length: {} degree'.format(self.segmentation_length))
-
-        """ 
-        if self.save_files:
-            output_path = Path(__file__).parents[1] / 'test/output/'
-            path = output_path / 'edges_complex_cut.shp'
-            edges_complex.to_file(path, driver='ESRI Shapefile', encoding='utf-8')
-            print(path, 'saved')
-            # also save edges_complex_cut.p
-            with open((output_path / 'edges_complex_cut.p'), 'wb') as handle:
-                pickle.dump(edges_complex, handle)
-                print(output_path, 'edges_complex_cut.p saved')"""
-
-        return edges_complex
+        self.cut_gdf()
+        logging.info('Finished segmenting the geodataframe with split length: {} degree'.format(self.segmentation_length))
+        return self.edges_complex
 
     def cut(self, line, distance):
         """Cuts a line in two at a distance from its starting point
@@ -1631,10 +1615,10 @@ class Segmentation:
             *gdf* (GeoDataFrame) : GeoDataFrame to split
             *length* (units of the projection) : Typically in degrees, 0.001 degrees ~ 111 m in Europe
         """
-        gdf = self.edges_complex
+        gdf = self.edges_complex.copy()
         columns = gdf.columns
-        data = {}
-        data['splt_id'] = []
+
+        data = {'splt_id': []}
 
         for column in columns:
             data[column] = []
@@ -1642,18 +1626,18 @@ class Segmentation:
         count = 0
         for i, row in gdf.iterrows():
             geom = row['geometry']
-            assert type(geom)==LineString
+            assert type(geom) == LineString or type(geom) == MultiLineString
             linestrings = self.split_linestring(geom, self.segmentation_length)
 
             for j, linestring in enumerate(linestrings):
                 for key, value in row.items():
-                    if key=='geometry':
+                    if key == 'geometry':
                         data[key].append(linestring)
                     else:
                         data[key].append(value)
                 data['splt_id'].append(count)
                 count += 1
-        return gpd.GeoDataFrame(data)
+        self.edges_complex = gpd.GeoDataFrame(data)
 
 
 class HazardUtils:

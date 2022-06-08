@@ -2,51 +2,35 @@
 
 """Tests for `ra2ce` package."""
 
+from ra2ce import __version__
 from pathlib import Path
-import pytest
-from click.testing import CliRunner
-import pandas as pd
-from ra2ce import ra2ce
+
+TESTDATADIR = Path(__file__).resolve().parent.joinpath("data")
 
 
-def lookup_output(output_path, case):
-    """Read an output file"""
-    root_path = Path(__file__).resolve().parent.parent
-    test_path = Path(output_path) / case / f'{case}_test.csv'
-    if not test_path.is_file():
-        test_path = root_path / test_path
-    return pd.read_csv(test_path)
+def get_paths(name):
+    print(TESTDATADIR)
+    network_conf = TESTDATADIR / name / 'network.ini'
+    analyses_conf = TESTDATADIR / name / 'analyses.ini'
+    print(network_conf)
+    if not network_conf.is_file():
+        network_conf = None
+    if not analyses_conf.is_file():
+        analyses_conf = None
+    return network_conf, analyses_conf
 
 
-@pytest.mark.skip(reason="work in progress")
-def test_output():
-    """Sample pytest test function for output"""
-    cases = ['direct', 'single_link_redundancy', 'multi_link_redundancy', 'optimal_route_origin_destination',
-             'multi_link_origin_destination']
-    input_network_path = Path('data/test/network.ini')
-    input_analyses_path = Path('data/test/analyses.ini')
-    ra2ce.main(input_network_path, input_analyses_path)
-
-    # to_check = ['ra2ce_fid', 'alt_dist', 'alt_nodes', 'diff_dist']
-
-    for case in cases:
-        outputs_correct = lookup_output('data/test/output/correct', case)
-        outputs_test = lookup_output('data/test/output', case)
-
-        # Check if the pandas dataframes are equal in all aspects
-        print(case)
-        pd.testing.assert_frame_equal(outputs_test, outputs_correct)
+# def check_output_files():
 
 
-# @pytest.mark.skip(reason="work in progress")
-def test_command_line_interface():
-    """Test the CLI."""
-    from run import cli
 
-    runner = CliRunner()
-    result = runner.invoke(cli.main)
-    assert result.exit_code == 0
-    assert 'ra2ce.cli.main' in result.output
-    help_result = runner.invoke(cli.main, ['--help'])
-    assert help_result.exit_code == 0
-    assert '--help  Show this message and exit.' in help_result.output
+def test_version():
+    assert __version__ == "0.1.0"
+
+
+def test_import():
+    """Import test"""
+    try:
+        from ra2ce.ra2ce import main
+    except ImportError:
+        raise

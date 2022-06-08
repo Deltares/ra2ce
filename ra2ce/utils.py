@@ -13,13 +13,33 @@ from ast import literal_eval
 import codecs
 import logging
 from shutil import copyfile
-import os
+import sys
 
 # Local modules
 from .checks import input_validation, check_files, available_checks
 
 
 list_indirect_analyses, list_direct_analyses = available_checks()
+
+
+def get_root_path(net_ini, ana_ini):
+    if net_ini is not None or ana_ini is not None:
+        if net_ini is not None and ana_ini is not None:
+            if Path(net_ini).resolve().parent.parent == Path(ana_ini).resolve().parent.parent:
+                rootpath = Path(net_ini).resolve().parent.parent
+        elif net_ini is None and ana_ini is not None:
+            rootpath = Path(ana_ini).resolve().parent.parent
+        elif net_ini is not None and ana_ini is None:
+            rootpath = Path(net_ini).resolve().parent.parent
+    else:
+        logging.error("No network.ini or analyses.ini supplied. Program will close.")
+        sys.exit()
+
+    if rootpath.is_dir():
+        return rootpath
+    else:
+        logging.error(f"Path {rootpath} does not exist. Program will close.")
+        sys.exit()
 
 
 def parse_config(root, path=None, opt_cli=None):
@@ -144,9 +164,9 @@ def load_config(root_path, config_path):
         config = configure_analyses(config)
 
     # Set the output paths in the configuration Dict for ease of saving to those folders.
-    config['input'] = config['root_path'] / 'data' / config['project']['name'] / 'input'
-    config['static'] = config['root_path'] / 'data' / config['project']['name'] / 'static'
-    config['output'] = config['root_path'] / 'data' / config['project']['name'] / 'output'
+    config['input'] = config['root_path'] / config['project']['name'] / 'input'
+    config['static'] = config['root_path'] / config['project']['name'] / 'static'
+    config['output'] = config['root_path'] / config['project']['name'] / 'output'
 
     # check if files exist:
     config = check_files(config)
