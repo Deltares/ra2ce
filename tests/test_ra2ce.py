@@ -9,10 +9,8 @@ TESTDATADIR = Path(__file__).resolve().parent.joinpath("data")
 
 
 def get_paths(name):
-    print(TESTDATADIR)
     network_conf = TESTDATADIR / name / 'network.ini'
     analyses_conf = TESTDATADIR / name / 'analyses.ini'
-    print(network_conf)
     if not network_conf.is_file():
         network_conf = None
     if not analyses_conf.is_file():
@@ -20,8 +18,18 @@ def get_paths(name):
     return network_conf, analyses_conf
 
 
-# def check_output_files():
+def get_output_graph_path(name):
+    return TESTDATADIR / name / 'static' / 'output_graph'
 
+
+def get_output_path(name):
+    return TESTDATADIR / name / 'output'
+
+
+def check_output_files(name, file_names):
+    folder = get_output_graph_path(name)
+    for fn in file_names:
+        assert folder.joinpath(fn).is_file()
 
 
 def test_version():
