@@ -107,7 +107,7 @@ def check_paths(config, key, item, input_dirs, error):
     for p in config[key][item].split(','):
         p = Path(p)
         if not p.is_file():
-            abs_path = config['root_path'] / 'data' / config['project']['name'] / 'static' / input_dirs[
+            abs_path = config['root_path'] / config['project']['name'] / 'static' / input_dirs[
                 item] / p
             if not abs_path.is_file():
                 logging.error('Wrong input to property [ {} ], file does not exist: {}'.format(item, abs_path))
