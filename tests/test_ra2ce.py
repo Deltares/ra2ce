@@ -22,14 +22,20 @@ def get_output_graph_path(name):
     return TESTDATADIR / name / 'static' / 'output_graph'
 
 
+def check_output_graph_files(name, file_names):
+    folder = get_output_graph_path(name)
+    for fn in file_names:
+        assert folder.joinpath(fn).is_file()
+
+
 def get_output_path(name):
     return TESTDATADIR / name / 'output'
 
 
-def check_output_files(name, file_names):
-    folder = get_output_graph_path(name)
+def check_output_files(name, analysis_name, file_names):
+    folder = get_output_path(name)
     for fn in file_names:
-        assert folder.joinpath(fn).is_file()
+        assert folder.joinpath(analysis_name, fn).is_file()
 
 
 def test_version():

@@ -11,7 +11,10 @@ import click
 import warnings
 import logging
 
-warnings.filterwarnings('ignore', message='.*initial implementation of Parquet.*')
+warnings.filterwarnings(action='ignore', message='.*initial implementation of Parquet.*')
+warnings.filterwarnings(action='ignore', message='All-NaN slice encountered')
+warnings.filterwarnings(action='ignore', message='Value *not successfully written.*')
+
 
 # Local modules
 from .utils import get_root_path, initiate_root_logger, load_config
