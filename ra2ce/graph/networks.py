@@ -589,8 +589,6 @@ class Hazard:
         Returns:
 
         """
-        # TODO differentiate between graph and geodataframe input
-
         hazard_names = list(self.hazard_name_table['File name'])
         ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
         hfns = self.config['hazard']['hazard_field_name']
@@ -656,7 +654,8 @@ class Hazard:
                             how='left',
                             left_on=self.config['network']['file_id'],
                             right_on=self.config['hazard']['hazard_id'])
-        #TODO: rename the hazard column names to RA2CE names.
+
+        graph.rename(columns={self.config['hazard']['hazard_field_name']: [n[:-3] for n in self.hazard_name_table['RA2CE name']][0]}, inplace=True)  # Check if this is the right name
         return graph
 
     def create_hazard_name_table(self):
@@ -718,8 +717,8 @@ class Hazard:
         hf = [haz for haz in self.list_hazard_files if haz.suffix == '.tif']
 
         # Name the attribute name the name of the hazard file
-        hazard_names = [f.stem for f in hf]
-        hazard_names = ['_'.join([h[0] if (h.upper() != 'RP') and not h.isdecimal() else h for h in hazard.split('_')]) for hazard in hazard_names]
+        hazard_names = list(self.hazard_name_table['File name'])
+        ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
 
         # Check if the extent and resolution of the different hazard maps are the same.
         same_extent = check_hazard_extent_resolution(hf)
@@ -727,7 +726,7 @@ class Hazard:
             extent = get_extent(gdal.Open(str(hf[0])))
             logging.info("The flood maps have the same extent. Flood maps used: {}".format(", ".join(hazard_names)))
 
-        for i, hn in enumerate(hazard_names):
+        for i, (hn, rn) in enumerate(zip(hazard_names, ra2ce_names)):
             src = gdal.Open(str(hf[i]))
             if not same_extent:
                 extent = get_extent(src)
@@ -759,7 +758,7 @@ class Hazard:
                                             extent['minX'], extent['pixelWidth'], extent['maxY'],
                                             extent['pixelHeight'])
 
-            attribute_dict = {od: {hn: wl} for od, wl in zip(od_ids, water_level)}
+            attribute_dict = {od: {rn+'_'+self.aggregate_wl[:2]: wl} for od, wl in zip(od_ids, water_level)}
             nx.set_node_attributes(graph, attribute_dict)
 
         return graph
