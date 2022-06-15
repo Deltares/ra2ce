@@ -1099,7 +1099,7 @@ def find_closest_node_attr(H, keyName, weighingName, originLabelContains, destLa
     return originClosestDest, list_no_path
 
 
-def calc_pref_routes_closest_dest(graph, base_graph, weighing, crs, od_id, idName, origin_closest_dest, origins, nr_people_name, factor_hospital):
+def calc_pref_routes_closest_dest(graph, base_graph, weighing, crs, od_id, idName, origin_closest_dest, origins, nr_people_name, factor_out):
     # dataframe to save the preferred routes
     pref_routes = gpd.GeoDataFrame(columns=['o_node', 'd_node', 'origin', 'destination',
                                             'opt_path', weighing, 'match_ids', 'origin_cnt', 'cnt_weight', 'tot_miles', 'geometry'],
@@ -1118,7 +1118,7 @@ def calc_pref_routes_closest_dest(graph, base_graph, weighing, crs, od_id, idNam
 
         # Find the number of people per neighborhood
         nr_people_per_route_total = origins.loc[origins[od_id] == int(o[1].split('_')[-1]), nr_people_name].iloc[0]
-        nr_per_route = nr_people_per_route_total * factor_hospital
+        nr_per_route = nr_people_per_route_total * factor_out
 
         pref_edges = []
         match_list = []
@@ -1135,8 +1135,8 @@ def calc_pref_routes_closest_dest(graph, base_graph, weighing, crs, od_id, idNam
             if 'length' in graph[u][v][edge_key]:
                 length_list.append(graph[u][v][edge_key]['length'])
 
-            # Add the number of people that need hospital care, to the road segments. For now, each road segment in a route
-            # gets attributed all the people that are taking that route.
+            # Add the number of people that go from the origin to a destination to the road segments.
+            # For now, each road segment in a route gets attributed all the people that are taking that route.
             base_graph[u][v][edge_key]['opt_cnt'] = base_graph[u][v][edge_key]['opt_cnt'] + nr_per_route
 
         # compile the road segments into one geometry

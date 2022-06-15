@@ -7,14 +7,8 @@ Created on 26-7-2021
 """
 
 # external modules
-# TODO: remove the useless imports
-# from osgeo import gdal
-# import numpy as np
 import time
-# from osmnx.geometries import geometries_from_xml
-# from osmnx.graph import _create_graph
 from osmnx.graph import graph_from_xml
-# import geopandas as gpd
 
 # local modules
 from .networks_utils import *
@@ -386,12 +380,28 @@ class Network:
 
             elif self.source == 'pickle':
                 logging.info('Start importing a network from pickle')
-                # base_graph = nx.read_gpickle(self.config['static'] / 'network' / 'base_graph.gpickle')
+                base_graph = nx.read_gpickle(self.config['static'] / 'network' / 'base_graph.gpickle')
                 network_gdf = read_pickle_file(self.config['static'] / 'network' / 'base_network.p')
 
             if self.source != 'pickle' and self.source != 'shapefile':
+                # Graph & Network from OSM download or OSM PBF
                 # Check if all geometries between nodes are there, if not, add them as a straight line.
                 base_graph = add_missing_geoms_graph(base_graph, geom_name='geometry')
+
+                if all(['length' in e for u, v, e in base_graph.edges.data()]) and any(['maxspeed' in e for u, v, e in base_graph.edges.data()]):
+                    # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
+                    path_avg_speed = self.config['static'] / 'output_graph' / 'avg_speed.csv'
+                    if path_avg_speed.is_file():
+                        avg_speeds = pd.read_csv(path_avg_speed)
+                    else:
+                        avg_speeds = calc_avg_speed(base_graph, 'highway', save_csv=True,
+                                                    save_path=self.config['static'] / 'output_graph' / 'avg_speed.csv')
+                    G = assign_avg_speed(base_graph, avg_speeds, 'highway')
+
+                    # make a time value of seconds, length of road streches is in meters
+                    for u, v, k, edata in G.edges.data(keys=True):
+                        hours = (edata['length'] / 1000) / edata['avgspeed']
+                        G[u][v][k]['time'] = hours * 3600
 
             # Save the graph and geodataframe
             self.config['files']['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
