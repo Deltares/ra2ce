@@ -141,14 +141,16 @@ class Network:
         road_types = self.road_types.lower().replace(' ', ' ').split(',')
 
         input_path = self.config['static'] / "network"
-        osm_convert_exe = self.config['root_path'] / "executables" / 'osmconvert64.exe'
-        osm_filter_exe = self.config['root_path'] / "executables" / 'osmfilter.exe'
+        executables_path = Path(__file__).parents[1] / 'executables'
+        osm_convert_exe = executables_path  / 'osmconvert64.exe'
+        osm_filter_exe = executables_path  / 'osmfilter.exe'
         assert osm_convert_exe.exists() and osm_filter_exe.exists()
 
         pbf_file = input_path / self.primary_files
         o5m_path = input_path / self.primary_files.replace('.pbf', '.o5m')
         o5m_filtered_path = input_path / self.primary_files.replace('.pbf', '_filtered.o5m')
 
+        #Todo: check what excacly these functions do, and if this is always what we want
         if o5m_filtered_path.exists():
             logging.info('filtered o5m path already exists: {}'.format(o5m_filtered_path))
         elif o5m_path.exists():
@@ -160,6 +162,7 @@ class Network:
             logging.info('Converted and filtered osm.pbf to o5m, created: {}'.format(o5m_path))
 
         logging.info('Start reading graph from o5m...')
+        #Todo: make sure that bidirectionality is inferred from the settings, similar for other settings
         graph_complex = graph_from_xml(o5m_filtered_path, bidirectional=False, simplify=False, retain_all=False)
 
         # Create 'graph_simple'
@@ -345,12 +348,31 @@ class Network:
             return None
 
     def save_linking_tables(self, simple_to_complex, complex_to_simple):
+        """
+        Function that save the tables that link the simple and complex graph/netwok
+
+        Arguments:
+            *simple_to_complex* (dict) : keys: ids of simple graph; values: matching ids of complex graph [list]
+            *complex_to_simple* (dict) : keys: ids of complex graph; values: matching ids of simple graph [int]
+
+        Returns:
+            None
+
+        Effect: saves the lookup tables as json files in the static/output_graph folder
+
+        """
+
         # save lookup table if necessary
         import json
-        with open(self.config['static'] / 'output_graph' / 'simple_to_complex.json', 'w') as fp:
+
+        destination_folder = self.config['static'] / 'output_graph'
+        if not destination_folder.exists():
+            destination_folder.mkdir()
+
+        with open((destination_folder / 'simple_to_complex.json'), 'w') as fp:
             json.dump(simple_to_complex, fp)
             logging.info('saved (or overwrote) simple_to_complex.json')
-        with open(self.config['static'] / 'output_graph' / 'complex_to_simple.json', 'w') as fp:
+        with open((destination_folder /'complex_to_simple.json'), 'w') as fp:
             json.dump(complex_to_simple, fp)
             logging.info('saved (or overwrote) complex_to_simple.json')
 
