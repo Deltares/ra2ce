@@ -454,8 +454,8 @@ def snap_endpoints_lines(lines_gdf, max_dist, idName, tolerance=1e-7):
     # isolated endpoints are being snapped to the closest vertex
     isolated_endpoints = find_isolated_endpoints(list(lines_gdf[idName]), snapped_lines)
 
-    print("Number of isolated endpoints (points that probably need to be snapped): {} ".format(len(isolated_endpoints)))
-    print("Snapping lines.. Follow the progress:")
+    logging.info("Number of isolated endpoints (points that probably need to be snapped): {} ".format(len(isolated_endpoints)))
+    logging.info("Snapping lines.. Follow the progress:")
     # only snap isolated endpoints within max_dist of another vertice / endpoint
     for i, isolated_endpoint in enumerate(isolated_endpoints):
         ids, endpoint = isolated_endpoint
@@ -495,9 +495,6 @@ def snap_endpoints_lines(lines_gdf, max_dist, idName, tolerance=1e-7):
     # TODO: remove any lines that are overlapping?
 
     return lines_gdf
-
-
-
 
 
 def find_isolated_endpoints(linesIds, lines):
@@ -959,31 +956,31 @@ def delete_duplicates(all_points):
     return uniquepoints
 
 
-def create_simplified_graph(graph_complex, new_id='ra2ce_fid'):
+def create_simplified_graph(graph_complex, new_id='rfid'):
     """ Create a simplified graph with unique ids from a complex graph"""
     logging.info('Simplifying graph')
     try:
-        graph_complex = graph_create_unique_ids(graph_complex, '{}_complex'.format(new_id))
+        graph_complex = graph_create_unique_ids(graph_complex, '{}_c'.format(new_id))
 
         # Create simplified graph and add unique ids
         graph_simple = simplify_graph_count(graph_complex)
         graph_simple = graph_create_unique_ids(graph_simple, new_id)
 
         # Create look_up_tables between graphs with unique ids
-        simple_to_complex, complex_to_simple = graph_link_simple_id_to_complex(graph_simple, new_id=new_id, save_json_folder=None)
+        simple_to_complex, complex_to_simple = graph_link_simple_id_to_complex(graph_simple, new_id=new_id)
 
         # Store id table and add simple ids to complex graph
         id_tables = (simple_to_complex, complex_to_simple)
         graph_complex = add_simple_id_to_graph_complex(graph_complex, complex_to_simple, new_id)
-        logging.info('simplified graph succesfully created')
+        logging.info('Simplified graph succesfully created')
     except:
         graph_simple = None
         id_tables = None
         logging.error('Did not create a simplified version of the graph')
-    return graph_simple, graph_complex  #, id_tables
+    return graph_simple, graph_complex, id_tables
 
 
-def gdf_check_create_unique_ids(gdf, id_name, new_id_name='ra2ce_fid'):
+def gdf_check_create_unique_ids(gdf, id_name, new_id_name='rfid'):
     # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
     check = list(gdf.index)
     logging.info('Started creating unique ids...')
@@ -998,7 +995,7 @@ def gdf_check_create_unique_ids(gdf, id_name, new_id_name='ra2ce_fid'):
         return gdf, id_name
 
 
-def graph_check_create_unique_ids(graph, idname, new_id_name='ra2ce_fid'):
+def graph_check_create_unique_ids(graph, idname, new_id_name='rfid'):
     # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
     if len(set([str(e[-1][idname]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
 
@@ -1014,7 +1011,7 @@ def graph_check_create_unique_ids(graph, idname, new_id_name='ra2ce_fid'):
         return graph, idname
 
 
-def graph_create_unique_ids(graph, new_id_name='ra2ce_fid'):
+def graph_create_unique_ids(graph, new_id_name='rfid'):
     # Check if new_id_name exists and if unique
     u, v, k = list(graph.edges)[0]
     if new_id_name not in graph.edges[u, v, k]:
@@ -1140,8 +1137,12 @@ def graph_to_shp(G, edge_shp, node_shp):
             if df[col].dtype == np_object and col != df.geometry.name:
                 df[col] = df[col].astype(str)
 
-    print('\nSaving nodes as shapefile: {}'.format(node_shp))
-    print('\nSaving edges as shapefile: {}'.format(edge_shp))
+    # Add a CRS to the nodes
+    if nodes.crs is None and edges.crs is not None:
+        nodes.crs = edges.crs
+
+    logging.info('Saving nodes as shapefile: {}'.format(node_shp))
+    logging.info('Saving edges as shapefile: {}'.format(edge_shp))
 
     # The encoding utf-8 might result in an empty shapefile if the wrong encoding is used.
     nodes.to_file(node_shp, driver='ESRI Shapefile', encoding='utf-8')
@@ -1423,7 +1424,7 @@ def filter_osm(osm_filter_path, o5m, filtered_o5m, tags=None):
     os.system(command)
 
 
-def graph_link_simple_id_to_complex(graph_simple, new_id, save_json_folder=None):
+def graph_link_simple_id_to_complex(graph_simple, new_id):
     """
 
     Create lookup tables (dicts) to match edges_ids of the complex and simple graph
@@ -1447,7 +1448,7 @@ def graph_link_simple_id_to_complex(graph_simple, new_id, save_json_folder=None)
     # keys are the ids of the simple graph, values are lists with all matching complex id's
     for u, v, k in tqdm.tqdm(graph_simple.edges(keys=True)):
         key_1 = graph_simple[u][v][k]['{}'.format(new_id)]
-        value_1 = graph_simple[u][v][k]['{}_complex'.format(new_id)]
+        value_1 = graph_simple[u][v][k]['{}_c'.format(new_id)]
         lookup_dict[key_1] = value_1
 
     inverted_lookup_dict = {}
@@ -1462,45 +1463,35 @@ def graph_link_simple_id_to_complex(graph_simple, new_id, save_json_folder=None)
     simple_to_complex = lookup_dict
     complex_to_simple = inverted_lookup_dict
 
-    # save lookup table if necessary
-    if save_json_folder is not None:
-        assert isinstance(save_json_folder, Path)
-        import json
-        with open((save_json_folder / 'simple_to_complex.json'),'w') as fp:
-            json.dump(simple_to_complex,fp)
-            logging.info('saved (or overwrote) simple_to_complex.json')
-        with open((save_json_folder / 'complex_to_simple.json'),'w') as fp:
-            json.dump(complex_to_simple,fp)
-            logging.info('saved (or overwrote) complex_to_simple.json')
     logging.info('Lookup tables from complex to simple and vice versa were created')
     return simple_to_complex, complex_to_simple
 
 
 def add_simple_id_to_graph_complex(G_complex, complex_to_simple, new_id):
     """
-    Adds the appropriate ID of the simple graph to each edge of the complex graph as a new attribute 'G_fid_simple'
+    Adds the appropriate ID of the simple graph to each edge of the complex graph as a new attribute 'rfid'
 
     Arguments:
-        G_complex (Graph) : The complex graph, still lacking 'G_fid_simple'
+        G_complex (Graph) : The complex graph, still lacking 'rfid'
         complex_to_simple (dict) : lookup table linking complex to simple graphs
 
     Returns:
-         G_complex (Graph) : Same object, with added attribute 'G_fid_simple'
+         G_complex (Graph) : Same object, with added attribute 'rfid'
 
     """
 
-    obtained_complex_ids = nx.get_edge_attributes(G_complex, '{}_complex'.format(new_id)) # {(u,v,k) : 'G_fid_complex'}
-    simple_ids_per_complex_id = obtained_complex_ids #start with a copy
+    obtained_complex_ids = nx.get_edge_attributes(G_complex, '{}_c'.format(new_id))  # {(u,v,k) : 'rfid_c'}
+    simple_ids_per_complex_id = obtained_complex_ids  # start with a copy
 
-    for key, value in obtained_complex_ids.items(): # {(u,v,k) : 'G_fid_complex'}
+    for key, value in obtained_complex_ids.items():  # {(u,v,k) : 'rfid_c'}
         try:
-            new_value = complex_to_simple[value] #find simple id belonging to the complex id
+            new_value = complex_to_simple[value]  # find simple id belonging to the complex id
             simple_ids_per_complex_id[key] = new_value
         except KeyError as e:
             logging.error('Could not find the simple ID belonging to complex ID {}; value set to None'.format(key))
             simple_ids_per_complex_id[key] = None
 
-    # Now the format of simple_ids_per_complex_id is: {(u,v,k) : 'G_fid_simple}
+    # Now the format of simple_ids_per_complex_id is: {(u,v,k) : 'rfid}
     set_edge_attributes(G_complex, simple_ids_per_complex_id, new_id)
 
     return G_complex
@@ -1530,22 +1521,9 @@ class Segmentation:
         self.save_files = save_files
 
     def apply_segmentation(self):
-        edges_complex = self.cut_gdf()
-
-        print('Finished segmenting the geodataframe with split length: {} degree'.format(self.segmentation_length))
-
-        """ 
-        if self.save_files:
-            output_path = Path(__file__).parents[1] / 'test/output/'
-            path = output_path / 'edges_complex_cut.shp'
-            edges_complex.to_file(path, driver='ESRI Shapefile', encoding='utf-8')
-            print(path, 'saved')
-            # also save edges_complex_cut.p
-            with open((output_path / 'edges_complex_cut.p'), 'wb') as handle:
-                pickle.dump(edges_complex, handle)
-                print(output_path, 'edges_complex_cut.p saved')"""
-
-        return edges_complex
+        self.cut_gdf()
+        logging.info('Finished segmenting the geodataframe with split length: {} degree'.format(self.segmentation_length))
+        return self.edges_complex
 
     def cut(self, line, distance):
         """Cuts a line in two at a distance from its starting point
@@ -1637,10 +1615,10 @@ class Segmentation:
             *gdf* (GeoDataFrame) : GeoDataFrame to split
             *length* (units of the projection) : Typically in degrees, 0.001 degrees ~ 111 m in Europe
         """
-        gdf = self.edges_complex
+        gdf = self.edges_complex.copy()
         columns = gdf.columns
-        data = {}
-        data['splt_id'] = []
+
+        data = {'splt_id': []}
 
         for column in columns:
             data[column] = []
@@ -1648,18 +1626,18 @@ class Segmentation:
         count = 0
         for i, row in gdf.iterrows():
             geom = row['geometry']
-            assert type(geom)==LineString
+            assert type(geom) == LineString or type(geom) == MultiLineString
             linestrings = self.split_linestring(geom, self.segmentation_length)
 
             for j, linestring in enumerate(linestrings):
                 for key, value in row.items():
-                    if key=='geometry':
+                    if key == 'geometry':
                         data[key].append(linestring)
                     else:
                         data[key].append(value)
                 data['splt_id'].append(count)
                 count += 1
-        return gpd.GeoDataFrame(data)
+        self.edges_complex = gpd.GeoDataFrame(data)
 
 
 class HazardUtils:
@@ -1771,3 +1749,130 @@ class HazardUtils:
                 gdf['hazard'] = hzd_names[iter_]
                 all_hzds.append(gdf)
         return pd.concat(all_hzds)
+
+
+def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
+    """Calculates the average speed from OSM roads, per road type
+    Args:
+        graph: NetworkX graph with road types
+        road_type_col_name: name of the column which holds the road types ('highway' in OSM)
+        save_csv [boolean]: to save a csv or not
+        save_path [string]: path to save the csv to
+    Returns:
+        dataframe with the average road speeds per road type
+    """
+    # Create a dataframe of all road types
+    exceptions = list(set([str(edata[road_type_col_name]) for u, v, edata in graph.edges.data() if isinstance(edata[road_type_col_name], list)]))
+    types = list(set([str(edata[road_type_col_name]) for u, v, edata in graph.edges.data() if isinstance(edata[road_type_col_name], str)]))
+    all_road_types = exceptions + types
+    df = pd.DataFrame({'road_types': all_road_types, 'avg_speed': 0})
+
+    # calculate average speed
+    for i in range(len(df)):
+        roadtype = df.road_types[i]
+        all_edges = [(u, v, edata['maxspeed'], edata['length']) for u, v, edata in graph.edges.data() if
+                     (str(edata[road_type_col_name]) == roadtype) & ('maxspeed' in edata)]
+        all_avg = []
+        all_l = []
+        for u, v, s, l in all_edges:
+            if isinstance(s, list):
+                ns = []
+                for ss in s:
+                    if not any(c.isalpha() for c in ss) and not (';' in ss) and not ('|' in ss):
+                        ns.append(int(ss))
+                    elif not any(c.isalpha() for c in ss) and ';' in ss:
+                        ns.extend([int(x) for x in ss.split(';') if x.isnumeric()])
+                    elif not any(c.isalpha() for c in ss) and '|' in ss:
+                        ns.extend([int(x) for x in ss.split('|') if x.isnumeric()])
+                    elif ' mph' in ss:
+                        ns.append(int(ss.split(' mph')[0]) * 1.609344)
+                if len(ns) > 0:
+                    ss = sum(ns) / len(ns)
+                else:
+                    continue
+            elif isinstance(s, str):
+                if not any(c.isalpha() for c in s) and not (';' in s) and not ('|' in s):
+                    ss = int(s)
+                elif not any(c.isalpha() for c in s) and ';' in s:
+                    ss = mean([int(x) for x in s.split(';') if x.isnumeric()])
+                elif not any(c.isalpha() for c in s) and '|' in s:
+                    ss = mean([int(x) for x in s.split('|') if x.isnumeric()])
+                elif ' mph' in s:
+                    ss = int(s.split(' mph')[0]) * 1.609344
+                else:
+                    continue
+            all_avg.append(ss * l)
+            all_l.append(l)
+            df.iloc[i, 1] = sum(all_avg) / sum(all_l)
+
+    # For all types without an average speed, take one that is closest. E.g. for the links take the one of the same type
+    # of the main roads
+    if not df.loc[df['avg_speed'] == 0].empty:
+        logging.info(f"Not all of the edges contain a 'maxspeed' attribute. RA2CE will guess the right average maximum "
+                     f"speed per road type that does not contain a 'maxspeed' attribute. Please check the average speed CSV to ensure correct speeds here: {save_path}")
+        for i in df.loc[df['avg_speed'] == 0].index:
+            if df['road_types'].iloc[i] in exceptions:
+                if any(rt in df['road_types'].iloc[i] for rt in df['road_types']):
+                    road_type, avg_speed = [(rt, avg_s) for rt, avg_s in zip(df['road_types'], df['avg_speed']) if rt in df['road_types'].iloc[i] and avg_s != 0][0]
+                    df['avg_speed'].iloc[i] = avg_speed
+            else:
+                # if any(rt in df['road_types'].iloc[i] for rt in df['road_types']):
+                if 'link' in df['road_types'].iloc[i]:
+                    try:
+                        df['avg_speed'].iloc[i] = df.loc[df['road_types'] == df['road_types'].iloc[i].split('_link')[0], 'avg_speed'].values[0]
+                    except IndexError as e:
+                        logging.warning(f"Road type '{df['road_types'].iloc[i]}' cannot be assigned any average speed. Please check the average speed CSV ({save_path}), enter the right average speed for this road type, and run RA2CE again.")
+                        df['avg_speed'].iloc[i] = 0
+
+    if save_csv:
+        df.to_csv(save_path)
+        logging.info("Saved the average speeds per road type to: {}".format(save_path))
+
+    return df
+
+
+def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
+    """Assigns the average speed to roads in an existing (OSM) graph
+    """
+    # make a list of strings instead of just a string of the road types column
+    avg_road_speed["road_types"] = avg_road_speed["road_types"].astype(str)
+
+    # calculate the average maximum speed per edge and assign the ones that don't have a value
+    for u, v, k, edata in graph.edges.data(keys=True):
+        road_type = str(edata[road_type_col_name])
+        if 'maxspeed' in edata:
+            max_speed = edata['maxspeed']
+            if isinstance(max_speed, list):
+                ns = []
+                for ms in max_speed:
+                    if not any(c.isalpha() for c in ms) and not (';' in ms) and not ('|' in ms):
+                        ns.append(int(ms))
+                    elif not any(c.isalpha() for c in ms) and ';' in ms:
+                        ns.extend([int(x) for x in ms.split(';') if x.isnumeric()])
+                    elif not any(c.isalpha() for c in ms) and '|' in ms:
+                        ns.extend([int(x) for x in ms.split('|') if x.isnumeric()])
+                    elif ' mph' in ms:
+                        ns.append(int(ms.split(' mph')[0]) * 1.609344)
+                if len(ns) > 0:
+                    graph[u][v][k]['avgspeed'] = sum(ns) / len(ns)
+                else:
+                    graph[u][v][k]['avgspeed'] = avg_road_speed.loc[avg_road_speed['road_types'] == road_type, 'avg_speed'].iloc[0]
+            elif isinstance(max_speed, str):
+                if not any(c.isalpha() for c in max_speed) and not (';' in max_speed) and not ('|' in max_speed):
+                    graph[u][v][k]['avgspeed'] = int(max_speed)
+                elif not any(c.isalpha() for c in max_speed) and ';' in max_speed:
+                    graph[u][v][k]['avgspeed'] = mean([int(x) for x in max_speed.split(';') if x.isnumeric()])
+                elif not any(c.isalpha() for c in max_speed) and '|' in max_speed:
+                    graph[u][v][k]['avgspeed'] = mean([int(x) for x in max_speed.split('|') if x.isnumeric()])
+                elif ' mph' in max_speed:
+                    graph[u][v][k]['avgspeed'] = int(max_speed.split(' mph')[0]) * 1.609344
+                else:
+                    graph[u][v][k]['avgspeed'] = avg_road_speed.loc[avg_road_speed['road_types'] == road_type, 'avg_speed'].iloc[0]
+        else:
+            if ']' in road_type:
+                avg_speed = int([s for r, s in zip(avg_road_speed['road_types'], avg_road_speed['avg_speed']) if set(road_type[2:-2].split("', '")) == set(r[2:-2].split("', '"))][0])
+                graph[u][v][k]['avgspeed'] = avg_speed
+            else:
+                graph[u][v][k]['avgspeed'] = avg_road_speed.loc[avg_road_speed['road_types'] == road_type, 'avg_speed'].iloc[0]
+
+    return graph

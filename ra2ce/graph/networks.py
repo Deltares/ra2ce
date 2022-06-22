@@ -7,14 +7,8 @@ Created on 26-7-2021
 """
 
 # external modules
-# TODO: remove the useless imports
-# from osgeo import gdal
-# import numpy as np
 import time
-# from osmnx.geometries import geometries_from_xml
-# from osmnx.graph import _create_graph
 from osmnx.graph import graph_from_xml
-# import geopandas as gpd
 
 # local modules
 from .networks_utils import *
@@ -66,7 +60,7 @@ class Network:
 
         # Cleanup
         self.snapping = config['cleanup']['snapping_threshold']
-        self.pruning = config['cleanup']['pruning_threshold']
+        # self.pruning = config['cleanup']['pruning_threshold']  # NOT IMPLEMENTED CURRENTLY
         self.segmentation_length = config['cleanup']['segmentation_length']
 
         # files
@@ -100,10 +94,9 @@ class Network:
 
         edges, id_name = gdf_check_create_unique_ids(edges, self.file_id)
 
-        if self.snapping is not None or self.pruning is not None:
-            if self.snapping is not None:
-                edges = snap_endpoints_lines(edges, self.snapping, id_name, tolerance=1e-7)
-                logging.info("Function [snap_endpoints_lines]: executed with threshold = {}".format(self.snapping))
+        if self.snapping is not None:
+            edges = snap_endpoints_lines(edges, self.snapping, id_name, tolerance=1e-7)
+            logging.info("Function [snap_endpoints_lines]: executed with threshold = {}".format(self.snapping))
 
         # merge merged lines if there are any merged lines
         if not lines_merged.empty:
@@ -115,12 +108,11 @@ class Network:
         nodes = create_nodes(edges, crs, self.config['cleanup']['ignore_intersections'])
         logging.info("Function [create_nodes]: executed")
 
-        if self.snapping is not None or self.pruning is not None:
-            if self.snapping is not None:
-                # merged lines may be updated when new nodes are created which makes a line cut in two
-                edges = cut_lines(edges, nodes, id_name, tolerance=1e-4)
-                nodes = create_nodes(edges, crs, self.config['cleanup']['ignore_intersections'])
-                logging.info("Function [cut_lines]: executed")
+        if self.snapping is not None:
+            # merged lines may be updated when new nodes are created which makes a line cut in two
+            edges = cut_lines(edges, nodes, id_name, tolerance=1e-4)
+            nodes = create_nodes(edges, crs, self.config['cleanup']['ignore_intersections'])
+            logging.info("Function [cut_lines]: executed")
 
         # create tuples from the adjecent nodes and add as column in geodataframe
         edges_complex = join_nodes_edges(nodes, edges, id_name)
@@ -132,12 +124,14 @@ class Network:
 
         if self.segmentation_length is not None:
             edges_complex = Segmentation(edges_complex, self.segmentation_length)
-            edges_complex.apply_segmentation()
+            edges_complex = edges_complex.apply_segmentation()
+            if edges_complex.crs is None:  # The CRS might have dissapeared.
+                edges_complex.crs = crs  # set the right CRS
 
         # Exporting complex graph because the shapefile should be kept the same as much as possible.
         return graph_complex, edges_complex
 
-    def network_osm_pbf(self):
+    def network_osm_pbf(self, crs=4326):
         """Creates a network from an OSM PBF file.
 
         Returns:
@@ -168,14 +162,22 @@ class Network:
         logging.info('Start reading graph from o5m...')
         graph_complex = graph_from_xml(o5m_filtered_path, bidirectional=False, simplify=False, retain_all=False)
 
-        logging.info('Start converting the graphs to GeoDataFrame...')
-        edges_complex, node_complex = graph_to_gdf(graph_complex)
+        # Create 'graph_simple'
+        graph_simple, graph_complex, link_tables = create_simplified_graph(graph_complex)
 
-        graph_simple, graph_complex = create_simplified_graph(graph_complex)
+        # Create 'edges_complex', convert complex graph to geodataframe
+        logging.info('Start converting the graph to a geodataframe')
+        edges_complex, node_complex = graph_to_gdf(graph_complex)
+        logging.info('Finished converting the graph to a geodataframe')
+
+        # Save the link tables linking complex and simple IDs
+        self.save_linking_tables(link_tables[0], link_tables[1])
 
         if self.segmentation_length is not None:
             edges_complex = Segmentation(edges_complex, self.segmentation_length)
-            edges_complex.apply_segmentation()
+            edges_complex = edges_complex.apply_segmentation()
+            if edges_complex.crs is None:  # The CRS might have dissapeared.
+                edges_complex.crs = crs  # set the right CRS
 
         return graph_simple, edges_complex
 
@@ -206,22 +208,23 @@ class Network:
         logging.info('graph downloaded from OSM with {:,} nodes and {:,} edges'.format(len(list(graph_complex.nodes())),
                                                                                        len(list(graph_complex.edges()))))
 
+        # Create 'graph_simple'
+        graph_simple, graph_complex, link_tables = create_simplified_graph(graph_complex)
+
         # Create 'edges_complex', convert complex graph to geodataframe
         logging.info('Start converting the graph to a geodataframe')
-        edges_complex, nodes = graph_to_gdf(graph_complex)
-
-        # edges_simple, nodes_simple = graph_to_gdf(graph_simple)
+        edges_complex, node_complex = graph_to_gdf(graph_complex)
         logging.info('Finished converting the graph to a geodataframe')
 
-        # Create 'graph_simple'
-        graph_simple, graph_complex = create_simplified_graph(graph_complex)
+        # Save the link tables linking complex and simple IDs
+        self.save_linking_tables(link_tables[0], link_tables[1])
 
         # If the user wants to use undirected graphs, turn into an undirected graph (default).
         if not self.directed:
             if type(graph_simple) == nx.classes.multidigraph.MultiDiGraph:
                 graph_simple = graph_simple.to_undirected()
 
-        # TODO: Check if segmentation is necessary (maybe the road segments are already small enough)
+        # No segmentation required, the non-simplified road segments from OSM are already small enough
 
         return graph_simple, edges_complex
 
@@ -305,10 +308,10 @@ class Network:
         if lines['geometry'].apply(lambda row: isinstance(row, MultiLineString)).any():
             for line in lines.loc[lines['geometry'].apply(lambda row: isinstance(row, MultiLineString))].iterrows():
                 if len(linemerge(line[1].geometry)) > 1:
-                    warnings.warn("Edge with {} = {} is a MultiLineString, which cannot be merged to one line. Check this part.".format(
+                    logging.warning("Edge with {} = {} is a MultiLineString, which cannot be merged to one line. Check this part.".format(
                             self.file_id, line[1][self.file_id]))
 
-        print('Shapefile(s) loaded with attributes: {}.'.format(list(lines.columns.values)))  # fill in parameter names
+        logging.info('Shapefile(s) loaded with attributes: {}.'.format(list(lines.columns.values)))  # fill in parameter names
 
         return lines
 
@@ -341,6 +344,16 @@ class Network:
         else:
             return None
 
+    def save_linking_tables(self, simple_to_complex, complex_to_simple):
+        # save lookup table if necessary
+        import json
+        with open(self.config['static'] / 'output_graph' / 'simple_to_complex.json', 'w') as fp:
+            json.dump(simple_to_complex, fp)
+            logging.info('saved (or overwrote) simple_to_complex.json')
+        with open(self.config['static'] / 'output_graph' / 'complex_to_simple.json', 'w') as fp:
+            json.dump(complex_to_simple, fp)
+            logging.info('saved (or overwrote) complex_to_simple.json')
+
     def create(self):
         """Function with the logic to call the right analyses."""
         # Save the 'base' network as gpickle and if the user requested, also as shapefile.
@@ -367,12 +380,28 @@ class Network:
 
             elif self.source == 'pickle':
                 logging.info('Start importing a network from pickle')
-                # base_graph = nx.read_gpickle(self.config['static'] / 'network' / 'base_graph.gpickle')
+                base_graph = nx.read_gpickle(self.config['static'] / 'network' / 'base_graph.gpickle')
                 network_gdf = read_pickle_file(self.config['static'] / 'network' / 'base_network.p')
 
             if self.source != 'pickle' and self.source != 'shapefile':
+                # Graph & Network from OSM download or OSM PBF
                 # Check if all geometries between nodes are there, if not, add them as a straight line.
                 base_graph = add_missing_geoms_graph(base_graph, geom_name='geometry')
+
+                if all(['length' in e for u, v, e in base_graph.edges.data()]) and any(['maxspeed' in e for u, v, e in base_graph.edges.data()]):
+                    # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
+                    path_avg_speed = self.config['static'] / 'output_graph' / 'avg_speed.csv'
+                    if path_avg_speed.is_file():
+                        avg_speeds = pd.read_csv(path_avg_speed)
+                    else:
+                        avg_speeds = calc_avg_speed(base_graph, 'highway', save_csv=True,
+                                                    save_path=self.config['static'] / 'output_graph' / 'avg_speed.csv')
+                    G = assign_avg_speed(base_graph, avg_speeds, 'highway')
+
+                    # make a time value of seconds, length of road streches is in meters
+                    for u, v, k, edata in G.edges.data(keys=True):
+                        hours = (edata['length'] / 1000) / edata['avgspeed']
+                        G[u][v][k]['time'] = hours * 3600
 
             # Save the graph and geodataframe
             self.config['files']['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
@@ -386,11 +415,6 @@ class Network:
                 network_gdf = gpd.read_feather(self.config['files']['base_network'])
             else:
                 network_gdf = None
-
-            if self.save_shp:
-                to_save = ['shp', 'pickle']
-                self.config['files']['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
-                self.config['files']['base_network'] = self.save_network(network_gdf, 'base', types=to_save)
 
         # create origins destinations graph
         if (self.origins is not None) and (self.destinations is not None) and self.od_graph_path is None:
@@ -565,8 +589,6 @@ class Hazard:
         Returns:
 
         """
-        # TODO differentiate between graph and geodataframe input
-
         hazard_names = list(self.hazard_name_table['File name'])
         ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
         hfns = self.config['hazard']['hazard_field_name']
@@ -632,7 +654,8 @@ class Hazard:
                             how='left',
                             left_on=self.config['network']['file_id'],
                             right_on=self.config['hazard']['hazard_id'])
-        #TODO: rename the hazard column names to RA2CE names.
+
+        graph.rename(columns={self.config['hazard']['hazard_field_name']: [n[:-3] for n in self.hazard_name_table['RA2CE name']][0]}, inplace=True)  # Check if this is the right name
         return graph
 
     def create_hazard_name_table(self):
@@ -694,8 +717,8 @@ class Hazard:
         hf = [haz for haz in self.list_hazard_files if haz.suffix == '.tif']
 
         # Name the attribute name the name of the hazard file
-        hazard_names = [f.stem for f in hf]
-        hazard_names = ['_'.join([h[0] if (h.upper() != 'RP') and not h.isdecimal() else h for h in hazard.split('_')]) for hazard in hazard_names]
+        hazard_names = list(self.hazard_name_table['File name'])
+        ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
 
         # Check if the extent and resolution of the different hazard maps are the same.
         same_extent = check_hazard_extent_resolution(hf)
@@ -703,7 +726,7 @@ class Hazard:
             extent = get_extent(gdal.Open(str(hf[0])))
             logging.info("The flood maps have the same extent. Flood maps used: {}".format(", ".join(hazard_names)))
 
-        for i, hn in enumerate(hazard_names):
+        for i, (hn, rn) in enumerate(zip(hazard_names, ra2ce_names)):
             src = gdal.Open(str(hf[i]))
             if not same_extent:
                 extent = get_extent(src)
@@ -735,7 +758,7 @@ class Hazard:
                                             extent['minX'], extent['pixelWidth'], extent['maxY'],
                                             extent['pixelHeight'])
 
-            attribute_dict = {od: {hn: wl} for od, wl in zip(od_ids, water_level)}
+            attribute_dict = {od: {rn+'_'+self.aggregate_wl[:2]: wl} for od, wl in zip(od_ids, water_level)}
             nx.set_node_attributes(graph, attribute_dict)
 
         return graph
