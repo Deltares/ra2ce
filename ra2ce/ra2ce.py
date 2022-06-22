@@ -11,10 +11,13 @@ import click
 import warnings
 import logging
 
-warnings.filterwarnings('ignore', message='.*initial implementation of Parquet.*')
+warnings.filterwarnings(action='ignore', message='.*initial implementation of Parquet.*')
+warnings.filterwarnings(action='ignore', message='All-NaN slice encountered')
+warnings.filterwarnings(action='ignore', message='Value *not successfully written.*')
+
 
 # Local modules
-from .utils import initiate_root_logger, load_config
+from .utils import get_root_path, initiate_root_logger, load_config
 from .graph.networks import Network, Hazard
 from .analyses.direct import analyses_direct
 from .analyses.indirect import analyses_indirect
@@ -30,7 +33,7 @@ def main(network_ini=None, analyses_ini=None):
         analyses_ini: An initialization file with the configuration for the analyses.
     """
     # Find the network.ini and analysis.ini files
-    root_path = Path(__file__).resolve().parent.parent
+    root_path = get_root_path(network_ini, analyses_ini)
 
     if network_ini:
         config_network = load_config(root_path, config_path=network_ini)
