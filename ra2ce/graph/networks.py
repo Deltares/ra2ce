@@ -506,12 +506,11 @@ class Hazard:
         if type(graph) != gpd.GeoDataFrame: #so a networkX graph (multiple classes)
             assert type(graph).__module__.split('.')[0] == 'networkx'
             extent_graph = get_graph_edges_extent(graph)
-            x_overlap = (extent_graph[0] <= extent['minX'] <= extent_graph[1]) or \
-                        extent_graph[0] <= extent['maxX'] <= extent_graph[1]
-            y_overlap = (extent_graph[2] <= extent['minY'] <= extent_graph[3]) or \
-                        extent_graph[2] <= extent['maxY'] <= extent_graph[3]
-            if x_overlap and y_overlap:
+            extent_hazard = (extent['minX'],extent['maxX'],extent['minY'],extent['maxY'])
+
+            if bounds_intersect_2d(extent_graph, extent_hazard):
                 pass
+
             else:
                 logging.info("Raster extent: {}, Graph extent: {}".format(extent,extent_graph))
                 raise ValueError(
@@ -812,7 +811,7 @@ class Hazard:
 
         return graph
 
-    def save_network(self, to_save, name, types=['pickle']):
+    def save_network(self, to_save, name, types=['pickle', 'shp']):
         """Saves a geodataframe or graph to output_path
 
         Args:
@@ -832,7 +831,8 @@ class Hazard:
                 logging.info(f"Saved {output_path.stem} in {output_path.resolve().parent}.")
             return output_path_pickle
 
-        elif type(to_save) == nx.classes.multigraph.MultiGraph:
+        #Todo: this does not always work: #type(to_save) == nx.classes.multigraph.MultiGraph:
+        else:
             # The file that needs to be saved is a graph
             if 'shp' in types:
                 graph_to_shp(to_save, self.config['static'] / 'output_graph' / (name + '_edges.shp'),
@@ -867,7 +867,27 @@ class Hazard:
                         graph = nx.read_gpickle(file_path)
                     elif graph is None:
                         graph = gpd.read_feather(file_path)
-                    base_graph_hazard = self.hazard_intersect(graph) #todo: I recommend to EITHER intersect the graph or the dataframe, not both
+
+                    #### If the hazard the networks are not in the same projection, try to match them
+                    #Todo: Hardcoding this for now for test , needs to be moved to the settings/ini
+                    hazard_crs = "EPSG:3035"
+                    graph_crs = "EPSG:4326" #this is WGS84
+
+                    if hazard_crs != graph_crs:
+                        logging.warning("""Hazard crs {} and graph crs {} are inconsistent, 
+                        we try to reproject the graph crs""".format(hazard_crs,graph_crs))
+                        if type(graph) != gpd.GeoDataFrame: #Todo: Improve this check
+                            extent_graph = get_graph_edges_extent(graph)
+                            logging.info('Graph extent before reprojecting: {}'.format(extent_graph))
+                            graph_reprojected = reproject_graph(graph,graph_crs,hazard_crs)
+                            extent_graph_reprojected = get_graph_edges_extent(graph_reprojected)
+                            logging.info('Graph extent after reprojecting: {}'.format(extent_graph_reprojected))
+
+                        base_graph_hazard_reprojected = self.hazard_intersect(graph_reprojected)
+                        base_graph_hazard = base_graph_hazard_reprojected #Todo: bring back the old geometry data
+
+                    else:
+                        base_graph_hazard = self.hazard_intersect(graph) #todo: I recommend to EITHER intersect the graph or the dataframe, not both
 
                     if input_graph == 'origins_destinations_graph':
                         # Overlay the origins and destinations with the hazard maps
