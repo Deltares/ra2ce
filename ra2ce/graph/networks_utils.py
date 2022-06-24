@@ -1314,6 +1314,29 @@ def get_extent(dataset):
     return {"minX": minx, "maxX": maxx, "minY": miny, "maxY": maxy, "cols": cols, "rows": rows,
             "width": width, "height": height, "pixelWidth": transform[1], "pixelHeight": transform[5]}
 
+def get_graph_edges_extent(G):
+    """
+    Inspects all geometries of the edges of a graph and returns the most extreme coordinates
+
+    Arguments:
+        *G* (networkX) : NetworkX graph, should have an attribute 'geometry' containty shapely geometries
+
+    Returns
+        *extent* (tuple) : (minX,maxX,minY,maxY)
+    """
+    #Start with the bounds of the (random) first edge
+    (minX, minY, maxX, maxY) = list(G.edges.data('geometry'))[0][-1].bounds
+
+    #Compare with the bounds of all other edges to see if there are linestrings with more extreme bounds
+    for (u, v, geom) in G.edges.data('geometry'):
+        #print(u, v, geom)
+        (minx, miny, maxx, maxy) = geom.bounds #shapely returns (minx, miny, maxx, maxy)
+        if minx < minX: minX = minx
+        if maxx > maxX: maxX = maxx
+        if miny < minY: minY = miny
+        if maxy > maxY: maxY = maxy
+
+    return (minX,maxX,minY,maxY)
 
 def sample_raster_full(raster, x_objects, y_objects, size_array, extent):
     index_x_objects = np.int64(np.floor((x_objects - extent['minX']) / extent['pixelWidth']))

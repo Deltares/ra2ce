@@ -479,20 +479,47 @@ class Hazard:
     def overlay_hazard_raster(self, hf, graph):
         """Overlays the hazard raster over the road segments.
 
+        #Todo: I think we should avoid that the object type of graph can be a dataframe or not,
+        #      that is very not pythonic, and for sure not object-based
+
         Args:
+            *hf* (list of Pathlib paths) : #not sure if this is needed as argument if we also read if from the config
+            *graph* (graph or GDf) :
 
         Returns:
 
         """
         # Name the attribute name the name of the hazard file
-        hazard_names = list(self.hazard_name_table['File name'])
+        hazard_names = list(self.hazard_name_table['File name']) #Todo: these are not unique, is that not risky?
         ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
 
         # Check if the extent and resolution of the different hazard maps are the same.
         same_extent = check_hazard_extent_resolution(hf)
         if same_extent:
             extent = get_extent(gdal.Open(str(hf[0])))
-            logging.info("The flood maps have the same extent. Flood maps used: {}".format(", ".join(hazard_names)))
+            logging.info("The flood maps have the same extent. Flood maps used: {}".format(", ".join(list(set(hazard_names)))))
+        else:
+            pass
+            #Todo: what if they do not have the same extent?
+
+        # Check if network and raster overlap
+        if type(graph) != gpd.GeoDataFrame: #so a networkX graph (multiple classes)
+            assert type(graph).__module__.split('.')[0] == 'networkx'
+            extent_graph = get_graph_edges_extent(graph)
+            x_overlap = (extent_graph[0] <= extent['minX'] <= extent_graph[1]) or \
+                        extent_graph[0] <= extent['maxX'] <= extent_graph[1]
+            y_overlap = (extent_graph[2] <= extent['minY'] <= extent_graph[3]) or \
+                        extent_graph[2] <= extent['maxY'] <= extent_graph[3]
+            if x_overlap and y_overlap:
+                pass
+            else:
+                logging.info("Raster extent: {}, Graph extent: {}".format(extent,extent_graph))
+                raise ValueError(
+                    "The hazard raster and the graph geometries do not overlap, check projection")
+
+        if type(graph) == gpd.GeoDataFrame:
+            #Todo: do the same here
+            pass
 
         for i, (hn, rn) in enumerate(zip(hazard_names, ra2ce_names)):
             src = gdal.Open(str(hf[i]))
@@ -827,7 +854,7 @@ class Hazard:
             logging.warning("Either a base graph or od graph is missing to intersect the hazard with. "
                             "Check your network folder.")
 
-        for input_graph in ['base_graph', 'base_network', 'origins_destinations_graph']:
+        for input_graph in ['base_graph', 'base_network', 'origins_destinations_graph']: #Todo: please explain what is happening here
 
             file_path = self.config['files'][input_graph]
             graph = self.graphs[input_graph]
@@ -840,7 +867,7 @@ class Hazard:
                         graph = nx.read_gpickle(file_path)
                     elif graph is None:
                         graph = gpd.read_feather(file_path)
-                    base_graph_hazard = self.hazard_intersect(graph)
+                    base_graph_hazard = self.hazard_intersect(graph) #todo: I recommend to EITHER intersect the graph or the dataframe, not both
 
                     if input_graph == 'origins_destinations_graph':
                         # Overlay the origins and destinations with the hazard maps
