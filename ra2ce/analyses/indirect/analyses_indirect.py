@@ -19,6 +19,7 @@ import time
 import copy
 from ...graph.networks_utils import graph_to_shp
 from pathlib import Path
+from pyproj import CRS
 
 
 class IndirectAnalyses:
@@ -741,6 +742,86 @@ class IndirectAnalyses:
 
         return base_graph, origins, destinations, aggregated
 
+    def multi_link_isolated_locations(self, graph, analysis):
+        crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGABLE
+
+        # Load the point shapefile with the locations of which the isolated locations should be identified.
+        locations = gpd.read_feather(self.config['static'] / 'output_graph' / 'locations_hazard.feather')
+
+        # reproject the datasets to be able to make a buffer in meters
+        nearest_utm = utm_crs(locations.total_bounds)
+        locations = locations.set_crs(epsg=crs)
+        locations.to_crs(crs=nearest_utm, inplace=True)
+
+        isolated_locations = copy.deepcopy(locations)
+
+        for i, hazard in enumerate(self.config['hazard_names']):
+            hazard_name = self.hazard_names.loc[self.hazard_names['File name'] == hazard, 'RA2CE name'].values[0]
+
+            graph_hz = copy.deepcopy(graph)
+
+            # Check if the o/d pairs are still connected while some links are disrupted by the hazard(s)
+            edges_remove = [e for e in graph.edges.data(keys=True) if hazard_name in e[-1]]
+            edges_remove = [e for e in edges_remove if
+                            (e[-1][hazard_name] > float(analysis['threshold'])) & ('bridge' not in e[-1])]
+            graph_hz.remove_edges_from(edges_remove)
+
+            # evaluate on connected components
+            connected_components = list(graph_hz.subgraph(c) for c in nx.connected_components(graph_hz))
+
+            # find the disconnected islands and merge their linestrings into one multilinestring
+            # save the geometries in a geodataframe where later the isolated are counted in
+            results = gpd.GeoDataFrame(columns=['fid', 'count', 'geometry'], geometry='geometry', crs=crs)
+            for ii, g in enumerate(connected_components):
+                if g.size() == 0:
+                    continue
+                edges_geoms = []
+                count_edges = 0
+                for edge in g.edges(data=True):
+                    edges_geoms.append(edge[-1]['geometry'])
+                    count_edges += 1
+                total_geom = MultiLineString(edges_geoms)
+                results = results.append({'fid': ii, 'count': count_edges, 'geometry': total_geom}, ignore_index=True)
+
+            # remove the largest (main) graph
+            results.sort_values(by='count', ascending=False, inplace=True)
+            results = results.loc[results['count'] != results['count'].max()]
+
+            # reproject the datasets to be able to make a buffer in meters
+            results = results.set_crs(crs=crs)
+            results.to_crs(crs=nearest_utm, inplace=True)
+
+            results_buffered = results.copy()
+            results_buffered.geometry = results_buffered.geometry.buffer(analysis['buffer_meters'])
+            intersect = gpd.overlay(results_buffered, locations, keep_geom_type=False)
+            intersect.set_crs(crs=nearest_utm)
+        
+            # Replace nan with 0 for the water depth columns
+            intersect[hazard_name] = intersect[hazard_name].fillna(0)
+
+            # TODO: Overlay locations with hazard maps
+            # Extract the flood depth of the locations
+            # intersect = intersect.loc[intersect[hz] <= threshold_businesses]
+
+            # Save the results in isolated_locations
+            isolated_locations[f'i_{hazard_name}'] = [1 if idx in intersect['i_id'] else 0 for idx in isolated_locations['i_id']]
+
+            # Group by commercial category and count the number of businesses per category
+            if i == 0:
+                # the first iteration, create a new pd dataframe
+                df_aggregation = intersect.groupby(analysis['category_field_name']).size().to_frame('count_' + hazard_name)
+            else:
+                # after more iterations the new columns are appended
+                df_aggregation = df_aggregation.join(intersect.groupby(analysis['category_field_name']).size().to_frame('count_' + hazard_name),
+                                                     how='outer')
+
+        # Wide to long format for the aggregated results
+        df_aggregation = pd.melt(df_aggregation)
+
+        # Set the isolated_locations geopandas dataframe back to the original crs
+        isolated_locations.to_crs(crs=crs, inplace=True)
+        return isolated_locations, df_aggregation
+
     def execute(self):
         """Executes the indirect analysis."""
         for analysis in self.config['indirect']:
@@ -866,6 +947,12 @@ class IndirectAnalyses:
                 losses = Losses(self.config, analysis)
                 df = losses.calculate_losses_from_table()
                 gdf = gdf_in.merge(df, how='left', on='LinkNr')
+            elif analysis['analysis'] == 'multi_link_isolated_locations':
+                g = nx.read_gpickle(self.config['files']['base_graph_hazard'])
+                gdf, df = self.multi_link_isolated_locations(g, analysis)
+
+                df_path = output_path / (analysis['name'].replace(' ', '_') + '_results.csv')
+                df.to_csv(df_path, index=False)
             else:
                 logging.error(f"Analysis {analysis['analysis']} does not exist in RA2CE. Please choose an existing analysis.")
                 sys.exit()
@@ -1232,3 +1319,28 @@ def load_destinations(config):
     del destination['o_id']
     del destination['match_ids']
     return destination
+
+
+def utm_crs(bbox):
+    """Returns wkt string of nearest UTM projects
+    Parameters
+    ----------
+    bbox : array-like of floats
+        (xmin, ymin, xmax, ymax) bounding box in latlon WGS84 (EPSG:4326) coordinates
+    Returns
+    -------
+    crs: pyproj.CRS
+        CRS of UTM projection
+
+    FROM HYDROMT: https://github.com/Deltares/hydromt - 10.5281/zenodo.6107669
+    """
+    left, bottom, right, top = bbox
+    x = (left + right) / 2
+    y = (top + bottom) / 2
+    kwargs = dict(zone=int(np.ceil((x + 180) / 6)))
+    # BUGFIX hydroMT v0.3.5: south=False doesn't work only add south=True if y<0
+    if y < 0:
+        kwargs.update(south=True)
+    # BUGFIX hydroMT v0.4.6: add datum
+    epsg = CRS(proj="utm", datum="WGS84", ellps="WGS84", **kwargs).to_epsg()
+    return CRS.from_epsg(epsg)
