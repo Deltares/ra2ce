@@ -141,14 +141,16 @@ class Network:
         road_types = self.road_types.lower().replace(' ', ' ').split(',')
 
         input_path = self.config['static'] / "network"
-        osm_convert_exe = self.config['root_path'] / "executables" / 'osmconvert64.exe'
-        osm_filter_exe = self.config['root_path'] / "executables" / 'osmfilter.exe'
+        executables_path = Path(__file__).parents[1] / 'executables'
+        osm_convert_exe = executables_path  / 'osmconvert64.exe'
+        osm_filter_exe = executables_path  / 'osmfilter.exe'
         assert osm_convert_exe.exists() and osm_filter_exe.exists()
 
         pbf_file = input_path / self.primary_files
         o5m_path = input_path / self.primary_files.replace('.pbf', '.o5m')
         o5m_filtered_path = input_path / self.primary_files.replace('.pbf', '_filtered.o5m')
 
+        #Todo: check what excacly these functions do, and if this is always what we want
         if o5m_filtered_path.exists():
             logging.info('filtered o5m path already exists: {}'.format(o5m_filtered_path))
         elif o5m_path.exists():
@@ -160,6 +162,7 @@ class Network:
             logging.info('Converted and filtered osm.pbf to o5m, created: {}'.format(o5m_path))
 
         logging.info('Start reading graph from o5m...')
+        #Todo: make sure that bidirectionality is inferred from the settings, similar for other settings
         graph_complex = graph_from_xml(o5m_filtered_path, bidirectional=False, simplify=False, retain_all=False)
 
         # Create 'graph_simple'
@@ -345,12 +348,31 @@ class Network:
             return None
 
     def save_linking_tables(self, simple_to_complex, complex_to_simple):
+        """
+        Function that save the tables that link the simple and complex graph/netwok
+
+        Arguments:
+            *simple_to_complex* (dict) : keys: ids of simple graph; values: matching ids of complex graph [list]
+            *complex_to_simple* (dict) : keys: ids of complex graph; values: matching ids of simple graph [int]
+
+        Returns:
+            None
+
+        Effect: saves the lookup tables as json files in the static/output_graph folder
+
+        """
+
         # save lookup table if necessary
         import json
-        with open(self.config['static'] / 'output_graph' / 'simple_to_complex.json', 'w') as fp:
+
+        destination_folder = self.config['static'] / 'output_graph'
+        if not destination_folder.exists():
+            destination_folder.mkdir()
+
+        with open((destination_folder / 'simple_to_complex.json'), 'w') as fp:
             json.dump(simple_to_complex, fp)
             logging.info('saved (or overwrote) simple_to_complex.json')
-        with open(self.config['static'] / 'output_graph' / 'complex_to_simple.json', 'w') as fp:
+        with open((destination_folder /'complex_to_simple.json'), 'w') as fp:
             json.dump(complex_to_simple, fp)
             logging.info('saved (or overwrote) complex_to_simple.json')
 
@@ -457,20 +479,46 @@ class Hazard:
     def overlay_hazard_raster(self, hf, graph):
         """Overlays the hazard raster over the road segments.
 
+        #Todo: I think we should avoid that the object type of graph can be a dataframe or not,
+        #      that is very not pythonic, and for sure not object-based
+
         Args:
+            *hf* (list of Pathlib paths) : #not sure if this is needed as argument if we also read if from the config
+            *graph* (graph or GDf) :
 
         Returns:
 
         """
         # Name the attribute name the name of the hazard file
-        hazard_names = list(self.hazard_name_table['File name'])
+        hazard_names = list(self.hazard_name_table['File name']) #Todo: these are not unique, is that not risky?
         ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
 
         # Check if the extent and resolution of the different hazard maps are the same.
         same_extent = check_hazard_extent_resolution(hf)
         if same_extent:
             extent = get_extent(gdal.Open(str(hf[0])))
-            logging.info("The flood maps have the same extent. Flood maps used: {}".format(", ".join(hazard_names)))
+            logging.info("The flood maps have the same extent. Flood maps used: {}".format(", ".join(list(set(hazard_names)))))
+        else:
+            pass
+            #Todo: what if they do not have the same extent?
+
+        # Check if network and raster overlap
+        if type(graph) != gpd.GeoDataFrame: #so a networkX graph (multiple classes)
+            assert type(graph).__module__.split('.')[0] == 'networkx'
+            extent_graph = get_graph_edges_extent(graph)
+            extent_hazard = (extent['minX'],extent['maxX'],extent['minY'],extent['maxY'])
+
+            if bounds_intersect_2d(extent_graph, extent_hazard):
+                pass
+
+            else:
+                logging.info("Raster extent: {}, Graph extent: {}".format(extent,extent_graph))
+                raise ValueError(
+                    "The hazard raster and the graph geometries do not overlap, check projection")
+
+        if type(graph) == gpd.GeoDataFrame:
+            #Todo: do the same here
+            pass
 
         for i, (hn, rn) in enumerate(zip(hazard_names, ra2ce_names)):
             src = gdal.Open(str(hf[i]))
@@ -837,7 +885,8 @@ class Hazard:
                 logging.info(f"Saved {output_path.stem} in {output_path.resolve().parent}.")
             return output_path_pickle
 
-        elif type(to_save) == nx.classes.multigraph.MultiGraph:
+        #Todo: this does not always work: #type(to_save) == nx.classes.multigraph.MultiGraph:
+        else:
             # The file that needs to be saved is a graph
             if 'shp' in types:
                 graph_to_shp(to_save, self.config['static'] / 'output_graph' / (name + '_edges.shp'),
@@ -859,7 +908,7 @@ class Hazard:
             logging.warning("Either a base graph or od graph is missing to intersect the hazard with. "
                             "Check your network folder.")
 
-        for input_graph in ['base_graph', 'base_network', 'origins_destinations_graph']:
+        for input_graph in ['base_graph', 'base_network', 'origins_destinations_graph']: #Todo: please explain what is happening here
 
             file_path = self.config['files'][input_graph]
             graph = self.graphs[input_graph]
@@ -872,7 +921,27 @@ class Hazard:
                         graph = nx.read_gpickle(file_path)
                     elif graph is None:
                         graph = gpd.read_feather(file_path)
-                    base_graph_hazard = self.hazard_intersect(graph)
+
+                    #### If the hazard the networks are not in the same projection, try to match them
+                    #Todo: Hardcoding this for now for test , needs to be moved to the settings/ini
+                    hazard_crs = "EPSG:3035"
+                    graph_crs = "EPSG:4326" #this is WGS84
+
+                    if hazard_crs != graph_crs:
+                        logging.warning("""Hazard crs {} and graph crs {} are inconsistent, 
+                        we try to reproject the graph crs""".format(hazard_crs,graph_crs))
+                        if type(graph) != gpd.GeoDataFrame: #Todo: Improve this check
+                            extent_graph = get_graph_edges_extent(graph)
+                            logging.info('Graph extent before reprojecting: {}'.format(extent_graph))
+                            graph_reprojected = reproject_graph(graph,graph_crs,hazard_crs)
+                            extent_graph_reprojected = get_graph_edges_extent(graph_reprojected)
+                            logging.info('Graph extent after reprojecting: {}'.format(extent_graph_reprojected))
+
+                        base_graph_hazard_reprojected = self.hazard_intersect(graph_reprojected)
+                        base_graph_hazard = base_graph_hazard_reprojected #Todo: bring back the old geometry data
+
+                    else:
+                        base_graph_hazard = self.hazard_intersect(graph) #todo: I recommend to EITHER intersect the graph or the dataframe, not both
 
                     if input_graph == 'origins_destinations_graph':
                         # Overlay the origins and destinations with the hazard maps

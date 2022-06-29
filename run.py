@@ -12,6 +12,7 @@ import click
 from ra2ce.ra2ce import main
 
 
+### Below is the documentation for the commandline interface, see the CLICK-package.
 @click.command()
 @click.option("--network_ini", default=None, help="Full path to the network.ini file.")
 @click.option("--analyses_ini", default=None, help="Full path to the analyses.ini file.")
@@ -20,4 +21,4 @@ def cli(network_ini, analyses_ini):
 
 
 if __name__ == "__main__":
-    cli()
+    # main(r"D:\ra2ceMaster\ra2ce\data\Nepal_shp_test\network.ini")

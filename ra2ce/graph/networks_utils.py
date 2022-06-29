@@ -4,6 +4,7 @@ Created on 30-9-2020
 
 @author: F.C. de Groen, Deltares
 @author: M. Kwant, Deltares
+#author: Kees van Ginkel, Deltares
 """
 
 # external modules
@@ -1313,6 +1314,80 @@ def get_extent(dataset):
 
     return {"minX": minx, "maxX": maxx, "minY": miny, "maxY": maxy, "cols": cols, "rows": rows,
             "width": width, "height": height, "pixelWidth": transform[1], "pixelHeight": transform[5]}
+
+def get_graph_edges_extent(G):
+    """
+    Inspects all geometries of the edges of a graph and returns the most extreme coordinates
+
+    Arguments:
+        *G* (networkX) : NetworkX graph, should have an attribute 'geometry' containty shapely geometries
+
+    Returns
+        *extent* (tuple) : (minX,maxX,minY,maxY)
+    """
+    #Start with the bounds of the (random) first edge
+    (minX, minY, maxX, maxY) = list(G.edges.data('geometry'))[0][-1].bounds
+
+    #Compare with the bounds of all other edges to see if there are linestrings with more extreme bounds
+    for (u, v, geom) in G.edges.data('geometry'):
+        #print(u, v, geom)
+        (minx, miny, maxx, maxy) = geom.bounds #shapely returns (minx, miny, maxx, maxy)
+        if minx < minX: minX = minx
+        if maxx > maxX: maxX = maxx
+        if miny < minY: minY = miny
+        if maxy > maxY: maxY = maxy
+
+    return (minX,maxX,minY,maxY)
+
+def reproject_graph(G_in,crs_in,crs_out):
+    """
+    Reprojects the shapely geometry data (of a NetworkX graph) to a different projection
+
+    Arguments:
+        *G_in* (NetworkX graph) : needs a geometry attribute containing shapely linestrings
+        *crs_in* (string) : input projection, follow the Geopandas crs convention: "espg:3035" or "EPSG4326"
+        *crs_out* (string) : output projection to covert to, idem.
+
+    Returns:
+        *G_out* NetworkX graph)
+    """
+    att = nx.get_edge_attributes(G_in, 'geometry')
+    df = pd.DataFrame.from_dict(data=att, orient='index',columns=["geometry"])
+    gdf = gpd.GeoDataFrame(df)
+    gdf = gdf.set_crs(crs=crs_in)
+    gdf_out = gdf.to_crs(crs=crs_out)
+    G_out = G_in.copy()
+    set_values = gdf_out.to_dict(orient='index')
+    nx.set_edge_attributes(G_out,values=set_values)
+    return G_out
+
+def bounds_intersect_1d(tup1,tup2):
+    """
+    check if bounds of A and B intersect anywhere (have any overlapping points)
+
+    Arguments:
+        tup1 (tuple) : (min, max)
+        tup2 (tuple) : (min, max)
+
+    :return:
+        Boolean (True/False)
+    """
+    return  (tup1[0] <= tup2[1] and tup1[1] >= tup2[0])
+
+def bounds_intersect_2d(extent1,extent2):
+    """
+    check if bounds of A and B intersect anywhere (have any overlapping area)
+
+    Arguments:
+        *extent1* (tuple) : (minx,maxx,miny,maxy)
+        *extent2* (tuple) : (minx,maxx,miny,maxy)
+
+    :return:
+        Boolean (True/False)
+    """
+    x_overlap = bounds_intersect_1d((extent1[0],extent1[1]),(extent2[0],extent2[1]))
+    y_overlap = bounds_intersect_1d((extent1[2], extent1[3]), (extent2[2], extent2[3]))
+    return (x_overlap and y_overlap)
 
 
 def sample_raster_full(raster, x_objects, y_objects, size_array, extent):
