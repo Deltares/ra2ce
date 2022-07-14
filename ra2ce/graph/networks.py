@@ -793,7 +793,7 @@ class Hazard:
                 size_array = None
                 nodatavalue = raster_band.GetNoDataValue()
 
-            # check which road is overlapping with the flood and append the flood depth to the graph or geodataframe
+            # check which road is overlapping with the flood and append the flood depth to the graph
             od_nodes = [(n, ndata) for n, ndata in graph.nodes.data() if 'od_id' in ndata]
             od_ids = [n[0] for n in od_nodes]
             od_x = np.array([n[1]['geometry'].coords[0][0] for n in od_nodes])
@@ -813,7 +813,61 @@ class Hazard:
 
         return graph
 
-    def save_network(self, to_save, name, types=['pickle', 'shp']):
+    def point_hazard_intersect(self, gdf):
+        """Overlays the origin and destination locations with the hazard maps
+
+        Args:
+
+        Returns:
+
+        """
+        # Intersect the origin and destination nodes with the hazard map (now only geotiff possible)
+        hf = [haz for haz in self.list_hazard_files if haz.suffix == '.tif']
+
+        # Name the attribute name the name of the hazard file
+        hazard_names = list(self.hazard_name_table['File name'])
+        ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
+
+        # Check if the extent and resolution of the different hazard maps are the same.
+        same_extent = check_hazard_extent_resolution(hf)
+        if same_extent:
+            extent = get_extent(gdal.Open(str(hf[0])))
+            logging.info("The flood maps have the same extent. Flood maps used: {}".format(", ".join(hazard_names)))
+
+        for i, (hn, rn) in enumerate(zip(hazard_names, ra2ce_names)):
+            src = gdal.Open(str(hf[i]))
+            if not same_extent:
+                extent = get_extent(src)
+            raster_band = src.GetRasterBand(1)
+
+            try:
+                raster = raster_band.ReadAsArray()
+                size_array = raster.shape
+                logging.info("Getting water depth or surface water elevation values from {}".format(hn))
+            except MemoryError as e:
+                logging.warning(
+                    "The raster is too large to read as a whole and will be sampled point by point. MemoryError: {}".format(
+                        e))
+                size_array = None
+                nodatavalue = raster_band.GetNoDataValue()
+
+            x = gdf.geometry.apply(lambda p: p.x)
+            y = gdf.geometry.apply(lambda p: p.y)
+
+            if size_array:
+                # Fastest method but be aware of out of memory errors!
+                water_level = sample_raster_full(raster, x, y, size_array, extent)
+            else:
+                # Slower method but no issues with memory errors
+                water_level = sample_raster(raster_band, nodatavalue, x, y,
+                                            extent['minX'], extent['pixelWidth'], extent['maxY'],
+                                            extent['pixelHeight'])
+
+            gdf[rn+'_'+self.aggregate_wl[:2]] = water_level
+
+        return gdf
+
+    def save_network(self, to_save, name, types=['pickle']):
         """Saves a geodataframe or graph to output_path
 
         Args:
@@ -928,7 +982,6 @@ class Hazard:
         # Save the hazard name bookkeeping table.
         self.hazard_name_table.to_excel(self.config['output'] / 'hazard_names.xlsx', index=False)
 
-
             #if hazard_path is None:
                 #if file_path is not None or graph is not None:
                 #    if graph is None and input_graph != 'base_network':
@@ -938,6 +991,12 @@ class Hazard:
 
                     #### If the hazard the networks are not in the same projection, try to match them
                     #Todo: Hardcoding this for now for test , needs to be moved to the settings/ini
+
+        if 'isolation' in self.config:
+            locations = gpd.read_file(self.config['isolation']['locations'][0])
+            locations['i_id'] = locations.index
+            locations = self.point_hazard_intersect(locations)
+            self.save_network(locations, 'locations_hazard')
 
 
         return self.graphs

@@ -2,7 +2,7 @@
 """
 Created on 26-7-2021
 
-@author: F.C. de Groen, Deltares
+@author: Deltares
 """
 
 from collections import OrderedDict
