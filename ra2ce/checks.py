@@ -21,7 +21,8 @@ def available_checks():
                               'multi_link_origin_closest_destination',
                               'losses',
                               'single_link_losses',
-                              'multi_link_losses']
+                              'multi_link_losses',
+                              'multi_link_isolated_locations']
     list_direct_analyses = ['direct',
                             'effectiveness_measures']
 
@@ -40,7 +41,7 @@ def input_validation(config):
 
     if 'network' in config.keys():
         check_shp_input(config['network'])
-        check_headers.extend(['network', 'origins_destinations', 'hazard', 'cleanup'])
+        check_headers.extend(['network', 'origins_destinations', 'hazard', 'cleanup', 'isolation'])
 
     for k in check_headers:
         if k not in config.keys():
@@ -53,22 +54,23 @@ def input_validation(config):
     list_analyses = list_direct_analyses + list_indirect_analyses
     check_answer = {'source': ['OSM PBF', 'OSM download', 'shapefile', 'pickle'],
                     'polygon': ['file', None],
-                    'directed': [True, False],
+                    'directed': [True, False, None],
                     'network_type': ['walk', 'bike', 'drive', 'drive_service', 'all'],
                     'road_types': ['motorway', 'motorway_link', 'trunk', 'trunk_link', 'primary', 'primary_link', 'secondary',
                                    'secondary_link', 'tertiary', 'tertiary_link', 'unclassified', 'residential',
                                    'road', None],
                     'origins': ['file', None],
                     'destinations': ['file', None],
-                    'save_shp': [True, False],
-                    'save_csv': [True, False],
+                    'save_shp': [True, False, None],
+                    'save_csv': [True, False, None],
                     'analysis': list_analyses,
                     'hazard_map': ['file', None],
-                    'aggregate_wl': ['max', 'min', 'mean'],
+                    'aggregate_wl': ['max', 'min', 'mean', None],
                     'weighing': ['distance', 'time'],
-                    'save_traffic': [True, False]}
+                    'save_traffic': [True, False, None],
+                    'locations': ['file', None]}
     input_dirs = {'polygon': 'network', 'hazard_map': 'hazard', 'origins': 'network',
-                  'destinations': 'network'}
+                  'destinations': 'network', 'locations': 'network'}
 
     error = False
     for key in config:
@@ -109,6 +111,12 @@ def check_paths(config, key, item, input_dirs, error):
         if not p.is_file():
             abs_path = config['root_path'] / config['project']['name'] / 'static' / input_dirs[
                 item] / p
+            try:
+                assert abs_path.is_file()
+            except AssertionError:
+                abs_path = config['root_path'] / config['project']['name'] / 'input' / input_dirs[
+                    item] / p
+
             if not abs_path.is_file():
                 logging.error('Wrong input to property [ {} ], file does not exist: {}'.format(item, abs_path))
                 logging.error('If no file is needed, please insert value - None - for property - {} -'.format(item))

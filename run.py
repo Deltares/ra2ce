@@ -3,6 +3,9 @@
 Created on 6-8-2021
 
 @author: F.C. de Groen, Deltares
+
+TODO: explain
+run.py is command line interface (starting point for working with RA2CE if you're working on the command line)
 """
 
 import click
@@ -18,7 +21,4 @@ def cli(network_ini, analyses_ini):
 
 
 if __name__ == "__main__":
-    ### Todo: built check that tells you what went wrong
-    # cli()
-    main(r"D:\Python\ra2ce\data\91_OSdaMage_EAD\network.ini",r"D:\Python\ra2ce\data\91_OSdaMage_EAD\analysis.ini")
-    #main(r"D:\Python\ra2ce\data\4_test_hazard_dominicana\network.ini",r"D:\Python\ra2ce\data\4_test_hazard_dominicana\analyses.ini")
+    # main(r"D:\ra2ceMaster\ra2ce\data\Nepal_shp_test\network.ini")
