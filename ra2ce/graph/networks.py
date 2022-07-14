@@ -8,6 +8,7 @@ Created on 26-7-2021
 
 # external modules
 import time
+import pyproj
 from osmnx.graph import graph_from_xml
 
 # local modules
@@ -521,6 +522,7 @@ class Hazard:
             pass
 
         for i, (hn, rn) in enumerate(zip(hazard_names, ra2ce_names)):
+            #Todo: hier even naar kijken @Frederique
             src = gdal.Open(str(hf[i]))
             if not same_extent:
                 extent = get_extent(src)
@@ -901,64 +903,100 @@ class Hazard:
         return None
 
     def create(self):
-        """ creates the hazard overlay over a graph """
+        """ Overlays the different possible graph objects with the hazard data
+
+        Arguments:
+            none
+            (implicit) : (self.graphs) : dictionary with the graph names as keys, and values the graphs
+                        keys: ['base_graph', 'base_network', 'origins_destinations_graph']
+
+        Returns:
+            self.graph : same dictionary, but with new keys _hazard, which are copies of the graphs but with hazard data
+
+        Effect:
+            write all the objects
+
+        """
         to_save = ['pickle'] if not self.config['network']['save_shp'] else ['pickle', 'shp']
 
-        if self.base_graph_path is None and self.od_graph_path is None:
-            logging.warning("Either a base graph or od graph is missing to intersect the hazard with. "
-                            "Check your network folder.")
+        #if self.base_graph_path is None and self.od_graph_path is None:
+        #    logging.warning("Either a base graph or od graph is missing to intersect the hazard with. "
+        #                    "Check your network folder.")
 
-        for input_graph in ['base_graph', 'base_network', 'origins_destinations_graph']: #Todo: please explain what is happening here
+        for input_graph in ['base_graph', 'base_network', 'origins_destinations_graph']:
+            #file_path = self.config['files'][input_graph]
 
-            file_path = self.config['files'][input_graph]
-            graph = self.graphs[input_graph]
             hazard_path = self.config['files'][input_graph+'_hazard']
-            self.graphs[input_graph + '_hazard'] = None
+            self.graphs[input_graph + '_hazard'] = None #construct empty variable
 
-            if hazard_path is None:
-                if file_path is not None or graph is not None:
-                    if graph is None and input_graph != 'base_network':
-                        graph = nx.read_gpickle(file_path)
-                    elif graph is None:
-                        graph = gpd.read_feather(file_path)
+        #### Step 1: Hazard overlay of the NetworkX graph object (if any) ###
+        if self.graphs['base_graph'] is not None:
+            graph = self.graphs['base_graph']
 
-                    #### If the hazard the networks are not in the same projection, try to match them
-                    #Todo: Hardcoding this for now for test , needs to be moved to the settings/ini
-                    hazard_crs = "EPSG:3035"
-                    graph_crs = "EPSG:4326" #this is WGS84
+            #Check if the graph needs to be reprojected
+            hazard_crs = pyproj.CRS.from_user_input(self.config['hazard']['hazard_crs'])
+            graph_crs = pyproj.CRS.from_user_input("EPSG:4326")  # this is WGS84
 
-                    if hazard_crs != graph_crs:
-                        logging.warning("""Hazard crs {} and graph crs {} are inconsistent, 
-                        we try to reproject the graph crs""".format(hazard_crs,graph_crs))
-                        if type(graph) != gpd.GeoDataFrame: #Todo: Improve this check
-                            extent_graph = get_graph_edges_extent(graph)
-                            logging.info('Graph extent before reprojecting: {}'.format(extent_graph))
-                            graph_reprojected = reproject_graph(graph,graph_crs,hazard_crs)
-                            extent_graph_reprojected = get_graph_edges_extent(graph_reprojected)
-                            logging.info('Graph extent after reprojecting: {}'.format(extent_graph_reprojected))
 
-                        base_graph_hazard_reprojected = self.hazard_intersect(graph_reprojected)
-                        base_graph_hazard = base_graph_hazard_reprojected #Todo: bring back the old geometry data
+            if hazard_crs != graph_crs: #temporarily reproject the graph to the CRS of the hazard
+                logging.warning("""Hazard crs {} and graph crs {} are inconsistent, 
+                                              we try to reproject the graph crs""".format(hazard_crs, graph_crs))
+                extent_graph = get_graph_edges_extent(graph)
+                logging.info('Graph extent before reprojecting: {}'.format(extent_graph))
+                graph_reprojected = reproject_graph(graph, graph_crs, hazard_crs)
+                extent_graph_reprojected = get_graph_edges_extent(graph_reprojected)
+                logging.info('Graph extent after reprojecting: {}'.format(extent_graph_reprojected))
 
-                    else:
-                        base_graph_hazard = self.hazard_intersect(graph) #todo: I recommend to EITHER intersect the graph or the dataframe, not both
+                #Do the actual hazard intersect
+                base_graph_hazard_reprojected = self.hazard_intersect(graph_reprojected)
 
-                    if input_graph == 'origins_destinations_graph':
-                        # Overlay the origins and destinations with the hazard maps
-                        self.graphs[input_graph + '_hazard'] = self.od_hazard_intersect(graph)
+                #Assign the original geometries to the reprojected raster
+                original_geometries = nx.get_edge_attributes(graph,'geometry')
+                base_graph_hazard = base_graph_hazard_reprojected.copy()
+                nx.set_edge_attributes(base_graph_hazard,original_geometries,'geometry')
+                del graph_reprojected
 
-                    # save graph with hazard
-                    if base_graph_hazard is not None:
-                        self.graphs[input_graph + '_hazard'] = base_graph_hazard
-                        self.config['files'][input_graph+'_hazard'] = self.save_network(base_graph_hazard, input_graph+'_hazard', types=to_save)
+            else:
+                base_graph_hazard = self.hazard_intersect(
+                    graph)  # todo: I recommend to EITHER intersect the graph or the dataframe, not both
+
+
+        #### Step 1b: hazard overlay of the origins_destinations (NetworkX) ###
+        if self.graphs['origins_destinations_graph'] is not None:
+            # Overlay the origins and destinations with the hazard maps
+            self.graphs[input_graph + '_hazard'] = self.od_hazard_intersect(graph)
+
+
+        #### Step 2: iterate overlay of the GeoPandas Dataframe (if any) ###
+        if self.graphs['base_network] is not None:
+            pass
+
+
+        for input_graph in ['base_graph', 'base_network', 'origins_destinations_graph']:
+            # save graph with hazard
+            if base_graph_hazard is not None:
+                self.graphs[input_graph + '_hazard'] = base_graph_hazard
+                self.config['files'][input_graph + '_hazard'] = self.save_network(base_graph_hazard,
+                                                input_graph + '_hazard', types=to_save)
 
         # Save the hazard name bookkeeping table.
         self.hazard_name_table.to_excel(self.config['output'] / 'hazard_names.xlsx', index=False)
+
+            #if hazard_path is None:
+                #if file_path is not None or graph is not None:
+                #    if graph is None and input_graph != 'base_network':
+                #        graph = nx.read_gpickle(file_path)
+                #    elif graph is None:
+                #        graph = gpd.read_feather(file_path)
+
+                    #### If the hazard the networks are not in the same projection, try to match them
+                    #Todo: Hardcoding this for now for test , needs to be moved to the settings/ini
 
         if 'isolation' in self.config:
             locations = gpd.read_file(self.config['isolation']['locations'][0])
             locations['i_id'] = locations.index
             locations = self.point_hazard_intersect(locations)
             self.save_network(locations, 'locations_hazard')
+
 
         return self.graphs
