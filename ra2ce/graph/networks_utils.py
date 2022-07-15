@@ -405,29 +405,42 @@ def pairs(lst):
         prev = item
 
 
-def line_length(line):
+def line_length(line, crs):
     """Calculate length of a line in meters, given in geographic coordinates.
     Args:
-        line: a shapely LineString object with WGS 84 coordinates
+        line: a shapely LineString object with coordinate reference system 'crs'
+        crs: the coordinate reference system of the 'line' LineString
     Returns:
         Length of line in m
     """
-    # check if the projection is EPSG:4326
-    distance.geodesic.ELLIPSOID = 'WGS-84'
-    try:
-        # Swap shapely (lonlat) to geopy (latlon) points
-        latlon = lambda lonlat: (lonlat[1], lonlat[0])
+    # Check if the coordinate system is projected or geographic
+    if crs.is_geographic:
+        distance.geodesic.ELLIPSOID = 'WGS-84'
+        try:
+            # Swap shapely (lonlat) to geopy (latlon) points
+            latlon = lambda lonlat: (lonlat[1], lonlat[0])
+            if isinstance(line, LineString):
+                total_length = sum(distance.distance(latlon(a), latlon(b)).meters for (a, b) in pairs(line.coords))
+            elif isinstance(line, MultiLineString):
+                total_length = sum(
+                    [sum(distance.distance(latlon(a), latlon(b)).meters for (a, b) in pairs(l.coords)) for l in line])
+            else:
+                logging.warning("The road strech is not a Shapely LineString or MultiLineString so the length cannot be computed."
+                                "Please check your data network data.")
+        except:
+            logging.error(
+                "The CRS is not EPSG:4326. Quit the analysis, reproject the layer to EPSG:4326 and try again to run the tool.")
+            quit()
+    elif crs.is_projected:
+        ## line length of projected linestrings
         if isinstance(line, LineString):
-            total_length = sum(distance.distance(latlon(a), latlon(b)).meters for (a, b) in pairs(line.coords))
+            total_length = line.length
         elif isinstance(line, MultiLineString):
-            total_length = sum(
-                [sum(distance.distance(latlon(a), latlon(b)).meters for (a, b) in pairs(l.coords)) for l in line])
+            total_length = line.length
         else:
-            logging.warning("Something went wrong while calculating the length of the road stretches.")
-    except:
-        logging.error(
-            "The CRS is not EPSG:4326. Quit the analysis, reproject the layer to EPSG:4326 and try again to run the tool.")
-        quit()
+            logging.warning(
+                "The road strech is not a Shapely LineString or MultiLineString so the length cannot be computed."
+                "Please check your data network data.")
     return round(total_length, 0)
 
 
@@ -1337,9 +1350,10 @@ def get_graph_edges_extent(G):
         if miny < minY: minY = miny
         if maxy > maxY: maxY = maxy
 
-    return (minX,maxX,minY,maxY)
+    return (minX, maxX, minY, maxY)
 
-def reproject_graph(G_in,crs_in,crs_out):
+
+def reproject_graph(G_in, crs_in, crs_out):
     """
     Reprojects the shapely geometry data (of a NetworkX graph) to a different projection
 
@@ -1361,7 +1375,8 @@ def reproject_graph(G_in,crs_in,crs_out):
     nx.set_edge_attributes(G_out,values=set_values)
     return G_out
 
-def bounds_intersect_1d(tup1,tup2):
+
+def bounds_intersect_1d(tup1, tup2):
     """
     check if bounds of A and B intersect anywhere (have any overlapping points)
 
@@ -1372,9 +1387,10 @@ def bounds_intersect_1d(tup1,tup2):
     :return:
         Boolean (True/False)
     """
-    return  (tup1[0] <= tup2[1] and tup1[1] >= tup2[0])
+    return (tup1[0] <= tup2[1]) and (tup1[1] >= tup2[0])
 
-def bounds_intersect_2d(extent1,extent2):
+
+def bounds_intersect_2d(extent1, extent2):
     """
     check if bounds of A and B intersect anywhere (have any overlapping area)
 
@@ -1951,3 +1967,8 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
                 graph[u][v][k]['avgspeed'] = avg_road_speed.loc[avg_road_speed['road_types'] == road_type, 'avg_speed'].iloc[0]
 
     return graph
+
+
+def fraction_flooded(x):
+    x = x.filled(0).flatten()
+    return len(np.where(x > 0)[0]) / len(x)
