@@ -4,8 +4,8 @@ Created on 6-8-2021
 
 @author: F.C. de Groen, Deltares
 
-TODO: explain
-run.py is command line interface (starting point for working with RA2CE if you're working on the command line)
+This script (run.py) contains the command line interface configurations and is the starting point
+for working with RA2CE, if you want to use RA2CE via the command line.
 """
 
 import click
@@ -21,4 +21,4 @@ def cli(network_ini, analyses_ini):
 
 
 if __name__ == "__main__":
-    # main(r"D:\ra2ceMaster\ra2ce\data\Nepal_shp_test\network.ini")
+    cli()
