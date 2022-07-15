@@ -10,6 +10,7 @@ Created on 26-7-2021
 import time
 import pyproj
 from osmnx.graph import graph_from_xml
+from rasterstats import zonal_stats
 
 # local modules
 from .networks_utils import *
@@ -41,6 +42,8 @@ class Network:
         self.network_type = config['network']['network_type']
         self.road_types = config['network']['road_types']
         self.save_shp = config['network']['save_shp']
+        self.base_graph_crs = None  # Initiate variable
+        self.base_network_crs = None  # Initiate variable
 
         # Origins and destinations
         self.origins = config['origins_destinations']['origins']
@@ -129,6 +132,9 @@ class Network:
             if edges_complex.crs is None:  # The CRS might have dissapeared.
                 edges_complex.crs = crs  # set the right CRS
 
+        self.base_graph_crs = pyproj.CRS.from_user_input(crs)
+        self.base_network_crs = pyproj.CRS.from_user_input(crs)
+
         # Exporting complex graph because the shapefile should be kept the same as much as possible.
         return graph_complex, edges_complex
 
@@ -183,6 +189,9 @@ class Network:
             if edges_complex.crs is None:  # The CRS might have dissapeared.
                 edges_complex.crs = crs  # set the right CRS
 
+        self.base_graph_crs = pyproj.CRS.from_user_input(crs)
+        self.base_network_crs = pyproj.CRS.from_user_input(crs)
+
         return graph_simple, edges_complex
 
     def network_osm_download(self):
@@ -230,9 +239,12 @@ class Network:
 
         # No segmentation required, the non-simplified road segments from OSM are already small enough
 
+        self.base_graph_crs = pyproj.CRS.from_user_input("EPSG:4326")  # Graphs from OSM download are always in this CRS.
+        self.base_network_crs = pyproj.CRS.from_user_input("EPSG:4326")  # Graphs from OSM download are always in this CRS.
+
         return graph_simple, edges_complex
 
-    def add_od_nodes(self, graph):
+    def add_od_nodes(self, graph, crs):
         """Adds origins and destinations nodes from shapefiles to the graph."""
         from .origins_destinations import read_OD_files, create_OD_pairs, add_od_nodes
 
@@ -257,7 +269,7 @@ class Network:
             ods.to_file(ods_path, index=False)
             logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
 
-        graph = add_od_nodes(graph, ods)
+        graph = add_od_nodes(graph, ods, crs)
 
         return graph
 
@@ -307,7 +319,7 @@ class Network:
         lines.crs = crs_
 
         # append the length of the road stretches
-        lines['length'] = lines['geometry'].apply(lambda x: line_length(x))
+        lines['length'] = lines['geometry'].apply(lambda x: line_length(x, lines.crs))
 
         if lines['geometry'].apply(lambda row: isinstance(row, MultiLineString)).any():
             for line in lines.loc[lines['geometry'].apply(lambda row: isinstance(row, MultiLineString))].iterrows():
@@ -406,6 +418,10 @@ class Network:
                 base_graph = nx.read_gpickle(self.config['static'] / 'network' / 'base_graph.gpickle')
                 network_gdf = read_pickle_file(self.config['static'] / 'network' / 'base_network.p')
 
+                # Assuming the same CRS for both the network and graph
+                self.base_graph_crs = pyproj.CRS.from_user_input(network_gdf.crs)
+                self.base_network_crs = pyproj.CRS.from_user_input(network_gdf.crs)
+
             if self.source != 'pickle' and self.source != 'shapefile':
                 # Graph & Network from OSM download or OSM PBF
                 # Check if all geometries between nodes are there, if not, add them as a straight line.
@@ -439,6 +455,10 @@ class Network:
             else:
                 network_gdf = None
 
+            # Assuming the same CRS for both the network and graph
+            self.base_graph_crs = pyproj.CRS.from_user_input(network_gdf.crs)
+            self.base_network_crs = pyproj.CRS.from_user_input(network_gdf.crs)
+
         # create origins destinations graph
         if (self.origins is not None) and (self.destinations is not None) and self.od_graph_path is None:
             # reading the base graphs
@@ -447,7 +467,7 @@ class Network:
             # adding OD nodes
             if self.origins[0].suffix == '.tif':
                 self.origins[0] = self.generate_origins_from_raster()
-            od_graph = self.add_od_nodes(base_graph)
+            od_graph = self.add_od_nodes(base_graph, self.base_graph_crs)
             self.config['files']['origins_destinations_graph'] = self.save_network(od_graph, 'origins_destinations', types=to_save)
 
         return {'base_graph': base_graph, 'base_network':  network_gdf, 'origins_destinations_graph': od_graph}
@@ -488,6 +508,8 @@ class Hazard:
         Returns:
 
         """
+        from tqdm import tqdm
+
         # Name the attribute name the name of the hazard file
         hazard_names = list(self.hazard_name_table['File name'])  # Todo: these are not unique, is that not risky?
         ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
@@ -505,6 +527,7 @@ class Hazard:
         # Check if network and raster overlap
         assert type(gdf) == gpd.GeoDataFrame
         extent_graph = gdf.total_bounds
+        extent_graph = (extent_graph[0], extent_graph[2], extent_graph[1], extent_graph[3])
         extent_hazard = (extent['minX'], extent['maxX'], extent['minY'], extent['maxY'])
 
         if bounds_intersect_2d(extent_graph, extent_hazard):
@@ -517,70 +540,64 @@ class Hazard:
 
         for i, (hn, rn) in enumerate(zip(hazard_names, ra2ce_names)):
             #Todo: hier even naar kijken @Frederique
-            src = gdal.Open(str(self.hazard_files['tif'][i]))
-            if not same_extent:
-                extent = get_extent(src)
-            raster_band = src.GetRasterBand(1)
+            tqdm.pandas(desc=hn)
+            flood_stats = gdf.geometry.progress_apply(lambda x: zonal_stats(x, str(self.hazard_files['tif'][i]),
+                                                                              all_touched=True,
+                                                                              stats="count min max mean",
+                                                                              add_stats={'fraction': fraction_flooded}))
+            gdf[rn + '_fr'] = [x[0]['fraction'] for x in flood_stats]
+            gdf[rn + '_mi'] = [x[0]['min'] for x in flood_stats]
+            gdf[rn + '_ma'] = [x[0]['max'] for x in flood_stats]
+            gdf[rn + '_me'] = [x[0]['mean'] for x in flood_stats]
 
-            try:
-                raster = raster_band.ReadAsArray()
-                size_array = raster.shape
-                logging.info("Getting water depth or surface water elevation values from {}".format(hn))
-            except MemoryError as e:
-                logging.warning(
-                    "The raster is too large to read as a whole and will be sampled point by point. MemoryError: {}".format(
-                        e))
-                size_array = None
-                nodatavalue = raster_band.GetNoDataValue()
+            ### OTHER METHOD (Not used at the moment) ###
+            # src = gdal.Open(str(self.hazard_files['tif'][i]))
+            # if not same_extent:
+            #     extent = get_extent(src)
+            # raster_band = src.GetRasterBand(1)
 
-            for idx in range(len(gdf.index)):
-                # check how long the road stretch is and make a point every other meter
-                nr_points = round(line_length(gdf.iloc[idx]['geometry']))
-                if nr_points == 1:
-                    coords_to_check = list(gdf.iloc[idx]['geometry'].boundary)
-                else:
-                    coords_to_check = [gdf.iloc[idx]['geometry'].interpolate(i / float(nr_points - 1), normalized=True) for
-                                       i in range(nr_points)]
+            # try:
+            #     raster = raster_band.ReadAsArray()
+            #     size_array = raster.shape
+            #     logging.info("Getting water depth or surface water elevation values from {}".format(hn))
+            # except MemoryError as e:
+            #     logging.warning(
+            #         "The raster is too large to read as a whole and will be sampled point by point. MemoryError: {}".format(
+            #             e))
+            #     size_array = None
+            #     nodatavalue = raster_band.GetNoDataValue()
 
-                x_objects = np.array([c.coords[0][0] for c in coords_to_check])
-                y_objects = np.array([c.coords[0][1] for c in coords_to_check])
-
-                if size_array:
-                    # Fastest method but be aware of out of memory errors!
-                    water_level = sample_raster_full(raster, x_objects, y_objects, size_array, extent)
-                else:
-                    # Slower method but no issues with memory errors
-                    water_level = sample_raster(raster_band, nodatavalue, x_objects, y_objects, extent['minX'],
-                                                extent['pixelWidth'], extent['maxY'], extent['pixelHeight'])
-
-                if len(water_level) > 0:
-                    water_level = np.where(water_level <= 0, np.nan, water_level)
-                    number_nan = np.sum(np.isnan(water_level))
-                    factor_flooded = (len(water_level) - number_nan) / len(water_level)
-
-                    gdf.loc[idx, rn + '_fr'] = factor_flooded
-                    gdf.loc[idx, rn + '_mi'] = np.nanmin(water_level)
-                    gdf.loc[idx, rn + '_ma'] = np.nanmax(water_level)
-                    gdf.loc[idx, rn + '_me'] = np.nanmean(water_level)
-                else:
-                    gdf.loc[idx, rn+'_'+self.aggregate_wl[:2]] = np.nan
-
-                ## OLD METHOD START ##
-                # start = time.time()
-                # hazard = str(hf[0])
-                # from tqdm import tqdm
-                # from rasterstats import zonal_stats
-                # tqdm.pandas(desc=hn)
-                # flood_stats = graph.geometry.progress_apply(lambda x: zonal_stats(x, hazard,
-                #                                                                   all_touched=True,
-                #                                                                   stats="count min max mean"))
-                # graph[rn + '_co'] = [x[0]['count'] for x in flood_stats]
-                # graph[rn + '_mi'] = [x[0]['min'] for x in flood_stats]
-                # graph[rn + '_ma'] = [x[0]['max'] for x in flood_stats]
-                # graph[rn + '_me'] = [x[0]['mean'] for x in flood_stats]
-                # end = time.time()
-                # logging.info(f"Hazard raster intersect time rasterstats method: {str(round(end - start, 2))}s")
-                ## OLD METHOD END ##
+            # for idx in range(len(gdf.index)):
+            #     # check how long the road stretch is and make a point every other meter
+            #     nr_points = round(line_length(gdf.iloc[idx]['geometry'], gdf.crs))
+            #     if nr_points == 1:
+            #         coords_to_check = list(gdf.iloc[idx]['geometry'].boundary)
+            #     else:
+            #         coords_to_check = [gdf.iloc[idx]['geometry'].interpolate(i / float(nr_points - 1), normalized=True) for
+            #                            i in range(nr_points)]
+            #
+            #     x_objects = np.array([c.coords[0][0] for c in coords_to_check])
+            #     y_objects = np.array([c.coords[0][1] for c in coords_to_check])
+            #
+            #     if size_array:
+            #         # Fastest method but be aware of out of memory errors!
+            #         water_level = sample_raster_full(raster, x_objects, y_objects, size_array, extent)
+            #     else:
+            #         # Slower method but no issues with memory errors
+            #         water_level = sample_raster(raster_band, nodatavalue, x_objects, y_objects, extent['minX'],
+            #                                     extent['pixelWidth'], extent['maxY'], extent['pixelHeight'])
+            #
+            #     if len(water_level) > 0:
+            #         water_level = np.where(water_level <= 0, np.nan, water_level)
+            #         number_nan = np.sum(np.isnan(water_level))
+            #         factor_flooded = (len(water_level) - number_nan) / len(water_level)
+            #
+            #         gdf.loc[idx, rn + '_fr'] = factor_flooded
+            #         gdf.loc[idx, rn + '_mi'] = np.nanmin(water_level)
+            #         gdf.loc[idx, rn + '_ma'] = np.nanmax(water_level)
+            #         gdf.loc[idx, rn + '_me'] = np.nanmean(water_level)
+            #     else:
+            #         gdf.loc[idx, rn+'_'+self.aggregate_wl[:2]] = np.nan
 
         return gdf
 
@@ -676,7 +693,7 @@ class Hazard:
 
         return graph
 
-    def overlay_hazard_shp_graph(self, gdf):
+    def overlay_hazard_shp_gdf(self, gdf):
         """Overlays the hazard shapefile over the road segments GeoDataFrame.
 
         Args:
@@ -1018,7 +1035,7 @@ class Hazard:
                 elif self.graphs[input_graph] is None and input_graph == 'base_network':
                     self.graphs[input_graph] = gpd.read_feather(file_path)
 
-        if self.graphs['base_graph'] is not None:
+        if (self.graphs['base_graph'] is not None) and (self.config['files']['base_graph_hazard'] is None):
             graph = self.graphs['base_graph']
 
             # Check if the graph needs to be reprojected
@@ -1049,35 +1066,70 @@ class Hazard:
                     graph)
 
         #### Step 1b: hazard overlay of the origins_destinations (NetworkX) ###
-        if self.graphs['origins_destinations_graph'] is not None:
+        if (self.graphs['origins_destinations_graph'] is not None) and (self.config['files']['origins_destinations_graph_hazard'] is None):
             # Overlay the origins and destinations with the hazard maps
             self.graphs['origins_destinations_graph_hazard'] = self.od_hazard_intersect(graph)
 
         #### Step 2: iterate overlay of the GeoPandas Dataframe (if any) ###
-        if self.graphs['base_network'] is not None:
-            self.graphs['base_network_hazard'] = self.hazard_intersect(self.graphs['base_network'])
+        if (self.graphs['base_network'] is not None) and (self.config['files']['base_network_hazard'] is None):
+            # Check if the graph needs to be reprojected
+            hazard_crs = pyproj.CRS.from_user_input(self.config['hazard']['hazard_crs'])
+            gdf_crs = pyproj.CRS.from_user_input(self.graphs['base_network'].crs)
+
+            if hazard_crs != gdf_crs:  # Temporarily reproject the graph to the CRS of the hazard
+                logging.warning("""Hazard crs {} and gdf crs {} are inconsistent, 
+                                              we try to reproject the gdf crs""".format(hazard_crs, gdf_crs))
+                extent_gdf = self.graphs['base_network'].total_bounds
+                logging.info('Gdf extent before reprojecting: {}'.format(extent_gdf))
+                gdf_reprojected = self.graphs['base_network'].copy().to_crs(hazard_crs)
+                extent_gdf_reprojected = gdf_reprojected.total_bounds
+                logging.info('Gdf extent after reprojecting: {}'.format(extent_gdf_reprojected))
+
+                # Do the actual hazard intersect
+                gdf_reprojected = self.hazard_intersect(gdf_reprojected)
+
+                # Assign the original geometries to the reprojected raster
+                original_geometries = self.graphs['base_network']['geometry']
+                gdf_reprojected['geometry'] = original_geometries
+                self.graphs['base_network_hazard'] = gdf_reprojected.copy()
+                del gdf_reprojected
+            else:
+                self.graphs['base_network_hazard'] = self.hazard_intersect(self.graphs['base_network'])
 
         for input_graph in ['base_graph', 'base_network', 'origins_destinations_graph']:
             # save graph with hazard
-            if base_graph_hazard is not None:
-                self.graphs[input_graph + '_hazard'] = base_graph_hazard
-                self.config['files'][input_graph + '_hazard'] = self.save_network(base_graph_hazard,
+            if self.graphs[input_graph + '_hazard'] is not None:
+                self.config['files'][input_graph + '_hazard'] = self.save_network(self.graphs[input_graph + '_hazard'],
                                                 input_graph + '_hazard', types=to_save)
 
         # Save the hazard name bookkeeping table.
         self.hazard_name_table.to_excel(self.config['output'] / 'hazard_names.xlsx', index=False)
 
-            #if hazard_path is None:
-                #if file_path is not None or graph is not None:
-                #    if graph is None and input_graph != 'base_network':
-                #        graph = nx.read_gpickle(file_path)
-                #    elif graph is None:
-                #        graph = gpd.read_feather(file_path)
-
         if 'isolation' in self.config:
             locations = gpd.read_file(self.config['isolation']['locations'][0])
             locations['i_id'] = locations.index
-            locations = self.point_hazard_intersect(locations)
+            locations_crs = pyproj.CRS.from_user_input(locations.crs)
+
+            if hazard_crs != locations_crs:  # Temporarily reproject the locations to the CRS of the hazard
+                logging.warning("""Hazard crs {} and location crs {} are inconsistent, 
+                                               we try to reproject the location crs""".format(hazard_crs, locations_crs))
+                extent_locations = locations.total_bounds
+                logging.info('Gdf extent before reprojecting: {}'.format(extent_locations))
+                locations_reprojected = locations.copy().to_crs(hazard_crs)
+                extent_locations_reprojected = locations_reprojected.total_bounds
+                logging.info('Gdf extent after reprojecting: {}'.format(extent_locations_reprojected))
+
+                # Do the actual hazard intersect
+                locations_reprojected = self.point_hazard_intersect(locations_reprojected)
+
+                # Assign the original geometries to the reprojected raster
+                original_geometries = locations['geometry']
+                locations_reprojected['geometry'] = original_geometries
+                locations = locations_reprojected.copy()
+                del locations_reprojected
+            else:
+                locations = self.point_hazard_intersect(locations)
+
             self.save_network(locations, 'locations_hazard')
 
         return self.graphs
