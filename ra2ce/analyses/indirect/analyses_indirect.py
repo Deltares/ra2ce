@@ -35,6 +35,7 @@ class IndirectAnalyses:
         self.graphs = graphs
         if self.config['output'].joinpath('hazard_names.xlsx').is_file():
             self.hazard_names = pd.read_excel(self.config['output'].joinpath('hazard_names.xlsx'))
+            self.config['hazard_names'] = list(set(self.hazard_names['File name']))
 
     def single_link_redundancy(self, graph, analysis):
         """This is the function to analyse roads with a single link disruption and an alternative route.
@@ -633,7 +634,7 @@ class IndirectAnalyses:
         o_name = self.config['origins_destinations']['origins_names']
         d_name = self.config['origins_destinations']['destinations_names']
         od_id = self.config['origins_destinations']['id_name_origin_destination']
-        id_name = self.config['network']['file_id'] if self.config['network']['file_id'] is not None else 'rfid'
+        id_name = self.config['network']['network']['file_id'] if self.config['network']['network']['file_id'] is not None else 'rfid'
         count_col_name = self.config['origins_destinations']['origin_count']
         weight_factor = self.config['origins_destinations']['origin_out_fraction']
 
@@ -1250,9 +1251,15 @@ def calc_routes_closest_dest(graph, base_graph, list_closest, pref_routes, weigh
     # find the optimal route with hazard disruption
     for o, d in list_closest:
         # Check if the destination that is accessed, is flooded
-        if graph.nodes[d[0]][hazname] > threshold_destinations:
-            list_disrupted_destinations.append((o, d))
-            continue
+        try:
+            if graph.nodes[d[0]][hazname] > threshold_destinations:
+                list_disrupted_destinations.append((o, d))
+                continue
+        except KeyError as e:
+            logging.warning(f"The destination nodes do not contain the required attribute '{hazname}',"
+                            f" please make sure that the hazard overlay is done correctly by rerunning the 'network.ini'"
+                            f" and checking the output files.")
+            quit()
 
         # calculate the length of the preferred route
         alt_route = nx.dijkstra_path_length(graph, o[0], d[0], weight=weighing)

@@ -44,8 +44,12 @@ def input_validation(config):
         check_headers.extend(['network', 'origins_destinations', 'hazard', 'cleanup', 'isolation'])
 
     for k in check_headers:
+        if k == 'isolation':
+            # The isolation header is not required but needs to be checked with the code underneath.
+            continue
+
         if k not in config.keys():
-            logging.error('Property [ {} ] is not configured. Add property [ {} ] to the settings.ini file. '.format(k, k))
+            logging.error('Property [ {} ] is not configured. Add property [ {} ] to the *.ini file. '.format(k, k))
             sys.exit()
 
     # check if properties have correct input
@@ -97,7 +101,7 @@ def input_validation(config):
 
     # Quit if error
     if error:
-        logging.error("There are inconsistencies in the settings.ini file. Please consult the log file for more information: {}".format(config['root_path'] / 'data' / config['project']['name'] / 'output' / 'RA2CE.log'))
+        logging.error("There are inconsistencies in the *.ini file. Please consult the log file for more information: {}".format(config['root_path'] / 'data' / config['project']['name'] / 'output' / 'RA2CE.log'))
         sys.exit()
 
     return config
@@ -131,7 +135,7 @@ def check_paths(config, key, item, input_dirs, error):
 def check_shp_input(config):
     """Checks if a file id is configured when using the option to create network from shapefile """
     if (config['source'] == 'shapefile') and (config['file_id'] is None):
-        logging.error('Not possible to create network - Shapefile used as source, but no file_id configured in .ini file')
+        logging.error('Not possible to create network - Shapefile used as source, but no file_id configured in the network.ini file')
         sys.exit()
 
 
