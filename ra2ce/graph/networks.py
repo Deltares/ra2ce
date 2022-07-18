@@ -10,7 +10,7 @@ Created on 26-7-2021
 import time
 import pyproj
 from osmnx.graph import graph_from_xml
-from rasterstats import zonal_stats
+from rasterstats import zonal_stats, point_query
 
 # local modules
 from .networks_utils import *
@@ -416,7 +416,7 @@ class Network:
             elif self.source == 'pickle':
                 logging.info('Start importing a network from pickle')
                 base_graph = nx.read_gpickle(self.config['static'] / 'network' / 'base_graph.gpickle')
-                network_gdf = read_pickle_file(self.config['static'] / 'network' / 'base_network.p')
+                network_gdf = gpd.read_feather(self.config['static'] / 'network' / 'base_network.feather')
 
                 # Assuming the same CRS for both the network and graph
                 self.base_graph_crs = pyproj.CRS.from_user_input(network_gdf.crs)
@@ -440,7 +440,7 @@ class Network:
                     # make a time value of seconds, length of road streches is in meters
                     for u, v, k, edata in G.edges.data(keys=True):
                         hours = (edata['length'] / 1000) / edata['avgspeed']
-                        G[u][v][k]['time'] = hours * 3600
+                        G[u][v][k]['time'] = round(hours * 3600, 0)
 
             # Save the graph and geodataframe
             self.config['files']['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
@@ -497,6 +497,8 @@ class Hazard:
 
         # bookkeeping for the hazard map names
         self.hazard_name_table = self.create_hazard_name_table()
+        self.hazard_names = list(dict.fromkeys(list(self.hazard_name_table['File name'])))
+        self.ra2ce_names = list(dict.fromkeys([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
 
     def overlay_hazard_raster_gdf(self, gdf):
         """Overlays the hazard raster over the road segments GeoDataFrame.
@@ -510,16 +512,12 @@ class Hazard:
         """
         from tqdm import tqdm
 
-        # Name the attribute name the name of the hazard file
-        hazard_names = list(self.hazard_name_table['File name'])  # Todo: these are not unique, is that not risky?
-        ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
-
         # Check if the extent and resolution of the different hazard maps are the same.
         same_extent = check_hazard_extent_resolution(self.hazard_files['tif'])
         if same_extent:
             extent = get_extent(gdal.Open(str(self.hazard_files['tif'][0])))
             logging.info(
-                "The flood maps have the same extent. Flood maps used: {}".format(", ".join(list(set(hazard_names)))))
+                "The flood maps have the same extent. Flood maps used: {}".format(", ".join(self.hazard_names)))
         else:
             pass
             # Todo: what if they do not have the same extent?
@@ -538,67 +536,18 @@ class Hazard:
             raise ValueError(
                 "The hazard raster and the network geometries do not overlap, check projection")
 
-        for i, (hn, rn) in enumerate(zip(hazard_names, ra2ce_names)):
-            #Todo: hier even naar kijken @Frederique
-            tqdm.pandas(desc=hn)
+        for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
+            print(i, hn, rn)
+            tqdm.pandas(desc="Network hazard overlay with "+hn)
             flood_stats = gdf.geometry.progress_apply(lambda x: zonal_stats(x, str(self.hazard_files['tif'][i]),
                                                                               all_touched=True,
-                                                                              stats="count min max mean",
-                                                                              add_stats={'fraction': fraction_flooded}))
-            gdf[rn + '_fr'] = [x[0]['fraction'] for x in flood_stats]
+                                                                              stats="min max mean"))
             gdf[rn + '_mi'] = [x[0]['min'] for x in flood_stats]
             gdf[rn + '_ma'] = [x[0]['max'] for x in flood_stats]
             gdf[rn + '_me'] = [x[0]['mean'] for x in flood_stats]
 
-            ### OTHER METHOD (Not used at the moment) ###
-            # src = gdal.Open(str(self.hazard_files['tif'][i]))
-            # if not same_extent:
-            #     extent = get_extent(src)
-            # raster_band = src.GetRasterBand(1)
-
-            # try:
-            #     raster = raster_band.ReadAsArray()
-            #     size_array = raster.shape
-            #     logging.info("Getting water depth or surface water elevation values from {}".format(hn))
-            # except MemoryError as e:
-            #     logging.warning(
-            #         "The raster is too large to read as a whole and will be sampled point by point. MemoryError: {}".format(
-            #             e))
-            #     size_array = None
-            #     nodatavalue = raster_band.GetNoDataValue()
-
-            # for idx in range(len(gdf.index)):
-            #     # check how long the road stretch is and make a point every other meter
-            #     nr_points = round(line_length(gdf.iloc[idx]['geometry'], gdf.crs))
-            #     if nr_points == 1:
-            #         coords_to_check = list(gdf.iloc[idx]['geometry'].boundary)
-            #     else:
-            #         coords_to_check = [gdf.iloc[idx]['geometry'].interpolate(i / float(nr_points - 1), normalized=True) for
-            #                            i in range(nr_points)]
-            #
-            #     x_objects = np.array([c.coords[0][0] for c in coords_to_check])
-            #     y_objects = np.array([c.coords[0][1] for c in coords_to_check])
-            #
-            #     if size_array:
-            #         # Fastest method but be aware of out of memory errors!
-            #         water_level = sample_raster_full(raster, x_objects, y_objects, size_array, extent)
-            #     else:
-            #         # Slower method but no issues with memory errors
-            #         water_level = sample_raster(raster_band, nodatavalue, x_objects, y_objects, extent['minX'],
-            #                                     extent['pixelWidth'], extent['maxY'], extent['pixelHeight'])
-            #
-            #     if len(water_level) > 0:
-            #         water_level = np.where(water_level <= 0, np.nan, water_level)
-            #         number_nan = np.sum(np.isnan(water_level))
-            #         factor_flooded = (len(water_level) - number_nan) / len(water_level)
-            #
-            #         gdf.loc[idx, rn + '_fr'] = factor_flooded
-            #         gdf.loc[idx, rn + '_mi'] = np.nanmin(water_level)
-            #         gdf.loc[idx, rn + '_ma'] = np.nanmax(water_level)
-            #         gdf.loc[idx, rn + '_me'] = np.nanmean(water_level)
-            #     else:
-            #         gdf.loc[idx, rn+'_'+self.aggregate_wl[:2]] = np.nan
-
+            tqdm.pandas(desc="Network fraction with hazard overlay with " + hn)
+            gdf[rn + '_fr'] = gdf.geometry.progress_apply(lambda x: fraction_flooded(x, str(self.hazard_files['tif'][i])))
         return gdf
 
     def overlay_hazard_raster_graph(self, graph):
@@ -611,85 +560,54 @@ class Hazard:
         Returns:
             *graph* (NetworkX Graph) : NetworkX graph with hazard values
         """
-        # Name the attribute name the name of the hazard file
-        hazard_names = list(self.hazard_name_table['File name']) #Todo: these are not unique, is that not risky?
-        ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
+        from tqdm import tqdm
 
-        # Check if the extent and resolution of the different hazard maps are the same.
-        same_extent = check_hazard_extent_resolution(self.hazard_files['tif'])
-        if same_extent:
-            extent = get_extent(gdal.Open(str(self.hazard_files['tif'][0])))
-            logging.info("The flood maps have the same extent. Flood maps used: {}".format(", ".join(list(set(hazard_names)))))
-        else:
-            pass
-            #Todo: what if they do not have the same extent?
-
-        # Check if network and raster overlap
+        # Verify the graph type (networkx)
         assert type(graph).__module__.split('.')[0] == 'networkx'
         extent_graph = get_graph_edges_extent(graph)
-        extent_hazard = (extent['minX'],extent['maxX'],extent['minY'],extent['maxY'])
 
-        if bounds_intersect_2d(extent_graph, extent_hazard):
-            pass
+        # Get all edge geometries
+        edges_geoms = [(u, v, k, edata) for u, v, k, edata in graph.edges.data(keys=True) if 'geometry' in edata]
 
-        else:
-            logging.info("Raster extent: {}, Graph extent: {}".format(extent,extent_graph))
-            raise ValueError(
-                "The hazard raster and the graph geometries do not overlap, check projection")
+        for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
+            print(i, hn, rn)
+            # Check if the hazard and graph extents overlap
+            extent = get_extent(gdal.Open(str(self.hazard_files['tif'][i])))
+            extent_hazard = (extent['minX'], extent['maxX'], extent['minY'], extent['maxY'])
 
-        for i, (hn, rn) in enumerate(zip(hazard_names, ra2ce_names)):
-            #Todo: hier even naar kijken @Frederique
-            src = gdal.Open(str(self.hazard_files['tif'][i]))
-            if not same_extent:
-                extent = get_extent(src)
-            raster_band = src.GetRasterBand(1)
+            if bounds_intersect_2d(extent_graph, extent_hazard):
+                pass
+
+            else:
+                logging.info("Raster extent: {}, Graph extent: {}".format(extent, extent_graph))
+                raise ValueError(
+                    "The hazard raster and the graph geometries do not overlap, check projection")
+
+            # Add a no-data value for the edges that do not have a geometry
+            nx.set_edge_attributes(graph,
+                                   {(u, v, k): {rn + '_' + self.aggregate_wl[:2]: np.nan} for u, v, k, edata in graph.edges.data(keys=True) if 'geometry' not in edata})
+
+            # Add the hazard values to the edges that do have a geometry
+            gdf = gpd.GeoDataFrame({'geometry': [edata['geometry'] for u, v, k, edata in edges_geoms]})
+            tqdm.pandas(desc="Graph hazard overlay with "+hn)
+            flood_stats = gdf.geometry.progress_apply(lambda x: zonal_stats(x, str(self.hazard_files['tif'][i]),
+                                                                            all_touched=True,
+                                                                            stats=f"{self.aggregate_wl}"))
 
             try:
-                raster = raster_band.ReadAsArray()
-                size_array = raster.shape
-                logging.info("Getting water depth or surface water elevation values from {}".format(hn))
-            except MemoryError as e:
-                logging.warning(
-                    "The raster is too large to read as a whole and will be sampled point by point. MemoryError: {}".format(
-                        e))
-                size_array = None
-                nodatavalue = raster_band.GetNoDataValue()
+                nx.set_edge_attributes(graph,
+                                       {(edges[0], edges[1], edges[2]): {rn + '_' + self.aggregate_wl[:2]: x[0][self.aggregate_wl]} for x, edges in
+                                        zip(flood_stats, edges_geoms)})
+            except:
+                logging.warning("No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'.")
 
-            # check which road is overlapping with the flood and append the flood depth to the graph
-            for u, v, k, edata in graph.edges.data(keys=True):
-                if 'geometry' in edata:
-                    # check how long the road stretch is and make a point every other meter
-                    nr_points = round(edata['length'])
-                    if nr_points == 1:
-                        coords_to_check = list(edata['geometry'].boundary)
-                    else:
-                        coords_to_check = [edata['geometry'].interpolate(i / float(nr_points - 1), normalized=True) for
-                                           i in range(nr_points)]
-
-                    x_objects = np.array([c.coords[0][0] for c in coords_to_check])
-                    y_objects = np.array([c.coords[0][1] for c in coords_to_check])
-
-                    if size_array:
-                        # Fastest method but be aware of out of memory errors!
-                        water_level = sample_raster_full(raster, x_objects, y_objects, size_array, extent)
-                    else:
-                        # Slower method but no issues with memory errors
-                        water_level = sample_raster(raster_band, nodatavalue, x_objects, y_objects, extent['minX'], extent['pixelWidth'], extent['maxY'], extent['pixelHeight'])
-
-                    if len(water_level) > 0:
-                        if self.aggregate_wl == 'max':
-                            graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = np.nanmax(water_level)
-                        elif self.aggregate_wl == 'min':
-                            graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = np.nanmin(water_level)
-                        elif self.aggregate_wl == 'mean':
-                            graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = np.nanmean(water_level)
-                        else:
-                            logging.warning("No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'.")
-                    else:
-                        graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = np.nan
-
-                else:
-                    graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = np.nan
+            # Get the fraction of the road that is intersecting with the hazard
+            tqdm.pandas(desc="Graph fraction with hazard overlay with " + hn)
+            graph_fraction_flooded = gdf.geometry.progress_apply(
+                lambda x: fraction_flooded(x, str(self.hazard_files['tif'][i])))
+            nx.set_edge_attributes(graph,
+                                   {(edges[0], edges[1], edges[2]): {rn + '_fr': x} for x, edges in
+                                    zip(graph_fraction_flooded, edges_geoms)})
 
         return graph
 
@@ -701,11 +619,10 @@ class Hazard:
         Returns:
 
         """
-        hazard_names = list(self.hazard_name_table['File name'])
-        ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
+        self.ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
         hfns = self.config['hazard']['hazard_field_name']
 
-        for i, (hn, rn, hfn) in enumerate(zip(hazard_names, ra2ce_names, hfns)):
+        for i, (hn, rn, hfn) in enumerate(zip(self.hazard_names, self.ra2ce_names, hfns)):
             gdf_hazard = gpd.read_file(str(self.hazard_files['shp'][i]))
             spatial_index = gdf_hazard.sindex
 
@@ -721,11 +638,9 @@ class Hazard:
         Returns:
 
         """
-        hazard_names = list(self.hazard_name_table['File name'])
-        ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
         hfns = self.config['hazard']['hazard_field_name']
 
-        for i, (hn, rn, hfn) in enumerate(zip(hazard_names, ra2ce_names, hfns)):
+        for i, (hn, rn, hfn) in enumerate(zip(self.hazard_names, self.ra2ce_names, hfns)):
             gdf = gpd.read_file(str(hf[i]))
             spatial_index = gdf.sindex
 
@@ -748,6 +663,101 @@ class Hazard:
                     graph[u][v][k][rn+'_'+self.aggregate_wl[:2]] = 0
 
         return graph
+
+    def od_hazard_intersect(self, graph):
+        """Overlays the origin and destination locations with the hazard maps
+
+        Args:
+
+        Returns:
+
+        """
+        from tqdm import tqdm
+
+        ## Intersect the origin and destination nodes with the hazard map (now only geotiff possible)
+        # Verify the graph type (networkx)
+        assert type(graph).__module__.split('.')[0] == 'networkx'
+        extent_graph = get_graph_edges_extent(graph)
+
+        # Get all node geometries
+        od_nodes = [(n, ndata) for n, ndata in graph.nodes.data() if 'od_id' in ndata]
+        od_ids = [n[0] for n in od_nodes]
+
+        # Get all edge geometries
+        edges_geoms = [(u, v, k, edata) for u, v, k, edata in graph.edges.data(keys=True) if 'geometry' in edata]
+
+        for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
+            print(i, hn, rn)
+            # Check if the hazard and graph extents overlap
+            extent = get_extent(gdal.Open(str(self.hazard_files['tif'][i])))
+            extent_hazard = (extent['minX'], extent['maxX'], extent['minY'], extent['maxY'])
+
+            if bounds_intersect_2d(extent_graph, extent_hazard):
+                pass
+
+            else:
+                logging.info("Raster extent: {}, Graph extent: {}".format(extent, extent_graph))
+                raise ValueError(
+                    "The hazard raster and the graph geometries do not overlap, check projection")
+
+            # Read the hazard values at the nodes and write to the nodes.
+            gdf = gpd.GeoDataFrame({'geometry': [ndata['geometry'] for n, ndata in od_nodes]})
+            tqdm.pandas(desc='Destinations hazard overlay with '+hn)
+            flood_stats = gdf.geometry.progress_apply(lambda x: point_query(x, str(self.hazard_files['tif'][i])))
+
+            attribute_dict = {od: {rn+'_'+self.aggregate_wl[:2]: wl} for od, wl in zip(od_ids, flood_stats)}
+            nx.set_node_attributes(graph, attribute_dict)
+
+            # Read the hazard values at the edges and write to the edges.
+            # Add a no-data value for the edges that do not have a geometry
+            nx.set_edge_attributes(graph,
+                                   {(u, v, k): {rn + '_' + self.aggregate_wl[:2]: np.nan} for u, v, k, edata in
+                                    graph.edges.data(keys=True) if 'geometry' not in edata})
+
+            # Add the hazard values to the edges that do have a geometry
+            gdf = gpd.GeoDataFrame({'geometry': [edata['geometry'] for u, v, k, edata in edges_geoms]})
+            tqdm.pandas(desc='OD graph hazard overlay with '+hn)
+            flood_stats = gdf.geometry.progress_apply(lambda x: zonal_stats(x, str(self.hazard_files['tif'][i]),
+                                                                            all_touched=True,
+                                                                            stats=f"{self.aggregate_wl}"))
+
+            try:
+                nx.set_edge_attributes(graph,
+                                       {(edges[0], edges[1], edges[2]): {
+                                           rn + '_' + self.aggregate_wl[:2]: x[0][self.aggregate_wl]} for x, edges in
+                                        zip(flood_stats, edges_geoms)})
+            except:
+                logging.warning(
+                    "No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'.")
+
+            # Get the fraction of the road that is intersecting with the hazard
+            tqdm.pandas(desc='OD graph fraction with hazard overlay with ' + hn)
+            graph_fraction_flooded = gdf.geometry.progress_apply(
+                lambda x: fraction_flooded(x, str(self.hazard_files['tif'][i])))
+            nx.set_edge_attributes(graph,
+                                   {(edges[0], edges[1], edges[2]): {rn + '_fr': x} for x, edges in
+                                    zip(graph_fraction_flooded, edges_geoms)})
+
+        return graph
+
+    def point_hazard_intersect(self, gdf):
+        """Overlays the origin and destination locations with the hazard maps
+
+        Args:
+
+        Returns:
+
+        """
+        from tqdm import tqdm
+
+        ## Intersect the origin and destination nodes with the hazard map (now only geotiff possible)
+        for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
+            # Read the hazard values at the nodes and write to the nodes.
+            tqdm.pandas(desc='Potentially isolated locations hazard overlay with '+hn)
+            flood_stats = gdf.geometry.progress_apply(lambda x: point_query(x, str(self.hazard_files['tif'][i])))
+            gdf[rn+'_'+self.aggregate_wl[:2]] = flood_stats
+
+        return gdf
 
     def join_hazard_table_gdf(self, gdf):
         """Joins a table with IDs and hazard information with the road segments with corresponding IDs.
@@ -861,114 +871,6 @@ class Hazard:
             logging.warning("No hazard files found.")
             pass
 
-    def od_hazard_intersect(self, graph):
-        """Overlays the origin and destination locations with the hazard maps
-
-        Args:
-
-        Returns:
-
-        """
-        ## Intersect the origin and destination nodes with the hazard map (now only geotiff possible)
-        # Name the attribute name the name of the hazard file
-        hazard_names = list(self.hazard_name_table['File name'])
-        ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
-
-        # Check if the extent and resolution of the different hazard maps are the same.
-        same_extent = check_hazard_extent_resolution(self.hazard_files['tif'])
-        if same_extent:
-            extent = get_extent(gdal.Open(str(self.hazard_files['tif'][0])))
-            logging.info("The flood maps have the same extent. Flood maps used: {}".format(", ".join(hazard_names)))
-
-        for i, (hn, rn) in enumerate(zip(hazard_names, ra2ce_names)):
-            src = gdal.Open(str(self.hazard_files['tif'][i]))
-            if not same_extent:
-                extent = get_extent(src)
-            raster_band = src.GetRasterBand(1)
-
-            try:
-                raster = raster_band.ReadAsArray()
-                size_array = raster.shape
-                logging.info("Getting water depth or surface water elevation values from {}".format(hn))
-            except MemoryError as e:
-                logging.warning(
-                    "The raster is too large to read as a whole and will be sampled point by point. MemoryError: {}".format(
-                        e))
-                size_array = None
-                nodatavalue = raster_band.GetNoDataValue()
-
-            # check which road is overlapping with the flood and append the flood depth to the graph
-            od_nodes = [(n, ndata) for n, ndata in graph.nodes.data() if 'od_id' in ndata]
-            od_ids = [n[0] for n in od_nodes]
-            od_x = np.array([n[1]['geometry'].coords[0][0] for n in od_nodes])
-            od_y = np.array([n[1]['geometry'].coords[0][1] for n in od_nodes])
-
-            if size_array:
-                # Fastest method but be aware of out of memory errors!
-                water_level = sample_raster_full(raster, od_x, od_y, size_array, extent)
-            else:
-                # Slower method but no issues with memory errors
-                water_level = sample_raster(raster_band, nodatavalue, od_x, od_y,
-                                            extent['minX'], extent['pixelWidth'], extent['maxY'],
-                                            extent['pixelHeight'])
-
-            attribute_dict = {od: {rn+'_'+self.aggregate_wl[:2]: wl} for od, wl in zip(od_ids, water_level)}
-            nx.set_node_attributes(graph, attribute_dict)
-
-        return graph
-
-    def point_hazard_intersect(self, gdf):
-        """Overlays the origin and destination locations with the hazard maps
-
-        Args:
-
-        Returns:
-
-        """
-        ## Intersect the origin and destination nodes with the hazard map (now only geotiff possible)
-        # Name the attribute name the name of the hazard file
-        hazard_names = list(self.hazard_name_table['File name'])
-        ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
-
-        # Check if the extent and resolution of the different hazard maps are the same.
-        same_extent = check_hazard_extent_resolution(self.hazard_files['tif'])
-        if same_extent:
-            extent = get_extent(gdal.Open(str(self.hazard_files['tif'][0])))
-            logging.info("The flood maps have the same extent. Flood maps used: {}".format(", ".join(hazard_names)))
-
-        for i, (hn, rn) in enumerate(zip(hazard_names, ra2ce_names)):
-            src = gdal.Open(str(self.hazard_files['tif'][i]))
-            if not same_extent:
-                extent = get_extent(src)
-            raster_band = src.GetRasterBand(1)
-
-            try:
-                raster = raster_band.ReadAsArray()
-                size_array = raster.shape
-                logging.info("Getting water depth or surface water elevation values from {}".format(hn))
-            except MemoryError as e:
-                logging.warning(
-                    "The raster is too large to read as a whole and will be sampled point by point. MemoryError: {}".format(
-                        e))
-                size_array = None
-                nodatavalue = raster_band.GetNoDataValue()
-
-            x = gdf.geometry.apply(lambda p: p.x)
-            y = gdf.geometry.apply(lambda p: p.y)
-
-            if size_array:
-                # Fastest method but be aware of out of memory errors!
-                water_level = sample_raster_full(raster, x, y, size_array, extent)
-            else:
-                # Slower method but no issues with memory errors
-                water_level = sample_raster(raster_band, nodatavalue, x, y,
-                                            extent['minX'], extent['pixelWidth'], extent['maxY'],
-                                            extent['pixelHeight'])
-
-            gdf[rn+'_'+self.aggregate_wl[:2]] = water_level
-
-        return gdf
-
     def save_network(self, to_save, name, types=['pickle']):
         """Saves a geodataframe or graph to output_path
 
@@ -1060,15 +962,59 @@ class Hazard:
                 nx.set_edge_attributes(base_graph_hazard, original_geometries, 'geometry')
                 self.graphs['base_graph_hazard'] = base_graph_hazard.copy()
                 del graph_reprojected
+                del base_graph_hazard_reprojected
                 del base_graph_hazard
             else:
                 self.graphs['base_graph_hazard'] = self.hazard_intersect(
                     graph)
 
-        #### Step 1b: hazard overlay of the origins_destinations (NetworkX) ###
+            # Save graphs/network with hazard
+            self.config['files']['base_graph_hazard'] = self.save_network(
+                self.graphs['base_graph_hazard'],
+                'base_graph_hazard', types=to_save)
+        else:
+            self.graphs['base_graph_hazard'] = nx.read_gpickle(self.config['static'] / 'output_graph' / 'base_graph_hazard.gpickle')
+
+            #### Step 1b: hazard overlay of the origins_destinations (NetworkX) ###
         if (self.graphs['origins_destinations_graph'] is not None) and (self.config['files']['origins_destinations_graph_hazard'] is None):
-            # Overlay the origins and destinations with the hazard maps
-            self.graphs['origins_destinations_graph_hazard'] = self.od_hazard_intersect(graph)
+            graph = self.graphs['origins_destinations_graph']
+
+            # Check if the graph needs to be reprojected
+            hazard_crs = pyproj.CRS.from_user_input(self.config['hazard']['hazard_crs'])
+            graph_crs = pyproj.CRS.from_user_input("EPSG:4326")  # this is WGS84, TODO: Make flexible by including in the network ini
+
+            if hazard_crs != graph_crs:  # Temporarily reproject the graph to the CRS of the hazard
+                logging.warning("""Hazard crs {} and graph crs {} are inconsistent, 
+                                              we try to reproject the graph crs""".format(hazard_crs, graph_crs))
+                extent_graph = get_graph_edges_extent(graph)
+                logging.info('Graph extent before reprojecting: {}'.format(extent_graph))
+                graph_reprojected = reproject_graph(graph, graph_crs, hazard_crs)
+                extent_graph_reprojected = get_graph_edges_extent(graph_reprojected)
+                logging.info('Graph extent after reprojecting: {}'.format(extent_graph_reprojected))
+
+                # Do the actual hazard intersect
+                od_graph_hazard_reprojected = self.od_hazard_intersect(graph_reprojected)
+
+                # Assign the original geometries to the reprojected raster
+                original_geometries = nx.get_edge_attributes(graph, 'geometry')
+                od_graph_hazard = od_graph_hazard_reprojected.copy()
+                nx.set_edge_attributes(od_graph_hazard, original_geometries, 'geometry')
+                self.graphs['origins_destinations_graph_hazard'] = od_graph_hazard.copy()
+                del graph_reprojected
+                del od_graph_hazard_reprojected
+                del od_graph_hazard
+
+            else:
+                self.graphs['origins_destinations_graph_hazard'] = self.od_hazard_intersect(
+                    graph)
+
+            # Save graphs/network with hazard
+            self.config['files']['origins_destinations_graph_hazard'] = self.save_network(
+                self.graphs['origins_destinations_graph_hazard'],
+                'origins_destinations_graph_hazard', types=to_save)
+        else:
+            self.graphs['origins_destinations_graph_hazard'] = nx.read_gpickle(
+                self.config['static'] / 'output_graph' / 'origins_destinations_graph_hazard.gpickle')
 
         #### Step 2: iterate overlay of the GeoPandas Dataframe (if any) ###
         if (self.graphs['base_network'] is not None) and (self.config['files']['base_network_hazard'] is None):
@@ -1096,19 +1042,19 @@ class Hazard:
             else:
                 self.graphs['base_network_hazard'] = self.hazard_intersect(self.graphs['base_network'])
 
-        for input_graph in ['base_graph', 'base_network', 'origins_destinations_graph']:
-            # save graph with hazard
-            if self.graphs[input_graph + '_hazard'] is not None:
-                self.config['files'][input_graph + '_hazard'] = self.save_network(self.graphs[input_graph + '_hazard'],
-                                                input_graph + '_hazard', types=to_save)
-
-        # Save the hazard name bookkeeping table.
-        self.hazard_name_table.to_excel(self.config['output'] / 'hazard_names.xlsx', index=False)
+            # Save graphs/network with hazard
+            self.config['files']['base_network_hazard'] = self.save_network(
+                self.graphs['base_network_hazard'],
+                'base_network_hazard', types=to_save)
+        else:
+            self.graphs['base_network_hazard'] = gpd.read_feather(
+                self.config['static'] / 'output_graph' / 'base_network_hazard.feather')
 
         if 'isolation' in self.config:
             locations = gpd.read_file(self.config['isolation']['locations'][0])
             locations['i_id'] = locations.index
             locations_crs = pyproj.CRS.from_user_input(locations.crs)
+            hazard_crs = pyproj.CRS.from_user_input(self.config['hazard']['hazard_crs'])
 
             if hazard_crs != locations_crs:  # Temporarily reproject the locations to the CRS of the hazard
                 logging.warning("""Hazard crs {} and location crs {} are inconsistent, 
@@ -1131,5 +1077,8 @@ class Hazard:
                 locations = self.point_hazard_intersect(locations)
 
             self.save_network(locations, 'locations_hazard')
+
+        # Save the hazard name bookkeeping table.
+        self.hazard_name_table.to_excel(self.config['output'] / 'hazard_names.xlsx', index=False)
 
         return self.graphs

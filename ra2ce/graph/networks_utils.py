@@ -23,13 +23,13 @@ import matplotlib.path as mpltPath
 import tqdm
 import tqdm._tqdm_pandas
 from osgeo import gdal
-from shapely.ops import linemerge
+from shapely.ops import linemerge, unary_union
 from geopy import distance
 from osmnx.simplification import simplify_graph
 from networkx import set_edge_attributes
 from numpy import object as np_object
 from statistics import mean
-from shapely.geometry import shape, Point, LineString, MultiLineString
+from shapely.geometry import shape, Point, LineString, MultiLineString, box
 from pathlib import Path
 from decimal import Decimal
 
@@ -1945,30 +1945,40 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
                     elif ' mph' in ms:
                         ns.append(int(ms.split(' mph')[0]) * 1.609344)
                 if len(ns) > 0:
-                    graph[u][v][k]['avgspeed'] = sum(ns) / len(ns)
+                    graph[u][v][k]['avgspeed'] = round(sum(ns) / len(ns), 0)
                 else:
-                    graph[u][v][k]['avgspeed'] = avg_road_speed.loc[avg_road_speed['road_types'] == road_type, 'avg_speed'].iloc[0]
+                    graph[u][v][k]['avgspeed'] = round(avg_road_speed.loc[avg_road_speed['road_types'] == road_type, 'avg_speed'].iloc[0], 0)
             elif isinstance(max_speed, str):
                 if not any(c.isalpha() for c in max_speed) and not (';' in max_speed) and not ('|' in max_speed):
-                    graph[u][v][k]['avgspeed'] = int(max_speed)
+                    graph[u][v][k]['avgspeed'] = round(int(max_speed), 0)
                 elif not any(c.isalpha() for c in max_speed) and ';' in max_speed:
-                    graph[u][v][k]['avgspeed'] = mean([int(x) for x in max_speed.split(';') if x.isnumeric()])
+                    graph[u][v][k]['avgspeed'] = round(mean([int(x) for x in max_speed.split(';') if x.isnumeric()]), 0)
                 elif not any(c.isalpha() for c in max_speed) and '|' in max_speed:
-                    graph[u][v][k]['avgspeed'] = mean([int(x) for x in max_speed.split('|') if x.isnumeric()])
+                    graph[u][v][k]['avgspeed'] = round(mean([int(x) for x in max_speed.split('|') if x.isnumeric()]), 0)
                 elif ' mph' in max_speed:
-                    graph[u][v][k]['avgspeed'] = int(max_speed.split(' mph')[0]) * 1.609344
+                    graph[u][v][k]['avgspeed'] = round(int(max_speed.split(' mph')[0]) * 1.609344, 0)
                 else:
-                    graph[u][v][k]['avgspeed'] = avg_road_speed.loc[avg_road_speed['road_types'] == road_type, 'avg_speed'].iloc[0]
+                    graph[u][v][k]['avgspeed'] = round(avg_road_speed.loc[avg_road_speed['road_types'] == road_type, 'avg_speed'].iloc[0], 0)
         else:
             if ']' in road_type:
                 avg_speed = int([s for r, s in zip(avg_road_speed['road_types'], avg_road_speed['avg_speed']) if set(road_type[2:-2].split("', '")) == set(r[2:-2].split("', '"))][0])
-                graph[u][v][k]['avgspeed'] = avg_speed
+                graph[u][v][k]['avgspeed'] = round(avg_speed, 0)
             else:
-                graph[u][v][k]['avgspeed'] = avg_road_speed.loc[avg_road_speed['road_types'] == road_type, 'avg_speed'].iloc[0]
+                graph[u][v][k]['avgspeed'] = round(avg_road_speed.loc[avg_road_speed['road_types'] == road_type, 'avg_speed'].iloc[0], 0)
 
     return graph
 
 
-def fraction_flooded(x):
-    x = x.filled(0).flatten()
-    return len(np.where(x > 0)[0]) / len(x)
+def fraction_flooded(line, hazard_map):
+    bbox_line = box(*line.bounds)
+    try:
+        with rasterio.open(hazard_map) as src:
+            out_image, out_transform = mask(src, [bbox_line], crop=True, all_touched=True)
+
+        flooded_cells = unary_union([shape(x[0]) for x in shapes(out_image, transform=out_transform) if x[-1] > 0])
+        flooded_cells = gpd.GeoDataFrame({'geometry': [flooded_cells]})
+
+        line_intersect = flooded_cells.intersection(line)
+        return line_intersect.length.sum() / line.length
+    except ValueError:
+        return 0

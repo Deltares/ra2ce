@@ -21,6 +21,7 @@ from .utils import get_root_path, initiate_root_logger, load_config
 from .graph.networks import Network, Hazard
 from .analyses.direct import analyses_direct
 from .analyses.indirect import analyses_indirect
+from .io import read_graphs
 
 
 def main(network_ini=None, analyses_ini=None):
@@ -55,6 +56,25 @@ def main(network_ini=None, analyses_ini=None):
         else:
             initiate_root_logger(str(config_analyses['output'] / 'RA2CE.log'))
 
+        if network_ini:
+            # The network_ini and analyses_ini are both called, copy the config values of the network ini
+            # into the analyses config.
+            if config_network['network'] is not None:
+                config_analyses['network'] = config_network['network']
+            if config_network['origins_destinations'] is not None:
+                config_analyses['origins_destinations'] = config_network['origins_destinations']
+        else:
+            # Only the analyses.ini is called, load all network/graph files.
+            graphs = read_graphs(config_analyses)
+            try:
+                config_analyses['network'] = load_config(root_path, config_path=config_analyses['output'].joinpath('network.ini'),
+                                                         check=False)
+                config_analyses['origins_destinations'] = config_analyses['network']['origins_destinations']
+            except FileNotFoundError:
+                logging.error(f"The configuration file 'network.ini' is not found at {config_analyses['output'].joinpath('network.ini')}."
+                              f"Please make sure to name your network settings file 'network.ini'.")
+                quit()
+
         # Create the output folders
         if 'direct' in config_analyses:
             for a in config_analyses['direct']:
@@ -67,14 +87,6 @@ def main(network_ini=None, analyses_ini=None):
                 output_path.mkdir(parents=True, exist_ok=True)
 
         # Do the analyses
-        if network_ini:
-            if config_network['network'] is not None:
-                config_analyses['network'] = config_network['network']
-            if config_network['origins_destinations'] is not None:
-                config_analyses['origins_destinations'] = config_network['origins_destinations']
-            if config_network['hazard']['hazard_map'] is not None:
-                config_analyses['hazard_names'] = [haz.stem for haz in config_network['hazard']['hazard_map']]
-
         if 'direct' in config_analyses:
             if config_network['hazard']['hazard_map'] is not None:
                 analyses_direct.DirectAnalyses(config_analyses, graphs).execute()

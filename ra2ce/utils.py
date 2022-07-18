@@ -147,7 +147,7 @@ def configure_analyses(config):
     return config
 
 
-def load_config(root_path, config_path):
+def load_config(root_path, config_path, check=True):
     # Read the configurations in network.ini and add the root path to the configuration dictionary.
     config_path = Path(config_path)
     if not config_path.is_file():
@@ -156,28 +156,29 @@ def load_config(root_path, config_path):
     config['project']['name'] = config_path.parts[-2]
     config['root_path'] = root_path
 
-    # Validate the configuration input.
-    config = input_validation(config)
+    if check:
+        # Validate the configuration input.
+        config = input_validation(config)
 
-    if config_path.stem == 'analyses':
-        # Create a dictionary with direct and indirect analyses separately.
-        config = configure_analyses(config)
+        if config_path.stem == 'analyses':
+            # Create a dictionary with direct and indirect analyses separately.
+            config = configure_analyses(config)
 
-    # Set the output paths in the configuration Dict for ease of saving to those folders.
-    config['input'] = config['root_path'] / config['project']['name'] / 'input'
-    config['static'] = config['root_path'] / config['project']['name'] / 'static'
-    config['output'] = config['root_path'] / config['project']['name'] / 'output'
+        # Set the output paths in the configuration Dict for ease of saving to those folders.
+        config['input'] = config['root_path'] / config['project']['name'] / 'input'
+        config['static'] = config['root_path'] / config['project']['name'] / 'static'
+        config['output'] = config['root_path'] / config['project']['name'] / 'output'
 
-    # check if files exist:
-    config = check_files(config)
+        # check if files exist:
+        config = check_files(config)
 
-    if 'hazard' in config:
-        if 'hazard_field_name' in config['hazard']:
-            if config['hazard']['hazard_field_name']:
-                config['hazard']['hazard_field_name'] = config['hazard']['hazard_field_name'].split(',')
+        if 'hazard' in config:
+            if 'hazard_field_name' in config['hazard']:
+                if config['hazard']['hazard_field_name']:
+                    config['hazard']['hazard_field_name'] = config['hazard']['hazard_field_name'].split(',')
 
-    #TODO: give warning when the path to the ini to copy to is not found (probably the project folder is not in the ra2ce/data folder)
+        #TODO: give warning when the path to the ini to copy to is not found (probably the project folder is not in the ra2ce/data folder)
 
-    # copy ini file for future references to output folder
-    copyfile(config_path, config['output'] / '{}.ini'.format(config_path.stem))
+        # copy ini file for future references to output folder
+        copyfile(config_path, config['output'] / '{}.ini'.format(config_path.stem))
     return config
