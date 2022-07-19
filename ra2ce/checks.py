@@ -148,7 +148,7 @@ def check_files(config):
         if file == 'base_network' or file == 'base_network_hazard':
             file_path = config['static'] / 'output_graph' / '{}.feather'.format(file)
         else:
-            file_path = config['static'] / 'output_graph' / '{}.gpickle'.format(file)
+            file_path = config['static'] / 'output_graph' / '{}.p'.format(file)
 
         # check if file exists, else return None
         if file_path.is_file():

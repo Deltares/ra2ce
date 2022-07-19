@@ -51,24 +51,23 @@ def main(network_ini=None, analyses_ini=None):
 
     if analyses_ini:
         config_analyses = load_config(root_path, config_path=analyses_ini)
-        if network_ini:
-            config_analyses['files'] = network.config['files']
-        else:
-            initiate_root_logger(str(config_analyses['output'] / 'RA2CE.log'))
 
         if network_ini:
             # The network_ini and analyses_ini are both called, copy the config values of the network ini
             # into the analyses config.
+            config_analyses['files'] = network.config['files']
             if config_network['network'] is not None:
                 config_analyses['network'] = config_network['network']
             if config_network['origins_destinations'] is not None:
                 config_analyses['origins_destinations'] = config_network['origins_destinations']
         else:
-            # Only the analyses.ini is called, load all network/graph files.
+            # Only the analyses.ini is called, initiate logger and load all network/graph files.
+            initiate_root_logger(str(config_analyses['output'] / 'RA2CE.log'))
             graphs = read_graphs(config_analyses)
             try:
-                config_analyses['network'] = load_config(root_path, config_path=config_analyses['output'].joinpath('network.ini'),
+                config_network = load_config(root_path, config_path=config_analyses['output'].joinpath('network.ini'),
                                                          check=False)
+                config_analyses.update(config_network)
                 config_analyses['origins_destinations'] = config_analyses['network']['origins_destinations']
             except FileNotFoundError:
                 logging.error(f"The configuration file 'network.ini' is not found at {config_analyses['output'].joinpath('network.ini')}."
