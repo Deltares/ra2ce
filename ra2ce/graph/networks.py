@@ -652,6 +652,7 @@ class Hazard:
             tqdm.pandas(desc='Destinations hazard overlay with '+hn)
             flood_stats = gdf.geometry.progress_apply(lambda x: point_query(x, str(self.hazard_files['tif'][i])))
 
+            flood_stats = flood_stats.apply(lambda x: x[0] if x[0] else 0)
             attribute_dict = {od: {rn+'_'+self.aggregate_wl[:2]: wl} for od, wl in zip(od_ids, flood_stats)}
             nx.set_node_attributes(graph, attribute_dict)
 
