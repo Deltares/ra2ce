@@ -17,9 +17,13 @@ import pandas as pd
 from tqdm import tqdm
 import time
 import copy
-from ...graph.networks_utils import graph_to_shp
+import pickle
 from pathlib import Path
 from pyproj import CRS
+
+# Local modules
+from ...graph.networks_utils import graph_to_shp
+from ...io import read_gpickle
 
 
 class IndirectAnalyses:
@@ -634,7 +638,7 @@ class IndirectAnalyses:
         o_name = self.config['origins_destinations']['origins_names']
         d_name = self.config['origins_destinations']['destinations_names']
         od_id = self.config['origins_destinations']['id_name_origin_destination']
-        id_name = self.config['network']['network']['file_id'] if self.config['network']['network']['file_id'] is not None else 'rfid'
+        id_name = self.config['network']['file_id'] if self.config['network']['file_id'] is not None else 'rfid'
         count_col_name = self.config['origins_destinations']['origin_count']
         weight_factor = self.config['origins_destinations']['origin_out_fraction']
 
@@ -838,31 +842,33 @@ class IndirectAnalyses:
                     analysis['weighing'] = 'length'
 
             if analysis['analysis'] == 'single_link_redundancy':
-                g = nx.read_gpickle(self.config['files']['base_graph'])
+                g = read_gpickle(self.config['files']['base_graph'])
                 gdf = self.single_link_redundancy(g, analysis)
             elif analysis['analysis'] == 'multi_link_redundancy':
-                g = nx.read_gpickle(self.config['files']['base_graph_hazard'])
+                g = read_gpickle(self.config['files']['base_graph_hazard'])
                 gdf = self.multi_link_redundancy(g, analysis)
             elif analysis['analysis'] == 'optimal_route_origin_destination':
-                g = nx.read_gpickle(self.config['files']['origins_destinations_graph'])
+                g = read_gpickle(self.config['files']['origins_destinations_graph'])
                 gdf = self.optimal_route_origin_destination(g, analysis)
+
                 if ('save_traffic' in analysis.keys()) & ('origin_count' in self.config['origins_destinations'].keys()):
-                        if analysis['save_traffic']:
-                            od_table = gpd.read_feather(self.config['static'] / 'output_graph' / 'origin_destination_table.feather')
-                            if 'equity_weight' in analysis.keys():
-                                try:
-                                    equity = pd.read_csv(self.config['static'] / 'network' / analysis['equity_weight'])
-                                except:
-                                    equity = pd.DataFrame()
-                            else:
+                    if analysis['save_traffic']:
+                        od_table = gpd.read_feather(self.config['static'] / 'output_graph' / 'origin_destination_table.feather')
+                        if 'equity_weight' in analysis.keys():
+                            try:
+                                equity = pd.read_csv(self.config['static'] / 'network' / analysis['equity_weight'])
+                            except:
                                 equity = pd.DataFrame()
-                            route_traffic_df = self.optimal_route_od_link(gdf, od_table, equity)
-                            impact_csv_path = self.config['output'] / analysis['analysis'] / (analysis['name'].replace(' ', '_') + '_link_traffic.csv')
-                            route_traffic_df.to_csv(impact_csv_path, index=False)
+                        else:
+                            equity = pd.DataFrame()
+                        route_traffic_df = self.optimal_route_od_link(gdf, od_table, equity)
+                        impact_csv_path = self.config['output'] / analysis['analysis'] / (analysis['name'].replace(' ', '_') + '_link_traffic.csv')
+                        route_traffic_df.to_csv(impact_csv_path, index=False)
+
             elif analysis['analysis'] == 'multi_link_origin_destination':
-                g = nx.read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
+                g = read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
                 gdf = self.multi_link_origin_destination(g, analysis)
-                g_not_disrupted = nx.read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
+                g_not_disrupted = read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
                 gdf_not_disrupted = self.optimal_route_origin_destination(g_not_disrupted, analysis)
                 disruption_impact_df, gdf_ori = self.multi_link_origin_destination_impact(gdf, gdf_not_disrupted)
                 try:
@@ -880,15 +886,15 @@ class IndirectAnalyses:
                 impact_csv_path = self.config['output'] / analysis['analysis'] / (analysis['name'].replace(' ', '_') + '_impact_summary.csv')
                 disruption_impact_df.to_csv(impact_csv_path, index=False)
             elif analysis['analysis'] == 'single_link_losses':
-                g = nx.read_gpickle(self.config['files']['base_graph_hazard'])
+                g = read_gpickle(self.config['files']['base_graph_hazard'])
                 gdf = self.single_link_redundancy(g, analysis)
                 gdf = self.single_link_losses(gdf, analysis)
             elif analysis['analysis'] == 'multi_link_losses':
-                g = nx.read_gpickle(self.config['files']['base_graph_hazard'])
+                g = read_gpickle(self.config['files']['base_graph_hazard'])
                 gdf = self.multi_link_redundancy(g, analysis)
                 gdf = self.multi_link_losses(gdf, analysis)
             elif analysis['analysis'] == 'optimal_route_origin_closest_destination':
-                g = nx.read_gpickle(self.config['files']['origins_destinations_graph'])
+                g = read_gpickle(self.config['files']['origins_destinations_graph'])
                 base_graph, opt_routes, destination = self.optimal_route_origin_closest_destination(g, analysis)
                 if analysis['save_shp']:
                     # TODO MAKE ONE GDF FROM RESULTS?
@@ -911,7 +917,7 @@ class IndirectAnalyses:
                     opt_routes.to_csv(csv_path, index=False)
             elif analysis['analysis'] == 'multi_link_origin_closest_destination':
                 # TODO MAKE ONE GDF FROM RESULTS?
-                g = nx.read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
+                g = read_gpickle(self.config['files']['origins_destinations_graph_hazard'])
                 base_graph, opt_routes, destinations = self.optimal_route_origin_closest_destination(g, analysis)
 
                 base_graph, origins, destinations, agg_results = self.multi_link_origin_closest_destination(g, base_graph, destinations, analysis, opt_routes)
@@ -949,7 +955,7 @@ class IndirectAnalyses:
                 df = losses.calculate_losses_from_table()
                 gdf = gdf_in.merge(df, how='left', on='LinkNr')
             elif analysis['analysis'] == 'multi_link_isolated_locations':
-                g = nx.read_gpickle(self.config['files']['base_graph_hazard'])
+                g = read_gpickle(self.config['files']['base_graph_hazard'])
                 gdf, df = self.multi_link_isolated_locations(g, analysis)
 
                 df_path = output_path / (analysis['name'].replace(' ', '_') + '_results.csv')

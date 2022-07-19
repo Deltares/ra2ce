@@ -377,7 +377,7 @@ def merge_lines_automatic(lines_gdf, idName, aadtNames, crs_):
                                             zip(aadtNames, lines_gdf.loc[lines_gdf[idName] == i][aadtNames].iloc[0])})
                 merged = merged.append(properties_dict, ignore_index=True)
 
-    merged['length'] = merged['geometry'].apply(lambda x: line_length(x))
+    merged['length'] = merged['geometry'].apply(lambda x: line_length(x, crs_))
 
     return merged, lines_merged
 

@@ -14,6 +14,7 @@ from rasterstats import zonal_stats, point_query
 
 # local modules
 from .networks_utils import *
+from ..io import *
 
 
 class Network:
@@ -85,6 +86,8 @@ class Network:
             graph_complex (NetworkX graph): The resulting graph.
             edges_complex (GeoDataFrame): The resulting network.
         """
+        # Make a pyproj CRS from the EPSG code
+        crs = pyproj.CRS.from_user_input(crs)
 
         lines = self.read_merge_shp()
         logging.info("Function [read_merge_shp]: executed with {} {}".format(self.primary_files, self.diversion_files))
@@ -181,7 +184,7 @@ class Network:
         logging.info('Finished converting the graph to a geodataframe')
 
         # Save the link tables linking complex and simple IDs
-        self.save_linking_tables(link_tables[0], link_tables[1])
+        save_linking_tables(self.config['static'] / 'output_graph', link_tables[0], link_tables[1])
 
         if self.segmentation_length is not None:
             edges_complex = Segmentation(edges_complex, self.segmentation_length)
@@ -230,7 +233,7 @@ class Network:
         logging.info('Finished converting the graph to a geodataframe')
 
         # Save the link tables linking complex and simple IDs
-        self.save_linking_tables(link_tables[0], link_tables[1])
+        save_linking_tables(self.config['static'] / 'output_graph', link_tables[0], link_tables[1])
 
         # If the user wants to use undirected graphs, turn into an undirected graph (default).
         if not self.directed:
@@ -331,64 +334,6 @@ class Network:
 
         return lines
 
-    def save_network(self, to_save, name, types=['pickle']):
-        """Saves a geodataframe or graph to output_path
-        TODO: add encoding to ini file to make output more flexible"""
-        if type(to_save) == gpd.GeoDataFrame:
-            # The file that needs to be saved is a geodataframe
-            if 'pickle' in types:
-                output_path_pickle = self.config['static'] / 'output_graph' / (name + '_network.feather')
-                to_save.to_feather(output_path_pickle, index=False)
-                logging.info(f"Saved {output_path_pickle.stem} in {output_path_pickle.resolve().parent}.")
-            if 'shp' in types:
-                output_path = self.config['static'] / 'output_graph' / (name + '_network.shp')
-                to_save.to_file(output_path, index=False)  #, encoding='utf-8' -Removed the encoding type because this causes some shapefiles not to save.
-                logging.info(f"Saved {output_path.stem} in {output_path.resolve().parent}.")
-            return output_path_pickle
-
-        elif type(to_save) == nx.classes.multigraph.MultiGraph or type(to_save) == nx.classes.multidigraph.MultiDiGraph:
-            # The file that needs to be saved is a graph
-            if 'shp' in types:
-                graph_to_shp(to_save, self.config['static'] / 'output_graph' / (name + '_edges.shp'),
-                             self.config['static'] / 'output_graph' / (name + '_nodes.shp'))
-                logging.info(f"Saved {name + '_edges.shp'} and {name + '_nodes.shp'} in {self.config['static'] / 'output_graph'}.")
-            if 'pickle' in types:
-                output_path_pickle = self.config['static'] / 'output_graph' / (name + '_graph.gpickle')
-                nx.write_gpickle(to_save, output_path_pickle, protocol=4)
-                logging.info(f"Saved {output_path_pickle.stem} in {output_path_pickle.resolve().parent}.")
-            return output_path_pickle
-        else:
-            return None
-
-    def save_linking_tables(self, simple_to_complex, complex_to_simple):
-        """
-        Function that save the tables that link the simple and complex graph/netwok
-
-        Arguments:
-            *simple_to_complex* (dict) : keys: ids of simple graph; values: matching ids of complex graph [list]
-            *complex_to_simple* (dict) : keys: ids of complex graph; values: matching ids of simple graph [int]
-
-        Returns:
-            None
-
-        Effect: saves the lookup tables as json files in the static/output_graph folder
-
-        """
-
-        # save lookup table if necessary
-        import json
-
-        destination_folder = self.config['static'] / 'output_graph'
-        if not destination_folder.exists():
-            destination_folder.mkdir()
-
-        with open((destination_folder / 'simple_to_complex.json'), 'w') as fp:
-            json.dump(simple_to_complex, fp)
-            logging.info('saved (or overwrote) simple_to_complex.json')
-        with open((destination_folder /'complex_to_simple.json'), 'w') as fp:
-            json.dump(complex_to_simple, fp)
-            logging.info('saved (or overwrote) complex_to_simple.json')
-
     def create(self):
         """Function with the logic to call the right analyses."""
         # Save the 'base' network as gpickle and if the user requested, also as shapefile.
@@ -415,8 +360,8 @@ class Network:
 
             elif self.source == 'pickle':
                 logging.info('Start importing a network from pickle')
-                base_graph = nx.read_gpickle(self.config['static'] / 'network' / 'base_graph.gpickle')
-                network_gdf = gpd.read_feather(self.config['static'] / 'network' / 'base_network.feather')
+                base_graph = read_gpickle(self.config['static'] / 'output_graph' / 'base_graph.p')
+                network_gdf = gpd.read_feather(self.config['static'] / 'output_graph' / 'base_network.feather')
 
                 # Assuming the same CRS for both the network and graph
                 self.base_graph_crs = pyproj.CRS.from_user_input(network_gdf.crs)
@@ -443,11 +388,13 @@ class Network:
                         G[u][v][k]['time'] = round(hours * 3600, 0)
 
             # Save the graph and geodataframe
-            self.config['files']['base_graph'] = self.save_network(base_graph, 'base', types=to_save)
-            self.config['files']['base_network'] = self.save_network(network_gdf, 'base', types=to_save)
+            self.config['files']['base_graph'] = save_network(base_graph, self.config['static'] / 'output_graph',
+                                                              'base_graph', types=to_save)
+            self.config['files']['base_network'] = save_network(network_gdf, self.config['static'] / 'output_graph',
+                                                                'base_network', types=to_save)
         else:
             if self.base_graph_path is not None:
-                base_graph = nx.read_gpickle(self.config['files']['base_graph'])
+                base_graph = read_gpickle(self.config['files']['base_graph'])
             else:
                 base_graph = None
             if self.base_network_path is not None:
@@ -463,12 +410,13 @@ class Network:
         if (self.origins is not None) and (self.destinations is not None) and self.od_graph_path is None:
             # reading the base graphs
             if (self.base_graph_path is not None) and (base_graph is not None):
-                base_graph = nx.read_gpickle(self.base_graph_path)
+                base_graph = read_gpickle(self.base_graph_path)
             # adding OD nodes
             if self.origins[0].suffix == '.tif':
                 self.origins[0] = self.generate_origins_from_raster()
             od_graph = self.add_od_nodes(base_graph, self.base_graph_crs)
-            self.config['files']['origins_destinations_graph'] = self.save_network(od_graph, 'origins_destinations', types=to_save)
+            self.config['files']['origins_destinations_graph'] = save_network(od_graph, self.config['static'] / 'output_graph',
+                                                                              'origins_destinations_graph', types=to_save)
 
         return {'base_graph': base_graph, 'base_network':  network_gdf, 'origins_destinations_graph': od_graph}
 
@@ -537,7 +485,6 @@ class Hazard:
                 "The hazard raster and the network geometries do not overlap, check projection")
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
-            print(i, hn, rn)
             tqdm.pandas(desc="Network hazard overlay with "+hn)
             flood_stats = gdf.geometry.progress_apply(lambda x: zonal_stats(x, str(self.hazard_files['tif'][i]),
                                                                               all_touched=True,
@@ -570,7 +517,6 @@ class Hazard:
         edges_geoms = [(u, v, k, edata) for u, v, k, edata in graph.edges.data(keys=True) if 'geometry' in edata]
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
-            print(i, hn, rn)
             # Check if the hazard and graph extents overlap
             extent = get_extent(gdal.Open(str(self.hazard_files['tif'][i])))
             extent_hazard = (extent['minX'], extent['maxX'], extent['minY'], extent['maxY'])
@@ -595,8 +541,9 @@ class Hazard:
                                                                             stats=f"{self.aggregate_wl}"))
 
             try:
+                flood_stats = flood_stats.apply(lambda x: x[0][self.aggregate_wl] if x[0][self.aggregate_wl] else 0)
                 nx.set_edge_attributes(graph,
-                                       {(edges[0], edges[1], edges[2]): {rn + '_' + self.aggregate_wl[:2]: x[0][self.aggregate_wl]} for x, edges in
+                                       {(edges[0], edges[1], edges[2]): {rn + '_' + self.aggregate_wl[:2]: x} for x, edges in
                                         zip(flood_stats, edges_geoms)})
             except:
                 logging.warning("No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'.")
@@ -605,6 +552,7 @@ class Hazard:
             tqdm.pandas(desc="Graph fraction with hazard overlay with " + hn)
             graph_fraction_flooded = gdf.geometry.progress_apply(
                 lambda x: fraction_flooded(x, str(self.hazard_files['tif'][i])))
+            graph_fraction_flooded = graph_fraction_flooded.fillna(0)
             nx.set_edge_attributes(graph,
                                    {(edges[0], edges[1], edges[2]): {rn + '_fr': x} for x, edges in
                                     zip(graph_fraction_flooded, edges_geoms)})
@@ -687,7 +635,6 @@ class Hazard:
         edges_geoms = [(u, v, k, edata) for u, v, k, edata in graph.edges.data(keys=True) if 'geometry' in edata]
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
-            print(i, hn, rn)
             # Check if the hazard and graph extents overlap
             extent = get_extent(gdal.Open(str(self.hazard_files['tif'][i])))
             extent_hazard = (extent['minX'], extent['maxX'], extent['minY'], extent['maxY'])
@@ -722,6 +669,7 @@ class Hazard:
                                                                             stats=f"{self.aggregate_wl}"))
 
             try:
+                flood_stats = flood_stats.apply(lambda x: x[0][self.aggregate_wl] if x[0][self.aggregate_wl] else 0)
                 nx.set_edge_attributes(graph,
                                        {(edges[0], edges[1], edges[2]): {
                                            rn + '_' + self.aggregate_wl[:2]: x[0][self.aggregate_wl]} for x, edges in
@@ -734,6 +682,7 @@ class Hazard:
             tqdm.pandas(desc='OD graph fraction with hazard overlay with ' + hn)
             graph_fraction_flooded = gdf.geometry.progress_apply(
                 lambda x: fraction_flooded(x, str(self.hazard_files['tif'][i])))
+            graph_fraction_flooded = graph_fraction_flooded.fillna(0)
             nx.set_edge_attributes(graph,
                                    {(edges[0], edges[1], edges[2]): {rn + '_fr': x} for x, edges in
                                     zip(graph_fraction_flooded, edges_geoms)})
@@ -871,41 +820,6 @@ class Hazard:
             logging.warning("No hazard files found.")
             pass
 
-    def save_network(self, to_save, name, types=['pickle']):
-        """Saves a geodataframe or graph to output_path
-
-        Args:
-
-        Returns:
-
-        """
-        if type(to_save) == gpd.GeoDataFrame:
-            # The file that needs to be saved is a geodataframe
-            if 'pickle' in types:
-                output_path_pickle = self.config['static'] / 'output_graph' / (name + '.feather')
-                to_save.to_feather(output_path_pickle, index=False)
-                logging.info(f"Saved {output_path_pickle.stem} in {output_path_pickle.resolve().parent}.")
-            if 'shp' in types:
-                output_path = self.config['static'] / 'output_graph' / (name + '_network.shp')
-                to_save.to_file(output_path, index=False)
-                logging.info(f"Saved {output_path.stem} in {output_path.resolve().parent}.")
-            return output_path_pickle
-
-        #Todo: this does not always work: #type(to_save) == nx.classes.multigraph.MultiGraph:
-        else:
-            # The file that needs to be saved is a graph
-            if 'shp' in types:
-                graph_to_shp(to_save, self.config['static'] / 'output_graph' / (name + '_edges.shp'),
-                             self.config['static'] / 'output_graph' / (name + '_nodes.shp'))
-                logging.info(f"Saved {name + '_edges.shp'} and {name + '_nodes.shp'} in {self.config['static'] / 'output_graph'}.")
-            if 'pickle' in types:
-                output_path_pickle = self.config['static'] / 'output_graph' / (name + '.gpickle')
-                nx.write_gpickle(to_save, output_path_pickle, protocol=4)
-                logging.info(f"Saved {output_path_pickle.stem} in {output_path_pickle.resolve().parent}.")
-            return output_path_pickle
-
-        return None
-
     def create(self):
         """ Overlays the different possible graph objects with the hazard data
 
@@ -933,7 +847,7 @@ class Hazard:
 
             if file_path is not None or self.graphs[input_graph] is not None:
                 if self.graphs[input_graph] is None and input_graph != 'base_network':
-                    self.graphs[input_graph] = nx.read_gpickle(file_path)
+                    self.graphs[input_graph] = read_gpickle(file_path)
                 elif self.graphs[input_graph] is None and input_graph == 'base_network':
                     self.graphs[input_graph] = gpd.read_feather(file_path)
 
@@ -969,11 +883,11 @@ class Hazard:
                     graph)
 
             # Save graphs/network with hazard
-            self.config['files']['base_graph_hazard'] = self.save_network(
-                self.graphs['base_graph_hazard'],
+            self.config['files']['base_graph_hazard'] = save_network(
+                self.graphs['base_graph_hazard'], self.config['static'] / 'output_graph',
                 'base_graph_hazard', types=to_save)
         else:
-            self.graphs['base_graph_hazard'] = nx.read_gpickle(self.config['static'] / 'output_graph' / 'base_graph_hazard.gpickle')
+            self.graphs['base_graph_hazard'] = read_gpickle(self.config['static'] / 'output_graph' / 'base_graph_hazard.p')
 
             #### Step 1b: hazard overlay of the origins_destinations (NetworkX) ###
         if (self.graphs['origins_destinations_graph'] is not None) and (self.config['files']['origins_destinations_graph_hazard'] is None):
@@ -1009,12 +923,12 @@ class Hazard:
                     graph)
 
             # Save graphs/network with hazard
-            self.config['files']['origins_destinations_graph_hazard'] = self.save_network(
-                self.graphs['origins_destinations_graph_hazard'],
+            self.config['files']['origins_destinations_graph_hazard'] = save_network(
+                self.graphs['origins_destinations_graph_hazard'], self.config['static'] / 'output_graph',
                 'origins_destinations_graph_hazard', types=to_save)
         else:
-            self.graphs['origins_destinations_graph_hazard'] = nx.read_gpickle(
-                self.config['static'] / 'output_graph' / 'origins_destinations_graph_hazard.gpickle')
+            self.graphs['origins_destinations_graph_hazard'] = read_gpickle(
+                self.config['static'] / 'output_graph' / 'origins_destinations_graph_hazard.p')
 
         #### Step 2: iterate overlay of the GeoPandas Dataframe (if any) ###
         if (self.graphs['base_network'] is not None) and (self.config['files']['base_network_hazard'] is None):
@@ -1043,8 +957,8 @@ class Hazard:
                 self.graphs['base_network_hazard'] = self.hazard_intersect(self.graphs['base_network'])
 
             # Save graphs/network with hazard
-            self.config['files']['base_network_hazard'] = self.save_network(
-                self.graphs['base_network_hazard'],
+            self.config['files']['base_network_hazard'] = save_network(
+                self.graphs['base_network_hazard'], self.config['static'] / 'output_graph',
                 'base_network_hazard', types=to_save)
         else:
             self.graphs['base_network_hazard'] = gpd.read_feather(
@@ -1076,7 +990,7 @@ class Hazard:
             else:
                 locations = self.point_hazard_intersect(locations)
 
-            self.save_network(locations, 'locations_hazard')
+            save_network(locations, self.config['static'] / 'output_graph', 'locations_hazard')
 
         # Save the hazard name bookkeeping table.
         self.hazard_name_table.to_excel(self.config['output'] / 'hazard_names.xlsx', index=False)
