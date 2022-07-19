@@ -15,7 +15,7 @@ def test_1_1_network_shape_redundancy():
     test_name = "1_1_network_shape_redundancy"
     network_ini, analyses_ini = get_paths(test_name)
     main(network_ini=network_ini, analyses_ini=analyses_ini)
-    check_output_graph_files(test_name, ['1_1_network_shape_redundancy_lines_that_merged.shp', 'base_graph.gpickle', 'base_network.feather'])
+    check_output_graph_files(test_name, ['1_1_network_shape_redundancy_lines_that_merged.shp', 'base_graph.p', 'base_network.feather'])
     check_output_files(test_name, 'single_link_redundancy', ['single_link_redundancy_test.csv'])
 
 
