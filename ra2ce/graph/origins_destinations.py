@@ -418,13 +418,15 @@ def rescale_and_crop(path_name, gdf, outputFolderPath, res=500):
     os.remove(outputFolderPath / "origins_raster_reprojected.tif")
     
     return out_array, out_meta
-    
+
+
 def export_raster_to_geotiff(array, meta, path, fileName):
     Cropped_outputfile = path / fileName
     with rasterio.open(Cropped_outputfile, 'w', **meta, compress = 'LZW', tiled=True) as dest:
         dest.write(array)
     return Cropped_outputfile
-    
+
+
 def generate_points_from_raster(fn, out_fn):
     # Read raster coordinate centroid
     with rasterio.open(fn) as src:
@@ -449,8 +451,12 @@ def generate_points_from_raster(fn, out_fn):
     gdf.loc[gdf['values']>0].to_file(out_fn)
     
     return out_fn
-    
+
+
 def origins_from_raster(outputFolderPath, mask_fn, raster_fn):
+    """Makes origin points from a population raster.
+
+    """
     output_fn = outputFolderPath / "origins_raster.tif"
     mask = gpd.read_file(mask_fn[0])
     res = 1000 #in meter; TODO: put in config file or in network.ini
