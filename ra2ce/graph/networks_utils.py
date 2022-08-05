@@ -1982,3 +1982,5 @@ def fraction_flooded(line, hazard_map):
         return line_intersect.length.sum() / line.length
     except ValueError:
         return 0
+    except Exception as e:
+        logging.info('fraction_flooded() {} \n for line {}'.format(e,line))
