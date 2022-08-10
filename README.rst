@@ -1,337 +1,211 @@
 RA2CE
 =====
 
-Risk Assessment and Adaptation for Critical InfrastructurE (RA2CE) is a
-tool developed by Deltares for calculating damages and losses for
-infrastructure networks resulting from hazards.
+This is the repository of RA2CE (*just say race!*) - the Resilience Assessment and Adaptation for Critical infrastructurE Toolkit Python Package eveloped by Deltares. RA2CE helps to quantify resilience of critical infrastructure networks, prioritize interventions and adaptation measures and select the most appropriate action perspective to increase resilience considering future conditions.
 
-The tool consists currently of four components:
-
-- Network creation
-- Exposure
-- Criticality
-- Damages
-
-- Prioritization - to be implemented
-- Adaptation - to be implemented
-
-The user needs to decide which analysis should be performed:
-
-- Direct damages
-- Redundancy-based criticality
-- Both
-
-Both Direct damanges and Redundancy-based criticality have their own
-functionalities. See for more detail below.
-
-Contact details: RA2CE Margreet van Marle
-(Margreet.vanMarle@Deltares.nl), Direct Damages: Kees van Ginkel
-(Kees.vanGinkel@Deltares.nl), Criticality: Frederique de Groen
-(Frederique.deGroen@Deltares.nl)
-
-Network Creation
-----------------
-
-THe user needs to decide which type of input data will be used to create
-the infrastructure network. Currently the following 3 methods are
-implemented:
-
-- *Create a network based on OSM dump file* (.osm.pbf)
-- The user needs to identify the name of the OSM dump and a shapefile
-containing the area of interest.
-- *Create a network based on a shapefile*
-- The user needs to deliver a shapefile and indicate the
-column of the unique identifier.
-
-- (Create a network based on OSM online download) - to be implemented
-
-Exposure
---------
-
-For every hazard map an exposure map will be created, where exposure is
-defined as the overlay between the infrastructure network and the hazard
-map. In case of a flooding on road-infrastructure this will for example
-result in a map with the waterdepth projected on the road. The exposure
-value is based on the average value of the hazard data intersecting with
-the infrastructure element. The user can choose what size the segments
-should be based on a segmentation script. This should be given in
-degree.
-
-Criticality
------------
-
-This module calculated the redundancy based criticality There are three
-possible analyses.
-
-**1. Single-link Disruption** What is the effect of disruption when a
-single link for the redundancy of the system. In this analysis, each
-link of the network is disrupted at a time. For each disrupted link, a
-redundancy analysis is performed that identifies the best existing
-alternative or, if there is no redundancy, the lack of alternative
-routes. This is performed sequentially, for each link of the network. It
-is also possible to focus on a specific network level and use the
-remaining existing links as detour possibilities: such distinction can
-be chosen in a subsequent question.
-
-**2. Multi-link Disruption (1): Calculate the disruption for all damaged
-roads** Multiple link disruption can be analyzed making use of a hazard
-map. This can be a hazard map with a return interval or it can be an
-event-based approach. In this analysis, a group of multiple links are
-removed simultaneously. While the group disruption is in place,
-alternative routes connecting the end-points of each link of the group
-is identified. This is a redundancy analysis for each link of the
-network when multiple parts of the network are out of operation and can
-be used to simulate area covering events such as specific flooding or
-earthquakes. Also can be identified whether groups of the network are
-isolated.
-
-**3. Multi-link Disruption (2): Calculate the disruption for an
-Origin/Destination matrix** When origin and destination files are
-provided
-
-When infrastructure usage data are available it is also possible to
-calculate the losses. The user should provide these data in the excel
-file:
-
-Damages - to be implemented
----------------------------
-
-**vulnerability curves** The user will need to identify the
-vulnerability curves for the hazard intensity and damage based on the
-following table: .xlsx
-
-Risk prioritization
----------------------------------------
-Yet to be implemented.
+**Contact** Margreet van Marle (Margreet.vanMarle@Deltares.nl)
 
 Installation
-============
-
-in PYcharm use the ra2ce.yml file to set up an environment. This is
-running on Python 3.7. The python interpreter should be based on ra2ce.
-Furthermore the user should set the working directory to the main ra2ce
-folder: ra2ce/ra2ce (where the ra2ce script is located).
-
-Testing
--------
-
-Test files are standard refered to in the ra2ce.py (main script). This
-will perform a multi-link diruption based on a map in the dominican
-republic.
-
-Config file
------------
-
-Standard the utils.py directs to the test\_config.json file. When the
-test is exiting without errors, the user should change this to
-config.json to perform their own analysis.
-
-
-User input
-==========
-
-The user needs to fill out the document to\_fill\_in.xlsx and has to
-choose for several options. Multiple analysis can be done: add another
-row with settings for the different calculations. Below is an overview
-of the user input variables. All relative paths are described in the
-*config* file. All geospatial files should be projected in *EPSG:4326*.
-
-analysis\_name
---------------
-
-Name that you want to give to the analysis. All output files will start with
-this name.
-
-analysis
---------
-
-Choose from:
-
-- *Direct Damages*
-- *Redundancy-based criticality*
-- *Both*
-
-links\_analysis
----------------
-
-Only when chosen for *Redundancy-based criticality* or *Both*
-
-Choose from:
-
-- *Single-link Disruption*
-- *Multi-link Disruption (1): Calculate the disruption for all damaged roads*
-- *Multi-link Disruption (2): Calculate the disruption for an Origin/Destination matrix*
-
-network\_source
----------------
-
-Choose how the network will be created. Choose from:
-
-- *Network based on shapefile* - user needs to provide shapefile with network and indicate
-the attribute with unique\_ID at **shp\_input\_data** and
-**shp\_unique\_ID** in input table
-- *Network based on OSM dump* - user needs to provide .shp file with area of interest at
-**OSM\_area\_of\_interest** in input table
-- *Network based on OSM online* - user needs to provide .shp file with area of interest at
-**OSM\_area\_of\_interest** in input table
-
-OSM\_area\_of\_interest
------------------------
-
-When choosing **network\_source** *Network based on OSM online* provide name of shapefile with region for
-OSM input. No extension needed.
-
-name\_of\_pbf
-----------------
-When choosing **network\_source** *Network based on OSM dump* based on OSM dump. Provide name of *.pbf dump. No extension needed.
-
-shp\_input\_data
-----------------
-
-When choosing **network\_source** *Network based on shapefile* provide
-name of shapefile with with the infrastructure network.  No extension needed.
-
-shp\_unique\_ID
----------------
-
-When choosing **network\_source** *Network based on shapefile* provide
-name of shapefile at **shp\_input\_data** and indicate here the column
-of the shapefile with the Unique\_ID. In case no unique ID exists, leave
-this cell empty and the tool will create a new one.
-
-shp\_for\_diversion
--------------------
-
-In case you would like to make use of the underlying network for
-diversions, add here the shapefile used for that.
-
-data\_manipulation
-------------------
-
-When choosing **network\_source** *Network based on shapefile* indicate
-whether the shapefile should be fixed for unconnected lines. After
-performing this analysis, the user should check out the result via
-shapefile based on visual inspection. Choose from:
-
-- *snapping*
-- *pruning*
-- *snapping,pruning*
-
-snapping\_threshold
--------------------
-
-When choosing **network\_source** *Network based on shapefile* and
-**data\_manipulation** *snapping* or *snapping,pruning* please indicate
-the threshold for snapping. This value should be given in degree.
-
-network\_type
--------------
-
-Choose from:
-
-- *walk*
-- *bike*
-- *drive*
-- *drive\_service*
-- *all*
-
-When left empty default is: XXXXX
-
-road\_types
---------------------------------------------------
-
-Here the user can specify which road\_types are included in the
-network. These can be used for creation of the vulnerability curve input
-sheets. **andere dingen ook nog?** When left empty default is **XXXXXX**
-Anny option is valid, but these are some commmon types:
-
-- *motorway, trunk, primary, secondary, tertiary*
-- *motorway, trunk, primary, secondary*
-- *motorway, trunk, primary*
-- *motorway, trunk* 
-- *motorway*
-- *add another option here*
-
-hazard\_data
-------------
-
-When including hazard data, provide the specific filenames, separated by
-comma. The tool can handle both *.shp* and *.tif* files. By default, the
-tool uses all files in the hazard folder (see **config**) ending at
-*.tif*, or *.shp*
-
-hazard\_attribute\_name
------------------------
-
-In case **hazard\_data** of .shp hazard map indicate the column of the
-attribute that represents the hazard intensity.
-
-hazard\_unique\_ID
-------------------
-
-In case the **hazard\_data** can be linked to the infrastructure network
-by unique\_ID similar to **shp\_unique\_id** indicate here the column of
-the unique ID in the hazard shapefile .
-
-hazard\_unit
-------------
-
-Indicate here the units for the hazard intensity described in
-**hazard\_attribute\_name**
-
-hazard\_aggregation
--------------------
-
-When translating the hazard intensity to the infrastructure network,
-indicate how the hazard intensity should be determined in case of
-crossing multiple hazard intensities. It can include the following
-options:
-
-- *max*
-- *min*
-- *mean*
-
-In case of multiple analyses, separate by comma.
-
-segmentation
-------------
-
-When translating the hazard intensity to the infrastructure network,
-indicate at which length of infrastructure lines the direct damages
-should be projected. The length of the segments should be given in
-degree.By default a node-to-node value will be determined based on the
-given input in **hazard\_aggregation**.
-
-hazard\_threshold
------------------
-
-Should be in the unit of the hazard map.
-
-origin\_shp
------------
-
-**add text on origin and destination analysis** name of the file(s) for
-the point data that can be used as origins (must be shapefiles) - do not
-add file extension
-
-destination\_shp
-----------------
-
-name of the file(s) for the point data that can be used as destinations
-(must be shapefiles) - do not add file extension
-
-id\_name\_origin\_destination
------------------------------
-
-name of the attribute that is the Unique ID in both origin shapefiles
-and destination shapefiles
-
-infra\_usage
------------------------------------------------------------------------
-
-File names where information on infrastructure usage is stored: the
-Average Annual Daily Traffic and costs per vehicle type. **This should be tested still!!**
-
-vulnerability\_functions --> deze moet nog toegevoegd!
+---------------------------
+RA2CE can be operated via the command-line interface with two commands. Before RA2CE can be used, the correct Python environment needs to be installed (see *environment.yml*). Anaconda is a well-known environment manager for Python and can be used to install the correct environment and run RA2CE via its command-line interface. It is recommended to install Miniconda , this is a small version of Anaconda that contains the functionality required for setting up the Python environment for RA2CE.
+
+Command-line interface operation
+---------------------------
+a.	To run both the network creation and analysis modules, run RA2CE with ``python run.py --network_ini <path to network.ini file> --analyses_ini <path to analyses.ini file>``
+b.	To only run the network creation module, run RA2CE with ``python run.py --network_ini <path to network.ini file>``
+c.	To only run the analysis module, run RA2CE with ``python run.py --analyses_ini <path to analyses.ini file>``
+
+The user can also always ask for clarification of the input arguments with ``python run.py --help``.
+
+Folder structure
+---------------------------
+RA2CE can be run from anywhere, but it requires a certain folder structure for loading and saving data. RA2CE expects data to be stored separately per project, which can be defined in any way by the user, e.g. by its location in the world or the type of assessment. A project folder must contain the following subfolders: input, output, and static. It must also contain the network.ini and analyses.ini files. Within the subfolder static, RA2CE expects three subfolders: hazard, network, and output_graph. See below an example folder structure of “Project A”. This folder structure must be created and filled with data by the user before running RA2CE.
+
+::
+
+    Project A               --- Example project name 
+    ├── input               --- Input data
+    ├── output              --- Contains the analyses results
+    ├── static              --- Contains files that generally do not change per run
+    │   ├── hazard          --- Hazard data
+    │   ├── network         --- Network data, e.g. an OSM PBF or GeoJSON file
+    │   └── output_graph    --- The resulting network(s) intermediary files that can also be used for quality control
+    ├── network.ini         --- Configuration file for the network
+    ├── analyses.ini        --- Configuration file for the analyses
+
+Workflow
+---------------------------
+RA2CE is developed to be used in four ways:
+
+•	Create one or multiple networks *(only run --network_ini)*
+•	Calculate the exposure of hazards on those networks *(only run --network_ini)*
+•	Execute one or multiple analyses on (a) network(s) *(only run --analyses_ini)*
+•	Create a network and execute analyses *(run --network_ini and --analyses_ini)*
+
+To create a network, a network configuration file, also called initialization file, is required. We call this the network.ini file. To execute analyses, an analyses initialization file is required, we call this the analyses.ini file. Both initialization files are required if users want to create a network and execute analyses.
+
+Data requirements
+---------------------------
+The types of possible input file formats to create a network are:
+
+•	Shapefile of network;
+•	GeoJSON polygon of area of interest for downloading a network from OSM;
+•	OSM PBF file;
+•	Pickle – a python data format, also used to save graphs.
+
+Depending on the required analysis, more data might be needed.
+
+Direct damages
+---------------------------
+The ‘damage to the network’ depends on the intensity of the hazard in relation to how the network (and its assets) are built and its current condition (e.g. type, state of maintenance, dimensions). Here, the hazard intensity and asset condition are linked to a percentage of damage, via vulnerability functions/ fragility curves. To develop these vulnerability curves data is needed about replacements costs per asset type and the potential damage per hazard intensity. This data can be collected during a workshop with for example national road agencies and the technicians. The output of the analyses consist of damage maps per hazard (e.g. flooding, landslides), per return period or per event, per asset and per road segment.
+
+Possible (built-in) options for vulnerability curves include:
+
+- *Global*: Huizinga curves
+- *Europe*: OSdaMage functions
+- *TO BE IMPLEMENTED*: your own damage curves
+
+Indirect losses / Network criticality
+---------------------------
+
+======================================================   =====================
+Analyis                                                   Name in analyses.ini
+======================================================   =====================
+Single link redundancy                                    single_link_redundancy
+Multi-link redundancy                                    multi_link_redundancy
+Origin-Destination, defined OD couples, no disruption    optimal_route_origin_destination
+Origin-Destination, defined OD couples, disruption       multi_link_origin_destination
+Origin-Destination, O to closest D, no disruption        optimal_route_origin_closest_destination
+Origin-Destination,  O to closest D, disruption          multi_link_origin_closest_destination
+Isolated locations                                       multi_link_isolated_locations 
+======================================================   =====================
+
+**Single link redundancy**
+This analysis removes each link of the network one at a time. For each disrupted link, a redundancy analysis is performed. It identifies the best existing alternative route or, if there is no redundancy, the lack of alternative routes. This is performed sequentially, for each link of the network. The redundancy of each link is expressed in total distance or time for the alternative route, difference in distance/time between the alternative route and the original route (additional distance/time), and if there is an alternative route available, or not.
+
+**Multi-link redundancy**
+This analysis removes multiple disrupted links of the network. The disrupted links are indicated with an overlay of a hazard map and a threshold for disruption. For example, for flooding, the threshold could be a maximum of 0.5 m water on a road segment. For each disrupted link, a redundancy analysis is performed that identifies the best existing alternative route or, if there is no redundancy, the lack of alternative routes. The redundancy of each link is expressed in total distance or time for the alternative route, difference in distance/time between the alternative route and the original route (additional distance/time), and if there is an alternative route available, or not.
+
+**Origin-Destination, defined OD couples**
+This analysis finds the shortest (distance-weighed) or quickest (time-weighed) route between all Origins and all Destinations input by the user.
+
+**Origin-Destination, defined origins to closest destinations**
+This analysis finds the shortest (distance-weighed) or quickest (time-weighed) route from all Origins to the closest Destinations input by the user.
+
+**Isolated locations**
+This analysis finds the sections of the network that are fully isolated from the rest of the network (also named disconnected islands), because of network disruption due to a hazard.
+
+Initialization file templates
+---------------------------
+**network.ini**
+::
+
+  [project]
+  name = test
+
+  [network]
+  directed = False
+  source = OSM download
+  primary_file = None
+  diversion_file = None
+  file_id = None
+  polygon = map.geojson
+  network_type = drive
+  road_types = motorway,motorway_link,trunk,trunk_link,primary, primary_link,secondary,secondary_link,tertiary,tertiary_link
+  save_shp = True
+
+  [origins_destinations]
+  origins = origins.shp 
+  destinations = destinations.shp
+  origins_names = A
+  destinations_names = B
+  id_name_origin_destination = OBJECTID
+  origin_count = people
+  origin_out_fraction = 1  # fraction of things/people going out of the origin to the destination
+
+  [hazard]
+  hazard_map = flood_RP_100.tif,flood_RP_500.tif
+  hazard_id = None
+  hazard_field_name = None
+  aggregate_wl = max
+  hazard_crs = EPSG:4326
+
+  [cleanup]
+  snapping_threshold = None
+  segmentation_length = None
+  merge_lines = False
+  merge_on_id = False
+  ignore_interactions = False
+
+**analyses.ini**
+::
+
+  [project]
+  name = test
+
+  [analysis1]
+  name = single link redundancy test
+  analysis = single_link_redundancy
+  weighing = distance
+  save_shp = True
+  save_csv = True
+
+  [analysis2]
+  name = multi link redundancy test
+  analysis = multi_link_redundancy
+  aggregate_wl = max
+  threshold = 0.5
+  weighing = distance
+  save_shp = True
+  save_csv = True
+
+  [analysis3]
+  name = optimal origin dest test
+  analysis = optimal_route_origin_destination
+  weighing = distance
+  save_shp = True
+  save_csv = True
+
+  [analysis4]
+  name = multilink origin closest dest test
+  analysis = multi_link_origin_closest_destination
+  aggregate_wl = max
+  threshold = 0.5
+  weighing = distance
+  save_shp = True
+  save_csv = False
+
+  [analysis5]
+  name = multilink origin dest test
+  analysis = multi_link_origin_destination
+  aggregate_wl = max
+  threshold = 0.5
+  weighing = distance
+  save_shp = True
+  save_csv = True
+
+  [analysis6]
+  name = multilink isolated locations
+  analysis = multi_link_isolated_locations
+  aggregate_wl = max
+  threshold = 1
+  weighing = length
+  buffer_meters = 40
+  category_field_name = category
+  save_shp = True
+  save_csv = True
+
+
+Third-party Notices
 ------------------------------------------------------
+This project incorporates components from the projects listed below.
 
+**NetworkX**: NetworkX is distributed with the 3-clause BSD license.
+
+   Copyright (C) 2004-2022, NetworkX Developers
+   Aric Hagberg <hagberg@lanl.gov>
+   Dan Schult <dschult@colgate.edu>
+   Pieter Swart <swart@lanl.gov>
+   All rights reserved.
+
+**OSMnx**: Boeing, G. 2017. "OSMnx: New Methods for Acquiring, Constructing, Analyzing, and Visualizing Complex Street Networks." Computers, Environment and Urban Systems 65, 126-139. doi:10.1016/j.compenvurbsys.2017.05.004

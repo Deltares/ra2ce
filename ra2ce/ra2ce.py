@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on 26-7-2021
-
-@author: F.C. de Groen, Deltares
-@author: M. Kwant, Deltares
+Main RA2CE script.
 """
 
 from pathlib import Path
@@ -25,7 +22,7 @@ from .io import read_graphs
 
 
 def main(network_ini=None, analyses_ini=None):
-    """Main function to start RA2CE. Runs the RA2CE tool according to the settings made in network_ini and analysis_ini.
+    """Main function to start RA2CE. Runs RA2CE according to the settings in network_ini and analysis_ini.
 
     Reads the network and analyses ini files and chooses the right functions.
 
