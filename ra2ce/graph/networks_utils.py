@@ -1267,41 +1267,16 @@ def read_merge_shp(shapefileAnalyse,  idName, shapefileDiversion=[], crs_=4326):
     return lines
 
 
-def filter_link_ids(config, linkid='LinkNr', simple_id='G_fid_simp', hazard=None):
-    """ This function filters link IDS and removes doubles.
-     Sometimes a single graph_simple_id had multiple LinkIDs.
-     With this script you can change rows where multiple LinkIDS exist for a single graph Simple Id.
-     The ID with the highest frequency is selected and returned as a dataframe. """
-    df_original = pd.read_csv(config['static'] / 'LinkNR_FID_lookup2.csv')
-    out_list = []
-
-    df = df_original[[simple_id, linkid]]
-    for id in df[simple_id].drop_duplicates():
-        #select Ids from a single simple id
-        df_iter = df.loc[df[simple_id] == id].copy()
-        df_iter['freq'] = df_iter.groupby(linkid)[linkid].transform('count')
-        df_iter = df_iter.sort_values(['freq'], ascending=[0])
-        # select first row (highest frequency) and add to a list)
-        out_list.append([df_iter[simple_id].iloc[0], df_iter[linkid].iloc[0]])
-
-    columns = df_original.columns
-    #adding the column with new linkIds and remove the old one. Write as csv
-    df_original = df_original.rename(columns={linkid: linkid + 'old'})
-    df = pd.DataFrame(out_list, columns=[simple_id, linkid])
-    df_new = df_original.merge(df, how='left', on=simple_id)
-    df_new = df_new[columns]
-    df_new.to_csv(config['static'] / 'LinkNR_FID_lookup_new.csv', index=False)
-
-    if hazard is not None:
-        # join ids to hazard file
-        df_hazard = pd.read_csv(config['static'] / hazard)
-        df_hazard = df_hazard.merge(df, how='left', on=linkid)
-        df_hazard[simple_id] = df_hazard[simple_id].replace(np.nan, 9999999).astype(int)
-        new_name = hazard.replace('.csv', '_new.csv')
-        df_hazard.to_csv(config['static'] / new_name, index=False)
-
-
 def check_hazard_extent_resolution(list_hazards):
+    """Checks whether the extent of a list of hazard rasters is exactly the same.
+
+    Args:
+        list_hazards (list of pathlib paths or strings): A list of paths to the hazard map rasters of which
+            the extent needs to be checked
+
+    Returns:
+        (bool): True if the extents are exactly the same, False if they are not.
+    """
     if len(list_hazards) == 1:
         return True
     check_hazard_extent = [gdal.Open(str(haz)).GetGeoTransform() for haz in list_hazards]
@@ -1328,20 +1303,20 @@ def get_extent(dataset):
     return {"minX": minx, "maxX": maxx, "minY": miny, "maxY": maxy, "cols": cols, "rows": rows,
             "width": width, "height": height, "pixelWidth": transform[1], "pixelHeight": transform[5]}
 
+
 def get_graph_edges_extent(G):
-    """
-    Inspects all geometries of the edges of a graph and returns the most extreme coordinates
+    """Inspects all geometries of the edges of a graph and returns the most extreme coordinates
 
     Arguments:
-        *G* (networkX) : NetworkX graph, should have an attribute 'geometry' containty shapely geometries
+        G (networkX) : NetworkX graph, should have an attribute 'geometry' containty shapely geometries
 
     Returns
-        *extent* (tuple) : (minX,maxX,minY,maxY)
+        extent (tuple) : (minX,maxX,minY,maxY)
     """
-    #Start with the bounds of the (random) first edge
+    # Start with the bounds of the (random) first edge
     (minX, minY, maxX, maxY) = list(G.edges.data('geometry'))[0][-1].bounds
 
-    #Compare with the bounds of all other edges to see if there are linestrings with more extreme bounds
+    # Compare with the bounds of all other edges to see if there are linestrings with more extreme bounds
     for (u, v, geom) in G.edges.data('geometry'):
         #print(u, v, geom)
         (minx, miny, maxx, maxy) = geom.bounds #shapely returns (minx, miny, maxx, maxy)
@@ -1358,12 +1333,12 @@ def reproject_graph(G_in, crs_in, crs_out):
     Reprojects the shapely geometry data (of a NetworkX graph) to a different projection
 
     Arguments:
-        *G_in* (NetworkX graph) : needs a geometry attribute containing shapely linestrings
-        *crs_in* (string) : input projection, follow the Geopandas crs convention: "espg:3035" or "EPSG4326"
-        *crs_out* (string) : output projection to covert to, idem.
+        G_in (NetworkX graph): needs a geometry attribute containing shapely linestrings
+        crs_in (string): input projection, follow the Geopandas crs convention: "espg:3035" or "EPSG4326"
+        crs_out (string): output projection to covert to, idem.
 
     Returns:
-        *G_out* NetworkX graph)
+        G_out (NetworkX graph)
     """
     att = nx.get_edge_attributes(G_in, 'geometry')
     df = pd.DataFrame.from_dict(data=att, orient='index',columns=["geometry"])
@@ -1377,14 +1352,13 @@ def reproject_graph(G_in, crs_in, crs_out):
 
 
 def bounds_intersect_1d(tup1, tup2):
-    """
-    check if bounds of A and B intersect anywhere (have any overlapping points)
+    """Check if bounds of A and B intersect anywhere (have any overlapping points)
 
     Arguments:
         tup1 (tuple) : (min, max)
         tup2 (tuple) : (min, max)
 
-    :return:
+    Returns:
         Boolean (True/False)
     """
     return (tup1[0] <= tup2[1]) and (tup1[1] >= tup2[0])
@@ -1398,106 +1372,12 @@ def bounds_intersect_2d(extent1, extent2):
         *extent1* (tuple) : (minx,maxx,miny,maxy)
         *extent2* (tuple) : (minx,maxx,miny,maxy)
 
-    :return:
+    Returns:
         Boolean (True/False)
     """
     x_overlap = bounds_intersect_1d((extent1[0],extent1[1]),(extent2[0],extent2[1]))
     y_overlap = bounds_intersect_1d((extent1[2], extent1[3]), (extent2[2], extent2[3]))
     return (x_overlap and y_overlap)
-
-
-def sample_raster_full(raster, x_objects, y_objects, size_array, extent):
-    index_x_objects = np.int64(np.floor((x_objects - extent['minX']) / extent['pixelWidth']))
-    index_y_objects = np.int64(np.floor((y_objects - extent['maxY']) / extent['pixelHeight']))
-
-    fltr = np.logical_and(index_x_objects < size_array[1], index_y_objects < size_array[0])
-    index_x_objects = index_x_objects[fltr]
-    index_y_objects = index_y_objects[fltr]
-
-    water_level = raster[tuple([index_y_objects, index_x_objects])]
-    return water_level
-
-
-def find_cell(x_y_coord, ll_corner, x_y_res):
-    return np.int64(np.floor((x_y_coord - ll_corner) / x_y_res))
-
-
-def find_cell_array_y(y_coord, ul_corner, y_res):
-    return np.int64(np.floor((ul_corner - y_coord) / y_res))
-
-
-def sample_raster(raster_band, nodatavalue, x_obj, y_obj, ulx, xres, uly, yres):
-    water_levels = list()
-    for x, y in zip(x_obj, y_obj):
-        index_x_objects = find_cell(x, ulx, xres)
-        index_y_objects = find_cell_array_y(y, uly, -yres)
-
-        try:
-            # It's possible that a part of some of the polygons is outside of the hazard extent.
-            value = raster_band.ReadAsArray(index_x_objects, index_y_objects, 1, 1)
-            if value[0, 0] == nodatavalue:
-                water_levels.append(0)
-            else:
-                water_levels.append(value[0, 0])
-        except TypeError as e:
-            # The polygon that is partially outside of the hazard extent is skipped.
-            logging.info(e)
-            water_levels.append(0)
-
-    return np.array(water_levels)
-
-
-def find_points_in_polygon(geometries, extent_resolution):
-    polygons_grid_coords = list()
-    for geometry in geometries:
-        # Derive the geometry boundaries.
-        minx, miny, maxx, maxy = geometry.bounds
-
-        # Select the grid cells related to the geometry boundaries.
-        col_off = find_cell(minx, extent_resolution["minX"], extent_resolution["pixelWidth"])
-        width = abs(find_cell(maxx, extent_resolution["minX"], extent_resolution["pixelWidth"]) - col_off)
-        row_off = find_cell(miny, extent_resolution["minY"], extent_resolution["pixelHeight"])
-        height = abs(find_cell(maxy, extent_resolution["minY"], extent_resolution["pixelHeight"]) - row_off)
-        grid = np.zeros((width * height, 2), dtype=np.float64)
-
-        # Determine the grid cells that are located within the geometry (https://stackoverflow.com/questions/36399381/whats-the-fastest-way-of-checking-if-a-point-is-inside-a-polygon-in-python).
-        grid_coords = grid_to_coords(grid, width, height, extent_resolution["minX"] + col_off * extent_resolution["pixelWidth"],
-                                     extent_resolution["pixelWidth"], extent_resolution["minY"] + row_off * extent_resolution["pixelHeight"], extent_resolution["pixelHeight"])
-
-        if grid_coords.size > 0:
-            # In case any grid cell centroid is located within the geometry, extract the water levels at the grid cell centroids.
-            polygon_grid_coords = grid_coords[mpltPath.Path(list(geometry.exterior.coords)).contains_points(grid_coords)]
-
-            if polygon_grid_coords.size == 0:
-                polygon_grid_coords = list(geometry.exterior.coords)
-        else:
-            # In case no grid cell centroid is located within the geometry, extract the water level at the exterior coords of the geometry.
-            polygon_grid_coords = list(geometry.exterior.coords)
-
-        polygons_grid_coords.append(polygon_grid_coords)
-
-    return polygons_grid_coords
-
-
-def grid_to_coords(array, width, heigth, minx, resx, miny, resy):
-    i = 0
-    for x in range(width):
-        for y in range(heigth):
-            array[i] = [minx + (np.float64(x) * resx) + (0.5 * resx), miny + (np.float64(y) * -resy) + (0.5 * -resy)]
-            i += 1
-    return array
-
-
-def water_level_at_points(points_in_polygons, extent_resolution, raster_band, nodatavalue):
-    total_water_levels = list()
-    for pnts in points_in_polygons:
-        x_objects = np.transpose(pnts)[0]
-        y_objects = np.transpose(pnts)[1]
-
-        water_level = sample_raster(raster_band, nodatavalue, x_objects, y_objects, extent_resolution['minX'], extent_resolution['pixelWidth'], extent_resolution['maxY'], extent_resolution['pixelHeight'])
-        total_water_levels.append(list(np.where(water_level <= 0, np.nan, water_level)))
-
-    return total_water_levels
 
 
 def convert_osm(osm_convert_path, pbf, o5m):
@@ -1507,7 +1387,7 @@ def convert_osm(osm_convert_path, pbf, o5m):
 
 
 def filter_osm(osm_filter_path, o5m, filtered_o5m, tags=None):
-    """Filters an o5m OSM file to only motorways, trunks, primary and secondary roads  """
+    """Filters an o5m OSM file to only motorways, trunks, primary and secondary roads (or tags, if specified)"""
     if tags is None:
         tags = ['motorway', 'motorway_link', 'primary', 'primary_link',
                 'secondary', 'secondary_link', 'trunk', 'trunk_link']
@@ -1517,17 +1397,16 @@ def filter_osm(osm_filter_path, o5m, filtered_o5m, tags=None):
 
 def graph_link_simple_id_to_complex(graph_simple, new_id):
     """
-
     Create lookup tables (dicts) to match edges_ids of the complex and simple graph
     Optionally, saves these lookup tables as json files.
 
     Arguments:
-        *G_simple* (Graph) : Graph, containing attribute 'G_fid_simple' and 'G_fid_complex'
-        *save_json_folder* (Path) : Path to folder in which the json files should be generated (default None)
+        graph_simple (Graph) : Graph, containing attribute 'new_id'
+        new_id (string) : Name of the ID attribute in graph_simple
 
     Returns:
-        *simple_to_complex* (dict) : keys are ids of the simple graph, values are lists with all matching complex ids
-        *complex_to_simple* (dict) : keys are the ids of the complex graph, value is the matching simple_ID
+        simple_to_complex (dict): Keys are ids of the simple graph, values are lists with all matching complex ids
+        complex_to_simple (dict): Keys are the ids of the complex graph, value is the matching simple_ID
 
     We need this because the simple graph is derived from the complex graph, and therefore initially only the
     simple graph knows from which complex edges it was created. To assign this information also to the complex
@@ -1559,8 +1438,7 @@ def graph_link_simple_id_to_complex(graph_simple, new_id):
 
 
 def add_simple_id_to_graph_complex(G_complex, complex_to_simple, new_id):
-    """
-    Adds the appropriate ID of the simple graph to each edge of the complex graph as a new attribute 'rfid'
+    """Adds the appropriate ID of the simple graph to each edge of the complex graph as a new attribute 'rfid'
 
     Arguments:
         G_complex (Graph) : The complex graph, still lacking 'rfid'
@@ -1588,19 +1466,6 @@ def add_simple_id_to_graph_complex(G_complex, complex_to_simple, new_id):
     return G_complex
 
 
-def read_pickle_file(file_loc):
-    import pickle
-    pickle_file = open(file_loc, "rb")
-    objects = []
-    while True:
-        try:
-            objects.append(pickle.load(pickle_file))
-        except EOFError:
-            break
-    pickle_file.close()
-    return gpd.GeoDataFrame(objects[0])
-
-
 class Segmentation:
     """ cut the edges in the complex geodataframe to segments of equal lengths or smaller
         # output will be the cut edges_complex  """
@@ -1619,9 +1484,12 @@ class Segmentation:
     def cut(self, line, distance):
         """Cuts a line in two at a distance from its starting point
 
-        :param line: a shapely geometry line object (shapely.geometry.linestring.LineString)
-        :param distance: distance from starting point of linestring (float)
-        :return: a list containing two shapely linestring objects.
+        Args:
+            line (LineString): Single linestring.
+            distance (float): Distance from starting point of linestring
+
+        Returns:
+            (list): A list containing two shapely linestring objects.
         """
 
         if distance <= 0.0 or distance >= line.length:
@@ -1640,12 +1508,14 @@ class Segmentation:
                     LineString([(cp.x, cp.y)] + coords[i:])]
 
     def check_divisibility(self, dividend, divisor):
-        """Checks if the dividend is a multiple of the divisor and outputs a
-        boolean value
+        """Checks if the dividend is a multiple of the divisor and outputs a boolean value
 
-        :param dividend: the number which is divided (float)
-        :param divisor: the number which divides (float)
-        :return: bool: True if the dividend is a multiple of the divisor, False if not (bool)
+        Args:
+            dividend (float): The number which is divided
+            divisor (float): The number which divides
+
+        Returns:
+            is_multiple (bool): True if the dividend is a multiple of the divisor, False if not
         """
 
         dividend = Decimal(str(dividend))
@@ -1659,13 +1529,15 @@ class Segmentation:
             is_multiple = False
             return is_multiple
 
-
     def number_of_segments(self, linestring, split_length):
-        """returns the integer number of segments which will result from chopping up a linestring with split_length
+        """Returns the integer number of segments which will result from chopping up a linestring with split_length
 
-        :param linestring: a shapely linestring object. (shapely.geometry.multilinestring.MultiLineString)
-        :param split_length: the length by which to divide the linestring object. (float)
-        :return: n: integer number of segments which will result from splitting linestring with split_length. (int)
+        Args:
+            linestring (LineString): Single linestring.
+            split_length (float): The length by which to divide the linestring object.
+
+        Returns:
+            n (int): Integer number of segments which will result from splitting linestring with split_length.
         """
 
         divisible = self.check_divisibility(linestring.length, split_length)
@@ -1676,11 +1548,14 @@ class Segmentation:
         return n
 
     def split_linestring(self, linestring, split_length):
-        """cuts a linestring in equivalent segments of length split_length
+        """Cuts a linestring in equivalent segments of length split_length
 
-        :param linestring: linestring object. (shapely.geometry.linestring.LineString)
-        :param split_length: length by which to split the linestring into equal segments. (float)
-        :return: result_list: list of linestring objects all having the same length. (list)
+        Args:
+            linestring (LineString): Single linestring.
+            split_length (float): Length by which to split the linestring into equal segments.
+
+        Returns:
+            result_list (list): List of LineString objects that all have the same length split_lenght.
         """
 
         n_segments = self.number_of_segments(linestring, split_length)
@@ -1789,68 +1664,18 @@ class HazardUtils:
                         'motorway_junction': 'motorway'}
         return mapping_dict
 
-    @staticmethod
-    def create_hzd_df(geometry, hzd_list, hzd_names):
-        """
-        Arguments:
-
-            *geometry* (Shapely Polygon) -- shapely geometry of the region for which we do the calculation.
-            *hzd_list* (list) -- list of file paths to the hazard files.
-            *hzd_names* (list) -- list of names to the hazard files.
-
-        Returns:
-            *Geodataframe* -- GeoDataFrame where each row is a unique flood shape in the specified **region**.
-
-        """
-
-        ## MAKE GEOJSON GEOMETRY OF SHAPELY GEOMETRY FOR RASTERIO CLIP
-        geoms = [geometry['features'][0]['geometry']]
-
-        all_hzds = []
-
-        ## LOOP OVER ALL HAZARD FILES TO CREATE VECTOR FILES
-        for iter_, hzd_path in enumerate(hzd_list):
-            # extract the raster values values within the polygon
-            with rasterio.open(hzd_path) as src:
-                out_image, out_transform = mask(src, geoms, crop=True)
-
-                # change into centimeters and make any weird negative numbers -1 (will result in less polygons)
-                out_image[out_image <= 0] = -1
-                out_image = np.array(out_image * 100, dtype='int32')
-
-                # vectorize geotiff
-                results = (
-                    {'properties': {'raster_val': v}, 'geometry': s}
-                    for i, (s, v)
-                    in enumerate(
-                    shapes(out_image[0, :, :], mask=None, transform=out_transform)))
-
-                # save to geodataframe, this can take quite long if you have a big area
-                gdf = gpd.GeoDataFrame.from_features(list(results))
-
-                # Confirm that it is WGS84
-                gdf.crs = 4326
-                # gdf.crs = {'init': 'epsg:3035'}
-                # gdf.to_crs(epsg=4326,inplace=True) #convert to WGS84
-
-                gdf = gdf.loc[gdf.raster_val >= 0]
-                gdf = gdf.loc[gdf.raster_val < 5000]  # remove outliers with extreme flood depths (i.e. >50 m)
-                gdf['geometry'] = gdf.buffer(0)
-
-                gdf['hazard'] = hzd_names[iter_]
-                all_hzds.append(gdf)
-        return pd.concat(all_hzds)
-
 
 def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
     """Calculates the average speed from OSM roads, per road type
+
     Args:
-        graph: NetworkX graph with road types
-        road_type_col_name: name of the column which holds the road types ('highway' in OSM)
-        save_csv [boolean]: to save a csv or not
-        save_path [string]: path to save the csv to
+        graph (NetworkX graph): NetworkX graph with road types
+        road_type_col_name (string): name of the column which holds the road types ('highway' in OSM)
+        save_csv (boolean): To save a csv or not
+        save_path (string): Path to save the csv to
+
     Returns:
-        dataframe with the average road speeds per road type
+        df (Pandas DataFrame): Dataframe with the average road speeds per road type
     """
     # Create a dataframe of all road types
     exceptions = list(set([str(edata[road_type_col_name]) for u, v, edata in graph.edges.data() if isinstance(edata[road_type_col_name], list)]))
@@ -1924,6 +1749,14 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
 
 def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
     """Assigns the average speed to roads in an existing (OSM) graph
+
+    Args:
+        graph (NetworkX graph): NetworkX graph with road types
+        avg_road_speed (Pandas DataFrame): a Dataframe with columns "road_types" and "maxspeed"
+        road_type_col_name (string): Attribute name of the road type in the NetworkX graph
+
+    Returns:
+        graph (NetworkX graph): NetworkX graph with an additional attribute 'avgspeed'
     """
     # make a list of strings instead of just a string of the road types column
     avg_road_speed["road_types"] = avg_road_speed["road_types"].astype(str)
@@ -1970,6 +1803,18 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
 
 
 def fraction_flooded(line, hazard_map):
+    """Calculates the fraction of a linestring that overlaps with a hazard raster with value > 0
+
+    Args:
+        line (LineString): A single linestring that should be overlayed with the hazard map.
+        hazard_map (string): Full path to the hazard map.
+
+    Returns:
+        (float) The fraction of the linestring that overlaps with the hazard raster with a value > 0.
+        (0) If there is a ValueError, for example, if the linestring has no overlap with the raster,
+        the function returns 0.
+    """
+
     bbox_line = box(*line.bounds)
     try:
         with rasterio.open(hazard_map) as src:
