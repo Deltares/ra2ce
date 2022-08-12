@@ -198,6 +198,36 @@ class Network:
 
         return graph_simple, edges_complex
 
+    def network_trails_import(self, crs=4326):
+        """Creates a network which has been prepared in the TRAILS package
+
+        Returns:
+            graph_simple (NetworkX graph): Simplified graph (for use in the indirect analyses).
+            complex_edges (GeoDataFrame): Complex graph (for use in the direct analyses).
+        """
+
+        logging.info('TRAILS importer: Reads the provided primary edge file: {}, assumes there also is a_nodes file'.format(
+            self.primary_files))
+        edges = pd.read_pickle(self.config['static'] / "network" / self.primary_files)
+        corresponding_node_file = (self.config['static'] / "network" / self.primary_files.replace("edges","nodes"))
+        assert corresponding_node_file.exists()
+        nodes = pd.read_pickle(corresponding_node_file) #Todo: Throw exception if nodes file is not present
+
+        logging.info('TRAILS importer: start generating graph')
+        #tempfix to rename columns
+        edges = edges.rename({"from_id":"node_A","to_id" : "node_B"},axis='columns')
+        node_id = 'id'
+        graph_simple = graph_from_gdf(edges,nodes,name='network',node_id=node_id)
+
+        logging.info('TRAILS importer: graph generating was succesfull')
+
+        graph_complex = graph_simple #Todo: quickfix
+        edges_complex = edges
+
+        return graph_complex, edges_complex
+
+
+
     def network_osm_download(self):
         """Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
 
@@ -358,11 +388,13 @@ class Network:
             elif self.source == 'OSM PBF':
                 logging.info('Start creating a network from an OSM PBF file.')
 
-                base_graph, network_gdf = self.network_osm_pbf()
+                #base_graph, network_gdf = self.network_osm_pbf()
+                base_graph, network_gdf = self.network_trails_import() #Todo remove this temporary solution
 
             elif self.source == 'OSM download':
                 logging.info('Start downloading a network from OSM.')
-                base_graph, network_gdf = self.network_osm_download()
+                #base_graph, network_gdf = self.network_osm_download() #Todo revert this
+
 
             elif self.source == 'pickle':
                 logging.info('Start importing a network from pickle')
@@ -373,7 +405,7 @@ class Network:
                 self.base_graph_crs = pyproj.CRS.from_user_input(network_gdf.crs)
                 self.base_network_crs = pyproj.CRS.from_user_input(network_gdf.crs)
 
-            if self.source != 'pickle' and self.source != 'shapefile':
+            if self.source != 'pickle' and self.source != 'shapefile' and self.source != 'OSM PBF':
                 # Graph & Network from OSM download or OSM PBF
                 # Check if all geometries between nodes are there, if not, add them as a straight line.
                 base_graph = add_missing_geoms_graph(base_graph, geom_name='geometry')

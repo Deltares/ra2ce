@@ -109,18 +109,19 @@ if __name__ == "__main__":
 
     out_path = data_folder / 'input'
 
-    from_shapefile_to_poly(shapefile,out_path,'zh_') #Returns
+    #from_shapefile_to_poly(shapefile,out_path,'zh_')
 
     #############################################################################
     #STEP 2: Use .poly file to cut down the osm.pbf
     input_osm_pbf = data_folder / 'input' / 'netherlands.osm.pbf'
+    out_type = 'pbf' #or 'o5m'
 
     osm_convert_exe = root_path.parents[0] / 'ra2ce' / 'executables'/ 'osmconvert64.exe'
     polyfile = data_folder / 'input' / 'zh_0.poly'
-    outfile = data_folder / 'input' / (polyfile.stem + '.o5m')
+    outfile = data_folder / 'input' / (polyfile.stem + '.' + out_type)
     assert osm_convert_exe.exists()
     assert polyfile.exists()
 
     #For documentation on how the executable works, see this wiki: https://wiki.openstreetmap.org/wiki/Osmconvert
-    os.system('{}  {} -B={} --complete-ways --drop-broken-refs --hash-memory=10000 --out-o5m -o={}'.format(
-        str(osm_convert_exe), str(input_osm_pbf), str(polyfile), str(outfile)))
+    os.system('{}  {} -B={} --complete-ways --drop-broken-refs --hash-memory=10000 --out-{} -o={}'.format(
+        str(osm_convert_exe), str(input_osm_pbf), str(polyfile), out_type, str(outfile)))
