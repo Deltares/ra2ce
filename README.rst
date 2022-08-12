@@ -105,21 +105,21 @@ Initialization file templates
 
     [network]
     directed = False				# True / False
-    source = OSM download				# OSM PBF / OSM download / shapefile / pickle
+    source = OSM download			# OSM PBF / OSM download / shapefile / pickle
     primary_file = None				# <name + file extension or full path of file> / None			
-    diversion_file = None				# <name + file extension or full path of file> / None
-    file_id = None					# <field name of the ID attribute in the shapefile for network creating with a shapefile> / None
-    polygon = map.geojson				# <name + file extension of the geojson polygon file in the static/network folder> / None
-    network_type = drive				# drive / walk / bike / drive_service / all
+    diversion_file = None			# <name + file extension or full path of file> / None
+    file_id = None				# <field name of the ID attribute in the shapefile for network creating with a shapefile> / None
+    polygon = map.geojson			# <name + file extension of the geojson polygon file in the static/network folder> / None
+    network_type = drive			# drive / walk / bike / drive_service / all
     road_types = motorway,motorway_link,trunk,trunk_link,primary, primary_link,secondary,secondary_link,tertiary,tertiary_link
-    save_shp = True					# True / False
+    save_shp = True				# True / False
 
     [origins_destinations]
-    origins = origins.shp 				# <file name> / None
-    destinations = destinations.shp			# <file name> / None
+    origins = origins.shp 			# <file name> / None
+    destinations = destinations.shp		# <file name> / None
     origins_names = A				# <origin name> / None	
-    destinations_names = B				# <destination name> / None
-    id_name_origin_destination = OBJECTID		# <column name of origins/destinations data ID> / None
+    destinations_names = B			# <destination name> / None
+    id_name_origin_destination = OBJECTID	# <column name of origins/destinations data ID> / None
     origin_count = None				# <column name> / None
     origin_out_fraction = 1  			# fraction of things/people going out of the origin to the destination
 
@@ -128,7 +128,7 @@ Initialization file templates
     hazard_id = None				# <field name> / None
     hazard_field_name = None			# <field name(s)> / None	
     aggregate_wl = max				# max / min / mean
-    hazard_crs = None                               # EPSG code / projection that can be read by pyproj / None
+    hazard_crs = None                           # EPSG code / projection that can be read by pyproj / None
 
     [cleanup] # use only when the input file is a shapefile
     snapping_threshold = None			# Numeric value / None
@@ -196,6 +196,12 @@ Initialization file templates
   save_shp = True
   save_csv = True
 
+
+Example projects
+------------------------------------------------------
+`NRT Flood Impact Analysis on Road Networks <https://arcg.is/1uGm5W0>`__ - A case study in the Mandalay region, Myanmar
+
+`Cascading impacts of flooded infrastructure <https://arcg.is/1iC1rX>`__ - Economic quantification for evaluating cascading risks and adaptation solutions
 
 Third-party Notices
 ------------------------------------------------------
