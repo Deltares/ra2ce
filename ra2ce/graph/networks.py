@@ -393,8 +393,7 @@ class Network:
 
             elif self.source == 'OSM download':
                 logging.info('Start downloading a network from OSM.')
-                #base_graph, network_gdf = self.network_osm_download() #Todo revert this
-
+                base_graph, network_gdf = self.network_osm_download()  # TODO: Kees?
 
             elif self.source == 'pickle':
                 logging.info('Start importing a network from pickle')
