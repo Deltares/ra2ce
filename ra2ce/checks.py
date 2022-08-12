@@ -137,23 +137,3 @@ def check_shp_input(config):
     if (config['source'] == 'shapefile') and (config['file_id'] is None):
         logging.error('Not possible to create network - Shapefile used as source, but no file_id configured in the network.ini file')
         sys.exit()
-
-
-def check_files(config):
-    """ Checks if file of graph exist in network folder and adds filename to config"""
-    file_list = ['base_graph', 'base_network', 'origins_destinations_graph', 'base_graph_hazard', 'origins_destinations_graph_hazard', 'base_network_hazard']
-    config['files'] = {}
-    for file in file_list:
-        # base network is stored as feather object
-        if file == 'base_network' or file == 'base_network_hazard':
-            file_path = config['static'] / 'output_graph' / '{}.feather'.format(file)
-        else:
-            file_path = config['static'] / 'output_graph' / '{}.p'.format(file)
-
-        # check if file exists, else return None
-        if file_path.is_file():
-            config['files'][file] = file_path
-            logging.info(f"Existing graph found: {file_path}.")
-        else:
-            config['files'][file] = None
-    return config
