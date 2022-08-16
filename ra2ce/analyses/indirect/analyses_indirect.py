@@ -747,8 +747,8 @@ class IndirectAnalyses:
 
         return base_graph, origins, destinations, aggregated
 
-    def multi_link_isolated_locations(self, graph, analysis):
-        crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGABLE
+    def multi_link_isolated_locations(self, graph, analysis, crs=4326):
+        # TODO PUT CRS IN DOCUMENTATION OR MAKE CHANGABLE
 
         # Load the point shapefile with the locations of which the isolated locations should be identified.
         locations = gpd.read_feather(self.config['static'] / 'output_graph' / 'locations_hazard.feather')
@@ -798,30 +798,33 @@ class IndirectAnalyses:
 
             results_buffered = results.copy()
             results_buffered.geometry = results_buffered.geometry.buffer(analysis['buffer_meters'])
+            results_buffered.to_file(self.config['output'] / analysis['analysis'] / f'isolated_{hazard_name}.shp')  # Save the buffer
+
             intersect = gpd.overlay(results_buffered, locations, keep_geom_type=False)
             intersect.set_crs(crs=nearest_utm)
         
             # Replace nan with 0 for the water depth columns
             intersect[hazard_name] = intersect[hazard_name].fillna(0)
 
-            # TODO: Overlay locations with hazard maps
+            # TODO: Put in analyses.ini file a variable to set the threshold for locations that are not isolated when they are flooded.
             # Extract the flood depth of the locations
-            # intersect = intersect.loc[intersect[hz] <= threshold_businesses]
+            # intersect = intersect.loc[intersect[hazard_name] > analysis['threshold_locations']]
 
             # Save the results in isolated_locations
-            isolated_locations[f'i_{hazard_name}'] = [1 if idx in intersect['i_id'] else 0 for idx in isolated_locations['i_id']]
+            isolated_locations[f'i_{hazard_name[:-3]}'] = [1 if idx in intersect['i_id'] else 0 for idx in isolated_locations['i_id']]
 
             # Group by commercial category and count the number of businesses per category
             if i == 0:
                 # the first iteration, create a new pd dataframe
-                df_aggregation = intersect.groupby(analysis['category_field_name']).size().to_frame('count_' + hazard_name)
+                df_aggregation = intersect.groupby(analysis['category_field_name']).size().to_frame(hazard_name)
             else:
                 # after more iterations the new columns are appended
-                df_aggregation = df_aggregation.join(intersect.groupby(analysis['category_field_name']).size().to_frame('count_' + hazard_name),
+                df_aggregation = df_aggregation.join(intersect.groupby(analysis['category_field_name']).size().to_frame(hazard_name),
                                                      how='outer')
 
         # Wide to long format for the aggregated results
         df_aggregation = pd.melt(df_aggregation)
+        df_aggregation.rename(columns={'variable': 'Hazard', 'value': 'Nr. isolated'}, inplace=True)
 
         # Set the isolated_locations geopandas dataframe back to the original crs
         isolated_locations.to_crs(crs=crs, inplace=True)

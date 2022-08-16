@@ -59,7 +59,7 @@ def input_validation(config):
     check_answer = {'source': ['OSM PBF', 'OSM download', 'shapefile', 'pickle'],
                     'polygon': ['file', None],
                     'directed': [True, False, None],
-                    'network_type': ['walk', 'bike', 'drive', 'drive_service', 'all'],
+                    'network_type': ['walk', 'bike', 'drive', 'drive_service', 'all', None],
                     'road_types': ['motorway', 'motorway_link', 'trunk', 'trunk_link', 'primary', 'primary_link', 'secondary',
                                    'secondary_link', 'tertiary', 'tertiary_link', 'unclassified', 'residential',
                                    'road', None],
@@ -70,7 +70,7 @@ def input_validation(config):
                     'analysis': list_analyses,
                     'hazard_map': ['file', None],
                     'aggregate_wl': ['max', 'min', 'mean', None],
-                    'weighing': ['distance', 'time'],
+                    'weighing': ['distance', 'time', None],
                     'save_traffic': [True, False, None],
                     'locations': ['file', None]}
     input_dirs = {'polygon': 'network', 'hazard_map': 'hazard', 'origins': 'network',

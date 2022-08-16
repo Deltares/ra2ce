@@ -30,6 +30,7 @@ def main(network_ini=None, analyses_ini=None):
         network_ini (string): Path to initialization file with the configuration for network creation.
         analyses_ini (string) : Path to initialization file with the configuration for the analyses.
     """
+
     # Find the network.ini and analysis.ini files
     root_path = get_root_path(network_ini, analyses_ini)
 
@@ -37,17 +38,21 @@ def main(network_ini=None, analyses_ini=None):
         config_network = load_config(root_path, config_path=network_ini)
         initiate_root_logger(str(config_network['output'] / 'RA2CE.log'))
 
-        # Try to find pre-existing files
-        files = get_files(config_network)
+        try:
+            # Try to find pre-existing files
+            files = get_files(config_network)
 
-        network = Network(config_network, files)
-        graphs = network.create()
+            network = Network(config_network, files)
+            graphs = network.create()
 
-        if config_network['hazard']['hazard_map'] is not None:
-            # There is a hazard map or multiple hazard maps that should be intersected with the graph.
-            # Overlay the hazard on the geodataframe as well (todo: combine with graph overlay if both need to be done?)
-            hazard = Hazard(network, graphs, files)
-            graphs = hazard.create()
+            if config_network['hazard']['hazard_map'] is not None:
+                # There is a hazard map or multiple hazard maps that should be intersected with the graph.
+                # Overlay the hazard on the geodataframe as well (todo: combine with graph overlay if both need to be done?)
+                hazard = Hazard(network, graphs, files)
+                graphs = hazard.create()
+
+        except BaseException as e:
+            logging.error(e)
 
     if analyses_ini:
         config_analyses = load_config(root_path, config_path=analyses_ini)
@@ -74,23 +79,27 @@ def main(network_ini=None, analyses_ini=None):
                               f"Please make sure to name your network settings file 'network.ini'.")
                 quit()
 
-        # Create the output folders
-        if 'direct' in config_analyses:
-            for a in config_analyses['direct']:
-                output_path = config_analyses['output'] / a['analysis']
-                output_path.mkdir(parents=True, exist_ok=True)
+        try:
+            # Create the output folders
+            if 'direct' in config_analyses:
+                for a in config_analyses['direct']:
+                    output_path = config_analyses['output'] / a['analysis']
+                    output_path.mkdir(parents=True, exist_ok=True)
 
-        if 'indirect' in config_analyses:
-            for a in config_analyses['indirect']:
-                output_path = config_analyses['output'] / a['analysis']
-                output_path.mkdir(parents=True, exist_ok=True)
+            if 'indirect' in config_analyses:
+                for a in config_analyses['indirect']:
+                    output_path = config_analyses['output'] / a['analysis']
+                    output_path.mkdir(parents=True, exist_ok=True)
 
-        # Do the analyses
-        if 'direct' in config_analyses:
-            if config_network['hazard']['hazard_map'] is not None:
-                analyses_direct.DirectAnalyses(config_analyses, graphs).execute()
-            else:
-                logging.error('Please define a hazardmap in your network.ini file. Unable to calculate direct damages...')
+            # Do the analyses
+            if 'direct' in config_analyses:
+                if config_network['hazard']['hazard_map'] is not None:
+                    analyses_direct.DirectAnalyses(config_analyses, graphs).execute()
+                else:
+                    logging.error('Please define a hazardmap in your network.ini file. Unable to calculate direct damages...')
 
-        if 'indirect' in config_analyses:
-            analyses_indirect.IndirectAnalyses(config_analyses, graphs).execute()
+            if 'indirect' in config_analyses:
+                analyses_indirect.IndirectAnalyses(config_analyses, graphs).execute()
+
+        except BaseException as e:
+            logging.error(e)
