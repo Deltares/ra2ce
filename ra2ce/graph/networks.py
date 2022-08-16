@@ -153,8 +153,8 @@ class Network:
 
         input_path = self.config['static'] / "network"
         executables_path = Path(__file__).parents[1] / 'executables'
-        osm_convert_exe = executables_path  / 'osmconvert64.exe'
-        osm_filter_exe = executables_path  / 'osmfilter.exe'
+        osm_convert_exe = executables_path / 'osmconvert64.exe'
+        osm_filter_exe = executables_path / 'osmfilter.exe'
         assert osm_convert_exe.exists() and osm_filter_exe.exists()
 
         pbf_file = input_path / self.primary_files
@@ -215,9 +215,9 @@ class Network:
 
         logging.info('TRAILS importer: start generating graph')
         #tempfix to rename columns
-        edges = edges.rename({"from_id":"node_A","to_id" : "node_B"},axis='columns')
+        edges = edges.rename({"from_id": "node_A", "to_id": "node_B"}, axis='columns')
         node_id = 'id'
-        graph_simple = graph_from_gdf(edges,nodes,name='network',node_id=node_id)
+        graph_simple = graph_from_gdf(edges, nodes, name='network', node_id=node_id)
 
         logging.info('TRAILS importer: graph generating was succesfull')
 
@@ -225,8 +225,6 @@ class Network:
         edges_complex = edges
 
         return graph_complex, edges_complex
-
-
 
     def network_osm_download(self):
         """Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
@@ -487,7 +485,6 @@ class Hazard:
         """Overlays the hazard raster over the road segments GeoDataFrame.
 
         Args:
-            *hf* (list of Pathlib paths) : #not sure if this is needed as argument if we also read if from the config
             *graph* (GeoDataFrame) : GeoDataFrame that will be intersected with the hazard map raster.
 
         Returns:
@@ -719,7 +716,7 @@ class Hazard:
                                                                             stats=f"{self.aggregate_wl}"))
 
             try:
-                flood_stats = flood_stats.apply(lambda x: x[0][self.aggregate_wl] if x[0][self.aggregate_wl] else 0)
+                flood_stats = flood_stats.fillna(0)
                 nx.set_edge_attributes(graph,
                                        {(edges[0], edges[1], edges[2]): {
                                            rn + '_' + self.aggregate_wl[:2]: x[0][self.aggregate_wl]} for x, edges in
@@ -754,7 +751,7 @@ class Hazard:
             # Read the hazard values at the nodes and write to the nodes.
             tqdm.pandas(desc='Potentially isolated locations hazard overlay with '+hn)
             flood_stats = gdf.geometry.progress_apply(lambda x: point_query(x, str(self.hazard_files['tif'][i])))
-            gdf[rn+'_'+self.aggregate_wl[:2]] = flood_stats
+            gdf[rn+'_'+self.aggregate_wl[:2]] = flood_stats.apply(lambda x: x[0] if x[0] else 0)
 
         return gdf
 
