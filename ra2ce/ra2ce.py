@@ -52,7 +52,7 @@ def main(network_ini=None, analyses_ini=None):
                 graphs = hazard.create()
 
         except BaseException as e:
-            logging.error(e)
+            logging.exception(f"RA2CE crashed. Check the logfile for the Traceback message: {e}")
 
     if analyses_ini:
         config_analyses = load_config(root_path, config_path=analyses_ini)
