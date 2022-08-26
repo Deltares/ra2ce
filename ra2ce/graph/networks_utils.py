@@ -1576,13 +1576,22 @@ class Segmentation: #Todo: more naturally, this would be METHOD of the network c
             current_right_linestring = linestring
 
             for i in range(0, n_segments-1):
-                r = cut(current_right_linestring, split_length)
-                current_left_linestring = r[0]
-                current_right_linestring = r[1]
-                result_list[i] = current_left_linestring
-                result_list[i+1] = current_right_linestring
+                r = cut(current_right_linestring, split_length) #Can accidently return Nonetypes
+                if not r is None:
+                    current_left_linestring = r[0]
+                    current_right_linestring = r[1]
+                    result_list[i] = current_left_linestring
+                    result_list[i+1] = current_right_linestring
+                else:
+                    # Sometimes the remainder is so small that it is only one point, which cannot be cut, in that case
+                    # just pass #Todo: maybe we can do something here to avoid this error
+                    pass
+
         else:
             result_list = [linestring]
+
+        #Make sure this  function does not return any None objects, because these will cause problems later
+        result_list = [x for x in result_list if (type(x) == LineString or type(x) == MultiLineString)]
 
         return result_list
 
@@ -1605,6 +1614,7 @@ class Segmentation: #Todo: more naturally, this would be METHOD of the network c
         for i, row in gdf.iterrows():
             geom = row['geometry']
             assert type(geom) == LineString or type(geom) == MultiLineString
+            leeg = geom.is_empty
             linestrings = self.split_linestring(geom, self.segmentation_length)
 
             for j, linestring in enumerate(linestrings):
