@@ -1466,20 +1466,32 @@ def add_simple_id_to_graph_complex(G_complex, complex_to_simple, new_id):
     return G_complex
 
 
-class Segmentation:
+class Segmentation: #Todo: more naturally, this would be METHOD of the network class.
     """ cut the edges in the complex geodataframe to segments of equal lengths or smaller
-        # output will be the cut edges_complex  """
+        # output will be the cut edges_complex
 
-    def __init__(self, edges_complex, segmentation_length, save_files=False):
+        Variables:
+            *self.edges_input* (Geopandas DataFrame) : the edges that are to be segmented
+            *self.segmentation_length* (float) : segmentation lenght in degrees #Todo also in meters?
+            *self.save_files* (Boolean) : save segmented graph?
+
+        Result:
+            *self.edges_segmented* (Geopandas DataFrame) : the segmented edges dataframe
+
+
+    """
+
+    def __init__(self, edges_input, segmentation_length, save_files=False):
         # General
-        self.edges_complex = edges_complex
+        self.edges_input = edges_input #Edges GeoDataFrame
+        self.edges_segmented = None #This is where the result will be saved Edges GeoDataframe
         self.segmentation_length = segmentation_length
-        self.save_files = save_files
+        self.save_files = save_files #Todo not implemented yet
 
     def apply_segmentation(self):
         self.cut_gdf()
         logging.info('Finished segmenting the geodataframe with split length: {} degree'.format(self.segmentation_length))
-        return self.edges_complex
+        return self.edges_segmented
 
     def cut(self, line, distance):
         """Cuts a line in two at a distance from its starting point
@@ -1564,13 +1576,22 @@ class Segmentation:
             current_right_linestring = linestring
 
             for i in range(0, n_segments-1):
-                r = cut(current_right_linestring, split_length)
-                current_left_linestring = r[0]
-                current_right_linestring = r[1]
-                result_list[i] = current_left_linestring
-                result_list[i+1] = current_right_linestring
+                r = cut(current_right_linestring, split_length) #Can accidently return Nonetypes
+                if not r is None:
+                    current_left_linestring = r[0]
+                    current_right_linestring = r[1]
+                    result_list[i] = current_left_linestring
+                    result_list[i+1] = current_right_linestring
+                else:
+                    # Sometimes the remainder is so small that it is only one point, which cannot be cut, in that case
+                    # just pass #Todo: maybe we can do something here to avoid this error
+                    pass
+
         else:
             result_list = [linestring]
+
+        #Make sure this  function does not return any None objects, because these will cause problems later
+        result_list = [x for x in result_list if (type(x) == LineString or type(x) == MultiLineString)]
 
         return result_list
 
@@ -1581,7 +1602,7 @@ class Segmentation:
             *gdf* (GeoDataFrame) : GeoDataFrame to split
             *length* (units of the projection) : Typically in degrees, 0.001 degrees ~ 111 m in Europe
         """
-        gdf = self.edges_complex.copy()
+        gdf = self.edges_input.copy()
         columns = gdf.columns
 
         data = {'splt_id': []}
@@ -1593,6 +1614,7 @@ class Segmentation:
         for i, row in gdf.iterrows():
             geom = row['geometry']
             assert type(geom) == LineString or type(geom) == MultiLineString
+            leeg = geom.is_empty
             linestrings = self.split_linestring(geom, self.segmentation_length)
 
             for j, linestring in enumerate(linestrings):
@@ -1603,7 +1625,8 @@ class Segmentation:
                         data[key].append(value)
                 data['splt_id'].append(count)
                 count += 1
-        self.edges_complex = gpd.GeoDataFrame(data)
+        self.edges_segmented = gpd.GeoDataFrame(data)
+
 
 
 class HazardUtils:
