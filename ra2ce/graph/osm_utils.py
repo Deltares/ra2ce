@@ -104,12 +104,14 @@ if __name__ == "__main__":
 
     #############################################################################
     #STEP 1: Convert shapefile to .poly file(s)
-    shapefile = data_folder / 'input' / 'zuid_holland_epsg4326_wgs84.shp'
+    #shapefile = data_folder / 'input' / 'zuid_holland_epsg4326_wgs84.shp'
+    shapefile = data_folder / 'input' / 'zuid_holland_redundancy_epsg4326_wgs84.shp'
+
     assert shapefile.exists()
 
     out_path = data_folder / 'input'
 
-    #from_shapefile_to_poly(shapefile,out_path,'zh_')
+    from_shapefile_to_poly(shapefile,out_path,'zh_')
 
     #############################################################################
     #STEP 2: Use .poly file to cut down the osm.pbf
@@ -117,7 +119,7 @@ if __name__ == "__main__":
     out_type = 'pbf' #or 'o5m'
 
     osm_convert_exe = root_path.parents[0] / 'ra2ce' / 'executables'/ 'osmconvert64.exe'
-    polyfile = data_folder / 'input' / 'zh_0.poly'
+    polyfile = data_folder / 'input' / 'zh_1.poly'
     outfile = data_folder / 'input' / (polyfile.stem + '.' + out_type)
     assert osm_convert_exe.exists()
     assert polyfile.exists()
