@@ -87,7 +87,7 @@ def main(network_ini=None, analyses_ini=None):
                     output_path.mkdir(parents=True, exist_ok=True)
 
             if 'indirect' in config_analyses:
-                for a in config_analyses['indirect']:
+                for a in config_analyses['indirecte']:
                     output_path = config_analyses['output'] / a['analysis']
                     output_path.mkdir(parents=True, exist_ok=True)
 
@@ -102,4 +102,4 @@ def main(network_ini=None, analyses_ini=None):
                 analyses_indirect.IndirectAnalyses(config_analyses, graphs).execute()
 
         except BaseException as e:
-            logging.error(e)
+            logging.exception(f"RA2CE crashed. Check the logfile for the Traceback message: {e}")

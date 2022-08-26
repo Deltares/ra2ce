@@ -120,7 +120,7 @@ def initiate_root_logger(filename):
     ch.setLevel(logging.INFO)  # Can be also set to WARNING
 
     # Create a formatter and add to the file and console handlers.
-    formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p')
+    formatter = logging.Formatter(fmt='%(asctime)s - [%(filename)s:%(lineno)d] - %(name)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p')
     fh.setFormatter(formatter)
     ch.setFormatter(formatter)
 
