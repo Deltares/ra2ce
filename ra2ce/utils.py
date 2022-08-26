@@ -16,7 +16,7 @@ from shutil import copyfile
 import sys
 
 # Local modules
-from .checks import input_validation, check_files, available_checks
+from .checks import input_validation, available_checks
 
 
 list_indirect_analyses, list_direct_analyses = available_checks()
@@ -169,16 +169,34 @@ def load_config(root_path, config_path, check=True):
         config['static'] = config['root_path'] / config['project']['name'] / 'static'
         config['output'] = config['root_path'] / config['project']['name'] / 'output'
 
-        # check if files exist:
-        config = check_files(config)
-
         if 'hazard' in config:
             if 'hazard_field_name' in config['hazard']:
                 if config['hazard']['hazard_field_name']:
                     config['hazard']['hazard_field_name'] = config['hazard']['hazard_field_name'].split(',')
 
-        #TODO: give warning when the path to the ini to copy to is not found (probably the project folder is not in the ra2ce/data folder)
-
         # copy ini file for future references to output folder
-        copyfile(config_path, config['output'] / '{}.ini'.format(config_path.stem))
+        try:
+            copyfile(config_path, config['output'] / '{}.ini'.format(config_path.stem))
+        except FileNotFoundError as e:
+            logging.warning(e)
     return config
+
+
+def get_files(config):
+    """ Checks if file of graph exist in network folder and adds filename to the files dict"""
+    file_list = ['base_graph', 'base_network', 'origins_destinations_graph', 'base_graph_hazard', 'origins_destinations_graph_hazard', 'base_network_hazard']
+    files = {}
+    for file in file_list:
+        # base network is stored as feather object
+        if file == 'base_network' or file == 'base_network_hazard':
+            file_path = config['static'] / 'output_graph' / '{}.feather'.format(file)
+        else:
+            file_path = config['static'] / 'output_graph' / '{}.p'.format(file)
+
+        # check if file exists, else return None
+        if file_path.is_file():
+            files[file] = file_path
+            logging.info(f"Existing graph/network found: {file_path}.")
+        else:
+            files[file] = None
+    return files

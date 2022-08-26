@@ -14,7 +14,7 @@ warnings.filterwarnings(action='ignore', message='Value *not successfully writte
 
 
 # Local modules
-from .utils import get_root_path, initiate_root_logger, load_config
+from .utils import get_root_path, initiate_root_logger, load_config, get_files
 from .graph.networks import Network, Hazard
 from .analyses.direct import analyses_direct
 from .analyses.indirect import analyses_indirect
@@ -30,6 +30,7 @@ def main(network_ini=None, analyses_ini=None):
         network_ini (string): Path to initialization file with the configuration for network creation.
         analyses_ini (string) : Path to initialization file with the configuration for the analyses.
     """
+
     # Find the network.ini and analysis.ini files
     root_path = get_root_path(network_ini, analyses_ini)
 
@@ -37,14 +38,21 @@ def main(network_ini=None, analyses_ini=None):
         config_network = load_config(root_path, config_path=network_ini)
         initiate_root_logger(str(config_network['output'] / 'RA2CE.log'))
 
-        network = Network(config_network)
-        graphs = network.create()
+        try:
+            # Try to find pre-existing files
+            files = get_files(config_network)
 
-        if config_network['hazard']['hazard_map'] is not None:
-            # There is a hazard map or multiple hazard maps that should be intersected with the graph.
-            # Overlay the hazard on the geodataframe as well (todo: combine with graph overlay if both need to be done?)
-            hazard = Hazard(network, graphs)
-            graphs = hazard.create()
+            network = Network(config_network, files)
+            graphs = network.create()
+
+            if config_network['hazard']['hazard_map'] is not None:
+                # There is a hazard map or multiple hazard maps that should be intersected with the graph.
+                # Overlay the hazard on the geodataframe as well (todo: combine with graph overlay if both need to be done?)
+                hazard = Hazard(network, graphs, files)
+                graphs = hazard.create()
+
+        except BaseException as e:
+            logging.error(e)
 
     if analyses_ini:
         config_analyses = load_config(root_path, config_path=analyses_ini)
@@ -52,7 +60,7 @@ def main(network_ini=None, analyses_ini=None):
         if network_ini:
             # The network_ini and analyses_ini are both called, copy the config values of the network ini
             # into the analyses config.
-            config_analyses['files'] = network.config['files']
+            config_analyses['files'] = files
             if config_network['network'] is not None:
                 config_analyses['network'] = config_network['network']
             if config_network['origins_destinations'] is not None:
@@ -63,7 +71,7 @@ def main(network_ini=None, analyses_ini=None):
             graphs = read_graphs(config_analyses)
             try:
                 config_network = load_config(root_path, config_path=config_analyses['output'].joinpath('network.ini'),
-                                                         check=False)
+                                             check=False)
                 config_analyses.update(config_network)
                 config_analyses['origins_destinations'] = config_analyses['network']['origins_destinations']
             except FileNotFoundError:
@@ -71,23 +79,27 @@ def main(network_ini=None, analyses_ini=None):
                               f"Please make sure to name your network settings file 'network.ini'.")
                 quit()
 
-        # Create the output folders
-        if 'direct' in config_analyses:
-            for a in config_analyses['direct']:
-                output_path = config_analyses['output'] / a['analysis']
-                output_path.mkdir(parents=True, exist_ok=True)
+        try:
+            # Create the output folders
+            if 'direct' in config_analyses:
+                for a in config_analyses['direct']:
+                    output_path = config_analyses['output'] / a['analysis']
+                    output_path.mkdir(parents=True, exist_ok=True)
 
-        if 'indirect' in config_analyses:
-            for a in config_analyses['indirect']:
-                output_path = config_analyses['output'] / a['analysis']
-                output_path.mkdir(parents=True, exist_ok=True)
+            if 'indirect' in config_analyses:
+                for a in config_analyses['indirect']:
+                    output_path = config_analyses['output'] / a['analysis']
+                    output_path.mkdir(parents=True, exist_ok=True)
 
-        # Do the analyses
-        if 'direct' in config_analyses:
-            if config_network['hazard']['hazard_map'] is not None:
-                analyses_direct.DirectAnalyses(config_analyses, graphs).execute()
-            else:
-                logging.error('Please define a hazardmap in your network.ini file. Unable to calculate direct damages...')
+            # Do the analyses
+            if 'direct' in config_analyses:
+                if config_network['hazard']['hazard_map'] is not None:
+                    analyses_direct.DirectAnalyses(config_analyses, graphs).execute()
+                else:
+                    logging.error('Please define a hazardmap in your network.ini file. Unable to calculate direct damages...')
 
-        if 'indirect' in config_analyses:
-            analyses_indirect.IndirectAnalyses(config_analyses, graphs).execute()
+            if 'indirect' in config_analyses:
+                analyses_indirect.IndirectAnalyses(config_analyses, graphs).execute()
+
+        except BaseException as e:
+            logging.error(e)
