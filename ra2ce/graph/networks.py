@@ -27,7 +27,7 @@ class Network:
         config: A dictionary with the configuration details on how to create and adjust the network.
     """
 
-    def __init__(self, config):
+    def __init__(self, config, files):
         # General
         self.config = config
         self.name = config['project']['name']
@@ -69,9 +69,7 @@ class Network:
         self.segmentation_length = config['cleanup']['segmentation_length']
 
         # files
-        self.base_graph_path = config['files']['base_graph']
-        self.base_network_path = config['files']['base_network']
-        self.od_graph_path = config['files']['origins_destinations_graph']
+        self.files = files
 
     def network_shp(self, crs=4326):
         """Creates a (graph) network from a shapefile.
@@ -158,8 +156,8 @@ class Network:
 
         input_path = self.config['static'] / "network"
         executables_path = Path(__file__).parents[1] / 'executables'
-        osm_convert_exe = executables_path  / 'osmconvert64.exe'
-        osm_filter_exe = executables_path  / 'osmfilter.exe'
+        osm_convert_exe = executables_path / 'osmconvert64.exe'
+        osm_filter_exe = executables_path / 'osmfilter.exe'
         assert osm_convert_exe.exists() and osm_filter_exe.exists()
 
         pbf_file = input_path / self.primary_files
@@ -224,9 +222,9 @@ class Network:
 
         logging.info('TRAILS importer: start generating graph')
         #tempfix to rename columns
-        edges = edges.rename({"from_id":"node_A","to_id" : "node_B"},axis='columns')
+        edges = edges.rename({"from_id": "node_A", "to_id": "node_B"}, axis='columns')
         node_id = 'id'
-        graph_simple = graph_from_gdf(edges,nodes,name='network',node_id=node_id)
+        graph_simple = graph_from_gdf(edges, nodes, name='network', node_id=node_id)
 
         logging.info('TRAILS importer: graph generating was succesfull.')
         logging.warning('RA2CE will not clean-up your graph, assuming that it is already done in TRAILS')
@@ -249,8 +247,6 @@ class Network:
 
 
         return graph_complex, edges_complex
-
-
 
     def network_osm_download(self):
         """Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
@@ -403,7 +399,7 @@ class Network:
         network_gdf = None
 
         # For all graph and networks - check if it exists, otherwise, make the graph and/or network.
-        if self.base_graph_path is None and self.base_network_path is None:
+        if self.files['base_graph'] is None and self.files['base_network'] is None:
             # Create the network from the network source
             if self.source == 'shapefile':
                 logging.info('Start creating a network from the submitted shapefile.')
@@ -453,19 +449,25 @@ class Network:
                         G[u][v][k]['time'] = round(hours * 3600, 0)
 
             # Save the graph and geodataframe
-            self.config['files']['base_graph'] = save_network(base_graph, self.config['static'] / 'output_graph',
-                                                              'base_graph', types=to_save)
-            self.config['files']['base_network'] = save_network(network_gdf, self.config['static'] / 'output_graph',
-                                                                'base_network', types=to_save)
+            self.files['base_graph'] = save_network(base_graph, self.config['static'] / 'output_graph',
+                                                    'base_graph', types=to_save)
+            self.files['base_network'] = save_network(network_gdf, self.config['static'] / 'output_graph',
+                                                      'base_network', types=to_save)
         else:
+
             logging.info('Apparently, you already did create a network with ra2ce earlier. ' +
                          'Ra2ce will use this: {}'.format(self.config['files']['base_graph']))
             if self.base_graph_path is not None:
                 base_graph = read_gpickle(self.config['files']['base_graph'])
+
+            #Todo: I think these two lines can be removed, this is the old logic?
+            #if self.files['base_graph'] is not None:
+            #    base_graph = read_gpickle(self.files['base_graph'])
+
             else:
                 base_graph = None
-            if self.base_network_path is not None:
-                network_gdf = gpd.read_feather(self.config['files']['base_network'])
+            if self.files['base_network'] is not None:
+                network_gdf = gpd.read_feather(self.files['base_network'])
             else:
                 network_gdf = None
 
@@ -474,15 +476,15 @@ class Network:
             self.base_network_crs = pyproj.CRS.from_user_input(network_gdf.crs)
 
         # create origins destinations graph
-        if (self.origins is not None) and (self.destinations is not None) and self.od_graph_path is None:
+        if (self.origins is not None) and (self.destinations is not None) and self.files['origins_destinations_graph'] is None:
             # reading the base graphs
-            if (self.base_graph_path is not None) and (base_graph is not None):
-                base_graph = read_gpickle(self.base_graph_path)
+            if (self.files['base_graph'] is not None) and (base_graph is not None):
+                base_graph = read_gpickle(self.files['base_graph'])
             # adding OD nodes
             if self.origins[0].suffix == '.tif':
                 self.origins[0] = self.generate_origins_from_raster()
             od_graph = self.add_od_nodes(base_graph, self.base_graph_crs)
-            self.config['files']['origins_destinations_graph'] = save_network(od_graph, self.config['static'] / 'output_graph',
+            self.files['origins_destinations_graph'] = save_network(od_graph, self.config['static'] / 'output_graph',
                                                                               'origins_destinations_graph', types=to_save)
 
         return {'base_graph': base_graph, 'base_network':  network_gdf, 'origins_destinations_graph': od_graph}
@@ -496,16 +498,14 @@ class Hazard:
         graphs: NetworkX graphs.
     """
 
-    def __init__(self, network, graphs):
+    def __init__(self, network, graphs, files):
         self.config = network.config
 
         # graphs
         self.graphs = graphs
 
         # files
-        self.base_graph_path = self.config['files']['base_graph']
-        self.base_network_path = self.config['files']['base_network']
-        self.od_graph_path = self.config['files']['origins_destinations_graph']
+        self.files = files
         self.aggregate_wl = self.config['hazard']['aggregate_wl']
         self.hazard_files = {}  # Initiate the variable hazard_files
         self.find_hazard_files()
@@ -519,7 +519,6 @@ class Hazard:
         """Overlays the hazard raster over the road segments GeoDataFrame.
 
         Args:
-            *hf* (list of Pathlib paths) : #not sure if this is needed as argument if we also read if from the config
             *graph* (GeoDataFrame) : GeoDataFrame that will be intersected with the hazard map raster.
 
         Returns:
@@ -639,31 +638,44 @@ class Hazard:
         """Overlays the hazard shapefile over the road segments GeoDataFrame.
 
         Args:
+            gdf (GeoDataFrame): the network geodataframe that should be overlayed with the hazard shapefile(s)
 
         Returns:
+            gdf (GeoDataFrame): the network geodataframe with hazard shapefile(s) data joined
 
+        The gdf is reprojected to the hazard shapefile if necessary.
         """
-        self.ra2ce_names = list(set([n[:-3] for n in self.hazard_name_table['RA2CE name']]))
         hfns = self.config['hazard']['hazard_field_name']
+        gdf_crs_original = gdf.crs
 
         for i, (hn, rn, hfn) in enumerate(zip(self.hazard_names, self.ra2ce_names, hfns)):
             gdf_hazard = gpd.read_file(str(self.hazard_files['shp'][i]))
-            spatial_index = gdf_hazard.sindex
 
-        # TODO: add this option
-        logging.warning("THE OPTION OF SPATIALLY INTERSECTING A HAZARD SHAPEFILE WITH GDF IS NOT IMPLEMENTED YET.")
+            if gdf.crs != gdf_hazard.crs:
+                gdf = gdf.to_crs(gdf_hazard.crs)
+
+            gdf = gpd.sjoin(gdf, gdf_hazard[[hfn, 'geometry']], how='left')
+            gdf.rename(columns={hfn: rn+'_'+self.aggregate_wl[:2]}, inplace=True)
+
+        if gdf.crs != gdf_crs_original:
+            gdf = gdf.to_crs(gdf_crs_original)
+
         return gdf
 
     def overlay_hazard_shp_graph(self, graph):
         """Overlays the hazard shapefile over the road segments NetworkX graph.
 
         Args:
+            graph (NetworkX graph): The graph that should be overlayed with the hazard shapefile(s)
 
         Returns:
-
+            graph (NetworkX graph): The graph with hazard shapefile(s) data joined
         """
+        # TODO check if the CRS of the graph and shapefile match
 
-        for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
+        hfns = self.config['hazard']['hazard_field_name']
+
+        for i, (hn, rn, hfn) in enumerate(zip(self.hazard_names, self.ra2ce_names, hfns)):
             gdf = gpd.read_file(str(self.hazard_files['shp'][i]))
             spatial_index = gdf.sindex
 
@@ -688,12 +700,14 @@ class Hazard:
         return graph
 
     def od_hazard_intersect(self, graph):
-        """Overlays the origin and destination locations with the hazard maps
+        """Overlays the origin and destination locations and edges with the hazard maps
 
         Args:
+            graph (NetworkX graph): The origin-destination graph that should be overlayed with the hazard raster(s)
 
         Returns:
-
+            graph (NetworkX graph): The origin-destination graph hazard raster(s) data joined to both the origin- and
+            destination nodes and the edges.
         """
         from tqdm import tqdm
 
@@ -745,7 +759,7 @@ class Hazard:
                                                                             stats=f"{self.aggregate_wl}"))
 
             try:
-                flood_stats = flood_stats.apply(lambda x: x[0][self.aggregate_wl] if x[0][self.aggregate_wl] else 0)
+                flood_stats = flood_stats.fillna(0)
                 nx.set_edge_attributes(graph,
                                        {(edges[0], edges[1], edges[2]): {
                                            rn + '_' + self.aggregate_wl[:2]: x[0][self.aggregate_wl]} for x, edges in
@@ -766,12 +780,12 @@ class Hazard:
         return graph
 
     def point_hazard_intersect(self, gdf):
-        """Overlays the origin and destination locations with the hazard maps
+        """Overlays the point locations with hazard maps
 
         Args:
-
+            gdf (GeoDataFrame): the point geodataframe that should be overlayed with the hazard raster(s)
         Returns:
-
+            gdf (GeoDataFrame): the point geodataframe with hazard raster(s) data joined
         """
         from tqdm import tqdm
 
@@ -780,7 +794,7 @@ class Hazard:
             # Read the hazard values at the nodes and write to the nodes.
             tqdm.pandas(desc='Potentially isolated locations hazard overlay with '+hn)
             flood_stats = gdf.geometry.progress_apply(lambda x: point_query(x, str(self.hazard_files['tif'][i])))
-            gdf[rn+'_'+self.aggregate_wl[:2]] = flood_stats
+            gdf[rn+'_'+self.aggregate_wl[:2]] = flood_stats.apply(lambda x: x[0] if x[0] else 0)
 
         return gdf
 
@@ -928,13 +942,13 @@ class Hazard:
         """
         to_save = ['pickle'] if not self.config['network']['save_shp'] else ['pickle', 'shp']
 
-        if self.base_graph_path is None and self.od_graph_path is None:
+        if self.files['base_graph'] is None and self.files['origins_destinations_graph'] is None:
             logging.warning("Either a base graph or OD graph is missing to intersect the hazard with. "
                             "Check your network folder.")
 
         # Iterate over the three graph/network types to load the file if necessary (when not yet loaded in memory).
         for input_graph in ['base_graph', 'base_network', 'origins_destinations_graph']:
-            file_path = self.config['files'][input_graph]
+            file_path = self.files[input_graph]
 
             if file_path is not None or self.graphs[input_graph] is not None:
                 if self.graphs[input_graph] is None and input_graph != 'base_network':
@@ -943,7 +957,7 @@ class Hazard:
                     self.graphs[input_graph] = gpd.read_feather(file_path)
 
         #### Step 1: hazard overlay of the base graph (NetworkX) ###
-        if (self.graphs['base_graph'] is not None) and (self.config['files']['base_graph_hazard'] is None):
+        if (self.graphs['base_graph'] is not None) and (self.files['base_graph_hazard'] is None):
             graph = self.graphs['base_graph']
 
             # Check if the graph needs to be reprojected
@@ -975,7 +989,7 @@ class Hazard:
                     graph)
 
             # Save graphs/network with hazard
-            self.config['files']['base_graph_hazard'] = save_network(
+            self.files['base_graph_hazard'] = save_network(
                 self.graphs['base_graph_hazard'], self.config['static'] / 'output_graph',
                 'base_graph_hazard', types=to_save)
         else:
@@ -989,8 +1003,8 @@ class Hazard:
                 pass
 
         #### Step 2: hazard overlay of the origins_destinations (NetworkX) ###
-        #TODO: do not enter this block of code when the user is not using any origins/destinations
-        if (self.graphs['origins_destinations_graph'] is not None) and (self.config['files']['origins_destinations_graph_hazard'] is None):
+        if (self.config['origins_destinations']['origins'] is not None) and (self.config['origins_destinations']['origins'] is not None) \
+                and (self.graphs['origins_destinations_graph'] is not None) and (self.files['origins_destinations_graph_hazard'] is None):
             graph = self.graphs['origins_destinations_graph']
 
             # Check if the graph needs to be reprojected
@@ -1023,22 +1037,12 @@ class Hazard:
                     graph)
 
             # Save graphs/network with hazard
-            self.config['files']['origins_destinations_graph_hazard'] = save_network(
+            self.files['origins_destinations_graph_hazard'] = save_network(
                 self.graphs['origins_destinations_graph_hazard'], self.config['static'] / 'output_graph',
                 'origins_destinations_graph_hazard', types=to_save)
-        else:
-            try:
-                # Try to find the OD graph hazard file
-                self.graphs['origins_destinations_graph_hazard'] = read_gpickle(
-                    self.config['static'] / 'output_graph' / 'origins_destinations_graph_hazard.p')
-            except FileNotFoundError:
-                # File not found
-                logging.warning(
-                    f"Origin-destination graph hazard file not found at {self.config['static'] / 'output_graph' / 'origins_destinations_graph_hazard.p'}")
-                pass
 
         #### Step 3: iterate overlay of the GeoPandas Dataframe (if any) ###
-        if (self.graphs['base_network'] is not None) and (self.config['files']['base_network_hazard'] is None):
+        if (self.graphs['base_network'] is not None) and (self.files['base_network_hazard'] is None):
             # Check if the graph needs to be reprojected
             hazard_crs = pyproj.CRS.from_user_input(self.config['hazard']['hazard_crs'])
             gdf_crs = pyproj.CRS.from_user_input(self.graphs['base_network'].crs)
@@ -1064,7 +1068,7 @@ class Hazard:
                 self.graphs['base_network_hazard'] = self.hazard_intersect(self.graphs['base_network'])
 
             # Save graphs/network with hazard
-            self.config['files']['base_network_hazard'] = save_network(
+            self.files['base_network_hazard'] = save_network(
                 self.graphs['base_network_hazard'], self.config['static'] / 'output_graph',
                 'base_network_hazard', types=to_save)
         else:
