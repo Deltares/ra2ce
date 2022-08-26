@@ -141,8 +141,11 @@ class Network:
         # Exporting complex graph because the shapefile should be kept the same as much as possible.
         return graph_complex, edges_complex
 
-    def network_osm_pbf(self, crs=4326):
+    def network_osm_pbf_DEPRECIATED(self, crs=4326):
         """Creates a network from an OSM PBF file.
+
+        WARNING: THIS FUNCTION IS DEPRECIATED SINCE 10/8/2022, WHEN KEES MADE A NEW OSM PBF IMPORT USING
+                THE TRAILS PACKAGE.
 
         Args:
             crs (int): the EPSG number of the coordinate reference system that is used
@@ -203,6 +206,10 @@ class Network:
     def network_trails_import(self, crs=4326):
         """Creates a network which has been prepared in the TRAILS package
 
+        #Todo: we might later simply import the whole trails code as a package, and directly use these functions
+        #Todo: because TRAILS is still in beta version we better wait with that untill the first stable version is
+        # released
+
         Returns:
             graph_simple (NetworkX graph): Simplified graph (for use in the indirect analyses).
             complex_edges (GeoDataFrame): Complex graph (for use in the direct analyses).
@@ -221,10 +228,25 @@ class Network:
         node_id = 'id'
         graph_simple = graph_from_gdf(edges,nodes,name='network',node_id=node_id)
 
-        logging.info('TRAILS importer: graph generating was succesfull')
+        logging.info('TRAILS importer: graph generating was succesfull.')
+        logging.warning('RA2CE will not clean-up your graph, assuming that it is already done in TRAILS')
 
-        graph_complex = graph_simple #Todo: quickfix
-        edges_complex = edges
+        if self.segmentation_length is not None:
+            to_segment = Segmentation(edges, self.segmentation_length)
+            edges_simple_segmented = to_segment.apply_segmentation()
+            if edges_simple_segmented.crs is None:  # The CRS might have dissapeared.
+                edges_simple_segmented.crs = crs  # set the right CRS
+                edges_complex = edges_simple_segmented
+
+        else:
+            edges_complex = edges
+
+        graph_complex = graph_simple #NOTE THAT DIFFERENCE
+                # BETWEEN SIMPLE AND COMPLEX DOES NOT EXIST WHEN IMPORTING WITH TRAILS
+
+        #Todo: better control over metadata in trails
+        #Todo: better control over where things are saved in the pipeline
+
 
         return graph_complex, edges_complex
 
@@ -388,14 +410,17 @@ class Network:
                 base_graph, network_gdf = self.network_shp()
 
             elif self.source == 'OSM PBF':
-                logging.info('Start creating a network from an OSM PBF file.')
+                logging.info("""The original OSM PBF import is no longer supported. 
+                                Instead, the beta version of package TRAILS is used. 
+                                First stable release of TRAILS is excepted in 2023.""")
 
-                #base_graph, network_gdf = self.network_osm_pbf()
-                base_graph, network_gdf = self.network_trails_import() #Todo remove this temporary solution
+                #base_graph, network_gdf = self.network_osm_pbf() #The old approach is depreciated
+                base_graph, network_gdf = self.network_trails_import()
+
 
             elif self.source == 'OSM download':
                 logging.info('Start downloading a network from OSM.')
-                #base_graph, network_gdf = self.network_osm_download() #Todo revert this
+                base_graph, network_gdf = self.network_osm_download()
 
 
             elif self.source == 'pickle':
@@ -433,6 +458,8 @@ class Network:
             self.config['files']['base_network'] = save_network(network_gdf, self.config['static'] / 'output_graph',
                                                                 'base_network', types=to_save)
         else:
+            logging.info('Apparently, you already did create a network with ra2ce earlier. ' +
+                         'Ra2ce will use this: {}'.format(self.config['files']['base_graph']))
             if self.base_graph_path is not None:
                 base_graph = read_gpickle(self.config['files']['base_graph'])
             else:
@@ -523,6 +550,15 @@ class Hazard:
             logging.info("Raster extent: {}, Graph extent: {}".format(extent,extent_graph))
             raise ValueError(
                 "The hazard raster and the network geometries do not overlap, check projection")
+
+        #Make sure none of the geometries is a nonetype object (this will raise an error in zonal_stats)
+        empty_entries = gdf.loc[gdf.geometry.isnull()]
+        if not len(empty_entries) == 0:
+            logging.warning(("Some geometries have NoneType objects (no coordinate information), namely: {}.".format(
+                empty_entries) +
+                             "This could  due  to segmentation, and might cause an exception in hazard  overlay"))
+
+
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             tqdm.pandas(desc="Network hazard overlay with "+hn)
