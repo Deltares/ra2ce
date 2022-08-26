@@ -456,13 +456,11 @@ class Network:
         else:
 
             logging.info('Apparently, you already did create a network with ra2ce earlier. ' +
-                         'Ra2ce will use this: {}'.format(self.config['files']['base_graph']))
-            if self.base_graph_path is not None:
-                base_graph = read_gpickle(self.config['files']['base_graph'])
+                         'Ra2ce will use this: {}'.format(self.files['base_graph']))
 
             #Todo: I think these two lines can be removed, this is the old logic?
-            #if self.files['base_graph'] is not None:
-            #    base_graph = read_gpickle(self.files['base_graph'])
+            if self.files['base_graph'] is not None:
+                base_graph = read_gpickle(self.files['base_graph'])
 
             else:
                 base_graph = None
