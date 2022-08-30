@@ -147,7 +147,7 @@ def configure_analyses(config):
     return config
 
 
-def load_config(root_path, config_path, check=True):
+def load_config(root_path: Path, config_path: str, check: bool = True) -> dict:
     # Read the configurations in network.ini and add the root path to the configuration dictionary.
     config_path = Path(config_path)
     if not config_path.is_file():

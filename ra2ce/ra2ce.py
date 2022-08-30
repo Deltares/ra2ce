@@ -19,9 +19,10 @@ from .graph.networks import Network, Hazard
 from .analyses.direct import analyses_direct
 from .analyses.indirect import analyses_indirect
 from .io import read_graphs
+# from typing import Any,   # Python object types
 
 
-def main(network_ini=None, analyses_ini=None):
+def main(network_ini: str = None, analyses_ini: str = None) -> None:
     """Main function to start RA2CE. Runs RA2CE according to the settings in network_ini and analysis_ini.
 
     Reads the network and analyses ini files and chooses the right functions.
@@ -87,7 +88,7 @@ def main(network_ini=None, analyses_ini=None):
                     output_path.mkdir(parents=True, exist_ok=True)
 
             if 'indirect' in config_analyses:
-                for a in config_analyses['indirecte']:
+                for a in config_analyses['indirect']:
                     output_path = config_analyses['output'] / a['analysis']
                     output_path.mkdir(parents=True, exist_ok=True)
 

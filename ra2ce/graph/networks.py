@@ -522,10 +522,14 @@ class Hazard:
         Returns:
 
         """
-        from tqdm import tqdm
+        assert type(gdf) == gpd.GeoDataFrame, "Network is not a GeoDataFrame"
 
+        from tqdm import tqdm  # Doesn't work when imported at the top of the script
+
+        ## beneden naar 1 methode
+        # Validate input
         # Check if the extent and resolution of the different hazard maps are the same.
-        same_extent = check_hazard_extent_resolution(self.hazard_files['tif'])
+        same_extent = check_hazard_extent_resolution(self.hazard_files['tif'])  # property van Hazard
         if same_extent:
             extent = get_extent(gdal.Open(str(self.hazard_files['tif'][0])))
             logging.info(
@@ -533,20 +537,20 @@ class Hazard:
         else:
             pass
             # Todo: what if they do not have the same extent?
+        ## boven naar 1 methode
 
+        ## Dit is 1 methode
+        # Validate input
         # Check if network and raster overlap
-        assert type(gdf) == gpd.GeoDataFrame
         extent_graph = gdf.total_bounds
         extent_graph = (extent_graph[0], extent_graph[2], extent_graph[1], extent_graph[3])
         extent_hazard = (extent['minX'], extent['maxX'], extent['minY'], extent['maxY'])
 
-        if bounds_intersect_2d(extent_graph, extent_hazard):
-            pass
-
-        else:
-            logging.info("Raster extent: {}, Graph extent: {}".format(extent,extent_graph))
+        if not bounds_intersect_2d(extent_graph, extent_hazard):
+            logging.info("Raster extent: {}, Graph extent: {}".format(extent, extent_graph))
             raise ValueError(
                 "The hazard raster and the network geometries do not overlap, check projection")
+        ## Tot hier
 
         #Make sure none of the geometries is a nonetype object (this will raise an error in zonal_stats)
         empty_entries = gdf.loc[gdf.geometry.isnull()]
@@ -554,8 +558,6 @@ class Hazard:
             logging.warning(("Some geometries have NoneType objects (no coordinate information), namely: {}.".format(
                 empty_entries) +
                              "This could  due  to segmentation, and might cause an exception in hazard  overlay"))
-
-
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             tqdm.pandas(desc="Network hazard overlay with "+hn)
@@ -835,21 +837,21 @@ class Hazard:
         graph.rename(columns={self.config['hazard']['hazard_field_name']: [n[:-3] for n in self.hazard_name_table['RA2CE name']][0]}, inplace=True)  # Check if this is the right name
         return graph
 
-    def create_hazard_name_table(self):
+    def create_hazard_name_table(self) -> pd.DataFrame:
         agg_types = ['maximum', 'minimum', 'average', 'fraction of network segment impacted by hazard']
-
+        _hazard_map_config = self.config['hazard']['hazard_map']
         df = pd.DataFrame()
-        df[['File name', 'Aggregation method']] = [(haz.stem, agg_type) for haz in self.config['hazard']['hazard_map'] for agg_type in agg_types]
-        if all(['RP' in haz.stem for haz in self.config['hazard']['hazard_map']]):
+        df[['File name', 'Aggregation method']] = [(haz.stem, agg_type) for haz in _hazard_map_config for agg_type in agg_types]
+        if all(['RP' in haz.stem for haz in _hazard_map_config]):
             # Return period hazard maps are used
             # TODO: now it is assumed that there is a flood event, this should be made flexible
-            rps = [haz.stem.split('RP_')[-1].split('_')[0] for haz in self.config['hazard']['hazard_map']]
+            rps = [haz.stem.split('RP_')[-1].split('_')[0] for haz in _hazard_map_config]
             df['RA2CE name'] = ['F_' + 'RP' + rp + '_' + agg_type[:2] for rp in rps for agg_type in agg_types]
         else:
             # Event hazard maps are used
             # TODO: now it is assumed that there is a flood event, this should be made flexible
-            df['RA2CE name'] = ['F_' + 'EV' + str(i+1) + '_' + agg_type[:2] for i in range(len(self.config['hazard']['hazard_map'])) for agg_type in agg_types]
-        df['Full path'] = [haz for haz in self.config['hazard']['hazard_map'] for agg_type in agg_types]
+            df['RA2CE name'] = ['F_' + 'EV' + str(i+1) + '_' + agg_type[:2] for i in range(len(_hazard_map_config)) for agg_type in agg_types]
+        df['Full path'] = [haz for haz in _hazard_map_config for _ in agg_types]
         return df
 
     def find_hazard_files(self):
@@ -866,7 +868,7 @@ class Hazard:
         self.hazard_files['shp'] = hazards_shp
         self.hazard_files['table'] = hazards_table
 
-    def hazard_intersect(self, to_overlay):
+    def get_hazard_intersect_geodataframe_tif(self, to_overlay):
         """Logic to find the right hazard overlay function for the input to_overlay.
 
         Args:
@@ -877,51 +879,60 @@ class Hazard:
 
         The hazard file paths are in self.hazard_files.
         """
+        start = time.time()
+        to_overlay = self.overlay_hazard_raster_gdf(to_overlay)
+        end = time.time()
+        logging.info(f"Hazard raster intersect time: {str(round(end - start, 2))}s")
+        return to_overlay
+
+    def get_hazard_intersect_networkx_tif(self, to_overlay):
+        start = time.time()
+        to_overlay = self.overlay_hazard_raster_graph(to_overlay)
+        end = time.time()
+        logging.info(f"Hazard raster intersect time: {str(round(end - start, 2))}s")
+        return to_overlay
+
+    def get_hazard_intersect_geodataframe_shp(self, to_overlay):
+        start = time.time()
+        to_overlay = self.overlay_hazard_shp_gdf(to_overlay)
+        end = time.time()
+        logging.info(f"Hazard shapefile intersect time: {str(round(end - start, 2))}s")
+        return to_overlay
+
+    def get_hazard_intersect_networkx_shp(self, to_overlay):
+        start = time.time()
+        to_overlay = self.overlay_hazard_shp_graph(to_overlay)
+        end = time.time()
+        logging.info(f"Hazard shapefile intersect time: {str(round(end - start, 2))}s")
+        return to_overlay
+
+    def get_hazard_intersect_geodataframe_table(self, to_overlay):
+        # elif (self.hazard_files['table']) and (type(to_overlay) == gpd.GeoDataFrame):
+        start = time.time()
+        to_overlay = self.join_hazard_table_gdf(to_overlay)
+        end = time.time()
+        logging.info(f"Hazard table intersect time: {str(round(end - start, 2))}s")
+        return to_overlay
+
+    def get_hazard_intersect_networkx_table(self, to_overlay):
+        # elif (self.hazard_files['table']) and (type(to_overlay).__module__.split('.')[0] == 'networkx'):
+        start = time.time()
+        to_overlay = self.join_hazard_table_graph(to_overlay)
+        end = time.time()
+        logging.info(f"Hazard table intersect time: {str(round(end - start, 2))}s")
+        return to_overlay
+
+    def hazard_intersect(self, to_overlay):
+
         if (self.hazard_files['tif']) and (type(to_overlay) == gpd.GeoDataFrame):
-            start = time.time()
-            to_overlay = self.overlay_hazard_raster_gdf(to_overlay)
-            end = time.time()
-            logging.info(f"Hazard raster intersect time: {str(round(end - start, 2))}s")
-            return to_overlay
-
+            to_overlay = self.get_hazard_intersect_geodataframe_tif(to_overlay)
         elif (self.hazard_files['tif']) and (type(to_overlay).__module__.split('.')[0] == 'networkx'):
-            start = time.time()
-            to_overlay = self.overlay_hazard_raster_graph(to_overlay)
-            end = time.time()
-            logging.info(f"Hazard raster intersect time: {str(round(end - start, 2))}s")
-            return to_overlay
-
+            to_overlay = self.get_hazard_intersect_networkx_tif(to_overlay)
         elif (self.hazard_files['shp']) and (type(to_overlay) == gpd.GeoDataFrame):
-            start = time.time()
-            to_overlay = self.overlay_hazard_shp_gdf(to_overlay)
-            end = time.time()
-            logging.info(f"Hazard shapefile intersect time: {str(round(end - start, 2))}s")
-            return to_overlay
-
+            to_overlay = self.get_hazard_intersect_geodataframe_shp(to_overlay)
         elif (self.hazard_files['shp']) and (type(to_overlay).__module__.split('.')[0] == 'networkx'):
-            start = time.time()
-            to_overlay = self.overlay_hazard_shp_graph(to_overlay)
-            end = time.time()
-            logging.info(f"Hazard shapefile intersect time: {str(round(end - start, 2))}s")
-            return to_overlay
-
-        elif (self.hazard_files['table']) and (type(to_overlay) == gpd.GeoDataFrame):
-            start = time.time()
-            to_overlay = self.join_hazard_table_gdf(to_overlay)
-            end = time.time()
-            logging.info(f"Hazard table intersect time: {str(round(end - start, 2))}s")
-            return to_overlay
-
-        elif (self.hazard_files['table']) and (type(to_overlay).__module__.split('.')[0] == 'networkx'):
-            start = time.time()
-            to_overlay = self.join_hazard_table_graph(to_overlay)
-            end = time.time()
-            logging.info(f"Hazard table intersect time: {str(round(end - start, 2))}s")
-            return to_overlay
-
-        else:
-            logging.warning("No hazard files found.")
-            pass
+            to_overlay = self.get_hazard_intersect_networkx_shp(to_overlay)
+        
 
     def create(self):
         """ Overlays the different possible graph objects with the hazard data
