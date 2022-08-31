@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Created on 30-8-2022
-
-@author: F.C. de Groen, Deltares
 """
 
+"""
 from abc import ABC
 
 class AnalysisBase(ABC):
@@ -28,3 +27,4 @@ class AnalysisSimple(AnalysisBase):
     def run_analysis(self):
         #specific analysis for simple
         network.simple_configuration()...
+"""

@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on 30-9-2020
-
-@author: F.C. de Groen, Deltares
-@author: M. Kwant, Deltares
-#author: Kees van Ginkel, Deltares
 """
 
 # external modules

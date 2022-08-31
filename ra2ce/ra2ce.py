@@ -15,26 +15,15 @@ warnings.filterwarnings(action='ignore', message='Value *not successfully writte
 
 # Local modules
 from .utils import get_root_path, initiate_root_logger, load_config, get_files
-from .graph.networks import Network, Hazard
+from .graph.networks import Network
+from .graph.hazard import Hazard
 from .analyses.direct import analyses_direct
 from .analyses.indirect import analyses_indirect
 from .io import read_graphs
-# from typing import Any,   # Python object types
+from typing import Union   # Python object types
 
 
-def main(network_ini: str = None, analyses_ini: str = None) -> None:
-    """Main function to start RA2CE. Runs RA2CE according to the settings in network_ini and analysis_ini.
-
-    Reads the network and analyses ini files and chooses the right functions.
-
-    Args:
-        network_ini (string): Path to initialization file with the configuration for network creation.
-        analyses_ini (string) : Path to initialization file with the configuration for the analyses.
-    """
-
-    # Find the network.ini and analysis.ini files
-    root_path = get_root_path(network_ini, analyses_ini)
-
+def initialize_with_network_ini(root_path: Union[Path, str], network_ini: Union[Path, str]):
     if network_ini:
         config_network = load_config(root_path, config_path=network_ini)
         initiate_root_logger(str(config_network['output'] / 'RA2CE.log'))
@@ -54,6 +43,22 @@ def main(network_ini: str = None, analyses_ini: str = None) -> None:
 
         except BaseException as e:
             logging.exception(f"RA2CE crashed. Check the logfile for the Traceback message: {e}")
+
+
+def main(network_ini: str = None, analyses_ini: str = None) -> None:
+    """Main function to start RA2CE. Runs RA2CE according to the settings in network_ini and analysis_ini.
+
+    Reads the network and analyses ini files and chooses the right functions.
+
+    Args:
+        network_ini (string): Path to initialization file with the configuration for network creation.
+        analyses_ini (string) : Path to initialization file with the configuration for the analyses.
+    """
+
+    # Find the network.ini and analysis.ini files
+    root_path = get_root_path(network_ini, analyses_ini)
+
+    initialize_with_network_ini(root_path, network_ini)
 
     if analyses_ini:
         config_analyses = load_config(root_path, config_path=analyses_ini)
