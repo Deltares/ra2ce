@@ -9,5 +9,5 @@ class TestAcceptance:
 
     def test_given_when(self):
         from ra2ce.ra2ce import main
-        main(r"D:\ra2ceMaster\ra2ce\data\test\network.ini",
-             r"D:\ra2ceMaster\ra2ce\data\test\analyses.ini")
+        main(r"d:\ra2ceMaster\ra2ce\tests\local_data\network.ini",
+             r"d:\ra2ceMaster\ra2ce\tests\local_data\analyses.ini")
