@@ -21,8 +21,8 @@ class Hazard:
         graphs: NetworkX graphs.
     """
 
-    def __init__(self, network, graphs, files):
-        self.config = network.config
+    def __init__(self, config: dict, graphs: dict, files: dict):
+        self.config = config
 
         # graphs
         self.graphs = graphs
@@ -98,7 +98,7 @@ class Hazard:
                 lambda x: fraction_flooded(x, str(self.hazard_files['tif'][i])))
         return gdf
 
-    def overlay_hazard_raster_graph(self, graph: nx.Graph) -> nx.Graph: #TODO: test if it is this type
+    def overlay_hazard_raster_graph(self, graph: nx.classes.graph.Graph) -> nx.classes.graph.Graph:
         """Overlays the hazard raster over the road segments graph.
 
         Args:
@@ -191,7 +191,7 @@ class Hazard:
 
         return gdf
 
-    def overlay_hazard_shp_graph(self, graph: nx.Graph) -> nx.Graph:
+    def overlay_hazard_shp_graph(self, graph: nx.classes.graph.Graph) -> nx.classes.graph.Graph:
         """Overlays the hazard shapefile over the road segments NetworkX graph.
 
         Args:
@@ -228,7 +228,7 @@ class Hazard:
 
         return graph
 
-    def od_hazard_intersect(self, graph: nx.Graph) -> nx.Graph:
+    def od_hazard_intersect(self, graph: nx.classes.graph.Graph) -> nx.classes.graph.Graph:
         """Overlays the origin and destination locations and edges with the hazard maps
 
         Args:
@@ -340,7 +340,7 @@ class Hazard:
                 gdf = self.join_table(gdf, haz)
         return gdf
 
-    def join_hazard_table_graph(self, graph: nx.Graph) -> nx.Graph:
+    def join_hazard_table_graph(self, graph: nx.classes.graph.Graph) -> nx.classes.graph.Graph:
         """Joins a table with IDs and hazard information with the road segments with corresponding IDs.
 
         Args:
@@ -355,7 +355,7 @@ class Hazard:
         graph = graph_from_gdf(gdf, gdf_nodes)
         return graph
 
-    def join_table(self, graph: nx.Graph, hazard: str) -> nx.Graph:
+    def join_table(self, graph: nx.classes.graph.Graph, hazard: str) -> nx.classes.graph.Graph:
         df = pd.read_csv(hazard)
         df = df[self.config['hazard']['hazard_field_name']]
         graph = graph.merge(df,
@@ -402,7 +402,7 @@ class Hazard:
         self.hazard_files['shp'] = hazards_shp
         self.hazard_files['table'] = hazards_table
 
-    def get_hazard_intersect_geodataframe_tif(self, to_overlay: Union[gpd.GeoDataFrame, nx.Graph]):
+    def get_hazard_intersect_geodataframe_tif(self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]):
         """Logic to find the right hazard overlay function for the input to_overlay.
 
         Args:
@@ -419,42 +419,42 @@ class Hazard:
         logging.info(f"Hazard raster intersect time: {str(round(end - start, 2))}s")
         return to_overlay
 
-    def get_hazard_intersect_networkx_tif(self, to_overlay: Union[gpd.GeoDataFrame, nx.Graph]):
+    def get_hazard_intersect_networkx_tif(self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]):
         start = time.time()
         to_overlay = self.overlay_hazard_raster_graph(to_overlay)
         end = time.time()
         logging.info(f"Hazard raster intersect time: {str(round(end - start, 2))}s")
         return to_overlay
 
-    def get_hazard_intersect_geodataframe_shp(self, to_overlay: Union[gpd.GeoDataFrame, nx.Graph]):
+    def get_hazard_intersect_geodataframe_shp(self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]):
         start = time.time()
         to_overlay = self.overlay_hazard_shp_gdf(to_overlay)
         end = time.time()
         logging.info(f"Hazard shapefile intersect time: {str(round(end - start, 2))}s")
         return to_overlay
 
-    def get_hazard_intersect_networkx_shp(self, to_overlay: Union[gpd.GeoDataFrame, nx.Graph]):
+    def get_hazard_intersect_networkx_shp(self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]):
         start = time.time()
         to_overlay = self.overlay_hazard_shp_graph(to_overlay)
         end = time.time()
         logging.info(f"Hazard shapefile intersect time: {str(round(end - start, 2))}s")
         return to_overlay
 
-    def get_hazard_intersect_geodataframe_table(self, to_overlay: Union[gpd.GeoDataFrame, nx.Graph]):
+    def get_hazard_intersect_geodataframe_table(self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]):
         start = time.time()
         to_overlay = self.join_hazard_table_gdf(to_overlay)
         end = time.time()
         logging.info(f"Hazard table intersect time: {str(round(end - start, 2))}s")
         return to_overlay
 
-    def get_hazard_intersect_networkx_table(self, to_overlay: Union[gpd.GeoDataFrame, nx.Graph]):
+    def get_hazard_intersect_networkx_table(self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]):
         start = time.time()
         to_overlay = self.join_hazard_table_graph(to_overlay)
         end = time.time()
         logging.info(f"Hazard table intersect time: {str(round(end - start, 2))}s")
         return to_overlay
 
-    def hazard_intersect(self, to_overlay: Union[gpd.GeoDataFrame, nx.Graph]) -> Union[gpd.GeoDataFrame, nx.Graph]:
+    def hazard_intersect(self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]) -> Union[gpd.GeoDataFrame, nx.classes.graph.Graph]:
         """Handler function that chooses the right function for overlaying the network with the hazard data."""
         if (self.hazard_files['tif']) and (type(to_overlay) == gpd.GeoDataFrame):
             to_overlay = self.get_hazard_intersect_geodataframe_tif(to_overlay)
@@ -473,6 +473,20 @@ class Hazard:
                             f"Please check your input data.")
 
         return to_overlay
+
+    def get_reproject_graph(self, G: nx.classes.graph.Graph, in_crs: pyproj.CRS, out_crs: pyproj.CRS) -> nx.classes.graph.Graph:
+        extent_graph = get_graph_edges_extent(G)
+        logging.info('Graph extent before reprojecting: {}'.format(extent_graph))
+        graph_reprojected = reproject_graph(G, in_crs, out_crs)
+        extent_graph_reprojected = get_graph_edges_extent(graph_reprojected)
+        logging.info('Graph extent after reprojecting: {}'.format(extent_graph_reprojected))
+        return graph_reprojected
+
+    def get_original_geoms_graph(self, graph_original, graph_new):
+        original_geometries = nx.get_edge_attributes(graph_original, 'geometry')
+        _graph_new = graph_new.copy()
+        nx.set_edge_attributes(_graph_new, original_geometries, 'geometry')
+        return _graph_new.copy()
 
     def create(self):
         """ Overlays the different possible graph objects with the hazard data
@@ -517,23 +531,16 @@ class Hazard:
             if hazard_crs != graph_crs:  # Temporarily reproject the graph to the CRS of the hazard
                 logging.warning("""Hazard crs {} and graph crs {} are inconsistent, 
                                               we try to reproject the graph crs""".format(hazard_crs, graph_crs))
-                extent_graph = get_graph_edges_extent(graph)
-                logging.info('Graph extent before reprojecting: {}'.format(extent_graph))
-                graph_reprojected = reproject_graph(graph, graph_crs, hazard_crs)
-                extent_graph_reprojected = get_graph_edges_extent(graph_reprojected)
-                logging.info('Graph extent after reprojecting: {}'.format(extent_graph_reprojected))
+                graph_reprojected = self.get_reproject_graph(graph, graph_crs, hazard_crs)
 
                 # Do the actual hazard intersect
                 base_graph_hazard_reprojected = self.hazard_intersect(graph_reprojected)
 
                 # Assign the original geometries to the reprojected raster
-                original_geometries = nx.get_edge_attributes(graph, 'geometry')
-                base_graph_hazard = base_graph_hazard_reprojected.copy()
-                nx.set_edge_attributes(base_graph_hazard, original_geometries, 'geometry')
-                self.graphs['base_graph_hazard'] = base_graph_hazard.copy()
-                del graph_reprojected
-                del base_graph_hazard_reprojected
-                del base_graph_hazard
+                self.graphs['base_graph_hazard'] = self.get_original_geoms_graph(graph, base_graph_hazard_reprojected)
+
+                # Clean up memory
+                clean_memory([graph_reprojected, base_graph_hazard_reprojected])
             else:
                 self.graphs['base_graph_hazard'] = self.hazard_intersect(
                     graph)
@@ -568,23 +575,16 @@ class Hazard:
             if hazard_crs != graph_crs:  # Temporarily reproject the graph to the CRS of the hazard
                 logging.warning("""Hazard crs {} and graph crs {} are inconsistent, 
                                               we try to reproject the graph crs""".format(hazard_crs, graph_crs))
-                extent_graph = get_graph_edges_extent(graph)
-                logging.info('Graph extent before reprojecting: {}'.format(extent_graph))
-                graph_reprojected = reproject_graph(graph, graph_crs, hazard_crs)
-                extent_graph_reprojected = get_graph_edges_extent(graph_reprojected)
-                logging.info('Graph extent after reprojecting: {}'.format(extent_graph_reprojected))
+                graph_reprojected = self.get_reproject_graph(graph, graph_crs, hazard_crs)
 
                 # Do the actual hazard intersect
                 od_graph_hazard_reprojected = self.od_hazard_intersect(graph_reprojected)
 
                 # Assign the original geometries to the reprojected raster
-                original_geometries = nx.get_edge_attributes(graph, 'geometry')
-                od_graph_hazard = od_graph_hazard_reprojected.copy()
-                nx.set_edge_attributes(od_graph_hazard, original_geometries, 'geometry')
-                self.graphs['origins_destinations_graph_hazard'] = od_graph_hazard.copy()
-                del graph_reprojected
-                del od_graph_hazard_reprojected
-                del od_graph_hazard
+                self.graphs['origins_destinations_graph_hazard'] = self.get_original_geoms_graph(graph, od_graph_hazard_reprojected)
+
+                # Clean up memory
+                clean_memory([graph_reprojected, od_graph_hazard_reprojected])
 
             else:
                 self.graphs['origins_destinations_graph_hazard'] = self.od_hazard_intersect(

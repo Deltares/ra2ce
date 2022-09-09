@@ -6,6 +6,7 @@ Created on 26-7-2021
 # external modules
 import pyproj
 from osmnx.graph import graph_from_xml
+from typing import Union, Tuple
 
 # local modules
 from .networks_utils import *
@@ -25,19 +26,9 @@ class Network:
     def __init__(self, config, files):
         # General
         self.config = config
-        self.name = config['project']['name']
         self.output_path = config['static'] / "output_graph"
 
         # Network
-        self.directed = config['network']['directed']
-        self.source = config['network']['source']
-        self.primary_files = config['network']['primary_file']
-        self.diversion_files = config['network']['diversion_file']
-        self.file_id = config['network']['file_id']
-        self.polygon_file = config['network']['polygon']
-        self.network_type = config['network']['network_type']
-        self.road_types = config['network']['road_types']
-        self.save_shp = config['network']['save_shp']
         self.base_graph_crs = None  # Initiate variable
         self.base_network_crs = None  # Initiate variable
 
@@ -54,19 +45,14 @@ class Network:
             self.region = None
             self.region_var = None
 
-        # Hazard
-        self.hazard_map = config['hazard']['hazard_map']
-        self.aggregate_wl = config['hazard']['aggregate_wl']
-
         # Cleanup
         self.snapping = config['cleanup']['snapping_threshold']
-        # self.pruning = config['cleanup']['pruning_threshold']  # NOT IMPLEMENTED CURRENTLY
         self.segmentation_length = config['cleanup']['segmentation_length']
 
         # files
         self.files = files
 
-    def network_shp(self, crs=4326):
+    def network_shp(self, crs: int = 4326) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """Creates a (graph) network from a shapefile.
 
         Returns the same geometries for the network (GeoDataFrame) as for the graph (NetworkX graph), because
@@ -83,16 +69,16 @@ class Network:
         crs = pyproj.CRS.from_user_input(crs)
 
         lines = self.read_merge_shp()
-        logging.info("Function [read_merge_shp]: executed with {} {}".format(self.primary_files, self.diversion_files))
-        aadt_names = None
+        logging.info("Function [read_merge_shp]: executed with {} {}".format(self.config['network']['primary_file'], self.config['network']['diversion_file']))
 
         # Multilinestring to linestring
         # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
         # The list of fid's is reduced by the fid's that are not anymore in the merged lines
-        edges, lines_merged = merge_lines_automatic(lines, self.file_id, aadt_names, crs)
+        aadt_names = None
+        edges, lines_merged = merge_lines_automatic(lines, self.config['network']['file_id'], aadt_names, crs)
         logging.info("Function [merge_lines_shpfiles]: executed with properties {}".format(list(edges.columns)))
 
-        edges, id_name = gdf_check_create_unique_ids(edges, self.file_id)
+        edges, id_name = gdf_check_create_unique_ids(edges, self.config['network']['file_id'])
 
         if self.snapping is not None:
             edges = snap_endpoints_lines(edges, self.snapping, id_name, tolerance=1e-7)
@@ -101,8 +87,8 @@ class Network:
         # merge merged lines if there are any merged lines
         if not lines_merged.empty:
             # save the merged lines to a shapefile - CHECK if there are lines merged that should not be merged (e.g. main + secondary road)
-            lines_merged.to_file(os.path.join(self.output_path, "{}_lines_that_merged.shp".format(self.name)))
-            logging.info("Function [edges_to_shp]: saved at {}".format(os.path.join(self.output_path, '{}_lines_that_merged'.format(self.name))))
+            lines_merged.to_file(os.path.join(self.output_path, "{}_lines_that_merged.shp".format(self.config['project']['name'])))
+            logging.info("Function [edges_to_shp]: saved at {}".format(os.path.join(self.output_path, '{}_lines_that_merged'.format(self.config['project']['name']))))
 
         # Get the unique points at the end of lines and at intersections to create nodes
         nodes = create_nodes(edges, crs, self.config['cleanup']['ignore_intersections'])
@@ -120,7 +106,7 @@ class Network:
 
         # Create networkx graph from geodataframe
         graph_complex = graph_from_gdf(edges_complex, nodes, node_id='node_fid')
-        logging.info("Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(self.name))
+        logging.info("Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(self.config['project']['name']))
 
         if self.segmentation_length is not None:
             edges_complex = Segmentation(edges_complex, self.segmentation_length)
@@ -134,7 +120,7 @@ class Network:
         # Exporting complex graph because the shapefile should be kept the same as much as possible.
         return graph_complex, edges_complex
 
-    def network_osm_pbf_DEPRECIATED(self, crs=4326):
+    def network_osm_pbf_DEPRECIATED(self, crs=4326) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """Creates a network from an OSM PBF file.
 
         WARNING: THIS FUNCTION IS DEPRECIATED SINCE 10/8/2022, WHEN KEES MADE A NEW OSM PBF IMPORT USING
@@ -147,7 +133,7 @@ class Network:
             G_simple (NetworkX graph): Simplified graph (for use in the indirect analyses).
             G_complex_edges (GeoDataFrame): Complex graph (for use in the direct analyses).
         """
-        road_types = self.road_types.lower().replace(' ', ' ').split(',')
+        road_types = self.config['network']['road_types'].lower().replace(' ', ' ').split(',')
 
         input_path = self.config['static'] / "network"
         executables_path = Path(__file__).parents[1] / 'executables'
@@ -155,9 +141,9 @@ class Network:
         osm_filter_exe = executables_path / 'osmfilter.exe'
         assert osm_convert_exe.exists() and osm_filter_exe.exists()
 
-        pbf_file = input_path / self.primary_files
-        o5m_path = input_path / self.primary_files.replace('.pbf', '.o5m')
-        o5m_filtered_path = input_path / self.primary_files.replace('.pbf', '_filtered.o5m')
+        pbf_file = input_path / self.config['network']['primary_file']
+        o5m_path = input_path / self.config['network']['primary_file'].replace('.pbf', '.o5m')
+        o5m_filtered_path = input_path / self.config['network']['primary_file'].replace('.pbf', '_filtered.o5m')
 
         #Todo: check what excacly these functions do, and if this is always what we want
         if o5m_filtered_path.exists():
@@ -196,7 +182,7 @@ class Network:
 
         return graph_simple, edges_complex
 
-    def network_trails_import(self, crs=4326):
+    def network_trails_import(self, crs: int = 4326) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """Creates a network which has been prepared in the TRAILS package
 
         #Todo: we might later simply import the whole trails code as a package, and directly use these functions
@@ -209,9 +195,9 @@ class Network:
         """
 
         logging.info('TRAILS importer: Reads the provided primary edge file: {}, assumes there also is a_nodes file'.format(
-            self.primary_files))
-        edges = pd.read_pickle(self.config['static'] / "network" / self.primary_files)
-        corresponding_node_file = (self.config['static'] / "network" / self.primary_files.replace("edges","nodes"))
+            self.config['network']['primary_file']))
+        edges = pd.read_pickle(self.config['static'] / "network" / self.config['network']['primary_file'])
+        corresponding_node_file = (self.config['static'] / "network" / self.config['network']['primary_file'].replace("edges","nodes"))
         assert corresponding_node_file.exists()
         nodes = pd.read_pickle(corresponding_node_file) #Todo: Throw exception if nodes file is not present
 
@@ -240,31 +226,30 @@ class Network:
         #Todo: better control over metadata in trails
         #Todo: better control over where things are saved in the pipeline
 
-
         return graph_complex, edges_complex
 
-    def network_osm_download(self):
+    def network_osm_download(self) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
 
         Returns:
             graph_simple (NetworkX graph): Simplified graph (for use in the indirect analyses).
             complex_edges (GeoDataFrame): Complex graph (for use in the direct analyses).
         """
-        poly_dict = read_geojson(self.polygon_file[0])  # It can only read in one geojson
+        poly_dict = read_geojson(self.config['network']['polygon'][0])  # It can only read in one geojson
         poly = geojson_to_shp(poly_dict)
 
-        if not self.road_types:
+        if not self.config['network']['road_types']:
             # The user specified only the network type.
-            graph_complex = osmnx.graph_from_polygon(polygon=poly, network_type=self.network_type,
+            graph_complex = osmnx.graph_from_polygon(polygon=poly, network_type=self.config['network']['network_type'],
                                                  simplify=False, retain_all=True)
-        elif not self.network_type:
+        elif not self.config['network']['network_type']:
             # The user specified only the road types.
-            cf = ('["highway"~"{}"]'.format(self.road_types.replace(',', '|')))
+            cf = ('["highway"~"{}"]'.format(self.config['network']['road_types'].replace(',', '|')))
             graph_complex = osmnx.graph_from_polygon(polygon=poly, custom_filter=cf, simplify=False, retain_all=True)
         else:
             # The user specified the network type and road types.
-            cf = ('["highway"~"{}"]'.format(self.road_types.replace(',', '|')))
-            graph_complex = osmnx.graph_from_polygon(polygon=poly, network_type=self.network_type,
+            cf = ('["highway"~"{}"]'.format(self.config['network']['road_types'].replace(',', '|')))
+            graph_complex = osmnx.graph_from_polygon(polygon=poly, network_type=self.config['network']['network_type'],
                                                  custom_filter=cf, simplify=False, retain_all=True)
 
         logging.info('graph downloaded from OSM with {:,} nodes and {:,} edges'.format(len(list(graph_complex.nodes())),
@@ -282,7 +267,7 @@ class Network:
         save_linking_tables(self.config['static'] / 'output_graph', link_tables[0], link_tables[1])
 
         # If the user wants to use undirected graphs, turn into an undirected graph (default).
-        if not self.directed:
+        if not self.config['network']['directed']:
             if type(graph_simple) == nx.classes.multidigraph.MultiDiGraph:
                 graph_simple = graph_simple.to_undirected()
 
@@ -293,7 +278,7 @@ class Network:
 
         return graph_simple, edges_complex
 
-    def add_od_nodes(self, graph, crs):
+    def add_od_nodes(self, graph: nx.classes.graph.Graph, crs: pyproj.CRS) -> nx.classes.graph.Graph:
         """Adds origins and destinations nodes from shapefiles to the graph.
 
         Args:
@@ -321,7 +306,7 @@ class Network:
         logging.info(f"Saved {name + '.feather'} in {self.config['static'] / 'output_graph'}.")
 
         # Save the OD pairs (GeoDataFrame) as shapefile
-        if self.save_shp:
+        if self.config['network']['save_shp']:
             ods_path = self.config['static'] / 'output_graph' / (name + '.shp')
             ods.to_file(ods_path, index=False)
             logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
@@ -334,11 +319,11 @@ class Network:
         """Adds origins and destinations nodes from shapefiles to the graph."""
         from .origins_destinations import origins_from_raster
         
-        out_fn = origins_from_raster(self.config['static'] / 'network', self.polygon_file, self.origins[0])
+        out_fn = origins_from_raster(self.config['static'] / 'network', self.config['network']['polygon'], self.origins[0])
 
         return out_fn
 
-    def read_merge_shp(self, crs_=4326):
+    def read_merge_shp(self, crs_: int = 4326) -> gpd.GeoDataFrame:
         """Imports shapefile(s) and saves attributes in a pandas dataframe.
 
         Args:
@@ -349,25 +334,18 @@ class Network:
         """
 
         # read shapefiles and add to list with path
-        if isinstance(self.primary_files, str):
-            shapefiles_analysis = [self.config['static'] / "network" / shp for shp in self.primary_files.split(',')]
-        if isinstance(self.diversion_files, str):
-            shapefiles_diversion = [self.config['static'] / "network" / shp for shp in self.diversion_files.split(',')]
-
-        def read_file(file, crs, analyse=1):
-            """"Set analysis to 1 for main analysis and 0 for diversion network"""
-            shp = gpd.read_file(file)
-            if shp.crs != crs:
-                logging.error('Shape projection is epsg:{} - only projection epsg:{} is allowed. '
-                          'Please reproject the input file - {}'.format(shp.crs, crs, file))
-                sys.exit()
-            shp['analyse'] = analyse
-            return shp
+        if isinstance(self.config['network']['primary_file'], str):
+            shapefiles_analysis = [self.config['static'] / "network" / shp for shp in self.config['network']['primary_file'].split(',')]
+        if isinstance(self.config['network']['diversion_file'], str):
+            shapefiles_diversion = [self.config['static'] / "network" / shp for shp in self.config['network']['diversion_file'].split(',')]
 
         # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
-        lines = [read_file(shp, crs_) for shp in shapefiles_analysis]
-        if isinstance(self.diversion_files, str):
-            [lines.append(read_file(shp, crs_, 0)) for shp in shapefiles_diversion]
+        lines = [gpd.read_file(shp) for shp in shapefiles_analysis]
+        # for
+
+        # check_crs_gdf(, crs_)
+        if isinstance(self.config['network']['diversion_file'], str):
+            lines.extend([check_crs_gdf(gpd.read_file(shp), crs_) for shp in shapefiles_diversion])
         lines = pd.concat(lines)
 
         lines.crs = crs_
@@ -379,16 +357,42 @@ class Network:
             for line in lines.loc[lines['geometry'].apply(lambda row: isinstance(row, MultiLineString))].iterrows():
                 if len(linemerge(line[1].geometry)) > 1:
                     logging.warning("Edge with {} = {} is a MultiLineString, which cannot be merged to one line. Check this part.".format(
-                            self.file_id, line[1][self.file_id]))
+                            self.config['network']['file_id'], line[1][self.config['network']['file_id']]))
 
         logging.info('Shapefile(s) loaded with attributes: {}.'.format(list(lines.columns.values)))  # fill in parameter names
 
         return lines
 
-    def create(self):
-        """Handler function with the logic to call the right functions to create a network."""
+    def get_avg_speed(self, G: nx.classes.graph.Graph) -> nx.classes.graph.Graph:
+        if all(['length' in e for u, v, e in G.edges.data()]) and any(
+                ['maxspeed' in e for u, v, e in G.edges.data()]):
+            # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
+            path_avg_speed = self.config['static'] / 'output_graph' / 'avg_speed.csv'
+            if path_avg_speed.is_file():
+                avg_speeds = pd.read_csv(path_avg_speed)
+            else:
+                avg_speeds = calc_avg_speed(G, 'highway', save_csv=True,
+                                            save_path=self.config['static'] / 'output_graph' / 'avg_speed.csv')
+            G = assign_avg_speed(G, avg_speeds, 'highway')
+
+            # make a time value of seconds, length of road streches is in meters
+            for u, v, k, edata in G.edges.data(keys=True):
+                hours = (edata['length'] / 1000) / edata['avgspeed']
+                G[u][v][k]['time'] = round(hours * 3600, 0)
+
+            return G
+        else:
+            logging.info("No attributes found in the graph to estimate average speed per network segment.")
+            return G
+
+    def create(self) -> dict:
+        """Handler function with the logic to call the right functions to create a network.
+
+        Returns:
+            (dict): A dict of a network (GeoDataFrame) and 1 (base NetworkX graph) or 2 graphs (base NetworkX and OD graph)
+        """
         # Save the 'base' network as gpickle and if the user requested, also as shapefile.
-        to_save = ['pickle'] if not self.save_shp else ['pickle', 'shp']
+        to_save = ['pickle'] if not self.config['network']['save_shp'] else ['pickle', 'shp']
         od_graph = None
         base_graph = None
         network_gdf = None
@@ -396,11 +400,11 @@ class Network:
         # For all graph and networks - check if it exists, otherwise, make the graph and/or network.
         if self.files['base_graph'] is None and self.files['base_network'] is None:
             # Create the network from the network source
-            if self.source == 'shapefile':
+            if self.config['network']['source'] == 'shapefile':
                 logging.info('Start creating a network from the submitted shapefile.')
                 base_graph, network_gdf = self.network_shp()
 
-            elif self.source == 'OSM PBF':
+            elif self.config['network']['source'] == 'OSM PBF':
                 logging.info("""The original OSM PBF import is no longer supported. 
                                 Instead, the beta version of package TRAILS is used. 
                                 First stable release of TRAILS is excepted in 2023.""")
@@ -408,13 +412,11 @@ class Network:
                 #base_graph, network_gdf = self.network_osm_pbf() #The old approach is depreciated
                 base_graph, network_gdf = self.network_trails_import()
 
-
-            elif self.source == 'OSM download':
+            elif self.config['network']['source'] == 'OSM download':
                 logging.info('Start downloading a network from OSM.')
                 base_graph, network_gdf = self.network_osm_download()
 
-
-            elif self.source == 'pickle':
+            elif self.config['network']['source'] == 'pickle':
                 logging.info('Start importing a network from pickle')
                 base_graph = read_gpickle(self.config['static'] / 'output_graph' / 'base_graph.p')
                 network_gdf = gpd.read_feather(self.config['static'] / 'output_graph' / 'base_network.feather')
@@ -423,25 +425,11 @@ class Network:
                 self.base_graph_crs = pyproj.CRS.from_user_input(network_gdf.crs)
                 self.base_network_crs = pyproj.CRS.from_user_input(network_gdf.crs)
 
-            if self.source != 'pickle' and self.source != 'shapefile' and self.source != 'OSM PBF':
+            if self.config['network']['source'] != 'pickle' and self.config['network']['source'] != 'shapefile' and self.config['network']['source'] != 'OSM PBF':
                 # Graph & Network from OSM download or OSM PBF
                 # Check if all geometries between nodes are there, if not, add them as a straight line.
                 base_graph = add_missing_geoms_graph(base_graph, geom_name='geometry')
-
-                if all(['length' in e for u, v, e in base_graph.edges.data()]) and any(['maxspeed' in e for u, v, e in base_graph.edges.data()]):
-                    # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
-                    path_avg_speed = self.config['static'] / 'output_graph' / 'avg_speed.csv'
-                    if path_avg_speed.is_file():
-                        avg_speeds = pd.read_csv(path_avg_speed)
-                    else:
-                        avg_speeds = calc_avg_speed(base_graph, 'highway', save_csv=True,
-                                                    save_path=self.config['static'] / 'output_graph' / 'avg_speed.csv')
-                    G = assign_avg_speed(base_graph, avg_speeds, 'highway')
-
-                    # make a time value of seconds, length of road streches is in meters
-                    for u, v, k, edata in G.edges.data(keys=True):
-                        hours = (edata['length'] / 1000) / edata['avgspeed']
-                        G[u][v][k]['time'] = round(hours * 3600, 0)
+                base_graph = self.get_avg_speed(base_graph)
 
             # Save the graph and geodataframe
             self.files['base_graph'] = save_network(base_graph, self.config['static'] / 'output_graph',
