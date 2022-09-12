@@ -15,13 +15,103 @@ warnings.filterwarnings(action='ignore', message='Value *not successfully writte
 
 # Local modules
 from .utils import get_root_path, initiate_root_logger, load_config, get_files
-from .graph.networks import Network, Hazard
+from .graph.networks import Network
+from .graph.hazard import Hazard
 from .analyses.direct import analyses_direct
 from .analyses.indirect import analyses_indirect
 from .io import read_graphs
+from typing import Union, Tuple, Optional   # Python object types
 
 
-def main(network_ini=None, analyses_ini=None):
+def initialize_with_network_ini(root_path: Union[Path, str], network_ini: Union[Path, str]) -> Tuple[dict, dict]:
+    config_network = load_config(root_path, config_path=network_ini)
+    initiate_root_logger(str(config_network['output'] / 'RA2CE.log'))
+
+    # Try to find pre-existing files
+    files = get_files(config_network)
+    return config_network, files
+
+
+def network_handler(config: dict, files: dict) -> Optional[dict]:
+    try:
+        network = Network(config, files)
+        graphs = network.create()
+        return graphs
+
+    except BaseException as e:
+        logging.exception(f"RA2CE crashed. Check the logfile for the Traceback message: {e}")
+
+
+def hazard_handler(config: dict, graphs: dict, files: dict) -> Optional[dict]:
+    if config['hazard']['hazard_map'] is not None:
+        # There is a hazard map or multiple hazard maps that should be intersected with the graph.
+        hazard = Hazard(config, graphs, files)
+        graphs = hazard.create()
+        return graphs
+    else:
+        return None
+
+
+def get_output_folders(config: dict, analysis_type: str) -> None:
+    # Create the output folders
+    if analysis_type in config:
+        for a in config[analysis_type]:
+            output_path = config['output'] / a['analysis']
+            output_path.mkdir(parents=True, exist_ok=True)
+
+
+def analysis_handler(network_config: dict, analysis_config: dict, graphs: dict) -> None:
+    """Directs the script to the right functions to run the analyses
+
+    Args:
+        network_config: Network configuration dict, from the network.ini input file
+        analysis_config: Analysis configuration dict, from the analyses.ini input file
+        graphs: Dictionary of a network (GDF) and graph(s) (NetworkX Graph)
+
+    Returns:
+        Nothing
+    """
+    # Do the analyses
+    try:
+        if 'direct' in analysis_config:
+            if network_config['hazard']['hazard_map'] is not None:
+                analyses_direct.DirectAnalyses(analysis_config, graphs).execute()
+            else:
+                logging.error('Please define a hazardmap in your network.ini file. Unable to calculate direct damages...')
+
+        if 'indirect' in analysis_config:
+            analyses_indirect.IndirectAnalyses(analysis_config, graphs).execute()
+
+    except BaseException as e:
+        logging.exception(f"RA2CE crashed. Check the logfile for the Traceback message: {e}")
+
+
+def get_config_params(config_in: dict, config_out: dict, files: dict) -> dict:
+    # The network_ini and analyses_ini are both called, copy the config values of the network ini
+    # into the analyses config.
+    config_out['files'] = files
+    if config_in['network'] is not None:
+        config_out['network'] = config_in['network']
+    if config_in['origins_destinations'] is not None:
+        config_out['origins_destinations'] = config_in['origins_destinations']
+    return config_out
+
+
+def get_network_config_params(root_path: Path, analysis_config: dict) -> dict:
+    try:
+        config_network = load_config(root_path, config_path=analysis_config['output'].joinpath('network.ini'),
+                                     check=False)
+        analysis_config.update(config_network)
+        analysis_config['origins_destinations'] = analysis_config['network']['origins_destinations']
+        return analysis_config
+    except FileNotFoundError:
+        logging.error(
+            f"The configuration file 'network.ini' is not found at {analysis_config['output'].joinpath('network.ini')}."
+            f"Please make sure to name your network settings file 'network.ini'.")
+        quit()
+
+
+def main(network_ini: str = None, analyses_ini: str = None) -> None:
     """Main function to start RA2CE. Runs RA2CE according to the settings in network_ini and analysis_ini.
 
     Reads the network and analyses ini files and chooses the right functions.
@@ -35,71 +125,26 @@ def main(network_ini=None, analyses_ini=None):
     root_path = get_root_path(network_ini, analyses_ini)
 
     if network_ini:
-        config_network = load_config(root_path, config_path=network_ini)
-        initiate_root_logger(str(config_network['output'] / 'RA2CE.log'))
-
-        try:
-            # Try to find pre-existing files
-            files = get_files(config_network)
-
-            network = Network(config_network, files)
-            graphs = network.create()
-
-            if config_network['hazard']['hazard_map'] is not None:
-                # There is a hazard map or multiple hazard maps that should be intersected with the graph.
-                # Overlay the hazard on the geodataframe as well (todo: combine with graph overlay if both need to be done?)
-                hazard = Hazard(network, graphs, files)
-                graphs = hazard.create()
-
-        except BaseException as e:
-            logging.exception(f"RA2CE crashed. Check the logfile for the Traceback message: {e}")
+        # If no network_ini is provided, config and files are both None
+        config_network, files = initialize_with_network_ini(root_path, network_ini)
+        graphs = network_handler(config_network, files)
+        graphs = hazard_handler(config_network, graphs, files)
 
     if analyses_ini:
         config_analyses = load_config(root_path, config_path=analyses_ini)
 
         if network_ini:
-            # The network_ini and analyses_ini are both called, copy the config values of the network ini
-            # into the analyses config.
-            config_analyses['files'] = files
-            if config_network['network'] is not None:
-                config_analyses['network'] = config_network['network']
-            if config_network['origins_destinations'] is not None:
-                config_analyses['origins_destinations'] = config_network['origins_destinations']
+            # The logger is already made, just the analysis config needs to be updated with the network config parameters
+            config_analyses = get_config_params(config_network, config_analyses, files)
+
         else:
             # Only the analyses.ini is called, initiate logger and load all network/graph files.
             initiate_root_logger(str(config_analyses['output'] / 'RA2CE.log'))
             graphs = read_graphs(config_analyses)
-            try:
-                config_network = load_config(root_path, config_path=config_analyses['output'].joinpath('network.ini'),
-                                             check=False)
-                config_analyses.update(config_network)
-                config_analyses['origins_destinations'] = config_analyses['network']['origins_destinations']
-            except FileNotFoundError:
-                logging.error(f"The configuration file 'network.ini' is not found at {config_analyses['output'].joinpath('network.ini')}."
-                              f"Please make sure to name your network settings file 'network.ini'.")
-                quit()
+            config_analyses = get_network_config_params(root_path, config_analyses)
 
-        try:
-            # Create the output folders
-            if 'direct' in config_analyses:
-                for a in config_analyses['direct']:
-                    output_path = config_analyses['output'] / a['analysis']
-                    output_path.mkdir(parents=True, exist_ok=True)
+        get_output_folders(config_analyses, 'direct')
+        get_output_folders(config_analyses, 'indirect')
 
-            if 'indirect' in config_analyses:
-                for a in config_analyses['indirecte']:
-                    output_path = config_analyses['output'] / a['analysis']
-                    output_path.mkdir(parents=True, exist_ok=True)
+        analysis_handler(config_network, config_analyses, graphs)
 
-            # Do the analyses
-            if 'direct' in config_analyses:
-                if config_network['hazard']['hazard_map'] is not None:
-                    analyses_direct.DirectAnalyses(config_analyses, graphs).execute()
-                else:
-                    logging.error('Please define a hazardmap in your network.ini file. Unable to calculate direct damages...')
-
-            if 'indirect' in config_analyses:
-                analyses_indirect.IndirectAnalyses(config_analyses, graphs).execute()
-
-        except BaseException as e:
-            logging.exception(f"RA2CE crashed. Check the logfile for the Traceback message: {e}")
