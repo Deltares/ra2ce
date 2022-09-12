@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on 26-7-2021
-
-@author: F.C. de Groen, Deltares
-@author: M. Kwant, Deltares
 """
 # External modules
 from configparser import ConfigParser
@@ -22,7 +19,7 @@ from .checks import input_validation, available_checks
 list_indirect_analyses, list_direct_analyses = available_checks()
 
 
-def get_root_path(net_ini, ana_ini):
+def get_root_path(net_ini: str, ana_ini: str) -> Path:
     if net_ini is not None or ana_ini is not None:
         if net_ini is not None and ana_ini is not None:
             if Path(net_ini).resolve().parent.parent == Path(ana_ini).resolve().parent.parent:
@@ -42,7 +39,7 @@ def get_root_path(net_ini, ana_ini):
         sys.exit()
 
 
-def parse_config(root, path=None, opt_cli=None):
+def parse_config(root: Path, path: Path = None, opt_cli=None) -> dict:
     """Ajusted from HydroMT
     source: https://github.com/Deltares/hydromt/blob/af4e5d858b0ac0883719ca59e522053053c21b82/hydromt/cli/cli_utils.py"""
     opt = {}
@@ -107,7 +104,7 @@ def configread(config_fn, root, encoding="utf-8", cf=None, defaults=dict(), nohe
     return cfdict
 
 
-def initiate_root_logger(filename):
+def initiate_root_logger(filename: str) -> None:
     # Create a root logger and set the minimum logging level.
     logging.getLogger('').setLevel(logging.INFO)
 
@@ -129,7 +126,7 @@ def initiate_root_logger(filename):
     logging.getLogger('').addHandler(ch)
 
 
-def configure_analyses(config):
+def configure_analyses(config: dict) -> dict:
     analyses_names = [a for a in config.keys() if 'analysis' in a]
     for a in analyses_names:
         if any(t in config[a]['analysis'] for t in list_direct_analyses):
@@ -147,7 +144,7 @@ def configure_analyses(config):
     return config
 
 
-def load_config(root_path, config_path, check=True):
+def load_config(root_path: Path, config_path: str, check: bool = True) -> dict:
     # Read the configurations in network.ini and add the root path to the configuration dictionary.
     config_path = Path(config_path)
     if not config_path.is_file():
@@ -182,7 +179,7 @@ def load_config(root_path, config_path, check=True):
     return config
 
 
-def get_files(config):
+def get_files(config: dict) -> dict:
     """ Checks if file of graph exist in network folder and adds filename to the files dict"""
     file_list = ['base_graph', 'base_network', 'origins_destinations_graph', 'base_graph_hazard', 'origins_destinations_graph_hazard', 'base_network_hazard']
     files = {}
