@@ -132,3 +132,4 @@ dmypy.json
 
 # ra2ce ignore:
 data/
+/tests/local_data

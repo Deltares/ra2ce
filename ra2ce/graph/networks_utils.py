@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 Created on 30-9-2020
-
-@author: F.C. de Groen, Deltares
-@author: M. Kwant, Deltares
-#author: Kees van Ginkel, Deltares
 """
 
 # external modules
 import os, sys
+import pyproj
 import networkx as nx
 import osmnx
 import pandas as pd
@@ -32,6 +29,7 @@ from statistics import mean
 from shapely.geometry import shape, Point, LineString, MultiLineString, box
 from pathlib import Path
 from decimal import Decimal
+from typing import Optional, Tuple, Union
 
 # Hazard overlay
 #from boltons.iterutils import pairwise
@@ -44,6 +42,7 @@ from rasterio.features import shapes
 folder = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(folder)
 
+
 def drawProgressBar(percent, barLen=20):
     """Draws a progress bar
     https://stackoverflow.com/questions/3002085/python-to-print-out-status-bar-and-percentage
@@ -54,7 +53,7 @@ def drawProgressBar(percent, barLen=20):
     sys.stdout.flush()
 
 
-def merge_lines_shpfiles(lines_gdf, idName, aadtNames, crs_):
+def merge_lines_shpfiles(lines_gdf: gpd.GeoDataFrame, idName: str, aadtNames: list, crs_: int) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
     """Asks the user for input and possibly merges the LineStrings in a geodataframe (network)
     Args:
         lines_gdf (geodataframe): the network with edges that can possibly be merged
@@ -258,7 +257,7 @@ def merge_lines_shpfiles(lines_gdf, idName, aadtNames, crs_):
     return merged, lines_merged
 
 
-def merge_lines_automatic(lines_gdf, idName, aadtNames, crs_):
+def merge_lines_automatic(lines_gdf: gpd.GeoDataFrame, idName: str, aadtNames: list, crs_: pyproj.CRS) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
     """Automatically merge lines based on a config file
     Args:
         lines_gdf (geodataframe): the network with edges that can possibly be merged
@@ -382,7 +381,7 @@ def merge_lines_automatic(lines_gdf, idName, aadtNames, crs_):
     return merged, lines_merged
 
 
-def pairs(lst):
+def pairs(lst: list):
     """Iterate over a list in overlapping pairs without wrap-around.
     Args:
         lst: an iterable/list
@@ -405,7 +404,7 @@ def pairs(lst):
         prev = item
 
 
-def line_length(line, crs):
+def line_length(line: LineString, crs: pyproj.CRS) -> float:
     """Calculate length of a line in meters, given in geographic coordinates.
     Args:
         line: a shapely LineString object with coordinate reference system 'crs'
@@ -444,13 +443,14 @@ def line_length(line, crs):
     return round(total_length, 0)
 
 
-def snap_endpoints_lines(lines_gdf, max_dist, idName, tolerance=1e-7):
+def snap_endpoints_lines(lines_gdf: gpd.GeoDataFrame, max_dist: Union[int, float], idName: str) -> gpd.GeoDataFrame:
     """Snap endpoints of lines with endpoints or vertices of other lines
     if they are at most max_dist apart. Choose the closest endpoint or vertice.
 
     Args:
-        lines: a list of LineStrings or a MultiLineString
+        lines_gdf: a list of LineStrings or a MultiLineString
         max_dist: maximum distance two endpoints may be joined together
+        idName: the name of the ID column in lines_gdf
 
     From shapely_tools:
         @author: Dirk Eilander (dirk.eilander@deltares.nl)
@@ -511,10 +511,11 @@ def snap_endpoints_lines(lines_gdf, max_dist, idName, tolerance=1e-7):
     return lines_gdf
 
 
-def find_isolated_endpoints(linesIds, lines):
+def find_isolated_endpoints(linesIds: list, lines: list) -> list:
     """Find endpoints of lines that don't touch another line.
 
     Args:
+        linesIds: a list of the IDs of lines
         lines: a list of LineStrings or a MultiLineString
 
     Returns:
@@ -548,11 +549,12 @@ def find_isolated_endpoints(linesIds, lines):
     return isolated_endpoints
 
 
-def nearest_neighbor_within(search_points, spatial_index, point, max_distance):
+def nearest_neighbor_within(search_points: list, spatial_index, point: Point, max_distance: Union[float, int]) -> Point:
     """Find nearest point among others up to a maximum distance.
 
     Args:
-        others: a dict with keys: index of line, values: list of Points or a MultiPoint
+        search_points: list of points to search in
+        spatial_index: rtree spatial index of the points to search in
         point: a Point
         max_distance: maximum distance to search for the nearest neighbor
 
@@ -1097,7 +1099,7 @@ def graph_from_gdf(gdf, gdf_nodes, name='network', node_id='ID'):
     return G
 
 
-def graph_to_gdf(G, save_nodes=False, save_edges=True, to_save=False):
+def graph_to_gdf(G: nx.classes.graph.Graph, save_nodes=False, save_edges=True, to_save=False):
     """Takes in a networkx graph object and returns edges and nodes as geodataframes
     Arguments:
         G (Graph): networkx graph object to be converted
@@ -1825,7 +1827,7 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
     return graph
 
 
-def fraction_flooded(line, hazard_map):
+def fraction_flooded(line: LineString, hazard_map: str):
     """Calculates the fraction of a linestring that overlaps with a hazard raster with value > 0
 
     Args:
@@ -1852,3 +1854,20 @@ def fraction_flooded(line, hazard_map):
         return 0
     except Exception as e:
         logging.info('fraction_flooded() {} \n for line {}'.format(e,line))
+
+
+def check_crs_gdf(gdf: gpd.GeoDataFrame, crs) -> None:
+    if gdf.crs != crs:
+        logging.error('Shape projection is epsg:{} - only projection epsg:{} is allowed. '.format(gdf.crs, crs))
+        sys.exit()
+
+
+def set_analysis_value(gdf: gpd.GeoDataFrame, analyse: int = 1) -> gpd.GeoDataFrame:
+    """"Set analysis to 1 for main analysis and 0 for diversion network"""
+    gdf['analyse'] = analyse
+    return gdf
+
+
+def clean_memory(list_delete: list) -> None:
+    for to_delete in list_delete:
+        del to_delete
