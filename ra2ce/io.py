@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on 18-7-2022
-
-@author: F.C. de Groen, Deltares
 """
 # Import modules
 import networkx as nx
