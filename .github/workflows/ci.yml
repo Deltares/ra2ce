@@ -48,7 +48,8 @@ jobs:
         
       - name: Install Dependencies
         run: |
-          conda env update --file environment.yml --name base
+          conda env update --file environment.yml --name ci_base
+          conda activate ci_base
           poetry install
         if: steps.cache.outputs.cache-hit != 'true'
 
