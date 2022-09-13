@@ -54,7 +54,7 @@ jobs:
         
       - name: Install Dependencies
         run: |
-          conda init shell
+          conda init bash
           conda activate ra2ce_env
           poetry install
         if: steps.cache.outputs.cache-hit != 'true'
