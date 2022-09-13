@@ -13,7 +13,10 @@ class TestIndirectAnalyses:
         test_name = "1_1_network_shape_redundancy"
         _test_dir = test_data / test_name
         network_ini = _test_dir / "network.ini"
+        analysis_ini = _test_dir / "analyses.ini"
         assert network_ini.is_file()
+        assert analysis_ini.is_file()
+        # Purge output dirs.
         _output_graph_dir = _test_dir / "static" / "output_graph"
         if _output_graph_dir.is_dir():
             shutil.rmtree(_output_graph_dir)
@@ -33,7 +36,7 @@ class TestIndirectAnalyses:
         ]
 
         # 2. When test:
-        main(network_ini=network_ini, analyses_ini=None)
+        main(network_ini=network_ini, analyses_ini=analysis_ini)
 
         # 3. Then, validate expectations
         for _graph_file in _expected_graph_files:
