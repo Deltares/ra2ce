@@ -41,7 +41,7 @@ class TestIndirectAnalyses:
         for _analysis_output in _expected_analysis_output_files:
             assert _analysis_output.is_file() and _analysis_output.exists()
 
-    def test_4_analyses_indirect():
+    def test_4_analyses_indirect(self):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data.
         test_name = "4_analyses_indirect"
