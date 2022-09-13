@@ -17,10 +17,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        uses: actions/setup-python@v1
-        with:
-          python-version: ${{ matrix.python-version }}
+      # - name: Set up Python
+      #   uses: actions/setup-python@v1
+      #   with:
+      #     python-version: ${{ matrix.python-version }}
 
       - uses: conda-incubator/setup-miniconda@v2
         with:
@@ -30,42 +30,52 @@ jobs:
           channels: conda-forge,defaults
           channel-priority: true
           # always activate the ra2ce environment (name is specified in environment.yml)
-          activate-environment: ra2ce_env
           environment-file: environment.yml
+          auto-activate-base: true
+          activate-environment: ra2ce_env
+      # - run: |
+      #     conda info
+      #     conda list
+      #     conda activate
+      #     poetry install
 
-      - name: Run Poetry image
-        uses: abatilo/actions-poetry@v2.0.0
-        with:
-          poetry-version: 1.1.8
+      # - name: Run Poetry image
+      #   uses: abatilo/actions-poetry@v2.0.0
+      #   with:
+      #     poetry-version: 1.1.8
 
-      - name: Cache Poetry virtualenv
-        uses: actions/cache@v1
-        id: cache
-        with:
-          path: ~/.virtualenvs
-          key: venv-${{ matrix.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
-          restore-keys: |
-            venv-${{ matrix.os }}-${{ matrix.python-version }}-
+      # - name: Cache Poetry virtualenv
+      #   uses: actions/cache@v1
+      #   id: cache
+      #   with:
+      #     path: ~/.virtualenvs
+      #     key: venv-${{ matrix.os }}-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
+      #     restore-keys: |
+      #       venv-${{ matrix.os }}-${{ matrix.python-version }}-
 
-      - name: Set Poetry config
-        run: |
-          poetry config virtualenvs.in-project false
-          poetry config virtualenvs.path ~/.virtualenvs
+      # - name: Set Poetry config
+      #   shell: pwsh
+      #   run: |
+      #     conda activate ra2ce_env
+      #     poetry config virtualenvs.in-project false
+      #     poetry config virtualenvs.path ~/.virtualenvs
         
       - name: Install Dependencies
-        run: |
-          conda init bash
+        shell: pwsh
+        run:
           conda activate ra2ce_env
           poetry install
         if: steps.cache.outputs.cache-hit != 'true'
 
       - name: Test with pytest
+        shell: pwsh
         run: |
           conda activate ra2ce_env
           poetry run pytest --cov . --cov-report xml:coverage-reports/coverage-ra2ce.xml --junitxml=xunit-reports/xunit-result-ra2ce.xml
 
       - name: Autoformat code if the check fails
         if: ${{ (matrix.os == 'ubuntu-20.04') && (matrix.python-version == 3.8) }}
+        shell: pwsh
         run: |
           poetry run isort .
           poetry run black .
