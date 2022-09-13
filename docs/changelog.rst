@@ -4,4 +4,7 @@
 
 - **setup.py**: Encoding for the rst files should be enforced
 
-## v0.0.1 (2021-07-19)
+## v0.1.0 (2020-09-25)
+------------------
+
+* First release on PyPI.
