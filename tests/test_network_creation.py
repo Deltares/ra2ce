@@ -5,7 +5,7 @@ Created on 8-6-2022
 @author: F.C. de Groen, Deltares
 """
 
-from tests.test_ra2ce import get_paths, check_output_graph_files
+from tests.test_ra2ce import check_output_graph_files, get_paths
 
 
 def test_1_network_shape():

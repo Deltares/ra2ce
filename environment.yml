@@ -1,32 +1,12 @@
-name: ra2ce
+name: ra2ce_env
 channels:
   - conda-forge
   - defaults
 dependencies:
-  - affine
-  - click
-  - fiona
-  - future
-  - gdal
-  - geojson
-  - geopy
-  - geopandas
-  - networkx
-  - numpy
-  - osmnx=0.16.*
-  - pandas
-  - pyarrow
-  - pytest
-  - python=3.8.*
-  - rasterio
-  - rasterstats
-  - rtree
-  - scipy
-  - seaborn
-  - shapely
-  - sphinx
-  - tqdm
-  - xarray
-  - xlrd
-  - openpyxl
-  - pathlib
+  - python=3.9
+  - pip
+  - conda-forge::rasterio
+  - conda-forge::gdal
+  - conda-forge::geos
+  - conda-forge::fiona
+  - poetry
