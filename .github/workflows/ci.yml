@@ -75,7 +75,7 @@ jobs:
 
       - name: Autoformat code if the check fails
         if: ${{ (matrix.os == 'ubuntu-20.04') && (matrix.python-version == 3.8) }}
-        shell:
+        shell: pwsh
         run: |
           poetry run isort .
           poetry run black .
