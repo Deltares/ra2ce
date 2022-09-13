@@ -8,8 +8,22 @@ maintainers = [
   Kees van Ginkel <kees.vanginkel@deltares.nl>,
   Carles Salvador Soriano Perez <carles.sorianoperez@deltares.nl>
 ]
-packages = [{include = "ra2ce"}]
 license = "GNU General Public License v3"
+readme = "README.rst"
+repository = "https://github.com/Deltares/ra2ce"
+documentation = "https://ra2ce.readthedocs.io/en/latest/"
+classifiers = [
+  'Development Status :: 2 - Pre-Alpha',
+  'Intended Audience :: Developers',
+  'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+  'Natural Language :: English',
+  'Programming Language :: Python :: 3',
+  'Programming Language :: Python :: 3.8',
+]
+packages = [{include = "ra2ce"}]
+
+[tool.poetry.scripts]
+console_scripts = "ra2ce=ra2ce.cli:main"
 
 [tool.poetry.dependencies]
 python = "^3.9, <3.11"
