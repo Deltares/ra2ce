@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
+from ra2ce.ra2ce import main
 from tests.test_ra2ce import check_output_files, check_output_graph_files, get_paths
 
 
 def test_1_1_network_shape_redundancy():
     """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
-    from ra2ce.ra2ce import main
 
     test_name = "1_1_network_shape_redundancy"
     network_ini, analyses_ini = get_paths(test_name)
@@ -24,8 +24,6 @@ def test_1_1_network_shape_redundancy():
 
 def test_4_analyses_indirect():
     """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
-    from ra2ce.ra2ce import main
-
     test_name = "4_analyses_indirect"
     network_ini, analyses_ini = get_paths(test_name)
     main(network_ini=network_ini, analyses_ini=analyses_ini)

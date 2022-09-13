@@ -1,16 +1,13 @@
-# -*- coding: utf-8 -*-
-"""
-Created on 30-8-2022
-
-@author: F.C. de Groen, Deltares
-"""
+from ra2ce.ra2ce import main
+from tests import test_data
 
 
 class TestAcceptance:
     def test_given_when(self):
-        from ra2ce.ra2ce import main
-        main(
-            r"d:\ra2ceMaster\ra2ce\tests\local_data\network.ini",
-            r"d:\ra2ceMaster\ra2ce\tests\local_data\analyses.ini",
-        )
+        _network = test_data / "network.ini"
+        _analysis = test_data / "analyses.ini"
 
+        assert _network.is_file()
+        assert _analysis.is_file()
+
+        main(_network, _analysis)
