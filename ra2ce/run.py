@@ -9,6 +9,7 @@ for working with RA2CE, if you want to use RA2CE via the command line.
 """
 
 import click
+
 from ra2ce.ra2ce import main
 
 

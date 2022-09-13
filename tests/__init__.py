@@ -1,4 +1,7 @@
 """Unit test package for ra2ce."""
 from pathlib import Path
 
-test_data = Path(__file__).parent / "data"
+_test_dir = Path(__file__).parent
+
+test_data = _test_dir / "test_data"
+test_results = _test_dir / "test_results"
