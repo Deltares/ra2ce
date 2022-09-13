@@ -38,7 +38,7 @@ class TestNetworkCreation:
             _graph_file = _output_graph_dir / filename
             return _graph_file.is_file() and _graph_file.exists()
 
-        assert all(validate_file, _expected_files)
+        assert all(map(validate_file, _expected_files))
 
     def test_3_network_osm_download(self):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
@@ -69,4 +69,4 @@ class TestNetworkCreation:
             _graph_file = _output_graph_dir / filename
             return _graph_file.is_file() and _graph_file.exists()
 
-        assert all(validate_file, _expected_files)
+        assert all(map(validate_file, _expected_files))
