@@ -23,7 +23,7 @@ classifiers = [
 packages = [{include = "ra2ce"}]
 
 [tool.poetry.scripts]
-console_scripts = "ra2ce.cli:main"
+console_scripts = "ra2ce.ra2ce:main"
 
 [tool.poetry.dependencies]
 python = "^3.9, <3.11"
