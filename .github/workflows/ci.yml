@@ -54,11 +54,13 @@ jobs:
         
       - name: Install Dependencies
         run: |
+          conda activate ra2ce_env
           poetry install
         if: steps.cache.outputs.cache-hit != 'true'
 
       - name: Test with pytest
         run: |
+          conda activate ra2ce_env
           poetry run pytest --cov . --cov-report xml:coverage-reports/coverage-ra2ce.xml --junitxml=xunit-reports/xunit-result-ra2ce.xml
 
       - name: Autoformat code if the check fails
