@@ -4,11 +4,11 @@ version = "0.1.0"
 description = "Risk Assessment  and Adaptation for Critical infrastructurE."
 authors = ["Margreet van Marle <Margreet.vanMarle@deltares.nl>"]
 maintainers = [
-  Frederique de Groen <frederique.degroen@deltares.nl>,
-  Kees van Ginkel <kees.vanginkel@deltares.nl>,
-  Carles Salvador Soriano Perez <carles.sorianoperez@deltares.nl>
+  "Frederique de Groen <frederique.degroen@deltares.nl>",
+  "Kees van Ginkel <kees.vanginkel@deltares.nl>",
+  "Carles Salvador Soriano Perez <carles.sorianoperez@deltares.nl>",
 ]
-license = "GNU General Public License v3"
+license = "GPL-3.0-or-later"
 readme = "README.rst"
 repository = "https://github.com/Deltares/ra2ce"
 documentation = "https://ra2ce.readthedocs.io/en/latest/"
@@ -23,7 +23,7 @@ classifiers = [
 packages = [{include = "ra2ce"}]
 
 [tool.poetry.scripts]
-console_scripts = "ra2ce=ra2ce.cli:main"
+console_scripts = "ra2ce.cli:main"
 
 [tool.poetry.dependencies]
 python = "^3.9, <3.11"
