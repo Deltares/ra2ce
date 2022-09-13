@@ -188,16 +188,20 @@ class IndirectAnalyses:
         """
         results = []
         master_graph = copy.deepcopy(graph)
-        for hz in self.config['hazard_names']:
+        for hazard in self.config['hazard_names']:
+            hazard_name = self.hazard_names.loc[self.hazard_names['File name'] == hazard, 'RA2CE name'].values[0]
+
             graph = copy.deepcopy(master_graph)
             # Create a geodataframe from the full graph
             gdf = osmnx.graph_to_gdfs(master_graph, nodes=False)
             gdf['rfid'] = gdf['rfid'].astype(str)
 
             # Create the edgelist that consist of edges that should be removed
-            edges_remove = [e for e in graph.edges.data(keys=True) if hz+'_'+analysis['aggregate_wl'] in e[-1]]
+            edges_remove = [e for e in graph.edges.data(keys=True) if hazard_name in e[-1]]
             edges_remove = [e for e in edges_remove if
-                            (e[-1][hz+'_'+analysis['aggregate_wl']] > float(analysis['threshold'])) & ('bridge' not in e[-1])]
+                            (e[-1][hazard_name] is not None)]
+            edges_remove = [e for e in edges_remove if
+                            (e[-1][hazard_name] > float(analysis['threshold'])) & ('bridge' not in e[-1])]
 
             graph.remove_edges_from(edges_remove)
 
@@ -232,7 +236,7 @@ class IndirectAnalyses:
             gdf['diff_dist'] = [dist - length if dist == dist else np.NaN for (dist, length) in
                                 zip(gdf['alt_dist'], gdf[analysis['weighing']])]
 
-            gdf['hazard'] = hz+'_'+analysis['aggregate_wl']
+            gdf['hazard'] = hazard_name
 
             results.append(gdf)
 
@@ -262,8 +266,10 @@ class IndirectAnalyses:
             road_classes = [x for x in disruption_df.columns if 'class' in x]
 
         results = []
-        for hz in self.config['hazard_names']:
-            gdf_ = gdf.loc[gdf['hazard']==hz+'_'+analysis['aggregate_wl']].copy()
+        for hazard in self.config['hazard_names']:
+            hazard_name = self.hazard_names.loc[self.hazard_names['File name'] == hazard, 'RA2CE name'].values[0]
+
+            gdf_ = gdf.loc[gdf['hazard']==hazard_name].copy()
             if analysis['loss_type'] == 'uniform': #assume uniform threshold for disruption
                 for col in analysis['traffic_cols'].split(","):
                     # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle] * duration_disruption[hour] / 24[hour/day]
@@ -424,19 +430,22 @@ class IndirectAnalyses:
                              [(n, n_name) for n, n_name in all_nodes if (n_name == bb) | (bb in n_name)][0]))
 
         all_results = []
-        for hz in self.config['hazard_names']:
+        for hazard in self.config['hazard_names']:
+            hazard_name = self.hazard_names.loc[self.hazard_names['File name'] == hazard, 'RA2CE name'].values[0]
+
             graph_hz = copy.deepcopy(graph)
 
             # Check if the o/d pairs are still connected while some links are disrupted by the hazard(s)
-            edges_remove = [e for e in graph.edges.data(keys=True) if hz+'_'+analysis['aggregate_wl'] in e[-1]]
+            edges_remove = [e for e in graph.edges.data(keys=True) if hazard_name in e[-1]]
             edges_remove = [e for e in edges_remove if
-                            (e[-1][hz+'_'+analysis['aggregate_wl']] > float(analysis['threshold'])) & ('bridge' not in e[-1])]
-            # to_remove = [(e[0], e[1], e[2]) for e in graph.edges.data(keys=True) if (e[-1][hz+'_'+analysis['aggregate_wl']] > float(analysis['threshold']))]
+                            (e[-1][hazard_name] is not None)]
+            edges_remove = [e for e in edges_remove if
+                            (e[-1][hazard_name] > float(analysis['threshold'])) & ('bridge' not in e[-1])]
             graph_hz.remove_edges_from(edges_remove)
 
             # Find the routes
             od_routes = find_route_ods(graph_hz, od_nodes, analysis['weighing'])
-            od_routes['hazard'] = hz+'_'+analysis['aggregate_wl']
+            od_routes['hazard'] = hazard_name
             all_results.append(od_routes)
 
         all_results = pd.concat(all_results, ignore_index=True)
@@ -691,6 +700,8 @@ class IndirectAnalyses:
             h = copy.deepcopy(graph)
 
             edges_remove = [e for e in graph.edges.data(keys=True) if hazard_name in e[-1]]
+            edges_remove = [e for e in edges_remove if
+                            (e[-1][hazard_name] is not None)]
             edges_remove = [e for e in edges_remove if
                             (e[-1][hazard_name] > float(analysis['threshold'])) & ('bridge' not in e[-1])]
             h.remove_edges_from(edges_remove)
