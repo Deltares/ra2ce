@@ -24,11 +24,6 @@ class TestIndirectAnalyses:
         if _output_files_dir.is_dir():
             shutil.rmtree(_output_files_dir)
 
-        _expected_graph_files = [
-            _output_graph_dir / "1_1_network_shape_redundancy_lines_that_merged.shp",
-            _output_graph_dir / "base_graph.p",
-            _output_graph_dir / "base_network.feather",
-        ]
         _expected_analysis_output_files = [
             _output_files_dir
             / "single_link_redundancy"
@@ -39,7 +34,13 @@ class TestIndirectAnalyses:
         main(network_ini=network_ini, analyses_ini=analysis_ini)
 
         # 3. Then, validate expectations
+        _expected_graph_files = [
+            "1_1_network_shape_redundancy_lines_that_merged.shp",
+            "base_graph.p",
+            "base_network.feather",
+        ]
         for _graph_file in _expected_graph_files:
+            _graph_file = _output_graph_dir / _graph_file
             assert _graph_file.is_file() and _graph_file.exists()
         for _analysis_output in _expected_analysis_output_files:
             assert _analysis_output.is_file() and _analysis_output.exists()
@@ -51,7 +52,10 @@ class TestIndirectAnalyses:
         _test_data_dir = test_data / test_name
         network_ini = _test_data_dir / "network.ini"
         analyses_ini = _test_data_dir / "analyses.ini"
-        _output_files_dir = _test_data_dir / "static" / "output_graph"
+        _output_files_dir = _test_data_dir / "output"
+        if _output_files_dir.is_dir():
+            shutil.rmtree(_output_files_dir)
+
         _expected_analysis_files = dict(
             single_link_redundancy=[
                 "single_link_redundancy_test.csv",
@@ -92,4 +96,4 @@ class TestIndirectAnalyses:
                 analysis_file = _output_files_dir / analysis / a_file
                 return analysis_file.is_file() and analysis_file.exists()
 
-            assert all(map(_verify_file, files))
+            assert all(list(map(_verify_file, files)))
