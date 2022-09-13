@@ -2,7 +2,12 @@
 name = "ra2ce"
 version = "0.1.0"
 description = "Risk Assessment  and Adaptation for Critical infrastructurE."
-authors = ["Your Name <you@example.com>"]
+authors = ["Margreet van Marle <Margreet.vanMarle@deltares.nl>"]
+maintainers = [
+  Frederique de Groen <frederique.degroen@deltares.nl>,
+  Kees van Ginkel <kees.vanginkel@deltares.nl>,
+  Carles Salvador Soriano Perez <carles.sorianoperez@deltares.nl>
+]
 packages = [{include = "ra2ce"}]
 license = "GNU General Public License v3"
 
