@@ -62,7 +62,7 @@ jobs:
         
       - name: Install Dependencies
         shell: pwsh
-        run:
+        run: |
           conda activate ra2ce_env
           poetry install
         if: steps.cache.outputs.cache-hit != 'true'
@@ -75,7 +75,7 @@ jobs:
 
       - name: Autoformat code if the check fails
         if: ${{ (matrix.os == 'ubuntu-20.04') && (matrix.python-version == 3.8) }}
-        shell: pwsh
+        shell:
         run: |
           poetry run isort .
           poetry run black .
