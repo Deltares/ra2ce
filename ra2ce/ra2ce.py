@@ -30,7 +30,7 @@ def initialize_with_network_ini(
     root_path: Union[Path, str], network_ini: Union[Path, str]
 ) -> Tuple[dict, dict]:
     config_network = load_config(root_path, config_path=network_ini)
-    initiate_root_logger(str(config_network["output"] / "RA2CE.log"))
+    initiate_root_logger(config_network["output"] / "RA2CE.log")
 
     # Try to find pre-existing files
     files = get_files(config_network)
