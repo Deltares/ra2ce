@@ -7,11 +7,15 @@ Created on 8-6-2022
 
 import shutil
 
+import pytest
+
 from ra2ce.ra2ce import main
 from tests import test_data
 
 
 class TestNetworkCreation:
+
+    @pytest.mark.skip(reason="Work in progress.")
     def test_1_network_shape(self):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data.
