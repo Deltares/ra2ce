@@ -1,5 +1,3 @@
-import pytest
-
 from ra2ce.ra2ce import main
 from tests import test_data
 
