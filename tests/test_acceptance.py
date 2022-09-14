@@ -12,10 +12,10 @@ class TestAcceptance:
         except ImportError:
             raise
 
-    @pytest.mark.skip(reason="Test data not available in the repository.")
-    def test_given_when(self):
-        _network = test_data / "network.ini"
-        _analysis = test_data / "analyses.ini"
+    def test_given_test_data_main_does_not_throw(self):
+        _test_dir = test_data / "acceptance_test_data"
+        _network = _test_dir / "network.ini"
+        _analysis = _test_dir / "analyses.ini"
 
         assert _network.is_file()
         assert _analysis.is_file()
