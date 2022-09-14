@@ -56,14 +56,12 @@ class TestNetworkCreation:
         main(network_ini=network_ini)
 
         # 3. Then verify expectations.
-        _expected_files = (
-            [
-                "base_graph.p",
-                "base_network.feather",
-                "simple_to_complex.json",
-                "complex_to_simple.json",
-            ],
-        )
+        _expected_files = [
+            "base_graph.p",
+            "base_network.feather",
+            "simple_to_complex.json",
+            "complex_to_simple.json",
+        ]
 
         def validate_file(filename: str):
             _graph_file = _output_graph_dir / filename
