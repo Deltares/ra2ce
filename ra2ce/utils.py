@@ -20,26 +20,33 @@ from .checks import available_checks, input_validation
 list_indirect_analyses, list_direct_analyses = available_checks()
 
 
-def get_root_path(net_ini: str, ana_ini: str) -> Path:
-    if net_ini is not None or ana_ini is not None:
-        if net_ini is not None and ana_ini is not None:
-            if (
-                Path(net_ini).resolve().parent.parent
-                == Path(ana_ini).resolve().parent.parent
-            ):
-                rootpath = Path(net_ini).resolve().parent.parent
-        elif net_ini is None and ana_ini is not None:
-            rootpath = Path(ana_ini).resolve().parent.parent
-        elif net_ini is not None and ana_ini is None:
-            rootpath = Path(net_ini).resolve().parent.parent
-    else:
+def get_root_path(net_ini: Path, ana_ini: Path) -> Path:
+    def get_parent(ini_path: Path) -> Path:
+        # Return the parent directory of the one containing the given file.
+        if not ini_path:
+            return None
+        return ini_path.parent.parent
+
+    _parents = list(
+        set(
+            [
+                _parent_dir
+                for _parent_dir in (map(get_parent, [net_ini, ana_ini]))
+                if _parent_dir
+            ]
+        )
+    )
+    if not _parents:
         logging.error("No network.ini or analyses.ini supplied. Program will close.")
         sys.exit()
-
-    if rootpath.is_dir():
-        return rootpath
+    if len(_parents) > 1:
+        logging.error("Root directory differs between network and analyses .ini files")
+        sys.exit()
+    _root_path = _parents[0]
+    if _root_path.is_dir():
+        return _root_path
     else:
-        logging.error(f"Path {rootpath} does not exist. Program will close.")
+        logging.error(f"Path {_root_path} does not exist. Program will close.")
         sys.exit()
 
 
@@ -128,7 +135,8 @@ def initiate_root_logger(filename: Path) -> None:
 
     # Create a file handler and set the required logging level.
     if not filename.is_file():
-        filename.parent.mkdir(parents=True)
+        if not filename.parent.is_dir():
+            filename.parent.mkdir(parents=True)
         filename.touch()
     fh = logging.FileHandler(filename=filename, mode="w")
     fh.setLevel(logging.INFO)
@@ -170,7 +178,6 @@ def configure_analyses(config: dict) -> dict:
 
 def load_config(root_path: Path, config_path: str, check: bool = True) -> dict:
     # Read the configurations in network.ini and add the root path to the configuration dictionary.
-    config_path = Path(config_path)
     if not config_path.is_file():
         config_path = root_path / config_path
     config = parse_config(root_path, path=config_path)
