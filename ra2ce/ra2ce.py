@@ -4,6 +4,7 @@ Main RA2CE script.
 """
 
 import logging
+import sys
 import warnings
 from pathlib import Path
 
@@ -14,7 +15,7 @@ warnings.filterwarnings(action="ignore", message="All-NaN slice encountered")
 warnings.filterwarnings(action="ignore", message="Value *not successfully written.*")
 
 
-from typing import Optional, Tuple, Union  # Python object types
+from typing import Any, List, Optional, Tuple, Union  # Python object types
 
 from .analyses.direct import analyses_direct
 from .analyses.indirect import analyses_indirect
@@ -144,11 +145,11 @@ def main(
     # Find the network.ini and analysis.ini files
     root_path = get_root_path(network_ini, analyses_ini)
 
-    if network_ini:
-        # If no network_ini is provided, config and files are both None
-        config_network, files = initialize_with_network_ini(root_path, network_ini)
-        graphs = network_handler(config_network, files)
-        graphs = hazard_handler(config_network, graphs, files)
+    # if network_ini:
+    #     # If no network_ini is provided, config and files are both None
+    #     config_network, files = initialize_with_network_ini(root_path, network_ini)
+    #     graphs = network_handler(config_network, files)
+    #     graphs = hazard_handler(config_network, graphs, files)
 
     if analyses_ini:
         config_analyses = load_config(root_path, config_path=analyses_ini)
@@ -167,3 +168,67 @@ def main(
         get_output_folders(config_analyses, "indirect")
 
         analysis_handler(config_network, config_analyses, graphs)
+
+class Ra2ceInput:
+    network: Optional[Path]
+    analysis: Optional[Path]
+    def __init__(self, network: Path, analysis: Path) -> None:
+        self.network = network
+        self.analysis = analysis
+    
+    def _get_root_dir(self, filename: Path) -> Path:
+        """
+        Gets the root directory for the directories containing both the network and the analysis ini files.
+
+        Returns:
+            Path: Path to the root directory.
+        """
+        if not filename:
+            return self.analysis.parent.parent
+        return filename.parent.parent
+
+    def validate_input(self) -> bool:
+        if not self.analysis or not self.analysis.is_file():
+            logging.error("No valid analyses.ini file provided. Program will close.")
+            return False
+
+        _root_network = self._get_root_dir(self.network)
+        _root_analysis = self._get_root_dir(self.analysis)
+
+        if _root_network and (_root_analysis != _root_network):
+            logging.error("Root directory differs between network and analyses .ini files")
+            return False
+
+        if not _root_analysis.is_dir():
+            logging.error(f"Path {_root_analysis} does not exist. Program will close.")
+            return False
+        return True
+
+class AnalysisIniConfiguration:
+
+    def __init__(self, inifile: Path) -> None:
+        pass
+
+class NetworkIniConfiguration:
+    files: List[Path] = None
+    config_network: Any = None
+    graphs: List[Any] = None
+
+    def __init__(self, inifile: Path) -> None:
+        if not inifile.is_file():
+            return
+        self.config_network, self.files = initialize_with_network_ini
+        _graphs = network_handler(self.config_network, self.files)
+        self.graphs = hazard_handler(self.config_network, _graphs, self.files)
+        
+
+class Ra2ce:
+    input_files: Ra2ceInput = None
+    def __init__(self, network: Path, analysis: Path) -> None:
+        self.input_files = Ra2ceInput(network, analysis)
+        if not self.input_files.validate_input():
+            sys.exit()
+        _network_ini_config = NetworkIniConfiguration(network)
+        
+        
+    
