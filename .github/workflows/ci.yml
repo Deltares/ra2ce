@@ -1,0 +1,56 @@
+name: ci
+
+on: [push]
+
+jobs:
+
+  CI:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.9]
+        os: [ubuntu-20.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: 3.9
+          # use the latest mamba version
+          mamba-version: "*"
+          channels: conda-forge,defaults
+          channel-priority: true
+          # always activate the ra2ce environment (name is specified in environment.yml)
+          environment-file: environment.yml
+          auto-activate-base: true
+          activate-environment: ra2ce_env
+        
+      - name: Install Dependencies
+        shell: pwsh
+        run: |
+          conda activate ra2ce_env
+          poetry install
+        if: steps.cache.outputs.cache-hit != 'true'
+
+      - name: Test with pytest
+        shell: pwsh
+        run: |
+          conda activate ra2ce_env
+          poetry run pytest --cov . --cov-report xml:coverage-reports/coverage-ra2ce.xml --junitxml=xunit-reports/xunit-result-ra2ce.xml
+
+      - name: Autoformat code if the check fails
+        if: ${{ (matrix.os == 'ubuntu-20.04') && (matrix.python-version == 3.9) }}
+        shell: pwsh
+        run: |
+          conda activate ra2ce_env
+          poetry run isort .
+          poetry run black .
+          git config --global user.name '${{ github.actor }}'
+          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git fetch
+          git checkout $GITHUB_HEAD_REF
+          git commit -am "autoformat: isort & black" && git push || true      
