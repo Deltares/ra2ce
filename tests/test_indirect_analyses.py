@@ -25,6 +25,8 @@ class TestIndirectAnalyses:
             files = _output_graph_dir.glob('*')
             for f in files:
                 f.unlink()
+        else:
+            _output_graph_dir.mkdir(parents=True, exist_ok=True)
         _output_files_dir = _test_dir / "output"
         if _output_files_dir.is_dir():
             shutil.rmtree(_output_files_dir)
