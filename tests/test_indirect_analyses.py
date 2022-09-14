@@ -2,11 +2,14 @@
 import pathlib
 import shutil
 
+import pytest
+
 from ra2ce.ra2ce import main
 from tests import test_data
 
 
 class TestIndirectAnalyses:
+    @pytest.mark.skip(reason="Work in progress.")
     def test_1_1_given_only_network_shape_redundancy(self):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data
