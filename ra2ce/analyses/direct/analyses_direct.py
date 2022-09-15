@@ -33,6 +33,11 @@ class DirectAnalyses: ### THIS SHOULD ONLY DO COORDINATION
         :return:
         """
         rd = RoadDamage() #Creates a Road Damage object, the methods of this object are used to do the damage calculation
+
+        #Todo: maybe the whole RoadDamage() class can be removed, because it is either:
+        # - a controler: the info should stay here
+        # - a handler: these should be methods of the datastructure
+
         gdf = self.graphs['base_network_hazard']
         if self.graphs['base_network_hazard'] is None:
             gdf = gpd.read_feather(self.config['files']['base_network_hazard'])
@@ -203,12 +208,11 @@ class RoadDamage:
             #return_period_gdf = event_hazard_network_gdf(road_gdf,val_cols) #Create datastructure for RP hazard data
             return_period_gdf = DamageNetworkReturnPeriods(road_gdf, val_cols)
 
-            damage_function = 'HZ' # can be 'HZ', 'OSD' or 'manual' #Todo: supply this information from a higher level
+            damage_function = 'OSD' # can be 'HZ', 'OSD' or 'manual' #Todo: supply this information from a higher level
 
             return_period_gdf.main(damage_function = damage_function)
+            result_gdf = return_period_gdf.gdf
 
-
-            result_gdf = return_period_gdf
         else:
             raise ValueError(""""The hazard calculation does not know 
             what to do if {} event_cols and {} rp_cols are provided""".format(
@@ -298,7 +302,7 @@ class rp_hazard_network_gdf_standalone():
         self.stats = set([x.split('_')[2] for x in val_cols])  # set of availabe hazard info per event
         self.gdf = road_gdf
 
-
+#DATA STRUCTURES
 class DamageNetwork():
     """A road network gdf with hazard data stored in it, and for which damages can be calculated"""
 
@@ -366,9 +370,77 @@ class DamageNetwork():
 
     def calculate_damage_OSdaMage(self,events):
         """ OSdaMage calculation not yet implemented"""
-        pass #needs to know for which columns
+        # Todo: Dirty fixes, these should be read from the code
+        hazard_prefix = 'F'
+        end = 'me'  # indicate that you want to use the mean
 
-    ### Utils handlers
+        #Load the OSdaMage functions
+        max_damages = lookup.max_damages()
+        interpolators = lookup.flood_curves()
+        interpolators.pop('HZ') # input: water depth (cm); output: damage (fraction road construction costs)
+
+        #Prepare the output files
+        df = self.df
+        df['tuple'] = [tuple([0] * 5)] * len(df['lanes'])
+
+        # CALCULATE MINIMUM AND MAXIMUM CONSTRUCTION COST PER ROAD TYPE
+        # pre-calculation of max damages per percentage (same for each C1-C6 category)
+        df['lower_damage'] = df['road_type'].copy().map(max_damages["Lower"])  # i.e. min construction costs
+        df['upper_damage'] = df['road_type'].copy().map(max_damages["Upper"])  # i.e. max construction costs
+
+        # create separate column for each percentile of construction costs (is faster then tuple)
+        for percentage in [0, 25, 50, 75, 100]:  # So this interpolates the min to the max damage
+            df['damage_{}'.format(percentage)] = (df['upper_damage'] * percentage / 100) + (
+                    df['lower_damage'] * (100 - percentage) / 100)
+
+        columns = []
+        for curve_name, interpolator in interpolators.items():
+            # print(curve_name, interpolator)
+            for event in events:
+                for percentage in [0, 25, 50, 75, 100]:
+                    df['dam_{}_{}_{}'.format(percentage, curve_name, event)] = round(
+                        df['damage_{}'.format(percentage)].astype(float)  # max damage (in euro/km)
+                        * interpolator(df['{}_{}_{}'.format(hazard_prefix, event, end)]).astype(
+                            float)  # damage curve: fraction f(depth-cm) #Todo check units
+                        * df['{}_{}_{}'.format(hazard_prefix, event, 'fr')].astype(
+                            float)  # inundated fraction of the segment
+                        * df['length'].astype(float), 2)
+
+                # This wraps it all in tuple again
+                df['dam_{}_{}'.format(curve_name, event)] = tuple(zip(df['dam_0_{}_{}'.format(curve_name, event)],
+                                                                      df['dam_25_{}_{}'.format(curve_name, event)],
+                                                                      df['dam_50_{}_{}'.format(curve_name, event)],
+                                                                      df['dam_75_{}_{}'.format(curve_name, event)],
+                                                                      df['dam_100_{}_{}'.format(curve_name,
+                                                                                                event)]))
+
+                # And throw way all intermediate results (that are not in the tuple)
+                df = df.drop(columns=['dam_{}_{}_{}'.format(percentage, curve_name, event) for percentage in
+                                      [0, 25, 50, 75, 100]])
+
+        df = df.drop(columns=[c for c in df.columns if c.startswith('damage_')])
+
+        # drop invalid combinations of damage curves and road types (C1-C4 for motorways; C5,C6 for other)
+        all_dam_cols = [c for c in df.columns if c.startswith('dam_')]
+        motorway_curves = [c for c in all_dam_cols if int(c.split('_')[1][-1]) <= 4]  # C1-C4
+        other_curves = [c for c in all_dam_cols if int(c.split('_')[1][-1]) > 4]  # C5, C6
+
+        for curve in other_curves:
+            df.loc[df['road_type'] == ('motorway' or 'trunk'), curve] = np.nan
+
+        for curve in motorway_curves:
+            df.loc[df['road_type'] != ('motorway' or 'trunk'), curve] = np.nan
+
+        # Todo: still need to check the units
+        logging.warning("Damage calculation units have not been checked!!! TODO")
+
+        # Add the new columns add the right location to the df
+        self.gdf[all_dam_cols] = df[all_dam_cols]
+        logging.info('calculate_damage_OSdaMage(): Damage calculation with the OSdaMage functions was succesfull')
+
+
+
+        ### Utils handlers
     def create_mask(self):
         """
         #Create a mask of only the dataframes with hazard data (to speed-up damage calculations)
@@ -423,8 +495,10 @@ class DamageNetworkReturnPeriods(DamageNetwork):
         if damage_function == 'HZ':
             self.calculate_damage_HZ(events=self.return_periods)
 
-        if damage_function == 'OSD'
+        if damage_function == 'OSD':
             self.calculate_damage_OSdaMage(events=self.return_periods)
+
+
 
 
 class event_hazard_network_gdf(): #DEPRECIATED, SEE THE ABOVE CLASSES STRUCTURE!!!
@@ -512,7 +586,7 @@ class event_hazard_network_gdf(): #DEPRECIATED, SEE THE ABOVE CLASSES STRUCTURE!
         self.gdf[dam_cols] = df[dam_cols]
         logging.info('calculate_damage_HZ(): Damage calculation with the Huizinga damage functions was succesfull')
 
-    def calculate_damage_OSdaMage(self, interpolators, max_damages):#TODO: DONE, THIS STILL NEEDS TO BE IMPLEMENTED
+    def calculate_damage_OSdaMage(self, interpolators, max_damages):#TODO: DONE, THIS HAS BEEN IMPLEMENTED
         """
         Calculate the road damage per event with OSdaMage functions
         #uses the mean inundation depth, and the inundated fraction
