@@ -34,7 +34,10 @@ def initialize_with_network_ini(
     initiate_root_logger(config_network["output"] / "RA2CE.log")
 
     # Try to find pre-existing files
-    files = get_files(config_network)
+    _output_graph = config_network["static"] / "output_graph"
+    # if not _output_graph.is_dir():
+    #     _output_graph.mkdir(parents=True)
+    files = get_files(_output_graph)
     return config_network, files
 
 
@@ -145,11 +148,11 @@ def main(
     # Find the network.ini and analysis.ini files
     root_path = get_root_path(network_ini, analyses_ini)
 
-    # if network_ini:
-    #     # If no network_ini is provided, config and files are both None
-    #     config_network, files = initialize_with_network_ini(root_path, network_ini)
-    #     graphs = network_handler(config_network, files)
-    #     graphs = hazard_handler(config_network, graphs, files)
+    if network_ini:
+        # If no network_ini is provided, config and files are both None
+        config_network, files = initialize_with_network_ini(root_path, network_ini)
+        graphs = network_handler(config_network, files)
+        graphs = hazard_handler(config_network, graphs, files)
 
     if analyses_ini:
         config_analyses = load_config(root_path, config_path=analyses_ini)
@@ -168,6 +171,7 @@ def main(
         get_output_folders(config_analyses, "indirect")
 
         analysis_handler(config_network, config_analyses, graphs)
+
 
 class Ra2ceInput:
     network: Optional[Path]

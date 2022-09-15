@@ -3,14 +3,16 @@
 Created on 26-7-2021
 """
 
+from typing import Tuple, Union
+
 # external modules
 import pyproj
 from osmnx.graph import graph_from_xml
-from typing import Union, Tuple
+
+from ..io import *
 
 # local modules
 from .networks_utils import *
-from ..io import *
 
 
 class Network:
@@ -27,7 +29,8 @@ class Network:
         # General
         self.config = config
         self.output_path = config['static'] / "output_graph"
-
+        if not self.output_path.is_dir():
+            self.output_path.mkdir(parents=True)
         # Network
         self.base_graph_crs = None  # Initiate variable
         self.base_network_crs = None  # Initiate variable
@@ -288,7 +291,7 @@ class Network:
         Returns:
             graph (NetworkX graph): the NetworkX graph with OD nodes
         """
-        from .origins_destinations import read_OD_files, create_OD_pairs, add_od_nodes
+        from .origins_destinations import add_od_nodes, create_OD_pairs, read_OD_files
 
         name = 'origin_destination_table'
 
