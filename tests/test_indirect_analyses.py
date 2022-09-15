@@ -9,7 +9,7 @@ from tests import test_data
 
 
 class TestIndirectAnalyses:
-    @pytest.mark.skip(reason="Work in progress.")
+    # @pytest.mark.skip(reason="Work in progress.")
     def test_1_1_given_only_network_shape_redundancy(self):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data
@@ -21,8 +21,12 @@ class TestIndirectAnalyses:
         assert analysis_ini.is_file()
         # Purge output dirs.
         _output_graph_dir = _test_dir / "static" / "output_graph"
-        if _output_graph_dir.is_dir():
-            shutil.rmtree(_output_graph_dir)
+        if _output_graph_dir.is_dir():  # The output_graph directory should be empty, but should exist
+            files = _output_graph_dir.glob('*')
+            for f in files:
+                f.unlink()
+        else:
+            _output_graph_dir.mkdir(parents=True, exist_ok=True)
         _output_files_dir = _test_dir / "output"
         if _output_files_dir.is_dir():
             shutil.rmtree(_output_files_dir)
