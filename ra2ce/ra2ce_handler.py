@@ -3,85 +3,16 @@ import logging
 import sys
 import warnings
 from pathlib import Path
+from typing import Optional
+
+from ra2ce.ra2ce_input import Ra2ceInput
+from ra2ce.utils import initiate_root_logger
 
 warnings.filterwarnings(
     action="ignore", message=".*initial implementation of Parquet.*"
 )
 warnings.filterwarnings(action="ignore", message="All-NaN slice encountered")
 warnings.filterwarnings(action="ignore", message="Value *not successfully written.*")
-
-
-from typing import Any, Optional, Protocol
-
-from ra2ce.analyses.direct import analyses_direct
-from ra2ce.analyses.indirect import analyses_indirect
-from ra2ce.configuration.analysis_ini_configuration import AnalysisIniConfigurationBase
-from ra2ce.ra2ce_input import Ra2ceInput
-
-# Local modules
-from ra2ce.utils import initiate_root_logger
-
-
-class AnalysisRunner(Protocol):
-    @staticmethod
-    def can_run(ra2ce_input: Ra2ceInput) -> bool:
-        pass
-
-    def run(self, analysis_config: AnalysisIniConfigurationBase) -> None:
-        pass
-
-
-class DirectAnalysisRunner(AnalysisRunner):
-    def __str__(self) -> str:
-        return "Direct Analysis Runner"
-
-    @staticmethod
-    def can_run(ra2ce_input: Ra2ceInput) -> bool:
-        _network_config = ra2ce_input.network_config.config_data
-        if not ("direct" in ra2ce_input.analysis_config.config_data):
-            return False
-        if not _network_config["hazard"]["hazard_map"]:
-            logging.error(
-                "Please define a hazardmap in your network.ini file. Unable to calculate direct damages."
-            )
-            return False
-        return True
-
-    def run(self, analysis_config: AnalysisIniConfigurationBase) -> None:
-        analyses_direct.DirectAnalyses(
-            analysis_config.config_data, analysis_config.graphs
-        ).execute()
-
-
-class IndirectAnalysisRunner(AnalysisRunner):
-    def __str__(self) -> str:
-        return "Indirect Analysis Runner"
-
-    @staticmethod
-    def can_run(ra2ce_input: Ra2ceInput) -> bool:
-        return super().can_run(ra2ce_input)
-
-    def run(self, analysis_config: AnalysisIniConfigurationBase) -> None:
-        analyses_indirect.IndirectAnalyses(
-            analysis_config.config_data, analysis_config.graphs
-        ).execute()
-
-
-class AnalysisRunnerFactory:
-    @staticmethod
-    def get_runner(ra2ce_input: Ra2ceInput) -> AnalysisRunner:
-        _available_runners = [DirectAnalysisRunner, IndirectAnalysisRunner]
-        _supported_runners = [
-            _runner for _runner in _available_runners if _runner.can_run(ra2ce_input)
-        ]
-        if not _supported_runners:
-            logging.error("No analysis runner found for the given configuration.")
-
-        if len(_supported_runners) > 1:
-            logging.warn(
-                f"More than one runner available, using {_supported_runners[0]}"
-            )
-        return _supported_runners[0]
 
 
 class Ra2ceHandler:
