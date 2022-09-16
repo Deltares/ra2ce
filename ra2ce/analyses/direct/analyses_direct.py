@@ -3,17 +3,18 @@
 Created on 26-7-2021
 """
 
-import geopandas as gpd
 import logging
+import os
+import sys
 import time
+
+import geopandas as gpd
 import numpy as np
 import pandas as pd
-import os, sys
 from numpy import object as np_object
 
-from .direct_utils import *
-from .direct_lookup import LookUp as lookup
-
+from ra2ce.analyses.direct.direct_lookup import LookUp as lookup
+from ra2ce.analyses.direct.direct_utils import *
 
 folder = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(folder)
