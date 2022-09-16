@@ -6,8 +6,6 @@ from click.testing import CliRunner
 from ra2ce import main
 from tests import test_data
 
-# from click_app import configure, cli
-
 test_dir = test_data / "acceptance_test_data"
 
 
@@ -41,17 +39,20 @@ class TestMainCli:
         self, arguments: List[str], expected_error: str
     ):
         _run_result = CliRunner().invoke(
-            main.cli,
+            main.run_analysis,
             arguments,
         )
         assert _run_result.exit_code == 1
         assert FileNotFoundError == type(_run_result.exc_info[1])
         assert expected_error == str(_run_result.exc_info[1])
 
-    def test_given_none_values_does_not_raise(self):
+    @pytest.mark.skip(reason="Still not clear which are the optional arguments.")
+    def test_given_none_network_config_does_not_raise(self):
+        _analysis_file = test_dir / "analyses.ini"
+        assert _analysis_file.is_file()
         _run_result = CliRunner().invoke(
-            main.cli,
-            [],
+            main.run_analysis,
+            ["--analyses_ini", str(_analysis_file)],
         )
         assert _run_result.exit_code == 0
         assert SystemExit == type(_run_result.exc_info[1])

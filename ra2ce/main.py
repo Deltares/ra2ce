@@ -5,7 +5,7 @@ from typing import Optional
 
 import click
 
-from ra2ce.ra2ce_handler import main
+from ra2ce.ra2ce_handler import Ra2ceHandler
 
 
 ### Below is the documentation for the commandline interface, see the CLICK-package.
@@ -14,7 +14,7 @@ from ra2ce.ra2ce_handler import main
 @click.option(
     "--analyses_ini", default=None, help="Full path to the analyses.ini file."
 )
-def cli(network_ini: str, analyses_ini: str):
+def run_analysis(network_ini: str, analyses_ini: str):
     def _as_path(ini_file: str) -> Optional[Path]:
         if not ini_file:
             return None
@@ -26,11 +26,13 @@ def cli(network_ini: str, analyses_ini: str):
 
     _network_ini = _as_path(network_ini)
     _analysis_ini = _as_path(analyses_ini)
-    main(_network_ini, _analysis_ini)
+    _handler = Ra2ceHandler(_network_ini, _analysis_ini)
+    _handler.configure()
+    _handler.run_analysis()
 
 
 if __name__ == "__main__":
     try:
-        cli()
+        run_analysis()
     except Exception as e_info:
         logging.error(str(e_info))
