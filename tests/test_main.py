@@ -6,10 +6,7 @@ from click.testing import CliRunner
 from ra2ce import main
 from tests import test_data
 
-# from click_app import configure, cli
-
 test_dir = test_data / "acceptance_test_data"
-
 
 class TestMainCli:
     @pytest.mark.parametrize(

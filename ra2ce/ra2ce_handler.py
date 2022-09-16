@@ -11,7 +11,7 @@ warnings.filterwarnings(action="ignore", message="All-NaN slice encountered")
 warnings.filterwarnings(action="ignore", message="Value *not successfully written.*")
 
 
-from typing import Any, List, Optional, Tuple, Union  # Python object types
+from typing import Any, Dict, List, Optional, Tuple, Union  # Python object types
 
 from ra2ce.analyses.direct import analyses_direct
 from ra2ce.analyses.indirect import analyses_indirect
@@ -20,21 +20,7 @@ from ra2ce.graph.networks import Network
 from ra2ce.io import read_graphs
 
 # Local modules
-from ra2ce.utils import get_files, get_root_path, initiate_root_logger, load_config
-
-
-def initialize_with_network_ini(
-    root_path: Union[Path, str], network_ini: Union[Path, str]
-) -> Tuple[dict, dict]:
-    config_network = load_config(root_path, config_path=network_ini)
-    initiate_root_logger(config_network["output"] / "RA2CE.log")
-
-    # Try to find pre-existing files
-    _output_graph = config_network["static"] / "output_graph"
-    # if not _output_graph.is_dir():
-    #     _output_graph.mkdir(parents=True)
-    files = get_files(_output_graph)
-    return config_network, files
+from ra2ce.utils import get_files, initiate_root_logger, load_config
 
 
 def network_handler(config: dict, files: dict) -> Optional[dict]:
@@ -57,14 +43,6 @@ def hazard_handler(config: dict, graphs: dict, files: dict) -> Optional[dict]:
         return graphs
     else:
         return None
-
-
-def get_output_folders(config: dict, analysis_type: str) -> None:
-    # Create the output folders
-    if analysis_type in config:
-        for a in config[analysis_type]:
-            output_path = config["output"] / a["analysis"]
-            output_path.mkdir(parents=True, exist_ok=True)
 
 
 def analysis_handler(network_config: dict, analysis_config: dict, graphs: dict) -> None:
@@ -97,144 +75,162 @@ def analysis_handler(network_config: dict, analysis_config: dict, graphs: dict) 
         )
 
 
-def get_config_params(config_in: dict, config_out: dict, files: dict) -> dict:
-    # The network_ini and analyses_ini are both called, copy the config values of the network ini
-    # into the analyses config.
-    config_out["files"] = files
-    if config_in["network"] is not None:
-        config_out["network"] = config_in["network"]
-    if config_in["origins_destinations"] is not None:
-        config_out["origins_destinations"] = config_in["origins_destinations"]
-    return config_out
-
-
-def get_network_config_params(root_path: Path, analysis_config: dict) -> dict:
-    try:
-        config_network = load_config(
-            root_path,
-            config_path=analysis_config["output"].joinpath("network.ini"),
-            check=False,
-        )
-        analysis_config.update(config_network)
-        analysis_config["origins_destinations"] = analysis_config["network"][
-            "origins_destinations"
-        ]
-        return analysis_config
-    except FileNotFoundError:
-        logging.error(
-            f"The configuration file 'network.ini' is not found at {analysis_config['output'].joinpath('network.ini')}."
-            f"Please make sure to name your network settings file 'network.ini'."
-        )
-        quit()
-
-
-def main(
-    network_ini: Optional[Path],
-    analyses_ini: Optional[Path],
-) -> None:
-    """Main function to start RA2CE. Runs RA2CE according to the settings in network_ini and analysis_ini.
-
-    Reads the network and analyses ini files and chooses the right functions.
-
-    Args:
-        network_ini (string): Path to initialization file with the configuration for network creation.
-        analyses_ini (string) : Path to initialization file with the configuration for the analyses.
-    """
-
-    # Find the network.ini and analysis.ini files
-    root_path = get_root_path(network_ini, analyses_ini)
-
-    if network_ini:
-        # If no network_ini is provided, config and files are both None
-        config_network, files = initialize_with_network_ini(root_path, network_ini)
-        graphs = network_handler(config_network, files)
-        graphs = hazard_handler(config_network, graphs, files)
-
-    if analyses_ini:
-        config_analyses = load_config(root_path, config_path=analyses_ini)
-
-        if network_ini:
-            # The logger is already made, just the analysis config needs to be updated with the network config parameters
-            config_analyses = get_config_params(config_network, config_analyses, files)
-
-        else:
-            # Only the analyses.ini is called, initiate logger and load all network/graph files.
-            initiate_root_logger(str(config_analyses["output"] / "RA2CE.log"))
-            graphs = read_graphs(config_analyses)
-            config_analyses = get_network_config_params(root_path, config_analyses)
-
-        get_output_folders(config_analyses, "direct")
-        get_output_folders(config_analyses, "indirect")
-
-        analysis_handler(config_network, config_analyses, graphs)
-
-
-from abc import ABC, abstractmethod
 from typing import Protocol
 
 
-class IniConfiguration(ABC):
+class IniConfiguration(Protocol):
     ini_file: Path
+    root_dir: Path
+    config_data: Dict = None
+
+    def configure(self) -> None:
+        raise NotImplementedError()
+
+    def is_valid(self) -> bool:
+        raise NotImplementedError()
+
+
+class NetworkIniConfiguration(IniConfiguration):
+    files: List[Path] = None
+    graphs: List[Any] = None
 
     def __init__(self, ini_file: Path) -> None:
         if not ini_file.is_file():
             raise FileNotFoundError(ini_file)
         self.ini_file = ini_file
-        self.initialize_configuration()
-
-    @abstractmethod
-    def initialize_configuration(self) -> None:
-        raise NotImplementedError("Implement in concrete classes.")
 
     @property
     def root_dir(self) -> Path:
         return self.ini_file.parent.parent
 
-
-class AnalysisIniConfiguration(IniConfiguration):
-    def __init__(self, inifile: Path) -> None:
-        pass
-
-
-class NetworkIniConfiguration(IniConfiguration):
-    files: List[Path] = None
-    config_network: Any = None
-    graphs: List[Any] = None
-
     def initialize_configuration(self) -> None:
-        self.config_network, self.files = initialize_with_network_ini(
-            self.root_dir, self.ini_file
+        self.config_data = load_config(self.root_dir, config_path=self.ini_file)
+        _output_graph = self.config_data["static"] / "output_graph"
+        self.files = get_files(_output_graph)
+        # Call Handlers (to rework)
+        _graphs = network_handler(self.config_data, self.files)
+        self.graphs = hazard_handler(self.config_data, _graphs, self.files)
+
+    def is_valid(self) -> bool:
+        return self.ini_file.is_file() and self.ini_file.suffix == ".ini"
+
+
+class AnalysisIniConfigurationBase(IniConfiguration):
+    ini_file: Path
+    root_dir: Path
+    config_data: Dict = None
+
+    @property
+    def root_dir(self) -> Path:
+        return self.ini_file.parent.parent
+
+    def initialize_output_dirs(self) -> None:
+        """
+        Initializes the required output directories for a Ra2ce analysis.
+        """
+
+        def _create_output_folders(analysis_type: str) -> None:
+            # Create the output folders
+            if not analysis_type in self.config_data.keys():
+                raise ValueError(f"Analysis type {analysis_type} not supported.")
+
+            for a in self.config_data[analysis_type]:
+                output_path = self.config_data["output"] / a["analysis"]
+                output_path.mkdir(parents=True, exist_ok=True)
+
+        _create_output_folders("direct")
+        _create_output_folders("indirect")
+
+
+class AnalysisWithNetworkConfiguration(AnalysisIniConfigurationBase):
+    def __init__(self, ini_file: Path, network_config: NetworkIniConfiguration) -> None:
+        if not ini_file.is_file():
+            raise FileNotFoundError(ini_file)
+        self.ini_file = ini_file
+        self._network_config = network_config
+
+    def configure(self) -> None:
+        self.config_data = load_config(self.root_dir, config_path=self.ini_file)
+        self.config_data["files"] = self._network_config.files
+        self.config_data["network"] = self._network_config.get("network", None)
+        self.config_data["origins_destinations"] = self._network_config.get(
+            "origins_destinations", None
         )
-        _graphs = network_handler(self.config_network, self.files)
-        self.graphs = hazard_handler(self.config_network, _graphs, self.files)
+        self.initialize_output_dirs()
+
+
+class AnalysisWithoutNetworkConfiguration(AnalysisIniConfigurationBase):
+    def __init__(self, ini_file: Path) -> None:
+        if not ini_file.is_file():
+            raise FileNotFoundError(ini_file)
+        self.ini_file = ini_file
+
+    def _get_network_config_params(self, analysis_config: dict) -> dict:
+        try:
+            config_network = load_config(
+                self.root_dir,
+                config_path=analysis_config["output"].joinpath("network.ini"),
+                check=False,
+            )
+            analysis_config.update(config_network)
+            analysis_config["origins_destinations"] = analysis_config["network"][
+                "origins_destinations"
+            ]
+            return analysis_config
+        except FileNotFoundError:
+            logging.error(
+                f"The configuration file 'network.ini' is not found at {analysis_config['output'].joinpath('network.ini')}."
+                f"Please make sure to name your network settings file 'network.ini'."
+            )
+            quit()
+
+    def configure(self) -> None:
+        _config_analyses = load_config(self.root_dir, config_path=self.ini_file)
+        self.graphs = read_graphs(_config_analyses)
+        self.config_data = self._get_network_config_params(_config_analyses)
+        self.initialize_output_dirs()
 
 
 class Ra2ceInput:
     network_config: NetworkIniConfiguration = None
-    analysis_config: AnalysisIniConfiguration = None
+    analysis_config: AnalysisIniConfigurationBase = None
 
     def __init__(self, network_ini: Path, analysis_ini: Path) -> None:
         self.network_config = NetworkIniConfiguration(network_ini)
-        self.analysis_config = AnalysisIniConfiguration(analysis_ini)
+        if self.network_config.is_valid():
+            self.analysis_config = AnalysisWithNetworkConfiguration(
+                analysis_ini, self.network_config
+            )
+        else:
+            self.analysis_config = AnalysisWithoutNetworkConfiguration(analysis_ini)
 
-    def _get_root_dir(self, filename: Path) -> Path:
+    def get_root_dir(self) -> Path:
+        if self.network_config.ini_file:
+            return self.network_config.root_dir
+        elif self.analysis_config.ini_file:
+            return self.analysis_config.root_dir
+        else:
+            raise ValueError()
+
+    def is_valid_input(self) -> bool:
         """
-        Gets the root directory for the directories containing both the network and the analysis ini files.
+        Validates whether the input is valid. This require that at least the network ini file is given.
 
         Returns:
-            Path: Path to the root directory.
+            bool: Input parameters are valid for a ra2ce run.
         """
-        if not filename:
-            return self.analysis_config.parent.parent
-        return filename.parent.parent
-
-    def validate_input(self) -> bool:
-        if not self.analysis_config or not self.analysis_config.is_file():
-            logging.error("No valid analyses.ini file provided. Program will close.")
+        if not self.network_config.is_valid():
+            logging.error(
+                f"No valid network configuration provided. File provided: {self.network_config.ini_file}."
+            )
             return False
 
-        _root_network = self._get_root_dir(self.network_config)
-        _root_analysis = self._get_root_dir(self.analysis_config)
+        # if not self.analysis_config or not self.analysis_config.is_file():
+        #     logging.error("No valid analyses.ini file provided. Program will close.")
+        #     return False
+
+        _root_network = self.network_config.root_dir
+        _root_analysis = self.analysis_config.root_dir
 
         if _root_network and (_root_analysis != _root_network):
             logging.error(
@@ -243,39 +239,39 @@ class Ra2ceInput:
             return False
 
         if not _root_analysis.is_dir():
-            logging.error(f"Path {_root_analysis} does not exist. Program will close.")
+            logging.error(f"Path {_root_analysis} does not exist.")
             return False
         return True
 
 
 class Ra2ceHandler:
-    def __init__(self, network: Path, analysis: Path) -> None:
-        _input_configs = Ra2ceInput(network, analysis)
-        if not _input_configs.validate_input():
+    def __init__(self, network: Optional[Path], analysis: Optional[Path]) -> None:
+        self.input_config = Ra2ceInput(network, analysis)
+        self._initialize_logger(self.input_config)
+
+    def _initialize_logger(self, input_config: Ra2ceInput) -> None:
+        """
+        Initializes the logger in the output directory, giving preference to the network output.
+
+        Args:
+            input_config (Ra2ceInput): Configuration containing ini data for both network and analysis.
+        """
+        _output_config = {}
+        if input_config.network_config.is_valid():
+            _output_config = input_config.network_config.config_data["output"]
+        elif input_config.analysis_config.is_valid():
+            _output_config = input_config.analysis_config.config_data["output"]
+        else:
+            raise ValueError()
+        initiate_root_logger(_output_config / "RA2CE.log")
+
+    def configure(self) -> None:
+        if not self.input_config.is_valid_input():
+            logging.error("Error validating input files. Ra2ce will close now.")
             sys.exit()
 
-        if network:
-            # If no network_ini is provided, config and files are both None
-            config_network, files = initialize_with_network_ini(root_path, network)
-            graphs = network_handler(config_network, files)
-            graphs = hazard_handler(config_network, graphs, files)
+        self.input_config.network_config.configure()
+        self.input_config.analysis_config.configure()
 
-        if analyses:
-            config_analyses = load_config(root_path, config_path=analyses)
-
-            if network:
-                # The logger is already made, just the analysis config needs to be updated with the network config parameters
-                config_analyses = get_config_params(
-                    config_network, config_analyses, files
-                )
-
-            else:
-                # Only the analyses.ini is called, initiate logger and load all network/graph files.
-                initiate_root_logger(str(config_analyses["output"] / "RA2CE.log"))
-                graphs = read_graphs(config_analyses)
-                config_analyses = get_network_config_params(root_path, config_analyses)
-
-            get_output_folders(config_analyses, "direct")
-            get_output_folders(config_analyses, "indirect")
-
-            analysis_handler(config_network, config_analyses, graphs)
+    def run_analysis(self) -> None:
+        analysis_handler()
