@@ -15,7 +15,7 @@ from shutil import copyfile
 import numpy as np
 
 # Local modules
-from .checks import available_checks, input_validation
+from ra2ce.checks import available_checks, input_validation
 
 list_indirect_analyses, list_direct_analyses = available_checks()
 
@@ -195,7 +195,7 @@ def load_config(root_path: Path, config_path: str, check: bool = True) -> dict:
         # Set the output paths in the configuration Dict for ease of saving to those folders.
         config["input"] = config["root_path"] / config["project"]["name"] / "input"
         config["static"] = config["root_path"] / config["project"]["name"] / "static"
-        config["output"] = config["root_path"] / config["project"]["name"] / "output"
+        # config["output"] = config["root_path"] / config["project"]["name"] / "output"
 
         if "hazard" in config:
             if "hazard_field_name" in config["hazard"]:
@@ -205,6 +205,15 @@ def load_config(root_path: Path, config_path: str, check: bool = True) -> dict:
                     ].split(",")
 
         # copy ini file for future references to output folder
+        def create_config_dir(dir_name: str):
+            _dir = config["root_path"] / config["project"]["name"] / dir_name
+            if not _dir.exists():
+                _dir.mkdir(parents=True)
+            config[dir_name] = _dir
+
+        # create_config_dir("static")
+        create_config_dir("output")
+
         try:
             copyfile(config_path, config["output"] / "{}.ini".format(config_path.stem))
         except FileNotFoundError as e:
@@ -212,7 +221,7 @@ def load_config(root_path: Path, config_path: str, check: bool = True) -> dict:
     return config
 
 
-def get_files(config: dict) -> dict:
+def get_files(parent_dir: Path) -> dict:
     """Checks if file of graph exist in network folder and adds filename to the files dict"""
     file_list = [
         "base_graph",
@@ -226,9 +235,9 @@ def get_files(config: dict) -> dict:
     for file in file_list:
         # base network is stored as feather object
         if file == "base_network" or file == "base_network_hazard":
-            file_path = config["static"] / "output_graph" / "{}.feather".format(file)
+            file_path = parent_dir / "{}.feather".format(file)
         else:
-            file_path = config["static"] / "output_graph" / "{}.p".format(file)
+            file_path = parent_dir / "{}.p".format(file)
 
         # check if file exists, else return None
         if file_path.is_file():
