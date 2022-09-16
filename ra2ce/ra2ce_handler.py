@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.ra2ce_input import Ra2ceInput
+from ra2ce.runners import AnalysisRunner, AnalysisRunnerFactory
 from ra2ce.utils import initiate_root_logger
 
 warnings.filterwarnings(

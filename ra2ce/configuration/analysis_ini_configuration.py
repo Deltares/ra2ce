@@ -5,7 +5,7 @@ from typing import Dict
 from ra2ce.configuration.ini_configuration import IniConfiguration
 from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
 from ra2ce.io import read_graphs
-from ra2ce.utils import get_files, initiate_root_logger, load_config
+from ra2ce.utils import load_config
 
 
 class AnalysisIniConfigurationBase(IniConfiguration):
