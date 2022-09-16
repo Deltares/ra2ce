@@ -25,6 +25,7 @@ class TestAcceptance:
     def test_ra2ce_package_can_be_imported(self):
         """Import test"""
         try:
+            import ra2ce.main
             from ra2ce.ra2ce_handler import main
         except ImportError:
             raise
