@@ -175,9 +175,12 @@ class AnalysisWithoutNetworkConfiguration(AnalysisIniConfigurationBase):
 
     def _update_with_network_configuration(self) -> dict:
         try:
+            _output_network_ini_file = self.config_data["output"] / "network.ini"
+            assert _output_network_ini_file.is_file()
+
             _config_network = load_config(
                 self.root_dir,
-                config_path=self.config_data["output"].joinpath("network.ini"),
+                config_path=_output_network_ini_file,
                 check=False,
             )
             self.config_data.update(_config_network)
@@ -198,12 +201,12 @@ class AnalysisWithoutNetworkConfiguration(AnalysisIniConfigurationBase):
 
 
 class Ra2ceInput:
-    network_config: NetworkIniConfiguration = None
+    network_config: Optional[NetworkIniConfiguration] = None
     analysis_config: AnalysisIniConfigurationBase = None
 
-    def __init__(self, network_ini: Path, analysis_ini: Path) -> None:
-        self.network_config = NetworkIniConfiguration(network_ini)
-        if self.network_config.is_valid():
+    def __init__(self, network_ini: Optional[Path], analysis_ini: Path) -> None:
+        if network_ini:
+            self.network_config = NetworkIniConfiguration(network_ini)
             self.analysis_config = AnalysisWithNetworkConfiguration(
                 analysis_ini, self.network_config
             )
@@ -220,34 +223,37 @@ class Ra2ceInput:
 
     def is_valid_input(self) -> bool:
         """
-        Validates whether the input is valid. This require that at least the network ini file is given.
+        Validates whether the input is valid. This require that at least the analysis ini file is given.
 
         Returns:
             bool: Input parameters are valid for a ra2ce run.
         """
-        if not self.network_config.is_valid():
-            logging.error(
-                f"No valid network configuration provided. File provided: {self.network_config.ini_file}."
-            )
-            return False
-
-        # if not self.analysis_config or not self.analysis_config.is_file():
-        #     logging.error("No valid analyses.ini file provided. Program will close.")
+        # if not self.network_config.is_valid():
+        #     logging.error(
+        #         f"No valid network configuration provided. File provided: {self.network_config.ini_file}."
+        #     )
         #     return False
 
-        _root_network = self.network_config.root_dir
-        _root_analysis = self.analysis_config.root_dir
+        if not self.analysis_config or not self.analysis_config.is_valid():
+            logging.error("No valid analyses.ini file provided. Program will close.")
+            return False
 
-        if _root_network and (_root_analysis != _root_network):
+        _root_analysis = self.analysis_config.root_dir
+        if not _root_analysis.is_dir():
+            logging.error(f"Path {_root_analysis} does not exist.")
+            return False
+
+        if self.network_config and (_root_analysis != self.network_config.root_dir):
             logging.error(
                 "Root directory differs between network and analyses .ini files"
             )
             return False
-
-        if not _root_analysis.is_dir():
-            logging.error(f"Path {_root_analysis} does not exist.")
-            return False
         return True
+
+    def configure(self) -> None:
+        if self.network_config:
+            self.network_config.configure()
+        self.analysis_config.configure()
 
 
 class Ra2ceHandler:
@@ -263,7 +269,7 @@ class Ra2ceHandler:
             input_config (Ra2ceInput): Configuration containing ini data for both network and analysis.
         """
         _output_config = {}
-        if input_config.network_config.is_valid():
+        if input_config.network_config and input_config.network_config.is_valid():
             _output_config = input_config.network_config.config_data["output"]
         elif input_config.analysis_config.is_valid():
             _output_config = input_config.analysis_config.config_data["output"]
@@ -275,9 +281,7 @@ class Ra2ceHandler:
         if not self.input_config.is_valid_input():
             logging.error("Error validating input files. Ra2ce will close now.")
             sys.exit()
-
-        self.input_config.network_config.configure()
-        self.input_config.analysis_config.configure()
+        self.input_config.configure()
 
     def run_analysis(self) -> None:
         _network_config = self.input_config.network_config.config_data

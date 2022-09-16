@@ -27,10 +27,14 @@ def run_from_cli(network_ini: Path, analysis_ini: Path) -> None:
 
 class TestAcceptance:
     def test_ra2ce_package_can_be_imported(self):
-        """Import test"""
+        """
+        Import test. Not really necessary given the current way we are testing (directly to the cli). But better safe than sorry.
+        """
+
         try:
+            import ra2ce
             import ra2ce.main
-            from ra2ce.ra2ce_handler import main
+            import ra2ce.ra2ce_handler
         except ImportError:
             raise
 
