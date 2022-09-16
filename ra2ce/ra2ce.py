@@ -6,7 +6,6 @@ Main RA2CE script.
 import logging
 import sys
 import warnings
-from msilib.schema import IniFile
 from pathlib import Path
 
 warnings.filterwarnings(
@@ -259,16 +258,16 @@ class Ra2ce:
         if not _input_configs.validate_input():
             sys.exit()
 
-        if network_ini:
+        if network:
             # If no network_ini is provided, config and files are both None
-            config_network, files = initialize_with_network_ini(root_path, network_ini)
+            config_network, files = initialize_with_network_ini(root_path, network)
             graphs = network_handler(config_network, files)
             graphs = hazard_handler(config_network, graphs, files)
 
-        if analyses_ini:
-            config_analyses = load_config(root_path, config_path=analyses_ini)
+        if analyses:
+            config_analyses = load_config(root_path, config_path=analyses)
 
-            if network_ini:
+            if network:
                 # The logger is already made, just the analysis config needs to be updated with the network config parameters
                 config_analyses = get_config_params(
                     config_network, config_analyses, files
