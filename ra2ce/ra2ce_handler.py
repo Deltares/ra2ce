@@ -98,13 +98,13 @@ class NetworkIniConfiguration(IniConfiguration):
         if not ini_file.is_file():
             raise FileNotFoundError(ini_file)
         self.ini_file = ini_file
+        self.config_data = load_config(self.root_dir, config_path=self.ini_file)
 
     @property
     def root_dir(self) -> Path:
         return self.ini_file.parent.parent
 
-    def initialize_configuration(self) -> None:
-        self.config_data = load_config(self.root_dir, config_path=self.ini_file)
+    def configure(self) -> None:
         _output_graph = self.config_data["static"] / "output_graph"
         self.files = get_files(_output_graph)
         # Call Handlers (to rework)
@@ -132,14 +132,16 @@ class AnalysisIniConfigurationBase(IniConfiguration):
         def _create_output_folders(analysis_type: str) -> None:
             # Create the output folders
             if not analysis_type in self.config_data.keys():
-                raise ValueError(f"Analysis type {analysis_type} not supported.")
-
+                return
             for a in self.config_data[analysis_type]:
                 output_path = self.config_data["output"] / a["analysis"]
                 output_path.mkdir(parents=True, exist_ok=True)
 
         _create_output_folders("direct")
         _create_output_folders("indirect")
+
+    def is_valid(self) -> bool:
+        return self.ini_file.is_file() and self.ini_file.suffix == ".ini"
 
 
 class AnalysisWithNetworkConfiguration(AnalysisIniConfigurationBase):
@@ -148,12 +150,14 @@ class AnalysisWithNetworkConfiguration(AnalysisIniConfigurationBase):
             raise FileNotFoundError(ini_file)
         self.ini_file = ini_file
         self._network_config = network_config
+        self.config_data = load_config(self.root_dir, config_path=self.ini_file)
 
     def configure(self) -> None:
-        self.config_data = load_config(self.root_dir, config_path=self.ini_file)
         self.config_data["files"] = self._network_config.files
-        self.config_data["network"] = self._network_config.get("network", None)
-        self.config_data["origins_destinations"] = self._network_config.get(
+        self.config_data["network"] = self._network_config.config_data.get(
+            "network", None
+        )
+        self.config_data["origins_destinations"] = self._network_config.config_data.get(
             "origins_destinations", None
         )
 
@@ -167,30 +171,29 @@ class AnalysisWithoutNetworkConfiguration(AnalysisIniConfigurationBase):
         if not ini_file.is_file():
             raise FileNotFoundError(ini_file)
         self.ini_file = ini_file
+        self.config_data = load_config(self.root_dir, config_path=self.ini_file)
 
-    def _get_network_config_params(self, analysis_config: dict) -> dict:
+    def _update_with_network_configuration(self) -> dict:
         try:
-            config_network = load_config(
+            _config_network = load_config(
                 self.root_dir,
-                config_path=analysis_config["output"].joinpath("network.ini"),
+                config_path=self.config_data["output"].joinpath("network.ini"),
                 check=False,
             )
-            analysis_config.update(config_network)
-            analysis_config["origins_destinations"] = analysis_config["network"][
+            self.config_data.update(_config_network)
+            self.config_data["origins_destinations"] = self.config_data["network"][
                 "origins_destinations"
             ]
-            return analysis_config
         except FileNotFoundError:
             logging.error(
-                f"The configuration file 'network.ini' is not found at {analysis_config['output'].joinpath('network.ini')}."
+                f"The configuration file 'network.ini' is not found at {self.config_data['output'].joinpath('network.ini')}."
                 f"Please make sure to name your network settings file 'network.ini'."
             )
             quit()
 
     def configure(self) -> None:
-        _config_analyses = load_config(self.root_dir, config_path=self.ini_file)
-        self.graphs = read_graphs(_config_analyses)
-        self.config_data = self._get_network_config_params(_config_analyses)
+        self.graphs = read_graphs(self.config_data)
+        self.config_data = self._update_with_network_configuration()
         self.initialize_output_dirs()
 
 
@@ -278,7 +281,7 @@ class Ra2ceHandler:
 
     def run_analysis(self) -> None:
         _network_config = self.input_config.network_config.config_data
-        _analysis_config = self.input_config.network_config.config_data
+        _analysis_config = self.input_config.analysis_config.config_data
         analysis_handler(
             _network_config, _analysis_config, self.input_config.network_config.graphs
         )
