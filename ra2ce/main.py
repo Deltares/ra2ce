@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import logging
 from pathlib import Path
 
 import click
@@ -14,11 +15,10 @@ from ra2ce.ra2ce import main
 )
 def cli(network_ini: str, analyses_ini: str):
     def _as_path(ini_file: str) -> Path:
-        if not ini_file:
-            raise ValueError(f"Not a valid path given: {ini_file}")
         _ini = Path(ini_file)
         if not _ini.is_file():
             raise FileNotFoundError(_ini)
+        return _ini
 
     _network_ini = _as_path(network_ini)
     _analysis_ini = _as_path(analyses_ini)
@@ -26,4 +26,7 @@ def cli(network_ini: str, analyses_ini: str):
 
 
 if __name__ == "__main__":
-    cli()
+    try:
+        cli()
+    except Exception as e_info:
+        logging.error(str(e_info))
