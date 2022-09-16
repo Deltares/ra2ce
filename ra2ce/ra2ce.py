@@ -6,6 +6,7 @@ Main RA2CE script.
 import logging
 import sys
 import warnings
+from msilib.schema import IniFile
 from pathlib import Path
 
 warnings.filterwarnings(
@@ -173,13 +174,54 @@ def main(
         analysis_handler(config_network, config_analyses, graphs)
 
 
+from abc import ABC, abstractmethod
+from typing import Protocol
+
+
+class IniConfiguration(ABC):
+    ini_file: Path
+
+    def __init__(self, ini_file: Path) -> None:
+        if not ini_file.is_file():
+            raise FileNotFoundError(ini_file)
+        self.ini_file = ini_file
+        self.initialize_configuration()
+
+    @abstractmethod
+    def initialize_configuration(self) -> None:
+        raise NotImplementedError("Implement in concrete classes.")
+
+    @property
+    def root_dir(self) -> Path:
+        return self.ini_file.parent.parent
+
+
+class AnalysisIniConfiguration(IniConfiguration):
+    def __init__(self, inifile: Path) -> None:
+        pass
+
+
+class NetworkIniConfiguration(IniConfiguration):
+    files: List[Path] = None
+    config_network: Any = None
+    graphs: List[Any] = None
+
+    def initialize_configuration(self) -> None:
+        self.config_network, self.files = initialize_with_network_ini(
+            self.root_dir, self.ini_file
+        )
+        _graphs = network_handler(self.config_network, self.files)
+        self.graphs = hazard_handler(self.config_network, _graphs, self.files)
+
+
 class Ra2ceInput:
-    network: Optional[Path]
-    analysis: Optional[Path]
-    def __init__(self, network: Path, analysis: Path) -> None:
-        self.network = network
-        self.analysis = analysis
-    
+    network_config: NetworkIniConfiguration = None
+    analysis_config: AnalysisIniConfiguration = None
+
+    def __init__(self, network_ini: Path, analysis_ini: Path) -> None:
+        self.network_config = NetworkIniConfiguration(network_ini)
+        self.analysis_config = AnalysisIniConfiguration(analysis_ini)
+
     def _get_root_dir(self, filename: Path) -> Path:
         """
         Gets the root directory for the directories containing both the network and the analysis ini files.
@@ -188,19 +230,21 @@ class Ra2ceInput:
             Path: Path to the root directory.
         """
         if not filename:
-            return self.analysis.parent.parent
+            return self.analysis_config.parent.parent
         return filename.parent.parent
 
     def validate_input(self) -> bool:
-        if not self.analysis or not self.analysis.is_file():
+        if not self.analysis_config or not self.analysis_config.is_file():
             logging.error("No valid analyses.ini file provided. Program will close.")
             return False
 
-        _root_network = self._get_root_dir(self.network)
-        _root_analysis = self._get_root_dir(self.analysis)
+        _root_network = self._get_root_dir(self.network_config)
+        _root_analysis = self._get_root_dir(self.analysis_config)
 
         if _root_network and (_root_analysis != _root_network):
-            logging.error("Root directory differs between network and analyses .ini files")
+            logging.error(
+                "Root directory differs between network and analyses .ini files"
+            )
             return False
 
         if not _root_analysis.is_dir():
@@ -208,31 +252,9 @@ class Ra2ceInput:
             return False
         return True
 
-class AnalysisIniConfiguration:
-
-    def __init__(self, inifile: Path) -> None:
-        pass
-
-class NetworkIniConfiguration:
-    files: List[Path] = None
-    config_network: Any = None
-    graphs: List[Any] = None
-
-    def __init__(self, inifile: Path) -> None:
-        if not inifile.is_file():
-            return
-        self.config_network, self.files = initialize_with_network_ini
-        _graphs = network_handler(self.config_network, self.files)
-        self.graphs = hazard_handler(self.config_network, _graphs, self.files)
-        
 
 class Ra2ce:
-    input_files: Ra2ceInput = None
     def __init__(self, network: Path, analysis: Path) -> None:
-        self.input_files = Ra2ceInput(network, analysis)
-        if not self.input_files.validate_input():
+        _input_configs = Ra2ceInput(network, analysis)
+        if not _input_configs.validate_input():
             sys.exit()
-        _network_ini_config = NetworkIniConfiguration(network)
-        
-        
-    
