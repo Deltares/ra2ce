@@ -11,7 +11,7 @@ warnings.filterwarnings(action="ignore", message="All-NaN slice encountered")
 warnings.filterwarnings(action="ignore", message="Value *not successfully written.*")
 
 
-from typing import Any, Dict, List, Optional, Tuple, Union  # Python object types
+from typing import Any, Dict, List, Optional
 
 from ra2ce.analyses.direct import analyses_direct
 from ra2ce.analyses.indirect import analyses_indirect
@@ -82,6 +82,7 @@ class IniConfiguration(Protocol):
     ini_file: Path
     root_dir: Path
     config_data: Dict = None
+    graphs: List[Any] = None
 
     def configure(self) -> None:
         raise NotImplementedError()
@@ -92,7 +93,6 @@ class IniConfiguration(Protocol):
 
 class NetworkIniConfiguration(IniConfiguration):
     files: List[Path] = None
-    graphs: List[Any] = None
 
     def __init__(self, ini_file: Path) -> None:
         if not ini_file.is_file():
@@ -156,6 +156,9 @@ class AnalysisWithNetworkConfiguration(AnalysisIniConfigurationBase):
         self.config_data["origins_destinations"] = self._network_config.get(
             "origins_destinations", None
         )
+
+        # When Network is present the graphs are retrieved from the already configured object.
+        self.graphs = self._network_config.graphs
         self.initialize_output_dirs()
 
 
@@ -274,4 +277,8 @@ class Ra2ceHandler:
         self.input_config.analysis_config.configure()
 
     def run_analysis(self) -> None:
-        analysis_handler()
+        _network_config = self.input_config.network_config.config_data
+        _analysis_config = self.input_config.network_config.config_data
+        analysis_handler(
+            _network_config, _analysis_config, self.input_config.network_config.graphs
+        )
