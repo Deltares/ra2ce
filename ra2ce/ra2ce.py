@@ -258,3 +258,29 @@ class Ra2ce:
         _input_configs = Ra2ceInput(network, analysis)
         if not _input_configs.validate_input():
             sys.exit()
+
+        if network_ini:
+            # If no network_ini is provided, config and files are both None
+            config_network, files = initialize_with_network_ini(root_path, network_ini)
+            graphs = network_handler(config_network, files)
+            graphs = hazard_handler(config_network, graphs, files)
+
+        if analyses_ini:
+            config_analyses = load_config(root_path, config_path=analyses_ini)
+
+            if network_ini:
+                # The logger is already made, just the analysis config needs to be updated with the network config parameters
+                config_analyses = get_config_params(
+                    config_network, config_analyses, files
+                )
+
+            else:
+                # Only the analyses.ini is called, initiate logger and load all network/graph files.
+                initiate_root_logger(str(config_analyses["output"] / "RA2CE.log"))
+                graphs = read_graphs(config_analyses)
+                config_analyses = get_network_config_params(root_path, config_analyses)
+
+            get_output_folders(config_analyses, "direct")
+            get_output_folders(config_analyses, "indirect")
+
+            analysis_handler(config_network, config_analyses, graphs)
