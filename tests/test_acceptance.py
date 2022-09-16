@@ -15,7 +15,9 @@ def run_from_cli(network_ini: Path, analysis_ini: Path) -> None:
         f"--analyses_ini {analysis_ini}",
     ]
     args_str = " ".join(args)
-    _return_code = subprocess.call(f"python {main.__file__} {args_str}")
+    _main_file = main.__file__
+    assert Path(_main_file).exists(), "No main file was found."
+    _return_code = subprocess.call(f"python {_main_file} {args_str}")
     assert _return_code == 0
 
 
