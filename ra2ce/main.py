@@ -4,7 +4,7 @@ from pathlib import Path
 
 import click
 
-from ra2ce.ra2ce import main
+from ra2ce.ra2ce_handler import main
 
 
 ### Below is the documentation for the commandline interface, see the CLICK-package.

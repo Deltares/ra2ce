@@ -1,4 +1,4 @@
-from ra2ce.ra2ce import Ra2ceInput
+from ra2ce.ra2ce_handler import Ra2ceInput
 from tests import test_data
 
 

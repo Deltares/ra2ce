@@ -15,7 +15,7 @@ def run_from_cli(network_ini: Path, analysis_ini: Path) -> None:
         f"--analyses_ini {analysis_ini}",
     ]
     args_str = " ".join(args)
-    _return_code = subprocess.call(f"poetry run python {main.__file__} {args_str}")
+    _return_code = subprocess.call(f"python {main.__file__} {args_str}")
     assert _return_code == 0
 
 
@@ -23,7 +23,7 @@ class TestAcceptance:
     def test_ra2ce_package_can_be_imported(self):
         """Import test"""
         try:
-            from ra2ce.ra2ce import main
+            from ra2ce.ra2ce_handler import main
         except ImportError:
             raise
 
