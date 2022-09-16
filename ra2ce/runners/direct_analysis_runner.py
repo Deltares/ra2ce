@@ -10,7 +10,6 @@ class DirectAnalysisRunner(AnalysisRunner):
     def __str__(self) -> str:
         return "Direct Analysis Runner"
 
-    @staticmethod
     def can_run(ra2ce_input: Ra2ceInput) -> bool:
         _network_config = ra2ce_input.network_config.config_data
         if not ("direct" in ra2ce_input.analysis_config.config_data):

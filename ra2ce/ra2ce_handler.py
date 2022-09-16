@@ -46,7 +46,7 @@ class Ra2ceHandler:
             sys.exit()
         _runner: AnalysisRunner = AnalysisRunnerFactory.get_runner(self.input_config)
         try:
-            _runner().run(self.input_config.analysis_config)
+            _runner.run(self.input_config.analysis_config)
         except BaseException as e:
             logging.exception(
                 f"RA2CE crashed. Check the logfile for the Traceback message: {e}"
