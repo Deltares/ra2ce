@@ -94,8 +94,7 @@ class TestIndirectAnalyses:
         network_ini = _test_data_dir / "network.ini"
         analyses_ini = _test_data_dir / "analyses.ini"
         _output_files_dir = _test_data_dir / "output"
-        if _output_files_dir.is_dir():
-            shutil.rmtree(_output_files_dir)
+        shutil.rmtree(_output_files_dir, ignore_errors=True)
 
         _expected_analysis_files = dict(
             single_link_redundancy=[
@@ -151,8 +150,7 @@ class TestNetworkCreation:
         assert network_ini.is_file()
 
         _output_graph_dir = _test_dir / "static" / "output_graph"
-        if _output_graph_dir.is_dir():
-            shutil.rmtree(_output_graph_dir)
+        shutil.rmtree(_output_graph_dir, ignore_errors=True)
 
         # 2. When run test.
         run_from_cli(network_ini, None)
@@ -179,8 +177,7 @@ class TestNetworkCreation:
         assert network_ini.is_file()
 
         _output_graph_dir = _test_dir / "static" / "output_graph"
-        if _output_graph_dir.is_dir():
-            shutil.rmtree(_output_graph_dir)
+        shutil.rmtree(_output_graph_dir, ignore_errors=True)
 
         # 2. When run test.
         run_from_cli(network_ini, None)
