@@ -3,25 +3,26 @@
 Created on 26-7-2021
 """
 
-import sys
-import logging
-import networkx as nx
-import osmnx
-import numpy as np
-from numpy import object as np_object
-import geopandas as gpd
-from shapely.geometry import LineString, MultiLineString
-import pandas as pd
-from tqdm import tqdm
-import time
 import copy
+import logging
 import pickle
+import sys
+import time
 from pathlib import Path
+
+import geopandas as gpd
+import networkx as nx
+import numpy as np
+import osmnx
+import pandas as pd
+from numpy import object as np_object
 from pyproj import CRS
+from shapely.geometry import LineString, MultiLineString
+from tqdm import tqdm
 
 # Local modules
-from ...graph.networks_utils import graph_to_shp
-from ...io import read_gpickle
+from ra2ce.graph.networks_utils import graph_to_shp
+from ra2ce.io import read_gpickle
 
 
 class IndirectAnalyses:

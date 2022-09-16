@@ -17,14 +17,14 @@ warnings.filterwarnings(action="ignore", message="Value *not successfully writte
 
 from typing import Any, List, Optional, Tuple, Union  # Python object types
 
-from .analyses.direct import analyses_direct
-from .analyses.indirect import analyses_indirect
-from .graph.hazard import Hazard
-from .graph.networks import Network
-from .io import read_graphs
+from ra2ce.analyses.direct import analyses_direct
+from ra2ce.analyses.indirect import analyses_indirect
+from ra2ce.graph.hazard import Hazard
+from ra2ce.graph.networks import Network
+from ra2ce.io import read_graphs
 
 # Local modules
-from .utils import get_files, get_root_path, initiate_root_logger, load_config
+from ra2ce.utils import get_files, get_root_path, initiate_root_logger, load_config
 
 
 def initialize_with_network_ini(
