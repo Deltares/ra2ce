@@ -207,11 +207,14 @@ class Ra2ceInput:
     def __init__(self, network_ini: Optional[Path], analysis_ini: Path) -> None:
         if network_ini:
             self.network_config = NetworkIniConfiguration(network_ini)
-            self.analysis_config = AnalysisWithNetworkConfiguration(
-                analysis_ini, self.network_config
-            )
-        else:
-            self.analysis_config = AnalysisWithoutNetworkConfiguration(analysis_ini)
+
+        if analysis_ini:
+            if self.network_config:
+                self.analysis_config = AnalysisWithNetworkConfiguration(
+                    analysis_ini, self.network_config
+                )
+            else:
+                self.analysis_config = AnalysisWithoutNetworkConfiguration(analysis_ini)
 
     def get_root_dir(self) -> Path:
         if self.network_config.ini_file:
@@ -253,7 +256,8 @@ class Ra2ceInput:
     def configure(self) -> None:
         if self.network_config:
             self.network_config.configure()
-        self.analysis_config.configure()
+        if self.analysis_config:
+            self.analysis_config.configure()
 
 
 class Ra2ceHandler:
@@ -278,12 +282,12 @@ class Ra2ceHandler:
         initiate_root_logger(_output_config / "RA2CE.log")
 
     def configure(self) -> None:
-        if not self.input_config.is_valid_input():
-            logging.error("Error validating input files. Ra2ce will close now.")
-            sys.exit()
         self.input_config.configure()
 
     def run_analysis(self) -> None:
+        if not self.input_config.is_valid_input():
+            logging.error("Error validating input files. Ra2ce will close now.")
+            sys.exit()
         _network_config = self.input_config.network_config.config_data
         _analysis_config = self.input_config.analysis_config.config_data
         analysis_handler(
