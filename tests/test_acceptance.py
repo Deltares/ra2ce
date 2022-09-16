@@ -15,7 +15,8 @@ def run_from_cli(network_ini: Path, analysis_ini: Path) -> None:
         f"--analyses_ini {analysis_ini}",
     ]
     args_str = " ".join(args)
-    subprocess.call(f"python {main.__file__} {args_str}")
+    _return_code = subprocess.call(f"poetry run python {main.__file__} {args_str}")
+    assert _return_code == 0
 
 
 class TestAcceptance:
