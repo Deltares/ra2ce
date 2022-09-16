@@ -27,10 +27,14 @@ def run_from_cli(network_ini: Path, analysis_ini: Path) -> None:
 
 class TestAcceptance:
     def test_ra2ce_package_can_be_imported(self):
-        """Import test"""
+        """
+        Import test. Not really necessary given the current way we are testing (directly to the cli). But better safe than sorry.
+        """
+
         try:
+            import ra2ce
             import ra2ce.main
-            from ra2ce.ra2ce_handler import main
+            import ra2ce.ra2ce_handler
         except ImportError:
             raise
 
@@ -94,8 +98,7 @@ class TestIndirectAnalyses:
         network_ini = _test_data_dir / "network.ini"
         analyses_ini = _test_data_dir / "analyses.ini"
         _output_files_dir = _test_data_dir / "output"
-        if _output_files_dir.is_dir():
-            shutil.rmtree(_output_files_dir)
+        shutil.rmtree(_output_files_dir, ignore_errors=True)
 
         _expected_analysis_files = dict(
             single_link_redundancy=[
@@ -151,8 +154,7 @@ class TestNetworkCreation:
         assert network_ini.is_file()
 
         _output_graph_dir = _test_dir / "static" / "output_graph"
-        if _output_graph_dir.is_dir():
-            shutil.rmtree(_output_graph_dir)
+        shutil.rmtree(_output_graph_dir, ignore_errors=True)
 
         # 2. When run test.
         run_from_cli(network_ini, None)
@@ -179,8 +181,7 @@ class TestNetworkCreation:
         assert network_ini.is_file()
 
         _output_graph_dir = _test_dir / "static" / "output_graph"
-        if _output_graph_dir.is_dir():
-            shutil.rmtree(_output_graph_dir)
+        shutil.rmtree(_output_graph_dir, ignore_errors=True)
 
         # 2. When run test.
         run_from_cli(network_ini, None)
