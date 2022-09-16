@@ -19,7 +19,7 @@ def run_from_cli(network_ini: Path, analysis_ini: Path) -> None:
     if network_ini:
         args.extend(["--network_ini", str(network_ini)])
     if analysis_ini:
-        args.extend(["--analysis_ini", str(analysis_ini)])
+        args.extend(["--analyses_ini", str(analysis_ini)])
 
     _return_code = subprocess.call(args)
     assert _return_code == 0
