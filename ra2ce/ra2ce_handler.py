@@ -248,7 +248,7 @@ class Ra2ceInput:
         return True
 
 
-class Ra2ce:
+class Ra2ceHandler:
     def __init__(self, network: Path, analysis: Path) -> None:
         _input_configs = Ra2ceInput(network, analysis)
         if not _input_configs.validate_input():

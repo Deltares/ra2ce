@@ -47,3 +47,11 @@ class TestMainCli:
         assert _run_result.exit_code == 1
         assert FileNotFoundError == type(_run_result.exc_info[1])
         assert expected_error == str(_run_result.exc_info[1])
+
+    def test_given_none_values_does_not_raise(self):
+        _run_result = CliRunner().invoke(
+            main.cli,
+            [],
+        )
+        assert _run_result.exit_code == 0
+        assert SystemExit == type(_run_result.exc_info[1])
