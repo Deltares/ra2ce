@@ -129,8 +129,8 @@ def get_network_config_params(root_path: Path, analysis_config: dict) -> dict:
 
 
 def main(
-    network_ini: Optional[Union[str, Path]] = None,
-    analyses_ini: Optional[Union[str, Path]] = None,
+    network_ini: Optional[Path],
+    analyses_ini: Optional[Path],
 ) -> None:
     """Main function to start RA2CE. Runs RA2CE according to the settings in network_ini and analysis_ini.
 
