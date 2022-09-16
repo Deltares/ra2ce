@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Main RA2CE script.
-"""
-
 import logging
 import sys
 import warnings
