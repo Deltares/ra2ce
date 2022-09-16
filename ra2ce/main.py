@@ -1,13 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on 6-8-2021
-
-@author: F.C. de Groen, Deltares
-
-This script (run.py) contains the command line interface configurations and is the starting point
-for working with RA2CE, if you want to use RA2CE via the command line.
-"""
-
 from pathlib import Path
 
 import click
