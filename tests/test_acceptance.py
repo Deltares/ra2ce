@@ -12,7 +12,7 @@ def run_from_cli(network_ini: Path, analysis_ini: Path) -> None:
 
     args = [
         f"--network_ini {network_ini}",
-        f"--analysis_ini {analysis_ini}",
+        f"--analyses_ini {analysis_ini}",
     ]
     args_str = " ".join(args)
     subprocess.call(f"python {main.__file__} {args_str}")
@@ -64,7 +64,7 @@ class TestIndirectAnalyses:
         ]
 
         # 2. When test:
-        run_from_cli(network_ini=network_ini, analyses_ini=analysis_ini)
+        run_from_cli(network_ini, analysis_ini)
 
         # 3. Then, validate expectations
         _expected_graph_files = [
@@ -120,7 +120,7 @@ class TestIndirectAnalyses:
             ],
         )
         # 2. When run test:
-        run_from_cli(network_ini=network_ini, analyses_ini=analyses_ini)
+        run_from_cli(network_ini, analyses_ini)
 
         # 3. Then validate expectations:
         for analysis, files in _expected_analysis_files.items():
@@ -147,7 +147,7 @@ class TestNetworkCreation:
             shutil.rmtree(_output_graph_dir)
 
         # 2. When run test.
-        run_from_cli(network_ini=network_ini)
+        run_from_cli(network_ini, None)
 
         # 3. Then verify expectations.
         _expected_files = [
@@ -175,7 +175,7 @@ class TestNetworkCreation:
             shutil.rmtree(_output_graph_dir)
 
         # 2. When run test.
-        run_from_cli(network_ini=network_ini)
+        run_from_cli(network_ini, None)
 
         # 3. Then verify expectations.
         _expected_files = [
