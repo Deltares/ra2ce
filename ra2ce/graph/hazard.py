@@ -3,7 +3,7 @@
 Created on 31-8-2022
 """
 import time
-from typing import Any, Union
+from typing import Union
 
 # external modules
 import pyproj
@@ -11,7 +11,8 @@ from rasterstats import point_query, zonal_stats
 
 # local modules
 from ra2ce.graph.networks_utils import *
-from ra2ce.io import *
+from ra2ce.io.generic import *
+from ra2ce.io.readers import GraphPickleReader
 
 
 class Hazard:
@@ -706,7 +707,7 @@ class Hazard:
 
             if file_path is not None or self.graphs[input_graph] is not None:
                 if self.graphs[input_graph] is None and input_graph != "base_network":
-                    self.graphs[input_graph] = read_gpickle(file_path)
+                    self.graphs[input_graph] = GraphPickleReader().read(file_path)
                 elif self.graphs[input_graph] is None and input_graph == "base_network":
                     self.graphs[input_graph] = gpd.read_feather(file_path)
 
@@ -758,7 +759,7 @@ class Hazard:
         else:
             try:
                 # Try to find the base graph hazard file
-                self.graphs["base_graph_hazard"] = read_gpickle(
+                self.graphs["base_graph_hazard"] = GraphPickleReader().read(
                     self.config["static"] / "output_graph" / "base_graph_hazard.p"
                 )
             except FileNotFoundError:
