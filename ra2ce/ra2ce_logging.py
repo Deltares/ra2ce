@@ -5,12 +5,10 @@ from typing import Optional
 
 class Ra2ceLogger:
     log_file: Optional[Path] = None
-    log_name: str = ""
 
     def __init__(self, logging_dir: Path, logger_name: str) -> None:
         if not logging_dir.is_dir():
             logging_dir.mkdir(parents=True)
-        self.log_name = logger_name
         self.log_file = logging_dir / f"{logger_name}.log"
         if not self.log_file.is_file():
             self.log_file.touch()
@@ -20,7 +18,13 @@ class Ra2ceLogger:
         self._set_formatter()
 
     def _get_logger(self) -> logging.Logger:
-        return logging.getLogger(self.log_name)
+        """
+        Gets the ra2ce logger which by default is the root logging.Logger.
+
+        Returns:
+            logging.Logger: Logger instance.
+        """
+        return logging.getLogger("")
 
     def _set_file_handler(self) -> None:
         # Create a root logger and set the minimum logging level.
