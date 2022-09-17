@@ -20,36 +20,6 @@ from ra2ce.checks import available_checks, input_validation
 list_indirect_analyses, list_direct_analyses = available_checks()
 
 
-def get_root_path(net_ini: Path, ana_ini: Path) -> Path:
-    def get_parent(ini_path: Path) -> Path:
-        # Return the parent directory of the one containing the given file.
-        if not ini_path:
-            return None
-        return ini_path.parent.parent
-
-    _parents = list(
-        set(
-            [
-                _parent_dir
-                for _parent_dir in (map(get_parent, [net_ini, ana_ini]))
-                if _parent_dir
-            ]
-        )
-    )
-    if not _parents:
-        logging.error("No network.ini or analyses.ini supplied. Program will close.")
-        sys.exit()
-    if len(_parents) > 1:
-        logging.error("Root directory differs between network and analyses .ini files")
-        sys.exit()
-    _root_path = _parents[0]
-    if _root_path.is_dir():
-        return _root_path
-    else:
-        logging.error(f"Path {_root_path} does not exist. Program will close.")
-        sys.exit()
-
-
 def parse_config(root: Path, path: Path = None, opt_cli=None) -> dict:
     """Ajusted from HydroMT
     source: https://github.com/Deltares/hydromt/blob/af4e5d858b0ac0883719ca59e522053053c21b82/hydromt/cli/cli_utils.py"""
