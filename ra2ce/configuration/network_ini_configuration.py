@@ -1,11 +1,11 @@
 import logging
 from pathlib import Path
-from typing import List, Optional
+from typing import Dict, Optional
 
 from ra2ce.configuration.ini_configuration import IniConfiguration
 from ra2ce.graph.hazard import Hazard
 from ra2ce.graph.networks import Network
-from ra2ce.utils import get_files, load_config
+from ra2ce.utils import load_config
 
 
 def network_handler(config: dict, files: dict) -> Optional[dict]:
@@ -31,7 +31,7 @@ def hazard_handler(config: dict, graphs: dict, files: dict) -> Optional[dict]:
 
 
 class NetworkIniConfiguration(IniConfiguration):
-    files: List[Path] = None
+    files: Dict[str, Path] = None
 
     def __init__(self, ini_file: Path) -> None:
         if not ini_file.is_file():
@@ -43,9 +43,32 @@ class NetworkIniConfiguration(IniConfiguration):
     def root_dir(self) -> Path:
         return self.ini_file.parent.parent
 
+    def _set_files(self) -> dict:
+        """Checks if file of graph exist in network folder and adds filename to the files dict"""
+        _parent_dir = self.config_data["static"] / "output_graph"
+        _filename_list = list(
+            map(
+                lambda x: _parent_dir / x,
+                [
+                    "base_graph.feather",
+                    "base_network.feather",
+                    "origins_destinations_graph.p",
+                    "base_graph_hazard.p",
+                    "origins_destinations_graph_hazard.p",
+                    "base_network_hazard.p",
+                ],
+            )
+        )
+
+        self.files = {}
+        for _file in _filename_list:
+            self.files[_file.stem] = None
+            if _file.is_file():
+                self.files[_file.stem] = _file
+                logging.info(f"Existing graph/network found: {_file}.")
+
     def configure(self) -> None:
-        _output_graph = self.config_data["static"] / "output_graph"
-        self.files = get_files(_output_graph)
+        self._set_files()
         # Call Handlers (to rework)
         _graphs = network_handler(self.config_data, self.files)
         self.graphs = hazard_handler(self.config_data, _graphs, self.files)
