@@ -11,7 +11,7 @@ from osmnx.graph import graph_from_xml
 
 # local modules
 from ra2ce.graph.networks_utils import *
-from ra2ce.io import *
+from ra2ce.io.readers import GraphPickleReader
 
 
 class Network:
@@ -575,7 +575,7 @@ class Network:
 
             elif self.config["network"]["source"] == "pickle":
                 logging.info("Start importing a network from pickle")
-                base_graph = read_gpickle(
+                base_graph = GraphPickleReader().read(
                     self.config["static"] / "output_graph" / "base_graph.p"
                 )
                 network_gdf = gpd.read_feather(
@@ -617,7 +617,7 @@ class Network:
             )
 
             if self.files["base_graph"] is not None:
-                base_graph = read_gpickle(self.files["base_graph"])
+                base_graph = GraphPickleReader().read(self.files["base_graph"])
             else:
                 base_graph = None
 
@@ -638,7 +638,7 @@ class Network:
         ):
             # reading the base graphs
             if (self.files["base_graph"] is not None) and (base_graph is not None):
-                base_graph = read_gpickle(self.files["base_graph"])
+                base_graph = GraphPickleReader().read(self.files["base_graph"])
             # adding OD nodes
             if self.origins[0].suffix == ".tif":
                 self.origins[0] = self.generate_origins_from_raster()

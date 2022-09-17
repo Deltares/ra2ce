@@ -14,44 +14,6 @@ import networkx as nx
 from ra2ce.graph.networks_utils import graph_to_shp
 
 
-def read_gpickle(path):
-    with open(path, "rb") as f:
-        g = pickle.load(f)
-    return g
-
-
-def read_graphs(config):
-    graphs = {}
-    for input_graph in ["base_graph", "origins_destinations_graph"]:
-        # Load graphs
-        filename = config["static"] / "output_graph" / f"{input_graph}.p"
-        if filename.is_file():
-            graphs[input_graph] = read_gpickle(filename)
-        else:
-            graphs[input_graph] = None
-
-        filename = config["static"] / "output_graph" / f"{input_graph}_hazard.p"
-        if filename.is_file():
-            graphs[input_graph + "_hazard"] = read_gpickle(filename)
-        else:
-            graphs[input_graph + "_hazard"] = None
-
-    # Load networks
-    filename = config["static"] / "output_graph" / f"base_network.feather"
-    if filename.is_file():
-        graphs["base_network"] = gpd.read_feather(filename)
-    else:
-        graphs["base_network"] = None
-
-    filename = config["static"] / "output_graph" / f"base_network_hazard.feather"
-    if filename.is_file():
-        graphs["base_network_hazard"] = gpd.read_feather(filename)
-    else:
-        graphs["base_network_hazard"] = None
-
-    return graphs
-
-
 def save_network(to_save, output_folder, name, types=["pickle"]):
     """Saves a geodataframe or graph to output_path
     TODO: add encoding to ini file to make output more flexible
