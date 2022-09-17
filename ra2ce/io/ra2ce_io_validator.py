@@ -9,9 +9,7 @@ Created on 26-7-2021
 import logging
 import sys
 from pathlib import Path
-from typing import Any, List, Protocol, Tuple
-
-import future
+from typing import Any, List, Protocol
 
 
 def available_checks():
@@ -107,23 +105,33 @@ def input_validation(config):
     }
 
     error = False
-    for key in config:
+    for config_header in config:
         # First check the headers.
-        if key in check_headers:
+        if config_header in check_headers:
             # Now check the parameters per configured item.
-            for item in config[key]:
-                if item in check_answer:
-                    if ("file" in check_answer[item]) and (
-                        config[key][item] is not None
+            for config_header_value in config[config_header]:
+                if config_header_value in check_answer:
+                    if ("file" in check_answer[config_header_value]) and (
+                        config[config_header][config_header_value] is not None
                     ):
                         # Check if the path is an absolute path or a file name that is placed in the right folder
-                        config[key][item], error = check_paths(
-                            config, key, item, input_dirs, error
+                        config[config_header][config_header_value], error = check_paths(
+                            config,
+                            config_header,
+                            config_header_value,
+                            input_dirs,
+                            error,
                         )
                         continue
 
-                    if item == "road_types" and (config[key][item] is not None):
-                        for road_type in config[key][item].replace(" ", "").split(","):
+                    if config_header_value == "road_types" and (
+                        config[config_header][config_header_value] is not None
+                    ):
+                        for road_type in (
+                            config[config_header][config_header_value]
+                            .replace(" ", "")
+                            .split(",")
+                        ):
                             if road_type not in check_answer["road_types"]:
                                 logging.error(
                                     "Wrong road type is configured ({}), has to be one or multiple of: {}".format(
@@ -133,10 +141,13 @@ def input_validation(config):
                                 error = True
                         continue
 
-                    if config[key][item] not in check_answer[item]:
+                    if (
+                        config[config_header][config_header_value]
+                        not in check_answer[config_header_value]
+                    ):
                         logging.error(
                             "Wrong input to property [ {} ], has to be one of: {}".format(
-                                item, check_answer[item]
+                                config_header_value, check_answer[config_header_value]
                             )
                         )
                         error = True
@@ -157,17 +168,17 @@ def input_validation(config):
     return config
 
 
-def check_paths(config, key, item, input_dirs, error):
+def check_paths(config, config_header, config_header_value, input_dirs, error):
     # Check if the path is an absolute path or a file name that is placed in the right folder
     list_paths = []
-    for p in config[key][item].split(","):
+    for p in config[config_header][config_header_value].split(","):
         p = Path(p)
         if not p.is_file():
             abs_path = (
                 config["root_path"]
                 / config["project"]["name"]
                 / "static"
-                / input_dirs[item]
+                / input_dirs[config_header_value]
                 / p
             )
             try:
@@ -177,19 +188,19 @@ def check_paths(config, key, item, input_dirs, error):
                     config["root_path"]
                     / config["project"]["name"]
                     / "input"
-                    / input_dirs[item]
+                    / input_dirs[config_header_value]
                     / p
                 )
 
             if not abs_path.is_file():
                 logging.error(
                     "Wrong input to property [ {} ], file does not exist: {}".format(
-                        item, abs_path
+                        config_header_value, abs_path
                     )
                 )
                 logging.error(
                     "If no file is needed, please insert value - None - for property - {} -".format(
-                        item
+                        config_header_value
                     )
                 )
                 error = True
@@ -245,22 +256,20 @@ class IniConfigurationPathValidator(Ra2ceIoValidator):
     def __init__(
         self,
         config_data: dict,
-        config_header: str,
-        config_key: str,
+        config_property_name: str,
+        path_values: str,
         input_dirs: List[Path],
     ) -> None:
         self.list_paths = []
-        self._config_data = config_data
-        self._config_header = config_header
-        self._config_key = config_key
+        self._config = config_data
+        self._config_property_name = config_property_name
+        self._path_values = path_values
         self._input_dirs = input_dirs
 
     def validate(self) -> ValidationReport:
         # Check if the path is an absolute path or a file name that is placed in the right folder
         _report = ValidationReport()
-        _path_values = self._config_data[self._config_header][self._config_key]
-
-        for path_value in _path_values.split(","):
+        for path_value in self._path_values.split(","):
             path_value = Path(path_value)
             if path_value.is_file():
                 self.list_paths.append(path_value)
@@ -272,7 +281,7 @@ class IniConfigurationPathValidator(Ra2ceIoValidator):
             abs_path = (
                 _project_name_dir
                 / "static"
-                / self._input_dirs[self._config_key]
+                / self._input_dirs[self._config_property_name]
                 / path_value
             )
             try:
@@ -281,19 +290,19 @@ class IniConfigurationPathValidator(Ra2ceIoValidator):
                 abs_path = (
                     _project_name_dir
                     / "input"
-                    / self._input_dirs[self._config_key]
+                    / self._input_dirs[self._config_property_name]
                     / path_value
                 )
 
             if not abs_path.is_file():
                 _report.error(
                     "Wrong input to property [ {} ], file does not exist: {}".format(
-                        self._config_key, abs_path
+                        self._config_property_name, abs_path
                     )
                 )
                 _report.error(
                     "If no file is needed, please insert value - None - for property - {} -".format(
-                        self._config_key
+                        self._config_property_name
                     )
                 )
             else:
@@ -302,26 +311,12 @@ class IniConfigurationPathValidator(Ra2ceIoValidator):
         return _report
 
 
-class NetworkIniConfigurationValidatorBase(Ra2ceIoValidator):
-    def __init__(self, network_data: dict) -> None:
-        self._config = network_data
+class IniConfigurationValidatorBase(Ra2ceIoValidator):
+    def __init__(self, config_data: dict) -> None:
+        self._config = config_data
 
-    def validate(self) -> ValidationReport:
-        """Check if input properties are correct and exist."""
+    def _validate_headers(self, required_headers: List[str]) -> ValidationReport:
         _report = ValidationReport()
-        if not self._config.get("network", None):
-            _report.error("Network properties not present in Network ini file.")
-            return _report
-
-        # check if properties exist in settings.ini file
-        _required_headers = [
-            "project",
-            "network",
-            "origins_destinations",
-            "hazard",
-            "cleanup",
-        ]
-        check_shp_input(self._config["network"])
 
         def _check_header(header: str) -> None:
             if not header in self._config.keys():
@@ -329,11 +324,10 @@ class NetworkIniConfigurationValidatorBase(Ra2ceIoValidator):
                     f"Property [ {header} ] is not configured. Add property [ {header} ] to the *.ini file. "
                 )
 
-        list(map(_check_header, _required_headers))
+        list(map(_check_header, required_headers))
         if not _report.is_valid():
             return _report
-        _required_headers.append("isolation")
-
+        required_headers.append("isolation")
         # check if properties have correct input
         # TODO: Decide whether also the non-used properties must be checked or those are not checked
         # TODO: Decide how to check for multiple analyses (analysis1, analysis2, etc)
@@ -378,7 +372,7 @@ class NetworkIniConfigurationValidatorBase(Ra2ceIoValidator):
             "locations": "network",
         }
 
-        for header in _required_headers:
+        for header in required_headers:
             # Now check the parameters per configured item.
             for key, value in self._config[header].items():
                 if not key in _expected_values.keys():
@@ -387,9 +381,10 @@ class NetworkIniConfigurationValidatorBase(Ra2ceIoValidator):
                 if ("file" in _expected_values[key]) and (value is not None):
                     # Check if the path is an absolute path or a file name that is placed in the right folder
                     _path_validator = IniConfigurationPathValidator(
-                        self._config, header, key, _input_dirs
+                        self._config, key, value, _input_dirs
                     )
                     _report.merge(_path_validator.validate())
+                    # TODO: Technically this is wrong, a validator should not be 'formatting' data.
                     self._config[header][key] = _path_validator.list_paths
                     continue
 
@@ -418,4 +413,45 @@ class NetworkIniConfigurationValidatorBase(Ra2ceIoValidator):
                 )
             )
 
+
+class NetworkIniConfigurationValidator(IniConfigurationValidatorBase):
+    def validate(self) -> ValidationReport:
+        """Check if input properties are correct and exist."""
+        _report = ValidationReport()
+        if not self._config.get("network", None):
+            _report.error("Network properties not present in Network ini file.")
+            return _report
+
+        # check if properties exist in settings.ini file
+        _required_headers = [
+            "project",
+            "network",
+            "origins_destinations",
+            "hazard",
+            "cleanup",
+        ]
+        check_shp_input(self._config["network"])
+        _report.merge(self._validate_headers(_required_headers))
         return _report
+
+
+class AnalysisIniConfigurationValidator(IniConfigurationValidatorBase):
+    def validate(self) -> ValidationReport:
+        _report = ValidationReport()
+        _required_headers = ["project"]
+        _required_headers.extend([a for a in self._config.keys() if "analysis" in a])
+
+        _report.merge(self._validate_headers(_required_headers))
+        return _report
+
+
+class IniConfigurationValidatorFactory:
+    @staticmethod
+    def get_validator(config_data: dict) -> IniConfigurationValidatorBase:
+        if "network" in config_data.keys():
+            return NetworkIniConfigurationValidator(config_data)
+        elif any([a for a in config_data.keys() if "analysis" in a]):
+            # ToDo: Verify whether this is correct
+            # or networkini should also check for the analysis headers.
+            return AnalysisIniConfigurationValidator(config_data)
+        raise NotImplementedError()
