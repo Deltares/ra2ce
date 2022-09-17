@@ -5,7 +5,7 @@ from typing import Dict, Optional
 from ra2ce.configuration.ini_configuration import IniConfiguration
 from ra2ce.graph.hazard import Hazard
 from ra2ce.graph.networks import Network
-from ra2ce.utils import load_config
+from ra2ce.io.readers import IniConfigurationReader
 
 
 def network_handler(config: dict, files: dict) -> Optional[dict]:
@@ -37,7 +37,9 @@ class NetworkIniConfiguration(IniConfiguration):
         if not ini_file.is_file():
             raise FileNotFoundError(ini_file)
         self.ini_file = ini_file
-        self.config_data = load_config(self.root_dir, config_path=self.ini_file)
+        self.config_data = IniConfigurationReader.import_configuration(
+            self.root_dir, config_path=self.ini_file
+        )
 
     @property
     def root_dir(self) -> Path:

@@ -6,8 +6,7 @@ import geopandas as gpd
 
 from ra2ce.configuration.ini_configuration import IniConfiguration
 from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
-from ra2ce.io.readers import GraphPickleReader
-from ra2ce.utils import load_config
+from ra2ce.io.readers import GraphPickleReader, IniConfigurationReader
 
 
 class AnalysisIniConfigurationBase(IniConfiguration):
@@ -45,7 +44,9 @@ class AnalysisWithNetworkConfiguration(AnalysisIniConfigurationBase):
             raise FileNotFoundError(ini_file)
         self.ini_file = ini_file
         self._network_config = network_config
-        self.config_data = load_config(self.root_dir, config_path=self.ini_file)
+        self.config_data = IniConfigurationReader().import_configuration(
+            self.root_dir, config_path=self.ini_file
+        )
 
     def configure(self) -> None:
         self.config_data["files"] = self._network_config.files
@@ -66,14 +67,16 @@ class AnalysisWithoutNetworkConfiguration(AnalysisIniConfigurationBase):
         if not ini_file.is_file():
             raise FileNotFoundError(ini_file)
         self.ini_file = ini_file
-        self.config_data = load_config(self.root_dir, config_path=self.ini_file)
+        self.config_data = IniConfigurationReader.import_configuration(
+            self.root_dir, config_path=self.ini_file
+        )
 
     def _update_with_network_configuration(self) -> dict:
         try:
             _output_network_ini_file = self.config_data["output"] / "network.ini"
             assert _output_network_ini_file.is_file()
 
-            _config_network = load_config(
+            _config_network = IniConfigurationReader.import_configuration(
                 self.root_dir,
                 config_path=_output_network_ini_file,
                 check=False,
