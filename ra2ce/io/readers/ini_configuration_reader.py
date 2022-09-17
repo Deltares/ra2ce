@@ -7,7 +7,7 @@ from shutil import copyfile
 
 import numpy as np
 
-from ra2ce.checks import available_checks, input_validation
+from ra2ce.io.ra2ce_io_validator import available_checks, input_validation
 
 list_indirect_analyses, list_direct_analyses = available_checks()
 
