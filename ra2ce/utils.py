@@ -190,30 +190,3 @@ def load_config(root_path: Path, config_path: str, check: bool = True) -> dict:
         except FileNotFoundError as e:
             logging.warning(e)
     return config
-
-
-def get_files(parent_dir: Path) -> dict:
-    """Checks if file of graph exist in network folder and adds filename to the files dict"""
-    file_list = [
-        "base_graph",
-        "base_network",
-        "origins_destinations_graph",
-        "base_graph_hazard",
-        "origins_destinations_graph_hazard",
-        "base_network_hazard",
-    ]
-    files = {}
-    for file in file_list:
-        # base network is stored as feather object
-        if file == "base_network" or file == "base_network_hazard":
-            file_path = parent_dir / "{}.feather".format(file)
-        else:
-            file_path = parent_dir / "{}.p".format(file)
-
-        # check if file exists, else return None
-        if file_path.is_file():
-            files[file] = file_path
-            logging.info(f"Existing graph/network found: {file_path}.")
-        else:
-            files[file] = None
-    return files
