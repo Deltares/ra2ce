@@ -67,7 +67,7 @@ class AnalysisWithoutNetworkConfiguration(AnalysisIniConfigurationBase):
         if not ini_file.is_file():
             raise FileNotFoundError(ini_file)
         self.ini_file = ini_file
-        self.config_data = IniConfigurationReader.import_configuration(
+        self.config_data = IniConfigurationReader().import_configuration(
             self.root_dir, config_path=self.ini_file
         )
 
@@ -76,7 +76,7 @@ class AnalysisWithoutNetworkConfiguration(AnalysisIniConfigurationBase):
             _output_network_ini_file = self.config_data["output"] / "network.ini"
             assert _output_network_ini_file.is_file()
 
-            _config_network = IniConfigurationReader.import_configuration(
+            _config_network = IniConfigurationReader().import_configuration(
                 self.root_dir,
                 config_path=_output_network_ini_file,
                 check=False,
