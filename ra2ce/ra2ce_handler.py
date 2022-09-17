@@ -6,8 +6,8 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.ra2ce_input import Ra2ceInput
+from ra2ce.ra2ce_logging import Ra2ceLogger
 from ra2ce.runners import AnalysisRunner, AnalysisRunnerFactory
-from ra2ce.utils import initiate_root_logger
 
 warnings.filterwarnings(
     action="ignore", message=".*initial implementation of Parquet.*"
@@ -17,11 +17,13 @@ warnings.filterwarnings(action="ignore", message="Value *not successfully writte
 
 
 class Ra2ceHandler:
+    _logger: logging.Logger = None
+
     def __init__(self, network: Optional[Path], analysis: Optional[Path]) -> None:
         self.input_config = Ra2ceInput(network, analysis)
-        self._initialize_logger(self.input_config)
+        self._logger = self._initialize_logger(self.input_config)
 
-    def _initialize_logger(self, input_config: Ra2ceInput) -> None:
+    def _initialize_logger(self, input_config: Ra2ceInput) -> logging.Logger:
         """
         Initializes the logger in the output directory, giving preference to the network output.
 
@@ -35,7 +37,8 @@ class Ra2ceHandler:
             _output_config = input_config.analysis_config.config_data["output"]
         else:
             raise ValueError()
-        initiate_root_logger(_output_config / "RA2CE.log")
+        _logger = Ra2ceLogger(logging_dir=_output_config, logger_name="RA2CE")
+        return _logger._get_logger()
 
     def configure(self) -> None:
         self.input_config.configure()

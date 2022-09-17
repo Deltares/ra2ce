@@ -129,35 +129,6 @@ def configread(
     return cfdict
 
 
-def initiate_root_logger(filename: Path) -> None:
-    # Create a root logger and set the minimum logging level.
-    logging.getLogger("").setLevel(logging.INFO)
-
-    # Create a file handler and set the required logging level.
-    if not filename.is_file():
-        if not filename.parent.is_dir():
-            filename.parent.mkdir(parents=True)
-        filename.touch()
-    fh = logging.FileHandler(filename=filename, mode="w")
-    fh.setLevel(logging.INFO)
-
-    # Create a console handler and set the required logging level.
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)  # Can be also set to WARNING
-
-    # Create a formatter and add to the file and console handlers.
-    formatter = logging.Formatter(
-        fmt="%(asctime)s - [%(filename)s:%(lineno)d] - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%Y-%m-%d %I:%M:%S %p",
-    )
-    fh.setFormatter(formatter)
-    ch.setFormatter(formatter)
-
-    # Add the file and console handlers to the root logger.
-    logging.getLogger("").addHandler(fh)
-    logging.getLogger("").addHandler(ch)
-
-
 def configure_analyses(config: dict) -> dict:
     analyses_names = [a for a in config.keys() if "analysis" in a]
     for a in analyses_names:
