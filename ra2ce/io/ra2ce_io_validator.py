@@ -2,24 +2,19 @@ import logging
 from pathlib import Path
 from typing import Any, List, Protocol
 
-
-def available_checks():
-    """List of available analyses in RA2CE."""
-    list_indirect_analyses = [
-        "single_link_redundancy",
-        "multi_link_redundancy",
-        "optimal_route_origin_destination",
-        "multi_link_origin_destination",
-        "optimal_route_origin_closest_destination",
-        "multi_link_origin_closest_destination",
-        "losses",
-        "single_link_losses",
-        "multi_link_losses",
-        "multi_link_isolated_locations",
-    ]
-    list_direct_analyses = ["direct", "effectiveness_measures"]
-
-    return list_indirect_analyses, list_direct_analyses
+IndirectAnalysisNameList: List[str] = [
+    "single_link_redundancy",
+    "multi_link_redundancy",
+    "optimal_route_origin_destination",
+    "multi_link_origin_destination",
+    "optimal_route_origin_closest_destination",
+    "multi_link_origin_closest_destination",
+    "losses",
+    "single_link_losses",
+    "multi_link_losses",
+    "multi_link_isolated_locations",
+]
+DirectAnalysisNameList = ["direct", "effectiveness_measures"]
 
 
 class ValidationReport:
@@ -133,8 +128,6 @@ class IniConfigurationValidatorBase(Ra2ceIoValidator):
         # check if properties have correct input
         # TODO: Decide whether also the non-used properties must be checked or those are not checked
         # TODO: Decide how to check for multiple analyses (analysis1, analysis2, etc)
-        _indirect_analysis_list, _direct_analysis_list = available_checks()
-        _list_analysis = _indirect_analysis_list + _direct_analysis_list
         _expected_values = {
             "source": ["OSM PBF", "OSM download", "shapefile", "pickle"],
             "polygon": ["file", None],
@@ -160,7 +153,7 @@ class IniConfigurationValidatorBase(Ra2ceIoValidator):
             "destinations": ["file", None],
             "save_shp": [True, False, None],
             "save_csv": [True, False, None],
-            "analysis": _list_analysis,
+            "analysis": IndirectAnalysisNameList + DirectAnalysisNameList,
             "hazard_map": ["file", None],
             "aggregate_wl": ["max", "min", "mean", None],
             "weighing": ["distance", "time", None],

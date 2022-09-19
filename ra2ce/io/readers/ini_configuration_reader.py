@@ -9,8 +9,9 @@ from shutil import copyfile
 import numpy as np
 
 from ra2ce.io.ra2ce_io_validator import (
+    DirectAnalysisNameList,
+    IndirectAnalysisNameList,
     IniConfigurationValidatorFactory,
-    available_checks,
 )
 
 
@@ -21,15 +22,14 @@ class IniConfigurationReader:
     """
 
     def configure_analyses(self, config: dict) -> dict:
-        _list_indirect_analyses, _list_direct_analyses = available_checks()
         analyses_names = [a for a in config.keys() if "analysis" in a]
         for a in analyses_names:
-            if any(t in config[a]["analysis"] for t in _list_direct_analyses):
+            if any(t in config[a]["analysis"] for t in DirectAnalysisNameList):
                 if "direct" in config:
                     (config["direct"]).append(config[a])
                 else:
                     config["direct"] = [config[a]]
-            elif any(t in config[a]["analysis"] for t in _list_indirect_analyses):
+            elif any(t in config[a]["analysis"] for t in IndirectAnalysisNameList):
                 if "indirect" in config:
                     (config["indirect"]).append(config[a])
                 else:
