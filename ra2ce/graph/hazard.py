@@ -9,7 +9,6 @@ import pyproj
 from rasterstats import point_query, zonal_stats
 
 from ra2ce.graph.networks_utils import *
-from ra2ce.io.generic import *
 from ra2ce.io.readers import GraphPickleReader
 from ra2ce.io.writers.network_exporter_factory import NetworkExporterFactory
 
