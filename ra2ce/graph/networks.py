@@ -13,6 +13,7 @@ from osmnx.graph import graph_from_xml
 from ra2ce.graph.networks_utils import *
 from ra2ce.io.readers import GraphPickleReader
 from ra2ce.io.writers import JsonExporter
+from ra2ce.io.writers.network_exporter_factory import NetworkExporterFactory
 
 
 class Network:
@@ -543,6 +544,18 @@ class Network:
             )
             return G
 
+    def _export_network_files(
+        self, network: Any, graph_name: str, types_to_export: List[str]
+    ):
+        _exporter = NetworkExporterFactory()
+        _exporter.export(
+            network=network,
+            basename=graph_name,
+            output_dir=self.config["static"] / "output_graph",
+            export_types=types_to_export,
+        )
+        self.files[graph_name] = _exporter.get_pickle_path()
+
     def create(self) -> dict:
         """Handler function with the logic to call the right functions to create a network.
 
@@ -602,18 +615,8 @@ class Network:
                 base_graph = self.get_avg_speed(base_graph)
 
             # Save the graph and geodataframe
-            self.files["base_graph"] = save_network(
-                base_graph,
-                self.config["static"] / "output_graph",
-                "base_graph",
-                types=to_save,
-            )
-            self.files["base_network"] = save_network(
-                network_gdf,
-                self.config["static"] / "output_graph",
-                "base_network",
-                types=to_save,
-            )
+            self._export_network_files(base_graph, "base_graph", to_save)
+            self._export_network_files(base_graph, "base_network", to_save)
         else:
 
             logging.info(
@@ -648,12 +651,7 @@ class Network:
             if self.origins[0].suffix == ".tif":
                 self.origins[0] = self.generate_origins_from_raster()
             od_graph = self.add_od_nodes(base_graph, self.base_graph_crs)
-            self.files["origins_destinations_graph"] = save_network(
-                od_graph,
-                self.config["static"] / "output_graph",
-                "origins_destinations_graph",
-                types=to_save,
-            )
+            self._export_network_files(od_graph, "origins_destinations_graph", to_save)
 
         return {
             "base_graph": base_graph,
