@@ -5,6 +5,7 @@ Created on 31-8-2022
 import time
 from typing import List, Union
 
+import numpy as np
 import pyproj
 from rasterstats import point_query, zonal_stats
 
