@@ -5,7 +5,6 @@ Created on 26-7-2021
 
 import copy
 import logging
-import pickle
 import sys
 import time
 from pathlib import Path
@@ -15,13 +14,13 @@ import networkx as nx
 import numpy as np
 import osmnx
 import pandas as pd
-from numpy import object as np_object
 from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
 
 # Local modules
 from ra2ce.graph.networks_utils import graph_to_shp
+from ra2ce.io.readers.graph_pickle_reader import GraphPickleReader
 
 
 class IndirectAnalyses:
@@ -1733,7 +1732,7 @@ def save_gdf(gdf, save_path):
     gdf.crs = "epsg:4326"  # TODO: decide if this should be variable with e.g. an output_crs configured
 
     for col in gdf.columns:
-        if gdf[col].dtype == np_object and col != gdf.geometry.name:
+        if gdf[col].dtype == object and col != gdf.geometry.name:
             gdf[col] = gdf[col].astype(str)
 
     gdf.to_file(save_path, driver="ESRI Shapefile", encoding="utf-8")
