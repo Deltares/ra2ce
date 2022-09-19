@@ -1,7 +1,10 @@
 name: ci
 
-on: [push]
-
+on:
+  pull_request:
+    branches:
+      - master
+      - develop
 jobs:
 
   CI:
@@ -27,7 +30,7 @@ jobs:
           environment-file: environment.yml
           auto-activate-base: true
           activate-environment: ra2ce_env
-        
+
       - name: Install Dependencies
         shell: pwsh
         run: |
