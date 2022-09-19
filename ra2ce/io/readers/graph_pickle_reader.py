@@ -10,8 +10,8 @@ class GraphPickleReader:
         if not pickle_path:
             raise ValueError(f"No pickle path was provided")
         if not pickle_path.is_file():
-            logging.warning(f"No pickle found at path {pickle_path}")
-            return None
+            logging.error(f"No pickle found at path {pickle_path}")
+            raise ValueError()
 
         with open(pickle_path, "rb") as f:
             _read_graph = pickle.load(f)
