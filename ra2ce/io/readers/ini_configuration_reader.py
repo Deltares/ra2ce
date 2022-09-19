@@ -1,109 +1,95 @@
 import codecs
 import logging
-import sys
 from ast import literal_eval
 from configparser import ConfigParser
 from pathlib import Path
 from shutil import copyfile
+from typing import List, Optional, Protocol
 
 import numpy as np
 
+from ra2ce.configuration.analysis_ini_configuration import (
+    AnalysisIniConfigurationBase,
+    AnalysisWithNetworkConfiguration,
+    AnalysisWithoutNetworkConfiguration,
+)
+from ra2ce.configuration.ini_configuration import IniConfigurationProtocol
+from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
 from ra2ce.io.ra2ce_io_validator import (
     DirectAnalysisNameList,
     IndirectAnalysisNameList,
-    IniConfigurationValidatorFactory,
+    _expected_values,
 )
 
 
-class IniConfigurationReader:
+class IniConfigurationReaderProtocol(Protocol):
+    def read(self, ini_file: Path) -> IniConfigurationProtocol:
+        pass
+
+
+class IniConfigurationReaderBase(IniConfigurationReaderProtocol):
     """
     Generic Ini Configuration Reader.
     Eventually it will be split into smaller readers for each type of IniConfiguration.
     """
 
-    def configure_analyses(self, config: dict) -> dict:
-        analyses_names = [a for a in config.keys() if "analysis" in a]
-        for a in analyses_names:
-            if any(t in config[a]["analysis"] for t in DirectAnalysisNameList):
-                if "direct" in config:
-                    (config["direct"]).append(config[a])
-                else:
-                    config["direct"] = [config[a]]
-            elif any(t in config[a]["analysis"] for t in IndirectAnalysisNameList):
-                if "indirect" in config:
-                    (config["indirect"]).append(config[a])
-                else:
-                    config["indirect"] = [config[a]]
-            del config[a]
+    def read(self, ini_file: Path) -> IniConfigurationProtocol:
+        raise NotImplementedError("Implement in concrete classes.")
 
-        return config
-
-    def import_configuration(
-        self, root_path: Path, config_path: str, check: bool = True
-    ) -> dict:
+    def _import_configuration(self, root_path: Path, config_path: Path) -> dict:
         # Read the configurations in network.ini and add the root path to the configuration dictionary.
         if not config_path.is_file():
             config_path = root_path / config_path
-        config = self.parse_config(root_path, path=config_path)
-        config["project"]["name"] = config_path.parts[-2]
-        config["root_path"] = root_path
+        _config = self._parse_config(path=config_path)
+        _config["project"]["name"] = config_path.parts[-2]
+        _config["root_path"] = root_path
 
-        if check:
-            # Validate the configuration input.
-            _report = IniConfigurationValidatorFactory.get_validator(config).validate()
-            if not _report.is_valid():
-                sys.exit()
-            # config = input_validation(config)
+        # Validate the configuration input.
+        # _report = IniConfigurationValidatorFactory.get_validator(_config).validate()
+        # if not _report.is_valid():
+        #     sys.exit()
+        # config = input_validation(config)
+        if "hazard" in _config:
+            # TODO: This might only be relevant for NETWORK reader.
+            if "hazard_field_name" in _config["hazard"]:
+                if _config["hazard"]["hazard_field_name"]:
+                    _config["hazard"]["hazard_field_name"] = _config["hazard"][
+                        "hazard_field_name"
+                    ].split(",")
 
-            if config_path.stem == "analyses":
-                # Create a dictionary with direct and indirect analyses separately.
-                config = self.configure_analyses(config)
+        # Set the output paths in the configuration Dict for ease of saving to those folders.
+        _config["input"] = _config["root_path"] / _config["project"]["name"] / "input"
+        _config["static"] = _config["root_path"] / _config["project"]["name"] / "static"
+        # config["output"] = config["root_path"] / config["project"]["name"] / "output"
+        return _config
 
-            # Set the output paths in the configuration Dict for ease of saving to those folders.
-            config["input"] = config["root_path"] / config["project"]["name"] / "input"
-            config["static"] = (
-                config["root_path"] / config["project"]["name"] / "static"
-            )
-            # config["output"] = config["root_path"] / config["project"]["name"] / "output"
+    def _copy_output_files(self, from_path: Path, config_data: dict) -> None:
+        self._create_config_dir("output", config_data)
+        # self._create_config_dir("static")
+        try:
+            copyfile(from_path, config_data["output"] / "{}.ini".format(from_path.stem))
+        except FileNotFoundError as e:
+            logging.warning(e)
 
-            if "hazard" in config:
-                if "hazard_field_name" in config["hazard"]:
-                    if config["hazard"]["hazard_field_name"]:
-                        config["hazard"]["hazard_field_name"] = config["hazard"][
-                            "hazard_field_name"
-                        ].split(",")
+    def _create_config_dir(self, dir_name: str, config_data: dict):
+        _dir = config_data["root_path"] / config_data["project"]["name"] / dir_name
+        if not _dir.exists():
+            _dir.mkdir(parents=True)
+        config_data[dir_name] = _dir
 
-            # copy ini file for future references to output folder
-            def create_config_dir(dir_name: str):
-                _dir = config["root_path"] / config["project"]["name"] / dir_name
-                if not _dir.exists():
-                    _dir.mkdir(parents=True)
-                config[dir_name] = _dir
-
-            # create_config_dir("static")
-            create_config_dir("output")
-
-            try:
-                copyfile(
-                    config_path, config["output"] / "{}.ini".format(config_path.stem)
-                )
-            except FileNotFoundError as e:
-                logging.warning(e)
-        return config
-
-    def parse_config(self, root: Path, path: Path = None, opt_cli=None) -> dict:
+    def _parse_config(self, path: Path = None, opt_cli=None) -> dict:
         """Ajusted from HydroMT
         source: https://github.com/Deltares/hydromt/blob/af4e5d858b0ac0883719ca59e522053053c21b82/hydromt/cli/cli_utils.py"""
         opt = {}
         if path is not None and path.is_file():
-            opt = self.configread(
-                path, root, abs_path=False
+            opt = self._configread(
+                path, abs_path=False
             )  # Set from True to False 29-7-2021 by Frederique
             # make sure paths in config section are not abs paths
             if (
                 "setup_config" in opt
             ):  # BELOW IS CURRENTLY NOT USED IN RA2CE BUT COULD BE GOOD FOR FUTURE LINKAGE WITH HYDROMT
-                opt["setup_config"].update(self.configread(path).get("config", {}))
+                opt["setup_config"].update(self._configread(path).get("config", {}))
         elif path is not None:
             raise IOError(f"Config not found at {path}")
         if (
@@ -122,10 +108,9 @@ class IniConfigurationReader:
                     opt[section].update({option: value})
         return opt
 
-    def configread(
+    def _configread(
         self,
         config_fn,
-        root,
         encoding="utf-8",
         cf=None,
         defaults=dict(),
@@ -168,3 +153,94 @@ class IniConfigurationReader:
             cfdict = cfdict["dummy"]
 
         return cfdict
+
+    def _parse_path_list(self, path_list: str) -> List[Path]:
+        _list_paths = []
+        for path_value in path_list.split(","):
+            path_value = Path(path_value)
+            if path_value.is_file():
+                _list_paths.append(path_value)
+                continue
+
+            _project_name_dir = (
+                self._config["root_path"] / self._config["project"]["name"]
+            )
+            abs_path = (
+                _project_name_dir
+                / "static"
+                / self._input_dirs[self._config_property_name]
+                / path_value
+            )
+            try:
+                assert abs_path.is_file()
+            except AssertionError:
+                abs_path = (
+                    _project_name_dir
+                    / "input"
+                    / self._input_dirs[self._config_property_name]
+                    / path_value
+                )
+
+            self.list_paths.append(abs_path)
+
+    def _update_path_values(self, config_data: dict) -> None:
+        """
+        TODO: Work in progress, for now it's happening during validation, which should not be the case.
+
+        Args:
+            config_data (dict): _description_
+        """
+        for key, value_dict in config_data.items():
+            if not (dict == type(value_dict)):
+                continue
+            for k, v in value_dict.items():
+                if "file" in _expected_values[key]:
+                    self._config[key][k] = self._parse_path_list(v)
+
+
+class AnalysisIniConfigurationReader(IniConfigurationReaderBase):
+    def __init__(self, network_data: Optional[IniConfigurationProtocol]) -> None:
+        self._network_data = network_data
+
+    def _configure_analyses(self, config: dict) -> dict:
+        def set_analysis_values(config_type: str):
+            if config_type in config:
+                (config[config_type]).append(config[a])
+            else:
+                config[config_type] = [config[a]]
+
+        analyses_names = [a for a in config.keys() if "analysis" in a]
+        for a in analyses_names:
+            if any(t in config[a]["analysis"] for t in DirectAnalysisNameList):
+                set_analysis_values("direct")
+            elif any(t in config[a]["analysis"] for t in IndirectAnalysisNameList):
+                set_analysis_values("indirect")
+            del config[a]
+
+        return config
+
+    def read(self, ini_file: Path) -> AnalysisIniConfigurationBase:
+        if not ini_file:
+            return None
+        _root_path = AnalysisIniConfigurationBase.get_network_root_dir(ini_file)
+        _config_data = self._import_configuration(_root_path, ini_file)
+        # self._update_path_values(_config_data)
+        _config_data = self._configure_analyses(_config_data)
+        self._copy_output_files(ini_file, _config_data)
+        if self._network_data:
+            return AnalysisWithNetworkConfiguration(
+                ini_file, _config_data, self._network_data
+            )
+        else:
+            return AnalysisWithoutNetworkConfiguration(ini_file, _config_data)
+
+
+class NetworkIniConfigurationReader(IniConfigurationReaderBase):
+    def read(self, ini_file: Path) -> IniConfigurationProtocol:
+        if not ini_file:
+            return None
+        _root_dir = NetworkIniConfiguration.get_network_root_dir(ini_file)
+        _config_data = self._import_configuration(_root_dir, ini_file)
+        # self._update_path_values(_config_data)
+        self._copy_output_files(ini_file, _config_data)
+        return NetworkIniConfiguration(ini_file, _config_data)

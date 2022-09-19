@@ -4,19 +4,25 @@ from typing import Dict
 
 import geopandas as gpd
 
-from ra2ce.configuration.ini_configuration import IniConfiguration
+from ra2ce.configuration.ini_configuration import IniConfigurationProtocol
 from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
-from ra2ce.io.readers import GraphPickleReader, IniConfigurationReader
+from ra2ce.io.readers import GraphPickleReader
+
+# from ra2ce.io.readers.ini_configuration_reader import IniConfigurationReader
 
 
-class AnalysisIniConfigurationBase(IniConfiguration):
+class AnalysisIniConfigurationBase(IniConfigurationProtocol):
     ini_file: Path
     root_dir: Path
     config_data: Dict = None
 
+    @staticmethod
+    def get_network_root_dir(filepath: Path) -> Path:
+        return filepath.parent.parent
+
     @property
     def root_dir(self) -> Path:
-        return self.ini_file.parent.parent
+        return self.get_network_root_dir(self.ini_file)
 
     def initialize_output_dirs(self) -> None:
         """
@@ -39,14 +45,17 @@ class AnalysisIniConfigurationBase(IniConfiguration):
 
 
 class AnalysisWithNetworkConfiguration(AnalysisIniConfigurationBase):
-    def __init__(self, ini_file: Path, network_config: NetworkIniConfiguration) -> None:
+    def __init__(
+        self,
+        ini_file: Path,
+        analysis_data: dict,
+        network_config: NetworkIniConfiguration,
+    ) -> None:
         if not ini_file.is_file():
             raise FileNotFoundError(ini_file)
         self.ini_file = ini_file
         self._network_config = network_config
-        self.config_data = IniConfigurationReader().import_configuration(
-            self.root_dir, config_path=self.ini_file
-        )
+        self.config_data = analysis_data
 
     def configure(self) -> None:
         self.config_data["files"] = self._network_config.files
@@ -63,34 +72,33 @@ class AnalysisWithNetworkConfiguration(AnalysisIniConfigurationBase):
 
 
 class AnalysisWithoutNetworkConfiguration(AnalysisIniConfigurationBase):
-    def __init__(self, ini_file: Path) -> None:
+    def __init__(self, ini_file: Path, config_data: dict) -> None:
         if not ini_file.is_file():
             raise FileNotFoundError(ini_file)
         self.ini_file = ini_file
-        self.config_data = IniConfigurationReader().import_configuration(
-            self.root_dir, config_path=self.ini_file
-        )
+        self.config_data = config_data
 
     def _update_with_network_configuration(self) -> dict:
-        try:
-            _output_network_ini_file = self.config_data["output"] / "network.ini"
-            assert _output_network_ini_file.is_file()
+        pass
+        # try:
+        #     _output_network_ini_file = self.config_data["output"] / "network.ini"
+        #     assert _output_network_ini_file.is_file()
 
-            _config_network = IniConfigurationReader().import_configuration(
-                self.root_dir,
-                config_path=_output_network_ini_file,
-                check=False,
-            )
-            self.config_data.update(_config_network)
-            self.config_data["origins_destinations"] = self.config_data["network"][
-                "origins_destinations"
-            ]
-        except FileNotFoundError:
-            logging.error(
-                f"The configuration file 'network.ini' is not found at {self.config_data['output'].joinpath('network.ini')}."
-                f"Please make sure to name your network settings file 'network.ini'."
-            )
-            quit()
+        #     _config_network = IniConfigurationReader().import_configuration(
+        #         self.root_dir,
+        #         config_path=_output_network_ini_file,
+        #         check=False,
+        #     )
+        #     self.config_data.update(_config_network)
+        #     self.config_data["origins_destinations"] = self.config_data["network"][
+        #         "origins_destinations"
+        #     ]
+        # except FileNotFoundError:
+        #     logging.error(
+        #         f"The configuration file 'network.ini' is not found at {self.config_data['output'].joinpath('network.ini')}."
+        #         f"Please make sure to name your network settings file 'network.ini'."
+        #     )
+        #     quit()
 
     def _read_graphs_from_config(self) -> dict:
         _graphs = {}

@@ -17,7 +17,38 @@ IndirectAnalysisNameList: List[str] = [
     "multi_link_isolated_locations",
 ]
 DirectAnalysisNameList: List[str] = ["direct", "effectiveness_measures"]
-
+_expected_values = {
+            "source": ["OSM PBF", "OSM download", "shapefile", "pickle"],
+            "polygon": ["file", None],
+            "directed": [True, False, None],
+            "network_type": ["walk", "bike", "drive", "drive_service", "all", None],
+            "road_types": [
+                "motorway",
+                "motorway_link",
+                "trunk",
+                "trunk_link",
+                "primary",
+                "primary_link",
+                "secondary",
+                "secondary_link",
+                "tertiary",
+                "tertiary_link",
+                "unclassified",
+                "residential",
+                "road",
+                None,
+            ],
+            "origins": ["file", None],
+            "destinations": ["file", None],
+            "save_shp": [True, False, None],
+            "save_csv": [True, False, None],
+            "analysis": IndirectAnalysisNameList + DirectAnalysisNameList,
+            "hazard_map": ["file", None],
+            "aggregate_wl": ["max", "min", "mean", None],
+            "weighing": ["distance", "time", None],
+            "save_traffic": [True, False, None],
+            "locations": ["file", None],
+        }
 
 class IniConfigurationPathValidator(Ra2ceIoValidator):
     def __init__(
@@ -101,38 +132,6 @@ class IniConfigurationValidatorBase(Ra2ceIoValidator):
         # check if properties have correct input
         # TODO: Decide whether also the non-used properties must be checked or those are not checked
         # TODO: Decide how to check for multiple analyses (analysis1, analysis2, etc)
-        _expected_values = {
-            "source": ["OSM PBF", "OSM download", "shapefile", "pickle"],
-            "polygon": ["file", None],
-            "directed": [True, False, None],
-            "network_type": ["walk", "bike", "drive", "drive_service", "all", None],
-            "road_types": [
-                "motorway",
-                "motorway_link",
-                "trunk",
-                "trunk_link",
-                "primary",
-                "primary_link",
-                "secondary",
-                "secondary_link",
-                "tertiary",
-                "tertiary_link",
-                "unclassified",
-                "residential",
-                "road",
-                None,
-            ],
-            "origins": ["file", None],
-            "destinations": ["file", None],
-            "save_shp": [True, False, None],
-            "save_csv": [True, False, None],
-            "analysis": IndirectAnalysisNameList + DirectAnalysisNameList,
-            "hazard_map": ["file", None],
-            "aggregate_wl": ["max", "min", "mean", None],
-            "weighing": ["distance", "time", None],
-            "save_traffic": [True, False, None],
-            "locations": ["file", None],
-        }
         _input_dirs = {
             "polygon": "network",
             "hazard_map": "hazard",
