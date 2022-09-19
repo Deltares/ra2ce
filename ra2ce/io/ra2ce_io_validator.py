@@ -14,7 +14,7 @@ IndirectAnalysisNameList: List[str] = [
     "multi_link_losses",
     "multi_link_isolated_locations",
 ]
-DirectAnalysisNameList = ["direct", "effectiveness_measures"]
+DirectAnalysisNameList: List[str] = ["direct", "effectiveness_measures"]
 
 
 class ValidationReport:
