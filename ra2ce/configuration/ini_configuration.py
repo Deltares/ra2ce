@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Protocol
 
 
-class IniConfiguration(Protocol):
+class IniConfigurationProtocol(Protocol):
     ini_file: Path
     root_dir: Path
     config_data: Dict = None

@@ -2,10 +2,9 @@ import logging
 from pathlib import Path
 from typing import Dict, Optional
 
-from ra2ce.configuration.ini_configuration import IniConfiguration
+from ra2ce.configuration.ini_configuration import IniConfigurationProtocol
 from ra2ce.graph.hazard import Hazard
 from ra2ce.graph.networks import Network
-from ra2ce.io.readers import IniConfigurationReader
 
 
 def network_handler(config: dict, files: dict) -> Optional[dict]:
@@ -31,20 +30,20 @@ def hazard_handler(config: dict, graphs: dict, files: dict) -> Optional[dict]:
         return None
 
 
-class NetworkIniConfiguration(IniConfiguration):
+class NetworkIniConfiguration(IniConfigurationProtocol):
     files: Dict[str, Path] = None
 
-    def __init__(self, ini_file: Path) -> None:
-        if not ini_file.is_file():
-            raise FileNotFoundError(ini_file)
+    def __init__(self, ini_file: Path, config_data: dict) -> None:
         self.ini_file = ini_file
-        self.config_data = IniConfigurationReader().import_configuration(
-            self.root_dir, config_path=self.ini_file
-        )
+        self.config_data = config_data
+
+    @staticmethod
+    def get_network_root_dir(filepath: Path) -> Path:
+        return filepath.parent.parent
 
     @property
     def root_dir(self) -> Path:
-        return self.ini_file.parent.parent
+        return self.get_network_root_dir(self.ini_file)
 
     def _set_files(self) -> dict:
         """Checks if file of graph exist in network folder and adds filename to the files dict"""

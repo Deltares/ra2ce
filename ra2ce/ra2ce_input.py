@@ -2,12 +2,12 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.configuration.analysis_ini_configuration import (
-    AnalysisIniConfigurationBase,
-    AnalysisWithNetworkConfiguration,
-    AnalysisWithoutNetworkConfiguration,
-)
+from ra2ce.configuration.analysis_ini_configuration import AnalysisIniConfigurationBase
 from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
+from ra2ce.io.readers.ini_configuration_reader import (
+    AnalysisIniConfigurationReader,
+    NetworkIniConfigurationReader,
+)
 
 
 class Ra2ceInput:
@@ -15,16 +15,20 @@ class Ra2ceInput:
     analysis_config: AnalysisIniConfigurationBase = None
 
     def __init__(self, network_ini: Optional[Path], analysis_ini: Path) -> None:
-        if network_ini:
-            self.network_config = NetworkIniConfiguration(network_ini)
+        self.network_config = NetworkIniConfigurationReader().read(network_ini)
+        self.analysis_config = AnalysisIniConfigurationReader(self.network_config).read(
+            analysis_ini
+        )
+        # if network_ini:
+        #     self.network_config = NetworkIniConfiguration(network_ini)
 
-        if analysis_ini:
-            if self.network_config:
-                self.analysis_config = AnalysisWithNetworkConfiguration(
-                    analysis_ini, self.network_config
-                )
-            else:
-                self.analysis_config = AnalysisWithoutNetworkConfiguration(analysis_ini)
+        # if analysis_ini:
+        #     if self.network_config:
+        #         self.analysis_config = AnalysisWithNetworkConfiguration(
+        #             analysis_ini, self.network_config
+        #         )
+        #     else:
+        #         self.analysis_config = AnalysisWithoutNetworkConfiguration(analysis_ini)
 
     def get_root_dir(self) -> Path:
         if self.network_config.ini_file:
