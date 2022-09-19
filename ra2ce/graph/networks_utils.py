@@ -1164,7 +1164,7 @@ def join_nodes_edges(gdf_nodes, gdf_edges, idName):
             )
         elif len(node_tuple) == 2:
             # this is what you want for a good network
-            tuples_df = tuples_df.append(
+            tuples_df = tuples_df.concat(
                 {"node_A": node_tuple.iloc[0], "node_B": node_tuple.iloc[1]},
                 ignore_index=True,
             )
