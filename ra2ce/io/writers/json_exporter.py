@@ -7,7 +7,7 @@ from ra2ce.io.writers.ra2ce_exporter_protocol import Ra2ceExporterProtocol
 
 
 class JsonExporter(Ra2ceExporterProtocol):
-    def export(export_path: Path, export_data: Any) -> None:
+    def export(self, export_path: Path, export_data: Any) -> None:
         """
         Exports into JSON the given data at the given path. When the parent(s) directory does not exist then it will be created.
 
