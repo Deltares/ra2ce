@@ -18,6 +18,7 @@ def network_handler(config: dict, files: dict) -> Optional[dict]:
         logging.exception(
             f"RA2CE crashed. Check the logfile for the Traceback message: {e}"
         )
+        raise e
 
 
 def hazard_handler(config: dict, graphs: dict, files: dict) -> Optional[dict]:

@@ -1151,21 +1151,39 @@ def join_nodes_edges(gdf_nodes, gdf_edges, idName):
                     )
                 )
             ]
-            tuples_df = tuples_df.append(
-                {
-                    "node_A": gdf_nodes.loc[
-                        gdf_nodes["node_fid"] == node_a[0], "node_fid"
-                    ].iloc[0],
-                    "node_B": gdf_nodes.loc[
-                        gdf_nodes["node_fid"] == node_b[0], "node_fid"
-                    ].iloc[0],
-                },
+            tuples_df = pd.concat(
+                [
+                    tuples_df,
+                    pd.DataFrame.from_records(
+                        [
+                            {
+                                "node_A": gdf_nodes.loc[
+                                    gdf_nodes["node_fid"] == node_a[0], "node_fid"
+                                ].iloc[0],
+                                "node_B": gdf_nodes.loc[
+                                    gdf_nodes["node_fid"] == node_b[0], "node_fid"
+                                ].iloc[0],
+                            },
+                        ]
+                    ),
+                ],
                 ignore_index=True,
             )
+
         elif len(node_tuple) == 2:
             # this is what you want for a good network
-            tuples_df = tuples_df.concat(
-                {"node_A": node_tuple.iloc[0], "node_B": node_tuple.iloc[1]},
+            tuples_df = pd.concat(
+                [
+                    tuples_df,
+                    pd.DataFrame.from_records(
+                        [
+                            {
+                                "node_A": node_tuple.iloc[0],
+                                "node_B": node_tuple.iloc[1],
+                            },
+                        ]
+                    ),
+                ],
                 ignore_index=True,
             )
         else:
