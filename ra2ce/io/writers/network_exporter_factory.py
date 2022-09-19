@@ -1,7 +1,7 @@
 import logging
 import pickle
 from pathlib import Path
-from typing import Any, List, Optional, Union
+from typing import Any, List, Optional, Type, Union
 
 import geopandas as gpd
 import networkx as nx
@@ -14,8 +14,13 @@ MULTIGRAPH_TYPE = Union[
 NETWORK_TYPE = Union[gpd.GeoDataFrame, MULTIGRAPH_TYPE]
 
 
-class NetworkExporterProtocol(Ra2ceExporterProtocol):
+class NetworkExporterBase(Ra2ceExporterProtocol):
     _export_types: List[str] = ["pickle"]
+
+    def __init__(self, basename: str, export_types: List[str]) -> None:
+        self._basename = basename
+        self._export_types = export_types
+        self.pickle_path = None
 
     def export_to_shp(self, output_dir: Path, export_data: NETWORK_TYPE) -> None:
         pass
@@ -39,13 +44,8 @@ class NetworkExporterProtocol(Ra2ceExporterProtocol):
             self.export_to_shp(export_path, export_data)
 
 
-class MultiGraphNetworkExporter(NetworkExporterProtocol):
+class MultiGraphNetworkExporter(NetworkExporterBase):
     pickle_path: Optional[Path]
-
-    def __init__(self, basename: str, export_types: List[str]) -> None:
-        self._basename = basename
-        self._export_types = export_types
-        self.pickle_path = None
 
     def export_to_shp(self, output_dir: Path, export_data: MULTIGRAPH_TYPE) -> None:
         if not output_dir.is_dir():
@@ -69,12 +69,7 @@ class MultiGraphNetworkExporter(NetworkExporterProtocol):
         )
 
 
-class GeoDataFrameNetworkExporter(NetworkExporterProtocol):
-    def __init__(self, basename: str, export_types: List[str]) -> None:
-        self._basename = basename
-        self._export_types = export_types
-        self.pickle_path = None
-
+class GeoDataFrameNetworkExporter(NetworkExporterBase):
     def export_to_shp(self, output_dir: Path, export_data: gpd.GeoDataFrame) -> None:
         _output_shp_path = output_dir / (self._basename + ".shp")
         export_data.to_file(
@@ -89,13 +84,27 @@ class GeoDataFrameNetworkExporter(NetworkExporterProtocol):
 
 
 class NetworkExporterFactory:
+    def export(
+        self,
+        network: NETWORK_TYPE,
+        basename: str,
+        output_dir: Path,
+        export_types: List[str],
+    ) -> None:
+        _exporter_type = self.get_exporter(network)
+        self._exporter = _exporter_type(basename, export_types)
+        self._exporter.export(output_dir, network)
+
+    def get_pickle_path(self) -> Path:
+        return self._exporter.pickle_path
+
     @staticmethod
-    def get_exporter(network: NETWORK_TYPE) -> NetworkExporterProtocol:
+    def get_exporter(network: NETWORK_TYPE) -> Type[NetworkExporterBase]:
         _network_type = type(network)
         if _network_type == gpd.GeoDataFrame:
-            pass
+            return GeoDataFrameNetworkExporter
         elif _network_type in [
             nx.classes.multigraph.MultiGraph,
             nx.classes.multidigraph.MultiDiGraph,
         ]:
-            pass
+            return MultiGraphNetworkExporter
