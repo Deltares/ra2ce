@@ -3,16 +3,15 @@
 Created on 31-8-2022
 """
 import time
-from typing import Union
+from typing import List, Union
 
-# external modules
 import pyproj
 from rasterstats import point_query, zonal_stats
 
-# local modules
 from ra2ce.graph.networks_utils import *
 from ra2ce.io.generic import *
 from ra2ce.io.readers import GraphPickleReader
+from ra2ce.io.writers.network_exporter_factory import NetworkExporterFactory
 
 
 class Hazard:
@@ -673,6 +672,16 @@ class Hazard:
         nx.set_edge_attributes(_graph_new, original_geometries, "geometry")
         return _graph_new.copy()
 
+    def _export_network_files(self, graph_name: str, types_to_export: List[str]):
+        _exporter = NetworkExporterFactory()
+        _exporter.export(
+            network=self.graphs[graph_name],
+            basename=graph_name,
+            output_dir=self.config["static"] / "output_graph",
+            export_types=types_to_export,
+        )
+        self.files[graph_name] = _exporter.get_pickle_path()
+
     def create(self):
         """Overlays the different possible graph objects with the hazard data
 
@@ -688,7 +697,7 @@ class Hazard:
             write all the objects
 
         """
-        to_save = (
+        types_to_export = (
             ["pickle"] if not self.config["network"]["save_shp"] else ["pickle", "shp"]
         )
 
@@ -750,12 +759,7 @@ class Hazard:
                 self.graphs["base_graph_hazard"] = self.hazard_intersect(graph)
 
             # Save graphs/network with hazard
-            self.files["base_graph_hazard"] = save_network(
-                self.graphs["base_graph_hazard"],
-                self.config["static"] / "output_graph",
-                "base_graph_hazard",
-                types=to_save,
-            )
+            self._export_network_files("base_graph_hazard", types_to_export)
         else:
             try:
                 # Try to find the base graph hazard file
@@ -816,11 +820,8 @@ class Hazard:
                 ] = self.od_hazard_intersect(graph)
 
             # Save graphs/network with hazard
-            self.files["origins_destinations_graph_hazard"] = save_network(
-                self.graphs["origins_destinations_graph_hazard"],
-                self.config["static"] / "output_graph",
-                "origins_destinations_graph_hazard",
-                types=to_save,
+            self._export_network_files(
+                "origins_destinations_graph_hazard", types_to_export
             )
 
         #### Step 3: iterate overlay of the GeoPandas Dataframe (if any) ###
@@ -862,12 +863,7 @@ class Hazard:
                 )
 
             # Save graphs/network with hazard
-            self.files["base_network_hazard"] = save_network(
-                self.graphs["base_network_hazard"],
-                self.config["static"] / "output_graph",
-                "base_network_hazard",
-                types=to_save,
-            )
+            self._export_network_files("base_network_hazard", types_to_export)
         else:
             try:
                 # Try to find the base network hazard file
@@ -923,8 +919,12 @@ class Hazard:
             else:
                 locations = self.point_hazard_intersect(locations)
 
-            save_network(
-                locations, self.config["static"] / "output_graph", "locations_hazard"
+            _exporter = NetworkExporterFactory()
+            _exporter.export(
+                network=locations,
+                basename="locations_hazard",
+                output_dir=self.config["static"] / "output_graph",
+                export_types=["pickle"],
             )
 
         # Save the hazard name bookkeeping table.
