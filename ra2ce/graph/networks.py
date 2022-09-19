@@ -616,7 +616,7 @@ class Network:
 
             # Save the graph and geodataframe
             self._export_network_files(base_graph, "base_graph", to_save)
-            self._export_network_files(base_graph, "base_network", to_save)
+            self._export_network_files(network_gdf, "base_network", to_save)
         else:
 
             logging.info(
