@@ -1,13 +1,4 @@
-# -*- coding: utf-8 -*-
-"""
-Created on 26-7-2021
-
-@author: F.C. de Groen, Deltares
-@author: M. Kwant, Deltares
-"""
-
 import logging
-import sys
 from pathlib import Path
 from typing import Any, List, Protocol
 
@@ -31,195 +22,6 @@ def available_checks():
     return list_indirect_analyses, list_direct_analyses
 
 
-list_indirect_analyses, list_direct_analyses = available_checks()
-
-
-def input_validation(config):
-    """Check if input properties are correct and exist."""
-
-    # check if properties exist in settings.ini file
-    check_headers = ["project"]
-    check_headers.extend([a for a in config.keys() if "analysis" in a])
-
-    if "network" in config.keys():
-        check_shp_input(config["network"])
-        check_headers.extend(
-            ["network", "origins_destinations", "hazard", "cleanup", "isolation"]
-        )
-
-    for k in check_headers:
-        if k == "isolation":
-            # The isolation header is not required but needs to be checked with the code underneath.
-            continue
-
-        if k not in config.keys():
-            logging.error(
-                "Property [ {} ] is not configured. Add property [ {} ] to the *.ini file. ".format(
-                    k, k
-                )
-            )
-            sys.exit()
-
-    # check if properties have correct input
-    # TODO: Decide whether also the non-used properties must be checked or those are not checked
-    # TODO: Decide how to check for multiple analyses (analysis1, analysis2, etc)
-    list_analyses = list_direct_analyses + list_indirect_analyses
-    check_answer = {
-        "source": ["OSM PBF", "OSM download", "shapefile", "pickle"],
-        "polygon": ["file", None],
-        "directed": [True, False, None],
-        "network_type": ["walk", "bike", "drive", "drive_service", "all", None],
-        "road_types": [
-            "motorway",
-            "motorway_link",
-            "trunk",
-            "trunk_link",
-            "primary",
-            "primary_link",
-            "secondary",
-            "secondary_link",
-            "tertiary",
-            "tertiary_link",
-            "unclassified",
-            "residential",
-            "road",
-            None,
-        ],
-        "origins": ["file", None],
-        "destinations": ["file", None],
-        "save_shp": [True, False, None],
-        "save_csv": [True, False, None],
-        "analysis": list_analyses,
-        "hazard_map": ["file", None],
-        "aggregate_wl": ["max", "min", "mean", None],
-        "weighing": ["distance", "time", None],
-        "save_traffic": [True, False, None],
-        "locations": ["file", None],
-    }
-    input_dirs = {
-        "polygon": "network",
-        "hazard_map": "hazard",
-        "origins": "network",
-        "destinations": "network",
-        "locations": "network",
-    }
-
-    error = False
-    for config_header in config:
-        # First check the headers.
-        if config_header in check_headers:
-            # Now check the parameters per configured item.
-            for config_header_value in config[config_header]:
-                if config_header_value in check_answer:
-                    if ("file" in check_answer[config_header_value]) and (
-                        config[config_header][config_header_value] is not None
-                    ):
-                        # Check if the path is an absolute path or a file name that is placed in the right folder
-                        config[config_header][config_header_value], error = check_paths(
-                            config,
-                            config_header,
-                            config_header_value,
-                            input_dirs,
-                            error,
-                        )
-                        continue
-
-                    if config_header_value == "road_types" and (
-                        config[config_header][config_header_value] is not None
-                    ):
-                        for road_type in (
-                            config[config_header][config_header_value]
-                            .replace(" ", "")
-                            .split(",")
-                        ):
-                            if road_type not in check_answer["road_types"]:
-                                logging.error(
-                                    "Wrong road type is configured ({}), has to be one or multiple of: {}".format(
-                                        road_type, check_answer["road_types"]
-                                    )
-                                )
-                                error = True
-                        continue
-
-                    if (
-                        config[config_header][config_header_value]
-                        not in check_answer[config_header_value]
-                    ):
-                        logging.error(
-                            "Wrong input to property [ {} ], has to be one of: {}".format(
-                                config_header_value, check_answer[config_header_value]
-                            )
-                        )
-                        error = True
-
-    # Quit if error
-    if error:
-        logging.error(
-            "There are inconsistencies in the *.ini file. Please consult the log file for more information: {}".format(
-                config["root_path"]
-                / "data"
-                / config["project"]["name"]
-                / "output"
-                / "RA2CE.log"
-            )
-        )
-        sys.exit()
-
-    return config
-
-
-def check_paths(config, config_header, config_header_value, input_dirs, error):
-    # Check if the path is an absolute path or a file name that is placed in the right folder
-    list_paths = []
-    for p in config[config_header][config_header_value].split(","):
-        p = Path(p)
-        if not p.is_file():
-            abs_path = (
-                config["root_path"]
-                / config["project"]["name"]
-                / "static"
-                / input_dirs[config_header_value]
-                / p
-            )
-            try:
-                assert abs_path.is_file()
-            except AssertionError:
-                abs_path = (
-                    config["root_path"]
-                    / config["project"]["name"]
-                    / "input"
-                    / input_dirs[config_header_value]
-                    / p
-                )
-
-            if not abs_path.is_file():
-                logging.error(
-                    "Wrong input to property [ {} ], file does not exist: {}".format(
-                        config_header_value, abs_path
-                    )
-                )
-                logging.error(
-                    "If no file is needed, please insert value - None - for property - {} -".format(
-                        config_header_value
-                    )
-                )
-                error = True
-            else:
-                list_paths.append(abs_path)
-        else:
-            list_paths.append(p)
-    return list_paths, error
-
-
-def check_shp_input(config):
-    """Checks if a file id is configured when using the option to create network from shapefile"""
-    if (config["source"] == "shapefile") and (config["file_id"] is None):
-        logging.error(
-            "Not possible to create network - Shapefile used as source, but no file_id configured in the network.ini file"
-        )
-        sys.exit()
-
-
 class ValidationReport:
     def __init__(self) -> None:
         self._errors = []
@@ -234,7 +36,7 @@ class ValidationReport:
         self._warns.append(warn_mssg)
 
     def is_valid(self) -> bool:
-        return any(self._errors)
+        return not any(self._errors)
 
     def merge(self, with_report: Any) -> None:
         """
@@ -331,7 +133,8 @@ class IniConfigurationValidatorBase(Ra2ceIoValidator):
         # check if properties have correct input
         # TODO: Decide whether also the non-used properties must be checked or those are not checked
         # TODO: Decide how to check for multiple analyses (analysis1, analysis2, etc)
-        _list_analysis = list_direct_analyses + list_indirect_analyses
+        _indirect_analysis_list, _direct_analysis_list = available_checks()
+        _list_analysis = _indirect_analysis_list + _direct_analysis_list
         _expected_values = {
             "source": ["OSM PBF", "OSM download", "shapefile", "pickle"],
             "polygon": ["file", None],
@@ -415,10 +218,20 @@ class IniConfigurationValidatorBase(Ra2ceIoValidator):
 
 
 class NetworkIniConfigurationValidator(IniConfigurationValidatorBase):
+    def _validate_shp_input(self, network_config: dict) -> None:
+        """Checks if a file id is configured when using the option to create network from shapefile"""
+        if (network_config["source"] == "shapefile") and (
+            network_config["file_id"] is None
+        ):
+            self._report.error(
+                "Not possible to create network - Shapefile used as source, but no file_id configured in the network.ini file"
+            )
+
     def validate(self) -> ValidationReport:
         """Check if input properties are correct and exist."""
         _report = ValidationReport()
-        if not self._config.get("network", None):
+        _network_config = self._config.get("network", None)
+        if not _network_config:
             _report.error("Network properties not present in Network ini file.")
             return _report
 
@@ -430,7 +243,7 @@ class NetworkIniConfigurationValidator(IniConfigurationValidatorBase):
             "hazard",
             "cleanup",
         ]
-        check_shp_input(self._config["network"])
+        self._validate_shp_input(_network_config)
         _report.merge(self._validate_headers(_required_headers))
         return _report
 
@@ -439,6 +252,7 @@ class AnalysisIniConfigurationValidator(IniConfigurationValidatorBase):
     def validate(self) -> ValidationReport:
         _report = ValidationReport()
         _required_headers = ["project"]
+        # Analysis are marked as [analysis1], [analysis2], ...
         _required_headers.extend([a for a in self._config.keys() if "analysis" in a])
 
         _report.merge(self._validate_headers(_required_headers))
@@ -451,7 +265,5 @@ class IniConfigurationValidatorFactory:
         if "network" in config_data.keys():
             return NetworkIniConfigurationValidator(config_data)
         elif any([a for a in config_data.keys() if "analysis" in a]):
-            # ToDo: Verify whether this is correct
-            # or networkini should also check for the analysis headers.
             return AnalysisIniConfigurationValidator(config_data)
         raise NotImplementedError()

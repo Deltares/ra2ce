@@ -1,5 +1,6 @@
 import codecs
 import logging
+import sys
 from ast import literal_eval
 from configparser import ConfigParser
 from pathlib import Path
@@ -7,9 +8,10 @@ from shutil import copyfile
 
 import numpy as np
 
-from ra2ce.io.ra2ce_io_validator import available_checks, input_validation
-
-list_indirect_analyses, list_direct_analyses = available_checks()
+from ra2ce.io.ra2ce_io_validator import (
+    IniConfigurationValidatorFactory,
+    available_checks,
+)
 
 
 class IniConfigurationReader:
@@ -19,14 +21,15 @@ class IniConfigurationReader:
     """
 
     def configure_analyses(self, config: dict) -> dict:
+        _list_indirect_analyses, _list_direct_analyses = available_checks()
         analyses_names = [a for a in config.keys() if "analysis" in a]
         for a in analyses_names:
-            if any(t in config[a]["analysis"] for t in list_direct_analyses):
+            if any(t in config[a]["analysis"] for t in _list_direct_analyses):
                 if "direct" in config:
                     (config["direct"]).append(config[a])
                 else:
                     config["direct"] = [config[a]]
-            elif any(t in config[a]["analysis"] for t in list_indirect_analyses):
+            elif any(t in config[a]["analysis"] for t in _list_indirect_analyses):
                 if "indirect" in config:
                     (config["indirect"]).append(config[a])
                 else:
@@ -47,7 +50,10 @@ class IniConfigurationReader:
 
         if check:
             # Validate the configuration input.
-            config = input_validation(config)
+            _report = IniConfigurationValidatorFactory.get_validator(config).validate()
+            if not _report.is_valid():
+                sys.exit()
+            # config = input_validation(config)
 
             if config_path.stem == "analyses":
                 # Create a dictionary with direct and indirect analyses separately.
