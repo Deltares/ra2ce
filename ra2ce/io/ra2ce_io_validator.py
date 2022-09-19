@@ -1,6 +1,8 @@
-import logging
 from pathlib import Path
-from typing import Any, List, Protocol
+from typing import List
+
+from ra2ce.validation.ra2ce_validator_protocol import Ra2ceIoValidator
+from ra2ce.validation.validation_report import ValidationReport
 
 IndirectAnalysisNameList: List[str] = [
     "single_link_redundancy",
@@ -15,38 +17,6 @@ IndirectAnalysisNameList: List[str] = [
     "multi_link_isolated_locations",
 ]
 DirectAnalysisNameList: List[str] = ["direct", "effectiveness_measures"]
-
-
-class ValidationReport:
-    def __init__(self) -> None:
-        self._errors = []
-        self._warns = []
-
-    def error(self, error_mssg: str) -> None:
-        logging.error(error_mssg)
-        self._errors.append(error_mssg)
-
-    def warn(self, warn_mssg: str) -> None:
-        logging.warning(warn_mssg)
-        self._warns.append(warn_mssg)
-
-    def is_valid(self) -> bool:
-        return not any(self._errors)
-
-    def merge(self, with_report: Any) -> None:
-        """
-        Merges a given report with the current one.
-
-        Args:
-            with_report (Any): ValidationReport that will be merged.
-        """
-        self._errors.extend(with_report._errors)
-        self._warns.extend(with_report._warns)
-
-
-class Ra2ceIoValidator(Protocol):
-    def validate(self) -> ValidationReport:
-        pass
 
 
 class IniConfigurationPathValidator(Ra2ceIoValidator):
