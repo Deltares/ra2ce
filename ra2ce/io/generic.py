@@ -63,32 +63,3 @@ def save_network(to_save, output_folder, name, types=["pickle"]):
         return output_path_pickle
     else:
         return None
-
-
-def save_linking_tables(destination_folder, simple_to_complex, complex_to_simple):
-    """
-    Function that save the tables that link the simple and complex graph/netwok
-
-    Arguments:
-        *simple_to_complex* (dict) : keys: ids of simple graph; values: matching ids of complex graph [list]
-        *complex_to_simple* (dict) : keys: ids of complex graph; values: matching ids of simple graph [int]
-
-    Returns:
-        None
-
-    Effect: saves the lookup tables as json files in the static/output_graph folder
-
-    """
-
-    # save lookup table if necessary
-    import json
-
-    if not destination_folder.exists():
-        destination_folder.mkdir()
-
-    with open((destination_folder / "simple_to_complex.json"), "w") as fp:
-        json.dump(simple_to_complex, fp)
-        logging.info("saved (or overwrote) simple_to_complex.json")
-    with open((destination_folder / "complex_to_simple.json"), "w") as fp:
-        json.dump(complex_to_simple, fp)
-        logging.info("saved (or overwrote) complex_to_simple.json")
