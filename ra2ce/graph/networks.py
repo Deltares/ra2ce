@@ -3,7 +3,7 @@
 Created on 26-7-2021
 """
 
-from typing import Tuple, Union
+from typing import Any, List, Tuple
 
 # external modules
 import pyproj
@@ -11,7 +11,9 @@ from osmnx.graph import graph_from_xml
 
 # local modules
 from ra2ce.graph.networks_utils import *
-from ra2ce.io import *
+from ra2ce.io.readers import GraphPickleReader
+from ra2ce.io.writers import JsonExporter
+from ra2ce.io.writers.network_exporter_factory import NetworkExporterFactory
 
 
 class Network:
@@ -163,6 +165,12 @@ class Network:
         # Exporting complex graph because the shapefile should be kept the same as much as possible.
         return graph_complex, edges_complex
 
+    def _export_linking_tables(self, linking_tables: List[Any]) -> None:
+        _exporter = JsonExporter()
+        _output_dir = self.config["static"] / "output_graph"
+        _exporter.export(_output_dir / "simple_to_complex.json", linking_tables[0])
+        _exporter.export(_output_dir / "complex_to_simple.json", linking_tables[1])
+
     def network_osm_pbf_DEPRECIATED(
         self, crs=4326
     ) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
@@ -228,7 +236,7 @@ class Network:
         logging.info("Finished converting the graph to a geodataframe")
 
         # Save the link tables linking complex and simple IDs
-        save_linking_tables(
+        JsonExporter().export(
             self.config["static"] / "output_graph", link_tables[0], link_tables[1]
         )
 
@@ -362,9 +370,7 @@ class Network:
         logging.info("Finished converting the graph to a geodataframe")
 
         # Save the link tables linking complex and simple IDs
-        save_linking_tables(
-            self.config["static"] / "output_graph", link_tables[0], link_tables[1]
-        )
+        self._export_linking_tables(link_tables)
 
         # If the user wants to use undirected graphs, turn into an undirected graph (default).
         if not self.config["network"]["directed"]:
@@ -538,6 +544,18 @@ class Network:
             )
             return G
 
+    def _export_network_files(
+        self, network: Any, graph_name: str, types_to_export: List[str]
+    ):
+        _exporter = NetworkExporterFactory()
+        _exporter.export(
+            network=network,
+            basename=graph_name,
+            output_dir=self.config["static"] / "output_graph",
+            export_types=types_to_export,
+        )
+        self.files[graph_name] = _exporter.get_pickle_path()
+
     def create(self) -> dict:
         """Handler function with the logic to call the right functions to create a network.
 
@@ -575,7 +593,7 @@ class Network:
 
             elif self.config["network"]["source"] == "pickle":
                 logging.info("Start importing a network from pickle")
-                base_graph = read_gpickle(
+                base_graph = GraphPickleReader().read(
                     self.config["static"] / "output_graph" / "base_graph.p"
                 )
                 network_gdf = gpd.read_feather(
@@ -597,18 +615,8 @@ class Network:
                 base_graph = self.get_avg_speed(base_graph)
 
             # Save the graph and geodataframe
-            self.files["base_graph"] = save_network(
-                base_graph,
-                self.config["static"] / "output_graph",
-                "base_graph",
-                types=to_save,
-            )
-            self.files["base_network"] = save_network(
-                network_gdf,
-                self.config["static"] / "output_graph",
-                "base_network",
-                types=to_save,
-            )
+            self._export_network_files(base_graph, "base_graph", to_save)
+            self._export_network_files(network_gdf, "base_network", to_save)
         else:
 
             logging.info(
@@ -617,7 +625,7 @@ class Network:
             )
 
             if self.files["base_graph"] is not None:
-                base_graph = read_gpickle(self.files["base_graph"])
+                base_graph = GraphPickleReader().read(self.files["base_graph"])
             else:
                 base_graph = None
 
@@ -638,17 +646,12 @@ class Network:
         ):
             # reading the base graphs
             if (self.files["base_graph"] is not None) and (base_graph is not None):
-                base_graph = read_gpickle(self.files["base_graph"])
+                base_graph = GraphPickleReader().read(self.files["base_graph"])
             # adding OD nodes
             if self.origins[0].suffix == ".tif":
                 self.origins[0] = self.generate_origins_from_raster()
             od_graph = self.add_od_nodes(base_graph, self.base_graph_crs)
-            self.files["origins_destinations_graph"] = save_network(
-                od_graph,
-                self.config["static"] / "output_graph",
-                "origins_destinations_graph",
-                types=to_save,
-            )
+            self._export_network_files(od_graph, "origins_destinations_graph", to_save)
 
         return {
             "base_graph": base_graph,

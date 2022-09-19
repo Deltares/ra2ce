@@ -2,10 +2,11 @@ import logging
 from pathlib import Path
 from typing import Dict
 
+import geopandas as gpd
+
 from ra2ce.configuration.ini_configuration import IniConfiguration
 from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
-from ra2ce.io import read_graphs
-from ra2ce.utils import load_config
+from ra2ce.io.readers import GraphPickleReader, IniConfigurationReader
 
 
 class AnalysisIniConfigurationBase(IniConfiguration):
@@ -43,7 +44,9 @@ class AnalysisWithNetworkConfiguration(AnalysisIniConfigurationBase):
             raise FileNotFoundError(ini_file)
         self.ini_file = ini_file
         self._network_config = network_config
-        self.config_data = load_config(self.root_dir, config_path=self.ini_file)
+        self.config_data = IniConfigurationReader().import_configuration(
+            self.root_dir, config_path=self.ini_file
+        )
 
     def configure(self) -> None:
         self.config_data["files"] = self._network_config.files
@@ -64,14 +67,16 @@ class AnalysisWithoutNetworkConfiguration(AnalysisIniConfigurationBase):
         if not ini_file.is_file():
             raise FileNotFoundError(ini_file)
         self.ini_file = ini_file
-        self.config_data = load_config(self.root_dir, config_path=self.ini_file)
+        self.config_data = IniConfigurationReader().import_configuration(
+            self.root_dir, config_path=self.ini_file
+        )
 
     def _update_with_network_configuration(self) -> dict:
         try:
             _output_network_ini_file = self.config_data["output"] / "network.ini"
             assert _output_network_ini_file.is_file()
 
-            _config_network = load_config(
+            _config_network = IniConfigurationReader().import_configuration(
                 self.root_dir,
                 config_path=_output_network_ini_file,
                 check=False,
@@ -87,7 +92,35 @@ class AnalysisWithoutNetworkConfiguration(AnalysisIniConfigurationBase):
             )
             quit()
 
+    def _read_graphs_from_config(self) -> dict:
+        _graphs = {}
+        _pickle_reader = GraphPickleReader()
+        _static_output_dir = self.config_data["static"] / "output_graph"
+        for input_graph in ["base_graph", "origins_destinations_graph"]:
+            # Load graphs
+            _graphs[input_graph] = _pickle_reader.read(
+                _static_output_dir / f"{input_graph}.p"
+            )
+            _graphs[input_graph + "_hazard"] = _pickle_reader.read(
+                _static_output_dir / f"{input_graph}_hazard.p"
+            )
+
+        # Load networks
+        filename = _static_output_dir / f"base_network.feather"
+        if filename.is_file():
+            _graphs["base_network"] = gpd.read_feather(filename)
+        else:
+            _graphs["base_network"] = None
+
+        filename = _static_output_dir / f"base_network_hazard.feather"
+        if filename.is_file():
+            _graphs["base_network_hazard"] = gpd.read_feather(filename)
+        else:
+            _graphs["base_network_hazard"] = None
+
+        return _graphs
+
     def configure(self) -> None:
-        self.graphs = read_graphs(self.config_data)
+        self.graphs = self._read_graphs_from_config()
         self.config_data = self._update_with_network_configuration()
         self.initialize_output_dirs()

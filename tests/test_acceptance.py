@@ -90,6 +90,9 @@ class TestIndirectAnalyses:
         for _analysis_output in _expected_analysis_output_files:
             assert _analysis_output.is_file() and _analysis_output.exists()
 
+    @pytest.mark.skipif(
+        reason="This test takes way too long due to the download of data."
+    )
     def test_4_analyses_indirect(self):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data.
