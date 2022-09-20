@@ -2,9 +2,10 @@ import logging
 from pathlib import Path
 from typing import Dict, Optional
 
-from ra2ce.configuration.ini_configuration import IniConfigurationProtocol
+from ra2ce.configuration.ini_configuration_protocol import IniConfigurationProtocol
 from ra2ce.graph.hazard import Hazard
 from ra2ce.graph.networks import Network
+from ra2ce.io.ra2ce_io_validator import NetworkIniConfigurationValidator
 
 
 def network_handler(config: dict, files: dict) -> Optional[dict]:
@@ -76,4 +77,6 @@ class NetworkIniConfiguration(IniConfigurationProtocol):
         self.graphs = hazard_handler(self.config_data, _graphs, self.files)
 
     def is_valid(self) -> bool:
-        return self.ini_file.is_file() and self.ini_file.suffix == ".ini"
+        _file_is_valid = self.ini_file.is_file() and self.ini_file.suffix == ".ini"
+        _report = NetworkIniConfigurationValidator(self.config_data).validate()
+        return _file_is_valid and _report.is_valid()

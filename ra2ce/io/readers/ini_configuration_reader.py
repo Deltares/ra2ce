@@ -13,7 +13,7 @@ from ra2ce.configuration.analysis_ini_configuration import (
     AnalysisWithNetworkConfiguration,
     AnalysisWithoutNetworkConfiguration,
 )
-from ra2ce.configuration.ini_configuration import IniConfigurationProtocol
+from ra2ce.configuration.ini_configuration_protocol import IniConfigurationProtocol
 from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
 from ra2ce.io.ra2ce_io_validator import (
     DirectAnalysisNameList,
