@@ -5,7 +5,6 @@ from typing import List
 
 from ra2ce.configuration.validators.ini_config_validator_base import _expected_values
 from ra2ce.io.readers.file_reader_protocol import FileReaderProtocol
-from ra2ce.io.readers.ini_file_reader import IniFileReader
 
 
 class IniConfigurationReaderBase(FileReaderProtocol):
@@ -13,29 +12,8 @@ class IniConfigurationReaderBase(FileReaderProtocol):
     Generic BASE Ini Configuration Reader.
     It is meant to behave as an abstract class, the concrete classes should
     implement the read method from the FileReaderProtocol.
+    Therefore it only contains common functionality among the IniConfigurationReaderBase inheriting implementations.
     """
-
-    def _import_configuration(self, root_path: Path, config_path: Path) -> dict:
-        # Read the configurations in network.ini and add the root path to the configuration dictionary.
-        if not config_path.is_file():
-            config_path = root_path / config_path
-        _config = IniFileReader().read(config_path)
-        _config["project"]["name"] = config_path.parts[-2]
-        _config["root_path"] = root_path
-
-        if "hazard" in _config:
-            # TODO: This might only be relevant for NETWORK reader.
-            if "hazard_field_name" in _config["hazard"]:
-                if _config["hazard"]["hazard_field_name"]:
-                    _config["hazard"]["hazard_field_name"] = _config["hazard"][
-                        "hazard_field_name"
-                    ].split(",")
-
-        # Set the output paths in the configuration Dict for ease of saving to those folders.
-        _config["input"] = _config["root_path"] / _config["project"]["name"] / "input"
-        _config["static"] = _config["root_path"] / _config["project"]["name"] / "static"
-        # config["output"] = config["root_path"] / config["project"]["name"] / "output"
-        return _config
 
     def _copy_output_files(self, from_path: Path, config_data: dict) -> None:
         self._create_config_dir("output", config_data)
