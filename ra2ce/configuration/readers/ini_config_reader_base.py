@@ -3,7 +3,6 @@ from pathlib import Path
 from shutil import copyfile
 from typing import List
 
-from ra2ce.configuration.validators.ini_config_validator_base import _expected_values
 from ra2ce.io.readers.file_reader_protocol import FileReaderProtocol
 
 
@@ -29,7 +28,9 @@ class IniConfigurationReaderBase(FileReaderProtocol):
             _dir.mkdir(parents=True)
         config_data[dir_name] = _dir
 
-    def _parse_path_list(self, path_list: str) -> List[Path]:
+    def _parse_path_list(
+        self, property_name: str, path_list: str, config_data: dict
+    ) -> List[Path]:
         _list_paths = []
         for path_value in path_list.split(","):
             path_value = Path(path_value)
@@ -38,25 +39,16 @@ class IniConfigurationReaderBase(FileReaderProtocol):
                 continue
 
             _project_name_dir = (
-                self._config["root_path"] / self._config["project"]["name"]
+                config_data["root_path"] / config_data["project"]["name"]
             )
-            abs_path = (
-                _project_name_dir
-                / "static"
-                / self._input_dirs[self._config_property_name]
-                / path_value
-            )
+            abs_path = _project_name_dir / "static" / property_name / path_value
             try:
                 assert abs_path.is_file()
             except AssertionError:
-                abs_path = (
-                    _project_name_dir
-                    / "input"
-                    / self._input_dirs[self._config_property_name]
-                    / path_value
-                )
+                abs_path = _project_name_dir / "input" / property_name / path_value
 
-            self.list_paths.append(abs_path)
+            _list_paths.append(abs_path)
+        return _list_paths
 
     def _update_path_values(self, config_data: dict) -> None:
         """
@@ -65,9 +57,20 @@ class IniConfigurationReaderBase(FileReaderProtocol):
         Args:
             config_data (dict): _description_
         """
-        for key, value_dict in config_data.items():
+        # _file_items = [k for k, v in _expected_values.items() if "file" in v]
+        _file_types = {
+            "polygon": "network",
+            "hazard_map": "hazard",
+            "origins": "network",
+            "destinations": "network",
+            "locations": "network",
+        }
+        for config_header, value_dict in config_data.items():
             if not (dict == type(value_dict)):
                 continue
-            for k, v in value_dict.items():
-                if "file" in _expected_values[key]:
-                    self._config[key][k] = self._parse_path_list(v)
+            for header_prop, prop_value in value_dict.items():
+                _prop_name = _file_types.get(header_prop, None)
+                if _prop_name and prop_value:
+                    config_data[config_header][header_prop] = self._parse_path_list(
+                        _prop_name, prop_value, config_data
+                    )
