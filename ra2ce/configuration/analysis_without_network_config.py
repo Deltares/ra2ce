@@ -2,12 +2,12 @@ from pathlib import Path
 
 import geopandas as gpd
 
-from ra2ce.configuration.analysis_ini_config_base import AnalysisIniConfigBase
+from ra2ce.configuration.analysis_ini_config_base import AnalysisConfigBase
 from ra2ce.configuration.validators import AnalysisWithoutNetworkConfigValidator
 from ra2ce.io.readers import GraphPickleReader
 
 
-class AnalysisWithoutNetworkConfiguration(AnalysisIniConfigBase):
+class AnalysisWithoutNetworkConfiguration(AnalysisConfigBase):
     def __init__(self, ini_file: Path, config_data: dict) -> None:
         if not ini_file.is_file():
             raise FileNotFoundError(ini_file)

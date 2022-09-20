@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.configuration.analysis_ini_config_base import AnalysisIniConfigBase
+from ra2ce.configuration.analysis_ini_config_base import AnalysisConfigBase
 from ra2ce.configuration.network_config import NetworkIniConfig
 from ra2ce.configuration.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
@@ -25,6 +25,6 @@ class AnalysisConfigReaderFactory:
 
     def read(
         self, ini_file: Path, network_config: Optional[NetworkIniConfig]
-    ) -> AnalysisIniConfigBase:
+    ) -> AnalysisConfigBase:
         _reader = self.get_reader(network_config)
         return _reader.read(ini_file)
