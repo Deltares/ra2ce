@@ -25,12 +25,10 @@ class NetworkIniConfigurationReader(IniConfigurationReaderBase):
         _config["project"]["name"] = config_path.parts[-2]
         _config["root_path"] = root_path
 
-        if "hazard" in _config:
-            if "hazard_field_name" in _config["hazard"]:
-                if _config["hazard"]["hazard_field_name"]:
-                    _config["hazard"]["hazard_field_name"] = _config["hazard"][
-                        "hazard_field_name"
-                    ].split(",")
+        _hazard = _config.get("hazard", None)
+        if _hazard and "hazard_field_name" in _hazard:
+            if _hazard["hazard_field_name"]:
+                _hazard["hazard_field_name"] = _hazard["hazard_field_name"].split(",")
 
         # Set the output paths in the configuration Dict for ease of saving to those folders.
         _config["input"] = _config["root_path"] / _config["project"]["name"] / "input"

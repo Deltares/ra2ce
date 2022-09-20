@@ -25,6 +25,7 @@ class Ra2ceHandler:
 
     def _initialize_logger(self, input_config: Ra2ceInput) -> logging.Logger:
         """
+        TODO make it to read directly the output directory from either of them WITHOUT calling the readers.
         Initializes the logger in the output directory, giving preference to the network output.
 
         Args:
