@@ -1,12 +1,5 @@
 from pathlib import Path
-from typing import Optional
 
-from ra2ce.configuration.analysis_ini_configuration import (
-    AnalysisIniConfigurationBase,
-    AnalysisWithNetworkConfiguration,
-    AnalysisWithoutNetworkConfiguration,
-)
-from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
 from ra2ce.configuration.readers.ini_config_reader_base import (
     IniConfigurationReaderBase,
 )
@@ -17,10 +10,7 @@ from ra2ce.configuration.validators.ini_config_validator_base import (
 from ra2ce.io.readers.ini_file_reader import IniFileReader
 
 
-class AnalysisIniConfigurationReader(IniConfigurationReaderBase):
-    def __init__(self, network_data: Optional[NetworkIniConfiguration]) -> None:
-        self._network_data = network_data
-
+class AnalysisConfigReaderBase(IniConfigurationReaderBase):
     def _convert_analysis_types(self, config: dict) -> dict:
         def set_analysis_values(config_type: str):
             if config_type in config:
@@ -51,17 +41,3 @@ class AnalysisIniConfigurationReader(IniConfigurationReaderBase):
         _config["static"] = _config["root_path"] / _config["project"]["name"] / "static"
         # config["output"] = config["root_path"] / config["project"]["name"] / "output"
         return _config
-
-    def read(self, ini_file: Path) -> AnalysisIniConfigurationBase:
-        if not ini_file:
-            return None
-        _root_path = AnalysisIniConfigurationBase.get_network_root_dir(ini_file)
-        _config_data = self._import_configuration(_root_path, ini_file)
-        _config_data = self._convert_analysis_types(_config_data)
-        self._copy_output_files(ini_file, _config_data)
-        if self._network_data:
-            return AnalysisWithNetworkConfiguration(
-                ini_file, _config_data, self._network_data
-            )
-        else:
-            return AnalysisWithoutNetworkConfiguration(ini_file, _config_data)

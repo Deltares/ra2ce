@@ -5,7 +5,7 @@ from typing import Optional
 from ra2ce.configuration.analysis_ini_configuration import AnalysisIniConfigurationBase
 from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
 from ra2ce.configuration.readers import (
-    AnalysisIniConfigurationReader,
+    AnalysisConfigReaderFactory,
     NetworkIniConfigurationReader,
 )
 
@@ -16,8 +16,8 @@ class Ra2ceInputConfig:
 
     def __init__(self, network_ini: Optional[Path], analysis_ini: Path) -> None:
         self.network_config = NetworkIniConfigurationReader().read(network_ini)
-        self.analysis_config = AnalysisIniConfigurationReader(self.network_config).read(
-            analysis_ini
+        self.analysis_config = AnalysisConfigReaderFactory().read(
+            analysis_ini, self.network_config
         )
 
     def get_root_dir(self) -> Path:
