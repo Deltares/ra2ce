@@ -6,11 +6,14 @@ from ra2ce.configuration.analysis_ini_configuration import (
     AnalysisWithNetworkConfiguration,
     AnalysisWithoutNetworkConfiguration,
 )
+from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
 from ra2ce.configuration.readers.ini_config_reader_base import (
     IniConfigurationReaderBase,
 )
-from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
-from ra2ce.io.ra2ce_io_validator import DirectAnalysisNameList, IndirectAnalysisNameList
+from ra2ce.configuration.validators.ini_config_validator_base import (
+    DirectAnalysisNameList,
+    IndirectAnalysisNameList,
+)
 
 
 class AnalysisIniConfigurationReader(IniConfigurationReaderBase):
