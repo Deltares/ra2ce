@@ -5,7 +5,7 @@ import warnings
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.configuration.analysis_ini_config_base import AnalysisConfigBase
+from ra2ce.configuration.analysis_config_base import AnalysisConfigBase
 from ra2ce.configuration.network_config import NetworkIniConfig
 from ra2ce.ra2ce_input_config import Ra2ceInputConfig
 from ra2ce.ra2ce_logging import Ra2ceLogger

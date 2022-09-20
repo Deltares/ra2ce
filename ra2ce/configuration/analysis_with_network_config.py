@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ra2ce.configuration.analysis_ini_config_base import AnalysisConfigBase
+from ra2ce.configuration.analysis_config_base import AnalysisConfigBase
 from ra2ce.configuration.network_config import NetworkIniConfig
 from ra2ce.configuration.validators import AnalysisIniConfigValidator
 

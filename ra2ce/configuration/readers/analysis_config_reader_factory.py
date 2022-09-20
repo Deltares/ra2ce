@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.configuration.analysis_ini_config_base import AnalysisConfigBase
+from ra2ce.configuration.analysis_config_base import AnalysisConfigBase
 from ra2ce.configuration.network_config import NetworkIniConfig
 from ra2ce.configuration.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
