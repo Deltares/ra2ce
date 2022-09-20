@@ -31,6 +31,6 @@ class NetworkIniConfigurationReader(IniConfigurationReaderBase):
                 _hazard["hazard_field_name"] = _hazard["hazard_field_name"].split(",")
 
         # Set the output paths in the configuration Dict for ease of saving to those folders.
-        _config["input"] = config_path / "input"
-        _config["static"] = config_path / "static"
+        _config["input"] = config_path.parent / "input"
+        _config["static"] = config_path.parent / "static"
         return _config

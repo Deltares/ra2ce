@@ -37,7 +37,7 @@ class AnalysisConfigReaderBase(IniConfigurationReaderBase):
         _config["root_path"] = root_path
 
         # Set the output paths in the configuration Dict for ease of saving to those folders.
-        _config["input"] = _config["root_path"] / _config["project"]["name"] / "input"
-        _config["static"] = _config["root_path"] / _config["project"]["name"] / "static"
+        _config["input"] = config_path.parent / "input"
+        _config["static"] = config_path.parent / "static"
         # config["output"] = config["root_path"] / config["project"]["name"] / "output"
         return _config
