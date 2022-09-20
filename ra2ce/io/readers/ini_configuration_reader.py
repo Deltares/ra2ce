@@ -119,7 +119,7 @@ class IniConfigurationReaderBase(IniFileReaderProtocol):
         # Read the configurations in network.ini and add the root path to the configuration dictionary.
         if not config_path.is_file():
             config_path = root_path / config_path
-        _config = IniFileReader().read(path=config_path)
+        _config = IniFileReader().read(config_path)
         _config["project"]["name"] = config_path.parts[-2]
         _config["root_path"] = root_path
 
@@ -199,7 +199,7 @@ class AnalysisIniConfigurationReader(IniConfigurationReaderBase):
     def __init__(self, network_data: Optional[IniConfigurationProtocol]) -> None:
         self._network_data = network_data
 
-    def _configure_analyses(self, config: dict) -> dict:
+    def _convert_analysis_types(self, config: dict) -> dict:
         def set_analysis_values(config_type: str):
             if config_type in config:
                 (config[config_type]).append(config[a])
@@ -222,7 +222,7 @@ class AnalysisIniConfigurationReader(IniConfigurationReaderBase):
         _root_path = AnalysisIniConfigurationBase.get_network_root_dir(ini_file)
         _config_data = self._import_configuration(_root_path, ini_file)
         # self._update_path_values(_config_data)
-        _config_data = self._configure_analyses(_config_data)
+        _config_data = self._convert_analysis_types(_config_data)
         self._copy_output_files(ini_file, _config_data)
         if self._network_data:
             return AnalysisWithNetworkConfiguration(
