@@ -42,6 +42,10 @@ class NetworkIniConfiguration(IniConfigurationProtocol):
     def get_network_root_dir(filepath: Path) -> Path:
         return filepath.parent.parent
 
+    @staticmethod
+    def get_data_output(ini_file: Path) -> Optional[Path]:
+        return ini_file.parent / "output"
+
     @property
     def root_dir(self) -> Path:
         return self.get_network_root_dir(self.ini_file)

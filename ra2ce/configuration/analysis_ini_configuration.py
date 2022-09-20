@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Optional
 
 import geopandas as gpd
 
@@ -17,6 +17,12 @@ class AnalysisIniConfigurationBase(IniConfigurationProtocol):
     @staticmethod
     def get_network_root_dir(filepath: Path) -> Path:
         return filepath.parent.parent
+
+    @staticmethod
+    def get_data_output(ini_file: Path) -> Optional[Path]:
+        _root_path = AnalysisIniConfigurationBase.get_network_root_dir(ini_file)
+        _project_name = ini_file.parent.name
+        return _root_path / _project_name / "output"
 
     @property
     def root_dir(self) -> Path:
