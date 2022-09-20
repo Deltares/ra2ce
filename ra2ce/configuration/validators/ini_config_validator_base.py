@@ -91,13 +91,16 @@ class IniConfigValidatorBase(Ra2ceIoValidator):
                     continue
 
                 if ("file" in _expected_values[key]) and (value is not None):
-                    # Check if the path is an absolute path or a file name that is placed in the right folder
-                    _path_validator = IniConfigPathValidator(
-                        self._config, key, value, _input_dirs
-                    )
-                    _report.merge(_path_validator.validate())
-                    # TODO: Technically this is wrong, a validator should not be 'formatting' data.
-                    self._config[header][key] = _path_validator.list_paths
+                    # Value should be none or a list of paths, because it already
+                    # checked that it's not none, we can assume it's a list of Paths.
+                    for path_value in value:
+                        if not path_value.is_file():
+                            _report.error(
+                                f"Wrong input to property [ {key} ], file does not exist: {path_value}"
+                            )
+                            _report.error(
+                                f"If no file is needed, please insert value - None - for property - {key} -"
+                            )
                     continue
 
                 if key == "road_types" and (value is not None):
