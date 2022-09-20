@@ -4,7 +4,7 @@ from typing import Optional
 
 from ra2ce.configuration.analysis_ini_configuration import AnalysisIniConfigurationBase
 from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
-from ra2ce.io.readers.ini_configuration_reader import (
+from ra2ce.io.readers.ini_config_readers import (
     AnalysisIniConfigurationReader,
     NetworkIniConfigurationReader,
 )
