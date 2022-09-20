@@ -502,7 +502,7 @@ class DamageNetwork():
         return gdf_mask
 
 class DamageNetworkReturnPeriods(DamageNetwork):
-    """A road network gdf with EVENT-BASED hazard data stored in it, and for which damages can be calculated
+    """A road network gdf with hazard data stored in it, and for which damages can be calculated
 
     @Author: Kees van Ginkel
 
