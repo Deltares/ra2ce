@@ -1,118 +1,18 @@
-import codecs
 import logging
-from ast import literal_eval
-from configparser import ConfigParser
 from pathlib import Path
 from shutil import copyfile
-from typing import List, Optional, Protocol
+from typing import List
 
-import numpy as np
-
-from ra2ce.configuration.analysis_ini_configuration import (
-    AnalysisIniConfigurationBase,
-    AnalysisWithNetworkConfiguration,
-    AnalysisWithoutNetworkConfiguration,
-)
-from ra2ce.configuration.ini_configuration_protocol import IniConfigurationProtocol
-from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
-from ra2ce.io.ra2ce_io_validator import (
-    DirectAnalysisNameList,
-    IndirectAnalysisNameList,
-    _expected_values,
-)
+from ra2ce.io.ra2ce_io_validator import _expected_values
+from ra2ce.io.readers.file_reader_protocol import FileReaderProtocol
+from ra2ce.io.readers.ini_file_reader import IniFileReader
 
 
-class IniFileReaderProtocol(Protocol):
-    def read(self, ini_file: Path) -> IniConfigurationProtocol:
-        pass
-
-
-class IniFileReader(IniFileReaderProtocol):
-    def read(self, ini_file: Path) -> IniConfigurationProtocol:
-        return self._parse_config(ini_file)
-
-    def _parse_config(self, path: Path = None, opt_cli=None) -> dict:
-        """Ajusted from HydroMT
-        source: https://github.com/Deltares/hydromt/blob/af4e5d858b0ac0883719ca59e522053053c21b82/hydromt/cli/cli_utils.py"""
-        opt = {}
-        if path is not None and path.is_file():
-            opt = self._configread(
-                path, abs_path=False
-            )  # Set from True to False 29-7-2021 by Frederique
-            # make sure paths in config section are not abs paths
-            if (
-                "setup_config" in opt
-            ):  # BELOW IS CURRENTLY NOT USED IN RA2CE BUT COULD BE GOOD FOR FUTURE LINKAGE WITH HYDROMT
-                opt["setup_config"].update(self._configread(path).get("config", {}))
-        elif path is not None:
-            raise IOError(f"Config not found at {path}")
-        if (
-            opt_cli is not None
-        ):  # BELOW IS CURRENTLY NOT USED IN RA2CE BUT COULD BE GOOD FOR FUTURE LINKAGE WITH HYDROMT
-            for section in opt_cli:
-                if not isinstance(opt_cli[section], dict):
-                    raise ValueError(
-                        f"No section found in --opt values: "
-                        "use <section>.<option>=<value> notation."
-                    )
-                if section not in opt:
-                    opt[section] = opt_cli[section]
-                    continue
-                for option, value in opt_cli[section].items():
-                    opt[section].update({option: value})
-        return opt
-
-    def _configread(
-        self,
-        config_fn,
-        encoding="utf-8",
-        cf=None,
-        defaults=dict(),
-        noheader=False,
-        abs_path=False,
-    ):
-        """read model configuration from file and parse to dictionary
-
-        Ajusted from HydroMT
-        source: https://github.com/Deltares/hydromt/blob/af4e5d858b0ac0883719ca59e522053053c21b82/hydromt/config.py"""
-        if cf is None:
-            cf = ConfigParser(allow_no_value=True, inline_comment_prefixes=[";", "#"])
-
-        cf.optionxform = str  # preserve capital letter
-        with codecs.open(config_fn, "r", encoding=encoding) as fp:
-            cf.read_file(fp)
-        root = Path(config_fn.stem)
-        cfdict = defaults.copy()
-        for section in cf.sections():
-            if section not in cfdict:
-                cfdict[section] = dict()  # init
-            sdict = dict()
-            for key, value in cf.items(section):
-                try:
-                    v = literal_eval(value)
-                    assert not isinstance(v, tuple)  # prevent tuples from being parsed
-                    value = v
-                except Exception:
-                    pass
-                if abs_path:
-                    if isinstance(value, str) and root.joinpath(value).exists():
-                        value = root.joinpath(value).resolve()
-                    elif isinstance(value, list) and np.all(
-                        [root.joinpath(v).exists() for v in value]
-                    ):
-                        value = [root.joinpath(v).resolve() for v in value]
-                sdict[key] = value
-            cfdict[section].update(**sdict)
-        if noheader and "dummy" in cfdict:
-            cfdict = cfdict["dummy"]
-
-        return cfdict
-
-
-class IniConfigurationReaderBase(IniFileReaderProtocol):
+class IniConfigurationReaderBase(FileReaderProtocol):
     """
-    Generic Ini Configuration Reader.
-    Eventually it will be split into smaller readers for each type of IniConfiguration.
+    Generic BASE Ini Configuration Reader.
+    It is meant to behave as an abstract class, the concrete classes should
+    implement the read method from the FileReaderProtocol.
     """
 
     def _import_configuration(self, root_path: Path, config_path: Path) -> dict:
@@ -193,51 +93,3 @@ class IniConfigurationReaderBase(IniFileReaderProtocol):
             for k, v in value_dict.items():
                 if "file" in _expected_values[key]:
                     self._config[key][k] = self._parse_path_list(v)
-
-
-class AnalysisIniConfigurationReader(IniConfigurationReaderBase):
-    def __init__(self, network_data: Optional[IniConfigurationProtocol]) -> None:
-        self._network_data = network_data
-
-    def _convert_analysis_types(self, config: dict) -> dict:
-        def set_analysis_values(config_type: str):
-            if config_type in config:
-                (config[config_type]).append(config[a])
-            else:
-                config[config_type] = [config[a]]
-
-        analyses_names = [a for a in config.keys() if "analysis" in a]
-        for a in analyses_names:
-            if any(t in config[a]["analysis"] for t in DirectAnalysisNameList):
-                set_analysis_values("direct")
-            elif any(t in config[a]["analysis"] for t in IndirectAnalysisNameList):
-                set_analysis_values("indirect")
-            del config[a]
-
-        return config
-
-    def read(self, ini_file: Path) -> AnalysisIniConfigurationBase:
-        if not ini_file:
-            return None
-        _root_path = AnalysisIniConfigurationBase.get_network_root_dir(ini_file)
-        _config_data = self._import_configuration(_root_path, ini_file)
-        # self._update_path_values(_config_data)
-        _config_data = self._convert_analysis_types(_config_data)
-        self._copy_output_files(ini_file, _config_data)
-        if self._network_data:
-            return AnalysisWithNetworkConfiguration(
-                ini_file, _config_data, self._network_data
-            )
-        else:
-            return AnalysisWithoutNetworkConfiguration(ini_file, _config_data)
-
-
-class NetworkIniConfigurationReader(IniConfigurationReaderBase):
-    def read(self, ini_file: Path) -> IniConfigurationProtocol:
-        if not ini_file:
-            return None
-        _root_dir = NetworkIniConfiguration.get_network_root_dir(ini_file)
-        _config_data = self._import_configuration(_root_dir, ini_file)
-        # self._update_path_values(_config_data)
-        self._copy_output_files(ini_file, _config_data)
-        return NetworkIniConfiguration(ini_file, _config_data)

@@ -3,8 +3,10 @@ import pickle
 from pathlib import Path
 from typing import Any
 
+from ra2ce.io.readers.file_reader_protocol import FileReaderProtocol
 
-class GraphPickleReader:
+
+class GraphPickleReader(FileReaderProtocol):
     def read(self, pickle_path: Path) -> Any:
         _read_graph = None
         if not pickle_path:
