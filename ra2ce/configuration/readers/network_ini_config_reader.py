@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
 from ra2ce.configuration.readers.ini_config_reader_base import (
@@ -12,19 +11,19 @@ class NetworkIniConfigurationReader(IniConfigurationReaderBase):
     def read(self, ini_file: Path) -> NetworkIniConfiguration:
         if not ini_file:
             return None
-        _root_dir = NetworkIniConfiguration.get_network_root_dir(ini_file)
-        _config_data = self._import_configuration(_root_dir, ini_file)
+        _config_data = self._import_configuration(ini_file)
         self._update_path_values(_config_data)
         self._copy_output_files(ini_file, _config_data)
         return NetworkIniConfiguration(ini_file, _config_data)
 
-    def _import_configuration(self, root_path: Path, config_path: Path) -> dict:
+    def _import_configuration(self, config_path: Path) -> dict:
         # Read the configurations in network.ini and add the root path to the configuration dictionary.
+        _root_path = NetworkIniConfiguration.get_network_root_dir(config_path)
         if not config_path.is_file():
-            config_path = root_path / config_path
+            config_path = _root_path / config_path
         _config = IniFileReader().read(config_path)
         _config["project"]["name"] = config_path.parent.name
-        _config["root_path"] = root_path
+        _config["root_path"] = _root_path
 
         _hazard = _config.get("hazard", None)
         if _hazard and "hazard_field_name" in _hazard:
@@ -32,7 +31,6 @@ class NetworkIniConfigurationReader(IniConfigurationReaderBase):
                 _hazard["hazard_field_name"] = _hazard["hazard_field_name"].split(",")
 
         # Set the output paths in the configuration Dict for ease of saving to those folders.
-        _config["input"] = _config["root_path"] / _config["project"]["name"] / "input"
-        _config["static"] = _config["root_path"] / _config["project"]["name"] / "static"
-        # config["output"] = config["root_path"] / config["project"]["name"] / "output"
+        _config["input"] = config_path / "input"
+        _config["static"] = config_path / "static"
         return _config
