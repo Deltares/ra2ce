@@ -5,6 +5,7 @@ import geopandas as gpd
 
 from ra2ce.configuration.ini_configuration_protocol import IniConfigurationProtocol
 from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
+from ra2ce.configuration.validators import AnalysisIniConfigValidator
 from ra2ce.io.readers import GraphPickleReader
 
 
@@ -38,7 +39,10 @@ class AnalysisIniConfigurationBase(IniConfigurationProtocol):
         _create_output_folders("indirect")
 
     def is_valid(self) -> bool:
-        return self.ini_file.is_file() and self.ini_file.suffix == ".ini"
+        _file_is_valid = self.ini_file.is_file() and self.ini_file.suffix == ".ini"
+        return (
+            _file_is_valid and AnalysisIniConfigValidator(self.config_data).validate()
+        )
 
 
 class AnalysisWithNetworkConfiguration(AnalysisIniConfigurationBase):

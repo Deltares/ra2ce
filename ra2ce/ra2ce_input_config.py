@@ -3,14 +3,14 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.configuration.analysis_ini_configuration import AnalysisIniConfigurationBase
+from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
 from ra2ce.configuration.readers import (
     AnalysisIniConfigurationReader,
     NetworkIniConfigurationReader,
 )
-from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
 
 
-class Ra2ceInput:
+class Ra2ceInputConfig:
     network_config: Optional[NetworkIniConfiguration] = None
     analysis_config: AnalysisIniConfigurationBase = None
 
@@ -19,16 +19,6 @@ class Ra2ceInput:
         self.analysis_config = AnalysisIniConfigurationReader(self.network_config).read(
             analysis_ini
         )
-        # if network_ini:
-        #     self.network_config = NetworkIniConfiguration(network_ini)
-
-        # if analysis_ini:
-        #     if self.network_config:
-        #         self.analysis_config = AnalysisWithNetworkConfiguration(
-        #             analysis_ini, self.network_config
-        #         )
-        #     else:
-        #         self.analysis_config = AnalysisWithoutNetworkConfiguration(analysis_ini)
 
     def get_root_dir(self) -> Path:
         if self.network_config.ini_file:
@@ -41,6 +31,7 @@ class Ra2ceInput:
     def is_valid_input(self) -> bool:
         """
         Validates whether the input is valid. This require that at least the analysis ini file is given.
+        TODO: Very unclear what a valid input is, needs to be better specified.
 
         Returns:
             bool: Input parameters are valid for a ra2ce run.
@@ -59,7 +50,8 @@ class Ra2ceInput:
                 "Root directory differs between network and analyses .ini files"
             )
             return False
-        return True
+
+        return self.network_config.is_valid() and self.analysis_config.is_valid()
 
     def configure(self) -> None:
         if self.network_config:
