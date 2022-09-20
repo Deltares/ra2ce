@@ -9,6 +9,12 @@ Installation
 ---------------------------
 RA2CE can be operated via the command-line interface with two commands. Before RA2CE can be used, the correct Python environment needs to be installed (see *environment.yml*). Anaconda is a well-known environment manager for Python and can be used to install the correct environment and run RA2CE via its command-line interface. It is recommended to install Miniconda , this is a small version of Anaconda that contains the functionality required for setting up the Python environment for RA2CE.
 
+If running a development environment with Anaconda, the user may follow these steps in command line:
+::
+  conda env create -f environment.yml
+  poetry install
+::
+
 Command-line interface operation
 ---------------------------
 a.	To run both the network creation and analysis modules, run RA2CE with ``python run.py --network_ini <path to network.ini file> --analyses_ini <path to analyses.ini file>``
