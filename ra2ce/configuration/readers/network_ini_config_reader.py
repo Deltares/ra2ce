@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
 from ra2ce.configuration.readers.ini_config_reader_base import (
@@ -22,7 +23,7 @@ class NetworkIniConfigurationReader(IniConfigurationReaderBase):
         if not config_path.is_file():
             config_path = root_path / config_path
         _config = IniFileReader().read(config_path)
-        _config["project"]["name"] = config_path.parts[-2]
+        _config["project"]["name"] = config_path.parent.name
         _config["root_path"] = root_path
 
         _hazard = _config.get("hazard", None)

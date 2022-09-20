@@ -5,6 +5,8 @@ import warnings
 from pathlib import Path
 from typing import Optional
 
+from ra2ce.configuration.analysis_ini_configuration import AnalysisIniConfigurationBase
+from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
 from ra2ce.ra2ce_input_config import Ra2ceInputConfig
 from ra2ce.ra2ce_logging import Ra2ceLogger
 from ra2ce.runners import AnalysisRunner, AnalysisRunnerFactory
@@ -17,14 +19,23 @@ warnings.filterwarnings(action="ignore", message="Value *not successfully writte
 
 
 class Ra2ceHandler:
-    _logger: logging.Logger = None
-
     def __init__(self, network: Optional[Path], analysis: Optional[Path]) -> None:
-        _output_config = None
-        self._logger = Ra2ceLogger(
-            logging_dir=_output_config, logger_name="RA2CE"
-        )._get_logger()
+        self._initialize_logger(network, analysis)
         self.input_config = Ra2ceInputConfig(network, analysis)
+
+    def _initialize_logger(
+        self, network: Optional[Path], analysis: Optional[Path]
+    ) -> None:
+        _output_config = None
+        if network:
+            _output_config = NetworkIniConfiguration.get_data_output(network)
+        elif analysis:
+            _output_config = AnalysisIniConfigurationBase.get_data_output(analysis)
+        else:
+            raise ValueError(
+                "No valid location provided to start logging. Either network or analysis are required."
+            )
+        Ra2ceLogger(logging_dir=_output_config, logger_name="RA2CE")
 
     def configure(self) -> None:
         self.input_config.configure()

@@ -43,7 +43,7 @@ class AnalysisIniConfigurationReader(IniConfigurationReaderBase):
         if not config_path.is_file():
             config_path = root_path / config_path
         _config = IniFileReader().read(config_path)
-        _config["project"]["name"] = config_path.parts[-2]
+        _config["project"]["name"] = config_path.parent.name
         _config["root_path"] = root_path
 
         # Set the output paths in the configuration Dict for ease of saving to those folders.
@@ -57,7 +57,6 @@ class AnalysisIniConfigurationReader(IniConfigurationReaderBase):
             return None
         _root_path = AnalysisIniConfigurationBase.get_network_root_dir(ini_file)
         _config_data = self._import_configuration(_root_path, ini_file)
-        # self._update_path_values(_config_data)
         _config_data = self._convert_analysis_types(_config_data)
         self._copy_output_files(ini_file, _config_data)
         if self._network_data:
