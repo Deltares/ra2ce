@@ -3,7 +3,7 @@ from pathlib import Path
 from shutil import copyfile
 from typing import List
 
-from ra2ce.io.ra2ce_io_validator import _expected_values
+from ra2ce.configuration.validators.ini_config_validator_base import _expected_values
 from ra2ce.io.readers.file_reader_protocol import FileReaderProtocol
 from ra2ce.io.readers.ini_file_reader import IniFileReader
 

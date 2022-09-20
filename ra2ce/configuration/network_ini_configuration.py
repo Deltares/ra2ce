@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import Dict, Optional
 
 from ra2ce.configuration.ini_configuration_protocol import IniConfigurationProtocol
+from ra2ce.configuration.validators import NetworkIniConfigurationValidator
 from ra2ce.graph.hazard import Hazard
 from ra2ce.graph.networks import Network
-from ra2ce.io.ra2ce_io_validator import NetworkIniConfigurationValidator
 
 
 def network_handler(config: dict, files: dict) -> Optional[dict]:
