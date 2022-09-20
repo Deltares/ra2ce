@@ -1,4 +1,3 @@
-from re import A
 from typing import List
 
 from ra2ce.configuration.validators.ini_config_path_validator import (

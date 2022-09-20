@@ -14,6 +14,7 @@ from ra2ce.configuration.validators.ini_config_validator_base import (
     DirectAnalysisNameList,
     IndirectAnalysisNameList,
 )
+from ra2ce.io.readers.ini_file_reader import IniFileReader
 
 
 class AnalysisIniConfigurationReader(IniConfigurationReaderBase):
@@ -36,6 +37,27 @@ class AnalysisIniConfigurationReader(IniConfigurationReaderBase):
             del config[a]
 
         return config
+
+    def _import_configuration(self, root_path: Path, config_path: Path) -> dict:
+        # Read the configurations in network.ini and add the root path to the configuration dictionary.
+        if not config_path.is_file():
+            config_path = root_path / config_path
+        _config = IniFileReader().read(config_path)
+        _config["project"]["name"] = config_path.parts[-2]
+        _config["root_path"] = root_path
+
+        # TODO: This might only be relevant for NETWORK reader.
+        # REMOVE: if only relevant for NetworkConfigReader
+        _hazard = _config.get("hazard", None)
+        if _hazard and "hazard_field_name" in _hazard:
+            if _hazard["hazard_field_name"]:
+                _hazard["hazard_field_name"] = _hazard["hazard_field_name"].split(",")
+
+        # Set the output paths in the configuration Dict for ease of saving to those folders.
+        _config["input"] = _config["root_path"] / _config["project"]["name"] / "input"
+        _config["static"] = _config["root_path"] / _config["project"]["name"] / "static"
+        # config["output"] = config["root_path"] / config["project"]["name"] / "output"
+        return _config
 
     def read(self, ini_file: Path) -> AnalysisIniConfigurationBase:
         if not ini_file:
