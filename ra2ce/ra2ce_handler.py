@@ -30,7 +30,7 @@ class Ra2ceHandler:
         if network:
             _output_config = NetworkIniConfig.get_data_output(network)
         elif analysis:
-            _output_config = AnalysisConfigBaset_data_output(analysis)
+            _output_config = AnalysisConfigBase.get_data_output(analysis)
         else:
             raise ValueError(
                 "No valid location provided to start logging. Either network or analysis are required."
