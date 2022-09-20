@@ -1,14 +1,11 @@
-import logging
 from pathlib import Path
 from typing import Dict
 
 import geopandas as gpd
 
-from ra2ce.configuration.ini_configuration import IniConfigurationProtocol
+from ra2ce.configuration.ini_configuration_protocol import IniConfigurationProtocol
 from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
 from ra2ce.io.readers import GraphPickleReader
-
-# from ra2ce.io.readers.ini_configuration_reader import IniConfigurationReader
 
 
 class AnalysisIniConfigurationBase(IniConfigurationProtocol):
