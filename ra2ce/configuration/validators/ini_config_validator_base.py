@@ -73,13 +73,6 @@ class IniConfigValidatorBase(Ra2ceIoValidator):
         # check if properties have correct input
         # TODO: Decide whether also the non-used properties must be checked or those are not checked
         # TODO: Decide how to check for multiple analyses (analysis1, analysis2, etc)
-        _input_dirs = {
-            "polygon": "network",
-            "hazard_map": "hazard",
-            "origins": "network",
-            "destinations": "network",
-            "locations": "network",
-        }
 
         for header in required_headers:
             # Now check the parameters per configured item.
