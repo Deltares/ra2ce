@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ra2ce.configuration.network_configuration import NetworkIniConfig
+from ra2ce.configuration.network_config import NetworkIniConfig
 from ra2ce.configuration.readers.ini_config_reader_base import (
     IniConfigurationReaderBase,
 )
