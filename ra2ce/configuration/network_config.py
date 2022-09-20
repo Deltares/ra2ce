@@ -31,7 +31,7 @@ def hazard_handler(config: dict, graphs: dict, files: dict) -> Optional[dict]:
         return None
 
 
-class NetworkIniConfiguration(IniConfigurationProtocol):
+class NetworkIniConfig(IniConfigurationProtocol):
     files: Dict[str, Path] = None
 
     def __init__(self, ini_file: Path, config_data: dict) -> None:

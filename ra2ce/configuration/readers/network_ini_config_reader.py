@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
+from ra2ce.configuration.network_configuration import NetworkIniConfig
 from ra2ce.configuration.readers.ini_config_reader_base import (
     IniConfigurationReaderBase,
 )
@@ -8,17 +8,17 @@ from ra2ce.io.readers.ini_file_reader import IniFileReader
 
 
 class NetworkIniConfigurationReader(IniConfigurationReaderBase):
-    def read(self, ini_file: Path) -> NetworkIniConfiguration:
+    def read(self, ini_file: Path) -> NetworkIniConfig:
         if not ini_file:
             return None
         _config_data = self._import_configuration(ini_file)
         self._update_path_values(_config_data)
         self._copy_output_files(ini_file, _config_data)
-        return NetworkIniConfiguration(ini_file, _config_data)
+        return NetworkIniConfig(ini_file, _config_data)
 
     def _import_configuration(self, config_path: Path) -> dict:
         # Read the configurations in network.ini and add the root path to the configuration dictionary.
-        _root_path = NetworkIniConfiguration.get_network_root_dir(config_path)
+        _root_path = NetworkIniConfig.get_network_root_dir(config_path)
         if not config_path.is_file():
             config_path = _root_path / config_path
         _config = IniFileReader().read(config_path)
