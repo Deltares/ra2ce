@@ -1,11 +1,11 @@
 from pathlib import Path
 
-from ra2ce.configuration.analysis_ini_config_base import AnalysisIniConfigBase
+from ra2ce.configuration.analysis_ini_config_base import AnalysisConfigBase
 from ra2ce.configuration.network_config import NetworkIniConfig
 from ra2ce.configuration.validators import AnalysisIniConfigValidator
 
 
-class AnalysisWithNetworkConfiguration(AnalysisIniConfigBase):
+class AnalysisWithNetworkConfiguration(AnalysisConfigBase):
     def __init__(
         self,
         ini_file: Path,

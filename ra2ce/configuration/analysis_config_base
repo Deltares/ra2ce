@@ -4,7 +4,7 @@ from typing import Dict, Optional
 from ra2ce.configuration.ini_configuration_protocol import IniConfigurationProtocol
 
 
-class AnalysisIniConfigBase(IniConfigurationProtocol):
+class AnalysisConfigBase(IniConfigurationProtocol):
     ini_file: Path
     root_dir: Path
     config_data: Dict = None
@@ -15,7 +15,7 @@ class AnalysisIniConfigBase(IniConfigurationProtocol):
 
     @staticmethod
     def get_data_output(ini_file: Path) -> Optional[Path]:
-        _root_path = AnalysisIniConfigBase.get_network_root_dir(ini_file)
+        _root_path = AnalysisConfigBase.get_network_root_dir(ini_file)
         _project_name = ini_file.parent.name
         return _root_path / _project_name / "output"
 
