@@ -163,6 +163,8 @@ def load_config(root_path, config_path, check=True):
         if config_path.stem == 'analyses':
             # Create a dictionary with direct and indirect analyses separately.
             config = configure_analyses(config)
+        else:
+            print('No analyses file found') #Todo make cleaner handling.
 
         # Set the output paths in the configuration Dict for ease of saving to those folders.
         config['input'] = config['root_path'] / config['project']['name'] / 'input'
