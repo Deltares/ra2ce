@@ -2,29 +2,21 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.configuration.analysis_ini_configuration import (
-    AnalysisIniConfigurationBase,
-    AnalysisWithNetworkConfiguration,
-    AnalysisWithoutNetworkConfiguration,
-)
-from ra2ce.configuration.network_ini_configuration import NetworkIniConfiguration
+from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
+from ra2ce.configuration.config_reader_factory import ConfigReaderFactory
 
 
-class Ra2ceInput:
-    network_config: Optional[NetworkIniConfiguration] = None
-    analysis_config: AnalysisIniConfigurationBase = None
+class Ra2ceInputConfig:
+    network_config: Optional[NetworkConfig] = None
+    analysis_config: AnalysisConfigBase = None
 
     def __init__(self, network_ini: Optional[Path], analysis_ini: Path) -> None:
-        if network_ini:
-            self.network_config = NetworkIniConfiguration(network_ini)
-
-        if analysis_ini:
-            if self.network_config:
-                self.analysis_config = AnalysisWithNetworkConfiguration(
-                    analysis_ini, self.network_config
-                )
-            else:
-                self.analysis_config = AnalysisWithoutNetworkConfiguration(analysis_ini)
+        self.network_config = ConfigReaderFactory.get_reader(NetworkConfig).read(
+            network_ini
+        )
+        self.analysis_config = ConfigReaderFactory.get_reader(AnalysisConfigBase).read(
+            analysis_ini, self.network_config
+        )
 
     def get_root_dir(self) -> Path:
         if self.network_config.ini_file:
@@ -37,6 +29,7 @@ class Ra2ceInput:
     def is_valid_input(self) -> bool:
         """
         Validates whether the input is valid. This require that at least the analysis ini file is given.
+        TODO: Very unclear what a valid input is, needs to be better specified.
 
         Returns:
             bool: Input parameters are valid for a ra2ce run.
@@ -55,7 +48,9 @@ class Ra2ceInput:
                 "Root directory differs between network and analyses .ini files"
             )
             return False
-        return True
+
+        # We already validated the anlysis, just need to validate the network now.
+        return self.network_config.is_valid()
 
     def configure(self) -> None:
         if self.network_config:
