@@ -44,12 +44,26 @@ class NetworkConfig(ConfigProtocol):
     def from_data(
         cls, ini_file: Path, config_data: NetworkIniConfigData
     ) -> NetworkConfig:
+        """
+        Initializes a `NetworkConfig` with the given parameters.
+
+        Args:
+            ini_file (Path): Path to the ini file containing the analysis data.
+            config_data (NetworkIniConfigData): Ini data representation.
+
+        Returns:
+            NetworkConfig: Initialized instance.
+        """
         _new_network_config = cls()
         _new_network_config.ini_file = ini_file
         _new_network_config.config_data = config_data
-        _new_network_config.files = _new_network_config._get_existent_network_files(
-            config_data["static"] / "output_graph"
-        )
+        _static_dir = config_data.get("static", None)
+        if _static_dir and _static_dir.is_dir():
+            _new_network_config.files = _new_network_config._get_existent_network_files(
+                _static_dir / "output_graph"
+            )
+        else:
+            logging.error(f"Static dir not found. Value provided: {_static_dir}")
         return _new_network_config
 
     @staticmethod
