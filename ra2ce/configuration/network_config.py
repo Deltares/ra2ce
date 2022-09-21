@@ -37,6 +37,9 @@ class NetworkIniConfig(IniConfigurationProtocol):
     def __init__(self, ini_file: Path, config_data: dict) -> None:
         self.ini_file = ini_file
         self.config_data = config_data
+        self.files = self._get_existent_network_files(
+            config_data["static"] / "output_graph"
+        )
 
     @staticmethod
     def get_network_root_dir(filepath: Path) -> Path:
@@ -46,36 +49,35 @@ class NetworkIniConfig(IniConfigurationProtocol):
     def get_data_output(ini_file: Path) -> Optional[Path]:
         return ini_file.parent / "output"
 
+    @staticmethod
+    def _get_existent_network_files(output_graph_dir: Path) -> dict:
+        """Checks if file of graph exist in network folder and adds filename to the files dict"""
+        _network_filenames = [
+            "base_graph.p",
+            "base_network.feather",
+            "origins_destinations_graph.p",
+            "base_graph_hazard.p",
+            "origins_destinations_graph_hazard.p",
+            "base_network_hazard.feather",
+        ]
+
+        def _get_file_entry(expected_file: Path) -> Optional[Path]:
+            _value = None
+            if expected_file and expected_file.is_file():
+                _value = expected_file
+                logging.info(f"Existing graph/network found: {expected_file}.")
+            return _value
+
+        return {
+            _ep.stem: _get_file_entry(_ep)
+            for _ep in map(lambda x: output_graph_dir / x, _network_filenames)
+        }
+
     @property
     def root_dir(self) -> Path:
         return self.get_network_root_dir(self.ini_file)
 
-    def _set_files(self) -> dict:
-        """Checks if file of graph exist in network folder and adds filename to the files dict"""
-        _parent_dir = self.config_data["static"] / "output_graph"
-        _filename_list = list(
-            map(
-                lambda x: _parent_dir / x,
-                [
-                    "base_graph.feather",
-                    "base_network.feather",
-                    "origins_destinations_graph.p",
-                    "base_graph_hazard.p",
-                    "origins_destinations_graph_hazard.p",
-                    "base_network_hazard.p",
-                ],
-            )
-        )
-
-        self.files = {}
-        for _file in _filename_list:
-            self.files[_file.stem] = None
-            if _file.is_file():
-                self.files[_file.stem] = _file
-                logging.info(f"Existing graph/network found: {_file}.")
-
     def configure(self) -> None:
-        self._set_files()
         # Call Handlers (to rework)
         _graphs = network_handler(self.config_data, self.files)
         self.graphs = hazard_handler(self.config_data, _graphs, self.files)
