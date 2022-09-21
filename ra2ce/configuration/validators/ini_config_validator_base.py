@@ -1,5 +1,6 @@
 from typing import List
 
+from ra2ce.configuration.ini_config_protocol import IniConfigDataProtocol
 from ra2ce.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.validation.validation_report import ValidationReport
 
@@ -51,7 +52,7 @@ _expected_values = {
 
 
 class IniConfigValidatorBase(Ra2ceIoValidator):
-    def __init__(self, config_data: dict) -> None:
+    def __init__(self, config_data: IniConfigDataProtocol) -> None:
         self._config = config_data
 
     def _validate_headers(self, required_headers: List[str]) -> ValidationReport:
