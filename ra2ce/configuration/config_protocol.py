@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, List, Protocol
+from typing import Any, List, Protocol
 
 from ra2ce.configuration.ini_config_protocol import IniConfigDataProtocol
 
