@@ -1,3 +1,6 @@
+from pathlib import Path
+from typing import Optional
+
 import pytest
 
 from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
@@ -29,9 +32,6 @@ class TestRa2ceInputConfig:
         assert isinstance(_input_config.analysis_config, AnalysisConfigBase)
         assert isinstance(_input_config.network_config, NetworkConfig)
 
-    @pytest.mark.skip(
-        reason="Network Config does not seem to initialize files correctly."
-    )
     def test_from_input_paths_given_only_analysis(self):
         # 1. Define test data.
         _test_dir = test_data / "simple_inputs"
@@ -63,3 +63,49 @@ class TestRa2ceInputConfig:
         assert _input_config
         assert isinstance(_input_config.network_config, NetworkConfig)
         assert not _input_config.analysis_config
+
+    @pytest.mark.parametrize(
+        "network_ini",
+        [
+            pytest.param(
+                test_data / "simple_inputs" / "network.ini", id="Valid network ini."
+            ),
+            pytest.param(None, id="No INI network."),
+        ],
+    )
+    @pytest.mark.parametrize(
+        "analysis_ini",
+        [
+            pytest.param(
+                test_data / "simple_inputs" / "analysis.ini", id="Valid analysis ini."
+            ),
+            pytest.param(None, id="No INI analysis."),
+        ],
+    )
+    def test_get_root_dir(
+        self, network_ini: Optional[Path], analysis_ini: Optional[Path]
+    ):
+        # 1. Define test data.
+        _input_config = Ra2ceInputConfig()
+        _input_config.network_config = NetworkConfig()
+        _input_config.analysis_config = AnalysisConfigBase()
+        _input_config.network_config.ini_file = network_ini
+        _input_config.analysis_config.ini_file = analysis_ini
+
+        # 2. Run test.
+        if not network_ini and not analysis_ini:
+            with pytest.raises(ValueError):
+                _input_config.get_root_dir()
+        else:
+            _root_dir = _input_config.get_root_dir()
+            # 3. Verify expectations.
+            assert _root_dir == test_data
+
+    def test_is_valid_input_no_analysis_config(self):
+        # 1. Define test data
+        _input_config = Ra2ceInputConfig()
+        _input_config.network_config = NetworkConfig()
+        _input_config.analysis_config = None
+
+        # 2. Run test
+        assert not _input_config.is_valid_input()

@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData, NetworkConfig
@@ -35,16 +36,20 @@ class AnalysisWithoutNetworkConfigReader(AnalysisConfigReaderBase):
     def read(self, ini_file: Path) -> AnalysisWithoutNetworkConfiguration:
         if not ini_file:
             return None
-        _analisis_config = self._get_analysis_config_data(ini_file)
-        _output_network_ini_file = _analisis_config["output"] / "network.ini"
+        _analisis_config_dict = self._get_analysis_config_data(ini_file)
+        _output_network_ini_file = _analisis_config_dict["output"] / "network.ini"
         _network_config = NetworkInAnalysisIniConfigReader().read(
             _output_network_ini_file
         )
-        _analisis_config.update(_network_config)
-        _analisis_config["origins_destinations"] = _analisis_config["network"][
-            "origins_destinations"
-        ]
-        _analysis_config_data = AnalysisIniConfigData.from_dict(_analisis_config)
+        _analisis_config_dict.update(_network_config.__dict__)
+        _network = _analisis_config_dict.get("network", None)
+        if _network:
+            _analisis_config_dict["origins_destinations"] = _network.get(
+                "origins_destinations", None
+            )
+        else:
+            logging.warn(f"Not found network key for the Analysis {ini_file}")
+        _analysis_config_data = AnalysisIniConfigData.from_dict(_analisis_config_dict)
 
         return AnalysisWithoutNetworkConfiguration.from_data(
             ini_file, _analysis_config_data
