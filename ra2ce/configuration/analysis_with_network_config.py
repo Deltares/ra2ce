@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from ra2ce.configuration.analysis_config_base import AnalysisConfigBase
-from ra2ce.configuration.network_config import NetworkIniConfig
+from ra2ce.configuration.network_config import NetworkConfig
 from ra2ce.configuration.validators import AnalysisIniConfigValidator
 
 
@@ -10,7 +10,7 @@ class AnalysisWithNetworkConfiguration(AnalysisConfigBase):
         self,
         ini_file: Path,
         analysis_data: dict,
-        network_config: NetworkIniConfig,
+        network_config: NetworkConfig,
     ) -> None:
         if not ini_file.is_file():
             raise FileNotFoundError(ini_file)

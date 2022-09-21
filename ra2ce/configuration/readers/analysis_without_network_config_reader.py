@@ -4,7 +4,7 @@ from ra2ce.configuration.analysis_config_base import AnalysisConfigBase
 from ra2ce.configuration.analysis_without_network_config import (
     AnalysisWithoutNetworkConfiguration,
 )
-from ra2ce.configuration.network_config import NetworkIniConfig
+from ra2ce.configuration.network_config import NetworkConfig
 from ra2ce.configuration.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
@@ -15,11 +15,11 @@ from ra2ce.io.readers.ini_file_reader import IniFileReader
 
 
 class NetworkInAnalysisIniConfigReader(IniConfigurationReaderBase):
-    def read(self, ini_file: Path) -> NetworkIniConfig:
+    def read(self, ini_file: Path) -> NetworkConfig:
         if not ini_file:
             return None
         _config_data = self._import_configuration(ini_file)
-        return NetworkIniConfig(ini_file, _config_data)
+        return NetworkConfig(ini_file, _config_data)
 
     def _import_configuration(self, config_path: Path) -> dict:
         _root_path = AnalysisConfigBase.get_network_root_dir(config_path)
