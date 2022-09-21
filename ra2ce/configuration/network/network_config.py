@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, Optional
 
 from ra2ce.configuration.config_protocol import ConfigProtocol
-from ra2ce.configuration.ini_config_protocol import NetworkIniConfigData
+from ra2ce.configuration.network.network_ini_config_data import NetworkIniConfigData
 from ra2ce.configuration.network.network_ini_config_validator import (
     NetworkIniConfigurationValidator,
 )
