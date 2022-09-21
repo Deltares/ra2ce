@@ -6,7 +6,7 @@ from typing import List
 import pytest
 
 from ra2ce.ra2ce_logging import Ra2ceLogger
-from tests import test_data
+from tests import test_results
 
 
 def get_logged_text_lines(log_file: Path) -> List[str]:
@@ -17,7 +17,7 @@ def get_logged_text_lines(log_file: Path) -> List[str]:
 
 class TestRa2ceLogging:
     def test_given_non_existent_dir_creates_log(self, request: pytest.FixtureRequest):
-        _test_dir = test_data / request.node.name
+        _test_dir = test_results / request.node.name
         _logger_name = "testlog"
         shutil.rmtree(_test_dir, ignore_errors=True)
         _initial_log_mssg = f"{_logger_name} logger initialized."
@@ -37,7 +37,7 @@ class TestRa2ceLogging:
 
     def test_log_messages(self, request: pytest.FixtureRequest):
         # 1. Define test data.
-        _test_dir = test_data / request.node.name
+        _test_dir = test_results / request.node.name
         _logger_name = "testlog"
         _err_mssg = "Minim cupidatat cupidatat ullamco mollit enim consequat proident incididunt excepteur amet."
         _warn_mssg = "Culpa eu et ea qui mollit tempor nulla consequat ex incididunt elit aliqua."
