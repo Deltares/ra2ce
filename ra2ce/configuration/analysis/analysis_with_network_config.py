@@ -31,6 +31,7 @@ class AnalysisWithNetworkConfiguration(AnalysisConfigBase):
         _new_analysis = cls()
         _new_analysis.ini_file = ini_file
         _new_analysis.config_data = config_data
+        return _new_analysis
 
     @classmethod
     def from_data_with_network(
