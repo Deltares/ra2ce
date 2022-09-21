@@ -55,10 +55,10 @@ class NetworkIniConfiguration(IniConfiguration):
                 [
                     "base_graph.feather",
                     "base_network.feather",
+                    "base_network_hazard.feather",
                     "origins_destinations_graph.p",
                     "base_graph_hazard.p",
                     "origins_destinations_graph_hazard.p",
-                    "base_network_hazard.p",
                 ],
             )
         )
