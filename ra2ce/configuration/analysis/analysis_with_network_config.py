@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from ra2ce.configuration.analysis_config_base import AnalysisConfigBase
-from ra2ce.configuration.ini_config_protocol import AnalysisIniConfigData
-from ra2ce.configuration.network_config import NetworkConfig
-from ra2ce.configuration.validators import AnalysisIniConfigValidator
+from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData, NetworkConfig
+from ra2ce.configuration.analysis.analysis_ini_config_validator import (
+    AnalysisIniConfigValidator,
+)
 
 
 class AnalysisWithNetworkConfiguration(AnalysisConfigBase):

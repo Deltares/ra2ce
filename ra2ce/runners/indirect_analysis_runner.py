@@ -1,5 +1,5 @@
 from ra2ce.analyses.indirect import analyses_indirect
-from ra2ce.configuration.analysis_config_base import AnalysisConfigBase
+from ra2ce.configuration import AnalysisConfigBase
 from ra2ce.ra2ce_input_config import Ra2ceInputConfig
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 

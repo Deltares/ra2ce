@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from ra2ce.configuration.analysis_config_base import AnalysisConfigBase
+from ra2ce.configuration import AnalysisConfigBase
 from ra2ce.ra2ce_input_config import Ra2ceInputConfig
 
 

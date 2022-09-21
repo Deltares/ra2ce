@@ -2,9 +2,10 @@ from pathlib import Path
 
 import geopandas as gpd
 
-from ra2ce.configuration.analysis_config_base import AnalysisConfigBase
-from ra2ce.configuration.ini_config_protocol import AnalysisIniConfigData
-from ra2ce.configuration.validators import AnalysisWithoutNetworkConfigValidator
+from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData
+from ra2ce.configuration.analysis.analysis_ini_config_validator import (
+    AnalysisWithoutNetworkConfigValidator,
+)
 from ra2ce.io.readers import GraphPickleReader
 
 

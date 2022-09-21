@@ -11,6 +11,9 @@ class IniConfigDataProtocol(dict):
     def from_dict(cls, dict_values) -> Any:
         pass
 
+    def is_valid(self) -> bool:
+        pass
+
 
 class AnalysisIniConfigData(IniConfigDataProtocol):
     @classmethod

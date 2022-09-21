@@ -2,10 +2,11 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.configuration.analysis_config_base import AnalysisConfigBase
-from ra2ce.configuration.network_config import NetworkConfig
-from ra2ce.configuration.readers import (
+from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
+from ra2ce.configuration.analysis.readers.analysis_config_reader_factory import (
     AnalysisConfigReaderFactory,
+)
+from ra2ce.configuration.network.readers.network_ini_config_reader import (
     NetworkIniConfigurationReader,
 )
 
@@ -15,6 +16,7 @@ class Ra2ceInputConfig:
     analysis_config: AnalysisConfigBase = None
 
     def __init__(self, network_ini: Optional[Path], analysis_ini: Path) -> None:
+        # TODO: These reads should be done from a ra2ce.configuration factory reader. Therefore not exposing the internal readers.
         self.network_config = NetworkIniConfigurationReader().read(network_ini)
         self.analysis_config = AnalysisConfigReaderFactory().read(
             analysis_ini, self.network_config

@@ -1,14 +1,13 @@
 from pathlib import Path
 
-from ra2ce.configuration.analysis_config_base import AnalysisConfigBase
-from ra2ce.configuration.analysis_with_network_config import (
+from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
+from ra2ce.configuration.analysis.analysis_with_network_config import (
     AnalysisWithNetworkConfiguration,
 )
-from ra2ce.configuration.ini_config_protocol import AnalysisIniConfigData
-from ra2ce.configuration.network_config import NetworkConfig
-from ra2ce.configuration.readers.analysis_config_reader_base import (
+from ra2ce.configuration.analysis.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
+from ra2ce.configuration.ini_config_protocol import AnalysisIniConfigData
 
 
 class AnalysisWithNetworkConfigReader(AnalysisConfigReaderBase):

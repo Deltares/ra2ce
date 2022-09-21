@@ -1,15 +1,14 @@
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.configuration.analysis_config_base import AnalysisConfigBase
-from ra2ce.configuration.network_config import NetworkConfig
-from ra2ce.configuration.readers.analysis_config_reader_base import (
+from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
+from ra2ce.configuration.analysis.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
-from ra2ce.configuration.readers.analysis_with_network_config_reader import (
+from ra2ce.configuration.analysis.readers.analysis_with_network_config_reader import (
     AnalysisWithNetworkConfigReader,
 )
-from ra2ce.configuration.readers.analysis_without_network_config_reader import (
+from ra2ce.configuration.analysis.readers.analysis_without_network_config_reader import (
     AnalysisWithoutNetworkConfigReader,
 )
 
