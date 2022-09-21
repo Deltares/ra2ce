@@ -41,7 +41,7 @@ class AnalysisWithoutNetworkConfigReader(AnalysisConfigReaderBase):
         _network_config: NetworkConfig = NetworkInAnalysisIniConfigReader().read(
             _output_network_ini_file
         )
-        _analisis_config_dict.update(_network_config.__dict__)
+        _analisis_config_dict.update(_network_config.config_data)
         _network = _analisis_config_dict.get("network", None)
         if _network:
             _analisis_config_dict["origins_destinations"] = _network.get(
