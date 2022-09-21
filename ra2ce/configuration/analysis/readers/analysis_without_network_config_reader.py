@@ -18,7 +18,7 @@ class NetworkInAnalysisIniConfigReader(IniConfigurationReaderBase):
         if not ini_file:
             return None
         _config_data = self._import_configuration(ini_file)
-        return NetworkConfig(ini_file, _config_data)
+        return NetworkConfig.from_data(ini_file, _config_data)
 
     def _import_configuration(self, config_path: Path) -> dict:
         _root_path = AnalysisConfigBase.get_network_root_dir(config_path)
@@ -46,7 +46,9 @@ class AnalysisWithoutNetworkConfigReader(AnalysisConfigReaderBase):
         ]
         _analysis_config_data = AnalysisIniConfigData.from_dict(_analisis_config)
 
-        return AnalysisWithoutNetworkConfiguration(ini_file, _analysis_config_data)
+        return AnalysisWithoutNetworkConfiguration.from_data(
+            ini_file, _analysis_config_data
+        )
 
     def _get_analysis_config_data(self, ini_file: Path) -> dict:
         _root_path = AnalysisConfigBase.get_network_root_dir(ini_file)

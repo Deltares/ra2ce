@@ -1,20 +1,32 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData, NetworkConfig
 
 
 class AnalysisWithNetworkConfiguration(AnalysisConfigBase):
-    def __init__(
-        self,
-        ini_file: Path,
-        analysis_data: AnalysisIniConfigData,
-        network_config: NetworkConfig,
-    ) -> None:
+
+    def __init__(self) -> None:
+        self.config_data = AnalysisIniConfigData()
+
+    @classmethod
+    def from_data(
+        cls, ini_file: Path, config_data: AnalysisIniConfigData
+    ) -> AnalysisWithNetworkConfiguration:
         if not ini_file.is_file():
             raise FileNotFoundError(ini_file)
-        self.ini_file = ini_file
-        self._network_config = network_config
-        self.config_data = analysis_data
+        _new_analysis = cls()
+        _new_analysis.ini_file = ini_file
+        _new_analysis.config_data = config_data
+
+    @classmethod
+    def from_data_with_network(
+        cls, ini_file: Path, config_data: AnalysisIniConfigData, network_config: NetworkConfig
+    ) -> AnalysisWithNetworkConfiguration:
+        _new_analysis = cls.from_data(ini_file, config_data)
+        _new_analysis._network_config = network_config
+        return _new_analysis
 
     def configure(self) -> None:
         self.config_data["files"] = self._network_config.files

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 from typing import Any, List, Protocol
 
@@ -9,6 +11,10 @@ class ConfigProtocol(Protocol):
     root_dir: Path
     config_data: IniConfigDataProtocol = None
     graphs: List[Any] = None
+
+    @classmethod
+    def from_data(cls, ini_file: Path, config_data: IniConfigDataProtocol) -> ConfigProtocol:
+        raise NotImplementedError()
 
     def configure(self) -> None:
         raise NotImplementedError()
