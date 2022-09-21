@@ -9,12 +9,12 @@ import geopandas as gpd
 from pathlib import Path
 
 
-def shp_to_feather(shp_path, output_dir, keep_osm_classes):
+def filter_shp(shp_path, output_dir, keep_osm_classes):
     gdf = gpd.read_file(shp_path)
     gdf = gdf.loc[gdf["fclass"].isin(keep_osm_classes)]
 
-    feather_path = Path(output_dir) / (Path(shp_path).stem + ".feather")
-    gdf.to_feather(feather_path, index=False)
+    feather_path = Path(output_dir) / (Path(shp_path).stem + ".shp")
+    gdf.to_file(feather_path, index=False)
     print(f"Saved {Path(shp_path).stem} in {output_dir}.")
 
 
@@ -25,4 +25,4 @@ if __name__ == "__main__":
                         'motorway', 'motorway_link', 'secondary_link',
                         'primary_link', 'tertiary_link']
 
-    shp_to_feather(_shp_path, _output_dir, _keep_osm_classes)
+    filter_shp(_shp_path, _output_dir, _keep_osm_classes)
