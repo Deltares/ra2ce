@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import Optional
 
+from ra2ce.configuration.analysis.analysis_ini_config_data import AnalysisIniConfigData
 from ra2ce.configuration.config_protocol import ConfigProtocol
-from ra2ce.configuration.ini_config_protocol import AnalysisIniConfigData
 
 
 class AnalysisConfigBase(ConfigProtocol):
