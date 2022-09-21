@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from typing import Dict, Optional
 
-from ra2ce.configuration.configuration_protocol import ConfigurationProtocol
+from ra2ce.configuration.config_protocol import ConfigProtocol
 from ra2ce.configuration.validators import NetworkIniConfigurationValidator
 from ra2ce.graph.hazard import Hazard
 from ra2ce.graph.networks import Network
@@ -31,7 +31,7 @@ def hazard_handler(config: dict, graphs: dict, files: dict) -> Optional[dict]:
         return None
 
 
-class NetworkConfig(ConfigurationProtocol):
+class NetworkConfig(ConfigProtocol):
     files: Dict[str, Path] = None
 
     def __init__(self, ini_file: Path, config_data: dict) -> None:

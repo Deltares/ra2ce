@@ -1,10 +1,10 @@
 from pathlib import Path
 from typing import Dict, Optional
 
-from ra2ce.configuration.configuration_protocol import ConfigurationProtocol
+from ra2ce.configuration.config_protocol import ConfigProtocol
 
 
-class AnalysisConfigBase(ConfigurationProtocol):
+class AnalysisConfigBase(ConfigProtocol):
     ini_file: Path
     root_dir: Path
     config_data: Dict = None
