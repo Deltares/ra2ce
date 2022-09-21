@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ra2ce.configuration.ini_config_protocol import IniConfigDataProtocol
 from ra2ce.configuration.network.network_ini_config_validator import (
     NetworkIniConfigurationValidator,
@@ -6,7 +8,7 @@ from ra2ce.configuration.network.network_ini_config_validator import (
 
 class NetworkIniConfigData(IniConfigDataProtocol):
     @classmethod
-    def from_dict(cls, dict_values) -> IniConfigDataProtocol:
+    def from_dict(cls, dict_values) -> NetworkIniConfigData:
         _new_network_ini_config_data = cls()
         _new_network_ini_config_data.update(**dict_values)
         return _new_network_ini_config_data
