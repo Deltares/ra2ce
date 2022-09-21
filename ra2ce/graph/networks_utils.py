@@ -36,10 +36,27 @@ from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
 from shapely.ops import linemerge, unary_union
+from typing import Optional
 
-# todo replace os.path by pathlib
-folder = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(folder)
+
+def convert_unit(unit: str) -> Optional[float]:
+    """Converts unit to meters.
+
+    Args:
+        unit (str): The unit to convert
+
+    Returns:
+        conversion ()
+    """
+    if unit == 'centimeters':
+        conversion = 1./100 # meters
+    elif unit == 'meters':
+        conversion = 1. # meters
+    elif unit == 'feet':
+        conversion = 1./3.28084 # meters
+    else:
+        conversion = None
+    return conversion
 
 
 def drawProgressBar(percent, barLen=20):

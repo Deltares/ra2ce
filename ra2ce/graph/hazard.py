@@ -880,52 +880,53 @@ class Hazard:
                 pass
 
         if "isolation" in self.config:
-            locations = gpd.read_file(self.config["isolation"]["locations"][0])
-            locations["i_id"] = locations.index
-            locations_crs = pyproj.CRS.from_user_input(locations.crs)
-            hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
+            if self.config["isolation"]["locations"]:
+                locations = gpd.read_file(self.config["isolation"]["locations"])
+                locations["i_id"] = locations.index
+                locations_crs = pyproj.CRS.from_user_input(locations.crs)
+                hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
 
-            if (
-                hazard_crs != locations_crs
-            ):  # Temporarily reproject the locations to the CRS of the hazard
-                logging.warning(
-                    """Hazard crs {} and location crs {} are inconsistent, 
-                                               we try to reproject the location crs""".format(
-                        hazard_crs, locations_crs
+                if (
+                    hazard_crs != locations_crs
+                ):  # Temporarily reproject the locations to the CRS of the hazard
+                    logging.warning(
+                        """Hazard crs {} and location crs {} are inconsistent, 
+                                                   we try to reproject the location crs""".format(
+                            hazard_crs, locations_crs
+                        )
                     )
-                )
-                extent_locations = locations.total_bounds
-                logging.info(
-                    "Gdf extent before reprojecting: {}".format(extent_locations)
-                )
-                locations_reprojected = locations.copy().to_crs(hazard_crs)
-                extent_locations_reprojected = locations_reprojected.total_bounds
-                logging.info(
-                    "Gdf extent after reprojecting: {}".format(
-                        extent_locations_reprojected
+                    extent_locations = locations.total_bounds
+                    logging.info(
+                        "Gdf extent before reprojecting: {}".format(extent_locations)
                     )
+                    locations_reprojected = locations.copy().to_crs(hazard_crs)
+                    extent_locations_reprojected = locations_reprojected.total_bounds
+                    logging.info(
+                        "Gdf extent after reprojecting: {}".format(
+                            extent_locations_reprojected
+                        )
+                    )
+
+                    # Do the actual hazard intersect
+                    locations_reprojected = self.point_hazard_intersect(
+                        locations_reprojected
+                    )
+
+                    # Assign the original geometries to the reprojected raster
+                    original_geometries = locations["geometry"]
+                    locations_reprojected["geometry"] = original_geometries
+                    locations = locations_reprojected.copy()
+                    del locations_reprojected
+                else:
+                    locations = self.point_hazard_intersect(locations)
+
+                _exporter = NetworkExporterFactory()
+                _exporter.export(
+                    network=locations,
+                    basename="locations_hazard",
+                    output_dir=self.config["static"] / "output_graph",
+                    export_types=["pickle"],
                 )
-
-                # Do the actual hazard intersect
-                locations_reprojected = self.point_hazard_intersect(
-                    locations_reprojected
-                )
-
-                # Assign the original geometries to the reprojected raster
-                original_geometries = locations["geometry"]
-                locations_reprojected["geometry"] = original_geometries
-                locations = locations_reprojected.copy()
-                del locations_reprojected
-            else:
-                locations = self.point_hazard_intersect(locations)
-
-            _exporter = NetworkExporterFactory()
-            _exporter.export(
-                network=locations,
-                basename="locations_hazard",
-                output_dir=self.config["static"] / "output_graph",
-                export_types=["pickle"],
-            )
 
         # Save the hazard name bookkeeping table.
         self.hazard_name_table.to_excel(
