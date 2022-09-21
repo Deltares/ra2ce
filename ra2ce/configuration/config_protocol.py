@@ -1,11 +1,13 @@
 from pathlib import Path
 from typing import Any, Dict, List, Protocol
 
+from ra2ce.configuration.ini_config_protocol import IniConfigDataProtocol
+
 
 class ConfigProtocol(Protocol):
     ini_file: Path
     root_dir: Path
-    config_data: Dict = None
+    config_data: IniConfigDataProtocol = None
     graphs: List[Any] = None
 
     def configure(self) -> None:
