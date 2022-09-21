@@ -38,7 +38,7 @@ class AnalysisWithoutNetworkConfigReader(AnalysisConfigReaderBase):
             return None
         _analisis_config_dict = self._get_analysis_config_data(ini_file)
         _output_network_ini_file = _analisis_config_dict["output"] / "network.ini"
-        _network_config = NetworkInAnalysisIniConfigReader().read(
+        _network_config: NetworkConfig = NetworkInAnalysisIniConfigReader().read(
             _output_network_ini_file
         )
         _analisis_config_dict.update(_network_config.__dict__)
