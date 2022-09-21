@@ -28,7 +28,6 @@ class TestRa2ceInputConfig:
         assert _input_config
         assert isinstance(_input_config.analysis_config, AnalysisConfigBase)
         assert isinstance(_input_config.network_config, NetworkConfig)
-        assert _input_config.is_valid()
 
     @pytest.mark.skip(
         reason="Network Config does not seem to initialize files correctly."
