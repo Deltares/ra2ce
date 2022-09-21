@@ -16,6 +16,19 @@ class AnalysisWithoutNetworkConfiguration(AnalysisConfigBase):
     def from_data(
         cls, ini_file: Path, config_data: AnalysisIniConfigData
     ) -> AnalysisWithoutNetworkConfiguration:
+        """
+        Initializes an `AnalysisWithoutNetworkConfiguration` with the given parameters.
+
+        Args:
+            ini_file (Path): Path to the ini file containing the analysis data.
+            config_data (AnalysisIniConfigData): Ini data representation.
+
+        Raises:
+            FileNotFoundError: When the provided `ini file` cannot be found.
+
+        Returns:
+            AnalysisWithoutNetworkConfiguration: Initialized instance.
+        """
         _new_analysis_config = cls()
         if not ini_file.is_file():
             raise FileNotFoundError(ini_file)
