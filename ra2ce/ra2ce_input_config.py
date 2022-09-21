@@ -11,7 +11,6 @@ class Ra2ceInputConfig:
     analysis_config: AnalysisConfigBase = None
 
     def __init__(self, network_ini: Optional[Path], analysis_ini: Path) -> None:
-        # TODO: These reads should be done from a ra2ce.configuration factory reader. Therefore not exposing the internal readers.
         self.network_config = ConfigReaderFactory.get_reader(NetworkConfig).read(
             network_ini
         )
@@ -50,7 +49,8 @@ class Ra2ceInputConfig:
             )
             return False
 
-        return self.network_config.is_valid() and self.analysis_config.is_valid()
+        # We already validated the anlysis, just need to validate the network now.
+        return self.network_config.is_valid()
 
     def configure(self) -> None:
         if self.network_config:

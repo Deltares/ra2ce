@@ -18,7 +18,7 @@ class AnalysisIniConfigValidator(IniConfigValidatorBase):
 class AnalysisWithoutNetworkConfigValidator(IniConfigValidatorBase):
     def validate(self) -> ValidationReport:
         _base_report = AnalysisIniConfigValidator(self._config).validate()
-        _output_network_ini_file = self.config_data["output"] / "network.ini"
+        _output_network_ini_file = self._config["output"] / "network.ini"
 
         if not _output_network_ini_file:
             _base_report.error(
