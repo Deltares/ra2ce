@@ -3,9 +3,6 @@ from pathlib import Path
 import geopandas as gpd
 
 from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData
-from ra2ce.configuration.analysis.analysis_ini_config_validator import (
-    AnalysisWithoutNetworkConfigValidator,
-)
 from ra2ce.io.readers import GraphPickleReader
 
 
@@ -50,7 +47,4 @@ class AnalysisWithoutNetworkConfiguration(AnalysisConfigBase):
 
     def is_valid(self) -> bool:
         _file_is_valid = self.ini_file.is_file() and self.ini_file.suffix == ".ini"
-        return (
-            _file_is_valid
-            and AnalysisWithoutNetworkConfigValidator(self.config_data).validate()
-        )
+        return _file_is_valid and self.config_data.is_valid()
