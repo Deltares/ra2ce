@@ -36,6 +36,7 @@ class NetworkConfig(ConfigProtocol):
     config_data: NetworkIniConfigData = None
 
     def __init__(self, ini_file: Path, config_data: NetworkIniConfigData) -> None:
+        # TODO: This should be parameterless to allow better extension of the class.
         self.ini_file = ini_file
         self.config_data = config_data
         self.files = self._get_existent_network_files(
