@@ -9,6 +9,8 @@ import os
 import sys
 import time
 
+from pathlib import Path
+
 import geopandas as gpd
 import numpy as np
 import pandas as pd
@@ -319,8 +321,8 @@ def save_gdf(gdf, save_path):
 
 
 # DATA STRUCTURES
-# Todo: make a general class from which these two datatypes inheret.
-class rp_hazard_network_gdf_standalone:
+# Todo: make a general class from which these two datatypes inherit.
+class rp_hazard_network_gdf_standalone: #DEPRECIATED, SEE BELOW
     """A road network gdf with hazard data per return period stored in it. This can be used for EAD calculation
 
     @Author: Kees van Ginkel, - I made this as an example of how we could develop the code more object-based
@@ -598,7 +600,7 @@ class DamageNetwork:
 
 
 class DamageNetworkReturnPeriods(DamageNetwork):
-    """A road network gdf with EVENT-BASED hazard data stored in it, and for which damages can be calculated
+    """A road network gdf with Return-Period based hazard data stored in it, and for which damages can be calculated
 
     @Author: Kees van Ginkel
 
@@ -647,6 +649,23 @@ class DamageNetworkReturnPeriods(DamageNetwork):
 
         if damage_function == "OSD":
             self.calculate_damage_OSdaMage(events=self.return_periods)
+
+class DamageNetworkEvents(DamageNetwork):
+    """A road network gdf with EVENT-BASED hazard data stored in it, and for which damages can be calculated
+
+    @Author: Kees van Ginkel
+
+    Mandatory attributes:
+        *self.rps* (set)  : all available unique events
+        *self.stats* (set)   : the available statistics
+    """
+
+    def __init__(self, road_gdf, val_cols):
+        pass
+
+    #Todo for pakistan project, make this working, by taking the code from below
+
+
 
 
 class event_hazard_network_gdf:  # DEPRECIATED, SEE THE ABOVE CLASSES STRUCTURE!!!
@@ -893,6 +912,243 @@ class event_hazard_network_gdf:  # DEPRECIATED, SEE THE ABOVE CLASSES STRUCTURE!
         logging.info(
             "calculate_damage_OSdaMage(): Damage calculation with the OSdaMage functions was succesfull"
         )
+
+class DamageFunction:
+    """
+    Generic damage function
+
+    """
+    def __init__(self, name=None,hazard='flood',type='depth_damage',infra_type='road'):
+        self.name = name
+        self.hazard = hazard
+        self.type = type
+        self.infra_type = infra_type
+
+        #Other attributes (will be added later)
+        #self.damage_fraction - x-values correspond to hazard_intenity; y-values correspond to damage fraction [0-1]
+        #self.hazard_intensity_unit #the unit of the x-values
+
+        #self.max_damage / reconstruction costs #length unit and width unit
+        #asset type
+        #price level etc.
+
+class DamageFunction_by_RoadType(DamageFunction):
+    """
+    A damage function that has different max damages per road type, but a uniform damage_fraction curve
+
+    """
+
+    def __init__(self, name=None,hazard='flood',type='depth_damage',infra_type='road'):
+        # Construct using the parent class __init__
+        DamageFunction.__init__(self, name=name,hazard=hazard,type=type,infra_type=infra_type)
+        #Do extra stuffs
+
+    def from_csv(self,csv_path_damage_fraction,csv_path_max_damage,sep=','):
+        """Construct a set of damage functions from csv files
+
+        Arguments:
+            *csv_path* (Pathlib Path) : path to csv file containing the damage fractions (uniform for all road types)
+            *csv_path_max_damage* (Pathlib Path) : path to the csv file containing the max damage values
+            *sep* : decimal seperator used in the files
+        """
+        pass
+
+class MaxDamage():
+    """
+    Base class for data containing maximum damage or construction costs data.
+
+    """
+    pass
+
+class MaxDamage_byRoadType_byLane(MaxDamage):
+    """
+    Subclass of MaxDamage, containing max damage per RoadType and per Lane
+
+    Attributes:
+        self.name (str) : Name of the damage curve
+        self.data (pd.DataFrame) : columns contain number of lanes; rows contain the road types
+
+    Optional attributes:
+        self.origin_path (Path) : Path to the file from which the function was constructed
+        self.raw_data : The raw data read from the input file
+
+
+    """
+    def __init__(self,name=None,damage_unit=None):
+        self.name = name
+        self.damage_unit = damage_unit
+
+    def from_csv(self,path: Path,sep=',',output_unit='euro/m') -> None:
+        """Construct object from csv file. Damage curve name is inferred from filename
+
+        The first row describe the lane numbers per column; and should have 'Road_type \ lanes' as index/first value
+        The second row has the units per column, and should have 'unit' as index/first value
+        the rest of the rows contains the different road types as index/first value; and the costs as values
+
+        Arguments:
+            *path* (Path) : Path to the csv file
+            *sep* (str) : csv seperator
+            *output_unit* (str) : desired output unit (default = 'euro/m')
+
+        """
+        self.name = path.stem
+        self.raw_data = pd.read_csv(path,index_col='Road_type \ lanes',sep=sep)
+        self.origin_path = path #to track the original path from which the object was constructed; maybe also date?
+
+        ###Determine units
+        units = self.raw_data.loc['unit',:].unique() #identify the unique units
+        assert len(units) == 1, 'Columns in the max damage csv seem to have different units, ra2ce cannot handle this'
+        #case only one unique unit is identified
+        self.damage_unit = units[0] #should have the structure 'x/y' , e.g. euro/m, dollar/yard
+
+        self.data = self.raw_data.drop('unit')
+        self.data = self.data.astype('float')
+
+        #assume road types are in the rows; lane numbers in the columns
+        self.road_types = list(self.data.index) #to method
+        #assumes that the columns containst the lanes
+        self.data.columns = self.data.columns.astype('int')
+
+
+        if self.damage_unit != 'output_unit':
+            print('niet gelijk!')
+            self.convert_length_unit() #convert the unit
+        else:
+            print('wel gelijk')
+
+    def convert_length_unit(self,desired_unit='euro/m') -> None:
+        """Converts max damage values to a different unit
+        Arguments:
+            self.damage_unit (implicit)
+            *desired_unit* (string)
+
+        Effect: converts the values in self.data; and sets the new damage_unit
+
+        Returns: the factor by which the original unit has been scaled
+
+        """
+        if desired_unit == self.damage_unit:
+            logging.info('Input damage units are already in the desired format')
+            return None
+
+        original_length_unit = self.damage_unit.split('/')[1]
+        print(original_length_unit)
+        target_length_unit = desired_unit.split('/')[1]
+        print(target_length_unit)
+
+        if (original_length_unit == 'km' and target_length_unit == 'm'):
+            scaling_factor = 1/1000
+            self.data = self.data * scaling_factor
+            logging.info('Damage data was scaled by a factor {}, to convert from {} to {}'.format(
+                scaling_factor,self.damage_unit,desired_unit))
+            self.damage_unit = desired_unit
+            return None
+        else:
+            logging.warning('Damage scaling from {} to {} is not supported'.format(self.damage_unit,desired_unit))
+            return None
+
+class DamageFractionHazardSeverity():
+    """
+    Base class for data containing maximum damage or construction costs data.
+
+    """
+    pass
+
+class DamageFractionHazardSeverityUniform(DamageFractionHazardSeverity):
+    """
+    Uniform: assuming the same curve for
+    each road type and lane numbers and any other metadata
+
+    """
+    def __init__(self,name=None,hazard_unit=None):
+        self.name = name
+        self.hazard_unit = hazard_unit
+
+    def from_csv(self,path: Path,sep=',',output_unit='m') -> None:
+        """Construct object from csv file. Damage curve name is inferred from filename
+
+        Arguments:
+            *path* (Path) : Path to the csv file
+            *sep* (str) : csv seperator
+            *output_unit* (str) : desired output unit (default = 'm')
+
+        The CSV file should have the following structure:
+         - column 1: hazard severity
+         - column 2: damage fraction
+         - row 1: column names
+         - row 2: unit of column:
+
+        Example:
+                +- ------+-------------------------------+
+                | depth | damage                        |
+                +-------+-------------------------------+
+                | cm    | % of total construction costs |
+                +-------+-------------------------------+
+                | 0     | 0                             |
+                +-------+-------------------------------+
+                | 50    | 0.25                          |
+                +-------+-------------------------------+
+                | 100   | 0.42                          |
+                +-------+-------------------------------+
+
+
+        """
+        self.name = path.stem
+        self.raw_data = pd.read_csv(path,index_col=0,sep=sep)
+        self.origin_path = path #to track the original path from which the object was constructed; maybe also date?
+
+        self.output_unit = self.raw_data.index[0]
+        self.data = self.raw_data.drop(self.output_unit)
+
+
+
+        # ###Determine units
+        # units = self.raw_data.loc['unit',:].unique() #identify the unique units
+        # assert len(units) == 1, 'Columns in the max damage csv seem to have different units, ra2ce cannot handle this'
+        # #case only one unique unit is identified
+        # self.damage_unit = units[0] #should have the structure 'x/y' , e.g. euro/m, dollar/yard
+        #
+        # self.data = self.raw_data.drop('unit')
+        # self.data = self.data.astype('float')
+        #
+        # #assume road types are in the rows; lane numbers in the columns
+        # self.road_types = list(self.data.index) #to method
+        # #assumes that the columns containst the lanes
+        # self.data.columns = self.data.columns.astype('int')
+        #
+        #
+        # if self.damage_unit != 'output_unit':
+        #     print('niet gelijk!')
+        #     self.convert_length_unit() #convert the unit
+        # else:
+        #     print('wel gelijk')
+
+
+
+
+
+#Tests:
+def test_construct_damage_function():
+    max_damage = MaxDamage_byRoadType_byLane()
+    path = Path(r"D:\Python\ra2ce\data\1010b_zuid_holland\input\damage_function\test\huizinga_max_damage.csv")
+    max_damage.from_csv(path,sep=';')
+    print(max_damage.data)
+
+#def test_construct_damage_function():
+damage_fraction = DamageFractionHazardSeverityUniform()
+path = Path(r"D:\Python\ra2ce\data\1010b_zuid_holland\input\damage_function\test\huizinga_damage_fraction_hazard_severity.csv")
+damage_fraction.from_csv(path,sep=';')
+
+
+
+
+
+
+
+
+
+
+
 
 
 class EffectivenessMeasures:
