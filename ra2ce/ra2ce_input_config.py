@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.configuration.analysis_config_base import AnalysisConfigBase
-from ra2ce.configuration.network_config import NetworkIniConfig
+from ra2ce.configuration.network_config import NetworkConfig
 from ra2ce.configuration.readers import (
     AnalysisConfigReaderFactory,
     NetworkIniConfigurationReader,
@@ -11,7 +11,7 @@ from ra2ce.configuration.readers import (
 
 
 class Ra2ceInputConfig:
-    network_config: Optional[NetworkIniConfig] = None
+    network_config: Optional[NetworkConfig] = None
     analysis_config: AnalysisConfigBase = None
 
     def __init__(self, network_ini: Optional[Path], analysis_ini: Path) -> None:
