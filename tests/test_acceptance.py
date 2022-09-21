@@ -147,7 +147,6 @@ class TestIndirectAnalyses:
 
 
 class TestNetworkCreation:
-    @pytest.mark.skip(reason="Work in progress.")
     def test_1_network_shape(self):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data.

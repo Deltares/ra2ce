@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from pathlib import Path
 from typing import Dict, Optional
@@ -33,15 +35,22 @@ def hazard_handler(config: dict, graphs: dict, files: dict) -> Optional[dict]:
 
 class NetworkConfig(ConfigProtocol):
     files: Dict[str, Path] = None
-    config_data: NetworkIniConfigData = None
+    config_data: NetworkIniConfigData
 
-    def __init__(self, ini_file: Path, config_data: NetworkIniConfigData) -> None:
-        # TODO: This should be parameterless to allow better extension of the class.
-        self.ini_file = ini_file
-        self.config_data = config_data
-        self.files = self._get_existent_network_files(
+    def __init__(self) -> None:
+        self.config_data = NetworkIniConfigData()
+
+    @classmethod
+    def from_data(
+        cls, ini_file: Path, config_data: NetworkIniConfigData
+    ) -> NetworkConfig:
+        _new_network_config = cls()
+        _new_network_config.ini_file = ini_file
+        _new_network_config.config_data = config_data
+        _new_network_config.files = _new_network_config._get_existent_network_files(
             config_data["static"] / "output_graph"
         )
+        return _new_network_config
 
     @staticmethod
     def get_network_root_dir(filepath: Path) -> Path:
