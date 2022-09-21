@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from ra2ce.io.readers.graph_pickle_reader import GraphPickleReader
-from tests import test_data
+from tests.io.readers import test_data_readers
 
 
 class TestGraphPickleReader:
@@ -20,7 +20,7 @@ class TestGraphPickleReader:
         assert str(exc_err.value) == f"No pickle found at path {_pickle_path}"
 
     def test_given_valid_path_reads_graph(self):
-        _pickle_path = test_data / "readers_test_data" / "base_graph.p"
+        _pickle_path = test_data_readers / "base_graph.p"
         assert _pickle_path.is_file()
 
         _graph = GraphPickleReader().read(_pickle_path)
