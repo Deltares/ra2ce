@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from pathlib import Path
 from typing import Dict, Optional
@@ -33,14 +35,36 @@ def hazard_handler(config: dict, graphs: dict, files: dict) -> Optional[dict]:
 
 class NetworkConfig(ConfigProtocol):
     files: Dict[str, Path] = None
-    config_data: NetworkIniConfigData = None
+    config_data: NetworkIniConfigData
 
-    def __init__(self, ini_file: Path, config_data: NetworkIniConfigData) -> None:
-        self.ini_file = ini_file
-        self.config_data = config_data
-        self.files = self._get_existent_network_files(
-            config_data["static"] / "output_graph"
-        )
+    def __init__(self) -> None:
+        self.config_data = NetworkIniConfigData()
+
+    @classmethod
+    def from_data(
+        cls, ini_file: Path, config_data: NetworkIniConfigData
+    ) -> NetworkConfig:
+        """
+        Initializes a `NetworkConfig` with the given parameters.
+
+        Args:
+            ini_file (Path): Path to the ini file containing the analysis data.
+            config_data (NetworkIniConfigData): Ini data representation.
+
+        Returns:
+            NetworkConfig: Initialized instance.
+        """
+        _new_network_config = cls()
+        _new_network_config.ini_file = ini_file
+        _new_network_config.config_data = config_data
+        _static_dir = config_data.get("static", None)
+        if _static_dir and _static_dir.is_dir():
+            _new_network_config.files = _new_network_config._get_existent_network_files(
+                _static_dir / "output_graph"
+            )
+        else:
+            logging.error(f"Static dir not found. Value provided: {_static_dir}")
+        return _new_network_config
 
     @staticmethod
     def get_network_root_dir(filepath: Path) -> Path:

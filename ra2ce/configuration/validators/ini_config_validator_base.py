@@ -55,6 +55,9 @@ class IniConfigValidatorBase(Ra2ceIoValidator):
     def __init__(self, config_data: IniConfigDataProtocol) -> None:
         self._config = config_data
 
+    def validate(self) -> ValidationReport:
+        raise NotImplementedError()
+
     def _validate_headers(self, required_headers: List[str]) -> ValidationReport:
         _report = ValidationReport()
 

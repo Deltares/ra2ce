@@ -26,6 +26,6 @@ class AnalysisWithNetworkConfigReader(AnalysisConfigReaderBase):
         _config_data = self._convert_analysis_types(_config_data)
         self._copy_output_files(ini_file, _config_data)
         _analysis_config_data = AnalysisIniConfigData.from_dict(_config_data)
-        return AnalysisWithNetworkConfiguration(
+        return AnalysisWithNetworkConfiguration.from_data_with_network(
             ini_file, _analysis_config_data, self._network_data
         )

@@ -16,7 +16,7 @@ class NetworkIniConfigurationReader(IniConfigurationReaderBase):
         self._update_path_values(_config_data)
         self._copy_output_files(ini_file, _config_data)
         _network_config_data = NetworkIniConfigData.from_dict(_config_data)
-        return NetworkConfig(ini_file, _network_config_data)
+        return NetworkConfig.from_data(ini_file, _network_config_data)
 
     def _import_configuration(self, config_path: Path) -> dict:
         # Read the configurations in network.ini and add the root path to the configuration dictionary.

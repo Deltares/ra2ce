@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 from pathlib import Path
 from typing import Optional
@@ -10,13 +12,22 @@ class Ra2ceInputConfig:
     network_config: Optional[NetworkConfig] = None
     analysis_config: AnalysisConfigBase = None
 
-    def __init__(self, network_ini: Optional[Path], analysis_ini: Path) -> None:
-        self.network_config = ConfigReaderFactory.get_reader(NetworkConfig).read(
-            network_ini
-        )
-        self.analysis_config = ConfigReaderFactory.get_reader(AnalysisConfigBase).read(
-            analysis_ini, self.network_config
-        )
+    @classmethod
+    def from_input_paths(cls, analysis_ini: Path, network_ini: Optional[Path]) -> Ra2ceInputConfig:
+        """
+        Initializes the `Ra2ceInputConfig` object and reads both the network and analysis files into their respective configuration objects.
+
+        Args:
+            analysis_ini (Path): Path to the analysis *.ini file.
+            network_ini (Optional[Path]): Path to the network *.ini file.
+
+        Returns:
+            Ra2ceInputConfig: Instance with initialized `AnalysisConfigBase` and `NetworkConfig`.
+        """
+        _input_config = Ra2ceInputConfig()
+        _input_config.network_config = ConfigReaderFactory.get_reader(NetworkConfig).read(network_ini)
+        _input_config.analysis_config = ConfigReaderFactory.get_reader(AnalysisConfigBase).read(analysis_ini, _input_config.network_config)
+        return _input_config
 
     def get_root_dir(self) -> Path:
         if self.network_config.ini_file:
