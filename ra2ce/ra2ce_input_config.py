@@ -11,6 +11,7 @@ class Ra2ceInputConfig:
     analysis_config: AnalysisConfigBase = None
 
     def __init__(self, network_ini: Optional[Path], analysis_ini: Path) -> None:
+        # TODO: This should be parameterless to allow better extension of the class.
         self.network_config = ConfigReaderFactory.get_reader(NetworkConfig).read(
             network_ini
         )
