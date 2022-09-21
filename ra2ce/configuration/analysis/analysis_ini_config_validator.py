@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from ra2ce.configuration.validators.ini_config_validator_base import (
     IniConfigValidatorBase,
 )
@@ -18,11 +20,13 @@ class AnalysisIniConfigValidator(IniConfigValidatorBase):
 class AnalysisWithoutNetworkConfigValidator(IniConfigValidatorBase):
     def validate(self) -> ValidationReport:
         _base_report = AnalysisIniConfigValidator(self._config).validate()
-        _output_network_ini_file = self._config["output"] / "network.ini"
-
-        if not _output_network_ini_file:
+        _output_network_dir = self._config.get("output", None)
+        if (
+            not _output_network_dir
+            or not (_output_network_dir / "network.ini").is_file()
+        ):
             _base_report.error(
-                f"The configuration file 'network.ini' is not found at {_output_network_ini_file}."
+                f"The configuration file 'network.ini' is not found at {_output_network_dir}."
                 f"Please make sure to name your network settings file 'network.ini'."
             )
         return _base_report

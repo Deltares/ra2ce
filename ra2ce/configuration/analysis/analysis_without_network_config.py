@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 import geopandas as gpd
@@ -7,11 +9,32 @@ from ra2ce.io.readers import GraphPickleReader
 
 
 class AnalysisWithoutNetworkConfiguration(AnalysisConfigBase):
-    def __init__(self, ini_file: Path, config_data: AnalysisIniConfigData) -> None:
+    def __init__(self) -> None:
+        self.config_data = AnalysisIniConfigData()
+
+    @classmethod
+    def from_data(
+        cls, ini_file: Path, config_data: AnalysisIniConfigData
+    ) -> AnalysisWithoutNetworkConfiguration:
+        """
+        Initializes an `AnalysisWithoutNetworkConfiguration` with the given parameters.
+
+        Args:
+            ini_file (Path): Path to the ini file containing the analysis data.
+            config_data (AnalysisIniConfigData): Ini data representation.
+
+        Raises:
+            FileNotFoundError: When the provided `ini file` cannot be found.
+
+        Returns:
+            AnalysisWithoutNetworkConfiguration: Initialized instance.
+        """
+        _new_analysis_config = cls()
         if not ini_file.is_file():
             raise FileNotFoundError(ini_file)
-        self.ini_file = ini_file
-        self.config_data = config_data
+        _new_analysis_config.ini_file = ini_file
+        _new_analysis_config.config_data = config_data
+        return _new_analysis_config
 
     def _read_graphs_from_config(self) -> dict:
         _graphs = {}

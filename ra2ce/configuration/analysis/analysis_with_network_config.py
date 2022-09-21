@@ -1,20 +1,59 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData, NetworkConfig
 
 
 class AnalysisWithNetworkConfiguration(AnalysisConfigBase):
-    def __init__(
-        self,
-        ini_file: Path,
-        analysis_data: AnalysisIniConfigData,
-        network_config: NetworkConfig,
-    ) -> None:
+    def __init__(self) -> None:
+        self.config_data = AnalysisIniConfigData()
+
+    @classmethod
+    def from_data(
+        cls, ini_file: Path, config_data: AnalysisIniConfigData
+    ) -> AnalysisWithNetworkConfiguration:
+        """
+        Initializes an `AnalysisWithNetworkConfiguration` with the given parameters.
+
+        Args:
+            ini_file (Path): Path to the ini file containing the analysis data.
+            config_data (AnalysisIniConfigData): Ini data representation.
+
+        Raises:
+            FileNotFoundError: When the provided `ini file` cannot be found.
+
+        Returns:
+            AnalysisWithNetworkConfiguration: Initialized instance.
+        """
         if not ini_file.is_file():
             raise FileNotFoundError(ini_file)
-        self.ini_file = ini_file
-        self._network_config = network_config
-        self.config_data = analysis_data
+        _new_analysis = cls()
+        _new_analysis.ini_file = ini_file
+        _new_analysis.config_data = config_data
+        return _new_analysis
+
+    @classmethod
+    def from_data_with_network(
+        cls,
+        ini_file: Path,
+        config_data: AnalysisIniConfigData,
+        network_config: NetworkConfig,
+    ) -> AnalysisWithNetworkConfiguration:
+        """
+        Initializes this class with a network_configuration.
+
+        Args:
+            ini_file (Path): Ini file containing the data from the config_data.
+            config_data (AnalysisIniConfigData): Ini data representation.
+            network_config (NetworkConfig): Network configuration to be used on this analysis.
+
+        Returns:
+            AnalysisWithNetworkConfiguration: Created instance.
+        """
+        _new_analysis = cls.from_data(ini_file, config_data)
+        _new_analysis._network_config = network_config
+        return _new_analysis
 
     def configure(self) -> None:
         self.config_data["files"] = self._network_config.files
