@@ -51,14 +51,17 @@ class MultiGraphNetworkExporter(NetworkExporterBase):
         if not output_dir.is_dir():
             output_dir.mkdir(parents=True)
 
-        # graph_to_shp(
-        #     export_data,
-        #     output_folder / (self._basename + "_edges.shp"),
-        #     output_folder / (self._basename + "_nodes.shp"),
-        # )
+        # Frederique added this
+        from ra2ce.graph.networks_utils import graph_to_shp
+        graph_to_shp(
+            export_data,
+            output_dir / (self._basename + "_edges.shp"),
+            output_dir / (self._basename + "_nodes.shp"),
+        )
         logging.info(
             f"Saved {self._basename + '_edges.shp'} and {self._basename + '_nodes.shp'} in {output_dir}."
         )
+        # Frederique added the above
 
     def export_to_pickle(self, output_dir: Path, export_data: MULTIGRAPH_TYPE) -> None:
         self.pickle_path = output_dir / (self._basename + ".p")
