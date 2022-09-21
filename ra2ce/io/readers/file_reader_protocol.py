@@ -3,5 +3,5 @@ from typing import Any, Protocol
 
 
 class FileReaderProtocol(Protocol):
-    def read(self, ini_file: Path) -> Any:
+    def read(self, file_path: Path) -> Any:
         pass
