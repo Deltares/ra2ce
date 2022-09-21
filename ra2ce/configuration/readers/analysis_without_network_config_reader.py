@@ -4,6 +4,7 @@ from ra2ce.configuration.analysis_config_base import AnalysisConfigBase
 from ra2ce.configuration.analysis_without_network_config import (
     AnalysisWithoutNetworkConfiguration,
 )
+from ra2ce.configuration.ini_config_protocol import AnalysisIniConfigData
 from ra2ce.configuration.network_config import NetworkConfig
 from ra2ce.configuration.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
@@ -45,7 +46,9 @@ class AnalysisWithoutNetworkConfigReader(AnalysisConfigReaderBase):
         _analisis_config["origins_destinations"] = _analisis_config["network"][
             "origins_destinations"
         ]
-        return AnalysisWithoutNetworkConfiguration(ini_file, _analisis_config)
+        _analysis_config_data = AnalysisIniConfigData.from_dict(_analisis_config)
+
+        return AnalysisWithoutNetworkConfiguration(ini_file, _analysis_config_data)
 
     def _get_analysis_config_data(self, ini_file: Path) -> dict:
         _root_path = AnalysisConfigBase.get_network_root_dir(ini_file)

@@ -2,12 +2,13 @@ from pathlib import Path
 from typing import Dict, Optional
 
 from ra2ce.configuration.config_protocol import ConfigProtocol
+from ra2ce.configuration.ini_config_protocol import AnalysisIniConfigData
 
 
 class AnalysisConfigBase(ConfigProtocol):
     ini_file: Path
     root_dir: Path
-    config_data: Dict = None
+    config_data: AnalysisIniConfigData = None
 
     @staticmethod
     def get_network_root_dir(filepath: Path) -> Path:

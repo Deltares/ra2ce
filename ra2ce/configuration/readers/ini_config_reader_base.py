@@ -3,10 +3,16 @@ from pathlib import Path
 from shutil import copyfile
 from typing import List
 
+from ra2ce.configuration.config_protocol import ConfigProtocol
 from ra2ce.io.readers.file_reader_protocol import FileReaderProtocol
 
 
-class IniConfigurationReaderBase(FileReaderProtocol):
+class IniConfigurationReaderProtocol(FileReaderProtocol):
+    def read(self, ini_file: Path) -> ConfigProtocol:
+        pass
+
+
+class IniConfigurationReaderBase(IniConfigurationReaderProtocol):
     """
     Generic BASE Ini Configuration Reader.
     It is meant to behave as an abstract class, the concrete classes should

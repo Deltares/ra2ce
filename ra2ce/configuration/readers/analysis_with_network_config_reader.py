@@ -4,6 +4,7 @@ from ra2ce.configuration.analysis_config_base import AnalysisConfigBase
 from ra2ce.configuration.analysis_with_network_config import (
     AnalysisWithNetworkConfiguration,
 )
+from ra2ce.configuration.ini_config_protocol import AnalysisIniConfigData
 from ra2ce.configuration.network_config import NetworkConfig
 from ra2ce.configuration.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
@@ -25,6 +26,7 @@ class AnalysisWithNetworkConfigReader(AnalysisConfigReaderBase):
         _config_data = self._import_configuration(_root_path, ini_file)
         _config_data = self._convert_analysis_types(_config_data)
         self._copy_output_files(ini_file, _config_data)
+        _analysis_config_data = AnalysisIniConfigData.from_dict(_config_data)
         return AnalysisWithNetworkConfiguration(
-            ini_file, _config_data, self._network_data
+            ini_file, _analysis_config_data, self._network_data
         )

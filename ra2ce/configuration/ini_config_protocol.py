@@ -8,13 +8,21 @@ class IniConfigDataProtocol(dict):
     """
 
     @classmethod
-    def from_dict(cls, dict_values: dict) -> Any:
+    def from_dict(cls, dict_values) -> Any:
         pass
 
 
 class AnalysisIniConfigData(IniConfigDataProtocol):
-    pass
+    @classmethod
+    def from_dict(cls, dict_values) -> IniConfigDataProtocol:
+        _new_analysis_ini_config_data = cls()
+        _new_analysis_ini_config_data.update(**dict_values)
+        return _new_analysis_ini_config_data
 
 
 class NetworkIniConfigData(IniConfigDataProtocol):
-    pass
+    @classmethod
+    def from_dict(cls, dict_values) -> IniConfigDataProtocol:
+        _new_network_ini_config_data = cls()
+        _new_network_ini_config_data.update(**dict_values)
+        return _new_network_ini_config_data
