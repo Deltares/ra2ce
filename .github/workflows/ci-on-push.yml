@@ -1,4 +1,4 @@
-name: Autoformat code
+name: ci
 
 on: [push]
 jobs:
@@ -33,6 +33,12 @@ jobs:
           conda activate ra2ce_env
           poetry install
         if: steps.cache.outputs.cache-hit != 'true'
+
+      - name: Test with pytest
+        shell: pwsh
+        run: |
+          conda activate ra2ce_env
+          poetry run pytest -v -m "not slow_test" --cov . --cov-report xml:coverage-reports/coverage-ra2ce.xml --junitxml=xunit-reports/xunit-result-ra2ce.xml
 
       - name: Autoformat code if the check fails
         if: ${{ (matrix.os == 'ubuntu-20.04') && (matrix.python-version == 3.9) }}
