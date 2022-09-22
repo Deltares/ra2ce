@@ -77,6 +77,13 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         # Read the desired damage function
         damage_function = analysis['damage_curve']
 
+        #If you want to use manual damage functions, the need to be loaded first
+        manual_damage_functions = None
+        if analysis['damage_curve'] == 'MAN':
+            manual_damage_functions = ManualDamageFunctions()
+            manual_damage_functions.find_damage_functions(folder=(self.config['input'] / 'damage_functions'))
+            manual_damage_functions.load_damage_functions()
+
         #Choose between event or return period based analysis
         if analysis['event_type'] == 'event':
             event_cols = [x for x in val_cols if "_EV" in x] #Todo: can be part of the init of the object
@@ -85,7 +92,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
                 raise ValueError('No event cols present in hazard data')
 
             event_gdf = DamageNetworkEvents(road_gdf, val_cols)
-            event_gdf.main(damage_function=damage_function)
+            event_gdf.main(damage_function=damage_function,manual_damage_functions=manual_damage_functions)
 
             result_gdf = event_gdf.gdf
 
@@ -347,7 +354,7 @@ class DamageNetwork:
 
 
     ### Damage handlers
-    def calculate_damage_manual_function(self,events):
+    def calculate_damage_manual_functions(self,events,manual_damage_functions):
         """
         Arguments:
         *events* (list) = list of events (or return periods) to iterate over, these should match the hazard column names 
@@ -358,6 +365,19 @@ class DamageNetwork:
         end = "me"  # indicate that you want to use the mean
 
         df = self.df #dataframe to carry out the damage calculation
+
+        assert manual_damage_functions is not None, "No damage functions were loaded"
+
+        for DamFun in manual_damage_functions.loaded:
+            #determine DamFun prefix
+            DamFun_prefix = "A" #Make prefix with a method, from the name
+            #Add max damage values to df
+            df = DamFun.add_max_damage(df,DamFun_prefix)
+            for event in events:
+                #Add apply interpolator objects
+                df = DamFun.calculate_damage(df,DamFun_prefix,Hazard_prefix)
+
+        pass
 
 
         #Todo hier verder
@@ -406,7 +426,7 @@ class DamageNetwork:
 
         for event in events:
             df["dam_{}_{}".format(event, curve_name)] = round(
-                df["max_dam_hz"].astype(float)  # max damage (euro/km)
+                df["max_dam_hz"].astype(float)  # max damage (euro/m)
                 * interpolator(df["{}_{}_{}".format(hazard_prefix, event, end)]).astype(
                     float
                 )  # damage curve  (-)
@@ -639,7 +659,7 @@ class DamageNetworkEvents(DamageNetwork):
         )  # set of unique events
 
     ### Controler for Event-based damage calculation
-    def main(self, damage_function):
+    def main(self, damage_function,manual_damage_functions):
         """Controler for doing the EAD calculation
 
         Arguments:
@@ -671,7 +691,7 @@ class DamageNetworkEvents(DamageNetwork):
             self.calculate_damage_OSdaMage(events=self.events)
 
         if damage_function == "MAN":
-            self.calculate_damage_manual_function(events=self.events)
+            self.calculate_damage_manual_functions(events=self.events,manual_damage_functions=manual_damage_functions)
 
 
 class event_hazard_network_gdf:  # DEPRECIATED, SEE THE ABOVE CLASSES STRUCTURE!!!
@@ -919,16 +939,57 @@ class event_hazard_network_gdf:  # DEPRECIATED, SEE THE ABOVE CLASSES STRUCTURE!
             "calculate_damage_OSdaMage(): Damage calculation with the OSdaMage functions was succesfull"
         )
 
+class ManualDamageFunctions:
+    """"
+    This class keeps an overview of the manual damage functions
+
+    Default behaviour is to find, load and apply all available functions
+    At 22 sept 2022: only implemented workflow for DamageFunction_by_RoadType_by_Lane
+    """
+    def __init__(self):
+        self.available = {} #keys = name of the available functions; values = paths to the folder
+        self.loaded = [] #List of DamageFunction objects (or child classes
+
+    def find_damage_functions(self,folder) -> None:
+        """Find all available damage functions in the specified folder"""
+        assert folder.exists(), 'Folder {} does not contain damage functions'.format(folder)
+        for subfolder in folder.iterdir(): #Subfolders contain the damage curves
+            if subfolder.is_dir():
+                #print(subfolder.stem,subfolder)
+                self.available[subfolder.stem] = subfolder
+        logging.info('Found {} manual damage curves: \n {}'.format(
+            len(self.available.keys()),
+            list(self.available.keys())))
+        return None
+
+    def load_damage_functions(self):
+        """"Load damage functions in Ra2Ce"""
+        for name, dir in self.available.items():
+            damage_function = DamageFunction_by_RoadType_by_Lane(name=name)
+            damage_function.from_input_folder(dir)
+            self.loaded.append(damage_function)
+            logging.info("Damage function {} loaded from folder {}".format(damage_function.name,dir))
+
+    def apply_damage_functions(self):
+        pass
+
+
+
+
+
 class DamageFunction:
     """
     Generic damage function
 
     """
-    def __init__(self, name=None,hazard='flood',type='depth_damage',infra_type='road'):
+    def __init__(self, max_damage=None,damage_fraction=None,
+                 name=None,hazard='flood',type='depth_damage',infra_type='road'):
         self.name = name
         self.hazard = hazard
         self.type = type
         self.infra_type = infra_type
+        self.max_damage = max_damage #Should be a MaxDamage object
+        self.damage_fraction = damage_fraction #Should be a DamageFractionHazardSeverity object
 
         #Other attributes (will be added later)
         #self.damage_fraction - x-values correspond to hazard_intenity; y-values correspond to damage fraction [0-1]
@@ -936,28 +997,103 @@ class DamageFunction:
 
         #self.max_damage / reconstruction costs #length unit and width unit
         #asset type
-        #price level etc.
+        #price level etc
 
-class DamageFunction_by_RoadType(DamageFunction):
+    def apply(self,df):
+        #This functions needs to be specified in child classes
+        logging.warning("""This method has not been applied. """)
+
+    def add_max_dam(self,df):
+        #This functions needs to be specified in child classes
+        logging.warning("""This method has not been applied. """)
+
+
+
+
+class DamageFunction_by_RoadType_by_Lane(DamageFunction):
     """
     A damage function that has different max damages per road type, but a uniform damage_fraction curve
 
+
+    The attributes need to be of the type:
+    self.max_damage (MaxDamage_byRoadType_byLane)
+    self.damage_fraction (DamageFractionHazardSeverityUniform)
+
     """
 
-    def __init__(self, name=None,hazard='flood',type='depth_damage',infra_type='road'):
+    def __init__(self, max_damage=None, damage_fraction=None,
+                 name=None,hazard='flood',type='depth_damage',infra_type='road'):
         # Construct using the parent class __init__
-        DamageFunction.__init__(self, name=name,hazard=hazard,type=type,infra_type=infra_type)
+        DamageFunction.__init__(self, max_damage=max_damage,damage_fraction=damage_fraction,
+                                name=name,hazard=hazard,type=type,infra_type=infra_type)
         #Do extra stuffs
 
-    def from_csv(self,csv_path_damage_fraction,csv_path_max_damage,sep=','):
-        """Construct a set of damage functions from csv files
+    def from_input_folder(self,folder_path):
+        """Construct a set of damage functions from csv files located in the folder_path
 
         Arguments:
-            *csv_path* (Pathlib Path) : path to csv file containing the damage fractions (uniform for all road types)
-            *csv_path_max_damage* (Pathlib Path) : path to the csv file containing the max damage values
-            *sep* : decimal seperator used in the files
+            *folder_path* (Pathlib Path) : path to folder where csv files can be found
         """
-        pass
+        #Load the max_damage object
+        max_damage = MaxDamage_byRoadType_byLane()
+        #search in the folder for something *max_damage*
+        #folder_path = Path(r"D:\Python\ra2ce\data\1010b_zuid_holland\input\damage_function\test")
+        max_dam_path = find_unique_csv_file(folder_path, "max_damage")
+        max_damage.from_csv(max_dam_path, sep=';')
+        self.max_damage = max_damage
+
+        #Load the damage fraction function
+        #search in the folder for something *damage_fraction
+        damage_fraction = DamageFractionHazardSeverityUniform()
+        dam_fraction_path = find_unique_csv_file(folder_path, "hazard_severity")
+        damage_fraction.from_csv(dam_fraction_path, sep=';')
+        #todo: unit correction of damage_fraction
+        damage_fraction.create_interpolator()
+        self.damage_fraction = damage_fraction
+
+    #Todo: these two below functions are maybe better implemented at a lower level?
+    def add_max_damage(self,df,prefix=None):
+        """"Ads the max damage value to the dataframe"""
+        cols = df.columns
+        assert "road_type" in cols, "no column 'road type' in df"
+        assert "lanes" in cols, "no column 'lanes in df"
+
+        max_damage_data = self.max_damage.data
+        df['{}_temp_max_dam'.format(prefix)] = max_damage_data.lookup(df["road_type"],df["lanes"])
+        return df
+
+    def calculate_damage(self,df,DamFun_prefix,Hazard_prefix):
+        """Calculates the damage for one event"""
+
+        interpolator = self.damage_fraction.interpolator #get the interpolator function
+
+
+
+
+
+def find_unique_csv_file(folder_path,part_of_filename):
+    """
+    Arguments: find unique csv file in a folder, with a given part_of_filename
+    Raises a warning if no file can be found, and an error if more than one file is found
+
+    :param folder_path: (pathlib Path) - The folder in which the csv is searched for
+    :return: result (pathlib Path) - The path with the csv file
+    """
+    result = []
+    for file in folder_path.iterdir():
+        if (part_of_filename in file.stem) and (file.suffix == '.csv'):
+            result.append(file)
+    if len(result) > 1:
+        raise ValueError("Found more then one damage file in {}".format(folder_path))
+    elif len(result) == 0:
+        logging.warning("Did not found any damage file in {}".format(folder_path))
+    else:
+        result = result[0]
+    return result
+
+
+
+
 
 class MaxDamage():
     """
@@ -1069,6 +1205,7 @@ class DamageFractionHazardSeverityUniform(DamageFractionHazardSeverity):
     def __init__(self,name=None,hazard_unit=None):
         self.name = name
         self.hazard_unit = hazard_unit
+        self.interpolator = None
 
     def from_csv(self,path: Path,sep=',',desired_unit='m') -> None:
         """Construct object from csv file. Damage curve name is inferred from filename
@@ -1134,6 +1271,19 @@ class DamageFractionHazardSeverityUniform(DamageFractionHazardSeverity):
         else:
             logging.warning('Hazard severity scaling from {} to {} is not  supported'.format(self.hazard_unit,desired_unit))
             return None
+
+    def create_interpolator(self):
+        """ Create interpolator object from loaded data
+        sets result to self.interpolator (Scipy interp1d)
+        """
+        from scipy.interpolate import interp1d
+        x_values = self.data.index.values
+        y_values = self.data.values[:,0]
+
+        self.interpolator = interp1d(x=x_values,y=y_values,
+                fill_value=(y_values[0],y_values[-1]), #fraction damage (y) if hazard severity (x) is outside curve range
+                bounds_error=False)
+        return None
 
 
 
