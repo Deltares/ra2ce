@@ -1,17 +1,16 @@
-import logging
-import pickle
 from pathlib import Path
-from typing import Any, List, Optional, Type, Union
+from typing import List, Type
 
 import geopandas as gpd
 import networkx as nx
 
-from ra2ce.io.writers.ra2ce_exporter_protocol import Ra2ceExporterProtocol
+from ra2ce.io.writers.geodataframe_network_exporter import GeoDataFrameNetworkExporter
+from ra2ce.io.writers.multi_graph_network_exporter import MultiGraphNetworkExporter
+from ra2ce.io.writers.network_exporter_base import (
+    NETWORK_TYPE,
+    NetworkExporterBase,
+)
 
-MULTIGRAPH_TYPE = Union[
-    nx.classes.multigraph.MultiGraph, nx.classes.multidigraph.MultiDiGraph
-]
-NETWORK_TYPE = Union[gpd.GeoDataFrame, MULTIGRAPH_TYPE]
 
 
 class NetworkExporterBase(Ra2ceExporterProtocol):

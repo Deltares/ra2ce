@@ -44,16 +44,17 @@ jobs:
           conda activate ra2ce_env
           poetry run pytest --cov . --cov-report xml:coverage-reports/coverage-ra2ce.xml --junitxml=xunit-reports/xunit-result-ra2ce.xml
 
-      - name: Autoformat code if the check fails
-        if: ${{ (matrix.os == 'ubuntu-20.04') && (matrix.python-version == 3.9) }}
-        shell: pwsh
-        run: |
-          conda activate ra2ce_env
-          poetry run isort .
-          poetry run black .
-          git config --global user.name '${{ github.actor }}'
-          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
-          git fetch
-          git checkout $GITHUB_HEAD_REF
-          git commit -am "autoformat: isort & black" && git push || true      
+      # DEACTIVATED. Currently being done 'on push' in the autoformat.yml workflow.
+      # - name: Autoformat code if the check fails
+      #   if: ${{ (matrix.os == 'ubuntu-20.04') && (matrix.python-version == 3.9) }}
+      #   shell: pwsh
+      #   run: |
+      #     conda activate ra2ce_env
+      #     poetry run isort .
+      #     poetry run black .
+      #     git config --global user.name '${{ github.actor }}'
+      #     git config --global user.email '${{ github.actor }}@users.noreply.github.com'
+      #     git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+      #     git fetch
+      #     git checkout $GITHUB_HEAD_REF
+      #     git commit -am "autoformat: isort & black" && git push || true      

@@ -1,7 +1,6 @@
 import logging
-from typing import Type
 
-from ra2ce.ra2ce_input import Ra2ceInput
+from ra2ce.ra2ce_input_config import Ra2ceInputConfig
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 from ra2ce.runners.direct_analysis_runner import DirectAnalysisRunner
 from ra2ce.runners.indirect_analysis_runner import IndirectAnalysisRunner
@@ -9,7 +8,7 @@ from ra2ce.runners.indirect_analysis_runner import IndirectAnalysisRunner
 
 class AnalysisRunnerFactory:
     @staticmethod
-    def get_runner(ra2ce_input: Ra2ceInput) -> AnalysisRunner:
+    def get_runner(ra2ce_input: Ra2ceInputConfig) -> AnalysisRunner:
         """
         Gets the supported first analysis runner for the given input. The runner is initialized within this method.
 
@@ -24,8 +23,11 @@ class AnalysisRunnerFactory:
             _runner for _runner in _available_runners if _runner.can_run(ra2ce_input)
         ]
         if not _supported_runners:
-            logging.error("No analysis runner found for the given configuration.")
+            _err_mssg = "No analysis runner found for the given configuration."
+            logging.error(_err_mssg)
+            raise ValueError(_err_mssg)
 
+        # Initialized selected supported runner (First one available).
         _selected_runner = _supported_runners[0]()
         if len(_supported_runners) > 1:
             logging.warn(f"More than one runner available, using {_selected_runner}")
