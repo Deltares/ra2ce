@@ -32,15 +32,15 @@ class ConfigFactory:
         _input_config.network_config = ConfigFactory.get_network_config_data(
             network_ini
         )
-        _input_config.analysis_config = ConfigFactory.get_reader(
-            AnalysisConfigBase
-        ).read(analysis_ini, _input_config.network_config)
+        _input_config.analysis_config = ConfigFactory.get_analysis_config_data(
+            analysis_ini, _input_config.network_config
+        )
         return _input_config
 
     @staticmethod
     def get_network_config_data(network_ini: Path) -> Optional[NetworkConfig]:
         _ini_config_data = NetworkIniConfigDataReader().read(network_ini)
-        return NetworkConfig.from_data(_ini_config_data)
+        return NetworkConfig.from_data(network_ini, _ini_config_data)
 
     @staticmethod
     def get_analysis_config_data(
@@ -50,5 +50,5 @@ class ConfigFactory:
             analysis_ini, network_config
         )
         return AnalysisConfigFactory.get_analysis_config(
-            _ini_config_data, analysis_ini, network_config
+            analysis_ini, _ini_config_data, network_config
         )
