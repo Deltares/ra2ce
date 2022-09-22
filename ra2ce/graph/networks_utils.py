@@ -20,6 +20,7 @@ import networkx as nx
 import osmnx
 import pandas as pd
 import pyproj
+import numpy as np
 
 # Hazard overlay
 # from boltons.iterutils import pairwise
@@ -2363,3 +2364,7 @@ def set_analysis_value(gdf: gpd.GeoDataFrame, analyse: int = 1) -> gpd.GeoDataFr
 def clean_memory(list_delete: list) -> None:
     for to_delete in list_delete:
         del to_delete
+
+
+def mean_ignore_nan(x):
+    return np.nanmean(x)

@@ -114,7 +114,8 @@ class Hazard:
                     x,
                     str(self.hazard_files["tif"][i]),
                     all_touched=True,
-                    stats="min max mean",
+                    stats="min max",
+                    add_stats={'mean': mean_ignore_nan}
                 )
             )
             gdf[rn + "_mi"] = [x[0]["min"] for x in flood_stats]
@@ -193,7 +194,7 @@ class Hazard:
                     x,
                     str(self.hazard_files["tif"][i]),
                     all_touched=True,
-                    stats=f"{self.aggregate_wl}",
+                    stats=f"{self.aggregate_wl}",  # TODO: ADD MEAN WITHOUT THE NANs
                 )
             )
 
@@ -304,7 +305,7 @@ class Hazard:
                         if self.aggregate_wl == "mean":
                             graph[u][v][k][
                                 rn + "_" + self.aggregate_wl[:2]
-                            ] = precise_matches[hfn].mean()
+                            ] = np.nanmean(precise_matches[hfn])
                     else:
                         graph[u][v][k][rn + "_" + self.aggregate_wl[:2]] = 0
                 else:
@@ -400,7 +401,7 @@ class Hazard:
                     x,
                     str(self.hazard_files["tif"][i]),
                     all_touched=True,
-                    stats=f"{self.aggregate_wl}",
+                    stats=f"{self.aggregate_wl}",  # TODO: ADD MEAN WITHOUT THE NANs
                 )
             )
 
