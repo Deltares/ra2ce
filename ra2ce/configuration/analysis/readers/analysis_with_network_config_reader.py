@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 from ra2ce.configuration.analysis.analysis_config_base import AnalysisConfigBase
 from ra2ce.configuration.analysis.analysis_ini_config_data import (
@@ -18,7 +19,7 @@ class AnalysisWithNetworkConfigReader(AnalysisConfigReaderBase):
                 "Network data mandatory for an AnalysisIniConfigurationReader reader."
             )
 
-    def read(self, ini_file: Path) -> AnalysisWithNetworkIniConfigData:
+    def read(self, ini_file: Path) -> Optional[AnalysisWithNetworkIniConfigData]:
         if not ini_file:
             return None
         _root_path = AnalysisConfigBase.get_network_root_dir(ini_file)
