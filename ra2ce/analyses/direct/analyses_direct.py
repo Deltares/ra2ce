@@ -58,75 +58,84 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
 
     def road_damage(self, analysis):
         """
-        Calculates the road damage
+        ### CONTROLER FOR CALCULATING THE ROAD DAMAGE
 
-        :param analysis:
+        Arguments:
+            *analysis* (dict) : contains part of the settings from the analysis ini
         :return:
         """
-        rd = (
-            RoadDamage()
-        )  # Creates a Road Damage object, the methods of this object are used to do the damage calculation
+        #Todo: remove this class
+        #rd = (
+        #    RoadDamage()
+        #)  # Creates a Road Damage object, the methods of this object are used to do the damage calculation
 
         # Todo: maybe the whole RoadDamage() class can be removed, because it is either:
         # - a controler: the info should stay here
         # - a handler: these should be methods of the datastructure
 
-        gdf = self.graphs["base_network_hazard"]
+        #Open the network with hazard data
+        road_gdf = self.graphs["base_network_hazard"]
         if self.graphs["base_network_hazard"] is None:
-            gdf = gpd.read_feather(self.config["files"]["base_network_hazard"])
+            road_gdf = gpd.read_feather(self.config["files"]["base_network_hazard"])
 
-        # TODO: MOVE TO CLEANUP FUNCTIONALITY
-        # reduce the number of road types (col 'infra_type') to smaller number of road_types for which damage curves exist
-        road_mapping_dict = (
-            lookup.road_mapping()
-        )  # The lookup class contains all kinds of data
-        gdf.rename(columns={"highway": "infra_type"}, inplace=True)
-        gdf["road_type"] = gdf["infra_type"]
-        gdf = gdf.replace({"road_type": road_mapping_dict})
+        # Find the hazard columns
+        val_cols = [
+            col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
+        ]
 
-        # TODO sometimes there are edges with multiple mappings ?? To check this
-        # TODO I, Kees think this is a dangerous cleanup procedure with possible unexpected outcomes
-        # cleanup of gdf
-        for column in gdf.columns:
-            gdf[column] = gdf[column].apply(
-                rd.apply_cleanup
-            )  # Todo: rename function, this is too vague.
+        # Read the desired damage function
+        damage_function = analysis['damage_curve']
 
-        # # cleanup and complete the lane data.
-        # ### Try to convert all data to floats
-        # try:
-        #     gdf.lanes = gdf.lanes.astype('float') #floats instead of ints because ints cannot be nan.
-        # except:
-        #     logging.warning('Available lane data cannot simply be converted to float/int, RA2CE will try a clean-up.')
-        #     gdf.lanes = clean_lane_data(gdf.lanes)
-        #
-        # gdf.lanes = gdf.lanes.round(0) #round to nearest integer, but save as float format
-        # nans = gdf.lanes.isnull() #boolean with trues for all nans, i.e. all road segements without lane data
-        # if nans.sum() > 0:
-        #     logging.warning("""Of the {} road segments, only {} had lane data, so for {} the '
-        #                     lane data will be interpolated from the existing data""".format(
-        #         len(gdf.lanes),(~nans).sum(),nans.sum()))
-        #     lane_stats = create_summary_statistics(gdf)
-        #
-        #     #Replace the missing lane data the neat way (without pandas SettingWithCopyWarning)
-        #     lane_nans_mask = gdf.lanes.isnull()
-        #     gdf.loc[lane_nans_mask, 'lanes'] = gdf.loc[lane_nans_mask, 'road_type'].replace(lane_stats)
-        #     logging.warning('Interpolated the missing lane data as follows: {}'.format(lane_stats))
-        #
-        #     #Todo: write the whole interpolater object
-        #
-        #     #This worked but raises an error
-        #     #lane_nans = gdf[gdf.lanes.isnull()]  # mask all nans in lane data
-        #     #lane_nans['lanes'] =  lane_nans['road_type'].replace(lane_stats)
-        #     #gdf.loc[lane_nans.index, :] = lane_nans
-        #
-        #     # Todo: What if for one road type all lane data is missing?
-        #     # Todo: we could script a seperate work-around for this situation, for now we just raise an assertion
-        #     assert not (np.nan in gdf.lanes.unique()) #all nans should be replaced
+        #Choose between event or return period based analysis
+        if analysis['event_type'] == 'event':
+            event_cols = [x for x in val_cols if "_EV" in x] #Todo: can be part of the init of the object
+
+            if not len(event_cols) > 0:
+                raise ValueError('No event cols present in hazard data')
+
+            event_gdf = DamageNetworkEvents(road_gdf, val_cols)
+            event_gdf.main(damage_function=damage_function)
+
+            result_gdf = event_gdf.gdf
+
+            return result_gdf
+
+        elif analysis['event_type'] == 'return_period':
+            #count number of return period cols
+            rp_cols = [x for x in val_cols if "_RP" in x] #Todo: can be part of the init of the object
+
+            if not len(rp_cols) > 1: #Todo, can be done after, or in object instantiation
+                raise ValueError('No return_period cols present in hazard data')
+
+            #return_period_gdf.main(damage_function=damage_function) #DEPRECATED
+            return_period_gdf = DamageNetworkReturnPeriods(road_gdf,val_cols)
+            DamageNetworkReturnPeriods.main(damage_function=damage_function)
+
+            result_gdf = return_period_gdf.gdf
+
+            return result_gdf
+
+        else:
+            raise ValueError(
+                """"The hazard calculation does not know 
+            what to do if the analysis specifies {}""".format(
+                    analysis['event_type']
+                )
+            )
+            return None
+
+
+        # # TODO I, Kees think this is a dangerous cleanup procedure with possible unexpected outcomes
+        # # cleanup of gdf
+        # for column in gdf.columns:
+        #     gdf[column] = gdf[column].apply(
+        #         rd.apply_cleanup
+        #     )  # Todo: rename function, this is too vague.
 
         # calculate direct damage
-        road_gdf_damage = rd.calculate_direct_damage(gdf)
-        return road_gdf_damage
+        #road_gdf_damage = rd.calculate_direct_damage(gdf)
+
+
 
     def effectiveness_measures(self, analysis):
         """This function calculated the efficiency of measures. Input is a csv file with efficiency
@@ -174,7 +183,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         return gdf
 
 
-class RoadDamage:
+class RoadDamage: # MAYBE THIS CLASS WIL BE DEPRECIATED
     def calculate_direct_damage(self, road_gdf):
         """
         Calculates the direct damage for all road segments with exposure data using a depth-damage curve
@@ -184,37 +193,21 @@ class RoadDamage:
             *road_gdf* (GeoPandas DataFrame) :
         """
 
-        # apply the add_default_lanes function to add default number of lanes
-        # load lookup tables
-        # These factors are derived from: Van Ginkel et al. 2021: https://nhess.copernicus.org/articles/21/1011/2021/
-        logging.warning(
-            "Damage calculations are based on Van Ginkel et al. 2021: https://nhess.copernicus.org/articles/21/1011/2021/"
-        )
-        logging.warning(
-            """All damages represent the former EU-28 (before Brexit), 2015-pricelevel in Euro's.
-                            To convert to local currency, these need to be:
-                                multiplied by the ratio (pricelevel_XXXX / pricelevel_2015)
-                                multiply by the ratio (local_GDP_per_capita / EU-28-2015-GDP_per_capita)          
-                            EU-28-2015-GDP_per_capita = 39.200 euro
-                        """
-        )
-        logging.warning(
-            "These numbers assume that motorways that each driving direction is mapped as a seperate segment such as in OSM!!!"
-        )
-        lane_damage_correction = lookup.road_damage_correction()
-        dict_max_damages = (
-            lookup.max_damages()
-        )  # In fact this is a new construction costs
-        max_damages_huizinga = lookup.max_damages_huizinga()
-        interpolators = (
-            lookup.flood_curves()
-        )  # input: water depth (cm); output: damage (fraction road construction costs)
-        curve_names = [name for name in interpolators]
+
+        #lane_damage_correction = lookup.road_damage_correction()
+        #dict_max_damages = (
+        #    lookup.max_damages()
+        #)  # In fact this is a new construction costs
+        #max_damages_huizinga = lookup.max_damages_huizinga()
+        #interpolators = (
+        #    lookup.flood_curves()
+        #)  # input: water depth (cm); output: damage (fraction road construction costs)
+        #curve_names = [name for name in interpolators]
 
         # Find the hazard columns
-        val_cols = [
-            col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
-        ]
+        # val_cols = [
+        #     col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
+        # ]
 
         # group the val cols:
         # Todo: make a hazard class?
@@ -223,41 +216,45 @@ class RoadDamage:
         # F = flood; _ ; EV = event-based + number event; _ ; _ ma/mi/mi/av/fr = maximum, minimum, average fraction that is affected
 
         # case we are dealing with events:
-        event_cols = [x for x in val_cols if "_EV" in x]
-        rp_cols = [
-            x for x in val_cols if "_RP" in x
-        ]  # todo test the workflow for event data
-        if len(event_cols) > 0 and len(rp_cols) == 0:
+        # event_cols = [x for x in val_cols if "_EV" in x]
+        # rp_cols = [
+        #     x for x in val_cols if "_RP" in x
+        # ]  # todo test the workflow for event data
+        # if len(event_cols) > 0 and len(rp_cols) == 0:
             # case only event data is provided
             # unique_events = set([x.split('_')[1] for x in event_cols]) #set of unique events
             # hazard_stats = set([x.split('_')[2] for x in event_cols]) #set of hazard info per event
 
-            event_gdf = event_hazard_network_gdf(
-                road_gdf, val_cols
-            )  # Create data structure for event hazard data
-            event_gdf.calculate_damage_HZ(interpolators["HZ"], max_damages_huizinga)
-            # event_gdf.calculate_damage_OSdaMage(interpolators,dict_max_damages)
+            #Intermediate approach; is already a bit objectbased, but can still be improved
+            # event_gdf = event_hazard_network_gdf(
+            #     road_gdf, val_cols
+            # )  # Create data structure for event hazard data
+            # event_gdf.calculate_damage_HZ(interpolators["HZ"], max_damages_huizinga) #Todo: this is deprecated
+            # # event_gdf.calculate_damage_OSdaMage(interpolators,dict_max_damages)
 
-            result_gdf = event_gdf.gdf
+            #NEW APPROACH
+            #event_gdf = DamageNetworkEvents(road_gdf,val_cols)
+
+            #result_gdf = event_gdf.gdf
 
         # case we are dealing with return period
-        elif len(rp_cols) > 0 and len(event_cols) == 0:
-            # case only return period data is provided
-            # return_period_gdf = event_hazard_network_gdf(road_gdf,val_cols) #Create datastructure for RP hazard data
-            return_period_gdf = DamageNetworkReturnPeriods(road_gdf, val_cols)
+        # elif len(rp_cols) > 0 and len(event_cols) == 0:
+        #     # case only return period data is provided
+        #     # return_period_gdf = event_hazard_network_gdf(road_gdf,val_cols) #Create datastructure for RP hazard data
+        #     return_period_gdf = DamageNetworkReturnPeriods(road_gdf, val_cols)
+        #
+        #     damage_function = "OSD"  # can be 'HZ', 'OSD' or 'manual' #Todo: supply this information from a higher level
+        #
+        #     return_period_gdf.main(damage_function=damage_function)
+        #     result_gdf = return_period_gdf.gdf
 
-            damage_function = "OSD"  # can be 'HZ', 'OSD' or 'manual' #Todo: supply this information from a higher level
-
-            return_period_gdf.main(damage_function=damage_function)
-            result_gdf = return_period_gdf.gdf
-
-        else:
-            raise ValueError(
-                """"The hazard calculation does not know 
-            what to do if {} event_cols and {} rp_cols are provided""".format(
-                    len(event_cols), len(rp_cols)
-                )
-            )
+        # else:
+        #     raise ValueError(
+        #         """"The hazard calculation does not know
+        #     what to do if {} event_cols and {} rp_cols are provided""".format(
+        #             len(event_cols), len(rp_cols)
+        #         )
+        #     )
 
         return result_gdf
 
@@ -435,12 +432,48 @@ class DamageNetwork:
 
 
     ### Damage handlers
-    def calculate_damage_HZ(self, events):  # Todo: This should need less data
-        """Arguments
-        -> remove interpolator, max_damage_huizinga, curve-name
+    def calculate_damage_manual_function(self,events):
+        """
+        Arguments:
+        *events* (list) = list of events (or return periods) to iterate over, these should match the hazard column names 
+        """
+
+        # Todo: Dirty fixes, these should be read from the init
+        hazard_prefix = "F"
+        end = "me"  # indicate that you want to use the mean
+
+        df = self.df #dataframe to carry out the damage calculation
+
+
+        #Todo hier verder
+
+
+
+
+    def calculate_damage_HZ(self, events):
+        """
+        Arguments:
            *events* (list) = list of events (or return periods) to iterate over, these should match the hazard column names
         """
-        # Todo: Dirty fixes, these should be read from the code
+        # These factors are derived from: Van Ginkel et al. 2021: https://nhess.copernicus.org/articles/21/1011/2021/
+        logging.warning(
+            "Damage calculations with Huizinga curves are based on Van Ginkel et al. 2021: https://nhess.copernicus.org/articles/21/1011/2021/"
+        )
+        logging.warning(
+            """All damages represent the former EU-28 (before Brexit), 2015-pricelevel in Euro's.
+                            To convert to local currency, these need to be:
+                                multiplied by the ratio (pricelevel_XXXX / pricelevel_2015)
+                                multiply by the ratio (local_GDP_per_capita / EU-28-2015-GDP_per_capita)          
+                            EU-28-2015-GDP_per_capita = 39.200 euro
+                        """
+        )
+        logging.warning(
+            "These numbers assume that motorways that each driving direction is mapped as a seperate segment such as in OSM!!!"
+        )
+
+
+
+        # Todo: Dirty fixes, these should be read from the init
         hazard_prefix = "F"
         end = "me"  # indicate that you want to use the mean
 
@@ -448,7 +481,7 @@ class DamageNetwork:
         curve_name = "HZ"
 
         df_max_damages_huizinga = pd.DataFrame.from_dict(lookup.max_damages_huizinga())
-        max_damages_huizinga = lookup.max_damages_huizinga()
+        #max_damages_huizinga = lookup.max_damages_huizinga()
         interpolator = lookup.flood_curves()[
             "HZ"
         ]  # input: water depth (cm); output: damage (fraction road construction costs)
@@ -481,6 +514,26 @@ class DamageNetwork:
 
     def calculate_damage_OSdaMage(self, events):
         """OSdaMage calculation not yet implemented"""
+
+        # These factors are derived from: Van Ginkel et al. 2021: https://nhess.copernicus.org/articles/21/1011/2021/
+        logging.warning(
+            """Damage calculations with OSdaMage functions are based on 
+            Van Ginkel et al. 2021: https://nhess.copernicus.org/articles/21/1011/2021/"""
+        )
+        logging.warning(
+            """All damages represent the former EU-28 (before Brexit), 2015-pricelevel in Euro's.
+                            To convert to local currency, these need to be:
+                                multiplied by the ratio (pricelevel_XXXX / pricelevel_2015)
+                                multiply by the ratio (local_GDP_per_capita / EU-28-2015-GDP_per_capita)          
+                            EU-28-2015-GDP_per_capita = 39.200 euro
+                        """
+        )
+        logging.warning(
+            "These numbers assume that motorways that each driving direction is mapped as a seperate segment such as in OSM!!!"
+        )
+
+
+
         # Todo: Dirty fixes, these should be read from the code
         hazard_prefix = "F"
         end = "me"  # indicate that you want to use the mean
@@ -656,16 +709,54 @@ class DamageNetworkEvents(DamageNetwork):
     @Author: Kees van Ginkel
 
     Mandatory attributes:
-        *self.rps* (set)  : all available unique events
+        *self.events* (set)  : all available unique events
         *self.stats* (set)   : the available statistics
     """
 
+    # Todo for pakistan project, make this working, by taking the code from below
+    # Todo: But let's start with the manual damage curves (and take Huizinga as an example)
+
     def __init__(self, road_gdf, val_cols):
-        pass
+        # Construct using the parent class __init__
+        DamageNetwork.__init__(self, road_gdf, val_cols)
+        self.events = set(
+            [x.split("_")[1] for x in val_cols]
+        )  # set of unique events
 
-    #Todo for pakistan project, make this working, by taking the code from below
+    ### Controler for Event-based damage calculation
+    def main(self, damage_function):
+        """Controler for doing the EAD calculation
 
+        Arguments:
+            *damage_function* = damage function that is to be used, valid arguments are: 'HZ', 'OSD', 'MAN'
 
+        """
+        assert len(self.events) > 0, "no return periods identified"
+        assert "me" in self.stats, "mean water depth (key: me) is missing"
+        assert "fr" in self.stats, "inundated fraction (key: fr) is missing"
+
+        # CLEANUPS
+        self.remap_road_types_to_fewer_classes()
+        self.clean_and_interpolate_missing_lane_data()
+
+        gdf_mask = self.create_mask()
+
+        # create dataframe from gdf  #Todo: check why this is necessary
+        column_names = list(gdf_mask.columns)
+        column_names.remove("geometry")
+        df = gdf_mask[column_names]
+
+        self.df = df  # helper dataframe to speedup the analysis
+        self.fix_extraordinary_lanes()
+
+        if damage_function == "HZ":
+            self.calculate_damage_HZ(events=self.events)
+
+        if damage_function == "OSD":
+            self.calculate_damage_OSdaMage(events=self.events)
+
+        if damage_function == "MAN":
+            self.calculate_damage_manual_function(events=self.events)
 
 
 class event_hazard_network_gdf:  # DEPRECIATED, SEE THE ABOVE CLASSES STRUCTURE!!!
@@ -1064,7 +1155,7 @@ class DamageFractionHazardSeverityUniform(DamageFractionHazardSeverity):
         self.name = name
         self.hazard_unit = hazard_unit
 
-    def from_csv(self,path: Path,sep=',',output_unit='m') -> None:
+    def from_csv(self,path: Path,sep=',',desired_unit='m') -> None:
         """Construct object from csv file. Damage curve name is inferred from filename
 
         Arguments:
@@ -1097,47 +1188,65 @@ class DamageFractionHazardSeverityUniform(DamageFractionHazardSeverity):
         self.raw_data = pd.read_csv(path,index_col=0,sep=sep)
         self.origin_path = path #to track the original path from which the object was constructed; maybe also date?
 
-        self.output_unit = self.raw_data.index[0]
-        self.data = self.raw_data.drop(self.output_unit)
+        #identify unit and drop from data
+        self.hazard_unit = self.raw_data.index[0]
+        self.data = self.raw_data.drop(self.hazard_unit)\
+
+        #convert data to floats
+        self.data = self.data.astype('float')
+        self.data.index = self.data.index.astype('float')
+
+    def convert_hazard_severity_unit(self,desired_unit='m') -> None:
+        """Converts hazard severity values to a different unit
+        Arguments:
+            self.hazard_unit - implicit (string)
+            *desired_unit* (string)
+
+        Effect: converts the values in self.data; and sets the new damage_unit to the desired unit
+
+        """
+        if desired_unit == self.hazard_unit:
+            logging.info('Damage units are already in the desired format {}'.format(desired_unit))
+            return None
+
+        if (self.hazard_unit == 'cm' and desired_unit == 'm'):
+            scaling_factor = 1/100
+            self.data = self.data * scaling_factor
+            logging.info('Hazard severity data was scaled by a factor {}, to convert from {} to {}'.format(
+                hazard_unit,self.damage_unit,desired_unit))
+            self.damage_unit = desired_unit
+            return None
+        else:
+            logging.warning('Hazard severity scaling from {} to {} is not  supported'.format(self.hazard_unit,desired_unit))
+            return None
 
 
 
-        # ###Determine units
-        # units = self.raw_data.loc['unit',:].unique() #identify the unique units
-        # assert len(units) == 1, 'Columns in the max damage csv seem to have different units, ra2ce cannot handle this'
-        # #case only one unique unit is identified
-        # self.damage_unit = units[0] #should have the structure 'x/y' , e.g. euro/m, dollar/yard
-        #
-        # self.data = self.raw_data.drop('unit')
-        # self.data = self.data.astype('float')
-        #
-        # #assume road types are in the rows; lane numbers in the columns
-        # self.road_types = list(self.data.index) #to method
-        # #assumes that the columns containst the lanes
-        # self.data.columns = self.data.columns.astype('int')
-        #
-        #
-        # if self.damage_unit != 'output_unit':
-        #     print('niet gelijk!')
-        #     self.convert_length_unit() #convert the unit
-        # else:
-        #     print('wel gelijk')
 
 
 
 
 
 #Tests:
-def test_construct_damage_function():
+def test_construct_max_damage():
     max_damage = MaxDamage_byRoadType_byLane()
     path = Path(r"D:\Python\ra2ce\data\1010b_zuid_holland\input\damage_function\test\huizinga_max_damage.csv")
     max_damage.from_csv(path,sep=';')
-    print(max_damage.data)
+    return max_damage
 
-#def test_construct_damage_function():
-damage_fraction = DamageFractionHazardSeverityUniform()
-path = Path(r"D:\Python\ra2ce\data\1010b_zuid_holland\input\damage_function\test\huizinga_damage_fraction_hazard_severity.csv")
-damage_fraction.from_csv(path,sep=';')
+def test_construct_damage_fraction():
+    damage_fraction = DamageFractionHazardSeverityUniform()
+    path = Path(r"D:\Python\ra2ce\data\1010b_zuid_holland\input\damage_function\test\huizinga_damage_fraction_hazard_severity.csv")
+    damage_fraction.from_csv(path,sep=';')
+    return damage_fraction
+
+max_damage = test_construct_max_damage()
+
+max_damage = test_construct_damage_fraction()
+
+
+
+
 
 
 
