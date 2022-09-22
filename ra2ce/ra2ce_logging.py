@@ -16,6 +16,7 @@ class Ra2ceLogger:
         self._set_file_handler()
         self._set_console_handler()
         self._set_formatter()
+        logging.info(f"{logger_name} logger initialized.")
 
     def _get_logger(self) -> logging.Logger:
         """
