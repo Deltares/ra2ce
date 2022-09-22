@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
-from ra2ce.ra2ce_input_config import Ra2ceInputConfig
+from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.ra2ce_logging import Ra2ceLogger
 from ra2ce.runners import AnalysisRunner, AnalysisRunnerFactory
 
@@ -20,7 +20,7 @@ warnings.filterwarnings(action="ignore", message="Value *not successfully writte
 class Ra2ceHandler:
     def __init__(self, network: Optional[Path], analysis: Optional[Path]) -> None:
         self._initialize_logger(network, analysis)
-        self.input_config = Ra2ceInputConfig.from_input_paths(analysis, network)
+        self.input_config = ConfigWrapper.from_input_paths(analysis, network)
 
     def _initialize_logger(
         self, network: Optional[Path], analysis: Optional[Path]

@@ -1,6 +1,6 @@
 import logging
 
-from ra2ce.ra2ce_input_config import Ra2ceInputConfig
+from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 from ra2ce.runners.direct_analysis_runner import DirectAnalysisRunner
 from ra2ce.runners.indirect_analysis_runner import IndirectAnalysisRunner
@@ -8,7 +8,7 @@ from ra2ce.runners.indirect_analysis_runner import IndirectAnalysisRunner
 
 class AnalysisRunnerFactory:
     @staticmethod
-    def get_runner(ra2ce_input: Ra2ceInputConfig) -> AnalysisRunner:
+    def get_runner(ra2ce_input: ConfigWrapper) -> AnalysisRunner:
         """
         Gets the supported first analysis runner for the given input. The runner is initialized within this method.
 
