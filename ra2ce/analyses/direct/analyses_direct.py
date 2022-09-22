@@ -1184,10 +1184,8 @@ class MaxDamage_byRoadType_byLane(MaxDamage):
 
 
         if self.damage_unit != 'output_unit':
-            print('niet gelijk!')
             self.convert_length_unit() #convert the unit
-        else:
-            print('wel gelijk')
+
 
     def convert_length_unit(self,desired_unit='euro/m') -> None:
         """Converts max damage values to a different unit
@@ -1205,9 +1203,7 @@ class MaxDamage_byRoadType_byLane(MaxDamage):
             return None
 
         original_length_unit = self.damage_unit.split('/')[1]
-        print(original_length_unit)
         target_length_unit = desired_unit.split('/')[1]
-        print(target_length_unit)
 
         if (original_length_unit == 'km' and target_length_unit == 'm'):
             scaling_factor = 1/1000
@@ -1341,19 +1337,6 @@ def test_construct_damage_fraction():
 #max_damage = test_construct_max_damage()
 
 #max_damage = test_construct_damage_fraction()
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
