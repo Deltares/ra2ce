@@ -122,7 +122,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
                     analysis['event_type']
                 )
             )
-            return  None
+            return None
 
 
         # # TODO I, Kees think this is a dangerous cleanup procedure with possible unexpected outcomes
