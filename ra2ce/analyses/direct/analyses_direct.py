@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-Created on 26-7-2021
 """
 
 import logging
@@ -24,6 +23,35 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         self.config = config
         self.graphs = graphs
 
+    def execute(self):
+        """Main Coordinator of all direct damage analysis"""
+        for analysis in self.config['direct']:
+            logging.info(f"----------------------------- Started analyzing '{analysis['name']}'  -----------------------------")
+            starttime = time.time()
+
+            if analysis['analysis'] == 'direct':
+
+                gdf = self.road_damage(analysis) #calls the coordinator for road damage calculation
+
+            elif analysis['analysis'] == 'effectiveness_measures':
+                gdf = self.effectiveness_measures(analysis)
+
+            else:
+                gdf = []
+
+            output_path = self.config['output'] / analysis['analysis']
+            if analysis['save_shp']:
+                shp_path = output_path / (analysis['name'].replace(' ', '_') + '.shp')
+                save_gdf(gdf, shp_path)
+            if analysis['save_csv']:
+                csv_path = output_path / (analysis['name'].replace(' ', '_') + '.csv')
+                del gdf['geometry']
+                gdf.to_csv(csv_path, index=False)
+
+            endtime = time.time()
+            logging.info(f"----------------------------- Analysis '{analysis['name']}' finished. "
+                         f"Time: {str(round(endtime - starttime, 2))}s  -----------------------------")
+
     def road_damage(self, analysis):
         """
         Calculates the road damage
@@ -44,13 +72,11 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
             gdf = gpd.read_feather(self.config["files"]["base_network_hazard"])
 
         # TODO: MOVE TO CLEANUP FUNCTIONALITY
-        # reduce the number of road types (col 'infra_type') to smaller number of road_types for which damage curves exist
-        road_mapping_dict = (
-            lookup.road_mapping()
-        )  # The lookup class contains all kinds of data
-        gdf.rename(columns={"highway": "infra_type"}, inplace=True)
-        gdf["road_type"] = gdf["infra_type"]
-        gdf = gdf.replace({"road_type": road_mapping_dict})
+        # # reduce the number of road types (col 'infra_type') to smaller number of road_types for which damage curves exist
+        # road_mapping_dict = lookup.road_mapping() #The lookup class contains all kinds of data
+        # gdf.rename(columns={'highway': 'infra_type'}, inplace=True)
+        # gdf['road_type'] = gdf['infra_type']
+        # gdf = gdf.replace({"road_type": road_mapping_dict})
 
         # TODO sometimes there are edges with multiple mappings ?? To check this
         # TODO I, Kees think this is a dangerous cleanup procedure with possible unexpected outcomes
@@ -60,53 +86,37 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
                 rd.apply_cleanup
             )  # Todo: rename function, this is too vague.
 
-        # TODO: MOVE TO CLEANUP FUNCTIONALITY
-        # cleanup and complete the lane data.
-        ### Try to convert all data to floats
-        try:
-            gdf.lanes = gdf.lanes.astype(
-                "float"
-            )  # floats instead of ints because ints cannot be nan.
-        except:
-            logging.warning(
-                "Available lane data cannot simply be converted to float/int, RA2CE will try a clean-up."
-            )
-            gdf.lanes = clean_lane_data(gdf.lanes)
-
-        gdf.lanes = gdf.lanes.round(
-            0
-        )  # round to nearest integer, but save as float format
-        nans = (
-            gdf.lanes.isnull()
-        )  # boolean with trues for all nans, i.e. all road segements without lane data
-        if nans.sum() > 0:
-            logging.warning(
-                """Of the {} road segments, only {} had lane data, so for {} the '
-                            lane data will be interpolated from the existing data""".format(
-                    len(gdf.lanes), (~nans).sum(), nans.sum()
-                )
-            )
-            lane_stats = create_summary_statistics(gdf)
-
-            # Replace the missing lane data the neat way (without pandas SettingWithCopyWarning)
-            lane_nans_mask = gdf.lanes.isnull()
-            gdf.loc[lane_nans_mask, "lanes"] = gdf.loc[
-                lane_nans_mask, "road_type"
-            ].replace(lane_stats)
-            logging.warning(
-                "Interpolated the missing lane data as follows: {}".format(lane_stats)
-            )
-
-            # Todo: write the whole interpolater object
-
-            # This worked but raises an error
-            # lane_nans = gdf[gdf.lanes.isnull()]  # mask all nans in lane data
-            # lane_nans['lanes'] =  lane_nans['road_type'].replace(lane_stats)
-            # gdf.loc[lane_nans.index, :] = lane_nans
-
-            # Todo: What if for one road type all lane data is missing?
-            # Todo: we could script a seperate work-around for this situation, for now we just raise an assertion
-            assert not (np.nan in gdf.lanes.unique())  # all nans should be replaced
+        # # cleanup and complete the lane data.
+        # ### Try to convert all data to floats
+        # try:
+        #     gdf.lanes = gdf.lanes.astype('float') #floats instead of ints because ints cannot be nan.
+        # except:
+        #     logging.warning('Available lane data cannot simply be converted to float/int, RA2CE will try a clean-up.')
+        #     gdf.lanes = clean_lane_data(gdf.lanes)
+        #
+        # gdf.lanes = gdf.lanes.round(0) #round to nearest integer, but save as float format
+        # nans = gdf.lanes.isnull() #boolean with trues for all nans, i.e. all road segements without lane data
+        # if nans.sum() > 0:
+        #     logging.warning("""Of the {} road segments, only {} had lane data, so for {} the '
+        #                     lane data will be interpolated from the existing data""".format(
+        #         len(gdf.lanes),(~nans).sum(),nans.sum()))
+        #     lane_stats = create_summary_statistics(gdf)
+        #
+        #     #Replace the missing lane data the neat way (without pandas SettingWithCopyWarning)
+        #     lane_nans_mask = gdf.lanes.isnull()
+        #     gdf.loc[lane_nans_mask, 'lanes'] = gdf.loc[lane_nans_mask, 'road_type'].replace(lane_stats)
+        #     logging.warning('Interpolated the missing lane data as follows: {}'.format(lane_stats))
+        #
+        #     #Todo: write the whole interpolater object
+        #
+        #     #This worked but raises an error
+        #     #lane_nans = gdf[gdf.lanes.isnull()]  # mask all nans in lane data
+        #     #lane_nans['lanes'] =  lane_nans['road_type'].replace(lane_stats)
+        #     #gdf.loc[lane_nans.index, :] = lane_nans
+        #
+        #     # Todo: What if for one road type all lane data is missing?
+        #     # Todo: we could script a seperate work-around for this situation, for now we just raise an assertion
+        #     assert not (np.nan in gdf.lanes.unique()) #all nans should be replaced
 
         # calculate direct damage
         road_gdf_damage = rd.calculate_direct_damage(gdf)
@@ -157,23 +167,10 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         gdf = gdf_in.merge(df, how="left", on="LinkNr")
         return gdf
 
-    def execute(self):
-        """Executes the direct analysis."""
-        for analysis in self.config["direct"]:
-            logging.info(
-                f"----------------------------- Started analyzing '{analysis['name']}'  -----------------------------"
-            )
-            starttime = time.time()
 
-            if analysis["analysis"] == "direct":
 
-                gdf = self.road_damage(analysis)
 
-            elif analysis["analysis"] == "effectiveness_measures":
-                gdf = self.effectiveness_measures(analysis)
 
-            else:
-                gdf = []
 
             output_path = self.config["output"] / analysis["analysis"]
             if analysis["save_shp"]:
@@ -387,7 +384,8 @@ class DamageNetwork:
 
     ### Generic cleanup functionality
     def fix_extraordinary_lanes(self):
-        # fixing lanes #todo move out this function
+        """Remove exceptionally high/low lane numbers """
+        # fixing lanes
         df = self.df
         df["lanes_copy"] = df["lanes"].copy()
         df["lanes"] = df["lanes_copy"].where(
@@ -398,11 +396,57 @@ class DamageNetwork:
         )
         df = self.df
 
-    def interpolate_missing_lane_data(self):
-        pass
+    def clean_and_interpolate_missing_lane_data(self):
+        # cleanup and complete the lane data.
+        ### Try to convert all data to floats
+        gdf = self.gdf
+        try:
+            gdf.lanes = gdf.lanes.astype('float')  # floats instead of ints because ints cannot be nan.
+        except:
+            logging.warning('Available lane data cannot simply be converted to float/int, RA2CE will try a clean-up.')
+            gdf.lanes = clean_lane_data(gdf.lanes)
+
+        gdf.lanes = gdf.lanes.round(0)  # round to nearest integer, but save as float format
+        nans = gdf.lanes.isnull()  # boolean with trues for all nans, i.e. all road segements without lane data
+        if nans.sum() > 0:
+            logging.warning("""Of the {} road segments, only {} had lane data, so for {} the '
+                                    lane data will be interpolated from the existing data""".format(
+                len(gdf.lanes), (~nans).sum(), nans.sum()))
+            lane_stats = create_summary_statistics(gdf)
+
+            # Replace the missing lane data the neat way (without pandas SettingWithCopyWarning)
+            lane_nans_mask = gdf.lanes.isnull()
+            gdf.loc[lane_nans_mask, 'lanes'] = gdf.loc[lane_nans_mask, 'road_type'].replace(lane_stats)
+            logging.warning('Interpolated the missing lane data as follows: {}'.format(lane_stats))
+
+            # Todo: write the whole interpolater object
+
+            # This worked but raises an error
+            # lane_nans = gdf[gdf.lanes.isnull()]  # mask all nans in lane data
+            # lane_nans['lanes'] =  lane_nans['road_type'].replace(lane_stats)
+            # gdf.loc[lane_nans.index, :] = lane_nans
+
+            # Todo: What if for one road type all lane data is missing?
+            # Todo: we could script a seperate work-around for this situation, for now we just raise an assertion
+            assert not (np.nan in gdf.lanes.unique())  # all nans should be replaced
+
+        self.gdf = gdf
 
     def remap_road_types_to_fewer_classes(self):
-        pass
+        """
+        Creates a new new column road_types, which has a fewer number of road type categories
+        e.g. -> 'motorway_junction' -> 'motorway'
+        (Renames highway column to infra_type)
+        :return:
+        """
+        # reduce the number of road types (col 'infra_type') to smaller number of road_types for which damage curves exist
+        road_mapping_dict = lookup.road_mapping()  # The lookup class contains all kinds of data
+        gdf = self.gdf
+        gdf.rename(columns={'highway': 'infra_type'}, inplace=True) #Todo: this should probably not be done here
+        gdf['road_type'] = gdf['infra_type']
+        gdf = gdf.replace({"road_type": road_mapping_dict})
+        self.gdf = gdf
+
 
     ### Damage handlers
     def calculate_damage_HZ(self, events):  # Todo: This should need less data
@@ -570,7 +614,7 @@ class DamageNetwork:
 
 
 class DamageNetworkReturnPeriods(DamageNetwork):
-    """A road network gdf with EVENT-BASED hazard data stored in it, and for which damages can be calculated
+    """A road network gdf with hazard data stored in it, and for which damages can be calculated
 
     @Author: Kees van Ginkel
 
@@ -598,6 +642,11 @@ class DamageNetworkReturnPeriods(DamageNetwork):
         assert len(self.return_periods) > 0, "no return periods identified"
         assert "me" in self.stats, "mean water depth (key: me) is missing"
         assert "fr" in self.stats, "inundated fraction (key: fr) is missing"
+
+
+        #CLEANUPS
+        self.remap_road_types_to_fewer_classes()
+        self.clean_and_interpolate_missing_lane_data()
 
         gdf_mask = self.create_mask()
 
