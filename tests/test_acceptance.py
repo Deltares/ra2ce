@@ -2,10 +2,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
-import pytest
-
 from ra2ce import main
-from tests import test_data
+from tests import slow_test, test_data
 
 
 def run_from_cli(network_ini: Path, analysis_ini: Path) -> None:
@@ -38,6 +36,7 @@ class TestAcceptance:
         except ImportError:
             raise
 
+    @slow_test
     def test_given_test_data_main_does_not_throw(self):
         """
         ToDo: is this test necessary? Would it not be better to frame it in direct / indirect ?
@@ -53,6 +52,7 @@ class TestAcceptance:
 
 
 class TestIndirectAnalyses:
+    @slow_test
     def test_1_1_given_only_network_shape_redundancy(self):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data
@@ -90,9 +90,7 @@ class TestIndirectAnalyses:
         for _analysis_output in _expected_analysis_output_files:
             assert _analysis_output.is_file() and _analysis_output.exists()
 
-    # @pytest.mark.skipif(
-    #     reason="This test takes way too long due to the download of data."
-    # )
+    @slow_test
     def test_4_analyses_indirect(self):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data.
@@ -147,6 +145,7 @@ class TestIndirectAnalyses:
 
 
 class TestNetworkCreation:
+    @slow_test
     def test_1_network_shape(self):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data.
@@ -174,6 +173,7 @@ class TestNetworkCreation:
 
         assert all(map(validate_file, _expected_files))
 
+    @slow_test
     def test_3_network_osm_download(self):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data.
