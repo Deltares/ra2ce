@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from ra2ce.configuration.validators.ini_config_validator_base import (
     IniConfigValidatorBase,
 )
