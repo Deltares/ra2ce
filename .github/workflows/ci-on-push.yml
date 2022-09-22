@@ -1,4 +1,4 @@
-name: ci
+name: ci-on-push-and-autoformat
 
 on: [push]
 jobs:
