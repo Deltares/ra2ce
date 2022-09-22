@@ -1,3 +1,9 @@
+## v0.3.0 (2022-09-22)
+
+### Feat
+
+- **config_factory; analysis_config_factory**: Split ConfigData creation from IniConfigDataReaders. Introduced factories to deal with the selection criteria for network / analysis and their concrete types
+
 ## v0.2.0 (2022-09-21)
 
 ### Feat
