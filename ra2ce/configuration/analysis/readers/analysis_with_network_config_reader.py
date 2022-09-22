@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from ra2ce.configuration.analysis import AnalysisConfigBase, AnalysisIniConfigData
-from ra2ce.configuration.analysis.analysis_with_network_config import (
-    AnalysisWithNetworkConfiguration,
+from ra2ce.configuration.analysis.analysis_config_base import AnalysisConfigBase
+from ra2ce.configuration.analysis.analysis_ini_config_data import (
+    AnalysisWithNetworkIniConfigData,
 )
 from ra2ce.configuration.analysis.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
@@ -18,14 +18,11 @@ class AnalysisWithNetworkConfigReader(AnalysisConfigReaderBase):
                 "Network data mandatory for an AnalysisIniConfigurationReader reader."
             )
 
-    def read(self, ini_file: Path) -> AnalysisWithNetworkConfiguration:
+    def read(self, ini_file: Path) -> AnalysisWithNetworkIniConfigData:
         if not ini_file:
             return None
         _root_path = AnalysisConfigBase.get_network_root_dir(ini_file)
         _config_data = self._import_configuration(_root_path, ini_file)
         _config_data = self._convert_analysis_types(_config_data)
         self._copy_output_files(ini_file, _config_data)
-        _analysis_config_data = AnalysisIniConfigData.from_dict(_config_data)
-        return AnalysisWithNetworkConfiguration.from_data_with_network(
-            ini_file, _analysis_config_data, self._network_data
-        )
+        return AnalysisWithNetworkIniConfigData.from_dict(_config_data)
