@@ -24,16 +24,16 @@ class AnalysisConfigFactory:
 
     @staticmethod
     def get_analysis_config(
-        analysis_ini_config: AnalysisIniConfigData,
         ini_file: Path,
+        analysis_ini_config: AnalysisIniConfigData,
         network_config: Optional[NetworkConfig],
     ) -> AnalysisConfigBase:
         """
         Converts an `AnalysisIniConfigData` into the matching concrete class of `AnalysisConfigBase`.
 
         Args:
-            analysis_ini_config (AnalysisIniConfigData): FileObjectModel to convert into DataObjectModel.
             ini_file (Path): Source `*.ini` file path to the FileObjectModel.
+            analysis_ini_config (AnalysisIniConfigData): FileObjectModel to convert into DataObjectModel.
             network_config (Optional[NetworkConfig]): Complementary network configuration DataObjectModel to be used.
 
         Raises:
@@ -42,11 +42,11 @@ class AnalysisConfigFactory:
         Returns:
             AnalysisConfigBase: Concrete `AnalysisConfigBase` DataObjectModel for the given data.
         """
-        if isinstance(AnalysisWithNetworkIniConfigData, analysis_ini_config):
+        if isinstance(analysis_ini_config, AnalysisWithNetworkIniConfigData):
             return AnalysisWithNetworkConfiguration.from_data_with_network(
                 ini_file, analysis_ini_config, network_config
             )
-        elif isinstance(AnalysisWithoutNetworkIniConfigData, analysis_ini_config):
+        elif isinstance(analysis_ini_config, AnalysisWithoutNetworkIniConfigData):
             return AnalysisWithoutNetworkConfiguration.from_data(
                 ini_file, analysis_ini_config
             )
