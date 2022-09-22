@@ -69,7 +69,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         if self.graphs["base_network_hazard"] is None:
             road_gdf = gpd.read_feather(self.config["files"]["base_network_hazard"])
 
-        # Find the hazard columns
+        # Find the hazard columns #Todo: use the hazard names .xlsx?
         val_cols = [
             col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
         ]
@@ -364,25 +364,24 @@ class DamageNetwork:
         hazard_prefix = "F"
         end = "me"  # indicate that you want to use the mean
 
-        df = self.df #dataframe to carry out the damage calculation
+        df = self.df #dataframe to carry out the damage calculation #todo: this is a bit dirty
 
         assert manual_damage_functions is not None, "No damage functions were loaded"
 
         for DamFun in manual_damage_functions.loaded:
-            #determine DamFun prefix
-            DamFun_prefix = "A" #Make prefix with a method, from the name
             #Add max damage values to df
-            df = DamFun.add_max_damage(df,DamFun_prefix)
+            df = DamFun.add_max_damage(df,DamFun.prefix)
             for event in events:
                 #Add apply interpolator objects
-                df = DamFun.calculate_damage(df,DamFun_prefix,Hazard_prefix)
+                event_prefix = event
+                df = DamFun.calculate_damage(df,DamFun.prefix,hazard_prefix,event_prefix)
 
-        pass
-
-
-        #Todo hier verder
-
-
+        #Only transfer the final results to the damage column
+        dam_cols = [c for c in df.columns if c.startswith("dam_")]
+        self.gdf[dam_cols] = df[dam_cols]
+        logging.info(
+            "Damage calculation with the manual damage functions was succesfull."
+        )
 
 
     def calculate_damage_HZ(self, events):
@@ -438,7 +437,7 @@ class DamageNetwork:
             )  # length segment (m)
 
         # Todo: still need to check the units
-        logging.warning("The units for the damage calculation have been corrected, but the inundated fraction not")
+        #logging.warning("The units for the damage calculation have been corrected, but the inundated fraction not")
 
         # Add the new columns add the right location to the df
         dam_cols = [c for c in df.columns if c.startswith("dam_")]
@@ -967,11 +966,10 @@ class ManualDamageFunctions:
         for name, dir in self.available.items():
             damage_function = DamageFunction_by_RoadType_by_Lane(name=name)
             damage_function.from_input_folder(dir)
+            damage_function.set_prefix()
             self.loaded.append(damage_function)
-            logging.info("Damage function {} loaded from folder {}".format(damage_function.name,dir))
+            logging.info("Damage function '{}' loaded from folder {}".format(damage_function.name,dir))
 
-    def apply_damage_functions(self):
-        pass
 
 
 
@@ -990,6 +988,7 @@ class DamageFunction:
         self.infra_type = infra_type
         self.max_damage = max_damage #Should be a MaxDamage object
         self.damage_fraction = damage_fraction #Should be a DamageFractionHazardSeverity object
+        self.prefix = None #Should be two caracters long at maximum
 
         #Other attributes (will be added later)
         #self.damage_fraction - x-values correspond to hazard_intenity; y-values correspond to damage fraction [0-1]
@@ -1006,6 +1005,13 @@ class DamageFunction:
     def add_max_dam(self,df):
         #This functions needs to be specified in child classes
         logging.warning("""This method has not been applied. """)
+
+    def set_prefix(self):
+        self.prefix = self.name[0:2]
+        logging.info("The prefix: '{}' refers to curve name '{}' in the results".format(
+            self.prefix,self.name
+        ))
+
 
 
 
@@ -1040,14 +1046,18 @@ class DamageFunction_by_RoadType_by_Lane(DamageFunction):
         #folder_path = Path(r"D:\Python\ra2ce\data\1010b_zuid_holland\input\damage_function\test")
         max_dam_path = find_unique_csv_file(folder_path, "max_damage")
         max_damage.from_csv(max_dam_path, sep=';')
+
         self.max_damage = max_damage
 
         #Load the damage fraction function
         #search in the folder for something *damage_fraction
-        damage_fraction = DamageFractionHazardSeverityUniform()
+        damage_fraction = DamageFractionUniform()
         dam_fraction_path = find_unique_csv_file(folder_path, "hazard_severity")
         damage_fraction.from_csv(dam_fraction_path, sep=';')
+
         #todo: unit correction of damage_fraction
+
+
         damage_fraction.create_interpolator()
         self.damage_fraction = damage_fraction
 
@@ -1062,11 +1072,32 @@ class DamageFunction_by_RoadType_by_Lane(DamageFunction):
         df['{}_temp_max_dam'.format(prefix)] = max_damage_data.lookup(df["road_type"],df["lanes"])
         return df
 
-    def calculate_damage(self,df,DamFun_prefix,Hazard_prefix):
-        """Calculates the damage for one event"""
+    def calculate_damage(self,df,DamFun_prefix,hazard_prefix,event_prefix):
+        """Calculates the damage for one event
+
+        The prefixes are used to find/set the right df columns
+
+        Arguments:
+            *df* (pd.Dataframe) : dataframe with road network data
+            *DamFun_prefix* : prefix to identify the right damage function e.g. 'A'
+            *hazard_prefix* : prefix to identify the right hazard e.g. 'F'
+            *event_prefix*  : prefix to identify the right event, e.g. 'EV1'
+
+        """
 
         interpolator = self.damage_fraction.interpolator #get the interpolator function
 
+        #Find correct columns in dataframe
+        result_col = "dam_{}_{}".format(event_prefix,DamFun_prefix)
+        max_dam_col = "{}_temp_max_dam".format(DamFun_prefix)
+        hazard_severity_col = "{}_{}_me".format(hazard_prefix,event_prefix) #mean is hardcoded now
+
+        df[result_col] = round(
+            df[max_dam_col].astype(float) #max damage (euro/m)
+            * interpolator(df[hazard_severity_col].astype(float)) # damage curve  (-)
+            * df["length"], #segment length (m),
+            0) #round to whole numbers
+        return df
 
 
 
@@ -1181,22 +1212,22 @@ class MaxDamage_byRoadType_byLane(MaxDamage):
         if (original_length_unit == 'km' and target_length_unit == 'm'):
             scaling_factor = 1/1000
             self.data = self.data * scaling_factor
-            logging.info('Damage data was scaled by a factor {}, to convert from {} to {}'.format(
-                scaling_factor,self.damage_unit,desired_unit))
+            logging.info('Damage data from {} was scaled by a factor {}, to convert from {} to {}'.format(
+                self.origin_path, scaling_factor,self.damage_unit,desired_unit))
             self.damage_unit = desired_unit
             return None
         else:
             logging.warning('Damage scaling from {} to {} is not supported'.format(self.damage_unit,desired_unit))
             return None
 
-class DamageFractionHazardSeverity():
+class DamageFraction():
     """
     Base class for data containing maximum damage or construction costs data.
 
     """
     pass
 
-class DamageFractionHazardSeverityUniform(DamageFractionHazardSeverity):
+class DamageFractionUniform(DamageFraction):
     """
     Uniform: assuming the same curve for
     each road type and lane numbers and any other metadata
@@ -1242,11 +1273,13 @@ class DamageFractionHazardSeverityUniform(DamageFractionHazardSeverity):
 
         #identify unit and drop from data
         self.hazard_unit = self.raw_data.index[0]
-        self.data = self.raw_data.drop(self.hazard_unit)\
+        self.data = self.raw_data.drop(self.hazard_unit)
 
         #convert data to floats
         self.data = self.data.astype('float')
         self.data.index = self.data.index.astype('float')
+
+        self.convert_hazard_severity_unit()
 
     def convert_hazard_severity_unit(self,desired_unit='m') -> None:
         """Converts hazard severity values to a different unit
@@ -1264,8 +1297,8 @@ class DamageFractionHazardSeverityUniform(DamageFractionHazardSeverity):
         if (self.hazard_unit == 'cm' and desired_unit == 'm'):
             scaling_factor = 1/100
             self.data = self.data * scaling_factor
-            logging.info('Hazard severity data was scaled by a factor {}, to convert from {} to {}'.format(
-                hazard_unit,self.damage_unit,desired_unit))
+            logging.info('Hazard severity from {} data was scaled by a factor {}, to convert from {} to {}'.format(
+                self.origin_path, scaling_factor,self.hazard_unit,desired_unit))
             self.damage_unit = desired_unit
             return None
         else:
@@ -1300,7 +1333,7 @@ def test_construct_max_damage():
     return max_damage
 
 def test_construct_damage_fraction():
-    damage_fraction = DamageFractionHazardSeverityUniform()
+    damage_fraction = DamageFractionUniform()
     path = Path(r"D:\Python\ra2ce\data\1010b_zuid_holland\input\damage_function\test\huizinga_damage_fraction_hazard_severity.csv")
     damage_fraction.from_csv(path,sep=';')
     return damage_fraction
