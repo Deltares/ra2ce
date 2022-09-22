@@ -15,7 +15,9 @@ from ra2ce.configuration.network.readers.network_ini_config_reader import (
 
 class ConfigFactory:
     @staticmethod
-    def get_config_wrapper(network_ini: Path, analysis_ini: Path) -> ConfigWrapper:
+    def get_config_wrapper(
+        network_ini: Optional[Path], analysis_ini: Optional[Path]
+    ) -> ConfigWrapper:
         """
         Generates a `ConfigWrapper` containing the DataObjectModel representations of the given network and analysis ini files.
 
