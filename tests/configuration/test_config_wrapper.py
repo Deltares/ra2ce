@@ -4,13 +4,13 @@ from typing import Optional
 import pytest
 
 from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
-from ra2ce.ra2ce_input_config import Ra2ceInputConfig
+from ra2ce.configuration.config_wrapper import ConfigWrapper
 from tests import test_data
 
 
-class TestRa2ceInputConfig:
+class TestConfigWrapper:
     def test_initialize(self):
-        _input_config = Ra2ceInputConfig()
+        _input_config = ConfigWrapper()
         assert _input_config
         assert not _input_config.analysis_config
         assert not _input_config.network_config
@@ -25,7 +25,7 @@ class TestRa2ceInputConfig:
         assert _analysis_ini.is_file() and _network_ini.is_file()
 
         # 2. Run test.
-        _input_config = Ra2ceInputConfig.from_input_paths(_analysis_ini, _network_ini)
+        _input_config = ConfigWrapper.from_input_paths(_analysis_ini, _network_ini)
 
         # 3. Verify final expectations.
         assert _input_config
@@ -41,7 +41,7 @@ class TestRa2ceInputConfig:
         assert _analysis_ini.is_file()
 
         # 2. Run test.
-        _input_config = Ra2ceInputConfig.from_input_paths(_analysis_ini, None)
+        _input_config = ConfigWrapper.from_input_paths(_analysis_ini, None)
 
         # 3. Verify final expectations.
         assert _input_config
@@ -57,7 +57,7 @@ class TestRa2ceInputConfig:
         assert _network_ini.is_file()
 
         # 2. Run test.
-        _input_config = Ra2ceInputConfig.from_input_paths(None, _network_ini)
+        _input_config = ConfigWrapper.from_input_paths(None, _network_ini)
 
         # 3. Verify final expectations.
         assert _input_config
@@ -86,7 +86,7 @@ class TestRa2ceInputConfig:
         self, network_ini: Optional[Path], analysis_ini: Optional[Path]
     ):
         # 1. Define test data.
-        _input_config = Ra2ceInputConfig()
+        _input_config = ConfigWrapper()
         _input_config.network_config = NetworkConfig()
         _input_config.analysis_config = AnalysisConfigBase()
         _input_config.network_config.ini_file = network_ini
@@ -103,7 +103,7 @@ class TestRa2ceInputConfig:
 
     def test_is_valid_input_no_analysis_config(self):
         # 1. Define test data
-        _input_config = Ra2ceInputConfig()
+        _input_config = ConfigWrapper()
         _input_config.network_config = NetworkConfig()
         _input_config.analysis_config = None
 
