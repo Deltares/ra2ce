@@ -39,6 +39,8 @@ class ConfigFactory:
 
     @staticmethod
     def get_network_config_data(network_ini: Path) -> Optional[NetworkConfig]:
+        if not network_ini:
+            return None
         _ini_config_data = NetworkIniConfigDataReader().read(network_ini)
         return NetworkConfig.from_data(network_ini, _ini_config_data)
 
@@ -46,6 +48,8 @@ class ConfigFactory:
     def get_analysis_config_data(
         analysis_ini: Path, network_config: Optional[NetworkConfig]
     ) -> Optional[AnalysisConfigBase]:
+        if not analysis_ini:
+            return None
         _ini_config_data = AnalysisConfigReaderFactory().read(
             analysis_ini, network_config
         )

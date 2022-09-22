@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 from ra2ce.configuration.network.network_config import NetworkConfig
 from ra2ce.configuration.network.network_ini_config_data import NetworkIniConfigData
@@ -9,7 +10,7 @@ from ra2ce.io.readers.ini_file_reader import IniFileReader
 
 
 class NetworkIniConfigDataReader(IniConfigurationReaderBase):
-    def read(self, ini_file: Path) -> NetworkIniConfigData:
+    def read(self, ini_file: Path) -> Optional[NetworkIniConfigData]:
         if not ini_file:
             return None
         _config_data = self._import_configuration(ini_file)
