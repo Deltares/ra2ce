@@ -64,15 +64,6 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
             *analysis* (dict) : contains part of the settings from the analysis ini
         :return:
         """
-        #Todo: remove this class
-        #rd = (
-        #    RoadDamage()
-        #)  # Creates a Road Damage object, the methods of this object are used to do the damage calculation
-
-        # Todo: maybe the whole RoadDamage() class can be removed, because it is either:
-        # - a controler: the info should stay here
-        # - a handler: these should be methods of the datastructure
-
         #Open the network with hazard data
         road_gdf = self.graphs["base_network_hazard"]
         if self.graphs["base_network_hazard"] is None:
@@ -122,7 +113,6 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
                     analysis['event_type']
                 )
             )
-            return None
 
 
         # # TODO I, Kees think this is a dangerous cleanup procedure with possible unexpected outcomes
@@ -183,117 +173,42 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         return gdf
 
 
-class RoadDamage: # MAYBE THIS CLASS WIL BE DEPRECIATED
-    def calculate_direct_damage(self, road_gdf):
-        """
-        Calculates the direct damage for all road segments with exposure data using a depth-damage curve
-        Arguments:
-            *road_gdf* (GeoPandas DataFrame) :
-        Returns:
-            *road_gdf* (GeoPandas DataFrame) :
-        """
-
-
-        #lane_damage_correction = lookup.road_damage_correction()
-        #dict_max_damages = (
-        #    lookup.max_damages()
-        #)  # In fact this is a new construction costs
-        #max_damages_huizinga = lookup.max_damages_huizinga()
-        #interpolators = (
-        #    lookup.flood_curves()
-        #)  # input: water depth (cm); output: damage (fraction road construction costs)
-        #curve_names = [name for name in interpolators]
-
-        # Find the hazard columns
-        # val_cols = [
-        #     col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
-        # ]
-
-        # group the val cols:
-        # Todo: make a hazard class?
-        # For now: this is how we do the hazard bookkeeping:
-        # F_EV1_ma
-        # F = flood; _ ; EV = event-based + number event; _ ; _ ma/mi/mi/av/fr = maximum, minimum, average fraction that is affected
-
-        # case we are dealing with events:
-        # event_cols = [x for x in val_cols if "_EV" in x]
-        # rp_cols = [
-        #     x for x in val_cols if "_RP" in x
-        # ]  # todo test the workflow for event data
-        # if len(event_cols) > 0 and len(rp_cols) == 0:
-            # case only event data is provided
-            # unique_events = set([x.split('_')[1] for x in event_cols]) #set of unique events
-            # hazard_stats = set([x.split('_')[2] for x in event_cols]) #set of hazard info per event
-
-            #Intermediate approach; is already a bit objectbased, but can still be improved
-            # event_gdf = event_hazard_network_gdf(
-            #     road_gdf, val_cols
-            # )  # Create data structure for event hazard data
-            # event_gdf.calculate_damage_HZ(interpolators["HZ"], max_damages_huizinga) #Todo: this is deprecated
-            # # event_gdf.calculate_damage_OSdaMage(interpolators,dict_max_damages)
-
-            #NEW APPROACH
-            #event_gdf = DamageNetworkEvents(road_gdf,val_cols)
-
-            #result_gdf = event_gdf.gdf
-
-        # case we are dealing with return period
-        # elif len(rp_cols) > 0 and len(event_cols) == 0:
-        #     # case only return period data is provided
-        #     # return_period_gdf = event_hazard_network_gdf(road_gdf,val_cols) #Create datastructure for RP hazard data
-        #     return_period_gdf = DamageNetworkReturnPeriods(road_gdf, val_cols)
-        #
-        #     damage_function = "OSD"  # can be 'HZ', 'OSD' or 'manual' #Todo: supply this information from a higher level
-        #
-        #     return_period_gdf.main(damage_function=damage_function)
-        #     result_gdf = return_period_gdf.gdf
-
-        # else:
-        #     raise ValueError(
-        #         """"The hazard calculation does not know
-        #     what to do if {} event_cols and {} rp_cols are provided""".format(
-        #             len(event_cols), len(rp_cols)
-        #         )
-        #     )
-
-        return result_gdf
-
-    @staticmethod
-    def apply_lane_damage_correction(lane_damage_correction, road_type, lanes):
-        """See load_lane_damage_correction; this function only avoids malbehaviour for weird lane numbers"""
-        if lanes < 1:  # if smaller than the mapped value -> correct with minimum value
-            lanes = 1
-        if (
-            lanes > 6
-        ):  # if larger than largest mapped value -> use maximum value (i.e. 6 lanes)
-            lanes = 6
-        return lane_damage_correction[road_type][lanes]
-
-    @staticmethod
-    def apply_huizinga_max_dam(max_damages_huizinga, road_type, lanes):
-        """See load_lane_damage_correction; this function only avoids malbehaviour for weird lane numbers"""
-        if lanes < 1:  # if smaller than the mapped value -> correct with minimum value
-            lanes = 1
-        if (
-            lanes > 6
-        ):  # if larger than largest mapped value -> use maximum value (i.e. 6 lanes)
-            lanes = 6
-        return max_damages_huizinga[road_type][lanes]
-
-    @staticmethod
-    def apply_cleanup(x):
-        """Cleanup for entries in dataframe, where there is a list with two values for a single field.
-
-        This happens when there is both a primary_link and a primary infra_type.
-        x[0] indicates the values of the primary_link infra_type
-        x[1] indicates the values of the primary infra_type
-        """
-        if x is None:
-            return None
-        if type(x) == list:
-            return x[1]  # 1 means select primary infra_type
-        else:
-            return x
+#Todo: old functions of the deprecated class
+# def apply_lane_damage_correction(lane_damage_correction, road_type, lanes):
+#         """See load_lane_damage_correction; this function only avoids malbehaviour for weird lane numbers"""
+#         if lanes < 1:  # if smaller than the mapped value -> correct with minimum value
+#             lanes = 1
+#         if (
+#             lanes > 6
+#         ):  # if larger than largest mapped value -> use maximum value (i.e. 6 lanes)
+#             lanes = 6
+#         return lane_damage_correction[road_type][lanes]
+#
+#
+# def apply_huizinga_max_dam(max_damages_huizinga, road_type, lanes):
+#         """See load_lane_damage_correction; this function only avoids malbehaviour for weird lane numbers"""
+#         if lanes < 1:  # if smaller than the mapped value -> correct with minimum value
+#             lanes = 1
+#         if (
+#             lanes > 6
+#         ):  # if larger than largest mapped value -> use maximum value (i.e. 6 lanes)
+#             lanes = 6
+#         return max_damages_huizinga[road_type][lanes]
+#
+#
+# def apply_cleanup(x):
+#         """Cleanup for entries in dataframe, where there is a list with two values for a single field.
+#
+#         This happens when there is both a primary_link and a primary infra_type.
+#         x[0] indicates the values of the primary_link infra_type
+#         x[1] indicates the values of the primary infra_type
+#         """
+#         if x is None:
+#             return None
+#         if type(x) == list:
+#             return x[1]  # 1 means select primary infra_type
+#         else:
+#             return x
 
 
 def save_gdf(gdf, save_path):
@@ -503,7 +418,7 @@ class DamageNetwork:
             )  # length segment (m)
 
         # Todo: still need to check the units
-        logging.warning("Damage calculation units have not been checked!!! TODO")
+        logging.warning("The units for the damage calculation have been corrected, but the inundated fraction not")
 
         # Add the new columns add the right location to the df
         dam_cols = [c for c in df.columns if c.startswith("dam_")]
@@ -1240,9 +1155,9 @@ def test_construct_damage_fraction():
     damage_fraction.from_csv(path,sep=';')
     return damage_fraction
 
-max_damage = test_construct_max_damage()
+#max_damage = test_construct_max_damage()
 
-max_damage = test_construct_damage_fraction()
+#max_damage = test_construct_damage_fraction()
 
 
 
