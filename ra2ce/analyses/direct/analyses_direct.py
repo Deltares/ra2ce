@@ -481,7 +481,7 @@ class DamageNetwork:
         curve_name = "HZ"
 
         df_max_damages_huizinga = pd.DataFrame.from_dict(lookup.max_damages_huizinga())
-        max_damages_huizinga = lookup.max_damages_huizinga()
+        #max_damages_huizinga = lookup.max_damages_huizinga()
         interpolator = lookup.flood_curves()[
             "HZ"
         ]  # input: water depth (cm); output: damage (fraction road construction costs)

@@ -179,7 +179,14 @@ class LookUp:
 
     @staticmethod
     def max_damages_huizinga():
-        """ Lookup table for max damages calculated with huizinga for number of lanes """
+        """ Lookup table for max damages calculated with huizinga for number of lanes
+
+        Output: dict:
+         - road types are keys
+         - max damages in euro / m road length
+        """
+
+        #Note, these values are in euro/km; while RA2CE standard unit is euro/m length
 
         lookup_dict = OrderedDict([('motorway', {1: 175000, 2: 350000, 3: 450000, 4: 550000, 5: 650000, 6: 750000}),
                                    ('trunk', {1: 175000, 2: 300000, 3: 400000, 4: 475000, 5: 575000, 6: 650000}),
@@ -189,11 +196,23 @@ class LookUp:
                                    ('track', {1: 75000, 2: 150000, 3: 225000, 4: 300000, 5: 375000, 6: 450000}),
                                    ('other', {1: 75000, 2: 150000, 3: 225000, 4: 300000, 5: 375000, 6: 450000})])
 
+        new_dict = {}
+        for road_type, lanedicts in lookup_dict.items():
+            new_lanedict = {}
+            for lane, costs in lanedicts.items():
+                new_lanedict[lane] = costs / 1000
+            new_dict[road_type] = new_lanedict
+
+        lookup_dict = new_dict
+
         return lookup_dict
 
     @staticmethod
     def flood_curves():
-        """ Lookup flood curve values and create interpolator around it """
+        """ Lookup flood curve values and create interpolator around it
+
+        Units of the interpolator objects: water depth in cm on x-axis; damage fraction (unitless) on y-axis
+        """
 
         lookup_dict = {'C1': {0: 'depth (cm)', 1: 0, 2: 50, 3: 100, 4: 150, 5: 200, 6: 600, 7: np.nan, 8: np.nan, 9: np.nan},
                        'Unnamed: 2': {0: 'damage (% of total construction costs)', 1: 0, 2: 0.01, 3: 0.03, 4: 0.075, 5: 0.1, 6: 0.2, 7: np.nan,
@@ -216,8 +235,17 @@ class LookUp:
                        'HZ': {0: np.nan, 1: 0.0, 2: 50.0, 3: 100.0, 4: 150.0, 5: 200.0, 6: 300.0, 7: 400.0, 8: 500.0, 9: 600.0},
                        'Unnamed: 14': {0: np.nan, 1: 0.0, 2: 0.25, 3: 0.42, 4: 0.55, 5: 0.65, 6: 0.8, 7: 0.9, 8: 1.0, 9: 1.0}}
 
+
         flood_curves = pd.DataFrame.from_dict(lookup_dict)
         headers = flood_curves.columns
+
+        #Convert to ra2ce standard units (depth (m))
+        depth_cols = [col for col in flood_curves.columns if not col.startswith('Unnamed')]
+        flood_curves.loc[1:,depth_cols] = flood_curves.loc[1:,depth_cols] / 100
+        flood_curves.loc[0, depth_cols] = 'depth (m)'
+
+
+
         curve_name = [0] * int(len(headers) / 2)  # create empty arrays
         interpolators = [0] * int(len(headers) / 2)
 
