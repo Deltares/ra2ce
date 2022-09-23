@@ -1,15 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
-Created on 26-7-2021
-"""
-
+from pathlib import Path
 from typing import Any, List, Tuple
 
-# external modules
 import pyproj
 from osmnx.graph import graph_from_xml
 
-# local modules
 from ra2ce.graph.networks_utils import *
 from ra2ce.io.readers import GraphPickleReader
 from ra2ce.io.writers import JsonExporter
@@ -104,7 +99,7 @@ class Network:
         )
 
         if self.snapping is not None:
-            edges = snap_endpoints_lines(edges, self.snapping, id_name, tolerance=1e-7)
+            edges = snap_endpoints_lines(edges, self.snapping, id_name, crs)
             logging.info(
                 "Function [snap_endpoints_lines]: executed with threshold = {}".format(
                     self.snapping
@@ -135,7 +130,9 @@ class Network:
 
         if self.snapping is not None:
             # merged lines may be updated when new nodes are created which makes a line cut in two
-            edges = cut_lines(edges, nodes, id_name, tolerance=1e-4)
+            edges = cut_lines(
+                lines_gdf=edges, nodes=nodes, idName=id_name, tolerance=1e-4, crs=crs
+            )
             nodes = create_nodes(
                 edges, crs, self.config["cleanup"]["ignore_intersections"]
             )
@@ -631,12 +628,11 @@ class Network:
 
             if self.files["base_network"] is not None:
                 network_gdf = gpd.read_feather(self.files["base_network"])
+                # Assuming the same CRS for both the network and graph
+                self.base_graph_crs = pyproj.CRS.from_user_input(network_gdf.crs)
+                self.base_network_crs = pyproj.CRS.from_user_input(network_gdf.crs)
             else:
                 network_gdf = None
-
-            # Assuming the same CRS for both the network and graph
-            self.base_graph_crs = pyproj.CRS.from_user_input(network_gdf.crs)
-            self.base_network_crs = pyproj.CRS.from_user_input(network_gdf.crs)
 
         # create origins destinations graph
         if (

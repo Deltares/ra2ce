@@ -776,7 +776,6 @@ class Hazard:
         #### Step 2: hazard overlay of the origins_destinations (NetworkX) ###
         if (
             (self.config["origins_destinations"]["origins"] is not None)
-            and (self.config["origins_destinations"]["origins"] is not None)
             and (self.graphs["origins_destinations_graph"] is not None)
             and (self.files["origins_destinations_graph_hazard"] is None)
         ):
