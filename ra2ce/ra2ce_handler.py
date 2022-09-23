@@ -19,7 +19,7 @@ warnings.filterwarnings(action="ignore", message="Value *not successfully writte
 
 
 class Ra2ceHandler:
-    input_config: ConfigWrapper = None
+    input_config: Optional[ConfigWrapper] = None
 
     def __init__(self, network: Optional[Path], analysis: Optional[Path]) -> None:
         self._initialize_logger(network, analysis)
