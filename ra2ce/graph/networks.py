@@ -197,7 +197,7 @@ class Network:
                 self.config["network"]["primary_file"]
             )
         )
-        edges = pd.read_pickle(
+        edges = pd.read_feather(
             self.config["static"] / "network" / self.config["network"]["primary_file"]
         )
         corresponding_node_file = (
@@ -206,7 +206,7 @@ class Network:
             / self.config["network"]["primary_file"].replace("edges", "nodes")
         )
         assert corresponding_node_file.exists()
-        nodes = pd.read_pickle(
+        nodes = pd.read_feather(
             corresponding_node_file
         )  # Todo: Throw exception if nodes file is not present
 
@@ -510,7 +510,7 @@ class Network:
                 logging.info(
                     """The original OSM PBF import is no longer supported. 
                                 Instead, the beta version of package TRAILS is used. 
-                                First stable release of TRAILS is excepted in 2023."""
+                                First stable release of TRAILS is expected in 2023."""
                 )
 
                 # base_graph, network_gdf = self.network_osm_pbf() #The old approach is depreciated
