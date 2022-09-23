@@ -95,7 +95,7 @@ class IniConfigValidatorBase(Ra2ceIoValidator):
         _available_keys: List[str] = self._config.keys()
 
         def _check_header(header: str) -> None:
-            if not header in _available_keys:
+            if header not in _available_keys:
                 _report.error(
                     f"Property [ {header} ] is not configured. Add property [ {header} ] to the *.ini file. "
                 )
@@ -103,7 +103,7 @@ class IniConfigValidatorBase(Ra2ceIoValidator):
         list(map(_check_header, required_headers))
         if not _report.is_valid():
             return _report
-        if not "isolation" in _available_keys:
+        if "isolation" not in _available_keys:
             _report.warn("Header 'isolation' not found in the configuration.")
         else:
             required_headers.append("isolation")
@@ -114,7 +114,7 @@ class IniConfigValidatorBase(Ra2ceIoValidator):
         for header in required_headers:
             # Now check the parameters per configured item.
             for key, value in self._config[header].items():
-                if not key in _expected_values.keys():
+                if key not in _expected_values.keys():
                     continue
                 _expected_values_list: List[Any] = _expected_values[key]
                 if "file" in _expected_values_list:

@@ -20,30 +20,30 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - uses: conda-incubator/setup-miniconda@v2
-      #   with:
-      #     python-version: 3.9
-      #     # use the latest mamba version
-      #     mamba-version: "*"
-      #     channels: conda-forge,defaults
-      #     channel-priority: true
-      #     # always activate the ra2ce environment (name is specified in environment.yml)
-      #     environment-file: environment.yml
-      #     auto-activate-base: true
-      #     activate-environment: ra2ce_env
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: 3.9
+          # use the latest mamba version
+          mamba-version: "*"
+          channels: conda-forge,defaults
+          channel-priority: true
+          # always activate the ra2ce environment (name is specified in environment.yml)
+          environment-file: environment.yml
+          auto-activate-base: true
+          activate-environment: ra2ce_env
 
-      # - name: Install Dependencies
-      #   shell: pwsh
-      #   run: |
-      #     conda activate ra2ce_env
-      #     poetry install
-      #   if: steps.cache.outputs.cache-hit != 'true'
+      - name: Install Dependencies
+        shell: pwsh
+        run: |
+          conda activate ra2ce_env
+          poetry install
+        if: steps.cache.outputs.cache-hit != 'true'
 
-      # - name: Test with pytest
-      #   shell: pwsh
-      #   run: |
-      #     conda activate ra2ce_env
-      #     poetry run pytest --cov . --cov-report xml:coverage-reports/coverage-ra2ce.xml --junitxml=xunit-reports/xunit-result-ra2ce.xml
+      - name: Test with pytest
+        shell: pwsh
+        run: |
+          conda activate ra2ce_env
+          poetry run pytest --cov . --cov-report xml:coverage-reports/coverage-ra2ce.xml --junitxml=xunit-reports/xunit-result-ra2ce.xml
 
       # - name: SonarCloud Scan
       #   uses: SonarSource/sonarcloud-github-action@master
