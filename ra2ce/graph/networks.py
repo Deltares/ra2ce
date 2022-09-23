@@ -80,85 +80,79 @@ class Network:
 
         lines = self.read_merge_shp()
 
-        ### FREDERIQUE COMMENTED OUT THE BELOW TO SPEED UP FOR PAKISTAN ASSESSMENT ###
-        # logging.info(
-        #     "Function [read_merge_shp]: executed with {} {}".format(
-        #         self.config["network"]["primary_file"],
-        #         self.config["network"]["diversion_file"],
-        #     )
-        # )
-        #
-        # # Multilinestring to linestring
-        # # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
-        # # The list of fid's is reduced by the fid's that are not anymore in the merged lines
-        # aadt_names = None
-        # edges, lines_merged = merge_lines_automatic(
-        #     lines, self.config["network"]["file_id"], aadt_names, crs
-        # )
-        # logging.info(
-        #     "Function [merge_lines_shpfiles]: executed with properties {}".format(
-        #         list(edges.columns)
-        #     )
-        # )
-        #
-        # edges, id_name = gdf_check_create_unique_ids(
-        #     edges, self.config["network"]["file_id"]
-        # )
-        #
-        # if self.snapping is not None:
-        #     edges = snap_endpoints_lines(edges, self.snapping, id_name, tolerance=1e-7)
-        #     logging.info(
-        #         "Function [snap_endpoints_lines]: executed with threshold = {}".format(
-        #             self.snapping
-        #         )
-        #     )
-        #
-        # # merge merged lines if there are any merged lines
-        # if not lines_merged.empty:
-        #     # save the merged lines to a shapefile - CHECK if there are lines merged that should not be merged (e.g. main + secondary road)
-        #     lines_merged.to_file(
-        #         os.path.join(
-        #             self.output_path,
-        #             "{}_lines_that_merged.shp".format(self.config["project"]["name"]),
-        #         )
-        #     )
-        #     logging.info(
-        #         "Function [edges_to_shp]: saved at {}".format(
-        #             os.path.join(
-        #                 self.output_path,
-        #                 "{}_lines_that_merged".format(self.config["project"]["name"]),
-        #             )
-        #         )
-        #     )
-        #
-        # # Get the unique points at the end of lines and at intersections to create nodes
-        # nodes = create_nodes(edges, crs, self.config["cleanup"]["ignore_intersections"])
-        # logging.info("Function [create_nodes]: executed")
-        #
-        # if self.snapping is not None:
-        #     # merged lines may be updated when new nodes are created which makes a line cut in two
-        #     edges = cut_lines(edges, nodes, id_name, tolerance=1e-4)
-        #     nodes = create_nodes(
-        #         edges, crs, self.config["cleanup"]["ignore_intersections"]
-        #     )
-        #     logging.info("Function [cut_lines]: executed")
-        #
-        # # create tuples from the adjecent nodes and add as column in geodataframe
-        # edges_complex = join_nodes_edges(nodes, edges, id_name)
-        # edges_complex.crs = crs  # set the right CRS
-        #
-        # # Create networkx graph from geodataframe
-        # graph_complex = graph_from_gdf(edges_complex, nodes, node_id="node_fid")
-        # logging.info(
-        #     "Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(
-        #         self.config["project"]["name"]
-        #     )
-        # )
-        ### FREDERIQUE COMMENTED OUT THE ABOVE TO SPEED UP FOR PAKISTAN ASSESSMENT ###
+        logging.info(
+            "Function [read_merge_shp]: executed with {} {}".format(
+                self.config["network"]["primary_file"],
+                self.config["network"]["diversion_file"],
+            )
+        )
 
-        ### ADDED FOR PAKISTAN
-        edges_complex = lines.copy()
-        graph_complex = nx.Graph()
+        # Multilinestring to linestring
+        # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
+        # The list of fid's is reduced by the fid's that are not anymore in the merged lines
+        aadt_names = None
+        edges, lines_merged = merge_lines_automatic(
+            lines, self.config["network"]["file_id"], aadt_names, crs
+        )
+        logging.info(
+            "Function [merge_lines_shpfiles]: executed with properties {}".format(
+                list(edges.columns)
+            )
+        )
+
+        edges, id_name = gdf_check_create_unique_ids(
+            edges, self.config["network"]["file_id"]
+        )
+
+        if self.snapping is not None:
+            edges = snap_endpoints_lines(edges, self.snapping, id_name, tolerance=1e-7)
+            logging.info(
+                "Function [snap_endpoints_lines]: executed with threshold = {}".format(
+                    self.snapping
+                )
+            )
+
+        # merge merged lines if there are any merged lines
+        if not lines_merged.empty:
+            # save the merged lines to a shapefile - CHECK if there are lines merged that should not be merged (e.g. main + secondary road)
+            lines_merged.to_file(
+                os.path.join(
+                    self.output_path,
+                    "{}_lines_that_merged.shp".format(self.config["project"]["name"]),
+                )
+            )
+            logging.info(
+                "Function [edges_to_shp]: saved at {}".format(
+                    os.path.join(
+                        self.output_path,
+                        "{}_lines_that_merged".format(self.config["project"]["name"]),
+                    )
+                )
+            )
+
+        # Get the unique points at the end of lines and at intersections to create nodes
+        nodes = create_nodes(edges, crs, self.config["cleanup"]["ignore_intersections"])
+        logging.info("Function [create_nodes]: executed")
+
+        if self.snapping is not None:
+            # merged lines may be updated when new nodes are created which makes a line cut in two
+            edges = cut_lines(edges, nodes, id_name, tolerance=1e-4)
+            nodes = create_nodes(
+                edges, crs, self.config["cleanup"]["ignore_intersections"]
+            )
+            logging.info("Function [cut_lines]: executed")
+
+        # create tuples from the adjecent nodes and add as column in geodataframe
+        edges_complex = join_nodes_edges(nodes, edges, id_name)
+        edges_complex.crs = crs  # set the right CRS
+
+        # Create networkx graph from geodataframe
+        graph_complex = graph_from_gdf(edges_complex, nodes, node_id="node_fid")
+        logging.info(
+            "Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(
+                self.config["project"]["name"]
+            )
+        )
 
         if self.segmentation_length is not None:
             edges_complex = Segmentation(edges_complex, self.segmentation_length)
@@ -405,7 +399,6 @@ class Network:
 
         # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
         lines = [gpd.read_file(shp) for shp in shapefiles_analysis]
-        # for
 
         # check_crs_gdf(, crs_)
         if isinstance(self.config["network"]["diversion_file"], str):
@@ -419,22 +412,20 @@ class Network:
 
         lines.crs = crs_
 
-        ### FREDERIQUE COMMENTED OUT THE BELOW TO SPEED UP FOR PAKISTAN ASSESSMENT ###
-        # # append the length of the road stretches
-        # lines["length"] = lines["geometry"].apply(lambda x: line_length(x, lines.crs))
-        #
-        # if lines["geometry"].apply(lambda row: isinstance(row, MultiLineString)).any():
-        #     for line in lines.loc[
-        #         lines["geometry"].apply(lambda row: isinstance(row, MultiLineString))
-        #     ].iterrows():
-        #         if len(linemerge(line[1].geometry)) > 1:
-        #             logging.warning(
-        #                 "Edge with {} = {} is a MultiLineString, which cannot be merged to one line. Check this part.".format(
-        #                     self.config["network"]["file_id"],
-        #                     line[1][self.config["network"]["file_id"]],
-        #                 )
-        #             )
-        ### FREDERIQUE COMMENTED OUT THE ABOVE TO SPEED UP FOR PAKISTAN ASSESSMENT ###
+        # append the length of the road stretches
+        lines["length"] = lines["geometry"].apply(lambda x: line_length(x, lines.crs))
+
+        if lines["geometry"].apply(lambda row: isinstance(row, MultiLineString)).any():
+            for line in lines.loc[
+                lines["geometry"].apply(lambda row: isinstance(row, MultiLineString))
+            ].iterrows():
+                if len(linemerge(line[1].geometry)) > 1:
+                    logging.warning(
+                        "Edge with {} = {} is a MultiLineString, which cannot be merged to one line. Check this part.".format(
+                            self.config["network"]["file_id"],
+                            line[1][self.config["network"]["file_id"]],
+                        )
+                    )
 
         logging.info(
             "Shapefile(s) loaded with attributes: {}.".format(
