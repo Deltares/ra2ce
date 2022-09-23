@@ -2,8 +2,14 @@ import shutil
 import subprocess
 from pathlib import Path
 
+import pytest
+
 from ra2ce import main
 from tests import slow_test, test_data
+
+# Just to make sonar-cloud stop complaining.
+_network_ini_name = "network.ini"
+_analysis_ini_name = "analyses.ini"
 
 
 def run_from_cli(network_ini: Path, analysis_ini: Path) -> None:
@@ -33,8 +39,8 @@ class TestAcceptance:
             import ra2ce
             import ra2ce.main
             import ra2ce.ra2ce_handler
-        except ImportError:
-            raise
+        except ImportError as exc_err:
+            pytest.fail(f"It was not possible to import required packages {exc_err}")
 
     @slow_test
     def test_given_test_data_main_does_not_throw(self):
@@ -58,8 +64,8 @@ class TestIndirectAnalyses:
         # 1. Given test data
         test_name = "1_1_network_shape_redundancy"
         _test_dir = test_data / test_name
-        network_ini = _test_dir / "network.ini"
-        analysis_ini = _test_dir / "analyses.ini"
+        network_ini = _test_dir / _network_ini_name
+        analysis_ini = _test_dir / _analysis_ini_name
         assert network_ini.is_file()
         assert analysis_ini.is_file()
         # Purge output dirs.
@@ -96,8 +102,8 @@ class TestIndirectAnalyses:
         # 1. Given test data.
         test_name = "4_analyses_indirect"
         _test_data_dir = test_data / test_name
-        network_ini = _test_data_dir / "network.ini"
-        analyses_ini = _test_data_dir / "analyses.ini"
+        network_ini = _test_data_dir / _network_ini_name
+        analyses_ini = _test_data_dir / _analysis_ini_name
         _output_files_dir = _test_data_dir / "output"
         shutil.rmtree(_output_files_dir, ignore_errors=True)
 
@@ -150,11 +156,11 @@ class TestNetworkCreation:
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data.
         test_name = "1_network_shape"
-        _test_dir = test_data / test_name
-        network_ini = _test_dir / "network.ini"
+        _test_data_dir = test_data / test_name
+        network_ini = _test_data_dir / _network_ini_name
         assert network_ini.is_file()
 
-        _output_graph_dir = _test_dir / "static" / "output_graph"
+        _output_graph_dir = _test_data_dir / "static" / "output_graph"
         shutil.rmtree(_output_graph_dir, ignore_errors=True)
 
         # 2. When run test.
@@ -178,11 +184,11 @@ class TestNetworkCreation:
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data.
         test_name = "3_network_osm_download"
-        _test_dir = test_data / test_name
-        network_ini = _test_dir / "network.ini"
+        _test_data_dir = test_data / test_name
+        network_ini = _test_data_dir / _network_ini_name
         assert network_ini.is_file()
 
-        _output_graph_dir = _test_dir / "static" / "output_graph"
+        _output_graph_dir = _test_data_dir / "static" / "output_graph"
         shutil.rmtree(_output_graph_dir, ignore_errors=True)
 
         # 2. When run test.
