@@ -193,11 +193,11 @@ class Network:
         """
 
         logging.info(
-            "TRAILS importer: Reads the provided primary edge file: {}, assumes there also is a_nodes file".format(
+            "TRAILS importer: Reads the provided primary edge file: {}, assumes there also is a nodes file".format(
                 self.config["network"]["primary_file"]
             )
         )
-        edges = pd.read_feather(
+        edges = gpd.read_feather(
             self.config["static"] / "network" / self.config["network"]["primary_file"]
         )
         corresponding_node_file = (
@@ -206,9 +206,17 @@ class Network:
             / self.config["network"]["primary_file"].replace("edges", "nodes")
         )
         assert corresponding_node_file.exists()
-        nodes = pd.read_feather(
+        nodes = gpd.read_feather(
             corresponding_node_file
         )  # Todo: Throw exception if nodes file is not present
+
+        # Make a pyproj CRS from the EPSG code and set the CRS for the nodes and edges
+        crs = pyproj.CRS.from_user_input(crs)
+        edges.crs = crs
+        nodes.crs = crs
+
+        self.base_graph_crs = pyproj.CRS.from_user_input(crs)
+        self.base_network_crs = pyproj.CRS.from_user_input(crs)
 
         logging.info("TRAILS importer: start generating graph")
         # tempfix to rename columns
@@ -216,7 +224,7 @@ class Network:
         node_id = "id"
         graph_simple = graph_from_gdf(edges, nodes, name="network", node_id=node_id)
 
-        logging.info("TRAILS importer: graph generating was succesfull.")
+        logging.info("TRAILS importer: graph generating was successful.")
         logging.warning(
             "RA2CE will not clean-up your graph, assuming that it is already done in TRAILS"
         )
@@ -540,8 +548,8 @@ class Network:
 
             # Set the road lengths to meters for both the base_graph and network_gdf
             # TODO: rename "length" column to "length [m]" to be explicit
-            # edges_lengths_meters = {(e[0], e[1], e[2]): {"length": line_length(e[-1]["geometry"], self.base_graph_crs)} for e in base_graph.edges.data(keys=True)}
-            # nx.set_edge_attributes(base_graph, edges_lengths_meters)
+            edges_lengths_meters = {(e[0], e[1], e[2]): {"length": line_length(e[-1]["geometry"], self.base_graph_crs)} for e in base_graph.edges.data(keys=True)}
+            nx.set_edge_attributes(base_graph, edges_lengths_meters)
 
             network_gdf["length"] = network_gdf["geometry"].apply(lambda x: line_length(x, self.base_network_crs))
 
@@ -549,7 +557,7 @@ class Network:
             #     base_graph = self.get_avg_speed(base_graph)
 
             # Save the graph and geodataframe
-            # self._export_network_files(base_graph, "base_graph", to_save)
+            self._export_network_files(base_graph, "base_graph", to_save)
             self._export_network_files(network_gdf, "base_network", to_save)
         else:
 

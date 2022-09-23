@@ -571,34 +571,34 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
     # Check if the coordinate system is projected or geographic
     if crs.is_geographic:
         distance.geodesic.ELLIPSOID = "WGS-84"
-        try:
-            # Swap shapely (lonlat) to geopy (latlon) points
-            latlon = lambda lonlat: (lonlat[1], lonlat[0])
-            if isinstance(line, LineString):
-                total_length = sum(
-                    distance.distance(latlon(a), latlon(b)).meters
-                    for (a, b) in pairs(line.coords)
-                )
-            elif isinstance(line, MultiLineString):
-                total_length = sum(
-                    [
-                        sum(
-                            distance.distance(latlon(a), latlon(b)).meters
-                            for (a, b) in pairs(l.coords)
-                        )
-                        for l in line
-                    ]
-                )
-            else:
-                logging.warning(
-                    "The road strech is not a Shapely LineString or MultiLineString so the length cannot be computed."
-                    "Please check your data network data."
-                )
-        except:
-            logging.error(
-                "The CRS is not EPSG:4326. Quit the analysis, reproject the layer to EPSG:4326 and try again to run the tool."
+        # try:
+        # Swap shapely (lonlat) to geopy (latlon) points
+        latlon = lambda lonlat: (lonlat[1], lonlat[0])
+        if isinstance(line, LineString):
+            total_length = sum(
+                distance.distance(latlon(a), latlon(b)).meters
+                for (a, b) in pairs(line.coords)
             )
-            quit()
+        elif isinstance(line, MultiLineString):
+            total_length = sum(
+                [
+                    sum(
+                        distance.distance(latlon(a), latlon(b)).meters
+                        for (a, b) in pairs(l.coords)
+                    )
+                    for l in line
+                ]
+            )
+        else:
+            logging.warning(
+                "The road strech is not a Shapely LineString or MultiLineString so the length cannot be computed."
+                "Please check your data network data."
+            )
+        # except:
+        #     logging.error(
+        #         "The CRS is not EPSG:4326. Quit the analysis, reproject the layer to EPSG:4326 and try again to run the tool."
+        #     )
+        #     quit()
     elif crs.is_projected:
         ## line length of projected linestrings
         if isinstance(line, LineString):
