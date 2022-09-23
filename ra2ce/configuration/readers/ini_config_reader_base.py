@@ -72,7 +72,6 @@ class IniConfigurationReaderBase(IniConfigurationReaderProtocol):
         Args:
             config_data (dict): _description_
         """
-        # _file_items = [k for k, v in _expected_values.items() if "file" in v]
         _file_types = {
             "polygon": "network",
             "hazard_map": "hazard",
@@ -81,7 +80,7 @@ class IniConfigurationReaderBase(IniConfigurationReaderProtocol):
             "locations": "network",
         }
         for config_header, value_dict in config_data.items():
-            if not (dict == type(value_dict)):
+            if not isinstance(value_dict, dict):
                 continue
             for header_prop, prop_value in value_dict.items():
                 _prop_name = _file_types.get(header_prop, None)
