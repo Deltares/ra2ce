@@ -18,7 +18,6 @@ class TestNetworkIniConfigurationValidator:
 
     def test_validate_given_valid_config_data(self):
         # 1. Define test data.
-        _test_config_data = NetworkIniConfigData()
         _expected_err = "Network properties not present in Network ini file."
         _test_config_data = {"network": None}
 
@@ -43,7 +42,6 @@ class TestNetworkIniConfigurationValidator:
 
     def test_validate_missing_shp_input_errors(self):
         # 1. Define test data.
-        _test_config_data = NetworkIniConfigData()
         _expected_err = "Not possible to create network - Shapefile used as source, but no file_id configured in the network.ini file"
         _test_config_data = {"network": dict(source="shapefile", file_id=None)}
 

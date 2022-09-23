@@ -20,7 +20,7 @@ class TestValidationReport:
         # 3. Verify expectations.
         assert not _report.is_valid()
         assert _err_mssg in _report._errors
-        assert not _err_mssg in _report._warns
+        assert _err_mssg not in _report._warns
 
     def test_warn_validation_report(self):
         # 1. Define test data.
@@ -33,7 +33,7 @@ class TestValidationReport:
         # 3. Verify expectations.
         assert _report.is_valid()
         assert _warn_mssg in _report._warns
-        assert not _warn_mssg in _report._errors
+        assert _warn_mssg not in _report._errors
 
     def test_merge_validation_reports(self):
         # 1. Define test data.
@@ -64,4 +64,4 @@ class TestValidationReport:
 
         assert _source_warn_mssg in _report_target._warns
         assert _source_err_mssg in _report_target._errors
-        assert not (_target_warn_mssg in _report_source._warns)
+        assert _target_warn_mssg not in _report_source._warns

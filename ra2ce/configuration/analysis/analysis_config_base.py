@@ -31,7 +31,7 @@ class AnalysisConfigBase(ConfigProtocol):
 
         def _create_output_folders(analysis_type: str) -> None:
             # Create the output folders
-            if not analysis_type in self.config_data.keys():
+            if analysis_type not in self.config_data.keys():
                 return
             for a in self.config_data[analysis_type]:
                 output_path = self.config_data["output"] / a["analysis"]
