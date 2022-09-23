@@ -1,6 +1,11 @@
-name: Autoformat code
+name: ci-pull-request
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize, reopened]
 jobs:
 
   CI:
@@ -34,16 +39,8 @@ jobs:
           poetry install
         if: steps.cache.outputs.cache-hit != 'true'
 
-      - name: Autoformat code if the check fails
-        if: ${{ (matrix.os == 'ubuntu-20.04') && (matrix.python-version == 3.9) }}
+      - name: Test with pytest
         shell: pwsh
         run: |
           conda activate ra2ce_env
-          poetry run isort .
-          poetry run black .
-          git config --global user.name '${{ github.actor }}'
-          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
-          git fetch
-          git checkout $GITHUB_HEAD_REF
-          git commit -am "autoformat: isort & black" && git push || true      
+          poetry run pytest

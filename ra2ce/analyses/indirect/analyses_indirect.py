@@ -343,8 +343,9 @@ class IndirectAnalyses:
             gdf = gdf.merge(df_calculated, how="left", on=["u", "v", "rfid"])
 
             # calculate the difference in distance
+            # previously here you would find if dist == dist which is a critical bug. Replaced by just verifying dist is a value.
             gdf["diff_dist"] = [
-                dist - length if dist == dist else np.NaN
+                dist - length if dist else np.NaN
                 for (dist, length) in zip(gdf["alt_dist"], gdf[analysis["weighing"]])
             ]
 

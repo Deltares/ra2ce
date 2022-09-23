@@ -38,7 +38,6 @@ class TestIniConfigValidatorBase:
 
     def test_validate_headers_fails_when_missing_expected_header(self):
         # 1. Define test data.
-        _test_config_data = DummyConfigData()
         _test_config_data = {}
         _missing_header = "Deltares"
         _expected_err = f"Property [ {_missing_header} ] is not configured. Add property [ {_missing_header} ] to the *.ini file. "
@@ -54,7 +53,6 @@ class TestIniConfigValidatorBase:
 
     def test_validate_headers_missing_isolation_reports_warn(self):
         # 1. Define test data.
-        _test_config_data = DummyConfigData()
         _required_header = "Deltares"
         _test_config_data = {_required_header: {}}
         _expected_warn = "Header 'isolation' not found in the configuration."

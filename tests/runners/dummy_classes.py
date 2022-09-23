@@ -1,6 +1,5 @@
 from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
-from ra2ce.configuration.network.network_ini_config_data import NetworkIniConfigData
-from ra2ce.ra2ce_input_config import Ra2ceInputConfig
+from ra2ce.configuration.config_wrapper import ConfigWrapper
 
 
 class DummyAnalysisConfig(AnalysisConfigBase):
@@ -8,7 +7,7 @@ class DummyAnalysisConfig(AnalysisConfigBase):
         self.config_data = {}
 
 
-class DummyRa2ceInput(Ra2ceInputConfig):
+class DummyRa2ceInput(ConfigWrapper):
     def __init__(self) -> None:
         self.analysis_config = DummyAnalysisConfig()
         self.network_config = NetworkConfig()
