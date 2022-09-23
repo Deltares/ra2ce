@@ -31,7 +31,6 @@ class IniConfigurationReaderBase(IniConfigurationReaderProtocol):
 
     def _copy_output_files(self, from_path: Path, config_data: dict) -> None:
         self._create_config_dir("output", config_data)
-        # self._create_config_dir("static")
         try:
             copyfile(from_path, config_data["output"] / "{}.ini".format(from_path.stem))
         except FileNotFoundError as e:
