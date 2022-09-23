@@ -2367,4 +2367,4 @@ def clean_memory(list_delete: list) -> None:
 
 
 def mean_ignore_nan(x):
-    return np.nanmean(x)
+    return np.nanmean(np.array(x))

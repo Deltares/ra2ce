@@ -335,6 +335,8 @@ class DamageNetwork:
             # Todo: we could script a seperate work-around for this situation, for now we just raise an assertion
             assert not (np.nan in gdf.lanes.unique())  # all nans should be replaced
 
+        gdf.loc[gdf['lanes'] == 0, 'lanes'] = 1  #TODO: think about if this is the best option
+
         self.gdf = gdf
 
     def remap_road_types_to_fewer_classes(self):
@@ -405,8 +407,6 @@ class DamageNetwork:
             "These numbers assume that motorways that each driving direction is mapped as a seperate segment such as in OSM!!!"
         )
 
-
-
         # Todo: Dirty fixes, these should be read from the init
         hazard_prefix = "F"
         end = "me"  # indicate that you want to use the mean
@@ -421,6 +421,7 @@ class DamageNetwork:
         ]  # input: water depth (cm); output: damage (fraction road construction costs)
 
         df = self.df
+        df["lanes"] = df["lanes"].astype(int)
         df["max_dam_hz"] = df_max_damages_huizinga.lookup(df["lanes"], df["road_type"])
 
         for event in events:
