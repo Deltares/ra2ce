@@ -21,9 +21,23 @@ class NetworkExporterBase(Ra2ceExporterProtocol):
         self.pickle_path = None
 
     def export_to_shp(self, output_dir: Path, export_data: NETWORK_TYPE) -> None:
+        """
+        Exports the given data into a `*.shp` file.
+
+        Args:
+            output_dir (Path): Output directory where the save the exported data.
+            export_data (NETWORK_TYPE): Data that needs to be exported.
+        """
         pass
 
     def export_to_pickle(self, output_dir: Path, export_data: NETWORK_TYPE) -> None:
+        """
+        Exports the given data into a `*.p` or `.feather` file.
+
+        Args:
+            output_dir (Path): Output directory where the save the exported data.
+            export_data (NETWORK_TYPE): Data that needs to be exported.
+        """
         pass
 
     def export(self, export_path: Path, export_data: Any) -> None:
