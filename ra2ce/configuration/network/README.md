@@ -6,7 +6,7 @@ Module containing:
 * Data Object Model for an Network Configuration.
 
 `NetworkConfiguration` -> contains -> `NetworkIniConfigurationData`
-`NetworkIniConfigurationReader` -> reads -> `*.ini` -> into -> `NetworkIniConfigurationData` -> then creates -> `NetworkConfiguration`
+`NetworkIniConfigDataReader` -> reads -> `*.ini` -> into -> `NetworkIniConfigurationData` -> then creates -> `NetworkConfiguration`
 
 ## What should go here?
 All definitions related to **any** network `ini` configuration file.

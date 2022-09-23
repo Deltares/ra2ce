@@ -721,109 +721,108 @@ class Hazard:
                 elif self.graphs[input_graph] is None and input_graph == "base_network":
                     self.graphs[input_graph] = gpd.read_feather(file_path)
 
-        # #### Step 1: hazard overlay of the base graph (NetworkX) ###
-        # if (self.graphs["base_graph"] is not None) and (
-        #     self.files["base_graph_hazard"] is None
-        # ):
-        #     graph = self.graphs["base_graph"]
-        #
-        #     # Check if the graph needs to be reprojected
-        #     hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
-        #     graph_crs = pyproj.CRS.from_user_input(
-        #         "EPSG:4326"
-        #     )  # this is WGS84, TODO: Make flexible by including in the network ini
-        #
-        #     if (
-        #         hazard_crs != graph_crs
-        #     ):  # Temporarily reproject the graph to the CRS of the hazard
-        #         logging.warning(
-        #             """Hazard crs {} and graph crs {} are inconsistent,
-        #                                       we try to reproject the graph crs""".format(
-        #                 hazard_crs, graph_crs
-        #             )
-        #         )
-        #         graph_reprojected = self.get_reproject_graph(
-        #             graph, graph_crs, hazard_crs
-        #         )
-        #
-        #         # Do the actual hazard intersect
-        #         base_graph_hazard_reprojected = self.hazard_intersect(graph_reprojected)
-        #
-        #         # Assign the original geometries to the reprojected raster
-        #         self.graphs["base_graph_hazard"] = self.get_original_geoms_graph(
-        #             graph, base_graph_hazard_reprojected
-        #         )
-        #
-        #         # Clean up memory
-        #         clean_memory([graph_reprojected, base_graph_hazard_reprojected])
-        #     else:
-        #         self.graphs["base_graph_hazard"] = self.hazard_intersect(graph)
-        #
-        #     # Save graphs/network with hazard
-        #     self._export_network_files("base_graph_hazard", types_to_export)
-        # else:
-        #     try:
-        #         # Try to find the base graph hazard file
-        #         self.graphs["base_graph_hazard"] = GraphPickleReader().read(
-        #             self.config["static"] / "output_graph" / "base_graph_hazard.p"
-        #         )
-        #     except FileNotFoundError:
-        #         # File not found
-        #         logging.warning(
-        #             f"Base graph hazard file not found at {self.config['static'] / 'output_graph' / 'base_graph_hazard.p'}"
-        #         )
-        #         pass
-        #
-        # #### Step 2: hazard overlay of the origins_destinations (NetworkX) ###
-        # if (
-        #     (self.config["origins_destinations"]["origins"] is not None)
-        #     and (self.config["origins_destinations"]["origins"] is not None)
-        #     and (self.graphs["origins_destinations_graph"] is not None)
-        #     and (self.files["origins_destinations_graph_hazard"] is None)
-        # ):
-        #     graph = self.graphs["origins_destinations_graph"]
-        #
-        #     # Check if the graph needs to be reprojected
-        #     hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
-        #     graph_crs = pyproj.CRS.from_user_input(
-        #         "EPSG:4326"
-        #     )  # this is WGS84, TODO: Make flexible by including in the network ini
-        #
-        #     if (
-        #         hazard_crs != graph_crs
-        #     ):  # Temporarily reproject the graph to the CRS of the hazard
-        #         logging.warning(
-        #             """Hazard crs {} and graph crs {} are inconsistent,
-        #                                       we try to reproject the graph crs""".format(
-        #                 hazard_crs, graph_crs
-        #             )
-        #         )
-        #         graph_reprojected = self.get_reproject_graph(
-        #             graph, graph_crs, hazard_crs
-        #         )
-        #
-        #         # Do the actual hazard intersect
-        #         od_graph_hazard_reprojected = self.od_hazard_intersect(
-        #             graph_reprojected
-        #         )
-        #
-        #         # Assign the original geometries to the reprojected raster
-        #         self.graphs[
-        #             "origins_destinations_graph_hazard"
-        #         ] = self.get_original_geoms_graph(graph, od_graph_hazard_reprojected)
-        #
-        #         # Clean up memory
-        #         clean_memory([graph_reprojected, od_graph_hazard_reprojected])
-        #
-        #     else:
-        #         self.graphs[
-        #             "origins_destinations_graph_hazard"
-        #         ] = self.od_hazard_intersect(graph)
-        #
-        #     # Save graphs/network with hazard
-        #     self._export_network_files(
-        #         "origins_destinations_graph_hazard", types_to_export
-        #     )
+        #### Step 1: hazard overlay of the base graph (NetworkX) ###
+        if (self.graphs["base_graph"] is not None) and (
+            self.files["base_graph_hazard"] is None
+        ):
+            graph = self.graphs["base_graph"]
+
+            # Check if the graph needs to be reprojected
+            hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
+            graph_crs = pyproj.CRS.from_user_input(
+                "EPSG:4326"
+            )  # this is WGS84, TODO: Make flexible by including in the network ini
+
+            if (
+                hazard_crs != graph_crs
+            ):  # Temporarily reproject the graph to the CRS of the hazard
+                logging.warning(
+                    """Hazard crs {} and graph crs {} are inconsistent, 
+                                              we try to reproject the graph crs""".format(
+                        hazard_crs, graph_crs
+                    )
+                )
+                graph_reprojected = self.get_reproject_graph(
+                    graph, graph_crs, hazard_crs
+                )
+
+                # Do the actual hazard intersect
+                base_graph_hazard_reprojected = self.hazard_intersect(graph_reprojected)
+
+                # Assign the original geometries to the reprojected raster
+                self.graphs["base_graph_hazard"] = self.get_original_geoms_graph(
+                    graph, base_graph_hazard_reprojected
+                )
+
+                # Clean up memory
+                clean_memory([graph_reprojected, base_graph_hazard_reprojected])
+            else:
+                self.graphs["base_graph_hazard"] = self.hazard_intersect(graph)
+
+            # Save graphs/network with hazard
+            self._export_network_files("base_graph_hazard", types_to_export)
+        else:
+            try:
+                # Try to find the base graph hazard file
+                self.graphs["base_graph_hazard"] = GraphPickleReader().read(
+                    self.config["static"] / "output_graph" / "base_graph_hazard.p"
+                )
+            except FileNotFoundError:
+                # File not found
+                logging.warning(
+                    f"Base graph hazard file not found at {self.config['static'] / 'output_graph' / 'base_graph_hazard.p'}"
+                )
+                pass
+
+        #### Step 2: hazard overlay of the origins_destinations (NetworkX) ###
+        if (
+            (self.config["origins_destinations"]["origins"] is not None)
+            and (self.graphs["origins_destinations_graph"] is not None)
+            and (self.files["origins_destinations_graph_hazard"] is None)
+        ):
+            graph = self.graphs["origins_destinations_graph"]
+
+            # Check if the graph needs to be reprojected
+            hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
+            graph_crs = pyproj.CRS.from_user_input(
+                "EPSG:4326"
+            )  # this is WGS84, TODO: Make flexible by including in the network ini
+
+            if (
+                hazard_crs != graph_crs
+            ):  # Temporarily reproject the graph to the CRS of the hazard
+                logging.warning(
+                    """Hazard crs {} and graph crs {} are inconsistent, 
+                                              we try to reproject the graph crs""".format(
+                        hazard_crs, graph_crs
+                    )
+                )
+                graph_reprojected = self.get_reproject_graph(
+                    graph, graph_crs, hazard_crs
+                )
+
+                # Do the actual hazard intersect
+                od_graph_hazard_reprojected = self.od_hazard_intersect(
+                    graph_reprojected
+                )
+
+                # Assign the original geometries to the reprojected raster
+                self.graphs[
+                    "origins_destinations_graph_hazard"
+                ] = self.get_original_geoms_graph(graph, od_graph_hazard_reprojected)
+
+                # Clean up memory
+                clean_memory([graph_reprojected, od_graph_hazard_reprojected])
+
+            else:
+                self.graphs[
+                    "origins_destinations_graph_hazard"
+                ] = self.od_hazard_intersect(graph)
+
+            # Save graphs/network with hazard
+            self._export_network_files(
+                "origins_destinations_graph_hazard", types_to_export
+            )
 
         #### Step 3: iterate overlay of the GeoPandas Dataframe (if any) ###
         if (self.graphs["base_network"] is not None) and (
