@@ -358,7 +358,7 @@ def merge_lines_automatic(
     try:
         merged_lines = linemerge(list_lines)  # merge the lines of both shapefiles
     except NotImplementedError as e:
-        Exception(
+        logging.error(
             "Your data contains Multi-part geometries, you cannot merge lines.", e
         )
         return lines_gdf, gpd.GeoDataFrame()
