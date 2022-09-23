@@ -1054,12 +1054,10 @@ class DamageFunction_by_RoadType_by_Lane(DamageFunction):
         damage_fraction = DamageFractionUniform()
         dam_fraction_path = find_unique_csv_file(folder_path, "hazard_severity")
         damage_fraction.from_csv(dam_fraction_path, sep=';')
-
-        #todo: unit correction of damage_fraction
-
+        self.damage_fraction = damage_fraction
 
         damage_fraction.create_interpolator()
-        self.damage_fraction = damage_fraction
+
 
     #Todo: these two below functions are maybe better implemented at a lower level?
     def add_max_damage(self,df,prefix=None):
@@ -1228,6 +1226,10 @@ class DamageFractionUniform(DamageFraction):
     Uniform: assuming the same curve for
     each road type and lane numbers and any other metadata
 
+
+    self.raw_data (pd.DataFrame) : Raw data from the csv file
+    self.data (pd.DataFrame) : index = hazard severity (e.g. flood depth); column 0 = damage fraction
+
     """
     def __init__(self,name=None,hazard_unit=None):
         self.name = name
@@ -1269,7 +1271,7 @@ class DamageFractionUniform(DamageFraction):
 
         #identify unit and drop from data
         self.hazard_unit = self.raw_data.index[0]
-        self.data = self.raw_data.drop(self.hazard_unit)
+        self.data = self.raw_data.drop(self.hazard_unit) #Todo: This could also be a series instead of DataFrame
 
         #convert data to floats
         self.data = self.data.astype('float')
@@ -1292,7 +1294,7 @@ class DamageFractionUniform(DamageFraction):
 
         if (self.hazard_unit == 'cm' and desired_unit == 'm'):
             scaling_factor = 1/100
-            self.data = self.data * scaling_factor
+            self.data.index = self.data.index * scaling_factor
             logging.info('Hazard severity from {} data was scaled by a factor {}, to convert from {} to {}'.format(
                 self.origin_path, scaling_factor,self.hazard_unit,desired_unit))
             self.damage_unit = desired_unit
@@ -1312,7 +1314,17 @@ class DamageFractionUniform(DamageFraction):
         self.interpolator = interp1d(x=x_values,y=y_values,
                 fill_value=(y_values[0],y_values[-1]), #fraction damage (y) if hazard severity (x) is outside curve range
                 bounds_error=False)
+
         return None
+
+    def __repr__(self):
+        if self.interpolator:
+            string = 'DamageFractionUniform with name: ' + self.name + ' interpolator: {}'.format(
+                list(zip(self.interpolator.y, self.interpolator.x)))
+        else:
+            string = 'DamageFractionUniform with name: ' +  self.name
+        return string
+
 
 
 
