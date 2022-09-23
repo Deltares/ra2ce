@@ -8,7 +8,7 @@ from ra2ce.configuration.config_protocol import ConfigProtocol
 class AnalysisConfigBase(ConfigProtocol):
     ini_file: Path
     root_dir: Path
-    config_data: AnalysisIniConfigData = None
+    config_data: Optional[AnalysisIniConfigData] = None
 
     @staticmethod
     def get_network_root_dir(filepath: Path) -> Path:
