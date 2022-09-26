@@ -8,7 +8,7 @@ from ra2ce.configuration.config_protocol import ConfigProtocol
 class AnalysisConfigBase(ConfigProtocol):
     ini_file: Path
     root_dir: Path
-    config_data: AnalysisIniConfigData = None
+    config_data: Optional[AnalysisIniConfigData] = None
 
     @staticmethod
     def get_network_root_dir(filepath: Path) -> Path:
@@ -31,7 +31,7 @@ class AnalysisConfigBase(ConfigProtocol):
 
         def _create_output_folders(analysis_type: str) -> None:
             # Create the output folders
-            if not analysis_type in self.config_data.keys():
+            if analysis_type not in self.config_data.keys():
                 return
             for a in self.config_data[analysis_type]:
                 output_path = self.config_data["output"] / a["analysis"]
