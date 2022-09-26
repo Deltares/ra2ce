@@ -1,3 +1,5 @@
+from pathlib import Path
+
 class ManualDamageFunctions:
     """"
     This class keeps an overview of the manual damage functions

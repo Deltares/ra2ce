@@ -1,3 +1,10 @@
+import logging
+import pandas as pd
+
+from ra2ce.analyses.direct.analyses_direct import clean_lane_data, create_summary_statistics
+from ra2ce.analyses.direct.direct_lookup import LookUp as lookup
+
+
 # DATA STRUCTURES
 class DamageNetwork:
     """A road network gdf with hazard data stored in it, and for which damages can be calculated"""
@@ -370,6 +377,7 @@ class DamageNetworkReturnPeriods(DamageNetwork):
         if damage_function == "OSD":
             self.calculate_damage_OSdaMage(events=self.return_periods)
 
+
 class DamageNetworkEvents(DamageNetwork):
     """A road network gdf with EVENT-BASED hazard data stored in it, and for which damages can be calculated
 
@@ -388,7 +396,7 @@ class DamageNetworkEvents(DamageNetwork):
         )  # set of unique events
 
     ### Controler for Event-based damage calculation
-    def main(self, damage_function,manual_damage_functions):
+    def main(self, damage_function, manual_damage_functions=None):
         """Controler for doing the EAD calculation
 
         Arguments:
@@ -407,7 +415,8 @@ class DamageNetworkEvents(DamageNetwork):
 
         # create dataframe from gdf  #Todo: check why this is necessary
         column_names = list(gdf_mask.columns)
-        column_names.remove("geometry")
+        if "geometry" in column_names:
+            column_names.remove("geometry")
         df = gdf_mask[column_names]
 
         self.df = df  # helper dataframe to speedup the analysis
@@ -420,4 +429,4 @@ class DamageNetworkEvents(DamageNetwork):
             self.calculate_damage_OSdaMage(events=self.events)
 
         if damage_function == "MAN":
-            self.calculate_damage_manual_functions(events=self.events,manual_damage_functions=manual_damage_functions)
+            self.calculate_damage_manual_functions(events=self.events, manual_damage_functions=manual_damage_functions)
