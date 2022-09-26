@@ -737,7 +737,7 @@ class Hazard:
                 hazard_crs != graph_crs
             ):  # Temporarily reproject the graph to the CRS of the hazard
                 logging.warning(
-                    """Hazard crs {} and graph crs {} are inconsistent, 
+                    """Hazard crs {} and graph crs {} are inconsistent,
                                               we try to reproject the graph crs""".format(
                         hazard_crs, graph_crs
                     )
@@ -792,7 +792,7 @@ class Hazard:
                 hazard_crs != graph_crs
             ):  # Temporarily reproject the graph to the CRS of the hazard
                 logging.warning(
-                    """Hazard crs {} and graph crs {} are inconsistent, 
+                    """Hazard crs {} and graph crs {} are inconsistent,
                                               we try to reproject the graph crs""".format(
                         hazard_crs, graph_crs
                     )
@@ -836,7 +836,7 @@ class Hazard:
                 hazard_crs != gdf_crs
             ):  # Temporarily reproject the graph to the CRS of the hazard
                 logging.warning(
-                    """Hazard crs {} and gdf crs {} are inconsistent, 
+                    """Hazard crs {} and gdf crs {} are inconsistent,
                                               we try to reproject the gdf crs""".format(
                         hazard_crs, gdf_crs
                     )
@@ -890,7 +890,7 @@ class Hazard:
                     hazard_crs != locations_crs
                 ):  # Temporarily reproject the locations to the CRS of the hazard
                     logging.warning(
-                        """Hazard crs {} and location crs {} are inconsistent, 
+                        """Hazard crs {} and location crs {} are inconsistent,
                                                    we try to reproject the location crs""".format(
                             hazard_crs, locations_crs
                         )
