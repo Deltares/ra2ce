@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import logging
-import os
-import sys
 import time
 
 from pathlib import Path
@@ -10,11 +8,7 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 
-from ra2ce.analyses.direct.direct_lookup import LookUp as lookup
 from ra2ce.analyses.direct.direct_utils import *
-
-folder = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(folder)
 
 
 class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
@@ -69,10 +63,10 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
             *result_gdf* (GeoDataFrame) : The original hazard dataframe with the result of the damage calculations added
 
         """
-        from direct_damage_calculation import DamageNetworkReturnPeriods, DamageNetworkEvents
-        from DamageFunctions import ManualDamageFunctions
+        from ra2ce.analyses.direct.direct_damage_calculation import DamageNetworkReturnPeriods, DamageNetworkEvents
+        from ra2ce.analyses.direct.DamageFunctions import ManualDamageFunctions
 
-        #Open the network with hazard data
+        # Open the network with hazard data
         road_gdf = self.graphs["base_network_hazard"]
         if self.graphs["base_network_hazard"] is None:
             road_gdf = gpd.read_feather(self.config["files"]["base_network_hazard"])
@@ -85,16 +79,16 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         # Read the desired damage function
         damage_function = analysis['damage_curve']
 
-        #If you want to use manual damage functions, the need to be loaded first
+        # If you want to use manual damage functions, the need to be loaded first
         manual_damage_functions = None
         if analysis['damage_curve'] == 'MAN':
             manual_damage_functions = ManualDamageFunctions()
             manual_damage_functions.find_damage_functions(folder=(self.config['input'] / 'damage_functions'))
             manual_damage_functions.load_damage_functions()
 
-        #Choose between event or return period based analysis
+        # Choose between event or return period based analysis
         if analysis['event_type'] == 'event':
-            event_cols = [x for x in val_cols if "_EV" in x] #Todo: can be part of the init of the object
+            event_cols = [x for x in val_cols if "_EV" in x]  # Todo: can be part of the init of the object
 
             if not len(event_cols) > 0:
                 raise ValueError('No event cols present in hazard data')
@@ -107,7 +101,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
             return result_gdf
 
         elif analysis['event_type'] == 'return_period':
-            #count number of return period cols
+            # count number of return period cols
             rp_cols = [x for x in val_cols if "_RP" in x] #Todo: can be part of the init of the object
 
             if not len(rp_cols) > 1: #Todo, can be done after, or in object instantiation
