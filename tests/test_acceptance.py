@@ -98,7 +98,7 @@ class TestIndirectAnalyses:
 
     @slow_test
     def test_4_analyses_indirect(self):
-        """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
+        """To test all indirect analyses."""
         # 1. Given test data.
         test_name = "4_analyses_indirect"
         _test_data_dir = test_data / test_name
