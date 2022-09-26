@@ -1,14 +1,23 @@
 import logging
 from pathlib import Path
 from shutil import copyfile
-from typing import List
+from typing import List, Optional
 
 from ra2ce.configuration.config_protocol import ConfigProtocol
 from ra2ce.io.readers.file_reader_protocol import FileReaderProtocol
 
 
 class IniConfigurationReaderProtocol(FileReaderProtocol):
-    def read(self, ini_file: Path) -> ConfigProtocol:
+    def read(self, ini_file: Path) -> Optional[ConfigProtocol]:
+        """
+        Reads the given `*.ini` file and if possible converts it into a `ConfigProtocol` object.
+
+        Args:
+            ini_file (Path): Ini file to be mapped into a `ConfigProtocol`.
+
+        Returns:
+            Optional[ConfigProtocol]: Resulting mapped object from the configuration data in the given file.
+        """
         pass
 
 
@@ -22,7 +31,6 @@ class IniConfigurationReaderBase(IniConfigurationReaderProtocol):
 
     def _copy_output_files(self, from_path: Path, config_data: dict) -> None:
         self._create_config_dir("output", config_data)
-        # self._create_config_dir("static")
         try:
             copyfile(from_path, config_data["output"] / "{}.ini".format(from_path.stem))
         except FileNotFoundError as e:
@@ -63,7 +71,6 @@ class IniConfigurationReaderBase(IniConfigurationReaderProtocol):
         Args:
             config_data (dict): _description_
         """
-        # _file_items = [k for k, v in _expected_values.items() if "file" in v]
         _file_types = {
             "polygon": "network",
             "hazard_map": "hazard",
@@ -72,7 +79,7 @@ class IniConfigurationReaderBase(IniConfigurationReaderProtocol):
             "locations": "network",
         }
         for config_header, value_dict in config_data.items():
-            if not (dict == type(value_dict)):
+            if not isinstance(value_dict, dict):
                 continue
             for header_prop, prop_value in value_dict.items():
                 _prop_name = _file_types.get(header_prop, None)

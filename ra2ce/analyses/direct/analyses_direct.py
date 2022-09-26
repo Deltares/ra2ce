@@ -1,9 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-@authors: Kees van Ginkel, Bramka Jafino, Frederique de Groen, Martijn Kwant, Elco Koks
-Created on 26-7-2021
-"""
-
 import logging
 import os
 import sys
@@ -29,32 +24,39 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
 
     def execute(self):
         """Main Coordinator of all direct damage analysis"""
-        for analysis in self.config['direct']:
-            logging.info(f"----------------------------- Started analyzing '{analysis['name']}'  -----------------------------")
+
+        for analysis in self.config["direct"]:
+            logging.info(
+                f"----------------------------- Started analyzing '{analysis['name']}'  -----------------------------"
+            )
             starttime = time.time()
 
-            if analysis['analysis'] == 'direct':
+            if analysis["analysis"] == "direct":
 
-                gdf = self.road_damage(analysis) #calls the coordinator for road damage calculation
+                gdf = self.road_damage(
+                    analysis
+                )  # calls the coordinator for road damage calculation
 
-            elif analysis['analysis'] == 'effectiveness_measures':
+            elif analysis["analysis"] == "effectiveness_measures":
                 gdf = self.effectiveness_measures(analysis)
 
             else:
                 gdf = []
 
-            output_path = self.config['output'] / analysis['analysis']
-            if analysis['save_shp']:
-                shp_path = output_path / (analysis['name'].replace(' ', '_') + '.shp')
+            output_path = self.config["output"] / analysis["analysis"]
+            if analysis["save_shp"]:
+                shp_path = output_path / (analysis["name"].replace(" ", "_") + ".shp")
                 save_gdf(gdf, shp_path)
-            if analysis['save_csv']:
-                csv_path = output_path / (analysis['name'].replace(' ', '_') + '.csv')
-                del gdf['geometry']
+            if analysis["save_csv"]:
+                csv_path = output_path / (analysis["name"].replace(" ", "_") + ".csv")
+                del gdf["geometry"]
                 gdf.to_csv(csv_path, index=False)
 
             endtime = time.time()
-            logging.info(f"----------------------------- Analysis '{analysis['name']}' finished. "
-                         f"Time: {str(round(endtime - starttime, 2))}s  -----------------------------")
+            logging.info(
+                f"----------------------------- Analysis '{analysis['name']}' finished. "
+                f"Time: {str(round(endtime - starttime, 2))}s  -----------------------------"
+            )
 
     def road_damage(self, analysis):
         """
@@ -132,7 +134,37 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         # calculate direct damage
         #road_gdf_damage = rd.calculate_direct_damage(gdf)
 
-
+        # # cleanup and complete the lane data.
+        # ### Try to convert all data to floats
+        # try:
+        #     gdf.lanes = gdf.lanes.astype('float') #floats instead of ints because ints cannot be nan.
+        # except:
+        #     logging.warning('Available lane data cannot simply be converted to float/int, RA2CE will try a clean-up.')
+        #     gdf.lanes = clean_lane_data(gdf.lanes)
+        #
+        # gdf.lanes = gdf.lanes.round(0) #round to nearest integer, but save as float format
+        # nans = gdf.lanes.isnull() #boolean with trues for all nans, i.e. all road segements without lane data
+        # if nans.sum() > 0:
+        #     logging.warning("""Of the {} road segments, only {} had lane data, so for {} the '
+        #                     lane data will be interpolated from the existing data""".format(
+        #         len(gdf.lanes),(~nans).sum(),nans.sum()))
+        #     lane_stats = create_summary_statistics(gdf)
+        #
+        #     #Replace the missing lane data the neat way (without pandas SettingWithCopyWarning)
+        #     lane_nans_mask = gdf.lanes.isnull()
+        #     gdf.loc[lane_nans_mask, 'lanes'] = gdf.loc[lane_nans_mask, 'road_type'].replace(lane_stats)
+        #     logging.warning('Interpolated the missing lane data as follows: {}'.format(lane_stats))
+        #
+        #     #Todo: write the whole interpolater object
+        #
+        #     #This worked but raises an error
+        #     #lane_nans = gdf[gdf.lanes.isnull()]  # mask all nans in lane data
+        #     #lane_nans['lanes'] =  lane_nans['road_type'].replace(lane_stats)
+        #     #gdf.loc[lane_nans.index, :] = lane_nans
+        #
+        #     # Todo: What if for one road type all lane data is missing?
+        #     # Todo: we could script a seperate work-around for this situation, for now we just raise an assertion
+        #     assert not (np.nan in gdf.lanes.unique()) #all nans should be replaced
 
     def effectiveness_measures(self, analysis):
         """This function calculated the efficiency of measures. Input is a csv file with efficiency
@@ -180,42 +212,129 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         return gdf
 
 
-#Todo: old functions of the deprecated class
-# def apply_lane_damage_correction(lane_damage_correction, road_type, lanes):
-#         """See load_lane_damage_correction; this function only avoids malbehaviour for weird lane numbers"""
-#         if lanes < 1:  # if smaller than the mapped value -> correct with minimum value
-#             lanes = 1
-#         if (
-#             lanes > 6
-#         ):  # if larger than largest mapped value -> use maximum value (i.e. 6 lanes)
-#             lanes = 6
-#         return lane_damage_correction[road_type][lanes]
-#
-#
-# def apply_huizinga_max_dam(max_damages_huizinga, road_type, lanes):
-#         """See load_lane_damage_correction; this function only avoids malbehaviour for weird lane numbers"""
-#         if lanes < 1:  # if smaller than the mapped value -> correct with minimum value
-#             lanes = 1
-#         if (
-#             lanes > 6
-#         ):  # if larger than largest mapped value -> use maximum value (i.e. 6 lanes)
-#             lanes = 6
-#         return max_damages_huizinga[road_type][lanes]
-#
-#
-# def apply_cleanup(x):
-#         """Cleanup for entries in dataframe, where there is a list with two values for a single field.
-#
-#         This happens when there is both a primary_link and a primary infra_type.
-#         x[0] indicates the values of the primary_link infra_type
-#         x[1] indicates the values of the primary infra_type
-#         """
-#         if x is None:
-#             return None
-#         if type(x) == list:
-#             return x[1]  # 1 means select primary infra_type
-#         else:
-#             return x
+class RoadDamage:
+    def calculate_direct_damage(self, road_gdf):
+        """
+        Calculates the direct damage for all road segments with exposure data using a depth-damage curve
+        Arguments:
+            *road_gdf* (GeoPandas DataFrame) :
+        Returns:
+            *road_gdf* (GeoPandas DataFrame) :
+        """
+
+        # apply the add_default_lanes function to add default number of lanes
+        # load lookup tables
+        # These factors are derived from: Van Ginkel et al. 2021: https://nhess.copernicus.org/articles/21/1011/2021/
+        logging.warning(
+            "Damage calculations are based on Van Ginkel et al. 2021: https://nhess.copernicus.org/articles/21/1011/2021/"
+        )
+        logging.warning(
+            """All damages represent the former EU-28 (before Brexit), 2015-pricelevel in Euro's.
+                            To convert to local currency, these need to be:
+                                multiplied by the ratio (pricelevel_XXXX / pricelevel_2015)
+                                multiply by the ratio (local_GDP_per_capita / EU-28-2015-GDP_per_capita)          
+                            EU-28-2015-GDP_per_capita = 39.200 euro
+                        """
+        )
+        logging.warning(
+            "These numbers assume that motorways that each driving direction is mapped as a seperate segment such as in OSM!!!"
+        )
+        lane_damage_correction = lookup.road_damage_correction()
+        dict_max_damages = (
+            lookup.max_damages()
+        )  # In fact this is a new construction costs
+        max_damages_huizinga = lookup.max_damages_huizinga()
+        interpolators = (
+            lookup.flood_curves()
+        )  # input: water depth (cm); output: damage (fraction road construction costs)
+        curve_names = [name for name in interpolators]
+
+        # Find the hazard columns
+        val_cols = [
+            col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
+        ]
+
+        # group the val cols:
+        # Todo: make a hazard class?
+        # For now: this is how we do the hazard bookkeeping:
+        # F_EV1_ma
+        # F = flood; _ ; EV = event-based + number event; _ ; _ ma/mi/mi/av/fr = maximum, minimum, average fraction that is affected
+
+        # case we are dealing with events:
+        event_cols = [x for x in val_cols if "_EV" in x]
+        rp_cols = [
+            x for x in val_cols if "_RP" in x
+        ]  # todo test the workflow for event data
+        if len(event_cols) > 0 and len(rp_cols) == 0:
+            # case only event data is provided
+            # unique_events = set([x.split('_')[1] for x in event_cols]) #set of unique events
+            # hazard_stats = set([x.split('_')[2] for x in event_cols]) #set of hazard info per event
+
+            event_gdf = event_hazard_network_gdf(
+                road_gdf, val_cols
+            )  # Create data structure for event hazard data
+            event_gdf.calculate_damage_HZ(interpolators["HZ"], max_damages_huizinga)
+            # event_gdf.calculate_damage_OSdaMage(interpolators,dict_max_damages)
+
+            result_gdf = event_gdf.gdf
+
+        # case we are dealing with return period
+        elif len(rp_cols) > 0 and len(event_cols) == 0:
+            # case only return period data is provided
+            # return_period_gdf = event_hazard_network_gdf(road_gdf,val_cols) #Create datastructure for RP hazard data
+            return_period_gdf = DamageNetworkReturnPeriods(road_gdf, val_cols)
+
+            damage_function = "OSD"  # can be 'HZ', 'OSD' or 'manual' #Todo: supply this information from a higher level
+
+            return_period_gdf.main(damage_function=damage_function)
+            result_gdf = return_period_gdf.gdf
+
+        else:
+            raise ValueError(
+                """"The hazard calculation does not know 
+            what to do if {} event_cols and {} rp_cols are provided""".format(
+                    len(event_cols), len(rp_cols)
+                )
+            )
+
+        return result_gdf
+
+    @staticmethod
+    def apply_lane_damage_correction(lane_damage_correction, road_type, lanes):
+        """See load_lane_damage_correction; this function only avoids malbehaviour for weird lane numbers"""
+        if lanes < 1:  # if smaller than the mapped value -> correct with minimum value
+            lanes = 1
+        if (
+            lanes > 6
+        ):  # if larger than largest mapped value -> use maximum value (i.e. 6 lanes)
+            lanes = 6
+        return lane_damage_correction[road_type][lanes]
+
+    @staticmethod
+    def apply_huizinga_max_dam(max_damages_huizinga, road_type, lanes):
+        """See load_lane_damage_correction; this function only avoids malbehaviour for weird lane numbers"""
+        if lanes < 1:  # if smaller than the mapped value -> correct with minimum value
+            lanes = 1
+        if (
+            lanes > 6
+        ):  # if larger than largest mapped value -> use maximum value (i.e. 6 lanes)
+            lanes = 6
+        return max_damages_huizinga[road_type][lanes]
+
+    @staticmethod
+    def apply_cleanup(x):
+        """Cleanup for entries in dataframe, where there is a list with two values for a single field.
+
+        This happens when there is both a primary_link and a primary infra_type.
+        x[0] indicates the values of the primary_link infra_type
+        x[1] indicates the values of the primary infra_type
+        """
+        if x is None:
+            return None
+        if type(x) == list:
+            return x[1]  # 1 means select primary infra_type
+        else:
+            return x
 
 
 def save_gdf(gdf, save_path):
@@ -289,7 +408,7 @@ class DamageNetwork:
 
     ### Generic cleanup functionality
     def fix_extraordinary_lanes(self):
-        """Remove exceptionally high/low lane numbers """
+        """Remove exceptionally high/low lane numbers"""
         # fixing lanes
         df = self.df
         df["lanes_copy"] = df["lanes"].copy()
@@ -306,23 +425,38 @@ class DamageNetwork:
         ### Try to convert all data to floats
         gdf = self.gdf
         try:
-            gdf.lanes = gdf.lanes.astype('float')  # floats instead of ints because ints cannot be nan.
+            gdf.lanes = gdf.lanes.astype(
+                "float"
+            )  # floats instead of ints because ints cannot be nan.
         except:
-            logging.warning('Available lane data cannot simply be converted to float/int, RA2CE will try a clean-up.')
+            logging.warning(
+                "Available lane data cannot simply be converted to float/int, RA2CE will try a clean-up."
+            )
             gdf.lanes = clean_lane_data(gdf.lanes)
 
-        gdf.lanes = gdf.lanes.round(0)  # round to nearest integer, but save as float format
-        nans = gdf.lanes.isnull()  # boolean with trues for all nans, i.e. all road segements without lane data
+        gdf.lanes = gdf.lanes.round(
+            0
+        )  # round to nearest integer, but save as float format
+        nans = (
+            gdf.lanes.isnull()
+        )  # boolean with trues for all nans, i.e. all road segements without lane data
         if nans.sum() > 0:
-            logging.warning("""Of the {} road segments, only {} had lane data, so for {} the '
+            logging.warning(
+                """Of the {} road segments, only {} had lane data, so for {} the '
                                     lane data will be interpolated from the existing data""".format(
-                len(gdf.lanes), (~nans).sum(), nans.sum()))
+                    len(gdf.lanes), (~nans).sum(), nans.sum()
+                )
+            )
             lane_stats = create_summary_statistics(gdf)
 
             # Replace the missing lane data the neat way (without pandas SettingWithCopyWarning)
             lane_nans_mask = gdf.lanes.isnull()
-            gdf.loc[lane_nans_mask, 'lanes'] = gdf.loc[lane_nans_mask, 'road_type'].replace(lane_stats)
-            logging.warning('Interpolated the missing lane data as follows: {}'.format(lane_stats))
+            gdf.loc[lane_nans_mask, "lanes"] = gdf.loc[
+                lane_nans_mask, "road_type"
+            ].replace(lane_stats)
+            logging.warning(
+                "Interpolated the missing lane data as follows: {}".format(lane_stats)
+            )
 
             # Todo: write the whole interpolater object
 
@@ -335,6 +469,8 @@ class DamageNetwork:
             # Todo: we could script a seperate work-around for this situation, for now we just raise an assertion
             assert not (np.nan in gdf.lanes.unique())  # all nans should be replaced
 
+        gdf.loc[gdf['lanes'] == 0, 'lanes'] = 1  #TODO: think about if this is the best option
+
         self.gdf = gdf
 
     def remap_road_types_to_fewer_classes(self):
@@ -345,13 +481,16 @@ class DamageNetwork:
         :return:
         """
         # reduce the number of road types (col 'infra_type') to smaller number of road_types for which damage curves exist
-        road_mapping_dict = lookup.road_mapping()  # The lookup class contains all kinds of data
+        road_mapping_dict = (
+            lookup.road_mapping()
+        )  # The lookup class contains all kinds of data
         gdf = self.gdf
-        gdf.rename(columns={'highway': 'infra_type'}, inplace=True) #Todo: this should probably not be done here
-        gdf['road_type'] = gdf['infra_type']
+        gdf.rename(
+            columns={"highway": "infra_type"}, inplace=True
+        )  # Todo: this should probably not be done here
+        gdf["road_type"] = gdf["infra_type"]
         gdf = gdf.replace({"road_type": road_mapping_dict})
         self.gdf = gdf
-
 
     ### Damage handlers
     def calculate_damage_manual_functions(self,events,manual_damage_functions):
@@ -405,8 +544,6 @@ class DamageNetwork:
             "These numbers assume that motorways that each driving direction is mapped as a seperate segment such as in OSM!!!"
         )
 
-
-
         # Todo: Dirty fixes, these should be read from the init
         hazard_prefix = "F"
         end = "me"  # indicate that you want to use the mean
@@ -421,6 +558,7 @@ class DamageNetwork:
         ]  # input: water depth (cm); output: damage (fraction road construction costs)
 
         df = self.df
+        df["lanes"] = df["lanes"].astype(int)
         df["max_dam_hz"] = df_max_damages_huizinga.lookup(df["lanes"], df["road_type"])
 
         for event in events:
@@ -588,7 +726,6 @@ class DamageNetwork:
 
 class DamageNetworkReturnPeriods(DamageNetwork):
     """A road network gdf with Return-Period based hazard data stored in it, and for which damages can be calculated
-
     @Author: Kees van Ginkel
 
     Mandatory attributes:
@@ -616,8 +753,7 @@ class DamageNetworkReturnPeriods(DamageNetwork):
         assert "me" in self.stats, "mean water depth (key: me) is missing"
         assert "fr" in self.stats, "inundated fraction (key: fr) is missing"
 
-
-        #CLEANUPS
+        # CLEANUPS
         self.remap_road_types_to_fewer_classes()
         self.clean_and_interpolate_missing_lane_data()
 
@@ -1054,12 +1190,10 @@ class DamageFunction_by_RoadType_by_Lane(DamageFunction):
         damage_fraction = DamageFractionUniform()
         dam_fraction_path = find_unique_csv_file(folder_path, "hazard_severity")
         damage_fraction.from_csv(dam_fraction_path, sep=';')
-
-        #todo: unit correction of damage_fraction
-
+        self.damage_fraction = damage_fraction
 
         damage_fraction.create_interpolator()
-        self.damage_fraction = damage_fraction
+
 
     #Todo: these two below functions are maybe better implemented at a lower level?
     def add_max_damage(self,df,prefix=None):
@@ -1228,6 +1362,10 @@ class DamageFractionUniform(DamageFraction):
     Uniform: assuming the same curve for
     each road type and lane numbers and any other metadata
 
+
+    self.raw_data (pd.DataFrame) : Raw data from the csv file
+    self.data (pd.DataFrame) : index = hazard severity (e.g. flood depth); column 0 = damage fraction
+
     """
     def __init__(self,name=None,hazard_unit=None):
         self.name = name
@@ -1269,7 +1407,7 @@ class DamageFractionUniform(DamageFraction):
 
         #identify unit and drop from data
         self.hazard_unit = self.raw_data.index[0]
-        self.data = self.raw_data.drop(self.hazard_unit)
+        self.data = self.raw_data.drop(self.hazard_unit) #Todo: This could also be a series instead of DataFrame
 
         #convert data to floats
         self.data = self.data.astype('float')
@@ -1292,7 +1430,7 @@ class DamageFractionUniform(DamageFraction):
 
         if (self.hazard_unit == 'cm' and desired_unit == 'm'):
             scaling_factor = 1/100
-            self.data = self.data * scaling_factor
+            self.data.index = self.data.index * scaling_factor
             logging.info('Hazard severity from {} data was scaled by a factor {}, to convert from {} to {}'.format(
                 self.origin_path, scaling_factor,self.hazard_unit,desired_unit))
             self.damage_unit = desired_unit
@@ -1312,7 +1450,17 @@ class DamageFractionUniform(DamageFraction):
         self.interpolator = interp1d(x=x_values,y=y_values,
                 fill_value=(y_values[0],y_values[-1]), #fraction damage (y) if hazard severity (x) is outside curve range
                 bounds_error=False)
+
         return None
+
+    def __repr__(self):
+        if self.interpolator:
+            string = 'DamageFractionUniform with name: ' + self.name + ' interpolator: {}'.format(
+                list(zip(self.interpolator.y, self.interpolator.x)))
+        else:
+            string = 'DamageFractionUniform with name: ' +  self.name
+        return string
+
 
 
 

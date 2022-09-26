@@ -1,4 +1,5 @@
-from typing import List
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from ra2ce.configuration.ini_config_protocol import IniConfigDataProtocol
 from ra2ce.validation.ra2ce_validator_protocol import Ra2ceIoValidator
@@ -17,7 +18,7 @@ IndirectAnalysisNameList: List[str] = [
     "multi_link_isolated_locations",
 ]
 DirectAnalysisNameList: List[str] = ["direct", "effectiveness_measures"]
-_expected_values = {
+_expected_values: Dict[str, List[Any]] = {
     "source": ["OSM PBF", "OSM download", "shapefile", "pickle"],
     "polygon": ["file", None],
     "directed": [True, False, None],
@@ -58,11 +59,43 @@ class IniConfigValidatorBase(Ra2ceIoValidator):
     def validate(self) -> ValidationReport:
         raise NotImplementedError()
 
+    def _validate_files(
+        self, header: str, path_value_list: Optional[List[Path]]
+    ) -> ValidationReport:
+        # Value should be none or a list of paths, because it already
+        # checked that it's not none, we can assume it's a list of Paths.
+        _files_report = ValidationReport()
+        if not path_value_list:
+            return _files_report
+        for path_value in path_value_list:
+            if not path_value.is_file():
+                _files_report.error(
+                    f"Wrong input to property [ {header} ], file does not exist: {path_value}"
+                )
+                _files_report.error(
+                    f"If no file is needed, please insert value - None - for property - {header} -"
+                )
+        return _files_report
+
+    def _validate_road_types(self, road_type_value: str) -> ValidationReport:
+        _road_types_report = ValidationReport()
+        if not road_type_value:
+            return _road_types_report
+        _expected_road_types = _expected_values["road_types"]
+        _road_type_value_list = road_type_value.replace(" ", "").split(",")
+        for road_type in _road_type_value_list:
+            if road_type not in _expected_road_types:
+                _road_types_report.error(
+                    f"Wrong road type is configured ({road_type}), has to be one or multiple of: {_expected_road_types}"
+                )
+        return _road_types_report
+
     def _validate_headers(self, required_headers: List[str]) -> ValidationReport:
         _report = ValidationReport()
+        _available_keys: List[str] = self._config.keys()
 
         def _check_header(header: str) -> None:
-            if not header in self._config.keys():
+            if header not in _available_keys:
                 _report.error(
                     f"Property [ {header} ] is not configured. Add property [ {header} ] to the *.ini file. "
                 )
@@ -70,7 +103,7 @@ class IniConfigValidatorBase(Ra2ceIoValidator):
         list(map(_check_header, required_headers))
         if not _report.is_valid():
             return _report
-        if not "isolation" in self._config.keys():
+        if "isolation" not in _available_keys:
             _report.warn("Header 'isolation' not found in the configuration.")
         else:
             required_headers.append("isolation")
@@ -81,34 +114,22 @@ class IniConfigValidatorBase(Ra2ceIoValidator):
         for header in required_headers:
             # Now check the parameters per configured item.
             for key, value in self._config[header].items():
-                if not key in _expected_values.keys():
+                if key not in _expected_values.keys():
                     continue
-
-                if ("file" in _expected_values[key]) and (value is not None):
+                _expected_values_list: List[Any] = _expected_values[key]
+                if "file" in _expected_values_list:
                     # Value should be none or a list of paths, because it already
                     # checked that it's not none, we can assume it's a list of Paths.
-                    for path_value in value:
-                        if not path_value.is_file():
-                            _report.error(
-                                f"Wrong input to property [ {key} ], file does not exist: {path_value}"
-                            )
-                            _report.error(
-                                f"If no file is needed, please insert value - None - for property - {key} -"
-                            )
+                    _report.merge(self._validate_files(key, value))
                     continue
 
-                if key == "road_types" and (value is not None):
-                    _expected_road_types = _expected_values["road_types"]
-                    for road_type in value.replace(" ", "").split(","):
-                        if road_type not in _expected_road_types:
-                            _report.error(
-                                f"Wrong road type is configured ({road_type}), has to be one or multiple of: {_expected_road_types}"
-                            )
+                if key == "road_types":
+                    _report.merge(self._validate_road_types(value))
                     continue
 
-                if value not in _expected_values[key]:
+                if value not in _expected_values_list:
                     _report.error(
-                        f"Wrong input to property [ {key} ], has to be one of: {_expected_values[key]}"
+                        f"Wrong input to property [ {key} ], has to be one of: {_expected_values_list}"
                     )
 
         if not _report.is_valid():

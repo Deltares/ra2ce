@@ -2,7 +2,7 @@ import logging
 
 from ra2ce.analyses.direct import analyses_direct
 from ra2ce.configuration import AnalysisConfigBase
-from ra2ce.ra2ce_input_config import Ra2ceInputConfig
+from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 
 
@@ -11,13 +11,13 @@ class DirectAnalysisRunner(AnalysisRunner):
         return "Direct Analysis Runner"
 
     @staticmethod
-    def can_run(ra2ce_input: Ra2ceInputConfig) -> bool:
+    def can_run(ra2ce_input: ConfigWrapper) -> bool:
         _network_config = ra2ce_input.network_config.config_data
-        if not ("direct" in ra2ce_input.analysis_config.config_data):
+        if "direct" not in ra2ce_input.analysis_config.config_data:
             return False
         if (
-            not "hazard" in _network_config.keys()
-            or not "hazard_map" in _network_config["hazard"].keys()
+            "hazard" not in _network_config.keys()
+            or "hazard_map" not in _network_config["hazard"].keys()
         ):
             logging.error(
                 "Please define a hazardmap in your network.ini file. Unable to calculate direct damages."

@@ -36,8 +36,8 @@ class AnalysisConfigReaderBase(IniConfigurationReaderBase):
         _config["project"]["name"] = config_path.parent.name
         _config["root_path"] = root_path
 
-        # Set the output paths in the configuration Dict for ease of saving to those folders.
+        # Set the paths in the configuration Dict for ease of saving to those folders.
+        # The output path is set at a different step `IniConfigurationReaderBase::_copy_output_files`
         _config["input"] = config_path.parent / "input"
         _config["static"] = config_path.parent / "static"
-        # config["output"] = config["root_path"] / config["project"]["name"] / "output"
         return _config
