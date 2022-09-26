@@ -109,6 +109,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.scannerwork/
+.vscode/
 
 # Spyder project settings
 .spyderproject
@@ -132,3 +134,4 @@ dmypy.json
 
 # ra2ce ignore:
 data/
+/tests/local_data
