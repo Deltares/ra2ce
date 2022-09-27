@@ -119,7 +119,7 @@ class direct_damage_tests:
                     pd.set_option('display.max_columns', None)
 
                     print('{} roads are roughly the same'.format(is_combined_different.sum()))
-                    print('So {} roads are signifcantly different'.format((~is_combined_different).sum()))
+                    print('So {} roads are significantly different'.format((~is_combined_different).sum()))
                     print('Below the 5 first differences:')
                     print('... for the result of the test:')
                     print(event_gdf.gdf[is_combined_different].head())
