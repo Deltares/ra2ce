@@ -48,6 +48,8 @@ jobs:
       - name: Autoformat code if the check fails
         if: ${{ (matrix.os == 'ubuntu-latest') && (matrix.python-version == 3.9) }}
         shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         run: |
           conda activate ra2ce_env
           poetry run isort .
