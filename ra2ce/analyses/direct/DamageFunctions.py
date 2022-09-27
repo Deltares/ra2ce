@@ -145,11 +145,13 @@ class DamageFunction_by_RoadType_by_Lane(DamageFunction):
         result_col = "dam_{}_{}".format(event_prefix,DamFun_prefix)
         max_dam_col = "{}_temp_max_dam".format(DamFun_prefix)
         hazard_severity_col = "{}_{}_me".format(hazard_prefix,event_prefix) #mean is hardcoded now
+        hazard_fraction_col = "{}_{}_fr".format(hazard_prefix,event_prefix) #fraction column is hardcoded
 
         df[result_col] = round(
             df[max_dam_col].astype(float) #max damage (euro/m)
             * interpolator(df[hazard_severity_col].astype(float)) # damage curve  (-)
-            * df["length"], #segment length (m),
+            * df["length"] #segment length (m)
+            * df[hazard_fraction_col],
             0) #round to whole numbers
         return df
 
