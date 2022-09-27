@@ -96,18 +96,17 @@ class DamageNetwork:
         gdf = gdf.replace({"road_type": road_mapping_dict})
         self.gdf = gdf
 
-    def drop_unclassified_road_types(self):
+    def remove_unclassified_road_types_from_mask(self):
         """
-        Drop all rows with road types classified as 'none'
+        Drop all rows with road types classified as 'none' from the self._gdf_mask
 
         :return:
         """
-        df = self.gdf
+        df = self._gdf_mask
         if 'none' in df['road_type'].unique():
             to_drop = df.loc[df['road_type'] == 'none']
             logging.warning('We will drop {} rows for which the road_type is unrecognized'.format(to_drop.shape[0]))
-            self.gdf = df.loc[~ (df['road_type'] == 'none')]
-
+            self._gdf_mask = df.loc[~ (df['road_type'] == 'none')]
 
     ### Damage handlers
     def calculate_damage_manual_functions(self,events,manual_damage_functions):
@@ -138,6 +137,11 @@ class DamageNetwork:
         logging.info(
             "Damage calculation with the manual damage functions was succesfull."
         )
+
+    def replace_none_with_nan(self):
+        import numpy as np
+        dam_cols = [c for c in self.gdf.columns if c.startswith("dam_")]
+        self.gdf[dam_cols] = self.gdf[dam_cols].fillna(value=np.nan)
 
 
     def calculate_damage_HZ(self, events):
@@ -191,11 +195,10 @@ class DamageNetwork:
                 2,
             )  # length segment (m)
 
-        # Todo: still need to check the units
-        #logging.warning("The units for the damage calculation have been corrected, but the inundated fraction not")
 
         # Add the new columns add the right location to the df
         dam_cols = [c for c in df.columns if c.startswith("dam_")]
+
         self.gdf[dam_cols] = df[dam_cols]
         logging.info(
             "calculate_damage_HZ(): Damage calculation with the Huizinga damage functions was succesfull"
@@ -330,15 +333,15 @@ class DamageNetwork:
     def create_mask(self):
         """
         #Create a mask of only the dataframes with hazard data (to speed-up damage calculations)
-        effect: *self.gdf_mask* = mask of only the rows with hazard data
-        also returns this value
+        effect: *self._gdf_mask* = mask of only the rows with hazard data
+
         """
         # because the fractions are often 0 (also if the rest is nan, this messes up the .isna)
         val_cols_temp = [c for c in self.val_cols if "_fr" not in c]
 
         gdf_mask = self.gdf.loc[~(self.gdf[val_cols_temp].isna()).all(axis=1)]
-        self.gdf_mask = gdf_mask  # todo: not sure if we need to store the mask
-        return gdf_mask
+        self._gdf_mask = gdf_mask  # todo: not sure if we need to store the mask
+
 
 
 class DamageNetworkReturnPeriods(DamageNetwork):
@@ -372,10 +375,10 @@ class DamageNetworkReturnPeriods(DamageNetwork):
 
         # CLEANUPS
         self.remap_road_types_to_fewer_classes()
-        self.drop_unclassified_road_types()
         self.clean_and_interpolate_missing_lane_data()
 
         gdf_mask = self.create_mask()
+        self.remove_unclassified_road_types_from_mask()
 
         # create dataframe from gdf  #Todo: check why this is necessary
         column_names = list(gdf_mask.columns)
@@ -423,16 +426,16 @@ class DamageNetworkEvents(DamageNetwork):
 
         # CLEANUPS
         self.remap_road_types_to_fewer_classes()
-        self.drop_unclassified_road_types()
         self.clean_and_interpolate_missing_lane_data()
 
-        gdf_mask = self.create_mask()
+        self.create_mask()
+        self.remove_unclassified_road_types_from_mask()
 
-        # create dataframe from gdf  #Todo: check why this is necessary
-        column_names = list(gdf_mask.columns)
+        # create dataframe from gdf  #Todo: check why this is necessary; combine this with mask!
+        column_names = list(self._gdf_mask.columns)
         if "geometry" in column_names:
             column_names.remove("geometry")
-        df = gdf_mask[column_names]
+        df = self._gdf_mask[column_names]
 
         self.df = df  # helper dataframe to speedup the analysis
         self.fix_extraordinary_lanes()
@@ -445,3 +448,5 @@ class DamageNetworkEvents(DamageNetwork):
 
         if damage_function == "MAN":
             self.calculate_damage_manual_functions(events=self.events, manual_damage_functions=manual_damage_functions)
+
+        #self.replace_none_with_nan() #Todo, not sure if we need this
