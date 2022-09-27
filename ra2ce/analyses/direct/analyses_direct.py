@@ -86,7 +86,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         if self.graphs["base_network_hazard"] is None:
             road_gdf = gpd.read_feather(self.config["files"]["base_network_hazard"])
 
-        # Find the hazard columns #Todo: use the hazard names .xlsx?
+        # Find the hazard columns; these may be events or return periods
         val_cols = [
             col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
         ]
@@ -103,32 +103,19 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
 
         # Choose between event or return period based analysis
         if analysis['event_type'] == 'event':
-            event_cols = [x for x in val_cols if "_EV" in x]  # Todo: can be part of the init of the object
-
-            if not len(event_cols) > 0:
-                raise ValueError('No event cols present in hazard data')
 
             event_gdf = DamageNetworkEvents(road_gdf, val_cols)
-            event_gdf.main(damage_function=damage_function,manual_damage_functions=manual_damage_functions)
+            event_gdf.main(damage_function=damage_function,
+                           manual_damage_functions=manual_damage_functions)
 
-            result_gdf = event_gdf.gdf
-
-            return result_gdf
+            return event_gdf.gdf
 
         elif analysis['event_type'] == 'return_period':
-            # count number of return period cols
-            rp_cols = [x for x in val_cols if "_RP" in x] #Todo: can be part of the init of the object
-
-            if not len(rp_cols) > 1: #Todo, can be done after, or in object instantiation
-                raise ValueError('No return_period cols present in hazard data')
-
-            #return_period_gdf.main(damage_function=damage_function) #DEPRECATED
             return_period_gdf = DamageNetworkReturnPeriods(road_gdf,val_cols)
-            DamageNetworkReturnPeriods.main(damage_function=damage_function)
+            DamageNetworkReturnPeriods.main(damage_function=damage_function,
+                                            manual_damage_functions=manual_damage_functions)
 
-            result_gdf = return_period_gdf.gdf
-
-            return result_gdf
+            return return_period_gdf.gdf
 
         else:
             raise ValueError(
