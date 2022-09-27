@@ -18,11 +18,23 @@ class DamageNetwork:
         )  # set of hazard info per event
         # events is missing
 
+    def do_cleanup_and_mask_creation(self):
+        """Call all cleanup and mask functions, because this is a standard procedure in most calculations"""
+        # CLEANUPS (on the original gdf)
+        self.remap_road_types_to_fewer_classes()
+        self.clean_and_interpolate_missing_lane_data()
+        self.fix_extraordinary_lanes()
+
+        # Mask creation
+        self.create_mask()
+        self.remove_unclassified_road_types_from_mask()
+
+
     ### Generic cleanup functionality
     def fix_extraordinary_lanes(self):
-        """Remove exceptionally high/low lane numbers"""
+        """Remove exceptionally high/low lane numbers in self.gdf"""
         # fixing lanes
-        df = self.df
+        df = self.gdf
         df["lanes_copy"] = df["lanes"].copy()
         df["lanes"] = df["lanes_copy"].where(
             df["lanes_copy"].astype(float) >= 1.0, other=1.0
@@ -30,7 +42,7 @@ class DamageNetwork:
         df["lanes"] = df["lanes_copy"].where(
             df["lanes_copy"].astype(float) <= 6.0, other=6.0
         )
-        df = self.df
+        df = self.gdf
 
     def clean_and_interpolate_missing_lane_data(self):
         # cleanup and complete the lane data.
@@ -119,7 +131,7 @@ class DamageNetwork:
         hazard_prefix = "F"
         end = "me"  # indicate that you want to use the mean
 
-        df = self.df #dataframe to carry out the damage calculation #todo: this is a bit dirty
+        df = self._gdf_mask #dataframe to carry out the damage calculation #todo: this is a bit dirty
 
         assert manual_damage_functions is not None, "No damage functions were loaded"
 
@@ -138,10 +150,7 @@ class DamageNetwork:
             "Damage calculation with the manual damage functions was succesfull."
         )
 
-    def replace_none_with_nan(self):
-        import numpy as np
-        dam_cols = [c for c in self.gdf.columns if c.startswith("dam_")]
-        self.gdf[dam_cols] = self.gdf[dam_cols].fillna(value=np.nan)
+
 
 
     def calculate_damage_HZ(self, events):
@@ -178,7 +187,7 @@ class DamageNetwork:
             "HZ"
         ]  # input: water depth (cm); output: damage (fraction road construction costs)
 
-        df = self.df
+        df = self._gdf_mask
         df["lanes"] = df["lanes"].astype(int)
         df["max_dam_hz"] = df_max_damages_huizinga.lookup(df["lanes"], df["road_type"])
 
@@ -238,7 +247,7 @@ class DamageNetwork:
         )  # input: water depth (cm); output: damage (fraction road construction costs)
 
         # Prepare the output files
-        df = self.df
+        df = self._gdf_mask
         df["tuple"] = [tuple([0] * 5)] * len(df["lanes"])
 
         # CALCULATE MINIMUM AND MAXIMUM CONSTRUCTION COST PER ROAD TYPE
@@ -336,11 +345,22 @@ class DamageNetwork:
         effect: *self._gdf_mask* = mask of only the rows with hazard data
 
         """
+
         # because the fractions are often 0 (also if the rest is nan, this messes up the .isna)
         val_cols_temp = [c for c in self.val_cols if "_fr" not in c]
-
         gdf_mask = self.gdf.loc[~(self.gdf[val_cols_temp].isna()).all(axis=1)]
         self._gdf_mask = gdf_mask  # todo: not sure if we need to store the mask
+
+        #Also remove the geometries from the mask
+        column_names = list(self._gdf_mask.columns)
+        if "geometry" in column_names:
+            column_names.remove("geometry")
+        self._gdf_mask = self._gdf_mask[column_names]
+
+    def replace_none_with_nan(self):
+        import numpy as np
+        dam_cols = [c for c in self.gdf.columns if c.startswith("dam_")]
+        self.gdf[dam_cols] = self.gdf[dam_cols].fillna(value=np.nan)
 
 
 
@@ -373,20 +393,7 @@ class DamageNetworkReturnPeriods(DamageNetwork):
         assert "me" in self.stats, "mean water depth (key: me) is missing"
         assert "fr" in self.stats, "inundated fraction (key: fr) is missing"
 
-        # CLEANUPS
-        self.remap_road_types_to_fewer_classes()
-        self.clean_and_interpolate_missing_lane_data()
-
-        gdf_mask = self.create_mask()
-        self.remove_unclassified_road_types_from_mask()
-
-        # create dataframe from gdf  #Todo: check why this is necessary
-        column_names = list(gdf_mask.columns)
-        column_names.remove("geometry")
-        df = gdf_mask[column_names]
-
-        self.df = df  # helper dataframe to speedup the analysis
-        self.fix_extraordinary_lanes()
+        self.do_cleanup_and_mask_creation()
 
         if damage_function == "HZ":
             self.calculate_damage_HZ(events=self.return_periods)
@@ -424,21 +431,8 @@ class DamageNetworkEvents(DamageNetwork):
         assert "me" in self.stats, "mean water depth (key: me) is missing"
         assert "fr" in self.stats, "inundated fraction (key: fr) is missing"
 
-        # CLEANUPS
-        self.remap_road_types_to_fewer_classes()
-        self.clean_and_interpolate_missing_lane_data()
+        self.do_cleanup_and_mask_creation()
 
-        self.create_mask()
-        self.remove_unclassified_road_types_from_mask()
-
-        # create dataframe from gdf  #Todo: check why this is necessary; combine this with mask!
-        column_names = list(self._gdf_mask.columns)
-        if "geometry" in column_names:
-            column_names.remove("geometry")
-        df = self._gdf_mask[column_names]
-
-        self.df = df  # helper dataframe to speedup the analysis
-        self.fix_extraordinary_lanes()
 
         if damage_function == "HZ":
             self.calculate_damage_HZ(events=self.events)
