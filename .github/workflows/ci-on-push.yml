@@ -9,11 +9,10 @@ jobs:
       matrix:
         python-version: [3.9]
         os: [ubuntu-20.04, windows-latest]
-    show-info:
-        runs-on: ${{ matrix.os }}
-        permissions:
-          id-token: write
-          contents: read
+    runs-on: ${{ matrix.os }}
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - uses: actions/checkout@v2
         with:
