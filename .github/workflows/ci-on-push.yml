@@ -57,7 +57,7 @@ jobs:
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git checkout $GITHUB_HEAD_REF
           git commit -am "autoformat: isort & black" && git push || true
-      
+
       # We only want to run the sonar cloud analysis during 'unit' and 'integration' tests so they are more accurate.
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
