@@ -96,6 +96,19 @@ class DamageNetwork:
         gdf = gdf.replace({"road_type": road_mapping_dict})
         self.gdf = gdf
 
+    def drop_unclassified_road_types(self):
+        """
+        Drop all rows with road types classified as 'none'
+
+        :return:
+        """
+        df = self.gdf
+        if 'none' in df['road_type'].unique():
+            to_drop = df.loc[df['road_type'] == 'none']
+            logging.warning('We will drop {} rows for which the road_type is unrecognized'.format(to_drop.shape[0]))
+            self.gdf = df.loc[~ (df['road_type'] == 'none')]
+
+
     ### Damage handlers
     def calculate_damage_manual_functions(self,events,manual_damage_functions):
         """
@@ -359,6 +372,7 @@ class DamageNetworkReturnPeriods(DamageNetwork):
 
         # CLEANUPS
         self.remap_road_types_to_fewer_classes()
+        self.drop_unclassified_road_types()
         self.clean_and_interpolate_missing_lane_data()
 
         gdf_mask = self.create_mask()
@@ -409,6 +423,7 @@ class DamageNetworkEvents(DamageNetwork):
 
         # CLEANUPS
         self.remap_road_types_to_fewer_classes()
+        self.drop_unclassified_road_types()
         self.clean_and_interpolate_missing_lane_data()
 
         gdf_mask = self.create_mask()
