@@ -47,7 +47,7 @@ class DamageFunction:
         self.infra_type = infra_type
         self.max_damage = max_damage #Should be a MaxDamage object
         self.damage_fraction = damage_fraction #Should be a DamageFractionHazardSeverity object
-        self.prefix = None #Should be two caracters long at maximum
+        self.prefix = None #Should be two characters long at maximum
 
         #Other attributes (will be added later)
         #self.damage_fraction - x-values correspond to hazard_intenity; y-values correspond to damage fraction [0-1]
@@ -57,9 +57,9 @@ class DamageFunction:
         #asset type
         #price level etc
 
-    def apply(self,df):
+    def from_input_folder(self,df):
         #This functions needs to be specified in child classes
-        logging.warning("""This method has not been applied. """)
+        logging.warning("""This method has not been specified in the parent class. """)
 
     def add_max_dam(self,df):
         #This functions needs to be specified in child classes
@@ -70,10 +70,6 @@ class DamageFunction:
         logging.info("The prefix: '{}' refers to curve name '{}' in the results".format(
             self.prefix,self.name
         ))
-
-
-
-
 
 class DamageFunction_by_RoadType_by_Lane(DamageFunction):
     """
@@ -101,8 +97,6 @@ class DamageFunction_by_RoadType_by_Lane(DamageFunction):
         """
         #Load the max_damage object
         max_damage = MaxDamage_byRoadType_byLane()
-        #search in the folder for something *max_damage*
-        #folder_path = Path(r"D:\Python\ra2ce\data\1010b_zuid_holland\input\damage_function\test")
         max_dam_path = find_unique_csv_file(folder_path, "max_damage")
         max_damage.from_csv(max_dam_path, sep=';')
 
@@ -129,7 +123,7 @@ class DamageFunction_by_RoadType_by_Lane(DamageFunction):
         df['{}_temp_max_dam'.format(prefix)] = max_damage_data.lookup(df["road_type"],df["lanes"])
         return df
 
-    def calculate_damage(self,df,DamFun_prefix,hazard_prefix,event_prefix):
+    def calculate_damage(self,df=pd.DataFrame,DamFun_prefix=str,hazard_prefix=str,event_prefix=str) -> pd.DataFrame:
         """Calculates the damage for one event
 
         The prefixes are used to find/set the right df columns
@@ -139,6 +133,9 @@ class DamageFunction_by_RoadType_by_Lane(DamageFunction):
             *DamFun_prefix* : prefix to identify the right damage function e.g. 'A'
             *hazard_prefix* : prefix to identify the right hazard e.g. 'F'
             *event_prefix*  : prefix to identify the right event, e.g. 'EV1'
+
+        Returns:
+            *df* (pd.DataFrame) : dataframe data with the damage calculation added as new column
 
         """
 
@@ -159,12 +156,13 @@ class DamageFunction_by_RoadType_by_Lane(DamageFunction):
 
 
 
-def find_unique_csv_file(folder_path,part_of_filename):
+def find_unique_csv_file(folder_path=Path,part_of_filename=str) -> Path:
     """
     Arguments: find unique csv file in a folder, with a given part_of_filename
     Raises a warning if no file can be found, and an error if more than one file is found
 
     :param folder_path: (pathlib Path) - The folder in which the csv is searched for
+     part_of_filename: (string) - the filename substring to search for
     :return: result (pathlib Path) - The path with the csv file
     """
     result = []
