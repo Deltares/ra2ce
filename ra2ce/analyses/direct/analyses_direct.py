@@ -12,12 +12,27 @@ from ra2ce.analyses.direct.direct_utils import *
 
 
 class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
+    """
+    Coordination classs for all direct damage analysis
+
+    Methods of this class are independent modules to do:
+     - direct damage analysis
+     - cost-benefit / cost-effectiveness calculations
+
+    """
+
     def __init__(self, config, graphs):
         self.config = config
         self.graphs = graphs
 
     def execute(self):
-        """Main Coordinator of all direct damage analysis"""
+        """Main Coordinator of all direct damage analysis
+
+        This function uses the analyses.ini file to make a decision between:
+         - running the direct damage calculations module
+         - running the cost-benefit analysis module (effectiveness_measures)
+
+        """
 
         for analysis in self.config["direct"]:
             logging.info(
@@ -79,7 +94,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         # Read the desired damage function
         damage_function = analysis['damage_curve']
 
-        # If you want to use manual damage functions, the need to be loaded first
+        # If you want to use manual damage functions, these need to be loaded first
         manual_damage_functions = None
         if analysis['damage_curve'] == 'MAN':
             manual_damage_functions = ManualDamageFunctions()

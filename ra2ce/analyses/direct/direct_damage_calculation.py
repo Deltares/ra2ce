@@ -189,7 +189,7 @@ class DamageNetwork:
         )
 
     def calculate_damage_OSdaMage(self, events):
-        """OSdaMage calculation not yet implemented"""
+        """Damage calculation with the OSdaMage functions"""
 
         # These factors are derived from: Van Ginkel et al. 2021: https://nhess.copernicus.org/articles/21/1011/2021/
         logging.warning(
