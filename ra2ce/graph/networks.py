@@ -8,6 +8,7 @@ from typing import Any, List, Tuple
 # external modules
 import pyproj
 from osmnx.graph import graph_from_xml
+from pathlib import Path
 
 # local modules
 from ra2ce.graph.networks_utils import *
@@ -191,18 +192,24 @@ class Network:
                 self.config["network"]["primary_file"]
             )
         )
-        edges = pd.read_pickle(
-            self.config["static"] / "network" / self.config["network"]["primary_file"]
-        )
+        #edges = pd.read_pickle(
+        #    self.config["static"] / "network" / self.config["network"]["primary_file"]
+        #)
+
+        edge_file = self.config["static"] / "network" / self.config["network"]["primary_file"]
+        edges = gpd.read_feather(edge_file)
+
+
         corresponding_node_file = (
             self.config["static"]
             / "network"
             / self.config["network"]["primary_file"].replace("edges", "nodes")
         )
-        assert corresponding_node_file.exists()
-        nodes = pd.read_pickle(
-            corresponding_node_file
-        )  # Todo: Throw exception if nodes file is not present
+        assert corresponding_node_file.exists(), 'The node file could not be found while importing from TRAILS'
+        nodes = gpd.read_feather(corresponding_node_file)
+        # nodes = pd.read_pickle(
+        #     corresponding_node_file
+        # )  # Todo: Throw exception if nodes file is not present
 
         logging.info("TRAILS importer: start generating graph")
         # tempfix to rename columns
@@ -216,10 +223,11 @@ class Network:
         )
 
         if self.segmentation_length is not None:
+            logging.info("TRAILS importer: start segmentating graph")
             to_segment = Segmentation(edges, self.segmentation_length)
             edges_simple_segmented = to_segment.apply_segmentation()
             if edges_simple_segmented.crs is None:  # The CRS might have dissapeared.
-                edges_simple_segmented.crs = crs  # set the right CRS
+                edges_simple_segmented.crs = edges.crs  # set the right CRS
                 edges_complex = edges_simple_segmented
 
         else:
@@ -501,11 +509,13 @@ class Network:
                 logging.info(
                     """The original OSM PBF import is no longer supported. 
                                 Instead, the beta version of package TRAILS is used. 
-                                First stable release of TRAILS is excepted in 2023."""
+                                First stable release of TRAILS is expected in 2023."""
                 )
 
                 # base_graph, network_gdf = self.network_osm_pbf() #The old approach is depreciated
                 base_graph, network_gdf = self.network_trails_import()
+
+                self.base_network_crs = network_gdf.crs
 
             elif self.config["network"]["source"] == "OSM download":
                 logging.info("Start downloading a network from OSM.")
@@ -533,6 +543,7 @@ class Network:
             # TODO: rename "length" column to "length [m]" to be explicit
             # edges_lengths_meters = {(e[0], e[1], e[2]): {"length": line_length(e[-1]["geometry"], self.base_graph_crs)} for e in base_graph.edges.data(keys=True)}
             # nx.set_edge_attributes(base_graph, edges_lengths_meters)
+
 
             network_gdf["length"] = network_gdf["geometry"].apply(lambda x: line_length(x, self.base_network_crs))
 
