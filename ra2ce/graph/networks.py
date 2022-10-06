@@ -2,7 +2,7 @@
 """
 Created on 26-7-2021
 """
-
+import logging
 from typing import Any, List, Tuple
 
 # external modules
@@ -192,12 +192,18 @@ class Network:
                 self.config["network"]["primary_file"]
             )
         )
+
+        logging.warning("Any coordinate projection information in the feather file will be overwritten (with default WGS84)")
+        # Make a pyproj CRS from the EPSG code
+        crs = pyproj.CRS.from_user_input(crs)
+
         #edges = pd.read_pickle(
         #    self.config["static"] / "network" / self.config["network"]["primary_file"]
         #)
 
         edge_file = self.config["static"] / "network" / self.config["network"]["primary_file"]
         edges = gpd.read_feather(edge_file)
+        edges = edges.set_crs(crs)
 
 
         corresponding_node_file = (
@@ -207,6 +213,7 @@ class Network:
         )
         assert corresponding_node_file.exists(), 'The node file could not be found while importing from TRAILS'
         nodes = gpd.read_feather(corresponding_node_file)
+        nodes = nodes.set_crs(crs)
         # nodes = pd.read_pickle(
         #     corresponding_node_file
         # )  # Todo: Throw exception if nodes file is not present
