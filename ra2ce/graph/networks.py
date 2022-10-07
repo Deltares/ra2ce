@@ -506,7 +506,7 @@ class Network:
         network_gdf = None
 
         # For all graph and networks - check if it exists, otherwise, make the graph and/or network.
-        if self.files["base_graph"] is None and self.files["base_network"] is None:
+        if self.files["base_graph"] is None or self.files["base_network"] is None:
             # Create the network from the network source
             if self.config["network"]["source"] == "shapefile":
                 logging.info("Start creating a network from the submitted shapefile.")
