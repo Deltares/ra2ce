@@ -548,17 +548,16 @@ class Network:
 
             # Set the road lengths to meters for both the base_graph and network_gdf
             # TODO: rename "length" column to "length [m]" to be explicit
-            # edges_lengths_meters = {(e[0], e[1], e[2]): {"length": line_length(e[-1]["geometry"], self.base_graph_crs)} for e in base_graph.edges.data(keys=True)}
-            # nx.set_edge_attributes(base_graph, edges_lengths_meters)
-
+            edges_lengths_meters = {(e[0], e[1], e[2]): {"length": line_length(e[-1]["geometry"], self.base_graph_crs)} for e in base_graph.edges.data(keys=True)}
+            nx.set_edge_attributes(base_graph, edges_lengths_meters)
 
             network_gdf["length"] = network_gdf["geometry"].apply(lambda x: line_length(x, self.base_network_crs))
 
-            # if self.config["network"]["source"] == "OSM download":
-            #     base_graph = self.get_avg_speed(base_graph)
+            if self.config["network"]["source"] == "OSM download":
+                base_graph = self.get_avg_speed(base_graph)
 
             # Save the graph and geodataframe
-            # self._export_network_files(base_graph, "base_graph", to_save)
+            self._export_network_files(base_graph, "base_graph", to_save)
             self._export_network_files(network_gdf, "base_network", to_save)
         else:
 
