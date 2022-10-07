@@ -189,14 +189,24 @@ class Hazard:
                 {"geometry": [edata["geometry"] for u, v, k, edata in edges_geoms]}
             )
             tqdm.pandas(desc="Graph hazard overlay with " + hn)
-            flood_stats = gdf.geometry.progress_apply(
-                lambda x: zonal_stats(
-                    x,
-                    str(self.hazard_files["tif"][i]),
-                    all_touched=True,
-                    stats=f"{self.aggregate_wl}",  # TODO: ADD MEAN WITHOUT THE NANs
+            if self.aggregate_wl == 'mean':
+                flood_stats = gdf.geometry.progress_apply(
+                    lambda x: zonal_stats(
+                        x,
+                        str(self.hazard_files["tif"][i]),
+                        all_touched=True,
+                        add_stats={'mean': mean_ignore_nan}
+                    )
                 )
-            )
+            else:
+                flood_stats = gdf.geometry.progress_apply(
+                    lambda x: zonal_stats(
+                        x,
+                        str(self.hazard_files["tif"][i]),
+                        all_touched=True,
+                        stats=f"{self.aggregate_wl}",
+                    )
+                )
 
             try:
                 flood_stats = flood_stats.apply(
@@ -211,7 +221,7 @@ class Hazard:
                         for x, edges in zip(flood_stats, edges_geoms)
                     },
                 )
-            except:
+            except KeyError:
                 logging.warning(
                     "No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'."
                 )
@@ -721,8 +731,7 @@ class Hazard:
                 elif self.graphs[input_graph] is None and input_graph == "base_network":
                     self.graphs[input_graph] = gpd.read_feather(file_path)
 
-
-        do_analysis_for_graph = False #Todo, dirty fix to avoid graph hazard overlay
+        do_analysis_for_graph = True #Todo, dirty fix to avoid graph hazard overlay
         do_analysis_for_od = False
 
         if do_analysis_for_graph:
