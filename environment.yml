@@ -10,4 +10,4 @@ dependencies:
   - conda-forge::geos
   - conda-forge::fiona
   - poetry
-  - gdal
+  - gdal=3.5.2
