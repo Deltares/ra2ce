@@ -106,7 +106,7 @@ class Network:
         )
 
         if self.snapping is not None:
-            edges = snap_endpoints_lines(edges, self.snapping, id_name, tolerance=1e-7)
+            edges = snap_endpoints_lines(edges, self.snapping, id_name, crs)
             logging.info(
                 "Function [snap_endpoints_lines]: executed with threshold = {}".format(
                     self.snapping
