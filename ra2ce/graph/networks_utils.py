@@ -5,6 +5,8 @@ Created on 30-9-2020
 
 import itertools
 import logging
+
+# external modules
 import os
 import sys
 import warnings
@@ -18,6 +20,11 @@ import networkx as nx
 import osmnx
 import pandas as pd
 import pyproj
+import numpy as np
+
+# Hazard overlay
+# from boltons.iterutils import pairwise
+# from geopy.distance import vincenty
 import rasterio
 import rtree
 import tqdm
@@ -30,10 +37,27 @@ from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
 from shapely.ops import linemerge, unary_union
+from typing import Optional
 
-# todo replace os.path by pathlib
-folder = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(folder)
+
+def convert_unit(unit: str) -> Optional[float]:
+    """Converts unit to meters.
+
+    Args:
+        unit (str): The unit to convert
+
+    Returns:
+        conversion ()
+    """
+    if unit == 'centimeters':
+        conversion = 1./100 # meters
+    elif unit == 'meters':
+        conversion = 1. # meters
+    elif unit == 'feet':
+        conversion = 1./3.28084 # meters
+    else:
+        conversion = None
+    return conversion
 
 
 def drawProgressBar(percent, barLen=20):
@@ -67,7 +91,7 @@ def merge_lines_shpfiles(
     try:
         merged_lines = linemerge(list_lines)  # merge the lines of both shapefiles
     except NotImplementedError as e:
-        logging.error(
+        Exception(
             "Your data contains Multi-part geometries, you cannot merge lines.", e
         )
         return lines_gdf, gpd.GeoDataFrame()
@@ -334,7 +358,7 @@ def merge_lines_shpfiles(
                     )
                 merged = merged.append(properties_dict, ignore_index=True)
 
-    merged["length"] = merged["geometry"].apply(lambda x: line_length(x, crs_))
+    merged["length"] = merged["geometry"].apply(lambda x: line_length(x))
 
     return merged, lines_merged
 
@@ -358,7 +382,7 @@ def merge_lines_automatic(
     try:
         merged_lines = linemerge(list_lines)  # merge the lines of both shapefiles
     except NotImplementedError as e:
-        logging.error(
+        Exception(
             "Your data contains Multi-part geometries, you cannot merge lines.", e
         )
         return lines_gdf, gpd.GeoDataFrame()
@@ -590,10 +614,7 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
 
 
 def snap_endpoints_lines(
-    lines_gdf: gpd.GeoDataFrame,
-    max_dist: Union[int, float],
-    idName: str,
-    crs: pyproj.CRS,
+    lines_gdf: gpd.GeoDataFrame, max_dist: Union[int, float], idName: str
 ) -> gpd.GeoDataFrame:
     """Snap endpoints of lines with endpoints or vertices of other lines
     if they are at most max_dist apart. Choose the closest endpoint or vertice.
@@ -660,12 +681,11 @@ def snap_endpoints_lines(
         new_line = LineString([(target.x, target.y), (endpoint.x, endpoint.y)])
         if not any(new_line.equals(another_line) for another_line in snapped_lines):
             if new_line.length > 0:
-                # TODO: No crs specified, so we use the one from pyproj parameter.
                 lines_gdf = lines_gdf.append(
                     {
                         idName: max_id + 1,
                         "geometry": new_line,
-                        "length": line_length(new_line, crs),
+                        "length": line_length(new_line),
                     },
                     ignore_index=True,
                 )
@@ -856,7 +876,7 @@ def create_nodes(merged_lines, crs_, ignore_intersections):
     return points_gdf
 
 
-def cut_lines(lines_gdf, nodes, idName, tolerance, crs: pyproj.CRS):
+def cut_lines(lines_gdf, nodes, idName, tolerance):
     """Cuts lines at the nodes, with a certain tolerance
     Args:
         lines_gdf (geodataframe): the network with edges that should be cut
@@ -912,11 +932,7 @@ def cut_lines(lines_gdf, nodes, idName, tolerance, crs: pyproj.CRS):
 
                     # add the data with one part of the cut linestring
                     properties_dict.update(
-                        {
-                            idName: i,
-                            "geometry": newline,
-                            "length": line_length(newline, crs),
-                        }
+                        {idName: i, "geometry": newline, "length": line_length(newline)}
                     )
                     to_add = to_add.append(properties_dict, ignore_index=True)
                     logging.info("added line segment to {} {}".format(idName, i))
@@ -928,7 +944,7 @@ def cut_lines(lines_gdf, nodes, idName, tolerance, crs: pyproj.CRS):
                         {
                             idName: max_id + 1,
                             "geometry": newline,
-                            "length": line_length(newline, crs),
+                            "length": line_length(newline),
                         }
                     )
                     to_add = to_add.append(properties_dict, ignore_index=True)
@@ -1585,7 +1601,7 @@ def read_merge_shp(shapefileAnalyse, idName, shapefileDiversion=[], crs_=4326):
     lines.crs = crs_
 
     # append the length of the road stretches
-    lines["length"] = lines["geometry"].apply(lambda x: line_length(x, crs_))
+    lines["length"] = lines["geometry"].apply(lambda x: line_length(x))
 
     if lines["geometry"].apply(lambda row: isinstance(row, MultiLineString)).any():
         for line in lines.loc[
@@ -2348,3 +2364,10 @@ def set_analysis_value(gdf: gpd.GeoDataFrame, analyse: int = 1) -> gpd.GeoDataFr
 def clean_memory(list_delete: list) -> None:
     for to_delete in list_delete:
         del to_delete
+
+
+def mean_ignore_nan(x):
+    result = x.mean()
+    if not isinstance(result, float):
+        result = np.nan
+    return result
