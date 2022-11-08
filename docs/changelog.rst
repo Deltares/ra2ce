@@ -1,3 +1,10 @@
+## v0.3.1 (2022-09-26)
+
+### Fix
+
+- **analysis_indirect.py;network_utils.py**: Fixed errors spotted by sonar cloud
+- **networks.py;networks_utils.py**: Fixed critical issues spotted by SonarCloud
+
 ## v0.3.0 (2022-09-22)
 
 ### Feat
