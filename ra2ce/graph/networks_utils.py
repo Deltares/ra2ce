@@ -358,7 +358,7 @@ def merge_lines_shpfiles(
                     )
                 merged = merged.append(properties_dict, ignore_index=True)
 
-    merged["length"] = merged["geometry"].apply(lambda x: line_length(x))
+    merged["length"] = merged["geometry"].apply(lambda x: line_length(x, crs))
 
     return merged, lines_merged
 
@@ -614,7 +614,7 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
 
 
 def snap_endpoints_lines(
-    lines_gdf: gpd.GeoDataFrame, max_dist: Union[int, float], idName: str
+    lines_gdf: gpd.GeoDataFrame, max_dist: Union[int, float], idName: str, crs: pyproj.CRS
 ) -> gpd.GeoDataFrame:
     """Snap endpoints of lines with endpoints or vertices of other lines
     if they are at most max_dist apart. Choose the closest endpoint or vertice.
@@ -685,7 +685,7 @@ def snap_endpoints_lines(
                     {
                         idName: max_id + 1,
                         "geometry": new_line,
-                        "length": line_length(new_line),
+                        "length": line_length(new_line, crs),
                     },
                     ignore_index=True,
                 )
@@ -730,7 +730,7 @@ def find_isolated_endpoints(linesIds: list, lines: list) -> list:
                     ):
                         continue
                     else:
-                        isolated_endpoints.append((ids, endpoint))
+                        isolated_endpoints.append((ids, endpnt))
     return isolated_endpoints
 
 
@@ -932,7 +932,7 @@ def cut_lines(lines_gdf, nodes, idName, tolerance):
 
                     # add the data with one part of the cut linestring
                     properties_dict.update(
-                        {idName: i, "geometry": newline, "length": line_length(newline)}
+                        {idName: i, "geometry": newline, "length": line_length(newline, crs)}
                     )
                     to_add = to_add.append(properties_dict, ignore_index=True)
                     logging.info("added line segment to {} {}".format(idName, i))
@@ -944,7 +944,7 @@ def cut_lines(lines_gdf, nodes, idName, tolerance):
                         {
                             idName: max_id + 1,
                             "geometry": newline,
-                            "length": line_length(newline),
+                            "length": line_length(newline, crs),
                         }
                     )
                     to_add = to_add.append(properties_dict, ignore_index=True)
@@ -1601,7 +1601,7 @@ def read_merge_shp(shapefileAnalyse, idName, shapefileDiversion=[], crs_=4326):
     lines.crs = crs_
 
     # append the length of the road stretches
-    lines["length"] = lines["geometry"].apply(lambda x: line_length(x))
+    lines["length"] = lines["geometry"].apply(lambda x: line_length(x, crs))
 
     if lines["geometry"].apply(lambda row: isinstance(row, MultiLineString)).any():
         for line in lines.loc[
