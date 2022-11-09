@@ -2,6 +2,7 @@
 """
 Created on 26-7-2021
 """
+
 import logging
 from typing import Any, List, Tuple
 
@@ -137,7 +138,7 @@ class Network:
 
         if self.snapping is not None:
             # merged lines may be updated when new nodes are created which makes a line cut in two
-            edges = cut_lines(edges, nodes, id_name, tolerance=1e-4)
+            edges = cut_lines(edges, nodes, id_name, tolerance=1e-4, crs_=crs)
             nodes = create_nodes(
                 edges, crs, self.config["cleanup"]["ignore_intersections"]
             )
