@@ -80,7 +80,7 @@ class Network:
         # Make a pyproj CRS from the EPSG code
         crs = pyproj.CRS.from_user_input(crs)
 
-        lines = self.read_merge_shp()
+        lines = self.read_merge_shp(crs)
 
         logging.info(
             "Function [read_merge_shp]: executed with {} {}".format(
@@ -133,16 +133,25 @@ class Network:
             )
 
         # Get the unique points at the end of lines and at intersections to create nodes
-        nodes = create_nodes(edges, crs, self.config["cleanup"]["ignore_intersections"])
+        nodes = create_nodes(edges, crs, self.config["cleanup"]["cut_at_intersections"])
         logging.info("Function [create_nodes]: executed")
 
-        if self.snapping is not None:
-            # merged lines may be updated when new nodes are created which makes a line cut in two
-            edges = cut_lines(edges, nodes, id_name, tolerance=1e-4, crs_=crs)
-            nodes = create_nodes(
-                edges, crs, self.config["cleanup"]["ignore_intersections"]
-            )
-            logging.info("Function [cut_lines]: executed")
+        edges = cut_lines(edges, nodes, id_name, tolerance=1e-4, crs_=crs)
+        logging.info("Function [cut_lines]: executed")
+
+        edges, id_name = gdf_check_create_unique_ids(
+            edges, self.config["network"]["file_id"]
+        )
+
+        if not edges.crs:
+            edges.crs = crs
+        #
+        # if self.snapping is not None:
+        #     # merged lines may be updated when new nodes are created which makes a line cut in two
+        #     nodes = create_nodes(
+        #         edges, crs, self.config["cleanup"]["cut_at_intersections"]
+        #     )
+        #     logging.info("Function [cut_lines]: executed")
 
         # create tuples from the adjecent nodes and add as column in geodataframe
         edges_complex = join_nodes_edges(nodes, edges, id_name)
@@ -391,7 +400,7 @@ class Network:
 
         return out_fn
 
-    def read_merge_shp(self, crs_: int = 4326) -> gpd.GeoDataFrame:
+    def read_merge_shp(self, crs_: pyproj.CRS) -> gpd.GeoDataFrame:
         """Imports shapefile(s) and saves attributes in a pandas dataframe.
 
         Args:
@@ -416,7 +425,6 @@ class Network:
         # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
         lines = [gpd.read_file(shp) for shp in shapefiles_analysis]
 
-        # check_crs_gdf(, crs_)
         if isinstance(self.config["network"]["diversion_file"], str):
             lines.extend(
                 [
@@ -428,20 +436,20 @@ class Network:
 
         lines.crs = crs_
 
-        # append the length of the road stretches
-        lines["length"] = lines["geometry"].apply(lambda x: line_length(x, lines.crs))
-
         if lines["geometry"].apply(lambda row: isinstance(row, MultiLineString)).any():
-            for line in lines.loc[
-                lines["geometry"].apply(lambda row: isinstance(row, MultiLineString))
-            ].iterrows():
-                if len(linemerge(line[1].geometry)) > 1:
-                    logging.warning(
-                        "Edge with {} = {} is a MultiLineString, which cannot be merged to one line. Check this part.".format(
-                            self.config["network"]["file_id"],
-                            line[1][self.config["network"]["file_id"]],
-                        )
-                    )
+            mls_idx = lines.loc[lines["geometry"].apply(lambda row: isinstance(row, MultiLineString))].index
+            for idx in mls_idx:
+                # Multilinestrings to linestrings
+                new_rows_geoms = list(lines.iloc[idx]["geometry"].geoms)
+                for nrg in new_rows_geoms:
+                    dict_attributes = dict(lines.iloc[idx])
+                    dict_attributes['geometry'] = nrg
+                    lines.loc[max(lines.index)+1] = dict_attributes
+
+            lines = lines.drop(labels=mls_idx, axis=0)
+
+        # append the length of the road stretches
+        lines["length"] = lines["geometry"].apply(lambda x: line_length(x, crs_))
 
         logging.info(
             "Shapefile(s) loaded with attributes: {}.".format(

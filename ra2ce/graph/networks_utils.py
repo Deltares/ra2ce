@@ -378,9 +378,9 @@ def merge_lines_automatic(
     """
     list_lines = list(lines_gdf["geometry"])
 
-    # Multilinestring to linestring
+    # Try to merge the lines
     try:
-        merged_lines = linemerge(list_lines)  # merge the lines of both shapefiles
+        merged_lines = linemerge(list_lines)
     except NotImplementedError as e:
         Exception(
             "Your data contains Multi-part geometries, you cannot merge lines.", e
@@ -434,32 +434,33 @@ def merge_lines_automatic(
                 else:
                     aadts_set_merged = []
 
-                while not full_line.equals(mline):
-                    for line2, j in lines_fids:
-                        if (
-                            line2.within(mline)
-                            and not line2.equals(mline)
-                            and line != line2
-                        ):
-                            line_set_merged.append(line2)
-                            fid_set_merged.append(j)
-                            if aadtNames:
-                                aadts_set_merged.append(
-                                    lines_gdf[lines_gdf[idName] == i][aadtNames]
-                                    .iloc[0]
-                                    .tolist()
-                                )
-
-                            lines_fids.remove(
-                                (line2, j)
-                            )  # remove the lines that have been through the iteration so there are no duplicates
-                    full_line = linemerge(line_set_merged)
-                lines_fids.remove(
-                    (line, i)
-                )  # remove the lines that have been through the iteration so there are no duplicates
-                lines_merged = lines_merged.append(
-                    {idName: i, "geometry": full_line}, ignore_index=True
-                )  # the lines in this list are the same lines that make up the merged line
+                # COMMENTED OUT BELOW TO SPEED UP THE CODE (this code below is only a check to see which lines are merged)
+                # while not full_line.equals(mline):
+                #     for line2, j in lines_fids:
+                #         if (
+                #             line2.within(mline)
+                #             and not line2.equals(mline)
+                #             and line != line2
+                #         ):
+                #             line_set_merged.append(line2)
+                #             fid_set_merged.append(j)
+                #             if aadtNames:
+                #                 aadts_set_merged.append(
+                #                     lines_gdf[lines_gdf[idName] == i][aadtNames]
+                #                     .iloc[0]
+                #                     .tolist()
+                #                 )
+                #
+                #             lines_fids.remove(
+                #                 (line2, j)
+                #             )  # remove the lines that have been through the iteration so there are no duplicates
+                #     full_line = linemerge(line_set_merged)
+                # lines_fids.remove(
+                #     (line, i)
+                # )  # remove the lines that have been through the iteration so there are no duplicates
+                # the lines in this list are the same lines that make up the merged line
+                add_idx = 0 if lines_merged.empty else max(lines_merged.index) + 1
+                lines_merged.loc[add_idx] = {idName: i, "geometry": full_line}
 
                 # check with the user the right traffic count for the merged lines
                 if aadts_set_merged:  # check if the list is not empty
@@ -512,7 +513,8 @@ def merge_lines_automatic(
                     )
 
                 # append row to merged gdf
-                merged = merged.append(properties_dict, ignore_index=True)
+                add_idx = 0 if merged.empty else max(merged.index)+1
+                merged.loc[add_idx] = properties_dict
 
             elif line.equals(mline):
                 # this line is not merged
@@ -530,7 +532,8 @@ def merge_lines_automatic(
                             )
                         }
                     )
-                merged = merged.append(properties_dict, ignore_index=True)
+                add_idx = 0 if merged.empty else max(merged.index)+1
+                merged.loc[add_idx] = properties_dict
 
     merged["length"] = merged["geometry"].apply(lambda x: line_length(x, crs_))
 
@@ -804,7 +807,7 @@ def vertices_from_lines(lines, listIds):
     return vertices_dict
 
 
-def create_nodes(merged_lines, crs_, ignore_intersections):
+def create_nodes(merged_lines, crs_, cut_at_intersections):
     """Creates shapely points on intersections and endpoints of a list of shapely lines
     Args:
         merged_lines [list of shapely LineStrings]: the edges of a graph
@@ -833,7 +836,7 @@ def create_nodes(merged_lines, crs_, ignore_intersections):
     more_endpts = [pt for sublist in more_endpts for pt in sublist]
     endpts.extend(more_endpts)
 
-    if ignore_intersections is not True:
+    if cut_at_intersections is not True:
         # create nodes on intersections and on lines that should be snapped
         inters = []
         for line1, line2 in itertools.combinations(list_lines, 2):
@@ -1062,7 +1065,7 @@ def join_nodes_edges(gdf_nodes, gdf_edges, idName):
     """Creates tuples from the adjecent nodes and add as column in geodataframe.
     Args:
         gdf_nodes [geodataframe]: geodataframe of the nodes of a graph
-        gdf_edges [geodataframe]: geodataframe of the nodes of a graph
+        gdf_edges [geodataframe]: geodataframe of the edges of a graph
     Returns:
         result [geodataframe]: geodataframe of adjecent nodes from edges
     """
@@ -1321,11 +1324,10 @@ def gdf_check_create_unique_ids(gdf, id_name, new_id_name="rfid"):
     check = list(gdf.index)
     logging.info("Started creating unique ids...")
     if len(gdf[id_name].unique()) < len(check):
-        gdf[new_id_name] = check
         logging.info(
-            "Added a new unique identifier field {}.".format(new_id_name, id_name)
+            "Using the user-defined identifier field {}.".format(id_name)
         )
-        return gdf, new_id_name
+        return gdf, id_name
     else:
         gdf[new_id_name] = check
         logging.info(
@@ -1334,7 +1336,7 @@ def gdf_check_create_unique_ids(gdf, id_name, new_id_name="rfid"):
                 new_id_name, id_name
             )
         )
-        return gdf, id_name
+        return gdf, new_id_name
 
 
 def graph_check_create_unique_ids(graph, idname, new_id_name="rfid"):
