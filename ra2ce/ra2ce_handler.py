@@ -4,6 +4,7 @@ import sys
 import warnings
 from pathlib import Path
 from typing import Optional
+from shapely.errors import ShapelyDeprecationWarning
 
 from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
 from ra2ce.configuration.config_factory import ConfigFactory
@@ -16,6 +17,7 @@ warnings.filterwarnings(
 )
 warnings.filterwarnings(action="ignore", message="All-NaN slice encountered")
 warnings.filterwarnings(action="ignore", message="Value *not successfully written.*")
+warnings.filterwarnings("ignore", category=ShapelyDeprecationWarning)
 
 
 class Ra2ceHandler:
