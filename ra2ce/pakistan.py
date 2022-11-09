@@ -9,6 +9,6 @@ from tests.test_acceptance import run_from_cli
 
 
 if __name__ == "__main__":
-    run_from_cli(network_ini=r"C:\python\ra2ce\nepal\network.ini",
-                 analysis_ini=r"C:\python\ra2ce\nepal\analyses.ini")
+    run_from_cli(network_ini=r"C:\python\nepal\network.ini",
+                 analysis_ini=r"C:\python\nepal\analyses.ini")
 
