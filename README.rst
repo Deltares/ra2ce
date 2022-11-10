@@ -17,11 +17,11 @@ If running a development environment with Anaconda, the user may follow these st
 
 Command-line interface operation
 ---------------------------
-a.	To run both the network creation and analysis modules, run RA2CE with ``python run.py --network_ini <path to network.ini file> --analyses_ini <path to analyses.ini file>``
-b.	To only run the network creation module, run RA2CE with ``python run.py --network_ini <path to network.ini file>``
-c.	To only run the analysis module, run RA2CE with ``python run.py --analyses_ini <path to analyses.ini file>``
+a.	To run both the network creation and analysis modules, run RA2CE with ``python main.py --network_ini <path to network.ini file> --analyses_ini <path to analyses.ini file>``
+b.	To only run the network creation module, run RA2CE with ``python main.py --network_ini <path to network.ini file>``
+c.	To only run the analysis module, run RA2CE with ``python main.py --analyses_ini <path to analyses.ini file>``
 
-The user can also always ask for clarification of the input arguments with ``python run.py --help``.
+The user can also always ask for clarification of the input arguments with ``python main.py --help``.
 
 Folder structure
 ---------------------------
