@@ -36,14 +36,17 @@ class ConfigWrapper:
             logging.error(f"Path {_root_analysis} does not exist.")
             return False
 
+        if self.network_config and not self.network_config.is_valid():
+            logging.error("No valid network.ini file provided. Program will close.")
+            return False
+
         if self.network_config and (_root_analysis != self.network_config.root_dir):
             logging.error(
                 "Root directory differs between network and analyses .ini files"
             )
             return False
 
-        # We already validated the anlysis, just need to validate the network now.
-        return self.network_config.is_valid()
+        return True
 
     def configure(self) -> None:
         if self.network_config:
