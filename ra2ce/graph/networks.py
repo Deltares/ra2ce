@@ -89,18 +89,20 @@ class Network:
             )
         )
 
-        # Multilinestring to linestring
         # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
         # The list of fid's is reduced by the fid's that are not anymore in the merged lines
-        aadt_names = None
-        edges, lines_merged = merge_lines_automatic(
-            lines, self.config["network"]["file_id"], aadt_names, crs
-        )
-        logging.info(
-            "Function [merge_lines_shpfiles]: executed with properties {}".format(
-                list(edges.columns)
+        if self.config["cleanup"]["merge_lines"]:
+            aadt_names = None
+            edges, lines_merged = merge_lines_automatic(
+                lines, self.config["network"]["file_id"], aadt_names, crs
             )
-        )
+            logging.info(
+                "Function [merge_lines_shpfiles]: executed with properties {}".format(
+                    list(edges.columns)
+                )
+            )
+        else:
+            edges, lines_merged = lines, gpd.GeoDataFrame()
 
         edges, id_name = gdf_check_create_unique_ids(
             edges, self.config["network"]["file_id"]
@@ -136,16 +138,12 @@ class Network:
         nodes = create_nodes(edges, crs, self.config["cleanup"]["cut_at_intersections"])
         logging.info("Function [create_nodes]: executed")
 
-        edges = cut_lines(edges, nodes, id_name, tolerance=1e-4, crs_=crs)
+        edges = cut_lines(edges, nodes, id_name, tolerance=0.00001, crs_=crs) ## PAY ATTENTION TO THE TOLERANCE, THE UNIT IS DEGREES
         logging.info("Function [cut_lines]: executed")
-
-        edges, id_name = gdf_check_create_unique_ids(
-            edges, self.config["network"]["file_id"]
-        )
 
         if not edges.crs:
             edges.crs = crs
-        #
+
         # if self.snapping is not None:
         #     # merged lines may be updated when new nodes are created which makes a line cut in two
         #     nodes = create_nodes(
@@ -436,6 +434,7 @@ class Network:
 
         lines.crs = crs_
 
+        # Check if there are any multilinestrings and convert them to linestrings.
         if lines["geometry"].apply(lambda row: isinstance(row, MultiLineString)).any():
             mls_idx = lines.loc[lines["geometry"].apply(lambda row: isinstance(row, MultiLineString))].index
             for idx in mls_idx:
