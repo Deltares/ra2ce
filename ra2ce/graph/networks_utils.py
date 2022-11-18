@@ -434,30 +434,29 @@ def merge_lines_automatic(
                 else:
                     aadts_set_merged = []
 
-                # COMMENTED OUT BELOW TO SPEED UP THE CODE (this code below is only a check to see which lines are merged)
-                # while not full_line.equals(mline):
-                #     for line2, j in lines_fids:
-                #         if (
-                #             line2.within(mline)
-                #             and not line2.equals(mline)
-                #             and line != line2
-                #         ):
-                #             line_set_merged.append(line2)
-                #             fid_set_merged.append(j)
-                #             if aadtNames:
-                #                 aadts_set_merged.append(
-                #                     lines_gdf[lines_gdf[idName] == i][aadtNames]
-                #                     .iloc[0]
-                #                     .tolist()
-                #                 )
-                #
-                #             lines_fids.remove(
-                #                 (line2, j)
-                #             )  # remove the lines that have been through the iteration so there are no duplicates
-                #     full_line = linemerge(line_set_merged)
-                # lines_fids.remove(
-                #     (line, i)
-                # )  # remove the lines that have been through the iteration so there are no duplicates
+                while not full_line.equals(mline):
+                    for line2, j in lines_fids:
+                        if (
+                            line2.within(mline)
+                            and not line2.equals(mline)
+                            and line != line2
+                        ):
+                            line_set_merged.append(line2)
+                            fid_set_merged.append(j)
+                            if aadtNames:
+                                aadts_set_merged.append(
+                                    lines_gdf[lines_gdf[idName] == i][aadtNames]
+                                    .iloc[0]
+                                    .tolist()
+                                )
+
+                            lines_fids.remove(
+                                (line2, j)
+                            )  # remove the lines that have been through the iteration so there are no duplicates
+                    full_line = linemerge(line_set_merged)
+                lines_fids.remove(
+                    (line, i)
+                )  # remove the lines that have been through the iteration so there are no duplicates
                 # the lines in this list are the same lines that make up the merged line
                 add_idx = 0 if lines_merged.empty else max(lines_merged.index) + 1
                 lines_merged.loc[add_idx] = {idName: i, "geometry": full_line}
@@ -897,7 +896,7 @@ def cut_lines(lines_gdf, nodes, idName, tolerance, crs_):
     for rem in ["geometry", "length", idName]:
         list_columns.remove(rem)
 
-    to_add = gpd.GeoDataFrame(columns=list(lines_gdf.columns.values))
+    to_add = []
     to_remove = []
     to_iterate = zip(
         list(lines_gdf.index.values),
@@ -939,8 +938,9 @@ def cut_lines(lines_gdf, nodes, idName, tolerance, crs_):
                     properties_dict.update(
                         {idName: i, "geometry": newline, "length": line_length(newline, crs_)}
                     )
-                    to_add = to_add.append(properties_dict, ignore_index=True)
-                    logging.info("added line segment to {} {}".format(idName, i))
+                    to_add.append(properties_dict)
+                    logging.info("cut line segment {} {}, added new line segment with {} {}".format(idName, i,
+                                                                                                    idName, i))
                 else:
                     properties_dict = lines_gdf.loc[lines_gdf[idName] == i][
                         list_columns
@@ -952,8 +952,9 @@ def cut_lines(lines_gdf, nodes, idName, tolerance, crs_):
                             "length": line_length(newline, crs_),
                         }
                     )
-                    to_add = to_add.append(properties_dict, ignore_index=True)
-                    logging.info("added line segment to {} {}".format(idName, i))
+                    to_add.append(properties_dict)
+                    logging.info("cut line segment {} {}, added new line segment with {} {}".format(idName, i,
+                                                                                                    idName, properties_dict[idName]))
                     max_id += 1
 
             # remove the original linestring that has been cut
@@ -973,11 +974,16 @@ def split_line_with_points(line, points):
     list_dist = [current_line.project(pnt) for pnt in points]
     list_dist.sort()
 
-    for d in list_dist:
+    for i, d in enumerate(list_dist):
+        # Subtract the previous distance from the current distance to cut the segments in the right way.
+        if i > 0:
+            d = d - list_dist[i-1]
+
         # cut the line at a distance d
         seg, current_line = cut(current_line, d)
         if seg:
             segments.append(seg)
+
     segments.append(current_line)
     return segments
 
@@ -1323,7 +1329,7 @@ def gdf_check_create_unique_ids(gdf, id_name, new_id_name="rfid"):
     # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
     check = list(gdf.index)
     logging.info("Started creating unique ids...")
-    if len(gdf[id_name].unique()) < len(check):
+    if len(gdf[id_name].unique()) == len(check):
         logging.info(
             "Using the user-defined identifier field {}.".format(id_name)
         )
