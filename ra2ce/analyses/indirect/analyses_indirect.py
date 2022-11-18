@@ -1237,18 +1237,18 @@ class IndirectAnalyses:
                 for idx in isolated_locations["i_id"]
             ]
 
-            # Group by commercial category and count the number of businesses per category
+            # Group by category and count the number of locations per category
             if i == 0:
                 # the first iteration, create a new pd dataframe
                 df_aggregation = (
-                    intersect.groupby(analysis["category_field_name"])
+                    intersect.groupby(by=analysis["category_field_name"])
                     .size()
                     .to_frame(hazard_name)
                 )
             else:
                 # after more iterations the new columns are appended
                 df_aggregation = df_aggregation.join(
-                    intersect.groupby(analysis["category_field_name"])
+                    intersect.groupby(by=analysis["category_field_name"])
                     .size()
                     .to_frame(hazard_name),
                     how="outer",
