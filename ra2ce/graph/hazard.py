@@ -722,7 +722,7 @@ class Hazard:
             )
 
         # Iterate over the three graph/network types to load the file if necessary (when not yet loaded in memory).
-        for input_graph in ["base_network"]: #["base_graph", "base_network", "origins_destinations_graph"]:
+        for input_graph in ["base_graph", "base_network", "origins_destinations_graph"]:
             file_path = self.files[input_graph]
 
             if file_path is not None or self.graphs[input_graph] is not None:
@@ -731,14 +731,9 @@ class Hazard:
                 elif self.graphs[input_graph] is None and input_graph == "base_network":
                     self.graphs[input_graph] = gpd.read_feather(file_path)
 
-        do_analysis_for_graph = True #Todo, dirty fix to avoid graph hazard overlay
-        do_analysis_for_od = False
-
-        if do_analysis_for_graph:
-            #### Step 1: hazard overlay of the base graph (NetworkX) ###
-            if (self.graphs["base_graph"] is not None) and (
-                self.files["base_graph_hazard"] is None
-            ):
+        #### Step 1: hazard overlay of the base graph (NetworkX) ###
+        if self.files['base_graph']:
+            if self.files["base_graph_hazard"] is None:
                 graph = self.graphs["base_graph"]
 
                 # Check if the graph needs to be reprojected
@@ -788,11 +783,11 @@ class Hazard:
                     )
                     pass
 
-        if do_analysis_for_od:
-            #### Step 2: hazard overlay of the origins_destinations (NetworkX) ###
+        #### Step 2: hazard overlay of the origins_destinations (NetworkX) ###
+        if self.files['origins_destinations_graph']:
             if (
-                (self.config["origins_destinations"]["origins"] is not None)
-                and (self.graphs["origins_destinations_graph"] is not None)
+                (self.config["origins_destinations"]["origins"])
+                and (self.config["origins_destinations"]["destinations"])
                 and (self.files["origins_destinations_graph_hazard"] is None)
             ):
                 graph = self.graphs["origins_destinations_graph"]
@@ -840,45 +835,44 @@ class Hazard:
                 )
 
         #### Step 3: iterate overlay of the GeoPandas Dataframe (if any) ###
-        if (self.graphs["base_network"] is not None) and (
-            self.files["base_network_hazard"] is None
-        ):
-            # Check if the graph needs to be reprojected
-            hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
-            gdf_crs = pyproj.CRS.from_user_input(self.graphs["base_network"].crs)
+        if self.files["base_network"]:
+            if self.files["base_network_hazard"] is None:
+                # Check if the graph needs to be reprojected
+                hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
+                gdf_crs = pyproj.CRS.from_user_input(self.graphs["base_network"].crs)
 
-            if (
-                hazard_crs != gdf_crs
-            ):  # Temporarily reproject the graph to the CRS of the hazard
-                logging.warning(
-                    """Hazard crs {} and gdf crs {} are inconsistent,
-                                              we try to reproject the gdf crs""".format(
-                        hazard_crs, gdf_crs
+                if (
+                    hazard_crs != gdf_crs
+                ):  # Temporarily reproject the graph to the CRS of the hazard
+                    logging.warning(
+                        """Hazard crs {} and gdf crs {} are inconsistent,
+                                                  we try to reproject the gdf crs""".format(
+                            hazard_crs, gdf_crs
+                        )
                     )
-                )
-                extent_gdf = self.graphs["base_network"].total_bounds
-                logging.info("Gdf extent before reprojecting: {}".format(extent_gdf))
-                gdf_reprojected = self.graphs["base_network"].copy().to_crs(hazard_crs)
-                extent_gdf_reprojected = gdf_reprojected.total_bounds
-                logging.info(
-                    "Gdf extent after reprojecting: {}".format(extent_gdf_reprojected)
-                )
+                    extent_gdf = self.graphs["base_network"].total_bounds
+                    logging.info("Gdf extent before reprojecting: {}".format(extent_gdf))
+                    gdf_reprojected = self.graphs["base_network"].copy().to_crs(hazard_crs)
+                    extent_gdf_reprojected = gdf_reprojected.total_bounds
+                    logging.info(
+                        "Gdf extent after reprojecting: {}".format(extent_gdf_reprojected)
+                    )
 
-                # Do the actual hazard intersect
-                gdf_reprojected = self.hazard_intersect(gdf_reprojected)
+                    # Do the actual hazard intersect
+                    gdf_reprojected = self.hazard_intersect(gdf_reprojected)
 
-                # Assign the original geometries to the reprojected raster
-                original_geometries = self.graphs["base_network"]["geometry"]
-                gdf_reprojected["geometry"] = original_geometries
-                self.graphs["base_network_hazard"] = gdf_reprojected.copy()
-                del gdf_reprojected
-            else:
-                self.graphs["base_network_hazard"] = self.hazard_intersect(
-                    self.graphs["base_network"]
-                )
+                    # Assign the original geometries to the reprojected raster
+                    original_geometries = self.graphs["base_network"]["geometry"]
+                    gdf_reprojected["geometry"] = original_geometries
+                    self.graphs["base_network_hazard"] = gdf_reprojected.copy()
+                    del gdf_reprojected
+                else:
+                    self.graphs["base_network_hazard"] = self.hazard_intersect(
+                        self.graphs["base_network"]
+                    )
 
-            # Save graphs/network with hazard
-            self._export_network_files("base_network_hazard", types_to_export)
+                # Save graphs/network with hazard
+                self._export_network_files("base_network_hazard", types_to_export)
         else:
             try:
                 # Try to find the base network hazard file
@@ -894,9 +888,10 @@ class Hazard:
                 )
                 pass
 
+        #### Step 4: hazard overlay of the locations that are checked for isolation ###
         if "isolation" in self.config:
             if self.config["isolation"]["locations"]:
-                locations = gpd.read_file(self.config["isolation"]["locations"])
+                locations = gpd.read_file(self.config["isolation"]["locations"][0])
                 locations["i_id"] = locations.index
                 locations_crs = pyproj.CRS.from_user_input(locations.crs)
                 hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
