@@ -12,9 +12,11 @@ class DirectAnalysisRunner(AnalysisRunner):
 
     @staticmethod
     def can_run(ra2ce_input: ConfigWrapper) -> bool:
-        _network_config = ra2ce_input.network_config.config_data
         if "direct" not in ra2ce_input.analysis_config.config_data:
             return False
+        if not ra2ce_input.network_config:
+            return False
+        _network_config = ra2ce_input.network_config.config_data
         if (
             "hazard" not in _network_config.keys()
             or "hazard_map" not in _network_config["hazard"].keys()
