@@ -180,6 +180,34 @@ class TestNetworkCreation:
         assert all(map(validate_file, _expected_files))
 
     @slow_test
+    def test_2_network_shape(self):
+        """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
+        # 1. Given test data.
+        test_name = "2_network_shape"
+        _test_data_dir = test_data / test_name
+        network_ini = _test_data_dir / _network_ini_name
+        assert network_ini.is_file()
+
+        _output_graph_dir = _test_data_dir / "static" / "output_graph"
+        shutil.rmtree(_output_graph_dir, ignore_errors=True)
+
+        # 2. When run test.
+        run_from_cli(network_ini, None)
+
+        # 3. Then verify expectations.
+        _expected_files = [
+            "2_network_shape_lines_that_merged.shp",
+            "base_graph.p",
+            "base_network.feather",
+        ]
+
+        def validate_file(filename: str):
+            _graph_file = _output_graph_dir / filename
+            return _graph_file.is_file() and _graph_file.exists()
+
+        assert all(map(validate_file, _expected_files))
+
+    @slow_test
     def test_3_network_osm_download(self):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data.
