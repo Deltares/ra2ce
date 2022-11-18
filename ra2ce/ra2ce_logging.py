@@ -30,7 +30,7 @@ class Ra2ceLogger:
     def _set_file_handler(self) -> None:
         # Create a root logger and set the minimum logging level.
         self._get_logger().setLevel(logging.INFO)
-        self._file_handler = logging.FileHandler(filename=self.log_file, mode="w")
+        self._file_handler = logging.FileHandler(filename=self.log_file, mode="a")
         self._file_handler.setLevel(logging.INFO)
         self._get_logger().addHandler(self._file_handler)
 
