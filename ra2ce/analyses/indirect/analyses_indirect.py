@@ -101,7 +101,7 @@ class IndirectAnalyses:
         gdf["alt_dist"] = alt_dist_list
         gdf["alt_nodes"] = alt_nodes_list
         gdf["diff_dist"] = dif_dist_list
-        gdf["detour_exist"] = detour_exist_list
+        gdf["detour"] = detour_exist_list
 
         # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
         # todo: input here this option
@@ -137,7 +137,7 @@ class IndirectAnalyses:
                         gdf[col + "_nodetour_losses"] = 0
                     # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle]  * duration_disruption[hour] / 24[hour/day]
                     gdf.loc[
-                        (gdf["detour_exist"] == 1)
+                        (gdf["detour"] == 1)
                         & (
                             gdf[hz + "_" + analysis["aggregate_wl"]]
                             > analysis["threshold"]
@@ -154,7 +154,7 @@ class IndirectAnalyses:
                     )
                     # no_detour_losses = traffic_per_day[veh/day] * occupancy[person/veh] * gdp_percapita_per_day[USD/person] * duration_disruption[hour] / 24[hour/day]
                     gdf.loc[
-                        (gdf["detour_exist"] == 0)
+                        (gdf["detour"] == 0)
                         & (
                             gdf[hz + "_" + analysis["aggregate_wl"]]
                             > analysis["threshold"]
@@ -223,7 +223,7 @@ class IndirectAnalyses:
                         gdf[col + "_detour_losses"] = 0
                         gdf[col + "_nodetour_losses"] = 0
                     # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle] * duration_disruption[hour] / 24[hour/day]
-                    gdf.loc[gdf["detour_exist"] == 1, col + "_detour_losses"] += (
+                    gdf.loc[gdf["detour"] == 1, col + "_detour_losses"] += (
                         gdf[col]
                         * gdf["diff_dist"]
                         * losses_df.loc[
@@ -233,7 +233,7 @@ class IndirectAnalyses:
                         / 24
                     )
                     # no_detour_losses = traffic_per_day[veh/day] * occupancy[person/veh] * gdp_percapita[USD/person] * duration_disruption[hour] / 24[hour/day]
-                    gdf.loc[gdf["detour_exist"] == 0, col + "_nodetour_losses"] += (
+                    gdf.loc[gdf["detour"] == 0, col + "_nodetour_losses"] += (
                         gdf[col]
                         * losses_df.loc[
                             losses_df["traffic_class"] == col, "occupancy"
