@@ -158,9 +158,7 @@ class Network:
         # Create networkx graph from geodataframe
         graph_complex = graph_from_gdf(edges_complex, nodes, node_id="node_fid")
         logging.info(
-            "Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(
-                self.config["project"]["name"]
-            )
+            "Function [graph_from_gdf]: executed"
         )
 
         if self.segmentation_length is not None:
