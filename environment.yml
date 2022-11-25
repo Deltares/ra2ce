@@ -4,9 +4,7 @@ channels:
   - defaults
 dependencies:
   - python=3.9
-  - conda-forge::rasterio
-  - conda-forge::gdal
-  - conda-forge::geos
+  - conda-forge::gdal=3.5.1
   - conda-forge::fiona
   - pip
   - pip:
