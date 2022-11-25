@@ -5,7 +5,7 @@ channels:
 dependencies:
   - python=3.9
   - conda-forge::gdal=3.5.1
-  - conda-forge::fiona
+  - conda-forge::fiona=1.8.22
   - pip
   - pip:
     - poetry
