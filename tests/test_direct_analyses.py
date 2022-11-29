@@ -2,11 +2,7 @@
 import pandas as pd
 import pytest
 
-from ra2ce.analyses.direct.damage.manual_damage_functions import ManualDamageFunctions
-from ra2ce.analyses.direct.direct_damage_calculation import (
-    DamageNetworkEvents,
-    DamageNetworkReturnPeriods,
-)
+from ra2ce.analyses.direct.damage_calculation import DamageNetworkEvents
 
 
 class TestDirectAnalyses:

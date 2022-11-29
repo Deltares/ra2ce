@@ -1,4 +1,6 @@
-from ra2ce.analyses.direct.damage_network.damage_network_base import DamageNetworkBase
+from ra2ce.analyses.direct.damage_calculation.damage_network_base import (
+    DamageNetworkBase,
+)
 
 
 class DamageNetworkEvents(DamageNetworkBase):
@@ -37,4 +39,3 @@ class DamageNetworkEvents(DamageNetworkBase):
             self.calculate_damage_manual_functions(
                 events=self.events, manual_damage_functions=manual_damage_functions
             )
-

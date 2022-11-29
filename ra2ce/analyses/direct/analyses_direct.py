@@ -9,7 +9,7 @@ from ra2ce.analyses.direct.cost_benefit_analysis import EffectivenessMeasures
 from ra2ce.analyses.direct.damage.damage_fraction_uniform import DamageFractionUniform
 from ra2ce.analyses.direct.damage.manual_damage_functions import ManualDamageFunctions
 from ra2ce.analyses.direct.damage.max_damage import MaxDamageByRoadTypeByLane
-from ra2ce.analyses.direct.direct_damage_calculation import (
+from ra2ce.analyses.direct.damage_calculation import (
     DamageNetworkEvents,
     DamageNetworkReturnPeriods,
 )
