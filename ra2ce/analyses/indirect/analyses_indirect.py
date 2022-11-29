@@ -1522,7 +1522,6 @@ class IndirectAnalyses:
                     csv_path = output_path / (
                         analysis["name"].replace(" ", "_") + ".csv"
                     )
-                    del gdf["geometry"]
                     gdf.to_csv(csv_path, index=False)
 
             # Save the configuration for this analysis to the output folder.
