@@ -7,7 +7,7 @@ This is the repository of RA2CE (*just say race!*) - the Resilience Assessment a
 
 Installation
 ---------------------------
-RA2CE can be operated via the command-line interface with two commands. Before RA2CE can be used, the correct Python environment needs to be installed (see *environment.yml*). Anaconda is a well-known environment manager for Python and can be used to install the correct environment and run RA2CE via its command-line interface. It is recommended to install Miniconda , this is a small version of Anaconda that contains the functionality required for setting up the Python environment for RA2CE.
+RA2CE can be operated via the command-line interface with two commands. Before RA2CE can be used, the correct Python environment needs to be installed (see *environment.yml*). Anaconda is a well-known environment manager for Python and can be used to install the correct environment and run RA2CE via its command-line interface. It is recommended to install Anaconda, instead of `miniconda`, so that you have all required packages already available during the following steps.
 
 If running a development environment with Anaconda, the user may follow these steps in command line:
 ::
