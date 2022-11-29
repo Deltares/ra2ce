@@ -29,8 +29,7 @@ class DamageFunctionByRoadTypeByLane(DamageFunctionBase):
         infra_type="road",
     ):
         # Construct using the parent class __init__
-        super(DamageFunctionByRoadTypeByLane).__init__(
-            self,
+        super().__init__(
             max_damage=max_damage,
             damage_fraction=damage_fraction,
             name=name,

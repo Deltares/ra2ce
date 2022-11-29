@@ -1,4 +1,6 @@
+import abc
 import logging
+from abc import ABC, abstractmethod
 
 import pandas as pd
 
@@ -9,8 +11,7 @@ from ra2ce.analyses.direct.analyses_direct import (
 from ra2ce.analyses.direct.direct_lookup import LookUp as lookup
 
 
-# DATA STRUCTURES
-class DamageNetwork:
+class DamageNetworkBase(ABC):
     """A road network gdf with hazard data stored in it, and for which damages can be calculated"""
 
     def __init__(self, road_gdf, val_cols):
@@ -20,8 +21,19 @@ class DamageNetwork:
         self.stats = set(
             [x.split("_")[2] for x in val_cols]
         )  # set of hazard info per event
-        # events is missing
 
+    @abstractmethod
+    def main(self, damage_function: str, manual_damage_functions):
+        """
+        Controler for doing the EAD calculation
+
+        Args:
+            damage_function (str): damage function key name that is to be used, valid arguments are: 'HZ', 'OSD', 'MAN'
+            manual_damage_functions (ManualDamageFunctions): `ManualDamageFunctions` object
+        """
+        raise ValueError("Needs to be implented in concrete class.")
+
+    # events is missing
     def do_cleanup_and_mask_creation(self):
         """Call all cleanup and mask functions, because this is a standard procedure in most calculations"""
         # CLEANUPS (on the original gdf)
@@ -343,8 +355,7 @@ class DamageNetwork:
             "calculate_damage_OSdaMage(): Damage calculation with the OSdaMage functions was succesfull"
         )
 
-        ### Utils handlers
-
+    ### Utils handlers
     def create_mask(self):
         """
         #Create a mask of only the dataframes with hazard data (to speed-up damage calculations)
@@ -368,98 +379,3 @@ class DamageNetwork:
 
         dam_cols = [c for c in self.gdf.columns if c.startswith("dam_")]
         self.gdf[dam_cols] = self.gdf[dam_cols].fillna(value=np.nan)
-
-
-class DamageNetworkReturnPeriods(DamageNetwork):
-    """A road network gdf with Return-Period based hazard data stored in it, and for which damages can be calculated
-    @Author: Kees van Ginkel
-
-    Mandatory attributes:
-        *self.rps* (set)  : all available unique events
-        *self.stats* (set)   : the available statistics
-    """
-
-    def __init__(self, road_gdf, val_cols):
-        # Construct using the parent class __init__
-        DamageNetwork.__init__(self, road_gdf, val_cols)
-
-        self.return_periods = set(
-            [x.split("_")[1] for x in val_cols]
-        )  # set of unique return_periods
-
-        if not len(self.return_periods) > 1:
-            raise ValueError("No return_period cols present in hazard data")
-
-    ### Controlers for EAD calculation
-    def main(self, damage_function):
-        """Controler for doing the EAD calculation
-
-        Arguments:
-            *damage_function* = damage function that is to be used, valid arguments are: 'HZ', 'OSD', 'MAN'
-            *manual_damage_functions* = ManualDamageFunctions object
-
-        """
-
-        assert len(self.return_periods) > 0, "no return periods identified"
-        assert "me" in self.stats, "mean water depth (key: me) is missing"
-        assert "fr" in self.stats, "inundated fraction (key: fr) is missing"
-
-        self.do_cleanup_and_mask_creation()
-
-        if damage_function == "HZ":
-            self.calculate_damage_HZ(events=self.return_periods)
-
-        if damage_function == "OSD":
-            self.calculate_damage_OSdaMage(events=self.return_periods)
-
-        if damage_function == "MAN":
-            self.calculate_damage_manual_functions(
-                events=self.events, manual_damage_functions=manual_damage_functions
-            )
-
-
-class DamageNetworkEvents(DamageNetwork):
-    """A road network gdf with EVENT-BASED hazard data stored in it, and for which damages can be calculated
-
-    @Author: Kees van Ginkel
-
-    Mandatory attributes:
-        *self.events* (set)  : all available unique events
-        *self.stats* (set)   : the available statistics
-    """
-
-    def __init__(self, road_gdf, val_cols):
-        # Construct using the parent class __init__
-        DamageNetwork.__init__(self, road_gdf, val_cols)
-        self.events = set([x.split("_")[1] for x in val_cols])  # set of unique events
-
-        if not len(self.events) > 0:
-            raise ValueError("No event cols present in hazard data")
-
-    ### Controler for Event-based damage calculation
-    def main(self, damage_function, manual_damage_functions=None):
-        """Controler for doing the EAD calculation
-
-        Arguments:
-            *damage_function* = damage function that is to be used, valid arguments are: 'HZ', 'OSD', 'MAN'
-            *manual_damage_functions* = ManualDamageFunctions object
-
-        """
-        assert len(self.events) > 0, "no return periods identified"
-        assert "me" in self.stats, "mean water depth (key: me) is missing"
-        assert "fr" in self.stats, "inundated fraction (key: fr) is missing"
-
-        self.do_cleanup_and_mask_creation()
-
-        if damage_function == "HZ":
-            self.calculate_damage_HZ(events=self.events)
-
-        if damage_function == "OSD":
-            self.calculate_damage_OSdaMage(events=self.events)
-
-        if damage_function == "MAN":
-            self.calculate_damage_manual_functions(
-                events=self.events, manual_damage_functions=manual_damage_functions
-            )
-
-        #
