@@ -12,7 +12,7 @@ class direct_damage_tests:
     def __init__(self):
         pass
 
-    def event_based_damage_calculation_huizinga(self):
+    def test_event_based_damage_calculation_huizinga(self):
         damage_function = 'HZ'
 
         #This test roughly follows the DirectDamage.road_damage() controller in analyses_direct.py
