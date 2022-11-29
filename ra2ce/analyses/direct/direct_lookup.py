@@ -178,7 +178,7 @@ class LookUp:
         return lookup_dict
 
     @staticmethod
-    def max_damages_huizinga():
+    def get_max_damages_huizinga() -> dict:
         """ Lookup table for max damages calculated with huizinga for number of lanes
 
         Output: dict:
