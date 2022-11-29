@@ -47,17 +47,10 @@ def convert_unit(unit: str) -> Optional[float]:
         unit (str): The unit to convert
 
     Returns:
-        conversion ()
+        Optional[float]: The result of the conversion.
     """
-    if unit == 'centimeters':
-        conversion = 1./100 # meters
-    elif unit == 'meters':
-        conversion = 1. # meters
-    elif unit == 'feet':
-        conversion = 1./3.28084 # meters
-    else:
-        conversion = None
-    return conversion
+    _conversion_dict = dict(centimeters=1/100, meters=1, feet=1/3.28084)
+    return _conversion_dict.get(unit.lower(), None)
 
 
 def drawProgressBar(percent, barLen=20):
