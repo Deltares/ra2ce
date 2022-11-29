@@ -4,10 +4,8 @@ channels:
   - defaults
 dependencies:
   - python=3.9
-  - pip
-  - conda-forge::rasterio
-  - conda-forge::gdal=3.5.2
-  - conda-forge::geos
+  - conda-forge::gdal=3.5.1
   - conda-forge::fiona
-  - poetry
-  - gdal
+  - pip
+  - pip:
+    - poetry
