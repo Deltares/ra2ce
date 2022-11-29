@@ -16,6 +16,7 @@ class TestDirectAnalyses:
             gdf_test_direct_damage,
             gdf_test_direct_damage_correct,
         )
+
         road_gdf = pd.DataFrame.from_dict(gdf_test_direct_damage)
         gdf_correct = pd.DataFrame.from_dict(gdf_test_direct_damage_correct)
 
@@ -29,14 +30,18 @@ class TestDirectAnalyses:
 
         test_outcomes = event_gdf.gdf
 
-        test_outcomes.sort_values('osm_id')
-        gdf_correct.sort_values('osm_id')
+        test_outcomes.sort_values("osm_id")
+        gdf_correct.sort_values("osm_id")
 
         test_outcomes.reset_index(inplace=True)
         gdf_correct.reset_index(inplace=True)
 
-        assert pd.testing.assert_series_equal(test_outcomes['dam_EV1_HZ'], gdf_correct['dam_HZ_rp100'],
-                                              check_dtype=False, check_index_type=False, check_series_type=False,
-                                              check_names=False, check_exact=False
-                                              )
-
+        assert pd.testing.assert_series_equal(
+            test_outcomes["dam_EV1_HZ"],
+            gdf_correct["dam_HZ_rp100"],
+            check_dtype=False,
+            check_index_type=False,
+            check_series_type=False,
+            check_names=False,
+            check_exact=False,
+        )

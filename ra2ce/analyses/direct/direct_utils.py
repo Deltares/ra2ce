@@ -9,8 +9,9 @@ This contains some helper functions for assisting in the direct damage analyses.
 """
 
 import json
-import numpy as np
 import logging
+
+import numpy as np
 import pandas as pd
 
 
@@ -28,16 +29,17 @@ def clean_lane_data(lane_col):
                                     each value is already a float
     """
 
-    #Todo: drawback of this approach is that you cannot easily see which lanes have the erratic lanedata,
-    #The upside is that it is probably faster...
-    #for index, cell in lane_col.iteritems():
+    # Todo: drawback of this approach is that you cannot easily see which lanes have the erratic lanedata,
+    # The upside is that it is probably faster...
+    # for index, cell in lane_col.iteritems():
     #    print(cell, type(cell))
     new_lane_col = lane_col.apply(lambda x: lane_cleaner(x))
 
     return new_lane_col
 
+
 def lane_cleaner(cell):
-    """"
+    """ "
     Helper function to clean an object with lane data and return it as a float
 
     @author: Kees van Ginkel, Deltares
@@ -51,36 +53,58 @@ def lane_cleaner(cell):
     """
     if cell is None:
         new = np.nan
-    elif isinstance(cell,int):
+    elif isinstance(cell, int):
         new = float(cell)
-    elif isinstance(cell,float):
+    elif isinstance(cell, float):
         new = cell
-    elif isinstance(cell,str): #try to unpack the cell
+    elif isinstance(cell, str):  # try to unpack the cell
         try:
             new = float(cell)
         except:
-            logging.warning('Lanedata {} could not be converted to float, if it is a list we will try to unpack'.format(cell))
-            if (';' in cell): #it looks some sort of a list
+            logging.warning(
+                "Lanedata {} could not be converted to float, if it is a list we will try to unpack".format(
+                    cell
+                )
+            )
+            if ";" in cell:  # it looks some sort of a list
                 try:
-                    new = max([float(x) for x in cell.split(';')]) #assumption: better overestimate than underestimate # lanes
-                    logging.warning('Our best guess of the lane number is: {}'.format(new))
-                except:
-                    new=np.nan
-                    logging.warning('Unexpected datatype, lane data removed {} {}'.format(cell, type(cell)))
-            elif (',' in cell):  # it looks some sort of a list
-                try:
-                    new = max([float(x) for x in
-                               cell.split(',')])  # assumption: better overestimate than underestimate # lanes
-                    logging.warning('Our best guess of the lane number is: {}').format(new)
+                    new = max(
+                        [float(x) for x in cell.split(";")]
+                    )  # assumption: better overestimate than underestimate # lanes
+                    logging.warning(
+                        "Our best guess of the lane number is: {}".format(new)
+                    )
                 except:
                     new = np.nan
-                    logging.warning('Unexpected datatype, lane data removed {} {}'.format(cell, type(cell)))
+                    logging.warning(
+                        "Unexpected datatype, lane data removed {} {}".format(
+                            cell, type(cell)
+                        )
+                    )
+            elif "," in cell:  # it looks some sort of a list
+                try:
+                    new = max(
+                        [float(x) for x in cell.split(",")]
+                    )  # assumption: better overestimate than underestimate # lanes
+                    logging.warning("Our best guess of the lane number is: {}").format(
+                        new
+                    )
+                except:
+                    new = np.nan
+                    logging.warning(
+                        "Unexpected datatype, lane data removed {} {}".format(
+                            cell, type(cell)
+                        )
+                    )
     else:
-        logging.warning('Unexpected datatype, lane data removed {} {}'.format(cell,type(cell)))
+        logging.warning(
+            "Unexpected datatype, lane data removed {} {}".format(cell, type(cell))
+        )
         new = np.nan
 
-    #assert type(new) == float
+    # assert type(new) == float
     return new
+
 
 def create_summary_statistics(gdf):
     """
@@ -95,11 +119,7 @@ def create_summary_statistics(gdf):
         *dictionary* (Dict) : keys = road types; values = lanes
 
     """
-    #Todo: in the future we can make it more generic, so that we can easily get the mode/mean/whatever
+    # Todo: in the future we can make it more generic, so that we can easily get the mode/mean/whatever
 
-    dictionary = dict(gdf.groupby('road_type')['lanes'].agg(pd.Series.mode))
+    dictionary = dict(gdf.groupby("road_type")["lanes"].agg(pd.Series.mode))
     return dictionary
-
-
-
-

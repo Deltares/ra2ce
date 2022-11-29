@@ -12,15 +12,15 @@ import sys
 import warnings
 from decimal import Decimal
 from statistics import mean
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 
 import geojson
 import geopandas as gpd
 import networkx as nx
+import numpy as np
 import osmnx
 import pandas as pd
 import pyproj
-import numpy as np
 
 # Hazard overlay
 # from boltons.iterutils import pairwise
@@ -37,7 +37,6 @@ from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
 from shapely.ops import linemerge, unary_union
-from typing import Optional
 
 
 def convert_unit(unit: str) -> Optional[float]:
@@ -49,12 +48,12 @@ def convert_unit(unit: str) -> Optional[float]:
     Returns:
         conversion ()
     """
-    if unit == 'centimeters':
-        conversion = 1./100 # meters
-    elif unit == 'meters':
-        conversion = 1. # meters
-    elif unit == 'feet':
-        conversion = 1./3.28084 # meters
+    if unit == "centimeters":
+        conversion = 1.0 / 100  # meters
+    elif unit == "meters":
+        conversion = 1.0  # meters
+    elif unit == "feet":
+        conversion = 1.0 / 3.28084  # meters
     else:
         conversion = None
     return conversion
@@ -512,7 +511,7 @@ def merge_lines_automatic(
                     )
 
                 # append row to merged gdf
-                add_idx = 0 if merged.empty else max(merged.index)+1
+                add_idx = 0 if merged.empty else max(merged.index) + 1
                 merged.loc[add_idx] = properties_dict
 
             elif line.equals(mline):
@@ -531,7 +530,7 @@ def merge_lines_automatic(
                             )
                         }
                     )
-                add_idx = 0 if merged.empty else max(merged.index)+1
+                add_idx = 0 if merged.empty else max(merged.index) + 1
                 merged.loc[add_idx] = properties_dict
 
     merged["length"] = merged["geometry"].apply(lambda x: line_length(x, crs_))
@@ -616,7 +615,10 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
 
 
 def snap_endpoints_lines(
-    lines_gdf: gpd.GeoDataFrame, max_dist: Union[int, float], idName: str, crs: pyproj.CRS
+    lines_gdf: gpd.GeoDataFrame,
+    max_dist: Union[int, float],
+    idName: str,
+    crs: pyproj.CRS,
 ) -> gpd.GeoDataFrame:
     """Snap endpoints of lines with endpoints or vertices of other lines
     if they are at most max_dist apart. Choose the closest endpoint or vertice.
@@ -687,7 +689,6 @@ def snap_endpoints_lines(
                     {
                         idName: max_id + 1,
                         "geometry": new_line,
-
                         "length": line_length(new_line, crs),
                     },
                     ignore_index=True,
@@ -936,11 +937,18 @@ def cut_lines(lines_gdf, nodes, idName, tolerance, crs_):
 
                     # add the data with one part of the cut linestring
                     properties_dict.update(
-                        {idName: i, "geometry": newline, "length": line_length(newline, crs_)}
+                        {
+                            idName: i,
+                            "geometry": newline,
+                            "length": line_length(newline, crs_),
+                        }
                     )
                     to_add.append(properties_dict)
-                    logging.info("cut line segment {} {}, added new line segment with {} {}".format(idName, i,
-                                                                                                    idName, i))
+                    logging.info(
+                        "cut line segment {} {}, added new line segment with {} {}".format(
+                            idName, i, idName, i
+                        )
+                    )
                 else:
                     properties_dict = lines_gdf.loc[lines_gdf[idName] == i][
                         list_columns
@@ -953,8 +961,11 @@ def cut_lines(lines_gdf, nodes, idName, tolerance, crs_):
                         }
                     )
                     to_add.append(properties_dict)
-                    logging.info("cut line segment {} {}, added new line segment with {} {}".format(idName, i,
-                                                                                                    idName, properties_dict[idName]))
+                    logging.info(
+                        "cut line segment {} {}, added new line segment with {} {}".format(
+                            idName, i, idName, properties_dict[idName]
+                        )
+                    )
                     max_id += 1
 
             # remove the original linestring that has been cut
@@ -977,7 +988,7 @@ def split_line_with_points(line, points):
     for i, d in enumerate(list_dist):
         # Subtract the previous distance from the current distance to cut the segments in the right way.
         if i > 0:
-            d = d - list_dist[i-1]
+            d = d - list_dist[i - 1]
 
         # cut the line at a distance d
         seg, current_line = cut(current_line, d)
@@ -1330,9 +1341,7 @@ def gdf_check_create_unique_ids(gdf, id_name, new_id_name="rfid"):
     check = list(gdf.index)
     logging.info("Started creating unique ids...")
     if len(gdf[id_name].unique()) == len(check):
-        logging.info(
-            "Using the user-defined identifier field {}.".format(id_name)
-        )
+        logging.info("Using the user-defined identifier field {}.".format(id_name))
         return gdf, id_name
     else:
         gdf[new_id_name] = check
