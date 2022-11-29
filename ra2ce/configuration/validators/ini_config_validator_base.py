@@ -104,6 +104,7 @@ class IniConfigValidatorBase(Ra2ceIoValidator):
         if not _report.is_valid():
             return _report
         if "isolation" not in _available_keys:
+            #TODO Fix this, this warning is always there even when the 'isolation' header is in the configuration.
             _report.warn("Header 'isolation' not found in the configuration.")
         else:
             required_headers.append("isolation")
