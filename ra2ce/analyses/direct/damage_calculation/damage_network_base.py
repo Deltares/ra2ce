@@ -1,12 +1,17 @@
 import logging
+from abc import ABC, abstractmethod
+
+import numpy as np
 import pandas as pd
 
-from ra2ce.analyses.direct.analyses_direct import clean_lane_data, create_summary_statistics
 from ra2ce.analyses.direct.direct_lookup import LookUp as lookup
+from ra2ce.analyses.direct.direct_utils import (
+    clean_lane_data,
+    create_summary_statistics,
+)
 
 
-# DATA STRUCTURES
-class DamageNetwork:
+class DamageNetworkBase(ABC):
     """A road network gdf with hazard data stored in it, and for which damages can be calculated"""
 
     def __init__(self, road_gdf, val_cols):
@@ -16,8 +21,19 @@ class DamageNetwork:
         self.stats = set(
             [x.split("_")[2] for x in val_cols]
         )  # set of hazard info per event
-        # events is missing
 
+    @abstractmethod
+    def main(self, damage_function: str, manual_damage_functions):
+        """
+        Controler for doing the EAD calculation
+
+        Args:
+            damage_function (str): damage function key name that is to be used, valid arguments are: 'HZ', 'OSD', 'MAN'
+            manual_damage_functions (ManualDamageFunctions): `ManualDamageFunctions` object
+        """
+        raise ValueError("Needs to be implented in concrete class.")
+
+    # events is missing
     def do_cleanup_and_mask_creation(self):
         """Call all cleanup and mask functions, because this is a standard procedure in most calculations"""
         # CLEANUPS (on the original gdf)
@@ -28,7 +44,6 @@ class DamageNetwork:
         # Mask creation
         self.create_mask()
         self.remove_unclassified_road_types_from_mask()
-
 
     ### Generic cleanup functionality
     def fix_extraordinary_lanes(self):
@@ -82,10 +97,11 @@ class DamageNetwork:
                 "Interpolated the missing lane data as follows: {}".format(lane_stats)
             )
 
-
             assert not (np.nan in gdf.lanes.unique())  # all nans should be replaced
 
-        gdf.loc[gdf['lanes'] == 0, 'lanes'] = 1  #TODO: think about if this is the best option
+        gdf.loc[
+            gdf["lanes"] == 0, "lanes"
+        ] = 1  # TODO: think about if this is the best option
 
         self.gdf = gdf
 
@@ -115,13 +131,17 @@ class DamageNetwork:
         :return:
         """
         df = self._gdf_mask
-        if 'none' in df['road_type'].unique():
-            to_drop = df.loc[df['road_type'] == 'none']
-            logging.warning('We will drop {} rows for which the road_type is unrecognized'.format(to_drop.shape[0]))
-            self._gdf_mask = df.loc[~ (df['road_type'] == 'none')]
+        if "none" in df["road_type"].unique():
+            to_drop = df.loc[df["road_type"] == "none"]
+            logging.warning(
+                "We will drop {} rows for which the road_type is unrecognized".format(
+                    to_drop.shape[0]
+                )
+            )
+            self._gdf_mask = df.loc[~(df["road_type"] == "none")]
 
     ### Damage handlers
-    def calculate_damage_manual_functions(self,events,manual_damage_functions):
+    def calculate_damage_manual_functions(self, events, manual_damage_functions):
         """
         Arguments:
         *events* (list) = list of events (or return periods) to iterate over, these should match the hazard column names
@@ -131,27 +151,28 @@ class DamageNetwork:
         hazard_prefix = "F"
         end = "me"  # indicate that you want to use the mean
 
-        df = self._gdf_mask #dataframe to carry out the damage calculation #todo: this is a bit dirty
+        df = (
+            self._gdf_mask
+        )  # dataframe to carry out the damage calculation #todo: this is a bit dirty
 
         assert manual_damage_functions is not None, "No damage functions were loaded"
 
         for DamFun in manual_damage_functions.loaded:
-            #Add max damage values to df
-            df = DamFun.add_max_damage(df,DamFun.prefix)
+            # Add max damage values to df
+            df = DamFun.add_max_damage(df, DamFun.prefix)
             for event in events:
-                #Add apply interpolator objects
+                # Add apply interpolator objects
                 event_prefix = event
-                df = DamFun.calculate_damage(df,DamFun.prefix,hazard_prefix,event_prefix)
+                df = DamFun.calculate_damage(
+                    df, DamFun.prefix, hazard_prefix, event_prefix
+                )
 
-        #Only transfer the final results to the damage column
+        # Only transfer the final results to the damage column
         dam_cols = [c for c in df.columns if c.startswith("dam_")]
         self.gdf[dam_cols] = df[dam_cols]
         logging.info(
             "Damage calculation with the manual damage functions was succesfull."
         )
-
-
-
 
     def calculate_damage_HZ(self, events):
         """
@@ -182,7 +203,7 @@ class DamageNetwork:
         curve_name = "HZ"
 
         df_max_damages_huizinga = pd.DataFrame.from_dict(lookup.max_damages_huizinga())
-        #max_damages_huizinga = lookup.max_damages_huizinga()
+        # max_damages_huizinga = lookup.max_damages_huizinga()
         interpolator = lookup.flood_curves()[
             "HZ"
         ]  # input: water depth (cm); output: damage (fraction road construction costs)
@@ -203,7 +224,6 @@ class DamageNetwork:
                 * df["length"],
                 2,
             )  # length segment (m)
-
 
         # Add the new columns add the right location to the df
         dam_cols = [c for c in df.columns if c.startswith("dam_")]
@@ -232,8 +252,6 @@ class DamageNetwork:
         logging.warning(
             "These numbers assume that motorways that each driving direction is mapped as a seperate segment such as in OSM!!!"
         )
-
-
 
         # Todo: Dirty fixes, these should be read from the code
         hazard_prefix = "F"
@@ -337,8 +355,7 @@ class DamageNetwork:
             "calculate_damage_OSdaMage(): Damage calculation with the OSdaMage functions was succesfull"
         )
 
-        ### Utils handlers
-
+    ### Utils handlers
     def create_mask(self):
         """
         #Create a mask of only the dataframes with hazard data (to speed-up damage calculations)
@@ -351,7 +368,7 @@ class DamageNetwork:
         gdf_mask = self.gdf.loc[~(self.gdf[val_cols_temp].isna()).all(axis=1)]
         self._gdf_mask = gdf_mask  # todo: not sure if we need to store the mask
 
-        #Also remove the geometries from the mask
+        # Also remove the geometries from the mask
         column_names = list(self._gdf_mask.columns)
         if "geometry" in column_names:
             column_names.remove("geometry")
@@ -359,99 +376,6 @@ class DamageNetwork:
 
     def replace_none_with_nan(self):
         import numpy as np
+
         dam_cols = [c for c in self.gdf.columns if c.startswith("dam_")]
         self.gdf[dam_cols] = self.gdf[dam_cols].fillna(value=np.nan)
-
-
-
-class DamageNetworkReturnPeriods(DamageNetwork):
-    """A road network gdf with Return-Period based hazard data stored in it, and for which damages can be calculated
-    @Author: Kees van Ginkel
-
-    Mandatory attributes:
-        *self.rps* (set)  : all available unique events
-        *self.stats* (set)   : the available statistics
-    """
-
-    def __init__(self, road_gdf, val_cols):
-        # Construct using the parent class __init__
-        DamageNetwork.__init__(self, road_gdf, val_cols)
-
-        self.return_periods = set(
-            [x.split("_")[1] for x in val_cols]
-        )  # set of unique return_periods
-
-        if not len(self.return_periods) > 1:
-            raise ValueError('No return_period cols present in hazard data')
-
-    ### Controlers for EAD calculation
-    def main(self, damage_function):
-        """Controler for doing the EAD calculation
-
-        Arguments:
-            *damage_function* = damage function that is to be used, valid arguments are: 'HZ', 'OSD', 'MAN'
-            *manual_damage_functions* = ManualDamageFunctions object
-
-        """
-
-        assert len(self.return_periods) > 0, "no return periods identified"
-        assert "me" in self.stats, "mean water depth (key: me) is missing"
-        assert "fr" in self.stats, "inundated fraction (key: fr) is missing"
-
-        self.do_cleanup_and_mask_creation()
-
-        if damage_function == "HZ":
-            self.calculate_damage_HZ(events=self.return_periods)
-
-        if damage_function == "OSD":
-            self.calculate_damage_OSdaMage(events=self.return_periods)
-
-        if damage_function == "MAN":
-            self.calculate_damage_manual_functions(events=self.events, manual_damage_functions=manual_damage_functions)
-
-
-class DamageNetworkEvents(DamageNetwork):
-    """A road network gdf with EVENT-BASED hazard data stored in it, and for which damages can be calculated
-
-    @Author: Kees van Ginkel
-
-    Mandatory attributes:
-        *self.events* (set)  : all available unique events
-        *self.stats* (set)   : the available statistics
-    """
-
-    def __init__(self, road_gdf, val_cols):
-        # Construct using the parent class __init__
-        DamageNetwork.__init__(self, road_gdf, val_cols)
-        self.events = set(
-            [x.split("_")[1] for x in val_cols]
-        )  # set of unique events
-
-        if not len(self.events) > 0:
-            raise ValueError('No event cols present in hazard data')
-
-    ### Controler for Event-based damage calculation
-    def main(self, damage_function, manual_damage_functions=None):
-        """Controler for doing the EAD calculation
-
-        Arguments:
-            *damage_function* = damage function that is to be used, valid arguments are: 'HZ', 'OSD', 'MAN'
-            *manual_damage_functions* = ManualDamageFunctions object
-
-        """
-        assert len(self.events) > 0, "no return periods identified"
-        assert "me" in self.stats, "mean water depth (key: me) is missing"
-        assert "fr" in self.stats, "inundated fraction (key: fr) is missing"
-
-        self.do_cleanup_and_mask_creation()
-
-        if damage_function == "HZ":
-            self.calculate_damage_HZ(events=self.events)
-
-        if damage_function == "OSD":
-            self.calculate_damage_OSdaMage(events=self.events)
-
-        if damage_function == "MAN":
-            self.calculate_damage_manual_functions(events=self.events, manual_damage_functions=manual_damage_functions)
-
-        #

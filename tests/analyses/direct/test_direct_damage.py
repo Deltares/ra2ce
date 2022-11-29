@@ -3,8 +3,8 @@ import pandas as pd
 from pathlib import Path
 import pytest
 
-from ra2ce.analyses.direct.direct_damage_calculation import DamageNetworkEvents
-from ra2ce.analyses.direct.DamageFunctions import ManualDamageFunctions
+from ra2ce.analyses.direct.damage_calculation.damage_network_events import DamageNetworkEvents
+from ra2ce.analyses.direct.damage.manual_damage_functions import ManualDamageFunctions
 
 
 ### Tests
