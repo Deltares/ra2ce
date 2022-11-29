@@ -8,7 +8,7 @@ from ra2ce.analyses.direct.DamageFunctions import ManualDamageFunctions
 
 ### Tests
 
-class direct_damage_tests:
+class TestDirectDamage:
     def __init__(self):
         pass
 
