@@ -178,7 +178,7 @@ class LookUp:
         return lookup_dict
 
     @staticmethod
-    def max_damages_huizinga():
+    def get_max_damages_huizinga() -> dict:
         """ Lookup table for max damages calculated with huizinga for number of lanes
 
         Output: dict:
@@ -208,7 +208,7 @@ class LookUp:
         return lookup_dict
 
     @staticmethod
-    def flood_curves() -> dict:
+    def get_flood_curves() -> dict:
         """ Lookup flood curve values and create interpolator around it
 
         Units of the interpolator objects: water depth in cm on x-axis; damage fraction (unitless) on y-axis
