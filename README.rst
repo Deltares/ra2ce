@@ -11,6 +11,7 @@ RA2CE can be operated via the command-line interface with two commands. Before R
 
 If running a development environment with Anaconda, the user may follow these steps in command line:
 ::
+  cd <to the main repository RA2CE folder>
   conda env create -f environment.yml
   poetry install
 ::
