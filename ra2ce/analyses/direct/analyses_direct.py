@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
 import logging
 import time
-
 from pathlib import Path
 
 import geopandas as gpd
-import numpy as np
-import pandas as pd
 
+from ra2ce.analyses.direct.cost_benefit_analysis import EffectivenessMeasures
+from ra2ce.analyses.direct.damage.damage_fraction_uniform import DamageFractionUniform
+from ra2ce.analyses.direct.damage.manual_damage_functions import ManualDamageFunctions
+from ra2ce.analyses.direct.damage.max_damage import MaxDamageByRoadTypeByLane
+from ra2ce.analyses.direct.direct_damage_calculation import (
+    DamageNetworkEvents,
+    DamageNetworkReturnPeriods,
+)
 from ra2ce.analyses.direct.direct_utils import *
 
 
@@ -78,9 +83,6 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
             *result_gdf* (GeoDataFrame) : The original hazard dataframe with the result of the damage calculations added
 
         """
-        from ra2ce.analyses.direct.direct_damage_calculation import DamageNetworkReturnPeriods, DamageNetworkEvents
-        from ra2ce.analyses.direct.DamageFunctions import ManualDamageFunctions
-
         # Open the network with hazard data
         road_gdf = self.graphs["base_network_hazard"]
         if self.graphs["base_network_hazard"] is None:
@@ -92,28 +94,34 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         ]
 
         # Read the desired damage function
-        damage_function = analysis['damage_curve']
+        damage_function = analysis["damage_curve"]
 
         # If you want to use manual damage functions, these need to be loaded first
         manual_damage_functions = None
-        if analysis['damage_curve'] == 'MAN':
+        if analysis["damage_curve"] == "MAN":
             manual_damage_functions = ManualDamageFunctions()
-            manual_damage_functions.find_damage_functions(folder=(self.config['input'] / 'damage_functions'))
+            manual_damage_functions.find_damage_functions(
+                folder=(self.config["input"] / "damage_functions")
+            )
             manual_damage_functions.load_damage_functions()
 
         # Choose between event or return period based analysis
-        if analysis['event_type'] == 'event':
+        if analysis["event_type"] == "event":
 
             event_gdf = DamageNetworkEvents(road_gdf, val_cols)
-            event_gdf.main(damage_function=damage_function,
-                           manual_damage_functions=manual_damage_functions)
+            event_gdf.main(
+                damage_function=damage_function,
+                manual_damage_functions=manual_damage_functions,
+            )
 
             return event_gdf.gdf
 
-        elif analysis['event_type'] == 'return_period':
-            return_period_gdf = DamageNetworkReturnPeriods(road_gdf,val_cols)
-            DamageNetworkReturnPeriods.main(damage_function=damage_function,
-                                            manual_damage_functions=manual_damage_functions)
+        elif analysis["event_type"] == "return_period":
+            return_period_gdf = DamageNetworkReturnPeriods(road_gdf, val_cols)
+            DamageNetworkReturnPeriods.main(
+                damage_function=damage_function,
+                manual_damage_functions=manual_damage_functions,
+            )
 
             return return_period_gdf.gdf
 
@@ -121,7 +129,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
             raise ValueError(
                 """"The hazard calculation does not know 
             what to do if the analysis specifies {}""".format(
-                    analysis['event_type']
+                    analysis["event_type"]
                 )
             )
 
@@ -192,19 +200,25 @@ def save_gdf(gdf, save_path):
     logging.info("Results saved to: {}".format(save_path))
 
 
-#Tests:
+# Tests:
 def test_construct_max_damage():
-    max_damage = MaxDamage_byRoadType_byLane()
-    path = Path(r"D:\Python\ra2ce\data\1010b_zuid_holland\input\damage_function\test\huizinga_max_damage.csv")
-    max_damage.from_csv(path,sep=';')
+    max_damage = MaxDamageByRoadTypeByLane()
+    path = Path(
+        r"D:\Python\ra2ce\data\1010b_zuid_holland\input\damage_function\test\huizinga_max_damage.csv"
+    )
+    max_damage.from_csv(path, sep=";")
     return max_damage
+
 
 def test_construct_damage_fraction():
     damage_fraction = DamageFractionUniform()
-    path = Path(r"D:\Python\ra2ce\data\1010b_zuid_holland\input\damage_function\test\huizinga_damage_fraction_hazard_severity.csv")
-    damage_fraction.from_csv(path,sep=';')
+    path = Path(
+        r"D:\Python\ra2ce\data\1010b_zuid_holland\input\damage_function\test\huizinga_damage_fraction_hazard_severity.csv"
+    )
+    damage_fraction.from_csv(path, sep=";")
     return damage_fraction
 
-#max_damage = test_construct_max_damage()
 
-#max_damage = test_construct_damage_fraction()
+# max_damage = test_construct_max_damage()
+
+# max_damage = test_construct_damage_fraction()
