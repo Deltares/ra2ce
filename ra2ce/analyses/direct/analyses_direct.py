@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import logging
 import time
 from pathlib import Path
@@ -13,7 +12,6 @@ from ra2ce.analyses.direct.damage_calculation import (
     DamageNetworkEvents,
     DamageNetworkReturnPeriods,
 )
-from ra2ce.analyses.direct.direct_utils import *
 
 
 class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION

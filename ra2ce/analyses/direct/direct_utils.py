@@ -1,14 +1,3 @@
-# -*- coding: utf-8 -*-
-
-"""
-Created on 10-5-2022
-
-@author: Kees van Ginkel, Deltares
-
-This contains some helper functions for assisting in the direct damage analyses.
-"""
-
-import json
 import logging
 
 import numpy as np

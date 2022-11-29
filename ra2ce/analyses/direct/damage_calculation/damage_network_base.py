@@ -1,14 +1,14 @@
-import abc
 import logging
 from abc import ABC, abstractmethod
 
+import numpy as np
 import pandas as pd
 
-from ra2ce.analyses.direct.analyses_direct import (
+from ra2ce.analyses.direct.direct_lookup import LookUp as lookup
+from ra2ce.analyses.direct.direct_utils import (
     clean_lane_data,
     create_summary_statistics,
 )
-from ra2ce.analyses.direct.direct_lookup import LookUp as lookup
 
 
 class DamageNetworkBase(ABC):
