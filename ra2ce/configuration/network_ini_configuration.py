@@ -21,7 +21,6 @@ def network_handler(config: dict, files: dict) -> Optional[dict]:
         raise e
 
 
-
 def hazard_handler(config: dict, graphs: dict, files: dict) -> Optional[dict]:
     if config["hazard"]["hazard_map"] is not None:
         # There is a hazard map or multiple hazard maps that should be intersected with the graph.
@@ -59,7 +58,7 @@ class NetworkIniConfiguration(IniConfiguration):
                     "base_network_hazard.feather",
                     "origins_destinations_graph.p",
                     "base_graph_hazard.p",
-                    "origins_destinations_graph_hazard.p"
+                    "origins_destinations_graph_hazard.p",
                 ],
             )
         )

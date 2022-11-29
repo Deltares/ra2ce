@@ -8,8 +8,9 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [3.9]
-        os: [ubuntu-20.04, windows-latest]
+        os: [ubuntu-latest, windows-latest]
     runs-on: ${{ matrix.os }}
+    permissions: write-all
     steps:
       - uses: actions/checkout@v2
         with:
@@ -40,13 +41,12 @@ jobs:
         run: |
           conda activate ra2ce_env
           poetry run pytest -v -m "not slow_test" --cov=ra2ce --cov-report xml:coverage-reports/coverage-ra2ce.xml --junitxml=xunit-reports/xunit-result-ra2ce.xml
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-
+          poetry run coverage xml -i
       - name: Autoformat code if the check fails
-        if: ${{ (matrix.os == 'ubuntu-20.04') && (matrix.python-version == 3.9) }}
+        if: ${{ (matrix.os == 'ubuntu-latest') && (matrix.python-version == 3.9) }}
         shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
         run: |
           conda activate ra2ce_env
           poetry run isort .
@@ -54,14 +54,12 @@ jobs:
           git config --global user.name '${{ github.actor }}'
           git config --global user.email '${{ github.actor }}@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
-          git fetch
           git checkout $GITHUB_HEAD_REF
           git commit -am "autoformat: isort & black" && git push || true
-      
       # We only want to run the sonar cloud analysis during 'unit' and 'integration' tests so they are more accurate.
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
-        if: ${{ (matrix.os == 'ubuntu-20.04') && (matrix.python-version == 3.9) }}
+        if: ${{ (matrix.os == 'ubuntu-latest') && (matrix.python-version == 3.9) }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

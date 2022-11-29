@@ -51,6 +51,12 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+# Coverages
+.scannerwork/
+*-reports/**
+.coverage
+coverage.xml
+
 # Translations
 *.mo
 *.pot
