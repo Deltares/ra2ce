@@ -1,6 +1,7 @@
 #Some tests that we need to insert in the test module later.
 import pandas as pd
 from pathlib import Path
+import pytest
 
 from ra2ce.analyses.direct.direct_damage_calculation import DamageNetworkEvents
 from ra2ce.analyses.direct.DamageFunctions import ManualDamageFunctions
@@ -12,6 +13,7 @@ class TestDirectDamage:
     def __init__(self):
         pass
 
+    @pytest.mark.skip(reason="Not yet finished")
     def test_event_based_damage_calculation_huizinga(self):
         damage_function = 'HZ'
 
@@ -43,7 +45,6 @@ class TestDirectDamage:
                 print('Below the 5 first differences')
                 print(event_gdf.gdf[~comparison2].head())
                 print(test_ref_output[~comparison2].head())
-
 
     def event_based_damage_calculation_OSdaMage(self):
         pass
@@ -172,7 +173,7 @@ def prepare_event_test_input_output():
 
     return test_input,test_output
 
-tests = direct_damage_tests()
-tests.event_based_damage_calculation_huizinga()
-tests.load_manual_damage_function()
-tests.event_based_damage_calculation_manualfunction()
+# tests = direct_damage_tests()
+# tests.event_based_damage_calculation_huizinga()
+# tests.load_manual_damage_function()
+# tests.event_based_damage_calculation_manualfunction()
