@@ -208,7 +208,7 @@ class LookUp:
         return lookup_dict
 
     @staticmethod
-    def flood_curves() -> dict:
+    def get_flood_curves() -> dict:
         """ Lookup flood curve values and create interpolator around it
 
         Units of the interpolator objects: water depth in cm on x-axis; damage fraction (unitless) on y-axis
