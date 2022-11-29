@@ -3,19 +3,17 @@ import pandas as pd
 import pytest
 
 from ra2ce.analyses.direct.damage_calculation import DamageNetworkEvents
+from tests.analyses.direct import gdf_test_direct_damage as road_gdf
+from tests.analyses.direct import gdf_test_direct_damage_correct as gdf_correct
 
 
 class TestDirectAnalyses:
     @pytest.mark.skip(reason="Results are not yet comparable")
-    def test_direct_analysis_event_huizinga(self):
-        from tests.test_data.direct_analyses_data.direct_analyses_data import (
-            gdf_test_direct_damage,
-            gdf_test_direct_damage_correct,
-        )
-
-        road_gdf = pd.DataFrame.from_dict(gdf_test_direct_damage)
-        gdf_correct = pd.DataFrame.from_dict(gdf_test_direct_damage_correct)
-
+    def test_direct_analysis_event_huizinga(
+        self, road_gdf: pd.DataFrame, gdf_correct: pd.DataFrame
+    ):
+        assert isinstance(road_gdf, pd.DataFrame)
+        assert isinstance(gdf_correct, pd.DataFrame)
         # Find the hazard columns
         val_cols = [
             col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
