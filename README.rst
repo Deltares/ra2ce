@@ -13,7 +13,9 @@ If running a development environment with Anaconda, the user may follow these st
 ::
   cd <to the main repository RA2CE folder>
   conda env create -f environment.yml
+  conda activate ra2ce_env
   poetry install
+  pip install -e .
 ::
 
 Command-line interface operation
