@@ -181,7 +181,7 @@ def find_closest_vertice(
     return origins_destinations
 
 
-def find_new_nearest_vertice(edge_list, graph, od, id_name, match_OD, i):
+def find_new_nearest_vertice(edge_list, match_OD):
     vertices_dict = {}
     for line in edge_list:
         vertices_dict[(line[0], line[1])] = [
@@ -318,7 +318,7 @@ def add_od_nodes(graph, od, graph_crs, id_name="rfid"):
                     if str(e[-1][id_name]) == od.iloc[i]["match_ids"]
                 ]
                 all_matches, match_OD = find_new_nearest_vertice(
-                    edge_list, graph, od, id_name, match_OD, i
+                    edge_list, match_OD
                 )
         if len(all_matches) == 1:
             if [
@@ -333,14 +333,14 @@ def add_od_nodes(graph, od, graph_crs, id_name="rfid"):
                     if str(e[-1][id_name]) == od.iloc[i]["match_ids"]
                 ]
                 all_matches, match_OD = find_new_nearest_vertice(
-                    edge_list, graph, od, id_name, match_OD, i
+                    edge_list, match_OD
                 )
         if (
             len(all_matches) == 0
         ):  # when the edge does not exist anymore in the adjusted graph. look over the full graph and find the nearest vertice
             edge_list = [e for e in graph.edges.data() if "geometry" in e[-1]]
             all_matches, match_OD = find_new_nearest_vertice(
-                edge_list, graph, od, id_name, match_OD, i
+                edge_list, match_OD
             )
         m = all_matches[0]
 
