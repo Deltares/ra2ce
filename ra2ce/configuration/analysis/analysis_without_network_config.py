@@ -4,7 +4,7 @@ from pathlib import Path
 
 import geopandas as gpd
 
-from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData,NetworkConfig
+from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData, NetworkConfig
 from ra2ce.io.readers import GraphPickleReader
 
 
@@ -39,7 +39,7 @@ class AnalysisWithoutNetworkConfiguration(AnalysisConfigBase):
             config_data.files = NetworkConfig._get_existent_network_files(
                 _static_dir / "output_graph"
             )
-        _new_analysis_config.config_data['files'] = config_data.files
+        _new_analysis_config.config_data["files"] = config_data.files
         return _new_analysis_config
 
     def _read_graphs_from_config(self) -> dict:
@@ -52,17 +52,13 @@ class AnalysisWithoutNetworkConfiguration(AnalysisConfigBase):
         for input_graph in ["base_graph", "origins_destinations_graph"]:
             filename = _static_output_dir / f"{input_graph}.p"
             if filename.is_file():
-                _graphs[input_graph] = _pickle_reader.read(
-                    filename
-                )
+                _graphs[input_graph] = _pickle_reader.read(filename)
             else:
                 _graphs[input_graph] = None
 
             filename = _static_output_dir / f"{input_graph}_hazard.p"
             if filename.is_file():
-                _graphs[input_graph + "_hazard"] = _pickle_reader.read(
-                    filename
-                )
+                _graphs[input_graph + "_hazard"] = _pickle_reader.read(filename)
             else:
                 _graphs[input_graph + "_hazard"] = None
 

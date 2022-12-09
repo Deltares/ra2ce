@@ -115,7 +115,7 @@ class Hazard:
                     str(self.hazard_files["tif"][i]),
                     all_touched=True,
                     stats="min max",
-                    add_stats={'mean': mean_ignore_nan}
+                    add_stats={"mean": mean_ignore_nan},
                 )
             )
             gdf[rn + "_mi"] = [x[0]["min"] for x in flood_stats]
@@ -189,13 +189,13 @@ class Hazard:
                 {"geometry": [edata["geometry"] for u, v, k, edata in edges_geoms]}
             )
             tqdm.pandas(desc="Graph hazard overlay with " + hn)
-            if self.aggregate_wl == 'mean':
+            if self.aggregate_wl == "mean":
                 flood_stats = gdf.geometry.progress_apply(
                     lambda x: zonal_stats(
                         x,
                         str(self.hazard_files["tif"][i]),
                         all_touched=True,
-                        add_stats={'mean': mean_ignore_nan}
+                        add_stats={"mean": mean_ignore_nan},
                     )
                 )
             else:
@@ -732,12 +732,14 @@ class Hazard:
                     self.graphs[input_graph] = gpd.read_feather(file_path)
 
         #### Step 1: hazard overlay of the base graph (NetworkX) ###
-        if self.files['base_graph']:
+        if self.files["base_graph"]:
             if self.files["base_graph_hazard"] is None:
                 graph = self.graphs["base_graph"]
 
                 # Check if the graph needs to be reprojected
-                hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
+                hazard_crs = pyproj.CRS.from_user_input(
+                    self.config["hazard"]["hazard_crs"]
+                )
                 graph_crs = pyproj.CRS.from_user_input(
                     "EPSG:4326"
                 )  # this is WGS84, TODO: Make flexible by including in the network ini
@@ -756,7 +758,9 @@ class Hazard:
                     )
 
                     # Do the actual hazard intersect
-                    base_graph_hazard_reprojected = self.hazard_intersect(graph_reprojected)
+                    base_graph_hazard_reprojected = self.hazard_intersect(
+                        graph_reprojected
+                    )
 
                     # Assign the original geometries to the reprojected raster
                     self.graphs["base_graph_hazard"] = self.get_original_geoms_graph(
@@ -784,7 +788,7 @@ class Hazard:
                     pass
 
         #### Step 2: hazard overlay of the origins_destinations (NetworkX) ###
-        if self.files['origins_destinations_graph']:
+        if self.files["origins_destinations_graph"]:
             if (
                 (self.config["origins_destinations"]["origins"])
                 and (self.config["origins_destinations"]["destinations"])
@@ -793,7 +797,9 @@ class Hazard:
                 graph = self.graphs["origins_destinations_graph"]
 
                 # Check if the graph needs to be reprojected
-                hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
+                hazard_crs = pyproj.CRS.from_user_input(
+                    self.config["hazard"]["hazard_crs"]
+                )
                 graph_crs = pyproj.CRS.from_user_input(
                     "EPSG:4326"
                 )  # this is WGS84, TODO: Make flexible by including in the network ini
@@ -819,7 +825,9 @@ class Hazard:
                     # Assign the original geometries to the reprojected raster
                     self.graphs[
                         "origins_destinations_graph_hazard"
-                    ] = self.get_original_geoms_graph(graph, od_graph_hazard_reprojected)
+                    ] = self.get_original_geoms_graph(
+                        graph, od_graph_hazard_reprojected
+                    )
 
                     # Clean up memory
                     clean_memory([graph_reprojected, od_graph_hazard_reprojected])
@@ -838,7 +846,9 @@ class Hazard:
         if self.files["base_network"]:
             if self.files["base_network_hazard"] is None:
                 # Check if the graph needs to be reprojected
-                hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
+                hazard_crs = pyproj.CRS.from_user_input(
+                    self.config["hazard"]["hazard_crs"]
+                )
                 gdf_crs = pyproj.CRS.from_user_input(self.graphs["base_network"].crs)
 
                 if (
@@ -851,11 +861,17 @@ class Hazard:
                         )
                     )
                     extent_gdf = self.graphs["base_network"].total_bounds
-                    logging.info("Gdf extent before reprojecting: {}".format(extent_gdf))
-                    gdf_reprojected = self.graphs["base_network"].copy().to_crs(hazard_crs)
+                    logging.info(
+                        "Gdf extent before reprojecting: {}".format(extent_gdf)
+                    )
+                    gdf_reprojected = (
+                        self.graphs["base_network"].copy().to_crs(hazard_crs)
+                    )
                     extent_gdf_reprojected = gdf_reprojected.total_bounds
                     logging.info(
-                        "Gdf extent after reprojecting: {}".format(extent_gdf_reprojected)
+                        "Gdf extent after reprojecting: {}".format(
+                            extent_gdf_reprojected
+                        )
                     )
 
                     # Do the actual hazard intersect
@@ -894,7 +910,9 @@ class Hazard:
                 locations = gpd.read_file(self.config["isolation"]["locations"][0])
                 locations["i_id"] = locations.index
                 locations_crs = pyproj.CRS.from_user_input(locations.crs)
-                hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
+                hazard_crs = pyproj.CRS.from_user_input(
+                    self.config["hazard"]["hazard_crs"]
+                )
 
                 if (
                     hazard_crs != locations_crs

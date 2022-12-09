@@ -4,12 +4,12 @@ Created on 26-7-2021
 """
 
 import logging
+from pathlib import Path
 from typing import Any, List, Tuple
 
 # external modules
 import pyproj
 from osmnx.graph import graph_from_xml
-from pathlib import Path
 
 # local modules
 from ra2ce.graph.networks_utils import *
@@ -138,7 +138,9 @@ class Network:
         nodes = create_nodes(edges, crs, self.config["cleanup"]["cut_at_intersections"])
         logging.info("Function [create_nodes]: executed")
 
-        edges = cut_lines(edges, nodes, id_name, tolerance=0.00001, crs_=crs) ## PAY ATTENTION TO THE TOLERANCE, THE UNIT IS DEGREES
+        edges = cut_lines(
+            edges, nodes, id_name, tolerance=0.00001, crs_=crs
+        )  ## PAY ATTENTION TO THE TOLERANCE, THE UNIT IS DEGREES
         logging.info("Function [cut_lines]: executed")
 
         if not edges.crs:
@@ -157,9 +159,7 @@ class Network:
 
         # Create networkx graph from geodataframe
         graph_complex = graph_from_gdf(edges_complex, nodes, node_id="node_fid")
-        logging.info(
-            "Function [graph_from_gdf]: executed"
-        )
+        logging.info("Function [graph_from_gdf]: executed")
 
         if self.segmentation_length is not None:
             edges_complex = Segmentation(edges_complex, self.segmentation_length)
@@ -199,25 +199,30 @@ class Network:
             )
         )
 
-        logging.warning("Any coordinate projection information in the feather file will be overwritten (with default WGS84)")
+        logging.warning(
+            "Any coordinate projection information in the feather file will be overwritten (with default WGS84)"
+        )
         # Make a pyproj CRS from the EPSG code
         crs = pyproj.CRS.from_user_input(crs)
 
-        #edges = pd.read_pickle(
+        # edges = pd.read_pickle(
         #    self.config["static"] / "network" / self.config["network"]["primary_file"]
-        #)
+        # )
 
-        edge_file = self.config["static"] / "network" / self.config["network"]["primary_file"]
+        edge_file = (
+            self.config["static"] / "network" / self.config["network"]["primary_file"]
+        )
         edges = gpd.read_feather(edge_file)
         edges = edges.set_crs(crs)
-
 
         corresponding_node_file = (
             self.config["static"]
             / "network"
             / self.config["network"]["primary_file"].replace("edges", "nodes")
         )
-        assert corresponding_node_file.exists(), 'The node file could not be found while importing from TRAILS'
+        assert (
+            corresponding_node_file.exists()
+        ), "The node file could not be found while importing from TRAILS"
         nodes = gpd.read_feather(corresponding_node_file)
         nodes = nodes.set_crs(crs)
         # nodes = pd.read_pickle(
@@ -434,14 +439,16 @@ class Network:
 
         # Check if there are any multilinestrings and convert them to linestrings.
         if lines["geometry"].apply(lambda row: isinstance(row, MultiLineString)).any():
-            mls_idx = lines.loc[lines["geometry"].apply(lambda row: isinstance(row, MultiLineString))].index
+            mls_idx = lines.loc[
+                lines["geometry"].apply(lambda row: isinstance(row, MultiLineString))
+            ].index
             for idx in mls_idx:
                 # Multilinestrings to linestrings
                 new_rows_geoms = list(lines.iloc[idx]["geometry"].geoms)
                 for nrg in new_rows_geoms:
                     dict_attributes = dict(lines.iloc[idx])
-                    dict_attributes['geometry'] = nrg
-                    lines.loc[max(lines.index)+1] = dict_attributes
+                    dict_attributes["geometry"] = nrg
+                    lines.loc[max(lines.index) + 1] = dict_attributes
 
             lines = lines.drop(labels=mls_idx, axis=0)
 
@@ -554,10 +561,17 @@ class Network:
 
             # Set the road lengths to meters for both the base_graph and network_gdf
             # TODO: rename "length" column to "length [m]" to be explicit
-            edges_lengths_meters = {(e[0], e[1], e[2]): {"length": line_length(e[-1]["geometry"], self.base_graph_crs)} for e in base_graph.edges.data(keys=True)}
+            edges_lengths_meters = {
+                (e[0], e[1], e[2]): {
+                    "length": line_length(e[-1]["geometry"], self.base_graph_crs)
+                }
+                for e in base_graph.edges.data(keys=True)
+            }
             nx.set_edge_attributes(base_graph, edges_lengths_meters)
 
-            network_gdf["length"] = network_gdf["geometry"].apply(lambda x: line_length(x, self.base_network_crs))
+            network_gdf["length"] = network_gdf["geometry"].apply(
+                lambda x: line_length(x, self.base_network_crs)
+            )
 
             if self.config["network"]["source"] == "OSM download":
                 base_graph = self.get_avg_speed(base_graph)
