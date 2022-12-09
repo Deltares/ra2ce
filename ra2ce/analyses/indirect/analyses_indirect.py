@@ -1186,9 +1186,7 @@ class IndirectAnalyses:
 
             # find the disconnected islands and merge their linestrings into one multilinestring
             # save the geometries in a geodataframe where later the isolated are counted in
-            results = gpd.GeoDataFrame(
-                columns=["fid", "count", "geometry"], geometry="geometry", crs=crs
-            )
+            results_list_gdf = []
             for ii, g in enumerate(connected_components):
                 if g.size() == 0:
                     continue
@@ -1198,10 +1196,12 @@ class IndirectAnalyses:
                     edges_geoms.append(edge[-1]["geometry"])
                     count_edges += 1
                 total_geom = MultiLineString(edges_geoms)
-                results = results.append(
+                results_list_gdf.append(gpd.GeoDataFrame(
                     {"fid": ii, "count": count_edges, "geometry": total_geom},
-                    ignore_index=True,
+                    geometry="geometry", crs=crs)
                 )
+
+            results = gpd.GeoDataFrame(pd.concat(results_list_gdf, ignore_index=True), geometry="geometry", crs=crs)
 
             # remove the largest (main) graph
             results.sort_values(by="count", ascending=False, inplace=True)
@@ -1907,9 +1907,15 @@ def calc_pref_routes_closest_dest(
         edgesinpath = list(zip(pref_nodes[0:], pref_nodes[1:]))
 
         # Find the number of people per neighborhood
-        nr_people_per_route_total = origins.loc[
-            origins[od_id] == int(o[1].split("_")[-1]), nr_people_name
-        ].iloc[0]
+        try:
+            nr_people_per_route_total = origins.loc[
+                origins[od_id] == int(o[1].split("_")[-1]), nr_people_name
+            ].iloc[0]
+        except IndexError:
+            origin_node = [a for a in o[1].split(",") if 'A' in a][0]
+            nr_people_per_route_total = origins.loc[
+                origins[od_id] == int(origin_node.split("_")[-1]), nr_people_name
+            ].iloc[0]
         nr_per_route = nr_people_per_route_total * factor_out
 
         pref_edges = []
@@ -1999,9 +2005,15 @@ def calc_routes_closest_dest(
         alt_nodes = nx.dijkstra_path(graph, o[0], d[0], weight=weighing)
 
         # Find the number of people per neighborhood
-        nr_people_per_route_total = origin.loc[
-            origin[od_id] == int(o[1].split("_")[-1]), nr_people_name
-        ].iloc[0]
+        try:
+            nr_people_per_route_total = origin.loc[
+                origin[od_id] == int(o[1].split("_")[-1]), nr_people_name
+            ].iloc[0]
+        except IndexError:
+            origin_node = [a for a in o[1].split(",") if 'A' in a][0]
+            nr_people_per_route_total = origin.loc[
+                origin[od_id] == int(origin_node.split("_")[-1]), nr_people_name
+            ].iloc[0]
         nr_per_route = nr_people_per_route_total * factor_hospital
 
         # find out which edges belong to the preferred path

@@ -92,8 +92,14 @@ def read_OD_files(
     return od
 
 
+def closest_node(node, nodes):
+    deltas = nodes - node
+    dist_2 = np.einsum('ij,ij->i', deltas, deltas)
+    return nodes[np.argmin(dist_2)]
+
+
 def create_OD_pairs(od, graph, id_name="rfid"):
-    """Get centroids of the selected NUTS-3 regions and gets closest vertice on the road of a graph.
+    """Gets from each origin and destination the closest vertice on the graph edge.
     Args:
         origins [string]: file path of shapefile of the NUTS-3 regions in Europe
         country_codes [list of string(s)]: list of NUTS country codes
@@ -105,80 +111,36 @@ def create_OD_pairs(od, graph, id_name="rfid"):
     Returns:
         centroids: dataframe of vertices closest to the centroids of the selected NUTS-3 regions
     """
+    logging.info("Finding vertices closest to Origins and Destinations")
 
-    # find closest vertice of road network to centroid
     # create dictionary of the roads geometries
-    edge_list = [e for e in graph.edges.data() if "geometry" in e[-1]]
-    vertices_dict = {}
+    edge_list = [e for e in graph.edges.data(keys=True) if "geometry" in e[-1]]
+    inverse_vertices_dict = {}
     for i, line in enumerate(edge_list):
-        vertices_dict[(line[0], line[1])] = [
-            Point(p) for p in set(list(line[-1]["geometry"].coords))
-        ]
+        inverse_vertices_dict.update({p: (line[0], line[1], line[2]) for p in set(list(line[-1]["geometry"].coords))})
 
     # create list of all points to search in
-    all_vertices = [p for sublist in list(vertices_dict.values()) for p in sublist]
+    all_vertices = np.array([p for p in list(inverse_vertices_dict.keys())])
 
-    # create an empty spatial index object to search in
-    idx = rtree.index.Index()
-
-    # populate the spatial index
-    for i, pnt in enumerate(all_vertices):
-        idx.insert(i, pnt.bounds)
-
-    od = find_closest_vertice(od, idx, all_vertices, vertices_dict, edge_list, id_name)
-
-    return od
-
-
-def find_closest_vertice(
-    origins_destinations,
-    spatial_idx,
-    search_vertices,
-    vertices_dict,
-    edge_list,
-    id_name,
-):
     ODs = []
     match_ids = []
-    for i, c in enumerate(
-        tqdm(
-            origins_destinations["geometry"],
-            desc="Finding vertices closest to Origins and Destinations",
-            leave=True,
-        )
-    ):
-        # find the closest vertice and line the vertice lays on
-        target = list(spatial_idx.nearest(c.bounds))
+    for o_d_point in tqdm(list(zip(od['geometry'].x, od['geometry'].y))):
+        closest_node_on_road = closest_node(np.array(o_d_point), all_vertices)
+        closest_u_v_k = inverse_vertices_dict[(closest_node_on_road[0], closest_node_on_road[1])]
 
-        # do nothing if the target point is further away from the endpoint than max_dist
-        # or if they are at the same location
-        if not target:
-            continue
-
-        points_list = [search_vertices[ip] for ip in target]
-
-        # check on which road this point lays
-        road_i = getKeysByValue(vertices_dict, points_list[0])
-        match_ids.append(
-            [
-                i[-1][id_name]
-                for i in edge_list
-                if (road_i[0] == i[0]) and (road_i[1] == i[1])
-            ][0]
-        )
-
-        # save in list
-        ODs.append(points_list[0])
+        # save in lists
+        match_ids.append(graph.edges[closest_u_v_k[0], closest_u_v_k[1], closest_u_v_k[2]][id_name])
+        ODs.append(Point(closest_node_on_road))  # save the point as a Shapely Point
 
     # save in dataframe
-    origins_destinations["OD"] = ODs
-    origins_destinations["match_ids"] = match_ids
+    od["OD"] = ODs
+    od["match_ids"] = match_ids
 
-    # save the road vertices closest to the centroids as geometry, delete the centroid geometry
-    origins_destinations = gpd.GeoDataFrame(origins_destinations, geometry="OD")
-    origins_destinations = origins_destinations.drop(columns=["geometry"])
+    # save the road vertices closest to the origin/destination as geometry, delete the input origin/destination point geometry
+    od = gpd.GeoDataFrame(od, geometry="OD")
+    od = od.drop(columns=["geometry"])
 
-    return origins_destinations
+    return od
 
 
 def find_new_nearest_vertice(edge_list, match_OD):
