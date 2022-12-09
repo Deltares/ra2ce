@@ -363,7 +363,7 @@ class Network:
             self.region_var,
         )
 
-        ods = create_OD_pairs(ods, graph)
+        ods = create_OD_pairs(ods, graph, self.config['network']['file_id'])
         ods.crs = crs
 
         # Save the OD pairs (GeoDataFrame) as pickle

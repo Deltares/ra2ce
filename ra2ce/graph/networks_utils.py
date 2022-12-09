@@ -1329,10 +1329,12 @@ def gdf_check_create_unique_ids(gdf, id_name, new_id_name="rfid"):
         return gdf, id_name
     else:
         gdf[new_id_name] = check
-        logging.info(
+        logging.warning(
             "Added a new unique identifier field {} because the original field '{}' "
-            "did not contain unique values per road segment.".format(
-                new_id_name, id_name
+            "did not contain unique values per road segment."
+            "For further network processing, change the 'file_id' parameter in the network.ini file"
+            "to '{}".format(
+                new_id_name, id_name, new_id_name
             )
         )
         return gdf, new_id_name
