@@ -6,10 +6,7 @@ import networkx as nx
 
 from ra2ce.io.writers.geodataframe_network_exporter import GeoDataFrameNetworkExporter
 from ra2ce.io.writers.multi_graph_network_exporter import MultiGraphNetworkExporter
-from ra2ce.io.writers.network_exporter_base import (
-    NETWORK_TYPE,
-    NetworkExporterBase,
-)
+from ra2ce.io.writers.network_exporter_base import NETWORK_TYPE, NetworkExporterBase
 
 
 class NetworkExporterFactory:

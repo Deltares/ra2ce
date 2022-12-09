@@ -8,7 +8,7 @@ Created on 26-7-2021
 
 class MultiLink:
     def __init__(self):
-        self.bla = 'bla'
+        self.bla = "bla"
 
     def calculate_redundancy(self):
         return
