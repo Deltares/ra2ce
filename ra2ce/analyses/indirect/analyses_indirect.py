@@ -1160,6 +1160,8 @@ class IndirectAnalyses:
 
         isolated_locations = copy.deepcopy(locations)
 
+        #create an empty list to append the df_aggregation to
+        aggregation = pd.DataFrame()
         for i, hazard in enumerate(self.config["hazard_names"]):
             hazard_name = self.hazard_names.loc[
                 self.hazard_names["File name"] == hazard, "RA2CE name"
@@ -1232,37 +1234,21 @@ class IndirectAnalyses:
             # intersect = intersect.loc[intersect[hazard_name] > analysis['threshold_locations']]
 
             # Save the results in isolated_locations
-            isolated_locations[f"i_{hazard_name[:-3]}"] = [
-                1 if idx in intersect["i_id"] else 0
-                for idx in isolated_locations["i_id"]
-            ]
+            intersect[f"i_{hazard_name[:-3]}"] = 1
+            intersect_join = intersect[[f"i_{hazard_name[:-3]}", "i_id"]]
+            isolated_locations_merge = isolated_locations.merge(intersect_join, on="i_id", how='left')
+            isolated_locations_merge[f"i_{hazard_name[:-3]}"] = isolated_locations_merge[f"i_{hazard_name[:-3]}"].fillna(0)
 
-            # Group by category and count the number of locations per category
-            if i == 0:
-                # the first iteration, create a new pd dataframe
-                df_aggregation = (
-                    intersect.groupby(by=analysis["category_field_name"])
-                    .size()
-                    .to_frame(hazard_name)
-                )
-            else:
-                # after more iterations the new columns are appended
-                df_aggregation = df_aggregation.join(
-                    intersect.groupby(by=analysis["category_field_name"])
-                    .size()
-                    .to_frame(hazard_name),
-                    how="outer",
-                )
+            #make an overview of the isolated_locations, aggregated per category (category is specified by the user)
+            df_aggregation = isolated_locations_merge.groupby(by=analysis["category_field_name"])[f"i_{hazard_name[:-3]}"].sum().reset_index()
+            df_aggregation["hazard"] = hazard_name
+            df_aggregation.rename(columns={f"i_{hazard_name[:-3]}": "nr_isolated"}, inplace=True)
+            aggregation = pd.concat([aggregation, df_aggregation], axis=0)
 
-        # Wide to long format for the aggregated results
-        df_aggregation = pd.melt(df_aggregation)
-        df_aggregation.rename(
-            columns={"variable": "Hazard", "value": "Nr. isolated"}, inplace=True
-        )
 
         # Set the isolated_locations geopandas dataframe back to the original crs
-        isolated_locations.to_crs(crs=crs, inplace=True)
-        return isolated_locations, df_aggregation
+        isolated_locations_merge.to_crs(crs=crs, inplace=True)
+        return isolated_locations_merge, aggregation
 
     def execute(self):
         """Executes the indirect analysis."""
