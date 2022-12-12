@@ -1236,19 +1236,19 @@ class IndirectAnalyses:
             # Save the results in isolated_locations
             intersect[f"i_{hazard_name[:-3]}"] = 1
             intersect_join = intersect[[f"i_{hazard_name[:-3]}", "i_id"]]
-            isolated_locations_merge = isolated_locations.merge(intersect_join, on="i_id", how='left')
-            isolated_locations_merge[f"i_{hazard_name[:-3]}"] = isolated_locations_merge[f"i_{hazard_name[:-3]}"].fillna(0)
+            isolated_locations = isolated_locations.merge(intersect_join, on="i_id", how='left')
+            isolated_locations[f"i_{hazard_name[:-3]}"] = isolated_locations[f"i_{hazard_name[:-3]}"].fillna(0)
 
             #make an overview of the isolated_locations, aggregated per category (category is specified by the user)
-            df_aggregation = isolated_locations_merge.groupby(by=analysis["category_field_name"])[f"i_{hazard_name[:-3]}"].sum().reset_index()
+            df_aggregation = isolated_locations.groupby(by=analysis["category_field_name"])[f"i_{hazard_name[:-3]}"].sum().reset_index()
             df_aggregation["hazard"] = hazard_name
             df_aggregation.rename(columns={f"i_{hazard_name[:-3]}": "nr_isolated"}, inplace=True)
             aggregation = pd.concat([aggregation, df_aggregation], axis=0)
 
 
         # Set the isolated_locations geopandas dataframe back to the original crs
-        isolated_locations_merge.to_crs(crs=crs, inplace=True)
-        return isolated_locations_merge, aggregation
+        isolated_locations.to_crs(crs=crs, inplace=True)
+        return isolated_locations, aggregation
 
     def execute(self):
         """Executes the indirect analysis."""
