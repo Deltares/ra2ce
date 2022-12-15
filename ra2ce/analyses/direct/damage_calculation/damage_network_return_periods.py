@@ -42,3 +42,5 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
             self.calculate_damage_manual_functions(
                 events=self.events, manual_damage_functions=manual_damage_functions
             )
+
+        raise Exception("No EAD caclculation has been performed")

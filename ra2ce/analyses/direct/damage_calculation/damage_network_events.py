@@ -15,7 +15,7 @@ class DamageNetworkEvents(DamageNetworkBase):
 
     def __init__(self, road_gdf, val_cols):
         # Construct using the parent class __init__
-        super.__init__(road_gdf, val_cols)
+        super().__init__(road_gdf, val_cols)
         self.events = set([x.split("_")[1] for x in val_cols])  # set of unique events
 
         if not len(self.events) > 0:
