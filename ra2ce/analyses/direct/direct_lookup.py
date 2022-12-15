@@ -232,8 +232,8 @@ class LookUp:
                        'C6': {0: 'depth (cm)', 1: 0, 2: 50, 3: 100, 4: 200, 5: 600, 6: np.nan, 7: np.nan, 8: np.nan, 9: np.nan},
                        'Unnamed: 12': {0: 'damage (% of total construction costs)', 1: 0, 2: 0.12, 3: 0.2, 4: 0.28, 5: 0.35, 6: np.nan, 7: np.nan,
                                        8: np.nan, 9: np.nan},
-                       'HZ': {0: np.nan, 1: 0.0, 2: 50.0, 3: 100.0, 4: 150.0, 5: 200.0, 6: 300.0, 7: 400.0, 8: 500.0, 9: 600.0},
-                       'Unnamed: 14': {0: np.nan, 1: 0.0, 2: 0.25, 3: 0.42, 4: 0.55, 5: 0.65, 6: 0.8, 7: 0.9, 8: 1.0, 9: 1.0}}
+                       'HZ': {0: 'depth (cm)', 1: 0.0, 2: 50.0, 3: 100.0, 4: 150.0, 5: 200.0, 6: 300.0, 7: 400.0, 8: 500.0, 9: 600.0},
+                       'Unnamed: 14': {0: 'damage (% of total construction costs)', 1: 0.0, 2: 0.25, 3: 0.42, 4: 0.55, 5: 0.65, 6: 0.8, 7: 0.9, 8: 1.0, 9: 1.0}}
 
 
         flood_curves = pd.DataFrame.from_dict(lookup_dict)
