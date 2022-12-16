@@ -143,27 +143,21 @@ def create_OD_pairs(od, graph, id_name="rfid"):
     return od
 
 
-def find_new_nearest_vertice(edge_list, match_OD):
-    vertices_dict = {}
-    for line in edge_list:
-        vertices_dict[(line[0], line[1])] = [
-            Point(p) for p in set(list(line[-1]["geometry"].coords))
-        ]
-    all_vertices = [p for sublist in list(vertices_dict.values()) for p in sublist]
-    # create an empty spatial index object to search in
-    idx = rtree.index.Index()
-    # populate the spatial index
-    for j, pnt in enumerate(all_vertices):
-        idx.insert(j, pnt.bounds)
-    # find the closest vertice and line the vertice lays on
-    target = list(idx.nearest(match_OD.coords[0]))
-    match_OD = [all_vertices[ip] for ip in target]
-    match_OD = match_OD[0]
-    all_matches = [
-        am
-        for am in edge_list
-        if match_OD.coords[0] in [p for p in set(list(am[-1]["geometry"].coords))]
-    ]
+def find_new_nearest_vertice(graph, match_OD):
+    # create dictionary of the roads geometries
+    edge_list = [e for e in graph.edges.data(keys=True) if "geometry" in e[-1]]
+
+    inverse_vertices_dict = {}
+    for i, line in enumerate(edge_list):
+        inverse_vertices_dict.update({p: (line[0], line[1], line[2]) for p in set(list(line[-1]["geometry"].coords))})
+
+    # create list of all points to search in
+    all_vertices = np.array([p for p in list(inverse_vertices_dict.keys())])
+
+    closest_node_on_road = closest_node(np.array(match_OD), all_vertices)
+    closest_u_v_k = inverse_vertices_dict[(closest_node_on_road[0], closest_node_on_road[1])]
+
+    all_matches = graph.edges[closest_u_v_k[0], closest_u_v_k[1], closest_u_v_k[2]]
     return all_matches, match_OD
 
 
@@ -237,11 +231,11 @@ def getKeysByValue(dictOfElements, value):
 def add_od_nodes(graph, od, graph_crs, id_name="rfid"):
     """From a geodataframe of vertices on a graph, adds nodes on that graph.
     Args:
-        graph [networkX graph]: graph of the roads of a or multiple European countries
+        graph [networkX graph]: graph
         od [geodataframe]: geodataframe from the function 'create_OD_pairs'
         id_name [string]: string
     Returns:
-        graph: networkX graph with the nodes closes to the centroids of the NUTS-3 regions added.
+        graph: networkX graph with the nodes closes to the origins and destinations
         The ID's of the added nodes are adding in number from the highest ID of the nodes in the original graph.
     """
     # To make it easier to match the match_ids potential lists are turned into strings (or strings to strings)
@@ -256,14 +250,13 @@ def add_od_nodes(graph, od, graph_crs, id_name="rfid"):
     ):
         # the vertice on the edge that is closest to the origin/destination point
         match_OD = od.iloc[i]["OD"]
-        # Check which roads belong to the centroids closest vertices
+        # Check which roads belong to the origin/destinations closest vertices
         all_matches = [
             e
             for e in graph.edges(data=True, keys=True)
             if str(e[-1][id_name]) == od.iloc[i]["match_ids"]
         ]
         if len(all_matches) > 1:
-            # all_matches = [am for am in all_matches if match_OD in [(Point(p) for p in set(list(am[-1]['geometry'].coords)))]]
             all_matches = [
                 am
                 for am in all_matches
@@ -273,14 +266,8 @@ def add_od_nodes(graph, od, graph_crs, id_name="rfid"):
             if (
                 len(all_matches) == 0
             ):  # created to find nearest vertice when a new edge has already been created
-                # todo build this in in the other def find nearest vertice
-                edge_list = [
-                    e
-                    for e in graph.edges(data=True, keys=True)
-                    if str(e[-1][id_name]) == od.iloc[i]["match_ids"]
-                ]
                 all_matches, match_OD = find_new_nearest_vertice(
-                    edge_list, match_OD
+                    graph, match_OD
                 )
         if len(all_matches) == 1:
             if [
@@ -289,26 +276,22 @@ def add_od_nodes(graph, od, graph_crs, id_name="rfid"):
                 if match_OD.coords[0]
                 in [p for p in set(list(am[-1]["geometry"].coords))]
             ] == []:
-                edge_list = [
-                    e
-                    for e in graph.edges(data=True, keys=True)
-                    if str(e[-1][id_name]) == od.iloc[i]["match_ids"]
-                ]
                 all_matches, match_OD = find_new_nearest_vertice(
-                    edge_list, match_OD
+                    graph, match_OD
                 )
         if (
             len(all_matches) == 0
         ):  # when the edge does not exist anymore in the adjusted graph. look over the full graph and find the nearest vertice
             edge_list = [e for e in graph.edges.data() if "geometry" in e[-1]]
             all_matches, match_OD = find_new_nearest_vertice(
-                edge_list, match_OD
+                graph, match_OD
             )
         m = all_matches[0]
 
         if "geometry" in m[-1]:
             match_geom = m[-1]["geometry"]
             if len(m) == 3:
+                # If the geometry has a z-value
                 match_edge = m[0], m[1], 0
             else:
                 match_edge = m[:3]
