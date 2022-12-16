@@ -10,8 +10,7 @@ from ra2ce.analyses.direct.damage.manual_damage_functions import ManualDamageFun
 ### Tests
 
 class TestDirectDamage:
-    def __init__(self):
-        pass
+    #Remember: test class has no init...
 
     def test_event_based_damage_calculation_huizinga_stylized(self):
         """A very stylized test with hypothetical data for the Huizinga damage function.
@@ -39,13 +38,8 @@ class TestDirectDamage:
         error_rows = df['ref_damage'] != df['dam_EV1_HZ']
         df_errors = df[error_rows]
 
-        if not df_errors.empty:
-            print('Test of Huizinga damage functions failed.')
-            print(df[error_rows])
-        else:
-            print('Test of Huizinga damage functions passed.')
-
-        return None
+        #EVALUATE THE RESULT OF THE TEST
+        assert df_errors.empty, "Test of Huizinga damage functions failed: {}".format(df[error_rows])
 
 
     @pytest.mark.skip(reason="Not yet finished")
