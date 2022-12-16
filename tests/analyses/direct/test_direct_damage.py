@@ -13,6 +13,41 @@ class TestDirectDamage:
     def __init__(self):
         pass
 
+    def test_event_based_damage_calculation_huizinga_stylized(self):
+        """A very stylized test with hypothetical data for the Huizinga damage function.
+
+        The rationale behind this test is described in the appendix of the RA2CE documentation document
+        """
+
+        #SET PARAMETERS AND LOAD REFERENCE DATA
+        damage_function = 'HZ'
+        test_data_path = Path(r"test_data\Direct_damage_tests_EV_HZ.xlsx")
+        test_data = pd.read_excel(test_data_path)
+        road_gdf = test_data
+
+        val_cols = [
+            col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
+        ]
+
+        #DO ACTUAL DAMAGE CALCULATION
+        event_gdf = DamageNetworkEvents(road_gdf, val_cols)
+        event_gdf.main(damage_function=damage_function)
+
+        #CHECK OUTCOMES OF DAMAGE CALCULATIONS
+        df = event_gdf.gdf
+        df['dam_EV1_HZ'] = df['dam_EV1_HZ'].fillna(0) #Fill nans with zeros, like in the reference data
+        error_rows = df['ref_damage'] != df['dam_EV1_HZ']
+        df_errors = df[error_rows]
+
+        if not df_errors.empty:
+            print('Test of Huizinga damage functions failed.')
+            print(df[error_rows])
+        else:
+            print('Test of Huizinga damage functions passed.')
+
+        return None
+
+
     @pytest.mark.skip(reason="Not yet finished")
     def test_event_based_damage_calculation_huizinga(self):
         damage_function = 'HZ'
@@ -129,17 +164,6 @@ class TestDirectDamage:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 #### Sample data
 def load_osm_test_data(file_path=Path('test_data/NL332.csv')):
     # This is taken from OSdaMage version 0.8 D:\Europe_trade_disruptions\EuropeFloodResults\Model08_VMs\main
@@ -177,3 +201,9 @@ def prepare_event_test_input_output():
 # tests.event_based_damage_calculation_huizinga()
 # tests.load_manual_damage_function()
 # tests.event_based_damage_calculation_manualfunction()
+
+
+if __name__ == "__main__":
+    tests = TestDirectDamage()
+    tests.test_event_based_damage_calculation_huizinga_stylized()
+

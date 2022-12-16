@@ -31,7 +31,7 @@ class DamageNetworkBase(ABC):
             damage_function (str): damage function key name that is to be used, valid arguments are: 'HZ', 'OSD', 'MAN'
             manual_damage_functions (ManualDamageFunctions): `ManualDamageFunctions` object
         """
-        raise ValueError("Needs to be implented in concrete class.")
+        raise ValueError("Needs to be implented in concrete child class.")
 
     # events is missing
     def do_cleanup_and_mask_creation(self):
@@ -202,9 +202,8 @@ class DamageNetworkBase(ABC):
         # Load the Huizinga damage functions
         curve_name = "HZ"
 
-        df_max_damages_huizinga = pd.DataFrame.from_dict(lookup.max_damages_huizinga())
-        # max_damages_huizinga = lookup.max_damages_huizinga()
-        interpolator = lookup.flood_curves()[
+        df_max_damages_huizinga = pd.DataFrame.from_dict(lookup.get_max_damages_huizinga())
+        interpolator = lookup.get_flood_curves()[
             "HZ"
         ]  # input: water depth (cm); output: damage (fraction road construction costs)
 
