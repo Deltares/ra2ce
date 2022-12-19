@@ -349,7 +349,6 @@ class Network:
         """
         from ra2ce.graph.origins_destinations import (
             add_od_nodes,
-            create_OD_pairs,
             read_OD_files,
         )
 
@@ -368,7 +367,7 @@ class Network:
             self.region_var,
         )
 
-        ods = create_OD_pairs(ods, graph, self.config['network']['file_id'])
+        ods = add_od_nodes(ods, graph, crs, self.config['network']['file_id'])
         ods.crs = crs
 
         # Save the OD pairs (GeoDataFrame) as pickle
@@ -385,7 +384,7 @@ class Network:
             ods.to_file(ods_path, index=False)
             logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
 
-        graph = add_od_nodes(graph, ods, crs)
+        # graph = add_od_nodes(graph, ods, crs, id_name=self.config['network']['file_id'])
 
         return graph
 
