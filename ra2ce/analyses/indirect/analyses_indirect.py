@@ -2069,7 +2069,6 @@ def load_origins(config):
     od = gpd.read_feather(od_path)
     origin = od.loc[od["o_id"].notna()]
     del origin["d_id"]
-    del origin["match_ids"]
     return origin
 
 
@@ -2078,7 +2077,6 @@ def load_destinations(config):
     od = gpd.read_feather(od_path)
     destination = od.loc[od["d_id"].notna()]
     del destination["o_id"]
-    del destination["match_ids"]
     return destination
 
 

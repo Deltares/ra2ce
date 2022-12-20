@@ -367,7 +367,7 @@ class Network:
             self.region_var,
         )
 
-        ods = add_od_nodes(ods, graph, crs, self.config['network']['file_id'])
+        ods, graph = add_od_nodes(ods, graph, crs)
         ods.crs = crs
 
         # Save the OD pairs (GeoDataFrame) as pickle
@@ -383,8 +383,6 @@ class Network:
             ods_path = self.config["static"] / "output_graph" / (name + ".shp")
             ods.to_file(ods_path, index=False)
             logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
-
-        # graph = add_od_nodes(graph, ods, crs, id_name=self.config['network']['file_id'])
 
         return graph
 
