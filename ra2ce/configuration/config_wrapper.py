@@ -50,6 +50,7 @@ class ConfigWrapper:
 
     def configure(self) -> None:
         if self.network_config:
-            self.network_config.configure()
+            self.network_config.configure_network()
+            self.network_config.configure_hazard()
         if self.analysis_config:
             self.analysis_config.configure()
