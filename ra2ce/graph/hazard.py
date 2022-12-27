@@ -375,6 +375,7 @@ class Hazard:
                 )
 
             # Read the hazard values at the nodes and write to the nodes.
+            # TODO: DO THE HAZARD OVERLAY WITH THE ORIGINAL OD LOCATIONS AND NOT THE PROJECTED LOCATIONS ON THE ROAD
             gdf = gpd.GeoDataFrame(
                 {"geometry": [ndata["geometry"] for n, ndata in od_nodes]}
             )
@@ -889,20 +890,6 @@ class Hazard:
 
                 # Save graphs/network with hazard
                 self._export_network_files("base_network_hazard", types_to_export)
-        else:
-            try:
-                # Try to find the base network hazard file
-                self.graphs["base_network_hazard"] = gpd.read_feather(
-                    self.config["static"]
-                    / "output_graph"
-                    / "base_network_hazard.feather"
-                )
-            except FileNotFoundError:
-                # File not found
-                logging.warning(
-                    f"Base network hazard file not found at {self.config['static'] / 'output_graph' / 'base_network_hazard.feather'}"
-                )
-                pass
 
         #### Step 4: hazard overlay of the locations that are checked for isolation ###
         if "isolation" in self.config:
