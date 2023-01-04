@@ -8,37 +8,53 @@ Created on 30-7-2021
 
 import logging
 import os
-from pathlib import Path
 
+from typing import Union, Optional
 import geopandas as gpd
 import numpy as np
 import pandas as pd
+import pyproj
 import rasterio
 import rasterio.mask
 import rasterio.transform
-import rtree
-from geopy import distance
 from rasterio import Affine
 from rasterio.warp import Resampling, calculate_default_transform, reproject
 from shapely.geometry import LineString, MultiLineString, Point
-from tqdm import tqdm, trange
+from tqdm import tqdm
+import networkx as nx
 
-from ra2ce.graph.networks_utils import line_length, pairs
+from ra2ce.graph.networks_utils import line_length
 
 # from shapely.geometry.point import Point
 
 
 def read_OD_files(
-    origin_paths,
-    origin_names,
-    destination_paths,
-    destination_names,
-    od_id,
-    origin_count,
-    crs_,
-    region_paths,
-    region_var,
+    origin_paths: Union[str, list],
+    origin_names: Union[str, list],
+    destination_paths: Union[str, list],
+    destination_names: Union[str, list],
+    od_id: str,
+    origin_count: str,
+    crs_: pyproj.CRS,
+    category: str,
+    region_paths: Optional[str],
+    region_var: Optional[str],
 ):
+    """Reads the Origin and Destination point shapefiles and creates one big OD GeoDataFrame.
+    Args:
+        origin_paths: The path (as string) or paths (in a list) of the point shapefile(s) used for the locations of the Origins.
+        origin_names: The name(s) of the origins
+        destination_paths: The path (as string) or paths (in a list) of the point shapefile(s) used for the locations of the Destinations.
+        destination_names: The name(s) of the destinations
+        od_id: The name of the unique identifier attribute in both the origin and destination shapefiles.
+        origin_count: The name of the attribute in the origin shapefile that can be used for counting the flow over the network (e.g. nr. of people)
+        crs_: The Coordinate Reference System used in the project.
+        category: The name of the attribute in the destination shapefile that can be used to categorize the (closest) destination.
+        region_paths:
+        region_var:
+    Returns:
+        od:
+    """
 
     if region_paths:
         origin = gpd.GeoDataFrame(
@@ -48,7 +64,12 @@ def read_OD_files(
         region = region[[region_var, "geometry"]]
     else:
         origin = gpd.GeoDataFrame(columns=[od_id, "o_id", "geometry"], crs=crs_)
-    destination = gpd.GeoDataFrame(columns=[od_id, "d_id", "geometry"], crs=crs_)
+
+    destination_columns = [od_id, "d_id", "geometry"]
+    if category:
+        destination_columns.append(category)
+
+    destination = gpd.GeoDataFrame(columns=destination_columns, crs=crs_)
 
     if isinstance(origin_paths, str):
         origin_paths = [origin_paths]
@@ -76,13 +97,17 @@ def read_OD_files(
         origin_new["o_id"] = on + "_" + origin_new[od_id].astype(str)
         origin = origin.append(origin_new, ignore_index=True, sort=False)
 
+    destination_columns_add = [od_id, "geometry"]
+    if category:
+        destination_columns_add.append(category)
+
     for dp, dn in zip(destination_paths, destination_names):
         destination_new = gpd.read_file(dp, crs=crs_)
         try:
             assert destination_new[od_id]
         except:
             destination_new[od_id] = destination_new.index
-        destination_new = destination_new[[od_id, "geometry"]]
+        destination_new = destination_new[destination_columns_add]
         destination_new["d_id"] = dn + "_" + destination_new[od_id].astype(str)
         destination = destination.append(destination_new, ignore_index=True, sort=False)
 
@@ -216,7 +241,10 @@ def update_edges_with_new_node(graph, edge_data, node_a, node_b, k, line_a, line
     return graph, inverse_vertices_dict
 
 
-def add_od_nodes(od: gpd.GeoDataFrame, graph, crs):
+def add_od_nodes(od: gpd.GeoDataFrame,
+                 graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
+                 crs,
+                 category: Optional[str] = None):
     """Gets from each origin and destination the closest vertice on the graph edge.
     Args:
         od [Geodataframe]: The GeoDataFrame with the origins and destinations
@@ -250,12 +278,12 @@ def add_od_nodes(od: gpd.GeoDataFrame, graph, crs):
     max_node_id = max([n for n in graph.nodes()])
 
     ODs = []
-    for o_d_pointx, o_d_pointy, o_id, d_id in tqdm(list(zip(od['geometry'].x, od['geometry'].y, od['o_id'], od['d_id'])),
+    for i, od_data in tqdm(enumerate(list(zip(od['geometry'].x, od['geometry'].y, od['o_id'], od['d_id']))),
                           desc="Adding Origin-Destination nodes to graph"):
-        match_name = get_od(o_id, d_id)
+        match_name = get_od(od_data[-2], od_data[-1])
 
         # Find the vertice on the road that is closest to the origin or destination point
-        closest_node_on_road = closest_node(np.array((o_d_pointx, o_d_pointy)), all_vertices)
+        closest_node_on_road = closest_node(np.array((od_data[0], od_data[1])), all_vertices)
         match_OD = Point(closest_node_on_road)
 
         # Find the road to which this vertice belongs. If the vertice is on an end-point of a road, it cannot be found
@@ -277,14 +305,20 @@ def add_od_nodes(od: gpd.GeoDataFrame, graph, crs):
             new_node_id = max_node_id + 1
             max_node_id = new_node_id
 
+            node_info = {"node_fid": new_node_id,  # Check if this attribute always exists
+                "y": match_OD.coords[0][1],
+                "x": match_OD.coords[0][0],
+                "geometry": match_OD,
+                "od_id": match_name}
+            if category and od_data[-1] == od_data[-1]:
+                # If the user wants to calculate the routes to multiple locations with categories
+                # and if the current location is a destination (od_data[-1] is not NaN)
+                node_info["category"] = od.iloc[i][category]
+
             # Add the new node to the graph
             graph.add_node(
                 new_node_id,
-                node_fid=new_node_id,  # Check if this attribute always exists
-                y=match_OD.coords[0][1],
-                x=match_OD.coords[0][0],
-                geometry=match_OD,
-                od_id=match_name,
+                **node_info
             )
 
             # Update the inverse_nodes_dict with the new node
@@ -307,6 +341,11 @@ def add_od_nodes(od: gpd.GeoDataFrame, graph, crs):
             # Update the node with the OD attribute
             graph = add_data_to_existing_node(graph, match_node, match_name)
 
+            if category and od_data[-1] == od_data[-1]:
+                # If the user wants to calculate the routes to multiple locations with categories
+                # and if the current location is a destination (od_data[-1] is not NaN)
+                graph.nodes[match_node]["category"] = od.iloc[i][category]
+
         # Save both in lists
         ODs.append(match_OD)  # save the point as a Shapely Point
 
@@ -314,8 +353,8 @@ def add_od_nodes(od: gpd.GeoDataFrame, graph, crs):
     od["OD"] = ODs
 
     # save the road vertices closest to the origin/destination as geometry, delete the input origin/destination point geometry
-    od = gpd.GeoDataFrame(od, geometry="OD")
-    od = od.drop(columns=["geometry"])
+    od = gpd.GeoDataFrame(od)
+    od = od.drop(columns=["OD"])
 
     return od, graph
 
