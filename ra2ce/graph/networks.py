@@ -46,6 +46,10 @@ class Network:
         self.id_name_origin_destination = config["origins_destinations"][
             "id_name_origin_destination"
         ]
+        if "category" in self.config["origins_destinations"]:
+            self.od_category = self.config["origins_destinations"]["category"]
+        else:
+            self.od_category = None
         try:
             self.region = (
                 config["static"] / "network" / config["origins_destinations"]["region"]
@@ -363,11 +367,12 @@ class Network:
             self.id_name_origin_destination,
             self.config["origins_destinations"]["origin_count"],
             crs,
+            self.od_category,
             self.region,
             self.region_var,
         )
 
-        ods, graph = add_od_nodes(ods, graph, crs)
+        ods, graph = add_od_nodes(ods, graph, crs, self.config["origins_destinations"]["category"])
         ods.crs = crs
 
         # Save the OD pairs (GeoDataFrame) as pickle
