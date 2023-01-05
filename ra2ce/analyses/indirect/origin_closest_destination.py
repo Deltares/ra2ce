@@ -70,20 +70,23 @@ class OriginClosestDestination:
 
         # Add a column for the number of people that go to a certain destination, per flood map
         col_name = "noHaz"
-        destinations[col_name + "_P"] = 0
 
         if self.destination_key:
             self.destination_names = list(destinations[self.config['origins_destinations']['category']].unique())
             self.destination_names_short = {dn: f"D{i+1}" for i, dn in enumerate(self.destination_names)}
             logging.info(self.destination_names_short)  #TODO: WRITE SOMEWHERE
 
-            base_graph, origins, destinations, list_disrupted_dest = self.find_multiple_closest_locations(graph,
+            for i, dn in self.destination_names_short.items():
+                destinations[col_name + "_P" + dn] = 0
+
+            base_graph, origins, destinations, list_disrupted_dest, optimal_routes_gdf = self.find_multiple_closest_locations(graph,
                                                                                                           base_graph,
                                                                                                           origins,
                                                                                                           destinations,
                                                                                                           col_name
                                                                                                           )
         else:
+            destinations[col_name + "_P"] = 0
             base_graph, origins, destinations, list_disrupted_dest, optimal_routes_gdf = self.find_closest_location(graph,
                                                                                                 base_graph,
                                                                                                 origins,
@@ -106,9 +109,7 @@ class OriginClosestDestination:
 
         return base_graph, optimal_routes_gdf, destinations
 
-    def multi_link_origin_closest_destination(
-            self
-    ):
+    def multi_link_origin_closest_destination(self):
         """Calculates per origin the location of its closest destination with hazard disruption"""
         graph = self.read(self.config["files"]["origins_destinations_graph_hazard"])
 
@@ -125,6 +126,7 @@ class OriginClosestDestination:
             logging.info(self.destination_names_short)  #TODO: WRITE SOMEWHERE
 
         aggregated = []
+        opt_routes_aggregated = []
 
         # Calculate the criticality
         hazards = [self.hazard_names.loc[
@@ -136,7 +138,12 @@ class OriginClosestDestination:
             self.results_dict["Hazard"] = [hazard_name]
 
             # Add a column for the number of people that go to a certain destination, per flood map
-            destinations[hazard_name + "_P"] = 0
+            if self.destination_key:
+                for i, dn in self.destination_names_short.items():
+                    destinations[hazard_name + "_P" + dn] = 0
+            else:
+                destinations[hazard_name + "_P"] = 0
+
 
             # Check if the o/d pairs are still connected while some links are disrupted by the hazard(s)
             h = copy.deepcopy(graph)
@@ -154,7 +161,7 @@ class OriginClosestDestination:
             h.remove_edges_from(edges_remove)
 
             if self.destination_key:
-                base_graph, origins, destinations, list_disrupted_dest = self.find_multiple_closest_locations(h,
+                base_graph, origins, destinations, list_disrupted_dest, optimal_routes_gdf = self.find_multiple_closest_locations(h,
                                                                                                               base_graph,
                                                                                                               origins,
                                                                                                               destinations,
@@ -216,16 +223,21 @@ class OriginClosestDestination:
                 pd.DataFrame(self.results_dict)
             )
 
+            optimal_routes_gdf["name"] = hazard_name
+            opt_routes_aggregated.append(optimal_routes_gdf)
+
+
         # Create one dataframe from the aggregated results
         aggregated = pd.concat(aggregated)
+        opt_routes_aggregated = pd.concat(opt_routes_aggregated)
 
-        return base_graph, origins, destinations, aggregated
+        return base_graph, origins, destinations, aggregated, opt_routes_aggregated
 
     def get_route_length(self, graph, origin_node, destination_node):
         # calculate the length of the preferred route
         return nx.dijkstra_path_length(graph, origin_node, destination_node, weight=self.weighing)
 
-    def compare_route_with_without_distruption(self, pref_routes, nr_per_route, o_name, d_name, alt_route, alt_dist):
+    def compare_route_with_without_disruption(self, pref_routes, nr_per_route, o_name, d_name, alt_route, alt_dist):
         pp_no_delay = [0]
         pp_delayed = [0]
         extra_weights = [0]
@@ -288,6 +300,8 @@ class OriginClosestDestination:
             base_graph[u][v][edge_key][col_name] = (
                     base_graph[u][v][edge_key][col_name] + nr_from_origin
             )
+
+        pref_edges = MultiLineString(pref_edges)
 
         return base_graph, sum(length_list), pref_edges
 
@@ -377,6 +391,7 @@ class OriginClosestDestination:
 
         disrupted_graph.add_node("special", speciallabel="special")
 
+
         special_edges = []
         for n, ndat in disrupted_graph.nodes.data():
             if self.od_key in ndat:
@@ -443,7 +458,7 @@ class OriginClosestDestination:
                                         "destination": disrupted_graph.nodes[closest_dest][self.od_key],
                                         self.weighing: route_path,
                                         "origin_cnt": nr_per_route,
-                                        "geometry": route_geoms,
+                                        "geometry": [route_geoms],
                                     },
                                     crs=self.crs
                                 )
@@ -466,7 +481,7 @@ class OriginClosestDestination:
             for o in originClosestDest:
                 del disrupted_graph.nodes[o]["closest"]
 
-        optimal_routes_gdf = pd.concat(optimal_routes)
+            optimal_routes_gdf = pd.concat(optimal_routes)
 
         return base_graph, origins, destinations, list_disrupted_destinations, optimal_routes_gdf
 
@@ -496,6 +511,8 @@ class OriginClosestDestination:
             destinations: the updated destinations GeoDataFrame
             list_disrupted_destinations [list of tuples]: list of the origin and destination node id and node name from the origins/nodes that do not have a route between them
         """
+
+        optimal_routes = []
         for dest_name in self.destination_names:
             name_save = column_name + "_{}" + self.destination_names_short[dest_name]
             nx.set_edge_attributes(base_graph, 0, name_save.format("P"))
@@ -515,6 +532,7 @@ class OriginClosestDestination:
 
             disrupted_graph.add_edges_from(special_edges)
 
+
             list_disrupted_destinations = []
             list_no_path = []
             for n, ndat in tqdm(disrupted_graph.nodes.data(), desc=f"Finding optimal routes to {dest_name}"):
@@ -528,19 +546,22 @@ class OriginClosestDestination:
                             ndat["closest"] = path[
                                 -2
                             ]
+                            closest_dest = ndat["closest"]
+
 
                             # Check if the destination that is accessed, is flooded
-                            try:
-                                if disrupted_graph.nodes[ndat["closest"]][hazard_name] > self.threshold_destinations:
-                                    list_disrupted_destinations.append(((n, ndat[self.od_key]), (ndat["closest"], disrupted_graph.nodes[ndat["closest"]][self.od_key])))
-                                    continue
-                            except KeyError as e:
-                                logging.warning(
-                                    f"The destination nodes do not contain the required attribute '{hazard_name}',"
-                                    f" please make sure that the hazard overlay is done correctly by rerunning the 'network.ini'"
-                                    f" and checking the output files."
-                                )
-                                quit()
+                            if hazard_name:
+                                try:
+                                    if disrupted_graph.nodes[closest_dest][hazard_name] > self.threshold_destinations:
+                                        list_disrupted_destinations.append(((n, ndat[self.od_key]), (closest_dest, disrupted_graph.nodes[closest_dest][self.od_key])))
+                                        continue
+                                except KeyError as e:
+                                    logging.warning(
+                                        f"The destination nodes do not contain the required attribute '{hazard_name}',"
+                                        f" please make sure that the hazard overlay is done correctly by rerunning the 'network.ini'"
+                                        f" and checking the output files."
+                                    )
+                                    quit()
 
                             nr_per_route = self.get_nr_people_on_route(origins, ndat[self.od_key])
                             base_graph, route_path, route_geoms = self.get_route_path(disrupted_graph, base_graph,
@@ -549,7 +570,7 @@ class OriginClosestDestination:
                                                                          name_save.format("P"))
                             if pref_routes:
                                 route_length = self.get_route_length(disrupted_graph, n, ndat["closest"])
-                                self.compare_route_with_without_distruption(pref_routes, nr_per_route,
+                                self.compare_route_with_without_disruption(pref_routes, nr_per_route,
                                                                             ndat[self.od_key],
                                                                             disrupted_graph.nodes[ndat["closest"]],
                                                                             route_length,
@@ -557,12 +578,29 @@ class OriginClosestDestination:
                             destinations = self.update_destinations(destinations,
                                                                     disrupted_graph.nodes[ndat["closest"]][self.od_key],
                                                                     nr_per_route,
-                                                                    hazard_name)
+                                                                    name_save.format("P"))
+
+                            if route_geoms:
+                                optimal_routes.append(
+                                    gpd.GeoDataFrame(
+                                        {
+                                            "o_node": n,
+                                            "d_node": closest_dest,
+                                            "origin": ndat[self.od_key],
+                                            "destination": disrupted_graph.nodes[closest_dest][self.od_key],
+                                            self.weighing: route_path,
+                                            "origin_cnt": nr_per_route,
+                                            "geometry": [route_geoms],
+                                            "category": dest_name
+                                        },
+                                        crs=self.crs
+                                    )
+                                )
                         else:
                             list_no_path.append((n, ndat[self.od_key]))
 
-            origins = self.update_origins(origins, list_no_path, name_save.format("A"))
-            self.get_nr_without_access(origins, list_no_path, f" {dest_name}")
+                origins = self.update_origins(origins, list_no_path, name_save.format("A"))
+                self.get_nr_without_access(origins, list_no_path, f" {dest_name}")
 
             # Remove the special edges
             disrupted_graph.remove_edges_from([(n[0], n[1]) for n in disrupted_graph.edges.data() if n[1] == dest_name])
@@ -575,7 +613,9 @@ class OriginClosestDestination:
                 for o in originClosestDest:
                     del disrupted_graph.nodes[o]["closest"]
 
-        return base_graph, origins, destinations, list_disrupted_destinations
+        optimal_routes_gdf = pd.concat(optimal_routes)
+
+        return base_graph, origins, destinations, list_disrupted_destinations, optimal_routes_gdf
 
     def calc_pref_routes_closest_dest(
         self,
@@ -794,3 +834,15 @@ class OriginClosestDestination:
         destination = od.loc[od["d_id"].notna()]
         del destination["o_id"]
         return destination
+
+    def difference_length_with_without_hazard(self, with_hazard, without_hazard):
+        with_hazard.rename(columns={"length": "lengthDisr"}, inplace=True)
+        without_hazard.rename(columns={"length": "lengthNorm"}, inplace=True)
+        diff_length_bc_hazard = pd.merge(with_hazard, without_hazard[["lengthNorm","origin","destination"]], on=['origin','destination'], how='left')
+        diff_length_bc_hazard['difference'] = diff_length_bc_hazard['lengthDisr'].values - diff_length_bc_hazard['lengthNorm'].values
+        return diff_length_bc_hazard
+
+
+
+
+

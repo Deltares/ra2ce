@@ -428,7 +428,7 @@ class Hazard:
                 },
             )
 
-        return graph
+        return graph, ods
 
     def point_hazard_intersect(self, gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         """Overlays the point locations with hazard maps
