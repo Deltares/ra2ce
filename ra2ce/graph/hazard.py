@@ -304,9 +304,10 @@ class Hazard:
         return graph
 
     def od_hazard_intersect(
-        self, graph: nx.classes.graph.Graph,
-            ods: gpd.GeoDataFrame
-    ) -> nx.classes.graph.Graph:
+        self,
+        graph: nx.classes.graph.Graph,
+        ods: gpd.GeoDataFrame
+    ) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """Overlays the origin and destination locations and edges with the hazard maps
 
         Args:
@@ -836,7 +837,7 @@ class Hazard:
                 else:
                     self.graphs[
                         "origins_destinations_graph_hazard"
-                    ] = self.od_hazard_intersect(graph, ods)
+                    ], ods = self.od_hazard_intersect(graph, ods)
 
                 # Save graphs/network with hazard
                 self._export_network_files(
