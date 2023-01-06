@@ -372,7 +372,7 @@ class Network:
             self.region_var,
         )
 
-        ods, graph = add_od_nodes(ods, graph, crs, self.config["origins_destinations"]["category"])
+        ods, graph = add_od_nodes(ods, graph, crs, self.od_category)
         ods.crs = crs
 
         # Save the OD pairs (GeoDataFrame) as pickle
