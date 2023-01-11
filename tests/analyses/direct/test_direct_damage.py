@@ -12,10 +12,15 @@ from ra2ce.analyses.direct.damage.manual_damage_functions import ManualDamageFun
 class TestDirectDamage:
     #Remember: test class has no init...
 
+    ######################### EVENT-BASED AND HUIZINGA DAMAGE FUNCTION ###############################################
     def test_event_based_damage_calculation_huizinga_stylized(self):
         """A very stylized test with hypothetical data for the Huizinga damage function.
 
         The rationale behind this test is described in the appendix of the RA2CE documentation document
+
+        Test characteristics:
+            Hazard data: event-based, floods
+            Damage function: Huizinga
         """
 
         #SET PARAMETERS AND LOAD REFERENCE DATA
@@ -76,6 +81,7 @@ class TestDirectDamage:
                 print(test_ref_output[~comparison2].head())
 
     def event_based_damage_calculation_OSdaMage(self):
+
         pass
 
     def load_manual_damage_function(self):
@@ -95,10 +101,57 @@ class TestDirectDamage:
         assert md_data.at['motorway', 4] == 550 #euro/km
         assert md_data.at['track', 2] == 150 #euro/km
 
-        print("Load manual damage function test passed")
         return manual_damage_functions
 
-    def event_based_damage_calculation_manualfunction(self):
+    ######################### EVENT-BASED AND STYLIZED DAMAGE FUNCTION ###############################################
+    def test_event_based_damage_calculation_manual_stylized(self):
+        """A very stylized test with hypothetical data for a Manual damage function.
+        We here manually load precisely the huizinga damage function, so the test is almost similar to
+            test_event_based_damage_calculation_huizinga_stylized
+
+        The rationale behind this test is described in the appendix of the RA2CE documentation document
+
+        Test characteristics:
+            Hazard data: event-based, floods
+            Damage function: manual
+        """
+
+        #SET PARAMETERS AND LOAD REFERENCE DATA
+        damage_function = 'MAN'
+        test_data_path = Path(r"test_data\Direct_damage_tests_EV_HZ.xlsx")
+        test_data = pd.read_excel(test_data_path)
+        road_gdf = test_data
+
+        val_cols = [
+            col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
+        ]
+
+        #LOAD DAMAGE FUNCTIONS
+        manual_damage_functions = ManualDamageFunctions()
+        manual_damage_functions.find_damage_functions(folder=Path(r'test_data/test_damage_functions'))
+        manual_damage_functions.load_damage_functions()
+
+        fun0 = manual_damage_functions.loaded[0]
+        assert fun0.prefix == 'te'
+
+        # DO ACTUAL DAMAGE CALCULATION
+        event_gdf = DamageNetworkEvents(road_gdf, val_cols)
+        event_gdf.main(damage_function=damage_function,manual_damage_functions=manual_damage_functions)
+
+        # CHECK OUTCOMES OF DAMAGE CALCULATIONS
+        df = event_gdf.gdf
+        df['dam_EV1_te'] = df['dam_EV1_te'].fillna(0)  # Fill nans with zeros, like in the reference data
+        error_rows = df['ref_damage'] != df['dam_EV1_te']
+        df_errors = df[error_rows]
+
+        # EVALUATE THE RESULT OF THE TEST
+        assert df_errors.empty, "Test of Huizinga damage functions failed: {}".format(df[error_rows])
+
+
+    def OLD_event_based_damage_calculation_manualfunction(self):
+        #Todo: have a look at this test again, to see if the existing issues have been solved
+
+
         damage_function = 'MAN'
 
         # This test roughly follows the DirectDamage.road_damage() controller in analyses_direct.py
@@ -200,4 +253,7 @@ def prepare_event_test_input_output():
 if __name__ == "__main__":
     tests = TestDirectDamage()
     tests.test_event_based_damage_calculation_huizinga_stylized()
+    tests.test_event_based_damage_calculation_manual_stylized()
+
+    print('hoi')
 
