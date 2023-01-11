@@ -178,6 +178,23 @@ class LookUp:
         return lookup_dict
 
     @staticmethod
+    def get_max_damages_OSD():
+        """ Lookup table for max damages of the OSdaMage damage functions"""
+
+        #Note that these values have been converted to euro/m road length
+        lookup_dict = OrderedDict([('Lower', OrderedDict([('motorway', 1750), ('trunk', 1250),
+                                                          ('primary', 1000), ('secondary', 500),
+                                                          ('tertiary', 200), ('other', 100),
+                                                          ('track', 20), ('none', 0)])),
+                                   ('Upper', OrderedDict([('motorway', 17500), ('trunk', 3750),
+                                                          ('primary', 3000), ('secondary', 1500),
+                                                          ('tertiary', 600), ('other', 300),
+                                                          ('track', 50), ('none', 0)]))])
+
+
+        return lookup_dict
+
+    @staticmethod
     def get_max_damages_huizinga() -> dict:
         """ Lookup table for max damages calculated with huizinga for number of lanes
 
