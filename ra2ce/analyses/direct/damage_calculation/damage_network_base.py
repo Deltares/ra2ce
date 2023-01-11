@@ -345,14 +345,13 @@ class DamageNetworkBase(ABC):
             c for c in all_dam_cols if int(c.split("_")[1][-1]) > 4
         ]  # C5, C6
 
+        is_motorway_mask = df["road_type"].isin(["motorway","trunk"])
+
         for curve in other_curves:
-            df.loc[df["road_type"] == ("motorway" or "trunk"), curve] = np.nan
+            df.loc[is_motorway_mask, curve] = np.nan
 
         for curve in motorway_curves:
-            df.loc[df["road_type"] != ("motorway" or "trunk"), curve] = np.nan
-
-        # Todo: still need to check the units
-        logging.warning("Damage calculation units have not been checked!!! TODO")
+            df.loc[~is_motorway_mask, curve] = np.nan
 
         # Add the new columns add the right location to the df
         self.gdf[all_dam_cols] = df[all_dam_cols]

@@ -80,9 +80,44 @@ class TestDirectDamage:
                 print(event_gdf.gdf[~comparison2].head())
                 print(test_ref_output[~comparison2].head())
 
-    def event_based_damage_calculation_OSdaMage(self):
+    def test_event_based_damage_calculation_OSdaMage_stylized(self):
+        """A very stylized test with hypothetical data using the OSdaMage damage function.
 
-        pass
+        The rationale behind this test is described in the appendix of the RA2CE documentation document
+
+        Test characteristics:
+            Hazard data: event-based, floods
+            Damage function: OSdaMage
+        """
+
+        # SET PARAMETERS AND LOAD REFERENCE DATA
+        damage_function = 'OSD'
+        test_data_path = Path(r"test_data\Direct_damage_tests_EV_OSD.xlsx")
+        test_data = pd.read_excel(test_data_path)
+        road_gdf = test_data
+
+        val_cols = [
+            col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
+        ]
+
+        # DO ACTUAL DAMAGE CALCULATION
+        event_gdf = DamageNetworkEvents(road_gdf, val_cols)
+        event_gdf.main(damage_function=damage_function)
+
+        # CHECK OUTCOMES OF DAMAGE CALCULATIONS
+        df = event_gdf.gdf
+
+        # LOOP OVER THE OSdaMage functions
+        for curve in ['C1','C2','C3','C4','C5','C6']:
+            #Check lower boundary of the reconstruction/max damage costs
+            ra2ce_results_lower = df['dam_{}_EV1'.format(curve)].apply(lambda x: x[0] if isinstance(x,tuple) else x)
+            ra2ce_results_lower = ra2ce_results_lower.fillna(0)
+            reference_results_lower = df['ref_{}_LOWEST'.format(curve)]
+
+            # EVALUATE THE RESULT OF THE TEST USING PANDAS BUILT-IN FUNCTIONALITY
+            pd.testing.assert_series_equal(ra2ce_results_lower,  reference_results_lower,
+                                           check_names=False,
+                                           check_dtype=False)
 
     def load_manual_damage_function(self):
         manual_damage_functions = ManualDamageFunctions()
@@ -145,7 +180,7 @@ class TestDirectDamage:
         df_errors = df[error_rows]
 
         # EVALUATE THE RESULT OF THE TEST
-        assert df_errors.empty, "Test of Huizinga damage functions failed: {}".format(df[error_rows])
+        assert df_errors.empty, "Test of damage calculation using manually loaded damage functions failed: {}".format(df[error_rows])
 
 
     def OLD_event_based_damage_calculation_manualfunction(self):
@@ -254,6 +289,5 @@ if __name__ == "__main__":
     tests = TestDirectDamage()
     tests.test_event_based_damage_calculation_huizinga_stylized()
     tests.test_event_based_damage_calculation_manual_stylized()
-
-    print('hoi')
+    tests.test_event_based_damage_calculation_OSdaMage_stylized()
 
