@@ -253,13 +253,13 @@ class DamageNetworkBase(ABC):
             "These numbers assume that motorways that each driving direction is mapped as a seperate segment such as in OSM!!!"
         )
 
-        # Todo: Dirty fixes, these should be read from the code
+        # Todo: Dirty fixes, these should be read from the configuration file
         hazard_prefix = "F"
         end = "me"  # indicate that you want to use the mean
 
         # Load the OSdaMage functions
         max_damages = lookup.max_damages()
-        interpolators = lookup.flood_curves()
+        interpolators = lookup.get_flood_curves()
         interpolators.pop(
             "HZ"
         )  # input: water depth (cm); output: damage (fraction road construction costs)
