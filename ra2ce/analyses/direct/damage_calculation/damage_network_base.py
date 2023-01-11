@@ -144,7 +144,8 @@ class DamageNetworkBase(ABC):
     def calculate_damage_manual_functions(self, events, manual_damage_functions):
         """
         Arguments:
-        *events* (list) = list of events (or return periods) to iterate over, these should match the hazard column names
+            *events* (list) : list of events (or return periods) to iterate over, these should match the hazard column names
+            *manual_damage_functions* (RA2CE ManualDamageFunctions object) :
         """
 
         # Todo: Dirty fixes, these should be read from the init
