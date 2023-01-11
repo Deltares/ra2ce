@@ -149,7 +149,7 @@ class LookUp:
         return lanes_dict
 
     @staticmethod
-    def road_damage_correction():
+    def get_lane_number_damage_correction():
         """ Lookup table for correction factor of damage for lanes """
         lookup_dict = OrderedDict(
             [('motorway', {1: 0.75, 2: 1.0, 3: 1.25, 4: 1.5, 5: 1.75, 6: 2.0}),
