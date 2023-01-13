@@ -1,4 +1,5 @@
 #Some tests that we need to insert in the test module later.
+import numpy as np
 import pandas as pd
 from pathlib import Path
 import pytest
@@ -60,12 +61,31 @@ class TestDirectDamage:
             col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
         ]
 
-        #event_cols = [x for x in val_cols if "_EV" in x]
-
         event_gdf = DamageNetworkEvents(road_gdf,val_cols)
         event_gdf.main(damage_function=damage_function)
-        test_output_series = event_gdf.gdf['dam_EV1_HZ']
-        reference_output_series = test_ref_output['dam_HZ_ref']
+
+
+        ### Some manual corrections, because the RA2CE implementation also calculates damage for bridges, but the
+        ### reference model did not.
+        bridges = ~test_ref_output['bridge'].isna() #find all bridges...
+
+        test_output_series = event_gdf.gdf['dam_EV1_HZ']  #... and remove data from ra2ce outcomes
+        test_output_series[bridges] = 0
+        test_output_series = test_output_series.fillna(0)
+
+        reference_output_series = test_ref_output['dam_HZ_ref'] #... and remove data from reference outcomes
+        reference_output_series[bridges] = 0
+        reference_output_series = reference_output_series.fillna(0)
+
+        ### TOT HIER WAS IK GEKOMEN ###
+        similar = (test_output_series == reference_output_series)
+        differences = ~similar
+
+        pd.testing.assert_series_equal(test_output_series, reference_output_series,
+                                       check_names=False,
+                                       check_dtype=False,
+                                       rtol = 0.1)
+
 
         if test_output_series.equals(reference_output_series):
             print('test passed')
@@ -79,6 +99,8 @@ class TestDirectDamage:
                 print('Below the 5 first differences')
                 print(event_gdf.gdf[~comparison2].head())
                 print(test_ref_output[~comparison2].head())
+
+                differences = event_gdf.gdf[~comparison2]
 
     def test_event_based_damage_calculation_OSdaMage_stylized(self):
         """A very stylized test with hypothetical data using the OSdaMage damage function.
@@ -290,4 +312,8 @@ if __name__ == "__main__":
     tests.test_event_based_damage_calculation_huizinga_stylized()
     tests.test_event_based_damage_calculation_manual_stylized()
     tests.test_event_based_damage_calculation_OSdaMage_stylized()
+
+    tests.test_event_based_damage_calculation_huizinga()
+
+    #tests.OLD_event_based_damage_calculation_manualfunction()
 
