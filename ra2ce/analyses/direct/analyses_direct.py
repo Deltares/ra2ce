@@ -82,13 +82,17 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
 
         """
         # Open the network with hazard data
+        # Dirty fix, Todo: figure out why this key does not exist under certaint conditions
+        if "base_network_hazard" not in self.graphs: #key is missing due to error in handler?
+            self.graphs["base_network_hazard"] = None
+
         road_gdf = self.graphs["base_network_hazard"]
         if self.graphs["base_network_hazard"] is None:
             road_gdf = gpd.read_feather(self.config["files"]["base_network_hazard"])
 
         # Find the hazard columns; these may be events or return periods
         val_cols = [
-            col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
+            col for col in road_gdf.columns if (col.startswith('RP') or col.startswith('F'))
         ]
 
         # Read the desired damage function
@@ -121,7 +125,18 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
                 manual_damage_functions=manual_damage_functions,
             )
 
+            if 'risk_calculation' in analysis: #Check if risk_calculation is demanded
+                if analysis['risk_calculation'] != 'none':
+                    pass #Call the function to do the risk calculation
+                    DamageNetworkReturnPeriods.risk_calculation()
+
+            else:
+                logging.info("""No parameters for risk calculation are specified. 
+                             Add key [risk_calculation] to analyses.ini.""")
+
             return return_period_gdf.gdf
+
+
 
         else:
             raise ValueError(
