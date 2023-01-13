@@ -19,7 +19,7 @@ class DamageNetworkBase(ABC):
         self.val_cols = val_cols
         self.gdf = road_gdf
         self.stats = set(
-            [x.split("_")[2] for x in val_cols]
+            [x.split("_")[-1] for x in val_cols]
         )  # set of hazard info per event
 
     @abstractmethod
