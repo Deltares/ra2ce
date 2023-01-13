@@ -653,6 +653,7 @@ class Hazard:
     def get_reproject_graph(
         self, G: nx.classes.graph.Graph, in_crs: pyproj.CRS, out_crs: pyproj.CRS
     ) -> nx.classes.graph.Graph:
+        """Reproject networkX graph"""
         extent_graph = get_graph_edges_extent(G)
         logging.info("Graph extent before reprojecting: {}".format(extent_graph))
         graph_reprojected = reproject_graph(G, in_crs, out_crs)
