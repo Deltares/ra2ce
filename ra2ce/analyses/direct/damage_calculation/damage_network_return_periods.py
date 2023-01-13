@@ -78,13 +78,15 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
             #Stop integrating at the last known return period, so no further manipulation needed
             _min_RP = min(_to_integrate.columns)
 
+            _to_integrate = _to_integrate.fillna(0)
+
             _risk = integrate_df_trapezoidal(_to_integrate.copy())
             self.gdf['risk'] = _risk
 
             logging.info("""Risk calculation was succesfull, and ran in 'default' mode. 
             Assumptions:
-                - for all return periods > max RP {}, damage = RP{}
-                - for all return periods < min RP {} 
+                - for all return periods > max RP{}, damage = dam_RP{}
+                - for all return periods < min RP{}, damage = 0
             
             """.format(_max_RP, _max_RP, _min_RP))
 
