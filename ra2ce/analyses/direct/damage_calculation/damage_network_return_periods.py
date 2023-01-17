@@ -6,6 +6,7 @@ from ra2ce.analyses.direct.damage_calculation.damage_network_base import (
 
 import numpy as np
 import pandas as pd
+from pathlib import Path
 
 
 class DamageNetworkReturnPeriods(DamageNetworkBase):
@@ -29,6 +30,12 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
 
         if not len(self.return_periods) > 1:
             raise ValueError("No return_period cols present in hazard data")
+
+    @classmethod
+    def construct_from_csv(cls,path,sep=';'):
+        road_gdf = pd.read_csv(path,sep=sep)
+        val_cols = [c for c in road_gdf.columns if c.startswith('F_')] #Find everything starting with 'F'
+        return cls(road_gdf,val_cols)
 
     ### Controlers for return period based damage and risk calculations
     def main(self, damage_function, manual_damage_functions):
@@ -54,7 +61,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
                 events=self.events, manual_damage_functions=manual_damage_functions
             )
 
-    def control_risk_calculation(self,mode=''):
+    def control_risk_calculation(self,mode='default'):
         """
         Controler of the risk calculation, which calls the correct risk (integration) functions
 
@@ -92,7 +99,36 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
 
 
         elif mode.startswith('cut_from'):
-            #this is the OSdaMage approach
+            """
+            In this mode, the integration mimics the presence of a flood protecit
+            """
+            _cutoff_rp = int(mode.split('_')[2])
+
+            # Copy the maximum return period with an infinitely high damage
+            _max_RP = max(_to_integrate.columns)
+            _to_integrate[float('inf')] = _to_integrate[_max_RP]
+
+            ###Todo: hier verder: iets met de eerste erboven, en de eerste eronder qua RP, dan inverse en dan inteproleren?
+            
+
+            #Drop all the columns with an RP below the cutoff (aka protection level)
+            #_cols_to_drop = [c for c in _to_integrate.columns if c < _cutoff_rp]
+
+            # F
+            _min_RP = min(_to_integrate.columns)
+
+            _to_integrate = _to_integrate.fillna(0)
+
+            _risk = integrate_df_trapezoidal(_to_integrate.copy())
+            self.gdf['risk'] = _risk
+
+            logging.info("""Risk calculation was succesfull, and ran in 'default' mode. 
+                        Assumptions:
+                            - for all return periods > max RP{}, damage = dam_RP{}
+                            - for all return periods < min RP{}, damage = 0
+
+                        """.format(_max_RP, _max_RP, _min_RP))
+
             pass
         elif mode.startswith('triangle_to_null'):
             #This is the approach used in the Mozambique project
@@ -135,3 +171,15 @@ def test_integrate_df_trapezoidal():
     res = integrate_df_trapezoidal(df)
 
     assert res == np.array([7.5,3.75])
+
+def test_risk_calculation_default():
+    pass
+
+def test_construct_damage_network_return_periods():
+    data_path= Path(r'D:\Python\ra2ce\tests\analyses\direct\test_data\test_data.csv')
+    damage_network = DamageNetworkReturnPeriods.construct_from_csv(data_path,sep=';')
+    pass
+
+if __name__ == "__main__":
+    test_construct_damage_network_return_periods()
+    pass
