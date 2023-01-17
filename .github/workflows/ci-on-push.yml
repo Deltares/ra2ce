@@ -37,6 +37,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
 
       - name: Test with pytest
+        shell: pwsh
         run: |
           poetry run pytest -v -m "not slow_test" --cov=ra2ce --cov-report xml:coverage-reports/coverage-ra2ce.xml --junitxml=xunit-reports/xunit-result-ra2ce.xml
           poetry run coverage xml -i
