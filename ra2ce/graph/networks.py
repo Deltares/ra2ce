@@ -46,6 +46,10 @@ class Network:
         self.id_name_origin_destination = config["origins_destinations"][
             "id_name_origin_destination"
         ]
+        if "category" in self.config["origins_destinations"]:
+            self.od_category = self.config["origins_destinations"]["category"]
+        else:
+            self.od_category = None
         try:
             self.region = (
                 config["static"] / "network" / config["origins_destinations"]["region"]
@@ -349,7 +353,6 @@ class Network:
         """
         from ra2ce.graph.origins_destinations import (
             add_od_nodes,
-            create_OD_pairs,
             read_OD_files,
         )
 
@@ -364,11 +367,12 @@ class Network:
             self.id_name_origin_destination,
             self.config["origins_destinations"]["origin_count"],
             crs,
+            self.od_category,
             self.region,
             self.region_var,
         )
 
-        ods = create_OD_pairs(ods, graph)
+        ods, graph = add_od_nodes(ods, graph, crs, self.od_category)
         ods.crs = crs
 
         # Save the OD pairs (GeoDataFrame) as pickle
@@ -384,8 +388,6 @@ class Network:
             ods_path = self.config["static"] / "output_graph" / (name + ".shp")
             ods.to_file(ods_path, index=False)
             logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
-
-        graph = add_od_nodes(graph, ods, crs)
 
         return graph
 
