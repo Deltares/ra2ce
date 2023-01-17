@@ -1475,13 +1475,13 @@ def graph_to_gdf(
     return edges, nodes
 
 
-def graph_to_shp(G, edge_shp, node_shp):
-    """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_shp and node_shp
+def graph_to_gpkg(G, edge_gpkg, node_gpkg):
+    """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_gpkg and node_gpkg
 
     Arguments:
         G []: networkx graph object to be converted
-        edge_shp [str]: output path including extension for edges shapefile
-        node_shp [str]: output path including extension for nodes shapefile
+        edge_gpkg [str]: output path including extension for edges geopackage
+        node_gpkg [str]: output path including extension for nodes geopackage
 
     Returns:
         None
@@ -1504,12 +1504,12 @@ def graph_to_shp(G, edge_shp, node_shp):
     if nodes.crs is None and edges.crs is not None:
         nodes.crs = edges.crs
 
-    logging.info("Saving nodes as shapefile: {}".format(node_shp))
-    logging.info("Saving edges as shapefile: {}".format(edge_shp))
+    logging.info("Saving nodes as shapefile: {}".format(node_gpkg))
+    logging.info("Saving edges as shapefile: {}".format(edge_gpkg))
 
     # The encoding utf-8 might result in an empty shapefile if the wrong encoding is used.
-    nodes.to_file(node_shp, driver="ESRI Shapefile", encoding="utf-8")
-    edges.to_file(edge_shp, driver="ESRI Shapefile", encoding="utf-8")
+    nodes.to_file(node_gpkg, driver="GPKG", encoding="utf-8")
+    edges.to_file(edge_gpkg, driver="GPKG", encoding="utf-8")
 
 
 def geojson_to_shp(geojson_obj, feature_number=0):
