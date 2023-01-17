@@ -1,4 +1,5 @@
 #Some tests that we need to insert in the test module later.
+import numpy as np
 import pandas as pd
 from pathlib import Path
 import pytest
@@ -10,8 +11,42 @@ from ra2ce.analyses.direct.damage.manual_damage_functions import ManualDamageFun
 ### Tests
 
 class TestDirectDamage:
-    def __init__(self):
-        pass
+    #Remember: test class has no init...
+
+    ######################### EVENT-BASED AND HUIZINGA DAMAGE FUNCTION ###############################################
+    def test_event_based_damage_calculation_huizinga_stylized(self):
+        """A very stylized test with hypothetical data for the Huizinga damage function.
+
+        The rationale behind this test is described in the appendix of the RA2CE documentation document
+
+        Test characteristics:
+            Hazard data: event-based, floods
+            Damage function: Huizinga
+        """
+
+        #SET PARAMETERS AND LOAD REFERENCE DATA
+        damage_function = 'HZ'
+        test_data_path = Path(r"test_data\Direct_damage_tests_EV_HZ.xlsx")
+        test_data = pd.read_excel(test_data_path)
+        road_gdf = test_data
+
+        val_cols = [
+            col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
+        ]
+
+        #DO ACTUAL DAMAGE CALCULATION
+        event_gdf = DamageNetworkEvents(road_gdf, val_cols)
+        event_gdf.main(damage_function=damage_function)
+
+        #CHECK OUTCOMES OF DAMAGE CALCULATIONS
+        df = event_gdf.gdf
+        df['dam_EV1_HZ'] = df['dam_EV1_HZ'].fillna(0) #Fill nans with zeros, like in the reference data
+        error_rows = df['ref_damage'] != df['dam_EV1_HZ']
+        df_errors = df[error_rows]
+
+        #EVALUATE THE RESULT OF THE TEST
+        assert df_errors.empty, "Test of Huizinga damage functions failed: {}".format(df[error_rows])
+
 
     @pytest.mark.skip(reason="Not yet finished")
     def test_event_based_damage_calculation_huizinga(self):
@@ -26,12 +61,31 @@ class TestDirectDamage:
             col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
         ]
 
-        #event_cols = [x for x in val_cols if "_EV" in x]
-
         event_gdf = DamageNetworkEvents(road_gdf,val_cols)
         event_gdf.main(damage_function=damage_function)
-        test_output_series = event_gdf.gdf['dam_EV1_HZ']
-        reference_output_series = test_ref_output['dam_HZ_ref']
+
+
+        ### Some manual corrections, because the RA2CE implementation also calculates damage for bridges, but the
+        ### reference model did not.
+        bridges = ~test_ref_output['bridge'].isna() #find all bridges...
+
+        test_output_series = event_gdf.gdf['dam_EV1_HZ']  #... and remove data from ra2ce outcomes
+        test_output_series[bridges] = 0
+        test_output_series = test_output_series.fillna(0)
+
+        reference_output_series = test_ref_output['dam_HZ_ref'] #... and remove data from reference outcomes
+        reference_output_series[bridges] = 0
+        reference_output_series = reference_output_series.fillna(0)
+
+        ### TOT HIER WAS IK GEKOMEN ###
+        similar = (test_output_series == reference_output_series)
+        differences = ~similar
+
+        pd.testing.assert_series_equal(test_output_series, reference_output_series,
+                                       check_names=False,
+                                       check_dtype=False,
+                                       rtol = 0.1)
+
 
         if test_output_series.equals(reference_output_series):
             print('test passed')
@@ -46,8 +100,46 @@ class TestDirectDamage:
                 print(event_gdf.gdf[~comparison2].head())
                 print(test_ref_output[~comparison2].head())
 
-    def event_based_damage_calculation_OSdaMage(self):
-        pass
+                differences = event_gdf.gdf[~comparison2]
+
+    def test_event_based_damage_calculation_OSdaMage_stylized(self):
+        """A very stylized test with hypothetical data using the OSdaMage damage function.
+
+        The rationale behind this test is described in the appendix of the RA2CE documentation document
+
+        Test characteristics:
+            Hazard data: event-based, floods
+            Damage function: OSdaMage
+        """
+
+        # SET PARAMETERS AND LOAD REFERENCE DATA
+        damage_function = 'OSD'
+        test_data_path = Path(r"test_data\Direct_damage_tests_EV_OSD.xlsx")
+        test_data = pd.read_excel(test_data_path)
+        road_gdf = test_data
+
+        val_cols = [
+            col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
+        ]
+
+        # DO ACTUAL DAMAGE CALCULATION
+        event_gdf = DamageNetworkEvents(road_gdf, val_cols)
+        event_gdf.main(damage_function=damage_function)
+
+        # CHECK OUTCOMES OF DAMAGE CALCULATIONS
+        df = event_gdf.gdf
+
+        # LOOP OVER THE OSdaMage functions
+        for curve in ['C1','C2','C3','C4','C5','C6']:
+            #Check lower boundary of the reconstruction/max damage costs
+            ra2ce_results_lower = df['dam_{}_EV1'.format(curve)].apply(lambda x: x[0] if isinstance(x,tuple) else x)
+            ra2ce_results_lower = ra2ce_results_lower.fillna(0)
+            reference_results_lower = df['ref_{}_LOWEST'.format(curve)]
+
+            # EVALUATE THE RESULT OF THE TEST USING PANDAS BUILT-IN FUNCTIONALITY
+            pd.testing.assert_series_equal(ra2ce_results_lower,  reference_results_lower,
+                                           check_names=False,
+                                           check_dtype=False)
 
     def load_manual_damage_function(self):
         manual_damage_functions = ManualDamageFunctions()
@@ -66,10 +158,57 @@ class TestDirectDamage:
         assert md_data.at['motorway', 4] == 550 #euro/km
         assert md_data.at['track', 2] == 150 #euro/km
 
-        print("Load manual damage function test passed")
         return manual_damage_functions
 
-    def event_based_damage_calculation_manualfunction(self):
+    ######################### EVENT-BASED AND STYLIZED DAMAGE FUNCTION ###############################################
+    def test_event_based_damage_calculation_manual_stylized(self):
+        """A very stylized test with hypothetical data for a Manual damage function.
+        We here manually load precisely the huizinga damage function, so the test is almost similar to
+            test_event_based_damage_calculation_huizinga_stylized
+
+        The rationale behind this test is described in the appendix of the RA2CE documentation document
+
+        Test characteristics:
+            Hazard data: event-based, floods
+            Damage function: manual
+        """
+
+        #SET PARAMETERS AND LOAD REFERENCE DATA
+        damage_function = 'MAN'
+        test_data_path = Path(r"test_data\Direct_damage_tests_EV_HZ.xlsx")
+        test_data = pd.read_excel(test_data_path)
+        road_gdf = test_data
+
+        val_cols = [
+            col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
+        ]
+
+        #LOAD DAMAGE FUNCTIONS
+        manual_damage_functions = ManualDamageFunctions()
+        manual_damage_functions.find_damage_functions(folder=Path(r'test_data/test_damage_functions'))
+        manual_damage_functions.load_damage_functions()
+
+        fun0 = manual_damage_functions.loaded[0]
+        assert fun0.prefix == 'te'
+
+        # DO ACTUAL DAMAGE CALCULATION
+        event_gdf = DamageNetworkEvents(road_gdf, val_cols)
+        event_gdf.main(damage_function=damage_function,manual_damage_functions=manual_damage_functions)
+
+        # CHECK OUTCOMES OF DAMAGE CALCULATIONS
+        df = event_gdf.gdf
+        df['dam_EV1_te'] = df['dam_EV1_te'].fillna(0)  # Fill nans with zeros, like in the reference data
+        error_rows = df['ref_damage'] != df['dam_EV1_te']
+        df_errors = df[error_rows]
+
+        # EVALUATE THE RESULT OF THE TEST
+        assert df_errors.empty, "Test of damage calculation using manually loaded damage functions failed: {}".format(df[error_rows])
+
+
+    def OLD_event_based_damage_calculation_manualfunction(self):
+        #Todo: have a look at this test again, to see if the existing issues have been solved
+
+
         damage_function = 'MAN'
 
         # This test roughly follows the DirectDamage.road_damage() controller in analyses_direct.py
@@ -129,17 +268,6 @@ class TestDirectDamage:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 #### Sample data
 def load_osm_test_data(file_path=Path('test_data/NL332.csv')):
     # This is taken from OSdaMage version 0.8 D:\Europe_trade_disruptions\EuropeFloodResults\Model08_VMs\main
@@ -177,3 +305,15 @@ def prepare_event_test_input_output():
 # tests.event_based_damage_calculation_huizinga()
 # tests.load_manual_damage_function()
 # tests.event_based_damage_calculation_manualfunction()
+
+
+if __name__ == "__main__":
+    tests = TestDirectDamage()
+    tests.test_event_based_damage_calculation_huizinga_stylized()
+    tests.test_event_based_damage_calculation_manual_stylized()
+    tests.test_event_based_damage_calculation_OSdaMage_stylized()
+
+    tests.test_event_based_damage_calculation_huizinga()
+
+    #tests.OLD_event_based_damage_calculation_manualfunction()
+

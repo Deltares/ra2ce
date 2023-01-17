@@ -112,3 +112,26 @@ def create_summary_statistics(gdf):
 
     dictionary = dict(gdf.groupby("road_type")["lanes"].agg(pd.Series.mode))
     return dictionary
+
+def scale_damage_using_lanes(lane_scale_factors,df,cols_to_scale) -> pd.DataFrame:
+    """
+    Scale (max) damage or construction cost data using the lane data
+
+    Arguments:
+        *lane_scale_factors* (dict)  : output of direct_lookup.get_max_damages_OSD()
+        *df* (pd.DataFrame)          : the data to scale, should have a col road_types, and a col lanes
+        *cols_to_scale* (list)       : names of the columns to scale
+
+    Returns:
+        *df* (pd.Dataframe) : the scaled data
+    """
+    assert "road_type" in df.columns, "Road type data is missing"
+    assert "lanes" in df.columns, "Lane number data is missing"
+    df["road_type_scale_factors"] = df.apply(lambda x: lane_scale_factors[x.road_type][x.lanes],axis=1)
+
+    for col in cols_to_scale:
+        df[col] = df[col] * df["road_type_scale_factors"]
+
+    df = df.drop(columns=["road_type_scale_factors"])
+
+    return df

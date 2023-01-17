@@ -103,10 +103,7 @@ class IniConfigValidatorBase(Ra2ceIoValidator):
         list(map(_check_header, required_headers))
         if not _report.is_valid():
             return _report
-        if "isolation" not in _available_keys:
-            _report.warn("Header 'isolation' not found in the configuration.")
-        else:
-            required_headers.append("isolation")
+
         # check if properties have correct input
         # TODO: Decide whether also the non-used properties must be checked or those are not checked
         # TODO: Decide how to check for multiple analyses (analysis1, analysis2, etc)

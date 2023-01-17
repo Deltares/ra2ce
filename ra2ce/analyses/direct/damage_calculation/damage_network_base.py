@@ -8,8 +8,8 @@ from ra2ce.analyses.direct.direct_lookup import LookUp as lookup
 from ra2ce.analyses.direct.direct_utils import (
     clean_lane_data,
     create_summary_statistics,
+    scale_damage_using_lanes
 )
-
 
 class DamageNetworkBase(ABC):
     """A road network gdf with hazard data stored in it, and for which damages can be calculated"""
@@ -19,7 +19,7 @@ class DamageNetworkBase(ABC):
         self.val_cols = val_cols
         self.gdf = road_gdf
         self.stats = set(
-            [x.split("_")[2] for x in val_cols]
+            [x.split("_")[-1] for x in val_cols]
         )  # set of hazard info per event
 
     @abstractmethod
@@ -31,7 +31,7 @@ class DamageNetworkBase(ABC):
             damage_function (str): damage function key name that is to be used, valid arguments are: 'HZ', 'OSD', 'MAN'
             manual_damage_functions (ManualDamageFunctions): `ManualDamageFunctions` object
         """
-        raise ValueError("Needs to be implented in concrete class.")
+        raise ValueError("Needs to be implented in concrete child class.")
 
     # events is missing
     def do_cleanup_and_mask_creation(self):
@@ -144,7 +144,8 @@ class DamageNetworkBase(ABC):
     def calculate_damage_manual_functions(self, events, manual_damage_functions):
         """
         Arguments:
-        *events* (list) = list of events (or return periods) to iterate over, these should match the hazard column names
+            *events* (list) : list of events (or return periods) to iterate over, these should match the hazard column names
+            *manual_damage_functions* (RA2CE ManualDamageFunctions object) :
         """
 
         # Todo: Dirty fixes, these should be read from the init
@@ -202,9 +203,8 @@ class DamageNetworkBase(ABC):
         # Load the Huizinga damage functions
         curve_name = "HZ"
 
-        df_max_damages_huizinga = pd.DataFrame.from_dict(lookup.max_damages_huizinga())
-        # max_damages_huizinga = lookup.max_damages_huizinga()
-        interpolator = lookup.flood_curves()[
+        df_max_damages_huizinga = pd.DataFrame.from_dict(lookup.get_max_damages_huizinga())
+        interpolator = lookup.get_flood_curves()[
             "HZ"
         ]  # input: water depth (cm); output: damage (fraction road construction costs)
 
@@ -253,16 +253,17 @@ class DamageNetworkBase(ABC):
             "These numbers assume that motorways that each driving direction is mapped as a seperate segment such as in OSM!!!"
         )
 
-        # Todo: Dirty fixes, these should be read from the code
+        # Todo: Dirty fixes, these should be read from the configuration file
         hazard_prefix = "F"
         end = "me"  # indicate that you want to use the mean
 
         # Load the OSdaMage functions
-        max_damages = lookup.max_damages()
-        interpolators = lookup.flood_curves()
+        max_damages = lookup.get_max_damages_OSD()
+        interpolators = lookup.get_flood_curves()
         interpolators.pop(
             "HZ"
         )  # input: water depth (cm); output: damage (fraction road construction costs)
+        lane_scale_factors = lookup.get_lane_number_damage_correction()
 
         # Prepare the output files
         df = self._gdf_mask
@@ -276,6 +277,10 @@ class DamageNetworkBase(ABC):
         df["upper_damage"] = (
             df["road_type"].copy().map(max_damages["Upper"])
         )  # i.e. max construction costs
+
+        #apply damage correction for lanes
+        cols_to_scale = ["lower_damage","upper_damage"]
+        df = scale_damage_using_lanes(lane_scale_factors,df,cols_to_scale)
 
         # create separate column for each percentile of construction costs (is faster then tuple)
         for percentage in [
@@ -340,14 +345,13 @@ class DamageNetworkBase(ABC):
             c for c in all_dam_cols if int(c.split("_")[1][-1]) > 4
         ]  # C5, C6
 
+        is_motorway_mask = df["road_type"].isin(["motorway","trunk"])
+
         for curve in other_curves:
-            df.loc[df["road_type"] == ("motorway" or "trunk"), curve] = np.nan
+            df.loc[is_motorway_mask, curve] = np.nan
 
         for curve in motorway_curves:
-            df.loc[df["road_type"] != ("motorway" or "trunk"), curve] = np.nan
-
-        # Todo: still need to check the units
-        logging.warning("Damage calculation units have not been checked!!! TODO")
+            df.loc[~is_motorway_mask, curve] = np.nan
 
         # Add the new columns add the right location to the df
         self.gdf[all_dam_cols] = df[all_dam_cols]

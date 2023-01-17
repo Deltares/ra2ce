@@ -82,9 +82,15 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
 
         """
         # Open the network with hazard data
+        # Dirty fix, Todo: figure out why this key does not exist under certaint conditions
+        if "base_network_hazard" not in self.graphs: #key is missing due to error in handler?
+            self.graphs["base_network_hazard"] = None
+
         road_gdf = self.graphs["base_network_hazard"]
         if self.graphs["base_network_hazard"] is None:
             road_gdf = gpd.read_feather(self.config["files"]["base_network_hazard"])
+
+        road_gdf.columns = rename_road_gdf_to_conventions(road_gdf.columns)
 
         # Find the hazard columns; these may be events or return periods
         val_cols = [
@@ -116,12 +122,22 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
 
         elif analysis["event_type"] == "return_period":
             return_period_gdf = DamageNetworkReturnPeriods(road_gdf, val_cols)
-            DamageNetworkReturnPeriods.main(
+            return_period_gdf.main(
                 damage_function=damage_function,
                 manual_damage_functions=manual_damage_functions,
             )
 
+            if 'risk_calculation' in analysis: #Check if risk_calculation is demanded
+                if analysis['risk_calculation'] != 'none':
+                    return_period_gdf.control_risk_calculation(mode='default')
+
+            else:
+                logging.info("""No parameters for risk calculation are specified. 
+                             Add key [risk_calculation] to analyses.ini.""")
+
             return return_period_gdf.gdf
+
+
 
         else:
             raise ValueError(
@@ -220,3 +236,23 @@ def test_construct_damage_fraction():
 # max_damage = test_construct_max_damage()
 
 # max_damage = test_construct_damage_fraction()
+
+def rename_road_gdf_to_conventions(road_gdf_columns):
+    """
+    Rename the columns in the road_gdf to the conventions of the ra2ce documentation
+
+    'eg' RP100_fr -> F_RP100_me
+                   -> F_EV1_mi
+
+    """
+    cs = road_gdf_columns
+    ### Handle return period columns
+    new_cols = []
+    for c in cs:
+        if c.startswith('RP'):
+            new_cols.append('F_'+c)
+        else:
+            new_cols.append(c)
+
+    ### Todo add handling of events if this gives a problem
+    return new_cols
