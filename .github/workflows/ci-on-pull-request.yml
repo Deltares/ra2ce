@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: 3.9
           # use the latest mamba version
-          mamba-version: "*"
+          miniconda-version: "latest"
           channels: conda-forge,defaults
           channel-priority: true
           # always activate the ra2ce environment (name is specified in environment.yml)
