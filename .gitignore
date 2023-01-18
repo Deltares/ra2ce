@@ -6,8 +6,7 @@ __pycache__/
 # C extensions
 *.so
 
-run.py
-pakistan.py
+
 
 # Distribution / packaging
 .Python
@@ -144,3 +143,5 @@ dmypy.json
 # ra2ce ignore:
 data/
 /tests/local_data
+run.py
+pakistan.py
