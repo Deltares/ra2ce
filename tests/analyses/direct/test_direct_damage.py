@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from ra2ce.analyses.direct.damage_calculation.damage_network_events import DamageNetworkEvents
+from ra2ce.analyses.direct.damage_calculation.damage_network_return_periods import DamageNetworkReturnPeriods
 from ra2ce.analyses.direct.damage.manual_damage_functions import ManualDamageFunctions
 
 
@@ -204,7 +205,7 @@ class TestDirectDamage:
         # EVALUATE THE RESULT OF THE TEST
         assert df_errors.empty, "Test of damage calculation using manually loaded damage functions failed: {}".format(df[error_rows])
 
-
+    @pytest.mark.skip(reason="Not yet finished")
     def OLD_event_based_damage_calculation_manualfunction(self):
         #Todo: have a look at this test again, to see if the existing issues have been solved
 
@@ -266,6 +267,34 @@ class TestDirectDamage:
                     print('... and the reference output:')
                     print(test_ref_output[is_combined_different].head())
 
+    def test_construct_damage_network_return_periods(self):
+        data_path = Path(r'test_data\risk_test_data.csv')
+        damage_network = DamageNetworkReturnPeriods.construct_from_csv(data_path, sep=';')
+        assert type(damage_network) == DamageNetworkReturnPeriods, 'Did not construct object of the right type'
+
+    def test_risk_calculation_default(self):
+        data_path = Path(r'test_data\risk_test_data.csv')
+        damage_network = DamageNetworkReturnPeriods.construct_from_csv(data_path, sep=';')
+        damage_network.control_risk_calculation(mode='default')
+        assert damage_network.gdf['risk'][0] == damage_network.gdf['ref_risk_default'][0]
+
+    def test_risk_calculation_cutoff(self):
+        data_path = Path(r'test_data\risk_test_data.csv')
+        for rp in [15, 200, 25]:
+            damage_network = DamageNetworkReturnPeriods.construct_from_csv(data_path, sep=';')
+            damage_network.control_risk_calculation(mode='cut_from_{}_year'.format(rp))
+            test_result = round(damage_network.gdf['risk'][0], 0)
+            reference_result = round(damage_network.gdf['ref_risk_cut_from_{}_year'.format(rp)][0], 0)
+            assert test_result == reference_result
+
+    def test_risk_calculation_triangle_to_null(self):
+        data_path = Path(r'test_data\risk_test_data.csv')
+        damage_network = DamageNetworkReturnPeriods.construct_from_csv(data_path, sep=';')
+        for triangle_rp in [8, 2]:
+            damage_network.control_risk_calculation(mode='triangle_to_null_{}_year'.format(triangle_rp))
+            test_result = round(damage_network.gdf['risk'][0], 0)
+            reference_result = round(damage_network.gdf['ref_risk_triangle_to_null_{}_year'.format(triangle_rp)][0], 0)
+            assert test_result == reference_result
 
 
 #### Sample data
@@ -276,8 +305,6 @@ def load_osm_test_data(file_path=Path('test_data/NL332.csv')):
     file = folder / 'NL332.csv'
     raw_data = pd.read_csv(file,index_col=0)
     return raw_data
-
-#def prepare_data_for_event_test(raw_data):
 
 
 def prepare_event_test_input_output():
@@ -309,11 +336,19 @@ def prepare_event_test_input_output():
 
 if __name__ == "__main__":
     tests = TestDirectDamage()
+
+    #TEST DAMAGE CALCULATIONS EVENT-BASED
     tests.test_event_based_damage_calculation_huizinga_stylized()
     tests.test_event_based_damage_calculation_manual_stylized()
     tests.test_event_based_damage_calculation_OSdaMage_stylized()
 
-    tests.test_event_based_damage_calculation_huizinga()
+    #TEST DAMAGE CALCULATIONS RETURN PERIOD-BASED
+    tests.test_construct_damage_network_return_periods()
+    tests.test_risk_calculation_default()
+    tests.test_risk_calculation_cutoff()
+    tests.test_risk_calculation_triangle_to_null()
 
+    #TESTS THAT DO NOT (YET) WORK
     #tests.OLD_event_based_damage_calculation_manualfunction()
+    #tests.test_event_based_damage_calculation_huizinga()
 
