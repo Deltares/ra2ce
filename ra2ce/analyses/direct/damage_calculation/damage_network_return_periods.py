@@ -16,7 +16,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
     @Author: Kees van Ginkel
 
     Mandatory attributes:
-        *self.rps* (set)  : all available unique events
+        *self.return_periods* (set of strings): 'e.g
         *self.stats* (set)   : the available statistics
     """
 
@@ -100,39 +100,103 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
 
         elif mode.startswith('cut_from'):
             """
-            In this mode, the integration mimics the presence of a flood protecit
+            In this mode, the integration mimics the presence of a flood protection
             """
+
+            _to_integrate = _to_integrate.sort_index(axis='columns',ascending=False) #from large to small RP
+            _rps = list(_to_integrate.columns)
+
             _cutoff_rp = int(mode.split('_')[2])
+
+            if _cutoff_rp <= min(_rps):
+                raise ValueError("""
+                RA2CE cannot calculate risk in 'cut_from' mode if 
+                Return period of the cutoff ({}) <= smallest available return period ({})
+                Use 'default' mode or 'triangle_to_null_mode' instead.
+                                    """.format(_cutoff_rp,min(_rps)))
+
+            if _rps[-1] < _cutoff_rp < _rps[0]: #if protection level is between min and max RP
+                if _cutoff_rp in _rps:
+                    _dropcols = [rp for rp in _rps if rp < _cutoff_rp]
+                    _to_integrate = _to_integrate.drop(columns=_dropcols)
+                else:
+                    pos = _rps.index(next(i for i in _rps if i < _cutoff_rp)) #find position of first RP value < PL
+                    #_to_integrate = _to_integrate[_rps[0:pos+1]] #remove all the values with smaller RPs than the PL
+
+                    _frequencies = _to_integrate.copy()
+                    _frequencies.columns = [1/c for c in _frequencies.columns]
+
+                    _frequencies[1/_cutoff_rp] = np.nan
+                    _frequencies = _frequencies.interpolate(method='index', axis=1)
+
+                    #Drop the columns outside the cutoff
+                    _dropcols = [c for c in _frequencies.columns if c > 1/_cutoff_rp]
+                    _frequencies = _frequencies.drop(columns=_dropcols)
+
+                    _to_integrate = _frequencies
+                    _to_integrate.columns = [1/c for c in _to_integrate.columns]
+
+                    # Copy the maximum return period with an infinitely high damage
+                    _max_RP = max(_to_integrate.columns)
+                    _to_integrate[float('inf')] = _to_integrate[_max_RP]
+
+                    _to_integrate = _to_integrate.fillna(0)
+                    _risk = integrate_df_trapezoidal(_to_integrate.copy())
+
+            elif _cutoff_rp >= _rps[0]: #cutoff is larger or equal than largest return period
+                # risk is return frequency of cutoff
+                # times the damage of the most extreme event
+                _risk = _to_integrate[_rps[0]]/_cutoff_rp
+                _max_RP = max(_to_integrate.columns)
+
+            self.gdf['risk'] = _risk
+
+            logging.info("""Risk calculation was succesfull, and ran in 'cut_from' mode. 
+                        Assumptions:
+                            - for all return periods > max RP{}, damage = dam_RP{}
+                            - damage at cutoff is linearly interpolated from known damages
+                            - no damage for al RPs > RP_cutoff ({})
+
+                        """.format(_max_RP, _max_RP,_cutoff_rp))
+
+        elif mode.startswith('triangle_to_null'):
+            """
+            In this mode, an extra data point with zero damage is added at some distance from the smallest known RP,
+            and the area of the Triangle this creates is also calculated
+            """
+
+            _rps = list(_to_integrate.columns)
+
+            _triangle_end = int(mode.split('_')[3]) #The return period at which the triangle should end
+
+            if _triangle_end >= min(_rps):
+                raise ValueError("""
+                RA2CE cannot calculate risk in 'triangle_to_null' mode if 
+                Return period of the triangle ({}) >= smallest available return period ({})
+                Use 'default' mode or 'cut_from' instead.
+                                    """.format(_triangle_end,min(_rps)))
 
             # Copy the maximum return period with an infinitely high damage
             _max_RP = max(_to_integrate.columns)
             _to_integrate[float('inf')] = _to_integrate[_max_RP]
 
-            ###Todo: hier verder: iets met de eerste erboven, en de eerste eronder qua RP, dan inverse en dan inteproleren?
-            
+            # At the return period of the triangle end, set all damage values to zero
+            _to_integrate[_triangle_end] = 0
 
-            #Drop all the columns with an RP below the cutoff (aka protection level)
-            #_cols_to_drop = [c for c in _to_integrate.columns if c < _cutoff_rp]
-
-            # F
-            _min_RP = min(_to_integrate.columns)
+            _to_integrate = _to_integrate.sort_index(axis='columns', ascending=False)  # from large to small RP
 
             _to_integrate = _to_integrate.fillna(0)
 
             _risk = integrate_df_trapezoidal(_to_integrate.copy())
             self.gdf['risk'] = _risk
 
-            logging.info("""Risk calculation was succesfull, and ran in 'default' mode. 
+            logging.info("""Risk calculation was succesfull, and ran in 'triangle to null' mode. 
                         Assumptions:
                             - for all return periods > max RP{}, damage = dam_RP{}
-                            - for all return periods < min RP{}, damage = 0
+                            - at the end of the triangle {}, damage = 0
 
-                        """.format(_max_RP, _max_RP, _min_RP))
+                        """.format(_max_RP, _max_RP, _triangle_end))
 
-            pass
-        elif mode.startswith('triangle_to_null'):
-            #This is the approach used in the Mozambique project
-            pass
 
     def verify_damage_data_for_risk_calculation(self):
         """
@@ -172,14 +236,40 @@ def test_integrate_df_trapezoidal():
 
     assert res == np.array([7.5,3.75])
 
-def test_risk_calculation_default():
-    pass
 
 def test_construct_damage_network_return_periods():
-    data_path= Path(r'D:\Python\ra2ce\tests\analyses\direct\test_data\test_data.csv')
+    data_path= Path(r'D:\Python\ra2ce\tests\analyses\direct\test_data\risk_test_data.csv')
     damage_network = DamageNetworkReturnPeriods.construct_from_csv(data_path,sep=';')
-    pass
+    assert type(damage_network) == DamageNetworkReturnPeriods, 'Did not construct object of the right type'
+
+def test_risk_calculation_default():
+    data_path = Path(r'D:\Python\ra2ce\tests\analyses\direct\test_data\risk_test_data.csv')
+    damage_network = DamageNetworkReturnPeriods.construct_from_csv(data_path, sep=';')
+    damage_network.control_risk_calculation(mode='default')
+    assert damage_network.gdf['risk'][0] == damage_network.gdf['ref_risk_default'][0]
+
+def test_risk_calculation_cutoff():
+    data_path = Path(r'D:\Python\ra2ce\tests\analyses\direct\test_data\risk_test_data.csv')
+    for rp in [15,200,25]:
+        damage_network = DamageNetworkReturnPeriods.construct_from_csv(data_path, sep=';')
+        damage_network.control_risk_calculation(mode='cut_from_{}_year'.format(rp))
+        test_result = round(damage_network.gdf['risk'][0],0)
+        reference_result = round(damage_network.gdf['ref_risk_cut_from_{}_year'.format(rp)][0],0)
+        assert test_result == reference_result
+
+def test_risk_calculation_triangle_to_null():
+    data_path = Path(r'D:\Python\ra2ce\tests\analyses\direct\test_data\risk_test_data.csv')
+    damage_network = DamageNetworkReturnPeriods.construct_from_csv(data_path, sep=';')
+    for triangle_rp in [8,2]:
+        damage_network.control_risk_calculation(mode='triangle_to_null_{}_year'.format(triangle_rp))
+        test_result = round(damage_network.gdf['risk'][0], 0)
+        reference_result = round(damage_network.gdf['ref_risk_triangle_to_null_{}_year'.format(triangle_rp)][0], 0)
+        assert test_result == reference_result
+
+
 
 if __name__ == "__main__":
     test_construct_damage_network_return_periods()
-    pass
+    test_risk_calculation_default()
+    test_risk_calculation_cutoff()
+    test_risk_calculation_triangle_to_null()
