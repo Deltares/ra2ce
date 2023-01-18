@@ -21,7 +21,7 @@ jobs:
         with:
           python-version: 3.9
           # use the latest mamba version
-          mamba-version: "*"
+          miniconda-version: "latest"
           channels: conda-forge,defaults
           channel-priority: true
           # always activate the ra2ce environment (name is specified in environment.yml)
@@ -39,7 +39,6 @@ jobs:
       - name: Test with pytest
         shell: pwsh
         run: |
-          conda activate ra2ce_env
           poetry run pytest -v -m "not slow_test" --cov=ra2ce --cov-report xml:coverage-reports/coverage-ra2ce.xml --junitxml=xunit-reports/xunit-result-ra2ce.xml
           poetry run coverage xml -i
       - name: Autoformat code if the check fails
