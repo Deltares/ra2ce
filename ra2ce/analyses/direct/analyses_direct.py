@@ -129,7 +129,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
 
             if 'risk_calculation' in analysis: #Check if risk_calculation is demanded
                 if analysis['risk_calculation'] != 'none':
-                    return_period_gdf.control_risk_calculation(mode='default')
+                    return_period_gdf.control_risk_calculation(mode=analysis['risk_calculation'])
 
             else:
                 logging.info("""No parameters for risk calculation are specified. 
