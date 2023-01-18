@@ -75,38 +75,21 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         dam_cols = [c for c in self.gdf.columns if c.startswith('dam')]
         _to_integrate = self.gdf[dam_cols]
         _to_integrate.columns = [float(c.split('_')[1].replace('RP', '')) for c in _to_integrate.columns]
+        _to_integrate = _to_integrate.sort_index(axis='columns', ascending=False)  # from large to small RP
 
         if mode == 'default':
 
-            #Copy the maximum return period with an infinitely high damage
-            _max_RP = max(_to_integrate.columns)
-            _to_integrate[float('inf')] =_to_integrate[_max_RP]
-
-            #Stop integrating at the last known return period, so no further manipulation needed
-            _min_RP = min(_to_integrate.columns)
-
-            _to_integrate = _to_integrate.fillna(0)
-
-            _risk = integrate_df_trapezoidal(_to_integrate.copy())
+            _to_integrate = self.rework_damage_data_default(_to_integrate)
+            _risk = self.integrate_df_trapezoidal(_to_integrate.copy())
             self.gdf['risk'] = _risk
-
-            logging.info("""Risk calculation was succesfull, and ran in 'default' mode. 
-            Assumptions:
-                - for all return periods > max RP{}, damage = dam_RP{}
-                - for all return periods < min RP{}, damage = 0
-            
-            """.format(_max_RP, _max_RP, _min_RP))
-
 
         elif mode.startswith('cut_from'):
             """
             In this mode, the integration mimics the presence of a flood protection
             """
-
-            _to_integrate = _to_integrate.sort_index(axis='columns',ascending=False) #from large to small RP
-            _rps = list(_to_integrate.columns)
-
             _cutoff_rp = int(mode.split('_')[2])
+
+            _rps = list(_to_integrate.columns)
 
             if _cutoff_rp <= min(_rps):
                 raise ValueError("""
@@ -115,49 +98,18 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
                 Use 'default' mode or 'triangle_to_null_mode' instead.
                                     """.format(_cutoff_rp,min(_rps)))
 
-            if _rps[-1] < _cutoff_rp < _rps[0]: #if protection level is between min and max RP
-                if _cutoff_rp in _rps:
-                    _dropcols = [rp for rp in _rps if rp < _cutoff_rp]
-                    _to_integrate = _to_integrate.drop(columns=_dropcols)
-                else:
-                    pos = _rps.index(next(i for i in _rps if i < _cutoff_rp)) #find position of first RP value < PL
-                    #_to_integrate = _to_integrate[_rps[0:pos+1]] #remove all the values with smaller RPs than the PL
+            elif min(_rps) < _cutoff_rp < max(_rps): #if protection level is between min and max RP
+                _to_integrate = self.rework_damage_data_cut_from(_to_integrate, _cutoff_rp)
+                _risk = self.integrate_df_trapezoidal(_to_integrate.copy())
 
-                    _frequencies = _to_integrate.copy()
-                    _frequencies.columns = [1/c for c in _frequencies.columns]
-
-                    _frequencies[1/_cutoff_rp] = np.nan
-                    _frequencies = _frequencies.interpolate(method='index', axis=1)
-
-                    #Drop the columns outside the cutoff
-                    _dropcols = [c for c in _frequencies.columns if c > 1/_cutoff_rp]
-                    _frequencies = _frequencies.drop(columns=_dropcols)
-
-                    _to_integrate = _frequencies
-                    _to_integrate.columns = [1/c for c in _to_integrate.columns]
-
-                    # Copy the maximum return period with an infinitely high damage
-                    _max_RP = max(_to_integrate.columns)
-                    _to_integrate[float('inf')] = _to_integrate[_max_RP]
-
-                    _to_integrate = _to_integrate.fillna(0)
-                    _risk = integrate_df_trapezoidal(_to_integrate.copy())
-
-            elif _cutoff_rp >= _rps[0]: #cutoff is larger or equal than largest return period
+            elif _cutoff_rp >= max(_rps): #cutoff is larger or equal than largest return period
                 # risk is return frequency of cutoff
                 # times the damage of the most extreme event
+                _to_integrate = _to_integrate.fillna(0)
                 _risk = _to_integrate[_rps[0]]/_cutoff_rp
                 _max_RP = max(_to_integrate.columns)
 
             self.gdf['risk'] = _risk
-
-            logging.info("""Risk calculation was succesfull, and ran in 'cut_from' mode. 
-                        Assumptions:
-                            - for all return periods > max RP{}, damage = dam_RP{}
-                            - damage at cutoff is linearly interpolated from known damages
-                            - no damage for al RPs > RP_cutoff ({})
-
-                        """.format(_max_RP, _max_RP,_cutoff_rp))
 
         elif mode.startswith('triangle_to_null'):
             """
@@ -176,26 +128,12 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
                 Use 'default' mode or 'cut_from' instead.
                                     """.format(_triangle_end,min(_rps)))
 
-            # Copy the maximum return period with an infinitely high damage
-            _max_RP = max(_to_integrate.columns)
-            _to_integrate[float('inf')] = _to_integrate[_max_RP]
+            _to_integrate = self.rework_damage_data_triangle_to_null(_to_integrate, _triangle_end)
+            _risk = self.integrate_df_trapezoidal(_to_integrate.copy())
 
-            # At the return period of the triangle end, set all damage values to zero
-            _to_integrate[_triangle_end] = 0
-
-            _to_integrate = _to_integrate.sort_index(axis='columns', ascending=False)  # from large to small RP
-
-            _to_integrate = _to_integrate.fillna(0)
-
-            _risk = integrate_df_trapezoidal(_to_integrate.copy())
             self.gdf['risk'] = _risk
 
-            logging.info("""Risk calculation was succesfull, and ran in 'triangle to null' mode. 
-                        Assumptions:
-                            - for all return periods > max RP{}, damage = dam_RP{}
-                            - at the end of the triangle {}, damage = 0
 
-                        """.format(_max_RP, _max_RP, _triangle_end))
 
 
     def verify_damage_data_for_risk_calculation(self):
@@ -208,24 +146,126 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         #RP should in the column name
         pass
 
-    def calculate_expected_annual_damage(self):
+    @staticmethod
+    def integrate_df_trapezoidal(df: pd.DataFrame)-> np.array:
+        """
+        Arguments:
+            *df* (pd.DataFrame) :
+                Column names should contain return periods (years)
+                Each row should contain a set of damages for one object
 
-        pass
+        Returns:
+            np.array : integrated result per row
 
+        """
+        #convert return periods to frequencies
+        df.columns = [1/RP for RP in df.columns]
+        #sort columns by ascending frequency
+        df = df.sort_index(axis='columns')
+        values = df.values
+        frequencies = df.columns
+        return np.trapz(values,frequencies,axis=1)
 
-def integrate_df_trapezoidal(df):
-    """
-    Column names should contain return periods (years)
-    Each row should contain a set of damages for one object
+    @staticmethod
+    def rework_damage_data_default(_to_integrate: pd.DataFrame) -> pd.DataFrame:
+        """
+        Rework the damage data to make it suitable for integration (risk calculation) in default mode
+        
+        :param _to_integrate: 
+        :return: _to_integrate
+        """
+        # Copy the maximum return period with an infinitely high damage
+        _max_RP = max(_to_integrate.columns)
+        _to_integrate[float('inf')] = _to_integrate[_max_RP]
 
-    """
-    #convert return periods to frequencies
-    df.columns = [1/RP for RP in df.columns]
-    #sort columns by ascending frequency
-    df = df.sort_index(axis='columns')
-    values = df.values
-    frequencies = df.columns
-    return np.trapz(values,frequencies,axis=1)
+        # Stop integrating at the last known return period, so no further manipulation needed
+        _min_RP = min(_to_integrate.columns)
+
+        _to_integrate = _to_integrate.fillna(0)
+
+        logging.info("""Risk calculation runs in 'default' mode. 
+                    Assumptions:
+                        - for all return periods > max RP{}, damage = dam_RP{}
+                        - for all return periods < min RP{}, damage = 0
+
+                    """.format(_max_RP, _max_RP, _min_RP))
+        return _to_integrate
+
+    @staticmethod
+    def rework_damage_data_cut_from(_to_integrate: pd.DataFrame, _cutoff_rp: float) -> pd.DataFrame:
+        """
+        Rework the damage data to make it suitable for integration (risk calculation) in default mode
+
+        :param _to_integrate: 
+                _cutoff_rp : the return period at which to make the cutoff, aka the flood protection level
+        :return: _to_integrate
+        """
+        _rps = list(_to_integrate.columns)
+
+        if _cutoff_rp in _rps:
+            _dropcols = [rp for rp in _rps if rp < _cutoff_rp]
+            _to_integrate = _to_integrate.drop(columns=_dropcols)
+        else:
+            pos = _rps.index(next(i for i in _rps if i < _cutoff_rp))  # find position of first RP value < PL
+            # _to_integrate = _to_integrate[_rps[0:pos+1]] #remove all the values with smaller RPs than the PL
+
+            _frequencies = _to_integrate.copy()
+            _frequencies.columns = [1 / c for c in _frequencies.columns]
+
+            _frequencies[1 / _cutoff_rp] = np.nan
+            _frequencies = _frequencies.interpolate(method='index', axis=1)
+
+            # Drop the columns outside the cutoff
+            _dropcols = [c for c in _frequencies.columns if c > 1 / _cutoff_rp]
+            _frequencies = _frequencies.drop(columns=_dropcols)
+
+            _to_integrate = _frequencies
+            _to_integrate.columns = [1 / c for c in _to_integrate.columns]
+
+            # Copy the maximum return period with an infinitely high damage
+            _max_RP = max(_to_integrate.columns)
+            _to_integrate[float('inf')] = _to_integrate[_max_RP]
+
+            _to_integrate = _to_integrate.fillna(0)
+
+        logging.info("""Risk calculation runs in 'cut_from' mode. 
+                                Assumptions:
+                                    - for all return periods > max RP{}, damage = dam_RP{}
+                                    - damage at cutoff is linearly interpolated from known damages
+                                    - no damage for al RPs > RP_cutoff ({})
+
+                                """.format(_max_RP, _max_RP, _cutoff_rp))
+
+        return _to_integrate
+
+    @staticmethod
+    def rework_damage_data_triangle_to_null(_to_integrate: pd.DataFrame, _triangle_end: float) -> pd.DataFrame:
+        """
+        Rework the damage data to make it suitable for integration (risk calculation) in default mode
+
+        :param _to_integrate:
+                _triangle_end_rp : the return period at to end the triangle
+        :return: _to_integrate
+        """
+        # Copy the maximum return period with an infinitely high damage
+        _max_RP = max(_to_integrate.columns)
+        _to_integrate[float('inf')] = _to_integrate[_max_RP]
+
+        # At the return period of the triangle end, set all damage values to zero
+        _to_integrate[_triangle_end] = 0
+
+        _to_integrate = _to_integrate.sort_index(axis='columns', ascending=False)  # from large to small RP
+
+        _to_integrate = _to_integrate.fillna(0)
+
+        logging.info("""Risk calculation runs in 'triangle to null' mode. 
+                                Assumptions:
+                                    - for all return periods > max RP{}, damage = dam_RP{}
+                                    - at the end of the triangle {}, damage = 0
+
+                                """.format(_max_RP, _max_RP, _triangle_end))
+        return _to_integrate
+
 
 def test_integrate_df_trapezoidal():
     data = np.array(([[1000,2000],[500,1000]]))
