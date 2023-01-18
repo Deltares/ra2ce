@@ -9,17 +9,20 @@ import sys
 import time
 from pathlib import Path
 
+#import igraph as ig
 import geopandas as gpd
 import networkx as nx
 import numpy as np
 import osmnx
 import pandas as pd
+
+
 from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
 
 # Local modules
-from ra2ce.graph.networks_utils import graph_to_shp
+from ra2ce.graph.networks_utils import graph_to_gpkg
 from ra2ce.io.readers.graph_pickle_reader import GraphPickleReader
 from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDestination
 
@@ -719,6 +722,9 @@ class IndirectAnalyses:
             ]
             graph_hz.remove_edges_from(edges_remove)
 
+            #convert the networkx graph to igraph object to speed up the route finding algorithm
+            #igraph_hz = ig.Graph.from_networkx(igraph_hz)
+
             # Find the routes
             od_routes = find_route_ods(graph_hz, od_nodes, analysis["weighing"])
             od_routes["hazard"] = hazard_name
@@ -884,7 +890,7 @@ class IndirectAnalyses:
         origin_fn = (
             Path(self.config["static"])
             / "output_graph"
-            / "origin_destination_table.shp"
+            / "origin_destination_table.gpkg"
         )
         origin = gpd.read_file(origin_fn)
         index = [type(x) == str for x in origin["o_id"]]
@@ -1171,19 +1177,19 @@ class IndirectAnalyses:
                     to_save_gdf_names = ["destinations", "optimal_routes"]
                     for to_save, save_name in zip(to_save_gdf, to_save_gdf_names):
                         if not to_save.empty:
-                            shp_path = output_path / (
-                                    analysis["name"].replace(" ", "_") + f"_{save_name}.shp"
+                            gpkg_path = output_path / (
+                                    analysis["name"].replace(" ", "_") + f"_{save_name}.gpkg"
                             )
-                            save_gdf(to_save, shp_path)
+                            save_gdf(to_save, gpkg_path)
 
                     # Save the Graph
-                    shp_path_nodes = output_path / (
-                            analysis["name"].replace(" ", "_") + "_results_nodes.shp"
+                    gpkg_path_nodes = output_path / (
+                            analysis["name"].replace(" ", "_") + "_results_nodes.gpkg"
                     )
-                    shp_path_edges = output_path / (
-                            analysis["name"].replace(" ", "_") + "_results_edges.shp"
+                    gpkg_path_edges = output_path / (
+                            analysis["name"].replace(" ", "_") + "_results_edges.gpkg"
                     )
-                    graph_to_shp(base_graph, shp_path_edges, shp_path_nodes)
+                    graph_to_gpkg(base_graph,  gpkg_path_edges,  gpkg_path_nodes)
                 if analysis["save_csv"]:
                     csv_path = output_path / (
                         analysis["name"].replace(" ", "_") + "_destinations.csv"
@@ -1199,7 +1205,7 @@ class IndirectAnalyses:
             elif analysis["analysis"] == "multi_link_origin_closest_destination":
                 analyzer = OriginClosestDestination(self.config, analysis, self.hazard_names)
 
-                if analysis['calculate_route_without_disruption']:
+                if analysis["calculate_route_without_disruption"]:
                     (
                         base_graph,
                         opt_routes_without_hazard,
@@ -1238,19 +1244,19 @@ class IndirectAnalyses:
                     to_save_gdf_names = ["origins", "destinations", "optimal_routes_without_hazard", "optimal_routes_with_hazard"]
                     for to_save, save_name in zip(to_save_gdf, to_save_gdf_names):
                         if not to_save.empty:
-                            shp_path = output_path / (
-                                analysis["name"].replace(" ", "_") + f"_{save_name}.shp"
+                            gpkg_path = output_path / (
+                                analysis["name"].replace(" ", "_") + f"_{save_name}.gpkg"
                             )
-                            save_gdf(to_save, shp_path)
+                            save_gdf(to_save,  gpkg_path)
 
                     # Save the Graph
-                    shp_path_nodes = output_path / (
-                        analysis["name"].replace(" ", "_") + "_results_nodes.shp"
+                    gpkg_path_nodes = output_path / (
+                        analysis["name"].replace(" ", "_") + "_results_nodes.gpkg"
                     )
-                    shp_path_edges = output_path / (
-                        analysis["name"].replace(" ", "_") + "_results_edges.shp"
+                    gpkg_path_edges = output_path / (
+                        analysis["name"].replace(" ", "_") + "_results_edges.gpkg"
                     )
-                    graph_to_shp(base_graph, shp_path_edges, shp_path_nodes)
+                    graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
                 if analysis["save_csv"]:
                     csv_path = output_path / (
                         analysis["name"].replace(" ", "_") + "_destinations.csv"
@@ -1301,15 +1307,15 @@ class IndirectAnalyses:
             if not gdf.empty:
                 # Not for all analyses a gdf is created as output.
                 if analysis["save_shp"]:
-                    shp_path = output_path / (
-                        analysis["name"].replace(" ", "_") + ".shp"
+                    gpkg_path = output_path / (
+                        analysis["name"].replace(" ", "_") + ".gpkg"
                     )
-                    save_gdf(gdf, shp_path)
+                    save_gdf(gdf, gpkg_path)
                     if opt_routes:
-                        shp_path = output_path / (
-                            analysis["name"].replace(" ", "_") + "_optimal_routes.shp"
+                        gpkg_path = output_path / (
+                            analysis["name"].replace(" ", "_") + "_optimal_routes.gpkg"
                         )
-                        save_gdf(gdf, shp_path)
+                        save_gdf(gdf, gpkg_path)
                 if analysis["save_csv"]:
                     csv_path = output_path / (
                         analysis["name"].replace(" ", "_") + ".csv"
@@ -1527,7 +1533,7 @@ def save_gdf(gdf, save_path):
         if gdf[col].dtype == object and col != gdf.geometry.name:
             gdf[col] = gdf[col].astype(str)
 
-    gdf.to_file(save_path, driver="ESRI Shapefile", encoding="utf-8")
+    gdf.to_file(save_path, driver='GPKG')
     logging.info("Results saved to: {}".format(save_path))
 
 
