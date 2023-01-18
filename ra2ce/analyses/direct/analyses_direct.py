@@ -214,7 +214,7 @@ def save_gdf(gdf, save_path):
     logging.info("Results saved to: {}".format(save_path))
 
 
-# Tests:
+# Todo: these should be moved
 def test_construct_max_damage():
     max_damage = MaxDamageByRoadTypeByLane()
     path = Path(
