@@ -43,4 +43,27 @@ jobs:
         shell: pwsh
         run: |
           conda activate ra2ce_env
-          poetry run pytest
+          poetry run pytest -v -m "not slow_test" --cov=ra2ce --cov-report xml:coverage-reports/coverage-ra2ce.xml --junitxml=xunit-reports/xunit-result-ra2ce.xml
+          poetry run coverage xml -i
+
+      - name: Autoformat code if the check fails
+        if: ${{ (matrix.os == 'ubuntu-latest') && (matrix.python-version == 3.9) }}
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+        run: |
+          conda activate ra2ce_env
+          poetry run isort .
+          poetry run black .
+          git config --global user.name '${{ github.actor }}'
+          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git checkout $GITHUB_HEAD_REF
+          git commit -am "autoformat: isort & black" && git push || true
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        if: ${{ (matrix.os == 'ubuntu-latest') && (matrix.python-version == 3.9) }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
