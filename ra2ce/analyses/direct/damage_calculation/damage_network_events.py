@@ -1,7 +1,9 @@
+from __future__ import annotations
 from ra2ce.analyses.direct.damage_calculation.damage_network_base import (
     DamageNetworkBase,
 )
 
+from pathlib import Path
 
 class DamageNetworkEvents(DamageNetworkBase):
     """A road network gdf with EVENT-BASED hazard data stored in it, and for which damages can be calculated
@@ -12,6 +14,13 @@ class DamageNetworkEvents(DamageNetworkBase):
         *self.events* (set)  : all available unique events
         *self.stats* (set)   : the available statistics
     """
+
+    # @classmethod
+    # def from_csv_file(cls, csv_file: Path) -> DamageNetworkEvents:
+    #     # Cls is the class where this classmethod is, however is not instantiated yet.
+    #     _dne_object = cls(123, 456)
+    #     _text_lines = csv_file.read_text().splitlines()
+    #     return _dne_object
 
     def __init__(self, road_gdf, val_cols):
         # Construct using the parent class __init__
@@ -39,3 +48,12 @@ class DamageNetworkEvents(DamageNetworkBase):
             self.calculate_damage_manual_functions(
                 events=self.events, manual_damage_functions=manual_damage_functions
             )
+
+# class DamageNetworkEventsBuilder:
+#     @staticmethod
+#     def from_csv_file(file_path) -> DamageNetworkEvents:
+#         pass
+#
+#     @staticmethod
+#     def from_pandas(pd_dataframe) -> DamageNetworkEvents:
+#         pass

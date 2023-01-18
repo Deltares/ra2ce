@@ -47,3 +47,24 @@ class ManualDamageFunctions:
                     damage_function.name, dir
                 )
             )
+# class DamageFWhateverFactoryBuilder:
+#     available_items: Dict[str, Path]
+#
+#     def __init__(self):
+#         self.available_items = {}
+#
+#     def build(self) -> Union[List[DamageFunctionByRoadTypeByLane], None]:
+#         if not available_items:
+#             return None
+#         _loaded = []
+#         for name, dir in self.available_items.items():
+#             damage_function = DamageFunctionByRoadTypeByLane(name=name)
+#             damage_function.from_input_folder(dir)
+#             damage_function.set_prefix()
+#             _loaded.append(damage_function)
+#             logging.info(
+#                 "Damage function '{}' loaded from folder {}".format(
+#                     damage_function.name, dir
+#                 )
+#             )
+#         return _loaded

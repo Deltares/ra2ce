@@ -36,3 +36,4 @@ if __name__ == "__main__":
         run_analysis()
     except Exception as e_info:
         logging.error(str(e_info))
+        raise

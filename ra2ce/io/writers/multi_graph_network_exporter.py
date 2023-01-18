@@ -3,7 +3,7 @@ import pickle
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.graph.networks_utils import graph_to_shp
+from ra2ce.graph.networks_utils import graph_to_gpkg
 from ra2ce.io.writers.network_exporter_base import MULTIGRAPH_TYPE, NetworkExporterBase
 
 
@@ -15,10 +15,10 @@ class MultiGraphNetworkExporter(NetworkExporterBase):
             output_dir.mkdir(parents=True)
 
         # TODO: This method should be a writer itself.
-        graph_to_shp(
+        graph_to_gpkg(
             export_data,
-            output_dir / (self._basename + "_edges.shp"),
-            output_dir / (self._basename + "_nodes.shp"),
+            output_dir / (self._basename + "_edges.gpkg"),
+            output_dir / (self._basename + "_nodes.gpkg"),
         )
         logging.info(
             f"Saved {self._basename + '_edges.shp'} and {self._basename + '_nodes.shp'} in {output_dir}."
