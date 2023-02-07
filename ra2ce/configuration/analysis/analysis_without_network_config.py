@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 import geopandas as gpd
@@ -39,6 +40,8 @@ class AnalysisWithoutNetworkConfiguration(AnalysisConfigBase):
             config_data.files = NetworkConfig._get_existent_network_files(
                 _static_dir / "output_graph"
             )
+        else:
+            logging.error(f"Static dir not found. Value provided: {_static_dir}")
         _new_analysis_config.config_data["files"] = config_data.files
         return _new_analysis_config
 
