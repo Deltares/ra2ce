@@ -95,7 +95,7 @@ class Hazard:
                     str(self.hazard_files["tif"][i]),
                     all_touched=True,
                     stats="min max",
-                    add_stats={"mean": mean_ignore_nan},
+                    add_stats={"mean": get_valid_mean},
                 )
             )
             gdf[rn + "_mi"] = [x[0]["min"] for x in flood_stats]
@@ -175,7 +175,7 @@ class Hazard:
                         x,
                         str(self.hazard_files["tif"][i]),
                         all_touched=True,
-                        add_stats={"mean": mean_ignore_nan},
+                        add_stats={"mean": get_valid_mean},
                     )
                 )
             else:
