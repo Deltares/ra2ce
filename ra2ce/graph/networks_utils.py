@@ -920,24 +920,23 @@ def cut_lines(lines_gdf, nodes, idName, tolerance, crs_):
         if points_to_cut:
             # cut lines
             newlines = split_line_with_points(line=line, points=points_to_cut)
+
+            # copy and remove the row of the original linestring
+            properties_dict = {}
+            if list_columns:
+                properties_dict = lines_gdf.loc[lines_gdf[idName] == i][
+                    list_columns
+                ].to_dict(orient="records")[0]
+
             for j, newline in enumerate(newlines):
                 if j == 0:
-                    # copy and remove the row of the original linestring
-                    properties_dict = lines_gdf.loc[lines_gdf[idName] == i][
-                        list_columns
-                    ].to_dict(orient="records")[0]
-
                     # add the data with one part of the cut linestring
                     properties_dict.update(
                         {idName: i, "geometry": newline, "length": line_length(newline, crs_)}
                     )
-                    to_add.append(properties_dict)
                     logging.info("cut line segment {} {}, added new line segment with {} {}".format(idName, i,
                                                                                                     idName, i))
                 else:
-                    properties_dict = lines_gdf.loc[lines_gdf[idName] == i][
-                        list_columns
-                    ].to_dict(orient="records")[0]
                     properties_dict.update(
                         {
                             idName: max_id + 1,
@@ -945,10 +944,11 @@ def cut_lines(lines_gdf, nodes, idName, tolerance, crs_):
                             "length": line_length(newline, crs_),
                         }
                     )
-                    to_add.append(properties_dict)
                     logging.info("cut line segment {} {}, added new line segment with {} {}".format(idName, i,
                                                                                                     idName, properties_dict[idName]))
                     max_id += 1
+
+                to_add.append(properties_dict)
 
             # remove the original linestring that has been cut
             to_remove.append(idx)

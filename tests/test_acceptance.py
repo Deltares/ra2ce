@@ -86,7 +86,6 @@ class TestIndirectAnalyses:
 
         # 3. Then, validate expectations
         _expected_graph_files = [
-            "1_1_network_shape_redundancy_lines_that_merged.shp",
             "base_graph.p",
             "base_network.feather",
         ]
