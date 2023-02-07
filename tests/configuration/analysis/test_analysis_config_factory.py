@@ -38,32 +38,35 @@ class TestAnalysisConfigFactory:
         # 3. Verify expectations.
         assert str(exc_err.value) == _expected_error
 
-    @pytest.mark.parametrize(
-        "analysis_types",
-        [
-            pytest.param(
-                dict(
-                    fom=AnalysisWithoutNetworkIniConfigData,
-                    dom=AnalysisWithoutNetworkConfiguration,
-                ),
-                id="Analysis Without Network Configuration",
-            ),
-            pytest.param(
-                dict(
-                    fom=AnalysisWithNetworkIniConfigData,
-                    dom=AnalysisWithNetworkConfiguration,
-                ),
-                id="Analysis With Network Configuration",
-            ),
-        ],
-    )
-    def test_given_known_config_get_analysis_config_returns_expected_value(
-        self, analysis_types: dict
+    def test_given_known_with_network_config_get_analysis_config_returns_expected_value(
+        self
     ):
         # 1. Given test data.
         _ini_file_path = test_data / "simple_inputs" / "analysis.ini"
-        _config_data = analysis_types["fom"]()
-        _expected_type = analysis_types["dom"]
+        _config_data = AnalysisWithNetworkIniConfigData()
+        _expected_type = AnalysisWithNetworkConfiguration
+        assert isinstance(_config_data, AnalysisIniConfigData)
+
+        # 2. Run test.
+        _ini_config = AnalysisConfigFactory.get_analysis_config(
+            _ini_file_path, _config_data, None
+        )
+
+        # 3. Verify expectations
+        assert _ini_config
+        assert isinstance(_ini_config, _expected_type)
+
+    def test_given_known_without_network_config_get_analysis_config_returns_expected_value(
+        self
+    ):
+        # 1. Given test data.
+        _ini_file_path = test_data / "simple_inputs" / "analysis.ini"
+        _config_data = AnalysisWithoutNetworkIniConfigData()
+
+        _config_data["static"] = test_data / "simple_inputs" / "static"
+        assert _config_data["static"].is_dir()
+
+        _expected_type = AnalysisWithoutNetworkConfiguration
         assert isinstance(_config_data, AnalysisIniConfigData)
 
         # 2. Run test.
