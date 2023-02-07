@@ -1,7 +1,3 @@
-# Some tests that we need to insert in the test module later.
-from pathlib import Path
-
-import numpy as np
 import pandas as pd
 import pytest
 
@@ -18,6 +14,40 @@ direct_damage_test_data = test_data / "direct_damage"
 
 
 class TestDirectDamage:
+    @pytest.fixture(autouse=False)
+    def event_input_output(self) -> dict:
+        import numpy as np
+
+        file_path = direct_damage_test_data / "NL332.csv"
+        raw_data = pd.read_csv(file_path, index_col=0)
+        input_cols = [
+            "osm_id",
+            "infra_type",
+            "lanes",
+            "bridge",
+            "length",
+            "length_rp100",
+            "val_rp100",
+        ]
+        test_input = raw_data[input_cols]
+
+        # rework and rename some columns
+        test_input["F_EV1_me"] = test_input["val_rp100"] / 100  # from cm to m
+        test_input["F_EV1_fr"] = test_input["length_rp100"] / test_input["length"]
+        test_input["length"] = test_input["length"] * 1000  # from km to m
+        test_input["highway"] = test_input["infra_type"]
+        test_input = test_input.drop(
+            columns=["val_rp100", "length_rp100", "infra_type"]
+        )
+
+        test_output = test_input.copy()
+        test_output["dam_HZ_ref"] = raw_data["dam_HZ_rp100"]
+        test_output["dam_HZ_ref"] = test_output["dam_HZ_ref"].replace(
+            to_replace=0.0, value=np.nan
+        )
+        test_output["road_type_ref"] = raw_data["road_type"]
+
+        return dict(input=test_input, output=test_output)
 
     ######################### EVENT-BASED AND HUIZINGA DAMAGE FUNCTION ###############################################
     def test_event_based_damage_calculation_huizinga_stylized(self):
@@ -59,11 +89,14 @@ class TestDirectDamage:
         )
 
     @pytest.mark.skip(reason="Not yet finished")
-    def test_event_based_damage_calculation_huizinga(self):
+    def test_event_based_damage_calculation_huizinga(
+        self, event_input_output: pytest.fixture
+    ):
         damage_function = "HZ"
 
         # This test roughly follows the DirectDamage.road_damage() controller in analyses_direct.py
-        test_input, test_ref_output = prepare_event_test_input_output()
+        test_input = event_input_output["input"]
+        test_ref_output = event_input_output["output"]
 
         road_gdf = test_input
 
@@ -235,13 +268,16 @@ class TestDirectDamage:
         )
 
     @pytest.mark.skip(reason="Not yet finished")
-    def OLD_event_based_damage_calculation_manualfunction(self):
+    def test_OLD_event_based_damage_calculation_manualfunction(
+        self, event_input_output: pytest.fixture
+    ):
         # Todo: have a look at this test again, to see if the existing issues have been solved
 
         damage_function = "MAN"
 
         # This test roughly follows the DirectDamage.road_damage() controller in analyses_direct.py
-        test_input, test_ref_output = prepare_event_test_input_output()
+        test_input = event_input_output["input"]
+        test_ref_output = event_input_output["output"]
 
         road_gdf = test_input
 
@@ -366,46 +402,3 @@ class TestDirectDamage:
                 0,
             )
             assert test_result == reference_result
-
-
-#### Sample data
-def load_osm_test_data(file_path=Path("test_data/NL332.csv")):
-    # This is taken from OSdaMage version 0.8 D:\Europe_trade_disruptions\EuropeFloodResults\Model08_VMs\main
-    # Region is NL332
-    folder = Path("test_data")
-    file = folder / "NL332.csv"
-    raw_data = pd.read_csv(file, index_col=0)
-    return raw_data
-
-
-def prepare_event_test_input_output():
-    import numpy as np
-
-    raw_data = load_osm_test_data()
-    input_cols = [
-        "osm_id",
-        "infra_type",
-        "lanes",
-        "bridge",
-        "length",
-        "length_rp100",
-        "val_rp100",
-    ]
-    test_input = raw_data[input_cols]
-
-    # rework and rename some columns
-    test_input["F_EV1_me"] = test_input["val_rp100"] / 100  # from cm to m
-    test_input["F_EV1_fr"] = test_input["length_rp100"] / test_input["length"]
-    test_input["length"] = test_input["length"] * 1000  # from km to m
-    test_input["highway"] = test_input["infra_type"]
-    test_input = test_input.drop(columns=["val_rp100", "length_rp100", "infra_type"])
-
-    test_output = test_input.copy()
-    test_output["dam_HZ_ref"] = raw_data["dam_HZ_rp100"]
-    test_output["dam_HZ_ref"] = test_output["dam_HZ_ref"].replace(
-        to_replace=0.0, value=np.nan
-    )
-    test_output["road_type_ref"] = raw_data["road_type"]
-
-    return test_input, test_output
-
