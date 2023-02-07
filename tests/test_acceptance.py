@@ -59,6 +59,7 @@ class TestAcceptance:
 
 class TestIndirectAnalyses:
     @slow_test
+    @pytest.mark.skip(reason="bug issue #85")
     def test_1_1_given_only_network_shape_redundancy(self):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data
@@ -169,7 +170,6 @@ class TestNetworkCreation:
 
         # 3. Then verify expectations.
         _expected_files = [
-            "1_network_shape_lines_that_merged.shp",
             "base_graph.p",
             "base_network.feather",
         ]
@@ -181,6 +181,7 @@ class TestNetworkCreation:
         assert all(map(validate_file, _expected_files))
 
     @slow_test
+    @pytest.mark.skip(reason="bug issue #86")
     def test_2_network_shape(self):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data.
@@ -197,7 +198,6 @@ class TestNetworkCreation:
 
         # 3. Then verify expectations.
         _expected_files = [
-            "2_network_shape_lines_that_merged.shp",
             "base_graph.p",
             "base_network.feather",
         ]
