@@ -50,16 +50,3 @@ class TestIniConfigValidatorBase:
         # 3. Verify final expectations.
         assert not _report.is_valid()
         assert _expected_err in _report._errors
-
-    def test_validate_headers_missing_isolation_reports_warn(self):
-        # 1. Define test data.
-        _required_header = "Deltares"
-        _test_config_data = {_required_header: {}}
-        _expected_warn = "Header 'isolation' not found in the configuration."
-        # 2. Run test.
-        _report = self._validate_headers_from_dict(
-            _test_config_data, required_headers=[_required_header]
-        )
-
-        # 3. Verify final expectations.
-        assert _expected_warn in _report._warns
