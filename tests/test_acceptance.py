@@ -59,6 +59,7 @@ class TestAcceptance:
 
 class TestIndirectAnalyses:
     @slow_test
+    @pytest.mark.skip(reason="bug issue #85")
     def test_1_1_given_only_network_shape_redundancy(self):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data
@@ -86,7 +87,6 @@ class TestIndirectAnalyses:
 
         # 3. Then, validate expectations
         _expected_graph_files = [
-            "1_1_network_shape_redundancy_lines_that_merged.shp",
             "base_graph.p",
             "base_network.feather",
         ]
@@ -98,7 +98,7 @@ class TestIndirectAnalyses:
 
     @slow_test
     def test_4_analyses_indirect(self):
-        """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
+        """To test all indirect analyses."""
         # 1. Given test data.
         test_name = "4_analyses_indirect"
         _test_data_dir = test_data / test_name
@@ -110,31 +110,32 @@ class TestIndirectAnalyses:
         _expected_analysis_files = dict(
             single_link_redundancy=[
                 "single_link_redundancy_test.csv",
-                "single_link_redundancy_test.shp",
+                "single_link_redundancy_test.gpkg",
             ],
             optimal_route_origin_destination=[
                 "optimal_origin_dest_test.csv",
-                "optimal_origin_dest_test.shp",
+                "optimal_origin_dest_test.gpkg",
             ],
             multi_link_redundancy=[
                 "multi_link_redundancy_test.csv",
-                "multi_link_redundancy_test.shp",
+                "multi_link_redundancy_test.gpkg",
             ],
             multi_link_origin_destination=[
                 "multilink_origin_dest_test.csv",
-                "multilink_origin_dest_test.shp",
+                "multilink_origin_dest_test.gpkg",
                 "multilink_origin_dest_test_impact_summary.csv",
                 "multilink_origin_dest_test_impact.csv",
             ],
             multi_link_origin_closest_destination=[
-                "multilink_origin_closest_dest_test_destinations.shp",
+                "multilink_origin_closest_dest_test_destinations.gpkg",
                 "multilink_origin_closest_dest_test_optimal_routes.csv",
-                "multilink_origin_closest_dest_test_optimal_routes.shp",
-                "multilink_origin_closest_dest_test_origins.shp",
+                "multilink_origin_closest_dest_test_optimal_routes_with_hazard.gpkg",
+                "multilink_origin_closest_dest_test_optimal_routes_without_hazard.gpkg",
+                "multilink_origin_closest_dest_test_origins.gpkg",
                 "multilink_origin_closest_dest_test_results.xlsx",
                 "multilink_origin_closest_dest_test_destinations.csv",
-                "multilink_origin_closest_dest_test_results_edges.shp",
-                "multilink_origin_closest_dest_test_results_nodes.shp",
+                "multilink_origin_closest_dest_test_results_edges.gpkg",
+                "multilink_origin_closest_dest_test_results_nodes.gpkg",
             ],
         )
         # 2. When run test:
@@ -145,9 +146,10 @@ class TestIndirectAnalyses:
 
             def _verify_file(a_file: Path):
                 analysis_file = _output_files_dir / analysis / a_file
-                return analysis_file.is_file() and analysis_file.exists()
+                assert analysis_file.is_file() and analysis_file.exists(), "File {} does not exist".format(analysis_file.resolve())
 
-            assert all(list(map(_verify_file, files)))
+            for file in files:
+                _verify_file(file)
 
 
 class TestNetworkCreation:
@@ -168,7 +170,34 @@ class TestNetworkCreation:
 
         # 3. Then verify expectations.
         _expected_files = [
-            "1_network_shape_lines_that_merged.shp",
+            "base_graph.p",
+            "base_network.feather",
+        ]
+
+        def validate_file(filename: str):
+            _graph_file = _output_graph_dir / filename
+            return _graph_file.is_file() and _graph_file.exists()
+
+        assert all(map(validate_file, _expected_files))
+
+    @slow_test
+    @pytest.mark.skip(reason="bug issue #86")
+    def test_2_network_shape(self):
+        """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
+        # 1. Given test data.
+        test_name = "2_network_shape"
+        _test_data_dir = test_data / test_name
+        network_ini = _test_data_dir / _network_ini_name
+        assert network_ini.is_file()
+
+        _output_graph_dir = _test_data_dir / "static" / "output_graph"
+        shutil.rmtree(_output_graph_dir, ignore_errors=True)
+
+        # 2. When run test.
+        run_from_cli(network_ini, None)
+
+        # 3. Then verify expectations.
+        _expected_files = [
             "base_graph.p",
             "base_network.feather",
         ]

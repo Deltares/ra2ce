@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on 30-9-2020
-"""
-
 import itertools
 import logging
 import os
@@ -10,11 +5,12 @@ import sys
 import warnings
 from decimal import Decimal
 from statistics import mean
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 
 import geojson
 import geopandas as gpd
 import networkx as nx
+import numpy as np
 import osmnx
 import pandas as pd
 import pyproj
@@ -31,9 +27,18 @@ from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
 from shapely.ops import linemerge, unary_union
 
-# todo replace os.path by pathlib
-folder = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(folder)
+
+def convert_unit(unit: str) -> Optional[float]:
+    """Converts unit to meters.
+
+    Args:
+        unit (str): The unit to convert
+
+    Returns:
+        Optional[float]: The result of the conversion.
+    """
+    _conversion_dict = dict(centimeters=1 / 100, meters=1, feet=1 / 3.28084)
+    return _conversion_dict.get(unit.lower(), None)
 
 
 def drawProgressBar(percent, barLen=20):
@@ -68,7 +73,7 @@ def merge_lines_shpfiles(
         merged_lines = linemerge(list_lines)  # merge the lines of both shapefiles
     except NotImplementedError as e:
         logging.error(
-            "Your data contains Multi-part geometries, you cannot merge lines.", e
+            "Your data contains Multi-part geometries, you cannot merge lines. Error: {}".format(e)
         )
         return lines_gdf, gpd.GeoDataFrame()
 
@@ -354,12 +359,12 @@ def merge_lines_automatic(
     """
     list_lines = list(lines_gdf["geometry"])
 
-    # Multilinestring to linestring
+    # Try to merge the lines
     try:
-        merged_lines = linemerge(list_lines)  # merge the lines of both shapefiles
+        merged_lines = linemerge(list_lines)
     except NotImplementedError as e:
         logging.error(
-            "Your data contains Multi-part geometries, you cannot merge lines.", e
+            "Your data contains Multi-part geometries, you cannot merge lines. Error: {}".format(e)
         )
         return lines_gdf, gpd.GeoDataFrame()
     # merge_input ='y'
@@ -433,9 +438,9 @@ def merge_lines_automatic(
                 lines_fids.remove(
                     (line, i)
                 )  # remove the lines that have been through the iteration so there are no duplicates
-                lines_merged = lines_merged.append(
-                    {idName: i, "geometry": full_line}, ignore_index=True
-                )  # the lines in this list are the same lines that make up the merged line
+                # the lines in this list are the same lines that make up the merged line
+                add_idx = 0 if lines_merged.empty else max(lines_merged.index) + 1
+                lines_merged.loc[add_idx] = {idName: i, "geometry": full_line}
 
                 # check with the user the right traffic count for the merged lines
                 if aadts_set_merged:  # check if the list is not empty
@@ -488,7 +493,8 @@ def merge_lines_automatic(
                     )
 
                 # append row to merged gdf
-                merged = merged.append(properties_dict, ignore_index=True)
+                add_idx = 0 if merged.empty else max(merged.index) + 1
+                merged.loc[add_idx] = properties_dict
 
             elif line.equals(mline):
                 # this line is not merged
@@ -506,7 +512,8 @@ def merge_lines_automatic(
                             )
                         }
                     )
-                merged = merged.append(properties_dict, ignore_index=True)
+                add_idx = 0 if merged.empty else max(merged.index) + 1
+                merged.loc[add_idx] = properties_dict
 
     merged["length"] = merged["geometry"].apply(lambda x: line_length(x, crs_))
 
@@ -660,7 +667,6 @@ def snap_endpoints_lines(
         new_line = LineString([(target.x, target.y), (endpoint.x, endpoint.y)])
         if not any(new_line.equals(another_line) for another_line in snapped_lines):
             if new_line.length > 0:
-                # TODO: No crs specified, so we use the one from pyproj parameter.
                 lines_gdf = lines_gdf.append(
                     {
                         idName: max_id + 1,
@@ -710,7 +716,7 @@ def find_isolated_endpoints(linesIds: list, lines: list) -> list:
                     ):
                         continue
                     else:
-                        isolated_endpoints.append((ids, endpoint))
+                        isolated_endpoints.append((ids, endpnt))
     return isolated_endpoints
 
 
@@ -783,7 +789,7 @@ def vertices_from_lines(lines, listIds):
     return vertices_dict
 
 
-def create_nodes(merged_lines, crs_, ignore_intersections):
+def create_nodes(merged_lines, crs_, cut_at_intersections):
     """Creates shapely points on intersections and endpoints of a list of shapely lines
     Args:
         merged_lines [list of shapely LineStrings]: the edges of a graph
@@ -812,7 +818,7 @@ def create_nodes(merged_lines, crs_, ignore_intersections):
     more_endpts = [pt for sublist in more_endpts for pt in sublist]
     endpts.extend(more_endpts)
 
-    if ignore_intersections is not True:
+    if cut_at_intersections is not True:
         # create nodes on intersections and on lines that should be snapped
         inters = []
         for line1, line2 in itertools.combinations(list_lines, 2):
@@ -856,13 +862,14 @@ def create_nodes(merged_lines, crs_, ignore_intersections):
     return points_gdf
 
 
-def cut_lines(lines_gdf, nodes, idName, tolerance, crs: pyproj.CRS):
+def cut_lines(lines_gdf, nodes, idName, tolerance, crs_):
     """Cuts lines at the nodes, with a certain tolerance
     Args:
         lines_gdf (geodataframe): the network with edges that should be cut
         nodes (geodataframe): points to use for cutting the edges
         idName (string): name of the Unique ID column in the lines_gdf
         tolerance: how far a point should be from the edge to cut the edge
+        crs_: the CRS of the project
 
     Returns:
         lines_gdf (geodataframe): the network with cut edges. The IDs of the new edges counting +1 on the maximum ID number
@@ -872,7 +879,7 @@ def cut_lines(lines_gdf, nodes, idName, tolerance, crs: pyproj.CRS):
     for rem in ["geometry", "length", idName]:
         list_columns.remove(rem)
 
-    to_add = gpd.GeoDataFrame(columns=list(lines_gdf.columns.values))
+    to_add = []
     to_remove = []
     to_iterate = zip(
         list(lines_gdf.index.values),
@@ -903,37 +910,45 @@ def cut_lines(lines_gdf, nodes, idName, tolerance, crs: pyproj.CRS):
         if points_to_cut:
             # cut lines
             newlines = split_line_with_points(line=line, points=points_to_cut)
+
+            # copy and remove the row of the original linestring
+            properties_dict = {}
+            if list_columns:
+                properties_dict = lines_gdf.loc[lines_gdf[idName] == i][
+                    list_columns
+                ].to_dict(orient="records")[0]
+
             for j, newline in enumerate(newlines):
                 if j == 0:
-                    # copy and remove the row of the original linestring
-                    properties_dict = lines_gdf.loc[lines_gdf[idName] == i][
-                        list_columns
-                    ].to_dict(orient="records")[0]
-
                     # add the data with one part of the cut linestring
                     properties_dict.update(
                         {
                             idName: i,
                             "geometry": newline,
-                            "length": line_length(newline, crs),
+                            "length": line_length(newline, crs_),
                         }
                     )
-                    to_add = to_add.append(properties_dict, ignore_index=True)
-                    logging.info("added line segment to {} {}".format(idName, i))
+                    logging.info(
+                        "cut line segment {} {}, added new line segment with {} {}".format(
+                            idName, i, idName, i
+                        )
+                    )
                 else:
-                    properties_dict = lines_gdf.loc[lines_gdf[idName] == i][
-                        list_columns
-                    ].to_dict(orient="records")[0]
                     properties_dict.update(
                         {
                             idName: max_id + 1,
                             "geometry": newline,
-                            "length": line_length(newline, crs),
+                            "length": line_length(newline, crs_),
                         }
                     )
-                    to_add = to_add.append(properties_dict, ignore_index=True)
-                    logging.info("added line segment to {} {}".format(idName, i))
+                    logging.info(
+                        "cut line segment {} {}, added new line segment with {} {}".format(
+                            idName, i, idName, properties_dict[idName]
+                        )
+                    )
                     max_id += 1
+
+                to_add.append(properties_dict)
 
             # remove the original linestring that has been cut
             to_remove.append(idx)
@@ -952,11 +967,16 @@ def split_line_with_points(line, points):
     list_dist = [current_line.project(pnt) for pnt in points]
     list_dist.sort()
 
-    for d in list_dist:
+    for i, d in enumerate(list_dist):
+        # Subtract the previous distance from the current distance to cut the segments in the right way.
+        if i > 0:
+            d = d - list_dist[i - 1]
+
         # cut the line at a distance d
         seg, current_line = cut(current_line, d)
         if seg:
             segments.append(seg)
+
     segments.append(current_line)
     return segments
 
@@ -1044,7 +1064,7 @@ def join_nodes_edges(gdf_nodes, gdf_edges, idName):
     """Creates tuples from the adjecent nodes and add as column in geodataframe.
     Args:
         gdf_nodes [geodataframe]: geodataframe of the nodes of a graph
-        gdf_edges [geodataframe]: geodataframe of the nodes of a graph
+        gdf_edges [geodataframe]: geodataframe of the edges of a graph
     Returns:
         result [geodataframe]: geodataframe of adjecent nodes from edges
     """
@@ -1302,21 +1322,18 @@ def gdf_check_create_unique_ids(gdf, id_name, new_id_name="rfid"):
     # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
     check = list(gdf.index)
     logging.info("Started creating unique ids...")
-    if len(gdf[id_name].unique()) < len(check):
-        gdf[new_id_name] = check
-        logging.info(
-            "Added a new unique identifier field {}.".format(new_id_name, id_name)
-        )
-        return gdf, new_id_name
+    if len(gdf[id_name].unique()) == len(check):
+        logging.info("Using the user-defined identifier field {}.".format(id_name))
+        return gdf, id_name
     else:
         gdf[new_id_name] = check
-        logging.info(
+        logging.warning(
             "Added a new unique identifier field {} because the original field '{}' "
-            "did not contain unique values per road segment.".format(
-                new_id_name, id_name
-            )
+            "did not contain unique values per road segment."
+            "For further network processing, change the 'file_id' parameter in the network.ini file"
+            "to '{}".format(new_id_name, id_name, new_id_name)
         )
-        return gdf, id_name
+        return gdf, new_id_name
 
 
 def graph_check_create_unique_ids(graph, idname, new_id_name="rfid"):
@@ -1454,13 +1471,13 @@ def graph_to_gdf(
     return edges, nodes
 
 
-def graph_to_shp(G, edge_shp, node_shp):
-    """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_shp and node_shp
+def graph_to_gpkg(G, edge_gpkg, node_gpkg):
+    """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_gpkg and node_gpkg
 
     Arguments:
         G []: networkx graph object to be converted
-        edge_shp [str]: output path including extension for edges shapefile
-        node_shp [str]: output path including extension for nodes shapefile
+        edge_gpkg [str]: output path including extension for edges geopackage
+        node_gpkg [str]: output path including extension for nodes geopackage
 
     Returns:
         None
@@ -1483,12 +1500,12 @@ def graph_to_shp(G, edge_shp, node_shp):
     if nodes.crs is None and edges.crs is not None:
         nodes.crs = edges.crs
 
-    logging.info("Saving nodes as shapefile: {}".format(node_shp))
-    logging.info("Saving edges as shapefile: {}".format(edge_shp))
+    logging.info("Saving nodes as shapefile: {}".format(node_gpkg))
+    logging.info("Saving edges as shapefile: {}".format(edge_gpkg))
 
     # The encoding utf-8 might result in an empty shapefile if the wrong encoding is used.
-    nodes.to_file(node_shp, driver="ESRI Shapefile", encoding="utf-8")
-    edges.to_file(edge_shp, driver="ESRI Shapefile", encoding="utf-8")
+    nodes.to_file(node_gpkg, driver="GPKG", encoding="utf-8")
+    edges.to_file(edge_gpkg, driver="GPKG", encoding="utf-8")
 
 
 def geojson_to_shp(geojson_obj, feature_number=0):
@@ -2348,3 +2365,9 @@ def set_analysis_value(gdf: gpd.GeoDataFrame, analyse: int = 1) -> gpd.GeoDataFr
 def clean_memory(list_delete: list) -> None:
     for to_delete in list_delete:
         del to_delete
+
+
+def get_valid_mean(x_value: float) -> Union[float, pd.Series]:
+    if not isinstance(x_value, pd.DataFrame):  # Or whatever type needs to be checked
+        return np.nan
+    return x_value.mean()  # You know it's a valid type, so return the mean.
