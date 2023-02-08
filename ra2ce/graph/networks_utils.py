@@ -2371,7 +2371,7 @@ def clean_memory(list_delete: list) -> None:
         del to_delete
 
 
-def get_valid_mean(x_value: float) -> Union[float, np.nan]:
-    if not isinstance(x_value, pd.DataFrame): # Or whatever type needs to be checked
+def get_valid_mean(x_value: float) -> Optional[float]:
+    if not isinstance(x_value, float):
         return np.nan
-    return x_value.mean() # You know it's a valid type, so return the mean.
+    return x_value.mean()  # You know it's a valid type, so return the mean.
