@@ -1,12 +1,12 @@
 import logging
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
 
 from ra2ce.analyses.direct.damage_calculation.damage_network_base import (
     DamageNetworkBase,
 )
-
-import numpy as np
-import pandas as pd
-from pathlib import Path
 
 
 class DamageNetworkReturnPeriods(DamageNetworkBase):
@@ -32,10 +32,12 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
             raise ValueError("No return_period cols present in hazard data")
 
     @classmethod
-    def construct_from_csv(cls,path,sep=';'):
-        road_gdf = pd.read_csv(path,sep=sep)
-        val_cols = [c for c in road_gdf.columns if c.startswith('F_')] #Find everything starting with 'F'
-        return cls(road_gdf,val_cols)
+    def construct_from_csv(cls, path, sep=";"):
+        road_gdf = pd.read_csv(path, sep=sep)
+        val_cols = [
+            c for c in road_gdf.columns if c.startswith("F_")
+        ]  # Find everything starting with 'F'
+        return cls(road_gdf, val_cols)
 
     ### Controlers for return period based damage and risk calculations
     def main(self, damage_function, manual_damage_functions):
@@ -61,7 +63,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
                 events=self.events, manual_damage_functions=manual_damage_functions
             )
 
-    def control_risk_calculation(self,mode='default'):
+    def control_risk_calculation(self, mode="default"):
         """
         Controler of the risk calculation, which calls the correct risk (integration) functions
 
@@ -72,46 +74,60 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         self.verify_damage_data_for_risk_calculation()
 
         # prepare the parameters of the risk calculation
-        dam_cols = [c for c in self.gdf.columns if c.startswith('dam')]
+        dam_cols = [c for c in self.gdf.columns if c.startswith("dam")]
         _to_integrate = self.gdf[dam_cols]
-        _to_integrate.columns = [float(c.split('_')[1].replace('RP', '')) for c in _to_integrate.columns]
-        _to_integrate = _to_integrate.sort_index(axis='columns', ascending=False)  # from large to small RP
+        _to_integrate.columns = [
+            float(c.split("_")[1].replace("RP", "")) for c in _to_integrate.columns
+        ]
+        _to_integrate = _to_integrate.sort_index(
+            axis="columns", ascending=False
+        )  # from large to small RP
 
-        if mode == 'default':
+        if mode == "default":
 
             _to_integrate = self.rework_damage_data_default(_to_integrate)
             _risk = self.integrate_df_trapezoidal(_to_integrate.copy())
-            self.gdf['risk'] = _risk
+            self.gdf["risk"] = _risk
 
-        elif mode.startswith('cut_from'):
+        elif mode.startswith("cut_from"):
             """
             In this mode, the integration mimics the presence of a flood protection
             """
-            _cutoff_rp = int(mode.split('_')[2])
+            _cutoff_rp = int(mode.split("_")[2])
 
             _rps = list(_to_integrate.columns)
 
             if _cutoff_rp <= min(_rps):
-                raise ValueError("""
+                raise ValueError(
+                    """
                 RA2CE cannot calculate risk in 'cut_from' mode if 
                 Return period of the cutoff ({}) <= smallest available return period ({})
                 Use 'default' mode or 'triangle_to_null_mode' instead.
-                                    """.format(_cutoff_rp,min(_rps)))
+                                    """.format(
+                        _cutoff_rp, min(_rps)
+                    )
+                )
 
-            elif min(_rps) < _cutoff_rp < max(_rps): #if protection level is between min and max RP
-                _to_integrate = self.rework_damage_data_cut_from(_to_integrate, _cutoff_rp)
+            elif (
+                min(_rps) < _cutoff_rp < max(_rps)
+            ):  # if protection level is between min and max RP
+                _to_integrate = self.rework_damage_data_cut_from(
+                    _to_integrate, _cutoff_rp
+                )
                 _risk = self.integrate_df_trapezoidal(_to_integrate.copy())
 
-            elif _cutoff_rp >= max(_rps): #cutoff is larger or equal than largest return period
+            elif _cutoff_rp >= max(
+                _rps
+            ):  # cutoff is larger or equal than largest return period
                 # risk is return frequency of cutoff
                 # times the damage of the most extreme event
                 _to_integrate = _to_integrate.fillna(0)
-                _risk = _to_integrate[_rps[0]]/_cutoff_rp
+                _risk = _to_integrate[_rps[0]] / _cutoff_rp
                 _max_RP = max(_to_integrate.columns)
 
-            self.gdf['risk'] = _risk
+            self.gdf["risk"] = _risk
 
-        elif mode.startswith('triangle_to_null'):
+        elif mode.startswith("triangle_to_null"):
             """
             In this mode, an extra data point with zero damage is added at some distance from the smallest known RP,
             and the area of the Triangle this creates is also calculated
@@ -119,22 +135,27 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
 
             _rps = list(_to_integrate.columns)
 
-            _triangle_end = int(mode.split('_')[3]) #The return period at which the triangle should end
+            _triangle_end = int(
+                mode.split("_")[3]
+            )  # The return period at which the triangle should end
 
             if _triangle_end >= min(_rps):
-                raise ValueError("""
+                raise ValueError(
+                    """
                 RA2CE cannot calculate risk in 'triangle_to_null' mode if 
                 Return period of the triangle ({}) >= smallest available return period ({})
                 Use 'default' mode or 'cut_from' instead.
-                                    """.format(_triangle_end,min(_rps)))
+                                    """.format(
+                        _triangle_end, min(_rps)
+                    )
+                )
 
-            _to_integrate = self.rework_damage_data_triangle_to_null(_to_integrate, _triangle_end)
+            _to_integrate = self.rework_damage_data_triangle_to_null(
+                _to_integrate, _triangle_end
+            )
             _risk = self.integrate_df_trapezoidal(_to_integrate.copy())
 
-            self.gdf['risk'] = _risk
-
-
-
+            self.gdf["risk"] = _risk
 
     def verify_damage_data_for_risk_calculation(self):
         """
@@ -142,12 +163,12 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
 
         :return:
         """
-        #Check if there is only one unique damage function
-        #RP should in the column name
+        # Check if there is only one unique damage function
+        # RP should in the column name
         pass
 
     @staticmethod
-    def integrate_df_trapezoidal(df: pd.DataFrame)-> np.array:
+    def integrate_df_trapezoidal(df: pd.DataFrame) -> np.array:
         """
         Arguments:
             *df* (pd.DataFrame) :
@@ -158,45 +179,51 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
             np.array : integrated result per row
 
         """
-        #convert return periods to frequencies
-        df.columns = [1/RP for RP in df.columns]
-        #sort columns by ascending frequency
-        df = df.sort_index(axis='columns')
+        # convert return periods to frequencies
+        df.columns = [1 / RP for RP in df.columns]
+        # sort columns by ascending frequency
+        df = df.sort_index(axis="columns")
         values = df.values
         frequencies = df.columns
-        return np.trapz(values,frequencies,axis=1)
+        return np.trapz(values, frequencies, axis=1)
 
     @staticmethod
     def rework_damage_data_default(_to_integrate: pd.DataFrame) -> pd.DataFrame:
         """
         Rework the damage data to make it suitable for integration (risk calculation) in default mode
-        
-        :param _to_integrate: 
+
+        :param _to_integrate:
         :return: _to_integrate
         """
         # Copy the maximum return period with an infinitely high damage
         _max_RP = max(_to_integrate.columns)
-        _to_integrate[float('inf')] = _to_integrate[_max_RP]
+        _to_integrate[float("inf")] = _to_integrate[_max_RP]
 
         # Stop integrating at the last known return period, so no further manipulation needed
         _min_RP = min(_to_integrate.columns)
 
         _to_integrate = _to_integrate.fillna(0)
 
-        logging.info("""Risk calculation runs in 'default' mode. 
+        logging.info(
+            """Risk calculation runs in 'default' mode. 
                     Assumptions:
                         - for all return periods > max RP{}, damage = dam_RP{}
                         - for all return periods < min RP{}, damage = 0
 
-                    """.format(_max_RP, _max_RP, _min_RP))
+                    """.format(
+                _max_RP, _max_RP, _min_RP
+            )
+        )
         return _to_integrate
 
     @staticmethod
-    def rework_damage_data_cut_from(_to_integrate: pd.DataFrame, _cutoff_rp: float) -> pd.DataFrame:
+    def rework_damage_data_cut_from(
+        _to_integrate: pd.DataFrame, _cutoff_rp: float
+    ) -> pd.DataFrame:
         """
         Rework the damage data to make it suitable for integration (risk calculation) in default mode
 
-        :param _to_integrate: 
+        :param _to_integrate:
                 _cutoff_rp : the return period at which to make the cutoff, aka the flood protection level
         :return: _to_integrate
         """
@@ -206,14 +233,16 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
             _dropcols = [rp for rp in _rps if rp < _cutoff_rp]
             _to_integrate = _to_integrate.drop(columns=_dropcols)
         else:
-            pos = _rps.index(next(i for i in _rps if i < _cutoff_rp))  # find position of first RP value < PL
+            pos = _rps.index(
+                next(i for i in _rps if i < _cutoff_rp)
+            )  # find position of first RP value < PL
             # _to_integrate = _to_integrate[_rps[0:pos+1]] #remove all the values with smaller RPs than the PL
 
             _frequencies = _to_integrate.copy()
             _frequencies.columns = [1 / c for c in _frequencies.columns]
 
             _frequencies[1 / _cutoff_rp] = np.nan
-            _frequencies = _frequencies.interpolate(method='index', axis=1)
+            _frequencies = _frequencies.interpolate(method="index", axis=1)
 
             # Drop the columns outside the cutoff
             _dropcols = [c for c in _frequencies.columns if c > 1 / _cutoff_rp]
@@ -224,22 +253,28 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
 
             # Copy the maximum return period with an infinitely high damage
             _max_RP = max(_to_integrate.columns)
-            _to_integrate[float('inf')] = _to_integrate[_max_RP]
+            _to_integrate[float("inf")] = _to_integrate[_max_RP]
 
             _to_integrate = _to_integrate.fillna(0)
 
-        logging.info("""Risk calculation runs in 'cut_from' mode. 
+        logging.info(
+            """Risk calculation runs in 'cut_from' mode. 
                                 Assumptions:
                                     - for all return periods > max RP{}, damage = dam_RP{}
                                     - damage at cutoff is linearly interpolated from known damages
                                     - no damage for al RPs > RP_cutoff ({})
 
-                                """.format(_max_RP, _max_RP, _cutoff_rp))
+                                """.format(
+                _max_RP, _max_RP, _cutoff_rp
+            )
+        )
 
         return _to_integrate
 
     @staticmethod
-    def rework_damage_data_triangle_to_null(_to_integrate: pd.DataFrame, _triangle_end: float) -> pd.DataFrame:
+    def rework_damage_data_triangle_to_null(
+        _to_integrate: pd.DataFrame, _triangle_end: float
+    ) -> pd.DataFrame:
         """
         Rework the damage data to make it suitable for integration (risk calculation) in default mode
 
@@ -249,29 +284,35 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         """
         # Copy the maximum return period with an infinitely high damage
         _max_RP = max(_to_integrate.columns)
-        _to_integrate[float('inf')] = _to_integrate[_max_RP]
+        _to_integrate[float("inf")] = _to_integrate[_max_RP]
 
         # At the return period of the triangle end, set all damage values to zero
         _to_integrate[_triangle_end] = 0
 
-        _to_integrate = _to_integrate.sort_index(axis='columns', ascending=False)  # from large to small RP
+        _to_integrate = _to_integrate.sort_index(
+            axis="columns", ascending=False
+        )  # from large to small RP
 
         _to_integrate = _to_integrate.fillna(0)
 
-        logging.info("""Risk calculation runs in 'triangle to null' mode. 
+        logging.info(
+            """Risk calculation runs in 'triangle to null' mode. 
                                 Assumptions:
                                     - for all return periods > max RP{}, damage = dam_RP{}
                                     - at the end of the triangle {}, damage = 0
 
-                                """.format(_max_RP, _max_RP, _triangle_end))
+                                """.format(
+                _max_RP, _max_RP, _triangle_end
+            )
+        )
         return _to_integrate
 
 
 def test_integrate_df_trapezoidal():
-    data = np.array(([[1000,2000],[500,1000]]))
-    rps = [100,200]
+    data = np.array(([[1000, 2000], [500, 1000]]))
+    rps = [100, 200]
 
-    df = pd.DataFrame(data,columns=rps)
+    df = pd.DataFrame(data, columns=rps)
     res = integrate_df_trapezoidal(df)
 
-    assert res == np.array([7.5,3.75])
+    assert res == np.array([7.5, 3.75])

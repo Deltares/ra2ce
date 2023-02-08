@@ -3,13 +3,14 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 from typing import Dict, Optional
+
 from geopandas import gpd
 
 from ra2ce.configuration.config_protocol import ConfigProtocol
 from ra2ce.configuration.network.network_ini_config_data import NetworkIniConfigData
-from ra2ce.io.readers import GraphPickleReader
 from ra2ce.graph.hazard import Hazard
 from ra2ce.graph.networks import Network
+from ra2ce.io.readers import GraphPickleReader
 
 
 def network_handler(config: dict, files: dict) -> Optional[dict]:

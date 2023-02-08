@@ -50,7 +50,9 @@ class Hazard:
         Returns:
 
         """
-        from tqdm import tqdm  # somehow this only works when importing here and not at the top of the file
+        from tqdm import (
+            tqdm,  # somehow this only works when importing here and not at the top of the file
+        )
 
         assert type(gdf) == gpd.GeoDataFrame, "Network is not a GeoDataFrame"
 
@@ -78,7 +80,12 @@ class Hazard:
                 extent_graph[1],
                 extent_graph[3],
             )
-            extent_hazard = (extent["minX"], extent["maxX"], extent["minY"], extent["maxY"])
+            extent_hazard = (
+                extent["minX"],
+                extent["maxX"],
+                extent["minY"],
+                extent["maxY"],
+            )
 
             if not bounds_intersect_2d(extent_graph, extent_hazard):
                 logging.info(
@@ -304,9 +311,7 @@ class Hazard:
         return graph
 
     def od_hazard_intersect(
-        self,
-        graph: nx.classes.graph.Graph,
-        ods: gpd.GeoDataFrame
+        self, graph: nx.classes.graph.Graph, ods: gpd.GeoDataFrame
     ) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """Overlays the origin and destination locations and edges with the hazard maps
 
@@ -517,7 +522,9 @@ class Hazard:
         _hazard_map_config = self.config["hazard"]["hazard_map"]
         df = pd.DataFrame()
         df[["File name", "Aggregation method"]] = [
-            (haz.stem, agg_type) for haz in _hazard_map_config for agg_type in chosen_agg_types
+            (haz.stem, agg_type)
+            for haz in _hazard_map_config
+            for agg_type in chosen_agg_types
         ]
         if all(["RP" in haz.stem for haz in _hazard_map_config]):
             # Return period hazard maps are used
@@ -680,7 +687,9 @@ class Hazard:
         self.files[graph_name] = _exporter.get_pickle_path()
 
     def load_origins_destinations(self):
-        od_path = self.config["static"] / "output_graph" / "origin_destination_table.feather"
+        od_path = (
+            self.config["static"] / "output_graph" / "origin_destination_table.feather"
+        )
         od = gpd.read_feather(od_path)
         return od
 
@@ -819,9 +828,10 @@ class Hazard:
                     )
 
                     # Do the actual hazard intersect
-                    od_graph_hazard_reprojected, ods_hazard_reprojected = self.od_hazard_intersect(
-                        graph_reprojected, ods_reprojected
-                    )
+                    (
+                        od_graph_hazard_reprojected,
+                        ods_hazard_reprojected,
+                    ) = self.od_hazard_intersect(graph_reprojected, ods_reprojected)
 
                     # Assign the original geometries to the reprojected dataset
                     self.graphs[
@@ -832,13 +842,20 @@ class Hazard:
                     ods = ods_hazard_reprojected.to_crs(ods.crs)
 
                     # Clean up memory
-                    clean_memory([graph_reprojected, od_graph_hazard_reprojected,
-                                  ods_reprojected, ods_hazard_reprojected])
+                    clean_memory(
+                        [
+                            graph_reprojected,
+                            od_graph_hazard_reprojected,
+                            ods_reprojected,
+                            ods_hazard_reprojected,
+                        ]
+                    )
 
                 else:
-                    self.graphs[
-                        "origins_destinations_graph_hazard"
-                    ], ods = self.od_hazard_intersect(graph, ods)
+                    (
+                        self.graphs["origins_destinations_graph_hazard"],
+                        ods,
+                    ) = self.od_hazard_intersect(graph, ods)
 
                 # Save graphs/network with hazard
                 self._export_network_files(
@@ -847,7 +864,10 @@ class Hazard:
 
                 # Save the OD pairs (GeoDataFrame) as pickle
                 ods.to_feather(
-                    self.config["static"] / "output_graph" / "origin_destination_table.feather", index=False
+                    self.config["static"]
+                    / "output_graph"
+                    / "origin_destination_table.feather",
+                    index=False,
                 )
                 logging.info(
                     f"Saved {'origin_destination_table.feather'} in {self.config['static'] / 'output_graph'}."
@@ -855,9 +875,15 @@ class Hazard:
 
                 # Save the OD pairs (GeoDataFrame) as shapefile
                 if self.config["network"]["save_shp"]:
-                    ods_path = self.config["static"] / "output_graph" / "origin_destination_table.shp"
+                    ods_path = (
+                        self.config["static"]
+                        / "output_graph"
+                        / "origin_destination_table.shp"
+                    )
                     ods.to_file(ods_path, index=False)
-                    logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
+                    logging.info(
+                        f"Saved {ods_path.stem} in {ods_path.resolve().parent}."
+                    )
 
         #### Step 3: iterate overlay of the GeoPandas Dataframe (if any) ###
         if self.files["base_network"]:
