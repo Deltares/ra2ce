@@ -143,13 +143,11 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
 
             return return_period_gdf.gdf
 
-        else:
-            raise ValueError(
-                """"The hazard calculation does not know 
-            what to do if the analysis specifies {}""".format(
-                    analysis["event_type"]
-                )
+        raise ValueError(
+            "The hazard calculation does not know what to do if the analysis specifies {}".format(
+                analysis["event_type"]
             )
+        )
 
     def effectiveness_measures(self, analysis):
         """This function calculated the efficiency of measures. Input is a csv file with efficiency
