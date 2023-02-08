@@ -2039,66 +2039,6 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
         self.edges_segmented = gpd.GeoDataFrame(data)
 
 
-class HazardUtils:
-    @staticmethod
-    def lookup_road_mapping():
-        """Mapping of OSM road infrastructure types"""
-
-        mapping_dict = {
-            "disused": "none",
-            "dummy": "none",
-            "planned": "none",
-            "platform": "none",
-            "unsurfaced": "track",
-            "traffic_island": "other",
-            "razed": "none",
-            "abandoned": "none",
-            "services": "none",
-            "proposed": "none",
-            "corridor": "track",
-            "bus_guideway": "other",
-            "bus_stop": "other",
-            "rest_area": "other",
-            "yes": "other",
-            "trail": "track",
-            "escape": "other",
-            "raceway": "other",
-            "emergency_access_point": "none",
-            "emergency_bay": "other",
-            "construction": "other",
-            "bridleway": "none",
-            "cycleway": "other",
-            "footway": "track",
-            "living_street": "other",
-            "path": "track",
-            "pedestrian": "other",
-            "primary": "primary",
-            "primary_link": "primary",
-            "residential": "other",
-            "road": "other",
-            "secondary": "secondary",
-            "secondary_link": "secondary",
-            "service": "other",
-            "steps": "none",
-            "tertiary": "tertiary",
-            "tertiary_link": "tertiary",
-            "track": "track",
-            "unclassified": "other",
-            "trunk": "trunk",
-            "motorway": "motorway",
-            "trunk_link": "trunk",
-            "motorway_link": "motorway",
-            "elevator": "none",
-            "access": "none",
-            "crossing": "other",
-            "mini_roundabout": "other",
-            "passing_place": "other",
-            "turning_circle": "other",
-            "motorway_junction": "motorway",
-        }
-        return mapping_dict
-
-
 def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
     """Calculates the average speed from OSM roads, per road type
 

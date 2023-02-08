@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on 26-7-2021
-
-@author: Deltares
-"""
-
 import os
 from collections import OrderedDict
 
