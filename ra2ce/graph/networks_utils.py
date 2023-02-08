@@ -72,8 +72,8 @@ def merge_lines_shpfiles(
     try:
         merged_lines = linemerge(list_lines)  # merge the lines of both shapefiles
     except NotImplementedError as e:
-        Exception(
-            "Your data contains Multi-part geometries, you cannot merge lines.", e
+        logging.error(
+            "Your data contains Multi-part geometries, you cannot merge lines. Error: {}".format(e)
         )
         return lines_gdf, gpd.GeoDataFrame()
 
@@ -363,8 +363,8 @@ def merge_lines_automatic(
     try:
         merged_lines = linemerge(list_lines)
     except NotImplementedError as e:
-        Exception(
-            "Your data contains Multi-part geometries, you cannot merge lines.", e
+        logging.error(
+            "Your data contains Multi-part geometries, you cannot merge lines. Error: {}".format(e)
         )
         return lines_gdf, gpd.GeoDataFrame()
     # merge_input ='y'
