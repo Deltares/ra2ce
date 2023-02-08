@@ -1,9 +1,7 @@
 import logging
-from pathlib import Path
 from typing import Any, List, Tuple
 
 import pyproj
-from osmnx.graph import graph_from_xml
 
 from ra2ce.graph.networks_utils import *
 from ra2ce.io.readers import GraphPickleReader
