@@ -307,6 +307,7 @@ class TestDirectDamage:
                 mssg += "{}\n".format(event_gdf.gdf[~comparison2].head())
                 mssg += "{}\n".format(test_ref_output[~comparison2].head())
                 mssg += "We know that manual inserting the HZ damage function may give slightly different results, Therefore, we are now checking if the result is significant"
+                print(mssg)
                 threshold_rel = (
                     1  # What is the acceptable difference in a relative sense
                 )
@@ -327,7 +328,7 @@ class TestDirectDamage:
 
                 if not is_combined_different.all():
                     pd.set_option("display.max_columns", None)
-                    mssg += "{} roads are roughly the same \n".format(
+                    mssg = "{} roads are roughly the same \n".format(
                         is_combined_different.sum()
                     )
                     mssg += "So {} roads are significantly different\n".format(
@@ -338,6 +339,7 @@ class TestDirectDamage:
                     mssg += "{}\n".format(event_gdf.gdf[is_combined_different].head())
                     mssg += "... and the reference output:\n"
                     mssg += "{}\n".format(test_ref_output[is_combined_different].head())
+                    print(mssg)
 
     def test_construct_damage_network_return_periods(self):
         data_path = direct_damage_test_data / "risk_test_data.csv"
