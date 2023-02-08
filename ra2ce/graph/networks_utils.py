@@ -73,7 +73,9 @@ def merge_lines_shpfiles(
         merged_lines = linemerge(list_lines)  # merge the lines of both shapefiles
     except NotImplementedError as e:
         logging.error(
-            "Your data contains Multi-part geometries, you cannot merge lines. Error: {}".format(e)
+            "Your data contains Multi-part geometries, you cannot merge lines. Error: {}".format(
+                e
+            )
         )
         return lines_gdf, gpd.GeoDataFrame()
 
@@ -364,7 +366,9 @@ def merge_lines_automatic(
         merged_lines = linemerge(list_lines)
     except NotImplementedError as e:
         logging.error(
-            "Your data contains Multi-part geometries, you cannot merge lines. Error: {}".format(e)
+            "Your data contains Multi-part geometries, you cannot merge lines. Error: {}".format(
+                e
+            )
         )
         return lines_gdf, gpd.GeoDataFrame()
     # merge_input ='y'
@@ -2033,66 +2037,6 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
                 data["splt_id"].append(count)
                 count += 1
         self.edges_segmented = gpd.GeoDataFrame(data)
-
-
-class HazardUtils:
-    @staticmethod
-    def lookup_road_mapping():
-        """Mapping of OSM road infrastructure types"""
-
-        mapping_dict = {
-            "disused": "none",
-            "dummy": "none",
-            "planned": "none",
-            "platform": "none",
-            "unsurfaced": "track",
-            "traffic_island": "other",
-            "razed": "none",
-            "abandoned": "none",
-            "services": "none",
-            "proposed": "none",
-            "corridor": "track",
-            "bus_guideway": "other",
-            "bus_stop": "other",
-            "rest_area": "other",
-            "yes": "other",
-            "trail": "track",
-            "escape": "other",
-            "raceway": "other",
-            "emergency_access_point": "none",
-            "emergency_bay": "other",
-            "construction": "other",
-            "bridleway": "none",
-            "cycleway": "other",
-            "footway": "track",
-            "living_street": "other",
-            "path": "track",
-            "pedestrian": "other",
-            "primary": "primary",
-            "primary_link": "primary",
-            "residential": "other",
-            "road": "other",
-            "secondary": "secondary",
-            "secondary_link": "secondary",
-            "service": "other",
-            "steps": "none",
-            "tertiary": "tertiary",
-            "tertiary_link": "tertiary",
-            "track": "track",
-            "unclassified": "other",
-            "trunk": "trunk",
-            "motorway": "motorway",
-            "trunk_link": "trunk",
-            "motorway_link": "motorway",
-            "elevator": "none",
-            "access": "none",
-            "crossing": "other",
-            "mini_roundabout": "other",
-            "passing_place": "other",
-            "turning_circle": "other",
-            "motorway_junction": "motorway",
-        }
-        return mapping_dict
 
 
 def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):

@@ -83,7 +83,9 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         """
         # Open the network with hazard data
         # Dirty fix, Todo: figure out why this key does not exist under certaint conditions
-        if "base_network_hazard" not in self.graphs: #key is missing due to error in handler?
+        if (
+            "base_network_hazard" not in self.graphs
+        ):  # key is missing due to error in handler?
             self.graphs["base_network_hazard"] = None
 
         road_gdf = self.graphs["base_network_hazard"]
@@ -127,25 +129,25 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
                 manual_damage_functions=manual_damage_functions,
             )
 
-            if 'risk_calculation' in analysis: #Check if risk_calculation is demanded
-                if analysis['risk_calculation'] != 'none':
-                    return_period_gdf.control_risk_calculation(mode=analysis['risk_calculation'])
+            if "risk_calculation" in analysis:  # Check if risk_calculation is demanded
+                if analysis["risk_calculation"] != "none":
+                    return_period_gdf.control_risk_calculation(
+                        mode=analysis["risk_calculation"]
+                    )
 
             else:
-                logging.info("""No parameters for risk calculation are specified. 
-                             Add key [risk_calculation] to analyses.ini.""")
+                logging.info(
+                    """No parameters for risk calculation are specified. 
+                             Add key [risk_calculation] to analyses.ini."""
+                )
 
             return return_period_gdf.gdf
 
-
-
-        else:
-            raise ValueError(
-                """"The hazard calculation does not know 
-            what to do if the analysis specifies {}""".format(
-                    analysis["event_type"]
-                )
+        raise ValueError(
+            "The hazard calculation does not know what to do if the analysis specifies {}".format(
+                analysis["event_type"]
             )
+        )
 
     def effectiveness_measures(self, analysis):
         """This function calculated the efficiency of measures. Input is a csv file with efficiency
@@ -237,6 +239,7 @@ def test_construct_damage_fraction():
 
 # max_damage = test_construct_damage_fraction()
 
+
 def rename_road_gdf_to_conventions(road_gdf_columns):
     """
     Rename the columns in the road_gdf to the conventions of the ra2ce documentation
@@ -249,8 +252,8 @@ def rename_road_gdf_to_conventions(road_gdf_columns):
     ### Handle return period columns
     new_cols = []
     for c in cs:
-        if c.startswith('RP'):
-            new_cols.append('F_'+c)
+        if c.startswith("RP"):
+            new_cols.append("F_" + c)
         else:
             new_cols.append(c)
 

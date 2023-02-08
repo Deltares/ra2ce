@@ -14,7 +14,7 @@ from ra2ce.ra2ce_handler import Ra2ceHandler
 @click.option(
     "--analyses_ini", default=None, help="Full path to the analyses.ini file."
 )
-def run_analysis(network_ini: str = None, analyses_ini: str = None):
+def run_analysis(network_ini: str, analyses_ini: str):
     def _as_path(ini_file: str) -> Optional[Path]:
         if not ini_file:
             return None

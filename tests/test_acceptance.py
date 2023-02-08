@@ -43,11 +43,22 @@ class TestAcceptance:
             pytest.fail(f"It was not possible to import required packages {exc_err}")
 
     @slow_test
-    def test_given_test_data_main_does_not_throw(self):
+    @pytest.mark.parametrize(
+        "project_name",
+        [
+            pytest.param("acceptance_test_data", id="Default test data."),
+            pytest.param(
+                "wpf_nepal",
+                id="Nepal project",
+                marks=pytest.mark.skip(reason="WPF Nepal test directory not presnt"),
+            ),
+        ],
+    )
+    def test_given_test_data_main_does_not_throw(self, project_name: str):
         """
         ToDo: is this test necessary? Would it not be better to frame it in direct / indirect ?
         """
-        _test_dir = test_data / "acceptance_test_data"
+        _test_dir = test_data / project_name
         _network = _test_dir / "network.ini"
         _analysis = _test_dir / "analyses.ini"
 
@@ -146,7 +157,9 @@ class TestIndirectAnalyses:
 
             def _verify_file(a_file: Path):
                 analysis_file = _output_files_dir / analysis / a_file
-                assert analysis_file.is_file() and analysis_file.exists(), "File {} does not exist".format(analysis_file.resolve())
+                assert (
+                    analysis_file.is_file() and analysis_file.exists()
+                ), "File {} does not exist".format(analysis_file.resolve())
 
             for file in files:
                 _verify_file(file)

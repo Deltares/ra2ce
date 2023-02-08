@@ -8,8 +8,9 @@ from ra2ce.analyses.direct.direct_lookup import LookUp as lookup
 from ra2ce.analyses.direct.direct_utils import (
     clean_lane_data,
     create_summary_statistics,
-    scale_damage_using_lanes
+    scale_damage_using_lanes,
 )
+
 
 class DamageNetworkBase(ABC):
     """A road network gdf with hazard data stored in it, and for which damages can be calculated"""
@@ -205,7 +206,9 @@ class DamageNetworkBase(ABC):
         # Load the Huizinga damage functions
         curve_name = "HZ"
 
-        df_max_damages_huizinga = pd.DataFrame.from_dict(lookup.get_max_damages_huizinga())
+        df_max_damages_huizinga = pd.DataFrame.from_dict(
+            lookup.get_max_damages_huizinga()
+        )
         interpolator = lookup.get_flood_curves()[
             "HZ"
         ]  # input: water depth (cm); output: damage (fraction road construction costs)
@@ -280,9 +283,9 @@ class DamageNetworkBase(ABC):
             df["road_type"].copy().map(max_damages["Upper"])
         )  # i.e. max construction costs
 
-        #apply damage correction for lanes
-        cols_to_scale = ["lower_damage","upper_damage"]
-        df = scale_damage_using_lanes(lane_scale_factors,df,cols_to_scale)
+        # apply damage correction for lanes
+        cols_to_scale = ["lower_damage", "upper_damage"]
+        df = scale_damage_using_lanes(lane_scale_factors, df, cols_to_scale)
 
         # create separate column for each percentile of construction costs (is faster then tuple)
         for percentage in [
@@ -347,7 +350,7 @@ class DamageNetworkBase(ABC):
             c for c in all_dam_cols if int(c.split("_")[1][-1]) > 4
         ]  # C5, C6
 
-        is_motorway_mask = df["road_type"].isin(["motorway","trunk"])
+        is_motorway_mask = df["road_type"].isin(["motorway", "trunk"])
 
         for curve in other_curves:
             df.loc[is_motorway_mask, curve] = np.nan
