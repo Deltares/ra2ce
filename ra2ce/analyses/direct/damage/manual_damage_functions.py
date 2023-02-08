@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 from ra2ce.analyses.direct.damage.damage_function_road_type_lane import (
     DamageFunctionByRoadTypeByLane,
@@ -19,7 +20,7 @@ class ManualDamageFunctions:
         )  # keys = name of the available functions; values = paths to the folder
         self.loaded = []  # List of DamageFunction objects (or child classes
 
-    def find_damage_functions(self, folder) -> None:
+    def find_damage_functions(self, folder: Path) -> None:
         """Find all available damage functions in the specified folder"""
         assert folder.exists(), "Folder {} does not contain damage functions".format(
             folder
@@ -37,13 +38,13 @@ class ManualDamageFunctions:
 
     def load_damage_functions(self):
         """ "Load damage functions in Ra2Ce"""
-        for name, dir in self.available.items():
+        for name, damage_dir in self.available.items():
             damage_function = DamageFunctionByRoadTypeByLane(name=name)
-            damage_function.from_input_folder(dir)
+            damage_function.from_input_folder(damage_dir)
             damage_function.set_prefix()
             self.loaded.append(damage_function)
             logging.info(
                 "Damage function '{}' loaded from folder {}".format(
-                    damage_function.name, dir
+                    damage_function.name, damage_dir
                 )
             )

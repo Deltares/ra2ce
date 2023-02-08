@@ -39,7 +39,7 @@ class TestAnalysisConfigFactory:
         assert str(exc_err.value) == _expected_error
 
     def test_given_known_with_network_config_get_analysis_config_returns_expected_value(
-        self
+        self,
     ):
         # 1. Given test data.
         _ini_file_path = test_data / "simple_inputs" / "analysis.ini"
@@ -57,7 +57,7 @@ class TestAnalysisConfigFactory:
         assert isinstance(_ini_config, _expected_type)
 
     def test_given_known_without_network_config_get_analysis_config_returns_expected_value(
-        self
+        self,
     ):
         # 1. Given test data.
         _ini_file_path = test_data / "simple_inputs" / "analysis.ini"

@@ -1,9 +1,11 @@
 from __future__ import annotations
+
+from pathlib import Path
+
 from ra2ce.analyses.direct.damage_calculation.damage_network_base import (
     DamageNetworkBase,
 )
 
-from pathlib import Path
 
 class DamageNetworkEvents(DamageNetworkBase):
     """A road network gdf with EVENT-BASED hazard data stored in it, and for which damages can be calculated
@@ -48,6 +50,7 @@ class DamageNetworkEvents(DamageNetworkBase):
             self.calculate_damage_manual_functions(
                 events=self.events, manual_damage_functions=manual_damage_functions
             )
+
 
 # class DamageNetworkEventsBuilder:
 #     @staticmethod
