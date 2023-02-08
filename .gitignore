@@ -139,9 +139,3 @@ dmypy.json
 .pyre/
 /.idea
 /logs
-
-# ra2ce ignore:
-data/
-/tests/local_data
-run.py
-pakistan.py
