@@ -1,15 +1,9 @@
-# -*- coding: utf-8 -*-
-"""
-Created on 26-7-2021
-"""
-
 import copy
 import logging
 import sys
 import time
 from pathlib import Path
 
-# import igraph as ig
 import geopandas as gpd
 import networkx as nx
 import numpy as np
@@ -20,8 +14,6 @@ from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
 
 from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDestination
-
-# Local modules
 from ra2ce.graph.networks_utils import graph_to_gpkg
 from ra2ce.io.readers.graph_pickle_reader import GraphPickleReader
 
@@ -496,11 +488,7 @@ class IndirectAnalyses:
         aggregated_results = pd.concat(results, ignore_index=True)
         return aggregated_results
 
-    def optimal_route_origin_destination(self, graph, analysis):
-        # Calculate the preferred routes
-        name = analysis["name"].replace(" ", "_")
-
-        # create list of origin-destination pairs
+    def _get_origin_destination_pairs(self, graph):
         od_path = (
             self.config["static"] / "output_graph" / "origin_destination_table.feather"
         )
@@ -528,7 +516,14 @@ class IndirectAnalyses:
                     ][0],
                 )
             )
+        return od_nodes
 
+    def optimal_route_origin_destination(self, graph, analysis):
+        # Calculate the preferred routes
+        name = analysis["name"].replace(" ", "_")
+
+        # create list of origin-destination pairs
+        od_nodes = self._get_origin_destination_pairs(graph)
         pref_routes = find_route_ods(graph, od_nodes, analysis["weighing"])
 
         # if shortest_route:
@@ -671,34 +666,7 @@ class IndirectAnalyses:
 
     def multi_link_origin_destination(self, graph, analysis):
         """Calculates the connectivity between origins and destinations"""
-        # create list of origin-destination pairs
-        od_path = (
-            self.config["static"] / "output_graph" / "origin_destination_table.feather"
-        )
-        od = gpd.read_feather(od_path)
-        od_pairs = [
-            (a, b)
-            for a in od.loc[od["o_id"].notnull(), "o_id"]
-            for b in od.loc[od["d_id"].notnull(), "d_id"]
-        ]
-        all_nodes = [(n, v["od_id"]) for n, v in graph.nodes(data=True) if "od_id" in v]
-        od_nodes = []
-        for aa, bb in od_pairs:
-            # it is possible that there are multiple origins/destinations at the same 'entry-point' in the road
-            od_nodes.append(
-                (
-                    [
-                        (n, n_name)
-                        for n, n_name in all_nodes
-                        if (n_name == aa) | (aa in n_name)
-                    ][0],
-                    [
-                        (n, n_name)
-                        for n, n_name in all_nodes
-                        if (n_name == bb) | (bb in n_name)
-                    ][0],
-                )
-            )
+        od_nodes = self._get_origin_destination_pairs(graph)
 
         all_results = []
         for hazard in self.config["hazard_names"]:
