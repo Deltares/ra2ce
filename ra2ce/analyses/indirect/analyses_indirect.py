@@ -3,6 +3,7 @@ import logging
 import sys
 import time
 from pathlib import Path
+from typing import List
 
 import geopandas as gpd
 import networkx as nx
@@ -1046,6 +1047,27 @@ class IndirectAnalyses:
             opt_routes = None
             output_path = self.config["output"] / analysis["analysis"]
 
+            def _save_shp_analysis(
+                base_graph,
+                to_save_gdf: List[gpd.GeoDataFrame],
+                to_save_gdf_names: List[str],
+            ):
+                for to_save, save_name in zip(to_save_gdf, to_save_gdf_names):
+                    if not to_save.empty:
+                        gpkg_path = output_path / (
+                            analysis["name"].replace(" ", "_") + f"_{save_name}.gpkg"
+                        )
+                        save_gdf(to_save, gpkg_path)
+
+                # Save the Graph
+                gpkg_path_nodes = output_path / (
+                    analysis["name"].replace(" ", "_") + "_results_nodes.gpkg"
+                )
+                gpkg_path_edges = output_path / (
+                    analysis["name"].replace(" ", "_") + "_results_edges.gpkg"
+                )
+                graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
+
             if "weighing" in analysis:
                 if analysis["weighing"] == "distance":
                     # The name is different in the graph.
@@ -1162,22 +1184,8 @@ class IndirectAnalyses:
                     # Save the GeoDataFrames
                     to_save_gdf = [destinations, opt_routes]
                     to_save_gdf_names = ["destinations", "optimal_routes"]
-                    for to_save, save_name in zip(to_save_gdf, to_save_gdf_names):
-                        if not to_save.empty:
-                            gpkg_path = output_path / (
-                                analysis["name"].replace(" ", "_")
-                                + f"_{save_name}.gpkg"
-                            )
-                            save_gdf(to_save, gpkg_path)
+                    _save_shp_analysis(base_graph, to_save_gdf, to_save_gdf_names)
 
-                    # Save the Graph
-                    gpkg_path_nodes = output_path / (
-                        analysis["name"].replace(" ", "_") + "_results_nodes.gpkg"
-                    )
-                    gpkg_path_edges = output_path / (
-                        analysis["name"].replace(" ", "_") + "_results_edges.gpkg"
-                    )
-                    graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
                 if analysis["save_csv"]:
                     csv_path = output_path / (
                         analysis["name"].replace(" ", "_") + "_destinations.csv"
@@ -1240,22 +1248,7 @@ class IndirectAnalyses:
                         "optimal_routes_without_hazard",
                         "optimal_routes_with_hazard",
                     ]
-                    for to_save, save_name in zip(to_save_gdf, to_save_gdf_names):
-                        if not to_save.empty:
-                            gpkg_path = output_path / (
-                                analysis["name"].replace(" ", "_")
-                                + f"_{save_name}.gpkg"
-                            )
-                            save_gdf(to_save, gpkg_path)
-
-                    # Save the Graph
-                    gpkg_path_nodes = output_path / (
-                        analysis["name"].replace(" ", "_") + "_results_nodes.gpkg"
-                    )
-                    gpkg_path_edges = output_path / (
-                        analysis["name"].replace(" ", "_") + "_results_edges.gpkg"
-                    )
-                    graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
+                    _save_shp_analysis(base_graph, to_save_gdf, to_save_gdf_names)
                 if analysis["save_csv"]:
                     csv_path = output_path / (
                         analysis["name"].replace(" ", "_") + "_destinations.csv"
