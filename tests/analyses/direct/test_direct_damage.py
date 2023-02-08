@@ -88,7 +88,7 @@ class TestDirectDamage:
             df[error_rows]
         )
 
-    @pytest.mark.skip(reason="Not yet finished")
+    @pytest.mark.skip(reason="To do: Needs refining on what needs to be verified.")
     def test_event_based_damage_calculation_huizinga(
         self, event_input_output: pytest.fixture
     ):
@@ -137,12 +137,12 @@ class TestDirectDamage:
 
         if not test_output_series.equals(reference_output_series):
             comparison2 = test_output_series.eq(reference_output_series, fill_value=0.0)
-            mssg += "{} roads are exactly the same\n".format(comparison2.sum())
+            mssg = "{} roads are exactly the same\n".format(comparison2.sum())
             mssg += "So {} roads are different\n".format((~comparison2).sum())
             mssg += "Below the 5 first differences\n"
-            mssg += "" + event_gdf.gdf[~comparison2].head() + "\n"
-            mssg += "" + test_ref_output[~comparison2].head() + "\n"
-            mssg += "" + event_gdf.gdf[~comparison2]
+            mssg += "{}\n".format(event_gdf.gdf[~comparison2].head())
+            mssg += "{}\n".format(test_ref_output[~comparison2].head())
+            mssg += "{}\n".format(event_gdf.gdf[~comparison2])
             assert comparison2.all()
 
     def test_event_based_damage_calculation_OSdaMage_stylized(self):
@@ -267,12 +267,13 @@ class TestDirectDamage:
             df[error_rows]
         )
 
-    @pytest.mark.skip(reason="Not yet finished")
+    @pytest.mark.skip(
+        reason="To do: Needs refining on what (and how) needs to be verified."
+    )
     def test_OLD_event_based_damage_calculation_manualfunction(
         self, event_input_output: pytest.fixture
     ):
         # Todo: have a look at this test again, to see if the existing issues have been solved
-
         damage_function = "MAN"
 
         # This test roughly follows the DirectDamage.road_damage() controller in analyses_direct.py
@@ -295,25 +296,17 @@ class TestDirectDamage:
         test_output_series = event_gdf.gdf["dam_EV1_te"]
         reference_output_series = test_ref_output["dam_HZ_ref"]
 
-        if test_output_series.equals(reference_output_series):
-            print("test passed")
-        else:
+        if not test_output_series.equals(reference_output_series):
             comparison2 = test_output_series.eq(reference_output_series, fill_value=0.0)
-            if comparison2.all():  # all elements are exactly the same
-                print("test passed")
-            else:
+            if not comparison2.all():  # all elements are exactly the same
                 import numpy as np
 
-                print("{} roads are exactly the same".format(comparison2.sum()))
-                print("So {} roads are different".format((~comparison2).sum()))
-                print("Below the 5 first differences")
-                print(event_gdf.gdf[~comparison2].head())
-                print(test_ref_output[~comparison2].head())
-
-                print(
-                    """We know that manual inserting the HZ damage function may give slightly different results,
-                Therefore, we are now checking if the result is significant"""
-                )
+                mssg = "{} roads are exactly the same\n".format(comparison2.sum())
+                mssg += "So {} roads are different\n".format((~comparison2).sum())
+                mssg += "Below the 5 first differences\n"
+                mssg += "{}\n".format(event_gdf.gdf[~comparison2].head())
+                mssg += "{}\n".format(test_ref_output[~comparison2].head())
+                mssg += "We know that manual inserting the HZ damage function may give slightly different results, Therefore, we are now checking if the result is significant"
                 threshold_rel = (
                     1  # What is the acceptable difference in a relative sense
                 )
@@ -332,26 +325,19 @@ class TestDirectDamage:
                     is_relative_different, is_absolute_different
                 )
 
-                if is_combined_different.all():
-                    print("test passed")
-                else:
+                if not is_combined_different.all():
                     pd.set_option("display.max_columns", None)
-
-                    print(
-                        "{} roads are roughly the same".format(
-                            is_combined_different.sum()
-                        )
+                    mssg += "{} roads are roughly the same \n".format(
+                        is_combined_different.sum()
                     )
-                    print(
-                        "So {} roads are significantly different".format(
-                            (~is_combined_different).sum()
-                        )
+                    mssg += "So {} roads are significantly different\n".format(
+                        (~is_combined_different).sum()
                     )
-                    print("Below the 5 first differences:")
-                    print("... for the result of the test:")
-                    print(event_gdf.gdf[is_combined_different].head())
-                    print("... and the reference output:")
-                    print(test_ref_output[is_combined_different].head())
+                    mssg += "Below the 5 first differences:\n"
+                    mssg += "... for the result of the test:\n"
+                    mssg += "{}\n".format(event_gdf.gdf[is_combined_different].head())
+                    mssg += "... and the reference output:\n"
+                    mssg += "{}\n".format(test_ref_output[is_combined_different].head())
 
     def test_construct_damage_network_return_periods(self):
         data_path = direct_damage_test_data / "risk_test_data.csv"
