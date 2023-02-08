@@ -1,3 +1,16 @@
+## v0.4.0 (2023-02-08)
+
+### Feat
+
+- **ra2ce/analyses/direct/damage_calculation/**: Split previous file into files within a submodule
+- **ra2ce/analyses/direct/damage/**: Added damage functions for direct analysis
+
+### Fix
+
+- **networks_utils.py**: Fixed one bug in networks_utils.py for the creation of a network from shp and related test (test_1_1_given_only_network_shape_redundancy).
+- **analyses_direct.py;damage_network_base.py**: Removed circular import
+- **analyses_direct.py**: Fixed some imports in the analyses_direct.py file
+
 ## v0.3.1 (2022-09-26)
 
 ### Fix
