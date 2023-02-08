@@ -3,9 +3,11 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 from typing import Dict, Optional
+from geopandas import gpd
 
 from ra2ce.configuration.config_protocol import ConfigProtocol
 from ra2ce.configuration.network.network_ini_config_data import NetworkIniConfigData
+from ra2ce.io.readers import GraphPickleReader
 from ra2ce.graph.hazard import Hazard
 from ra2ce.graph.networks import Network
 
@@ -102,10 +104,50 @@ class NetworkConfig(ConfigProtocol):
     def root_dir(self) -> Path:
         return self.get_network_root_dir(self.ini_file)
 
-    def configure(self) -> None:
-        # Call Handlers (to rework)
-        _graphs = network_handler(self.config_data, self.files)
-        self.graphs = hazard_handler(self.config_data, _graphs, self.files)
+    def _read_graphs_from_config(self) -> dict:
+        _graphs = {}
+        _pickle_reader = GraphPickleReader()
+        _static_output_dir = self.config_data["static"] / "output_graph"
+
+        # Load graphs
+        # FIXME: why still read hazard as neccessary if analysis of single link redundancy can run wihtout hazard?
+        for input_graph in ["base_graph", "origins_destinations_graph"]:
+            filename = _static_output_dir / f"{input_graph}.p"
+            if filename.is_file():
+                _graphs[input_graph] = _pickle_reader.read(filename)
+            else:
+                _graphs[input_graph] = None
+
+            filename = _static_output_dir / f"{input_graph}_hazard.p"
+            if filename.is_file():
+                _graphs[input_graph + "_hazard"] = _pickle_reader.read(filename)
+            else:
+                _graphs[input_graph + "_hazard"] = None
+
+        # Load networks
+        filename = _static_output_dir / f"base_network.feather"
+        if filename.is_file():
+            _graphs["base_network"] = gpd.read_feather(filename)
+        else:
+            _graphs["base_network"] = None
+
+        filename = _static_output_dir / f"base_network_hazard.feather"
+        if filename.is_file():
+            _graphs["base_network_hazard"] = gpd.read_feather(filename)
+        else:
+            _graphs["base_network_hazard"] = None
+
+        return _graphs
+
+    def configure_network(self) -> None:
+        # Call Network Handler (to rework)
+        self.graphs = network_handler(self.config_data, self.files)
+
+    def configure_hazard(self) -> None:
+        # Call Hazard Handler (to rework)
+        if not self.graphs:
+            self.graphs = self._read_graphs_from_config()
+        self.graphs = hazard_handler(self.config_data, self.graphs, self.files)
 
     def is_valid(self) -> bool:
         _file_is_valid = self.ini_file.is_file() and self.ini_file.suffix == ".ini"

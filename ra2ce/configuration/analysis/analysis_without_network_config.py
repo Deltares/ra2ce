@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 import geopandas as gpd
 
-from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData
+from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData, NetworkConfig
 from ra2ce.io.readers import GraphPickleReader
 
 
@@ -34,20 +35,35 @@ class AnalysisWithoutNetworkConfiguration(AnalysisConfigBase):
             raise FileNotFoundError(ini_file)
         _new_analysis_config.ini_file = ini_file
         _new_analysis_config.config_data = config_data
+        _static_dir = config_data.get("static", None)
+        if _static_dir and _static_dir.is_dir():
+            config_data.files = NetworkConfig._get_existent_network_files(
+                _static_dir / "output_graph"
+            )
+        else:
+            logging.error(f"Static dir not found. Value provided: {_static_dir}")
+        _new_analysis_config.config_data["files"] = config_data.files
         return _new_analysis_config
 
     def _read_graphs_from_config(self) -> dict:
         _graphs = {}
         _pickle_reader = GraphPickleReader()
         _static_output_dir = self.config_data["static"] / "output_graph"
+
+        # Load graphs
+        # FIXME: why still read hazard as neccessary if analysis of single link redundancy can run wihtout hazard?
         for input_graph in ["base_graph", "origins_destinations_graph"]:
-            # Load graphs
-            _graphs[input_graph] = _pickle_reader.read(
-                _static_output_dir / f"{input_graph}.p"
-            )
-            _graphs[input_graph + "_hazard"] = _pickle_reader.read(
-                _static_output_dir / f"{input_graph}_hazard.p"
-            )
+            filename = _static_output_dir / f"{input_graph}.p"
+            if filename.is_file():
+                _graphs[input_graph] = _pickle_reader.read(filename)
+            else:
+                _graphs[input_graph] = None
+
+            filename = _static_output_dir / f"{input_graph}_hazard.p"
+            if filename.is_file():
+                _graphs[input_graph + "_hazard"] = _pickle_reader.read(filename)
+            else:
+                _graphs[input_graph + "_hazard"] = None
 
         # Load networks
         filename = _static_output_dir / f"base_network.feather"

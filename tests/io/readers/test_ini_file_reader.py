@@ -5,7 +5,7 @@ from tests.io.readers import test_data_readers
 class TestIniFileReader:
     def test_given_valid_ini_file_reads_to_dict(self):
         # 1. Define test data.
-        _ini_file =  test_data_readers / "dummy.ini"
+        _ini_file = test_data_readers / "dummy.ini"
         assert _ini_file.is_file()
 
         _expected_dict = dict(

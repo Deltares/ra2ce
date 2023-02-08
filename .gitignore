@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+
+
 # Distribution / packaging
 .Python
 build/
@@ -50,6 +52,12 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+
+# Coverages
+.scannerwork/
+*-reports/**
+.coverage
+coverage.xml
 
 # Translations
 *.mo
@@ -135,3 +143,5 @@ dmypy.json
 # ra2ce ignore:
 data/
 /tests/local_data
+run.py
+pakistan.py

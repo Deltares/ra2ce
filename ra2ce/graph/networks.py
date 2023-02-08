@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
+"""
+Created on 26-7-2021
+"""
+
+import logging
 from pathlib import Path
 from typing import Any, List, Tuple
 
+# external modules
 import pyproj
 from osmnx.graph import graph_from_xml
 
+# local modules
 from ra2ce.graph.networks_utils import *
 from ra2ce.io.readers import GraphPickleReader
 from ra2ce.io.writers import JsonExporter
@@ -39,6 +46,10 @@ class Network:
         self.id_name_origin_destination = config["origins_destinations"][
             "id_name_origin_destination"
         ]
+        if "category" in self.config["origins_destinations"]:
+            self.od_category = self.config["origins_destinations"]["category"]
+        else:
+            self.od_category = None
         try:
             self.region = (
                 config["static"] / "network" / config["origins_destinations"]["region"]
@@ -73,7 +84,8 @@ class Network:
         # Make a pyproj CRS from the EPSG code
         crs = pyproj.CRS.from_user_input(crs)
 
-        lines = self.read_merge_shp()
+        lines = self.read_merge_shp(crs)
+
         logging.info(
             "Function [read_merge_shp]: executed with {} {}".format(
                 self.config["network"]["primary_file"],
@@ -81,18 +93,20 @@ class Network:
             )
         )
 
-        # Multilinestring to linestring
         # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
         # The list of fid's is reduced by the fid's that are not anymore in the merged lines
-        aadt_names = None
-        edges, lines_merged = merge_lines_automatic(
-            lines, self.config["network"]["file_id"], aadt_names, crs
-        )
-        logging.info(
-            "Function [merge_lines_shpfiles]: executed with properties {}".format(
-                list(edges.columns)
+        if self.config["cleanup"]["merge_lines"]:
+            aadt_names = None
+            edges, lines_merged = merge_lines_automatic(
+                lines, self.config["network"]["file_id"], aadt_names, crs
             )
-        )
+            logging.info(
+                "Function [merge_lines_shpfiles]: executed with properties {}".format(
+                    list(edges.columns)
+                )
+            )
+        else:
+            edges, lines_merged = lines, gpd.GeoDataFrame()
 
         edges, id_name = gdf_check_create_unique_ids(
             edges, self.config["network"]["file_id"]
@@ -125,18 +139,23 @@ class Network:
             )
 
         # Get the unique points at the end of lines and at intersections to create nodes
-        nodes = create_nodes(edges, crs, self.config["cleanup"]["ignore_intersections"])
+        nodes = create_nodes(edges, crs, self.config["cleanup"]["cut_at_intersections"])
         logging.info("Function [create_nodes]: executed")
 
-        if self.snapping is not None:
-            # merged lines may be updated when new nodes are created which makes a line cut in two
-            edges = cut_lines(
-                lines_gdf=edges, nodes=nodes, idName=id_name, tolerance=1e-4, crs=crs
-            )
-            nodes = create_nodes(
-                edges, crs, self.config["cleanup"]["ignore_intersections"]
-            )
-            logging.info("Function [cut_lines]: executed")
+        edges = cut_lines(
+            edges, nodes, id_name, tolerance=0.00001, crs_=crs
+        )  ## PAY ATTENTION TO THE TOLERANCE, THE UNIT IS DEGREES
+        logging.info("Function [cut_lines]: executed")
+
+        if not edges.crs:
+            edges.crs = crs
+
+        # if self.snapping is not None:
+        #     # merged lines may be updated when new nodes are created which makes a line cut in two
+        #     nodes = create_nodes(
+        #         edges, crs, self.config["cleanup"]["cut_at_intersections"]
+        #     )
+        #     logging.info("Function [cut_lines]: executed")
 
         # create tuples from the adjecent nodes and add as column in geodataframe
         edges_complex = join_nodes_edges(nodes, edges, id_name)
@@ -144,11 +163,7 @@ class Network:
 
         # Create networkx graph from geodataframe
         graph_complex = graph_from_gdf(edges_complex, nodes, node_id="node_fid")
-        logging.info(
-            "Function [graph_from_gdf]: executing, with '{}_resulting_network.shp'".format(
-                self.config["project"]["name"]
-            )
-        )
+        logging.info("Function [graph_from_gdf]: executed")
 
         if self.segmentation_length is not None:
             edges_complex = Segmentation(edges_complex, self.segmentation_length)
@@ -167,86 +182,6 @@ class Network:
         _output_dir = self.config["static"] / "output_graph"
         _exporter.export(_output_dir / "simple_to_complex.json", linking_tables[0])
         _exporter.export(_output_dir / "complex_to_simple.json", linking_tables[1])
-
-    def network_osm_pbf_DEPRECIATED(
-        self, crs=4326
-    ) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
-        """Creates a network from an OSM PBF file.
-
-        WARNING: THIS FUNCTION IS DEPRECIATED SINCE 10/8/2022, WHEN KEES MADE A NEW OSM PBF IMPORT USING
-                THE TRAILS PACKAGE.
-
-        Args:
-            crs (int): the EPSG number of the coordinate reference system that is used
-
-        Returns:
-            G_simple (NetworkX graph): Simplified graph (for use in the indirect analyses).
-            G_complex_edges (GeoDataFrame): Complex graph (for use in the direct analyses).
-        """
-        road_types = (
-            self.config["network"]["road_types"].lower().replace(" ", " ").split(",")
-        )
-
-        input_path = self.config["static"] / "network"
-        executables_path = Path(__file__).parents[1] / "executables"
-        osm_convert_exe = executables_path / "osmconvert64.exe"
-        osm_filter_exe = executables_path / "osmfilter.exe"
-        assert osm_convert_exe.exists() and osm_filter_exe.exists()
-
-        pbf_file = input_path / self.config["network"]["primary_file"]
-        o5m_path = input_path / self.config["network"]["primary_file"].replace(
-            ".pbf", ".o5m"
-        )
-        o5m_filtered_path = input_path / self.config["network"]["primary_file"].replace(
-            ".pbf", "_filtered.o5m"
-        )
-
-        # Todo: check what excacly these functions do, and if this is always what we want
-        if o5m_filtered_path.exists():
-            logging.info(
-                "filtered o5m path already exists: {}".format(o5m_filtered_path)
-            )
-        elif o5m_path.exists():
-            filter_osm(osm_filter_exe, o5m_path, o5m_filtered_path, tags=road_types)
-            logging.info("filtered o5m pbf, created: {}".format(o5m_path))
-        else:
-            convert_osm(osm_convert_exe, pbf_file, o5m_path)
-            filter_osm(osm_filter_exe, o5m_path, o5m_filtered_path, tags=road_types)
-            logging.info(
-                "Converted and filtered osm.pbf to o5m, created: {}".format(o5m_path)
-            )
-
-        logging.info("Start reading graph from o5m...")
-        # Todo: make sure that bidirectionality is inferred from the settings, similar for other settings
-        graph_complex = graph_from_xml(
-            o5m_filtered_path, bidirectional=False, simplify=False, retain_all=False
-        )
-
-        # Create 'graph_simple'
-        graph_simple, graph_complex, link_tables = create_simplified_graph(
-            graph_complex
-        )
-
-        # Create 'edges_complex', convert complex graph to geodataframe
-        logging.info("Start converting the graph to a geodataframe")
-        edges_complex, node_complex = graph_to_gdf(graph_complex)
-        logging.info("Finished converting the graph to a geodataframe")
-
-        # Save the link tables linking complex and simple IDs
-        JsonExporter().export(
-            self.config["static"] / "output_graph", link_tables[0], link_tables[1]
-        )
-
-        if self.segmentation_length is not None:
-            edges_complex = Segmentation(edges_complex, self.segmentation_length)
-            edges_complex = edges_complex.apply_segmentation()
-            if edges_complex.crs is None:  # The CRS might have dissapeared.
-                edges_complex.crs = crs  # set the right CRS
-
-        self.base_graph_crs = pyproj.CRS.from_user_input(crs)
-        self.base_network_crs = pyproj.CRS.from_user_input(crs)
-
-        return graph_simple, edges_complex
 
     def network_trails_import(
         self, crs: int = 4326
@@ -267,18 +202,36 @@ class Network:
                 self.config["network"]["primary_file"]
             )
         )
-        edges = pd.read_pickle(
+
+        logging.warning(
+            "Any coordinate projection information in the feather file will be overwritten (with default WGS84)"
+        )
+        # Make a pyproj CRS from the EPSG code
+        crs = pyproj.CRS.from_user_input(crs)
+
+        # edges = pd.read_pickle(
+        #    self.config["static"] / "network" / self.config["network"]["primary_file"]
+        # )
+
+        edge_file = (
             self.config["static"] / "network" / self.config["network"]["primary_file"]
         )
+        edges = gpd.read_feather(edge_file)
+        edges = edges.set_crs(crs)
+
         corresponding_node_file = (
             self.config["static"]
             / "network"
             / self.config["network"]["primary_file"].replace("edges", "nodes")
         )
-        assert corresponding_node_file.exists()
-        nodes = pd.read_pickle(
-            corresponding_node_file
-        )  # Todo: Throw exception if nodes file is not present
+        assert (
+            corresponding_node_file.exists()
+        ), "The node file could not be found while importing from TRAILS"
+        nodes = gpd.read_feather(corresponding_node_file)
+        nodes = nodes.set_crs(crs)
+        # nodes = pd.read_pickle(
+        #     corresponding_node_file
+        # )  # Todo: Throw exception if nodes file is not present
 
         logging.info("TRAILS importer: start generating graph")
         # tempfix to rename columns
@@ -292,10 +245,11 @@ class Network:
         )
 
         if self.segmentation_length is not None:
+            logging.info("TRAILS importer: start segmentating graph")
             to_segment = Segmentation(edges, self.segmentation_length)
             edges_simple_segmented = to_segment.apply_segmentation()
             if edges_simple_segmented.crs is None:  # The CRS might have dissapeared.
-                edges_simple_segmented.crs = crs  # set the right CRS
+                edges_simple_segmented.crs = edges.crs  # set the right CRS
                 edges_complex = edges_simple_segmented
 
         else:
@@ -399,7 +353,6 @@ class Network:
         """
         from ra2ce.graph.origins_destinations import (
             add_od_nodes,
-            create_OD_pairs,
             read_OD_files,
         )
 
@@ -414,11 +367,12 @@ class Network:
             self.id_name_origin_destination,
             self.config["origins_destinations"]["origin_count"],
             crs,
+            self.od_category,
             self.region,
             self.region_var,
         )
 
-        ods = create_OD_pairs(ods, graph)
+        ods, graph = add_od_nodes(ods, graph, crs, self.od_category)
         ods.crs = crs
 
         # Save the OD pairs (GeoDataFrame) as pickle
@@ -435,8 +389,6 @@ class Network:
             ods.to_file(ods_path, index=False)
             logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
 
-        graph = add_od_nodes(graph, ods, crs)
-
         return graph
 
     def generate_origins_from_raster(self):
@@ -451,7 +403,7 @@ class Network:
 
         return out_fn
 
-    def read_merge_shp(self, crs_: int = 4326) -> gpd.GeoDataFrame:
+    def read_merge_shp(self, crs_: pyproj.CRS) -> gpd.GeoDataFrame:
         """Imports shapefile(s) and saves attributes in a pandas dataframe.
 
         Args:
@@ -475,9 +427,7 @@ class Network:
 
         # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
         lines = [gpd.read_file(shp) for shp in shapefiles_analysis]
-        # for
 
-        # check_crs_gdf(, crs_)
         if isinstance(self.config["network"]["diversion_file"], str):
             lines.extend(
                 [
@@ -489,20 +439,23 @@ class Network:
 
         lines.crs = crs_
 
-        # append the length of the road stretches
-        lines["length"] = lines["geometry"].apply(lambda x: line_length(x, lines.crs))
-
+        # Check if there are any multilinestrings and convert them to linestrings.
         if lines["geometry"].apply(lambda row: isinstance(row, MultiLineString)).any():
-            for line in lines.loc[
+            mls_idx = lines.loc[
                 lines["geometry"].apply(lambda row: isinstance(row, MultiLineString))
-            ].iterrows():
-                if len(linemerge(line[1].geometry)) > 1:
-                    logging.warning(
-                        "Edge with {} = {} is a MultiLineString, which cannot be merged to one line. Check this part.".format(
-                            self.config["network"]["file_id"],
-                            line[1][self.config["network"]["file_id"]],
-                        )
-                    )
+            ].index
+            for idx in mls_idx:
+                # Multilinestrings to linestrings
+                new_rows_geoms = list(lines.iloc[idx]["geometry"].geoms)
+                for nrg in new_rows_geoms:
+                    dict_attributes = dict(lines.iloc[idx])
+                    dict_attributes["geometry"] = nrg
+                    lines.loc[max(lines.index) + 1] = dict_attributes
+
+            lines = lines.drop(labels=mls_idx, axis=0)
+
+        # append the length of the road stretches
+        lines["length"] = lines["geometry"].apply(lambda x: line_length(x, crs_))
 
         logging.info(
             "Shapefile(s) loaded with attributes: {}.".format(
@@ -568,7 +521,7 @@ class Network:
         network_gdf = None
 
         # For all graph and networks - check if it exists, otherwise, make the graph and/or network.
-        if self.files["base_graph"] is None and self.files["base_network"] is None:
+        if self.files["base_graph"] is None or self.files["base_network"] is None:
             # Create the network from the network source
             if self.config["network"]["source"] == "shapefile":
                 logging.info("Start creating a network from the submitted shapefile.")
@@ -578,11 +531,13 @@ class Network:
                 logging.info(
                     """The original OSM PBF import is no longer supported. 
                                 Instead, the beta version of package TRAILS is used. 
-                                First stable release of TRAILS is excepted in 2023."""
+                                First stable release of TRAILS is expected in 2023."""
                 )
 
                 # base_graph, network_gdf = self.network_osm_pbf() #The old approach is depreciated
                 base_graph, network_gdf = self.network_trails_import()
+
+                self.base_network_crs = network_gdf.crs
 
             elif self.config["network"]["source"] == "OSM download":
                 logging.info("Start downloading a network from OSM.")
@@ -601,14 +556,26 @@ class Network:
                 self.base_graph_crs = pyproj.CRS.from_user_input(network_gdf.crs)
                 self.base_network_crs = pyproj.CRS.from_user_input(network_gdf.crs)
 
-            if (
-                self.config["network"]["source"] != "pickle"
-                and self.config["network"]["source"] != "shapefile"
-                and self.config["network"]["source"] != "OSM PBF"
-            ):
-                # Graph & Network from OSM download or OSM PBF
+            if self.config["network"]["source"] == "OSM download":
+                # Graph & Network from OSM download
                 # Check if all geometries between nodes are there, if not, add them as a straight line.
                 base_graph = add_missing_geoms_graph(base_graph, geom_name="geometry")
+
+            # Set the road lengths to meters for both the base_graph and network_gdf
+            # TODO: rename "length" column to "length [m]" to be explicit
+            edges_lengths_meters = {
+                (e[0], e[1], e[2]): {
+                    "length": line_length(e[-1]["geometry"], self.base_graph_crs)
+                }
+                for e in base_graph.edges.data(keys=True)
+            }
+            nx.set_edge_attributes(base_graph, edges_lengths_meters)
+
+            network_gdf["length"] = network_gdf["geometry"].apply(
+                lambda x: line_length(x, self.base_network_crs)
+            )
+
+            if self.config["network"]["source"] == "OSM download":
                 base_graph = self.get_avg_speed(base_graph)
 
             # Save the graph and geodataframe
@@ -628,11 +595,12 @@ class Network:
 
             if self.files["base_network"] is not None:
                 network_gdf = gpd.read_feather(self.files["base_network"])
-                # Assuming the same CRS for both the network and graph
-                self.base_graph_crs = pyproj.CRS.from_user_input(network_gdf.crs)
-                self.base_network_crs = pyproj.CRS.from_user_input(network_gdf.crs)
             else:
                 network_gdf = None
+
+            # Assuming the same CRS for both the network and graph
+            self.base_graph_crs = pyproj.CRS.from_user_input(network_gdf.crs)
+            self.base_network_crs = pyproj.CRS.from_user_input(network_gdf.crs)
 
         # create origins destinations graph
         if (
