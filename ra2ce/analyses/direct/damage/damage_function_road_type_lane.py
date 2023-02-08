@@ -106,23 +106,21 @@ class DamageFunctionByRoadTypeByLane:
     def calculate_damage(
         self,
         df: pd.DataFrame,
-        DamFun_prefix: str,
+        damage_function_prefix: str,
         hazard_prefix: str,
         event_prefix: str,
     ) -> pd.DataFrame:
-        """Calculates the damage for one event
+        """
+        Calculates the damage for one event. The prefixes are used to find/set the right df columns.
 
-        The prefixes are used to find/set the right df columns
-
-        Arguments:
-            *df* (pd.Dataframe) : dataframe with road network data
-            *DamFun_prefix* : prefix to identify the right damage function e.g. 'A'
-            *hazard_prefix* : prefix to identify the right hazard e.g. 'F'
-            *event_prefix*  : prefix to identify the right event, e.g. 'EV1'
+        Args:
+            df (pd.DataFrame): dataframe with road network data.
+            damage_function_prefix (str): prefix to identify the right damage function e.g. 'A'.
+            hazard_prefix (str): prefix to identify the right hazard e.g. 'F'.
+            event_prefix (str): prefix to identify the right event, e.g. 'EV1'
 
         Returns:
-            *df* (pd.DataFrame) : dataframe data with the damage calculation added as new column
-
+            pd.DataFrame: dataframe data with the damage calculation added as new column
         """
 
         interpolator = (
@@ -130,8 +128,8 @@ class DamageFunctionByRoadTypeByLane:
         )  # get the interpolator function
 
         # Find correct columns in dataframe
-        result_col = "dam_{}_{}".format(event_prefix, DamFun_prefix)
-        max_dam_col = "{}_temp_max_dam".format(DamFun_prefix)
+        result_col = "dam_{}_{}".format(event_prefix, damage_function_prefix)
+        max_dam_col = "{}_temp_max_dam".format(damage_function_prefix)
         hazard_severity_col = "{}_{}_me".format(
             hazard_prefix, event_prefix
         )  # mean is hardcoded now
