@@ -1,17 +1,10 @@
-# -*- coding: utf-8 -*-
-"""
-Created on 26-7-2021
-"""
-
 import logging
 from pathlib import Path
 from typing import Any, List, Tuple
 
-# external modules
 import pyproj
 from osmnx.graph import graph_from_xml
 
-# local modules
 from ra2ce.graph.networks_utils import *
 from ra2ce.io.readers import GraphPickleReader
 from ra2ce.io.writers import JsonExporter
@@ -149,13 +142,6 @@ class Network:
 
         if not edges.crs:
             edges.crs = crs
-
-        # if self.snapping is not None:
-        #     # merged lines may be updated when new nodes are created which makes a line cut in two
-        #     nodes = create_nodes(
-        #         edges, crs, self.config["cleanup"]["cut_at_intersections"]
-        #     )
-        #     logging.info("Function [cut_lines]: executed")
 
         # create tuples from the adjecent nodes and add as column in geodataframe
         edges_complex = join_nodes_edges(nodes, edges, id_name)
@@ -351,10 +337,7 @@ class Network:
         Returns:
             graph (NetworkX graph): the NetworkX graph with OD nodes
         """
-        from ra2ce.graph.origins_destinations import (
-            add_od_nodes,
-            read_OD_files,
-        )
+        from ra2ce.graph.origins_destinations import add_od_nodes, read_OD_files
 
         name = "origin_destination_table"
 

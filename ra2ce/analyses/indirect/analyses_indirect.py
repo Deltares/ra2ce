@@ -9,22 +9,21 @@ import sys
 import time
 from pathlib import Path
 
-#import igraph as ig
+# import igraph as ig
 import geopandas as gpd
 import networkx as nx
 import numpy as np
 import osmnx
 import pandas as pd
-
-
 from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
 
+from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDestination
+
 # Local modules
 from ra2ce.graph.networks_utils import graph_to_gpkg
 from ra2ce.io.readers.graph_pickle_reader import GraphPickleReader
-from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDestination
 
 
 class IndirectAnalyses:
@@ -722,8 +721,8 @@ class IndirectAnalyses:
             ]
             graph_hz.remove_edges_from(edges_remove)
 
-            #convert the networkx graph to igraph object to speed up the route finding algorithm
-            #igraph_hz = ig.Graph.from_networkx(igraph_hz)
+            # convert the networkx graph to igraph object to speed up the route finding algorithm
+            # igraph_hz = ig.Graph.from_networkx(igraph_hz)
 
             # Find the routes
             od_routes = find_route_ods(graph_hz, od_nodes, analysis["weighing"])
@@ -959,7 +958,7 @@ class IndirectAnalyses:
 
         isolated_locations = copy.deepcopy(locations)
 
-        #create an empty list to append the df_aggregation to
+        # create an empty list to append the df_aggregation to
         aggregation = pd.DataFrame()
         for i, hazard in enumerate(self.config["hazard_names"]):
             hazard_name = self.hazard_names.loc[
@@ -997,12 +996,19 @@ class IndirectAnalyses:
                     edges_geoms.append(edge[-1]["geometry"])
                     count_edges += 1
                 total_geom = MultiLineString(edges_geoms)
-                results_list_gdf.append(gpd.GeoDataFrame(
-                    {"fid": ii, "count": count_edges, "geometry": total_geom},
-                    geometry="geometry", crs=crs)
+                results_list_gdf.append(
+                    gpd.GeoDataFrame(
+                        {"fid": ii, "count": count_edges, "geometry": total_geom},
+                        geometry="geometry",
+                        crs=crs,
+                    )
                 )
 
-            results = gpd.GeoDataFrame(pd.concat(results_list_gdf, ignore_index=True), geometry="geometry", crs=crs)
+            results = gpd.GeoDataFrame(
+                pd.concat(results_list_gdf, ignore_index=True),
+                geometry="geometry",
+                crs=crs,
+            )
 
             # remove the largest (main) graph
             results.sort_values(by="count", ascending=False, inplace=True)
@@ -1035,15 +1041,26 @@ class IndirectAnalyses:
             # Save the results in isolated_locations
             intersect[f"i_{hazard_name[:-3]}"] = 1
             intersect_join = intersect[[f"i_{hazard_name[:-3]}", "i_id"]]
-            isolated_locations = isolated_locations.merge(intersect_join, on="i_id", how='left')
-            isolated_locations[f"i_{hazard_name[:-3]}"] = isolated_locations[f"i_{hazard_name[:-3]}"].fillna(0)
+            isolated_locations = isolated_locations.merge(
+                intersect_join, on="i_id", how="left"
+            )
+            isolated_locations[f"i_{hazard_name[:-3]}"] = isolated_locations[
+                f"i_{hazard_name[:-3]}"
+            ].fillna(0)
 
-            #make an overview of the isolated_locations, aggregated per category (category is specified by the user)
-            df_aggregation = isolated_locations.groupby(by=analysis["category_field_name"])[f"i_{hazard_name[:-3]}"].sum().reset_index()
+            # make an overview of the isolated_locations, aggregated per category (category is specified by the user)
+            df_aggregation = (
+                isolated_locations.groupby(by=analysis["category_field_name"])[
+                    f"i_{hazard_name[:-3]}"
+                ]
+                .sum()
+                .reset_index()
+            )
             df_aggregation["hazard"] = hazard_name
-            df_aggregation.rename(columns={f"i_{hazard_name[:-3]}": "nr_isolated"}, inplace=True)
+            df_aggregation.rename(
+                columns={f"i_{hazard_name[:-3]}": "nr_isolated"}, inplace=True
+            )
             aggregation = pd.concat([aggregation, df_aggregation], axis=0)
-
 
         # Set the isolated_locations geopandas dataframe back to the original crs
         isolated_locations.to_crs(crs=crs, inplace=True)
@@ -1165,7 +1182,9 @@ class IndirectAnalyses:
                 gdf = self.multi_link_redundancy(g, analysis)
                 gdf = self.multi_link_losses(gdf, analysis)
             elif analysis["analysis"] == "optimal_route_origin_closest_destination":
-                analyzer = OriginClosestDestination(self.config, analysis, self.hazard_names)
+                analyzer = OriginClosestDestination(
+                    self.config, analysis, self.hazard_names
+                )
                 (
                     base_graph,
                     opt_routes,
@@ -1178,18 +1197,19 @@ class IndirectAnalyses:
                     for to_save, save_name in zip(to_save_gdf, to_save_gdf_names):
                         if not to_save.empty:
                             gpkg_path = output_path / (
-                                    analysis["name"].replace(" ", "_") + f"_{save_name}.gpkg"
+                                analysis["name"].replace(" ", "_")
+                                + f"_{save_name}.gpkg"
                             )
                             save_gdf(to_save, gpkg_path)
 
                     # Save the Graph
                     gpkg_path_nodes = output_path / (
-                            analysis["name"].replace(" ", "_") + "_results_nodes.gpkg"
+                        analysis["name"].replace(" ", "_") + "_results_nodes.gpkg"
                     )
                     gpkg_path_edges = output_path / (
-                            analysis["name"].replace(" ", "_") + "_results_edges.gpkg"
+                        analysis["name"].replace(" ", "_") + "_results_edges.gpkg"
                     )
-                    graph_to_gpkg(base_graph,  gpkg_path_edges,  gpkg_path_nodes)
+                    graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
                 if analysis["save_csv"]:
                     csv_path = output_path / (
                         analysis["name"].replace(" ", "_") + "_destinations.csv"
@@ -1203,7 +1223,9 @@ class IndirectAnalyses:
                     del opt_routes["geometry"]
                     opt_routes.to_csv(csv_path, index=False)
             elif analysis["analysis"] == "multi_link_origin_closest_destination":
-                analyzer = OriginClosestDestination(self.config, analysis, self.hazard_names)
+                analyzer = OriginClosestDestination(
+                    self.config, analysis, self.hazard_names
+                )
 
                 if analysis["calculate_route_without_disruption"]:
                     (
@@ -1221,9 +1243,10 @@ class IndirectAnalyses:
                     ) = analyzer.multi_link_origin_closest_destination()
 
                     (
-
                         opt_routes_with_hazard
-                    ) = analyzer.difference_length_with_without_hazard(opt_routes_with_hazard, opt_routes_without_hazard)
+                    ) = analyzer.difference_length_with_without_hazard(
+                        opt_routes_with_hazard, opt_routes_without_hazard
+                    )
 
                 else:
                     (
@@ -1235,19 +1258,27 @@ class IndirectAnalyses:
                     ) = analyzer.multi_link_origin_closest_destination()
                     opt_routes_without_hazard = gpd.GeoDataFrame()
 
-
-
-
                 if analysis["save_shp"]:
                     # Save the GeoDataFrames
-                    to_save_gdf = [origins, destinations, opt_routes_without_hazard, opt_routes_with_hazard]
-                    to_save_gdf_names = ["origins", "destinations", "optimal_routes_without_hazard", "optimal_routes_with_hazard"]
+                    to_save_gdf = [
+                        origins,
+                        destinations,
+                        opt_routes_without_hazard,
+                        opt_routes_with_hazard,
+                    ]
+                    to_save_gdf_names = [
+                        "origins",
+                        "destinations",
+                        "optimal_routes_without_hazard",
+                        "optimal_routes_with_hazard",
+                    ]
                     for to_save, save_name in zip(to_save_gdf, to_save_gdf_names):
                         if not to_save.empty:
                             gpkg_path = output_path / (
-                                analysis["name"].replace(" ", "_") + f"_{save_name}.gpkg"
+                                analysis["name"].replace(" ", "_")
+                                + f"_{save_name}.gpkg"
                             )
-                            save_gdf(to_save,  gpkg_path)
+                            save_gdf(to_save, gpkg_path)
 
                     # Save the Graph
                     gpkg_path_nodes = output_path / (
@@ -1533,7 +1564,7 @@ def save_gdf(gdf, save_path):
         if gdf[col].dtype == object and col != gdf.geometry.name:
             gdf[col] = gdf[col].astype(str)
 
-    gdf.to_file(save_path, driver='GPKG')
+    gdf.to_file(save_path, driver="GPKG")
     logging.info("Results saved to: {}".format(save_path))
 
 
