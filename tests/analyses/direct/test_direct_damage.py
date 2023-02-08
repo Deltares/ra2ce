@@ -191,7 +191,7 @@ class TestDirectDamage:
     def _load_manual_damage_function(self):
         manual_damage_functions = ManualDamageFunctions()
         manual_damage_functions.find_damage_functions(
-            folder="test_data" / "test_damage_functions"
+            folder=direct_damage_test_data / "test_damage_functions"
         )
         manual_damage_functions.load_damage_functions()
 
@@ -199,12 +199,12 @@ class TestDirectDamage:
 
         # Check some damage fractions
         assert fun0.prefix == "te"
-        fun0.damage_fraction.interpolator(
-            1
-        ) == 0.42  # At 1 m water depth, Huizinga should return 0.42 fraction damage
-        fun0.damage_fraction.interpolator(0.75) == (
-            0.25 + 0.42
-        ) / 2  # Check linear interpolation
+        assert (
+            fun0.damage_fraction.interpolator(1) == 0.42
+        )  # At 1 m water depth, Huizinga should return 0.42 fraction damage
+        assert (
+            fun0.damage_fraction.interpolator(0.75) == (0.25 + 0.42) / 2
+        )  # Check linear interpolation
 
         # Check some max damage values
         md_data = fun0.max_damage.data
