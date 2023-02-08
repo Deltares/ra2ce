@@ -1,5 +1,6 @@
 import os
 from collections import OrderedDict
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -71,7 +72,7 @@ class LookUp:
     def road_lanes():
         """Mapping of road lanes, this is used as a default in case of missings. Number of lanes differ per country."""
 
-        lanes_dict = OrderedDict(
+        return OrderedDict(
             [
                 (
                     "AL",
@@ -600,7 +601,6 @@ class LookUp:
                 ),
             ]
         )
-        return lanes_dict
 
     @staticmethod
     def get_lane_number_damage_correction():
@@ -623,7 +623,7 @@ class LookUp:
     @staticmethod
     def max_damages():
         """Lookup table for max damages"""
-        lookup_dict = OrderedDict(
+        return OrderedDict(
             [
                 (
                     "Lower",
@@ -658,14 +658,12 @@ class LookUp:
             ]
         )
 
-        return lookup_dict
-
     @staticmethod
     def get_max_damages_OSD():
         """Lookup table for max damages of the OSdaMage damage functions"""
 
         # Note that these values have been converted to euro/m road length
-        lookup_dict = OrderedDict(
+        return OrderedDict(
             [
                 (
                     "Lower",
@@ -699,8 +697,6 @@ class LookUp:
                 ),
             ]
         )
-
-        return lookup_dict
 
     @staticmethod
     def get_max_damages_huizinga() -> dict:
@@ -965,9 +961,8 @@ class CreateLookupTables:
     """This class lets you create the dictionary lookup tables from an excel file.
     ONLY use this class if dictionairies need to be updated."""
 
-    def __init__(self):
-        self.input_path = r"c:\Python\RACE\ra2ce\settings"
-        self.file_name = r"OSdaMage_functions.xlsx"
+    def __init__(self, settings_file: Path):
+        self.settings_file = settings_file
 
     def create(self):
         lane_damage_correction = self.load_lane_damage_correction("Max_damages", "G:M")
@@ -980,7 +975,6 @@ class CreateLookupTables:
 
         return (
             lane_damage_correction,
-            dict_max_damages,
             dict_max_damages,
             max_damages_hz,
             interpolators,
@@ -1001,7 +995,7 @@ class CreateLookupTables:
         """
 
         lane_corr_df = pd.read_excel(
-            os.path.join(self.input_path, self.file_name),
+            self.settings_file,
             sheet_name=sheet_name,
             header=0,
             usecols=usecols,
@@ -1031,7 +1025,7 @@ class CreateLookupTables:
         """
 
         df = pd.read_excel(
-            os.path.join(self.input_path, self.file_name),
+            self.settings_file,
             sheet_name=sheet_name,
             header=[3],
             usecols=usecols,
@@ -1056,7 +1050,7 @@ class CreateLookupTables:
         """
 
         lane_corr_df = pd.read_excel(
-            os.path.join(self.input_path, self.file_name),
+            self.settings_file,
             sheet_name=sheet_name,
             header=3,
             usecols=usecols,
@@ -1081,7 +1075,7 @@ class CreateLookupTables:
         """
 
         flood_curves_old = pd.read_excel(
-            os.path.join(self.input_path, self.file_name),
+            self.settings_file,
             sheet_name=sheet_name,
             header=[2],
             index_col=None,
