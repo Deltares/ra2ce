@@ -1,3 +1,10 @@
+## v0.4.1 (2023-02-09)
+
+### Fix
+
+- **test_acceptance.py**: fixed the test_1_1_given_only_network_shape_redundancy data and added assert statements to networks.py
+- **networks_utils.py**: Fixed function get_valid_mean, now it is tested.
+
 ## v0.4.0 (2023-02-08)
 
 ### Feat
