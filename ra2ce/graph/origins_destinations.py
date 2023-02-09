@@ -1,11 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on 30-7-2021
-
-@author: F.C. de Groen, Deltares
-@author: M. Kwant, Deltares
-"""
-
 import logging
 import os
 from typing import Optional, Union
@@ -24,8 +16,6 @@ from shapely.geometry import LineString, MultiLineString, Point
 from tqdm import tqdm
 
 from ra2ce.graph.networks_utils import line_length
-
-# from shapely.geometry.point import Point
 
 
 def read_OD_files(
