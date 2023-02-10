@@ -1,3 +1,9 @@
+## v0.4.2 (2023-02-10)
+
+### Fix
+
+- **README.rst**: typo fixed, issue #80 thanks Anoek!
+
 ## v0.4.1 (2023-02-09)
 
 ### Fix
