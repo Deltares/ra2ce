@@ -83,9 +83,3 @@ def from_shapefile_to_poly(shapefile: Path, out_path: Path, outname: str = ""):
                 _poly_file.write("END" + "\n")
         except Exception as e:
             print("Exception {}".format(e))
-
-
-if __name__ == "__main__":
-    # TODO: REMOVE, this should be a test !!!
-
-    
