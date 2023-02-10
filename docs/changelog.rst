@@ -1,3 +1,9 @@
+## v0.4.3 (2023-02-10)
+
+### Fix
+
+- **networks.py**: fix bug #86, ensured the merged_lines object is a GeoDataFrame and not sometimes a Series. Updated related test.
+
 ## v0.4.2 (2023-02-10)
 
 ### Fix
