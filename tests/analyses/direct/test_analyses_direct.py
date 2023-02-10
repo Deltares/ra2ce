@@ -1,4 +1,5 @@
 from ra2ce.analyses.direct.analyses_direct import DirectAnalyses
+from tests import test_data
 
 
 class TestDirectAnalyses:
@@ -10,8 +11,15 @@ class TestDirectAnalyses:
 
     def test_execute(self):
         _config = {
-            "direct": {"name": "DummyExecute", "save_shp": False, "save_csv": False}
+            "direct": [
+                {
+                    "name": "DummyExecute",
+                    "analysis": "",
+                    "save_shp": False,
+                    "save_csv": False,
+                }
+            ],
+            "output": test_data,
         }
         _graphs = {}
-        _analyses = DirectAnalyses(_config, _graphs)
-        assert isinstance(_analyses, DirectAnalyses)
+        DirectAnalyses(_config, _graphs).execute()

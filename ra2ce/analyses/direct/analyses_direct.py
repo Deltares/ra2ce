@@ -212,6 +212,7 @@ def save_gdf(gdf, save_path):
     gdf.to_file(save_path, driver="ESRI Shapefile", encoding="utf-8")
     logging.info("Results saved to: {}".format(save_path))
 
+
 def rename_road_gdf_to_conventions(road_gdf_columns):
     """
     Rename the columns in the road_gdf to the conventions of the ra2ce documentation
