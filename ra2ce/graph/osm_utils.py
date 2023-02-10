@@ -1,8 +1,10 @@
+from pathlib import Path
+
 import geopandas as gpd
 import numpy as np
 
 
-def from_shapefile_to_poly(shapefile, out_path, outname=None):
+def from_shapefile_to_poly(shapefile: Path, out_path: Path, outname: str = ""):
 
     """
     This function will create the .poly files from an input shapefile.
@@ -57,7 +59,9 @@ def from_shapefile_to_poly(shapefile, out_path, outname=None):
 
                     for ring in polygon:
                         j = j + 1
-                        _poly_file.write("    " + str(ring[0]) + "     " + str(ring[1]) + "\n")
+                        _poly_file.write(
+                            "    " + str(ring[0]) + "     " + str(ring[1]) + "\n"
+                        )
 
                     i = i + 1
                     # close the ring of one subpolygon if done
