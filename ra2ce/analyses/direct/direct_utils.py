@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 import numpy as np
 import pandas as pd
@@ -41,58 +42,46 @@ def lane_cleaner(cell):
 
     """
     if cell is None:
-        new = np.nan
-    elif isinstance(cell, int):
-        new = float(cell)
-    elif isinstance(cell, float):
-        new = cell
-    elif isinstance(cell, str):  # try to unpack the cell
+        return np.nan
+    if isinstance(cell, int):
+        return float(cell)
+    if isinstance(cell, float):
+        return cell
+    if isinstance(cell, str):  # try to unpack the cell
         try:
-            new = float(cell)
+            return float(cell)
         except:
             logging.warning(
                 "Lanedata {} could not be converted to float, if it is a list we will try to unpack".format(
                     cell
                 )
             )
-            if ";" in cell:  # it looks some sort of a list
-                try:
-                    new = max(
-                        [float(x) for x in cell.split(";")]
-                    )  # assumption: better overestimate than underestimate # lanes
-                    logging.warning(
-                        "Our best guess of the lane number is: {}".format(new)
-                    )
-                except:
-                    new = np.nan
-                    logging.warning(
-                        "Unexpected datatype, lane data removed {} {}".format(
-                            cell, type(cell)
-                        )
-                    )
-            elif "," in cell:  # it looks some sort of a list
-                try:
-                    new = max(
-                        [float(x) for x in cell.split(",")]
-                    )  # assumption: better overestimate than underestimate # lanes
-                    logging.warning("Our best guess of the lane number is: {}").format(
-                        new
-                    )
-                except:
-                    new = np.nan
-                    logging.warning(
-                        "Unexpected datatype, lane data removed {} {}".format(
-                            cell, type(cell)
-                        )
-                    )
-    else:
-        logging.warning(
-            "Unexpected datatype, lane data removed {} {}".format(cell, type(cell))
-        )
-        new = np.nan
 
-    # assert type(new) == float
-    return new
+            def _get_max(list_values: List[str]) -> float:
+                try:
+                    _max_value = max(map(float, list_values))
+                    logging.warning(
+                        "Our best guess of the lane number is: {}".format(_max_value)
+                    )
+                except:
+                    logging.warning(
+                        "Unexpected datatype, lane data removed {} {}".format(
+                            cell, type(cell)
+                        )
+                    )
+                    return np.nan
+                return _max_value
+
+            if ";" in cell:  # it looks some sort of a list
+                return _get_max(cell.split(";"))
+            elif "," in cell:  # it looks some sort of a list
+                return _get_max(cell.split(","))
+            return np.nan
+
+    logging.warning(
+        "Unexpected datatype, lane data removed {} {}".format(cell, type(cell))
+    )
+    return np.nan
 
 
 def create_summary_statistics(gdf):
