@@ -193,9 +193,10 @@ class TestNetworkCreation:
         assert all(map(validate_file, _expected_files))
 
     @slow_test
-    @pytest.mark.skip(reason="bug issue #86")
     def test_2_network_shape(self):
-        """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
+        """To test the graph and network creation from a shapefile.
+        Applies line segmentation for the network and merges lines and cuts lines at the intersections for the graph.
+        """
         # 1. Given test data.
         test_name = "2_network_shape"
         _test_data_dir = test_data / test_name
