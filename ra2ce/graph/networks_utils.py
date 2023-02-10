@@ -524,29 +524,6 @@ def merge_lines_automatic(
     return merged, lines_merged
 
 
-def pairs(lst: list):
-    """Iterate over a list in overlapping pairs without wrap-around.
-    Args:
-        lst: an iterable/list
-
-    Returns:
-        Yields a pair of consecutive elements (lst[k], lst[k+1]) of lst. Last
-        call yields the last two elements.
-
-    Example:
-        lst = [4, 7, 11, 2]
-        pairs(lst) yields (4, 7), (7, 11), (11, 2)
-
-    Source:
-        https://stackoverflow.com/questions/1257413/1257446#1257446
-    """
-    i = iter(lst)
-    prev = next(i)
-    for item in i:
-        yield prev, item
-        prev = item
-
-
 def line_length(line: LineString, crs: pyproj.CRS) -> float:
     """Calculate length of a line in meters, given in geographic coordinates.
     Args:
@@ -564,14 +541,14 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
             if isinstance(line, LineString):
                 total_length = sum(
                     distance.distance(latlon(a), latlon(b)).meters
-                    for (a, b) in pairs(line.coords)
+                    for (a, b) in zip(line.coords, line.coords[1:])
                 )
             elif isinstance(line, MultiLineString):
                 total_length = sum(
                     [
                         sum(
                             distance.distance(latlon(a), latlon(b)).meters
-                            for (a, b) in pairs(l.coords)
+                            for (a, b) in zip(l.coords, l.coords[1:])
                         )
                         for l in line
                     ]
