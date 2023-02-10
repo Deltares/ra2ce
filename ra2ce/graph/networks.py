@@ -146,6 +146,9 @@ class Network:
         edges_complex = join_nodes_edges(nodes, edges, id_name)
         edges_complex.crs = crs  # set the right CRS
 
+        assert edges_complex["node_A"].isnull().sum() == 0, "Some edges cannot be assigned nodes, please check your input shapefile."
+        assert edges_complex["node_B"].isnull().sum() == 0, "Some edges cannot be assigned nodes, please check your input shapefile."
+
         # Create networkx graph from geodataframe
         graph_complex = graph_from_gdf(edges_complex, nodes, node_id="node_fid")
         logging.info("Function [graph_from_gdf]: executed")
