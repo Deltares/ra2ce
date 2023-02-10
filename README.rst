@@ -157,7 +157,7 @@ Initialization file templates
     segmentation_length = None			# Numeric value / None
     merge_lines = True				# True / False
     merge_on_id = False				# True / False / None
-    cut_at_interactions = False			# True / False
+    cut_at_intersections = False			# True / False
 
 
 **analyses.ini**
