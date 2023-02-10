@@ -114,6 +114,7 @@ class Network:
         # merge merged lines if there are any merged lines
         if not lines_merged.empty:
             # save the merged lines to a shapefile - CHECK if there are lines merged that should not be merged (e.g. main + secondary road)
+            lines_merged.set_geometry(col='geometry', inplace=True)  # To ensure the object is a GeoDataFrame and not a Series
             lines_merged.to_file(
                 os.path.join(
                     self.output_path,
