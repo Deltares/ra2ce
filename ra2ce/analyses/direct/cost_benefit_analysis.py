@@ -21,40 +21,29 @@ class EffectivenessMeasures:
 
         # perform checks on input while initializing class
         if analysis["file_name"] is None:
-            logging.error(
-                "Effectiveness of measures calculation:... No input file configured. "
-                "Please define an input file in the analysis.ini file "
-            )
-            quit()
+            _error = "Effectiveness of measures calculation: No input file configured. Please define an input file in the analysis.ini file."
+            logging.error(_error)
+            raise ValueError(_error)
         elif analysis["file_name"].split(".")[1] != "shp":
-            logging.error(
-                "Effectiveness of measures calculation:... Wrong input file configured. "
-                "Extension of input file is -{}-, needs to be -shp- (shapefile)".format(
-                    analysis["file_name"].split(".")[1]
-                )
+            _error = "Effectiveness of measures calculation: Wrong input file configured. Extension of input file is -{}-, needs to be -shp- (shapefile)".format(
+                analysis["file_name"].split(".")[1]
             )
-            quit()
-        elif (
-            os.path.exists(config["input"] / "direct" / analysis["file_name"]) is False
-        ):
-            logging.error(
-                "Effectiveness of measures calculation:... Input file doesnt exist..."
-                " please place file in the following folder: {}".format(
-                    config["input"] / "direct"
-                )
+            logging.error(_error)
+            raise ValueError(_error)
+        elif not (config["input"] / "direct" / analysis["file_name"]).exists():
+            _error = "Effectiveness of measures calculation: Input file doesn't exist please place file in the following folder: {}".format(
+                config["input"] / "direct"
             )
-            quit()
-        elif (
-            os.path.exists(config["input"] / "direct" / "effectiveness_measures.csv")
-            is False
-        ):
-            logging.error(
-                "Effectiveness of measures calculation:... lookup table with effectiveness of measures doesnt exist..."
-                " Please place the effectiveness_measures.csv file in the following folder: {}".format(
-                    config["input"] / "direct"
-                )
+            logging.error(_error)
+            raise FileNotFoundError(config["input"] / "direct" / analysis["file_name"])
+        elif not (config["input"] / "direct" / "effectiveness_measures.csv").exists():
+            _error = "Effectiveness of measures calculation: lookup table with effectiveness of measures doesnt exist. Please place the effectiveness_measures.csv file in the following folder: {}".format(
+                config["input"] / "direct"
             )
-            quit()
+            logging.error(_error)
+            raise FileNotFoundError(
+                config["input"] / "direct" / "effectiveness_measures.csv"
+            )
 
     @staticmethod
     def load_effectiveness_table(path):
