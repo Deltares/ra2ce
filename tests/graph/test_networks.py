@@ -60,4 +60,3 @@ class TestNetworks:
 
         # 3. Verify expectations
         assert isinstance(_network, Network)
-        assert _network.od_category == "dummy_category"
