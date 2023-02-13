@@ -9,6 +9,7 @@ from ra2ce.graph.networks_utils import (
     drawProgressBar,
     line_length,
     merge_lines_automatic,
+    vertices_from_lines,
 )
 
 
@@ -56,6 +57,8 @@ class TestNetworkUtils:
         assert _merged
         assert _merged_lines
 
+
+class TestLineLength:
     def test_line_length_linestring_geographic(self):
         _crs = CRS.from_user_input(4326)
         assert _crs.is_geographic
@@ -117,3 +120,33 @@ class TestNetworkUtils:
 
         # 3. Verify expectations.
         assert _return_value is np.nan
+
+
+class TestVerticesFromLines:
+    def test_with_linestrings(self):
+        # 1. Define test data.
+        _left_line = LineString([[0, 0], [1, 0], [2, 0]])
+        _right_line = LineString([[2, 0], [2, 2], [0, 0]])
+        _lines = [_left_line, _right_line]
+        _ids = ["t_a", "t_b"]
+
+        # 2. Run test.
+        _vertices = vertices_from_lines(_lines, _ids)
+
+        # 3. Verify final expectations.
+        assert isinstance(_vertices, dict)
+        assert list(_vertices.keys()) == _ids
+
+    def test_with_multilinestrings(self):
+        # 1. Define test data.
+        _left_line = MultiLineString([[[0, 0], [1, 0], [2, 0]]])
+        _right_line = MultiLineString([[[1, 1], [2, 2], [3, 3]]])
+        _lines = [_left_line, _right_line]
+        _ids = ["t_a", "t_b"]
+
+        # 2. Run test.
+        _vertices = vertices_from_lines(_lines, _ids)
+
+        # 3. Verify final expectations.
+        assert isinstance(_vertices, dict)
+        assert list(_vertices.keys()) == _ids

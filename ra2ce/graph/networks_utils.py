@@ -459,12 +459,10 @@ def nearest_neighbor_within(
     return closest_point
 
 
-def vertices_from_lines(lines, listIds):
+def vertices_from_lines(lines, listIds) -> dict:
     """Return dict of with values: unique vertices from list of LineStrings.
     keys: index of LineString in original list
     From shapely_tools:
-        @author: Dirk Eilander (dirk.eilander@deltares.nl)
-        Adjusted 15-10-2019: Frederique de Groen (frederique.degroen@deltares.nl)
         Build on library from https://github.com/ojdo/python-tools/blob/master/shapelytools.py
     """
     vertices_dict = {}
