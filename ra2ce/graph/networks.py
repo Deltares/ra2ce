@@ -92,7 +92,7 @@ class Network:
                 lines, self.config["network"]["file_id"], aadt_names, crs
             )
             logging.info(
-                "Function [merge_lines_shpfiles]: executed with properties {}".format(
+                "Function [merge_lines_automatic]: executed with properties {}".format(
                     list(edges.columns)
                 )
             )
@@ -114,7 +114,9 @@ class Network:
         # merge merged lines if there are any merged lines
         if not lines_merged.empty:
             # save the merged lines to a shapefile - CHECK if there are lines merged that should not be merged (e.g. main + secondary road)
-            lines_merged.set_geometry(col='geometry', inplace=True)  # To ensure the object is a GeoDataFrame and not a Series
+            lines_merged.set_geometry(
+                col="geometry", inplace=True
+            )  # To ensure the object is a GeoDataFrame and not a Series
             lines_merged.to_file(
                 os.path.join(
                     self.output_path,
@@ -146,8 +148,12 @@ class Network:
         edges_complex = join_nodes_edges(nodes, edges, id_name)
         edges_complex.crs = crs  # set the right CRS
 
-        assert edges_complex["node_A"].isnull().sum() == 0, "Some edges cannot be assigned nodes, please check your input shapefile."
-        assert edges_complex["node_B"].isnull().sum() == 0, "Some edges cannot be assigned nodes, please check your input shapefile."
+        assert (
+            edges_complex["node_A"].isnull().sum() == 0
+        ), "Some edges cannot be assigned nodes, please check your input shapefile."
+        assert (
+            edges_complex["node_B"].isnull().sum() == 0
+        ), "Some edges cannot be assigned nodes, please check your input shapefile."
 
         # Create networkx graph from geodataframe
         graph_complex = graph_from_gdf(edges_complex, nodes, node_id="node_fid")

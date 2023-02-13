@@ -53,298 +53,6 @@ def drawProgressBar(percent, barLen=20):
     sys.stdout.flush()
 
 
-def merge_lines_shpfiles(
-    lines_gdf: gpd.GeoDataFrame, idName: str, aadtNames: list, crs_: int
-) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
-    """Asks the user for input and possibly merges the LineStrings in a geodataframe (network)
-    Args:
-        lines_gdf (geodataframe): the network with edges that can possibly be merged
-        idName (string): name of the Unique ID column in the lines_gdf
-        aadtNames (list of strings): names of the columns of the AADT (average annual daily traffic)
-        crs_ (int): the EPSG number of the coordinate reference system that is used
-    Returns:
-        lines_gdf (geodataframe): the network with edges that are (not) merged
-        lines_merged (geodataframe): the lines that are merged, if lines are merged. Otherwise it returns an empty GDF
-    """
-    list_lines = list(lines_gdf["geometry"])
-
-    # Multilinestring to linestring
-    try:
-        merged_lines = linemerge(list_lines)  # merge the lines of both shapefiles
-    except NotImplementedError as e:
-        logging.error(
-            "Your data contains Multi-part geometries, you cannot merge lines. Error: {}".format(
-                e
-            )
-        )
-        return lines_gdf, gpd.GeoDataFrame()
-
-    while True:
-        try:
-            merge_input = str(
-                input(
-                    "\nSome of the lines can be merged. Do you want to merge these lines? Fill in 'y' to merge lines or 'n' to not merge lines.\nYour input: "
-                )
-            ).lower()
-            if merge_input == "y":
-                logging.info("\nYou successfully chose to merge lines.")
-                break  # successfully received input --> continue below
-            elif merge_input == "n":
-                logging.info("\nYou successfully chose not to merge lines.")
-                return lines_gdf, gpd.GeoDataFrame()  # successfully received input
-        except ValueError:
-            logging.error("\nTry again to fill in 'y' or 'n' and press enter.")
-            continue
-
-    # continue
-    if len(merged_lines.geoms) < len(list_lines) and aadtNames:
-        # the number of merged lines is smaller than the number of lines in the input, so lines can be merged
-        while True:
-            try:
-                yes_to_all = str(
-                    input(
-                        """You can choose which AADT properties are chosen per road segment. Type 'all' if you want to treat all the cases the same or 'single' if you want to look at each case separately.\nYour input: """
-                    )
-                ).lower()
-            except ValueError:
-                print("\nTry again to fill in 'all' or 'single' and press enter.")
-                continue
-
-            if yes_to_all not in ["all", "single"]:
-                print("\nTry again to fill in 'all' or 'single' and press enter.")
-                continue
-            else:
-                print("\nYou successfully chose '{}'.".format(yes_to_all))
-                break  # successfully received input
-
-        if yes_to_all == "all":
-            # ask the user if they want to take the max, min or average for all values
-            while True:
-                try:
-                    all_type = str(
-                        input(
-                            """Choose the maximum, minimum or mean for the traffic type count in each merged line. Type 'max', 'min' or 'mean'.\nYour input: """
-                        )
-                    ).lower()
-                except ValueError:
-                    print(
-                        "\nTry again to fill in 'max', 'min' or 'mean' and press enter."
-                    )
-                    continue
-
-                if all_type not in ["max", "min", "mean"]:
-                    print(
-                        "\nTry again to fill in 'max', 'min' or 'mean' and press enter."
-                    )
-                    continue
-                else:
-                    print(
-                        "\nYou successfully chose '{}'.\nCalculating for all merged segments...".format(
-                            all_type
-                        )
-                    )
-                    break  # successfully received input
-    elif len(merged_lines.geoms) < len(list_lines) and not aadtNames:
-        while True:
-            try:
-                the_input = input(
-                    "\nDo you want to merge the lines on {}? Type 'y' for yes and 'n' for no.\nYour input: ".format(
-                        idName
-                    )
-                )
-                if the_input == "y":
-                    # merge by ID name
-                    lines_gdf = lines_gdf.dissolve(by=idName, aggfunc="max")
-                    lines_gdf.reset_index(inplace=True)
-                    break  # successfully received input
-                elif the_input == "n":
-                    break  # successfully received input
-            except ValueError:
-                print("\nTry again to fill in the correct letter.")
-    elif len(merged_lines.geoms) == len(list_lines):
-        print("No lines are merged.")
-        return lines_gdf, gpd.GeoDataFrame()
-    else:
-        # The lines have no additional properties.
-        return lines_gdf, gpd.GeoDataFrame()
-
-    # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
-    # The list of fid's is reduced by the fid's that are not anymore in the merged lines
-    lines_fids = list(
-        zip(list_lines, lines_gdf[idName])
-    )  # create tuples from the list of lines and the list of fid's
-    lines_merged = gpd.GeoDataFrame(
-        columns=[idName, "geometry"], crs=crs_, geometry="geometry"
-    )
-    merged = gpd.GeoDataFrame(
-        columns=[idName, "geometry"], crs=crs_, geometry="geometry"
-    )
-
-    for mline in merged_lines:
-        for line, i in lines_fids:
-            full_line = line
-            if line.within(mline) and not line.equals(mline):
-                # if the line is within the merged line but is not the same, the line is part of a merged line
-                line_set_merged = [line]
-                fid_set_merged = [i]
-
-                if aadtNames:
-                    aadts_set_merged = [
-                        lines_gdf[lines_gdf[idName] == i][aadtNames].iloc[0].tolist()
-                    ]
-                else:
-                    aadts_set_merged = []
-
-                while not full_line.equals(mline):
-                    for line2, j in lines_fids:
-                        if (
-                            line2.within(mline)
-                            and not line2.equals(mline)
-                            and line != line2
-                        ):
-                            line_set_merged.append(line2)
-                            fid_set_merged.append(j)
-                            if aadtNames:
-                                aadts_set_merged.append(
-                                    lines_gdf[lines_gdf[idName] == i][aadtNames]
-                                    .iloc[0]
-                                    .tolist()
-                                )
-
-                            lines_fids.remove(
-                                (line2, j)
-                            )  # remove the lines that have been through the iteration so there are no duplicates
-                    full_line = linemerge(line_set_merged)
-                lines_fids.remove(
-                    (line, i)
-                )  # remove the lines that have been through the iteration so there are no duplicates
-                lines_merged = lines_merged.append(
-                    {idName: i, "geometry": full_line}, ignore_index=True
-                )  # the lines in this list are the same lines that make up the merged line
-
-                # check with the user the right traffic count for the merged lines
-                if aadts_set_merged:  # check if the list is not empty
-                    aadts_set_merged = [
-                        i for i in aadts_set_merged if not all(v is None for v in i)
-                    ]
-                    if len(aadts_set_merged) > 1 and isinstance(
-                        aadts_set_merged[0], list
-                    ):
-                        if yes_to_all == "all":
-                            if all_type == "max":
-                                aadts_set_merged = [
-                                    max(sublist)
-                                    for sublist in list(
-                                        map(list, zip(*aadts_set_merged))
-                                    )
-                                ]
-                            elif all_type == "min":
-                                aadts_set_merged = [
-                                    min(sublist)
-                                    for sublist in list(
-                                        map(list, zip(*aadts_set_merged))
-                                    )
-                                ]
-                            elif all_type == "mean":
-                                aadts_set_merged = [
-                                    mean(sublist)
-                                    for sublist in list(
-                                        map(list, zip(*aadts_set_merged))
-                                    )
-                                ]
-                        elif yes_to_all == "single":
-                            t = []
-                            # remove pretty table
-                            # t = PrettyTable()
-                            # t.add_column('index', list(range(1, len(aadts_set_merged) + 1)))
-                            # t.add_column('AADT vehicle types', aadts_set_merged)
-
-                            while True:
-                                try:
-                                    aadt_input = input(
-                                        """Road segment with id's {} is merged. Choose the right values for the AADT by entering the number indicated before the list of AADT values and pressing enter.\nYou can also choose 'max', 'min' or 'mean' for all values of the merged road segment.\nThe options: \n {} \n Your input: """.format(
-                                            fid_set_merged, t
-                                        )
-                                    )
-                                    if aadt_input.isdigit():
-                                        aadts_set_merged = aadts_set_merged[
-                                            int(aadt_input) - 1
-                                        ]
-                                    elif aadt_input in ["max", "min", "mean"]:
-                                        first, second = aadts_set_merged
-                                        if aadt_input == "max":
-                                            aadts_set_merged = [
-                                                max([i, j])
-                                                for i, j in list(zip(first, second))
-                                            ]
-                                        elif aadt_input == "min":
-                                            aadts_set_merged = [
-                                                min([i, j])
-                                                for i, j in list(zip(first, second))
-                                            ]
-                                        elif aadt_input == "mean":
-                                            aadts_set_merged = [
-                                                mean([i, j])
-                                                for i, j in list(zip(first, second))
-                                            ]
-                                except ValueError:
-                                    print(
-                                        "\nTry again to fill in one of the index values or 'max', 'min' or 'mean' and press enter."
-                                    )
-                                    continue
-                                else:
-                                    print(
-                                        "\nYou successfully chose '{}': {}.".format(
-                                            aadt_input, aadts_set_merged
-                                        )
-                                    )
-                                    break
-
-                # add values to the dataframe
-                this_fid = [x[0] if isinstance(x, list) else x for x in fid_set_merged][
-                    0
-                ]  # take the first feature ID for the merged lines
-
-                # initiate dict for new row in merged gdf
-                properties_dict = {idName: this_fid, "geometry": mline}
-
-                if aadtNames:
-                    if isinstance(aadts_set_merged[0], list):
-                        this_aadts = aadts_set_merged[0]
-                    else:
-                        this_aadts = aadts_set_merged
-
-                    # update dict for new row in merged gdf
-                    properties_dict.update(
-                        {a: aadt_val for a, aadt_val in zip(aadtNames, this_aadts)}
-                    )
-
-                # append row to merged gdf
-                merged = merged.append(properties_dict, ignore_index=True)
-
-            elif line.equals(mline):
-                # this line is not merged
-                properties_dict = {idName: i, "geometry": mline}
-
-                if aadtNames:
-                    properties_dict.update(
-                        {
-                            a: aadt_val
-                            for a, aadt_val in zip(
-                                aadtNames,
-                                lines_gdf.loc[lines_gdf[idName] == i][aadtNames].iloc[
-                                    0
-                                ],
-                            )
-                        }
-                    )
-                merged = merged.append(properties_dict, ignore_index=True)
-
-    merged["length"] = merged["geometry"].apply(lambda x: line_length(x, crs_))
-
-    return merged, lines_merged
-
-
 def merge_lines_automatic(
     lines_gdf: gpd.GeoDataFrame, idName: str, aadtNames: list, crs_: pyproj.CRS
 ) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
@@ -553,15 +261,16 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
                     ]
                 )
             else:
-                logging.warning(
+                logging.error(
                     "The road strech is not a Shapely LineString or MultiLineString so the length cannot be computed."
                     "Please check your data network data."
                 )
+                return np.nan
         except:
             logging.error(
                 "The CRS is not EPSG:4326. Quit the analysis, reproject the layer to EPSG:4326 and try again to run the tool."
             )
-            quit()
+            return np.nan
     elif crs.is_projected:
         ## line length of projected linestrings
         if isinstance(line, LineString):
@@ -569,10 +278,11 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
         elif isinstance(line, MultiLineString):
             total_length = line.length
         else:
-            logging.warning(
+            logging.error(
                 "The road strech is not a Shapely LineString or MultiLineString so the length cannot be computed."
                 "Please check your data network data."
             )
+            return np.nan
     return round(total_length, 0)
 
 
