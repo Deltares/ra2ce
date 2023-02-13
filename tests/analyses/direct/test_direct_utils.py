@@ -32,6 +32,12 @@ class TestDirectUtils:
         _clean_value = lane_cleaner(_str_value)
         assert _clean_value is np.nan
 
+    @pytest.mark.parametrize("split_char", [(","), (";")])
+    def test_lane_cleaner_given_invalid_str_list_returns_nan(self, split_char: str):
+        _str_value = ["not", "valid", "list"]
+        _clean_value = lane_cleaner(split_char.join(_str_value))
+        assert _clean_value is np.nan
+
     def test_unknown_type_returns_nan(self):
         class DummyClass:
             pass

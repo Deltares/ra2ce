@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import Any, List, Union
 
 import numpy as np
 import pandas as pd
@@ -28,7 +28,7 @@ def clean_lane_data(lane_col):
     return new_lane_col
 
 
-def lane_cleaner(cell):
+def lane_cleaner(cell: Any) -> float:
     """ "
     Helper function to clean an object with lane data and return it as a float
 
