@@ -17,6 +17,10 @@ from tqdm import tqdm
 
 from ra2ce.graph.networks_utils import line_length
 
+"""
+TODO: This whole file should be throughouly tested / redesigned.
+"""
+
 
 def read_OD_files(
     origin_paths: Union[str, list],
