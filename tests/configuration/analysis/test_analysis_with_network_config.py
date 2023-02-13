@@ -57,7 +57,6 @@ class TestAnalysisWithNetworkConfig:
         _ini_file = test_data / "acceptance_test_data" / "analyses.ini"
         assert _ini_file.exists()
         _config_data = AnalysisIniConfigData()
-        _config_data
         _network_config = NetworkConfig()
         _config = AnalysisWithNetworkConfiguration.from_data_with_network(
             _ini_file, _config_data, _network_config
@@ -70,9 +69,12 @@ class TestAnalysisWithNetworkConfig:
         class DummyConfigData(AnalysisIniConfigData):
             def is_valid(self) -> bool:
                 return True
+
         # 1. Define test data
         _ini_file = test_data / "acceptance_test_data" / "analyses.ini"
         assert _ini_file.exists()
 
         # 2. Run test.
-        AnalysisWithNetworkConfiguration.from_data(_ini_file, DummyConfigData()).is_valid()
+        assert AnalysisWithNetworkConfiguration.from_data(
+            _ini_file, DummyConfigData()
+        ).is_valid()
