@@ -1,9 +1,10 @@
 from typing import Any
 
 import numpy as np
+import pandas as pd
 import pytest
 
-from ra2ce.analyses.direct.direct_utils import lane_cleaner
+from ra2ce.analyses.direct.direct_utils import clean_lane_data, lane_cleaner
 
 
 class TestDirectUtils:
@@ -43,3 +44,16 @@ class TestDirectUtils:
             pass
 
         assert lane_cleaner(DummyClass()) is np.nan
+
+    def test_clean_lane_data(self):
+        # 1. Define test data.
+        lane_values = ["0.42;4.2;42", "0.24;2.4;24"]
+        _test_lane = pd.Series(lane_values)
+
+        # 2. Run test.
+        _result_data = clean_lane_data(_test_lane)
+
+        # 3. Verify expectations.
+        assert len(_result_data) == 2
+        assert _result_data[0] == 42
+        assert _result_data[1] == 24

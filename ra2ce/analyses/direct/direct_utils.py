@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 
-def clean_lane_data(lane_col):
+def clean_lane_data(lane_col: pd.Series) -> pd.Series:
     """
     Function that cleans up the lane data, to be used in case this contains unexpected values
 
