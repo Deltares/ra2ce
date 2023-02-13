@@ -106,7 +106,7 @@ def read_OD_files(
     return od
 
 
-def closest_node(node, nodes):
+def closest_node(node: np.ndarray, nodes: np.ndarray) -> np.ndarray:
     deltas = nodes - node
     dist_2 = np.einsum("ij,ij->i", deltas, deltas)
     return nodes[np.argmin(dist_2)]
