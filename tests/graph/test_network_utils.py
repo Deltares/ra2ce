@@ -5,6 +5,7 @@ from shapely.geometry import LineString, MultiLineString, Point
 from ra2ce.graph.networks_utils import (
     convert_unit,
     drawProgressBar,
+    merge_lines_automatic,
     merge_lines_shpfiles,
 )
 
@@ -38,6 +39,20 @@ class TestNetworkUtils:
         assert _merged.equals(_test_gdf)
         assert _lines_merged.equals(gpd.GeoDataFrame())
 
+    def test_merge_lines_automatic_wrong_input_returns(self):
+        _left_line = MultiLineString([[[0, 0], [1, 0], [2, 0]]])
+        _right_line = MultiLineString([[[3, 0], [2, 1], [2, 2]]])
+        _data = {"col1": ["name1", "name2"], "geometry": [_left_line, _right_line]}
+        _test_gdf = gpd.GeoDataFrame(_data, crs="EPSG:4326")
+
+        # 2. Run test.
+        _merged, _lines_merged = merge_lines_automatic(_test_gdf, "sth", ["sth"], 4326)
+
+        # 3. Verify final expectations
+        assert _merged.equals(_test_gdf)
+        assert _lines_merged.equals(gpd.GeoDataFrame())
+
+    @pytest.mark.skip(reason="TODO: Refactor method, it uses 'input' from CLI.")
     def test_merge_lines_shpfiles(self):
         # 1. Define test data.
         _left_line = LineString([[0, 0], [1, 0], [2, 0]])
@@ -47,6 +62,20 @@ class TestNetworkUtils:
 
         # 2. Run test.
         _merged, _merged_lines = merge_lines_shpfiles(_test_gdf, "sth", ["sth"], 4326)
+
+        # 3. Verify final expectations.
+        assert _merged
+        assert _merged_lines
+
+    def test_merge_lines_automatic(self):
+        # 1. Define test data.
+        _left_line = LineString([[0, 0], [1, 0], [2, 0]])
+        _right_line = LineString([[2, 0], [2, 1], [2, 2]])
+        _data = {"col1": ["name1", "name2"], "geometry": [_left_line, _right_line]}
+        _test_gdf = gpd.GeoDataFrame(_data, crs="EPSG:4326")
+
+        # 2. Run test.
+        _merged, _merged_lines = merge_lines_automatic(_test_gdf, "sth", ["sth"], 4326)
 
         # 3. Verify final expectations.
         assert _merged

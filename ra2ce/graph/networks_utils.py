@@ -87,13 +87,13 @@ def merge_lines_shpfiles(
                 )
             ).lower()
             if merge_input == "y":
-                print("\nYou successfully chose to merge lines.")
+                logging.info("\nYou successfully chose to merge lines.")
                 break  # successfully received input --> continue below
             elif merge_input == "n":
-                print("\nYou successfully chose not to merge lines.")
+                logging.info("\nYou successfully chose not to merge lines.")
                 return lines_gdf, gpd.GeoDataFrame()  # successfully received input
         except ValueError:
-            print("\nTry again to fill in 'y' or 'n' and press enter.")
+            logging.error("\nTry again to fill in 'y' or 'n' and press enter.")
             continue
 
     # continue
@@ -144,7 +144,6 @@ def merge_lines_shpfiles(
                         )
                     )
                     break  # successfully received input
-
     elif len(merged_lines.geoms) < len(list_lines) and not aadtNames:
         while True:
             try:
