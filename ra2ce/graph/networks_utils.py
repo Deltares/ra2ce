@@ -5,7 +5,7 @@ import sys
 import warnings
 from decimal import Decimal
 from statistics import mean
-from typing import Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import geojson
 import geopandas as gpd
@@ -669,7 +669,7 @@ def split_line_with_points(line, points):
     return segments
 
 
-def cut(line, distance):
+def cut(line, distance) -> Tuple[LineString, LineString]:
     # Cuts a line in two at a distance from its starting point
     # This is taken from shapely manual
     if (distance <= 0.0) | (distance >= line.length):
@@ -706,49 +706,9 @@ def cut(line, distance):
                     ]
 
 
-# def prune_lines(lines, prune_threshold):
-#
-#    # create nodes on intersections and on lines that should be snapped
-#    inters = []
-#    for line1,line2 in itertools.combinations(lines, 2):
-#        # Make points at intersections of lines
-#        if line1.intersects(line2):
-#            inter = line1.intersection(line2)
-#            if "Point" == inter.type:
-#                segments1 = split_line_with_points(line1, [inter])
-#                segments2 = split_line_with_points(line2, [inter])
-#
-#
-#            elif "MultiPoint" == inter.type:
-#                inters.extend([pt for pt in inter])
-#            elif "MultiLineString" == inter.type:
-#                multiLine = [line for line in inter]
-#                first_coords = multiLine[0].coords[0]
-#                last_coords = multiLine[len(multiLine)-1].coords[1]
-#                inters.append(Point(first_coords[0], first_coords[1]))
-#                inters.append(Point(last_coords[0], last_coords[1]))
-#            elif "GeometryCollection" == inter.type:
-#                for geom in inter:
-#                    if "Point" == geom.type:
-#                        inters.append(geom)
-#                    elif "MultiPoint" == geom.type:
-#                        inters.extend([pt for pt in geom])
-#                    elif "MultiLineString" == geom.type:
-#                        multiLine = [line for line in geom]
-#                        first_coords = multiLine[0].coords[0]
-#                        last_coords = multiLine[len(multiLine)-1].coords[1]
-#                        inters.append(Point(first_coords[0], first_coords[1]))
-#                        inters.append(Point(last_coords[0], last_coords[1]))
-#    # prune lines
-#    if pruning:
-#        # from m to km
-#        prune_threshold = prune_threshold / 1000
-#
-#        # remove the segments shorter than prune_threshold meter
-#        new_lines = [line for line in new_lines if line.length > prune_threshold]
-
-
-def join_nodes_edges(gdf_nodes, gdf_edges, idName):
+def join_nodes_edges(
+    gdf_nodes: gpd.GeoDataFrame, gdf_edges: gpd.GeoDataFrame, idName: str
+) -> gpd.GeoDataFrame:
     """Creates tuples from the adjecent nodes and add as column in geodataframe.
     Args:
         gdf_nodes [geodataframe]: geodataframe of the nodes of a graph
@@ -969,7 +929,7 @@ def hazard_join_id_shp(roads, HazardDataDict):
 
 
 # Delete duplicate points
-def delete_duplicates(all_points):
+def delete_duplicates(all_points: List[Point]) -> List[Point]:
     points = [point for point in all_points]
     uniquepoints = []
     for point in points:

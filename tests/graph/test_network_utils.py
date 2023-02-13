@@ -208,3 +208,55 @@ class TestCut:
         # 3. Verify expectations.
         assert _left_line == LineString([[0, 0], [1, 0]])
         assert _right_line == LineString([[1, 0], [2, 0]])
+
+
+class TestJoinNodesEdges:
+    @pytest.mark.skip(reason="TODO: Test data should improve, node_fid missing")
+    @pytest.mark.parametrize(
+        "id_name", [pytest.param("col1_left"), pytest.param("col1_right")]
+    )
+    def test_with_valid_data(self, id_name: str):
+        # 1. Define test data.
+        _edges_data = {
+            "col1": ["first_edge", "second_edge"],
+            "geometry": [
+                LineString([[0, 0], [2, 0]]),
+                LineString([[2, 0], [3, 0]]),
+            ],
+        }
+        _edges = gpd.GeoDataFrame(_edges_data, crs="EPSG:4326")
+        _nodes_data = {
+            "col1": ["first_node", "second_node"],
+            "geometry": [
+                Point([0, 0]),
+                Point([2, 0]),
+            ],
+        }
+        _nodes = gpd.GeoDataFrame(_nodes_data, crs="EPSG:4326")
+
+        # 2. Run test.
+        _node_gdf = nu.join_nodes_edges(_nodes, _edges, id_name)
+
+        # 3. Verify final expectations.
+        assert isinstance(_node_gdf, gpd.GeoDataFrame)
+
+
+class TestDeleteDuplicates:
+    def test_with_valid_data(self):
+        _base_coords = [[0.42, 0.42], [4.2, 4.2], [42, 42]]
+        _diff = 1e-09
+        _almost_equal = [[x + _diff, y + _diff] for x, y in _base_coords]
+        _list_coords = []
+        _list_coords.extend(_base_coords)
+        _list_coords.extend(_almost_equal)
+        _points = list(map(Point, _list_coords))
+        assert len(_points) == 6
+
+        # 2. Run test
+        _unique_points = nu.delete_duplicates(_points)
+
+        # 3. Verify exepctations.
+        assert len(_unique_points) == 3
+
+        for _point in _unique_points:
+            assert any(_point.almost_equals(_p) for _p in _points[:3])
