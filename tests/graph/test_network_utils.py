@@ -1,16 +1,12 @@
+import math
+
 import geopandas as gpd
 import numpy as np
 import pytest
 from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString, Point
 
-from ra2ce.graph.networks_utils import (
-    convert_unit,
-    drawProgressBar,
-    line_length,
-    merge_lines_automatic,
-    vertices_from_lines,
-)
+from ra2ce.graph import networks_utils as nu
 
 
 class TestNetworkUtils:
@@ -23,11 +19,11 @@ class TestNetworkUtils:
         ],
     )
     def test_convert_unit(self, unit: str, expected_result: float):
-        assert convert_unit(unit) == expected_result
+        assert nu.convert_unit(unit) == expected_result
 
     @pytest.mark.parametrize("percent", [(-20), (0), (50), (100), (110)])
     def test_draw_progress_bar(self, percent: float):
-        drawProgressBar(percent)
+        nu.drawProgressBar(percent)
 
     def test_merge_lines_automatic_wrong_input_returns(self):
         _left_line = MultiLineString([[[0, 0], [1, 0], [2, 0]]])
@@ -36,7 +32,9 @@ class TestNetworkUtils:
         _test_gdf = gpd.GeoDataFrame(_data, crs="EPSG:4326")
 
         # 2. Run test.
-        _merged, _lines_merged = merge_lines_automatic(_test_gdf, "sth", ["sth"], 4326)
+        _merged, _lines_merged = nu.merge_lines_automatic(
+            _test_gdf, "sth", ["sth"], 4326
+        )
 
         # 3. Verify final expectations
         assert _merged.equals(_test_gdf)
@@ -51,7 +49,9 @@ class TestNetworkUtils:
         _test_gdf = gpd.GeoDataFrame(_data, crs="EPSG:4326")
 
         # 2. Run test.
-        _merged, _merged_lines = merge_lines_automatic(_test_gdf, "sth", ["sth"], 4326)
+        _merged, _merged_lines = nu.merge_lines_automatic(
+            _test_gdf, "sth", ["sth"], 4326
+        )
 
         # 3. Verify final expectations.
         assert _merged
@@ -65,7 +65,7 @@ class TestLineLength:
         _line = LineString([[0, 0], [1, 0], [2, 0]])
 
         # 2. Run test.
-        _return_value = line_length(_line, _crs)
+        _return_value = nu.line_length(_line, _crs)
 
         # 3. Verify expectations.
         assert _return_value == pytest.approx(222639, 0.0001)
@@ -76,7 +76,7 @@ class TestLineLength:
         _line = MultiLineString([[[0, 0], [1, 0], [2, 0]]])
 
         # 2. Run test.
-        _return_value = line_length(_line, _crs)
+        _return_value = nu.line_length(_line, _crs)
 
         # 3. Verify expectations.
         assert _return_value == pytest.approx(222638.98, 0.0001)
@@ -87,7 +87,7 @@ class TestLineLength:
         _line = Point([0, 1])
 
         # 2. Run test.
-        _return_value = line_length(_line, _crs)
+        _return_value = nu.line_length(_line, _crs)
 
         # 3. Verify expectations.
         assert _return_value is np.nan
@@ -99,7 +99,7 @@ class TestLineLength:
         _line = LineString([[0, 0], [1, 0], [2, 0]])
 
         # 2. Run test.
-        assert line_length(_line, _crs) == pytest.approx(2.0, 0.001)
+        assert nu.line_length(_line, _crs) == pytest.approx(2.0, 0.001)
 
     def test_line_length_multilinestring_projected(self):
         # 1. Define test data.
@@ -108,7 +108,7 @@ class TestLineLength:
         _line = MultiLineString([[[0, 0], [1, 0], [2, 0]]])
 
         # 2. Run test.
-        assert line_length(_line, _crs) == pytest.approx(2.0, 0.001)
+        assert nu.line_length(_line, _crs) == pytest.approx(2.0, 0.001)
 
     def test_line_length_non_supported_projected_doesnot_raise(self):
         _crs = CRS.from_user_input(26915)
@@ -116,7 +116,7 @@ class TestLineLength:
         _line = Point([0, 1])
 
         # 2. Run test.
-        _return_value = line_length(_line, _crs)
+        _return_value = nu.line_length(_line, _crs)
 
         # 3. Verify expectations.
         assert _return_value is np.nan
@@ -131,7 +131,7 @@ class TestVerticesFromLines:
         _ids = ["t_a", "t_b"]
 
         # 2. Run test.
-        _vertices = vertices_from_lines(_lines, _ids)
+        _vertices = nu.vertices_from_lines(_lines, _ids)
 
         # 3. Verify final expectations.
         assert isinstance(_vertices, dict)
@@ -145,8 +145,66 @@ class TestVerticesFromLines:
         _ids = ["t_a", "t_b"]
 
         # 2. Run test.
-        _vertices = vertices_from_lines(_lines, _ids)
+        _vertices = nu.vertices_from_lines(_lines, _ids)
 
         # 3. Verify final expectations.
         assert isinstance(_vertices, dict)
         assert list(_vertices.keys()) == _ids
+
+
+class TestSplitLineWithPoints:
+    @pytest.mark.skip(reason="TODO: Needs rework on the input data.")
+    def test_with_valid_values(self):
+        # 1. Define test data.
+        _line = LineString([[0, 0], [1, 0], [2, 0], [5, 5]])
+        _data = {"col1": ["name1"], "geometry": [_line]}
+        _test_gdf = gpd.GeoDataFrame(_data, crs="EPSG:4326")
+        _points = list(map(Point, [[1, 0], [2, 5]]))
+
+        # 2. Run test.
+        _result = nu.split_line_with_points(_test_gdf, _points)
+
+        # 3. Verify expectations.
+        assert _result
+
+
+class TestCut:
+    @pytest.mark.parametrize(
+        "distance",
+        [
+            pytest.param(-math.inf, id="Negative infinite"),
+            pytest.param(math.inf, id="Positive infinite"),
+        ],
+    )
+    def test_with_invalid_distance(self, distance):
+        # 1. Define test data.
+        _line = LineString([[0, 0], [1, 0], [2, 0]])
+
+        # 2. Run test.
+        _left_line, _right_line = nu.cut(_line, distance)
+
+        # 3. Verify expectations.
+        assert _left_line is None
+        assert _right_line == LineString(_line)
+
+    def test_with_linestring(self):
+        # 1. Define test data.
+        _line = LineString([[0, 0], [1, 0], [2, 0]])
+        _distance = 1.0
+        # 2. Run test.
+        _left_line, _right_line = nu.cut(_line, _distance)
+
+        # 3. Verify expectations.
+        assert _left_line == LineString([[0, 0], [1, 0]])
+        assert _right_line == LineString([[1, 0], [2, 0]])
+
+    def test_with_multilinestring(self):
+        # 1. Define test data.
+        _line = MultiLineString([[[0, 0], [1, 0], [2, 0]]])
+        _distance = 1.0
+        # 2. Run test.
+        _left_line, _right_line = nu.cut(_line, _distance)
+
+        # 3. Verify expectations.
+        assert _left_line == LineString([[0, 0], [1, 0]])
+        assert _right_line == LineString([[1, 0], [2, 0]])
