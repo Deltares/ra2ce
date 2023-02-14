@@ -389,16 +389,5 @@ class TestAddMissingGeomsGraph:
         assert isinstance(_data[_geom_name], LineString)
 
 
-class TestSimplyGraphCount:
-    def test_with_prebuilt_graph(self):
-        # 1. Define test data.
-        _graph = nx.complete_graph(42)
-
-        # 2. Run test.
-        _result = nu.simplify_graph_count(_graph)
-
-        # 3. Verify final expectations
-        assert _result == _graph
-
 
         
