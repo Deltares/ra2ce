@@ -19,7 +19,7 @@ import rtree
 import tqdm
 import tqdm._tqdm_pandas
 from geopy import distance
-from networkx import set_edge_attributes
+from networkx import Graph, set_edge_attributes
 from osgeo import gdal
 from osmnx.simplification import simplify_graph
 from rasterio.features import shapes
@@ -928,8 +928,16 @@ def hazard_join_id_shp(roads, HazardDataDict):
     return roads
 
 
-# Delete duplicate points
 def delete_duplicates(all_points: List[Point]) -> List[Point]:
+    """
+    Delete duplicate points given they are 'almost' equals.
+
+    Args:
+        all_points (List[Point]): List with potentially repeated points.
+
+    Returns:
+        List[Point]: List with unique points.
+    """
     points = [point for point in all_points]
     uniquepoints = []
     for point in points:
@@ -938,7 +946,7 @@ def delete_duplicates(all_points: List[Point]) -> List[Point]:
     return uniquepoints
 
 
-def create_simplified_graph(graph_complex, new_id="rfid"):
+def create_simplified_graph(graph_complex, new_id: str = "rfid"):
     """Create a simplified graph with unique ids from a complex graph"""
     logging.info("Simplifying graph")
     try:
@@ -966,26 +974,50 @@ def create_simplified_graph(graph_complex, new_id="rfid"):
     return graph_simple, graph_complex, id_tables
 
 
-def gdf_check_create_unique_ids(gdf, id_name, new_id_name="rfid"):
-    # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
+def gdf_check_create_unique_ids(
+    gdf: gpd.GeoDataFrame, id_name: str, new_id_name: str = "rfid"
+) -> Tuple[gpd.GeoDataFrame, str]:
+    """
+    Check if the ID's are unique per edge: if not, add an own ID called 'fid'
+
+    Args:
+        gdf (gpd.GeoDataFrame): Dataframe with edges to check.
+        id_name (str): ID to search for uniqueness.
+        new_id_name (str, optional): Optinal new id name to give. Defaults to "rfid".
+
+    Returns:
+        Tuple[gpd.GeoDataFrame, str]: Resulting dataframe and its ID.
+    """
     check = list(gdf.index)
     logging.info("Started creating unique ids...")
     if len(gdf[id_name].unique()) == len(check):
         logging.info("Using the user-defined identifier field {}.".format(id_name))
         return gdf, id_name
-    else:
-        gdf[new_id_name] = check
-        logging.warning(
-            "Added a new unique identifier field {} because the original field '{}' "
-            "did not contain unique values per road segment."
-            "For further network processing, change the 'file_id' parameter in the network.ini file"
-            "to '{}".format(new_id_name, id_name, new_id_name)
-        )
-        return gdf, new_id_name
+
+    gdf[new_id_name] = check
+    logging.warning(
+        "Added a new unique identifier field {} because the original field '{}' "
+        "did not contain unique values per road segment."
+        "For further network processing, change the 'file_id' parameter in the network.ini file"
+        "to '{}".format(new_id_name, id_name, new_id_name)
+    )
+    return gdf, new_id_name
 
 
-def graph_check_create_unique_ids(graph, idname, new_id_name="rfid"):
-    # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
+def graph_check_create_unique_ids(
+    graph: Graph, idname: str, new_id_name: str = "rfid"
+) -> Tuple[Graph, str]:
+    """
+    Check if the ID's are unique per edge: if not, add an own ID called 'fid'
+
+    Args:
+        graph (Graph): Graph to prune from repeated ids.
+        idname (str): ID to search.
+        new_id_name (str, optional): Optional new id to set for repeated elements. Defaults to "rfid".
+
+    Returns:
+        Tuple[Graph, str]: Resulting graph and used ID.
+    """
     if len(set([str(e[-1][idname]) for e in graph.edges.data(keys=True)])) < len(
         graph.edges()
     ):
@@ -1000,8 +1032,8 @@ def graph_check_create_unique_ids(graph, idname, new_id_name="rfid"):
             )
         )
         return graph, new_id_name
-    else:
-        return graph, idname
+
+    return graph, idname
 
 
 def graph_create_unique_ids(graph, new_id_name="rfid"):

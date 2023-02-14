@@ -3,6 +3,7 @@ import math
 import geopandas as gpd
 import numpy as np
 import pytest
+from networkx import Graph, MultiGraph
 from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString, Point
 
@@ -260,3 +261,83 @@ class TestDeleteDuplicates:
 
         for _point in _unique_points:
             assert any(_point.almost_equals(_p) for _p in _points[:3])
+
+
+class TestCreateSimplifiedGraph:
+    def test_with_none_graph_complex_doesnot_raise(self):
+        _return_result = nu.create_simplified_graph(None, "")
+        assert _return_result == (None, None, None)
+
+    @pytest.mark.skip(reason="TODO: Generate valid test data.")
+    def test_with_valid_data(self):
+        pass
+
+
+class TestGdfCheckCreateUniqueIds:
+    def test_with_user_defined_identifier(self):
+        # 1. Define test data.
+        _test_identifier = "columns_ids"
+        _edges_data = {
+            _test_identifier: ["first_edge", "second_edge"],
+            "geometry": [
+                LineString([[0, 0], [2, 0]]),
+                LineString([[2, 0], [3, 0]]),
+            ],
+        }
+        _edges = gpd.GeoDataFrame(_edges_data, crs="EPSG:4326")
+
+        # 2. Run test.
+        _result_df, _result_id = nu.gdf_check_create_unique_ids(
+            _edges, _test_identifier
+        )
+
+        # 3. Verify final expectations.
+        assert _result_df.equals(_edges)
+        assert _result_id == _test_identifier
+
+    def test_with_not_unique_values_per_road_segment(self):
+        # 1. Define test data.
+        _new_id = "new_id_string"
+        _test_identifier = "columns_ids"
+        _edges_data = {
+            _test_identifier: ["first_edge", "first_edge"],
+            "geometry": [
+                LineString([[0, 0], [2, 0]]),
+                LineString([[2, 0], [3, 0]]),
+            ],
+        }
+        _edges = gpd.GeoDataFrame(_edges_data, crs="EPSG:4326")
+        assert _new_id not in _edges.keys()
+
+        # 2. Run test.
+        _result_df, _result_id = nu.gdf_check_create_unique_ids(
+            _edges, _test_identifier, _new_id
+        )
+
+        # 3. Verify final expectations.
+        assert _result_df.equals(_edges)
+        assert _result_id == _new_id
+        assert _new_id in _edges.keys()
+
+
+class TestGraphCheckCreateUniqueIds:
+    def test_with_valid_graph(self):
+        # 1. Define test data
+        _repeated_id = "test_edge"
+        _dumb_data = {"capacity": 42}
+        _graph = Graph(name="Test graph")
+        _graph.add_edges_from(
+            [(0, 0, _dumb_data), (1, 0, _dumb_data)], label="test_edge"
+        )
+        _graph.add_edges_from(
+            [(2, 0, _dumb_data), (3, 0, _dumb_data)], label="test_another_edge"
+        )
+
+        # 2. Run test
+        _return_graph, _return_id = nu.graph_check_create_unique_ids(
+            _graph, _repeated_id, "new_id_name"
+        )
+
+        # 3. Verify final expectations
+        assert _return_graph == _graph
+        assert _return_id == _repeated_id
