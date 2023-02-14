@@ -1,9 +1,9 @@
 import math
 
 import geopandas as gpd
+import networkx as nx
 import numpy as np
 import pytest
-from networkx import Graph, MultiGraph
 from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString, Point
 
@@ -323,21 +323,16 @@ class TestGdfCheckCreateUniqueIds:
 class TestGraphCheckCreateUniqueIds:
     def test_with_valid_graph(self):
         # 1. Define test data
-        _repeated_id = "test_edge"
-        _dumb_data = {"capacity": 42}
-        _graph = Graph(name="Test graph")
-        _graph.add_edges_from(
-            [(0, 0, _dumb_data), (1, 0, _dumb_data)], label="test_edge"
-        )
-        _graph.add_edges_from(
-            [(2, 0, _dumb_data), (3, 0, _dumb_data)], label="test_another_edge"
-        )
+        _graph = nx.MultiGraph()
+        _graph.add_edge(2, 3, weight=5)
+        _graph.add_edge(2, 1, weight=2)
+        _find_id = "weight"
 
         # 2. Run test
         _return_graph, _return_id = nu.graph_check_create_unique_ids(
-            _graph, _repeated_id, "new_id_name"
+            _graph, _find_id, "new_id_name"
         )
 
         # 3. Verify final expectations
         assert _return_graph == _graph
-        assert _return_id == _repeated_id
+        assert _return_id == _find_id

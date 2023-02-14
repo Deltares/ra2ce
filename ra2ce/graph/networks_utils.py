@@ -1008,6 +1008,7 @@ def graph_check_create_unique_ids(
     graph: Graph, idname: str, new_id_name: str = "rfid"
 ) -> Tuple[Graph, str]:
     """
+    TODO: This is not really being used. It could be removed.
     Check if the ID's are unique per edge: if not, add an own ID called 'fid'
 
     Args:
@@ -1026,7 +1027,7 @@ def graph_check_create_unique_ids(
         for u, v, k in graph.edges(keys=True):
             graph[u][v][k][new_id_name] = i
             i += 1
-        print(
+        logging.info(
             "Added a new unique identifier field {} because the original field '{}' did not contain unique values per road segment.".format(
                 new_id_name, idname
             )
