@@ -1088,7 +1088,7 @@ def simplify_graph_count(G_complex: nx.Graph) -> nx.Graph:
     return G_simple
 
 
-def read_geojson(geojson_file: Path):
+def read_geojson(geojson_file: Path) -> dict:
     """Read a GeoJSON file into a GeoJSON object.
     From the script get_rcm.py from Martijn Kwant.
     """

@@ -8,6 +8,7 @@ from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString, Point
 
 from ra2ce.graph import networks_utils as nu
+from tests import test_data
 
 
 class TestNetworkUtils:
@@ -366,6 +367,21 @@ class TestGraphCreateUniqueIds:
 
         # 3. Verify final expectations
         assert _return_graph == _graph
+
+
+class TestNetworksUtils:
+    def test_read_from_geojson(self):
+        # 1. Define test data.
+        _test_file = (
+            test_data / "acceptance_test_data" / "static" / "network" / "map.geojson"
+        )
+        assert _test_file.exists()
+
+        # 2. Run test
+        _return_value = nu.read_geojson(_test_file)
+
+        # 3. Verify expectations
+        assert isinstance(_return_value, dict)
 
 
 class TestAddMissingGeomsGraph:
