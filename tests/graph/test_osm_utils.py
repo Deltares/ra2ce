@@ -43,3 +43,20 @@ class TestOsmUtils:
         outfile = _input_dir / (polyfile.stem + "." + out_type)
         assert osm_convert_exe.exists()
         assert polyfile.exists()
+
+    def test_from_shapefile_to_poly(self, request: pytest.FixtureRequest):
+        # 1. Define test data.
+        _shp_file = (
+            test_data / "acceptance_test_data" / "static" / "network" / "origins.shp"
+        )
+        assert _shp_file.exists()
+        _output = test_results / request.node.name
+        if _output.exists():
+            shutil.rmtree(_output)
+        _output.mkdir(parents=True)
+
+        # 2. Run test.
+        from_shapefile_to_poly(_shp_file, _output)
+
+        # 3. Verify final expectations.
+        assert any(_output.glob("*"))
