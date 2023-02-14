@@ -1037,18 +1037,17 @@ def graph_check_create_unique_ids(
     return graph, idname
 
 
-def graph_create_unique_ids(graph, new_id_name="rfid"):
+def graph_create_unique_ids(graph: nx.Graph, new_id_name: str = "rfid") -> nx.Graph:
     # Check if new_id_name exists and if unique
     u, v, k = list(graph.edges)[0]
-    if new_id_name not in graph.edges[u, v, k]:
-        # TODO: decide if we always add a new ID (in iGraph this is different)
-        # if len(set([str(e[-1][new_id_name]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
-        for i, (u, v, k) in enumerate(graph.edges(keys=True)):
-            graph[u][v][k][new_id_name] = i + 1
-        logging.info("Added a new unique identifier field '{}'.".format(new_id_name))
+    if new_id_name in graph.edges[u, v, k]:
         return graph
-    else:
-        return graph
+    # TODO: decide if we always add a new ID (in iGraph this is different)
+    # if len(set([str(e[-1][new_id_name]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
+    for i, (u, v, k) in enumerate(graph.edges(keys=True)):
+        graph[u][v][k][new_id_name] = i + 1
+    logging.info("Added a new unique identifier field '{}'.".format(new_id_name))
+    return graph
 
 
 def add_missing_geoms_graph(graph, geom_name="geometry"):
