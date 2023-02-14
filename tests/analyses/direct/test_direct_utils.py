@@ -1,10 +1,16 @@
 from typing import Any
 
+import geopandas as gpd
 import numpy as np
 import pandas as pd
 import pytest
+from shapely.geometry import LineString
 
-from ra2ce.analyses.direct.direct_utils import clean_lane_data, lane_cleaner
+from ra2ce.analyses.direct.direct_utils import (
+    clean_lane_data,
+    create_summary_statistics,
+    lane_cleaner,
+)
 
 
 class TestDirectUtils:
@@ -57,3 +63,16 @@ class TestDirectUtils:
         assert len(_result_data) == 2
         assert _result_data[0] == 42
         assert _result_data[1] == 24
+
+    def test_create_summary_statistics(self):
+        # 1. Define test data.
+        _left_line = LineString([[0, 0], [1, 0], [2, 0]])
+        _right_line = LineString([[3, 0], [2, 1], [2, 2]])
+        _data = {"road_type": ["name1", "name2"], "geometry": [_left_line, _right_line], "lanes": [0, 1]}
+        _test_gdf = gpd.GeoDataFrame(_data, crs="EPSG:4326")
+
+        # 2. Run test.
+        result_dict = create_summary_statistics(_test_gdf)
+
+        # 3. Verify final expectations
+        assert isinstance(result_dict, dict)

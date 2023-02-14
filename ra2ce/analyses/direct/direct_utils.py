@@ -1,8 +1,9 @@
 import logging
-from typing import Any, List, Union
+from typing import Any, List
 
 import numpy as np
 import pandas as pd
+from geopandas import GeoDataFrame
 
 
 def clean_lane_data(lane_col: pd.Series) -> pd.Series:
@@ -84,7 +85,7 @@ def lane_cleaner(cell: Any) -> float:
     return np.nan
 
 
-def create_summary_statistics(gdf):
+def create_summary_statistics(gdf: GeoDataFrame) -> dict:
     """
     Return the mode (most frequent) #lanes of the available road types in the data
 
