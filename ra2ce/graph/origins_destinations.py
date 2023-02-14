@@ -12,10 +12,10 @@ import rasterio.mask
 import rasterio.transform
 from rasterio import Affine
 from rasterio.warp import Resampling, calculate_default_transform, reproject
-from shapely.geometry import LineString, MultiLineString, Point
+from shapely.geometry import Point
 from tqdm import tqdm
 
-from ra2ce.graph.networks_utils import line_length
+from ra2ce.graph.networks_utils import cut, line_length
 
 """
 TODO: This whole file should be throughouly tested / redesigned.
@@ -429,43 +429,6 @@ def split_line_with_points(line, points):
             segments.append(seg)
     segments.append(current_line)
     return segments
-
-
-def cut(line, distance):
-    # Cuts a line in two at a distance from its starting point
-    # This is taken from shapely manual
-    if (distance <= 0.0) | (distance >= line.length):
-        return [None, LineString(line)]
-
-    if isinstance(line, LineString):
-        coords = list(line.coords)
-        for i, p in enumerate(coords):
-            pd = line.project(Point(p))
-            if pd == distance:
-                return [LineString(coords[: i + 1]), LineString(coords[i:])]
-            if pd > distance:
-                cp = line.interpolate(distance)
-                # check if the LineString contains an Z-value, if so, remove
-                # only use XY because otherwise the snapping functionality doesn't work
-                return [
-                    LineString([xy[0:2] for xy in coords[:i]] + [(cp.x, cp.y)]),
-                    LineString([(cp.x, cp.y)] + [xy[0:2] for xy in coords[i:]]),
-                ]
-    elif isinstance(line, MultiLineString):
-        for ln in line:
-            coords = list(ln.coords)
-            for i, p in enumerate(coords):
-                pd = ln.project(Point(p))
-                if pd == distance:
-                    return [LineString(coords[: i + 1]), LineString(coords[i:])]
-                if pd > distance:
-                    cp = ln.interpolate(distance)
-                    # check if the LineString contains an Z-value, if so, remove
-                    # only use XY because otherwise the snapping functionality doesn't work
-                    return [
-                        LineString([xy[0:2] for xy in coords[:i]] + [(cp.x, cp.y)]),
-                        LineString([(cp.x, cp.y)] + [xy[0:2] for xy in coords[i:]]),
-                    ]
 
 
 #########################################################################################

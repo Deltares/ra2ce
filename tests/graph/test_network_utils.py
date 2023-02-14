@@ -366,3 +366,39 @@ class TestGraphCreateUniqueIds:
 
         # 3. Verify final expectations
         assert _return_graph == _graph
+
+
+class TestAddMissingGeomsGraph:
+    def test_with_valid_data(self):
+        # 1. Define test data
+        _graph = nx.MultiGraph()
+        _graph.add_node(1, x=0, y=0)
+        _graph.add_node(2, x=1, y=1)
+        _graph.add_edge(1, 2, x=0, y=0)
+        _geom_name = "geometry"
+
+        # 2. Run test
+        _return_graph = nu.add_missing_geoms_graph(_graph, _geom_name)
+
+        # 3. Verify final expectations
+        assert _return_graph == _graph
+        _items = list(_return_graph.edges.data(keys=True))
+        assert len(_items) == 1
+        _data = _items[0][-1]
+        assert isinstance(_data, dict)
+        assert isinstance(_data[_geom_name], LineString)
+
+
+class TestSimplyGraphCount:
+    def test_with_prebuilt_graph(self):
+        # 1. Define test data.
+        _graph = nx.complete_graph(42)
+
+        # 2. Run test.
+        _result = nu.simplify_graph_count(_graph)
+
+        # 3. Verify final expectations
+        assert _result == _graph
+
+
+        
