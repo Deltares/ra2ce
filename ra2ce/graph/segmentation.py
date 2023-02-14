@@ -80,14 +80,9 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
         divisor = Decimal(str(divisor))
         remainder = dividend % divisor
 
-        if remainder == Decimal("0"):
-            is_multiple = True
-            return is_multiple
-        else:
-            is_multiple = False
-            return is_multiple
+        return remainder == Decimal("0")
 
-    def number_of_segments(self, linestring, split_length):
+    def number_of_segments(self, linestring: LineString, split_length: float) -> int:
         """Returns the integer number of segments which will result from chopping up a linestring with split_length
 
         Args:
@@ -100,12 +95,10 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
 
         divisible = self.check_divisibility(linestring.length, split_length)
         if divisible:
-            n = int(linestring.length / split_length)
-        else:
-            n = int(linestring.length / split_length) + 1
-        return n
+            return int(linestring.length / split_length)
+        return int(linestring.length / split_length) + 1
 
-    def split_linestring(self, linestring, split_length):
+    def split_linestring(self, linestring: LineString, split_length: float):
         """Cuts a linestring in equivalent segments of length split_length
 
         Args:
