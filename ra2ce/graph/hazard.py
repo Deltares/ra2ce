@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on 31-8-2022
-"""
 import time
 from typing import List, Union
 

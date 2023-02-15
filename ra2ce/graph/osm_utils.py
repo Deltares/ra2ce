@@ -1,14 +1,3 @@
-"""
-Utils to proprocess OpenStreetMap data.
-
-Contains the preprocessing functions required for running the OSdaMage model. The functions are called from a Jupyter Notebook 'Preproc_split_OSM.ipynb'
-
-This code is maintained on a GitHub repository: github.com/keesvanginkel/OSdaMage
-
-@author: Elco Koks and Kees van ginkel
-"""
-
-import os
 from pathlib import Path
 
 import geopandas as gpd
@@ -23,6 +12,7 @@ def from_shapefile_to_poly(shapefile: Path, out_path: Path, outname: str = ""):
     .poly files can then be used to extract data from the openstreetmap files.
 
     This function is adapted from the OSMPoly function in QGIS, and Elco Koks GMTRA model.
+    This code is maintained on a GitHub repository: github.com/keesvanginkel/OSdaMage
 
     Arguments:
         *shapefile* (string/Pathlib Path) : path to the shapefile
@@ -32,9 +22,7 @@ def from_shapefile_to_poly(shapefile: Path, out_path: Path, outname: str = ""):
     Returns:
         .poly file for each region, in a new dir in the working directory (in the CRS of te input file)
     """
-    shapefile = str(shapefile)
-    out_path = str(out_path)
-    shapefile_GDF = gpd.read_file(shapefile)
+    shapefile_GDF = gpd.read_file(str(shapefile))
 
     num = 0
     # iterate over the seperate polygons in the shapefile
@@ -56,14 +44,14 @@ def from_shapefile_to_poly(shapefile: Path, out_path: Path, outname: str = ""):
             id_name = str(f.name)
 
             # start writing the .poly file
-            _polyname = out_path / (outname + id_name + ".poly")
-            with open(_polyname, "w") as _poly_file:
+            _poly_filename = out_path / (outname + id_name + ".poly")
+            with open(_poly_filename, "w") as _poly_file:
                 _poly_file.write(id_name + "\n")
                 i = 0
+
                 # loop over the different polygons, get their exterior and write the
                 # coordinates of the ring to the .poly file
                 for polygon in polygons:
-
                     polygon = np.array(polygon.exterior)
 
                     j = 0

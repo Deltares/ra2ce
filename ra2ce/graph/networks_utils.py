@@ -3,9 +3,9 @@ import logging
 import os
 import sys
 import warnings
-from decimal import Decimal
+from pathlib import Path
 from statistics import mean
-from typing import Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import geojson
 import geopandas as gpd
@@ -19,7 +19,7 @@ import rtree
 import tqdm
 import tqdm._tqdm_pandas
 from geopy import distance
-from networkx import set_edge_attributes
+from networkx import Graph, set_edge_attributes
 from osgeo import gdal
 from osmnx.simplification import simplify_graph
 from rasterio.features import shapes
@@ -51,299 +51,6 @@ def drawProgressBar(percent, barLen=20):
         "[{:<{}}] {:.0f}%".format("=" * int(barLen * percent), barLen, percent * 100)
     )
     sys.stdout.flush()
-
-
-def merge_lines_shpfiles(
-    lines_gdf: gpd.GeoDataFrame, idName: str, aadtNames: list, crs_: int
-) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
-    """Asks the user for input and possibly merges the LineStrings in a geodataframe (network)
-    Args:
-        lines_gdf (geodataframe): the network with edges that can possibly be merged
-        idName (string): name of the Unique ID column in the lines_gdf
-        aadtNames (list of strings): names of the columns of the AADT (average annual daily traffic)
-        crs_ (int): the EPSG number of the coordinate reference system that is used
-    Returns:
-        lines_gdf (geodataframe): the network with edges that are (not) merged
-        lines_merged (geodataframe): the lines that are merged, if lines are merged. Otherwise it returns an empty GDF
-    """
-    list_lines = list(lines_gdf["geometry"])
-
-    # Multilinestring to linestring
-    try:
-        merged_lines = linemerge(list_lines)  # merge the lines of both shapefiles
-    except NotImplementedError as e:
-        logging.error(
-            "Your data contains Multi-part geometries, you cannot merge lines. Error: {}".format(
-                e
-            )
-        )
-        return lines_gdf, gpd.GeoDataFrame()
-
-    while True:
-        try:
-            merge_input = str(
-                input(
-                    "\nSome of the lines can be merged. Do you want to merge these lines? Fill in 'y' to merge lines or 'n' to not merge lines.\nYour input: "
-                )
-            ).lower()
-            if merge_input == "y":
-                print("\nYou successfully chose to merge lines.")
-                break  # successfully received input --> continue below
-            elif merge_input == "n":
-                print("\nYou successfully chose not to merge lines.")
-                return lines_gdf, gpd.GeoDataFrame()  # successfully received input
-        except ValueError:
-            print("\nTry again to fill in 'y' or 'n' and press enter.")
-            continue
-
-    # continue
-    if len(merged_lines.geoms) < len(list_lines) and aadtNames:
-        # the number of merged lines is smaller than the number of lines in the input, so lines can be merged
-        while True:
-            try:
-                yes_to_all = str(
-                    input(
-                        """You can choose which AADT properties are chosen per road segment. Type 'all' if you want to treat all the cases the same or 'single' if you want to look at each case separately.\nYour input: """
-                    )
-                ).lower()
-            except ValueError:
-                print("\nTry again to fill in 'all' or 'single' and press enter.")
-                continue
-
-            if yes_to_all not in ["all", "single"]:
-                print("\nTry again to fill in 'all' or 'single' and press enter.")
-                continue
-            else:
-                print("\nYou successfully chose '{}'.".format(yes_to_all))
-                break  # successfully received input
-
-        if yes_to_all == "all":
-            # ask the user if they want to take the max, min or average for all values
-            while True:
-                try:
-                    all_type = str(
-                        input(
-                            """Choose the maximum, minimum or mean for the traffic type count in each merged line. Type 'max', 'min' or 'mean'.\nYour input: """
-                        )
-                    ).lower()
-                except ValueError:
-                    print(
-                        "\nTry again to fill in 'max', 'min' or 'mean' and press enter."
-                    )
-                    continue
-
-                if all_type not in ["max", "min", "mean"]:
-                    print(
-                        "\nTry again to fill in 'max', 'min' or 'mean' and press enter."
-                    )
-                    continue
-                else:
-                    print(
-                        "\nYou successfully chose '{}'.\nCalculating for all merged segments...".format(
-                            all_type
-                        )
-                    )
-                    break  # successfully received input
-
-    elif len(merged_lines.geoms) < len(list_lines) and not aadtNames:
-        while True:
-            try:
-                the_input = input(
-                    "\nDo you want to merge the lines on {}? Type 'y' for yes and 'n' for no.\nYour input: ".format(
-                        idName
-                    )
-                )
-                if the_input == "y":
-                    # merge by ID name
-                    lines_gdf = lines_gdf.dissolve(by=idName, aggfunc="max")
-                    lines_gdf.reset_index(inplace=True)
-                    break  # successfully received input
-                elif the_input == "n":
-                    break  # successfully received input
-            except ValueError:
-                print("\nTry again to fill in the correct letter.")
-    elif len(merged_lines.geoms) == len(list_lines):
-        print("No lines are merged.")
-        return lines_gdf, gpd.GeoDataFrame()
-    else:
-        # The lines have no additional properties.
-        return lines_gdf, gpd.GeoDataFrame()
-
-    # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
-    # The list of fid's is reduced by the fid's that are not anymore in the merged lines
-    lines_fids = list(
-        zip(list_lines, lines_gdf[idName])
-    )  # create tuples from the list of lines and the list of fid's
-    lines_merged = gpd.GeoDataFrame(
-        columns=[idName, "geometry"], crs=crs_, geometry="geometry"
-    )
-    merged = gpd.GeoDataFrame(
-        columns=[idName, "geometry"], crs=crs_, geometry="geometry"
-    )
-
-    for mline in merged_lines:
-        for line, i in lines_fids:
-            full_line = line
-            if line.within(mline) and not line.equals(mline):
-                # if the line is within the merged line but is not the same, the line is part of a merged line
-                line_set_merged = [line]
-                fid_set_merged = [i]
-
-                if aadtNames:
-                    aadts_set_merged = [
-                        lines_gdf[lines_gdf[idName] == i][aadtNames].iloc[0].tolist()
-                    ]
-                else:
-                    aadts_set_merged = []
-
-                while not full_line.equals(mline):
-                    for line2, j in lines_fids:
-                        if (
-                            line2.within(mline)
-                            and not line2.equals(mline)
-                            and line != line2
-                        ):
-                            line_set_merged.append(line2)
-                            fid_set_merged.append(j)
-                            if aadtNames:
-                                aadts_set_merged.append(
-                                    lines_gdf[lines_gdf[idName] == i][aadtNames]
-                                    .iloc[0]
-                                    .tolist()
-                                )
-
-                            lines_fids.remove(
-                                (line2, j)
-                            )  # remove the lines that have been through the iteration so there are no duplicates
-                    full_line = linemerge(line_set_merged)
-                lines_fids.remove(
-                    (line, i)
-                )  # remove the lines that have been through the iteration so there are no duplicates
-                lines_merged = lines_merged.append(
-                    {idName: i, "geometry": full_line}, ignore_index=True
-                )  # the lines in this list are the same lines that make up the merged line
-
-                # check with the user the right traffic count for the merged lines
-                if aadts_set_merged:  # check if the list is not empty
-                    aadts_set_merged = [
-                        i for i in aadts_set_merged if not all(v is None for v in i)
-                    ]
-                    if len(aadts_set_merged) > 1 and isinstance(
-                        aadts_set_merged[0], list
-                    ):
-                        if yes_to_all == "all":
-                            if all_type == "max":
-                                aadts_set_merged = [
-                                    max(sublist)
-                                    for sublist in list(
-                                        map(list, zip(*aadts_set_merged))
-                                    )
-                                ]
-                            elif all_type == "min":
-                                aadts_set_merged = [
-                                    min(sublist)
-                                    for sublist in list(
-                                        map(list, zip(*aadts_set_merged))
-                                    )
-                                ]
-                            elif all_type == "mean":
-                                aadts_set_merged = [
-                                    mean(sublist)
-                                    for sublist in list(
-                                        map(list, zip(*aadts_set_merged))
-                                    )
-                                ]
-                        elif yes_to_all == "single":
-                            t = []
-                            # remove pretty table
-                            # t = PrettyTable()
-                            # t.add_column('index', list(range(1, len(aadts_set_merged) + 1)))
-                            # t.add_column('AADT vehicle types', aadts_set_merged)
-
-                            while True:
-                                try:
-                                    aadt_input = input(
-                                        """Road segment with id's {} is merged. Choose the right values for the AADT by entering the number indicated before the list of AADT values and pressing enter.\nYou can also choose 'max', 'min' or 'mean' for all values of the merged road segment.\nThe options: \n {} \n Your input: """.format(
-                                            fid_set_merged, t
-                                        )
-                                    )
-                                    if aadt_input.isdigit():
-                                        aadts_set_merged = aadts_set_merged[
-                                            int(aadt_input) - 1
-                                        ]
-                                    elif aadt_input in ["max", "min", "mean"]:
-                                        first, second = aadts_set_merged
-                                        if aadt_input == "max":
-                                            aadts_set_merged = [
-                                                max([i, j])
-                                                for i, j in list(zip(first, second))
-                                            ]
-                                        elif aadt_input == "min":
-                                            aadts_set_merged = [
-                                                min([i, j])
-                                                for i, j in list(zip(first, second))
-                                            ]
-                                        elif aadt_input == "mean":
-                                            aadts_set_merged = [
-                                                mean([i, j])
-                                                for i, j in list(zip(first, second))
-                                            ]
-                                except ValueError:
-                                    print(
-                                        "\nTry again to fill in one of the index values or 'max', 'min' or 'mean' and press enter."
-                                    )
-                                    continue
-                                else:
-                                    print(
-                                        "\nYou successfully chose '{}': {}.".format(
-                                            aadt_input, aadts_set_merged
-                                        )
-                                    )
-                                    break
-
-                # add values to the dataframe
-                this_fid = [x[0] if isinstance(x, list) else x for x in fid_set_merged][
-                    0
-                ]  # take the first feature ID for the merged lines
-
-                # initiate dict for new row in merged gdf
-                properties_dict = {idName: this_fid, "geometry": mline}
-
-                if aadtNames:
-                    if isinstance(aadts_set_merged[0], list):
-                        this_aadts = aadts_set_merged[0]
-                    else:
-                        this_aadts = aadts_set_merged
-
-                    # update dict for new row in merged gdf
-                    properties_dict.update(
-                        {a: aadt_val for a, aadt_val in zip(aadtNames, this_aadts)}
-                    )
-
-                # append row to merged gdf
-                merged = merged.append(properties_dict, ignore_index=True)
-
-            elif line.equals(mline):
-                # this line is not merged
-                properties_dict = {idName: i, "geometry": mline}
-
-                if aadtNames:
-                    properties_dict.update(
-                        {
-                            a: aadt_val
-                            for a, aadt_val in zip(
-                                aadtNames,
-                                lines_gdf.loc[lines_gdf[idName] == i][aadtNames].iloc[
-                                    0
-                                ],
-                            )
-                        }
-                    )
-                merged = merged.append(properties_dict, ignore_index=True)
-
-    merged["length"] = merged["geometry"].apply(lambda x: line_length(x, crs_))
-
-    return merged, lines_merged
 
 
 def merge_lines_automatic(
@@ -554,15 +261,16 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
                     ]
                 )
             else:
-                logging.warning(
+                logging.error(
                     "The road strech is not a Shapely LineString or MultiLineString so the length cannot be computed."
                     "Please check your data network data."
                 )
+                return np.nan
         except:
             logging.error(
                 "The CRS is not EPSG:4326. Quit the analysis, reproject the layer to EPSG:4326 and try again to run the tool."
             )
-            quit()
+            return np.nan
     elif crs.is_projected:
         ## line length of projected linestrings
         if isinstance(line, LineString):
@@ -570,10 +278,11 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
         elif isinstance(line, MultiLineString):
             total_length = line.length
         else:
-            logging.warning(
+            logging.error(
                 "The road strech is not a Shapely LineString or MultiLineString so the length cannot be computed."
                 "Please check your data network data."
             )
+            return np.nan
     return round(total_length, 0)
 
 
@@ -750,12 +459,10 @@ def nearest_neighbor_within(
     return closest_point
 
 
-def vertices_from_lines(lines, listIds):
+def vertices_from_lines(lines, listIds) -> dict:
     """Return dict of with values: unique vertices from list of LineStrings.
     keys: index of LineString in original list
     From shapely_tools:
-        @author: Dirk Eilander (dirk.eilander@deltares.nl)
-        Adjusted 15-10-2019: Frederique de Groen (frederique.degroen@deltares.nl)
         Build on library from https://github.com/ojdo/python-tools/blob/master/shapelytools.py
     """
     vertices_dict = {}
@@ -962,7 +669,7 @@ def split_line_with_points(line, points):
     return segments
 
 
-def cut(line, distance):
+def cut(line, distance) -> Tuple[LineString, LineString]:
     # Cuts a line in two at a distance from its starting point
     # This is taken from shapely manual
     if (distance <= 0.0) | (distance >= line.length):
@@ -999,49 +706,9 @@ def cut(line, distance):
                     ]
 
 
-# def prune_lines(lines, prune_threshold):
-#
-#    # create nodes on intersections and on lines that should be snapped
-#    inters = []
-#    for line1,line2 in itertools.combinations(lines, 2):
-#        # Make points at intersections of lines
-#        if line1.intersects(line2):
-#            inter = line1.intersection(line2)
-#            if "Point" == inter.type:
-#                segments1 = split_line_with_points(line1, [inter])
-#                segments2 = split_line_with_points(line2, [inter])
-#
-#
-#            elif "MultiPoint" == inter.type:
-#                inters.extend([pt for pt in inter])
-#            elif "MultiLineString" == inter.type:
-#                multiLine = [line for line in inter]
-#                first_coords = multiLine[0].coords[0]
-#                last_coords = multiLine[len(multiLine)-1].coords[1]
-#                inters.append(Point(first_coords[0], first_coords[1]))
-#                inters.append(Point(last_coords[0], last_coords[1]))
-#            elif "GeometryCollection" == inter.type:
-#                for geom in inter:
-#                    if "Point" == geom.type:
-#                        inters.append(geom)
-#                    elif "MultiPoint" == geom.type:
-#                        inters.extend([pt for pt in geom])
-#                    elif "MultiLineString" == geom.type:
-#                        multiLine = [line for line in geom]
-#                        first_coords = multiLine[0].coords[0]
-#                        last_coords = multiLine[len(multiLine)-1].coords[1]
-#                        inters.append(Point(first_coords[0], first_coords[1]))
-#                        inters.append(Point(last_coords[0], last_coords[1]))
-#    # prune lines
-#    if pruning:
-#        # from m to km
-#        prune_threshold = prune_threshold / 1000
-#
-#        # remove the segments shorter than prune_threshold meter
-#        new_lines = [line for line in new_lines if line.length > prune_threshold]
-
-
-def join_nodes_edges(gdf_nodes, gdf_edges, idName):
+def join_nodes_edges(
+    gdf_nodes: gpd.GeoDataFrame, gdf_edges: gpd.GeoDataFrame, idName: str
+) -> gpd.GeoDataFrame:
     """Creates tuples from the adjecent nodes and add as column in geodataframe.
     Args:
         gdf_nodes [geodataframe]: geodataframe of the nodes of a graph
@@ -1261,8 +928,16 @@ def hazard_join_id_shp(roads, HazardDataDict):
     return roads
 
 
-# Delete duplicate points
-def delete_duplicates(all_points):
+def delete_duplicates(all_points: List[Point]) -> List[Point]:
+    """
+    Delete duplicate points given they are 'almost' equals.
+
+    Args:
+        all_points (List[Point]): List with potentially repeated points.
+
+    Returns:
+        List[Point]: List with unique points.
+    """
     points = [point for point in all_points]
     uniquepoints = []
     for point in points:
@@ -1271,7 +946,7 @@ def delete_duplicates(all_points):
     return uniquepoints
 
 
-def create_simplified_graph(graph_complex, new_id="rfid"):
+def create_simplified_graph(graph_complex, new_id: str = "rfid"):
     """Create a simplified graph with unique ids from a complex graph"""
     logging.info("Simplifying graph")
     try:
@@ -1299,26 +974,51 @@ def create_simplified_graph(graph_complex, new_id="rfid"):
     return graph_simple, graph_complex, id_tables
 
 
-def gdf_check_create_unique_ids(gdf, id_name, new_id_name="rfid"):
-    # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
+def gdf_check_create_unique_ids(
+    gdf: gpd.GeoDataFrame, id_name: str, new_id_name: str = "rfid"
+) -> Tuple[gpd.GeoDataFrame, str]:
+    """
+    Check if the ID's are unique per edge: if not, add an own ID called 'fid'
+
+    Args:
+        gdf (gpd.GeoDataFrame): Dataframe with edges to check.
+        id_name (str): ID to search for uniqueness.
+        new_id_name (str, optional): Optinal new id name to give. Defaults to "rfid".
+
+    Returns:
+        Tuple[gpd.GeoDataFrame, str]: Resulting dataframe and its ID.
+    """
     check = list(gdf.index)
     logging.info("Started creating unique ids...")
     if len(gdf[id_name].unique()) == len(check):
         logging.info("Using the user-defined identifier field {}.".format(id_name))
         return gdf, id_name
-    else:
-        gdf[new_id_name] = check
-        logging.warning(
-            "Added a new unique identifier field {} because the original field '{}' "
-            "did not contain unique values per road segment."
-            "For further network processing, change the 'file_id' parameter in the network.ini file"
-            "to '{}".format(new_id_name, id_name, new_id_name)
-        )
-        return gdf, new_id_name
+
+    gdf[new_id_name] = check
+    logging.warning(
+        "Added a new unique identifier field {} because the original field '{}' "
+        "did not contain unique values per road segment."
+        "For further network processing, change the 'file_id' parameter in the network.ini file"
+        "to '{}".format(new_id_name, id_name, new_id_name)
+    )
+    return gdf, new_id_name
 
 
-def graph_check_create_unique_ids(graph, idname, new_id_name="rfid"):
-    # Check if the ID's are unique per edge: if not, add an own ID called 'fid'
+def graph_check_create_unique_ids(
+    graph: Graph, idname: str, new_id_name: str = "rfid"
+) -> Tuple[Graph, str]:
+    """
+    TODO: This is not really being used. It could be removed.
+    Check if the ID's are unique per edge: if not, add an own ID called 'fid'
+
+    Args:
+        graph (Graph): Graph to prune from repeated ids.
+        idname (str): ID to search.
+        new_id_name (str, optional): Optional new id to set for repeated elements. Defaults to "rfid".
+
+    Returns:
+        Tuple[Graph, str]: Resulting graph and used ID.
+    """
     if len(set([str(e[-1][idname]) for e in graph.edges.data(keys=True)])) < len(
         graph.edges()
     ):
@@ -1327,31 +1027,30 @@ def graph_check_create_unique_ids(graph, idname, new_id_name="rfid"):
         for u, v, k in graph.edges(keys=True):
             graph[u][v][k][new_id_name] = i
             i += 1
-        print(
+        logging.info(
             "Added a new unique identifier field {} because the original field '{}' did not contain unique values per road segment.".format(
                 new_id_name, idname
             )
         )
         return graph, new_id_name
-    else:
-        return graph, idname
+
+    return graph, idname
 
 
-def graph_create_unique_ids(graph, new_id_name="rfid"):
+def graph_create_unique_ids(graph: nx.Graph, new_id_name: str = "rfid") -> nx.Graph:
     # Check if new_id_name exists and if unique
     u, v, k = list(graph.edges)[0]
-    if new_id_name not in graph.edges[u, v, k]:
-        # TODO: decide if we always add a new ID (in iGraph this is different)
-        # if len(set([str(e[-1][new_id_name]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
-        for i, (u, v, k) in enumerate(graph.edges(keys=True)):
-            graph[u][v][k][new_id_name] = i + 1
-        logging.info("Added a new unique identifier field '{}'.".format(new_id_name))
+    if new_id_name in graph.edges[u, v, k]:
         return graph
-    else:
-        return graph
+    # TODO: decide if we always add a new ID (in iGraph this is different)
+    # if len(set([str(e[-1][new_id_name]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
+    for i, (u, v, k) in enumerate(graph.edges(keys=True)):
+        graph[u][v][k][new_id_name] = i + 1
+    logging.info("Added a new unique identifier field '{}'.".format(new_id_name))
+    return graph
 
 
-def add_missing_geoms_graph(graph, geom_name="geometry"):
+def add_missing_geoms_graph(graph: nx.Graph, geom_name: str = "geometry") -> nx.Graph:
     # Not all nodes have geometry attributed (some only x and y coordinates) so add a geometry columns
     nodes_without_geom = [
         n[0] for n in graph.nodes(data=True) if geom_name not in n[-1]
@@ -1370,7 +1069,7 @@ def add_missing_geoms_graph(graph, geom_name="geometry"):
     return graph
 
 
-def simplify_graph_count(G_complex):
+def simplify_graph_count(G_complex: nx.Graph) -> nx.Graph:
     # Simplify the graph topology and log the change in nr of nodes and edges.
     old_len_nodes = G_complex.number_of_nodes()
     old_len_edges = G_complex.number_of_edges()
@@ -1389,7 +1088,7 @@ def simplify_graph_count(G_complex):
     return G_simple
 
 
-def read_geojson(geojson_file):
+def read_geojson(geojson_file: Path) -> dict:
     """Read a GeoJSON file into a GeoJSON object.
     From the script get_rcm.py from Martijn Kwant.
     """
@@ -1397,7 +1096,9 @@ def read_geojson(geojson_file):
         return geojson.load(f)
 
 
-def graph_from_gdf(gdf, gdf_nodes, name="network", node_id="ID"):
+def graph_from_gdf(
+    gdf: gpd.GeoDataFrame, gdf_nodes, name: str = "network", node_id: str = "ID"
+) -> nx.MultiGraph:
     # create a Graph object
     G = nx.MultiGraph(crs=gdf.crs)
 
@@ -1843,179 +1544,6 @@ def add_simple_id_to_graph_complex(G_complex, complex_to_simple, new_id):
     return G_complex
 
 
-class Segmentation:  # Todo: more naturally, this would be METHOD of the network class.
-    """cut the edges in the complex geodataframe to segments of equal lengths or smaller
-    # output will be the cut edges_complex
-
-    Variables:
-        *self.edges_input* (Geopandas DataFrame) : the edges that are to be segmented
-        *self.segmentation_length* (float) : segmentation lenght in degrees #Todo also in meters?
-        *self.save_files* (Boolean) : save segmented graph?
-
-    Result:
-        *self.edges_segmented* (Geopandas DataFrame) : the segmented edges dataframe
-
-
-    """
-
-    def __init__(self, edges_input, segmentation_length, save_files=False):
-        # General
-        self.edges_input = edges_input  # Edges GeoDataFrame
-        self.edges_segmented = (
-            None  # This is where the result will be saved Edges GeoDataframe
-        )
-        self.segmentation_length = segmentation_length
-        self.save_files = save_files  # Todo not implemented yet
-
-    def apply_segmentation(self):
-        self.cut_gdf()
-        logging.info(
-            "Finished segmenting the geodataframe with split length: {} degree".format(
-                self.segmentation_length
-            )
-        )
-        return self.edges_segmented
-
-    def cut(self, line, distance):
-        """Cuts a line in two at a distance from its starting point
-
-        Args:
-            line (LineString): Single linestring.
-            distance (float): Distance from starting point of linestring
-
-        Returns:
-            (list): A list containing two shapely linestring objects.
-        """
-
-        if distance <= 0.0 or distance >= line.length:
-            return [LineString(line)]
-        coords = list(line.coords)
-        for i, p in enumerate(coords):
-            pd = line.project(Point(p))
-            if pd == distance:
-                return [LineString(coords[: i + 1]), LineString(coords[i:])]
-            if pd > distance:
-                cp = line.interpolate(distance)
-                return [
-                    LineString(coords[:i] + [(cp.x, cp.y)]),
-                    LineString([(cp.x, cp.y)] + coords[i:]),
-                ]
-
-    def check_divisibility(self, dividend, divisor):
-        """Checks if the dividend is a multiple of the divisor and outputs a boolean value
-
-        Args:
-            dividend (float): The number which is divided
-            divisor (float): The number which divides
-
-        Returns:
-            is_multiple (bool): True if the dividend is a multiple of the divisor, False if not
-        """
-
-        dividend = Decimal(str(dividend))
-        divisor = Decimal(str(divisor))
-        remainder = dividend % divisor
-
-        if remainder == Decimal("0"):
-            is_multiple = True
-            return is_multiple
-        else:
-            is_multiple = False
-            return is_multiple
-
-    def number_of_segments(self, linestring, split_length):
-        """Returns the integer number of segments which will result from chopping up a linestring with split_length
-
-        Args:
-            linestring (LineString): Single linestring.
-            split_length (float): The length by which to divide the linestring object.
-
-        Returns:
-            n (int): Integer number of segments which will result from splitting linestring with split_length.
-        """
-
-        divisible = self.check_divisibility(linestring.length, split_length)
-        if divisible:
-            n = int(linestring.length / split_length)
-        else:
-            n = int(linestring.length / split_length) + 1
-        return n
-
-    def split_linestring(self, linestring, split_length):
-        """Cuts a linestring in equivalent segments of length split_length
-
-        Args:
-            linestring (LineString): Single linestring.
-            split_length (float): Length by which to split the linestring into equal segments.
-
-        Returns:
-            result_list (list): List of LineString objects that all have the same length split_lenght.
-        """
-
-        n_segments = self.number_of_segments(linestring, split_length)
-        if n_segments != 1:
-            result_list = [None] * n_segments
-            current_right_linestring = linestring
-
-            for i in range(0, n_segments - 1):
-                r = cut(
-                    current_right_linestring, split_length
-                )  # Can accidently return Nonetypes
-                if not r is None:
-                    current_left_linestring = r[0]
-                    current_right_linestring = r[1]
-                    result_list[i] = current_left_linestring
-                    result_list[i + 1] = current_right_linestring
-                else:
-                    # Sometimes the remainder is so small that it is only one point, which cannot be cut, in that case
-                    # just pass #Todo: maybe we can do something here to avoid this error
-                    pass
-
-        else:
-            result_list = [linestring]
-
-        # Make sure this  function does not return any None objects, because these will cause problems later
-        result_list = [
-            x
-            for x in result_list
-            if (type(x) == LineString or type(x) == MultiLineString)
-        ]
-
-        return result_list
-
-    def cut_gdf(self):
-        """
-        Cuts every linestring or multilinestring feature in a gdf to equal length segments. Assumes only linestrings for now.
-
-            *gdf* (GeoDataFrame) : GeoDataFrame to split
-            *length* (units of the projection) : Typically in degrees, 0.001 degrees ~ 111 m in Europe
-        """
-        gdf = self.edges_input.copy()
-        columns = gdf.columns
-
-        data = {"splt_id": []}
-
-        for column in columns:
-            data[column] = []
-
-        count = 0
-        for i, row in gdf.iterrows():
-            geom = row["geometry"]
-            assert type(geom) == LineString or type(geom) == MultiLineString
-            leeg = geom.is_empty
-            linestrings = self.split_linestring(geom, self.segmentation_length)
-
-            for j, linestring in enumerate(linestrings):
-                for key, value in row.items():
-                    if key == "geometry":
-                        data[key].append(linestring)
-                    else:
-                        data[key].append(value)
-                data["splt_id"].append(count)
-                count += 1
-        self.edges_segmented = gpd.GeoDataFrame(data)
-
-
 def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
     """Calculates the average speed from OSM roads, per road type
 
@@ -2275,12 +1803,6 @@ def check_crs_gdf(gdf: gpd.GeoDataFrame, crs) -> None:
             )
         )
         sys.exit()
-
-
-def set_analysis_value(gdf: gpd.GeoDataFrame, analyse: int = 1) -> gpd.GeoDataFrame:
-    """ "Set analysis to 1 for main analysis and 0 for diversion network"""
-    gdf["analyse"] = analyse
-    return gdf
 
 
 def clean_memory(list_delete: list) -> None:
