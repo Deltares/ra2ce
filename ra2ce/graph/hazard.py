@@ -1,6 +1,6 @@
 import logging
 import time
-from typing import List, Tuple, Union
+from typing import Any, List, Tuple, Union
 
 import geopandas as gpd
 import networkx as nx
@@ -74,8 +74,6 @@ class Hazard:
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             # Validate input
             # Check if network and raster overlap
-            extent = ntu.get_extent(gdal.Open(str(self.hazard_files["tif"][i])))
-
             extent_graph = gdf.total_bounds
             extent_graph = (
                 extent_graph[0],
@@ -83,20 +81,7 @@ class Hazard:
                 extent_graph[1],
                 extent_graph[3],
             )
-            extent_hazard = (
-                extent["minX"],
-                extent["maxX"],
-                extent["minY"],
-                extent["maxY"],
-            )
-
-            if not ntu.bounds_intersect_2d(extent_graph, extent_hazard):
-                logging.info(
-                    "Raster extent: {}, Graph extent: {}".format(extent, extent_graph)
-                )
-                raise ValueError(
-                    f"The hazard raster '{hn}' and the network geometries do not overlap, please check the hazard and network input data."
-                )
+            self._validate_extent_graph(extent_graph, i)
 
             tqdm.pandas(desc="Network hazard overlay with " + hn)
             flood_stats = gdf.geometry.progress_apply(
@@ -118,6 +103,32 @@ class Hazard:
             )
         return gdf
 
+    def _get_edges_geoms(self, graph: nx.Graph) -> List[Any]:
+        # Get all edge geometries
+        return [
+            (u, v, k, edata)
+            for u, v, k, edata in graph.edges.data(keys=True)
+            if "geometry" in edata
+        ]
+
+    def _validate_extent_graph(self, extent_graph, n_idx: int):
+        # Check if the hazard and graph extents overlap
+        extent = ntu.get_extent(gdal.Open(str(self.hazard_files["tif"][n_idx])))
+        extent_hazard = (
+            extent["minX"],
+            extent["maxX"],
+            extent["minY"],
+            extent["maxY"],
+        )
+
+        if not ntu.bounds_intersect_2d(extent_graph, extent_hazard):
+            logging.info(
+                "Raster extent: {}, Graph extent: {}".format(extent, extent_graph)
+            )
+            raise ValueError(
+                "The hazard raster and the graph geometries do not overlap, check projection"
+            )
+
     def overlay_hazard_raster_graph(
         self, graph: nx.classes.graph.Graph
     ) -> nx.classes.graph.Graph:
@@ -137,33 +148,11 @@ class Hazard:
         extent_graph = ntu.get_graph_edges_extent(graph)
 
         # Get all edge geometries
-        edges_geoms = [
-            (u, v, k, edata)
-            for u, v, k, edata in graph.edges.data(keys=True)
-            if "geometry" in edata
-        ]
+        edges_geoms = self._get_edges_geoms(graph)
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             # Check if the hazard and graph extents overlap
-            extent = ntu.get_extent(gdal.Open(str(self.hazard_files["tif"][i])))
-            extent_hazard = (
-                extent["minX"],
-                extent["maxX"],
-                extent["minY"],
-                extent["maxY"],
-            )
-
-            if ntu.bounds_intersect_2d(extent_graph, extent_hazard):
-                pass
-
-            else:
-                logging.info(
-                    "Raster extent: {}, Graph extent: {}".format(extent, extent_graph)
-                )
-                raise ValueError(
-                    "The hazard raster and the graph geometries do not overlap, check projection"
-                )
-
+            self._validate_extent_graph(extent_graph, i)
             # Add a no-data value for the edges that do not have a geometry
             nx.set_edge_attributes(
                 graph,
@@ -337,32 +326,11 @@ class Hazard:
         od_ids = [n[0] for n in od_nodes]
 
         # Get all edge geometries
-        edges_geoms = [
-            (u, v, k, edata)
-            for u, v, k, edata in graph.edges.data(keys=True)
-            if "geometry" in edata
-        ]
+        edges_geoms = self._get_edges_geoms(graph)
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             # Check if the hazard and graph extents overlap
-            extent = ntu.get_extent(gdal.Open(str(self.hazard_files["tif"][i])))
-            extent_hazard = (
-                extent["minX"],
-                extent["maxX"],
-                extent["minY"],
-                extent["maxY"],
-            )
-
-            if ntu.bounds_intersect_2d(extent_graph, extent_hazard):
-                pass
-
-            else:
-                logging.info(
-                    "Raster extent: {}, Graph extent: {}".format(extent, extent_graph)
-                )
-                raise ValueError(
-                    "The hazard raster and the graph geometries do not overlap, check projection"
-                )
+            self._validate_extent_graph(extent_graph, i)
 
             # Read the hazard values at the nodes and write to the nodes.
             tqdm.pandas(desc="Destinations hazard overlay with " + hn)
