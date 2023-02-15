@@ -480,9 +480,11 @@ class OriginClosestDestination:
                 name_save,
                 optimal_routes,
                 origins,
+                base_graph,
+                destinations,
             )
 
-            if _new_origins:
+            if not (_new_origins is None):
                 origins = _new_origins
                 self.get_nr_without_access(origins, list_no_path)
 
@@ -522,9 +524,11 @@ class OriginClosestDestination:
         name_save: str,
         optimal_routes: str,
         origins,
+        base_graph,
+        destinations,
     ) -> Optional[gpd.GeoDataFrame]:
         """
-        Refactored method to avoid duplication of code between `_find_optimal_routes` and `find_multiple_closest_locations` with subtile differences:
+        Refactored method to avoid duplication of code between `find_closest_location` and `find_multiple_closest_locations` with subtile differences:
         - The first would not use a `dest_name` attribute.
         - The second one would use 'ndat["closest"]' instead of the assigned 'closest_dest'
 
@@ -691,6 +695,8 @@ class OriginClosestDestination:
                     name_save,
                     optimal_routes,
                     origins,
+                    base_graph,
+                    destinations,
                 )
 
                 if _new_origins:
