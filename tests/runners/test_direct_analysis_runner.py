@@ -43,3 +43,16 @@ class TestDirectAnalysisRunner:
 
         # 3. Verify expectations.
         assert not _result
+
+    def test_given_no_network_config_returns_false(self):
+        # 1. Define test data.
+        _input_config = DummyRa2ceInput()
+        assert _input_config
+        _input_config.analysis_config.config_data["direct"] = "sth"
+        _input_config.network_config = None
+
+        # 2. Run test.
+        _result = DirectAnalysisRunner.can_run(_input_config)
+
+        # 3. Verify expectations.
+        assert not _result

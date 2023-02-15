@@ -3,8 +3,6 @@ import pandas as pd
 import pytest
 
 from ra2ce.analyses.direct.damage_calculation import DamageNetworkEvents
-from tests.analyses.direct import gdf_test_direct_damage as road_gdf
-from tests.analyses.direct import gdf_test_direct_damage_correct as gdf_correct
 
 
 class TestDirectAnalyses:
