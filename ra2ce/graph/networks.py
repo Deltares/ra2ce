@@ -1,9 +1,16 @@
 import logging
+import os
 from typing import Any, List, Tuple
 
+import geopandas as gpd
+import networkx as nx
+import osmnx
+import pandas as pd
 import pyproj
+from shapely.geometry import MultiLineString
 
-from ra2ce.graph.networks_utils import *
+import ra2ce.graph.networks_utils as nut
+from ra2ce.graph.segmentation import Segmentation
 from ra2ce.io.readers import GraphPickleReader
 from ra2ce.io.writers import JsonExporter
 from ra2ce.io.writers.network_exporter_factory import NetworkExporterFactory
@@ -88,7 +95,7 @@ class Network:
         # The list of fid's is reduced by the fid's that are not anymore in the merged lines
         if self.config["cleanup"]["merge_lines"]:
             aadt_names = None
-            edges, lines_merged = merge_lines_automatic(
+            edges, lines_merged = nut.merge_lines_automatic(
                 lines, self.config["network"]["file_id"], aadt_names, crs
             )
             logging.info(
@@ -99,12 +106,12 @@ class Network:
         else:
             edges, lines_merged = lines, gpd.GeoDataFrame()
 
-        edges, id_name = gdf_check_create_unique_ids(
+        edges, id_name = nut.gdf_check_create_unique_ids(
             edges, self.config["network"]["file_id"]
         )
 
         if self.snapping is not None:
-            edges = snap_endpoints_lines(edges, self.snapping, id_name, crs)
+            edges = nut.snap_endpoints_lines(edges, self.snapping, id_name, crs)
             logging.info(
                 "Function [snap_endpoints_lines]: executed with threshold = {}".format(
                     self.snapping
@@ -133,10 +140,12 @@ class Network:
             )
 
         # Get the unique points at the end of lines and at intersections to create nodes
-        nodes = create_nodes(edges, crs, self.config["cleanup"]["cut_at_intersections"])
+        nodes = nut.create_nodes(
+            edges, crs, self.config["cleanup"]["cut_at_intersections"]
+        )
         logging.info("Function [create_nodes]: executed")
 
-        edges = cut_lines(
+        edges = nut.cut_lines(
             edges, nodes, id_name, tolerance=0.00001, crs_=crs
         )  ## PAY ATTENTION TO THE TOLERANCE, THE UNIT IS DEGREES
         logging.info("Function [cut_lines]: executed")
@@ -145,7 +154,7 @@ class Network:
             edges.crs = crs
 
         # create tuples from the adjecent nodes and add as column in geodataframe
-        edges_complex = join_nodes_edges(nodes, edges, id_name)
+        edges_complex = nut.join_nodes_edges(nodes, edges, id_name)
         edges_complex.crs = crs  # set the right CRS
 
         assert (
@@ -156,7 +165,7 @@ class Network:
         ), "Some edges cannot be assigned nodes, please check your input shapefile."
 
         # Create networkx graph from geodataframe
-        graph_complex = graph_from_gdf(edges_complex, nodes, node_id="node_fid")
+        graph_complex = nut.graph_from_gdf(edges_complex, nodes, node_id="node_fid")
         logging.info("Function [graph_from_gdf]: executed")
 
         if self.segmentation_length is not None:
@@ -231,7 +240,7 @@ class Network:
         # tempfix to rename columns
         edges = edges.rename({"from_id": "node_A", "to_id": "node_B"}, axis="columns")
         node_id = "id"
-        graph_simple = graph_from_gdf(edges, nodes, name="network", node_id=node_id)
+        graph_simple = nut.graph_from_gdf(edges, nodes, name="network", node_id=node_id)
 
         logging.info("TRAILS importer: graph generating was succesfull.")
         logging.warning(
@@ -264,10 +273,10 @@ class Network:
             graph_simple (NetworkX graph): Simplified graph (for use in the indirect analyses).
             complex_edges (GeoDataFrame): Complex graph (for use in the direct analyses).
         """
-        poly_dict = read_geojson(
+        poly_dict = nut.read_geojson(
             self.config["network"]["polygon"][0]
         )  # It can only read in one geojson
-        poly = geojson_to_shp(poly_dict)
+        poly = nut.geojson_to_shp(poly_dict)
 
         if not self.config["network"]["road_types"]:
             # The user specified only the network type.
@@ -305,13 +314,13 @@ class Network:
         )
 
         # Create 'graph_simple'
-        graph_simple, graph_complex, link_tables = create_simplified_graph(
+        graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
             graph_complex
         )
 
         # Create 'edges_complex', convert complex graph to geodataframe
         logging.info("Start converting the graph to a geodataframe")
-        edges_complex, node_complex = graph_to_gdf(graph_complex)
+        edges_complex, node_complex = nut.graph_to_gdf(graph_complex)
         logging.info("Finished converting the graph to a geodataframe")
 
         # Save the link tables linking complex and simple IDs
@@ -422,7 +431,7 @@ class Network:
         if isinstance(self.config["network"]["diversion_file"], str):
             lines.extend(
                 [
-                    check_crs_gdf(gpd.read_file(shp), crs_)
+                    nut.check_crs_gdf(gpd.read_file(shp), crs_)
                     for shp in shapefiles_diversion
                 ]
             )
@@ -446,7 +455,7 @@ class Network:
             lines = lines.drop(labels=mls_idx, axis=0)
 
         # append the length of the road stretches
-        lines["length"] = lines["geometry"].apply(lambda x: line_length(x, crs_))
+        lines["length"] = lines["geometry"].apply(lambda x: nut.line_length(x, crs_))
 
         logging.info(
             "Shapefile(s) loaded with attributes: {}.".format(
@@ -465,13 +474,13 @@ class Network:
             if path_avg_speed.is_file():
                 avg_speeds = pd.read_csv(path_avg_speed)
             else:
-                avg_speeds = calc_avg_speed(
+                avg_speeds = nut.calc_avg_speed(
                     G,
                     "highway",
                     save_csv=True,
                     save_path=self.config["static"] / "output_graph" / "avg_speed.csv",
                 )
-            G = assign_avg_speed(G, avg_speeds, "highway")
+            G = nut.assign_avg_speed(G, avg_speeds, "highway")
 
             # make a time value of seconds, length of road streches is in meters
             for u, v, k, edata in G.edges.data(keys=True):
@@ -550,20 +559,20 @@ class Network:
             if self.config["network"]["source"] == "OSM download":
                 # Graph & Network from OSM download
                 # Check if all geometries between nodes are there, if not, add them as a straight line.
-                base_graph = add_missing_geoms_graph(base_graph, geom_name="geometry")
+                base_graph = nut.add_missing_geoms_graph(base_graph, geom_name="geometry")
 
             # Set the road lengths to meters for both the base_graph and network_gdf
             # TODO: rename "length" column to "length [m]" to be explicit
             edges_lengths_meters = {
                 (e[0], e[1], e[2]): {
-                    "length": line_length(e[-1]["geometry"], self.base_graph_crs)
+                    "length": nut.line_length(e[-1]["geometry"], self.base_graph_crs)
                 }
                 for e in base_graph.edges.data(keys=True)
             }
             nx.set_edge_attributes(base_graph, edges_lengths_meters)
 
             network_gdf["length"] = network_gdf["geometry"].apply(
-                lambda x: line_length(x, self.base_network_crs)
+                lambda x: nut.line_length(x, self.base_network_crs)
             )
 
             if self.config["network"]["source"] == "OSM download":
