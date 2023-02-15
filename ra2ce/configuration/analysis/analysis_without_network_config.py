@@ -3,10 +3,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-import geopandas as gpd
-
 from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData, NetworkConfig
-from ra2ce.io.readers import GraphPickleReader
 
 
 class AnalysisWithoutNetworkConfiguration(AnalysisConfigBase):
@@ -45,43 +42,10 @@ class AnalysisWithoutNetworkConfiguration(AnalysisConfigBase):
         _new_analysis_config.config_data["files"] = config_data.files
         return _new_analysis_config
 
-    def _read_graphs_from_config(self) -> dict:
-        _graphs = {}
-        _pickle_reader = GraphPickleReader()
-        _static_output_dir = self.config_data["static"] / "output_graph"
-
-        # Load graphs
-        # FIXME: why still read hazard as neccessary if analysis of single link redundancy can run wihtout hazard?
-        for input_graph in ["base_graph", "origins_destinations_graph"]:
-            filename = _static_output_dir / f"{input_graph}.p"
-            if filename.is_file():
-                _graphs[input_graph] = _pickle_reader.read(filename)
-            else:
-                _graphs[input_graph] = None
-
-            filename = _static_output_dir / f"{input_graph}_hazard.p"
-            if filename.is_file():
-                _graphs[input_graph + "_hazard"] = _pickle_reader.read(filename)
-            else:
-                _graphs[input_graph + "_hazard"] = None
-
-        # Load networks
-        filename = _static_output_dir / f"base_network.feather"
-        if filename.is_file():
-            _graphs["base_network"] = gpd.read_feather(filename)
-        else:
-            _graphs["base_network"] = None
-
-        filename = _static_output_dir / f"base_network_hazard.feather"
-        if filename.is_file():
-            _graphs["base_network_hazard"] = gpd.read_feather(filename)
-        else:
-            _graphs["base_network_hazard"] = None
-
-        return _graphs
-
     def configure(self) -> None:
-        self.graphs = self._read_graphs_from_config()
+        self.graphs = NetworkConfig.read_graphs_from_config(
+            self.config_data["static"] / "output_graph"
+        )
         self.initialize_output_dirs()
 
     def is_valid(self) -> bool:
