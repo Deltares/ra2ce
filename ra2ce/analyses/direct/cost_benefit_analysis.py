@@ -244,7 +244,9 @@ class EffectivenessMeasures:
 
         return df_total
 
-    def calculate_cost_reduction(self, df, effectiveness_dict):
+    def calculate_cost_reduction(
+        self, df: pd.DataFrame, effectiveness_dict: dict
+    ) -> pd.DataFrame:
         """This function calculates the yearly costs and possible reduction"""
 
         strategies = [strategy for strategy in effectiveness_dict]

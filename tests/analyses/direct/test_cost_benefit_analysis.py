@@ -6,6 +6,11 @@ from ra2ce.analyses.direct.cost_benefit_analysis import EffectivenessMeasures
 from tests import test_data
 
 
+class MockEffectivenessMeasures(EffectivenessMeasures):
+    def __init__(self, config, analysis):
+        pass
+
+
 class TestCostBenefitAnalysis:
     def test_init_raises_when_file_name_not_defined(self):
         _config = {"input": test_data}
@@ -196,3 +201,64 @@ class TestCostBenefitAnalysis:
 
         # 3. Verify expectations.
         assert isinstance(_costs, pd.DataFrame)
+
+    @pytest.mark.skip(
+        reason="TODO: Is this being used? NPV is deprecated and won't run calc_npv."
+    )
+    def test_calculate_cost_benefit_analyses(self):
+        # 1. Define test data.
+        _measures = MockEffectivenessMeasures(None, None)
+        _measures.evaluation_period = 1
+        _measures.climate_factor = 24
+        _measures.interest_rate = 0.42
+        _effectiveness_dict = {
+            "col_1": {
+                "strategy": [42],
+                "investment": 2.4,
+                "lifespan": 1.0,
+                "dichtbij": 0.42,
+                "ver_hoger": 4.2,
+                "hwa_afw_ho": 42,
+                "gw_hwa": 2.4,
+                "slope_0015": 24,
+                "slope_001": 0.1,
+            },
+            "1": {
+                "lifespan": 1.0,
+            },
+            "2": {
+                "lifespan": 1.0,
+            },
+        }
+
+        # 2. Run test.
+        _measures.cost_benefit_analysis(_effectiveness_dict)
+
+    def test_calculate_cost_reduction(self):
+        # 1. Define test data.
+        _measures = MockEffectivenessMeasures(None, None)
+        _measures.return_period = 1
+        _measures.repair_costs = 24
+        _measures.interest_rate = 0.42
+        _effectiveness_dict = {}
+        df_data = {
+            "coefficient": 4.2,
+            "repair_costs_standard": [2.4],
+            "standard_gevoelig_sum": [42],
+            "standard_gevoelig_max": [42.24],
+            "return_period": [0.42],
+            "blockage_costs_standard": [1.24],
+            "blockage_costs": [1.42],
+            "yearly_repair_costs_standard": [1.42],
+            "repair_costs_standard": [2.42],
+            "yearly_blockage_costs_standard": [2.42],
+            "max_effectiveness_standard": [1],
+            "total_costs_standard": [2],
+        }
+        _dataframe = pd.DataFrame(df_data)
+
+        # 2. Run test.
+        _return_df = _measures.calculate_cost_reduction(_dataframe, _effectiveness_dict)
+
+        # 3. Verify expectations
+        assert isinstance(_return_df, pd.DataFrame)
