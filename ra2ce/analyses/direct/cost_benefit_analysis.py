@@ -20,41 +20,33 @@ class EffectivenessMeasures:
         self.btw = 1.21  # VAT multiplication factor to include taxes
 
         # perform checks on input while initializing class
+        self._validate_input_params(self.analysis, self.config)
+
+    def _validate_input_params(self, analysis: dict, config: dict) -> None:
         if analysis["file_name"] is None:
-            logging.error(
-                "Effectiveness of measures calculation:... No input file configured. "
-                "Please define an input file in the analysis.ini file "
-            )
-            quit()
+            _error = "Effectiveness of measures calculation: No input file configured. Please define an input file in the analysis.ini file."
+            logging.error(_error)
+            raise ValueError(_error)
         elif analysis["file_name"].split(".")[1] != "shp":
-            logging.error(
-                "Effectiveness of measures calculation:... Wrong input file configured. "
-                "Extension of input file is -{}-, needs to be -shp- (shapefile)".format(
-                    analysis["file_name"].split(".")[1]
-                )
+            _error = "Effectiveness of measures calculation: Wrong input file configured. Extension of input file is -{}-, needs to be -shp- (shapefile)".format(
+                analysis["file_name"].split(".")[1]
             )
-            quit()
-        elif (
-            os.path.exists(config["input"] / "direct" / analysis["file_name"]) is False
-        ):
-            logging.error(
-                "Effectiveness of measures calculation:... Input file doesnt exist..."
-                " please place file in the following folder: {}".format(
-                    config["input"] / "direct"
-                )
+            logging.error(_error)
+            raise ValueError(_error)
+        elif not (config["input"] / "direct" / analysis["file_name"]).exists():
+            _error = "Effectiveness of measures calculation: Input file doesn't exist please place file in the following folder: {}".format(
+                config["input"] / "direct"
             )
-            quit()
-        elif (
-            os.path.exists(config["input"] / "direct" / "effectiveness_measures.csv")
-            is False
-        ):
-            logging.error(
-                "Effectiveness of measures calculation:... lookup table with effectiveness of measures doesnt exist..."
-                " Please place the effectiveness_measures.csv file in the following folder: {}".format(
-                    config["input"] / "direct"
-                )
+            logging.error(_error)
+            raise FileNotFoundError(config["input"] / "direct" / analysis["file_name"])
+        elif not (config["input"] / "direct" / "effectiveness_measures.csv").exists():
+            _error = "Effectiveness of measures calculation: lookup table with effectiveness of measures doesnt exist. Please place the effectiveness_measures.csv file in the following folder: {}".format(
+                config["input"] / "direct"
             )
-            quit()
+            logging.error(_error)
+            raise FileNotFoundError(
+                config["input"] / "direct" / "effectiveness_measures.csv"
+            )
 
     @staticmethod
     def load_effectiveness_table(path):
@@ -111,7 +103,7 @@ class EffectivenessMeasures:
         return df
 
     @staticmethod
-    def knmi_correction(df, duration=60):
+    def knmi_correction(df: pd.DataFrame, duration: int = 60) -> pd.DataFrame:
         """This function corrects the length of each segment depending on a KNMI factor.
         This factor is calculated using an exponential relation and was calculated using an analysis on all line elements
         a relation is establisched for a 10 minute or 60 minute rainfall period
@@ -119,8 +111,9 @@ class EffectivenessMeasures:
         max 0.26 en 0.17
         """
         if duration not in [10, 60]:
-            logging.error("Wrong duration configured, has to be 10 or 60")
-            quit()
+            _error_mssg = "Wrong duration configured, has to be 10 or 60"
+            logging.error(_error_mssg)
+            raise ValueError(_error_mssg)
         logging.info(
             "Applying knmi length correction with duration of rainfall of -{}- minutes".format(
                 duration
@@ -140,7 +133,9 @@ class EffectivenessMeasures:
         return df
 
     @staticmethod
-    def calculate_effectiveness(df, name="standard"):
+    def calculate_effectiveness(
+        df: pd.DataFrame, name: str = "standard"
+    ) -> pd.DataFrame:
         """This function calculates effectiveness, based on a number of columns:
         'dichtbij_m', 'ver_hoger_m', 'hwa_afw_ho_m', 'gw_hwa_m', slope_0015_m' and 'slope_001_m'
         and contains the following steps:
@@ -249,7 +244,9 @@ class EffectivenessMeasures:
 
         return df_total
 
-    def calculate_cost_reduction(self, df, effectiveness_dict):
+    def calculate_cost_reduction(
+        self, df: pd.DataFrame, effectiveness_dict: dict
+    ) -> pd.DataFrame:
         """This function calculates the yearly costs and possible reduction"""
 
         strategies = [strategy for strategy in effectiveness_dict]
@@ -365,13 +362,13 @@ class EffectivenessMeasures:
         return df_cba, costs_dict
 
     @staticmethod
-    def calculate_strategy_costs(df, costs_dict):
+    def calculate_strategy_costs(df: pd.DataFrame, costs_dict: dict):
         """Method to calculate costs, benefits with net present value"""
 
         costs = costs_dict["costs"]
         columns = costs_dict["on_column"]
 
-        def columns_check(df, columns):
+        def columns_check(df, columns) -> bool:
             cols_check = []
             for col in columns:
                 cols_check.extend(columns[col].split(";"))
@@ -379,14 +376,12 @@ class EffectivenessMeasures:
 
             if any([True for col in cols_check if col not in df_cols]):
                 cols = [col for col in cols_check if col not in df_cols]
-                logging.error(
-                    "Wrong column configured in effectiveness_measures csv file. column {} is not available in imported sheet.".format(
-                        cols
-                    )
+                _error_mssg = "Wrong column configured in effectiveness_measures csv file. column {} is not available in imported sheet.".format(
+                    cols
                 )
-                quit()
-            else:
-                return True
+                logging.error(_error_mssg)
+                raise ValueError(_error_mssg)
+            return True
 
         columns_check(df, columns)
         strategies = {col: columns[col].split(";") for col in columns}
