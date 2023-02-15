@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, List, Optional, Protocol
+from typing import Any, List, Optional, Protocol, runtime_checkable
 
 from ra2ce.configuration.ini_config_protocol import IniConfigDataProtocol
 
 
+@runtime_checkable
 class ConfigProtocol(Protocol):
     ini_file: Path
     root_dir: Path
