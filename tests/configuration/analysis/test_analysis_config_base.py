@@ -1,3 +1,5 @@
+import shutil
+
 import pytest
 
 from ra2ce.configuration.analysis.analysis_config_base import AnalysisConfigBase
@@ -41,7 +43,8 @@ class TestAnalysisConfigBase:
             "indirect": [{"analysis": "test_indirect"}],
             "output": _output_dir,
         }
-        assert not _output_dir.exists()
+        if _output_dir.exists():
+            shutil.rmtree(_output_dir)
 
         # 2. Run test
         _analysis.initialize_output_dirs()
