@@ -1,13 +1,10 @@
 import logging
 import time
-from pathlib import Path
 
 import geopandas as gpd
 
 from ra2ce.analyses.direct.cost_benefit_analysis import EffectivenessMeasures
-from ra2ce.analyses.direct.damage.damage_fraction_uniform import DamageFractionUniform
 from ra2ce.analyses.direct.damage.manual_damage_functions import ManualDamageFunctions
-from ra2ce.analyses.direct.damage.max_damage import MaxDamageByRoadTypeByLane
 from ra2ce.analyses.direct.damage_calculation import (
     DamageNetworkEvents,
     DamageNetworkReturnPeriods,
@@ -214,30 +211,6 @@ def save_gdf(gdf, save_path):
 
     gdf.to_file(save_path, driver="ESRI Shapefile", encoding="utf-8")
     logging.info("Results saved to: {}".format(save_path))
-
-
-# Todo: these should be moved
-def test_construct_max_damage():
-    max_damage = MaxDamageByRoadTypeByLane()
-    path = Path(
-        r"D:\Python\ra2ce\data\1010b_zuid_holland\input\damage_function\test\huizinga_max_damage.csv"
-    )
-    max_damage.from_csv(path, sep=";")
-    return max_damage
-
-
-def test_construct_damage_fraction():
-    damage_fraction = DamageFractionUniform()
-    path = Path(
-        r"D:\Python\ra2ce\data\1010b_zuid_holland\input\damage_function\test\huizinga_damage_fraction_hazard_severity.csv"
-    )
-    damage_fraction.from_csv(path, sep=";")
-    return damage_fraction
-
-
-# max_damage = test_construct_max_damage()
-
-# max_damage = test_construct_damage_fraction()
 
 
 def rename_road_gdf_to_conventions(road_gdf_columns):
