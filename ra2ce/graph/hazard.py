@@ -1,9 +1,16 @@
+import logging
 import time
-from typing import List, Union
+from typing import List, Tuple, Union
 
+import geopandas as gpd
+import networkx as nx
+import numpy as np
+import pandas as pd
+import pyproj
+from osgeo import gdal
 from rasterstats import point_query, zonal_stats
 
-from ra2ce.graph.networks_utils import *
+import ra2ce.graph.networks_utils as ntu
 from ra2ce.io.readers import GraphPickleReader
 from ra2ce.io.writers.network_exporter_factory import NetworkExporterFactory
 
@@ -54,7 +61,7 @@ class Hazard:
 
         # Make sure none of the geometries is a nonetype object (this will raise an error in zonal_stats)
         empty_entries = gdf.loc[gdf.geometry.isnull()]
-        if not len(empty_entries) == 0:
+        if any(empty_entries):
             logging.warning(
                 (
                     "Some geometries have NoneType objects (no coordinate information), namely: {}.".format(
@@ -67,7 +74,7 @@ class Hazard:
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             # Validate input
             # Check if network and raster overlap
-            extent = get_extent(gdal.Open(str(self.hazard_files["tif"][i])))
+            extent = ntu.get_extent(gdal.Open(str(self.hazard_files["tif"][i])))
 
             extent_graph = gdf.total_bounds
             extent_graph = (
@@ -83,7 +90,7 @@ class Hazard:
                 extent["maxY"],
             )
 
-            if not bounds_intersect_2d(extent_graph, extent_hazard):
+            if not ntu.bounds_intersect_2d(extent_graph, extent_hazard):
                 logging.info(
                     "Raster extent: {}, Graph extent: {}".format(extent, extent_graph)
                 )
@@ -98,7 +105,7 @@ class Hazard:
                     str(self.hazard_files["tif"][i]),
                     all_touched=True,
                     stats="min max",
-                    add_stats={"mean": get_valid_mean},
+                    add_stats={"mean": ntu.get_valid_mean},
                 )
             )
             gdf[rn + "_mi"] = [x[0]["min"] for x in flood_stats]
@@ -107,7 +114,7 @@ class Hazard:
 
             tqdm.pandas(desc="Network fraction with hazard overlay with " + hn)
             gdf[rn + "_fr"] = gdf.geometry.progress_apply(
-                lambda x: fraction_flooded(x, str(self.hazard_files["tif"][i]))
+                lambda x: ntu.fraction_flooded(x, str(self.hazard_files["tif"][i]))
             )
         return gdf
 
@@ -127,7 +134,7 @@ class Hazard:
 
         # Verify the graph type (networkx)
         assert type(graph).__module__.split(".")[0] == "networkx"
-        extent_graph = get_graph_edges_extent(graph)
+        extent_graph = ntu.get_graph_edges_extent(graph)
 
         # Get all edge geometries
         edges_geoms = [
@@ -138,7 +145,7 @@ class Hazard:
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             # Check if the hazard and graph extents overlap
-            extent = get_extent(gdal.Open(str(self.hazard_files["tif"][i])))
+            extent = ntu.get_extent(gdal.Open(str(self.hazard_files["tif"][i])))
             extent_hazard = (
                 extent["minX"],
                 extent["maxX"],
@@ -146,7 +153,7 @@ class Hazard:
                 extent["maxY"],
             )
 
-            if bounds_intersect_2d(extent_graph, extent_hazard):
+            if ntu.bounds_intersect_2d(extent_graph, extent_hazard):
                 pass
 
             else:
@@ -178,7 +185,7 @@ class Hazard:
                         x,
                         str(self.hazard_files["tif"][i]),
                         all_touched=True,
-                        add_stats={"mean": get_valid_mean},
+                        add_stats={"mean": ntu.get_valid_mean},
                     )
                 )
             else:
@@ -212,7 +219,7 @@ class Hazard:
             # Get the fraction of the road that is intersecting with the hazard
             tqdm.pandas(desc="Graph fraction with hazard overlay with " + hn)
             graph_fraction_flooded = gdf.geometry.progress_apply(
-                lambda x: fraction_flooded(x, str(self.hazard_files["tif"][i]))
+                lambda x: ntu.fraction_flooded(x, str(self.hazard_files["tif"][i]))
             )
             graph_fraction_flooded = graph_fraction_flooded.fillna(0)
             nx.set_edge_attributes(
@@ -323,7 +330,7 @@ class Hazard:
         ## Intersect the origin and destination nodes with the hazard map (now only geotiff possible)
         # Verify the graph type (networkx)
         assert type(graph).__module__.split(".")[0] == "networkx"
-        extent_graph = get_graph_edges_extent(graph)
+        extent_graph = ntu.get_graph_edges_extent(graph)
 
         # Get all node geometries
         od_nodes = [(n, ndata) for n, ndata in graph.nodes.data() if "od_id" in ndata]
@@ -338,7 +345,7 @@ class Hazard:
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             # Check if the hazard and graph extents overlap
-            extent = get_extent(gdal.Open(str(self.hazard_files["tif"][i])))
+            extent = ntu.get_extent(gdal.Open(str(self.hazard_files["tif"][i])))
             extent_hazard = (
                 extent["minX"],
                 extent["maxX"],
@@ -346,7 +353,7 @@ class Hazard:
                 extent["maxY"],
             )
 
-            if bounds_intersect_2d(extent_graph, extent_hazard):
+            if ntu.bounds_intersect_2d(extent_graph, extent_hazard):
                 pass
 
             else:
@@ -419,7 +426,7 @@ class Hazard:
             # Get the fraction of the road that is intersecting with the hazard
             tqdm.pandas(desc="OD graph fraction with hazard overlay with " + hn)
             graph_fraction_flooded = gdf.geometry.progress_apply(
-                lambda x: fraction_flooded(x, str(self.hazard_files["tif"][i]))
+                lambda x: ntu.fraction_flooded(x, str(self.hazard_files["tif"][i]))
             )
             graph_fraction_flooded = graph_fraction_flooded.fillna(0)
             nx.set_edge_attributes(
@@ -478,11 +485,11 @@ class Hazard:
         Returns:
 
         """
-        gdf, gdf_nodes = graph_to_gdf(graph, save_nodes=True)
+        gdf, gdf_nodes = ntu.graph_to_gdf(graph, save_nodes=True)
         gdf = self.join_hazard_table_gdf(gdf)
 
         # TODO: Check if the graph is created again correctly.
-        graph = graph_from_gdf(gdf, gdf_nodes)
+        graph = ntu.graph_from_gdf(gdf, gdf_nodes)
         return graph
 
     def join_table(
@@ -657,10 +664,10 @@ class Hazard:
         self, G: nx.classes.graph.Graph, in_crs: pyproj.CRS, out_crs: pyproj.CRS
     ) -> nx.classes.graph.Graph:
         """Reproject networkX graph"""
-        extent_graph = get_graph_edges_extent(G)
+        extent_graph = ntu.get_graph_edges_extent(G)
         logging.info("Graph extent before reprojecting: {}".format(extent_graph))
-        graph_reprojected = reproject_graph(G, in_crs, out_crs)
-        extent_graph_reprojected = get_graph_edges_extent(graph_reprojected)
+        graph_reprojected = ntu.reproject_graph(G, in_crs, out_crs)
+        extent_graph_reprojected = ntu.get_graph_edges_extent(graph_reprojected)
         logging.info(
             "Graph extent after reprojecting: {}".format(extent_graph_reprojected)
         )
@@ -764,7 +771,7 @@ class Hazard:
                     )
 
                     # Clean up memory
-                    clean_memory([graph_reprojected, base_graph_hazard_reprojected])
+                    ntu.clean_memory([graph_reprojected, base_graph_hazard_reprojected])
                 else:
                     self.graphs["base_graph_hazard"] = self.hazard_intersect(graph)
 
@@ -838,7 +845,7 @@ class Hazard:
                     ods = ods_hazard_reprojected.to_crs(ods.crs)
 
                     # Clean up memory
-                    clean_memory(
+                    ntu.clean_memory(
                         [
                             graph_reprojected,
                             od_graph_hazard_reprojected,
