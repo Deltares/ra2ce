@@ -105,34 +105,35 @@ class NetworkConfig(ConfigProtocol):
     def root_dir(self) -> Path:
         return self.get_network_root_dir(self.ini_file)
 
-    def _read_graphs_from_config(self) -> dict:
+    @staticmethod
+    def read_graphs_from_config(static_output_dir: Path) -> dict:
         _graphs = {}
         _pickle_reader = GraphPickleReader()
-        _static_output_dir = self.config_data["static"] / "output_graph"
-
+        if not static_output_dir.exists():
+            raise ValueError("Path does not exist: {}".format(static_output_dir))
         # Load graphs
         # FIXME: why still read hazard as neccessary if analysis of single link redundancy can run wihtout hazard?
         for input_graph in ["base_graph", "origins_destinations_graph"]:
-            filename = _static_output_dir / f"{input_graph}.p"
+            filename = static_output_dir / f"{input_graph}.p"
             if filename.is_file():
                 _graphs[input_graph] = _pickle_reader.read(filename)
             else:
                 _graphs[input_graph] = None
 
-            filename = _static_output_dir / f"{input_graph}_hazard.p"
+            filename = static_output_dir / f"{input_graph}_hazard.p"
             if filename.is_file():
                 _graphs[input_graph + "_hazard"] = _pickle_reader.read(filename)
             else:
                 _graphs[input_graph + "_hazard"] = None
 
         # Load networks
-        filename = _static_output_dir / f"base_network.feather"
+        filename = static_output_dir / f"base_network.feather"
         if filename.is_file():
             _graphs["base_network"] = gpd.read_feather(filename)
         else:
             _graphs["base_network"] = None
 
-        filename = _static_output_dir / f"base_network_hazard.feather"
+        filename = static_output_dir / f"base_network_hazard.feather"
         if filename.is_file():
             _graphs["base_network_hazard"] = gpd.read_feather(filename)
         else:
@@ -147,7 +148,9 @@ class NetworkConfig(ConfigProtocol):
     def configure_hazard(self) -> None:
         # Call Hazard Handler (to rework)
         if not self.graphs:
-            self.graphs = self._read_graphs_from_config()
+            self.graphs = self.read_graphs_from_config(
+                self.config_data["static"] / "output_graph"
+            )
         self.graphs = hazard_handler(self.config_data, self.graphs, self.files)
 
     def is_valid(self) -> bool:
