@@ -484,7 +484,7 @@ class OriginClosestDestination:
                 destinations,
             )
 
-            if not (_new_origins is None):
+            if _new_origins is not None:
                 origins = _new_origins
                 self.get_nr_without_access(origins, list_no_path)
 
@@ -522,7 +522,7 @@ class OriginClosestDestination:
         pref_routes: gpd.GeoDataFrame,
         dest_name: str,
         name_save: str,
-        optimal_routes: str,
+        optimal_routes: list,
         origins,
         base_graph,
         destinations,
@@ -699,7 +699,7 @@ class OriginClosestDestination:
                     destinations,
                 )
 
-                if _new_origins:
+                if _new_origins is not None:
                     origins = _new_origins
                     self.get_nr_without_access(origins, list_no_path, f" {dest_name}")
 
