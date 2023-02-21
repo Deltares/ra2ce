@@ -41,7 +41,7 @@ class Losses:
         return vlh
 
     def calc_vlh(
-        self, traffic_data: pd.DataFrame, vehicle_loss_hours, detour_data
+        self, traffic_data: pd.DataFrame, vehicle_loss_hours: pd.Series, detour_data: pd.DataFrame
     ) -> pd.DataFrame:
         vlh = pd.DataFrame(
             index=traffic_data.index,
