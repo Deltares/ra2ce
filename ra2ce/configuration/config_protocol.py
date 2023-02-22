@@ -7,7 +7,7 @@ from ra2ce.configuration.ini_config_protocol import IniConfigDataProtocol
 
 
 @runtime_checkable
-class ConfigProtocol(Protocol):
+class ConfigProtocol(Protocol):  # pragma: no cover
     ini_file: Path
     root_dir: Path
     config_data: Optional[IniConfigDataProtocol] = None

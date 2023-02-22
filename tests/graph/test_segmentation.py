@@ -30,13 +30,26 @@ class TestSegmentation:
         assert len(_result) == 1
         assert isinstance(_result[0], LineString)
 
-    def test_cut_with_valid_distance(self):
+    def test_cut_with_projected_line_equals_distance(self):
         # 1. Define test data.
         _segmentation = Segmentation(None, None, False)
         _line = LineString([[0, 0], [1, 0], [2, 0]])
 
         # 2. Run test.
         _result = _segmentation.cut(_line, _line.length / 2)
+
+        # 3. Verify final expectations.
+        assert len(_result) == 2
+        assert all(isinstance(_r, LineString) for _r in _result)
+
+    def test_cut_with_projected_line_greater_than_distance(self):
+        # 1. Define test data.
+        _segmentation = Segmentation(None, None, False)
+        _line = LineString([[0, 0], [1, 1], [2, 2]])
+        _distance = 1.0
+
+        # 2. Run test.
+        _result = _segmentation.cut(_line, _distance)
 
         # 3. Verify final expectations.
         assert len(_result) == 2
@@ -65,4 +78,15 @@ class TestSegmentation:
 
         # 3. Verify expectations
         assert _return_value == segments
-   
+
+    def test_split_linestring_nsegments_is_one(self):
+        # 1. Define test data.
+        _segmentation = Segmentation(None, None, False)
+        _line = LineString([[0, 0], [1, 0], [2, 0]])
+        _length = 2
+
+        # 2. Run test.
+        _return_value = _segmentation.split_linestring(_line, _length)
+
+        # 3. Verify expectations
+        assert _return_value == [_line]

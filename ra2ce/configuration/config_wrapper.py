@@ -31,16 +31,13 @@ class ConfigWrapper:
             logging.error("No valid analyses.ini file provided. Program will close.")
             return False
 
-        _root_analysis = self.analysis_config.root_dir
-        if not _root_analysis.is_dir():
-            logging.error(f"Path {_root_analysis} does not exist.")
-            return False
-
         if self.network_config and not self.network_config.is_valid():
             logging.error("No valid network.ini file provided. Program will close.")
             return False
 
-        if self.network_config and (_root_analysis != self.network_config.root_dir):
+        if self.network_config and (
+            self.analysis_config.root_dir != self.network_config.root_dir
+        ):
             logging.error(
                 "Root directory differs between network and analyses .ini files"
             )
