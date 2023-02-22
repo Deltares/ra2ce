@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 
-class IniConfigDataProtocol(dict):
+class IniConfigDataProtocol(dict):  # pragma: no cover
     """
     IniConfigProtocol, for now it's a dictionary until we start mapping its entries to real properties.
     Then we will transform it into a protocol.
