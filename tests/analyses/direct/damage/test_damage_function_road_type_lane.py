@@ -13,8 +13,7 @@ class TestDamageFunctionByRoadTypeByLane:
         _damage_test_data = (
             test_data
             / "direct_damage"
-            / "test_damage_functions"
-            / "test_damage_function_byroadtype_bylane"
+            / "no_files"
         )
         # 2. Run test.
         with pytest.raises(ValueError) as exc_err:
