@@ -1806,6 +1806,9 @@ def check_crs_gdf(gdf: gpd.GeoDataFrame, crs) -> None:
 
 
 def clean_memory(list_delete: list) -> None:
+    """
+    TODO: Not sure why this method is here, is this even working?
+    """
     for to_delete in list_delete:
         del to_delete
 
