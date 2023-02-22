@@ -19,11 +19,12 @@ class DamageNetworkBase(ABC):
         """Construct the Data"""
         self.val_cols = val_cols
         self.gdf = road_gdf
+        # set of hazard info per event
         self.stats = set(
             [x.split("_")[-1] for x in val_cols]
-        )  # set of hazard info per event
-        # Todo: also trakc the damage cols after the dam calculation, that is useful for the risk calc. module
-        # Todo: also create constructors of the childs of this class
+        ) 
+        # TODO: also track the damage cols after the dam calculation, that is useful for the risk calc. module
+        # TODO: also create constructors of the childs of this class
 
     @abstractmethod
     def main(self, damage_function: str, manual_damage_functions):
