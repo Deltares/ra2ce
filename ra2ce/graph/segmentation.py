@@ -117,16 +117,15 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
             for i in range(0, n_segments - 1):
                 r = network_cut(
                     current_right_linestring, split_length
-                )  # Can accidently return Nonetypes
+                )  
+                # Can accidently return Nonetypes
                 if not r is None:
                     current_left_linestring = r[0]
                     current_right_linestring = r[1]
                     result_list[i] = current_left_linestring
                     result_list[i + 1] = current_right_linestring
-                else:
-                    # Sometimes the remainder is so small that it is only one point, which cannot be cut, in that case
-                    # just pass #Todo: maybe we can do something here to avoid this error
-                    pass
+                # Sometimes the remainder is so small that it is only one point, which cannot be cut, in that case
+                # just pass #Todo: maybe we can do something here to avoid this error
 
         else:
             result_list = [linestring]
