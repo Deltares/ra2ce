@@ -4,6 +4,12 @@ from typing import Optional
 import pytest
 
 from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
+from ra2ce.configuration.analysis.analysis_ini_config_data import (
+    AnalysisWithNetworkIniConfigData,
+)
+from ra2ce.configuration.analysis.analysis_without_network_config import (
+    AnalysisWithoutNetworkConfiguration,
+)
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from tests import test_data
 
@@ -60,3 +66,95 @@ class TestConfigWrapper:
 
         # 2. Run test
         assert not _input_config.is_valid_input()
+
+    def test_is_valid_input_given_invalid_network_config(self):
+        class MockedAnalysis(AnalysisConfigBase):
+            def is_valid(self) -> bool:
+                return True
+
+        class MockedNetwork(NetworkConfig):
+            def is_valid(self) -> bool:
+                return False
+
+        # 1. Define test data.
+        _wrapper = ConfigWrapper()
+        _wrapper.network_config = MockedNetwork()
+        _wrapper.analysis_config = MockedAnalysis()
+
+        # 2. Run test.
+        _result = _wrapper.is_valid_input()
+
+        # 3. Verify final expectations.
+        assert _result is False
+
+    def test_is_valid_input_given_invalid_root_directories(self):
+        class MockedAnalysis(AnalysisConfigBase):
+            @property
+            def root_dir(self) -> Path:
+                return test_data / "a_path"
+
+            def is_valid(self) -> bool:
+                return True
+
+        class MockedNetwork(NetworkConfig):
+            @property
+            def root_dir(self) -> Path:
+                return test_data / "another_path"
+
+            def is_valid(self) -> bool:
+                return True
+
+        # 1. Define test data.
+        _wrapper = ConfigWrapper()
+        _wrapper.network_config = MockedNetwork()
+        _wrapper.analysis_config = MockedAnalysis()
+
+        # 2. Run test.
+        _result = _wrapper.is_valid_input()
+
+        # 3. Verify final expectations.
+        assert _result is False
+
+    def test_is_valid_given_valid_analysis_no_network_config(self):
+        class MockedAnalysis(AnalysisConfigBase):
+            def is_valid(self) -> bool:
+                return True
+
+        # 1. Define test data.
+        _wrapper = ConfigWrapper()
+        _wrapper.analysis_config = MockedAnalysis()
+        _wrapper.network_config = None
+
+        # 2. Run test.
+        _result = _wrapper.is_valid_input()
+
+        # 3. Verify final expectations.
+        assert _result is True
+
+    def test_is_valid_given_valid_analysis_valid_network_config(self):
+        class MockedAnalysis(AnalysisConfigBase):
+            @property
+            def root_dir(self) -> Path:
+                return test_data
+
+            def is_valid(self) -> bool:
+                return True
+
+        class MockedNetwork(NetworkConfig):
+            @property
+            def root_dir(self) -> Path:
+                return test_data
+
+            def is_valid(self) -> bool:
+                return True
+
+        # 1. Define test data.
+        _wrapper = ConfigWrapper()
+        _wrapper.analysis_config = MockedAnalysis()
+        _wrapper.network_config = MockedNetwork()
+
+        # 2. Run test.
+        _result = _wrapper.is_valid_input()
+
+        # 3. Verify final expectations.
+        assert _result is True
