@@ -15,6 +15,9 @@ class TestDamageFunctionByRoadTypeByLane:
             / "direct_damage"
             / "no_files"
         )
+        if not _damage_test_data.exists():
+            _damage_test_data.mkdir(parents=True)
+
         # 2. Run test.
         with pytest.raises(ValueError) as exc_err:
             _damage_function.from_input_folder(_damage_test_data)
