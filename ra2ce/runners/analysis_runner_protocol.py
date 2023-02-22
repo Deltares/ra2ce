@@ -1,9 +1,10 @@
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 from ra2ce.configuration import AnalysisConfigBase
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 
 
+@runtime_checkable
 class AnalysisRunner(Protocol):
     @staticmethod
     def can_run(ra2ce_input: ConfigWrapper) -> bool:

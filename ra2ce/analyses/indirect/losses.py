@@ -31,7 +31,7 @@ class Losses:
         df = pd.read_csv(file_path, index_col="LinkNr")
         return df
 
-    def traffic_shockwave(self, vlh, capacity, intensity):
+    def traffic_shockwave(self, vlh: pd.DataFrame, capacity: pd.Series, intensity: pd.Series) -> pd.DataFrame:
         vlh["vlh_traffic"] = (
             (self.duration**2)
             * (self.rest_capacity - 1)
@@ -40,7 +40,9 @@ class Losses:
         )
         return vlh
 
-    def calc_vlh(self, traffic_data, vehicle_loss_hours, detour_data):
+    def calc_vlh(
+        self, traffic_data: pd.DataFrame, vehicle_loss_hours: pd.Series, detour_data: pd.DataFrame
+    ) -> pd.DataFrame:
         vlh = pd.DataFrame(
             index=traffic_data.index,
             columns=[
@@ -182,4 +184,3 @@ class Losses:
         vehicle_loss_hours = self.vehicle_loss_hours(self.config["input"] / "losses")
         vlh = self.calc_vlh(traffic_data, vehicle_loss_hours, detour_data)
         return vlh
-

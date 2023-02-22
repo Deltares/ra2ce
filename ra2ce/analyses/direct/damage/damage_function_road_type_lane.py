@@ -67,12 +67,11 @@ class DamageFunctionByRoadTypeByLane:
                     "Found more then one damage file in {}".format(folder_path)
                 )
             elif len(result) == 0:
-                logging.warning(
-                    "Did not found any damage file in {}".format(folder_path)
+                raise ValueError(
+                    "Did not find any damage file in {}".format(folder_path)
                 )
-            else:
-                result = result[0]
-            return result
+
+            return result[0]
 
         # Load the max_damage object
         max_damage = MaxDamageByRoadTypeByLane()

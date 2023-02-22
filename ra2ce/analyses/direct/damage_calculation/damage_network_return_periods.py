@@ -28,7 +28,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
             [x.split("_")[1] for x in val_cols]
         )  # set of unique return_periods
 
-        if not len(self.return_periods) > 1:
+        if not any(self.return_periods):
             raise ValueError("No return_period cols present in hazard data")
 
     @classmethod
@@ -40,7 +40,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         return cls(road_gdf, val_cols)
 
     ### Controlers for return period based damage and risk calculations
-    def main(self, damage_function, manual_damage_functions):
+    def main(self, damage_function: str, manual_damage_functions):
         """
         Control the damage calculation per return period
 
@@ -306,13 +306,3 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
             )
         )
         return _to_integrate
-
-
-def test_integrate_df_trapezoidal():
-    data = np.array(([[1000, 2000], [500, 1000]]))
-    rps = [100, 200]
-
-    df = pd.DataFrame(data, columns=rps)
-    res = integrate_df_trapezoidal(df)
-
-    assert res == np.array([7.5, 3.75])
