@@ -61,7 +61,7 @@ class MaxDamageByRoadTypeByLane:
         if self.damage_unit != "output_unit":
             self.convert_length_unit()  # convert the unit
 
-    def convert_length_unit(self, desired_unit="euro/m") -> None:
+    def convert_length_unit(self, desired_unit="euro/m"):
         """Converts max damage values to a different unit
         Arguments:
             self.damage_unit (implicit)
@@ -69,30 +69,28 @@ class MaxDamageByRoadTypeByLane:
 
         Effect: converts the values in self.data; and sets the new damage_unit
 
-        Returns: the factor by which the original unit has been scaled
-
         """
         if desired_unit == self.damage_unit:
             logging.info("Input damage units are already in the desired format")
-            return None
+            return
 
         original_length_unit = self.damage_unit.split("/")[1]
         target_length_unit = desired_unit.split("/")[1]
 
-        if original_length_unit == "km" and target_length_unit == "m":
-            scaling_factor = 1 / 1000
-            self.data = self.data * scaling_factor
-            logging.info(
-                "Damage data from {} was scaled by a factor {}, to convert from {} to {}".format(
-                    self.origin_path, scaling_factor, self.damage_unit, desired_unit
-                )
-            )
-            self.damage_unit = desired_unit
-            return None
-        else:
+        if original_length_unit != "km" or target_length_unit != "m":
+            # We currently only support from 'km' to 'm'
             logging.warning(
                 "Damage scaling from {} to {} is not supported".format(
                     self.damage_unit, desired_unit
                 )
             )
-            return None
+            return
+
+        scaling_factor = 1 / 1000
+        self.data = self.data * scaling_factor
+        logging.info(
+            "Damage data from {} was scaled by a factor {}, to convert from {} to {}".format(
+                self.origin_path, scaling_factor, self.damage_unit, desired_unit
+            )
+        )
+        self.damage_unit = desired_unit
