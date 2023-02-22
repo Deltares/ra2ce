@@ -17,19 +17,12 @@ class DamageNetworkEvents(DamageNetworkBase):
         *self.stats* (set)   : the available statistics
     """
 
-    # @classmethod
-    # def from_csv_file(cls, csv_file: Path) -> DamageNetworkEvents:
-    #     # Cls is the class where this classmethod is, however is not instantiated yet.
-    #     _dne_object = cls(123, 456)
-    #     _text_lines = csv_file.read_text().splitlines()
-    #     return _dne_object
-
     def __init__(self, road_gdf, val_cols):
         # Construct using the parent class __init__
         super().__init__(road_gdf, val_cols)
         self.events = set([x.split("_")[1] for x in val_cols])  # set of unique events
 
-        if not len(self.events) > 0:
+        if not any(self.events):
             raise ValueError("No event cols present in hazard data")
 
     ### Controler for Event-based damage calculation
