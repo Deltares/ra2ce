@@ -1,13 +1,14 @@
 import logging
 from pathlib import Path
 from shutil import copyfile
-from typing import List, Optional
+from typing import List, Optional, Protocol, runtime_checkable
 
 from ra2ce.configuration.config_protocol import ConfigProtocol
 from ra2ce.io.readers.file_reader_protocol import FileReaderProtocol
 
 
-class IniConfigurationReaderProtocol(FileReaderProtocol):
+@runtime_checkable
+class IniConfigurationReaderProtocol(FileReaderProtocol, Protocol):  # pragma: no cover
     def read(self, ini_file: Path) -> Optional[ConfigProtocol]:
         """
         Reads the given `*.ini` file and if possible converts it into a `ConfigProtocol` object.
