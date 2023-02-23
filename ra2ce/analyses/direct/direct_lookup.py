@@ -759,10 +759,10 @@ class LookUp:
 
         Units of the interpolator objects: water depth in cm on x-axis; damage fraction (unitless) on y-axis
         """
-
+        _depth_cm_str = "depth (cm)"
         lookup_dict = {
             "C1": {
-                0: "depth (cm)",
+                0: _depth_cm_str,
                 1: 0,
                 2: 50,
                 3: 100,
@@ -786,7 +786,7 @@ class LookUp:
                 9: np.nan,
             },
             "C2": {
-                0: "depth (cm)",
+                0: _depth_cm_str,
                 1: 0,
                 2: 50,
                 3: 100,
@@ -810,7 +810,7 @@ class LookUp:
                 9: np.nan,
             },
             "C3": {
-                0: "depth (cm)",
+                0: _depth_cm_str,
                 1: 0,
                 2: 50,
                 3: 100,
@@ -834,7 +834,7 @@ class LookUp:
                 9: np.nan,
             },
             "C4": {
-                0: "depth (cm)",
+                0: _depth_cm_str,
                 1: 0,
                 2: 50,
                 3: 100,
@@ -858,7 +858,7 @@ class LookUp:
                 9: np.nan,
             },
             "C5": {
-                0: "depth (cm)",
+                0: _depth_cm_str,
                 1: 0,
                 2: 50,
                 3: 100,
@@ -882,7 +882,7 @@ class LookUp:
                 9: np.nan,
             },
             "C6": {
-                0: "depth (cm)",
+                0: _depth_cm_str,
                 1: 0,
                 2: 50,
                 3: 100,
@@ -906,7 +906,7 @@ class LookUp:
                 9: np.nan,
             },
             "HZ": {
-                0: "depth (cm)",
+                0: _depth_cm_str,
                 1: 0.0,
                 2: 50.0,
                 3: 100.0,

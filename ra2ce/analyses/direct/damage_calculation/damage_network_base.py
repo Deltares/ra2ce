@@ -20,9 +20,7 @@ class DamageNetworkBase(ABC):
         self.val_cols = val_cols
         self.gdf = road_gdf
         # set of hazard info per event
-        self.stats = set(
-            [x.split("_")[-1] for x in val_cols]
-        ) 
+        self.stats = set([x.split("_")[-1] for x in val_cols])
         # TODO: also track the damage cols after the dam calculation, that is useful for the risk calc. module
         # TODO: also create constructors of the childs of this class
 
@@ -71,7 +69,7 @@ class DamageNetworkBase(ABC):
             gdf.lanes = gdf.lanes.astype(
                 "float"
             )  # floats instead of ints because ints cannot be nan.
-        except:
+        except Exception:
             logging.warning(
                 "Available lane data cannot simply be converted to float/int, RA2CE will try a clean-up."
             )
