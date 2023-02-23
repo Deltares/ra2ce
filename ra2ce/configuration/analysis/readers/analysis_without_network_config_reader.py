@@ -16,8 +16,8 @@ from ra2ce.io.readers.ini_file_reader import IniFileReader
 
 
 class NetworkInAnalysisIniConfigReader(IniConfigurationReaderBase):
-    def read(self, ini_file: Path) -> Optional[NetworkConfig]:
-        if not ini_file:
+    def read(self, ini_file: Optional[Path]) -> Optional[NetworkConfig]:
+        if not ini_file or not ini_file.exists():
             return None
         _config_data = self._import_configuration(ini_file)
         return NetworkConfig.from_data(ini_file, _config_data)
@@ -34,8 +34,10 @@ class NetworkInAnalysisIniConfigReader(IniConfigurationReaderBase):
 
 
 class AnalysisWithoutNetworkConfigReader(AnalysisConfigReaderBase):
-    def read(self, ini_file: Path) -> Optional[AnalysisWithoutNetworkIniConfigData]:
-        if not ini_file:
+    def read(
+        self, ini_file: Optional[Path]
+    ) -> Optional[AnalysisWithoutNetworkIniConfigData]:
+        if not ini_file or not ini_file.exists():
             return None
         _analisis_config_dict = self._get_analysis_config_data(ini_file)
         _output_network_ini_file = _analisis_config_dict["output"] / "network.ini"

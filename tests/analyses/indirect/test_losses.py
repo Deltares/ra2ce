@@ -112,6 +112,3 @@ class TestLosses:
         assert "vlh_total" in _result
         assert "vlh_traffic" in _result
         assert "vlh_detour" in _result
-
-    def test_calculate_losses_from_table(self):
-        pass
