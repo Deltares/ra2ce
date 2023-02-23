@@ -29,6 +29,7 @@ class IndirectAnalyses:
     """
 
     _file_name_key = "File name"
+    _ra2ce_name_key = "RA2CE name"
 
     def __init__(self, config, graphs):
         self.config = config
@@ -267,7 +268,7 @@ class IndirectAnalyses:
         master_graph = copy.deepcopy(graph)
         for hazard in self.config["hazard_names"]:
             hazard_name = self.hazard_names.loc[
-                self.hazard_names[self._file_name_key] == hazard, "RA2CE name"
+                self.hazard_names[self._file_name_key] == hazard, self._ra2ce_name_key
             ].values[0]
 
             graph = copy.deepcopy(master_graph)
@@ -377,7 +378,7 @@ class IndirectAnalyses:
         results = []
         for hazard in self.config["hazard_names"]:
             hazard_name = self.hazard_names.loc[
-                self.hazard_names[self._file_name_key] == hazard, "RA2CE name"
+                self.hazard_names[self._file_name_key] == hazard, self._ra2ce_name_key
             ].values[0]
 
             gdf_ = gdf.loc[gdf["hazard"] == hazard_name].copy()
@@ -670,7 +671,7 @@ class IndirectAnalyses:
         all_results = []
         for hazard in self.config["hazard_names"]:
             hazard_name = self.hazard_names.loc[
-                self.hazard_names[self._file_name_key] == hazard, "RA2CE name"
+                self.hazard_names[self._file_name_key] == hazard, self._ra2ce_name_key
             ].values[0]
 
             graph_hz = copy.deepcopy(graph)
@@ -929,7 +930,7 @@ class IndirectAnalyses:
         aggregation = pd.DataFrame()
         for i, hazard in enumerate(self.config["hazard_names"]):
             hazard_name = self.hazard_names.loc[
-                self.hazard_names[self._file_name_key] == hazard, "RA2CE name"
+                self.hazard_names[self._file_name_key] == hazard, self._ra2ce_name_key
             ].values[0]
 
             graph_hz = copy.deepcopy(graph)
