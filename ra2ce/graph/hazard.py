@@ -637,12 +637,15 @@ class Hazard:
         return to_overlay
 
     def get_reproject_graph(
-        self, G: nx.classes.graph.Graph, in_crs: pyproj.CRS, out_crs: pyproj.CRS
+        self,
+        original_graph: nx.classes.graph.Graph,
+        in_crs: pyproj.CRS,
+        out_crs: pyproj.CRS,
     ) -> nx.classes.graph.Graph:
         """Reproject networkX graph"""
-        extent_graph = ntu.get_graph_edges_extent(G)
+        extent_graph = ntu.get_graph_edges_extent(original_graph)
         logging.info("Graph extent before reprojecting: {}".format(extent_graph))
-        graph_reprojected = ntu.reproject_graph(G, in_crs, out_crs)
+        graph_reprojected = ntu.reproject_graph(original_graph, in_crs, out_crs)
         extent_graph_reprojected = ntu.get_graph_edges_extent(graph_reprojected)
         logging.info(
             "Graph extent after reprojecting: {}".format(extent_graph_reprojected)
@@ -764,7 +767,6 @@ class Hazard:
                     logging.warning(
                         f"Base graph hazard file not found at {self.config['static'] / 'output_graph' / 'base_graph_hazard.p'}"
                     )
-                    pass
 
         #### Step 2: hazard overlay of the origins_destinations (NetworkX) ###
         if (

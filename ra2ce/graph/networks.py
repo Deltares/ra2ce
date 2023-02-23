@@ -468,9 +468,11 @@ class Network:
 
         return lines
 
-    def get_avg_speed(self, G: nx.classes.graph.Graph) -> nx.classes.graph.Graph:
-        if all(["length" in e for u, v, e in G.edges.data()]) and any(
-            ["maxspeed" in e for u, v, e in G.edges.data()]
+    def get_avg_speed(
+        self, original_graph: nx.classes.graph.Graph
+    ) -> nx.classes.graph.Graph:
+        if all(["length" in e for u, v, e in original_graph.edges.data()]) and any(
+            ["maxspeed" in e for u, v, e in original_graph.edges.data()]
         ):
             # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
             path_avg_speed = self.config["static"] / "output_graph" / "avg_speed.csv"
@@ -478,24 +480,24 @@ class Network:
                 avg_speeds = pd.read_csv(path_avg_speed)
             else:
                 avg_speeds = nut.calc_avg_speed(
-                    G,
+                    original_graph,
                     "highway",
                     save_csv=True,
                     save_path=self.config["static"] / "output_graph" / "avg_speed.csv",
                 )
-            G = nut.assign_avg_speed(G, avg_speeds, "highway")
+            original_graph = nut.assign_avg_speed(original_graph, avg_speeds, "highway")
 
             # make a time value of seconds, length of road streches is in meters
-            for u, v, k, edata in G.edges.data(keys=True):
+            for u, v, k, edata in original_graph.edges.data(keys=True):
                 hours = (edata["length"] / 1000) / edata["avgspeed"]
-                G[u][v][k]["time"] = round(hours * 3600, 0)
+                original_graph[u][v][k]["time"] = round(hours * 3600, 0)
 
-            return G
+            return original_graph
         else:
             logging.info(
                 "No attributes found in the graph to estimate average speed per network segment."
             )
-            return G
+            return original_graph
 
     def _export_network_files(
         self, network: Any, graph_name: str, types_to_export: List[str]

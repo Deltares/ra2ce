@@ -493,12 +493,12 @@ class OriginClosestDestination:
         )
 
         # Remove the closest attribute from the nodes
-        originClosestDest = [
+        origin_closest_dst = [
             nn[0] for nn in disrupted_graph.nodes.data() if "closest" in nn[-1]
         ]
 
-        if originClosestDest:
-            for o in originClosestDest:
+        if origin_closest_dst:
+            for o in origin_closest_dst:
                 del disrupted_graph.nodes[o]["closest"]
 
             optimal_routes_gdf = pd.concat(optimal_routes)
@@ -711,13 +711,10 @@ class OriginClosestDestination:
             )
 
             # Remove the closest attribute from the nodes
-            originClosestDest = [
+            for o in [
                 nn[0] for nn in disrupted_graph.nodes.data() if "closest" in nn[-1]
-            ]
-
-            if originClosestDest:
-                for o in originClosestDest:
-                    del disrupted_graph.nodes[o]["closest"]
+            ]:
+                del disrupted_graph.nodes[o]["closest"]
 
         optimal_routes_gdf = pd.concat(optimal_routes)
 
@@ -860,8 +857,9 @@ class OriginClosestDestination:
             except KeyError as e:
                 logging.warning(
                     f"The destination nodes do not contain the required attribute '{hazname}',"
-                    f" please make sure that the hazard overlay is done correctly by rerunning the 'network.ini'"
-                    f" and checking the output files."
+                    " please make sure that the hazard overlay is done correctly by rerunning the 'network.ini'"
+                    " and checking the output files."
+                    f"Further error details {e}"
                 )
                 quit()
 
