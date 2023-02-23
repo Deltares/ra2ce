@@ -142,7 +142,7 @@ class IndirectAnalyses:
                 try:
                     assert gdf[col + "_detour_losses"]
                     assert gdf[col + "_nodetour_losses"]
-                except:
+                except Exception:
                     gdf[col + "_detour_losses"] = 0
                     gdf[col + "_nodetour_losses"] = 0
                 # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle]  * duration_disruption[hour] / 24[hour/day]
@@ -223,7 +223,7 @@ class IndirectAnalyses:
                 try:
                     assert gdf[col + "_detour_losses"]
                     assert gdf[col + "_nodetour_losses"]
-                except:
+                except Exception:
                     gdf[col + "_detour_losses"] = 0
                     gdf[col + "_nodetour_losses"] = 0
                 # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle] * duration_disruption[hour] / 24[hour/day]
@@ -628,7 +628,7 @@ class IndirectAnalyses:
                                 route_traffic_prioritarian[
                                     str(u) + "_" + str(v)
                                 ] += t_prioritarian
-                        except:
+                        except Exception:
                             route_traffic.update({str(u) + "_" + str(v): t})
                             route_traffic_equal.update({str(u) + "_" + str(v): t_eq})
                             if len(equity) > 0:
@@ -1097,7 +1097,7 @@ class IndirectAnalyses:
                                     / "network"
                                     / analysis["equity_weight"]
                                 )
-                            except:
+                            except Exception:
                                 equity = pd.DataFrame()
                         else:
                             equity = pd.DataFrame()
@@ -1146,7 +1146,7 @@ class IndirectAnalyses:
                         )
                     )
                     regional_impact_summary_df.to_csv(impact_csv_path)
-                except:
+                except Exception:
                     pass
                 impact_csv_path = (
                     self.config["output"]
