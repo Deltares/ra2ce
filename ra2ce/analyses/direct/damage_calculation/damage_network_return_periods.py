@@ -1,5 +1,4 @@
 import logging
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -123,7 +122,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
                 # times the damage of the most extreme event
                 _to_integrate = _to_integrate.fillna(0)
                 _risk = _to_integrate[_rps[0]] / _cutoff_rp
-                _max_RP = max(_to_integrate.columns)
+                # _max_RP = max(_to_integrate.columns)
 
             self.gdf["risk"] = _risk
 
@@ -196,11 +195,11 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         :return: _to_integrate
         """
         # Copy the maximum return period with an infinitely high damage
-        _max_RP = max(_to_integrate.columns)
-        _to_integrate[float("inf")] = _to_integrate[_max_RP]
+        _max_return_period = max(_to_integrate.columns)
+        _to_integrate[float("inf")] = _to_integrate[_max_return_period]
 
         # Stop integrating at the last known return period, so no further manipulation needed
-        _min_RP = min(_to_integrate.columns)
+        _min_return_period = min(_to_integrate.columns)
 
         _to_integrate = _to_integrate.fillna(0)
 
@@ -211,7 +210,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
                         - for all return periods < min RP{}, damage = 0
 
                     """.format(
-                _max_RP, _max_RP, _min_RP
+                _max_return_period, _max_return_period, _min_return_period
             )
         )
         return _to_integrate
@@ -233,9 +232,8 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
             _dropcols = [rp for rp in _rps if rp < _cutoff_rp]
             _to_integrate = _to_integrate.drop(columns=_dropcols)
         else:
-            pos = _rps.index(
-                next(i for i in _rps if i < _cutoff_rp)
-            )  # find position of first RP value < PL
+            # find position of first RP value < PL
+            # pos = _rps.index(next(i for i in _rps if i < _cutoff_rp))
             # _to_integrate = _to_integrate[_rps[0:pos+1]] #remove all the values with smaller RPs than the PL
 
             _frequencies = _to_integrate.copy()
@@ -252,8 +250,8 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
             _to_integrate.columns = [1 / c for c in _to_integrate.columns]
 
             # Copy the maximum return period with an infinitely high damage
-            _max_RP = max(_to_integrate.columns)
-            _to_integrate[float("inf")] = _to_integrate[_max_RP]
+            _max_return_period = max(_to_integrate.columns)
+            _to_integrate[float("inf")] = _to_integrate[_max_return_period]
 
             _to_integrate = _to_integrate.fillna(0)
 
@@ -265,7 +263,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
                                     - no damage for al RPs > RP_cutoff ({})
 
                                 """.format(
-                _max_RP, _max_RP, _cutoff_rp
+                _max_return_period, _max_return_period, _cutoff_rp
             )
         )
 
@@ -283,8 +281,8 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         :return: _to_integrate
         """
         # Copy the maximum return period with an infinitely high damage
-        _max_RP = max(_to_integrate.columns)
-        _to_integrate[float("inf")] = _to_integrate[_max_RP]
+        _max_return_period = max(_to_integrate.columns)
+        _to_integrate[float("inf")] = _to_integrate[_max_return_period]
 
         # At the return period of the triangle end, set all damage values to zero
         _to_integrate[_triangle_end] = 0
@@ -302,7 +300,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
                                     - at the end of the triangle {}, damage = 0
 
                                 """.format(
-                _max_RP, _max_RP, _triangle_end
+                _max_return_period, _max_return_period, _triangle_end
             )
         )
         return _to_integrate

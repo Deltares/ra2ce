@@ -96,10 +96,8 @@ class DamageNetworkBase(ABC):
             logging.warning(
                 "Interpolated the missing lane data as follows: {}".format(lane_stats)
             )
-
-            assert not (
-                np.nan in self.gdf.lanes.unique()
-            )  # all nans should be replaced
+            # all nans should be replaced
+            assert np.nan not in self.gdf.lanes.unique()
 
         # TODO: think about if this is the best option
         self.gdf.loc[self.gdf["lanes"] == 0, "lanes"] = 1
@@ -149,22 +147,20 @@ class DamageNetworkBase(ABC):
 
         # Todo: Dirty fixes, these should be read from the init
         hazard_prefix = "F"
-        end = "me"  # indicate that you want to use the mean
 
-        df = (
-            self._gdf_mask
-        )  # dataframe to carry out the damage calculation #todo: this is a bit dirty
+        # dataframe to carry out the damage calculation #todo: this is a bit dirty
+        df = self._gdf_mask
 
         assert manual_damage_functions is not None, "No damage functions were loaded"
 
-        for DamFun in manual_damage_functions.loaded:
+        for _loaded_func in manual_damage_functions.loaded:
             # Add max damage values to df
-            df = DamFun.add_max_damage(df, DamFun.prefix)
+            df = _loaded_func.add_max_damage(df, _loaded_func.prefix)
             for event in events:
                 # Add apply interpolator objects
                 event_prefix = event
-                df = DamFun.calculate_damage(
-                    df, DamFun.prefix, hazard_prefix, event_prefix
+                df = _loaded_func.calculate_damage(
+                    df, _loaded_func.prefix, hazard_prefix, event_prefix
                 )
 
         # Only transfer the final results to the damage column
@@ -259,7 +255,7 @@ class DamageNetworkBase(ABC):
         end = "me"  # indicate that you want to use the mean
 
         # Load the OSdaMage functions
-        max_damages = lookup.get_max_damages_OSD()
+        max_damages = lookup.get_max_damages_osd()
         interpolators = lookup.get_flood_curves()
         interpolators.pop(
             "HZ"
@@ -295,7 +291,6 @@ class DamageNetworkBase(ABC):
                 df["upper_damage"] * percentage / 100
             ) + (df["lower_damage"] * (100 - percentage) / 100)
 
-        columns = []
         for curve_name, interpolator in interpolators.items():
             # print(curve_name, interpolator)
             for event in events:

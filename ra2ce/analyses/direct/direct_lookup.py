@@ -659,7 +659,7 @@ class LookUp:
         )
 
     @staticmethod
-    def get_max_damages_OSD():
+    def get_max_damages_osd():
         """Lookup table for max damages of the OSdaMage damage functions"""
 
         # Note that these values have been converted to euro/m road length
@@ -970,9 +970,6 @@ class CreateLookupTables:
         dict_max_damages = self.import_damage("Max_damages", usecols="C:E")
         max_damages_hz = self.load_hz_max_dam("Huizinga_max_dam", "A:G")
         interpolators = self.import_flood_curves(sheet_name="All_curves", usecols="B:O")
-
-        # for copying:
-        put_debug_icon_here_for_copying = True
 
         return (
             lane_damage_correction,
