@@ -127,13 +127,13 @@ class NetworkConfig(ConfigProtocol):
                 _graphs[input_graph + "_hazard"] = None
 
         # Load networks
-        filename = static_output_dir / f"base_network.feather"
+        filename = static_output_dir / "base_network.feather"
         if filename.is_file():
             _graphs["base_network"] = gpd.read_feather(filename)
         else:
             _graphs["base_network"] = None
 
-        filename = static_output_dir / f"base_network_hazard.feather"
+        filename = static_output_dir / "base_network_hazard.feather"
         if filename.is_file():
             _graphs["base_network_hazard"] = gpd.read_feather(filename)
         else:
