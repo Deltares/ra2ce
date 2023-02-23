@@ -57,8 +57,6 @@ class IndirectAnalyses:
         # else:
         #     aadt_names = None
         #     road_usage_data = pd.DataFrame()
-        road_usage_data = None  # can be removed if the above is fixed
-        aadt_names = None  # can be removed if the above is fixed
 
         # create a geodataframe from the graph
         gdf = osmnx.graph_to_gdfs(graph, nodes=False)
@@ -177,7 +175,7 @@ class IndirectAnalyses:
                     / 24
                 )
             gdf["total_losses_" + hz] = np.nansum(
-                gdf[[x for x in gdf.columns if ("losses" in x) and (not "total" in x)]],
+                gdf[[x for x in gdf.columns if ("losses" in x) and ("total" not in x)]],
                 axis=1,
             )
 
@@ -205,7 +203,7 @@ class IndirectAnalyses:
             for lb in np.unique(disruption_df["lower_bound"]):
                 disruption_df_ = disruption_df.loc[disruption_df["lower_bound"] == lb]
                 ub = disruption_df_["upper_bound"].values[0]
-                if not ub > 0:
+                if ub <= 0:
                     ub = 1e10
                 for road_cat in _all_road_categories:
                     gdf.loc[
@@ -246,7 +244,7 @@ class IndirectAnalyses:
                     / 24
                 )
             gdf["total_losses_" + hz] = np.nansum(
-                gdf[[x for x in gdf.columns if ("losses" in x) and (not "total" in x)]],
+                gdf[[x for x in gdf.columns if ("losses" in x) and ("total" not in x)]],
                 axis=1,
             )
 
@@ -411,7 +409,7 @@ class IndirectAnalyses:
                         [
                             x
                             for x in gdf_.columns
-                            if ("losses" in x) and (not "total" in x)
+                            if ("losses" in x) and ("total" not in x)
                         ]
                     ],
                     axis=1,
@@ -437,7 +435,7 @@ class IndirectAnalyses:
                         disruption_df["lower_bound"] == lb
                     ]
                     ub = disruption_df_["upper_bound"].values[0]
-                    if not ub > 0:
+                    if ub <= 0:
                         ub = 1e10
                     for road_cat in all_road_categories:
                         gdf_.loc[
@@ -478,7 +476,7 @@ class IndirectAnalyses:
                         [
                             x
                             for x in gdf_.columns
-                            if ("losses" in x) and (not "total" in x)
+                            if ("losses" in x) and ("total" not in x)
                         ]
                     ],
                     axis=1,
@@ -519,9 +517,6 @@ class IndirectAnalyses:
         return od_nodes
 
     def optimal_route_origin_destination(self, graph, analysis):
-        # Calculate the preferred routes
-        name = analysis["name"].replace(" ", "_")
-
         # create list of origin-destination pairs
         od_nodes = self._get_origin_destination_pairs(graph)
         pref_routes = find_route_ods(graph, od_nodes, analysis["weighing"])
@@ -893,7 +888,7 @@ class IndirectAnalyses:
                 for col in origin_impact.columns:
                     if "_pc" in col:
                         delta = np.nanmean(origin_impact[col])
-                        if not delta >= 0:
+                        if delta < 0:
                             delta = 0
                         origin_impact_tosave.loc[0, col[12:] + "_increase"] = delta
 
@@ -1318,7 +1313,6 @@ class IndirectAnalyses:
             logging.info(
                 f"----------------------------- Analysis '{analysis['name']}' finished. Time: {str(round(endtime - starttime, 2))}s  -----------------------------"
             )
-        return
 
 
 def save_gdf(gdf, save_path):

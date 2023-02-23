@@ -292,15 +292,15 @@ class OriginClosestDestination:
         else:
             pp_no_delay.append(nr_per_route)
 
-        if not pp_no_delay == [0]:
+        if pp_no_delay != [0]:
             self.results_dict["Nr. no delay"] = [round(sum(pp_no_delay))]
-        if not pp_delayed == [0]:
+        if pp_delayed != [0]:
             self.results_dict["Nr. delayed"] = [round(sum(pp_delayed))]
-        if not extra_weights == [0]:
+        if extra_weights != [0]:
             self.results_dict[f"Total extra detour {self.weighing}"] = [
                 sum(extra_weights)
             ]
-        if not extra_kms_total == [0]:
+        if extra_kms_total != [0]:
             self.results_dict[f"Total extra detour distance ({self.unit})"] = [
                 sum(extra_kms_total)
             ]
