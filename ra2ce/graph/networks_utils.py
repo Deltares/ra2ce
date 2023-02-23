@@ -54,7 +54,7 @@ def drawProgressBar(percent, barLen=20):
 
 
 def merge_lines_automatic(
-    lines_gdf: gpd.GeoDataFrame, idName: str, aadtNames: list, crs_: pyproj.CRS
+    lines_gdf: gpd.GeoDataFrame, idName: str, aadtNames: List[str], crs_: pyproj.CRS
 ) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
     """Automatically merge lines based on a config file
     Args:

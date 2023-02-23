@@ -441,6 +441,8 @@ def rescale_and_crop(path_name, gdf, outputFolderPath, res=500):
     dst_crs = rasterio.crs.CRS.from_dict(gdf.crs.to_dict())
 
     # Rescale and reproject raster to gdf crs
+    _output_origins_raster_tif = outputFolderPath / "origins_raster_reprojected.tif"
+
     with rasterio.open(path_name) as src:
 
         transform, width, height = calculate_default_transform(
@@ -470,9 +472,7 @@ def rescale_and_crop(path_name, gdf, outputFolderPath, res=500):
             {"crs": dst_crs, "transform": transform, "width": width, "height": height}
         )
 
-        with rasterio.open(
-            outputFolderPath / "origins_raster_reprojected.tif", "w", **kwargs
-        ) as dst:
+        with rasterio.open(_output_origins_raster_tif, "w", **kwargs) as dst:
             for i in range(1, src.count + 1):
                 reproject(
                     source=rasterio.band(src, i),
@@ -484,7 +484,7 @@ def rescale_and_crop(path_name, gdf, outputFolderPath, res=500):
                     resampling=Resampling.sum,
                 )  # Resampling.sum or Resampling.nearest
 
-    raster = rasterio.open(outputFolderPath / "origins_raster_reprojected.tif")
+    raster = rasterio.open(_output_origins_raster_tif)
 
     # Crop to shapefile
     out_array, out_trans = rasterio.mask.mask(
@@ -500,7 +500,7 @@ def rescale_and_crop(path_name, gdf, outputFolderPath, res=500):
         }
     )
     raster.close()
-    os.remove(outputFolderPath / "origins_raster_reprojected.tif")
+    os.remove(_output_origins_raster_tif)
 
     return out_array, out_meta
 

@@ -94,7 +94,7 @@ class Network:
         # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
         # The list of fid's is reduced by the fid's that are not anymore in the merged lines
         if self.config["cleanup"]["merge_lines"]:
-            aadt_names = None
+            aadt_names = []
             edges, lines_merged = nut.merge_lines_automatic(
                 lines, self.config["network"]["file_id"], aadt_names, crs
             )
@@ -559,7 +559,9 @@ class Network:
             if self.config["network"]["source"] == "OSM download":
                 # Graph & Network from OSM download
                 # Check if all geometries between nodes are there, if not, add them as a straight line.
-                base_graph = nut.add_missing_geoms_graph(base_graph, geom_name="geometry")
+                base_graph = nut.add_missing_geoms_graph(
+                    base_graph, geom_name="geometry"
+                )
 
             # Set the road lengths to meters for both the base_graph and network_gdf
             # TODO: rename "length" column to "length [m]" to be explicit
