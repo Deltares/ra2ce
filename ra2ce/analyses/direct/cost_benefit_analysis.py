@@ -145,6 +145,9 @@ class EffectivenessMeasures:
         4. calculate sum of verweg, verkant and dichtbij
         5. aggregate (sum) of values to LinkNr
         """
+        _gevoelig_max_name = "{}_gevoelig_max".format(name)
+        _gevoelig_sum_name = "{}_gevoelig_sum".format(name)
+
         # perform calculation of max length of ver weg elements and slope elements:
         df["slope_0015_m2"] = df["slope_0015_m"] / 2
         df["verweg_max"] = (
@@ -153,12 +156,10 @@ class EffectivenessMeasures:
         df["verkant_max"] = df[["slope_0015_m2", "slope_001_m"]].values.max(1).round(0)
 
         # calculate gevoelig max and dum
-        df["{}_gevoelig_max".format(name)] = (
+        df[_gevoelig_max_name] = (
             df[["verweg_max", "verkant_max", "dichtbij_m"]].values.max(1).round(0)
         )
-        df["{}_gevoelig_sum".format(name)] = (
-            df["verweg_max"] + df["verkant_max"] + df["dichtbij_m"]
-        )
+        df[_gevoelig_sum_name] = df["verweg_max"] + df["verkant_max"] + df["dichtbij_m"]
 
         # aggregate to link nr
         new_df = df[
@@ -171,8 +172,8 @@ class EffectivenessMeasures:
                 "gw_hwa_m",
                 "verweg_max",
                 "verkant_max",
-                "{}_gevoelig_max".format(name),
-                "{}_gevoelig_sum".format(name),
+                _gevoelig_max_name,
+                _gevoelig_sum_name,
             ]
         ]
         new_df = new_df.groupby(["LinkNr"]).sum()
@@ -189,8 +190,8 @@ class EffectivenessMeasures:
                 "gw_hwa_m",
                 "verweg_max",
                 "verkant_max",
-                "{}_gevoelig_max".format(name),
-                "{}_gevoelig_sum".format(name),
+                _gevoelig_max_name,
+                _gevoelig_sum_name,
             ]
         ]
 
