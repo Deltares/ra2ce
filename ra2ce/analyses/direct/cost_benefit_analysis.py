@@ -263,38 +263,45 @@ class EffectivenessMeasures:
             df["repair_costs_{}".format(strategy)] = (
                 df["{}_gevoelig_max".format(strategy)] * self.repair_costs
             )
-            df["blockage_costs_{}".format(strategy)] = df["blockage_costs"]
-            df["yearly_repair_costs_{}".format(strategy)] = (
+            # Keys definition to avoid code duplication.
+            _blockage_costs_strategy = "blockage_costs_{}".format(strategy)
+            _yearly_blockage_costs_strategy = "yearly_blockage_costs_{}".format(
+                strategy
+            )
+            _yearly_repair_costs_strategy = "yearly_repair_costs_{}".format(strategy)
+            _total_costs_strategy = "total_costs_{}".format(strategy)
+
+            df[_blockage_costs_strategy] = df["blockage_costs"]
+            df[_yearly_repair_costs_strategy] = (
                 df["repair_costs_{}".format(strategy)] / df["return_period"]
             )
             if strategy == "standard":
-                df["yearly_blockage_costs_{}".format(strategy)] = (
-                    df["blockage_costs_{}".format(strategy)] / df["return_period"]
+                df[_yearly_blockage_costs_strategy] = (
+                    df[_blockage_costs_strategy] / df["return_period"]
                 )
             else:
-                df["yearly_blockage_costs_{}".format(strategy)] = (
-                    df["blockage_costs_{}".format(strategy)]
+                df[_yearly_blockage_costs_strategy] = (
+                    df[_blockage_costs_strategy]
                     / df["return_period"]
                     * (1 - df["max_effectiveness_{}".format(strategy)])
                 )
-            df["total_costs_{}".format(strategy)] = (
-                df["yearly_repair_costs_{}".format(strategy)]
-                + df["yearly_blockage_costs_{}".format(strategy)]
+            df[_total_costs_strategy] = (
+                df[_yearly_repair_costs_strategy] + df[_yearly_blockage_costs_strategy]
             )
             if strategy != "standard":
                 df["reduction_repair_costs_{}".format(strategy)] = (
                     df["yearly_repair_costs_standard"]
-                    - df["yearly_repair_costs_{}".format(strategy)]
+                    - df[_yearly_repair_costs_strategy]
                 )
                 df["reduction_blockage_costs_{}".format(strategy)] = (
                     df["yearly_blockage_costs_standard"]
-                    - df["yearly_blockage_costs_{}".format(strategy)]
+                    - df[_yearly_blockage_costs_strategy]
                 )
                 df["reduction_costs_{}".format(strategy)] = (
-                    df["total_costs_standard"] - df["total_costs_{}".format(strategy)]
+                    df["total_costs_standard"] - df[_total_costs_strategy]
                 )
                 df["effectiveness_{}".format(strategy)] = 1 - (
-                    df["total_costs_{}".format(strategy)] / df["total_costs_standard"]
+                    df[_total_costs_strategy] / df["total_costs_standard"]
                 )
         return df
 
@@ -392,22 +399,23 @@ class EffectivenessMeasures:
                 df["reduction_costs_{}".format(strategy)] * costs_dict["npv_factor"]
             )
             select_col = strategies[strategy]
+            # Definition of key strings to avoid code duplication
+            _strategy_costs = "{}_costs".format(strategy)
+
             if len(select_col) == 1:
-                df["{}_costs".format(strategy)] = (
-                    df[select_col[0]] * costs[strategy] * -1 / 1000
-                )
+                df[_strategy_costs] = df[select_col[0]] * costs[strategy] * -1 / 1000
             if len(select_col) > 1:
-                df["{}_costs".format(strategy)] = (
+                df[_strategy_costs] = (
                     (df[select_col[0]] - df[select_col[1]])
                     * costs[strategy]
                     * -1
                     / 1000
                 )
-                df["{}_costs".format(strategy)] = df["{}_costs".format(strategy)].where(
-                    df["{}_costs".format(strategy)] > 1, other=np.nan
+                df[_strategy_costs] = df[_strategy_costs].where(
+                    df[_strategy_costs] > 1, other=np.nan
                 )
             df["{}_bc_ratio".format(strategy)] = (
-                df["{}_benefits".format(strategy)] / df["{}_costs".format(strategy)]
+                df["{}_benefits".format(strategy)] / df[_strategy_costs]
             )
 
         return df
