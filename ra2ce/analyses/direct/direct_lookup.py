@@ -760,6 +760,7 @@ class LookUp:
         Units of the interpolator objects: water depth in cm on x-axis; damage fraction (unitless) on y-axis
         """
         _depth_cm_str = "depth (cm)"
+        _damage_str = "damage (% of total construction costs)"
         lookup_dict = {
             "C1": {
                 0: _depth_cm_str,
@@ -774,7 +775,7 @@ class LookUp:
                 9: np.nan,
             },
             "Unnamed: 2": {
-                0: "damage (% of total construction costs)",
+                0: _damage_str,
                 1: 0,
                 2: 0.01,
                 3: 0.03,
@@ -798,7 +799,7 @@ class LookUp:
                 9: np.nan,
             },
             "Unnamed: 4": {
-                0: "damage (% of total construction costs)",
+                0: _damage_str,
                 1: 0,
                 2: 0.02,
                 3: 0.06,
@@ -822,7 +823,7 @@ class LookUp:
                 9: np.nan,
             },
             "Unnamed: 6": {
-                0: "damage (% of total construction costs)",
+                0: _damage_str,
                 1: 0,
                 2: 0.002,
                 3: 0.004,
@@ -846,7 +847,7 @@ class LookUp:
                 9: np.nan,
             },
             "Unnamed: 8": {
-                0: "damage (% of total construction costs)",
+                0: _damage_str,
                 1: 0,
                 2: 0.015,
                 3: 0.04,
@@ -870,7 +871,7 @@ class LookUp:
                 9: np.nan,
             },
             "Unnamed: 10": {
-                0: "damage (% of total construction costs)",
+                0: _damage_str,
                 1: 0,
                 2: 0.015,
                 3: 0.025,
@@ -894,7 +895,7 @@ class LookUp:
                 9: np.nan,
             },
             "Unnamed: 12": {
-                0: "damage (% of total construction costs)",
+                0: _damage_str,
                 1: 0,
                 2: 0.12,
                 3: 0.2,
@@ -918,7 +919,7 @@ class LookUp:
                 9: 600.0,
             },
             "Unnamed: 14": {
-                0: "damage (% of total construction costs)",
+                0: _damage_str,
                 1: 0.0,
                 2: 0.25,
                 3: 0.42,
