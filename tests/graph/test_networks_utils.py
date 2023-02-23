@@ -269,10 +269,6 @@ class TestCreateSimplifiedGraph:
         _return_result = nu.create_simplified_graph(None, "")
         assert _return_result == (None, None, None)
 
-    @pytest.mark.skip(reason="TODO: Generate valid test data.")
-    def test_with_valid_data(self):
-        pass
-
 
 class TestGdfCheckCreateUniqueIds:
     def test_with_user_defined_identifier(self):
