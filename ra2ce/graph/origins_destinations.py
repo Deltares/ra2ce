@@ -78,7 +78,7 @@ def read_OD_files(
         origin_new = gpd.read_file(op, crs=crs_)
         try:
             origin_new[od_id] * 2  # just for checking
-        except:
+        except Exception:
             origin_new[od_id] = origin_new.index
 
         if region_paths:
@@ -99,7 +99,7 @@ def read_OD_files(
         destination_new = gpd.read_file(dp, crs=crs_)
         try:
             assert destination_new[od_id]
-        except:
+        except Exception:
             destination_new[od_id] = destination_new.index
         destination_new = destination_new[destination_columns_add]
         destination_new["d_id"] = dn + "_" + destination_new[od_id].astype(str)

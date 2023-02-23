@@ -23,6 +23,8 @@ class Hazard:
         graphs: NetworkX graphs.
     """
 
+    _ra2ce_name_key = "RA2CE name"
+
     def __init__(self, config: dict, graphs: dict, files: dict):
         self.config = config
 
@@ -41,7 +43,9 @@ class Hazard:
             dict.fromkeys(list(self.hazard_name_table["File name"]))
         )
         self.ra2ce_names = list(
-            dict.fromkeys([n[:-3] for n in self.hazard_name_table["RA2CE name"]])
+            dict.fromkeys(
+                [n[:-3] for n in self.hazard_name_table[self._ra2ce_name_key]]
+            )
         )
 
     def overlay_hazard_raster_gdf(self, gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -386,7 +390,7 @@ class Hazard:
                         for x, edges in zip(flood_stats, edges_geoms)
                     },
                 )
-            except:
+            except Exception:
                 logging.warning(
                     "No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'."
                 )
@@ -475,7 +479,7 @@ class Hazard:
         graph.rename(
             columns={
                 self.config["hazard"]["hazard_field_name"]: [
-                    n[:-3] for n in self.hazard_name_table["RA2CE name"]
+                    n[:-3] for n in self.hazard_name_table[self._ra2ce_name_key]
                 ][0]
             },
             inplace=True,
@@ -503,7 +507,7 @@ class Hazard:
             rps = [
                 haz.stem.split("RP_")[-1].split("_")[0] for haz in _hazard_map_config
             ]
-            df["RA2CE name"] = [
+            df[self._ra2ce_name_key] = [
                 "RP" + rp + "_" + agg_type[:2]
                 for rp in rps
                 for agg_type in chosen_agg_types
@@ -511,7 +515,7 @@ class Hazard:
         else:
             # Event hazard maps are used
             # Note: no hazard type is indicated because the name became too long
-            df["RA2CE name"] = [
+            df[self._ra2ce_name_key] = [
                 "EV" + str(i + 1) + "_" + agg_type[:2]
                 for i in range(len(_hazard_map_config))
                 for agg_type in chosen_agg_types

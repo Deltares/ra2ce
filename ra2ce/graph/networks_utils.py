@@ -266,7 +266,7 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
                     "Please check your data network data."
                 )
                 return np.nan
-        except:
+        except Exception:
             logging.error(
                 "The CRS is not EPSG:4326. Quit the analysis, reproject the layer to EPSG:4326 and try again to run the tool."
             )
@@ -967,7 +967,7 @@ def create_simplified_graph(graph_complex, new_id: str = "rfid"):
             graph_complex, complex_to_simple, new_id
         )
         logging.info("Simplified graph succesfully created")
-    except:
+    except Exception:
         graph_simple = None
         id_tables = None
         logging.error("Did not create a simplified version of the graph")

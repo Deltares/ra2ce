@@ -53,7 +53,7 @@ class Network:
                 config["static"] / "network" / config["origins_destinations"]["region"]
             )
             self.region_var = config["origins_destinations"]["region_var"]
-        except:
+        except Exception:
             self.region = None
             self.region_var = None
 
