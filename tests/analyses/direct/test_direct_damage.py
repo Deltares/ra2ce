@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
@@ -14,6 +16,13 @@ direct_damage_test_data = test_data / "direct_damage"
 
 
 class TestDirectDamage:
+    @pytest.fixture(autouse=False)
+    def risk_data_file(self) -> Path:
+        _risk_file = direct_damage_test_data / "risk_test_data.csv"
+        assert _risk_file.is_file()
+        assert _risk_file.exists()
+        return _risk_file
+
     @pytest.fixture(autouse=False)
     def event_input_output(self) -> dict:
         import numpy as np
@@ -341,30 +350,27 @@ class TestDirectDamage:
                     mssg += "{}\n".format(test_ref_output[is_combined_different].head())
                     print(mssg)
 
-    def test_construct_damage_network_return_periods(self):
-        data_path = direct_damage_test_data / "risk_test_data.csv"
+    def test_construct_damage_network_return_periods(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-            data_path, sep=";"
+            risk_data_file, sep=";"
         )
         assert (
             type(damage_network) == DamageNetworkReturnPeriods
         ), "Did not construct object of the right type"
 
-    def test_risk_calculation_default(self):
-        data_path = direct_damage_test_data / "risk_test_data.csv"
+    def test_risk_calculation_default(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-            data_path, sep=";"
+            risk_data_file, sep=";"
         )
         damage_network.control_risk_calculation(mode="default")
         assert (
             damage_network.gdf["risk"][0] == damage_network.gdf["ref_risk_default"][0]
         )
 
-    def test_risk_calculation_cutoff(self):
-        data_path = direct_damage_test_data / "risk_test_data.csv"
+    def test_risk_calculation_cutoff(self, risk_data_file: Path):
         for rp in [15, 200, 25]:
             damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-                data_path, sep=";"
+                risk_data_file, sep=";"
             )
             damage_network.control_risk_calculation(mode="cut_from_{}_year".format(rp))
             test_result = round(damage_network.gdf["risk"][0], 0)
@@ -373,10 +379,9 @@ class TestDirectDamage:
             )
             assert test_result == reference_result
 
-    def test_risk_calculation_triangle_to_null(self):
-        data_path = direct_damage_test_data / "risk_test_data.csv"
+    def test_risk_calculation_triangle_to_null(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-            data_path, sep=";"
+            risk_data_file, sep=";"
         )
         for triangle_rp in [8, 2]:
             damage_network.control_risk_calculation(

@@ -8,6 +8,9 @@ from tests import test_data
 
 class MockEffectivenessMeasures(EffectivenessMeasures):
     def __init__(self, config, analysis):
+        """
+        This class is only meant to inherit from `Effectiveness measures` and allow the partial testing of certain methods for pure code coverage reasons.
+        """
         pass
 
 

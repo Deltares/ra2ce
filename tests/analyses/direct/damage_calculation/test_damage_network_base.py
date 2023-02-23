@@ -27,7 +27,7 @@ class TestDamageNetworkBase:
 
         # 2. Run test
         with pytest.raises(ValueError) as exc_err:
-            _dnb.main(None, None)
+            _dnb.main("", None)
 
         # 3. Verify final expectations.
         assert str(exc_err.value) == "Needs to be implented in concrete child class."
