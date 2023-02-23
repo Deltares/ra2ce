@@ -459,9 +459,8 @@ class OriginClosestDestination:
 
         special_edges = []
         for n, ndat in disrupted_graph.nodes.data():
-            if self.od_key in ndat:
-                if self.d_name in ndat[self.od_key]:
-                    special_edges.append((n, "special", {self.weighing: 0}))
+            if self.od_key in ndat and self.d_name in ndat[self.od_key]:
+                special_edges.append((n, "special", {self.weighing: 0}))
 
         disrupted_graph.add_edges_from(special_edges)
 
@@ -536,96 +535,93 @@ class OriginClosestDestination:
             Optional[gpd.GeoDataFrame]: When the wrapper for-loop needs to go into the next iteration it will return 'None'. Otherwise a resulting `gpd.GeoDataFrame`.
         """
         n, ndat = n_ndat
-        if self.od_key in ndat:
-            if self.o_name in ndat[self.od_key]:
-                if nx.has_path(disrupted_graph, n, dest_name):
-                    path = nx.shortest_path(
-                        disrupted_graph,
-                        source=n,
-                        target=dest_name,
-                        weight=self.weighing,
-                    )
-                    # Closest node with destLabelContains in keyName
-                    ndat["closest"] = path[-2]
-                    closest_dest = ndat["closest"]
+        if self.od_key in ndat and self.o_name in ndat[self.od_key]:
+            if nx.has_path(disrupted_graph, n, dest_name):
+                path = nx.shortest_path(
+                    disrupted_graph,
+                    source=n,
+                    target=dest_name,
+                    weight=self.weighing,
+                )
+                # Closest node with destLabelContains in keyName
+                ndat["closest"] = path[-2]
+                closest_dest = ndat["closest"]
 
-                    # Check if the destination that is accessed, is flooded
-                    if hazard_name:
-                        try:
-                            if (
-                                disrupted_graph.nodes[closest_dest][hazard_name]
-                                > self.threshold_destinations
-                            ):
-                                list_disrupted_destinations.append(
+                # Check if the destination that is accessed, is flooded
+                if hazard_name:
+                    try:
+                        if (
+                            disrupted_graph.nodes[closest_dest][hazard_name]
+                            > self.threshold_destinations
+                        ):
+                            list_disrupted_destinations.append(
+                                (
+                                    (n, ndat[self.od_key]),
                                     (
-                                        (n, ndat[self.od_key]),
-                                        (
-                                            closest_dest,
-                                            disrupted_graph.nodes[closest_dest][
-                                                self.od_key
-                                            ],
-                                        ),
-                                    )
+                                        closest_dest,
+                                        disrupted_graph.nodes[closest_dest][
+                                            self.od_key
+                                        ],
+                                    ),
                                 )
-                                return None
-                        except KeyError as e:
-                            logging.error(
-                                f"The destination nodes do not contain the required attribute '{hazard_name}',"
-                                f" please make sure that the hazard overlay is done correctly by rerunning the 'network.ini'"
-                                f" and checking the output files."
                             )
-                            raise e
+                            return None
+                    except KeyError as e:
+                        logging.error(
+                            f"The destination nodes do not contain the required attribute '{hazard_name}',"
+                            f" please make sure that the hazard overlay is done correctly by rerunning the 'network.ini'"
+                            f" and checking the output files."
+                        )
+                        raise e
 
-                    nr_per_route = self.get_nr_people_on_route(
-                        origins, ndat[self.od_key]
+                nr_per_route = self.get_nr_people_on_route(origins, ndat[self.od_key])
+                base_graph, route_path, route_geoms = self.get_route_path(
+                    disrupted_graph,
+                    base_graph,
+                    n,
+                    closest_dest,
+                    nr_per_route,
+                    name_save.format("P"),
+                )
+                if pref_routes:
+                    route_length = self.get_route_length(
+                        disrupted_graph, n, closest_dest
                     )
-                    base_graph, route_path, route_geoms = self.get_route_path(
-                        disrupted_graph,
-                        base_graph,
-                        n,
-                        closest_dest,
+                    self.compare_route_with_without_distruption(
+                        pref_routes,
                         nr_per_route,
-                        name_save.format("P"),
+                        ndat[self.od_key],
+                        disrupted_graph.nodes[closest_dest],
+                        route_length,
+                        route_path,
                     )
-                    if pref_routes:
-                        route_length = self.get_route_length(
-                            disrupted_graph, n, closest_dest
-                        )
-                        self.compare_route_with_without_distruption(
-                            pref_routes,
-                            nr_per_route,
-                            ndat[self.od_key],
-                            disrupted_graph.nodes[closest_dest],
-                            route_length,
-                            route_path,
-                        )
-                    destinations = self.update_destinations(
-                        destinations,
-                        disrupted_graph.nodes[closest_dest][self.od_key],
-                        nr_per_route,
-                        name_save.format("P"),
-                    )
+                destinations = self.update_destinations(
+                    destinations,
+                    disrupted_graph.nodes[closest_dest][self.od_key],
+                    nr_per_route,
+                    name_save.format("P"),
+                )
 
-                    if route_geoms:
-                        optimal_routes.append(
-                            gpd.GeoDataFrame(
-                                {
-                                    "o_node": n,
-                                    "d_node": closest_dest,
-                                    "origin": ndat[self.od_key],
-                                    "destination": disrupted_graph.nodes[closest_dest][
-                                        self.od_key
-                                    ],
-                                    self.weighing: route_path,
-                                    "origin_cnt": nr_per_route,
-                                    "geometry": [route_geoms],
-                                    "category": dest_name,
-                                },
-                                crs=self.crs,
-                            )
+                if route_geoms:
+                    optimal_routes.append(
+                        gpd.GeoDataFrame(
+                            {
+                                "o_node": n,
+                                "d_node": closest_dest,
+                                "origin": ndat[self.od_key],
+                                "destination": disrupted_graph.nodes[closest_dest][
+                                    self.od_key
+                                ],
+                                self.weighing: route_path,
+                                "origin_cnt": nr_per_route,
+                                "geometry": [route_geoms],
+                                "category": dest_name,
+                            },
+                            crs=self.crs,
                         )
-                else:
-                    list_no_path.append((n, ndat[self.od_key]))
+                    )
+            else:
+                list_no_path.append((n, ndat[self.od_key]))
 
         return self.update_origins(origins, list_no_path, name_save.format("A"))
 
@@ -669,12 +665,14 @@ class OriginClosestDestination:
 
             special_edges = []
             for n, ndat in disrupted_graph.nodes.data():
-                if self.od_key in ndat:
-                    if self.destination_key in ndat:
-                        if ndat[self.destination_key] == dest_name:
-                            special_edges.append(
-                                (n, ndat[self.destination_key], {self.weighing: 0})
-                            )
+                if (
+                    self.od_key in ndat
+                    and self.destination_key in ndat
+                    and ndat[self.destination_key] == dest_name
+                ):
+                    special_edges.append(
+                        (n, ndat[self.destination_key], {self.weighing: 0})
+                    )
 
             disrupted_graph.add_edges_from(special_edges)
 
@@ -788,21 +786,23 @@ class OriginClosestDestination:
             length_list = []
             for u, v in edgesinpath:
                 # get edge with the lowest weighing if there are multiple edges that connect u and v
-                edge_key = sorted(
-                    graph[u][v], key=lambda x: graph[u][v][x][self.weighing]
-                )[0]
-                if "geometry" in graph[u][v][edge_key]:
-                    pref_edges.append(graph[u][v][edge_key]["geometry"])
+                _uv_graph = graph[u][v]
+                edge_key = sorted(_uv_graph, key=lambda x: _uv_graph[x][self.weighing])[
+                    0
+                ]
+                _uv_graph_edge = _uv_graph[edge_key]
+                if "geometry" in _uv_graph_edge:
+                    pref_edges.append(_uv_graph_edge["geometry"])
                 else:
                     pref_edges.append(
                         LineString(
                             [graph.nodes[u]["geometry"], graph.nodes[v]["geometry"]]
                         )
                     )
-                if self.id_name in graph[u][v][edge_key]:
-                    match_list.append(graph[u][v][edge_key][self.id_name])
-                if "length" in graph[u][v][edge_key]:
-                    length_list.append(graph[u][v][edge_key]["length"])
+                if self.id_name in _uv_graph_edge:
+                    match_list.append(_uv_graph_edge[self.id_name])
+                if "length" in _uv_graph_edge:
+                    length_list.append(_uv_graph_edge["length"])
 
                 # Add the number of people that go from the origin to a destination to the road segments.
                 # For now, each road segment in a route gets attributed all the people that are taking that route.
@@ -892,9 +892,11 @@ class OriginClosestDestination:
             length_list = []
             for u, v in edgesinpath:
                 # get edge with the lowest weighing if there are multiple edges that connect u and v
-                edge_key = sorted(
-                    graph[u][v], key=lambda x: graph[u][v][x][self.weighing]
-                )[0]
+                _uv_graph = graph[u][v]
+                edge_key = sorted(_uv_graph, key=lambda x: _uv_graph[x][self.weighing])[
+                    0
+                ]
+                _uv_graph_edge = _uv_graph[edge_key]
 
                 # Add the number of people that need to go to a destination to the road segments. For now, each road segment in a route
                 # gets attributed all the people that are taking that route.
@@ -902,8 +904,8 @@ class OriginClosestDestination:
                     base_graph[u][v][edge_key][hazname + "_P"] + nr_per_route
                 )
 
-                if "length" in graph[u][v][edge_key]:
-                    length_list.append(graph[u][v][edge_key]["length"])
+                if "length" in _uv_graph_edge:
+                    length_list.append(_uv_graph_edge["length"])
 
             alt_dist = sum(length_list)
 
