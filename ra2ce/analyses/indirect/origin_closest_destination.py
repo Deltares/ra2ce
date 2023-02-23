@@ -322,18 +322,18 @@ class OriginClosestDestination:
         length_list = []
         for u, v in edgesinpath:
             # get edge with the lowest weighing if there are multiple edges that connect u and v
-            edge_key = sorted(graph[u][v], key=lambda x: graph[u][v][x][self.weighing])[
-                0
-            ]
-            if "geometry" in graph[u][v][edge_key]:
-                pref_edges.append(graph[u][v][edge_key]["geometry"])
+            _uv_graph = graph[u][v]
+            edge_key = sorted(_uv_graph, key=lambda x: _uv_graph[x][self.weighing])[0]
+            _uv_graph_edge = _uv_graph[edge_key]
+            if "geometry" in _uv_graph_edge:
+                pref_edges.append(_uv_graph_edge["geometry"])
             else:
                 pref_edges.append(
                     LineString([graph.nodes[u]["geometry"], graph.nodes[v]["geometry"]])
                 )
 
-            if "length" in graph[u][v][edge_key]:
-                length_list.append(graph[u][v][edge_key]["length"])
+            if "length" in _uv_graph_edge:
+                length_list.append(_uv_graph_edge["length"])
 
             # Add the number of people that need to go to a destination to the road segments. For now, each road segment in a route
             # gets attributed all the people that are taking that route.

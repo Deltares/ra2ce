@@ -1067,10 +1067,9 @@ class IndirectAnalyses:
                 )
                 graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
 
-            if "weighing" in analysis:
-                if analysis["weighing"] == "distance":
-                    # The name is different in the graph.
-                    analysis["weighing"] = "length"
+            if analysis.get("weighing", "") == "distance":
+                # The name is different in the graph.
+                analysis["weighing"] = "length"
             _config_files = self.config["files"]
             if analysis["analysis"] == "single_link_redundancy":
                 g = _pickle_reader.read(_config_files["base_graph"])
@@ -1082,35 +1081,32 @@ class IndirectAnalyses:
                 g = _pickle_reader.read(_config_files["origins_destinations_graph"])
                 gdf = self.optimal_route_origin_destination(g, analysis)
 
-                if ("save_traffic" in analysis.keys()) & (
+                if analysis.get("save_traffic", False) and (
                     "origin_count" in self.config["origins_destinations"].keys()
                 ):
-                    if analysis["save_traffic"]:
-                        od_table = gpd.read_feather(
-                            self.config["static"]
-                            / "output_graph"
-                            / "origin_destination_table.feather"
-                        )
-                        if "equity_weight" in analysis.keys():
-                            try:
-                                equity = pd.read_csv(
-                                    self.config["static"]
-                                    / "network"
-                                    / analysis["equity_weight"]
-                                )
-                            except Exception:
-                                equity = pd.DataFrame()
-                        else:
+                    od_table = gpd.read_feather(
+                        self.config["static"]
+                        / "output_graph"
+                        / "origin_destination_table.feather"
+                    )
+                    if "equity_weight" in analysis.keys():
+                        try:
+                            equity = pd.read_csv(
+                                self.config["static"]
+                                / "network"
+                                / analysis["equity_weight"]
+                            )
+                        except Exception:
                             equity = pd.DataFrame()
-                        route_traffic_df = self.optimal_route_od_link(
-                            gdf, od_table, equity
-                        )
-                        impact_csv_path = (
-                            self.config["output"]
-                            / analysis["analysis"]
-                            / (analysis["name"].replace(" ", "_") + "_link_traffic.csv")
-                        )
-                        route_traffic_df.to_csv(impact_csv_path, index=False)
+                    else:
+                        equity = pd.DataFrame()
+                    route_traffic_df = self.optimal_route_od_link(gdf, od_table, equity)
+                    impact_csv_path = (
+                        self.config["output"]
+                        / analysis["analysis"]
+                        / (analysis["name"].replace(" ", "_") + "_link_traffic.csv")
+                    )
+                    route_traffic_df.to_csv(impact_csv_path, index=False)
             elif analysis["analysis"] == "multi_link_origin_destination":
                 g = _pickle_reader.read(
                     self.config["files"]["origins_destinations_graph_hazard"]
@@ -1373,19 +1369,19 @@ def find_route_ods(graph, od_nodes, weighing):
             match_list = []
             for u, v in edgesinpath:
                 # get edge with the lowest weighing if there are multiple edges that connect u and v
-                edge_key = sorted(graph[u][v], key=lambda x: graph[u][v][x][weighing])[
-                    0
-                ]
-                if "geometry" in graph[u][v][edge_key]:
-                    pref_edges.append(graph[u][v][edge_key]["geometry"])
+                _uv_graph = graph[u][v]
+                edge_key = sorted(_uv_graph, key=lambda x: _uv_graph[x][weighing])[0]
+                _uv_graph_edge = _uv_graph[edge_key]
+                if "geometry" in _uv_graph_edge:
+                    pref_edges.append(_uv_graph_edge["geometry"])
                 else:
                     pref_edges.append(
                         LineString(
                             [graph.nodes[u]["geometry"], graph.nodes[v]["geometry"]]
                         )
                     )
-                if "rfid" in graph[u][v][edge_key]:
-                    match_list.append(graph[u][v][edge_key]["rfid"])
+                if "rfid" in _uv_graph_edge:
+                    match_list.append(_uv_graph_edge["rfid"])
 
             # compile the road segments into one geometry
             pref_edges = MultiLineString(pref_edges)

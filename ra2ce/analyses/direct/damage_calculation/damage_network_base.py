@@ -64,48 +64,45 @@ class DamageNetworkBase(ABC):
     def clean_and_interpolate_missing_lane_data(self):
         # cleanup and complete the lane data.
         ### Try to convert all data to floats
-        gdf = self.gdf
         try:
-            gdf.lanes = gdf.lanes.astype(
+            self.gdf.lanes = self.gdf.lanes.astype(
                 "float"
             )  # floats instead of ints because ints cannot be nan.
         except Exception:
             logging.warning(
                 "Available lane data cannot simply be converted to float/int, RA2CE will try a clean-up."
             )
-            gdf.lanes = clean_lane_data(gdf.lanes)
+            self.gdf.lanes = clean_lane_data(self.gdf.lanes)
 
-        gdf.lanes = gdf.lanes.round(
-            0
-        )  # round to nearest integer, but save as float format
-        nans = (
-            gdf.lanes.isnull()
-        )  # boolean with trues for all nans, i.e. all road segements without lane data
+        # round to nearest integer, but save as float format
+        self.gdf.lanes = self.gdf.lanes.round(0)
+
+        # boolean with trues for all nans, i.e. all road segements without lane data
+        nans = self.gdf.lanes.isnull()
         if nans.sum() > 0:
             logging.warning(
                 """Of the {} road segments, only {} had lane data, so for {} the '
                                     lane data will be interpolated from the existing data""".format(
-                    len(gdf.lanes), (~nans).sum(), nans.sum()
+                    len(self.gdf.lanes), (~nans).sum(), nans.sum()
                 )
             )
-            lane_stats = create_summary_statistics(gdf)
+            lane_stats = create_summary_statistics(self.gdf)
 
             # Replace the missing lane data the neat way (without pandas SettingWithCopyWarning)
-            lane_nans_mask = gdf.lanes.isnull()
-            gdf.loc[lane_nans_mask, "lanes"] = gdf.loc[
+            lane_nans_mask = self.gdf.lanes.isnull()
+            self.gdf.loc[lane_nans_mask, "lanes"] = self.gdf.loc[
                 lane_nans_mask, "road_type"
             ].replace(lane_stats)
             logging.warning(
                 "Interpolated the missing lane data as follows: {}".format(lane_stats)
             )
 
-            assert not (np.nan in gdf.lanes.unique())  # all nans should be replaced
+            assert not (
+                np.nan in self.gdf.lanes.unique()
+            )  # all nans should be replaced
 
-        gdf.loc[
-            gdf["lanes"] == 0, "lanes"
-        ] = 1  # TODO: think about if this is the best option
-
-        self.gdf = gdf
+        # TODO: think about if this is the best option
+        self.gdf.loc[self.gdf["lanes"] == 0, "lanes"] = 1
 
     def remap_road_types_to_fewer_classes(self):
         """
