@@ -246,7 +246,6 @@ class TestCostBenefitAnalysis:
         _effectiveness_dict = {}
         df_data = {
             "coefficient": 4.2,
-            "repair_costs_standard": [2.4],
             "standard_gevoelig_sum": [42],
             "standard_gevoelig_max": [42.24],
             "return_period": [0.42],

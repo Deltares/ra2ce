@@ -22,7 +22,7 @@ TODO: This whole file should be throughouly tested / redesigned.
 """
 
 
-def read_OD_files(
+def read_origin_destination_files(
     origin_paths: Union[str, list],
     origin_names: Union[str, list],
     destination_paths: Union[str, list],
@@ -117,11 +117,14 @@ def closest_node(node: np.ndarray, nodes: np.ndarray) -> np.ndarray:
 
 
 def get_od(o_id, d_id):
+    """
+    TODO: VERY UNCLEAR what this method is meant to do.
+    FIX: Solve below logic, it is not a correct paradigm. ADD TESTS AND TYPE HINTS.
+    """
     match_name = o_id
-    if match_name == "nan":
-        match_name = (
-            np.nan
-        )  # convert string nans to np.nans to be able to differentiate between origins and destinations in the next step.
+    if o_id == "nan":
+        # convert string nans to np.nans to be able to differentiate between origins and destinations in the next step.
+        match_name = np.nan
     if not match_name == match_name:
         # match_name is nan, the point is not an origin but a destination
         match_name = d_id

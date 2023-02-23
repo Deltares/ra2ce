@@ -158,31 +158,26 @@ def merge_lines_automatic(
                     aadts_set_merged = [
                         i for i in aadts_set_merged if not all(v is None for v in i)
                     ]
-                    if len(aadts_set_merged) > 1 and isinstance(
-                        aadts_set_merged[0], list
+                    if (
+                        len(aadts_set_merged) > 1
+                        and isinstance(aadts_set_merged[0], list)
+                        and yes_to_all == "all"
                     ):
-                        if yes_to_all == "all":
-                            if all_type == "max":
-                                aadts_set_merged = [
-                                    max(sublist)
-                                    for sublist in list(
-                                        map(list, zip(*aadts_set_merged))
-                                    )
-                                ]
-                            elif all_type == "min":
-                                aadts_set_merged = [
-                                    min(sublist)
-                                    for sublist in list(
-                                        map(list, zip(*aadts_set_merged))
-                                    )
-                                ]
-                            elif all_type == "mean":
-                                aadts_set_merged = [
-                                    mean(sublist)
-                                    for sublist in list(
-                                        map(list, zip(*aadts_set_merged))
-                                    )
-                                ]
+                        if all_type == "max":
+                            aadts_set_merged = [
+                                max(sublist)
+                                for sublist in list(map(list, zip(*aadts_set_merged)))
+                            ]
+                        elif all_type == "min":
+                            aadts_set_merged = [
+                                min(sublist)
+                                for sublist in list(map(list, zip(*aadts_set_merged)))
+                            ]
+                        elif all_type == "mean":
+                            aadts_set_merged = [
+                                mean(sublist)
+                                for sublist in list(map(list, zip(*aadts_set_merged)))
+                            ]
 
                 # add values to the dataframe
                 this_fid = [x[0] if isinstance(x, list) else x for x in fid_set_merged][

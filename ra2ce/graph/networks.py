@@ -354,12 +354,15 @@ class Network:
         Returns:
             graph (NetworkX graph): the NetworkX graph with OD nodes
         """
-        from ra2ce.graph.origins_destinations import add_od_nodes, read_OD_files
+        from ra2ce.graph.origins_destinations import (
+            add_od_nodes,
+            read_origin_destination_files,
+        )
 
         name = "origin_destination_table"
 
         # Add the origin/destination nodes to the network
-        ods = read_OD_files(
+        ods = read_origin_destination_files(
             self.origins,
             self.origins_names,
             self.destinations,
