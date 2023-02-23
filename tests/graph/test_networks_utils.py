@@ -25,7 +25,7 @@ class TestNetworkUtils:
 
     @pytest.mark.parametrize("percent", [(-20), (0), (50), (100), (110)])
     def test_draw_progress_bar(self, percent: float):
-        nu.drawProgressBar(percent)
+        nu.draw_progress_bar(percent)
 
     def test_merge_lines_automatic_wrong_input_returns(self):
         _left_line = MultiLineString([[[0, 0], [1, 0], [2, 0]]])

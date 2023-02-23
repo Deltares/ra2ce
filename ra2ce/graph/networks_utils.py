@@ -41,7 +41,7 @@ def convert_unit(unit: str) -> Optional[float]:
     return _conversion_dict.get(unit.lower(), None)
 
 
-def drawProgressBar(percent, barLen=20):
+def draw_progress_bar(percent: float, barLen: int = 20):
     """Draws a progress bar
     https://stackoverflow.com/questions/3002085/python-to-print-out-status-bar-and-percentage
     """
@@ -346,7 +346,7 @@ def snap_endpoints_lines(
         target = nearest_neighbor_within(all_vertices, idx, endpoint, max_dist)
 
         # draw a progress bar
-        drawProgressBar(i / len(isolated_endpoints))
+        draw_progress_bar(i / len(isolated_endpoints))
 
         # do nothing if the target point is further away from the endpoint than max_dist
         # or if they are at the same location
