@@ -1,6 +1,7 @@
 import shutil
 import subprocess
 from pathlib import Path
+from typing import Optional
 
 import pytest
 
@@ -10,9 +11,11 @@ from tests import slow_test, test_data
 # Just to make sonar-cloud stop complaining.
 _network_ini_name = "network.ini"
 _analysis_ini_name = "analyses.ini"
+_base_graph_p_filename = "base_graph.p"
+_base_network_feather_filename = "base_network.feather"
 
 
-def run_from_cli(network_ini: Path, analysis_ini: Path) -> None:
+def _run_from_cli(network_ini: Optional[Path], analysis_ini: Optional[Path]) -> None:
 
     assert Path(main.__file__).exists(), "No main file was found."
 
@@ -59,13 +62,13 @@ class TestAcceptance:
         ToDo: is this test necessary? Would it not be better to frame it in direct / indirect ?
         """
         _test_dir = test_data / project_name
-        _network = _test_dir / "network.ini"
-        _analysis = _test_dir / "analyses.ini"
+        _network = _test_dir / _network_ini_name
+        _analysis = _test_dir / _analysis_ini_name
 
         assert _network.is_file()
         assert _analysis.is_file()
 
-        run_from_cli(_network, _analysis)
+        _run_from_cli(_network, _analysis)
 
 
 class TestIndirectAnalyses:
@@ -93,12 +96,12 @@ class TestIndirectAnalyses:
         ]
 
         # 2. When test:
-        run_from_cli(network_ini, analysis_ini)
+        _run_from_cli(network_ini, analysis_ini)
 
         # 3. Then, validate expectations
         _expected_graph_files = [
-            "base_graph.p",
-            "base_network.feather",
+            _base_graph_p_filename,
+            _base_network_feather_filename,
         ]
         for _graph_file in _expected_graph_files:
             _graph_file = _output_graph_dir / _graph_file
@@ -149,7 +152,7 @@ class TestIndirectAnalyses:
             ],
         )
         # 2. When run test:
-        run_from_cli(network_ini, analyses_ini)
+        _run_from_cli(network_ini, analyses_ini)
 
         # 3. Then validate expectations:
         for analysis, files in _expected_analysis_files.items():
@@ -179,12 +182,12 @@ class TestNetworkCreation:
         shutil.rmtree(_output_graph_dir, ignore_errors=True)
 
         # 2. When run test.
-        run_from_cli(network_ini, None)
+        _run_from_cli(network_ini, None)
 
         # 3. Then verify expectations.
         _expected_files = [
-            "base_graph.p",
-            "base_network.feather",
+            _base_graph_p_filename,
+            _base_network_feather_filename,
         ]
 
         def validate_file(filename: str):
@@ -208,12 +211,12 @@ class TestNetworkCreation:
         shutil.rmtree(_output_graph_dir, ignore_errors=True)
 
         # 2. When run test.
-        run_from_cli(network_ini, None)
+        _run_from_cli(network_ini, None)
 
         # 3. Then verify expectations.
         _expected_files = [
-            "base_graph.p",
-            "base_network.feather",
+            _base_graph_p_filename,
+            _base_network_feather_filename,
         ]
 
         def validate_file(filename: str):
@@ -235,12 +238,12 @@ class TestNetworkCreation:
         shutil.rmtree(_output_graph_dir, ignore_errors=True)
 
         # 2. When run test.
-        run_from_cli(network_ini, None)
+        _run_from_cli(network_ini, None)
 
         # 3. Then verify expectations.
         _expected_files = [
-            "base_graph.p",
-            "base_network.feather",
+            _base_graph_p_filename,
+            _base_network_feather_filename,
             "simple_to_complex.json",
             "complex_to_simple.json",
         ]
