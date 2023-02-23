@@ -30,7 +30,7 @@ def clean_lane_data(lane_col: pd.Series) -> pd.Series:
 
 
 def lane_cleaner(cell: Any) -> float:
-    """ "
+    """
     Helper function to clean an object with lane data and return it as a float
 
     @author: Kees van Ginkel, Deltares
@@ -40,7 +40,6 @@ def lane_cleaner(cell: Any) -> float:
 
     Returns:
         *new* (float) : number of lanes or np.nan
-
     """
     if cell is None:
         return np.nan
@@ -51,7 +50,7 @@ def lane_cleaner(cell: Any) -> float:
     if isinstance(cell, str):  # try to unpack the cell
         try:
             return float(cell)
-        except:
+        except Exception:
             logging.warning(
                 "Lanedata {} could not be converted to float, if it is a list we will try to unpack".format(
                     cell
@@ -64,7 +63,7 @@ def lane_cleaner(cell: Any) -> float:
                     logging.warning(
                         "Our best guess of the lane number is: {}".format(_max_value)
                     )
-                except:
+                except Exception:
                     logging.warning(
                         "Unexpected datatype, lane data removed {} {}".format(
                             cell, type(cell)
