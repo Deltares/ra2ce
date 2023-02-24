@@ -212,7 +212,7 @@ class TestAcceptance:
             list(
                 chain(
                     *(
-                        map(lambda x: _verify_file(_analysis_dir / k / x), v)
+                        list(map(lambda x: _verify_file(_analysis_dir / k / x), v))
                         for k, v in expected_analysis_files.items()
                     )
                 )
