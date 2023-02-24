@@ -201,20 +201,20 @@ class TestAcceptance:
         _run_from_cli(network_ini, analysis_ini)
 
         # 3. Then, validate expectations
-        def _verify_file(filepath: Path):
-            assert (
-                filepath.exists() and filepath.is_file()
-            ), "File {} was not found.".format(filepath)
+        def _verify_file(filepath: Path) -> bool:
+            return filepath.exists() and filepath.is_file()
 
         # Graph files
-        for _f in expected_graph_files:
-            assert _verify_file(_graph_dir / _f)
+        assert all(_verify_file(_graph_dir / _f) for _f in expected_graph_files)
+
         # Analysis files
-        list(
-            chain(
-                *(
-                    map(lambda x: _verify_file(_analysis_dir / k / x), v)
-                    for k, v in expected_analysis_files.items()
+        assert all(
+            list(
+                chain(
+                    *(
+                        map(lambda x: _verify_file(_analysis_dir / k / x), v)
+                        for k, v in expected_analysis_files.items()
+                    )
                 )
             )
         )
