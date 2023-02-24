@@ -28,6 +28,9 @@ class IndirectAnalyses:
         graphs: A dictionary with one or multiple NetworkX graphs.
     """
 
+    _file_name_key = "File name"
+    _ra2ce_name_key = "RA2CE name"
+
     def __init__(self, config, graphs):
         self.config = config
         self.graphs = graphs
@@ -35,7 +38,9 @@ class IndirectAnalyses:
             self.hazard_names = pd.read_excel(
                 self.config["output"].joinpath("hazard_names.xlsx")
             )
-            self.config["hazard_names"] = list(set(self.hazard_names["File name"]))
+            self.config["hazard_names"] = list(
+                set(self.hazard_names[self._file_name_key])
+            )
 
     def single_link_redundancy(self, graph, analysis):
         """This is the function to analyse roads with a single link disruption and an alternative route.
@@ -52,8 +57,6 @@ class IndirectAnalyses:
         # else:
         #     aadt_names = None
         #     road_usage_data = pd.DataFrame()
-        road_usage_data = None  # can be removed if the above is fixed
-        aadt_names = None  # can be removed if the above is fixed
 
         # create a geodataframe from the graph
         gdf = osmnx.graph_to_gdfs(graph, nodes=False)
@@ -105,7 +108,7 @@ class IndirectAnalyses:
 
         return gdf
 
-    def single_link_losses(self, gdf, analysis):
+    def single_link_losses(self, gdf: gpd.GeoDataFrame, analysis: dict):
         """Calculates single link disruption losses.
 
         Args:
@@ -115,142 +118,135 @@ class IndirectAnalyses:
         losses_fn = self.config["static"] / "hazard" / analysis["loss_per_distance"]
         losses_df = pd.read_excel(losses_fn, sheet_name="Sheet1")
 
+        if analysis["loss_type"] == "uniform":
+            # assume uniform threshold for disruption
+            self._single_link_losses_uniform(gdf, analysis, losses_df)
+
         if analysis["loss_type"] == "categorized":
-            disruption_fn = (
+            _disruption_file = (
                 self.config["static"] / "hazard" / analysis["disruption_per_category"]
             )
-            disruption_df = pd.read_excel(disruption_fn, sheet_name="Sheet1")
-
-        if (
-            analysis["loss_type"] == "uniform"
-        ):  # assume uniform threshold for disruption
-            for hz in self.config["hazard_names"]:
-                for col in analysis["traffic_cols"].split(","):
-                    try:
-                        assert gdf[col + "_detour_losses"]
-                        assert gdf[col + "_nodetour_losses"]
-                    except:
-                        gdf[col + "_detour_losses"] = 0
-                        gdf[col + "_nodetour_losses"] = 0
-                    # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle]  * duration_disruption[hour] / 24[hour/day]
-                    gdf.loc[
-                        (gdf["detour"] == 1)
-                        & (
-                            gdf[hz + "_" + analysis["aggregate_wl"]]
-                            > analysis["threshold"]
-                        ),
-                        col + "_detour_losses",
-                    ] += (
-                        gdf[col]
-                        * gdf["diff_dist"]
-                        * losses_df.loc[
-                            losses_df["traffic_class"] == col, "cost"
-                        ].values[0]
-                        * analysis["uniform_duration"]
-                        / 24
-                    )
-                    # no_detour_losses = traffic_per_day[veh/day] * occupancy[person/veh] * gdp_percapita_per_day[USD/person] * duration_disruption[hour] / 24[hour/day]
-                    gdf.loc[
-                        (gdf["detour"] == 0)
-                        & (
-                            gdf[hz + "_" + analysis["aggregate_wl"]]
-                            > analysis["threshold"]
-                        ),
-                        col + "_nodetour_losses",
-                    ] += (
-                        gdf[col]
-                        * losses_df.loc[
-                            losses_df["traffic_class"] == col, "occupancy"
-                        ].values[0]
-                        * analysis["gdp_percapita"]
-                        * analysis["uniform_duration"]
-                        / 24
-                    )
-                gdf["total_losses_" + hz] = np.nansum(
-                    gdf[
-                        [
-                            x
-                            for x in gdf.columns
-                            if ("losses" in x) and (not "total" in x)
-                        ]
-                    ],
-                    axis=1,
-                )
-
-        if analysis["loss_type"] == "categorized":
-            road_classes = [x for x in disruption_df.columns if "class" in x]
-            for hz in self.config["hazard_names"]:
-                disruption_df["class_identifier"] = ""
-                gdf["class_identifier"] = ""
-                for i, road_class in enumerate(road_classes):
-                    disruption_df["class_identifier"] += disruption_df[road_class]
-                    gdf["class_identifier"] += gdf[road_class[6:]]
-                    if i < len(road_classes) - 1:
-                        disruption_df["class_identifier"] += "_nextclass_"
-                        gdf["class_identifier"] += "_nextclass_"
-
-                all_road_categories = np.unique(gdf["class_identifier"])
-                gdf["duration_disruption"] = 0
-
-                for lb in np.unique(disruption_df["lower_bound"]):
-                    disruption_df_ = disruption_df.loc[
-                        disruption_df["lower_bound"] == lb
-                    ]
-                    ub = disruption_df_["upper_bound"].values[0]
-                    if not ub > 0:
-                        ub = 1e10
-                    for road_cat in all_road_categories:
-                        gdf.loc[
-                            (gdf[hz + "_" + analysis["aggregate_wl"]] > lb)
-                            & (gdf[hz + "_" + analysis["aggregate_wl"]] <= ub)
-                            & (gdf["class_identifier"] == road_cat),
-                            "duration_disruption",
-                        ] = disruption_df_.loc[
-                            disruption_df_["class_identifier"] == road_cat,
-                            "duration_disruption",
-                        ].values[
-                            0
-                        ]
-
-                for col in analysis["traffic_cols"].split(","):
-                    try:
-                        assert gdf[col + "_detour_losses"]
-                        assert gdf[col + "_nodetour_losses"]
-                    except:
-                        gdf[col + "_detour_losses"] = 0
-                        gdf[col + "_nodetour_losses"] = 0
-                    # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle] * duration_disruption[hour] / 24[hour/day]
-                    gdf.loc[gdf["detour"] == 1, col + "_detour_losses"] += (
-                        gdf[col]
-                        * gdf["diff_dist"]
-                        * losses_df.loc[
-                            losses_df["traffic_class"] == col, "cost"
-                        ].values[0]
-                        * gdf["duration_disruption"]
-                        / 24
-                    )
-                    # no_detour_losses = traffic_per_day[veh/day] * occupancy[person/veh] * gdp_percapita[USD/person] * duration_disruption[hour] / 24[hour/day]
-                    gdf.loc[gdf["detour"] == 0, col + "_nodetour_losses"] += (
-                        gdf[col]
-                        * losses_df.loc[
-                            losses_df["traffic_class"] == col, "occupancy"
-                        ].values[0]
-                        * analysis["gdp_percapita"]
-                        * gdf["duration_disruption"]
-                        / 24
-                    )
-                gdf["total_losses_" + hz] = np.nansum(
-                    gdf[
-                        [
-                            x
-                            for x in gdf.columns
-                            if ("losses" in x) and (not "total" in x)
-                        ]
-                    ],
-                    axis=1,
-                )
+            _disruption_df = pd.read_excel(_disruption_file, sheet_name="Sheet1")
+            self._single_link_losses_categorized(
+                gdf, analysis, losses_df, _disruption_df
+            )
 
         return gdf
+
+    def _single_link_losses_uniform(
+        self, gdf: gpd.GeoDataFrame, analysis: dict, losses_df: pd.DataFrame
+    ):
+        for hz in self.config["hazard_names"]:
+            for col in analysis["traffic_cols"].split(","):
+                try:
+                    assert gdf[col + "_detour_losses"]
+                    assert gdf[col + "_nodetour_losses"]
+                except Exception:
+                    gdf[col + "_detour_losses"] = 0
+                    gdf[col + "_nodetour_losses"] = 0
+                # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle]  * duration_disruption[hour] / 24[hour/day]
+                gdf.loc[
+                    (gdf["detour"] == 1)
+                    & (
+                        gdf[hz + "_" + analysis["aggregate_wl"]] > analysis["threshold"]
+                    ),
+                    col + "_detour_losses",
+                ] += (
+                    gdf[col]
+                    * gdf["diff_dist"]
+                    * losses_df.loc[losses_df["traffic_class"] == col, "cost"].values[0]
+                    * analysis["uniform_duration"]
+                    / 24
+                )
+                # no_detour_losses = traffic_per_day[veh/day] * occupancy[person/veh] * gdp_percapita_per_day[USD/person] * duration_disruption[hour] / 24[hour/day]
+                gdf.loc[
+                    (gdf["detour"] == 0)
+                    & (
+                        gdf[hz + "_" + analysis["aggregate_wl"]] > analysis["threshold"]
+                    ),
+                    col + "_nodetour_losses",
+                ] += (
+                    gdf[col]
+                    * losses_df.loc[
+                        losses_df["traffic_class"] == col, "occupancy"
+                    ].values[0]
+                    * analysis["gdp_percapita"]
+                    * analysis["uniform_duration"]
+                    / 24
+                )
+            gdf["total_losses_" + hz] = np.nansum(
+                gdf[[x for x in gdf.columns if ("losses" in x) and ("total" not in x)]],
+                axis=1,
+            )
+
+    def _single_link_losses_categorized(
+        self,
+        gdf: gpd.GeoDataFrame,
+        analysis: dict,
+        losses_df: pd.DataFrame,
+        disruption_df: pd.DataFrame,
+    ):
+        _road_classes = [x for x in disruption_df.columns if "class" in x]
+        for hz in self.config["hazard_names"]:
+            disruption_df["class_identifier"] = ""
+            gdf["class_identifier"] = ""
+            for i, road_class in enumerate(_road_classes):
+                disruption_df["class_identifier"] += disruption_df[road_class]
+                gdf["class_identifier"] += gdf[road_class[6:]]
+                if i < len(_road_classes) - 1:
+                    disruption_df["class_identifier"] += "_nextclass_"
+                    gdf["class_identifier"] += "_nextclass_"
+
+            _all_road_categories = np.unique(gdf["class_identifier"])
+            gdf["duration_disruption"] = 0
+
+            for lb in np.unique(disruption_df["lower_bound"]):
+                disruption_df_ = disruption_df.loc[disruption_df["lower_bound"] == lb]
+                ub = disruption_df_["upper_bound"].values[0]
+                if ub <= 0:
+                    ub = 1e10
+                for road_cat in _all_road_categories:
+                    gdf.loc[
+                        (gdf[hz + "_" + analysis["aggregate_wl"]] > lb)
+                        & (gdf[hz + "_" + analysis["aggregate_wl"]] <= ub)
+                        & (gdf["class_identifier"] == road_cat),
+                        "duration_disruption",
+                    ] = disruption_df_.loc[
+                        disruption_df_["class_identifier"] == road_cat,
+                        "duration_disruption",
+                    ].values[
+                        0
+                    ]
+
+            for col in analysis["traffic_cols"].split(","):
+                try:
+                    assert gdf[col + "_detour_losses"]
+                    assert gdf[col + "_nodetour_losses"]
+                except Exception:
+                    gdf[col + "_detour_losses"] = 0
+                    gdf[col + "_nodetour_losses"] = 0
+                # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle] * duration_disruption[hour] / 24[hour/day]
+                gdf.loc[gdf["detour"] == 1, col + "_detour_losses"] += (
+                    gdf[col]
+                    * gdf["diff_dist"]
+                    * losses_df.loc[losses_df["traffic_class"] == col, "cost"].values[0]
+                    * gdf["duration_disruption"]
+                    / 24
+                )
+                # no_detour_losses = traffic_per_day[veh/day] * occupancy[person/veh] * gdp_percapita[USD/person] * duration_disruption[hour] / 24[hour/day]
+                gdf.loc[gdf["detour"] == 0, col + "_nodetour_losses"] += (
+                    gdf[col]
+                    * losses_df.loc[
+                        losses_df["traffic_class"] == col, "occupancy"
+                    ].values[0]
+                    * analysis["gdp_percapita"]
+                    * gdf["duration_disruption"]
+                    / 24
+                )
+            gdf["total_losses_" + hz] = np.nansum(
+                gdf[[x for x in gdf.columns if ("losses" in x) and ("total" not in x)]],
+                axis=1,
+            )
 
     def multi_link_redundancy(self, graph, analysis):
         """Calculates the multi-link redundancy of a NetworkX graph.
@@ -270,7 +266,7 @@ class IndirectAnalyses:
         master_graph = copy.deepcopy(graph)
         for hazard in self.config["hazard_names"]:
             hazard_name = self.hazard_names.loc[
-                self.hazard_names["File name"] == hazard, "RA2CE name"
+                self.hazard_names[self._file_name_key] == hazard, self._ra2ce_name_key
             ].values[0]
 
             graph = copy.deepcopy(master_graph)
@@ -380,7 +376,7 @@ class IndirectAnalyses:
         results = []
         for hazard in self.config["hazard_names"]:
             hazard_name = self.hazard_names.loc[
-                self.hazard_names["File name"] == hazard, "RA2CE name"
+                self.hazard_names[self._file_name_key] == hazard, self._ra2ce_name_key
             ].values[0]
 
             gdf_ = gdf.loc[gdf["hazard"] == hazard_name].copy()
@@ -413,7 +409,7 @@ class IndirectAnalyses:
                         [
                             x
                             for x in gdf_.columns
-                            if ("losses" in x) and (not "total" in x)
+                            if ("losses" in x) and ("total" not in x)
                         ]
                     ],
                     axis=1,
@@ -439,7 +435,7 @@ class IndirectAnalyses:
                         disruption_df["lower_bound"] == lb
                     ]
                     ub = disruption_df_["upper_bound"].values[0]
-                    if not ub > 0:
+                    if ub <= 0:
                         ub = 1e10
                     for road_cat in all_road_categories:
                         gdf_.loc[
@@ -480,7 +476,7 @@ class IndirectAnalyses:
                         [
                             x
                             for x in gdf_.columns
-                            if ("losses" in x) and (not "total" in x)
+                            if ("losses" in x) and ("total" not in x)
                         ]
                     ],
                     axis=1,
@@ -521,9 +517,6 @@ class IndirectAnalyses:
         return od_nodes
 
     def optimal_route_origin_destination(self, graph, analysis):
-        # Calculate the preferred routes
-        name = analysis["name"].replace(" ", "_")
-
         # create list of origin-destination pairs
         od_nodes = self._get_origin_destination_pairs(graph)
         pref_routes = find_route_ods(graph, od_nodes, analysis["weighing"])
@@ -631,7 +624,7 @@ class IndirectAnalyses:
                                 route_traffic_prioritarian[
                                     str(u) + "_" + str(v)
                                 ] += t_prioritarian
-                        except:
+                        except Exception:
                             route_traffic.update({str(u) + "_" + str(v): t})
                             route_traffic_equal.update({str(u) + "_" + str(v): t_eq})
                             if len(equity) > 0:
@@ -673,7 +666,7 @@ class IndirectAnalyses:
         all_results = []
         for hazard in self.config["hazard_names"]:
             hazard_name = self.hazard_names.loc[
-                self.hazard_names["File name"] == hazard, "RA2CE name"
+                self.hazard_names[self._file_name_key] == hazard, self._ra2ce_name_key
             ].values[0]
 
             graph_hz = copy.deepcopy(graph)
@@ -895,7 +888,7 @@ class IndirectAnalyses:
                 for col in origin_impact.columns:
                     if "_pc" in col:
                         delta = np.nanmean(origin_impact[col])
-                        if not delta >= 0:
+                        if delta < 0:
                             delta = 0
                         origin_impact_tosave.loc[0, col[12:] + "_increase"] = delta
 
@@ -932,7 +925,7 @@ class IndirectAnalyses:
         aggregation = pd.DataFrame()
         for i, hazard in enumerate(self.config["hazard_names"]):
             hazard_name = self.hazard_names.loc[
-                self.hazard_names["File name"] == hazard, "RA2CE name"
+                self.hazard_names[self._file_name_key] == hazard, self._ra2ce_name_key
             ].values[0]
 
             graph_hz = copy.deepcopy(graph)
@@ -1069,10 +1062,9 @@ class IndirectAnalyses:
                 )
                 graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
 
-            if "weighing" in analysis:
-                if analysis["weighing"] == "distance":
-                    # The name is different in the graph.
-                    analysis["weighing"] = "length"
+            if analysis.get("weighing", "") == "distance":
+                # The name is different in the graph.
+                analysis["weighing"] = "length"
             _config_files = self.config["files"]
             if analysis["analysis"] == "single_link_redundancy":
                 g = _pickle_reader.read(_config_files["base_graph"])
@@ -1084,35 +1076,32 @@ class IndirectAnalyses:
                 g = _pickle_reader.read(_config_files["origins_destinations_graph"])
                 gdf = self.optimal_route_origin_destination(g, analysis)
 
-                if ("save_traffic" in analysis.keys()) & (
+                if analysis.get("save_traffic", False) and (
                     "origin_count" in self.config["origins_destinations"].keys()
                 ):
-                    if analysis["save_traffic"]:
-                        od_table = gpd.read_feather(
-                            self.config["static"]
-                            / "output_graph"
-                            / "origin_destination_table.feather"
-                        )
-                        if "equity_weight" in analysis.keys():
-                            try:
-                                equity = pd.read_csv(
-                                    self.config["static"]
-                                    / "network"
-                                    / analysis["equity_weight"]
-                                )
-                            except:
-                                equity = pd.DataFrame()
-                        else:
+                    od_table = gpd.read_feather(
+                        self.config["static"]
+                        / "output_graph"
+                        / "origin_destination_table.feather"
+                    )
+                    if "equity_weight" in analysis.keys():
+                        try:
+                            equity = pd.read_csv(
+                                self.config["static"]
+                                / "network"
+                                / analysis["equity_weight"]
+                            )
+                        except Exception:
                             equity = pd.DataFrame()
-                        route_traffic_df = self.optimal_route_od_link(
-                            gdf, od_table, equity
-                        )
-                        impact_csv_path = (
-                            self.config["output"]
-                            / analysis["analysis"]
-                            / (analysis["name"].replace(" ", "_") + "_link_traffic.csv")
-                        )
-                        route_traffic_df.to_csv(impact_csv_path, index=False)
+                    else:
+                        equity = pd.DataFrame()
+                    route_traffic_df = self.optimal_route_od_link(gdf, od_table, equity)
+                    impact_csv_path = (
+                        self.config["output"]
+                        / analysis["analysis"]
+                        / (analysis["name"].replace(" ", "_") + "_link_traffic.csv")
+                    )
+                    route_traffic_df.to_csv(impact_csv_path, index=False)
             elif analysis["analysis"] == "multi_link_origin_destination":
                 g = _pickle_reader.read(
                     self.config["files"]["origins_destinations_graph_hazard"]
@@ -1149,7 +1138,7 @@ class IndirectAnalyses:
                         )
                     )
                     regional_impact_summary_df.to_csv(impact_csv_path)
-                except:
+                except Exception:
                     pass
                 impact_csv_path = (
                     self.config["output"]
@@ -1324,7 +1313,6 @@ class IndirectAnalyses:
             logging.info(
                 f"----------------------------- Analysis '{analysis['name']}' finished. Time: {str(round(endtime - starttime, 2))}s  -----------------------------"
             )
-        return
 
 
 def save_gdf(gdf, save_path):
@@ -1375,19 +1363,19 @@ def find_route_ods(graph, od_nodes, weighing):
             match_list = []
             for u, v in edgesinpath:
                 # get edge with the lowest weighing if there are multiple edges that connect u and v
-                edge_key = sorted(graph[u][v], key=lambda x: graph[u][v][x][weighing])[
-                    0
-                ]
-                if "geometry" in graph[u][v][edge_key]:
-                    pref_edges.append(graph[u][v][edge_key]["geometry"])
+                _uv_graph = graph[u][v]
+                edge_key = sorted(_uv_graph, key=lambda x, _fgraph=_uv_graph: _fgraph[x][weighing])[0]
+                _uv_graph_edge = _uv_graph[edge_key]
+                if "geometry" in _uv_graph_edge:
+                    pref_edges.append(_uv_graph_edge["geometry"])
                 else:
                     pref_edges.append(
                         LineString(
                             [graph.nodes[u]["geometry"], graph.nodes[v]["geometry"]]
                         )
                     )
-                if "rfid" in graph[u][v][edge_key]:
-                    match_list.append(graph[u][v][edge_key]["rfid"])
+                if "rfid" in _uv_graph_edge:
+                    match_list.append(_uv_graph_edge["rfid"])
 
             # compile the road segments into one geometry
             pref_edges = MultiLineString(pref_edges)

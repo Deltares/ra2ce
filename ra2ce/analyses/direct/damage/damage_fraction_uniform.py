@@ -20,7 +20,7 @@ class DamageFractionUniform:
         self.hazard_unit = hazard_unit
         self.interpolator = None
 
-    def from_csv(self, path: Path, sep=",", desired_unit="m") -> None:
+    def from_csv(self, path: Path, sep=",") -> None:
         """Construct object from csv file. Damage curve name is inferred from filename
 
         Arguments:

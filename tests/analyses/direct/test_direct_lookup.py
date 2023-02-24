@@ -31,7 +31,7 @@ class TestDirectLookUp:
         )
 
     def test_get_max_damages_osd(self):
-        _max_damages = LookUp.get_max_damages_OSD()
+        _max_damages = LookUp.get_max_damages_osd()
         assert isinstance(_max_damages, OrderedDict)
         assert list(_max_damages.keys()) == ["Lower", "Upper"]
         _sorted_keys = sorted(_lookup_keys)

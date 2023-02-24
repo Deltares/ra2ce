@@ -60,7 +60,7 @@ class TestIniConfigValidatorBase:
         _validator = IniConfigValidatorBase(DummyConfigData())
 
         # 2. Run test.
-        _report = _validator._validate_road_types(None)
+        _report = _validator._validate_road_types("")
 
         # 3. Verify expectations.
         assert isinstance(_report, ValidationReport)

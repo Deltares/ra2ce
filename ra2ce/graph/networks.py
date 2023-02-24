@@ -53,7 +53,7 @@ class Network:
                 config["static"] / "network" / config["origins_destinations"]["region"]
             )
             self.region_var = config["origins_destinations"]["region_var"]
-        except:
+        except Exception:
             self.region = None
             self.region_var = None
 
@@ -94,7 +94,7 @@ class Network:
         # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
         # The list of fid's is reduced by the fid's that are not anymore in the merged lines
         if self.config["cleanup"]["merge_lines"]:
-            aadt_names = None
+            aadt_names = []
             edges, lines_merged = nut.merge_lines_automatic(
                 lines, self.config["network"]["file_id"], aadt_names, crs
             )
@@ -354,12 +354,15 @@ class Network:
         Returns:
             graph (NetworkX graph): the NetworkX graph with OD nodes
         """
-        from ra2ce.graph.origins_destinations import add_od_nodes, read_OD_files
+        from ra2ce.graph.origins_destinations import (
+            add_od_nodes,
+            read_origin_destination_files,
+        )
 
         name = "origin_destination_table"
 
         # Add the origin/destination nodes to the network
-        ods = read_OD_files(
+        ods = read_origin_destination_files(
             self.origins,
             self.origins_names,
             self.destinations,
@@ -465,9 +468,11 @@ class Network:
 
         return lines
 
-    def get_avg_speed(self, G: nx.classes.graph.Graph) -> nx.classes.graph.Graph:
-        if all(["length" in e for u, v, e in G.edges.data()]) and any(
-            ["maxspeed" in e for u, v, e in G.edges.data()]
+    def get_avg_speed(
+        self, original_graph: nx.classes.graph.Graph
+    ) -> nx.classes.graph.Graph:
+        if all(["length" in e for u, v, e in original_graph.edges.data()]) and any(
+            ["maxspeed" in e for u, v, e in original_graph.edges.data()]
         ):
             # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
             path_avg_speed = self.config["static"] / "output_graph" / "avg_speed.csv"
@@ -475,24 +480,24 @@ class Network:
                 avg_speeds = pd.read_csv(path_avg_speed)
             else:
                 avg_speeds = nut.calc_avg_speed(
-                    G,
+                    original_graph,
                     "highway",
                     save_csv=True,
                     save_path=self.config["static"] / "output_graph" / "avg_speed.csv",
                 )
-            G = nut.assign_avg_speed(G, avg_speeds, "highway")
+            original_graph = nut.assign_avg_speed(original_graph, avg_speeds, "highway")
 
             # make a time value of seconds, length of road streches is in meters
-            for u, v, k, edata in G.edges.data(keys=True):
+            for u, v, k, edata in original_graph.edges.data(keys=True):
                 hours = (edata["length"] / 1000) / edata["avgspeed"]
-                G[u][v][k]["time"] = round(hours * 3600, 0)
+                original_graph[u][v][k]["time"] = round(hours * 3600, 0)
 
-            return G
+            return original_graph
         else:
             logging.info(
                 "No attributes found in the graph to estimate average speed per network segment."
             )
-            return G
+            return original_graph
 
     def _export_network_files(
         self, network: Any, graph_name: str, types_to_export: List[str]
@@ -559,7 +564,9 @@ class Network:
             if self.config["network"]["source"] == "OSM download":
                 # Graph & Network from OSM download
                 # Check if all geometries between nodes are there, if not, add them as a straight line.
-                base_graph = nut.add_missing_geoms_graph(base_graph, geom_name="geometry")
+                base_graph = nut.add_missing_geoms_graph(
+                    base_graph, geom_name="geometry"
+                )
 
             # Set the road lengths to meters for both the base_graph and network_gdf
             # TODO: rename "length" column to "length [m]" to be explicit

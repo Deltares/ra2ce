@@ -33,7 +33,7 @@ class IniFileReader(FileReaderProtocol):
             for section in opt_cli:
                 if not isinstance(opt_cli[section], dict):
                     raise ValueError(
-                        f"No section found in --opt values: "
+                        "No section found in --opt values: "
                         "use <section>.<option>=<value> notation."
                     )
                 if section not in opt:

@@ -10,8 +10,8 @@ from ra2ce.io.readers.ini_file_reader import IniFileReader
 
 
 class NetworkIniConfigDataReader(IniConfigurationReaderBase):
-    def read(self, ini_file: Path) -> Optional[NetworkIniConfigData]:
-        if not ini_file:
+    def read(self, ini_file: Optional[Path]) -> Optional[NetworkIniConfigData]:
+        if not ini_file or not ini_file.exists():
             return None
         _config_data = self._import_configuration(ini_file)
         self._update_path_values(_config_data)

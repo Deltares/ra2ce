@@ -23,7 +23,7 @@ class MaxDamageByRoadTypeByLane:
         self.name = name
         self.damage_unit = damage_unit
 
-    def from_csv(self, path: Path, sep=",", output_unit="euro/m") -> None:
+    def from_csv(self, path: Path, sep=",") -> None:
         """Construct object from csv file. Damage curve name is inferred from filename
 
         The first row describe the lane numbers per column; and should have 'Road_type \ lanes' as index/first value
