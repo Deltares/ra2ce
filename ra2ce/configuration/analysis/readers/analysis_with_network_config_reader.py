@@ -19,8 +19,10 @@ class AnalysisWithNetworkConfigReader(AnalysisConfigReaderBase):
                 "Network data mandatory for an AnalysisIniConfigurationReader reader."
             )
 
-    def read(self, ini_file: Path) -> Optional[AnalysisWithNetworkIniConfigData]:
-        if not ini_file:
+    def read(
+        self, ini_file: Optional[Path]
+    ) -> Optional[AnalysisWithNetworkIniConfigData]:
+        if not ini_file or not ini_file.exists():
             return None
         _root_path = AnalysisConfigBase.get_network_root_dir(ini_file)
         _config_data = self._import_configuration(_root_path, ini_file)

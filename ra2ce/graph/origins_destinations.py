@@ -1,5 +1,6 @@
 import logging
 import os
+from pathlib import Path
 from typing import Optional, Union
 
 import geopandas as gpd
@@ -22,7 +23,7 @@ TODO: This whole file should be throughouly tested / redesigned.
 """
 
 
-def read_OD_files(
+def read_origin_destination_files(
     origin_paths: Union[str, list],
     origin_names: Union[str, list],
     destination_paths: Union[str, list],
@@ -78,7 +79,7 @@ def read_OD_files(
         origin_new = gpd.read_file(op, crs=crs_)
         try:
             origin_new[od_id] * 2  # just for checking
-        except:
+        except Exception:
             origin_new[od_id] = origin_new.index
 
         if region_paths:
@@ -99,7 +100,7 @@ def read_OD_files(
         destination_new = gpd.read_file(dp, crs=crs_)
         try:
             assert destination_new[od_id]
-        except:
+        except Exception:
             destination_new[od_id] = destination_new.index
         destination_new = destination_new[destination_columns_add]
         destination_new["d_id"] = dn + "_" + destination_new[od_id].astype(str)
@@ -117,11 +118,14 @@ def closest_node(node: np.ndarray, nodes: np.ndarray) -> np.ndarray:
 
 
 def get_od(o_id, d_id):
+    """
+    TODO: VERY UNCLEAR what this method is meant to do.
+    FIX: Solve below logic, it is not a correct paradigm. ADD TESTS AND TYPE HINTS.
+    """
     match_name = o_id
-    if match_name == "nan":
-        match_name = (
-            np.nan
-        )  # convert string nans to np.nans to be able to differentiate between origins and destinations in the next step.
+    if o_id == "nan":
+        # convert string nans to np.nans to be able to differentiate between origins and destinations in the next step.
+        match_name = np.nan
     if not match_name == match_name:
         # match_name is nan, the point is not an origin but a destination
         match_name = d_id
@@ -314,7 +318,7 @@ def add_od_nodes(
     # Get the maximum node id
     max_node_id = max([n for n in graph.nodes()])
 
-    ODs = []
+    od_list = []
     for i, od_data in tqdm(
         enumerate(
             list(zip(od["geometry"].x, od["geometry"].y, od["o_id"], od["d_id"]))
@@ -327,7 +331,7 @@ def add_od_nodes(
         closest_node_on_road = closest_node(
             np.array((od_data[0], od_data[1])), all_vertices
         )
-        match_OD = Point(closest_node_on_road)
+        match_od = Point(closest_node_on_road)
 
         # Find the road to which this vertice belongs. If the vertice is on an end-point of a road, it cannot be found
         # and it goes to the except statement.
@@ -340,10 +344,10 @@ def add_od_nodes(
             # Add the node to the graph edge
             match_geom = match_edge["geometry"]
 
-            new_lines = split_line_with_points(match_geom, [match_OD])
+            new_lines = split_line_with_points(match_geom, [match_od])
 
             assert len(new_lines) == 2
-            assert len([match_OD]) == 1
+            assert len([match_od]) == 1
 
             line1, line2 = new_lines
 
@@ -352,9 +356,9 @@ def add_od_nodes(
 
             node_info = {
                 "node_fid": new_node_id,  # Check if this attribute always exists
-                "y": match_OD.coords[0][1],
-                "x": match_OD.coords[0][0],
-                "geometry": match_OD,
+                "y": match_od.coords[0][1],
+                "x": match_od.coords[0][0],
+                "geometry": match_od,
                 "od_id": match_name,
             }
             if category and od_data[-1] == od_data[-1]:
@@ -366,10 +370,10 @@ def add_od_nodes(
             graph.add_node(new_node_id, **node_info)
 
             # Update the inverse_nodes_dict with the new node
-            inverse_nodes_dict[match_OD.coords[0]] = new_node_id
+            inverse_nodes_dict[match_od.coords[0]] = new_node_id
 
             # Delete the new node from the inverse_vertices_dict as no end-points are included here
-            del inverse_vertices_dict[match_OD.coords[0]]
+            del inverse_vertices_dict[match_od.coords[0]]
 
             # Update the graph edges and the inverse_vertices_dict
             graph, inverse_vertices_dict = update_edges_with_new_node(
@@ -401,10 +405,10 @@ def add_od_nodes(
                 graph.nodes[match_node]["category"] = od.iloc[i][category]
 
         # Save both in lists
-        ODs.append(match_OD)  # save the point as a Shapely Point
+        od_list.append(match_od)  # save the point as a Shapely Point
 
     # save in dataframe
-    od["OD"] = ODs
+    od["OD"] = od_list
 
     # save the road vertices closest to the origin/destination as geometry, delete the input origin/destination point geometry
     od = gpd.GeoDataFrame(od)
@@ -436,11 +440,13 @@ def split_line_with_points(line, points):
 #########################################################################################
 
 
-def rescale_and_crop(path_name, gdf, outputFolderPath, res=500):
+def rescale_and_crop(path_name, gdf, output_folder: Path, res: int = 500):
 
     dst_crs = rasterio.crs.CRS.from_dict(gdf.crs.to_dict())
 
     # Rescale and reproject raster to gdf crs
+    _output_origins_raster_tif = output_folder / "origins_raster_reprojected.tif"
+
     with rasterio.open(path_name) as src:
 
         transform, width, height = calculate_default_transform(
@@ -470,9 +476,7 @@ def rescale_and_crop(path_name, gdf, outputFolderPath, res=500):
             {"crs": dst_crs, "transform": transform, "width": width, "height": height}
         )
 
-        with rasterio.open(
-            outputFolderPath / "origins_raster_reprojected.tif", "w", **kwargs
-        ) as dst:
+        with rasterio.open(_output_origins_raster_tif, "w", **kwargs) as dst:
             for i in range(1, src.count + 1):
                 reproject(
                     source=rasterio.band(src, i),
@@ -484,7 +488,7 @@ def rescale_and_crop(path_name, gdf, outputFolderPath, res=500):
                     resampling=Resampling.sum,
                 )  # Resampling.sum or Resampling.nearest
 
-    raster = rasterio.open(outputFolderPath / "origins_raster_reprojected.tif")
+    raster = rasterio.open(_output_origins_raster_tif)
 
     # Crop to shapefile
     out_array, out_trans = rasterio.mask.mask(
@@ -500,18 +504,18 @@ def rescale_and_crop(path_name, gdf, outputFolderPath, res=500):
         }
     )
     raster.close()
-    os.remove(outputFolderPath / "origins_raster_reprojected.tif")
+    os.remove(_output_origins_raster_tif)
 
     return out_array, out_meta
 
 
-def export_raster_to_geotiff(array, meta, path, fileName):
-    Cropped_outputfile = path / fileName
+def export_raster_to_geotiff(array, meta, dir_path: Path, filename: str) -> Path:
+    cropped_outputfile = dir_path / filename
     with rasterio.open(
-        Cropped_outputfile, "w", **meta, compress="LZW", tiled=True
+        cropped_outputfile, "w", **meta, compress="LZW", tiled=True
     ) as dest:
         dest.write(array)
-    return Cropped_outputfile
+    return cropped_outputfile
 
 
 def generate_points_from_raster(fn, out_fn):
@@ -544,14 +548,14 @@ def generate_points_from_raster(fn, out_fn):
     return out_fn
 
 
-def origins_from_raster(outputFolderPath, mask_fn, raster_fn):
+def origins_from_raster(output_folder: Path, mask_fn, raster_fn) -> Path:
     """Makes origin points from a population raster."""
-    output_fn = outputFolderPath / "origins_raster.tif"
+    output_fn = output_folder / "origins_raster.tif"
     mask = gpd.read_file(mask_fn[0])
     res = 1000  # in meter; TODO: put in config file or in network.ini
-    out_array, out_meta = rescale_and_crop(raster_fn, mask, outputFolderPath, res)
+    out_array, out_meta = rescale_and_crop(raster_fn, mask, output_folder, res)
     outputfile = export_raster_to_geotiff(
-        out_array, out_meta, outputFolderPath, output_fn
+        out_array, out_meta, output_folder, output_fn
     )
 
     out_array[out_array > 0] = 1
@@ -561,7 +565,7 @@ def origins_from_raster(outputFolderPath, mask_fn, raster_fn):
         + " origin points."
     )
 
-    out_fn = outputFolderPath / "origins_points.shp"
+    out_fn = output_folder / "origins_points.shp"
     out_fn = generate_points_from_raster(outputfile, out_fn)
 
     return out_fn

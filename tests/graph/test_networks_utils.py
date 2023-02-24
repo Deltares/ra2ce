@@ -25,7 +25,7 @@ class TestNetworkUtils:
 
     @pytest.mark.parametrize("percent", [(-20), (0), (50), (100), (110)])
     def test_draw_progress_bar(self, percent: float):
-        nu.drawProgressBar(percent)
+        nu.draw_progress_bar(percent)
 
     def test_merge_lines_automatic_wrong_input_returns(self):
         _left_line = MultiLineString([[[0, 0], [1, 0], [2, 0]]])
@@ -268,10 +268,6 @@ class TestCreateSimplifiedGraph:
     def test_with_none_graph_complex_doesnot_raise(self):
         _return_result = nu.create_simplified_graph(None, "")
         assert _return_result == (None, None, None)
-
-    @pytest.mark.skip(reason="TODO: Generate valid test data.")
-    def test_with_valid_data(self):
-        pass
 
 
 class TestGdfCheckCreateUniqueIds:

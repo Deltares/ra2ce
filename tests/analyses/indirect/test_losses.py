@@ -79,13 +79,11 @@ class TestLosses:
                 "day_commute": [30, 60, 90],
                 "day_business": [30, 60, 90],
                 "day_other": [30, 60, 90],
-                "day_total": [60, 120, 180],
                 "evening_total": [50, 25, 10],
                 "evening_freight": [15, 30, 60],
                 "evening_commute": [15, 30, 60],
                 "evening_business": [15, 30, 60],
                 "evening_other": [15, 30, 60],
-                "evening_total": [30, 60, 90],
             }
         )
         _mi = list(
@@ -112,6 +110,3 @@ class TestLosses:
         assert "vlh_total" in _result
         assert "vlh_traffic" in _result
         assert "vlh_detour" in _result
-
-    def test_calculate_losses_from_table(self):
-        pass

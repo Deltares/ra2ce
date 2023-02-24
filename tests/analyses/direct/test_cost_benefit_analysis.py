@@ -8,6 +8,9 @@ from tests import test_data
 
 class MockEffectivenessMeasures(EffectivenessMeasures):
     def __init__(self, config, analysis):
+        """
+        This class is only meant to inherit from `Effectiveness measures` and allow the partial testing of certain methods for pure code coverage reasons.
+        """
         pass
 
 
@@ -243,7 +246,6 @@ class TestCostBenefitAnalysis:
         _effectiveness_dict = {}
         df_data = {
             "coefficient": 4.2,
-            "repair_costs_standard": [2.4],
             "standard_gevoelig_sum": [42],
             "standard_gevoelig_max": [42.24],
             "return_period": [0.42],

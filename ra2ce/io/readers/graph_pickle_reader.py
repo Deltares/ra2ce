@@ -10,7 +10,7 @@ class GraphPickleReader(FileReaderProtocol):
     def read(self, pickle_path: Path) -> Any:
         _read_graph = None
         if not pickle_path:
-            raise ValueError(f"No pickle path was provided.")
+            raise ValueError("No pickle path was provided.")
 
         if not pickle_path.is_file():
             _error_mssg = f"No pickle found at path {pickle_path}"

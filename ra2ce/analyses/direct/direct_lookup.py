@@ -659,7 +659,7 @@ class LookUp:
         )
 
     @staticmethod
-    def get_max_damages_OSD():
+    def get_max_damages_osd():
         """Lookup table for max damages of the OSdaMage damage functions"""
 
         # Note that these values have been converted to euro/m road length
@@ -759,10 +759,11 @@ class LookUp:
 
         Units of the interpolator objects: water depth in cm on x-axis; damage fraction (unitless) on y-axis
         """
-
+        _depth_cm_str = "depth (cm)"
+        _damage_str = "damage (% of total construction costs)"
         lookup_dict = {
             "C1": {
-                0: "depth (cm)",
+                0: _depth_cm_str,
                 1: 0,
                 2: 50,
                 3: 100,
@@ -774,7 +775,7 @@ class LookUp:
                 9: np.nan,
             },
             "Unnamed: 2": {
-                0: "damage (% of total construction costs)",
+                0: _damage_str,
                 1: 0,
                 2: 0.01,
                 3: 0.03,
@@ -786,7 +787,7 @@ class LookUp:
                 9: np.nan,
             },
             "C2": {
-                0: "depth (cm)",
+                0: _depth_cm_str,
                 1: 0,
                 2: 50,
                 3: 100,
@@ -798,7 +799,7 @@ class LookUp:
                 9: np.nan,
             },
             "Unnamed: 4": {
-                0: "damage (% of total construction costs)",
+                0: _damage_str,
                 1: 0,
                 2: 0.02,
                 3: 0.06,
@@ -810,7 +811,7 @@ class LookUp:
                 9: np.nan,
             },
             "C3": {
-                0: "depth (cm)",
+                0: _depth_cm_str,
                 1: 0,
                 2: 50,
                 3: 100,
@@ -822,7 +823,7 @@ class LookUp:
                 9: np.nan,
             },
             "Unnamed: 6": {
-                0: "damage (% of total construction costs)",
+                0: _damage_str,
                 1: 0,
                 2: 0.002,
                 3: 0.004,
@@ -834,7 +835,7 @@ class LookUp:
                 9: np.nan,
             },
             "C4": {
-                0: "depth (cm)",
+                0: _depth_cm_str,
                 1: 0,
                 2: 50,
                 3: 100,
@@ -846,7 +847,7 @@ class LookUp:
                 9: np.nan,
             },
             "Unnamed: 8": {
-                0: "damage (% of total construction costs)",
+                0: _damage_str,
                 1: 0,
                 2: 0.015,
                 3: 0.04,
@@ -858,7 +859,7 @@ class LookUp:
                 9: np.nan,
             },
             "C5": {
-                0: "depth (cm)",
+                0: _depth_cm_str,
                 1: 0,
                 2: 50,
                 3: 100,
@@ -870,7 +871,7 @@ class LookUp:
                 9: np.nan,
             },
             "Unnamed: 10": {
-                0: "damage (% of total construction costs)",
+                0: _damage_str,
                 1: 0,
                 2: 0.015,
                 3: 0.025,
@@ -882,7 +883,7 @@ class LookUp:
                 9: np.nan,
             },
             "C6": {
-                0: "depth (cm)",
+                0: _depth_cm_str,
                 1: 0,
                 2: 50,
                 3: 100,
@@ -894,7 +895,7 @@ class LookUp:
                 9: np.nan,
             },
             "Unnamed: 12": {
-                0: "damage (% of total construction costs)",
+                0: _damage_str,
                 1: 0,
                 2: 0.12,
                 3: 0.2,
@@ -906,7 +907,7 @@ class LookUp:
                 9: np.nan,
             },
             "HZ": {
-                0: "depth (cm)",
+                0: _depth_cm_str,
                 1: 0.0,
                 2: 50.0,
                 3: 100.0,
@@ -918,7 +919,7 @@ class LookUp:
                 9: 600.0,
             },
             "Unnamed: 14": {
-                0: "damage (% of total construction costs)",
+                0: _damage_str,
                 1: 0.0,
                 2: 0.25,
                 3: 0.42,
@@ -969,9 +970,6 @@ class CreateLookupTables:
         dict_max_damages = self.import_damage("Max_damages", usecols="C:E")
         max_damages_hz = self.load_hz_max_dam("Huizinga_max_dam", "A:G")
         interpolators = self.import_flood_curves(sheet_name="All_curves", usecols="B:O")
-
-        # for copying:
-        put_debug_icon_here_for_copying = True
 
         return (
             lane_damage_correction,

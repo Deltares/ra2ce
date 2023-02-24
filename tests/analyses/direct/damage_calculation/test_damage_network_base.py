@@ -27,7 +27,7 @@ class TestDamageNetworkBase:
 
         # 2. Run test
         with pytest.raises(ValueError) as exc_err:
-            _dnb.main(None, None)
+            _dnb.main("", None)
 
         # 3. Verify final expectations.
         assert str(exc_err.value) == "Needs to be implented in concrete child class."
@@ -43,7 +43,7 @@ class TestDamageNetworkBase:
         _dnb.create_mask()
 
         # 3. Verify expectations
-        assert not "geometry" in _dnb._gdf_mask.columns
+        assert "geometry" not in _dnb._gdf_mask.columns
 
     def test_replace_none_with_nan(self):
         # 1. Define test data.
