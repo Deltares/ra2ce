@@ -115,11 +115,9 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
             current_right_linestring = linestring
 
             for i in range(0, n_segments - 1):
-                r = network_cut(
-                    current_right_linestring, split_length
-                )  
+                r = network_cut(current_right_linestring, split_length)
                 # Can accidently return Nonetypes
-                if not r is None:
+                if r is not None:
                     current_left_linestring = r[0]
                     current_right_linestring = r[1]
                     result_list[i] = current_left_linestring
@@ -155,13 +153,12 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
             data[column] = []
 
         count = 0
-        for i, row in gdf.iterrows():
+        for _, row in gdf.iterrows():
             geom = row["geometry"]
             assert type(geom) == LineString or type(geom) == MultiLineString
-            leeg = geom.is_empty
             linestrings = self.split_linestring(geom, self.segmentation_length)
 
-            for j, linestring in enumerate(linestrings):
+            for _, linestring in enumerate(linestrings):
                 for key, value in row.items():
                     if key == "geometry":
                         data[key].append(linestring)

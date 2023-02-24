@@ -134,7 +134,7 @@ class TestDirectDamage:
 
         ### TOT HIER WAS IK GEKOMEN ###
         similar = test_output_series == reference_output_series
-        differences = ~similar
+        # differences = ~similar
 
         pd.testing.assert_series_equal(
             test_output_series,
@@ -152,9 +152,9 @@ class TestDirectDamage:
             mssg += "{}\n".format(event_gdf.gdf[~comparison2].head())
             mssg += "{}\n".format(test_ref_output[~comparison2].head())
             mssg += "{}\n".format(event_gdf.gdf[~comparison2])
-            assert comparison2.all()
+            assert comparison2.all(), mssg
 
-    def test_event_based_damage_calculation_OSdaMage_stylized(self):
+    def test_event_based_damage_calculation_osdamage_stylized(self):
         """A very stylized test with hypothetical data using the OSdaMage damage function.
 
         The rationale behind this test is described in the appendix of the RA2CE documentation document
@@ -279,7 +279,7 @@ class TestDirectDamage:
     @pytest.mark.skip(
         reason="To do: Needs refining on what (and how) needs to be verified."
     )
-    def test_OLD_event_based_damage_calculation_manualfunction(
+    def test_old_event_based_damage_calculation_manualfunction(
         self, event_input_output: pytest.fixture
     ):
         # Todo: have a look at this test again, to see if the existing issues have been solved
@@ -348,7 +348,7 @@ class TestDirectDamage:
                     mssg += "{}\n".format(event_gdf.gdf[is_combined_different].head())
                     mssg += "... and the reference output:\n"
                     mssg += "{}\n".format(test_ref_output[is_combined_different].head())
-                    print(mssg)
+                    pytest.fail(mssg)
 
     def test_construct_damage_network_return_periods(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(

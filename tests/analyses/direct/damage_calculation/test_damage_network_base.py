@@ -43,7 +43,7 @@ class TestDamageNetworkBase:
         _dnb.create_mask()
 
         # 3. Verify expectations
-        assert not "geometry" in _dnb._gdf_mask.columns
+        assert "geometry" not in _dnb._gdf_mask.columns
 
     def test_replace_none_with_nan(self):
         # 1. Define test data.
