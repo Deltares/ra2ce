@@ -1364,7 +1364,7 @@ def find_route_ods(graph, od_nodes, weighing):
             for u, v in edgesinpath:
                 # get edge with the lowest weighing if there are multiple edges that connect u and v
                 _uv_graph = graph[u][v]
-                edge_key = sorted(_uv_graph, key=lambda x: _uv_graph[x][weighing])[0]
+                edge_key = sorted(_uv_graph, key=lambda x, _fgraph=_uv_graph: _fgraph[x][weighing])[0]
                 _uv_graph_edge = _uv_graph[edge_key]
                 if "geometry" in _uv_graph_edge:
                     pref_edges.append(_uv_graph_edge["geometry"])
