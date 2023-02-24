@@ -61,8 +61,8 @@ def merge_lines_automatic(
     """Automatically merge lines based on a config file
     Args:
         lines_gdf (geodataframe): the network with edges that can possibly be merged
-        idName (string): name of the Unique ID column in the lines_gdf
-        aadtNames (list of strings): names of the columns of the AADT (average annual daily traffic)
+        id_name (string): name of the Unique ID column in the lines_gdf
+        aadt_names (list of strings): names of the columns of the AADT (average annual daily traffic)
         crs_ (int): the EPSG number of the coordinate reference system that is used
     Returns:
         lines_gdf (geodataframe): the network with edges that are (not) merged
@@ -295,7 +295,7 @@ def snap_endpoints_lines(
     Args:
         lines_gdf: a list of LineStrings or a MultiLineString
         max_dist: maximum distance two endpoints may be joined together
-        idName: the name of the ID column in lines_gdf
+        id_name: the name of the ID column in lines_gdf
 
     From shapely_tools:
         @author: Dirk Eilander (dirk.eilander@deltares.nl)
@@ -1099,24 +1099,24 @@ def graph_from_gdf(
     gdf: gpd.GeoDataFrame, gdf_nodes, name: str = "network", node_id: str = "ID"
 ) -> nx.MultiGraph:
     # create a Graph object
-    G = nx.MultiGraph(crs=gdf.crs)
+    _created_graph = nx.MultiGraph(crs=gdf.crs)
 
     # create nodes on the Graph
     for index, row in gdf_nodes.iterrows():
         c = {node_id: row[node_id], "geometry": row.geometry}
-        G.add_node(row[node_id], **c)
+        _created_graph.add_node(row[node_id], **c)
 
     # create edges on top of the nodes
     for index, row in gdf.iterrows():
         dict_row = row.to_dict()
-        G.add_edge(
+        _created_graph.add_edge(
             u_for_edge=dict_row["node_A"], v_for_edge=dict_row["node_B"], **dict_row
         )
 
     # make a name
-    G.graph["name"] = name
+    _created_graph.graph["name"] = name
 
-    return G
+    return _created_graph
 
 
 def graph_to_gdf(
@@ -1163,7 +1163,7 @@ def graph_to_gpkg(origin_graph: nx.classes.graph.Graph, edge_gpkg, node_gpkg):
     """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_gpkg and node_gpkg
 
     Arguments:
-        G []: networkx graph object to be converted
+        origin_graph [nx.classes.graph.Graph]: networkx graph object to be converted
         edge_gpkg [str]: output path including extension for edges geopackage
         node_gpkg [str]: output path including extension for nodes geopackage
 
@@ -1358,20 +1358,24 @@ def get_extent(dataset):
     }
 
 
-def get_graph_edges_extent(G):
+def get_graph_edges_extent(
+    network_graph: nx.classes.Graph,
+) -> Tuple[float, float, float, float]:
     """Inspects all geometries of the edges of a graph and returns the most extreme coordinates
 
     Arguments:
-        G (networkX) : NetworkX graph, should have an attribute 'geometry' containty shapely geometries
+        network_graph (networkX) : NetworkX graph, should have an attribute 'geometry' containty shapely geometries
 
     Returns
         extent (tuple) : (minX,maxX,minY,maxY)
     """
     # Start with the bounds of the (random) first edge
-    (minX, minY, maxX, maxY) = list(G.edges.data("geometry"))[0][-1].bounds
+    (min_x, min_y, max_x, max_y) = list(network_graph.edges.data("geometry"))[0][
+        -1
+    ].bounds
 
     # Compare with the bounds of all other edges to see if there are linestrings with more extreme bounds
-    for (u, v, geom) in G.edges.data("geometry"):
+    for (_, _, geom) in network_graph.edges.data("geometry"):
         # print(u, v, geom)
         (
             minx,
@@ -1379,39 +1383,41 @@ def get_graph_edges_extent(G):
             maxx,
             maxy,
         ) = geom.bounds  # shapely returns (minx, miny, maxx, maxy)
-        if minx < minX:
-            minX = minx
-        if maxx > maxX:
-            maxX = maxx
-        if miny < minY:
-            minY = miny
-        if maxy > maxY:
-            maxY = maxy
+        if minx < min_x:
+            min_x = minx
+        if maxx > max_x:
+            max_x = maxx
+        if miny < min_y:
+            min_y = miny
+        if maxy > max_y:
+            max_y = maxy
 
-    return (minX, maxX, minY, maxY)
+    return (min_x, max_x, min_y, max_y)
 
 
-def reproject_graph(G_in, crs_in, crs_out):
+def reproject_graph(
+    original_graph: nx.classes.Graph, crs_in: str, crs_out: str
+) -> nx.classes.Graph:
     """
     Reprojects the shapely geometry data (of a NetworkX graph) to a different projection
 
     Arguments:
-        G_in (NetworkX graph): needs a geometry attribute containing shapely linestrings
+        original_graph (NetworkX graph): needs a geometry attribute containing shapely linestrings
         crs_in (string): input projection, follow the Geopandas crs convention: "espg:3035" or "EPSG4326"
-        crs_out (string): output projection to covert to, idem.
+        crs_out (string): output projection to convert to, idem.
 
     Returns:
         G_out (NetworkX graph)
     """
-    att = nx.get_edge_attributes(G_in, "geometry")
+    att = nx.get_edge_attributes(original_graph, "geometry")
     df = pd.DataFrame.from_dict(data=att, orient="index", columns=["geometry"])
     gdf = gpd.GeoDataFrame(df)
     gdf = gdf.set_crs(crs=crs_in)
     gdf_out = gdf.to_crs(crs=crs_out)
-    G_out = G_in.copy()
+    _reprojected_graph = original_graph.copy()
     set_values = gdf_out.to_dict(orient="index")
-    nx.set_edge_attributes(G_out, values=set_values)
-    return G_out
+    nx.set_edge_attributes(_reprojected_graph, values=set_values)
+    return _reprojected_graph
 
 
 def bounds_intersect_1d(tup1, tup2):
@@ -1512,20 +1518,22 @@ def graph_link_simple_id_to_complex(graph_simple, new_id):
     return simple_to_complex, complex_to_simple
 
 
-def add_simple_id_to_graph_complex(G_complex, complex_to_simple, new_id):
+def add_simple_id_to_graph_complex(
+    complex_graph: nx.classes.Graph, complex_to_simple, new_id
+) -> nx.classes.Graph:
     """Adds the appropriate ID of the simple graph to each edge of the complex graph as a new attribute 'rfid'
 
     Arguments:
-        G_complex (Graph) : The complex graph, still lacking 'rfid'
+        complex_graph (Graph) : The complex graph, still lacking 'rfid'
         complex_to_simple (dict) : lookup table linking complex to simple graphs
 
     Returns:
-         G_complex (Graph) : Same object, with added attribute 'rfid'
+        complex_graph (Graph) : Same object, with added attribute 'rfid'
 
     """
 
     obtained_complex_ids = nx.get_edge_attributes(
-        G_complex, "{}_c".format(new_id)
+        complex_graph, "{}_c".format(new_id)
     )  # {(u,v,k) : 'rfid_c'}
     simple_ids_per_complex_id = obtained_complex_ids  # start with a copy
 
@@ -1537,16 +1545,16 @@ def add_simple_id_to_graph_complex(G_complex, complex_to_simple, new_id):
             simple_ids_per_complex_id[key] = new_value
         except KeyError as e:
             logging.error(
-                "Could not find the simple ID belonging to complex ID {}; value set to None".format(
-                    key
+                "Could not find the simple ID belonging to complex ID {}; value set to None. Full error: {}".format(
+                    key, e
                 )
             )
             simple_ids_per_complex_id[key] = None
 
     # Now the format of simple_ids_per_complex_id is: {(u,v,k) : 'rfid}
-    set_edge_attributes(G_complex, simple_ids_per_complex_id, new_id)
+    set_edge_attributes(complex_graph, simple_ids_per_complex_id, new_id)
 
-    return G_complex
+    return complex_graph
 
 
 def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
@@ -1599,8 +1607,8 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
                 for ss in s:
                     if (
                         not any(c.isalpha() for c in ss)
-                        and not (";" in ss)
-                        and not ("|" in ss)
+                        and (";" not in ss)
+                        and ("|" not in ss)
                     ):
                         ns.append(int(ss))
                     elif not any(c.isalpha() for c in ss) and ";" in ss:
@@ -1616,8 +1624,8 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
             elif isinstance(s, str):
                 if (
                     not any(c.isalpha() for c in s)
-                    and not (";" in s)
-                    and not ("|" in s)
+                    and (";" not in s)
+                    and ("|" not in s)
                 ):
                     ss = int(s)
                 elif not any(c.isalpha() for c in s) and ";" in s:
@@ -1661,6 +1669,7 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
                         logging.warning(
                             f"Road type '{df['road_types'].iloc[i]}' cannot be assigned any average speed. Please check the average speed CSV ({save_path}), enter the right average speed for this road type, and run RA2CE again."
                         )
+                        logging.error("Index error: {}".format(e))
                         df["avg_speed"].iloc[i] = 0
 
     if save_csv:
@@ -1694,8 +1703,8 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
                 for ms in max_speed:
                     if (
                         not any(c.isalpha() for c in ms)
-                        and not (";" in ms)
-                        and not ("|" in ms)
+                        and (";" not in ms)
+                        and ("|" not in ms)
                     ):
                         ns.append(int(ms))
                     elif not any(c.isalpha() for c in ms) and ";" in ms:
@@ -1716,8 +1725,8 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
             elif isinstance(max_speed, str):
                 if (
                     not any(c.isalpha() for c in max_speed)
-                    and not (";" in max_speed)
-                    and not ("|" in max_speed)
+                    and (";" not in max_speed)
+                    and ("|" not in max_speed)
                 ):
                     graph[u][v][k]["avgspeed"] = round(int(max_speed), 0)
                 elif not any(c.isalpha() for c in max_speed) and ";" in max_speed:
