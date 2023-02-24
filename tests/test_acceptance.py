@@ -46,31 +46,6 @@ class TestAcceptance:
         except ImportError as exc_err:
             pytest.fail(f"It was not possible to import required packages {exc_err}")
 
-    @slow_test
-    @pytest.mark.parametrize(
-        "project_name",
-        [
-            pytest.param("acceptance_test_data", id="Default test data."),
-            pytest.param(
-                "wpf_nepal",
-                id="Nepal project",
-                marks=pytest.mark.skip(reason="WPF Nepal test directory not presnt"),
-            ),
-        ],
-    )
-    def test_given_test_data_main_does_not_throw(self, project_name: str):
-        """
-        ToDo: is this test necessary? Would it not be better to frame it in direct / indirect ?
-        """
-        _test_dir = test_data / project_name
-        _network = _test_dir / _network_ini_name
-        _analysis = _test_dir / _analysis_ini_name
-
-        assert _network.is_file()
-        assert _analysis.is_file()
-
-        _run_from_cli(_network, _analysis)
-
     @pytest.fixture(autouse=False)
     def case_data_dir(self, request: pytest.FixtureRequest) -> Path:
         _test_data_dir = test_data / request.param
@@ -84,6 +59,31 @@ class TestAcceptance:
         purge_output_dirs()
         yield _test_data_dir
         purge_output_dirs()
+
+    @slow_test
+    @pytest.mark.parametrize(
+        "case_data_dir",
+        [
+            pytest.param("acceptance_test_data", id="Default test data."),
+            pytest.param(
+                "wpf_nepal",
+                id="Nepal project",
+                marks=pytest.mark.skip(reason="WPF Nepal test directory not presnt"),
+            ),
+        ],
+        indirect=["case_data_dir"],
+    )
+    def test_given_test_data_main_does_not_throw(self, case_data_dir: Path):
+        """
+        ToDo: is this test necessary? Would it not be better to frame it in direct / indirect ?
+        """
+        _network = case_data_dir / _network_ini_name
+        _analysis = case_data_dir / _analysis_ini_name
+
+        assert _network.is_file()
+        assert _analysis.is_file()
+
+        _run_from_cli(_network, _analysis)
 
     @slow_test
     @pytest.mark.parametrize(
