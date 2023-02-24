@@ -133,7 +133,7 @@ class TestDirectDamage:
         reference_output_series = reference_output_series.fillna(0)
 
         ### TOT HIER WAS IK GEKOMEN ###
-        similar = test_output_series == reference_output_series
+        # similar = test_output_series == reference_output_series
         # differences = ~similar
 
         pd.testing.assert_series_equal(

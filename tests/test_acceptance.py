@@ -2,7 +2,7 @@ import shutil
 import subprocess
 from itertools import chain
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, Iterator, List, Optional
 
 import pytest
 
@@ -47,7 +47,7 @@ class TestAcceptance:
             pytest.fail(f"It was not possible to import required packages {exc_err}")
 
     @pytest.fixture(autouse=False)
-    def case_data_dir(self, request: pytest.FixtureRequest) -> Path:
+    def case_data_dir(self, request: pytest.FixtureRequest) -> Iterator[Path]:
         _test_data_dir = test_data / request.param
         _output_files_dir = _test_data_dir / "output"
         _output_graph_dir = _test_data_dir / "static" / "output_graph"

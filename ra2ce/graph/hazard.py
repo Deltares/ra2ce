@@ -90,9 +90,9 @@ class Hazard:
             tqdm.pandas(desc="Network hazard overlay with " + hn)
             _hazard_files_str = str(self.hazard_files["tif"][i])
             flood_stats = gdf.geometry.progress_apply(
-                lambda x: zonal_stats(
+                lambda x, _hz_str=_hazard_files_str: zonal_stats(
                     x,
-                    _hazard_files_str,
+                    _hz_str,
                     all_touched=True,
                     stats="min max",
                     add_stats={"mean": ntu.get_valid_mean},
@@ -104,7 +104,7 @@ class Hazard:
 
             tqdm.pandas(desc="Network fraction with hazard overlay with " + hn)
             gdf[rn + "_fr"] = gdf.geometry.progress_apply(
-                lambda x: ntu.fraction_flooded(x, _hazard_files_str)
+                lambda x, _hz_str=_hazard_files_str: ntu.fraction_flooded(x, _hz_str)
             )
         return gdf
 
@@ -176,18 +176,18 @@ class Hazard:
             _tif_hazard_files = str(self.hazard_files["tif"][i])
             if self.aggregate_wl == "mean":
                 flood_stats = gdf.geometry.progress_apply(
-                    lambda x: zonal_stats(
+                    lambda x, _files_value=_tif_hazard_files: zonal_stats(
                         x,
-                        _tif_hazard_files,
+                        _files_value,
                         all_touched=True,
                         add_stats={"mean": ntu.get_valid_mean},
                     )
                 )
             else:
                 flood_stats = gdf.geometry.progress_apply(
-                    lambda x: zonal_stats(
+                    lambda x, _files_value=_tif_hazard_files: zonal_stats(
                         x,
-                        _tif_hazard_files,
+                        _files_value,
                         all_touched=True,
                         stats=f"{self.aggregate_wl}",
                     )
@@ -214,7 +214,9 @@ class Hazard:
             # Get the fraction of the road that is intersecting with the hazard
             tqdm.pandas(desc="Graph fraction with hazard overlay with " + hn)
             graph_fraction_flooded = gdf.geometry.progress_apply(
-                lambda x: ntu.fraction_flooded(x, _tif_hazard_files)
+                lambda x, _files_values=_tif_hazard_files: ntu.fraction_flooded(
+                    x, _files_values
+                )
             )
             graph_fraction_flooded = graph_fraction_flooded.fillna(0)
             nx.set_edge_attributes(
@@ -342,7 +344,7 @@ class Hazard:
             tqdm.pandas(desc="Destinations hazard overlay with " + hn)
             _tif_hazard_files = str(self.hazard_files["tif"][i])
             flood_stats = ods.geometry.progress_apply(
-                lambda x: point_query(x, _tif_hazard_files)
+                lambda x, _file_values=_tif_hazard_files: point_query(x, _file_values)
             )
 
             flood_stats = flood_stats.apply(lambda x: x[0] if x[0] else 0)
@@ -374,9 +376,9 @@ class Hazard:
             )
             tqdm.pandas(desc="OD graph hazard overlay with " + hn)
             flood_stats = gdf.geometry.progress_apply(
-                lambda x: zonal_stats(
+                lambda x, _files_values=_tif_hazard_files: zonal_stats(
                     x,
-                    _tif_hazard_files,
+                    _files_values,
                     all_touched=True,
                     stats=f"{self.aggregate_wl}",  # TODO: ADD MEAN WITHOUT THE NANs
                 )
@@ -401,7 +403,9 @@ class Hazard:
             # Get the fraction of the road that is intersecting with the hazard
             tqdm.pandas(desc="OD graph fraction with hazard overlay with " + hn)
             graph_fraction_flooded = gdf.geometry.progress_apply(
-                lambda x: ntu.fraction_flooded(x, _tif_hazard_files)
+                lambda x, _files_values=_tif_hazard_files: ntu.fraction_flooded(
+                    x, _files_values
+                )
             )
             graph_fraction_flooded = graph_fraction_flooded.fillna(0)
             nx.set_edge_attributes(
@@ -430,7 +434,7 @@ class Hazard:
             tqdm.pandas(desc="Potentially isolated locations hazard overlay with " + hn)
             _tif_hazard_files = str(self.hazard_files["tif"][i])
             flood_stats = gdf.geometry.progress_apply(
-                lambda x: point_query(x, _tif_hazard_files)
+                lambda x, _file_values=_tif_hazard_files: point_query(x, _file_values)
             )
             gdf[rn + "_" + self.aggregate_wl[:2]] = flood_stats.apply(
                 lambda x: x[0] if x[0] else 0
