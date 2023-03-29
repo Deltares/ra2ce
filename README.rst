@@ -5,6 +5,18 @@ This is the repository of RA2CE (*just say race!*) - the Resilience Assessment a
 
 **Contact** Margreet van Marle (Margreet.vanMarle@Deltares.nl)
 
+Contribution
+---------------------------
+- Please report to us if you wish to collaborate.
+- Use both black and isort (included in the development dependencies) for code formatting.
+- Use google docstrings format for documenting your methods and classes.
+- New code should come along with new tests verifying its functionality.
+- New additions (bug fixes, features, etc) can be done through Pull-requests. Before merging they will be subject to the Continuous Integration builds as well as a code review.
+
+Distribution
+---------------------------
+Ra2ce is shared with GPL3 license, you may use and / or extend it by using the same license. For specific agreements we urge you to contact us.
+
 Installation
 ---------------------------
 RA2CE can be operated via the command-line interface with two commands. Before RA2CE can be used, the correct Python environment needs to be installed (see *environment.yml*). Anaconda is a well-known environment manager for Python and can be used to install the correct environment and run RA2CE via its command-line interface. It is recommended to install Anaconda, instead of `miniconda`, so that you have all required packages already available during the following steps.
@@ -67,7 +79,7 @@ RA2CE is developed to be used in four ways:
 To create a network, a network configuration file, also called initialization file, is required. We call this the network.ini file. To execute analyses, an analyses initialization file is required, we call this the analyses.ini file. Both initialization files are required if users want to create a network and execute analyses.
 
 Data requirements
----------------------------
++++++++++++++++++++++++++++
 The types of possible input file formats to create a network are:
 
 •	Shapefile of network;
@@ -78,7 +90,7 @@ The types of possible input file formats to create a network are:
 Depending on the required analysis, more data might be needed.
 
 Direct damages
----------------------------
++++++++++++++++++++++++++++
 The ‘damage to the network’ depends on the intensity of the hazard in relation to how the network (and its assets) are built and its current condition (e.g. type, state of maintenance, dimensions). Here, the hazard intensity and asset condition are linked to a percentage of damage, via vulnerability functions/ fragility curves. To develop these vulnerability curves data is needed about replacements costs per asset type and the potential damage per hazard intensity. This data can be collected during a workshop with for example national road agencies and the technicians. The output of the analyses consist of damage maps per hazard (e.g. flooding, landslides), per return period or per event, per asset and per road segment.
 
 Possible (built-in) options for vulnerability curves include:
@@ -88,7 +100,7 @@ Possible (built-in) options for vulnerability curves include:
 - *TO BE IMPLEMENTED*: your own damage curves
 
 Indirect losses / Network criticality
----------------------------
++++++++++++++++++++++++++++
 
 ======================================================   =====================
 Analyis                                                   Name in analyses.ini
@@ -118,7 +130,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 This analysis finds the sections of the network that are fully isolated from the rest of the network (also named disconnected islands), because of network disruption due to a hazard.
 
 Initialization file templates
----------------------------
++++++++++++++++++++++++++++
 **network.ini**
 ::
 
