@@ -15,7 +15,7 @@ Contribution
 
 Distribution
 ---------------------------
-Ra2ce is shared with `GPL3 license<https://www.gnu.org/licenses/gpl-3.0.en.html>`, you may use and / or extend it by using the same license. For specific agreements we urge you to contact us.
+Ra2ce is shared with `GPL3 license <https://www.gnu.org/licenses/gpl-3.0.en.html>`__, you may use and / or extend it by using the same license. For specific agreements we urge you to contact us.
 
 Installation
 ---------------------------
@@ -241,7 +241,7 @@ Third-party Notices
 ------------------------------------------------------
 This project incorporates components from the projects listed below.
 
-**NetworkX**: NetworkX is distributed with the 3-clause BSD license.
+**NetworkX**: NetworkX is distributed with the `3-clause BSD license <https://opensource.org/license/bsd-3-clause/>`__.
 
    Copyright (C) 2004-2022, NetworkX Developers
    Aric Hagberg <hagberg@lanl.gov>
@@ -249,4 +249,8 @@ This project incorporates components from the projects listed below.
    Pieter Swart <swart@lanl.gov>
    All rights reserved.
 
-**OSMnx**: Boeing, G. 2017. "OSMnx: New Methods for Acquiring, Constructing, Analyzing, and Visualizing Complex Street Networks." Computers, Environment and Urban Systems 65, 126-139. doi:10.1016/j.compenvurbsys.2017.05.004
+**OSMnx**: OSMnx is distributed under the `MIT License <https://opensource.org/license/mit/>`__.
+
+  Boeing, G. 2017. 
+  `OSMnx: New Methods for Acquiring, Constructing, Analyzing, and Visualizing Complex Street Networks. <https://geoffboeing.com/publications/osmnx-complex-street-networks/>`__
+  Computers, Environment and Urban Systems 65, 126-139. doi:10.1016/j.compenvurbsys.2017.05.004
