@@ -15,7 +15,7 @@ Contribution
 
 Distribution
 ---------------------------
-Ra2ce is shared with GPL3 license, you may use and / or extend it by using the same license. For specific agreements we urge you to contact us.
+Ra2ce is shared with [GPL3 license](https://www.gnu.org/licenses/gpl-3.0.en.html), you may use and / or extend it by using the same license. For specific agreements we urge you to contact us.
 
 Installation
 ---------------------------
