@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "ra2ce"
 version = "0.4.3"
-description = "Risk Assessment  and Adaptation for Critical infrastructurE."
+description = "Risk Assessment and Adaptation for Critical Infrastructure (RA2CE)."
 authors = ["Margreet van Marle <Margreet.vanMarle@deltares.nl>"]
 maintainers = [
   "Frederique de Groen <frederique.degroen@deltares.nl>",
