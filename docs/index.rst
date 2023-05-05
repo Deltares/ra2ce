@@ -8,10 +8,8 @@ Welcome to Risk Assessment and Adaptation for Critical infrastructurE's document
    readme
    installation
    usage
-   modules
    contributing
-   authors
-   history
+   changelog
 
 Indices and tables
 ==================
