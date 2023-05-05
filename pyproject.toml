@@ -46,6 +46,7 @@ xarray = "^2023.4.2"
 geopandas = "^0.12.2"
 scipy = "^1.10.1"
 osmnx = "0.16"
+geos = "^0.2.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.1"
