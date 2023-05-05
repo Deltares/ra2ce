@@ -1,0 +1,44 @@
+name: "GitHub Pages documentation"
+on:
+  push:
+    branches: [ master ]
+
+  pull_request:
+    branches: [ master ]
+    types: [opened, synchronize]
+
+permissions:
+    contents: write
+
+jobs:
+  docs:
+    name: Build (and deploy) documentation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+
+      - name: Setup environment
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniforge-variant: Mambaforge
+          channels: conda-forge, defaults
+          channel-priority: strict
+          environment-file: .config/docs_environment.yml
+          activate-environment: ra2cedocs_env
+
+      - name: Build docs
+        run: |
+          cd docs
+          make html
+
+      - name: Upload to GitHub Pages
+        if: ${{ github.event_name != 'pull_request'}}
+        uses: peaceiris/actions-gh-pages@v3.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build/html
+          force_orphan: true
