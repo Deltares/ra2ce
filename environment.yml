@@ -1,11 +1,10 @@
 name: ra2ce_env
 channels:
-  - conda-forge
+  # - conda-forge
   - defaults
 dependencies:
   - python=3.9
   - conda-forge::gdal=3.5.1
-  - conda-forge::fiona
+  - conda-forge::fiona=1.8.21
   - pip
-  - pip:
-    - poetry
+  - poetry
