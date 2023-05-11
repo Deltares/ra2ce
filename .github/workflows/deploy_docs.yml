@@ -30,10 +30,13 @@ jobs:
           environment-file: .config/environment.yml
           activate-environment: ra2ce_env
 
+      - name: Install dependencies
+        run: poetry install --only docs
+
       - name: Build docs
         run: |
-          poetry install --only docs
-          poetry run docs/make html
+          cd docs
+          poetry run make html
 
       - name: Upload to GitHub Pages
         if: ${{ github.event_name != 'pull_request'}}
