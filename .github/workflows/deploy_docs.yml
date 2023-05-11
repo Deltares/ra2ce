@@ -33,8 +33,7 @@ jobs:
       - name: Build docs
         run: |
           poetry install --only docs
-          cd docs
-          make html
+          poetry run docs/make html
 
       - name: Upload to GitHub Pages
         if: ${{ github.event_name != 'pull_request'}}
