@@ -1,0 +1,5 @@
+name = single link redundancy test
+analysis = single_link_redundancy
+weighing = time
+save_shp = True
+save_csv = True
