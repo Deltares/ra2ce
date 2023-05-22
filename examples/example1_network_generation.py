@@ -16,9 +16,8 @@ if __name__ == "__main__":
     handler = Ra2ceHandler(network=network_ini, analysis=None)  # you can also input only the network_ini
     handler.configure()  # this will configure (create) the network and do the overlay of the hazard map with the
     # network if there is any
-    handler.run_analysis()  # this will run the analysis
 
-    map_path = Path(r'C:\repos\ra2ce\examples\Project\static\network\map.geojson')
-    gdf = gpd.read_file(map_path)
+    base_graph_path = root_dir / r'static\output_graph\base_graph_edges.gpkg'
+    gdf = gpd.read_file(base_graph_path)
     gpd.explore(gdf)
 
