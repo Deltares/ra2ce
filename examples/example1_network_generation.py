@@ -19,6 +19,6 @@ if __name__ == "__main__":
     handler.run_analysis()  # this will run the analysis
 
     map_path = Path(r'C:\repos\ra2ce\examples\Project\static\network\map.geojson')
-    gdf = gpd.read_file(mgit ap_path)
+    gdf = gpd.read_file(map_path)
     gpd.explore(gdf)
 
