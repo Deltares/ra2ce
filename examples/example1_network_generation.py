@@ -1,6 +1,5 @@
 from pathlib import Path
 import geopandas as gpd
-import folium
 import webbrowser
 
 # Just to make sonar-cloud stop complaining.
@@ -26,7 +25,8 @@ def visualise_map():
 if __name__ == "__main__":
     from ra2ce.ra2ce_handler import Ra2ceHandler
 
-    root_dir = Path(r'C:\repos\ra2ce\examples\Project')
+    example_num = 1
+    root_dir = Path(rf'C:\repos\ra2ce\examples\example_{example_num}')
 
     network_ini = root_dir / _network_ini_name
     assert network_ini.is_file()
