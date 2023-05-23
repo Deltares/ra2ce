@@ -45,4 +45,4 @@ if __name__ == "__main__":
     # Show the created maps.
     map_file_path = root_dir / r'output\single_link_redundancy'
     map_file_name = 'single_link_redundancy_test'
-    visualise_map(file_name=map_file_name, file_path=map_file_path, map_entities=["edges", "nodes"])
+    visualise_map(file_name=map_file_name, file_path=map_file_path)
