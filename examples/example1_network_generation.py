@@ -6,20 +6,26 @@ import webbrowser
 _network_ini_name = "network.ini"
 
 
-def visualise_map():
+def visualise_map(file_name, file_path, map_entities=None):
     global root_dir
-    layers = []
-    file_path = root_dir / r'static\output_graph\base_graph.html'
-    for i, entity_type in enumerate(["edges", "nodes"]):
-        base_graph_entity_path = root_dir / rf'static\output_graph\base_graph_{entity_type}.gpkg'
-        gdf = gpd.read_file(base_graph_entity_path)
-        if i == 0:
-            base_graph_map = gdf.explore()
-            layers.append(base_graph_map)
-        else:
-            base_graph_map = gdf.explore(m=layers[i-1])
-        base_graph_map.save(file_path)
-    webbrowser.open(str(file_path))
+    file_full_path = Path(str(file_path / file_name) + '.html')
+    if map_entities is not None:
+        layers = []
+        for i, entity_type in enumerate(map_entities):
+            base_graph_entity_path = Path(str(file_path / file_name) + f'_{entity_type}.gpkg')
+            gdf = gpd.read_file(base_graph_entity_path)
+            if i == 0:
+                base_graph_map = gdf.explore()
+                layers.append(base_graph_map)
+            else:
+                base_graph_map = gdf.explore(m=layers[i-1])
+            base_graph_map.save(file_full_path)
+    else:
+        base_graph_path = Path(str(file_path / file_name) + '.gpkg')
+        gdf = gpd.read_file(base_graph_path)
+        base_graph_map = gdf.explore()
+        base_graph_map.save(file_full_path)
+    webbrowser.open(str(file_full_path))
 
 
 if __name__ == "__main__":
@@ -35,4 +41,7 @@ if __name__ == "__main__":
     handler = Ra2ceHandler(network=network_ini, analysis=None)  # you can also input only the network_ini
     handler.configure()  # this will configure (create) the network and do the overlay of the hazard map with the
     # network if there is any
-    visualise_map()  # Show the created maps.
+    # Show the created maps.
+    map_file_path = root_dir / r'static\output_graph'
+    map_file_name = 'base_graph'
+    visualise_map(file_name=map_file_name, file_path=map_file_path, map_entities=["edges", "nodes"])
