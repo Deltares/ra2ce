@@ -1,6 +1,5 @@
-.. highlight:: shell
+.. _installation:
 
-============
 Installation
 ============
 
@@ -33,4 +32,3 @@ When running a development environment with Anaconda, the user may follow these 
   conda activate ra2ce_env
   poetry install
 ::
-
