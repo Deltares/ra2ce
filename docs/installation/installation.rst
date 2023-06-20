@@ -4,48 +4,33 @@
 Installation
 ============
 
+RA2CE can be operated via the command-line interface with two commands. 
+Before RA2CE can be used, the correct Python environment needs to be installed 
+(see *environment.yml*). Anaconda is a well-known environment manager for Python 
+and can be used to install the correct environment and run RA2CE via its 
+command-line interface. It is recommended to install Anaconda, instead of 
+`miniconda`, so that you have all required packages already available during the 
+following steps.
 
-Stable release
---------------
+CLI only
++++++++++++++++++++++++++++
+If only interested in using the tool via command-line interface follow these steps:
+::
+  pip install git+https://github.com/Deltares/ra2ce.git
+::
 
-To install Risk Assessment and Adaptation for Critical infrastructurE, run this command in your terminal:
+Alternatively you can install a specific tag or commit hash from our repo by using the symbol `@`:
+::
+  pip install git+https://github.com/Deltares/ra2ce.git@v0.3.1
+::
 
-.. code-block:: console
+Development mode
++++++++++++++++++++++++++++
+When running a development environment with Anaconda, the user may follow these steps in command line:
+::
+  cd <to the main repository RA2CE folder>
+  conda env create -f .config\environment.yml
+  conda activate ra2ce_env
+  poetry install
+::
 
-    $ pip install ra2ce
-
-This is the preferred method to install Risk Assessment and Adaptation for Critical infrastructurE, as it will always install the most recent stable release.
-
-If you don't have `pip`_ installed, this `Python installation guide`_ can guide
-you through the process.
-
-.. _pip: https://pip.pypa.io
-.. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
-
-
-From sources
-------------
-
-The sources for Risk Assessment and Adaptation for Critical infrastructurE can be downloaded from the `Github repo`_.
-
-You can either clone the public repository:
-
-.. code-block:: console
-
-    $ git clone git://github.com/mjevanmarle/ra2ce
-
-Or download the `tarball`_:
-
-.. code-block:: console
-
-    $ curl -OJL https://github.com/mjevanmarle/ra2ce/tarball/master
-
-Once you have a copy of the source, you can install it with:
-
-.. code-block:: console
-
-    $ python setup.py install
-
-
-.. _Github repo: https://github.com/mjevanmarle/ra2ce
-.. _tarball: https://github.com/mjevanmarle/ra2ce/tarball/master
