@@ -5,10 +5,11 @@ Welcome to Risk Assessment and Adaptation for Critical infrastructurE's document
    :maxdepth: 2
    :caption: Contents:
 
-   readme
+   getting_started
    installation
-   usage
-   contributing
+   user_guide
+   examples
+   collaboration
    changelog
 
 Indices and tables
