@@ -1,3 +1,5 @@
+.. _getting_started:
+
 Getting started
 ===============
 
@@ -15,7 +17,7 @@ Getting started
 
     .. grid-item-card::
         :text-align: center
-        :link: installation_guide
+        :link: installation
         :link-type: ref
 
         :octicon:`gear;10em`
@@ -90,12 +92,12 @@ Getting started
    :maxdepth: 2
    :hidden:
 
-   about.rst
-   installation.rst
-   user_guide.rst
-   faq.rst
-   technical_documentation.rst
-   examples.rst
-   collaboration.rst
-   publications.rst
-   model_builder.rst
+   about/about.rst
+   installation/installation.rst
+   user_guide/user_guide.rst
+   faq/faq.rst
+   technical_documentation/technical_documentation.rst
+   examples/examples.rst
+   collaboration/collaboration.rst
+   publications/publications.rst
+   model_builder/model_builder.rst
