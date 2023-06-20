@@ -25,9 +25,9 @@ Yes, absolutely! Explanation will follow soon.
 Direct damage assessment
 ----------------------------
 
- | **Q**: Example question?
+ | **Q**: Is this module working?
 
-Example answer.
+Not yet.
 
 
 Indirect damage assessment
@@ -36,3 +36,11 @@ Indirect damage assessment
  | **Q**: Example question?
 
 Example answer.
+
+
+Errors
+----------------------------
+
+ | **Q**: What if I get a key error?
+
+This can be caused by a lot of things, but please check your input parameters in the ini files and your input data.
