@@ -2710,6 +2710,21 @@ lint = ["docutils-stubs", "flake8 (>=3.5.0)", "flake8-simplify", "isort", "mypy 
 test = ["cython", "filelock", "html5lib", "pytest (>=4.6)"]
 
 [[package]]
+name = "sphinx-autosummary-accessors"
+version = "2023.4.0"
+description = "sphinx autosummary extension to properly format pandas or xarray accessors"
+category = "dev"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "sphinx-autosummary-accessors-2023.4.0.tar.gz", hash = "sha256:26f60f44dea2b4b487022921dfba6d773b4529b71afb7069cb97d4ceff0abab9"},
+    {file = "sphinx_autosummary_accessors-2023.4.0-py3-none-any.whl", hash = "sha256:75ac537ce318e2cb104324f714c0260ee32483f117d8cd376dfaa3c5e949933d"},
+]
+
+[package.dependencies]
+sphinx = ">=3.5"
+
+[[package]]
 name = "sphinx-book-theme"
 version = "1.0.1"
 description = "A clean book theme for scientific explanations and documentation with Sphinx"
@@ -3133,4 +3148,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9, <3.11"
-content-hash = "73491b5e1c940331c7054a02efb1cce9f904200b160b080f405a5583b3b8830d"
+content-hash = "c3b0944863cc304b20d6ba2e89ebefbc82968ccbf1fcf69bb18a9cfc708f5af4"
