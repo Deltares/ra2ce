@@ -1,5 +1,0 @@
-name = single link redundancy test 2
-analysis = single_link_redundancy
-weighing = time
-save_shp = True
-save_csv = True
