@@ -1,47 +1,8 @@
-RA2CE
-=====
+.. _user_guide:
 
-This is the repository of RA2CE (*just say race!*) - the Resilience Assessment and Adaptation for Critical infrastructurE Toolkit Python Package eveloped by Deltares. RA2CE helps to quantify resilience of critical infrastructure networks, prioritize interventions and adaptation measures and select the most appropriate action perspective to increase resilience considering future conditions.
+User Guide
+==========
 
-**Contact** Margreet van Marle (Margreet.vanMarle@Deltares.nl)
-
-Contribution
----------------------------
-- Please report to us if you wish to collaborate.
-- Use both black and isort (included in the development dependencies) for code formatting.
-- Use google docstrings format for documenting your methods and classes.
-- New code should come along with new tests verifying its functionality.
-- New additions (bug fixes, features, etc) can be done through Pull-requests. Before merging they will be subject to the Continuous Integration builds as well as a code review.
-
-Distribution
----------------------------
-Ra2ce is shared with `GPL3 license <https://www.gnu.org/licenses/gpl-3.0.en.html>`__, you may use and / or extend it by using the same license. For specific agreements we urge you to contact us.
-
-Installation
----------------------------
-RA2CE can be operated via the command-line interface with two commands. Before RA2CE can be used, the correct Python environment needs to be installed (see *environment.yml*). Anaconda is a well-known environment manager for Python and can be used to install the correct environment and run RA2CE via its command-line interface. It is recommended to install Anaconda, instead of `miniconda`, so that you have all required packages already available during the following steps.
-
-CLI only
-+++++++++++++++++++++++++++
-If only interested in using the tool via command-line interface follow these steps:
-::
-  pip install git+https://github.com/Deltares/ra2ce.git
-::
-
-Alternatively you can install a specific tag or commit hash from our repo by using the symbol `@`:
-::
-  pip install git+https://github.com/Deltares/ra2ce.git@v0.3.1
-::
-
-Development mode
-+++++++++++++++++++++++++++
-When running a development environment with Anaconda, the user may follow these steps in command line:
-::
-  cd <to the main repository RA2CE folder>
-  conda env create -f .config\environment.yml
-  conda activate ra2ce_env
-  poetry install
-::
 
 Command-line interface operation
 ---------------------------------
@@ -50,6 +11,14 @@ b.	To only run the network creation module, run RA2CE with ``python main.py --ne
 c.	To only run the analysis module, run RA2CE with ``python main.py --analyses_ini <path to analyses.ini file>``
 
 The user can also always ask for clarification of the input arguments with ``python main.py --help``.
+
+
+Within a Python script
+---------------------------
+To use Risk Assessment and Adaptation for Critical infrastructurE in a project::
+
+    import ra2ce
+
 
 Folder structure
 ---------------------------
@@ -130,7 +99,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 This analysis finds the sections of the network that are fully isolated from the rest of the network (also named disconnected islands), because of network disruption due to a hazard.
 
 Initialization file templates
-+++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++
 **network.ini**
 ::
 
@@ -230,27 +199,3 @@ Initialization file templates
   save_shp = True
   save_csv = True
 
-
-Example projects
-------------------------------------------------------
-`NRT Flood Impact Analysis on Road Networks <https://arcg.is/1uGm5W0>`__ - A case study in the Mandalay region, Myanmar
-
-`Cascading impacts of flooded infrastructure <https://arcg.is/1iC1rX>`__ - Economic quantification for evaluating cascading risks and adaptation solutions
-
-Third-party Notices
-------------------------------------------------------
-This project incorporates components from the projects listed below.
-
-**NetworkX**: NetworkX is distributed with the `3-clause BSD license <https://opensource.org/license/bsd-3-clause/>`__.
-
-   Copyright (C) 2004-2022, NetworkX Developers
-   Aric Hagberg <hagberg@lanl.gov>
-   Dan Schult <dschult@colgate.edu>
-   Pieter Swart <swart@lanl.gov>
-   All rights reserved.
-
-**OSMnx**: OSMnx is distributed under the `MIT License <https://opensource.org/license/mit/>`__.
-
-  Boeing, G. 2017. 
-  `OSMnx: New Methods for Acquiring, Constructing, Analyzing, and Visualizing Complex Street Networks. <https://geoffboeing.com/publications/osmnx-complex-street-networks/>`__
-  Computers, Environment and Urban Systems 65, 126-139. doi:10.1016/j.compenvurbsys.2017.05.004
