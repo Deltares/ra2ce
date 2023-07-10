@@ -7,7 +7,7 @@ from typing import Dict, Iterator, List, Optional
 import pytest
 
 from ra2ce import main
-from tests import slow_test, test_data
+from tests import slow_test, test_data, external_test, test_external_data
 
 # Just to make sonar-cloud stop complaining.
 _network_ini_name = "network.ini"
@@ -31,6 +31,13 @@ def _run_from_cli(network_ini: Optional[Path], analysis_ini: Optional[Path]) -> 
 
     _return_code = subprocess.call(args)
     assert _return_code == 0
+
+
+_external_test_cases = [
+    pytest.param(_dir, id=_dir.name)
+    for _dir in test_external_data.iterdir()
+    if _dir.is_dir()
+]
 
 
 class TestAcceptance:
@@ -59,6 +66,16 @@ class TestAcceptance:
         purge_output_dirs()
         yield _test_data_dir
         purge_output_dirs()
+
+    @slow_test
+    @external_test
+    @pytest.mark.parametrize(
+        "case_data_dir",
+        _external_test_cases,
+        indirect=["case_data_dir"],
+    )
+    def test_given_external_test_data_run_case(self, case_data_dir: Path):
+        pytest.fail("Work in progress.")
 
     @slow_test
     @pytest.mark.parametrize(
