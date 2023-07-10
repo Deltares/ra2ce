@@ -27,6 +27,12 @@ Distribution
 ---------------------------
 Ra2ce is shared with `GPL3 license <https://www.gnu.org/licenses/gpl-3.0.en.html>`__, you may use and / or extend it by using the same license. For specific agreements we urge you to contact us.
 
+Usage
+---------------------------
+If you wish to run ra2ce locally we recommend to have a look at the :ref:`installation section<README Installation>`. 
+On the other hand, if you wish to run a preinstalled environment, you may use our `binder configuration <https://mybinder.org/v2/gh/Deltares/ra2ce/chore/143-create-and-document-a-way-to-run-ra2ce-from-an-online-python-interpreter-such-as-binder>`.
+
+.. _README Installation:
 Installation
 ---------------------------
 RA2CE can be operated via the command-line interface with two commands. Before RA2CE can be used, the correct Python environment needs to be installed (see *environment.yml*). Anaconda is a well-known environment manager for Python and can be used to install the correct environment and run RA2CE via its command-line interface. It is recommended to install Anaconda, instead of `miniconda`, so that you have all required packages already available during the following steps.
