@@ -1,4 +1,5 @@
 name: ra2ce_env
+prefix: ra2ce_env
 channels:
   - defaults
 dependencies:
