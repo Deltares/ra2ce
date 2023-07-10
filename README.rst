@@ -1,3 +1,10 @@
+[![Python 3.10](https://img.shields.io/badge/Python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3109/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+.. image:: https://mybinder.org/badge_logo.svg
+  :target: https://mybinder.org/v2/gh/Deltares/ra2ce/chore/143-create-and-document-a-way-to-run-ra2ce-from-an-online-python-interpreter-such-as-binder
+ 
+![TeamCity build status](https://dpcbuild.deltares.nl/app/rest/builds/buildType:id:Ra2ce_Ra2ceContinuousIntegrationBuild_BuildDocumentation/statusIcon.svg)
+
 RA2CE
 =====
 
