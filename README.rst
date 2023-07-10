@@ -4,9 +4,9 @@
   :target: https://github.com/psf/black
 .. image:: https://mybinder.org/badge_logo.svg
   :target: https://mybinder.org/v2/gh/Deltares/ra2ce/chore/143-create-and-document-a-way-to-run-ra2ce-from-an-online-python-interpreter-such-as-binder
-.. image:: https://dpcbuild.deltares.nl/app/rest/builds/buildType:id:Ra2ce_Ra2ceContinuousIntegrationBuild_BuildDocumentation/statusIcon.svg
-  :target: https://dpcbuild.deltares.nl/buildConfiguration/Ra2ce_Ra2ceContinuousIntegrationBuild_BuildDocumentation?mode=builds
-  
+.. image:: https://dpcbuild.deltares.nl/app/rest/builds/buildType:id:Ra2ce_Ra2ceContinuousIntegrationBuild_RunFastTests/statusIcon.svg
+  :target: https://dpcbuild.deltares.nl/project/Ra2ce?mode=builds
+
 
 RA2CE
 =====
