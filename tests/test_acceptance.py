@@ -15,6 +15,12 @@ _analysis_ini_name = "analyses.ini"
 _base_graph_p_filename = "base_graph.p"
 _base_network_feather_filename = "base_network.feather"
 
+_external_test_cases = [
+    pytest.param(_dir, id=_dir.name, marks=external_test)
+    for _dir in test_external_data.iterdir()
+    if _dir.is_dir()
+]
+
 
 def _run_from_cli(network_ini: Optional[Path], analysis_ini: Optional[Path]) -> None:
 
@@ -31,13 +37,6 @@ def _run_from_cli(network_ini: Optional[Path], analysis_ini: Optional[Path]) -> 
 
     _return_code = subprocess.call(args)
     assert _return_code == 0
-
-
-_external_test_cases = [
-    pytest.param(_dir, id=_dir.name)
-    for _dir in test_external_data.iterdir()
-    if _dir.is_dir()
-]
 
 
 class TestAcceptance:
@@ -68,16 +67,6 @@ class TestAcceptance:
         purge_output_dirs()
 
     @slow_test
-    @external_test
-    @pytest.mark.parametrize(
-        "case_data_dir",
-        _external_test_cases,
-        indirect=["case_data_dir"],
-    )
-    def test_given_external_test_data_run_case(self, case_data_dir: Path):
-        pytest.fail("Work in progress.")
-
-    @slow_test
     @pytest.mark.parametrize(
         "case_data_dir",
         [
@@ -87,7 +76,8 @@ class TestAcceptance:
                 id="Nepal project",
                 marks=pytest.mark.skip(reason="WPF Nepal test directory not presnt"),
             ),
-        ],
+        ]
+        + _external_test_cases,
         indirect=["case_data_dir"],
     )
     def test_given_test_data_main_does_not_throw(self, case_data_dir: Path):
