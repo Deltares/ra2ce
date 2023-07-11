@@ -73,6 +73,10 @@ sphinx-rtd-theme = "^1.2.0"
 sphinx-autosummary-accessors = "^2023.4.0"
 sphinx-design = "^0.4.1"
 
+
+[tool.poetry.group.test.dependencies]
+testbook = "^0.4.2"
+
 [tool.black]
 line-length = 88
 target-version = ['py38', 'py39']

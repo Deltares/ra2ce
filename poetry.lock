@@ -2958,6 +2958,26 @@ files = [
 tests = ["pytest", "pytest-cov"]
 
 [[package]]
+name = "testbook"
+version = "0.4.2"
+description = "A unit testing framework for Jupyter Notebooks"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "testbook-0.4.2-py3-none-any.whl", hash = "sha256:21e03818017d1315607e117c101cf4b5f5b6dcd5ead77eab65ac9508a281f644"},
+]
+
+[package.dependencies]
+nbclient = ">=0.4.0"
+nbformat = ">=5.0.4"
+
+[package.extras]
+dev = ["black", "bumpversion", "check-manifest", "codecov", "coverage", "flake8", "ipykernel", "ipython", "ipywidgets", "pandas", "pip (>=18.1)", "pytest (>=4.1)", "pytest-cov (>=2.6.1)", "setuptools (>=38.6.0)", "tox", "twine (>=1.11.0)", "wheel (>=0.31.0)", "xmltodict"]
+sphinx = ["Sphinx (>=1.7,<3.0)", "myst-parser (==0.9.1)", "sphinx-book-theme (==0.0.35)"]
+test = ["black", "bumpversion", "check-manifest", "codecov", "coverage", "flake8", "ipykernel", "ipython", "ipywidgets", "pandas", "pip (>=18.1)", "pytest (>=4.1)", "pytest-cov (>=2.6.1)", "setuptools (>=38.6.0)", "tox", "twine (>=1.11.0)", "wheel (>=0.31.0)", "xmltodict"]
+
+[[package]]
 name = "tinycss2"
 version = "1.2.1"
 description = "A tiny CSS parser"
@@ -3184,4 +3204,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9, <3.11"
-content-hash = "11fc1351db4843e74cb827c70e51291ca6aedd86da5f72829f5134b2c4443ecf"
+content-hash = "b9aaceeb4727872200433d5cafd76abe456d6256ccd331b2555dbd5fa9569ac1"
