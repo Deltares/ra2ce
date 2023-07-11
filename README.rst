@@ -3,12 +3,11 @@
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
   :target: https://github.com/psf/black
 .. image:: https://mybinder.org/badge_logo.svg
-  :target: https://mybinder.org/v2/gh/Deltares/ra2ce/chore/143-create-and-document-a-way-to-run-ra2ce-from-an-online-python-interpreter-such-as-binder
+ :target: https://mybinder.org/v2/gh/Deltares/ra2ce/jupyter-binder
 .. image:: https://dpcbuild.deltares.nl/app/rest/builds/buildType:id:Ra2ce_Ra2ceContinuousIntegrationBuild_RunFastTests/statusIcon.svg
   :target: https://dpcbuild.deltares.nl/project/Ra2ce?mode=builds
 .. image:: https://github.com/Deltares/ra2ce/actions/workflows/deploy_docs.yml/badge.svg
   :target: https://github.com/Deltares/ra2ce/actions/workflows/deploy_docs.yml
-
 
 RA2CE
 =====
