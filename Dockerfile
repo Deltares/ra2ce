@@ -18,4 +18,4 @@ RUN micromamba run -n ra2ce_env pip install . --no-cache-dir --no-compile --disa
     && find /opt/conda/ -follow -type f -name '*.a' -delete \
     && find /opt/conda/ -follow -type f -name '*.pyc' -delete \
     && find /opt/conda/ -follow -type f -name '*.js.map' -delete
-ENTRYPOINT [ "micromamba", "run", "-n", "ra2ce_env" ]
+# ENTRYPOINT [ "micromamba", "run", "-n", "ra2ce_env" ]
