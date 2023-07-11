@@ -1,5 +1,4 @@
 FROM continuumio/miniconda3
-COPY environment.yml .
 RUN conda env create -f .config/environment.yml -p .env
 ARG conda_env=.env
 ENV PATH /opt/conda/envs/$conda_env:$PATH
