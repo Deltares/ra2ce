@@ -13,7 +13,7 @@ RUN micromamba create -f environment.yml -y --no-pyc \
     && rm environment.yml
 COPY examples/ ${HOME}/examples
 COPY ra2ce/ ${HOME}/ra2ce
-RUN micromamba run pip install --no-cache-dir notebook jupyterlab \
+RUN micromamba run -n ra2ce_env pip install --no-cache-dir notebook jupyterlab \
     && micromamba run -n ra2ce_env pip install . --no-cache-dir --no-compile --disable-pip-version-check --no-deps\
     && micromamba clean -ayf \
     && find /opt/conda/ -follow -type f -name '*.a' -delete \
