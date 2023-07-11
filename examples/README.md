@@ -14,3 +14,6 @@ python import ra2ce
 At the same time you may use our [binder environment](https://mybinder.org/v2/gh/Deltares/ra2ce/jupyter-binder).
 
 Please refer to our [Ra2ce documentation](https://deltares.github.io/ra2ce/) for more information.
+
+## Binder requirements.
+Binder requires the `apt.txt` and the `environment.yml` files to be present. Do not remove them from this repository.
