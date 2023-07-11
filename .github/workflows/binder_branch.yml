@@ -1,0 +1,27 @@
+name: "Binder branch"
+on:
+  [ push ]
+    # branches: [ master ]
+
+permissions:
+    contents: write
+
+jobs:
+  docs:
+    if: "!startsWith(github.event.head_commit.message, 'bump:')"
+    name: Checkout examples into separate directory.
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+
+      - name: Deploy
+        uses: s0/git-publish-subdir-action@develop
+        env:
+          REPO: self
+          BRANCH: jupyter-binder
+          FOLDER: examples
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
