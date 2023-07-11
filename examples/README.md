@@ -1,6 +1,7 @@
 [![Python 3.10](https://img.shields.io/badge/Python-3.10-blue.svg)](https://www.python.org/downloads/release/python-3109/)
 [![GitHub Pages documentation](https://github.com/Deltares/ra2ce/actions/workflows/deploy_docs.yml/badge.svg)](https://github.com/Deltares/ra2ce/actions/workflows/deploy_docs.yml)
 [![Binder branch](https://github.com/Deltares/ra2ce/actions/workflows/binder_branch.yml/badge.svg)](https://github.com/Deltares/ra2ce/actions/workflows/binder_branch.yml)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Deltares/ra2ce/jupyter-binder)
 
 # Ra2ce Examples
 
