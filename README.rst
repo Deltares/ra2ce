@@ -31,8 +31,7 @@ Ra2ce is shared with `GPL3 license <https://www.gnu.org/licenses/gpl-3.0.en.html
 Usage
 ---------------------------
 If you wish to run ra2ce locally we recommend to have a look at the ':ref:`README Installation`' section. 
-On the other hand, if you wish to run a preinstalled environment, you may use our `binder configuration <https://mybinder.org/v2/gh/Deltares/ra2ce/chore/143-create-and-document-a-way-to-run-ra2ce-from-an-online-python-interpreter-such-as-binder>`__.
-Binder makes use of the `environment.yml`` file and the `apt.txt` in the root directory.
+On the other hand, if you wish to run a preinstalled environment, you may use our :doc:`examples in binder <examples/README.md>`.
 
 .. _README Installation:
 Installation
