@@ -44,7 +44,7 @@ When running a development environment with Anaconda, the user may follow these 
 ::
 
 Command-line interface operation
----------------------------
+---------------------------------
 a.	To run both the network creation and analysis modules, run RA2CE with ``python main.py --network_ini <path to network.ini file> --analyses_ini <path to analyses.ini file>``
 b.	To only run the network creation module, run RA2CE with ``python main.py --network_ini <path to network.ini file>``
 c.	To only run the analysis module, run RA2CE with ``python main.py --analyses_ini <path to analyses.ini file>``
@@ -100,7 +100,7 @@ Possible (built-in) options for vulnerability curves include:
 - *TO BE IMPLEMENTED*: your own damage curves
 
 Indirect losses / Network criticality
-+++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++
 
 ======================================================   =====================
 Analyis                                                   Name in analyses.ini
@@ -130,7 +130,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 This analysis finds the sections of the network that are fully isolated from the rest of the network (also named disconnected islands), because of network disruption due to a hazard.
 
 Initialization file templates
-+++++++++++++++++++++++++++
++++++++++++++++++++++++++++++
 **network.ini**
 ::
 
