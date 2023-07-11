@@ -1,10 +1,8 @@
 FROM continuumio/miniconda3
 COPY environment.yml .
-RUN conda config --set channel_priority strict
-RUN conda env create -f environment.yml
-ARG conda_env=ra2ce
-ENV PATH /opt/conda/envs/$conda_env/bin:$PATH
+RUN conda env create -f .config/environment.yml -p .env
+ARG conda_env=.env
+ENV PATH /opt/conda/envs/$conda_env:$PATH
 ENV CONDA_DEFAULT_ENV $conda_env
-COPY . app
-WORKDIR app
-RUN pip install -e .
+RUN apt-get -qq update && apt-get install --yes --no-install-recommends libgdal-dev libgeos-dev libproj-dev && apt-get -qq purge && apt-get -qq clean && rm -rf /var/lib/apt/lists/*
+RUN poetry install
