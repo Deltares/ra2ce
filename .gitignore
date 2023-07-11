@@ -140,3 +140,4 @@ dmypy.json
 .pyre/
 /.idea
 /logs
+/tests/local_data
