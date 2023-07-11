@@ -1,7 +1,7 @@
 name: "Binder branch"
 on:
-  [ push ]
-    # branches: [ master ]
+  push:
+    branches: [ master ]
 
 permissions:
     contents: write
