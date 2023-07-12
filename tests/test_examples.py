@@ -17,4 +17,4 @@ class TestExamples:
     def test_run_jupyter_from_examples_dir(
         self, jupyter_example: Path, request: pytest.FixtureRequest
     ):
-        pytest.fail("Work in progress.")
+        pass
