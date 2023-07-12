@@ -12,6 +12,4 @@ test_external_data = _test_dir / "test_external_data"
 
 test_examples = _test_dir.parent.joinpath("examples")
 slow_test = pytest.mark.slow_test
-external_test = pytest.mark.skipif(
-    not test_external_data.exists(), reason="No external test data available."
-)
+external_test = pytest.mark.external_test_data
