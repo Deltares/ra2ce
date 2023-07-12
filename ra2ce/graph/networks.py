@@ -22,7 +22,7 @@
 import logging
 import os
 from pathlib import Path
-from typing import Any, List, Tuple, Union, Optional
+from typing import Any, List, Tuple, Union
 
 import geopandas as gpd
 import networkx as nx
@@ -30,9 +30,7 @@ import osmnx
 import pandas as pd
 import pyproj
 from networkx import Graph
-from shapely import Polygon, MultiPolygon
-from shapely.geometry import MultiLineString
-from shapely.geometry.base import BaseGeometry
+from shapely.geometry import MultiLineString, Polygon, MultiPolygon
 
 import ra2ce.graph.networks_utils as nut
 from ra2ce.graph.segmentation import Segmentation
@@ -292,14 +290,20 @@ class Network:
         return graph_complex, edges_complex
 
     @staticmethod
-    def get_clean_graph_from_osm_download(polygon: Union[Polygon, MultiPolygon], road_types="", network_type="") -> Graph:
-        """Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
+    def get_clean_graph_from_osm_download(polygon: Union[Polygon, MultiPolygon], link_type: str, network_type: str) \
+            -> Graph:
+        """
+        Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
+        Args:
+            polygon: Shapely Polygon or Multipolygon geometry
+            link_type: string, e.g., "highway,motorway"
+            network_type: string {"all_private", "all", "bike", "drive", "drive_service", "walk"}
 
-                Returns:
-                    complex_graph (NetworkX graph): Complex graph (for use in the direct analyses and
-                    input to derive simplified network).
-                """
-        if not road_types:
+        Returns:
+            complex_graph (NetworkX graph): Complex graph (for use in the direct analyses and
+            input to derive simplified network).
+        """
+        if not link_type:
             # The user specified only the network type.
             graph_complex = osmnx.graph_from_polygon(
                 polygon=polygon,
@@ -309,7 +313,7 @@ class Network:
             )
         elif not network_type:
             # The user specified only the road types.
-            cf = f'["highway"~"{road_types.replace(",", "|")}"]'
+            cf = f'["highway"~"{link_type.replace(",", "|")}"]'
             graph_complex = osmnx.graph_from_polygon(
                 polygon=polygon,
                 custom_filter=cf,
@@ -318,7 +322,7 @@ class Network:
             )
         else:
             # The user specified the network type and road types.
-            cf = f'["highway"~"{road_types.replace(",", "|")}"]'
+            cf = f'["highway"~"{link_type.replace(",", "|")}"]'
             graph_complex = osmnx.graph_from_polygon(
                 polygon=polygon,
                 network_type=network_type,
@@ -338,8 +342,11 @@ class Network:
     def network_osm_download(self) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         polygon_file = self.output_path.parent / "network" / self.config["network"]["polygon"]
         poly_dict = nut.read_geojson(geojson_file=polygon_file)  # It can only read in one geojson
-        poly: Union[Polygon, MultiPolygon] = nut.geojson_to_shp(poly_dict)
-        graph_complex = self.get_clean_graph_from_osm_download(polygon=poly, network_type="", road_types="")
+        graph_complex = self.get_clean_graph_from_osm_download(
+            polygon=nut.geojson_to_shp(poly_dict),
+            network_type=self.config["network"]["network_type"],
+            link_type=self.config["network"]["road_type"]
+        )
 
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
