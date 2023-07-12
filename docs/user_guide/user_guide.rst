@@ -3,12 +3,19 @@
 User Guide
 ==========
 
+Binder environment
+---------------------------------
+Binder provides us an online web-tool capable of hosting a `conda` environment with the latest-greatest version of `RA2CE` already installed and ready to be used.
+In this environment you will find all our available examples as well as the possibility to create your own `Jupyter` notebooks or experiment with the `CLI` options.
+
+- Our `ra2ce jupyter-binder <https://mybinder.org/v2/gh/Deltares/ra2ce/jupyter-binder>`_ environment.
+- More about `binder <https://mybinder.readthedocs.io/en/latest/>`_.
 
 Command-line interface operation
 ---------------------------------
-a.	To run both the network creation and analysis modules, run RA2CE with ``python main.py --network_ini <path to network.ini file> --analyses_ini <path to analyses.ini file>``
-b.	To only run the network creation module, run RA2CE with ``python main.py --network_ini <path to network.ini file>``
-c.	To only run the analysis module, run RA2CE with ``python main.py --analyses_ini <path to analyses.ini file>``
+a.	To run both the network creation and analysis modules, run RA2CE with: ``python main.py --network_ini <path to network.ini file> --analyses_ini <path to analyses.ini file>``
+b.	To only run the network creation module, run RA2CE with: ``python main.py --network_ini <path to network.ini file>``
+c.	To only run the analysis module, run RA2CE with: ``python main.py --analyses_ini <path to analyses.ini file>``
 
 The user can also always ask for clarification of the input arguments with ``python main.py --help``.
 
