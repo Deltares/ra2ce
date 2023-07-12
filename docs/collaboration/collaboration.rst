@@ -124,6 +124,8 @@ Please, write documentation on each "public" class or method you create using `g
         Returns:
             float: Result of first and second argument's addition.
         """
+
+
 In addition, we encourage you to extend our current documentation and examples to better describe the functionality you added.
 
 To locally validate your documentation changes, simply run :code:`poetry run docs\make html`, 
