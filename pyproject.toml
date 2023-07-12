@@ -9,7 +9,7 @@ maintainers = [
   "Carles Salvador Soriano Perez <carles.sorianoperez@deltares.nl>",
 ]
 license = "GPL-3.0-or-later"
-readme = "README.rst"
+readme = "README.md"
 repository = "https://github.com/Deltares/ra2ce"
 documentation = "https://deltares.github.io/ra2ce/"
 classifiers = [
