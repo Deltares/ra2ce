@@ -15,11 +15,18 @@ _analysis_ini_name = "analyses.ini"
 _base_graph_p_filename = "base_graph.p"
 _base_network_feather_filename = "base_network.feather"
 
-_external_test_cases = [
-    pytest.param(_dir, id=_dir.name, marks=external_test)
-    for _dir in test_external_data.iterdir()
-    if _dir.is_dir()
-]
+
+def get_external_test_cases() -> list[pytest.param]:
+    if not test_external_data.exists():
+        return []
+    return [
+        pytest.param(_dir, id=_dir.name, marks=external_test)
+        for _dir in test_external_data.iterdir()
+        if _dir.is_dir()
+    ]
+
+
+_external_test_cases = get_external_test_cases()
 
 
 def _run_from_cli(network_ini: Optional[Path], analysis_ini: Optional[Path]) -> None:
