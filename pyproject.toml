@@ -11,7 +11,7 @@ maintainers = [
 license = "GPL-3.0-or-later"
 readme = "README.rst"
 repository = "https://github.com/Deltares/ra2ce"
-documentation = "https://ra2ce.readthedocs.io/en/latest/"
+documentation = "https://deltares.github.io/ra2ce/"
 classifiers = [
   'Development Status :: 2 - Pre-Alpha',
   'Intended Audience :: Developers',
