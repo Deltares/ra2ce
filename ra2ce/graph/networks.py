@@ -19,17 +19,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 import os
-from typing import Any, List, Tuple
+from pathlib import Path
+from typing import Any, List, Tuple, Union, Optional
 
 import geopandas as gpd
 import networkx as nx
 import osmnx
 import pandas as pd
 import pyproj
+from networkx import Graph
+from shapely import Polygon, MultiPolygon
 from shapely.geometry import MultiLineString
+from shapely.geometry.base import BaseGeometry
 
 import ra2ce.graph.networks_utils as nut
 from ra2ce.graph.segmentation import Segmentation
@@ -72,7 +75,7 @@ class Network:
             self.od_category = None
         try:
             self.region = (
-                config["static"] / "network" / config["origins_destinations"]["region"]
+                    config["static"] / "network" / config["origins_destinations"]["region"]
             )
             self.region_var = config["origins_destinations"]["region_var"]
         except Exception:
@@ -87,7 +90,7 @@ class Network:
         self.files = files
 
     def network_shp(
-        self, crs: int = 4326
+            self, crs: int = 4326
     ) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """Creates a (graph) network from a shapefile.
 
@@ -180,10 +183,10 @@ class Network:
         edges_complex.crs = crs  # set the right CRS
 
         assert (
-            edges_complex["node_A"].isnull().sum() == 0
+                edges_complex["node_A"].isnull().sum() == 0
         ), "Some edges cannot be assigned nodes, please check your input shapefile."
         assert (
-            edges_complex["node_B"].isnull().sum() == 0
+                edges_complex["node_B"].isnull().sum() == 0
         ), "Some edges cannot be assigned nodes, please check your input shapefile."
 
         # Create networkx graph from geodataframe
@@ -209,7 +212,7 @@ class Network:
         _exporter.export(_output_dir / "complex_to_simple.json", linking_tables[1])
 
     def network_trails_import(
-        self, crs: int = 4326
+            self, crs: int = 4326
     ) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """Creates a network which has been prepared in the TRAILS package
 
@@ -239,15 +242,15 @@ class Network:
         # )
 
         edge_file = (
-            self.config["static"] / "network" / self.config["network"]["primary_file"]
+                self.config["static"] / "network" / self.config["network"]["primary_file"]
         )
         edges = gpd.read_feather(edge_file)
         edges = edges.set_crs(crs)
 
         corresponding_node_file = (
-            self.config["static"]
-            / "network"
-            / self.config["network"]["primary_file"].replace("edges", "nodes")
+                self.config["static"]
+                / "network"
+                / self.config["network"]["primary_file"].replace("edges", "nodes")
         )
         assert (
             corresponding_node_file.exists()
@@ -288,52 +291,55 @@ class Network:
 
         return graph_complex, edges_complex
 
-    def network_osm_download(self) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+    @staticmethod
+    def get_clean_graph_from_osm_download(polygon: Union[Polygon, MultiPolygon], road_types="", network_type="") -> Graph:
         """Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
 
-        Returns:
-            graph_simple (NetworkX graph): Simplified graph (for use in the indirect analyses).
-            complex_edges (GeoDataFrame): Complex graph (for use in the direct analyses).
-        """
-        poly_dict = nut.read_geojson(
-            self.config["network"]["polygon"][0]
-        )  # It can only read in one geojson
-        poly = nut.geojson_to_shp(poly_dict)
-
-        if not self.config["network"]["road_types"]:
+                Returns:
+                    complex_graph (NetworkX graph): Complex graph (for use in the direct analyses and
+                    input to derive simplified network).
+                """
+        if not road_types:
             # The user specified only the network type.
             graph_complex = osmnx.graph_from_polygon(
-                polygon=poly,
-                network_type=self.config["network"]["network_type"],
+                polygon=polygon,
+                network_type=network_type,
                 simplify=False,
                 retain_all=True,
             )
-        elif not self.config["network"]["network_type"]:
+        elif not network_type:
             # The user specified only the road types.
-            cf = '["highway"~"{}"]'.format(
-                self.config["network"]["road_types"].replace(",", "|")
-            )
+            cf = f'["highway"~"{road_types.replace(",", "|")}"]'
             graph_complex = osmnx.graph_from_polygon(
-                polygon=poly, custom_filter=cf, simplify=False, retain_all=True
+                polygon=polygon,
+                custom_filter=cf,
+                simplify=False,
+                retain_all=True
             )
         else:
             # The user specified the network type and road types.
-            cf = '["highway"~"{}"]'.format(
-                self.config["network"]["road_types"].replace(",", "|")
-            )
+            cf = f'["highway"~"{road_types.replace(",", "|")}"]'
             graph_complex = osmnx.graph_from_polygon(
-                polygon=poly,
-                network_type=self.config["network"]["network_type"],
+                polygon=polygon,
+                network_type=network_type,
                 custom_filter=cf,
                 simplify=False,
                 retain_all=True,
             )
-
         logging.info(
             "graph downloaded from OSM with {:,} nodes and {:,} edges".format(
                 len(list(graph_complex.nodes())), len(list(graph_complex.edges()))
             )
         )
+        # TODO: Create the clean graph function
+        # graph_complex = _clean_graph()
+        return graph_complex
+
+    def network_osm_download(self) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+        polygon_file = self.output_path.parent / "network" / self.config["network"]["polygon"]
+        poly_dict = nut.read_geojson(geojson_file=polygon_file)  # It can only read in one geojson
+        poly: Union[Polygon, MultiPolygon] = nut.geojson_to_shp(poly_dict)
+        graph_complex = self.get_clean_graph_from_osm_download(polygon=poly, network_type="", road_types="")
 
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
@@ -365,7 +371,7 @@ class Network:
         return graph_simple, edges_complex
 
     def add_od_nodes(
-        self, graph: nx.classes.graph.Graph, crs: pyproj.CRS
+            self, graph: nx.classes.graph.Graph, crs: pyproj.CRS
     ) -> nx.classes.graph.Graph:
         """Adds origins and destinations nodes from shapefiles to the graph.
 
@@ -491,10 +497,10 @@ class Network:
         return lines
 
     def get_avg_speed(
-        self, original_graph: nx.classes.graph.Graph
+            self, original_graph: nx.classes.graph.Graph
     ) -> nx.classes.graph.Graph:
         if all(["length" in e for u, v, e in original_graph.edges.data()]) and any(
-            ["maxspeed" in e for u, v, e in original_graph.edges.data()]
+                ["maxspeed" in e for u, v, e in original_graph.edges.data()]
         ):
             # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
             path_avg_speed = self.config["static"] / "output_graph" / "avg_speed.csv"
@@ -522,7 +528,7 @@ class Network:
             return original_graph
 
     def _export_network_files(
-        self, network: Any, graph_name: str, types_to_export: List[str]
+            self, network: Any, graph_name: str, types_to_export: List[str]
     ):
         _exporter = NetworkExporterFactory()
         _exporter.export(
@@ -633,9 +639,9 @@ class Network:
 
         # create origins destinations graph
         if (
-            (self.origins is not None)
-            and (self.destinations is not None)
-            and self.files["origins_destinations_graph"] is None
+                (self.origins is not None)
+                and (self.destinations is not None)
+                and self.files["origins_destinations_graph"] is None
         ):
             # reading the base graphs
             if (self.files["base_graph"] is not None) and (base_graph is not None):
