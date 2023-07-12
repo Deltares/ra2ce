@@ -19,6 +19,7 @@
 #
 import os
 import sys
+import sphinx_autosummary_accessors
 
 # This is not needed
 sys.path.insert(0, os.path.abspath(".."))
@@ -35,10 +36,18 @@ print("dir", dir(ra2ce))
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.viewcode"]
+extensions = [
+    "sphinx_design",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.githubpages",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.autosummary",
+    "sphinx_autosummary_accessors",
+]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
+templates_path = ["_templates", sphinx_autosummary_accessors.templates_path]
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -81,24 +90,61 @@ pygments_style = "sphinx"
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
+# Napoleon settings
+napoleon_numpy_docstring = True
+napoleon_google_docstring = False
+napoleon_preprocess_types = True
 
 # -- Options for HTML output -------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "alabaster"
+html_theme = "pydata_sphinx_theme"
+html_logo = "_resources/ra2ce_temp_logo.svg"
 
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    "show_nav_level": 2,
+    "navbar_align": "content",
+    "use_edit_page_button": True,
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/Deltares/ra2ce",  # required
+            "icon": "https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg",
+            "type": "url",
+        },
+        {
+            "name": "Deltares",
+            "url": "https://www.deltares.nl/en/",
+            "icon": "_resources/deltares-blue.svg",
+            "type": "local",
+        },
+    ],
+    "logo": {
+        "text": "RA2CE",
+    },
+    "navbar_end": ["navbar-icon-links"],  # remove dark mode switch
+}
+
+html_context = {
+    "github_url": "https://github.com",  # or your GitHub Enterprise interprise
+    "github_user": "Deltares",
+    "github_repo": "ra2ce",
+    "github_version": "master",  # FIXME
+    "doc_path": "docs",
+    "default_mode": "light",
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ["_static"]
+html_static_path = ["_resources"]
+html_css_files = ["theme-deltares.css"]
 
 
 # -- Options for HTMLHelp output ---------------------------------------
@@ -162,10 +208,10 @@ texinfo_documents = [
     (
         master_doc,
         "ra2ce",
-        "Risk Assessment and Adaptation for Critical infrastructurE Documentation",
+        "RA2CE Documentation",
         author,
         "ra2ce",
-        "One line description of project.",
+        "Risk Assessment and Adaptation for Critical infrastructurE Documentation",
         "Miscellaneous",
     ),
 ]
