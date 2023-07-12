@@ -6,7 +6,7 @@ from networkx import Graph
 from shapely.geometry import LineString, Polygon
 
 from ra2ce.graph.networks import Network
-from tests import test_results
+from tests import test_results, slow_test
 import ra2ce.graph.networks_utils as nut
 
 
@@ -84,6 +84,7 @@ class TestNetworks:
         assert str(
             exc_err.value) == "Geometry must be a shapely Polygon or MultiPolygon. If you requested graph from place name, make sure your query resolves to a Polygon or MultiPolygon, and not some other geometry, like a Point. See OSMnx documentation for details."
 
+    @slow_test
     def test_get_clean_graph_from_osm_download_with_invalid_network_type_arg(self):
         _polygon = Polygon([(0., 0.), (0., 1.), (1., 1.), (1., 0.), (0., 0.)])
         _link_type = ""
@@ -93,6 +94,7 @@ class TestNetworks:
 
         assert str(exc_err.value) == 'Unrecognized network_type ""'
 
+    @slow_test
     def test_get_clean_graph_from_osm_download_for_output_type(self):
         _test_input_directory = Path(r'C:\repos\ra2ce\tests\test_data\graph\test_networks')
         _polygon_file = _test_input_directory / "_test_polygon.geojson"
@@ -106,6 +108,7 @@ class TestNetworks:
         )
         assert isinstance(graph_complex, Graph) == True
 
+    @slow_test
     def test_get_clean_graph_from_osm_download_for_specific_node(self):
         _test_input_directory = Path(r'C:\repos\ra2ce\tests\test_data\graph\test_networks')
         _polygon_file = _test_input_directory / "_test_polygon.geojson"
@@ -127,6 +130,7 @@ class TestNetworks:
 
         assert node_to_validate_exists == True
 
+    @slow_test
     def test_get_clean_graph_from_osm_download_for_specific_edge(self):
         _test_input_directory = Path(r'C:\repos\ra2ce\tests\test_data\graph\test_networks')
         _polygon_file = _test_input_directory / "_test_polygon.geojson"
