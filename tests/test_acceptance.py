@@ -7,13 +7,26 @@ from typing import Dict, Iterator, List, Optional
 import pytest
 
 from ra2ce import main
-from tests import slow_test, test_data
+from tests import slow_test, test_data, external_test, test_external_data
 
 # Just to make sonar-cloud stop complaining.
 _network_ini_name = "network.ini"
 _analysis_ini_name = "analyses.ini"
 _base_graph_p_filename = "base_graph.p"
 _base_network_feather_filename = "base_network.feather"
+
+
+def get_external_test_cases() -> list[pytest.param]:
+    if not test_external_data.exists():
+        return []
+    return [
+        pytest.param(_dir, id=_dir.name, marks=external_test)
+        for _dir in test_external_data.iterdir()
+        if _dir.is_dir()
+    ]
+
+
+_external_test_cases = get_external_test_cases()
 
 
 def _run_from_cli(network_ini: Optional[Path], analysis_ini: Optional[Path]) -> None:
@@ -70,7 +83,8 @@ class TestAcceptance:
                 id="Nepal project",
                 marks=pytest.mark.skip(reason="WPF Nepal test directory not presnt"),
             ),
-        ],
+        ]
+        + _external_test_cases,
         indirect=["case_data_dir"],
     )
     def test_given_test_data_main_does_not_throw(self, case_data_dir: Path):
