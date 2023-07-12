@@ -19,8 +19,6 @@ Please follow these guidelines to make contributing to this project easier:
 5. New additions (bug fixes, features, etc) can be done through Pull Requests. Before merging they will be subject to the Continuous Integration builds as well as a code review.
 
 
-You can contribute in many ways:
-
 Types of Contributions
 ----------------------
 
