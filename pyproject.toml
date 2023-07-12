@@ -11,14 +11,14 @@ maintainers = [
 license = "GPL-3.0-or-later"
 readme = "README.rst"
 repository = "https://github.com/Deltares/ra2ce"
-documentation = "https://ra2ce.readthedocs.io/en/latest/"
+documentation = "https://deltares.github.io/ra2ce/"
 classifiers = [
   'Development Status :: 2 - Pre-Alpha',
   'Intended Audience :: Developers',
   'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
   'Natural Language :: English',
   'Programming Language :: Python :: 3',
-  'Programming Language :: Python :: 3.8',
+  'Programming Language :: Python :: 3.10'
 ]
 packages = [{include = "ra2ce"}]
 
@@ -72,6 +72,10 @@ sphinx-copybutton = "^0.5.2"
 sphinx-rtd-theme = "^1.2.0"
 sphinx-autosummary-accessors = "^2023.4.0"
 sphinx-design = "^0.4.1"
+
+
+[tool.poetry.group.test.dependencies]
+testbook = "^0.4.2"
 
 [tool.black]
 line-length = 88
