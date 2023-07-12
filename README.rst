@@ -1,3 +1,14 @@
+.. image:: https://img.shields.io/badge/Python-3.10-blue.svg
+  :target: https://www.python.org/downloads/release/python-3109
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+  :target: https://github.com/psf/black
+.. image:: https://mybinder.org/badge_logo.svg
+ :target: https://mybinder.org/v2/gh/Deltares/ra2ce/jupyter-binder
+.. image:: https://dpcbuild.deltares.nl/app/rest/builds/buildType:id:Ra2ce_Ra2ceContinuousIntegrationBuild_RunFastTests/statusIcon.svg
+  :target: https://dpcbuild.deltares.nl/project/Ra2ce?mode=builds
+.. image:: https://github.com/Deltares/ra2ce/actions/workflows/deploy_docs.yml/badge.svg
+  :target: https://github.com/Deltares/ra2ce/actions/workflows/deploy_docs.yml
+
 RA2CE
 =====
 
@@ -17,6 +28,12 @@ Distribution
 ---------------------------
 Ra2ce is shared with `GPL3 license <https://www.gnu.org/licenses/gpl-3.0.en.html>`__, you may use and / or extend it by using the same license. For specific agreements we urge you to contact us.
 
+Usage
+---------------------------
+If you wish to run ra2ce locally we recommend to have a look at the ':ref:`README Installation`' section. 
+On the other hand, if you wish to run a preinstalled environment, you may use our :doc:`examples in binder <examples/README.md>`.
+
+.. _README Installation:
 Installation
 ---------------------------
 RA2CE can be operated via the command-line interface with two commands. Before RA2CE can be used, the correct Python environment needs to be installed (see *environment.yml*). Anaconda is a well-known environment manager for Python and can be used to install the correct environment and run RA2CE via its command-line interface. It is recommended to install Anaconda, instead of `miniconda`, so that you have all required packages already available during the following steps.
