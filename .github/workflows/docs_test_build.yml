@@ -39,5 +39,5 @@ jobs:
         env:
           REPO: self
           BRANCH: test_docs
-          FOLDER: .docs/build/html
+          FOLDER: docs/build/html
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
