@@ -29,13 +29,15 @@ jobs:
       - name: Install dependencies
         run: poetry install --without dev,test
 
-      - name: Run sphinx
-        run: poetry run ./docs/make html
+      - name: Build docs
+        run: |
+          cd docs
+          poetry run make html
 
       - name: Deploy
         uses: s0/git-publish-subdir-action@develop
         env:
           REPO: self
           BRANCH: test_docs
-          FOLDER: docs\build
+          FOLDER: .docs/build/html
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
