@@ -1,4 +1,4 @@
-name: "Binder branch"
+name: "Test docs branch"
 on:
   - push
 
