@@ -929,6 +929,16 @@ class Hazard:
         if "isolation" in self.config and self.config["isolation"]["locations"]:
             locations = gpd.read_file(self.config["isolation"]["locations"][0])
             locations["i_id"] = locations.index
+
+            # spatial join the locations with the network edges
+            logging.info("Spatial join the locations with the network edges")
+            edges = self.graphs["base_network"]
+            edges["edge_fid"] = [f"{na}_{nb}" for na, nb in edges[["node_A", "node_B"]].values]
+            locations = gpd.sjoin_nearest(locations, edges, how="left", distance_col = "edges_distance")
+            if locations["edges_distance"].isna().sum() > 0:
+                logging.warning("Some locations are not connected to the network. These locations will be removed from the isolation analysis.")
+
+            # Check if the locations need to be reprojected
             locations_crs = pyproj.CRS.from_user_input(locations.crs)
             hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
 
