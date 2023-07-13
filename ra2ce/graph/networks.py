@@ -82,7 +82,19 @@ class Network:
         # Cleanup
         self.snapping = config["cleanup"]["snapping_threshold"]
         self.segmentation_length = config["cleanup"]["segmentation_length"]
+        self.merge_lines = config["cleanup"]["merge_lines"]
+        self.merge_on_id = config["cleanup"]["merge_on_id"]
+        self.cut_at_intersections = config["cleanup"]["cut_at_intersections"]
 
+        if (
+                self.snapping is None) and (
+                self.segmentation_length is None) and (
+                self.merge_lines is False) and (
+                self.merge_on_id is False) and (
+                self.cut_at_intersections is False):
+            self.cleanup = False				# True / False
+        else:
+            self.cleanup = True
         # files
         self.files = files
 
@@ -179,6 +191,9 @@ class Network:
         edges_complex = nut.join_nodes_edges(nodes, edges, id_name)
         edges_complex.crs = crs  # set the right CRS
 
+        edges_complex = edges_complex.loc[~edges_complex["node_A"].isnull()]
+        edges_complex = edges_complex.loc[~edges_complex["node_B"].isnull()]
+
         assert (
             edges_complex["node_A"].isnull().sum() == 0
         ), "Some edges cannot be assigned nodes, please check your input shapefile."
@@ -196,6 +211,63 @@ class Network:
             if edges_complex.crs is None:  # The CRS might have dissapeared.
                 edges_complex.crs = crs  # set the right CRS
 
+        self.base_graph_crs = pyproj.CRS.from_user_input(crs)
+        self.base_network_crs = pyproj.CRS.from_user_input(crs)
+
+        # Exporting complex graph because the shapefile should be kept the same as much as possible.
+        return graph_complex, edges_complex
+
+    def network_cleanshp(
+        self, crs: int = 4326
+    ) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+        """Creates a (graph) network from a clean shapefile (primary_file - no further advance cleanup is needed)
+
+        Returns the same geometries for the network (GeoDataFrame) as for the graph (NetworkX graph), because
+        it is assumed that the user wants to keep the same geometries as their shapefile input.
+
+        Args:
+            crs (int): the EPSG number of the coordinate reference system that is used
+
+        Returns:
+            graph_complex (NetworkX graph): The resulting graph.
+            edges_complex (GeoDataFrame): The resulting network.
+        """
+        # Make a pyproj CRS from the EPSG code
+        crs = pyproj.CRS.from_user_input(crs)
+
+        # Read the shapefile and simplify the geometry
+        shapefiles_analysis = [
+            self.config["static"] / "network" / shp
+            for shp in self.config["network"]["primary_file"].split(",")
+        ]
+        # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
+        lines = gpd.GeoDataFrame(pd.concat([gpd.read_file(shp) for shp in shapefiles_analysis]))
+        lines.set_index(self.config["network"]["file_id"], inplace=True)
+        # standard exploding and remove duplicated lines
+        lines = lines.explode()
+        lines = lines[lines.index.isin(lines["geometry"].apply(lambda geom: geom.wkb).drop_duplicates().index)]
+
+        # get edges and nodes for graph
+        G = nx.Graph()
+        for index, row in lines.iterrows():
+            from_node = row.geometry.coords[0]
+            to_node = row.geometry.coords[-1]
+            G.add_edge(from_node, to_node, id=row.index, geometry = row.geometry)
+        import momepy
+        nodes, edges = momepy.nx_to_gdf(G, nodeID="node_fid")
+        edges.rename({"node_start":"node_A", "node_end":"node_B"}, axis=1, inplace=True)
+        edges = edges.drop(columns=["id"])
+        if not nodes.crs:
+            nodes.crs = crs
+        if not edges.crs:
+            edges.crs = crs
+
+        # Create networkx graph again
+        graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
+        edges_complex = edges
+        logging.info("Function [graph_from_gdf]: executed")
+
+        # Set the CRS of the graph and network
         self.base_graph_crs = pyproj.CRS.from_user_input(crs)
         self.base_network_crs = pyproj.CRS.from_user_input(crs)
 
@@ -552,7 +624,10 @@ class Network:
             # Create the network from the network source
             if self.config["network"]["source"] == "shapefile":
                 logging.info("Start creating a network from the submitted shapefile.")
-                base_graph, network_gdf = self.network_shp()
+                if self.cleanup is False:
+                    base_graph, network_gdf = self.network_cleanshp()
+                else:
+                    base_graph, network_gdf = self.network_shp()
 
             elif self.config["network"]["source"] == "OSM PBF":
                 logging.info(

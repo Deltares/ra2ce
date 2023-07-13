@@ -976,14 +976,16 @@ class IndirectAnalyses:
                 if g.size() == 0:
                     continue
                 edges_geoms = []
+                edge_fids = []
                 count_edges = 0
                 for edge in g.edges(data=True):
                     edges_geoms.append(edge[-1]["geometry"])
                     count_edges += 1
+                    edge_fids.append(f"{edge[-1]['node_A']}_{edge[-1]['node_B']}")
                 total_geom = MultiLineString(edges_geoms)
                 results_list_gdf.append(
                     gpd.GeoDataFrame(
-                        {"fid": ii, "count": count_edges, "geometry": total_geom},
+                        {"fid": ii, "count": count_edges, "geometry": total_geom, "edge_fid": edge_fids},
                         geometry="geometry",
                         crs=crs,
                     )
@@ -1003,18 +1005,37 @@ class IndirectAnalyses:
             results = results.set_crs(crs=crs)
             results.to_crs(crs=nearest_utm, inplace=True)
 
+            # Buffer around the flooded roads
+            results_flooded_roads = gpd.GeoDataFrame({'geometry':[e[-1]['geometry'] for e in edges_remove],
+                                                      "edge_fid": [f"{e[-1]['node_A']}_{e[-1]['node_B']}" for e in edges_remove]
+                                                      }, crs=crs)
+            results_flooded_roads.to_crs(crs=nearest_utm, inplace=True)
+            results_flooded_roads.geometry = results_flooded_roads.geometry.buffer(
+                analysis["buffer_meters"], cap_style = 3,
+            )
+            results_flooded_roads[f"i_type_{hazard_name[:-3]}"] = "flooded"
+
+            # Buffer around the isolated roads
             results_buffered = results.copy()
             results_buffered.geometry = results_buffered.geometry.buffer(
-                analysis["buffer_meters"]
+                analysis["buffer_meters"], cap_style = 3,
             )
+            results_buffered[f"i_type_{hazard_name[:-3]}"] = "isolated"
+
+            # merge flooded and isolated
+            results_buffered = gpd.GeoDataFrame(pd.concat([results_buffered, results_flooded_roads]))
+
+            del results_buffered['count']
             results_buffered.to_file(
                 self.config["output"]
                 / analysis["analysis"]
                 / f"isolated_{hazard_name}.shp"
             )  # Save the buffer
 
-            intersect = gpd.overlay(results_buffered, locations, keep_geom_type=False)
-            intersect.set_crs(crs=nearest_utm)
+            # join the locations on edges_fid and results_buffered on edge_fid
+            joined = locations.merge(results_buffered.drop(columns = "geometry"), on='edge_fid', how='left')
+            intersect = joined.loc[~joined[f"i_type_{hazard_name[:-3]}"].isna()]
+            intersect = gpd.GeoDataFrame(intersect,  crs=nearest_utm)
 
             # Replace nan with 0 for the water depth columns
             intersect[hazard_name] = intersect[hazard_name].fillna(0)
@@ -1025,9 +1046,9 @@ class IndirectAnalyses:
 
             # Save the results in isolated_locations
             intersect[f"i_{hazard_name[:-3]}"] = 1
-            intersect_join = intersect[[f"i_{hazard_name[:-3]}", "i_id"]]
+            intersect = intersect[[f"i_{hazard_name[:-3]}", "i_id", f"i_type_{hazard_name[:-3]}"]]
             isolated_locations = isolated_locations.merge(
-                intersect_join, on="i_id", how="left"
+                intersect, on="i_id", how="left"
             )
             isolated_locations[f"i_{hazard_name[:-3]}"] = isolated_locations[
                 f"i_{hazard_name[:-3]}"
@@ -1035,7 +1056,7 @@ class IndirectAnalyses:
 
             # make an overview of the isolated_locations, aggregated per category (category is specified by the user)
             df_aggregation = (
-                isolated_locations.groupby(by=analysis["category_field_name"])[
+                isolated_locations.groupby(by=[analysis["category_field_name"], f"i_type_{hazard_name[:-3]}"])[
                     f"i_{hazard_name[:-3]}"
                 ]
                 .sum()
