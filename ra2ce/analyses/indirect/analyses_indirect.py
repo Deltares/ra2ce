@@ -1109,17 +1109,15 @@ class IndirectAnalyses:
                         / "output_graph"
                         / "origin_destination_table.feather"
                     )
-                    _equity_weights = pd.DataFrame()
+                    _equity_weights_file = None
                     if "equity_weight" in analysis.keys():
-                        _equity_weights = EquityAnalysis.read_equity_weights(
-                            self.config["static"].joinpath(
-                                "network", analysis["equity_weight"]
-                            )
+                        _equity_weights_file = self.config["static"].joinpath(
+                            "network", analysis["equity_weight"]
                         )
-                    route_traffic_df = EquityAnalysis().optimal_route_od_link(
+                    route_traffic_df = EquityAnalysis().analyze_with_weights(
                         gdf,
                         od_table,
-                        _equity_weights,
+                        _equity_weights_file,
                         self.config["origins_destinations"]["destinations_names"],
                     )
                     impact_csv_path = (

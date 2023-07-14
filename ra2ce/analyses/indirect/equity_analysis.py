@@ -1,3 +1,24 @@
+"""
+                    GNU GENERAL PUBLIC LICENSE
+                      Version 3, 29 June 2007
+
+    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+    Copyright (C) 2023 Stichting Deltares
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -5,6 +26,28 @@ import geopandas as gpd
 
 
 class EquityAnalysis:
+    @staticmethod
+    def read_equity_weights(equity_weight_file: Path) -> pd.DataFrame:
+        """
+        Reads the equity data from a geojson fileand loads it into a pandas dataframe.
+
+        Args:
+            equity_weight_file (Path): File containing values of region and weight.
+
+        Returns:
+            pd.DataFrame: Dataframe representing the geojson data.
+        """
+        if not equity_weight_file.exists():
+            return pd.DataFrame
+
+        try:
+            _separator = (
+                ";" if ";" in equity_weight_file.read_text().splitlines()[0] else ","
+            )
+            return pd.read_csv(equity_weight_file, sep=_separator)
+        except Exception:
+            return pd.DataFrame()
+
     def _get_values_prioritarian(
         self, equity_data: pd.DataFrame, od_table_data: gpd.GeoDataFrame
     ) -> np.array:
@@ -14,15 +57,29 @@ class EquityAnalysis:
             od_table_data["region"].map(prioritarian_mapping) * od_table_data["values"]
         )
 
-    @staticmethod
-    def read_equity_weights(equity_weight_file: Path) -> pd.DataFrame:
-        try:
-            _separator = (
-                ";" if ";" in equity_weight_file.read_text().splitlines()[0] else ","
-            )
-            return pd.read_csv(equity_weight_file, sep=_separator)
-        except Exception:
-            return pd.DataFrame()
+    def analyze_with_weights(
+        self,
+        gdf: gpd.GeoDataFrame,
+        od_table: gpd.GeoDataFrame,
+        equity_data_file: Path,
+        destination_names: list[str],
+    ) -> pd.DataFrame:
+        """
+        Generates a pandas `DataFrame` with the optimal traffic routes including results for `equal` and `prioritarian`.
+
+        Args:
+            gdf (gpd.GeoDataFrame): Geodataframe containing the overall network information.
+            od_table (gpd.GeoDataFrame): GeoDataFrame representing the Origins - Destinations table.
+            equity_data_file (Path): File containing the region's equity relations.
+            destination_names (list[str]): List of destinations nodes.
+
+        Returns:
+            pd.DataFrame: Resulting dataframe with optimal origin-destination routes.
+        """
+        _equity_weights_data = self.read_equity_weights(equity_data_file)
+        return self.optimal_route_od_link(
+            gdf, od_table, _equity_weights_data, destination_names
+        )
 
     def optimal_route_od_link(
         self,
