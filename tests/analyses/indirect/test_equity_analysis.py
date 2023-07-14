@@ -23,6 +23,7 @@ def import_from_csv(input_file: Path) -> gpd.GeoDataFrame:
 class TestEquityAnalysis:
     def test_analysis_with_valid_data(self):
         # 1. Define test data.
+        _destinations_names = "B"
         _gdf_data = import_from_csv(_equity_test_data.joinpath("gdf_data.csv"))
         _od_table_data = import_from_csv(
             _equity_test_data.joinpath("od_table_data.csv")
@@ -30,10 +31,19 @@ class TestEquityAnalysis:
         _equity_data = pd.read_csv(_equity_test_data.joinpath("equity_data.csv"))
         assert isinstance(_equity_data, pd.DataFrame)
 
+        _expected_columns = [
+            "u",
+            "v",
+            "traffic",
+            "traffic_egalitarian",
+            "traffic_prioritarian",
+        ]
+
         # 2. Run test.
         _result = EquityAnalysis().optimal_route_od_link(
-            _gdf_data, _od_table_data, _equity_data
+            _gdf_data, _od_table_data, _equity_data, _destinations_names
         )
 
         # 3. Verify expectations.
         assert isinstance(_result, pd.DataFrame)
+        assert list(_result.columns).sort() == _expected_columns.sort()

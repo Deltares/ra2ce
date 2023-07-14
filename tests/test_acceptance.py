@@ -8,6 +8,7 @@ import pytest
 
 from ra2ce import main
 from tests import slow_test, test_data, external_test, test_external_data
+from click.testing import CliRunner
 
 # Just to make sonar-cloud stop complaining.
 _network_ini_name = "network.ini"
@@ -30,13 +31,7 @@ _external_test_cases = get_external_test_cases()
 
 
 def _run_from_cli(network_ini: Optional[Path], analysis_ini: Optional[Path]) -> None:
-
-    assert Path(main.__file__).exists(), "No main file was found."
-
-    args = [
-        "python",
-        main.__file__,
-    ]
+    args = []
     if network_ini:
         args.extend(["--network_ini", str(network_ini)])
     if analysis_ini:
@@ -44,6 +39,12 @@ def _run_from_cli(network_ini: Optional[Path], analysis_ini: Optional[Path]) -> 
 
     _return_code = subprocess.call(args)
     assert _return_code == 0
+
+    # 2. Run test.
+    _run_result = CliRunner().invoke(main.run_full,args,)
+
+    # 3. Verify expectations.
+    assert _run_result.exit_code == 2
 
 
 class TestAcceptance:
