@@ -31,6 +31,7 @@ import pandas as pd
 import pyproj
 from networkx import Graph
 from shapely.geometry import MultiLineString, Polygon, MultiPolygon
+from shapely.geometry.base import BaseGeometry
 
 import ra2ce.graph.networks_utils as nut
 from ra2ce.graph.segmentation import Segmentation
@@ -290,7 +291,7 @@ class Network:
         return graph_complex, edges_complex
 
     @staticmethod
-    def get_clean_graph_from_osm_download(polygon: Union[Polygon, MultiPolygon], link_type: str, network_type: str) \
+    def get_graph_from_osm_download(polygon: BaseGeometry, link_type: str, network_type: str) \
             -> Graph:
         """
         Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
@@ -335,17 +336,16 @@ class Network:
                 len(list(graph_complex.nodes())), len(list(graph_complex.edges()))
             )
         )
-        # TODO: Create the clean graph function
-        # graph_complex = _clean_graph()
         return graph_complex
 
     def network_osm_download(self) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         polygon_file = self.output_path.parent / "network" / self.config["network"]["polygon"]
         poly_dict = nut.read_geojson(geojson_file=polygon_file)  # It can only read in one geojson
-        graph_complex = self.get_clean_graph_from_osm_download(
+        _network = self.config.get("network", {})
+        graph_complex = self.get_graph_from_osm_download(
             polygon=nut.geojson_to_shp(poly_dict),
-            network_type=self.config["network"]["network_type"],
-            link_type=self.config["network"]["road_type"]
+            network_type=_network.get("network_type", None),
+            link_type=_network.get("road_type", None)
         )
 
         # Create 'graph_simple'
