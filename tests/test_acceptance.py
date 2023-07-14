@@ -44,7 +44,7 @@ def _run_from_cli(network_ini: Optional[Path], analysis_ini: Optional[Path]) -> 
     )
 
     # 3. Verify expectations.
-    assert _run_result.exit_code == 2
+    assert _run_result.exit_code == 0
 
 
 class TestAcceptance:
