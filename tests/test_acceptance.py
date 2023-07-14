@@ -30,7 +30,6 @@ _external_test_cases = get_external_test_cases()
 
 
 def _run_from_cli(network_ini: Optional[Path], analysis_ini: Optional[Path]) -> None:
-
     assert Path(main.__file__).exists(), "No main file was found."
 
     args = [
@@ -82,6 +81,13 @@ class TestAcceptance:
                 "wpf_nepal",
                 id="Nepal project",
                 marks=pytest.mark.skip(reason="WPF Nepal test directory not presnt"),
+            ),
+            pytest.param(
+                "bolivia",
+                id="Bolivia project",
+                marks=pytest.mark.skip(
+                    reason="Bolivia project test directory not presnt"
+                ),
             ),
         ]
         + _external_test_cases,
