@@ -547,7 +547,7 @@ class IndirectAnalyses:
         #     pref_routes = pref_routes.loc[pref_routes.sort_values(analysis['weighing']).groupby('o_node').head(3).index]
         return pref_routes
 
-    def optimal_route_od_link(self, gdf, od_table, equity):
+    def optimal_route_od_link(self, gdf: gpd.GeoDataFrame, od_table: gpd.GeoDataFrame, equity: pd.DataFrame) -> pd.DataFrame:
         origin_nodes = np.unique(gdf["origin"])
         destination_nodes = np.unique(gdf["destination"])
 

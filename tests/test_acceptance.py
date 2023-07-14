@@ -22,7 +22,7 @@ def get_external_test_cases() -> list[pytest.param]:
     return [
         pytest.param(_dir, id=_dir.name, marks=external_test)
         for _dir in test_external_data.iterdir()
-        if _dir.is_dir()
+        if _dir.is_dir() and ".svn" not in _dir.name
     ]
 
 
