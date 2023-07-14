@@ -29,6 +29,7 @@ import networkx as nx
 import osmnx
 import pandas as pd
 import pyproj
+import momepy
 from shapely.geometry import MultiLineString
 
 import ra2ce.graph.networks_utils as nut
@@ -80,21 +81,23 @@ class Network:
             self.region_var = None
 
         # Cleanup
-        self.snapping = config["cleanup"]["snapping_threshold"]
-        self.segmentation_length = config["cleanup"]["segmentation_length"]
-        self.merge_lines = config["cleanup"]["merge_lines"]
-        self.merge_on_id = config["cleanup"]["merge_on_id"]
-        self.cut_at_intersections = config["cleanup"]["cut_at_intersections"]
+        self._cleanup_options = config.get("cleanup", {})
+        if bool(self._cleanup_options) and any(
+            [v for k, v in self._cleanup_options.items()]
+        ):
+            self._cleanup_options.update({"cleanup": True})
+        # TODO: remove the attributes once cleanup function is used
+        self.cleanup = self._cleanup_options.get("cleanup", False)
+        self.snapping = self._cleanup_options.get("snapping_threshold", None)
+        self.segmentation_length = self._cleanup_options.get(
+            "segmentation_length", None
+        )
+        self.merge_lines = self._cleanup_options.get("merge_lines", None)
+        self.merge_on_id = self._cleanup_options.get("merge_on_id", None)
+        self.cut_at_intersections = self._cleanup_options.get(
+            "cut_at_intersections", None
+        )
 
-        if (
-                self.snapping is None) and (
-                self.segmentation_length is None) and (
-                self.merge_lines is False) and (
-                self.merge_on_id is False) and (
-                self.cut_at_intersections is False):
-            self.cleanup = False				# True / False
-        else:
-            self.cleanup = True
         # files
         self.files = files
 
@@ -236,26 +239,37 @@ class Network:
         crs = pyproj.CRS.from_user_input(crs)
 
         # Read the shapefile and simplify the geometry
+        # TODO: read function
         shapefiles_analysis = [
             self.config["static"] / "network" / shp
             for shp in self.config["network"]["primary_file"].split(",")
         ]
         # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
-        lines = gpd.GeoDataFrame(pd.concat([gpd.read_file(shp) for shp in shapefiles_analysis]))
+        lines = gpd.GeoDataFrame(
+            pd.concat([gpd.read_file(shp) for shp in shapefiles_analysis])
+        )
         lines.set_index(self.config["network"]["file_id"], inplace=True)
-        # standard exploding and remove duplicated lines
-        lines = lines.explode()
-        lines = lines[lines.index.isin(lines["geometry"].apply(lambda geom: geom.wkb).drop_duplicates().index)]
 
-        # get edges and nodes for graph
+        # standard exploding and remove duplicated lines
+        # TODO: cleanup function
+        lines = lines.explode()
+        lines = lines[
+            lines.index.isin(
+                lines["geometry"].apply(lambda geom: geom.wkb).drop_duplicates().index
+            )
+        ]
+
+        # get edges and nodes without cleanup options (equivelant to nut.create_nodes with cleanup options)
+        # TODO: get_graph function fter cleanup
         G = nx.Graph()
         for index, row in lines.iterrows():
             from_node = row.geometry.coords[0]
             to_node = row.geometry.coords[-1]
-            G.add_edge(from_node, to_node, id=row.index, geometry = row.geometry)
-        import momepy
+            G.add_edge(from_node, to_node, id=row.index, geometry=row.geometry)
         nodes, edges = momepy.nx_to_gdf(G, nodeID="node_fid")
-        edges.rename({"node_start":"node_A", "node_end":"node_B"}, axis=1, inplace=True)
+        edges.rename(
+            {"node_start": "node_A", "node_end": "node_B"}, axis=1, inplace=True
+        )
         edges = edges.drop(columns=["id"])
         if not nodes.crs:
             nodes.crs = crs
@@ -263,15 +277,16 @@ class Network:
             edges.crs = crs
 
         # Create networkx graph again
+        # TODO: merge above and below function -complex graph is a multigraph, which could potentially be harmonized
         graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
         edges_complex = edges
         logging.info("Function [graph_from_gdf]: executed")
 
         # Set the CRS of the graph and network
+        # TODO: use one crs for both
         self.base_graph_crs = pyproj.CRS.from_user_input(crs)
         self.base_network_crs = pyproj.CRS.from_user_input(crs)
 
-        # Exporting complex graph because the shapefile should be kept the same as much as possible.
         return graph_complex, edges_complex
 
     def _export_linking_tables(self, linking_tables: List[Any]) -> None:
@@ -686,7 +701,6 @@ class Network:
             self._export_network_files(base_graph, "base_graph", to_save)
             self._export_network_files(network_gdf, "base_network", to_save)
         else:
-
             logging.info(
                 "Apparently, you already did create a network with ra2ce earlier. "
                 + "Ra2ce will use this: {}".format(self.files["base_graph"])
