@@ -37,16 +37,13 @@ class EquityAnalysis:
         Returns:
             pd.DataFrame: Dataframe representing the geojson data.
         """
-        if not equity_weight_file.exists():
-            return pd.DataFrame
-
-        try:
-            _separator = (
-                ";" if ";" in equity_weight_file.read_text().splitlines()[0] else ","
-            )
-            return pd.read_csv(equity_weight_file, sep=_separator)
-        except Exception:
+        if not equity_weight_file or not equity_weight_file.exists():
             return pd.DataFrame()
+
+        _separator = (
+            ";" if ";" in equity_weight_file.read_text().splitlines()[0] else ","
+        )
+        return pd.read_csv(equity_weight_file, sep=_separator)
 
     def _get_values_prioritarian(
         self, equity_data: pd.DataFrame, od_table_data: gpd.GeoDataFrame
