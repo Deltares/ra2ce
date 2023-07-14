@@ -37,7 +37,7 @@ from ra2ce.io.readers import GraphPickleReader
 
 def network_handler(config: dict, files: dict) -> Optional[dict]:
     try:
-        network = Network(config, files)
+        network = Network.from_config_and_files(config, files)
         graphs = network.create()
         return graphs
 

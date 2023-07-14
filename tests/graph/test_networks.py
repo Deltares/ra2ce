@@ -29,7 +29,7 @@ class TestNetworks:
             shutil.rmtree(_test_dir)
 
         # 2. Run test.
-        _network = Network(_config, _files)
+        _network = Network.from_config_and_files(_config, _files)
 
         # 3. Verify expectations
         assert isinstance(_network, Network)
@@ -56,7 +56,7 @@ class TestNetworks:
             shutil.rmtree(_test_dir)
 
         # 2. Run test.
-        _network = Network(_config, _files)
+        _network = Network.from_config_and_files(_config, _files)
 
         # 3. Verify expectations
         assert isinstance(_network, Network)
