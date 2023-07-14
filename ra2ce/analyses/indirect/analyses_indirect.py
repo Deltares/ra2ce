@@ -35,6 +35,7 @@ import pandas as pd
 from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
+from ra2ce.analyses.indirect.equity_analysis import EquityAnalysis
 
 from ra2ce.analyses.indirect.losses import Losses
 from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDestination
@@ -547,7 +548,9 @@ class IndirectAnalyses:
         #     pref_routes = pref_routes.loc[pref_routes.sort_values(analysis['weighing']).groupby('o_node').head(3).index]
         return pref_routes
 
-    def optimal_route_od_link(self, gdf: gpd.GeoDataFrame, od_table: gpd.GeoDataFrame, equity: pd.DataFrame) -> pd.DataFrame:
+    def optimal_route_od_link(
+        self, gdf: gpd.GeoDataFrame, od_table: gpd.GeoDataFrame, equity: pd.DataFrame
+    ) -> pd.DataFrame:
         origin_nodes = np.unique(gdf["origin"])
         destination_nodes = np.unique(gdf["destination"])
 
@@ -1106,18 +1109,19 @@ class IndirectAnalyses:
                         / "output_graph"
                         / "origin_destination_table.feather"
                     )
+                    _equity_weights = pd.DataFrame()
                     if "equity_weight" in analysis.keys():
-                        try:
-                            equity = pd.read_csv(
-                                self.config["static"]
-                                / "network"
-                                / analysis["equity_weight"]
+                        _equity_weights = EquityAnalysis.read_equity_weights(
+                            self.config["static"].joinpath(
+                                "network", analysis["equity_weight"]
                             )
-                        except Exception:
-                            equity = pd.DataFrame()
-                    else:
-                        equity = pd.DataFrame()
-                    route_traffic_df = self.optimal_route_od_link(gdf, od_table, equity)
+                        )
+                    route_traffic_df = EquityAnalysis().optimal_route_od_link(
+                        gdf,
+                        od_table,
+                        _equity_weights,
+                        self.config["origins_destinations"]["destinations_names"],
+                    )
                     impact_csv_path = (
                         self.config["output"]
                         / analysis["analysis"]
@@ -1386,7 +1390,9 @@ def find_route_ods(graph, od_nodes, weighing):
             for u, v in edgesinpath:
                 # get edge with the lowest weighing if there are multiple edges that connect u and v
                 _uv_graph = graph[u][v]
-                edge_key = sorted(_uv_graph, key=lambda x, _fgraph=_uv_graph: _fgraph[x][weighing])[0]
+                edge_key = sorted(
+                    _uv_graph, key=lambda x, _fgraph=_uv_graph: _fgraph[x][weighing]
+                )[0]
                 _uv_graph_edge = _uv_graph[edge_key]
                 if "geometry" in _uv_graph_edge:
                     pref_edges.append(_uv_graph_edge["geometry"])
