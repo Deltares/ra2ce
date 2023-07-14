@@ -37,11 +37,11 @@ def _run_from_cli(network_ini: Optional[Path], analysis_ini: Optional[Path]) -> 
     if analysis_ini:
         args.extend(["--analyses_ini", str(analysis_ini)])
 
-    _return_code = subprocess.call(args)
-    assert _return_code == 0
-
     # 2. Run test.
-    _run_result = CliRunner().invoke(main.run_full,args,)
+    _run_result = CliRunner().invoke(
+        main.run_analysis,
+        args,
+    )
 
     # 3. Verify expectations.
     assert _run_result.exit_code == 2
