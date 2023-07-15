@@ -49,7 +49,7 @@ class ConfigWrapper:
         Returns:
             bool: Input parameters are valid for a ra2ce run.
         """
-        if not self.analysis_config or not self.analysis_config.is_valid():
+        if self.analysis_config and not self.analysis_config.is_valid():
             logging.error("No valid analyses.ini file provided. Program will close.")
             return False
 
@@ -57,13 +57,12 @@ class ConfigWrapper:
             logging.error("No valid network.ini file provided. Program will close.")
             return False
 
-        if self.network_config and (
-            self.analysis_config.root_dir != self.network_config.root_dir
-        ):
-            logging.error(
-                "Root directory differs between network and analyses .ini files"
-            )
-            return False
+        if self.network_config and self.analysis_config:
+            if self.analysis_config.root_dir != self.network_config.root_dir:
+                logging.error(
+                    "Root directory differs between network and analyses .ini files"
+                )
+                return False
 
         return True
 
