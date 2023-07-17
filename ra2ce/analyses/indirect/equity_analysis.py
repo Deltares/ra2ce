@@ -19,10 +19,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import itertools
 from pathlib import Path
+from typing import Any
 import numpy as np
 import pandas as pd
 import geopandas as gpd
+import ast
 
 
 class EquityAnalysis:
@@ -99,94 +102,101 @@ class EquityAnalysis:
             od_table["values_prioritarian"] = self._get_values_prioritarian(
                 equity_data, od_table
             )
+
+        def _get_opt_path_values(opt_path: Any) -> list[Any]:
+            if isinstance(opt_path, list):
+                return opt_path
+            return ast.literal_eval(opt_path)
+
+        nodes_list = []
         for o_node in origin_nodes:
             for d_node in destination_nodes:
-                opt_path = gdf.loc[
-                    (gdf["origin"] == o_node) & (gdf["destination"] == d_node),
-                    "opt_path",
-                ].values[0]
-                for i, node in enumerate(range(len(opt_path))):
-                    if i < len(opt_path) - 1:
-                        u, v = opt_path[i], opt_path[i + 1]
-                        t = 1
-                        t_eq = 1
-                        if len(equity_data) > 0:
-                            t_prioritarian = 1
-                        if "," in o_node:
-                            o_nodes = o_node.split(",")
-                            o_num = len(o_nodes)
-                            j_ = 0
-                            for j, o_n in enumerate(o_nodes):
-                                if destinations_names in o_n:
-                                    o_num -= 1
-                                    j_ -= 1
-                                    continue
-                                else:
-                                    traffic = (
-                                        od_table.loc[
-                                            od_table["o_id"] == o_n, "values"
-                                        ].values[0]
-                                        / count_destination_nodes
-                                    )
-                                if j_ == 0:
-                                    t *= traffic
-                                else:
-                                    t += traffic
-                                if len(equity_data) > 0:
-                                    traffic_prioritarian = (
-                                        od_table.loc[
-                                            od_table["o_id"] == o_n,
-                                            "values_prioritarian",
-                                        ].values[0]
-                                        / count_destination_nodes
-                                    )
-                                    if j_ == 0:
-                                        t_prioritarian *= traffic_prioritarian
-                                    else:
-                                        t_prioritarian += traffic_prioritarian
-                                j_ += 1
-                            t_eq *= o_num
-                        else:
-                            traffic = (
-                                od_table.loc[
-                                    od_table["o_id"] == o_node, "values"
-                                ].values[0]
-                                / count_destination_nodes
-                            )
-                            t *= traffic
+                opt_path = _get_opt_path_values(
+                    gdf.loc[
+                        (gdf["origin"] == o_node) & (gdf["destination"] == d_node),
+                        "opt_path",
+                    ].values[0]
+                )
+                for u_node, v_node in itertools.pairwise(opt_path):
+                    nodes_list.append((u_node, v_node))
+                    _nodes_key_name = f"{u_node}_{v_node}"
+                    t = 1
+                    t_eq = 1
+                    if len(equity_data) > 0:
+                        t_prioritarian = 1
+                    if "," in o_node:
+                        o_nodes = o_node.split(",")
+                        o_num = len(o_nodes)
+                        j_ = 0
+                        for o_n in o_nodes:
+                            if destinations_names in o_n:
+                                o_num -= 1
+                                j_ -= 1
+                                continue
+                            else:
+                                traffic = (
+                                    od_table.loc[
+                                        od_table["o_id"] == o_n, "values"
+                                    ].values[0]
+                                    / count_destination_nodes
+                                )
+                            if j_ == 0:
+                                t *= traffic
+                            else:
+                                t += traffic
                             if len(equity_data) > 0:
                                 traffic_prioritarian = (
                                     od_table.loc[
-                                        od_table["o_id"] == o_node,
+                                        od_table["o_id"] == o_n,
                                         "values_prioritarian",
                                     ].values[0]
                                     / count_destination_nodes
                                 )
-                                t_prioritarian *= traffic_prioritarian
-                        if "," in d_node:
-                            d_nodes = d_node.split(",")
-                            d_num = len(d_nodes)
-                            t_eq *= d_num
-                            t *= d_num
-                            if len(equity_data) > 0:
-                                t_prioritarian *= d_num
-                        try:
-                            route_traffic[str(u) + "_" + str(v)] += t
-                            route_traffic_equal[str(u) + "_" + str(v)] += t_eq
-                            if len(equity_data) > 0:
-                                route_traffic_prioritarian[
-                                    str(u) + "_" + str(v)
-                                ] += t_prioritarian
-                        except Exception:
-                            route_traffic.update({str(u) + "_" + str(v): t})
-                            route_traffic_equal.update({str(u) + "_" + str(v): t_eq})
-                            if len(equity_data) > 0:
-                                route_traffic_prioritarian.update(
-                                    {str(u) + "_" + str(v): t_prioritarian}
-                                )
+                                if j_ == 0:
+                                    t_prioritarian *= traffic_prioritarian
+                                else:
+                                    t_prioritarian += traffic_prioritarian
+                            j_ += 1
+                        t_eq *= o_num
+                    else:
+                        traffic = (
+                            od_table.loc[od_table["o_id"] == o_node, "values"].values[0]
+                            / count_destination_nodes
+                        )
+                        t *= traffic
+                        if len(equity_data) > 0:
+                            traffic_prioritarian = (
+                                od_table.loc[
+                                    od_table["o_id"] == o_node,
+                                    "values_prioritarian",
+                                ].values[0]
+                                / count_destination_nodes
+                            )
+                            t_prioritarian *= traffic_prioritarian
+                    if "," in d_node:
+                        d_nodes = d_node.split(",")
+                        d_num = len(d_nodes)
+                        t_eq *= d_num
+                        t *= d_num
+                        if len(equity_data) > 0:
+                            t_prioritarian *= d_num
 
-        u_list = [x.split("_")[0] for x in route_traffic.keys()]
-        v_list = [x.split("_")[1] for x in route_traffic.keys()]
+                    try:
+                        route_traffic[_nodes_key_name] += t
+                        route_traffic_equal[_nodes_key_name] += t_eq
+                        if len(equity_data) > 0:
+                            route_traffic_prioritarian[
+                                _nodes_key_name
+                            ] += t_prioritarian
+                    except Exception:
+                        route_traffic.update({_nodes_key_name: t})
+                        route_traffic_equal.update({_nodes_key_name: t_eq})
+                        if len(equity_data) > 0:
+                            route_traffic_prioritarian.update(
+                                {_nodes_key_name: t_prioritarian}
+                            )
+
+        u_list, v_list = zip(*nodes_list)
         t_list = route_traffic.values()
         teq_list = route_traffic_equal.values()
         if len(equity_data) > 0:
