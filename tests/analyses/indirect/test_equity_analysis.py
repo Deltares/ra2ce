@@ -1,6 +1,6 @@
 from pathlib import Path
 from ra2ce.analyses.indirect.equity_analysis import EquityAnalysis
-from tests import test_data, test_results
+from tests import test_data, slow_test
 import pytest
 import geopandas as gpd
 import pandas as pd
@@ -39,6 +39,7 @@ class TestEquityAnalysis:
         assert isinstance(_result, pd.DataFrame)
         assert _result.empty
 
+    @slow_test
     def test_analysis_with_valid_data(self):
         # 1. Define test data.
         _destinations_names = "B"

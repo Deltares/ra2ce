@@ -100,7 +100,6 @@ class TestAcceptance:
 
         _run_from_cli(_network, _analysis)
 
-    @slow_test
     @pytest.mark.parametrize(
         "case_data_dir, expected_graph_files, expected_analysis_files",
         [
@@ -148,6 +147,7 @@ class TestAcceptance:
                     ],
                 ),
                 id="Case 2. All indirect analyses",
+                marks=slow_test,
             ),
         ],
         indirect=["case_data_dir"],
