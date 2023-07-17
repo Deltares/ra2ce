@@ -1217,7 +1217,7 @@ class IndirectAnalyses:
                     self.config, analysis, self.hazard_names
                 )
 
-                if analysis["calculate_route_without_disruption"]:
+                if analysis.get("calculate_route_without_disruption", False):
                     (
                         base_graph,
                         opt_routes_without_hazard,
