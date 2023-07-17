@@ -69,13 +69,15 @@ class Ra2ceHandler:
         self.input_config.configure()
 
     def run_analysis(self) -> None:
+        """
+        Runs a Ra2ce analysis based on the provided network and analysis files.
+        """
         if not self.input_config.is_valid_input():
             logging.error("Error validating input files. Ra2ce will close now.")
             sys.exit(1)
-        _runner: AnalysisRunner = AnalysisRunnerFactory.get_runner(self.input_config)
         try:
+            _runner = AnalysisRunnerFactory.get_runner(self.input_config)
             _runner.run(self.input_config.analysis_config)
-            sys.exit(0)
         except BaseException as e:
             logging.exception(
                 f"RA2CE crashed. Check the logfile for the Traceback message: {e}"
