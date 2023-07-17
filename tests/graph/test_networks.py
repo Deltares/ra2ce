@@ -3,7 +3,18 @@ import shutil
 import pytest
 
 from ra2ce.graph.networks import Network
-from tests import test_results
+from tests import test_results, slow_test
+from pathlib import Path
+from ra2ce.configuration.network.readers.network_ini_config_reader import (
+    NetworkIniConfigDataReader,
+)
+import networkx as nx
+import geopandas as gpd
+
+# Just to make sonar-cloud stop complaining.
+_network_ini_name = "network.ini"
+_base_graph_p_filename = "base_graph.p"
+_base_network_feather_filename = "base_network.feather"
 
 
 class TestNetworks:
@@ -60,3 +71,53 @@ class TestNetworks:
 
         # 3. Verify expectations
         assert isinstance(_network, Network)
+
+    @slow_test
+    @pytest.mark.parametrize(
+        "case_data_dir, expected_files",
+        [
+            pytest.param(
+                "1_network_shape",
+                [_base_graph_p_filename, _base_network_feather_filename],
+                id="Case 1. Network creation from shp file.",
+            ),
+            pytest.param(
+                "2_network_shape",
+                [_base_graph_p_filename, _base_network_feather_filename],
+                id="Case 2. Merges lines and cuts lines at the intersections",
+            ),
+            pytest.param(
+                "3_network_osm_download",
+                [
+                    _base_graph_p_filename,
+                    _base_network_feather_filename,
+                    "simple_to_complex.json",
+                    "complex_to_simple.json",
+                ],
+                id="Case 3. OSM download",
+            ),
+        ],
+        indirect=["case_data_dir"],
+    )
+    def test_network_creation(self, case_data_dir: Path, expected_files: list[str]):
+        """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
+        # 1. Given test data.
+        _output_graph_dir = case_data_dir / "static" / "output_graph"
+        network_ini = case_data_dir / _network_ini_name
+        assert network_ini.is_file()
+        _files_dict = {"base_graph": None, "base_network": None}
+
+        # 2. When run test.
+        _network_config = NetworkIniConfigDataReader().read(network_ini)
+        _network_controller = Network(_network_config, _files_dict).create()
+
+        # 3. Then verify expectations.
+        def validate_file(filename: str):
+            _graph_file = _output_graph_dir / filename
+            return _graph_file.is_file() and _graph_file.exists()
+
+        assert isinstance(_network_controller, dict)
+        assert isinstance(_network_controller["base_graph"], nx.MultiGraph)
+        assert isinstance(_network_controller["base_network"], gpd.GeoDataFrame)
+        assert _network_controller["origins_destinations_graph"] is None
+        assert all(map(validate_file, expected_files))

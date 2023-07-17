@@ -1,12 +1,12 @@
 import shutil
-import subprocess
 from itertools import chain
 from pathlib import Path
-from typing import Dict, Iterator, List, Optional
+from typing import Dict, Iterator, Optional
 
 import pytest
 
 from ra2ce import main
+
 from tests import slow_test, test_data, external_test, test_external_data
 from click.testing import CliRunner
 
@@ -102,50 +102,6 @@ class TestAcceptance:
 
     @slow_test
     @pytest.mark.parametrize(
-        "case_data_dir, expected_files",
-        [
-            pytest.param(
-                "1_network_shape",
-                [_base_graph_p_filename, _base_network_feather_filename],
-                id="Case 1. Network creation from shp file.",
-            ),
-            pytest.param(
-                "2_network_shape",
-                [_base_graph_p_filename, _base_network_feather_filename],
-                id="Case 2. Merges lines and cuts lines at the intersections",
-            ),
-            pytest.param(
-                "3_network_osm_download",
-                [
-                    _base_graph_p_filename,
-                    _base_network_feather_filename,
-                    "simple_to_complex.json",
-                    "complex_to_simple.json",
-                ],
-                id="Case 3. OSM download",
-            ),
-        ],
-        indirect=["case_data_dir"],
-    )
-    def test_network_creation(self, case_data_dir: Path, expected_files: List[str]):
-        """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
-        # 1. Given test data.
-        _output_graph_dir = case_data_dir / "static" / "output_graph"
-        network_ini = case_data_dir / _network_ini_name
-        assert network_ini.is_file()
-
-        # 2. When run test.
-        _run_from_cli(network_ini, None)
-
-        # 3. Then verify expectations.
-        def validate_file(filename: str):
-            _graph_file = _output_graph_dir / filename
-            return _graph_file.is_file() and _graph_file.exists()
-
-        assert all(map(validate_file, expected_files))
-
-    @slow_test
-    @pytest.mark.parametrize(
         "case_data_dir, expected_graph_files, expected_analysis_files",
         [
             pytest.param(
@@ -199,8 +155,8 @@ class TestAcceptance:
     def test_indirect_analysis(
         self,
         case_data_dir: Path,
-        expected_graph_files: List[str],
-        expected_analysis_files: Dict[str, List[str]],
+        expected_graph_files: list[str],
+        expected_analysis_files: Dict[str, list[str]],
     ):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data
