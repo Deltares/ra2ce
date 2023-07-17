@@ -1,9 +1,10 @@
 import shutil
+from typing import Iterator
 
 import pytest
 
 from ra2ce.graph.networks import Network
-from tests import test_results, slow_test
+from tests import test_results, slow_test, test_data
 from pathlib import Path
 from ra2ce.configuration.network.readers.network_ini_config_reader import (
     NetworkIniConfigDataReader,
@@ -71,6 +72,20 @@ class TestNetworks:
 
         # 3. Verify expectations
         assert isinstance(_network, Network)
+
+    @pytest.fixture(autouse=False)
+    def case_data_dir(self, request: pytest.FixtureRequest) -> Iterator[Path]:
+        _test_data_dir = test_data / request.param
+        _output_files_dir = _test_data_dir / "output"
+        _output_graph_dir = _test_data_dir / "static" / "output_graph"
+
+        def purge_output_dirs():
+            shutil.rmtree(_output_files_dir, ignore_errors=True)
+            shutil.rmtree(_output_graph_dir, ignore_errors=True)
+
+        purge_output_dirs()
+        yield _test_data_dir
+        purge_output_dirs()
 
     @slow_test
     @pytest.mark.parametrize(
