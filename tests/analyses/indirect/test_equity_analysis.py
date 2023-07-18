@@ -76,4 +76,5 @@ class TestEquityAnalysis:
 
         # 3. Verify expectations.
         assert isinstance(_result, pd.DataFrame)
+        _result.to_csv(_test_result)
         pd.testing.assert_frame_equal(_expected_result, _result)

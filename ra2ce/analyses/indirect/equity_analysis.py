@@ -117,7 +117,7 @@ class EquityAnalysis:
                     od_table["o_id"] == origin_node,
                     value_key,
                 ].values[0]
-                / destination_nodes
+                / count_destination_nodes
             )
 
         def _get_traffic_in_origin_node(
@@ -146,10 +146,12 @@ class EquityAnalysis:
                         t_prioritarian = 1
                     if "," in o_node:
                         o_nodes = o_node.split(",")
+                        o_num = len(o_nodes)
                         j_ = 0
                         for o_n in o_nodes:
                             if destinations_names in o_n:
                                 j_ -= 1
+                                o_num -= 1
                                 continue
 
                             _total_traffic = _get_traffic_in_origin_node(
@@ -160,9 +162,7 @@ class EquityAnalysis:
                                     j_, o_n, t_prioritarian, "values_prioritarian"
                                 )
                             j_ += 1
-                        t_eq *= len(
-                            list(filter(lambda x: x in destinations_names, o_nodes))
-                        )
+                        t_eq *= o_num
                     else:
                         _total_traffic *= _get_calculated_traffic(o_node, "values")
                         if any(equity_data):
