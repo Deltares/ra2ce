@@ -19,7 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from dataclasses import dataclass
 import itertools
 import operator
 from pathlib import Path
@@ -28,75 +27,9 @@ import numpy as np
 import pandas as pd
 import geopandas as gpd
 import ast
+from ra2ce.analyses.indirect.accumulated_traffic_dataclass import AccumulatedTraffic
 
-
-@dataclass
-class AccumulatedTraffic:
-    regular: float = 1.0
-    egalitarian: float = 1.0
-    prioritarian: float = 1.0
-
-
-class EquityTrafficData:
-    regular: dict
-    egalitarian: dict
-    prioritarian: dict
-    with_equity: bool
-
-    def __init__(self) -> None:
-        self.regular = {}
-        self.egalitarian = {}
-        self.prioritarian = {}
-        self.with_equity = False
-        self._visited_nodes = []
-
-    @staticmethod
-    def get_node_key(left_node: str, right_node: str) -> str:
-        return f"{left_node}_{right_node}"
-
-    def add_visited_nodes(self, left_node: str, right_node: str) -> str:
-        _node_key = self.get_node_key(left_node, right_node)
-        self._visited_nodes.append((left_node, right_node))
-        return _node_key
-
-    def update_traffic_routes(
-        self, nodes_key: str, accumulated_traffic: AccumulatedTraffic
-    ) -> None:
-        self.regular[nodes_key] = accumulated_traffic.regular + self.regular.get(
-            nodes_key, 0
-        )
-        self.egalitarian[
-            nodes_key
-        ] = accumulated_traffic.egalitarian + self.egalitarian.get(nodes_key, 0)
-        if self.with_equity:
-            self.prioritarian[
-                nodes_key
-            ] = accumulated_traffic.prioritarian + self.prioritarian.get(nodes_key, 0)
-
-    def get_route_traffic(self, nodes: list[tuple[str, str]]) -> pd.DataFrame:
-        u_list, v_list = zip(*self._visited_nodes)
-        t_list = self.regular.values()
-        teq_list = self.egalitarian.values()
-
-        if not self.with_equity:
-            data_tuples = list(zip(u_list, v_list, t_list, teq_list))
-            return pd.DataFrame(
-                data_tuples, columns=["u", "v", "traffic", "traffic_egalitarian"]
-            )
-
-        data_tuples = list(
-            zip(u_list, v_list, t_list, teq_list, self.prioritarian.values())
-        )
-        return pd.DataFrame(
-            data_tuples,
-            columns=[
-                "u",
-                "v",
-                "traffic",
-                "traffic_egalitarian",
-                "traffic_prioritarian",
-            ],
-        )
+from ra2ce.analyses.indirect.equity_traffic_data_wrapper import EquityTrafficDataWrapper
 
 
 class EquityAnalysis:
@@ -155,7 +88,7 @@ class EquityAnalysis:
         unique_destination_nodes = np.unique(list(self.od_table["d_id"].fillna("0")))
         count_destination_nodes = len([x for x in unique_destination_nodes if x != "0"])
 
-        _equity_traffic_data = EquityTrafficData()
+        _equity_traffic_data = EquityTrafficDataWrapper()
         _equity_traffic_data.with_equity = any(equity_data)
         if _equity_traffic_data.with_equity:
             self.od_table["values_prioritarian"] = self._get_values_prioritarian(
@@ -192,9 +125,7 @@ class EquityAnalysis:
                         _accumulated_traffic,
                     )
 
-        return _equity_traffic_data.get_route_traffic(
-            _equity_traffic_data._visited_nodes
-        )
+        return _equity_traffic_data.get_route_traffic()
 
     @staticmethod
     def read_equity_weights(equity_weight_file: Path) -> pd.DataFrame:
