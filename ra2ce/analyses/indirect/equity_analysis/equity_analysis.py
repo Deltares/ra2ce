@@ -22,14 +22,18 @@
 import itertools
 import operator
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 import numpy as np
 import pandas as pd
 import geopandas as gpd
 import ast
-from ra2ce.analyses.indirect.accumulated_traffic_dataclass import AccumulatedTraffic
+from ra2ce.analyses.indirect.equity_analysis.accumulated_traffic_dataclass import (
+    AccumulatedTraffic,
+)
 
-from ra2ce.analyses.indirect.equity_traffic_data_wrapper import EquityTrafficDataWrapper
+from ra2ce.analyses.indirect.equity_analysis.equity_traffic_data_wrapper import (
+    EquityTrafficDataWrapper,
+)
 
 
 class EquityAnalysis:

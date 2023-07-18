@@ -1,5 +1,7 @@
 import pandas as pd
-from ra2ce.analyses.indirect.accumulated_traffic_dataclass import AccumulatedTraffic
+from ra2ce.analyses.indirect.equity_analysis.accumulated_traffic_dataclass import (
+    AccumulatedTraffic,
+)
 
 
 class EquityTrafficDataWrapper:
