@@ -29,6 +29,26 @@ import ast
 
 
 class EquityAnalysis:
+    gdf: gpd.GeoDataFrame
+    od_table: gpd.GeoDataFrame
+    destinations_names: list[str]
+
+    def __init__(
+        self,
+        gdf: gpd.GeoDataFrame,
+        od_table: gpd.GeoDataFrame,
+        destination_names: list[str],
+    ) -> None:
+        """
+        Args:
+            gdf (gpd.GeoDataFrame): Geodataframe containing the overall network information.
+            od_table (gpd.GeoDataFrame): GeoDataFrame representing the Origins - Destinations table.
+            destination_names (list[str]): List of destinations nodes.
+        """
+        self.gdf = gdf
+        self.od_table = od_table
+        self.destinations_names = destination_names
+
     @staticmethod
     def read_equity_weights(equity_weight_file: Path) -> pd.DataFrame:
         """
@@ -48,6 +68,12 @@ class EquityAnalysis:
         )
         return pd.read_csv(equity_weight_file, sep=_separator)
 
+    @staticmethod
+    def get_opt_path_values(opt_path: Any) -> list[Any]:
+        if isinstance(opt_path, list):
+            return opt_path
+        return ast.literal_eval(opt_path)
+
     def _get_values_prioritarian(
         self, equity_data: pd.DataFrame, od_table_data: gpd.GeoDataFrame
     ) -> np.array:
@@ -59,39 +85,86 @@ class EquityAnalysis:
 
     def analyze_with_weights(
         self,
-        gdf: gpd.GeoDataFrame,
-        od_table: gpd.GeoDataFrame,
         equity_data_file: Path,
-        destination_names: list[str],
     ) -> pd.DataFrame:
         """
         Generates a pandas `DataFrame` with the optimal traffic routes including results for `equal` and `prioritarian`.
 
         Args:
-            gdf (gpd.GeoDataFrame): Geodataframe containing the overall network information.
-            od_table (gpd.GeoDataFrame): GeoDataFrame representing the Origins - Destinations table.
             equity_data_file (Path): File containing the region's equity relations.
-            destination_names (list[str]): List of destinations nodes.
 
         Returns:
             pd.DataFrame: Resulting dataframe with optimal origin-destination routes.
         """
         _equity_weights_data = self.read_equity_weights(equity_data_file)
-        return self.optimal_route_od_link(
-            gdf, od_table, _equity_weights_data, destination_names
+        return self.optimal_route_od_link(_equity_weights_data)
+
+    def _get_calculated_traffic(
+        self, origin_node: str, value_key: str, count_destination_nodes: int
+    ) -> gpd.GeoDataFrame:
+        return (
+            self.od_table.loc[
+                self.od_table["o_id"] == origin_node,
+                value_key,
+            ].values[0]
+            / count_destination_nodes
         )
+
+    def _get_traffic_in_origin_node(
+        self,
+        node_idx: int,
+        origin_node: str,
+        current_traffic: float,
+        value_key: str,
+        count_destination_nodes: int,
+    ) -> float:
+        _calculated_traffic = self._get_calculated_traffic(
+            origin_node, value_key, count_destination_nodes
+        )
+        if node_idx == 0:
+            return current_traffic * _calculated_traffic
+        return current_traffic + _calculated_traffic
+
+    def _get_origin_nodes_traffic(
+        self,
+        o_nodes: list[str],
+        regular_traffic: float,
+        equalitary_traffic: float,
+        prioritarian_taffic: float,
+        count_destination_nodes: int,
+        with_equity_data: bool,
+    ) -> tuple[float, float, float]:
+        o_num = len(o_nodes)
+        j_ = 0
+        for o_n in o_nodes:
+            if self.destinations_names in o_n:
+                j_ -= 1
+                o_num -= 1
+                continue
+            regular_traffic = self._get_traffic_in_origin_node(
+                j_, o_n, regular_traffic, "values", count_destination_nodes
+            )
+            if with_equity_data:
+                prioritarian_taffic = self._get_traffic_in_origin_node(
+                    j_,
+                    o_n,
+                    prioritarian_taffic,
+                    "values_prioritarian",
+                    count_destination_nodes,
+                )
+            j_ += 1
+
+        equalitary_traffic *= o_num
+        return regular_traffic, equalitary_traffic, prioritarian_taffic
 
     def optimal_route_od_link(
         self,
-        gdf: gpd.GeoDataFrame,
-        od_table: gpd.GeoDataFrame,
         equity_data: pd.DataFrame,
-        destinations_names: list[str],
     ) -> pd.DataFrame:
-        origin_nodes = np.unique(gdf["origin"])
-        destination_nodes = np.unique(gdf["destination"])
+        origin_nodes = np.unique(self.gdf["origin"])
+        destination_nodes = np.unique(self.gdf["destination"])
 
-        unique_destination_nodes = np.unique(list(od_table["d_id"].fillna("0")))
+        unique_destination_nodes = np.unique(list(self.od_table["d_id"].fillna("0")))
         count_destination_nodes = len([x for x in unique_destination_nodes if x != "0"])
 
         route_traffic = {}
@@ -99,35 +172,9 @@ class EquityAnalysis:
         route_traffic_prioritarian = {}
 
         if any(equity_data):
-            route_traffic_prioritarian = {}
-            od_table["values_prioritarian"] = self._get_values_prioritarian(
-                equity_data, od_table
+            self.od_table["values_prioritarian"] = self._get_values_prioritarian(
+                equity_data, self.od_table
             )
-
-        def _get_opt_path_values(opt_path: Any) -> list[Any]:
-            if isinstance(opt_path, list):
-                return opt_path
-            return ast.literal_eval(opt_path)
-
-        def _get_calculated_traffic(
-            origin_node: str,
-            value_key: str,
-        ) -> gpd.GeoDataFrame:
-            return (
-                od_table.loc[
-                    od_table["o_id"] == origin_node,
-                    value_key,
-                ].values[0]
-                / count_destination_nodes
-            )
-
-        def _get_traffic_in_origin_node(
-            node_idx: int, origin_node: str, current_traffic: float, value_key: str
-        ) -> float:
-            _calculated_traffic = _get_calculated_traffic(origin_node, value_key)
-            if node_idx == 0:
-                return current_traffic * _calculated_traffic
-            return current_traffic + _calculated_traffic
 
         def _set_traffic_routes(
             nodes_key: str,
@@ -146,37 +193,13 @@ class EquityAnalysis:
                     nodes_key, 0
                 )
 
-        def _get_origin_nodes_traffic(
-            o_nodes: list[str],
-            regular_traffic: float,
-            equalitary_traffic: float,
-            prioritarian_taffic: float,
-        ) -> tuple[float, float, float]:
-            o_num = len(o_nodes)
-            j_ = 0
-            for o_n in o_nodes:
-                if destinations_names in o_n:
-                    j_ -= 1
-                    o_num -= 1
-                    continue
-                regular_traffic = _get_traffic_in_origin_node(
-                    j_, o_n, regular_traffic, "values"
-                )
-                if any(equity_data):
-                    prioritarian_taffic = _get_traffic_in_origin_node(
-                        j_, o_n, prioritarian_taffic, "values_prioritarian"
-                    )
-                j_ += 1
-
-            equalitary_traffic *= o_num
-            return regular_traffic, equalitary_traffic, prioritarian_taffic
-
         nodes_list = []
         for o_node in origin_nodes:
             for d_node in destination_nodes:
-                opt_path = _get_opt_path_values(
-                    gdf.loc[
-                        (gdf["origin"] == o_node) & (gdf["destination"] == d_node),
+                opt_path = self.get_opt_path_values(
+                    self.gdf.loc[
+                        (self.gdf["origin"] == o_node)
+                        & (self.gdf["destination"] == d_node),
                         "opt_path",
                     ].values[0]
                 )
@@ -192,15 +215,21 @@ class EquityAnalysis:
                             _total_traffic,
                             t_eq,
                             t_prioritarian,
-                        ) = _get_origin_nodes_traffic(
-                            o_node.split(","), _total_traffic, t_eq, t_prioritarian
+                        ) = self._get_origin_nodes_traffic(
+                            o_node.split(","),
+                            _total_traffic,
+                            t_eq,
+                            t_prioritarian,
+                            count_destination_nodes,
+                            any(equity_data),
                         )
                     else:
-                        _total_traffic *= _get_calculated_traffic(o_node, "values")
+                        _total_traffic *= self._get_calculated_traffic(
+                            o_node, "values", count_destination_nodes
+                        )
                         if any(equity_data):
-                            t_prioritarian *= _get_calculated_traffic(
-                                o_node,
-                                "values_prioritarian",
+                            t_prioritarian *= self._get_calculated_traffic(
+                                o_node, "values_prioritarian", count_destination_nodes
                             )
                     if "," in d_node:
                         d_num = len(d_node.split(","))

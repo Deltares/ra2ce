@@ -1114,12 +1114,11 @@ class IndirectAnalyses:
                         _equity_weights_file = self.config["static"].joinpath(
                             "network", analysis["equity_weight"]
                         )
-                    route_traffic_df = EquityAnalysis().analyze_with_weights(
+                    route_traffic_df = EquityAnalysis(
                         gdf,
                         od_table,
-                        _equity_weights_file,
                         self.config["origins_destinations"]["destinations_names"],
-                    )
+                    ).analyze_with_weights(_equity_weights_file)
                     impact_csv_path = (
                         self.config["output"]
                         / analysis["analysis"]

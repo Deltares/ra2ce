@@ -70,9 +70,7 @@ class TestEquityAnalysis:
         assert len(_expected_result.values) == 359
 
         # 2. Run test.
-        _result = EquityAnalysis().optimal_route_od_link(
-            _gdf_data, _od_table_data, _equity_data, _destinations_names
-        )
+        _result = EquityAnalysis(_gdf_data, _od_table_data, _destinations_names).optimal_route_od_link(_equity_data)
 
         # 3. Verify expectations.
         assert isinstance(_result, pd.DataFrame)
