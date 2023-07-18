@@ -129,6 +129,23 @@ class EquityAnalysis:
                 return current_traffic * _calculated_traffic
             return current_traffic + _calculated_traffic
 
+        def _set_traffic_routes(
+            nodes_key: str,
+            total_traffic: float,
+            total_equalitary_traffic: float,
+            total_prioritarian_traffic: float,
+        ) -> None:
+            route_traffic[nodes_key] = total_traffic + route_traffic.get(nodes_key, 0)
+            route_traffic_equal[
+                nodes_key
+            ] = total_equalitary_traffic + route_traffic_equal.get(nodes_key, 0)
+            if any(equity_data):
+                route_traffic_prioritarian[
+                    nodes_key
+                ] = total_prioritarian_traffic + route_traffic_prioritarian.get(
+                    nodes_key, 0
+                )
+
         nodes_list = []
         for o_node in origin_nodes:
             for d_node in destination_nodes:
@@ -172,27 +189,15 @@ class EquityAnalysis:
                                 "values_prioritarian",
                             )
                     if "," in d_node:
-                        d_nodes = d_node.split(",")
-                        d_num = len(d_nodes)
+                        d_num = len(d_node.split(","))
                         t_eq *= d_num
                         _total_traffic *= d_num
                         if any(equity_data):
                             t_prioritarian *= d_num
 
-                    try:
-                        route_traffic[_nodes_key_name] += _total_traffic
-                        route_traffic_equal[_nodes_key_name] += t_eq
-                        if any(equity_data):
-                            route_traffic_prioritarian[
-                                _nodes_key_name
-                            ] += t_prioritarian
-                    except Exception:
-                        route_traffic.update({_nodes_key_name: _total_traffic})
-                        route_traffic_equal.update({_nodes_key_name: t_eq})
-                        if any(equity_data):
-                            route_traffic_prioritarian.update(
-                                {_nodes_key_name: t_prioritarian}
-                            )
+                    _set_traffic_routes(
+                        _nodes_key_name, _total_traffic, t_eq, t_prioritarian
+                    )
 
         u_list, v_list = zip(*nodes_list)
         t_list = route_traffic.values()
