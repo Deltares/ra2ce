@@ -146,6 +146,31 @@ class EquityAnalysis:
                     nodes_key, 0
                 )
 
+        def _get_origin_nodes_traffic(
+            o_nodes: list[str],
+            regular_traffic: float,
+            equalitary_traffic: float,
+            prioritarian_taffic: float,
+        ) -> tuple[float, float, float]:
+            o_num = len(o_nodes)
+            j_ = 0
+            for o_n in o_nodes:
+                if destinations_names in o_n:
+                    j_ -= 1
+                    o_num -= 1
+                    continue
+                regular_traffic = _get_traffic_in_origin_node(
+                    j_, o_n, regular_traffic, "values"
+                )
+                if any(equity_data):
+                    prioritarian_taffic = _get_traffic_in_origin_node(
+                        j_, o_n, prioritarian_taffic, "values_prioritarian"
+                    )
+                j_ += 1
+
+            equalitary_traffic *= o_num
+            return regular_traffic, equalitary_traffic, prioritarian_taffic
+
         nodes_list = []
         for o_node in origin_nodes:
             for d_node in destination_nodes:
@@ -163,24 +188,13 @@ class EquityAnalysis:
                     if any(equity_data):
                         t_prioritarian = 1
                     if "," in o_node:
-                        o_nodes = o_node.split(",")
-                        o_num = len(o_nodes)
-                        j_ = 0
-                        for o_n in o_nodes:
-                            if destinations_names in o_n:
-                                j_ -= 1
-                                o_num -= 1
-                                continue
-
-                            _total_traffic = _get_traffic_in_origin_node(
-                                j_, o_n, _total_traffic, "values"
-                            )
-                            if any(equity_data):
-                                t_prioritarian = _get_traffic_in_origin_node(
-                                    j_, o_n, t_prioritarian, "values_prioritarian"
-                                )
-                            j_ += 1
-                        t_eq *= o_num
+                        (
+                            _total_traffic,
+                            t_eq,
+                            t_prioritarian,
+                        ) = _get_origin_nodes_traffic(
+                            o_node.split(","), _total_traffic, t_eq, t_prioritarian
+                        )
                     else:
                         _total_traffic *= _get_calculated_traffic(o_node, "values")
                         if any(equity_data):
