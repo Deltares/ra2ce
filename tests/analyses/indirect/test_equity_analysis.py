@@ -1,6 +1,6 @@
 from pathlib import Path
 from ra2ce.analyses.indirect.equity_analysis import EquityAnalysis
-from tests import test_data, slow_test
+from tests import test_data, slow_test, test_results
 import pytest
 import geopandas as gpd
 import pandas as pd
@@ -40,8 +40,12 @@ class TestEquityAnalysis:
         assert _result.empty
 
     @slow_test
-    def test_analysis_with_valid_data(self):
+    def test_analysis_with_valid_data(self, request: pytest.FixtureRequest):
         # 1. Define test data.
+        _test_result = test_results.joinpath(request.node.name + ".csv")
+        if _test_result.exists():
+            _test_result.unlink()
+
         _destinations_names = "B"
         _gdf_data = import_from_csv(_equity_test_data.joinpath("gdf_data.csv"))
         _od_table_data = import_from_csv(
@@ -66,3 +70,4 @@ class TestEquityAnalysis:
         # 3. Verify expectations.
         assert isinstance(_result, pd.DataFrame)
         assert list(_result.columns).sort() == _expected_columns.sort()
+        _result.to_csv(_test_result)
