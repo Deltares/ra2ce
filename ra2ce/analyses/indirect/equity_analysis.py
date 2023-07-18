@@ -97,7 +97,8 @@ class EquityAnalysis:
         route_traffic = {}
         route_traffic_equal = {}
         route_traffic_prioritarian = {}
-        if len(equity_data) > 0:
+
+        if any(equity_data):
             route_traffic_prioritarian = {}
             od_table["values_prioritarian"] = self._get_values_prioritarian(
                 equity_data, od_table
@@ -142,7 +143,7 @@ class EquityAnalysis:
                     _nodes_key_name = f"{u_node}_{v_node}"
                     _total_traffic = 1
                     t_eq = 1
-                    if len(equity_data) > 0:
+                    if any(equity_data):
                         t_prioritarian = 1
                     if "," in o_node:
                         o_nodes = o_node.split(",")
@@ -175,20 +176,20 @@ class EquityAnalysis:
                         d_num = len(d_nodes)
                         t_eq *= d_num
                         _total_traffic *= d_num
-                        if len(equity_data) > 0:
+                        if any(equity_data):
                             t_prioritarian *= d_num
 
                     try:
                         route_traffic[_nodes_key_name] += _total_traffic
                         route_traffic_equal[_nodes_key_name] += t_eq
-                        if len(equity_data) > 0:
+                        if any(equity_data):
                             route_traffic_prioritarian[
                                 _nodes_key_name
                             ] += t_prioritarian
                     except Exception:
                         route_traffic.update({_nodes_key_name: _total_traffic})
                         route_traffic_equal.update({_nodes_key_name: t_eq})
-                        if len(equity_data) > 0:
+                        if any(equity_data):
                             route_traffic_prioritarian.update(
                                 {_nodes_key_name: t_prioritarian}
                             )
@@ -196,7 +197,7 @@ class EquityAnalysis:
         u_list, v_list = zip(*nodes_list)
         t_list = route_traffic.values()
         teq_list = route_traffic_equal.values()
-        if len(equity_data) > 0:
+        if any(equity_data):
             tprioritarian_list = route_traffic_prioritarian.values()
             data_tuples = list(
                 zip(u_list, v_list, t_list, teq_list, tprioritarian_list)
