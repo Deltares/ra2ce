@@ -54,6 +54,7 @@ class TestEquityAnalysis:
         _equity_data = pd.read_csv(_equity_test_data.joinpath("equity_data.csv"))
         assert isinstance(_equity_data, pd.DataFrame)
 
+        # Define expected results.
         _expected_columns = [
             "u",
             "v",
@@ -62,9 +63,11 @@ class TestEquityAnalysis:
             "traffic_prioritarian",
         ]
         _expected_result = pd.read_csv(
-            _equity_test_data.joinpath("expected_result.csv")
+            _equity_test_data.joinpath("expected_result.csv"), index_col=0
         )
         assert isinstance(_expected_result, pd.DataFrame)
+        assert list(_expected_result.columns).sort() == _expected_columns.sort()
+        assert len(_expected_result.values) == 359
 
         # 2. Run test.
         _result = EquityAnalysis().optimal_route_od_link(
@@ -73,6 +76,4 @@ class TestEquityAnalysis:
 
         # 3. Verify expectations.
         assert isinstance(_result, pd.DataFrame)
-        assert list(_result.columns).sort() == _expected_columns.sort()
-        assert len(_result.values) == 359
-        assert _result == _expected_result
+        pd.testing.assert_frame_equal(_expected_result, _result)
