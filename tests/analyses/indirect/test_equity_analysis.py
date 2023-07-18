@@ -40,7 +40,7 @@ class TestEquityAnalysis:
         assert _result.empty
 
     @slow_test
-    def test_analysis_with_valid_data(self, request: pytest.FixtureRequest):
+    def test_equity_analysis_with_valid_data(self, request: pytest.FixtureRequest):
         # 1. Define test data.
         _test_result = test_results.joinpath(request.node.name + ".csv")
         if _test_result.exists():
@@ -61,6 +61,10 @@ class TestEquityAnalysis:
             "traffic_egalitarian",
             "traffic_prioritarian",
         ]
+        _expected_result = pd.read_csv(
+            _equity_test_data.joinpath("expected_result.csv")
+        )
+        assert isinstance(_expected_result, pd.DataFrame)
 
         # 2. Run test.
         _result = EquityAnalysis().optimal_route_od_link(
@@ -70,4 +74,5 @@ class TestEquityAnalysis:
         # 3. Verify expectations.
         assert isinstance(_result, pd.DataFrame)
         assert list(_result.columns).sort() == _expected_columns.sort()
-        _result.to_csv(_test_result)
+        assert len(_result.values) == 359
+        assert _result == _expected_result
