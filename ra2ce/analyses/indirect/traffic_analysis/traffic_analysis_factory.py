@@ -50,7 +50,7 @@ class TrafficAnalysisFactory:
             equity_data (pd.DataFrame): Dataframe contaning region - weight information.
 
         Returns:
-            EquityAnalysis: Object to make an equity analysis.
+            TrafficAnalysisBase: Object to make an equity analysis.
         """
         if not equity_data:
             return TrafficAnalysis(gdf, od_table, destination_names)
