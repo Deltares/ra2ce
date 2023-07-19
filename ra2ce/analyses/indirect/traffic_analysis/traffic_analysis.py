@@ -26,16 +26,16 @@ import numpy as np
 import pandas as pd
 import geopandas as gpd
 import ast
-from ra2ce.analyses.indirect.equity_analysis.accumulated_traffic_dataclass import (
+from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass import (
     AccumulatedTaffic,
 )
 
-from ra2ce.analyses.indirect.equity_analysis.equity_traffic_data_wrapper import (
-    EquityTrafficDataWrapper,
+from ra2ce.analyses.indirect.traffic_analysis.traffic_data_wrapper import (
+    TrafficDataWrapper,
 )
 
 
-class EquityAnalysis:
+class TrafficAnalysis:
     gdf: gpd.GeoDataFrame
     od_table: gpd.GeoDataFrame
     destinations_names: str
@@ -71,14 +71,12 @@ class EquityAnalysis:
         unique_destination_nodes = np.unique(list(self.od_table["d_id"].fillna("0")))
         count_destination_nodes = len([x for x in unique_destination_nodes if x != "0"])
 
-        _equity_traffic_data = EquityTrafficDataWrapper()
+        _equity_traffic_data = TrafficDataWrapper()
         for o_node in origin_nodes:
             for d_node in destination_nodes:
                 opt_path = self.get_opt_path_values(o_node, d_node)
                 for u_node, v_node in itertools.pairwise(opt_path):
-                    _nodes_key_name = EquityTrafficDataWrapper.get_node_key(
-                        u_node, v_node
-                    )
+                    _nodes_key_name = TrafficDataWrapper.get_node_key(u_node, v_node)
                     _accumulated_traffic = self._get_origin_node_traffic(
                         o_node,
                         count_destination_nodes,

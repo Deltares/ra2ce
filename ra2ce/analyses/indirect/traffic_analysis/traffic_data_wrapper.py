@@ -1,10 +1,10 @@
 import pandas as pd
-from ra2ce.analyses.indirect.equity_analysis.accumulated_traffic_dataclass import (
+from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass import (
     AccumulatedTaffic,
 )
 
 
-class EquityTrafficDataWrapper:
+class TrafficDataWrapper:
     regular: dict
     egalitarian: dict
     prioritarian: dict

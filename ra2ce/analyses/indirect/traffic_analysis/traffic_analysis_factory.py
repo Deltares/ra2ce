@@ -23,20 +23,20 @@ from pathlib import Path
 
 import pandas as pd
 import geopandas as gpd
-from ra2ce.analyses.indirect.equity_analysis.equity_analysis import EquityAnalysis
-from ra2ce.analyses.indirect.equity_analysis.equity_analysis_with_equity import (
-    EquityAnalysisWithEquity,
+from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis import TrafficAnalysis
+from ra2ce.analyses.indirect.traffic_analysis.equity_analysis import (
+    EquityAnalysis,
 )
 
 
-class EquityAnalysisFactory:
+class TrafficAnalysisFactory:
     @staticmethod
     def get_analysis(
         gdf: gpd.GeoDataFrame,
         od_table: gpd.GeoDataFrame,
         destination_names: str,
         equity_data: pd.DataFrame,
-    ) -> EquityAnalysis:
+    ) -> TrafficAnalysis:
         """
         Gets an instance of an `EquityAnalysis` based on whether `equity_data` is provided or not.
 
@@ -50,11 +50,9 @@ class EquityAnalysisFactory:
             EquityAnalysis: Object to make an equity analysis.
         """
         if not equity_data:
-            return EquityAnalysis(gdf, od_table, destination_names)
+            return TrafficAnalysis(gdf, od_table, destination_names)
         else:
-            return EquityAnalysisWithEquity(
-                gdf, od_table, destination_names, equity_data
-            )
+            return EquityAnalysis(gdf, od_table, destination_names, equity_data)
 
     @staticmethod
     def read_equity_weights(equity_weight_file: Path) -> pd.DataFrame:
