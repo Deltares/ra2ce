@@ -18,33 +18,31 @@ class EquityTrafficDataWrapper:
         self._visited_nodes = []
 
     @staticmethod
-    def get_node_key(left_node: str, right_node: str) -> str:
+    def get_node_key(u_node: str, v_node: str) -> str:
         """
         Gets the string representation of the combination of two nodes.
 
         Args:
-            left_node (str): 'u' node.
-            right_node (str): 'v' node.
+            u_node (str): 'u' node.
+            v_node (str): 'v' node.
 
         Returns:
             str: Name for the combination of two nodes.
         """
-        return f"{left_node}_{right_node}"
+        return f"{u_node}_{v_node}"
 
-    def add_visited_nodes(self, left_node: str, right_node: str) -> str:
+    @staticmethod
+    def get_key_nodes(node_key: str) -> tuple[str, str]:
         """
-        Generates a node label and adds the provided nodes to a list of `visited` nodes.
+        Gets the nodes represented by the provided `node_key`.
 
         Args:
-            left_node (str): Represents the `u` node.
-            right_node (str): Represents the `v` node.
+            node_key (str): Node key representing `u_node` and `v_node`.
 
         Returns:
-            str: The combined node names.
+            tuple[str, str]: Values for the `u_node` and `v_node`.
         """
-        _node_key = self.get_node_key(left_node, right_node)
-        self._visited_nodes.append((left_node, right_node))
-        return _node_key
+        return node_key.split("_")
 
     def update_traffic_routes(
         self, nodes_key: str, accumulated_traffic: AccumulatedTaffic
@@ -74,7 +72,7 @@ class EquityTrafficDataWrapper:
         Returns:
             pd.DataFrame: Resulting dataframe with all traffic data.
         """
-        u_list, v_list = zip(*self._visited_nodes)
+        u_list, v_list = zip(*map(self.get_key_nodes, self.regular))
         t_list = self.regular.values()
         teq_list = self.egalitarian.values()
 
