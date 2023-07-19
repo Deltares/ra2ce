@@ -11,7 +11,7 @@ from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
 )
 
-from tests import test_data
+from tests import test_data, test_results
 from tests.analyses.indirect.traffic_analysis.test_equity_analysis import (
     import_from_csv,
 )
@@ -35,6 +35,28 @@ class TestTrafficAnalysisFactory:
         # 2. Verify expectations.
         assert isinstance(_result, pd.DataFrame)
         assert _result.empty
+
+    @pytest.mark.parametrize("separator", [pytest.param(","), pytest.param(";")])
+    def test_read_equity_weights_with_different_separator(
+        self, separator: str, request: pytest.FixtureRequest
+    ):
+        # 1. Define test data.
+        test_file = test_results.joinpath(
+            request.node.originalname, "equity_example.csv"
+        )
+        if test_file.exists():
+            test_file.unlink()
+        test_file.parent.mkdir(parents=True, exist_ok=True)
+        _test_data = pd.DataFrame.from_dict(
+            {"a_column": [42, 24], "b_column": [4.2, 2.4]}
+        )
+        _test_data.to_csv(test_file, sep=separator, index=False)
+
+        # 2. Run test.
+        _result_dataframe = TrafficAnalysisFactory.read_equity_weights(test_file)
+
+        # 3. Verify expectations.
+        pd.testing.assert_frame_equal(_test_data, _result_dataframe)
 
     @pytest.mark.parametrize(
         "equity_data_value",
