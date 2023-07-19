@@ -28,10 +28,6 @@ from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_base import (
     TrafficAnalysisBase,
 )
 
-from ra2ce.analyses.indirect.traffic_analysis.traffic_data_wrapper import (
-    TrafficDataWrapper,
-)
-
 
 class TrafficAnalysis(TrafficAnalysisBase):
     gdf: gpd.GeoDataFrame
@@ -53,9 +49,6 @@ class TrafficAnalysis(TrafficAnalysisBase):
         self.gdf = gdf
         self.od_table = od_table
         self.destinations_names = destination_names
-
-    def _get_traffic_data_wrapper(self) -> TrafficDataWrapper:
-        return TrafficDataWrapper(with_equity=False)
 
     def _get_accumulated_traffic_from_node(
         self, o_node: str, total_d_nodes: int

@@ -31,10 +31,6 @@ from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass impo
     AccumulatedTaffic,
 )
 
-from ra2ce.analyses.indirect.traffic_analysis.traffic_data_wrapper import (
-    TrafficDataWrapper,
-)
-
 
 class TrafficAnalysisBase:
     gdf: gpd.GeoDataFrame
@@ -66,9 +62,7 @@ class TrafficAnalysisBase:
                         o_node, count_destination_nodes
                     )
                     if "," in d_node:
-                        _calculated_traffic = self._calculate_destination_node_traffic(
-                            d_node, _calculated_traffic
-                        )
+                        _calculated_traffic *= len(d_node.split(","))
 
                     _accumulated_traffic = _traffic.get(
                         _nodes_key_name, AccumulatedTaffic.with_zeros()
@@ -123,7 +117,9 @@ class TrafficAnalysisBase:
             _acummulated_operator = (
                 operator.mul if _intermediate_nodes == 0 else operator.add
             )
-            _acummulated_operator(_accumulated_traffic, _node_traffic)
+            _accumulated_traffic = _acummulated_operator(
+                _accumulated_traffic, _node_traffic
+            )
             _intermediate_nodes += 1
 
         # Set the remainig values
@@ -143,17 +139,6 @@ class TrafficAnalysisBase:
             )
 
         return self._get_accumulated_traffic_from_node(origin_node, total_d_nodes)
-
-    def _calculate_destination_node_traffic(
-        self, d_node: str, accumulated_traffic: AccumulatedTaffic
-    ) -> AccumulatedTaffic:
-        d_num = len(d_node.split(","))
-        accumulated_traffic.product(d_num)
-        return accumulated_traffic
-
-    @abstractmethod
-    def _get_traffic_data_wrapper(self) -> TrafficDataWrapper:
-        raise NotImplementedError("Should be implemented in concrete class.")
 
     @abstractmethod
     def _get_accumulated_traffic_from_node(

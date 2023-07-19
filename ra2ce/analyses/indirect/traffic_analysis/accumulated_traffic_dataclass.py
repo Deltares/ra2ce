@@ -20,6 +20,7 @@
 """
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import Union
 
 
 @dataclass
@@ -32,33 +33,42 @@ class AccumulatedTaffic:
     def with_zeros(cls) -> AccumulatedTaffic:
         return cls(regular=0, egalitarian=0, prioritarian=0)
 
-    def __add__(self, other: AccumulatedTaffic) -> AccumulatedTaffic:
-        self.regular += other.regular
-        self.prioritarian += other.prioritarian
-        self.egalitarian += other.egalitarian
-        return AccumulatedTaffic(
-            regular=self.regular,
-            prioritarian=self.prioritarian,
-            egalitarian=self.egalitarian,
-        )
+    def __add__(self, other: Union[AccumulatedTaffic, float, int]) -> AccumulatedTaffic:
+        if isinstance(other, AccumulatedTaffic):
+            return AccumulatedTaffic(
+                regular=self.regular + other.regular,
+                prioritarian=self.prioritarian + other.prioritarian,
+                egalitarian=self.egalitarian + other.egalitarian,
+            )
+        elif isinstance(other, float) or isinstance(other, int):
+            return AccumulatedTaffic(
+                regular=self.regular + other,
+                prioritarian=self.prioritarian + other,
+                egalitarian=self.egalitarian + other,
+            )
+        else:
+            raise NotImplementedError(
+                "It is not possible to sum {} with a value of type {}.".format(
+                    AccumulatedTaffic.__name__, type(other).__name__
+                )
+            )
 
-    def __mul__(self, other: AccumulatedTaffic) -> AccumulatedTaffic:
-        self.regular *= other.regular
-        self.prioritarian *= other.prioritarian
-        self.egalitarian *= other.egalitarian
-        return AccumulatedTaffic(
-            regular=self.regular,
-            prioritarian=self.prioritarian,
-            egalitarian=self.egalitarian,
-        )
-
-    def product(self, value: float) -> None:
-        """
-        Multiplies all accumulated traffic properties with the provided `value`.
-
-        Args:
-            value (float): Value to multiply by.
-        """
-        self.regular *= value
-        self.prioritarian *= value
-        self.egalitarian *= value
+    def __mul__(self, other: Union[AccumulatedTaffic, float, int]) -> AccumulatedTaffic:
+        if isinstance(other, AccumulatedTaffic):
+            return AccumulatedTaffic(
+                regular=self.regular * other.regular,
+                prioritarian=self.prioritarian * other.prioritarian,
+                egalitarian=self.egalitarian * other.egalitarian,
+            )
+        elif isinstance(other, float) or isinstance(other, int):
+            return AccumulatedTaffic(
+                regular=self.regular * other,
+                prioritarian=self.prioritarian * other,
+                egalitarian=self.egalitarian * other,
+            )
+        else:
+            raise NotImplementedError(
+                "It is not possible to multiply {} with a value of type {}.".format(
+                    AccumulatedTaffic.__name__, type(other).__name__
+                )
+            )
