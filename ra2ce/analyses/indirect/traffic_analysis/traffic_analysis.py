@@ -19,13 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import itertools
-import operator
-from typing import Any
-import numpy as np
 import pandas as pd
 import geopandas as gpd
-import ast
 from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass import (
     AccumulatedTaffic,
 )
@@ -60,9 +55,7 @@ class TrafficAnalysis(TrafficAnalysisBase):
         self.destinations_names = destination_names
 
     def _get_traffic_data_wrapper(self) -> TrafficDataWrapper:
-        _data_wrapper = TrafficDataWrapper()
-        _data_wrapper.with_equity = False
-        return _data_wrapper
+        return TrafficDataWrapper(with_equity=False)
 
     def _get_accumulated_traffic_from_node(
         self, o_node: str, total_d_nodes: int
@@ -72,3 +65,26 @@ class TrafficAnalysis(TrafficAnalysisBase):
             o_node, "values", total_d_nodes
         )
         return _accumulated_traffic
+
+    def _get_route_traffic(
+        self, traffic_data: dict[str, AccumulatedTaffic]
+    ) -> pd.DataFrame:
+        def convert_to_df(dict_item: tuple[str, AccumulatedTaffic]):
+            node_id, traffic_values = dict_item
+            u_node, v_node = self._get_key_nodes(node_id)
+            return (
+                u_node,
+                v_node,
+                traffic_values.regular,
+                traffic_values.egalitarian,
+            )
+
+        return pd.DataFrame(
+            map(convert_to_df, traffic_data.items()),
+            columns=[
+                "u",
+                "v",
+                "traffic",
+                "traffic_egalitarian",
+            ],
+        )

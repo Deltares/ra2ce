@@ -28,15 +28,29 @@ class AccumulatedTaffic:
     egalitarian: float = 1.0
     prioritarian: float = 1.0
 
-    def __add__(self, other: AccumulatedTaffic) -> None:
+    @classmethod
+    def with_zeros(cls) -> AccumulatedTaffic:
+        return cls(regular=0, egalitarian=0, prioritarian=0)
+
+    def __add__(self, other: AccumulatedTaffic) -> AccumulatedTaffic:
         self.regular += other.regular
         self.prioritarian += other.prioritarian
         self.egalitarian += other.egalitarian
+        return AccumulatedTaffic(
+            regular=self.regular,
+            prioritarian=self.prioritarian,
+            egalitarian=self.egalitarian,
+        )
 
-    def __mul__(self, other: AccumulatedTaffic) -> None:
+    def __mul__(self, other: AccumulatedTaffic) -> AccumulatedTaffic:
         self.regular *= other.regular
         self.prioritarian *= other.prioritarian
         self.egalitarian *= other.egalitarian
+        return AccumulatedTaffic(
+            regular=self.regular,
+            prioritarian=self.prioritarian,
+            egalitarian=self.egalitarian,
+        )
 
     def product(self, value: float) -> None:
         """

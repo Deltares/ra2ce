@@ -1,21 +1,15 @@
+from dataclasses import dataclass, field
 import pandas as pd
 from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass import (
     AccumulatedTaffic,
 )
 
 
+@dataclass
 class TrafficDataWrapper:
-    regular: dict
-    egalitarian: dict
-    prioritarian: dict
-    with_equity: bool
-
-    def __init__(self) -> None:
-        self.regular = {}
-        self.egalitarian = {}
-        self.prioritarian = {}
-        self.with_equity = False
-        self._visited_nodes = []
+    regular: dict = field(default_factory={})
+    egalitarian: dict = field(default_factory={})
+    prioritarian: dict = field(default_factory={})
 
     @staticmethod
     def get_node_key(u_node: str, v_node: str) -> str:
@@ -44,54 +38,35 @@ class TrafficDataWrapper:
         """
         return node_key.split("_")
 
+    def _get_accumulated_data(self, node_key: str) -> AccumulatedTaffic:
+        """
+        Gets the accumulated traffic data structure (`AccumulatedTraffic`) for the requested node `node_key`.
+
+        Args:
+            node_key (str): Node key whose accumulated traffic is requested.
+
+        Returns:
+            AccumulatedTaffic: Accumulated traffic values or with zeros if the `node_key` is not present.
+        """
+        if node_key not in self.regular.keys():
+            return AccumulatedTaffic(regular=0, egalitarian=0, prioritarian=0)
+        return AccumulatedTaffic(
+            regular=self.regular[node_key],
+            egalitarian=self.egalitarian[node_key],
+            prioritarian=self.prioritarian[node_key],
+        )
+
     def update_traffic_routes(
-        self, nodes_key: str, accumulated_traffic: AccumulatedTaffic
+        self, nodes_key: str, traffic_values: AccumulatedTaffic
     ) -> None:
         """
         Updates the traffic dictionaries based on the provided accumulated traffic.
 
         Args:
             nodes_key (str): Node whose traffic data is provided.
-            accumulated_traffic (AccumulatedTraffic): Traffic data for regular, egalitarian and prioritarian traffic.
+            traffic_values (AccumulatedTraffic): Traffic data for regular, egalitarian and prioritarian traffic.
         """
-        self.regular[nodes_key] = accumulated_traffic.regular + self.regular.get(
-            nodes_key, 0
-        )
-        self.egalitarian[
-            nodes_key
-        ] = accumulated_traffic.egalitarian + self.egalitarian.get(nodes_key, 0)
-        if self.with_equity:
-            self.prioritarian[
-                nodes_key
-            ] = accumulated_traffic.prioritarian + self.prioritarian.get(nodes_key, 0)
-
-    def get_route_traffic(self) -> pd.DataFrame:
-        """
-        Combines all the `visited_nodes` with the traffic data stored in the internal dictionaries for `regular`, `egalitarian` and `prioritarian` traffic.
-
-        Returns:
-            pd.DataFrame: Resulting dataframe with all traffic data.
-        """
-        u_list, v_list = zip(*map(self.get_key_nodes, self.regular))
-        t_list = self.regular.values()
-        teq_list = self.egalitarian.values()
-
-        if not self.with_equity:
-            data_tuples = list(zip(u_list, v_list, t_list, teq_list))
-            return pd.DataFrame(
-                data_tuples, columns=["u", "v", "traffic", "traffic_egalitarian"]
-            )
-
-        data_tuples = list(
-            zip(u_list, v_list, t_list, teq_list, self.prioritarian.values())
-        )
-        return pd.DataFrame(
-            data_tuples,
-            columns=[
-                "u",
-                "v",
-                "traffic",
-                "traffic_egalitarian",
-                "traffic_prioritarian",
-            ],
-        )
+        _accumulated_traffic = self._get_accumulated_data(nodes_key) + traffic_values
+        self.regular[nodes_key] = _accumulated_traffic.regular
+        self.egalitarian[nodes_key] = _accumulated_traffic.egalitarian
+        self.prioritarian[nodes_key] = _accumulated_traffic.egalitarian
