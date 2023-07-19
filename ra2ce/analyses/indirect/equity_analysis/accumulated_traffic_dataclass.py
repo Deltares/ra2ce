@@ -18,12 +18,22 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+from __future__ import annotations
 from dataclasses import dataclass
 
 
 @dataclass
-class AccumulatedTraffic:
+class AccumulatedTaffic:
     regular: float = 1.0
     egalitarian: float = 1.0
     prioritarian: float = 1.0
+
+    def __add__(self, other: AccumulatedTaffic) -> None:
+        self.regular += other.regular
+        self.prioritarian += other.prioritarian
+        self.egalitarian += other.egalitarian
+
+    def __mul__(self, other: AccumulatedTaffic) -> None:
+        self.regular *= other.regular
+        self.prioritarian *= other.prioritarian
+        self.egalitarian *= other.egalitarian
