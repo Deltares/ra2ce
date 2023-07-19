@@ -56,26 +56,34 @@ class TrafficAnalysisBase:
         unique_destination_nodes = np.unique(list(self.od_table["d_id"].fillna("0")))
         count_destination_nodes = len([x for x in unique_destination_nodes if x != "0"])
 
-        _equity_traffic_data = self._get_traffic_data_wrapper()
+        _traffic: dict[str, AccumulatedTaffic] = {}
         for o_node in origin_nodes:
             for d_node in destination_nodes:
                 opt_path = self._get_opt_path_values(o_node, d_node)
                 for u_node, v_node in itertools.pairwise(opt_path):
-                    _nodes_key_name = TrafficDataWrapper.get_node_key(u_node, v_node)
-                    _accumulated_traffic = self._calculate_origin_node_traffic(
+                    _nodes_key_name = self._get_node_key(u_node, v_node)
+                    _calculated_traffic = self._calculate_origin_node_traffic(
                         o_node, count_destination_nodes
                     )
                     if "," in d_node:
-                        _accumulated_traffic = self._calculate_destination_node_traffic(
-                            d_node, _accumulated_traffic
+                        _calculated_traffic = self._calculate_destination_node_traffic(
+                            d_node, _calculated_traffic
                         )
 
-                    _equity_traffic_data.update_traffic_routes(
-                        _nodes_key_name,
-                        _accumulated_traffic,
+                    _accumulated_traffic = _traffic.get(
+                        _nodes_key_name, AccumulatedTaffic.with_zeros()
+                    )
+                    _traffic[_nodes_key_name] = (
+                        _accumulated_traffic + _calculated_traffic
                     )
 
-        return _equity_traffic_data.get_route_traffic()
+        return self._get_route_traffic(_traffic)
+
+    def _get_node_key(self, u_node: str, v_node: str) -> str:
+        return f"{u_node}_{v_node}"
+
+    def _get_key_nodes(self, node_key: str) -> tuple[str, str]:
+        return node_key.split("_")
 
     def _get_opt_path_values(self, o_node: str, d_node: str) -> list[Any]:
         _opt_path_value = self.gdf.loc[
@@ -151,4 +159,10 @@ class TrafficAnalysisBase:
     def _get_accumulated_traffic_from_node(
         self, target_node: str, total_d_nodes: int
     ) -> AccumulatedTaffic:
+        raise NotImplementedError("Should be implemented in concrete class.")
+
+    @abstractmethod
+    def _get_route_traffic(
+        self, traffic_data_wrapper: dict[str, AccumulatedTaffic]
+    ) -> pd.DataFrame:
         raise NotImplementedError("Should be implemented in concrete class.")

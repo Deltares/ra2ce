@@ -67,9 +67,7 @@ class EquityAnalysis(TrafficAnalysisBase):
         )
 
     def _get_traffic_data_wrapper(self) -> TrafficDataWrapper:
-        _data_wrapper = TrafficDataWrapper()
-        _data_wrapper.with_equity = True
-        return _data_wrapper
+        return TrafficDataWrapper(with_equity=True)
 
     def _get_accumulated_traffic_from_node(
         self, o_node: str, total_d_nodes: int
@@ -82,3 +80,28 @@ class EquityAnalysis(TrafficAnalysisBase):
             o_node, "values_prioritarian", total_d_nodes
         )
         return _accumulated_traffic
+
+    def _get_route_traffic(
+        self, traffic_data: dict[str, AccumulatedTaffic]
+    ) -> pd.DataFrame:
+        def convert_to_df(dict_item: tuple[str, AccumulatedTaffic]):
+            node_id, traffic_values = dict_item
+            u_node, v_node = self._get_key_nodes(node_id)
+            return (
+                u_node,
+                v_node,
+                traffic_values.regular,
+                traffic_values.egalitarian,
+                traffic_values.prioritarian,
+            )
+
+        return pd.DataFrame(
+            map(convert_to_df, traffic_data.items()),
+            columns=[
+                "u",
+                "v",
+                "traffic",
+                "traffic_egalitarian",
+                "traffic_prioritarian",
+            ],
+        )
