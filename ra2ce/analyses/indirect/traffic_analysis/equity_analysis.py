@@ -29,10 +29,6 @@ from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_base import (
     TrafficAnalysisBase,
 )
 
-from ra2ce.analyses.indirect.traffic_analysis.traffic_data_wrapper import (
-    TrafficDataWrapper,
-)
-
 
 class EquityAnalysis(TrafficAnalysisBase):
     """
@@ -65,9 +61,6 @@ class EquityAnalysis(TrafficAnalysisBase):
         self.od_table["values_prioritarian"] = (
             od_table_data["region"].map(prioritarian_mapping) * od_table_data["values"]
         )
-
-    def _get_traffic_data_wrapper(self) -> TrafficDataWrapper:
-        return TrafficDataWrapper(with_equity=True)
 
     def _get_accumulated_traffic_from_node(
         self, o_node: str, total_d_nodes: int
