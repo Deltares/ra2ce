@@ -37,3 +37,14 @@ class AccumulatedTaffic:
         self.regular *= other.regular
         self.prioritarian *= other.prioritarian
         self.egalitarian *= other.egalitarian
+
+    def product(self, value: float) -> None:
+        """
+        Multiplies all accumulated traffic properties with the provided `value`.
+
+        Args:
+            value (float): Value to multiply by.
+        """
+        self.regular *= value
+        self.prioritarian *= value
+        self.egalitarian *= value

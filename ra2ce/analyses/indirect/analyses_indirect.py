@@ -35,7 +35,6 @@ import pandas as pd
 from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
-from ra2ce.analyses.indirect.traffic_analysis import TrafficAnalysis
 
 from ra2ce.analyses.indirect.losses import Losses
 from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDestination
@@ -994,7 +993,9 @@ class IndirectAnalyses:
                     route_traffic_df = self.optimal_route_od_link(
                         gdf,
                         od_table,
-                        TrafficAnalysis.read_equity_weights(_equity_weights_file),
+                        TrafficAnalysisFactory.read_equity_weights(
+                            _equity_weights_file
+                        ),
                     )
                     impact_csv_path = (
                         self.config["output"]
