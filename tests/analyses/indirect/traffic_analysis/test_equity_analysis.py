@@ -1,5 +1,7 @@
 from pathlib import Path
-from ra2ce.analyses.indirect.equity_analysis import EquityAnalysis
+from ra2ce.analyses.indirect.traffic_analysis.equity_analysis import (
+    EquityAnalysis,
+)
 from tests import test_data, slow_test, test_results
 import pytest
 import geopandas as gpd
@@ -21,24 +23,6 @@ def import_from_csv(input_file: Path) -> gpd.GeoDataFrame:
 
 
 class TestEquityAnalysis:
-    @pytest.mark.parametrize(
-        "file_arg",
-        [
-            pytest.param("", id="Empty string"),
-            pytest.param(None, id="No value given"),
-            pytest.param(
-                Path("does_not_exist.geojson"), id="Non-existing geojson file"
-            ),
-        ],
-    )
-    def test_read_equity_weights_without_file(self, file_arg: Path):
-        # 1. Run test.
-        _result = EquityAnalysis.read_equity_weights(file_arg)
-
-        # 2. Verify expectations.
-        assert isinstance(_result, pd.DataFrame)
-        assert _result.empty
-
     @slow_test
     def test_equity_analysis_with_valid_data(self, request: pytest.FixtureRequest):
         # 1. Define test data.
@@ -71,8 +55,8 @@ class TestEquityAnalysis:
 
         # 2. Run test.
         _result = EquityAnalysis(
-            _gdf_data, _od_table_data, _destinations_names
-        ).optimal_route_od_link(_equity_data)
+            _gdf_data, _od_table_data, _destinations_names, _equity_data
+        ).optimal_route_od_link()
 
         # 3. Verify expectations.
         assert isinstance(_result, pd.DataFrame)

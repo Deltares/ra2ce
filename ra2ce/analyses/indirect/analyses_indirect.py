@@ -35,10 +35,13 @@ import pandas as pd
 from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
-from ra2ce.analyses.indirect.equity_analysis import EquityAnalysis
+from ra2ce.analyses.indirect.traffic_analysis import TrafficAnalysis
 
 from ra2ce.analyses.indirect.losses import Losses
 from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDestination
+from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_factory import (
+    TrafficAnalysisFactory,
+)
 from ra2ce.graph.networks_utils import graph_to_gpkg
 from ra2ce.io.readers.graph_pickle_reader import GraphPickleReader
 
@@ -551,11 +554,12 @@ class IndirectAnalyses:
     def optimal_route_od_link(
         self, gdf: gpd.GeoDataFrame, od_table: gpd.GeoDataFrame, equity: pd.DataFrame
     ) -> pd.DataFrame:
-        return EquityAnalysis(
+        return TrafficAnalysisFactory.get_analysis(
             gdf,
             od_table,
             self.config["origins_destinations"]["destinations_names"],
-        ).optimal_route_od_link(equity)
+            equity,
+        ).optimal_route_od_link()
 
     def multi_link_origin_destination(self, graph, analysis):
         """Calculates the connectivity between origins and destinations"""
@@ -990,7 +994,7 @@ class IndirectAnalyses:
                     route_traffic_df = self.optimal_route_od_link(
                         gdf,
                         od_table,
-                        EquityAnalysis.read_equity_weights(_equity_weights_file),
+                        TrafficAnalysis.read_equity_weights(_equity_weights_file),
                     )
                     impact_csv_path = (
                         self.config["output"]
