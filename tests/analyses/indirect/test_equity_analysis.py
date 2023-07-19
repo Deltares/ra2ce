@@ -70,9 +70,13 @@ class TestEquityAnalysis:
         assert len(_expected_result.values) == 359
 
         # 2. Run test.
-        _result = EquityAnalysis(_gdf_data, _od_table_data, _destinations_names).optimal_route_od_link(_equity_data)
+        _result = EquityAnalysis(
+            _gdf_data, _od_table_data, _destinations_names
+        ).optimal_route_od_link(_equity_data)
 
         # 3. Verify expectations.
         assert isinstance(_result, pd.DataFrame)
         _result.to_csv(_test_result)
+
+        assert not any(_result[["u", "v"]].duplicated())
         pd.testing.assert_frame_equal(_expected_result, _result)
