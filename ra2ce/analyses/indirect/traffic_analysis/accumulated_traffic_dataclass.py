@@ -24,24 +24,22 @@ from typing import Union
 
 
 @dataclass
-class AccumulatedTaffic:
-    regular: float = 1.0
-    egalitarian: float = 1.0
-    prioritarian: float = 1.0
+class AccumulatedTraffic:
+    regular: float = 0.0
+    egalitarian: float = 0.0
+    prioritarian: float = 0.0
 
-    @classmethod
-    def with_zeros(cls) -> AccumulatedTaffic:
-        return cls(regular=0, egalitarian=0, prioritarian=0)
-
-    def __add__(self, other: Union[AccumulatedTaffic, float, int]) -> AccumulatedTaffic:
-        if isinstance(other, AccumulatedTaffic):
-            return AccumulatedTaffic(
+    def __add__(
+        self, other: Union[AccumulatedTraffic, float, int]
+    ) -> AccumulatedTraffic:
+        if isinstance(other, AccumulatedTraffic):
+            return AccumulatedTraffic(
                 regular=self.regular + other.regular,
                 prioritarian=self.prioritarian + other.prioritarian,
                 egalitarian=self.egalitarian + other.egalitarian,
             )
         elif isinstance(other, float) or isinstance(other, int):
-            return AccumulatedTaffic(
+            return AccumulatedTraffic(
                 regular=self.regular + other,
                 prioritarian=self.prioritarian + other,
                 egalitarian=self.egalitarian + other,
@@ -49,19 +47,21 @@ class AccumulatedTaffic:
         else:
             raise NotImplementedError(
                 "It is not possible to sum {} with a value of type {}.".format(
-                    AccumulatedTaffic.__name__, type(other).__name__
+                    AccumulatedTraffic.__name__, type(other).__name__
                 )
             )
 
-    def __mul__(self, other: Union[AccumulatedTaffic, float, int]) -> AccumulatedTaffic:
-        if isinstance(other, AccumulatedTaffic):
-            return AccumulatedTaffic(
+    def __mul__(
+        self, other: Union[AccumulatedTraffic, float, int]
+    ) -> AccumulatedTraffic:
+        if isinstance(other, AccumulatedTraffic):
+            return AccumulatedTraffic(
                 regular=self.regular * other.regular,
                 prioritarian=self.prioritarian * other.prioritarian,
                 egalitarian=self.egalitarian * other.egalitarian,
             )
         elif isinstance(other, float) or isinstance(other, int):
-            return AccumulatedTaffic(
+            return AccumulatedTraffic(
                 regular=self.regular * other,
                 prioritarian=self.prioritarian * other,
                 egalitarian=self.egalitarian * other,
@@ -69,6 +69,6 @@ class AccumulatedTaffic:
         else:
             raise NotImplementedError(
                 "It is not possible to multiply {} with a value of type {}.".format(
-                    AccumulatedTaffic.__name__, type(other).__name__
+                    AccumulatedTraffic.__name__, type(other).__name__
                 )
             )

@@ -23,7 +23,7 @@ import geopandas as gpd
 import pandas as pd
 import numpy as np
 from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass import (
-    AccumulatedTaffic,
+    AccumulatedTraffic,
 )
 from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_base import (
     TrafficAnalysisBase,
@@ -64,8 +64,8 @@ class EquityAnalysis(TrafficAnalysisBase):
 
     def _get_accumulated_traffic_from_node(
         self, o_node: str, total_d_nodes: int
-    ) -> AccumulatedTaffic:
-        _accumulated_traffic = AccumulatedTaffic()
+    ) -> AccumulatedTraffic:
+        _accumulated_traffic = AccumulatedTraffic(egalitarian=1)
         _accumulated_traffic.regular = self._get_recorded_traffic_in_node(
             o_node, "values", total_d_nodes
         )
@@ -75,9 +75,9 @@ class EquityAnalysis(TrafficAnalysisBase):
         return _accumulated_traffic
 
     def _get_route_traffic(
-        self, traffic_data: dict[str, AccumulatedTaffic]
+        self, traffic_data: dict[str, AccumulatedTraffic]
     ) -> pd.DataFrame:
-        def convert_to_df(dict_item: tuple[str, AccumulatedTaffic]):
+        def convert_to_df(dict_item: tuple[str, AccumulatedTraffic]):
             node_id, traffic_values = dict_item
             u_node, v_node = self._get_key_nodes(node_id)
             return (
