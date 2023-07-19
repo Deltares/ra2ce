@@ -19,25 +19,27 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import geopandas as gpd
+import pandas as pd
 import itertools
 import operator
 from typing import Any
 import numpy as np
-import pandas as pd
-import geopandas as gpd
 import ast
 from ra2ce.analyses.indirect.equity_analysis.accumulated_traffic_dataclass import (
     AccumulatedTaffic,
 )
+from ra2ce.analyses.indirect.equity_analysis.equity_analysis import EquityAnalysis
 
 from ra2ce.analyses.indirect.equity_analysis.equity_traffic_data_wrapper import (
     EquityTrafficDataWrapper,
 )
 
 
-class EquityAnalysis:
+class EquityAnalysisWithEquity(EquityAnalysis):
     gdf: gpd.GeoDataFrame
     od_table: gpd.GeoDataFrame
+    equity_data: pd.DataFrame
     destinations_names: str
 
     def __init__(
@@ -45,16 +47,13 @@ class EquityAnalysis:
         gdf: gpd.GeoDataFrame,
         od_table: gpd.GeoDataFrame,
         destination_names: str,
+        equity_data: pd.DataFrame,
     ) -> None:
-        """
-        Args:
-            gdf (gpd.GeoDataFrame): Geodataframe containing the overall network information.
-            od_table (gpd.GeoDataFrame): GeoDataFrame representing the Origins - Destinations table.
-            destination_names (str): Destination nodes.
-        """
         self.gdf = gdf
         self.od_table = od_table
         self.destinations_names = destination_names
+        self.equity_data = equity_data
+        self._set_values_prioritarian(self.equity_data, self.od_table)
 
     def optimal_route_od_link(
         self,
@@ -72,6 +71,8 @@ class EquityAnalysis:
         count_destination_nodes = len([x for x in unique_destination_nodes if x != "0"])
 
         _equity_traffic_data = EquityTrafficDataWrapper()
+        _equity_traffic_data.with_equity = True
+
         for o_node in origin_nodes:
             for d_node in destination_nodes:
                 opt_path = self.get_opt_path_values(o_node, d_node)
@@ -80,15 +81,11 @@ class EquityAnalysis:
                         u_node, v_node
                     )
                     _accumulated_traffic = self._get_origin_node_traffic(
-                        o_node,
-                        count_destination_nodes,
-                        _equity_traffic_data.with_equity,
+                        o_node, count_destination_nodes
                     )
                     if "," in d_node:
                         _accumulated_traffic = self._calculate_destination_node_traffic(
-                            d_node,
-                            _accumulated_traffic,
-                            _equity_traffic_data.with_equity,
+                            d_node, _accumulated_traffic
                         )
 
                     _equity_traffic_data.update_traffic_routes(
@@ -98,30 +95,17 @@ class EquityAnalysis:
 
         return _equity_traffic_data.get_route_traffic()
 
-    def get_opt_path_values(self, o_node: str, d_node: str) -> list[Any]:
-        _opt_path_value = self.gdf.loc[
-            (self.gdf["origin"] == o_node) & (self.gdf["destination"] == d_node),
-            "opt_path",
-        ].values[0]
-        if isinstance(_opt_path_value, list):
-            return _opt_path_value
-        return ast.literal_eval(_opt_path_value)
-
-    def _get_node_traffic(
-        self, origin_node: str, value_key: str, count_destination_nodes: int
-    ) -> float:
-        return (
-            self.od_table.loc[
-                self.od_table["o_id"] == origin_node,
-                value_key,
-            ].values[0]
-            / count_destination_nodes
+    def _set_values_prioritarian(
+        self, equity_data: pd.DataFrame, od_table_data: gpd.GeoDataFrame
+    ) -> np.array:
+        prioritarian_mapping = dict(zip(equity_data["region"], equity_data["weight"]))
+        prioritarian_mapping.update({"Not assigned": 1})
+        self.od_table["values_prioritarian"] = (
+            od_table_data["region"].map(prioritarian_mapping) * od_table_data["values"]
         )
 
     def _calculate_origin_nodes_traffic(
-        self,
-        nodes_list: list[str],
-        count_destination_nodes: int,
+        self, nodes_list: list[str], count_destination_nodes: int
     ) -> AccumulatedTaffic:
         _accumulated_traffic = AccumulatedTaffic()
         _intermediate_nodes = 0
@@ -132,6 +116,9 @@ class EquityAnalysis:
             _node_traffic = AccumulatedTaffic(
                 regular=self._get_node_traffic(
                     _node, "values", count_destination_nodes
+                ),
+                prioritarian=self._get_node_traffic(
+                    _node, "values_prioritarian", count_destination_nodes
                 ),
             )
 
@@ -146,13 +133,10 @@ class EquityAnalysis:
         _accumulated_traffic.egalitarian = len(
             list(filter(lambda x: self.destinations_names not in x, nodes_list))
         )
-        _accumulated_traffic.prioritarian = 1
         return _accumulated_traffic
 
     def _get_origin_node_traffic(
-        self,
-        o_node: str,
-        total_d_nodes: int,
+        self, o_node: str, total_d_nodes: int
     ) -> AccumulatedTaffic:
         if "," in o_node:
             return self._calculate_origin_nodes_traffic(
@@ -163,6 +147,9 @@ class EquityAnalysis:
         _accumulated_traffic.regular = self._get_node_traffic(
             o_node, "values", total_d_nodes
         )
+        _accumulated_traffic.prioritarian = self._get_node_traffic(
+            o_node, "values_prioritarian", total_d_nodes
+        )
         return _accumulated_traffic
 
     def _calculate_destination_node_traffic(
@@ -171,4 +158,5 @@ class EquityAnalysis:
         d_num = len(d_node.split(","))
         accumulated_traffic.egalitarian *= d_num
         accumulated_traffic.regular *= d_num
+        accumulated_traffic.prioritarian *= d_num
         return accumulated_traffic
