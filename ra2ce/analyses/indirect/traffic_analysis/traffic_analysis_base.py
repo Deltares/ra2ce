@@ -20,6 +20,7 @@
 """
 
 from abc import abstractmethod
+import abc
 import itertools
 import operator
 from typing import Any
@@ -32,7 +33,7 @@ from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass impo
 )
 
 
-class TrafficAnalysisBase:
+class TrafficAnalysisBase(abc.ABC):
     gdf: gpd.GeoDataFrame
     od_table: gpd.GeoDataFrame
     destinations_names: str
