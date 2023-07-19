@@ -1,6 +1,6 @@
 import pandas as pd
 from ra2ce.analyses.indirect.equity_analysis.accumulated_traffic_dataclass import (
-    AccumulatedTraffic,
+    AccumulatedTaffic,
 )
 
 
@@ -47,7 +47,7 @@ class EquityTrafficDataWrapper:
         return _node_key
 
     def update_traffic_routes(
-        self, nodes_key: str, accumulated_traffic: AccumulatedTraffic
+        self, nodes_key: str, accumulated_traffic: AccumulatedTaffic
     ) -> None:
         """
         Updates the traffic dictionaries based on the provided accumulated traffic.
