@@ -55,18 +55,18 @@ class TestEquityAnalysis:
         assert isinstance(_equity_data, pd.DataFrame)
 
         # Define expected results.
-        _expected_columns = [
-            "u",
-            "v",
-            "traffic",
-            "traffic_egalitarian",
-            "traffic_prioritarian",
-        ]
         _expected_result = pd.read_csv(
-            _equity_test_data.joinpath("expected_result.csv"), index_col=0
+            _equity_test_data.joinpath("expected_result.csv"),
+            index_col=0,
+            dtype={
+                "u": str,
+                "v": str,
+                "traffic": float,
+                "traffic_egalitarian": float,
+                "traffic_prioritarian": float,
+            },
         )
         assert isinstance(_expected_result, pd.DataFrame)
-        assert list(_expected_result.columns).sort() == _expected_columns.sort()
         assert len(_expected_result.values) == 359
 
         # 2. Run test.

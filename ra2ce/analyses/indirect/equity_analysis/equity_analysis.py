@@ -101,15 +101,9 @@ class EquityAnalysis:
 
         for o_node in origin_nodes:
             for d_node in destination_nodes:
-                opt_path = self.get_opt_path_values(
-                    self.gdf.loc[
-                        (self.gdf["origin"] == o_node)
-                        & (self.gdf["destination"] == d_node),
-                        "opt_path",
-                    ].values[0]
-                )
+                opt_path = self.get_opt_path_values(o_node, d_node)
                 for u_node, v_node in itertools.pairwise(opt_path):
-                    _nodes_key_name = _equity_traffic_data.add_visited_nodes(
+                    _nodes_key_name = EquityTrafficDataWrapper.get_node_key(
                         u_node, v_node
                     )
                     _accumulated_traffic = self._get_origin_node_traffic(
@@ -150,11 +144,14 @@ class EquityAnalysis:
         )
         return pd.read_csv(equity_weight_file, sep=_separator)
 
-    @staticmethod
-    def get_opt_path_values(opt_path: Any) -> list[Any]:
-        if isinstance(opt_path, list):
-            return opt_path
-        return ast.literal_eval(opt_path)
+    def get_opt_path_values(self, o_node: str, d_node: str) -> list[Any]:
+        _opt_path_value = self.gdf.loc[
+            (self.gdf["origin"] == o_node) & (self.gdf["destination"] == d_node),
+            "opt_path",
+        ].values[0]
+        if isinstance(_opt_path_value, list):
+            return _opt_path_value
+        return ast.literal_eval(_opt_path_value)
 
     def _get_values_prioritarian(
         self, equity_data: pd.DataFrame, od_table_data: gpd.GeoDataFrame
