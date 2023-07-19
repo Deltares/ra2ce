@@ -29,13 +29,16 @@ import ast
 from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass import (
     AccumulatedTaffic,
 )
+from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_base import (
+    TrafficAnalysisBase,
+)
 
 from ra2ce.analyses.indirect.traffic_analysis.traffic_data_wrapper import (
     TrafficDataWrapper,
 )
 
 
-class TrafficAnalysis:
+class TrafficAnalysis(TrafficAnalysisBase):
     gdf: gpd.GeoDataFrame
     od_table: gpd.GeoDataFrame
     destinations_names: str
@@ -56,117 +59,16 @@ class TrafficAnalysis:
         self.od_table = od_table
         self.destinations_names = destination_names
 
-    def optimal_route_od_link(
-        self,
-    ) -> pd.DataFrame:
-        """
-        Gets the optimal routes based on regular, egalitarian and prioritarian traffic.
+    def _get_traffic_data_wrapper(self) -> TrafficDataWrapper:
+        _data_wrapper = TrafficDataWrapper()
+        _data_wrapper.with_equity = False
+        return _data_wrapper
 
-        Returns:
-            pd.DataFrame: Datafarme with the traffic indices for each of analysis.
-        """
-        origin_nodes = np.unique(self.gdf["origin"])
-        destination_nodes = np.unique(self.gdf["destination"])
-
-        unique_destination_nodes = np.unique(list(self.od_table["d_id"].fillna("0")))
-        count_destination_nodes = len([x for x in unique_destination_nodes if x != "0"])
-
-        _equity_traffic_data = TrafficDataWrapper()
-        for o_node in origin_nodes:
-            for d_node in destination_nodes:
-                opt_path = self.get_opt_path_values(o_node, d_node)
-                for u_node, v_node in itertools.pairwise(opt_path):
-                    _nodes_key_name = TrafficDataWrapper.get_node_key(u_node, v_node)
-                    _accumulated_traffic = self._get_origin_node_traffic(
-                        o_node,
-                        count_destination_nodes,
-                        _equity_traffic_data.with_equity,
-                    )
-                    if "," in d_node:
-                        _accumulated_traffic = self._calculate_destination_node_traffic(
-                            d_node,
-                            _accumulated_traffic,
-                            _equity_traffic_data.with_equity,
-                        )
-
-                    _equity_traffic_data.update_traffic_routes(
-                        _nodes_key_name,
-                        _accumulated_traffic,
-                    )
-
-        return _equity_traffic_data.get_route_traffic()
-
-    def get_opt_path_values(self, o_node: str, d_node: str) -> list[Any]:
-        _opt_path_value = self.gdf.loc[
-            (self.gdf["origin"] == o_node) & (self.gdf["destination"] == d_node),
-            "opt_path",
-        ].values[0]
-        if isinstance(_opt_path_value, list):
-            return _opt_path_value
-        return ast.literal_eval(_opt_path_value)
-
-    def _get_node_traffic(
-        self, origin_node: str, value_key: str, count_destination_nodes: int
-    ) -> float:
-        return (
-            self.od_table.loc[
-                self.od_table["o_id"] == origin_node,
-                value_key,
-            ].values[0]
-            / count_destination_nodes
-        )
-
-    def _calculate_origin_nodes_traffic(
-        self,
-        nodes_list: list[str],
-        count_destination_nodes: int,
+    def _get_accumulated_traffic_from_node(
+        self, o_node: str, total_d_nodes: int
     ) -> AccumulatedTaffic:
         _accumulated_traffic = AccumulatedTaffic()
-        _intermediate_nodes = 0
-        for _node in nodes_list:
-            if self.destinations_names in _node:
-                _intermediate_nodes -= 1
-                continue
-            _node_traffic = AccumulatedTaffic(
-                regular=self._get_node_traffic(
-                    _node, "values", count_destination_nodes
-                ),
-            )
-
-            # Multiplication (*) or Addition (+) operations to acummulate traffic.
-            _acummulated_operator = (
-                operator.mul if _intermediate_nodes == 0 else operator.add
-            )
-            _acummulated_operator(_accumulated_traffic, _node_traffic)
-            _intermediate_nodes += 1
-
-        # Set the remainig values
-        _accumulated_traffic.egalitarian = len(
-            list(filter(lambda x: self.destinations_names not in x, nodes_list))
-        )
-        _accumulated_traffic.prioritarian = 1
-        return _accumulated_traffic
-
-    def _get_origin_node_traffic(
-        self,
-        o_node: str,
-        total_d_nodes: int,
-    ) -> AccumulatedTaffic:
-        if "," in o_node:
-            return self._calculate_origin_nodes_traffic(
-                o_node.split(","), total_d_nodes
-            )
-
-        _accumulated_traffic = AccumulatedTaffic()
-        _accumulated_traffic.regular = self._get_node_traffic(
+        _accumulated_traffic.regular = self._get_recorded_traffic_in_node(
             o_node, "values", total_d_nodes
         )
         return _accumulated_traffic
-
-    def _calculate_destination_node_traffic(
-        self, d_node: str, accumulated_traffic: AccumulatedTaffic
-    ) -> AccumulatedTaffic:
-        d_num = len(d_node.split(","))
-        accumulated_traffic.egalitarian *= d_num
-        accumulated_traffic.regular *= d_num
-        return accumulated_traffic

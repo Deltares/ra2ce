@@ -27,6 +27,9 @@ from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis import TrafficAna
 from ra2ce.analyses.indirect.traffic_analysis.equity_analysis import (
     EquityAnalysis,
 )
+from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_base import (
+    TrafficAnalysisBase,
+)
 
 
 class TrafficAnalysisFactory:
@@ -36,9 +39,9 @@ class TrafficAnalysisFactory:
         od_table: gpd.GeoDataFrame,
         destination_names: str,
         equity_data: pd.DataFrame,
-    ) -> TrafficAnalysis:
+    ) -> TrafficAnalysisBase:
         """
-        Gets an instance of an `EquityAnalysis` based on whether `equity_data` is provided or not.
+        Gets an instance of an `TrafficAnalysisBase` based on whether `equity_data` is provided or not.
 
         Args:
             gdf (gpd.GeoDataFrame): General dataframe for the network to analyze.
