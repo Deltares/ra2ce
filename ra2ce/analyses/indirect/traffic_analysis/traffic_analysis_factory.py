@@ -52,10 +52,9 @@ class TrafficAnalysisFactory:
         Returns:
             TrafficAnalysisBase: Object to make an equity analysis.
         """
-        if not equity_data:
-            return TrafficAnalysis(gdf, od_table, destination_names)
-        else:
+        if isinstance(equity_data, pd.DataFrame) and not equity_data.empty:
             return EquityAnalysis(gdf, od_table, destination_names, equity_data)
+        return TrafficAnalysis(gdf, od_table, destination_names)
 
     @staticmethod
     def read_equity_weights(equity_weight_file: Path) -> pd.DataFrame:
