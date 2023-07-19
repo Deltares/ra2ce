@@ -28,7 +28,7 @@ import pandas as pd
 import geopandas as gpd
 import ast
 from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass import (
-    AccumulatedTaffic,
+    AccumulatedTraffic,
 )
 
 
@@ -52,7 +52,7 @@ class TrafficAnalysisBase:
         unique_destination_nodes = np.unique(list(self.od_table["d_id"].fillna("0")))
         count_destination_nodes = len([x for x in unique_destination_nodes if x != "0"])
 
-        _traffic: dict[str, AccumulatedTaffic] = {}
+        _traffic: dict[str, AccumulatedTraffic] = {}
         for o_node in origin_nodes:
             for d_node in destination_nodes:
                 opt_path = self._get_opt_path_values(o_node, d_node)
@@ -65,7 +65,7 @@ class TrafficAnalysisBase:
                         _calculated_traffic *= len(d_node.split(","))
 
                     _accumulated_traffic = _traffic.get(
-                        _nodes_key_name, AccumulatedTaffic.with_zeros()
+                        _nodes_key_name, AccumulatedTraffic()
                     )
                     _traffic[_nodes_key_name] = (
                         _accumulated_traffic + _calculated_traffic
@@ -103,8 +103,13 @@ class TrafficAnalysisBase:
         self,
         nodes_list: list[str],
         count_destination_nodes: int,
-    ) -> AccumulatedTaffic:
-        _accumulated_traffic = AccumulatedTaffic()
+    ) -> AccumulatedTraffic:
+        # TODO: This algorithm is not entirely clear (increase decrease of variable _intermediate_nodes)
+        # When do we want to 'multiply' the accumulated values?
+        # When do we want to 'add' the accumulated values?
+        _accumulated_traffic = AccumulatedTraffic(
+            regular=1, egalitarian=1, prioritarian=1
+        )
         _intermediate_nodes = 0
         for _node in nodes_list:
             if self.destinations_names in _node:
@@ -132,7 +137,7 @@ class TrafficAnalysisBase:
         self,
         origin_node: str,
         total_d_nodes: int,
-    ) -> AccumulatedTaffic:
+    ) -> AccumulatedTraffic:
         if "," in origin_node:
             return self._get_accumulated_traffic_from_node_list(
                 origin_node.split(","), total_d_nodes
@@ -143,11 +148,11 @@ class TrafficAnalysisBase:
     @abstractmethod
     def _get_accumulated_traffic_from_node(
         self, target_node: str, total_d_nodes: int
-    ) -> AccumulatedTaffic:
+    ) -> AccumulatedTraffic:
         raise NotImplementedError("Should be implemented in concrete class.")
 
     @abstractmethod
     def _get_route_traffic(
-        self, traffic_data_wrapper: dict[str, AccumulatedTaffic]
+        self, traffic_data_wrapper: dict[str, AccumulatedTraffic]
     ) -> pd.DataFrame:
         raise NotImplementedError("Should be implemented in concrete class.")
