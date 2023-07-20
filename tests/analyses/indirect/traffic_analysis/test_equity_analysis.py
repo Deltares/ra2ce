@@ -1,3 +1,6 @@
+from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass import (
+    AccumulatedTraffic,
+)
 from ra2ce.analyses.indirect.traffic_analysis.equity_analysis import (
     EquityAnalysis,
 )
@@ -14,10 +17,22 @@ _equity_test_data = test_data.joinpath("equity_data")
 
 
 class TestEquityAnalysis:
+    @pytest.fixture
+    def valid_equity_analysis(
+        self,
+        valid_traffic_analysis_input: TrafficAnalysisInput,
+    ) -> EquityAnalysis:
+        yield EquityAnalysis(
+            valid_traffic_analysis_input.gdf_data,
+            valid_traffic_analysis_input.od_table_data,
+            valid_traffic_analysis_input.destination_names,
+            valid_traffic_analysis_input.equity_data,
+        )
+
     @slow_test
     def test_equity_analysis_with_valid_data(
         self,
-        valid_traffic_analysis_input: TrafficAnalysisInput,
+        valid_equity_analysis: EquityAnalysis,
         request: pytest.FixtureRequest,
     ):
         # 1. Define test data.
@@ -41,12 +56,7 @@ class TestEquityAnalysis:
         assert len(_expected_result.values) == 359
 
         # 2. Run test.
-        _result = EquityAnalysis(
-            valid_traffic_analysis_input.gdf_data,
-            valid_traffic_analysis_input.od_table_data,
-            valid_traffic_analysis_input.destination_names,
-            valid_traffic_analysis_input.equity_data,
-        ).optimal_route_od_link()
+        _result = valid_equity_analysis.optimal_route_od_link()
 
         # 3. Verify expectations.
         assert isinstance(_result, pd.DataFrame)
@@ -55,5 +65,21 @@ class TestEquityAnalysis:
         assert not any(_result[["u", "v"]].duplicated())
         pd.testing.assert_frame_equal(_expected_result, _result)
 
-    def test_equity_analysis_get_accumulated_traffic_from_node(self):
-        pass
+    def test_equity_analysis_get_accumulated_traffic_from_node(
+        self, valid_equity_analysis: EquityAnalysis
+    ):
+        # 1. Define test data.
+        # Get some valid data, we will only check the type of output for this method.
+        _total_d_nodes = 42
+        _o_node = "A_22"
+
+        # 2. Run test.
+        _accumulated_traffic = valid_equity_analysis._get_accumulated_traffic_from_node(
+            _o_node, _total_d_nodes
+        )
+
+        # 3. Verify expectations.
+        assert isinstance(_accumulated_traffic, AccumulatedTraffic)
+        assert _accumulated_traffic.egalitarian == 1
+        assert _accumulated_traffic.regular == pytest.approx(3.1097, 0.0001)
+        assert _accumulated_traffic.prioritarian == pytest.approx(2.4615, 0.0001)
