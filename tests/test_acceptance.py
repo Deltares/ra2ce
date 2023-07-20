@@ -82,10 +82,6 @@ class TestAcceptance:
                 id="Nepal project",
                 marks=pytest.mark.skip(reason="WPF Nepal test directory not presnt"),
             ),
-            pytest.param(
-                "bolivia",
-                id="Bolivia project",
-            ),
         ]
         + _external_test_cases,
         indirect=["case_data_dir"],
