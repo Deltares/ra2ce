@@ -1,42 +1,29 @@
-from pathlib import Path
 from ra2ce.analyses.indirect.traffic_analysis.equity_analysis import (
     EquityAnalysis,
 )
-from tests import test_data, slow_test, test_results
+from tests import slow_test, test_results, test_data
 import pytest
-import geopandas as gpd
 import pandas as pd
+
+from tests.analyses.indirect.traffic_analysis import (
+    TrafficAnalysisInput,
+    valid_traffic_analysis_input,
+)
 
 _equity_test_data = test_data.joinpath("equity_data")
 
 
-def import_from_csv(input_file: Path) -> gpd.GeoDataFrame:
-    assert input_file.exists()
-    _as_pandas_df = pd.read_csv(input_file)
-    _as_geo_df = gpd.GeoDataFrame(
-        _as_pandas_df.loc[:, [c for c in _as_pandas_df.columns if c != "geometry"]],
-        geometry=gpd.GeoSeries.from_wkt(_as_pandas_df["geometry"]),
-        crs="epsg:3005",
-    )
-    assert isinstance(_as_geo_df, gpd.GeoDataFrame)
-    return _as_geo_df
-
-
 class TestEquityAnalysis:
     @slow_test
-    def test_equity_analysis_with_valid_data(self, request: pytest.FixtureRequest):
+    def test_equity_analysis_with_valid_data(
+        self,
+        valid_traffic_analysis_input: TrafficAnalysisInput,
+        request: pytest.FixtureRequest,
+    ):
         # 1. Define test data.
         _test_result = test_results.joinpath(request.node.name + ".csv")
         if _test_result.exists():
             _test_result.unlink()
-
-        _destinations_names = "B"
-        _gdf_data = import_from_csv(_equity_test_data.joinpath("gdf_data.csv"))
-        _od_table_data = import_from_csv(
-            _equity_test_data.joinpath("od_table_data.csv")
-        )
-        _equity_data = pd.read_csv(_equity_test_data.joinpath("equity_data.csv"))
-        assert isinstance(_equity_data, pd.DataFrame)
 
         # Define expected results.
         _expected_result = pd.read_csv(
@@ -55,7 +42,10 @@ class TestEquityAnalysis:
 
         # 2. Run test.
         _result = EquityAnalysis(
-            _gdf_data, _od_table_data, _destinations_names, _equity_data
+            valid_traffic_analysis_input.gdf_data,
+            valid_traffic_analysis_input.od_table_data,
+            valid_traffic_analysis_input.destination_names,
+            valid_traffic_analysis_input.equity_data,
         ).optimal_route_od_link()
 
         # 3. Verify expectations.
@@ -64,3 +54,6 @@ class TestEquityAnalysis:
 
         assert not any(_result[["u", "v"]].duplicated())
         pd.testing.assert_frame_equal(_expected_result, _result)
+
+    def test_equity_analysis_get_accumulated_traffic_from_node(self):
+        pass
