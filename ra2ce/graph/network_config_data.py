@@ -20,18 +20,27 @@
 """
 
 from __future__ import annotations
+import abc
 from dataclasses import dataclass, field
 from pathlib import Path
-import configparser
+from configparser import ConfigParser
 
 
 @dataclass
-class ProjectSection:
+class NetworkConfigDataBase(abc.ABC):
+    def __post_init__(self):
+        _keys_with_none = [k for k, v in self.__dict__.items() if v == "None"]
+        for k in _keys_with_none:
+            self.__dict__[k] = ""
+
+
+@dataclass
+class ProjectSection(NetworkConfigDataBase):
     name: str = ""
 
 
 @dataclass
-class NetworkSection:
+class NetworkSection(NetworkConfigDataBase):
     directed: bool = False
     source: str = ""  # should be enum
     primary_file: str = ""
@@ -44,7 +53,7 @@ class NetworkSection:
 
 
 @dataclass
-class OriginsDestinationsSection:
+class OriginsDestinationsSection(NetworkConfigDataBase):
     # Must be in the static/network folder, belongs to this analysis
     origins: str = ""  # Should be a path.
     # Must be in the static/network folder, belongs to this analysis
@@ -62,12 +71,12 @@ class OriginsDestinationsSection:
 
 
 @dataclass
-class IsolationSection:
+class IsolationSection(NetworkConfigDataBase):
     locations: str = ""  # Should be path.
 
 
 @dataclass
-class HazardSection:
+class HazardSection(NetworkConfigDataBase):
     hazard_map: list[str] = field(default_factory=list)  # Should be a list of paths.
     hazard_id: str = ""
     hazard_field_name: str = ""
@@ -75,11 +84,12 @@ class HazardSection:
     hazard_crs: str = ""
 
     def __post_init__(self):
+        super().__post_init__()
         self.hazard_field_name = self.hazard_field_name.split(",")
 
 
 @dataclass
-class CleanupSection:
+class CleanupSection(NetworkConfigDataBase):
     snapping_threshold: bool = False
     pruning_threshold: bool = False
     segmentation_length: bool = False
@@ -101,7 +111,7 @@ class NetworkConfigData:
 
     @classmethod
     def from_ini_file(cls, ini_file: Path) -> NetworkConfigData:
-        _ini_config = configparser.ConfigParser()
+        _ini_config = ConfigParser(defaults=None)
         _ini_config.read(ini_file)
         return cls(
             input_path=ini_file.parent.joinpath("input"),

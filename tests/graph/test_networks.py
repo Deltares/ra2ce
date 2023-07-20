@@ -88,13 +88,15 @@ class TestNetworks:
     ):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data.
-        _output_graph_dir = case_data_dir / "static" / "output_graph"
+        _test_dir = test_results / "test_networks" / request.node.name
+
         network_ini = case_data_dir / _network_ini_name
         assert network_ini.is_file()
-        _test_dir = test_results / "test_networks" / request.node.name
+
         _config_data = NetworkConfigData.from_ini_file(network_ini)
         _config_data.output_path = _test_dir.joinpath("output")
-        _config_data.static_path = _test_dir.joinpath("static")
+        _config_data.static_path = case_data_dir.joinpath("static")
+        _output_graph_dir = case_data_dir / "static" / "output_graph"
         _files_dict = {"base_graph": None, "base_network": None}
 
         # 2. When run test.
