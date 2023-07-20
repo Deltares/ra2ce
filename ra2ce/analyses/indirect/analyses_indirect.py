@@ -38,7 +38,7 @@ from tqdm import tqdm
 
 from ra2ce.analyses.indirect.losses import Losses
 from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDestination
-from ra2ce.graph.networks_utils import graph_to_gpkg
+from ra2ce.graph.networks_utils import graph_to_gpkg, graph_to_gdf, buffer_geometry
 from ra2ce.io.readers.graph_pickle_reader import GraphPickleReader
 
 
@@ -934,7 +934,7 @@ class IndirectAnalyses:
         Args:
             graph (nx.Graph): base graph with hazard information
             analysis (dict): configuration of the analysis. Keys: ["threshold"]
-            crs (int, optional): crs of the output. Defaults to 4326. # TODO PUT CRS IN DOCUMENTATION OR MAKE CHANGABLE
+            crs (int, optional): crs of the output. Defaults to 4326.
 
         """
 
@@ -942,7 +942,7 @@ class IndirectAnalyses:
         locations = gpd.read_feather(
             self.config["static"] / "output_graph" / "locations_hazard.feather"
         )
-
+        # TODO PUT CRS IN DOCUMENTATION OR MAKE CHANGABLE
         # reproject the datasets to be able to make a buffer in meters
         nearest_utm = utm_crs(locations.total_bounds)
         locations = locations.set_crs(epsg=crs)
@@ -958,25 +958,29 @@ class IndirectAnalyses:
                 self.hazard_names[self._file_name_key] == hazard, self._ra2ce_name_key
             ].values[0]
 
-            graph_hz = copy.deepcopy(graph)
+            graph_hz_direct = copy.deepcopy(graph)
+            graph_hz_indrect = copy.deepcopy(graph)
 
             # filter graph edges that are directly disrupted by the hazard(s), i.e. flooded
-            edges_remove = [
-                e for e in graph.edges.data(keys=True) if hazard_name in e[-1]
-            ]
-            edges_remove = [
+            edges = [e for e in graph.edges.data(keys=True) if hazard_name in e[-1]]
+            edges_hz_direct = [
                 e
-                for e in edges_remove
+                for e in edges
                 if (e[-1][hazard_name] > float(analysis["threshold"]))
                 & ("bridge" not in e[-1])
             ]
+            edges_hz_indirect = [e for e in edges if e not in edges_hz_direct]
 
-            # remove the edges to obtain isolated locations
-            graph_hz.remove_edges_from(edges_remove)
+            # remove the edges that are impacted by hazard indirectly, i.e. obtain flooded graph
+            graph_hz_direct.remove_edges_from(edges_hz_indirect)
+            # remove the edges that are impacted by hazard directly, i.e. obtain isolated graph
+            graph_hz_indrect.remove_edges_from(edges_hz_direct)
 
+            # get isolated network
             # evaluate connected components of the remaining graph
             connected_components = list(
-                graph_hz.subgraph(c) for c in nx.connected_components(graph_hz)
+                graph_hz_indrect.subgraph(c)
+                for c in nx.connected_components(graph_hz_indrect)
             )
 
             # find the disconnected islands and merge their linestrings into one multilinestring
@@ -1015,80 +1019,73 @@ class IndirectAnalyses:
 
             # remove the largest (main) graph, leaving isolated network
             results.sort_values(by="count", ascending=False, inplace=True)
-            results = results.loc[results["count"] != results["count"].max()]
-
+            network_hz_indrect = results.loc[results["count"] != results["count"].max()]
             # reproject the datasets to be able to make a buffer in meters
-            results = results.set_crs(crs=crs)
-            results.to_crs(crs=nearest_utm, inplace=True)
+            network_hz_indrect = network_hz_indrect.set_crs(crs=crs)
+            network_hz_indrect.to_crs(crs=nearest_utm, inplace=True)
+
+            # get flooded network
+            network_hz_direct = graph_to_gdf(graph_hz_direct)[0]
+            # TODO: add making "edges_fid" (internal convention) to graph_to_gdf
+            network_hz_direct["edge_fid"] = (
+                network_hz_direct["node_A"].astype(str)
+                + "_"
+                + network_hz_direct["node_B"].astype(str)
+            )
+            # reproject the datasets to be able to make a buffer in meters
+            network_hz_direct = network_hz_direct.set_crs(crs=crs)
+            network_hz_direct.to_crs(crs=nearest_utm, inplace=True)
 
             # process network to get output
-            # get directly disrupted roads
-            results_flooded_roads = gpd.GeoDataFrame(
-                {
-                    "geometry": [e[-1]["geometry"] for e in edges_remove],
-                    "edge_fid": [
-                        f"{e[-1]['node_A']}_{e[-1]['node_B']}" for e in edges_remove
-                    ],
-                },
-                crs=crs,
-            )
-            results_flooded_roads.to_crs(crs=nearest_utm, inplace=True)
-            results_flooded_roads.geometry = results_flooded_roads.geometry.buffer(
-                analysis["buffer_meters"],
-                cap_style=3,
+            # get flooded roads
+            results_flooded_roads = network_hz_direct[["edge_fid", "geometry"]]
+            results_flooded_roads = buffer_geometry(
+                results_flooded_roads, analysis["buffer_meters"]
             )
             results_flooded_roads[f"i_type_{hazard_name[:-3]}"] = "flooded"
 
-            # get indirect isolated roads
-            results_buffered = results.copy()
-            results_buffered.geometry = results_buffered.geometry.buffer(
-                analysis["buffer_meters"],
-                cap_style=3,
+            # get isolated roads
+            results_isolated_roads = network_hz_indrect[["edge_fid", "geometry"]]
+            results_isolated_roads = buffer_geometry(
+                results_isolated_roads, analysis["buffer_meters"]
             )
-            results_buffered[f"i_type_{hazard_name[:-3]}"] = "isolated"
+            results_isolated_roads[f"i_type_{hazard_name[:-3]}"] = "isolated"
 
             # merge for output, set original crs
             results_buffered = gpd.GeoDataFrame(
-                pd.concat([results_buffered, results_flooded_roads])
+                pd.concat([results_isolated_roads, results_flooded_roads])
             ).to_crs(crs=crs)
 
             # Save the output
             results_buffered.to_file(
                 self.config["output"]
                 / analysis["analysis"]
-                / f"isolated_{hazard_name}.shp"
+                / f"flooded_and_isolated_{hazard_name}.shp"
             )
 
-            # relate the locations to network disruption
+            # relate the locations to network disruption due to hazard
             # join the locations on edges_fid and results_buffered on edge_fid
-            joined = locations.merge(
-                results_buffered.drop(columns="geometry"), on="edge_fid", how="left"
+            locations_hz = self._get_location_network_intersect(
+                locations, results_buffered, on="edge_fid"
             )
-            intersect = joined.loc[~joined[f"i_type_{hazard_name[:-3]}"].isna()]
-            intersect = gpd.GeoDataFrame(intersect, crs=nearest_utm)
 
             # Replace nan with 0 for the water depth columns
-            intersect[hazard_name] = intersect[hazard_name].fillna(0)
+            # TODO: this should always be done in hazard class
+            locations_hz[hazard_name] = locations_hz[hazard_name].fillna(0)
 
             # TODO: Put in analyses.ini file a variable to set the threshold for locations that are not isolated when they are flooded.
             # Extract the flood depth of the locations
             # intersect = intersect.loc[intersect[hazard_name] > analysis['threshold_locations']]
 
-            # Save the results in isolated_locations
-            intersect[f"i_{hazard_name[:-3]}"] = 1
-            intersect = intersect[
-                [f"i_{hazard_name[:-3]}", "i_id", f"i_type_{hazard_name[:-3]}"]
+            # get isolated_locations
+            locations_hz_isolated = locations_hz[
+                locations_hz[f"i_type_{hazard_name[:-3]}"] == "isolated"
             ]
-            isolated_locations = isolated_locations.merge(
-                intersect, on="i_id", how="left"
-            )
-            isolated_locations[f"i_{hazard_name[:-3]}"] = isolated_locations[
-                f"i_{hazard_name[:-3]}"
-            ].fillna(0)
+            locations_hz_isolated[f"i_{hazard_name[:-3]}"] = 1  # add counter
 
-            # make an overview of the isolated_locations, aggregated per category (category is specified by the user)
+            # make an overview of the locations_hz_isolated, aggregated per category (category is specified by the user)
             df_aggregation = (
-                isolated_locations.groupby(
+                locations_hz_isolated.groupby(
                     by=[analysis["category_field_name"], f"i_type_{hazard_name[:-3]}"]
                 )[f"i_{hazard_name[:-3]}"]
                 .sum()
@@ -1100,10 +1097,21 @@ class IndirectAnalyses:
             )
             aggregation = pd.concat([aggregation, df_aggregation], axis=0)
 
-        # Set the isolated_locations geopandas dataframe back to the original crs
-        isolated_locations.to_crs(crs=crs, inplace=True)
+        # Set the locations_hz_isolated geopandas dataframe back to the original crs
+        locations_hz_isolated.to_crs(crs=crs, inplace=True)
 
-        return isolated_locations, aggregation
+        return locations_hz_isolated, aggregation
+
+    def _get_location_network_intersect(
+        self,
+        location: gpd.GeoDataFrame,
+        network: gpd.GeoDataFrame,
+        on: str = "edge_fid'",
+    ):
+        joined = location.merge(network.drop(columns="geometry"), on=on, how="left")
+        new_col = [c for c in joined.columns if c not in location.columns][0]
+        intersect = joined.dropna(subset=new_col)
+        return intersect
 
     def execute(self):
         """Executes the indirect analysis."""

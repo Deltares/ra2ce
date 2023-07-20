@@ -81,25 +81,24 @@ class Network:
             self.region_var = None
 
         # Cleanup
-        self._cleanup_options = config.get("cleanup", {})
-        if bool(self._cleanup_options) and any(
-            [v for k, v in self._cleanup_options.items()]
+        _cleanup_options = config.get("cleanup", {})
+        if any(_cleanup_options.items()) and any(
+            [v for k, v in _cleanup_options.items()]
         ):
-            self._cleanup_options.update({"cleanup": True})
-        # TODO: remove the attributes once cleanup function is used
-        self.cleanup = self._cleanup_options.get("cleanup", False)
-        self.snapping = self._cleanup_options.get("snapping_threshold", None)
-        self.segmentation_length = self._cleanup_options.get(
-            "segmentation_length", None
-        )
-        self.merge_lines = self._cleanup_options.get("merge_lines", None)
-        self.merge_on_id = self._cleanup_options.get("merge_on_id", None)
-        self.cut_at_intersections = self._cleanup_options.get(
-            "cut_at_intersections", None
-        )
+            _cleanup_options["cleanup"] = True
+        self._setup_cleanup_options(_cleanup_options)
 
         # files
         self.files = files
+
+    def _setup_cleanup_options(self, opt: dict = {}):
+        # TODO: remove the attributes once cleanup function is used
+        self.cleanup = opt.get("cleanup", False)
+        self.snapping = opt.get("snapping_threshold", None)
+        self.segmentation_length = opt.get("segmentation_length", None)
+        self.merge_lines = opt.get("merge_lines", None)
+        self.merge_on_id = opt.get("merge_on_id", None)
+        self.cut_at_intersections = opt.get("cut_at_intersections", None)
 
     def network_shp(
         self, crs: int = 4326
@@ -193,9 +192,7 @@ class Network:
         # create tuples from the adjecent nodes and add as column in geodataframe
         edges_complex = nut.join_nodes_edges(nodes, edges, id_name)
         edges_complex.crs = crs  # set the right CRS
-
-        edges_complex = edges_complex.loc[~edges_complex["node_A"].isnull()]
-        edges_complex = edges_complex.loc[~edges_complex["node_B"].isnull()]
+        edges_complex = edges_complex.dropna(subset=["node_A", "node_B"], inplace=True)
 
         assert (
             edges_complex["node_A"].isnull().sum() == 0
@@ -639,10 +636,10 @@ class Network:
             # Create the network from the network source
             if self.config["network"]["source"] == "shapefile":
                 logging.info("Start creating a network from the submitted shapefile.")
-                if self.cleanup is False:
-                    base_graph, network_gdf = self.network_cleanshp()
-                else:
+                if self.cleanup:
                     base_graph, network_gdf = self.network_shp()
+                else:
+                    base_graph, network_gdf = self.network_cleanshp()
 
             elif self.config["network"]["source"] == "OSM PBF":
                 logging.info(
