@@ -7,9 +7,6 @@ from ra2ce.graph.network_config_data import NetworkConfigData
 from ra2ce.graph.networks import Network
 from tests import test_results, slow_test, test_data
 from pathlib import Path
-from ra2ce.configuration.network.readers.network_ini_config_reader import (
-    NetworkIniConfigDataReader,
-)
 import networkx as nx
 import geopandas as gpd
 

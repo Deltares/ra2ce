@@ -26,15 +26,17 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
+from ra2ce.configuration import AnalysisConfigBase
+from ra2ce.graph.network_config_data import NetworkConfigData
 
 
 class ConfigWrapper:
-    network_config: Optional[NetworkConfig] = None
+    network_config: Optional[NetworkConfigData] = None
     analysis_config: AnalysisConfigBase = None
 
     def get_root_dir(self) -> Path:
         if self.network_config.ini_file:
+            # TODO: What do we need this for?
             return self.network_config.root_dir
         elif self.analysis_config.ini_file:
             return self.analysis_config.root_dir

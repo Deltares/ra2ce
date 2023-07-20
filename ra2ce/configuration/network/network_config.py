@@ -29,8 +29,8 @@ from typing import Dict, Optional
 from geopandas import gpd
 
 from ra2ce.configuration.config_protocol import ConfigProtocol
-from ra2ce.configuration.network.network_ini_config_data import NetworkIniConfigData
 from ra2ce.graph.hazard import Hazard
+from ra2ce.graph.network_config_data import NetworkConfigData
 from ra2ce.graph.networks import Network
 from ra2ce.io.readers import GraphPickleReader
 
@@ -60,15 +60,13 @@ def hazard_handler(config: dict, graphs: dict, files: dict) -> Optional[dict]:
 
 class NetworkConfig(ConfigProtocol):
     files: Dict[str, Path] = {}
-    config_data: NetworkIniConfigData
+    config_data: NetworkConfigData
 
     def __init__(self) -> None:
-        self.config_data = NetworkIniConfigData()
+        self.config_data = NetworkConfigData()
 
     @classmethod
-    def from_data(
-        cls, ini_file: Path, config_data: NetworkIniConfigData
-    ) -> NetworkConfig:
+    def from_data(cls, ini_file: Path, config_data: NetworkConfigData) -> NetworkConfig:
         """
         Initializes a `NetworkConfig` with the given parameters.
 
@@ -82,10 +80,10 @@ class NetworkConfig(ConfigProtocol):
         _new_network_config = cls()
         _new_network_config.ini_file = ini_file
         _new_network_config.config_data = config_data
-        _static_dir = config_data.get("static", None)
+        _static_dir = config_data.static_path
         if _static_dir and _static_dir.is_dir():
             _new_network_config.files = _new_network_config._get_existent_network_files(
-                _static_dir / "output_graph"
+                _static_dir.joinpath("output_graph")
             )
         else:
             logging.error(f"Static dir not found. Value provided: {_static_dir}")
@@ -171,7 +169,7 @@ class NetworkConfig(ConfigProtocol):
         # Call Hazard Handler (to rework)
         if not self.graphs:
             self.graphs = self.read_graphs_from_config(
-                self.config_data["static"] / "output_graph"
+                self.config_data.static_path.joinpath("output_graph")
             )
         self.graphs = hazard_handler(self.config_data, self.graphs, self.files)
 

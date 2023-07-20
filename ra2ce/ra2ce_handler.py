@@ -33,7 +33,7 @@ from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
 from ra2ce.configuration.config_factory import ConfigFactory
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.ra2ce_logging import Ra2ceLogger
-from ra2ce.runners import AnalysisRunner, AnalysisRunnerFactory
+from ra2ce.runners import AnalysisRunnerFactory
 
 warnings.filterwarnings(
     action="ignore", message=".*initial implementation of Parquet.*"

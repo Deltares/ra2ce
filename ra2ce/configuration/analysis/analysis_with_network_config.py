@@ -79,12 +79,10 @@ class AnalysisWithNetworkConfiguration(AnalysisConfigBase):
 
     def configure(self) -> None:
         self.config_data["files"] = self._network_config.files
-        self.config_data["network"] = self._network_config.config_data.get(
-            "network", None
-        )
-        self.config_data["origins_destinations"] = self._network_config.config_data.get(
-            "origins_destinations", None
-        )
+        self.config_data["network"] = self._network_config.config_data.network
+        self.config_data[
+            "origins_destinations"
+        ] = self._network_config.config_data.origins_destinations
 
         # When Network is present the graphs are retrieved from the already configured object.
         self.graphs = self._network_config.graphs
