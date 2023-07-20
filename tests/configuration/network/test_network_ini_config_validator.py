@@ -1,18 +1,18 @@
-from ra2ce.configuration.network.network_ini_config_data import NetworkIniConfigData
 from ra2ce.configuration.network.network_ini_config_validator import (
     NetworkIniConfigurationValidator,
 )
+from ra2ce.graph.network_config_data import NetworkConfigData
 from ra2ce.validation.validation_report import ValidationReport
 
 
 class TestNetworkIniConfigurationValidator:
     def _validate_from_dict(self, dict_values: dict) -> ValidationReport:
-        _test_config_data = NetworkIniConfigData.from_dict(dict_values)
+        _test_config_data = NetworkConfigData(**dict_values)
         _validator = NetworkIniConfigurationValidator(_test_config_data)
         return _validator.validate()
 
     def test_init_validator(self):
-        _test_config_data = NetworkIniConfigData()
+        _test_config_data = NetworkConfigData()
         _validator = NetworkIniConfigurationValidator(_test_config_data)
         assert _validator
 

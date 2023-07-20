@@ -1,6 +1,7 @@
 from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
 from ra2ce.configuration.config_factory import ConfigFactory
 from ra2ce.configuration.config_wrapper import ConfigWrapper
+from ra2ce.graph.network_config_data import NetworkConfigData
 from tests import test_data
 
 
@@ -21,7 +22,7 @@ class TestConfigFactory:
         assert _input_config
         assert isinstance(_input_config, ConfigWrapper)
         assert isinstance(_input_config.analysis_config, AnalysisConfigBase)
-        assert isinstance(_input_config.network_config, NetworkConfig)
+        assert isinstance(_input_config.network_config, NetworkConfigData)
 
     def test_from_input_paths_given_only_analysis(self):
         # 1. Define test data.
@@ -54,5 +55,5 @@ class TestConfigFactory:
         # 3. Verify final expectations.
         assert _input_config
         assert isinstance(_input_config, ConfigWrapper)
-        assert isinstance(_input_config.network_config, NetworkConfig)
+        assert isinstance(_input_config.network_config, NetworkConfigData)
         assert not _input_config.analysis_config

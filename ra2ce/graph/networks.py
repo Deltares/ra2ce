@@ -299,7 +299,7 @@ class Network:
             complex_edges (GeoDataFrame): Complex graph (for use in the direct analyses).
         """
         poly_dict = nut.read_geojson(
-            self._network_config.polygon[0]
+            self._network_config.polygon
         )  # It can only read in one geojson
         poly = nut.geojson_to_shp(poly_dict)
 

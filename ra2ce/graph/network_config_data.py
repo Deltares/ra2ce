@@ -140,6 +140,8 @@ class NetworkConfigDataSectionReader:
 
     def get_hazard_section(self) -> HazardSection:
         _section = "hazard"
+        if _section not in self.parser:
+            return HazardSection()
         _hazard_section = HazardSection(**self.parser[_section])
         _hazard_section.hazard_map = self.parser.getlist(
             _section, "hazard_map", fallback=_hazard_section.hazard_map
@@ -190,6 +192,16 @@ class NetworkConfigData:
     isolation: IsolationSection = IsolationSection()
     hazard: HazardSection = HazardSection()
     cleanup: CleanupSection = CleanupSection()
+
+    def to_dict(self) -> dict:
+        _dict = self.__dict__
+        _dict["project"] = self.project.__dict__
+        _dict["network"] = self.network.__dict__
+        _dict["origins_destinations"] = self.origins_destinations.__dict__
+        _dict["isolation"] = self.isolation.__dict__
+        _dict["hazard"] = self.hazard.__dict__
+        _dict["cleanup"] = self.cleanup.__dict__
+        return _dict
 
     @classmethod
     def from_ini_file(cls, ini_file: Path) -> NetworkConfigData:
