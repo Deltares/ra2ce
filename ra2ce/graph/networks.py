@@ -192,7 +192,7 @@ class Network:
         # create tuples from the adjecent nodes and add as column in geodataframe
         edges_complex = nut.join_nodes_edges(nodes, edges, id_name)
         edges_complex.crs = crs  # set the right CRS
-        edges_complex = edges_complex.dropna(subset=["node_A", "node_B"], inplace=True)
+        edges_complex.dropna(subset=["node_A", "node_B"], inplace=True)
 
         assert (
             edges_complex["node_A"].isnull().sum() == 0

@@ -748,6 +748,42 @@ class Hazard:
         od = gpd.read_feather(od_path)
         return od
 
+    def hazard_intersect_with_reprojection(
+        self, gdf: gpd.GeoDataFrame
+    ) -> gpd.GeoDataFrame:
+        """Intersect geodataframe and hazard with reprojection"""
+        # Check if the graph needs to be reprojected
+        hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
+        gdf_crs = pyproj.CRS.from_user_input(gdf.crs)
+
+        if (
+            hazard_crs != gdf_crs
+        ):  # Temporarily reproject the graph to the CRS of the hazard
+            logging.warning(
+                """Hazard crs {} and gdf crs {} are inconsistent,
+                                            we try to reproject the gdf crs""".format(
+                    hazard_crs, gdf_crs
+                )
+            )
+            extent_gdf = gdf.total_bounds
+            logging.info("Gdf extent before reprojecting: {}".format(extent_gdf))
+            gdf_reprojected = gdf.to_crs(hazard_crs)
+            extent_gdf_reprojected = gdf_reprojected.total_bounds
+            logging.info(
+                "Gdf extent after reprojecting: {}".format(extent_gdf_reprojected)
+            )
+
+            # Do the actual hazard intersect
+            gdf_reprojected = self.hazard_intersect(gdf_reprojected)
+
+            # reassign crs
+            gdf_output = gdf_reprojected.to_crs(gdf_crs)
+
+        else:
+            gdf_output = self.hazard_intersect(gdf)
+
+        return gdf_output
+
     def create(self):
         """Overlays the different possible graph and network objects with the hazard data
 
@@ -934,53 +970,14 @@ class Hazard:
                 logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
 
         #### Step 3: iterate overlay of the GeoPandas Dataframe (if any) ###
-        if self.files["base_network"]:
+        if self.graphs.get("base_network", None) is not None:
             if self.files["base_network_hazard"] is None:
-                # Check if the graph needs to be reprojected
-                hazard_crs = pyproj.CRS.from_user_input(
-                    self.config["hazard"]["hazard_crs"]
-                )
-                gdf_crs = pyproj.CRS.from_user_input(self.graphs["base_network"].crs)
-
-                if (
-                    hazard_crs != gdf_crs
-                ):  # Temporarily reproject the graph to the CRS of the hazard
-                    logging.warning(
-                        """Hazard crs {} and gdf crs {} are inconsistent,
-                                                    we try to reproject the gdf crs""".format(
-                            hazard_crs, gdf_crs
-                        )
-                    )
-                    extent_gdf = self.graphs["base_network"].total_bounds
-                    logging.info(
-                        "Gdf extent before reprojecting: {}".format(extent_gdf)
-                    )
-                    gdf_reprojected = (
-                        self.graphs["base_network"].copy().to_crs(hazard_crs)
-                    )
-                    extent_gdf_reprojected = gdf_reprojected.total_bounds
-                    logging.info(
-                        "Gdf extent after reprojecting: {}".format(
-                            extent_gdf_reprojected
-                        )
-                    )
-
-                    # Do the actual hazard intersect
-                    gdf_reprojected = self.hazard_intersect(gdf_reprojected)
-
-                    # Assign the original geometries to the reprojected raster
-                    gdf_reprojected["geometry"] = self.graphs["base_network"][
-                        "geometry"
-                    ]
-                    self.graphs["base_network_hazard"] = gdf_reprojected
-                else:
-                    self.graphs["base_network_hazard"] = self.hazard_intersect(
-                        self.graphs["base_network"]
-                    )
-
+                # get base network hazard from base network
+                self.graphs[
+                    "base_network_hazard"
+                ] = self.hazard_intersect_with_reprojection(self.graphs["base_network"])
                 # Save graphs/network with hazard
                 self._export_network_files("base_network_hazard", types_to_export)
-
             else:
                 # read previously created file
                 self.graphs["base_network_hazard"] = gpd.read_feather(
