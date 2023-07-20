@@ -299,7 +299,7 @@ class Network:
             complex_edges (GeoDataFrame): Complex graph (for use in the direct analyses).
         """
         poly_dict = nut.read_geojson(
-            self._network_config.polygon
+            self._network_dir.joinpath(self._network_config.polygon)
         )  # It can only read in one geojson
         poly = nut.geojson_to_shp(poly_dict)
 
@@ -313,17 +313,13 @@ class Network:
             )
         elif not self._network_config.network_type:
             # The user specified only the road types.
-            cf = '["highway"~"{}"]'.format(
-                self._network_config.road_types.replace(",", "|")
-            )
+            cf = '["highway"~"{}"]'.format("|".join(self._network_config.road_types))
             graph_complex = osmnx.graph_from_polygon(
                 polygon=poly, custom_filter=cf, simplify=False, retain_all=True
             )
         else:
             # The user specified the network type and road types.
-            cf = '["highway"~"{}"]'.format(
-                self._network_config.road_types.replace(",", "|")
-            )
+            cf = '["highway"~"{}"]'.format("|".join(self._network_config.road_types))
             graph_complex = osmnx.graph_from_polygon(
                 polygon=poly,
                 network_type=self._network_config.network_type,
