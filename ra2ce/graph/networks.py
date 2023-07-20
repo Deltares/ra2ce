@@ -450,7 +450,7 @@ class Network:
         # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
         lines = [gpd.read_file(shp) for shp in shapefiles_analysis]
 
-        if isinstance(self._network_config.diversion_file, str):
+        if self._network_config.diversion_file:
             lines.extend(
                 [
                     nut.check_crs_gdf(gpd.read_file(shp), crs_)
