@@ -29,6 +29,10 @@ from ra2ce.configuration.network.network_ini_config_validator import (
 
 
 class NetworkIniConfigData(IniConfigDataProtocol):
+    """
+    TODO: Deprecated, use instead `NetworkConfigData` from `ra2ce.graph.network_config_data.py`
+    """
+
     @classmethod
     def from_dict(cls, dict_values) -> NetworkIniConfigData:
         _new_network_ini_config_data = cls()
