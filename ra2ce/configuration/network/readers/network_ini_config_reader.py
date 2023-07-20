@@ -32,6 +32,10 @@ from ra2ce.io.readers.ini_file_reader import IniFileReader
 
 
 class NetworkIniConfigDataReader(IniConfigurationReaderBase):
+    """
+    DEPRECATED. This is now built-in the new NetworkConfigData (`ra2ce.graph.network_config_data.py`)
+    """
+
     def read(self, ini_file: Optional[Path]) -> Optional[NetworkIniConfigData]:
         if not ini_file or not ini_file.exists():
             return None
