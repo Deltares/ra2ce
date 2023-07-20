@@ -25,7 +25,7 @@ import logging
 import sys
 import time
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 import geopandas as gpd
 import networkx as nx
@@ -928,14 +928,22 @@ class IndirectAnalyses:
 
         return origin_impact_master, region_impact_master
 
-    def multi_link_isolated_locations(self, graph: nx.Graph, analysis: dict, crs=4326):
-        """Finds flooded/isolated locations because of network disruption due to a hazard.
+    def multi_link_isolated_locations(
+        self, graph: nx.Graph, analysis: dict, crs=4326
+    ) -> Tuple[gpd.GeoDataFrame, pd.DataFrame]:
+        """
+        This function identifies locations that are flooded or isolated due to the disruption of the network caused by a hazard.
+        It iterates over multiple hazard scenarios, modifies the graph to represent direct and indirect impacts, and then
+        spatially joins the impacted network with the location data to find out which locations are affected.
 
         Args:
-            graph (nx.Graph): base graph with hazard information
-            analysis (dict): configuration of the analysis. Keys: ["threshold"]
-            crs (int, optional): crs of the output. Defaults to 4326.
+            graph (nx.Graph): The original graph representing the network, with additional hazard information.
+            analysis (dict): The configuration of the analysis, which contains the threshold for considering a hazard impact significant.
+            crs (int, optional): The coordinate reference system used for geographical data. Defaults to 4326 (WGS84).
 
+        Returns:
+            tuple (gpd.GeoDataFrame, pd.DataFrame): A tuple containing the location GeoDataFrame updated with hazard impacts, 
+                and a DataFrame summarizing the impacts per location category.
         """
 
         # Load the point shapefile with the locations of which the isolated locations should be identified.
@@ -989,7 +997,7 @@ class IndirectAnalyses:
             network_hz_direct = network_hz_direct.set_crs(crs=crs)
             network_hz_direct.to_crs(crs=nearest_utm, inplace=True)
 
-            # get hazard roads 
+            # get hazard roads
             # merge buffer and set original crs
             results_hz_roads = gpd.GeoDataFrame(
                 pd.concat([network_hz_direct, network_hz_indirect])
@@ -1032,8 +1040,13 @@ class IndirectAnalyses:
 
         return locations_hz, aggregation
 
-    def remove_edges_from_lagest_component(self, G: nx.Graph):
-        """remove edges from largest component"""
+    def remove_edges_from_lagest_component(self, G: nx.Graph) -> None:
+        """
+        This function removes all edges from the largest connected component of a graph.
+
+        Args:
+            G (nx.Graph): The graph from which to remove the edges.
+        """
         connected_components = list(c for c in nx.connected_components(G))
         connected_components_size = list(len(c) for c in nx.connected_components(G))
 
@@ -1045,8 +1058,17 @@ class IndirectAnalyses:
         )
         G.remove_edges_from(edges_from_lagest_component)
 
-    def get_network_with_edge_fid(self, G: nx.Graph):
-        """get network (gpd.DataFrame) from graph with edge_fid convention and geometry"""
+    def get_network_with_edge_fid(self, G: nx.Graph) -> gpd.GeoDataFrame:
+        """
+        This function converts a NetworkX graph into a GeoDataFrame representing the network.
+        It also constructs an 'edge_fid' column based on the 'node_A' and 'node_B' columns, following a specific convention.
+
+        Args:
+            G (nx.Graph): The NetworkX graph to be converted.
+
+        Returns:
+            gpd.GeoDataFrame: The resulting GeoDataFrame, with an added 'edge_fid' column.
+        """
         network = graph_to_gdf(G)[0]
         # TODO: add making "edges_fid" (internal convention) to graph_to_gdf
         network["edge_fid"] = (
@@ -1057,7 +1079,18 @@ class IndirectAnalyses:
     def _summerize_locations(
         self, locations: gpd.GeoDataFrame, cat_col: str, hazard_id: str
     ) -> pd.DataFrame:
-        """get summary table (type and nr per category) for the isolated locations"""
+        """
+        This function summarizes the hazard impacts on different categories of locations.
+        It adds a counter for each hazard type and aggregates the data per category.
+
+        Args:
+            locations (gpd.GeoDataFrame): A GeoDataFrame containing the locations and their hazard impacts.
+            cat_col (str): The column name in the locations GeoDataFrame that represents the location categories.
+            hazard_id (str): The identifier for the hazard being considered.
+
+        Returns:
+            pd.DataFrame: A DataFrame summarizing the number of isolated locations per category for the given hazard.
+        """
         # add counter
         locations[f"i_{hazard_id}"] = 1  # add counter
         # make an overview of the locations, aggregated per category
