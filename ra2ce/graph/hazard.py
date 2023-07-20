@@ -533,11 +533,14 @@ class Hazard:
             error: if node id columns do not exisit in the network
         """
 
-        if "node_A" in network.columns:  # shapefiles
+        # TODO: use the same convention for shapefiles and osm
+        if all(
+            c_idx in network.columns for c_idx in ["node_A", "node_B"]
+        ):  # shapefiles
             network["edge_fid"] = [
                 f"{na}_{nb}" for na, nb in network[["node_A", "node_B"]].values
             ]
-        elif "u" in network.columns:  # osm
+        elif all(c_idx in network.columns for c_idx in ["u", "v"]):  # osm
             network["edge_fid"] = [
                 f"{na}_{nb}" for na, nb in network[["u", "v"]].values
             ]
@@ -546,12 +549,19 @@ class Hazard:
                 "Node id columns are not found in the network. Support node_A, node_B or u, v"
             )
 
+        # check for crs
+        if points.crs.is_geographic:
+            crs = points.crs
+            points = points.to_crs(3857)
+            network = network.to_crs(points.crs)
+
         points = gpd.sjoin_nearest(
             points, network, how="left", distance_col="edges_distance"
         )
-        if points["edges_distance"].isna().sum() > 0:
+        if any(points["edges_distance"].isna()) > 0:
             logging.warning("Not all points are snapped to the network.")
-        return points
+
+        return points.to_crs(crs)
 
     def get_hazard_name_table(self) -> pd.DataFrame:
         all_agg_types = {
@@ -959,10 +969,10 @@ class Hazard:
                     gdf_reprojected = self.hazard_intersect(gdf_reprojected)
 
                     # Assign the original geometries to the reprojected raster
-                    original_geometries = self.graphs["base_network"]["geometry"]
-                    gdf_reprojected["geometry"] = original_geometries
-                    self.graphs["base_network_hazard"] = gdf_reprojected.copy()
-                    del gdf_reprojected
+                    gdf_reprojected["geometry"] = self.graphs["base_network"][
+                        "geometry"
+                    ]
+                    self.graphs["base_network_hazard"] = gdf_reprojected
                 else:
                     self.graphs["base_network_hazard"] = self.hazard_intersect(
                         self.graphs["base_network"]
@@ -987,45 +997,6 @@ class Hazard:
             locations_hazard = self.get_point_hazard_from_network(
                 locations, self.graphs["base_network_hazard"]
             )
-
-            # get hazard at locations (only needed for direct analysis, maybe later)
-            # # Check if the locations need to be reprojected
-            # locations_crs = pyproj.CRS.from_user_input(locations.crs)
-            # hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
-
-            # if (
-            #     hazard_crs != locations_crs
-            # ):  # Temporarily reproject the locations to the CRS of the hazard
-            #     logging.warning(
-            #         """Hazard crs {} and location crs {} are inconsistent,
-            #                                     we try to reproject the location crs""".format(
-            #             hazard_crs, locations_crs
-            #         )
-            #     )
-            #     extent_locations = locations.total_bounds
-            #     logging.info(
-            #         "Gdf extent before reprojecting: {}".format(extent_locations)
-            #     )
-            #     locations_reprojected = locations.copy().to_crs(hazard_crs)
-            #     extent_locations_reprojected = locations_reprojected.total_bounds
-            #     logging.info(
-            #         "Gdf extent after reprojecting: {}".format(
-            #             extent_locations_reprojected
-            #         )
-            #     )
-
-            #     # Do the actual hazard intersect
-            #     locations_reprojected = self.point_hazard_intersect(
-            #         locations_reprojected
-            #     )
-
-            #     # Assign the original geometries to the reprojected raster
-            #     original_geometries = locations["geometry"]
-            #     locations_reprojected["geometry"] = original_geometries
-            #     locations = locations_reprojected.copy()
-            #     del locations_reprojected
-            # else:
-            #     locations = self.point_hazard_intersect(locations)
 
             _exporter = NetworkExporterFactory()
             _exporter.export(
