@@ -403,16 +403,12 @@ class Network:
         ods.crs = crs
 
         # Save the OD pairs (GeoDataFrame) as pickle
-        ods.to_feather(
-            self._static.joinpath("output_graph", name + ".feather"), index=False
-        )
-        logging.info(
-            f"Saved {name + '.feather'} in {self._static.joinpath('output_graph')}."
-        )
+        ods.to_feather(self.output_graph_dir.joinpath(name + ".feather"), index=False)
+        logging.info(f"Saved {name + '.feather'} in {self.output_graph_dir}.")
 
         # Save the OD pairs (GeoDataFrame) as shapefile
         if self._network_config.save_shp:
-            ods_path = self._static.joinpath("output_graph", name + ".shp")
+            ods_path = self.output_graph_dir.joinpath(name + ".shp")
             ods.to_file(ods_path, index=False)
             logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
 
@@ -423,7 +419,7 @@ class Network:
         from ra2ce.graph.origins_destinations import origins_from_raster
 
         out_fn = origins_from_raster(
-            self._static.joinpath("network"),
+            self._network_dir,
             self._network_config.polygon,
             self.origins[0],
         )
@@ -441,16 +437,15 @@ class Network:
         """
 
         # read shapefiles and add to list with path
-        if self._network_config.primary_file:
-            shapefiles_analysis = [
-                self._static.joinpath("network", shp)
-                for shp in self._network_config.primary_file.split(",")
-            ]
-        if self._network_config.diversion_file:
-            shapefiles_diversion = [
-                self._static.joinpath("network", shp)
-                for shp in self._network_config.diversion_file.split(",")
-            ]
+        def get_shp_paths(shp_str: str) -> Path:
+            return self._network_dir.joinpath(shp_str)
+
+        shapefiles_analysis = list(
+            map(get_shp_paths, self._network_config.primary_file.split(","))
+        )
+        shapefiles_diversion = list(
+            map(get_shp_paths, self._network_config.diversion_file.split(","))
+        )
 
         # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
         lines = [gpd.read_file(shp) for shp in shapefiles_analysis]
@@ -499,7 +494,7 @@ class Network:
             ["maxspeed" in e for u, v, e in original_graph.edges.data()]
         ):
             # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
-            path_avg_speed = self._static.joinpath("output_graph", "avg_speed.csv")
+            path_avg_speed = self.output_graph_dir.joinpath("avg_speed.csv")
             if path_avg_speed.is_file():
                 avg_speeds = pd.read_csv(path_avg_speed)
             else:
