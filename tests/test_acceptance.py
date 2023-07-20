@@ -85,9 +85,6 @@ class TestAcceptance:
             pytest.param(
                 "bolivia",
                 id="Bolivia project",
-                marks=pytest.mark.skip(
-                    reason="Bolivia project test directory not presnt"
-                ),
             ),
         ]
         + _external_test_cases,

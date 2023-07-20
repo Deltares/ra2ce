@@ -91,7 +91,7 @@ class Network:
         # files
         self.files = files
 
-    def _setup_cleanup_options(self, opt: dict = {}):
+    def _setup_cleanup_options(self, opt: dict):
         # TODO: remove the attributes once cleanup function is used
         self.cleanup = opt.get("cleanup", False)
         self.snapping = opt.get("snapping_threshold", None)
