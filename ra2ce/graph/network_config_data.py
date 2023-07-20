@@ -27,20 +27,12 @@ from configparser import ConfigParser
 
 
 @dataclass
-class NetworkConfigDataBase(abc.ABC):
-    def __post_init__(self):
-        _keys_with_none = [k for k, v in self.__dict__.items() if v == "None"]
-        for k in _keys_with_none:
-            self.__dict__[k] = ""
-
-
-@dataclass
-class ProjectSection(NetworkConfigDataBase):
+class ProjectSection:
     name: str = ""
 
 
 @dataclass
-class NetworkSection(NetworkConfigDataBase):
+class NetworkSection:
     directed: bool = False
     source: str = ""  # should be enum
     primary_file: str = ""
@@ -53,7 +45,7 @@ class NetworkSection(NetworkConfigDataBase):
 
 
 @dataclass
-class OriginsDestinationsSection(NetworkConfigDataBase):
+class OriginsDestinationsSection:
     # Must be in the static/network folder, belongs to this analysis
     origins: str = ""  # Should be a path.
     # Must be in the static/network folder, belongs to this analysis
@@ -71,30 +63,121 @@ class OriginsDestinationsSection(NetworkConfigDataBase):
 
 
 @dataclass
-class IsolationSection(NetworkConfigDataBase):
+class IsolationSection:
     locations: str = ""  # Should be path.
 
 
 @dataclass
-class HazardSection(NetworkConfigDataBase):
+class HazardSection:
     hazard_map: list[str] = field(default_factory=list)  # Should be a list of paths.
     hazard_id: str = ""
-    hazard_field_name: str = ""
+    hazard_field_name: list[str] = field(default_factory=list)
     aggregate_wl: str = ""  # Should be enum
     hazard_crs: str = ""
 
-    def __post_init__(self):
-        super().__post_init__()
-        self.hazard_field_name = self.hazard_field_name.split(",")
-
 
 @dataclass
-class CleanupSection(NetworkConfigDataBase):
+class CleanupSection:
     snapping_threshold: bool = False
     pruning_threshold: bool = False
-    segmentation_length: bool = False
+    segmentation_length: float = float("nan")
     merge_lines: bool = False
     cut_at_intersections: bool = False
+
+
+class NetworkConfigDataSectionReader:
+    parser: ConfigParser
+
+    def __init__(self, file_to_parse: Path) -> None:
+        self.parser = ConfigParser(
+            converters={"list": lambda x: [x.strip() for x in x.split(",")]}
+        )
+        self.parser.read(file_to_parse)
+        self._remove_none_values()
+
+    def _remove_none_values(self) -> None:
+        # Remove 'None' from values, replace them with empty strings
+        for _section in self.parser.sections():
+            _keys_with_none = [
+                k for k, v in self.parser[_section].items() if v == "None"
+            ]
+            for _key_with_none in _keys_with_none:
+                self.parser[_section].pop(_key_with_none)
+
+    def get_sections(self) -> dict:
+        return {
+            "project": self.get_project_section(),
+            "network": self.get_network_section(),
+            "origins_destinations": self.get_origins_destinations_section(),
+            "isolation": self.get_isolation_section(),
+            "hazard": self.get_hazard_section(),
+            "cleanup": self.get_cleanup_section(),
+        }
+
+    def get_project_section(self) -> ProjectSection:
+        return ProjectSection(**self.parser["project"])
+
+    def get_network_section(self) -> NetworkSection:
+        _section = "network"
+        _network_section = NetworkSection(**self.parser[_section])
+        _network_section.directed = self.parser.getboolean(_section, "directed")
+        _network_section.save_shp = self.parser.getboolean(_section, "save_shp")
+        _network_section.road_types = self.parser.getlist(_section, "road_types")
+        return _network_section
+
+    def get_origins_destinations_section(self) -> OriginsDestinationsSection:
+        _section = "origins_destinations"
+        _od_section = OriginsDestinationsSection(**self.parser[_section])
+        _od_section.origin_out_fraction = self.parser.getint(
+            _section, "origin_out_fraction", fallback=_od_section.origin_out_fraction
+        )
+        return _od_section
+
+    def get_isolation_section(self) -> IsolationSection:
+        _section = "isolation"
+        if _section not in self.parser:
+            return IsolationSection()
+        return IsolationSection(**self.parser[_section])
+
+    def get_hazard_section(self) -> HazardSection:
+        _section = "hazard"
+        _hazard_section = HazardSection(**self.parser[_section])
+        _hazard_section.hazard_map = self.parser.getlist(
+            _section, "hazard_map", fallback=_hazard_section.hazard_map
+        )
+        _hazard_section.hazard_field_name = self.parser.getlist(
+            _section, "hazard_field_name", fallback=_hazard_section.hazard_field_name
+        )
+        return _hazard_section
+
+    def get_cleanup_section(self) -> CleanupSection:
+        _section = "cleanup"
+
+        _cleanup_section = CleanupSection()
+        _cleanup_section.snapping_threshold = self.parser.getboolean(
+            _section,
+            "snapping_threshold",
+            fallback=_cleanup_section.snapping_threshold,
+        )
+        _cleanup_section.pruning_threshold = self.parser.getboolean(
+            _section,
+            "pruning_threshold",
+            fallback=_cleanup_section.pruning_threshold,
+        )
+        _cleanup_section.segmentation_length = self.parser.getfloat(
+            _section,
+            "segmentation_length",
+            fallback=_cleanup_section.segmentation_length,
+        )
+        _cleanup_section.merge_lines = self.parser.getboolean(
+            _section, "merge_lines", fallback=_cleanup_section.merge_lines
+        )
+        _cleanup_section.cut_at_intersections = self.parser.getboolean(
+            _section,
+            "cut_at_intersections",
+            fallback=_cleanup_section.cut_at_intersections,
+        )
+        return _cleanup_section
 
 
 @dataclass
@@ -111,19 +194,10 @@ class NetworkConfigData:
 
     @classmethod
     def from_ini_file(cls, ini_file: Path) -> NetworkConfigData:
-        _ini_config = ConfigParser(defaults=None)
-        _ini_config.read(ini_file)
+        _reader = NetworkConfigDataSectionReader(ini_file)
+        _reader_sections = _reader.get_sections()
         return cls(
             input_path=ini_file.parent.joinpath("input"),
             static_path=ini_file.parent.joinpath("static"),
-            project=ProjectSection(**_ini_config["project"]),
-            network=NetworkSection(**_ini_config["network"]),
-            origins_destinations=OriginsDestinationsSection(
-                **_ini_config["origins_destinations"]
-            ),
-            isolation=IsolationSection(
-                **_ini_config["isolation"] if "isolation" in _ini_config else {}
-            ),
-            hazard=HazardSection(**_ini_config["hazard"]),
-            cleanup=CleanupSection(**_ini_config["cleanup"]),
+            **_reader_sections,
         )

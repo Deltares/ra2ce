@@ -21,6 +21,7 @@
 
 
 import logging
+import math
 import os
 from pathlib import Path
 from typing import Any, List, Tuple
@@ -137,7 +138,7 @@ class Network:
             edges, self._network_config.file_id
         )
 
-        if self._cleanup.snapping_threshold is not None:
+        if self._cleanup.snapping_threshold:
             edges = nut.snap_endpoints_lines(
                 edges, self._cleanup.snapping_threshold, id_name, crs
             )
@@ -195,7 +196,7 @@ class Network:
         graph_complex = nut.graph_from_gdf(edges_complex, nodes, node_id="node_fid")
         logging.info("Function [graph_from_gdf]: executed")
 
-        if self._cleanup.segmentation_length is not None:
+        if not math.isnan(self._cleanup.segmentation_length):
             edges_complex = Segmentation(
                 edges_complex, self._cleanup.segmentation_length
             )
@@ -271,7 +272,7 @@ class Network:
             "RA2CE will not clean-up your graph, assuming that it is already done in TRAILS"
         )
 
-        if self._cleanup.segmentation_length is not None:
+        if self._cleanup.segmentation_length:
             logging.info("TRAILS importer: start segmentating graph")
             to_segment = Segmentation(edges, self._cleanup.segmentation_length)
             edges_simple_segmented = to_segment.apply_segmentation()
@@ -628,8 +629,8 @@ class Network:
 
         # create origins destinations graph
         if (
-            (self.origins is not None)
-            and (self.destinations is not None)
+            (self.origins)
+            and (self.destinations)
             and self.files["origins_destinations_graph"] is None
         ):
             # reading the base graphs
