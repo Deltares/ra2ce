@@ -29,6 +29,9 @@ from typing import Dict, Optional
 from geopandas import gpd
 
 from ra2ce.configuration.config_protocol import ConfigProtocol
+from ra2ce.configuration.network.network_ini_config_validator import (
+    NetworkIniConfigurationValidator,
+)
 from ra2ce.graph.hazard import Hazard
 from ra2ce.graph.network_config_data import NetworkConfigData
 from ra2ce.graph.networks import Network
@@ -185,4 +188,7 @@ class NetworkConfig(ConfigProtocol):
 
     def is_valid(self) -> bool:
         _file_is_valid = self.ini_file.is_file() and self.ini_file.suffix == ".ini"
-        return _file_is_valid and self.config_data.is_valid()
+        _validation_report = NetworkIniConfigurationValidator(
+            self.config_data
+        ).validate()
+        return _file_is_valid and _validation_report.is_valid()
