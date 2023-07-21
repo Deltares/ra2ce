@@ -102,6 +102,7 @@ class OsmNetworkWrapper:
     @staticmethod
     def get_clean_graph(complex_graph):
         complex_graph = OsmNetworkWrapper.drop_duplicates(complex_graph)
+        complex_graph = OsmNetworkWrapper.snap_nodes(complex_graph, 10)
         return complex_graph
 
     @staticmethod
@@ -180,6 +181,7 @@ class OsmNetworkWrapper:
                 sub_graph, graph.nodes[from_node_id]['x'], graph.nodes[from_node_id]['y']
             )
             if from_node_id_prime == to_node_id:
+                #  ToDo: Make a class and return it's object instead of 6 different parameters
                 return None, None, None, None, None, None
             else:
                 return OsmNetworkWrapper.arrange_extremities_data(
@@ -223,3 +225,8 @@ class OsmNetworkWrapper:
                 (graph.nodes[to_node_id]['x'], graph.nodes[from_node_id]['x']),
                 (graph.nodes[to_node_id]['y'], graph.nodes[from_node_id]['y'])
             )
+
+    @staticmethod
+    def snap_nodes(complex_graph, threshold):
+
+        pass
