@@ -186,12 +186,19 @@ class NetworkConfigData:
     input_path: Path = None
     output_path: Path = None
     static_path: Path = None
+
     project: ProjectSection = ProjectSection()
     network: NetworkSection = NetworkSection()
     origins_destinations: OriginsDestinationsSection = OriginsDestinationsSection()
     isolation: IsolationSection = IsolationSection()
     hazard: HazardSection = HazardSection()
     cleanup: CleanupSection = CleanupSection()
+
+    @property
+    def output_graph_dir(self) -> Path:
+        if not self.static_path:
+            return None
+        return self.static_path.joinpath("output_graph")
 
     def to_dict(self) -> dict:
         _dict = self.__dict__

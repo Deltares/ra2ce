@@ -19,20 +19,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
-from ra2ce.configuration.validators.ini_config_validator_base import (
-    IniConfigValidatorBase,
+from ra2ce.graph.network_config_data import (
+    HazardSection,
+    NetworkConfigData,
+    NetworkSection,
+    ProjectSection,
 )
+from ra2ce.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.validation.validation_report import ValidationReport
+from ra2ce.configuration.validators.ini_config_validator_base import _expected_values
 
 
-class NetworkIniConfigurationValidator(IniConfigValidatorBase):
-    def _validate_shp_input(self, network_config: dict) -> ValidationReport:
+class NetworkIniConfigurationValidator(Ra2ceIoValidator):
+    def __init__(self, config_data: NetworkConfigData) -> None:
+        self._config = config_data
+
+    def _validate_shp_input(self, network_config: NetworkSection) -> ValidationReport:
         """Checks if a file id is configured when using the option to create network from shapefile"""
         _shp_report = ValidationReport()
-        _source = network_config.get("source", None)
-        _file_id = network_config.get("file_id", None)
-        if (_source == "shapefile") and (not _file_id):
+        if network_config.source == "shapefile" and not network_config.file_id:
             _shp_report.error(
                 "Not possible to create network - Shapefile used as source, but no file_id configured in the network.ini file"
             )
@@ -41,19 +46,92 @@ class NetworkIniConfigurationValidator(IniConfigValidatorBase):
     def validate(self) -> ValidationReport:
         """Check if input properties are correct and exist."""
         _report = ValidationReport()
-        _network_config = self._config.get("network", None)
-        if not _network_config:
+        if not self._config.network:
             _report.error("Network properties not present in Network ini file.")
             return _report
 
         # check if properties exist in settings.ini file
-        _required_headers = [
+        _report.merge(self._validate_shp_input(self._config.network))
+        _report.merge(self._validate_sections())
+        return _report
+
+    def _wrong_value(self, key: str) -> str:
+        _accepted_values = ",".join(_expected_values[key])
+        return (
+            f"Wrong input to property [ {key} ], has to be one of: {_accepted_values}."
+        )
+
+    def _validate_project_section(
+        self, project_section: ProjectSection
+    ) -> ValidationReport:
+        _report = ValidationReport()
+        if not project_section:
+            _report.error(self._report_section_not_found("project"))
+        return _report
+
+    def _validate_network_section(
+        self, network_section: NetworkSection
+    ) -> ValidationReport:
+        _network_report = ValidationReport()
+
+        # Validate source
+        if (
+            network_section.source
+            and network_section.source not in _expected_values["source"]
+        ):
+            _network_report.error(self._wrong_value("source"))
+
+        # Validate network_type
+        if (
+            network_section.network_type
+            and network_section.network_type not in _expected_values["network_type"]
+        ):
+            _network_report.error(self._wrong_value("network_type"))
+
+        # Validate road types.
+        _expected_road_types = _expected_values["road_types"]
+        for road_type in filter(
+            lambda x: x not in _expected_road_types, network_section.road_types
+        ):
+            _network_report.error(
+                f"Wrong road type is configured ({road_type}), has to be one or multiple of: {_expected_road_types}"
+            )
+        return _network_report
+
+    def _validate_hazard_section(
+        self, hazard_section: HazardSection
+    ) -> ValidationReport:
+        _hazard_report = ValidationReport()
+
+        if not hazard_section.aggregate_wl:
+            return _hazard_report
+
+        if hazard_section.aggregate_wl not in _expected_values["aggregate_wl"]:
+            _hazard_report.error(self._wrong_value("aggregate_wl"))
+
+        return _hazard_report
+
+    def _validate_sections(self) -> ValidationReport:
+        _report = ValidationReport()
+        _available_keys = self._config.__dict__.keys()
+        _required_sections = [
             "project",
             "network",
             "origins_destinations",
             "hazard",
             "cleanup",
         ]
-        _report.merge(self._validate_shp_input(_network_config))
-        _report.merge(self._validate_headers(_required_headers))
+        for _required_section in _required_sections:
+            if _required_section not in _available_keys:
+                _report.error(
+                    f"Section [ {_required_section} ] is not configured. Add section [ {_required_section} ] to the *.ini file. "
+                )
+
+        if not _report.is_valid():
+            return _report
+
+        _report.merge(self._validate_project_section(self._config.project))
+        _report.merge(self._validate_network_section(self._config.network))
+        _report.merge(self._validate_hazard_section(self._config.hazard))
+
         return _report
