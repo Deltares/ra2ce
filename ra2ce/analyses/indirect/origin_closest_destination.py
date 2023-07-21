@@ -62,6 +62,7 @@ class OriginClosestDestination:
         )
         self.analysis = analysis
         self.config = config
+
         self.hazard_names = hazard_names
 
         self.destination_names = None

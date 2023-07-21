@@ -1190,17 +1190,17 @@ class IndirectAnalyses:
             if not gdf.empty:
                 # Not for all analyses a gdf is created as output.
                 if analysis["save_shp"]:
-                    gpkg_path = output_path / (
+                    gpkg_path = output_path.joinpath(
                         analysis["name"].replace(" ", "_") + ".gpkg"
                     )
                     save_gdf(gdf, gpkg_path)
                     if opt_routes:
-                        gpkg_path = output_path / (
+                        gpkg_path = output_path.joinpath(
                             analysis["name"].replace(" ", "_") + "_optimal_routes.gpkg"
                         )
                         save_gdf(gdf, gpkg_path)
                 if analysis["save_csv"]:
-                    csv_path = output_path / (
+                    csv_path = output_path.joinpath(
                         analysis["name"].replace(" ", "_") + ".csv"
                     )
                     gdf.to_csv(csv_path, index=False)
