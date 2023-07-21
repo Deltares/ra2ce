@@ -57,7 +57,9 @@ class Hazard:
         self._origins = config.origins_destinations.origins
         self._destinations = config.origins_destinations.destinations
         self._save_shp = config.network.save_shp
-        self._isolation_locations = config.isolation.locations
+        self._isolation_locations = config.static_path.joinpath(
+            "network", config.isolation.locations
+        )
 
         # Hazard properties
         self._hazard_field_name = config.hazard.hazard_field_name
@@ -84,6 +86,7 @@ class Hazard:
                 [n[:-3] for n in self.hazard_name_table[self._ra2ce_name_key]]
             )
         )
+        logging.info("Initialized hazard object.")
 
     def overlay_hazard_raster_gdf(self, gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         """Overlays the hazard raster over the road segments GeoDataFrame.
@@ -947,6 +950,7 @@ class Hazard:
 
         #### Step 4: hazard overlay of the locations that are checked for isolation ###
         if self._isolation_locations:
+            logging.info("Detected isolated locations, checking for hazard overlay.")
             locations = gpd.read_file(self._isolation_locations)
             locations["i_id"] = locations.index
             locations_crs = pyproj.CRS.from_user_input(locations.crs)
