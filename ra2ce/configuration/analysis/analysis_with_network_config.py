@@ -25,9 +25,12 @@ from __future__ import annotations
 from pathlib import Path
 
 from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData, NetworkConfig
+from ra2ce.graph.network_config_data import NetworkConfigData
 
 
 class AnalysisWithNetworkConfiguration(AnalysisConfigBase):
+    _network_config: NetworkConfigData
+
     def __init__(self) -> None:
         self.config_data = AnalysisIniConfigData()
 
@@ -79,10 +82,10 @@ class AnalysisWithNetworkConfiguration(AnalysisConfigBase):
 
     def configure(self) -> None:
         self.config_data["files"] = self._network_config.files
-        self.config_data["network"] = self._network_config.config_data.network
+        self.config_data["network"] = self._network_config.config_data.network.__dict__
         self.config_data[
             "origins_destinations"
-        ] = self._network_config.config_data.origins_destinations
+        ] = self._network_config.config_data.origins_destinations.__dict__
 
         # When Network is present the graphs are retrieved from the already configured object.
         self.graphs = self._network_config.graphs

@@ -8,6 +8,7 @@ from ra2ce.configuration.network.network_config import (
     network_handler,
 )
 from tests import test_results
+from ra2ce.graph.network_config_data import NetworkConfigData
 
 
 def test_network_handler_given_invalid_network_then_raises():
@@ -17,7 +18,8 @@ def test_network_handler_given_invalid_network_then_raises():
 
 def test_hazard_handler_given_invalid_values_returns_none():
     # 1. Define test data.
-    _config_dict = {"hazard": {"hazard_map": None}}
+    _config_dict = NetworkConfigData()
+    _config_dict.hazard.hazard_map = []
 
     # 2. Run test.
     _return_value = hazard_handler(_config_dict, {}, {})
