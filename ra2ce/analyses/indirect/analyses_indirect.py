@@ -942,7 +942,7 @@ class IndirectAnalyses:
             crs (int, optional): The coordinate reference system used for geographical data. Defaults to 4326 (WGS84).
 
         Returns:
-            tuple (gpd.GeoDataFrame, pd.DataFrame): A tuple containing the location GeoDataFrame updated with hazard impacts, 
+            tuple (gpd.GeoDataFrame, pd.DataFrame): A tuple containing the location GeoDataFrame updated with hazard impacts,
                 and a DataFrame summarizing the impacts per location category.
         """
 
@@ -1040,25 +1040,31 @@ class IndirectAnalyses:
 
         return locations_hz, aggregation
 
-    def remove_edges_from_lagest_component(self, G: nx.Graph) -> None:
+    def remove_edges_from_lagest_component(self, disconnected_graph: nx.Graph) -> None:
         """
         This function removes all edges from the largest connected component of a graph.
 
         Args:
-            G (nx.Graph): The graph from which to remove the edges.
+            disconnected_graph (nx.Graph): The graph from which to remove the edges.
         """
-        connected_components = list(c for c in nx.connected_components(G))
-        connected_components_size = list(len(c) for c in nx.connected_components(G))
+        connected_components = list(
+            c for c in nx.connected_components(disconnected_graph)
+        )
+        connected_components_size = list(
+            len(c) for c in nx.connected_components(disconnected_graph)
+        )
 
         largest_comp_index = connected_components_size.index(
             max(connected_components_size)
         )
         edges_from_lagest_component = list(
-            G.subgraph(connected_components[largest_comp_index]).edges()
+            disconnected_graph.subgraph(
+                connected_components[largest_comp_index]
+            ).edges()
         )
-        G.remove_edges_from(edges_from_lagest_component)
+        disconnected_graph.remove_edges_from(edges_from_lagest_component)
 
-    def get_network_with_edge_fid(self, G: nx.Graph) -> gpd.GeoDataFrame:
+    def get_network_with_edge_fid(self, graph: nx.Graph) -> gpd.GeoDataFrame:
         """
         This function converts a NetworkX graph into a GeoDataFrame representing the network.
         It also constructs an 'edge_fid' column based on the 'node_A' and 'node_B' columns, following a specific convention.
@@ -1069,7 +1075,7 @@ class IndirectAnalyses:
         Returns:
             gpd.GeoDataFrame: The resulting GeoDataFrame, with an added 'edge_fid' column.
         """
-        network = graph_to_gdf(G)[0]
+        network = graph_to_gdf(graph)[0]
         # TODO: add making "edges_fid" (internal convention) to graph_to_gdf
         network["edge_fid"] = (
             network["node_A"].astype(str) + "_" + network["node_B"].astype(str)
