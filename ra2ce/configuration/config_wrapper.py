@@ -27,11 +27,11 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.configuration import AnalysisConfigBase
-from ra2ce.graph.network_config_data import NetworkConfigData
+from ra2ce.configuration.network.network_config import NetworkConfig
 
 
 class ConfigWrapper:
-    network_config: Optional[NetworkConfigData] = None
+    network_config: Optional[NetworkConfig] = None
     analysis_config: AnalysisConfigBase = None
 
     def get_root_dir(self) -> Path:

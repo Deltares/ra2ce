@@ -23,6 +23,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 from configparser import ConfigParser
+from typing import Union
 
 
 @dataclass
@@ -46,9 +47,9 @@ class NetworkSection:
 @dataclass
 class OriginsDestinationsSection:
     # Must be in the static/network folder, belongs to this analysis
-    origins: str = ""  # Should be a path.
+    origins: Path = None
     # Must be in the static/network folder, belongs to this analysis
-    destinations: str = ""  # Should be a path.
+    destinations: Path = None
     origins_names: str = ""
     destinations_names: str = ""
     id_name_origin_destination: str = ""
@@ -57,7 +58,7 @@ class OriginsDestinationsSection:
         1  # fraction of things/people going out of the origin to the destination
     )
     category: str = ""
-    region: str = ""  # Should be a Path
+    region: Path = None
     region_var: str = ""
 
 
@@ -68,7 +69,7 @@ class IsolationSection:
 
 @dataclass
 class HazardSection:
-    hazard_map: list[str] = field(default_factory=list)  # Should be a list of paths.
+    hazard_map: list[Path] = field(default_factory=list)  # Should be a list of paths.
     hazard_id: str = ""
     hazard_field_name: list[str] = field(default_factory=list)
     aggregate_wl: str = ""  # Should be enum
@@ -89,10 +90,16 @@ class NetworkConfigDataSectionReader:
 
     def __init__(self, file_to_parse: Path) -> None:
         self.parser = ConfigParser(
-            converters={"list": lambda x: [x.strip() for x in x.split(",")]}
+            inline_comment_prefixes="#",
+            converters={"list": lambda x: [x.strip() for x in x.split(",")]},
         )
         self.parser.read(file_to_parse)
         self._remove_none_values()
+
+    def _get_str_as_path(self, str_value: Union[str, Path]) -> Path:
+        if str_value and not isinstance(str_value, Path):
+            return Path(str_value)
+        return str_value
 
     def _remove_none_values(self) -> None:
         # Remove 'None' from values, replace them with empty strings
@@ -130,6 +137,9 @@ class NetworkConfigDataSectionReader:
         _od_section.origin_out_fraction = self.parser.getint(
             _section, "origin_out_fraction", fallback=_od_section.origin_out_fraction
         )
+        _od_section.origins = self._get_str_as_path(_od_section.origins)
+        _od_section.destinations = self._get_str_as_path(_od_section.destinations)
+        _od_section.region = self._get_str_as_path(_od_section.region)
         return _od_section
 
     def get_isolation_section(self) -> IsolationSection:
@@ -143,8 +153,13 @@ class NetworkConfigDataSectionReader:
         if _section not in self.parser:
             return HazardSection()
         _hazard_section = HazardSection(**self.parser[_section])
-        _hazard_section.hazard_map = self.parser.getlist(
-            _section, "hazard_map", fallback=_hazard_section.hazard_map
+        _hazard_section.hazard_map = list(
+            map(
+                self._get_str_as_path,
+                self.parser.getlist(
+                    _section, "hazard_map", fallback=_hazard_section.hazard_map
+                ),
+            )
         )
         _hazard_section.hazard_field_name = self.parser.getlist(
             _section, "hazard_field_name", fallback=_hazard_section.hazard_field_name
@@ -217,5 +232,6 @@ class NetworkConfigData:
         return cls(
             input_path=ini_file.parent.joinpath("input"),
             static_path=ini_file.parent.joinpath("static"),
+            output_path=ini_file.parent.joinpath("output"),
             **_reader_sections,
         )

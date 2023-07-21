@@ -72,8 +72,14 @@ class Network:
 
         # Origins and destinations
         _origins_destinations = network_config.origins_destinations
-        self.origins = _origins_destinations.origins
-        self.destinations = _origins_destinations.destinations
+        self.origins = None
+        self.destinations = None
+        if _origins_destinations.origins:
+            self.origins = self._network_dir.joinpath(_origins_destinations.origins)
+        if _origins_destinations.destinations:
+            self.destinations = self._network_dir.joinpath(
+                _origins_destinations.destinations
+            )
         self.origins_names = _origins_destinations.origins_names
         self.destinations_names = _origins_destinations.destinations_names
         self.id_name_origin_destination = (
@@ -81,8 +87,12 @@ class Network:
         )
         self.origin_count = _origins_destinations.origin_count
         self.od_category = _origins_destinations.category
-        self.region = network_config.static_path.joinpath(
-            "network", _origins_destinations.region
+        self.region = (
+            None
+            if not _origins_destinations.region
+            else network_config.static_path.joinpath(
+                "network", _origins_destinations.region
+            )
         )
         self.region_var = _origins_destinations.region_var
 
@@ -384,15 +394,15 @@ class Network:
 
         # Add the origin/destination nodes to the network
         ods = read_origin_destination_files(
-            self.origins,
+            str(self.origins),
             self.origins_names,
-            self.destinations,
+            str(self.destinations),
             self.destinations_names,
             self.id_name_origin_destination,
             self.origin_count,
             crs,
             self.od_category,
-            self.region,
+            self.region if self.region else "",
             self.region_var,
         )
 
@@ -418,7 +428,7 @@ class Network:
         out_fn = origins_from_raster(
             self._network_dir,
             self._network_config.polygon,
-            self.origins[0],
+            self.origins,
         )
 
         return out_fn
@@ -540,7 +550,7 @@ class Network:
         network_gdf = None
 
         # For all graph and networks - check if it exists, otherwise, make the graph and/or network.
-        if self.files["base_graph"] is None or self.files["base_network"] is None:
+        if not (self.files["base_graph"] or self.files["base_network"]):
             # Create the network from the network source
             if self._network_config.source == "shapefile":
                 logging.info("Start creating a network from the submitted shapefile.")
@@ -627,14 +637,14 @@ class Network:
         if (
             (self.origins)
             and (self.destinations)
-            and self.files["origins_destinations_graph"] is None
+            and not self.files["origins_destinations_graph"]
         ):
             # reading the base graphs
-            if (self.files["base_graph"] is not None) and (base_graph is not None):
+            if self.files["base_graph"] and base_graph:
                 base_graph = GraphPickleReader().read(self.files["base_graph"])
             # adding OD nodes
-            if self.origins[0].suffix == ".tif":
-                self.origins[0] = self.generate_origins_from_raster()
+            if self.origins.suffix == ".tif":
+                self.origins = self.generate_origins_from_raster()
             od_graph = self.add_od_nodes(base_graph, self.base_graph_crs)
             self._export_network_files(od_graph, "origins_destinations_graph", to_save)
 
