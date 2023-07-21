@@ -35,7 +35,7 @@ from ra2ce.graph.networks import Network
 from ra2ce.io.readers import GraphPickleReader
 
 
-def network_handler(config: dict, files: dict) -> Optional[dict]:
+def network_handler(config: NetworkConfigData, files: dict) -> Optional[dict]:
     try:
         network = Network(config, files)
         graphs = network.create()
@@ -48,14 +48,16 @@ def network_handler(config: dict, files: dict) -> Optional[dict]:
         raise e
 
 
-def hazard_handler(config: dict, graphs: dict, files: dict) -> Optional[dict]:
-    if config["hazard"]["hazard_map"] is not None:
-        # There is a hazard map or multiple hazard maps that should be intersected with the graph.
-        hazard = Hazard(config, graphs, files)
-        graphs = hazard.create()
-        return graphs
-    else:
+def hazard_handler(
+    config: NetworkConfigData, graphs: dict, files: dict
+) -> Optional[dict]:
+    if not config.hazard.hazard_map:
         return None
+
+    # There is a hazard map or multiple hazard maps that should be intersected with the graph.
+    hazard = Hazard(config, graphs, files)
+    graphs = hazard.create()
+    return graphs
 
 
 class NetworkConfig(ConfigProtocol):
@@ -64,6 +66,14 @@ class NetworkConfig(ConfigProtocol):
 
     def __init__(self) -> None:
         self.config_data = NetworkConfigData()
+        self.files = {
+            "base_graph": None,
+            "base_network": None,
+            "base_network_hazard": None,
+            "origins_destinations_graph": None,
+            "base_graph_hazard": None,
+            "origins_destinations_graph_hazard": None,
+        }
 
     @classmethod
     def from_data(cls, ini_file: Path, config_data: NetworkConfigData) -> NetworkConfig:

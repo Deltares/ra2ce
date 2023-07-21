@@ -21,6 +21,7 @@
 
 
 import logging
+from pathlib import Path
 import time
 from typing import Any, List, Tuple, Union
 
@@ -31,6 +32,7 @@ import pandas as pd
 import pyproj
 from osgeo import gdal
 from rasterstats import point_query, zonal_stats
+from ra2ce.graph.network_config_data import HazardSection, NetworkConfigData
 
 import ra2ce.graph.networks_utils as ntu
 from ra2ce.io.readers import GraphPickleReader
@@ -47,17 +49,30 @@ class Hazard:
 
     _ra2ce_name_key = "RA2CE name"
 
-    def __init__(self, config: dict, graphs: dict, files: dict):
-        self.config = config
+    def __init__(self, config: NetworkConfigData, graphs: dict, files: dict):
+        # Sections properties
+        self._network_file_id = config.network.file_id
+        self._output_graph_dir = config.static_path.joinpath("output_graph")
+        self._output_dir = config.output_path
+        self._origins = config.origins_destinations.origins
+        self._destinations = config.origins_destinations.destinations
+        self._save_shp = config.network.save_shp
+        self._isolation_locations = config.isolation.locations
+
+        # Hazard properties
+        self._hazard_field_name = config.hazard.hazard_field_name
+        self._hazard_id = config.hazard.hazard_id
+        self._hazard_map = config.hazard.hazard_map
+        self._hazard_crs = config.hazard.hazard_crs
+        self._hazard_aggregate_wl = config.hazard.aggregate_wl
+        self._hazard_directory = config.static_path.joinpath("hazard")
 
         # graphs
         self.graphs = graphs
 
         # files
         self.files = files
-        self.aggregate_wl = self.config["hazard"]["aggregate_wl"]
-        self.hazard_files = {}  # Initiate the variable hazard_files
-        self.get_hazard_files()
+        self.hazard_files = self._get_hazard_files()
 
         # bookkeeping for the hazard map names
         self.hazard_name_table = self.get_hazard_name_table()
@@ -184,7 +199,7 @@ class Hazard:
             nx.set_edge_attributes(
                 graph,
                 {
-                    (u, v, k): {rn + "_" + self.aggregate_wl[:2]: np.nan}
+                    (u, v, k): {rn + "_" + self._hazard_aggregate_wl[:2]: np.nan}
                     for u, v, k, edata in graph.edges.data(keys=True)
                     if "geometry" not in edata
                 },
@@ -196,7 +211,7 @@ class Hazard:
             )
             tqdm.pandas(desc="Graph hazard overlay with " + hn)
             _tif_hazard_files = str(self.hazard_files["tif"][i])
-            if self.aggregate_wl == "mean":
+            if self._hazard_aggregate_wl == "mean":
                 flood_stats = gdf.geometry.progress_apply(
                     lambda x, _files_value=_tif_hazard_files: zonal_stats(
                         x,
@@ -211,19 +226,21 @@ class Hazard:
                         x,
                         _files_value,
                         all_touched=True,
-                        stats=f"{self.aggregate_wl}",
+                        stats=f"{self._hazard_aggregate_wl}",
                     )
                 )
 
             try:
                 flood_stats = flood_stats.apply(
-                    lambda x: x[0][self.aggregate_wl] if x[0][self.aggregate_wl] else 0
+                    lambda x: x[0][self._hazard_aggregate_wl]
+                    if x[0][self._hazard_aggregate_wl]
+                    else 0
                 )
                 nx.set_edge_attributes(
                     graph,
                     {
                         (edges[0], edges[1], edges[2]): {
-                            rn + "_" + self.aggregate_wl[:2]: x
+                            rn + "_" + self._hazard_aggregate_wl[:2]: x
                         }
                         for x, edges in zip(flood_stats, edges_geoms)
                     },
@@ -262,11 +279,10 @@ class Hazard:
 
         The gdf is reprojected to the hazard shapefile if necessary.
         """
-        hfns = self.config["hazard"]["hazard_field_name"]
         gdf_crs_original = gdf.crs
 
         for i, (hn, rn, hfn) in enumerate(
-            zip(self.hazard_names, self.ra2ce_names, hfns)
+            zip(self.hazard_names, self.ra2ce_names, self._hazard_field_name)
         ):
             gdf_hazard = gpd.read_file(str(self.hazard_files["shp"][i]))
 
@@ -274,7 +290,9 @@ class Hazard:
                 gdf = gdf.to_crs(gdf_hazard.crs)
 
             gdf = gpd.sjoin(gdf, gdf_hazard[[hfn, "geometry"]], how="left")
-            gdf.rename(columns={hfn: rn + "_" + self.aggregate_wl[:2]}, inplace=True)
+            gdf.rename(
+                columns={hfn: rn + "_" + self._hazard_aggregate_wl[:2]}, inplace=True
+            )
 
         if gdf.crs != gdf_crs_original:
             gdf = gdf.to_crs(gdf_crs_original)
@@ -294,7 +312,7 @@ class Hazard:
         """
         # TODO check if the CRS of the graph and shapefile match
 
-        hfns = self.config["hazard"]["hazard_field_name"]
+        hfns = self._hazard_config.hazard_field_name
 
         for i, (hn, rn, hfn) in enumerate(
             zip(self.hazard_names, self.ra2ce_names, hfns)
@@ -313,22 +331,22 @@ class Hazard:
                     ]
 
                     if not precise_matches.empty:
-                        if self.aggregate_wl == "max":
+                        if self._hazard_aggregate_wl == "max":
                             graph[u][v][k][
-                                rn + "_" + self.aggregate_wl[:2]
+                                rn + "_" + self._hazard_aggregate_wl[:2]
                             ] = precise_matches[hfn].max()
-                        if self.aggregate_wl == "min":
+                        if self._hazard_aggregate_wl == "min":
                             graph[u][v][k][
-                                rn + "_" + self.aggregate_wl[:2]
+                                rn + "_" + self._hazard_aggregate_wl[:2]
                             ] = precise_matches[hfn].min()
-                        if self.aggregate_wl == "mean":
+                        if self._hazard_aggregate_wl == "mean":
                             graph[u][v][k][
-                                rn + "_" + self.aggregate_wl[:2]
+                                rn + "_" + self._hazard_aggregate_wl[:2]
                             ] = np.nanmean(precise_matches[hfn])
                     else:
-                        graph[u][v][k][rn + "_" + self.aggregate_wl[:2]] = 0
+                        graph[u][v][k][rn + "_" + self._hazard_aggregate_wl[:2]] = 0
                 else:
-                    graph[u][v][k][rn + "_" + self.aggregate_wl[:2]] = 0
+                    graph[u][v][k][rn + "_" + self._hazard_aggregate_wl[:2]] = 0
 
         return graph
 
@@ -372,11 +390,11 @@ class Hazard:
             flood_stats = flood_stats.apply(lambda x: x[0] if x[0] else 0)
 
             # Update the ODs GeoDataFrame
-            ods[rn + "_" + self.aggregate_wl[:2]] = flood_stats
+            ods[rn + "_" + self._hazard_aggregate_wl[:2]] = flood_stats
 
             # Update the graph
             attribute_dict = {
-                od: {rn + "_" + self.aggregate_wl[:2]: wl}
+                od: {rn + "_" + self._hazard_aggregate_wl[:2]: wl}
                 for od, wl in zip(od_ids, flood_stats)
             }
             nx.set_node_attributes(graph, attribute_dict)
@@ -386,7 +404,7 @@ class Hazard:
             nx.set_edge_attributes(
                 graph,
                 {
-                    (u, v, k): {rn + "_" + self.aggregate_wl[:2]: np.nan}
+                    (u, v, k): {rn + "_" + self._hazard_aggregate_wl[:2]: np.nan}
                     for u, v, k, edata in graph.edges.data(keys=True)
                     if "geometry" not in edata
                 },
@@ -402,7 +420,7 @@ class Hazard:
                     x,
                     _files_values,
                     all_touched=True,
-                    stats=f"{self.aggregate_wl}",  # TODO: ADD MEAN WITHOUT THE NANs
+                    stats=f"{self._hazard_aggregate_wl}",  # TODO: ADD MEAN WITHOUT THE NANs
                 )
             )
 
@@ -412,7 +430,11 @@ class Hazard:
                     graph,
                     {
                         (edges[0], edges[1], edges[2]): {
-                            rn + "_" + self.aggregate_wl[:2]: x[0][self.aggregate_wl]
+                            rn
+                            + "_"
+                            + self._hazard_aggregate_wl[:2]: x[0][
+                                self._hazard_aggregate_wl
+                            ]
                         }
                         for x, edges in zip(flood_stats, edges_geoms)
                     },
@@ -458,7 +480,7 @@ class Hazard:
             flood_stats = gdf.geometry.progress_apply(
                 lambda x, _file_values=_tif_hazard_files: point_query(x, _file_values)
             )
-            gdf[rn + "_" + self.aggregate_wl[:2]] = flood_stats.apply(
+            gdf[rn + "_" + self._hazard_aggregate_wl[:2]] = flood_stats.apply(
                 lambda x: x[0] if x[0] else 0
             )
 
@@ -498,17 +520,17 @@ class Hazard:
         self, graph: nx.classes.graph.Graph, hazard: str
     ) -> nx.classes.graph.Graph:
         df = pd.read_csv(hazard)
-        df = df[self.config["hazard"]["hazard_field_name"]]
+        df = df[self._hazard_field_name]
         graph = graph.merge(
             df,
             how="left",
-            left_on=self.config["network"]["file_id"],
-            right_on=self.config["hazard"]["hazard_id"],
+            left_on=self._network_file_id,
+            right_on=self._hazard_id,
         )
 
         graph.rename(
             columns={
-                self.config["hazard"]["hazard_field_name"]: [
+                self._hazard_field_name: [
                     n[:-3] for n in self.hazard_name_table[self._ra2ce_name_key]
                 ][0]
             },
@@ -523,20 +545,20 @@ class Hazard:
             "mean": "average",
             "fr": "fraction of network segment impacted by hazard",
         }
-        chosen_agg_types = [all_agg_types[self.aggregate_wl], all_agg_types["fr"]]
-        _hazard_map_config = self.config["hazard"]["hazard_map"]
+        chosen_agg_types = [
+            all_agg_types[self._hazard_aggregate_wl],
+            all_agg_types["fr"],
+        ]
         df = pd.DataFrame()
         df[["File name", "Aggregation method"]] = [
             (haz.stem, agg_type)
-            for haz in _hazard_map_config
+            for haz in self._hazard_map
             for agg_type in chosen_agg_types
         ]
-        if all(["RP" in haz.stem for haz in _hazard_map_config]):
+        if all(["RP" in haz.stem for haz in self._hazard_map]):
             # Return period hazard maps are used
             # Note: no hazard type is indicated because the name became too long
-            rps = [
-                haz.stem.split("RP_")[-1].split("_")[0] for haz in _hazard_map_config
-            ]
+            rps = [haz.stem.split("RP_")[-1].split("_")[0] for haz in self._hazard_map]
             df[self._ra2ce_name_key] = [
                 "RP" + rp + "_" + agg_type[:2]
                 for rp in rps
@@ -547,26 +569,29 @@ class Hazard:
             # Note: no hazard type is indicated because the name became too long
             df[self._ra2ce_name_key] = [
                 "EV" + str(i + 1) + "_" + agg_type[:2]
-                for i in range(len(_hazard_map_config))
+                for i in range(len(self._hazard_map))
                 for agg_type in chosen_agg_types
             ]
-        df["Full path"] = [haz for haz in _hazard_map_config for _ in chosen_agg_types]
+        df["Full path"] = [haz for haz in self._hazard_map for _ in chosen_agg_types]
         return df
 
-    def get_hazard_files(self):
+    def _get_hazard_files(self) -> dict:
         """Sorts the hazard files into tif, shp, and csv/json
 
-        This function returns nothing but creates a dict self.hazard_files of hazard files sorted per type.
+        This function returns a dict of hazard files sorted per type.
         {key = hazard file type (tif / shp / table (csv/json) : value = list of file paths}
         """
-        _hazard_maps = self.config["hazard"]["hazard_map"]
-        hazards_tif = [haz for haz in _hazard_maps if haz.suffix == ".tif"]
-        hazards_shp = [haz for haz in _hazard_maps if haz.suffix == ".shp"]
-        hazards_table = [haz for haz in _hazard_maps if haz.suffix in [".csv", ".json"]]
 
-        self.hazard_files["tif"] = hazards_tif
-        self.hazard_files["shp"] = hazards_shp
-        self.hazard_files["table"] = hazards_table
+        def get_fullpath_filter(*suffix) -> list[Path]:
+            _filter = lambda x: x.suffix in list(suffix)
+            _to_full_path = lambda x: self._hazard_directory.joinpath(x)
+            return list(map(_to_full_path, filter(_filter, self._hazard_map)))
+
+        _hazard_files = {}
+        _hazard_files["tif"] = get_fullpath_filter(".tif")
+        _hazard_files["shp"] = get_fullpath_filter(".shp")
+        _hazard_files["table"] = get_fullpath_filter(".csv", ".json")
+        return _hazard_files
 
     def get_hazard_intersect_geodataframe_tif(
         self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]
@@ -636,9 +661,9 @@ class Hazard:
         self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]
     ) -> Union[gpd.GeoDataFrame, nx.classes.graph.Graph]:
         """Handler function that chooses the right function for overlaying the network with the hazard data."""
-        if (self.hazard_files["tif"]) and (type(to_overlay) == gpd.GeoDataFrame):
+        if self.hazard_files["tif"] and (type(to_overlay) == gpd.GeoDataFrame):
             to_overlay = self.get_hazard_intersect_geodataframe_tif(to_overlay)
-        elif (self.hazard_files["tif"]) and (
+        elif self.hazard_files["tif"] and (
             type(to_overlay).__module__.split(".")[0] == "networkx"
         ):
             to_overlay = self.get_hazard_intersect_networkx_tif(to_overlay)
@@ -689,15 +714,13 @@ class Hazard:
         _exporter.export(
             network=self.graphs[graph_name],
             basename=graph_name,
-            output_dir=self.config["static"] / "output_graph",
+            output_dir=self._output_graph_dir,
             export_types=types_to_export,
         )
         self.files[graph_name] = _exporter.get_pickle_path()
 
     def load_origins_destinations(self):
-        od_path = (
-            self.config["static"] / "output_graph" / "origin_destination_table.feather"
-        )
+        od_path = self._output_graph_dir.joinpath("origin_destination_table.feather")
         od = gpd.read_feather(od_path)
         return od
 
@@ -716,9 +739,7 @@ class Hazard:
             write all the objects
 
         """
-        types_to_export = (
-            ["pickle"] if not self.config["network"]["save_shp"] else ["pickle", "shp"]
-        )
+        types_to_export = ["pickle"] if not self._save_shp else ["pickle", "shp"]
 
         if (
             self.files["base_graph"] is None
@@ -745,16 +766,13 @@ class Hazard:
                 graph = self.graphs["base_graph"]
 
                 # Check if the graph needs to be reprojected
-                hazard_crs = pyproj.CRS.from_user_input(
-                    self.config["hazard"]["hazard_crs"]
-                )
+                hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
                 graph_crs = pyproj.CRS.from_user_input(
                     "EPSG:4326"
                 )  # this is WGS84, TODO: Make flexible by including in the network ini
 
-                if (
-                    hazard_crs != graph_crs
-                ):  # Temporarily reproject the graph to the CRS of the hazard
+                if hazard_crs != graph_crs:
+                    # Temporarily reproject the graph to the CRS of the hazard
                     logging.warning(
                         """Hazard crs {} and graph crs {} are inconsistent,
                                                   we try to reproject the graph crs""".format(
@@ -783,29 +801,32 @@ class Hazard:
                 # Save graphs/network with hazard
                 self._export_network_files("base_graph_hazard", types_to_export)
             else:
+                _hazard_base_graph = self._output_graph_dir.joinpath(
+                    "base_graph_hazard.p"
+                )
                 try:
                     # Try to find the base graph hazard file
                     self.graphs["base_graph_hazard"] = GraphPickleReader().read(
-                        self.config["static"] / "output_graph" / "base_graph_hazard.p"
+                        _hazard_base_graph
                     )
                 except FileNotFoundError:
                     # File not found
                     logging.warning(
-                        f"Base graph hazard file not found at {self.config['static'] / 'output_graph' / 'base_graph_hazard.p'}"
+                        f"Base graph hazard file not found at {_hazard_base_graph}"
                     )
 
         #### Step 2: hazard overlay of the origins_destinations (NetworkX) ###
         if (
             self.files["origins_destinations_graph"]
-            and (self.config["origins_destinations"]["origins"])
-            and (self.config["origins_destinations"]["destinations"])
-            and (self.files["origins_destinations_graph_hazard"] is None)
+            and self._origins
+            and self._destinations
+            and (not self.files["origins_destinations_graph_hazard"])
         ):
             graph = self.graphs["origins_destinations_graph"]
             ods = self.load_origins_destinations()
 
             # Check if the graph needs to be reprojected
-            hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
+            hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
             graph_crs = pyproj.CRS.from_user_input(
                 "EPSG:4326"
             )  # this is WGS84, TODO: Make flexible by including in the network ini
@@ -866,30 +887,29 @@ class Hazard:
             )
 
             # Save the OD pairs (GeoDataFrame) as pickle
+            _od_table_feather = self._output_graph_dir.joinpath(
+                "origin_destination_table.feather"
+            )
             ods.to_feather(
-                self.config["static"]
-                / "output_graph"
-                / "origin_destination_table.feather",
+                _od_table_feather,
                 index=False,
             )
             logging.info(
-                f"Saved {'origin_destination_table.feather'} in {self.config['static'] / 'output_graph'}."
+                f"Saved {_od_table_feather.name} in {_od_table_feather.parent}."
             )
 
             # Save the OD pairs (GeoDataFrame) as shapefile
-            if self.config["network"]["save_shp"]:
-                ods_path = (
-                    self.config["static"]
-                    / "output_graph"
-                    / "origin_destination_table.shp"
+            if self._save_shp:
+                ods_path = self._output_graph_dir.joinpath(
+                    "origin_destination_table.shp"
                 )
                 ods.to_file(ods_path, index=False)
                 logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
 
         #### Step 3: iterate overlay of the GeoPandas Dataframe (if any) ###
-        if self.files["base_network"] and self.files["base_network_hazard"] is None:
+        if self.files["base_network"] and not self.files["base_network_hazard"]:
             # Check if the graph needs to be reprojected
-            hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
+            hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
             gdf_crs = pyproj.CRS.from_user_input(self.graphs["base_network"].crs)
 
             if (
@@ -926,11 +946,11 @@ class Hazard:
             self._export_network_files("base_network_hazard", types_to_export)
 
         #### Step 4: hazard overlay of the locations that are checked for isolation ###
-        if "isolation" in self.config and self.config["isolation"]["locations"]:
-            locations = gpd.read_file(self.config["isolation"]["locations"][0])
+        if self._isolation_locations:
+            locations = gpd.read_file(self._isolation_locations)
             locations["i_id"] = locations.index
             locations_crs = pyproj.CRS.from_user_input(locations.crs)
-            hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
+            hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
 
             if (
                 hazard_crs != locations_crs
@@ -970,13 +990,13 @@ class Hazard:
             _exporter.export(
                 network=locations,
                 basename="locations_hazard",
-                output_dir=self.config["static"] / "output_graph",
+                output_dir=self._output_graph_dir,
                 export_types=["pickle"],
             )
 
         # Save the hazard name bookkeeping table.
         self.hazard_name_table.to_excel(
-            self.config["output"] / "hazard_names.xlsx", index=False
+            self._output_dir.joinpath("hazard_names.xlsx"), index=False
         )
 
         return self.graphs
