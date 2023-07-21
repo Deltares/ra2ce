@@ -18,8 +18,9 @@ logger = logging.getLogger()
 
 class VectorNetworkWrapper:
     """
-    VectorNetworkWrapper is a class for handling and manipulating geographic network data.
-    It provides methods for reading vector data, cleaning it, and setting up network graphs.
+    VectorNetworkWrapper is a class for handling and manipulating vector files.
+    It provides methods for reading vector data, cleaning it, and setting up graph and
+    network.
     """
 
     name: str = "project_name"
@@ -44,7 +45,8 @@ class VectorNetworkWrapper:
             raise ValueError("Config cannot be None")
         if not config.get("network", {}):
             raise ValueError(
-                f"A network dictionary is required for creating a {self.__class__.__name__} object."
+                "A network dictionary is required for creating a "
+                + f"{self.__class__.__name__} object."
             )
         if not isinstance(config.get("network"), dict):
             raise ValueError('Config["network"] should be a dictionary')
@@ -64,7 +66,8 @@ class VectorNetworkWrapper:
         Returns
         -------
         str or list of str
-            If the value contains a comma, it is split and returned as a list, otherwise the original value is returned.
+            If the value contains a comma, it is split and returned as a list,
+            otherwise the original value is returned.
         """
         if isinstance(value, str) and "," in value:
             return [v for v in value.split(",")]
@@ -84,8 +87,8 @@ class VectorNetworkWrapper:
         region = self._parse_ini_value(project_config.get(["region"], None))
         crs = self._parse_ini_value(project_config.get(["crs"], 4326))
         self.name = name
-        self.region = self.read_vector(region)
         self.crs = CRS.from_user_input(crs)
+        self.region = self.read_vector(region, self.crs)
 
     def _get_network_opt(self, network_config: dict) -> dict:
         """
@@ -148,14 +151,18 @@ class VectorNetworkWrapper:
             return G.to_undirected()
 
     def setup_network_from_graph(
-        self, G: nx.Graph, edge_fid="edge_fid", include_nodes=False, node_fid="node_fid"
+        self,
+        graph: nx.Graph,
+        edge_fid="edge_fid",
+        include_nodes=False,
+        node_fid="node_fid",
     ) -> gpd.GeoDataFrame:
         """
         Sets up network nodes and edges from a given graph.
 
         Parameters
         ----------
-        G : nx.Graph
+        graph : nx.Graph
             Input graph.
         edge_fid : str, optional
             Field id for edges, by default "edge_fid".
@@ -168,15 +175,16 @@ class VectorNetworkWrapper:
         -------
         gpd.GeoDataFrame
             GeoDataFrame representing edges of the network.
-            Or tuple of GeomDataFrames representing edges and nodes of the network if `include_nodes = True`
+            Or tuple of GeomDataFrames representing edges and nodes of the network
+            if `include_nodes = True`
         """
-        nodes, edges = momepy.nx_to_gdf(G, nodeID=node_fid)
+        nodes, edges = momepy.nx_to_gdf(graph, nodeID=node_fid)
         edges[edge_fid] = (
             edges["node_start"].astype(str) + "_" + edges["node_end"].astype(str)
         )
         edges.rename(
             {"node_start": "node_A", "node_end": "node_B"}, axis=1, inplace=True
-        )  # FIXME make consistant convention with osm
+        )  # TODO make consistant convention with osm
         if not nodes.crs:
             nodes.crs = self.crs
         if not edges.crs:
@@ -192,7 +200,6 @@ class VectorNetworkWrapper:
         file: Union[str, Path, List[str, Path]],
         file_crs: Union[int, str],
         is_directed: bool = False,
-        **kwargs,
     ) -> Tuple[nx.MultiGraph, gpd.GeoDataFrame]:
         """
         Sets up a network from a given vector file.
@@ -205,8 +212,6 @@ class VectorNetworkWrapper:
             Coordinate reference system for the file.
         is_directed : bool, optional
             Whether the graph is directed, by default "False"
-        **kwargs
-            Arbitrary keyword arguments.
 
         Returns
         -------
@@ -216,9 +221,9 @@ class VectorNetworkWrapper:
         gdf = self.read_vector(fn=file, crs=file_crs)
         gdf = self.clean_vector(
             gdf, explode_and_deduplicate_geometries=True
-        )  # TODO maybe move explode_and_deduplicate_geometries to [project] or [cleanup]
-        g = self.setup_graph_from_vector(gdf, include_nodes=False)
-        network = self.setup_network_from_graph(g, is_directed=is_directed)
+        )  # TODO move explode_and_deduplicate_geometries to [project] or [cleanup]
+        g = self.setup_graph_from_vector(gdf, is_directed=is_directed)
+        network = self.setup_network_from_graph(g, include_nodes=False)
         # assign to property
         self.base_graph = nx.MultiGraph(g)
         self.base_network = network
@@ -228,7 +233,8 @@ class VectorNetworkWrapper:
         self, fn: Union[str, Path, List[str, Path]], crs: Union[int, str]
     ) -> gpd.GeoDataFrame:
         """
-        Reads a vector file or a list of vector files within project region with project crs.
+        Reads a vector file or a list of vector files.
+        Clips for project region and reproject to project crs if available.
 
         Parameters
         ----------
@@ -263,7 +269,7 @@ class VectorNetworkWrapper:
 
         # validate
         if len(gdf) == 0:
-            logger.warning(f"No vector features found within project region")
+            logger.warning("No vector features found within project region")
             return None
 
         return gdf
