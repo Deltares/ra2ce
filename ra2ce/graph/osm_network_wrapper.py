@@ -101,8 +101,8 @@ class OsmNetworkWrapper:
 
     @staticmethod
     def get_clean_graph(complex_graph):
-        OsmNetworkWrapper.drop_duplicates(complex_graph)
-        pass
+        complex_graph = OsmNetworkWrapper.drop_duplicates(complex_graph)
+        return complex_graph
 
     @staticmethod
     def drop_duplicates(complex_graph: MultiDiGraph) -> MultiDiGraph:
