@@ -15,9 +15,9 @@ logger = logging.getLogger()
 
 
 class VectorNetworkWrapper:
-    """
-    VectorNetworkWrapper is a class for handling and manipulating vector files.
-    It provides methods for reading vector data, cleaning it, and setting up graph and
+    """A class for handling and manipulating vector files.
+
+    Provides methods for reading vector data, cleaning it, and setting up graph and
     network.
     """
 
@@ -29,13 +29,14 @@ class VectorNetworkWrapper:
     network_dict: dict
 
     def __init__(self, config: dict) -> None:
-        """
-        Initializes the VectorNetworkWrapper object.
+        """Initializes the VectorNetworkWrapper object.
 
-        Parameters
-        ----------
-        config : dict
-            Configuration dictionary.
+        Args:
+            config (dict): Configuration dictionary.
+
+        Raises:
+            ValueError: If the config is None or doesn't contain a network dictionary,
+                or if config['network'] is not a dictionary.
         """
 
         if not config:
@@ -52,20 +53,15 @@ class VectorNetworkWrapper:
         self.network_dict = self._get_network_opt(config["network"])
 
     def _parse_ini_value(self, value: str):
-        """
-        Parses a string value from an ini file.
+        """Parses a string value from an ini file.
 
-        Parameters
-        ----------
-        value : str
-            Value to parse.
+        Args:
+            value (str): Value to parse.
 
-        Returns
-        -------
-        str or list of str
-            If the value contains a comma, it is split and returned as a list,
-            otherwise the original value is returned.
-            None if the value is an empty string.
+        Returns:
+            str or list of str: If the value contains a comma, it is split and returned
+                as a list, otherwise the original value is returned. Returns None if
+                the value is an empty string.
         """
         if value == "":
             return None
@@ -76,13 +72,10 @@ class VectorNetworkWrapper:
         return value
 
     def _setup_global(self, config: dict):
-        """
-        Sets up project properties based on provided configuration.
+        """Sets up project properties based on provided configuration.
 
-        Parameters
-        ----------
-        config : dict
-            Project configuration dictionary.
+        Args:
+            config (dict): Project configuration dictionary.
         """
         self.input_path = config.get("static").joinpath("network")
         self.output_path = config.get("output")
@@ -99,18 +92,13 @@ class VectorNetworkWrapper:
             self.region = self._read_files([Path(region)])
 
     def _parse_ini_filename(self, filename: str) -> List[Path]:
-        """Makes a list of file paths by joining with input path.
-        Also checks validity of files.
+        """Makes a list of file paths by joining with input path and checks validity of files.
 
-        Parameters
-        ----------
-        filename : str
-            str of file names seperated by comma (",").
+        Args:
+            filename (str): String of file names separated by comma (",").
 
-        Returns
-        -------
-        file_paths : List[Path]
-            List of file paths.
+        Returns:
+            List[Path]: List of file paths.
         """
         if isinstance(filename, str):
             file_names = filename.split(",")
@@ -126,18 +114,13 @@ class VectorNetworkWrapper:
         return file_paths
 
     def _get_network_opt(self, network_config: dict) -> dict:
-        """
-        Retrieves network options used in this wrapper from provided configuration.
+        """Retrieves network options used in this wrapper from provided configuration.
 
-        Parameters
-        ----------
-        network_config : dict
-            Network configuration dictionary.
+        Args:
+            network_config (dict): Network configuration dictionary.
 
-        Returns
-        -------
-        dict
-            Dictionary of network options.
+        Returns:
+            dict: Dictionary of network options.
         """
 
         files = self._parse_ini_filename(network_config.get("primary_file", None))
@@ -157,23 +140,15 @@ class VectorNetworkWrapper:
 
     @staticmethod
     def setup_graph_from_vector(gdf: gpd.GeoDataFrame, is_directed: bool) -> nx.Graph:
-        """
-        Creates a simple graph with node and edge geometries based on a given GeoDataFrame.
-        Uses the save csv as the given GeoDataFrame
+        """Creates a simple graph with node and edge geometries based on a given GeoDataFrame.
 
-        Parameters
-        ----------
-        gdf : gpd.GeoDataFrame
-            Input GeoDataFrame containing line geometries.
-            Allow both LineString and MultiLineString.
-        is_directed : bool
-            Whether the graph should be directed.
+        Args:
+            gdf (gpd.GeoDataFrame): Input GeoDataFrame containing line geometries.
+                Allow both LineString and MultiLineString.
+            is_directed (bool): Whether the graph should be directed.
 
-        Returns
-        -------
-        nx.Graph
-            NetworkX graph object.
-            Contain ["crs", "approach"] as graph perperties.
+        Returns:
+            nx.Graph: NetworkX graph object with "crs", "approach" as graph properties.
         """
 
         # simple geometry handeling
@@ -202,24 +177,17 @@ class VectorNetworkWrapper:
     def setup_network_edges_and_nodes_from_graph(
         graph: nx.Graph,
     ) -> gpd.GeoDataFrame:
-        """
-        Sets up network nodes and edges from a given graph.
+        """Sets up network nodes and edges from a given graph.
 
-        Parameters
-        ----------
-        graph : nx.Graph
-            Input graph with geometry for nodes and edges.
-            Must contain "crs" as graph property.
+        Args:
+            graph (nx.Graph): Input graph with geometry for nodes and edges.
+                Must contain "crs" as graph property.
 
-        Returns
-        -------
-        gpd.GeoDataFrame
-            GeoDataFrame representing the network edges.
-            Contain ["edge_fid", "node_A", and "node_B"]
-        gpd.GeoDataFrame
-            GeoDataFrame representing the network nodes.
-            Contain ["node_fid"]
+        Returns:
+            gpd.GeoDataFrame: GeoDataFrame representing the network edges with "edge_fid", "node_A", and "node_B".
+            gpd.GeoDataFrame: GeoDataFrame representing the network nodes with "node_fid".
         """
+
         # TODO ths function use conventions. Good to make consistant convention with osm
         nodes, edges = momepy.nx_to_gdf(graph, nodeID="node_fid")
         edges["edge_fid"] = (
@@ -237,15 +205,11 @@ class VectorNetworkWrapper:
     def setup_network_from_vector(
         self,
     ) -> Tuple[nx.MultiGraph, gpd.GeoDataFrame]:
-        """
-        Sets up a network from vector files.
+        """Sets up a network from vector files.
 
-        Returns
-        -------
-        nx.MultiGraph
-            MultiGraph representing the graph.
-        gpd.GeoDataFrame
-            GeoDataFrame representing the network.
+        Returns:
+            nx.MultiGraph: MultiGraph representing the graph.
+            gpd.GeoDataFrame: GeoDataFrame representing the network.
         """
         files = self.network_dict["files"]
         file_crs = self.network_dict["file_crs"]
@@ -267,22 +231,17 @@ class VectorNetworkWrapper:
     def _read_vector_to_project_region_and_crs(
         self, vector_filenames: List[Path], crs: Union[int, str]
     ) -> gpd.GeoDataFrame:
-        """
-        Reads a vector file or a list of vector files.
+        """Reads a vector file or a list of vector files.
+
         Clips for project region and reproject to project crs if available.
         Explodes multi geometry into single geometry.
 
-        Parameters
-        ----------
-        vector_filenames : list[Path]
-            List of Path to the vector files.
-        crs : Union[int, str]
-            Coordinate reference system for the files. Allow only one crs for all  `vector_filenames`.
+        Args:
+            vector_filenames (list[Path]): List of Path to the vector files.
+            crs (Union[int, str]): Coordinate reference system for the files. Allow only one crs for all  `vector_filenames`.
 
-        Returns
-        -------
-        gpd.GeoDataFrame
-            GeoDataFrame representing the vector data.
+        Returns:
+            gpd.GeoDataFrame: GeoDataFrame representing the vector data.
         """
         gdf = self._read_files(vector_filenames)
         if gdf is None:
@@ -311,18 +270,13 @@ class VectorNetworkWrapper:
         return gdf
 
     def _read_files(self, file_list: list[Path]) -> gpd.GeoDataFrame:
-        """
-        Reads a list of files into a GeoDataFrame.
+        """Reads a list of files into a GeoDataFrame.
 
-        Parameters
-        ----------
-        file_list : list[Path]
-            List of file paths.
+        Args:
+            file_list (list[Path]): List of file paths.
 
-        Returns
-        -------
-        gpd.GeoDataFrame
-            GeoDataFrame representing the data.
+        Returns:
+            gpd.GeoDataFrame: GeoDataFrame representing the data.
         """
         # read file
         if isinstance(file_list, list):
@@ -335,17 +289,13 @@ class VectorNetworkWrapper:
 
     @staticmethod
     def clean_vector(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-        """
-        Cleans a GeoDataFrame.
-        Parameters
-        ----------
-        gdf : gpd.GeoDataFrame
-            Input GeoDataFrame.
+        """Cleans a GeoDataFrame.
 
-        Returns
-        -------
-        gpd.GeoDataFrame
-            Cleaned GeoDataFrame.
+        Args:
+            gdf (gpd.GeoDataFrame): Input GeoDataFrame.
+
+        Returns:
+            gpd.GeoDataFrame: Cleaned GeoDataFrame.
         """
 
         gdf = VectorNetworkWrapper.explode_and_deduplicate_geometries(gdf)
@@ -354,18 +304,13 @@ class VectorNetworkWrapper:
 
     @staticmethod
     def explode_and_deduplicate_geometries(gpd: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-        """
-        Explodes and deduplicates geometries a GeoDataFrame.
+        """Explodes and deduplicates geometries a GeoDataFrame.
 
-        Parameters
-        ----------
-        gpd : gpd.GeoDataFrame
-            Input GeoDataFrame.
+        Args:
+            gpd (gpd.GeoDataFrame): Input GeoDataFrame.
 
-        Returns
-        -------
-        gpd.GeoDataFrame
-            GeoDataFrame with exploded and deduplicated geometries.
+        Returns:
+            gpd.GeoDataFrame: GeoDataFrame with exploded and deduplicated geometries.
         """
         gpd = gpd.explode()
         gpd = gpd[
