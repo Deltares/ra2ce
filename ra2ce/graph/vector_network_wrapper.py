@@ -65,11 +65,15 @@ class VectorNetworkWrapper:
         str or list of str
             If the value contains a comma, it is split and returned as a list,
             otherwise the original value is returned.
+            None if the value is an empty string.
         """
+        if value == "":
+            return None
+
         if isinstance(value, str) and "," in value:
             return [v for v in value.split(",")]
-        else:
-            return value
+
+        return value
 
     def _setup_global(self, config: dict):
         """
@@ -80,17 +84,21 @@ class VectorNetworkWrapper:
         config : dict
             Project configuration dictionary.
         """
+        self.input_path = config.get("static").joinpath("network")
+        self.output_path = config.get("output")
+
         project_config = config.get("project")
         name = self._parse_ini_value(project_config.get("name", "project_name"))
         region = self._parse_ini_value(project_config.get("region", None))
         crs = self._parse_ini_value(project_config.get("crs", 4326))
         self.name = name
         self.crs = CRS.from_user_input(crs)
-        self.region = self.read_vector(region, self.crs)
-        self.input_path = config.get("static").joinpath("network")
-        self.output_path = config.get("output")
+        if not region:
+            self.region = region
+        else:
+            self.region = self._read_files([Path(region)])
 
-    def _pase_ini_filename(self, filename: str) -> List[Path]:
+    def _parse_ini_filename(self, filename: str) -> List[Path]:
         """Makes a list of file paths by joining with input path.
         Also checks validity of files.
 
@@ -109,7 +117,8 @@ class VectorNetworkWrapper:
         else:
             logger.error("file names are not valid.")
 
-        file_paths = [self.input_path.joinpath(f) for f in file_names]
+        file_paths = [self.input_path.joinpath(f.strip()) for f in file_names]
+
         for f in file_paths:
             if not f.resolve().is_file():
                 logger.error(f"vector file {f} is not found.")
@@ -131,7 +140,7 @@ class VectorNetworkWrapper:
             Dictionary of network options.
         """
 
-        files = self._pase_ini_filename(network_config.get("primary_file", None))
+        files = self._parse_ini_filename(network_config.get("primary_file", None))
         file_id = self._parse_ini_value(
             network_config.get("file_id", None)
         )  # TODO only needed when cleanup based on fid
@@ -146,16 +155,17 @@ class VectorNetworkWrapper:
             is_directed=is_directed,
         )
 
-    def setup_graph_from_vector(
-        self, gdf: gpd.GeoDataFrame, is_directed: bool
-    ) -> nx.Graph:
+    @staticmethod
+    def setup_graph_from_vector(gdf: gpd.GeoDataFrame, is_directed: bool) -> nx.Graph:
         """
-        Creates a graph with nodes and edges based on a given GeoDataFrame.
+        Creates a simple graph with node and edge geometries based on a given GeoDataFrame.
+        Uses the save csv as the given GeoDataFrame
 
         Parameters
         ----------
         gdf : gpd.GeoDataFrame
-            Input geographic data.
+            Input GeoDataFrame containing line geometries.
+            Allow both LineString and MultiLineString.
         is_directed : bool
             Whether the graph should be directed.
 
@@ -163,8 +173,14 @@ class VectorNetworkWrapper:
         -------
         nx.Graph
             NetworkX graph object.
+            Contain ["crs", "approach"] as graph perperties.
         """
-        digraph = nx.DiGraph(crs=self.crs, name=self.name, approach="primal")
+
+        # simple geometry handeling
+        gdf = VectorNetworkWrapper.explode_and_deduplicate_geometries(gdf)
+
+        # to graph
+        digraph = nx.DiGraph(crs=gdf.crs, approach="primal")
         for index, row in gdf.iterrows():
             from_node = row.geometry.coords[0]
             to_node = row.geometry.coords[-1]
@@ -182,8 +198,8 @@ class VectorNetworkWrapper:
             return digraph
         return digraph.to_undirected()
 
+    @staticmethod
     def setup_network_edges_and_nodes_from_graph(
-        self,
         graph: nx.Graph,
     ) -> gpd.GeoDataFrame:
         """
@@ -192,7 +208,8 @@ class VectorNetworkWrapper:
         Parameters
         ----------
         graph : nx.Graph
-            Input graph.
+            Input graph with geometry for nodes and edges.
+            Must contain "crs" as graph property.
 
         Returns
         -------
@@ -212,9 +229,9 @@ class VectorNetworkWrapper:
             {"node_start": "node_A", "node_end": "node_B"}, axis=1, inplace=True
         )
         if not nodes.crs:
-            nodes.crs = self.crs
+            nodes.crs = graph.graph["crs"]
         if not edges.crs:
-            edges.crs = self.crs
+            edges.crs = graph.graph["crs"]
         return edges, nodes
 
     def setup_network_from_vector(
@@ -234,19 +251,26 @@ class VectorNetworkWrapper:
         file_crs = self.network_dict["file_crs"]
         is_directed = self.network_dict["is_directed"]
 
-        gdf = self.read_vector(vector_filenames=files, crs=file_crs)
-        gdf = self.clean_vector(gdf)
-        graph = self.setup_graph_from_vector(gdf, is_directed=is_directed)
-        edges, nodes = self.setup_network_edges_and_nodes_from_graph(graph)
+        gdf = self._read_vector_to_project_region_and_crs(
+            vector_filenames=files, crs=file_crs
+        )
+        gdf = VectorNetworkWrapper.clean_vector(gdf)
+        graph = VectorNetworkWrapper.setup_graph_from_vector(
+            gdf, is_directed=is_directed
+        )
+        edges, nodes = VectorNetworkWrapper.setup_network_edges_and_nodes_from_graph(
+            graph
+        )
         graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
         return graph_complex, edges
 
-    def read_vector(
+    def _read_vector_to_project_region_and_crs(
         self, vector_filenames: List[Path], crs: Union[int, str]
     ) -> gpd.GeoDataFrame:
         """
         Reads a vector file or a list of vector files.
         Clips for project region and reproject to project crs if available.
+        Explodes multi geometry into single geometry.
 
         Parameters
         ----------
@@ -288,7 +312,7 @@ class VectorNetworkWrapper:
 
     def _read_files(self, file_list: list[Path]) -> gpd.GeoDataFrame:
         """
-        Reads a file or a list of files into a GeoDataFrame.
+        Reads a list of files into a GeoDataFrame.
 
         Parameters
         ----------
@@ -309,7 +333,8 @@ class VectorNetworkWrapper:
             logger.info("no file is read.")
         return gdf
 
-    def clean_vector(self, gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+    @staticmethod
+    def clean_vector(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
         """
         Cleans a GeoDataFrame.
         Parameters
@@ -322,7 +347,7 @@ class VectorNetworkWrapper:
         gpd.GeoDataFrame
             Cleaned GeoDataFrame.
         """
-        # preprocessing before cleanup
+
         gdf = VectorNetworkWrapper.explode_and_deduplicate_geometries(gdf)
 
         return gdf
@@ -345,7 +370,7 @@ class VectorNetworkWrapper:
         gpd = gpd.explode()
         gpd = gpd[
             gpd.index.isin(
-                gpd["geometry"].apply(lambda geom: geom.wkb).drop_duplicates().index
+                gpd.geometry.apply(lambda geom: geom.wkb).drop_duplicates().index
             )
         ]
         return gpd
