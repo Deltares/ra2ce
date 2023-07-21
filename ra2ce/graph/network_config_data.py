@@ -202,12 +202,14 @@ class NetworkConfigData:
     output_path: Path = None
     static_path: Path = None
 
-    project: ProjectSection = ProjectSection()
-    network: NetworkSection = NetworkSection()
-    origins_destinations: OriginsDestinationsSection = OriginsDestinationsSection()
-    isolation: IsolationSection = IsolationSection()
-    hazard: HazardSection = HazardSection()
-    cleanup: CleanupSection = CleanupSection()
+    project: ProjectSection = field(default_factory=lambda: ProjectSection())
+    network: NetworkSection = field(default_factory=lambda: NetworkSection())
+    origins_destinations: OriginsDestinationsSection = field(
+        default_factory=lambda: OriginsDestinationsSection()
+    )
+    isolation: IsolationSection = field(default_factory=lambda: IsolationSection())
+    hazard: HazardSection = field(default_factory=lambda: HazardSection())
+    cleanup: CleanupSection = field(default_factory=lambda: CleanupSection())
 
     @property
     def output_graph_dir(self) -> Path:
