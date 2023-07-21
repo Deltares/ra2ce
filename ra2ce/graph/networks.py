@@ -37,6 +37,7 @@ from ra2ce.graph.segmentation import Segmentation
 from ra2ce.io.readers import GraphPickleReader
 from ra2ce.io.writers import JsonExporter
 from ra2ce.io.writers.network_exporter_factory import NetworkExporterFactory
+from ra2ce.graph.vector_network_wrapper import VectorNetworkWrapper
 
 
 class Network:
@@ -217,72 +218,28 @@ class Network:
         # Exporting complex graph because the shapefile should be kept the same as much as possible.
         return graph_complex, edges_complex
 
-    def network_cleanshp(
-        self, crs: int = 4326
-    ) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+    def network_cleanshp(self) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """Creates a (graph) network from a clean shapefile (primary_file - no further advance cleanup is needed)
 
         Returns the same geometries for the network (GeoDataFrame) as for the graph (NetworkX graph), because
         it is assumed that the user wants to keep the same geometries as their shapefile input.
 
-        Args:
-            crs (int): the EPSG number of the coordinate reference system that is used
-
         Returns:
             graph_complex (NetworkX graph): The resulting graph.
             edges_complex (GeoDataFrame): The resulting network.
         """
-        # Make a pyproj CRS from the EPSG code
-        crs = pyproj.CRS.from_user_input(crs)
+        # initialise vector network wrapper
+        vector_network_wrapper = VectorNetworkWrapper(config=self.config)
 
-        # Read the shapefile and simplify the geometry
-        # TODO: read function
-        shapefiles_analysis = [
-            self.config["static"] / "network" / shp
-            for shp in self.config["network"]["primary_file"].split(",")
-        ]
-        # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
-        lines = gpd.GeoDataFrame(
-            pd.concat([gpd.read_file(shp) for shp in shapefiles_analysis])
-        )
-        lines.set_index(self.config["network"]["file_id"], inplace=True)
+        # setup network using the wrapper
+        (
+            graph_complex,
+            edges_complex,
+        ) = vector_network_wrapper.setup_network_from_vector()
 
-        # standard exploding and remove duplicated lines
-        # TODO: cleanup function
-        lines = lines.explode()
-        lines = lines[
-            lines.index.isin(
-                lines["geometry"].apply(lambda geom: geom.wkb).drop_duplicates().index
-            )
-        ]
-
-        # get edges and nodes without cleanup options (equivelant to nut.create_nodes with cleanup options)
-        # TODO: get_graph function fter cleanup
-        G = nx.Graph()
-        for index, row in lines.iterrows():
-            from_node = row.geometry.coords[0]
-            to_node = row.geometry.coords[-1]
-            G.add_edge(from_node, to_node, id=row.index, geometry=row.geometry)
-        nodes, edges = momepy.nx_to_gdf(G, nodeID="node_fid")
-        edges.rename(
-            {"node_start": "node_A", "node_end": "node_B"}, axis=1, inplace=True
-        )
-        edges = edges.drop(columns=["id"])
-        if not nodes.crs:
-            nodes.crs = crs
-        if not edges.crs:
-            edges.crs = crs
-
-        # Create networkx graph again
-        # TODO: merge above and below function -complex graph is a multigraph, which could potentially be harmonized
-        graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
-        edges_complex = edges
-        logging.info("Function [graph_from_gdf]: executed")
-
-        # Set the CRS of the graph and network
-        # TODO: use one crs for both
-        self.base_graph_crs = pyproj.CRS.from_user_input(crs)
-        self.base_network_crs = pyproj.CRS.from_user_input(crs)
+        # Set the CRS of the graph and network to wrapper crs
+        self.base_graph_crs = vector_network_wrapper.crs
+        self.base_network_crs = vector_network_wrapper.crs
 
         return graph_complex, edges_complex
 
