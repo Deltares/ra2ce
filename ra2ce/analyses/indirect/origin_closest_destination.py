@@ -66,7 +66,7 @@ class OriginClosestDestination:
 
         self.destination_names = None
         self.destination_key = None
-        if "category" in config["origins_destinations"]:
+        if config["origins_destinations"].get("category", None):
             self.destination_key = "category"
             self.destination_key_value = config["origins_destinations"]["category"]
 
