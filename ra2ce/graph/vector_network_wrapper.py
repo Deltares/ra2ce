@@ -9,9 +9,7 @@ import momepy
 
 from shapely.geometry import Point
 from pyproj import CRS
-
 import ra2ce.graph.networks_utils as nut
-from ra2ce.graph.networks import Network
 
 logger = logging.getLogger()
 
@@ -23,13 +21,12 @@ class VectorNetworkWrapper:
     network.
     """
 
-    name: str = "project_name"
-    region: gpd.GeoDataFrame = None
-    crs: CRS = CRS.from_user_input(4326)
+    name: str
+    region: gpd.GeoDataFrame
+    crs: CRS
     network_dict: dict
-
-    base_network: gpd.GeoDataFrame
-    base_graph: nx.MultiGraph
+    input_path: Path
+    output_path: Path
 
     def __init__(self, config: dict) -> None:
         """
@@ -51,7 +48,7 @@ class VectorNetworkWrapper:
         if not isinstance(config.get("network"), dict):
             raise ValueError('Config["network"] should be a dictionary')
 
-        self._setup_global(config["project"])
+        self._setup_global(config)
         self.network_dict = self._get_network_opt(config["network"])
 
     def _parse_ini_value(self, value: str):
@@ -74,25 +71,51 @@ class VectorNetworkWrapper:
         else:
             return value
 
-    def _setup_global(self, project_config: dict):
+    def _setup_global(self, config: dict):
         """
         Sets up project properties based on provided configuration.
 
         Parameters
         ----------
-        project_config : dict
+        config : dict
             Project configuration dictionary.
         """
-        name = self._parse_ini_value(project_config.get(["name"]))
-        region = self._parse_ini_value(project_config.get(["region"], None))
-        crs = self._parse_ini_value(project_config.get(["crs"], 4326))
+        project_config = config.get("project")
+        name = self._parse_ini_value(project_config.get("name", "project_name"))
+        region = self._parse_ini_value(project_config.get("region", None))
+        crs = self._parse_ini_value(project_config.get("crs", 4326))
         self.name = name
         self.crs = CRS.from_user_input(crs)
         self.region = self.read_vector(region, self.crs)
+        self.input_path = config.get("static").joinpath("network")
+        self.output_path = config.get("output")
+
+    def _pase_file_path(self, file: Union[str, List[str]]) -> List[Path]:
+        """Makes file paths by joining with input path.
+        Checks validity of files.
+
+        Parameters
+        ----------
+        file : Union[str, List[str]]
+            filename or a list of filenames.
+
+        Returns
+        -------
+        file_paths : List[Path]
+            List of file paths.
+        """
+        if isinstance(file, str):
+            file = [file]
+        file_paths = [self.input_path.joinpath(f) for f in file]
+        for f in file_paths:
+            if not f.resolve().is_file():
+                logger.error(f"vector file {f} is not found.")
+
+        return file_paths
 
     def _get_network_opt(self, network_config: dict) -> dict:
         """
-        Retrieves network options from provided configuration.
+        Retrieves network options used in this wrapper from provided configuration.
 
         Parameters
         ----------
@@ -104,13 +127,14 @@ class VectorNetworkWrapper:
         dict
             Dictionary of network options.
         """
-        file = self._parse_ini_value(network_config.get(["primary_file"], None))
+
+        file = self._pase_file_path(network_config.get("primary_file", None))
         file_id = self._parse_ini_value(
-            network_config.get(["file_id"], None)
-        )  # Removed trailing space
-        file_filter = self._parse_ini_value(network_config.get(["filter"], None))
-        file_crs = self._parse_ini_value(network_config.get(["crs"], None))
-        is_directed = self._parse_ini_value(network_config.get(["directed"], False))
+            network_config.get("file_id", None)
+        )  # TODO only needed when cleanup based on fid
+        file_filter = self._parse_ini_value(network_config.get("filter", None))
+        file_crs = self._parse_ini_value(network_config.get("crs", self.crs))  # assumes
+        is_directed = self._parse_ini_value(network_config.get("directed", False))
         return dict(
             file=file,
             file_id=file_id,
@@ -137,13 +161,19 @@ class VectorNetworkWrapper:
         nx.Graph
             NetworkX graph object.
         """
-        G = nx.DiGraph(crs=self.crs, name=self.name)
+        G = nx.DiGraph(crs=self.crs, name=self.name, approach="primal")
         for index, row in gdf.iterrows():
             from_node = row.geometry.coords[0]
             to_node = row.geometry.coords[-1]
             G.add_node(from_node, geometry=Point(from_node))
             G.add_node(to_node, geometry=Point(to_node))
-            G.add_edge(from_node, to_node, id=row.index, geometry=row.geometry)
+            G.add_edge(
+                from_node,
+                to_node,
+                geometry=row.pop(
+                    "geometry"
+                ),  # **row TODO: check if we do need all columns
+            )
 
         if is_directed:
             return G
@@ -197,40 +227,32 @@ class VectorNetworkWrapper:
 
     def setup_network_from_vector(
         self,
-        file: Union[str, Path, List[str, Path]],
-        file_crs: Union[int, str],
-        is_directed: bool = False,
     ) -> Tuple[nx.MultiGraph, gpd.GeoDataFrame]:
         """
-        Sets up a network from a given vector file.
-
-        Parameters
-        ----------
-        file : Union[str, Path, List[str, Path]]
-            Path to the vector file or list of paths.
-        file_crs : Union[int, str]
-            Coordinate reference system for the file.
-        is_directed : bool, optional
-            Whether the graph is directed, by default "False"
+        Sets up a network from vector files.
 
         Returns
         -------
+        nx.MultiGraph
+            MultiGraph representing the graph.
         gpd.GeoDataFrame
             GeoDataFrame representing the network.
         """
+        file = self.network_dict["file"]
+        file_crs = self.network_dict["file_crs"]
+        is_directed = self.network_dict["is_directed"]
+
         gdf = self.read_vector(fn=file, crs=file_crs)
         gdf = self.clean_vector(
             gdf, explode_and_deduplicate_geometries=True
         )  # TODO move explode_and_deduplicate_geometries to [project] or [cleanup]
         g = self.setup_graph_from_vector(gdf, is_directed=is_directed)
-        network = self.setup_network_from_graph(g, include_nodes=False)
-        # assign to property
-        self.base_graph = nx.MultiGraph(g)
-        self.base_network = network
-        return self.base_graph, self.base_network
+        edges, nodes = self.setup_network_from_graph(g, include_nodes=True)
+        graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
+        return graph_complex, edges
 
     def read_vector(
-        self, fn: Union[str, Path, List[str, Path]], crs: Union[int, str]
+        self, fn: Union[str, Path, List[Union[str, Path]]], crs: Union[int, str]
     ) -> gpd.GeoDataFrame:
         """
         Reads a vector file or a list of vector files.
@@ -238,7 +260,7 @@ class VectorNetworkWrapper:
 
         Parameters
         ----------
-        fn : Union[str, Path, List[str, Path]]
+        fn : Union[str, Path, List[Union[str, Path]]]
             Path to the vector file or list of paths.
         crs : Union[int, str]
             Coordinate reference system for the file. Allow only one crs for all fn.
@@ -274,13 +296,15 @@ class VectorNetworkWrapper:
 
         return gdf
 
-    def _read_file(self, fn: Union[str, Path, List[str, Path]]) -> gpd.GeoDataFrame:
+    def _read_file(
+        self, fn: Union[str, Path, List[Union[str, Path]]]
+    ) -> gpd.GeoDataFrame:
         """
         Reads a file or a list of files into a GeoDataFrame.
 
         Parameters
         ----------
-        fn : Union[str, Path, List[str, Path]]
+        fn : Union[str, Path, List[Union[str, Path]]]
             Path to the file or list of paths.
 
         Returns
@@ -295,6 +319,8 @@ class VectorNetworkWrapper:
         elif isinstance(fn, list):
             gdf = gpd.GeoDataFrame(pd.concat([gpd.read_file(_fn) for _fn in fn]))
             logger.info("read vector files.")
+        else:
+            gdf = None
         return gdf
 
     def clean_vector(
