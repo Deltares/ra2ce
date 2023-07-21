@@ -1,5 +1,8 @@
+from ra2ce.configuration.config_wrapper import ConfigWrapper
+from ra2ce.graph.network_config_data import NetworkConfigData
 from ra2ce.runners.direct_analysis_runner import DirectAnalysisRunner
 from tests.runners.dummy_classes import DummyRa2ceInput
+import pytest
 
 
 class TestDirectAnalysisRunner:
@@ -7,52 +10,56 @@ class TestDirectAnalysisRunner:
         _runner = DirectAnalysisRunner()
         assert str(_runner) == "Direct Analysis Runner"
 
-    def test_given_direct_configuration_can_run(self):
+    @pytest.fixture
+    def dummy_ra2ce_input(self):
+        _ra2ce_input = DummyRa2ceInput()
+        assert isinstance(_ra2ce_input, ConfigWrapper)
+        yield _ra2ce_input
+
+    def test_given_direct_configuration_can_run(self, dummy_ra2ce_input: ConfigWrapper):
         # 1. Define test data.
-        _input_config = DummyRa2ceInput()
-        assert _input_config
-        _input_config.analysis_config.config_data["direct"] = None
-        _input_config.network_config.config_data.hazard.hazard_map = "A value"
+        dummy_ra2ce_input.analysis_config.config_data["direct"] = None
+        dummy_ra2ce_input.network_config.config_data.hazard.hazard_map = "A value"
 
         # 2. Run test.
-        _result = DirectAnalysisRunner.can_run(_input_config)
+        _result = DirectAnalysisRunner.can_run(dummy_ra2ce_input)
 
         # 3. Verify expectations.
         assert _result
 
-    def test_given_wrong_analysis_configuration_cannot_run(self):
+    def test_given_wrong_analysis_configuration_cannot_run(
+        self, dummy_ra2ce_input: ConfigWrapper
+    ):
         # 1. Define test data.
-        _input_config = DummyRa2ceInput()
-        assert _input_config
-        _input_config.network_config.config_data.hazard.hazard_map = "A value"
+        dummy_ra2ce_input.network_config.config_data.hazard.hazard_map = "A value"
 
         # 2. Run test.
-        _result = DirectAnalysisRunner.can_run(_input_config)
+        _result = DirectAnalysisRunner.can_run(dummy_ra2ce_input)
 
         # 3. Verify expectations.
         assert not _result
 
-    def test_given_wrong_network_hazard_configuration_cannot_run(self):
+    def test_given_wrong_network_hazard_configuration_cannot_run(
+        self, dummy_ra2ce_input: ConfigWrapper
+    ):
         # 1. Define test data.
-        _input_config = DummyRa2ceInput()
-        assert _input_config
-        _input_config.analysis_config.config_data["direct"] = None
+        dummy_ra2ce_input.analysis_config.config_data["direct"] = None
 
         # 2. Run test.
-        _result = DirectAnalysisRunner.can_run(_input_config)
+        _result = DirectAnalysisRunner.can_run(dummy_ra2ce_input)
 
         # 3. Verify expectations.
         assert not _result
 
-    def test_given_no_network_config_returns_false(self):
+    def test_given_no_network_config_returns_false(
+        self, dummy_ra2ce_input: ConfigWrapper
+    ):
         # 1. Define test data.
-        _input_config = DummyRa2ceInput()
-        assert _input_config
-        _input_config.analysis_config.config_data["direct"] = "sth"
-        _input_config.network_config = None
+        dummy_ra2ce_input.analysis_config.config_data["direct"] = "sth"
+        dummy_ra2ce_input.network_config = None
 
         # 2. Run test.
-        _result = DirectAnalysisRunner.can_run(_input_config)
+        _result = DirectAnalysisRunner.can_run(dummy_ra2ce_input)
 
         # 3. Verify expectations.
         assert not _result
