@@ -12,7 +12,7 @@ class TestDirectAnalysisRunner:
         _input_config = DummyRa2ceInput()
         assert _input_config
         _input_config.analysis_config.config_data["direct"] = None
-        _input_config.network_config.config_data["hazard"] = dict(hazard_map="A value")
+        _input_config.network_config.config_data.hazard.hazard_map = "A value"
 
         # 2. Run test.
         _result = DirectAnalysisRunner.can_run(_input_config)
@@ -24,7 +24,7 @@ class TestDirectAnalysisRunner:
         # 1. Define test data.
         _input_config = DummyRa2ceInput()
         assert _input_config
-        _input_config.network_config.config_data["hazard"] = dict(hazard_map="A value")
+        _input_config.network_config.config_data.hazard.hazard_map = "A value"
 
         # 2. Run test.
         _result = DirectAnalysisRunner.can_run(_input_config)
