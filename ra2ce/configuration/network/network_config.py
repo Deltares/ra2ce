@@ -81,9 +81,9 @@ class NetworkConfig(ConfigProtocol):
         _new_network_config.ini_file = ini_file
         _new_network_config.config_data = config_data
         _static_dir = config_data.static_path
-        if _static_dir and _static_dir.is_dir():
+        if config_data.output_graph_dir and config_data.output_graph_dir.is_dir():
             _new_network_config.files = _new_network_config._get_existent_network_files(
-                _static_dir.joinpath("output_graph")
+                config_data.output_graph_dir
             )
         else:
             logging.error(f"Static dir not found. Value provided: {_static_dir}")
@@ -132,28 +132,28 @@ class NetworkConfig(ConfigProtocol):
         if not static_output_dir.exists():
             raise ValueError("Path does not exist: {}".format(static_output_dir))
         # Load graphs
-        # FIXME: why still read hazard as neccessary if analysis of single link redundancy can run wihtout hazard?
+        # TODO (fix): why still read hazard as neccessary if analysis of single link redundancy can run wihtout hazard?
         for input_graph in ["base_graph", "origins_destinations_graph"]:
-            filename = static_output_dir / f"{input_graph}.p"
-            if filename.is_file():
-                _graphs[input_graph] = _pickle_reader.read(filename)
+            _input_graph_filename = static_output_dir.joinpath(f"{input_graph}.p")
+            if _input_graph_filename.is_file():
+                _graphs[input_graph] = _pickle_reader.read(_input_graph_filename)
             else:
                 _graphs[input_graph] = None
 
-            filename = static_output_dir / f"{input_graph}_hazard.p"
-            if filename.is_file():
-                _graphs[input_graph + "_hazard"] = _pickle_reader.read(filename)
+            _hazard_filename = static_output_dir.joinpath(f"{input_graph}_hazard.p")
+            if _hazard_filename.is_file():
+                _graphs[input_graph + "_hazard"] = _pickle_reader.read(_hazard_filename)
             else:
                 _graphs[input_graph + "_hazard"] = None
 
         # Load networks
-        filename = static_output_dir / "base_network.feather"
+        filename = static_output_dir.joinpath("base_network.feather")
         if filename.is_file():
             _graphs["base_network"] = gpd.read_feather(filename)
         else:
             _graphs["base_network"] = None
 
-        filename = static_output_dir / "base_network_hazard.feather"
+        filename = static_output_dir.joinpath("base_network_hazard.feather")
         if filename.is_file():
             _graphs["base_network_hazard"] = gpd.read_feather(filename)
         else:
