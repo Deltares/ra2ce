@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import logging
+from dataclasses import dataclass
 from pathlib import Path
 
 import networkx as nx
@@ -148,18 +149,19 @@ class OsmNetworkWrapper:
             """)
         for u, v, data in graph.edges(data=True):
 
-            u, v, extremities, flipped_extremities, extremities_coor, flipped_extremities_coor = OsmNetworkWrapper. \
-                get_extremities_data_for_sub_graph(from_node_id=u, to_node_id=v, sub_graph=unique_graph, graph=graph,
-                                                   shared_elements=unique_elements)
-            if extremities is not None and extremities_coor is not None:
-                if (extremities, flipped_extremities) not in unique_elements and\
-                        (extremities_coor, flipped_extremities_coor) not in unique_elements:
+            extremities_data = OsmNetworkWrapper.get_extremities_data_for_sub_graph(from_node_id=u, to_node_id=v,
+                                                                                    sub_graph=unique_graph,
+                                                                                    graph=graph,
+                                                                                    shared_elements=unique_elements)
+            if extremities_data.from_to_id is not None and extremities_data.from_to_coor is not None:
+                if (extremities_data.from_to_id, extremities_data.to_from_id) not in unique_elements and \
+                        (extremities_data.from_to_coor, extremities_data.to_from_coor) not in unique_elements:
                     edge_attributes = {
                         key: value for key, value in data.items()
                     }
-                    unique_graph.add_edge(u, v, **edge_attributes)
-                    unique_elements.add((extremities, flipped_extremities))
-                    unique_elements.add((extremities_coor, flipped_extremities_coor))
+                    unique_graph.add_edge(extremities_data.from_id, extremities_data.to_id, **edge_attributes)
+                    unique_elements.add((extremities_data.from_to_id, extremities_data.to_from_id))
+                    unique_elements.add((extremities_data.from_to_coor, extremities_data.to_from_coor))
 
         return unique_graph
 
@@ -171,7 +173,7 @@ class OsmNetworkWrapper:
         when dropping duplicates"""
 
         if from_node_id in sub_graph.nodes() and to_node_id in sub_graph.nodes():
-            return OsmNetworkWrapper.arrange_extremities_data(
+            return ExtremitiesData.arrange_extremities_data(
                 from_node_id=from_node_id, to_node_id=to_node_id, graph=sub_graph
             )
         elif (graph.nodes[from_node_id]['x'], graph.nodes[from_node_id]['y']) in shared_elements and \
@@ -181,12 +183,10 @@ class OsmNetworkWrapper:
                 sub_graph, graph.nodes[from_node_id]['x'], graph.nodes[from_node_id]['y']
             )
             if from_node_id_prime == to_node_id:
-                #  ToDo: Make a class and return it's object instead of 6 different parameters
-                return None, None, None, None, None, None
+                return ExtremitiesData()
             else:
-                return OsmNetworkWrapper.arrange_extremities_data(
-                    from_node_id=from_node_id_prime, to_node_id=to_node_id, graph=sub_graph
-                )
+                return ExtremitiesData.arrange_extremities_data(from_node_id=from_node_id_prime, to_node_id=to_node_id,
+                                                                graph=sub_graph)
 
         elif from_node_id in sub_graph.nodes() and \
                 (graph.nodes[to_node_id]['x'], graph.nodes[to_node_id]['y']) in shared_elements:
@@ -195,13 +195,12 @@ class OsmNetworkWrapper:
                 sub_graph, graph.nodes[to_node_id]['x'], graph.nodes[to_node_id]['y']
             )
             if from_node_id == to_node_id_prime:
-                return None, None, None, None, None, None
+                return ExtremitiesData()
             else:
-                return OsmNetworkWrapper.arrange_extremities_data(
-                    from_node_id=from_node_id, to_node_id=to_node_id_prime, graph=sub_graph
-                )
+                return ExtremitiesData.arrange_extremities_data(from_node_id=from_node_id, to_node_id=to_node_id_prime,
+                                                                graph=sub_graph)
         else:
-            return None, None, None, None, None, None
+            return ExtremitiesData()
 
     @staticmethod
     def find_node_id_by_coor(graph: MultiDiGraph, target_x: float, target_y: float):
@@ -214,19 +213,33 @@ class OsmNetworkWrapper:
         return None
 
     @staticmethod
-    def arrange_extremities_data(from_node_id: int, to_node_id: int, graph: MultiDiGraph):
-        return from_node_id, to_node_id, \
-            (from_node_id, to_node_id), (to_node_id, from_node_id), \
-            (
-                (graph.nodes[from_node_id]['x'], graph.nodes[to_node_id]['x']),
-                (graph.nodes[from_node_id]['y'], graph.nodes[to_node_id]['y'])
-            ), \
-            (
-                (graph.nodes[to_node_id]['x'], graph.nodes[from_node_id]['x']),
-                (graph.nodes[to_node_id]['y'], graph.nodes[from_node_id]['y'])
-            )
-
-    @staticmethod
     def snap_nodes(complex_graph, threshold):
 
         pass
+
+
+@dataclass
+class ExtremitiesData:
+    from_id: int = None
+    to_id: int = None
+    from_to_id: tuple = (None, None)
+    to_from_id: tuple = (None, None)
+    from_to_coor: tuple = ((None, None), (None, None))
+    to_from_coor: tuple = ((None, None), (None, None))
+
+    @staticmethod
+    def arrange_extremities_data(from_node_id: int, to_node_id: int, graph: MultiDiGraph):
+        return ExtremitiesData(
+            from_id=from_node_id,
+            to_id=to_node_id,
+            from_to_id=(from_node_id, to_node_id),
+            to_from_id=(to_node_id, from_node_id),
+            from_to_coor=(
+                (graph.nodes[from_node_id]['x'], graph.nodes[to_node_id]['x']),
+                (graph.nodes[from_node_id]['y'], graph.nodes[to_node_id]['y'])
+            ),
+            to_from_coor=(
+                (graph.nodes[to_node_id]['x'], graph.nodes[from_node_id]['x']),
+                (graph.nodes[to_node_id]['y'], graph.nodes[from_node_id]['y'])
+            )
+        )
