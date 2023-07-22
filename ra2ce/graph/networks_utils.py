@@ -1833,12 +1833,13 @@ def fraction_flooded(line: LineString, hazard_map: str):
 
 def check_crs_gdf(gdf: gpd.GeoDataFrame, crs) -> None:
     if gdf.crs != crs:
-        logging.error(
+        _error = (
             "Shape projection is epsg:{} - only projection epsg:{} is allowed. ".format(
                 gdf.crs, crs
             )
         )
-        sys.exit()
+        logging.error(_error)
+        raise ValueError(_error)
 
 
 def clean_memory(list_delete: list) -> None:
