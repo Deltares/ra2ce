@@ -17,6 +17,7 @@
 import logging
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Union
 
 import networkx as nx
 import osmnx
@@ -222,10 +223,10 @@ class OsmNetworkWrapper:
 class ExtremitiesData:
     from_id: int = None
     to_id: int = None
-    from_to_id: tuple = (None, None)
-    to_from_id: tuple = (None, None)
-    from_to_coor: tuple = ((None, None), (None, None))
-    to_from_coor: tuple = ((None, None), (None, None))
+    from_to_id: Union[None, tuple] = None
+    to_from_id: Union[None, tuple] = None
+    from_to_coor: Union[None, tuple] = None
+    to_from_coor: Union[None, tuple] = None
 
     @staticmethod
     def arrange_extremities_data(from_node_id: int, to_node_id: int, graph: MultiDiGraph):
