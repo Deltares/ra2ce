@@ -28,7 +28,7 @@ def test_hazard_handler_given_invalid_values_returns_none():
     assert _return_value is None
 
 
-class TestNetworkConfig:
+class TestNetworkConfigWrapper:
     def test_get_data_output(self):
         # 1. Define test data
         _test_ini = test_results / "non_existing.ini"
