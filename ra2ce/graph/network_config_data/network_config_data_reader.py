@@ -1,7 +1,9 @@
 from configparser import ConfigParser
 from pathlib import Path
 from typing import Union
-from ra2ce.configuration.readers.ini_config_reader_base import IniConfigurationReaderProtocol
+from ra2ce.configuration.readers.ini_config_reader_base import (
+    IniConfigurationReaderProtocol,
+)
 
 from ra2ce.graph.network_config_data.network_config_data import (
     CleanupSection,
@@ -29,12 +31,54 @@ class NetworkConfigDataReader(IniConfigurationReaderProtocol):
 
         _parent_dir = file_to_parse.parent
 
-        return NetworkConfigData(
+        _config_data = NetworkConfigData(
             input_path=_parent_dir.joinpath("input"),
             static_path=_parent_dir.joinpath("static"),
             output_path=_parent_dir.joinpath("output"),
             **self._get_sections(),
         )
+        self._correct_paths(_config_data)
+        return _config_data
+
+    def _correct_paths(self, config_data: NetworkConfigData) -> None:
+        """
+        This method is created because we support defining Path properties with just their filename, but no relative or absolute references.
+        These need to be done later on by combining the `input`, `static` or `output` paths. To avoid extra logic all over the solution,
+        we can correct these paths here.
+
+        Args:
+            config_data (NetworkConfigData): The configuration data whose paths need to be corrected.
+        """
+
+        def _select_to_correct(path_value: Union[list[Path], Path]) -> bool:
+            if not path_value:
+                return False
+
+            if isinstance(path_value, list):
+                return _select_to_correct(path_value[0])
+            return not path_value.exists()
+
+        # Relative to network directory.
+        _network_directory = config_data.static_path.joinpath("network")
+        if _select_to_correct(config_data.origins_destinations.origins):
+            config_data.origins_destinations.origins = _network_directory.joinpath(
+                config_data.origins_destinations.origins
+            )
+
+        if _select_to_correct(config_data.origins_destinations.destinations):
+            config_data.origins_destinations.destinations = _network_directory.joinpath(
+                config_data.origins_destinations.destinations
+            )
+
+        # Relative to hazard directory.
+        _hazard_directory = config_data.static_path.joinpath("hazard")
+        if _select_to_correct(config_data.hazard.hazard_map):
+            config_data.hazard.hazard_map = list(
+                map(
+                    lambda x: _hazard_directory.joinpath(x),
+                    config_data.hazard.hazard_map,
+                )
+            )
 
     def _get_str_as_path(self, str_value: Union[str, Path]) -> Path:
         if str_value and not isinstance(str_value, Path):

@@ -33,10 +33,10 @@ class ProjectSection:
 class NetworkSection:
     directed: bool = False
     source: str = ""  # should be enum
-    primary_file: str = ""
-    diversion_file: str = ""
+    primary_file: str = ""  # TODO. Unclear whether this is `Path` or `list[Path]`
+    diversion_file: str = ""  # TODO. Unclear whether this is `Path` or `list[Path]`
     file_id: str = ""
-    polygon: str = ""
+    polygon: str = ""  # TODO. Unclear whether this is `str`` or `Path`
     network_type: str = ""  # Should be enum
     road_types: list[str] = field(default_factory=list)
     save_shp: bool = False
@@ -44,9 +44,7 @@ class NetworkSection:
 
 @dataclass
 class OriginsDestinationsSection:
-    # Must be in the static/network folder, belongs to this analysis
     origins: Path = None
-    # Must be in the static/network folder, belongs to this analysis
     destinations: Path = None
     origins_names: str = ""
     destinations_names: str = ""
@@ -67,7 +65,7 @@ class IsolationSection:
 
 @dataclass
 class HazardSection:
-    hazard_map: list[Path] = field(default_factory=list)  # Should be a list of paths.
+    hazard_map: list[Path] = field(default_factory=list)
     hazard_id: str = ""
     hazard_field_name: list[str] = field(default_factory=list)
     aggregate_wl: str = ""  # Should be enum
