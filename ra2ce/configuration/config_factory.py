@@ -29,8 +29,11 @@ from ra2ce.configuration.analysis.readers.analysis_config_reader_factory import 
     AnalysisConfigReaderFactory,
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper
-from ra2ce.configuration.network.network_config import NetworkConfig
-from ra2ce.graph.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_wrapper import NetworkConfig
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_data.network_config_data_reader import (
+    NetworkConfigDataReader,
+)
 
 
 class ConfigFactory:
@@ -61,7 +64,7 @@ class ConfigFactory:
     def get_network_config_data(network_ini: Path) -> Optional[NetworkConfigData]:
         if not network_ini:
             return None
-        _config_data = NetworkConfigData.from_ini_file(network_ini)
+        _config_data = NetworkConfigDataReader().read(network_ini)
         return NetworkConfig.from_data(network_ini, _config_data)
 
     @staticmethod

@@ -1,5 +1,5 @@
 from ra2ce.configuration.config_wrapper import ConfigWrapper
-from ra2ce.graph.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.runners.direct_analysis_runner import DirectAnalysisRunner
 from tests.runners.dummy_classes import DummyRa2ceInput
 import pytest

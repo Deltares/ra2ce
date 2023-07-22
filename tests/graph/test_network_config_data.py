@@ -1,5 +1,5 @@
 from pathlib import Path
-from ra2ce.graph.network_config_data import (
+from ra2ce.graph.network_config_data.network_config_data import (
     CleanupSection,
     HazardSection,
     IsolationSection,

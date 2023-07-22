@@ -1,7 +1,8 @@
-from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
+from ra2ce.configuration import AnalysisConfigBase
 from ra2ce.configuration.config_factory import ConfigFactory
 from ra2ce.configuration.config_wrapper import ConfigWrapper
-from ra2ce.graph.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_wrapper import NetworkConfig
 from tests import test_data
 
 

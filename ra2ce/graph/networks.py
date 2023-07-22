@@ -32,7 +32,7 @@ import osmnx
 import pandas as pd
 import pyproj
 from shapely.geometry import MultiLineString
-from ra2ce.graph.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 
 import ra2ce.graph.networks_utils as nut
 from ra2ce.graph.segmentation import Segmentation

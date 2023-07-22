@@ -36,7 +36,7 @@ from ra2ce.configuration.analysis.analysis_with_network_config import (
 from ra2ce.configuration.analysis.analysis_without_network_config import (
     AnalysisWithoutNetworkConfiguration,
 )
-from ra2ce.configuration.network.network_config import NetworkConfig
+from ra2ce.graph.network_config_wrapper import NetworkConfig
 
 
 class AnalysisConfigFactory:
