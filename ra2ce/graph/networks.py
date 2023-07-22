@@ -72,14 +72,8 @@ class Network:
 
         # Origins and destinations
         _origins_destinations = network_config.origins_destinations
-        self.origins = None
-        self.destinations = None
-        if _origins_destinations.origins:
-            self.origins = self._network_dir.joinpath(_origins_destinations.origins)
-        if _origins_destinations.destinations:
-            self.destinations = self._network_dir.joinpath(
-                _origins_destinations.destinations
-            )
+        self.origins = _origins_destinations.origins
+        self.destinations = _origins_destinations.destinations
         self.origins_names = _origins_destinations.origins_names
         self.destinations_names = _origins_destinations.destinations_names
         self.id_name_origin_destination = (

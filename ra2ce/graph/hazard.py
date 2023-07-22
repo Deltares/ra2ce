@@ -588,15 +588,14 @@ class Hazard:
         {key = hazard file type (tif / shp / table (csv/json) : value = list of file paths}
         """
 
-        def get_fullpath_filter(*suffix) -> list[Path]:
+        def get_filtered_files(*suffix) -> list[Path]:
             _filter = lambda x: x.suffix in list(suffix)
-            _to_full_path = lambda x: self._hazard_directory.joinpath(x)
-            return list(map(_to_full_path, filter(_filter, self._hazard_map)))
+            return list(filter(_filter, self._hazard_map))
 
         _hazard_files = {}
-        _hazard_files["tif"] = get_fullpath_filter(".tif")
-        _hazard_files["shp"] = get_fullpath_filter(".shp")
-        _hazard_files["table"] = get_fullpath_filter(".csv", ".json")
+        _hazard_files["tif"] = get_filtered_files(".tif")
+        _hazard_files["shp"] = get_filtered_files(".shp")
+        _hazard_files["table"] = get_filtered_files(".csv", ".json")
         return _hazard_files
 
     def get_hazard_intersect_geodataframe_tif(
