@@ -6,7 +6,7 @@ from ra2ce.configuration import AnalysisIniConfigData
 from ra2ce.configuration.analysis.analysis_with_network_config import (
     AnalysisWithNetworkConfiguration,
 )
-from ra2ce.graph.network_config_wrapper import NetworkConfig
+from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data
 
 
@@ -43,7 +43,7 @@ class TestAnalysisWithNetworkConfig:
     def test_from_data_with_network(self, valid_analysis_ini: Path):
         # 1. Define test data.
         _config_data = AnalysisIniConfigData()
-        _network_config = NetworkConfig()
+        _network_config = NetworkConfigWrapper()
 
         # 2. Run test.
         _config = AnalysisWithNetworkConfiguration.from_data_with_network(
@@ -59,7 +59,7 @@ class TestAnalysisWithNetworkConfig:
     def test_configure(self, valid_analysis_ini: Path):
         # 1. Define test data.
         _config_data = AnalysisIniConfigData()
-        _network_config = NetworkConfig()
+        _network_config = NetworkConfigWrapper()
         _config = AnalysisWithNetworkConfiguration.from_data_with_network(
             valid_analysis_ini, _config_data, _network_config
         )

@@ -5,7 +5,7 @@ import pytest
 from tests import test_results
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_wrapper import (
-    NetworkConfig,
+    NetworkConfigWrapper,
     hazard_handler,
     network_handler,
 )
@@ -35,7 +35,7 @@ class TestNetworkConfig:
         _expected_value = test_results / "output"
 
         # 2. Run test
-        _return_value = NetworkConfig.get_data_output(_test_ini)
+        _return_value = NetworkConfigWrapper.get_data_output(_test_ini)
 
         # 3. Verify expectations.
         assert _return_value == _expected_value
@@ -50,7 +50,7 @@ class TestNetworkConfig:
 
         # 2. Run test
         with pytest.raises(ValueError) as exc_err:
-            NetworkConfig.read_graphs_from_config(_test_dir)
+            NetworkConfigWrapper.read_graphs_from_config(_test_dir)
 
         # 3. Verify expectations.
         assert str(exc_err.value) == "Path does not exist: {}".format(_test_dir)
@@ -64,7 +64,7 @@ class TestNetworkConfig:
             _test_dir.mkdir(parents=True)
 
         # 2. Run test.
-        _result = NetworkConfig.read_graphs_from_config(_test_dir)
+        _result = NetworkConfigWrapper.read_graphs_from_config(_test_dir)
 
         # 3. Verify expectations
         assert isinstance(_result, dict)

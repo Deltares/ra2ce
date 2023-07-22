@@ -32,7 +32,7 @@ from ra2ce.configuration.config_protocol import ConfigProtocol
 from ra2ce.graph.hazard import Hazard
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_data.network_config_data_validator import (
-    NetworkIniConfigurationValidator,
+    NetworkConfigDataValidator,
 )
 from ra2ce.graph.networks import Network
 from ra2ce.io.readers import GraphPickleReader
@@ -63,7 +63,7 @@ def hazard_handler(
     return graphs
 
 
-class NetworkConfig(ConfigProtocol):
+class NetworkConfigWrapper(ConfigProtocol):
     files: Dict[str, Path] = {}
     config_data: NetworkConfigData
 
@@ -79,7 +79,9 @@ class NetworkConfig(ConfigProtocol):
         }
 
     @classmethod
-    def from_data(cls, ini_file: Path, config_data: NetworkConfigData) -> NetworkConfig:
+    def from_data(
+        cls, ini_file: Path, config_data: NetworkConfigData
+    ) -> NetworkConfigWrapper:
         """
         Initializes a `NetworkConfig` with the given parameters.
 
@@ -188,7 +190,5 @@ class NetworkConfig(ConfigProtocol):
 
     def is_valid(self) -> bool:
         _file_is_valid = self.ini_file.is_file() and self.ini_file.suffix == ".ini"
-        _validation_report = NetworkIniConfigurationValidator(
-            self.config_data
-        ).validate()
+        _validation_report = NetworkConfigDataValidator(self.config_data).validate()
         return _file_is_valid and _validation_report.is_valid()

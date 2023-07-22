@@ -31,7 +31,7 @@ from shapely.errors import ShapelyDeprecationWarning
 from ra2ce.configuration import AnalysisConfigBase
 from ra2ce.configuration.config_factory import ConfigFactory
 from ra2ce.configuration.config_wrapper import ConfigWrapper
-from ra2ce.graph.network_config_wrapper import NetworkConfig
+from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 from ra2ce.ra2ce_logging import Ra2ceLogger
 from ra2ce.runners import AnalysisRunnerFactory
 
@@ -56,7 +56,7 @@ class Ra2ceHandler:
     ) -> None:
         _output_config = None
         if network:
-            _output_config = NetworkConfig.get_data_output(network)
+            _output_config = NetworkConfigWrapper.get_data_output(network)
         elif analysis:
             _output_config = AnalysisConfigBase.get_data_output(analysis)
         else:
