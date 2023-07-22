@@ -5,7 +5,7 @@ import pytest
 
 from ra2ce.configuration import AnalysisConfigBase
 from ra2ce.configuration.config_wrapper import ConfigWrapper
-from ra2ce.graph.network_config_wrapper import NetworkConfig
+from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data
 
 
@@ -39,7 +39,7 @@ class TestConfigWrapper:
     ):
         # 1. Define test data.
         _input_config = ConfigWrapper()
-        _input_config.network_config = NetworkConfig()
+        _input_config.network_config = NetworkConfigWrapper()
         _input_config.analysis_config = AnalysisConfigBase()
         _input_config.network_config.ini_file = network_ini
         _input_config.analysis_config.ini_file = analysis_ini
@@ -56,7 +56,7 @@ class TestConfigWrapper:
     def test_is_valid_input_no_analysis_config(self):
         # 1. Define test data
         _input_config = ConfigWrapper()
-        _input_config.network_config = NetworkConfig()
+        _input_config.network_config = NetworkConfigWrapper()
         _input_config.analysis_config = None
 
         # 2. Run test
@@ -67,7 +67,7 @@ class TestConfigWrapper:
             def is_valid(self) -> bool:
                 return True
 
-        class MockedNetwork(NetworkConfig):
+        class MockedNetwork(NetworkConfigWrapper):
             def is_valid(self) -> bool:
                 return False
 
@@ -91,7 +91,7 @@ class TestConfigWrapper:
             def is_valid(self) -> bool:
                 return True
 
-        class MockedNetwork(NetworkConfig):
+        class MockedNetwork(NetworkConfigWrapper):
             @property
             def root_dir(self) -> Path:
                 return test_data / "another_path"
@@ -135,7 +135,7 @@ class TestConfigWrapper:
             def is_valid(self) -> bool:
                 return True
 
-        class MockedNetwork(NetworkConfig):
+        class MockedNetwork(NetworkConfigWrapper):
             @property
             def root_dir(self) -> Path:
                 return test_data

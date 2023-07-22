@@ -36,7 +36,7 @@ from ra2ce.configuration.analysis.analysis_with_network_config import (
 from ra2ce.configuration.analysis.analysis_without_network_config import (
     AnalysisWithoutNetworkConfiguration,
 )
-from ra2ce.graph.network_config_wrapper import NetworkConfig
+from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
 class AnalysisConfigFactory:
@@ -48,7 +48,7 @@ class AnalysisConfigFactory:
     def get_analysis_config(
         ini_file: Path,
         analysis_ini_config: AnalysisIniConfigData,
-        network_config: Optional[NetworkConfig],
+        network_config: Optional[NetworkConfigWrapper],
     ) -> AnalysisConfigBase:
         """
         Converts an `AnalysisIniConfigData` into the matching concrete class of `AnalysisConfigBase`.

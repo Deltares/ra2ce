@@ -1,5 +1,5 @@
 from ra2ce.graph.network_config_data.network_config_data_validator import (
-    NetworkIniConfigurationValidator,
+    NetworkConfigDataValidator,
 )
 from ra2ce.graph.network_config_data.network_config_data import (
     CleanupSection,
@@ -15,7 +15,7 @@ from ra2ce.validation.validation_report import ValidationReport
 class TestNetworkIniConfigurationValidator:
     def test_init_validator(self):
         _test_config_data = NetworkConfigData()
-        _validator = NetworkIniConfigurationValidator(_test_config_data)
+        _validator = NetworkConfigDataValidator(_test_config_data)
         assert _validator
 
     def test_validate_given_valid_config_data(self):
@@ -31,7 +31,7 @@ class TestNetworkIniConfigurationValidator:
         )
 
         # 2. Run test.
-        _report = NetworkIniConfigurationValidator(_test_config_data).validate()
+        _report = NetworkConfigDataValidator(_test_config_data).validate()
 
         # 3. Verify final expectations.
         assert isinstance(_report, ValidationReport)
@@ -44,7 +44,7 @@ class TestNetworkIniConfigurationValidator:
         _test_config_data = NetworkConfigData(network=None)
 
         # 2. Run test.
-        _report = NetworkIniConfigurationValidator(_test_config_data).validate()
+        _report = NetworkConfigDataValidator(_test_config_data).validate()
 
         # 3. Verify final expectations.
         assert isinstance(_report, ValidationReport)
@@ -59,7 +59,7 @@ class TestNetworkIniConfigurationValidator:
         )
 
         # 2. Run test.
-        _report = NetworkIniConfigurationValidator(_test_config_data).validate()
+        _report = NetworkConfigDataValidator(_test_config_data).validate()
 
         # 3. Verify final expectations.
         assert isinstance(_report, ValidationReport)

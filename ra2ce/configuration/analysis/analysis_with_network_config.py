@@ -26,7 +26,7 @@ from pathlib import Path
 
 from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.graph.network_config_wrapper import NetworkConfig
+from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
 class AnalysisWithNetworkConfiguration(AnalysisConfigBase):
@@ -64,7 +64,7 @@ class AnalysisWithNetworkConfiguration(AnalysisConfigBase):
         cls,
         ini_file: Path,
         config_data: AnalysisIniConfigData,
-        network_config: NetworkConfig,
+        network_config: NetworkConfigWrapper,
     ) -> AnalysisWithNetworkConfiguration:
         """
         Initializes this class with a network_configuration.

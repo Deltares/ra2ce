@@ -30,11 +30,11 @@ from ra2ce.configuration.analysis.analysis_ini_config_data import (
 from ra2ce.configuration.analysis.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
-from ra2ce.graph.network_config_wrapper import NetworkConfig
+from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
 class AnalysisWithNetworkConfigReader(AnalysisConfigReaderBase):
-    def __init__(self, network_data: NetworkConfig) -> None:
+    def __init__(self, network_data: NetworkConfigWrapper) -> None:
         self._network_data = network_data
         if not network_data:
             raise ValueError(

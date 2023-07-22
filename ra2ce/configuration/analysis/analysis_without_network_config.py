@@ -26,7 +26,7 @@ import logging
 from pathlib import Path
 
 from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData
-from ra2ce.graph.network_config_wrapper import NetworkConfig
+from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
 class AnalysisWithoutNetworkConfiguration(AnalysisConfigBase):
@@ -57,7 +57,7 @@ class AnalysisWithoutNetworkConfiguration(AnalysisConfigBase):
         _new_analysis_config.config_data = config_data
         _static_dir = config_data.get("static", None)
         if _static_dir and _static_dir.is_dir():
-            config_data.files = NetworkConfig._get_existent_network_files(
+            config_data.files = NetworkConfigWrapper._get_existent_network_files(
                 _static_dir / "output_graph"
             )
         else:
@@ -66,7 +66,7 @@ class AnalysisWithoutNetworkConfiguration(AnalysisConfigBase):
         return _new_analysis_config
 
     def configure(self) -> None:
-        self.graphs = NetworkConfig.read_graphs_from_config(
+        self.graphs = NetworkConfigWrapper.read_graphs_from_config(
             self.config_data["static"] / "output_graph"
         )
         self.initialize_output_dirs()

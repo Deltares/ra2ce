@@ -30,7 +30,7 @@ from ra2ce.validation.validation_report import ValidationReport
 from ra2ce.configuration.validators.ini_config_validator_base import _expected_values
 
 
-class NetworkIniConfigurationValidator(Ra2ceIoValidator):
+class NetworkConfigDataValidator(Ra2ceIoValidator):
     def __init__(self, config_data: NetworkConfigData) -> None:
         self._config = config_data
 
