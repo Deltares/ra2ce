@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from ra2ce.graph.hazard import Hazard
-from ra2ce.graph.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 
 
 class TestHazard:

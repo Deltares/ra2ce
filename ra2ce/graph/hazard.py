@@ -32,7 +32,10 @@ import pandas as pd
 import pyproj
 from osgeo import gdal
 from rasterstats import point_query, zonal_stats
-from ra2ce.graph.network_config_data import HazardSection, NetworkConfigData
+from ra2ce.graph.network_config_data.network_config_data import (
+    HazardSection,
+    NetworkConfigData,
+)
 
 import ra2ce.graph.networks_utils as ntu
 from ra2ce.io.readers import GraphPickleReader

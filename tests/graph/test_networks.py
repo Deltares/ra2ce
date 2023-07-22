@@ -2,7 +2,10 @@ import shutil
 from typing import Iterator
 
 import pytest
-from ra2ce.graph.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_data.network_config_data_reader import (
+    NetworkConfigDataReader,
+)
 
 from ra2ce.graph.networks import Network
 from tests import test_results, slow_test, test_data
@@ -90,7 +93,7 @@ class TestNetworks:
         network_ini = case_data_dir / _network_ini_name
         assert network_ini.is_file()
 
-        _config_data = NetworkConfigData.from_ini_file(network_ini)
+        _config_data = NetworkConfigDataReader().read(network_ini)
         _config_data.output_path = _test_dir.joinpath("output")
         _config_data.static_path = case_data_dir.joinpath("static")
         _output_graph_dir = case_data_dir / "static" / "output_graph"

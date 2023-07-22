@@ -3,8 +3,9 @@ from typing import Optional
 
 import pytest
 
-from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
+from ra2ce.configuration import AnalysisConfigBase
 from ra2ce.configuration.config_wrapper import ConfigWrapper
+from ra2ce.graph.network_config_wrapper import NetworkConfig
 from tests import test_data
 
 

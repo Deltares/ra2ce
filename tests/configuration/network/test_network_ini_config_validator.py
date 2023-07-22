@@ -1,7 +1,7 @@
-from ra2ce.configuration.network.network_ini_config_validator import (
+from ra2ce.graph.network_config_data.network_config_data_validator import (
     NetworkIniConfigurationValidator,
 )
-from ra2ce.graph.network_config_data import (
+from ra2ce.graph.network_config_data.network_config_data import (
     CleanupSection,
     HazardSection,
     NetworkConfigData,

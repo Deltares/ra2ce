@@ -24,14 +24,17 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
+from ra2ce.configuration import AnalysisConfigBase
 from ra2ce.configuration.analysis.analysis_ini_config_data import (
     AnalysisWithoutNetworkIniConfigData,
 )
 from ra2ce.configuration.analysis.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
-from ra2ce.graph.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_data.network_config_data_reader import (
+    NetworkConfigDataReader,
+)
 
 
 class AnalysisWithoutNetworkConfigReader(AnalysisConfigReaderBase):
@@ -42,7 +45,7 @@ class AnalysisWithoutNetworkConfigReader(AnalysisConfigReaderBase):
             return None
         _analisis_config_dict = self._get_analysis_config_data(ini_file)
         _output_network_ini_file = _analisis_config_dict["output"] / "network.ini"
-        _network_config = NetworkConfigData.from_ini_file(_output_network_ini_file)
+        _network_config = NetworkConfigDataReader().read(_output_network_ini_file)
         _analisis_config_dict.update(_network_config.to_dict())
         _network = _analisis_config_dict.get("network", None)
         if _network:

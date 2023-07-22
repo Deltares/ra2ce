@@ -27,7 +27,7 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.configuration import AnalysisConfigBase
-from ra2ce.configuration.network.network_config import NetworkConfig
+from ra2ce.graph.network_config_wrapper import NetworkConfig
 
 
 class ConfigWrapper:

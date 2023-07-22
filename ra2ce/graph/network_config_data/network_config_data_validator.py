@@ -19,7 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from ra2ce.graph.network_config_data import (
+from ra2ce.graph.network_config_data.network_config_data import (
     HazardSection,
     NetworkConfigData,
     NetworkSection,

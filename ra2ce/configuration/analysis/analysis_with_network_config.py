@@ -24,8 +24,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData, NetworkConfig
-from ra2ce.graph.network_config_data import NetworkConfigData
+from ra2ce.configuration import AnalysisConfigBase, AnalysisIniConfigData
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_wrapper import NetworkConfig
 
 
 class AnalysisWithNetworkConfiguration(AnalysisConfigBase):

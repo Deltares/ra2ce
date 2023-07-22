@@ -29,11 +29,11 @@ from typing import Dict, Optional
 from geopandas import gpd
 
 from ra2ce.configuration.config_protocol import ConfigProtocol
-from ra2ce.configuration.network.network_ini_config_validator import (
+from ra2ce.graph.hazard import Hazard
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_data.network_config_data_validator import (
     NetworkIniConfigurationValidator,
 )
-from ra2ce.graph.hazard import Hazard
-from ra2ce.graph.network_config_data import NetworkConfigData
 from ra2ce.graph.networks import Network
 from ra2ce.io.readers import GraphPickleReader
 

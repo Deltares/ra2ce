@@ -30,7 +30,7 @@ from ra2ce.configuration.analysis.analysis_ini_config_data import (
 from ra2ce.configuration.analysis.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
-from ra2ce.configuration.network import NetworkConfig
+from ra2ce.graph.network_config_wrapper import NetworkConfig
 
 
 class AnalysisWithNetworkConfigReader(AnalysisConfigReaderBase):

@@ -33,7 +33,7 @@ from ra2ce.configuration.analysis.readers.analysis_with_network_config_reader im
 from ra2ce.configuration.analysis.readers.analysis_without_network_config_reader import (
     AnalysisWithoutNetworkConfigReader,
 )
-from ra2ce.graph.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 
 
 class AnalysisConfigReaderFactory:
