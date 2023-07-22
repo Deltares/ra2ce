@@ -1182,10 +1182,9 @@ class IndirectAnalyses:
                 )
                 df.to_csv(df_path, index=False)
             else:
-                logging.error(
-                    f"Analysis {analysis['analysis']} does not exist in RA2CE. Please choose an existing analysis."
-                )
-                sys.exit()
+                _error = f"Analysis {analysis['analysis']} does not exist in RA2CE. Please choose an existing analysis."
+                logging.error(_error)
+                raise ValueError(_error)
 
             if not gdf.empty:
                 # Not for all analyses a gdf is created as output.

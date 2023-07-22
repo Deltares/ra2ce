@@ -79,11 +79,6 @@ class TestAcceptance:
         "case_data_dir",
         [
             pytest.param("acceptance_test_data", id="Default test data."),
-            pytest.param(
-                "wpf_nepal",
-                id="Nepal project",
-                marks=pytest.mark.skip(reason="WPF Nepal test directory not presnt"),
-            ),
         ]
         + _external_test_cases,
         indirect=["case_data_dir"],

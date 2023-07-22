@@ -126,9 +126,15 @@ class NetworkConfigDataSectionReader:
     def get_network_section(self) -> NetworkSection:
         _section = "network"
         _network_section = NetworkSection(**self.parser[_section])
-        _network_section.directed = self.parser.getboolean(_section, "directed")
-        _network_section.save_shp = self.parser.getboolean(_section, "save_shp")
-        _network_section.road_types = self.parser.getlist(_section, "road_types")
+        _network_section.directed = self.parser.getboolean(
+            _section, "directed", fallback=_network_section.directed
+        )
+        _network_section.save_shp = self.parser.getboolean(
+            _section, "save_shp", fallback=_network_section.save_shp
+        )
+        _network_section.road_types = self.parser.getlist(
+            _section, "road_types", fallback=_network_section.road_types
+        )
         return _network_section
 
     def get_origins_destinations_section(self) -> OriginsDestinationsSection:
