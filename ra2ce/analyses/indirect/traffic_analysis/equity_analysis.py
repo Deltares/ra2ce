@@ -73,7 +73,7 @@ class EquityAnalysis(TrafficAnalysisBase):
         self, o_node: str, total_d_nodes: int
     ) -> AccumulatedTraffic:
         _accumulated_traffic = AccumulatedTraffic(egalitarian=1)
-        _accumulated_traffic.regular = self._get_recorded_traffic_in_node(
+        _accumulated_traffic.utilitarian = self._get_recorded_traffic_in_node(
             o_node, "values", total_d_nodes
         )
         _accumulated_traffic.prioritarian = self._get_recorded_traffic_in_node(
@@ -90,7 +90,7 @@ class EquityAnalysis(TrafficAnalysisBase):
             return (
                 u_node,
                 v_node,
-                traffic_values.regular,
+                traffic_values.utilitarian,
                 traffic_values.egalitarian,
                 traffic_values.prioritarian,
             )

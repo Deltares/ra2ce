@@ -551,10 +551,13 @@ class IndirectAnalyses:
         return pref_routes
 
     def optimal_route_od_link(
-        self, gdf: gpd.GeoDataFrame, od_table: gpd.GeoDataFrame, equity: pd.DataFrame
+        self,
+        road_network: gpd.GeoDataFrame,
+        od_table: gpd.GeoDataFrame,
+        equity: pd.DataFrame,
     ) -> pd.DataFrame:
         return TrafficAnalysisFactory.get_analysis(
-            gdf,
+            road_network,
             od_table,
             self.config["origins_destinations"]["destinations_names"],
             equity,

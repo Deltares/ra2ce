@@ -59,7 +59,7 @@ class TestAccumulatedTrafficDataclass:
         # 3. Verify expectation.
         assert _result != valid_accumulated_traffic
         assert _result != right_value
-        assert _result.regular == expected_result.regular
+        assert _result.utilitarian == expected_result.utilitarian
         assert _result.egalitarian == expected_result.egalitarian
         assert _result.prioritarian == expected_result.prioritarian
 
@@ -75,7 +75,7 @@ class TestAccumulatedTrafficDataclass:
 
         # 3. Verify expectation.
         assert valid_accumulated_traffic != right_value
-        assert valid_accumulated_traffic.regular == expected_result.regular
+        assert valid_accumulated_traffic.utilitarian == expected_result.utilitarian
         assert valid_accumulated_traffic.egalitarian == expected_result.egalitarian
         assert valid_accumulated_traffic.prioritarian == expected_result.prioritarian
 
@@ -92,7 +92,7 @@ class TestAccumulatedTrafficDataclass:
         # 3. Verify expectation.
         assert _result != valid_accumulated_traffic
         assert _result != right_value
-        assert _result.regular == expected_result.regular
+        assert _result.utilitarian == expected_result.utilitarian
         assert _result.egalitarian == expected_result.egalitarian
         assert _result.prioritarian == expected_result.prioritarian
 
@@ -108,6 +108,6 @@ class TestAccumulatedTrafficDataclass:
 
         # 3. Verify expectation.
         assert valid_accumulated_traffic != right_value
-        assert valid_accumulated_traffic.regular == expected_result.regular
+        assert valid_accumulated_traffic.utilitarian == expected_result.utilitarian
         assert valid_accumulated_traffic.egalitarian == expected_result.egalitarian
         assert valid_accumulated_traffic.prioritarian == expected_result.prioritarian

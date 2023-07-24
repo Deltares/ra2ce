@@ -35,7 +35,7 @@ from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_base import (
 class TrafficAnalysisFactory:
     @staticmethod
     def get_analysis(
-        gdf: gpd.GeoDataFrame,
+        road_network: gpd.GeoDataFrame,
         od_table: gpd.GeoDataFrame,
         destination_names: str,
         equity_data: pd.DataFrame,
@@ -44,7 +44,7 @@ class TrafficAnalysisFactory:
         Gets an instance of an `TrafficAnalysisBase` based on whether `equity_data` is provided or not.
 
         Args:
-            gdf (gpd.GeoDataFrame): General dataframe for the network to analyze.
+            road_network (gpd.GeoDataFrame): General dataframe for the road network to analyze.
             od_table (gpd.GeoDataFrame): Origins - destination table dataframe.
             destination_names (str): Destination names.
             equity_data (pd.DataFrame): Dataframe contaning region - weight information.
@@ -53,8 +53,10 @@ class TrafficAnalysisFactory:
             TrafficAnalysisBase: Object to make an equity analysis.
         """
         if isinstance(equity_data, pd.DataFrame) and not equity_data.empty:
-            return EquityAnalysis(gdf, od_table, destination_names, equity_data)
-        return TrafficAnalysis(gdf, od_table, destination_names)
+            return EquityAnalysis(
+                road_network, od_table, destination_names, equity_data
+            )
+        return TrafficAnalysis(road_network, od_table, destination_names)
 
     @staticmethod
     def read_equity_weights(equity_weight_file: Path) -> pd.DataFrame:
