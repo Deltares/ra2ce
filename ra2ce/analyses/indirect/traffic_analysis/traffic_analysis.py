@@ -30,23 +30,23 @@ from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_base import (
 
 
 class TrafficAnalysis(TrafficAnalysisBase):
-    gdf: gpd.GeoDataFrame
+    road_network: gpd.GeoDataFrame
     od_table: gpd.GeoDataFrame
     destinations_names: str
 
     def __init__(
         self,
-        gdf: gpd.GeoDataFrame,
+        road_network: gpd.GeoDataFrame,
         od_table: gpd.GeoDataFrame,
         destination_names: str,
     ) -> None:
         """
         Args:
-            gdf (gpd.GeoDataFrame): Geodataframe containing the overall network information.
+            road_network (gpd.GeoDataFrame): Geodataframe containing the overall network information.
             od_table (gpd.GeoDataFrame): GeoDataFrame representing the Origins - Destinations table.
             destination_names (str): Destination nodes.
         """
-        self.gdf = gdf
+        self.road_network = road_network
         self.od_table = od_table
         self.destinations_names = destination_names
 

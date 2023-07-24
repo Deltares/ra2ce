@@ -32,6 +32,10 @@ class AccumulatedTraffic:
     def __add__(
         self, other: Union[AccumulatedTraffic, float, int]
     ) -> AccumulatedTraffic:
+        """
+        Overloading of the add (`operator.add` or simply `+`).
+        This overload ensures we correctly add the `AccumulatedTraffic` attributes (`regular`, `egalitarian`, `prioritarian`).
+        """
         if isinstance(other, AccumulatedTraffic):
             return AccumulatedTraffic(
                 regular=self.regular + other.regular,
@@ -54,6 +58,10 @@ class AccumulatedTraffic:
     def __mul__(
         self, other: Union[AccumulatedTraffic, float, int]
     ) -> AccumulatedTraffic:
+        """
+        Overloading of the multiply (`operator.mul` or simply `*`).
+        This overload ensures we correctly multiply the `AccumulatedTraffic` attributes (`regular`, `egalitarian`, `prioritarian`).
+        """
         if isinstance(other, AccumulatedTraffic):
             return AccumulatedTraffic(
                 regular=self.regular * other.regular,

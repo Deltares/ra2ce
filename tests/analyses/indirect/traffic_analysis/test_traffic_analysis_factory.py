@@ -96,7 +96,7 @@ class TestTrafficAnalysisFactory:
 
         # 2. Run test.
         _result = TrafficAnalysisFactory.get_analysis(
-            valid_traffic_analysis_input.gdf_data,
+            valid_traffic_analysis_input.road_network,
             valid_traffic_analysis_input.od_table_data,
             valid_traffic_analysis_input.destination_names,
             valid_traffic_analysis_input.equity_data,
@@ -106,7 +106,7 @@ class TestTrafficAnalysisFactory:
         assert isinstance(_result, TrafficAnalysisBase)
         assert isinstance(_result, EquityAnalysis)
         pd.testing.assert_frame_equal(
-            _result.gdf, valid_traffic_analysis_input.gdf_data
+            _result.road_network, valid_traffic_analysis_input.road_network
         )
         pd.testing.assert_frame_equal(
             _result.od_table, valid_traffic_analysis_input.od_table_data

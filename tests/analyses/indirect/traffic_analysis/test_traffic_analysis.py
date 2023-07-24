@@ -19,7 +19,7 @@ class TestTrafficAnalysis:
         valid_traffic_analysis_input: TrafficAnalysisInput,
     ) -> TrafficAnalysis:
         yield TrafficAnalysis(
-            valid_traffic_analysis_input.gdf_data,
+            valid_traffic_analysis_input.road_network,
             valid_traffic_analysis_input.od_table_data,
             valid_traffic_analysis_input.destination_names,
         )
