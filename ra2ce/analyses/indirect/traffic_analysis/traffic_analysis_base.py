@@ -19,8 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from abc import abstractmethod
-import abc
+from abc import abstractmethod, ABC
 import itertools
 import operator
 from typing import Any
@@ -33,7 +32,7 @@ from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass impo
 )
 
 
-class TrafficAnalysisBase(abc.ABC):
+class TrafficAnalysisBase(ABC):
     road_network: gpd.GeoDataFrame
     od_table: gpd.GeoDataFrame
     destinations_names: str
@@ -42,7 +41,7 @@ class TrafficAnalysisBase(abc.ABC):
         self,
     ) -> pd.DataFrame:
         """
-        Gets the optimal routes based on regular, egalitarian and prioritarian traffic.
+        Gets the optimal routes based on utilitarian, egalitarian and prioritarian traffic.
 
         Returns:
             pd.DataFrame: Datafarme with the traffic indices for each of analysis.
@@ -110,7 +109,7 @@ class TrafficAnalysisBase(abc.ABC):
         # When do we want to 'multiply' the accumulated values?
         # When do we want to 'add' the accumulated values?
         _accumulated_traffic = AccumulatedTraffic(
-            regular=1, egalitarian=1, prioritarian=1
+            utilitarian=1, egalitarian=1, prioritarian=1
         )
         _intermediate_nodes = 0
         for _node in nodes_list:

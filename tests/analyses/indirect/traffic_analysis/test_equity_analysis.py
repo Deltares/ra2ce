@@ -81,5 +81,5 @@ class TestEquityAnalysis:
         # 3. Verify expectations.
         assert isinstance(_accumulated_traffic, AccumulatedTraffic)
         assert _accumulated_traffic.egalitarian == 1
-        assert _accumulated_traffic.regular == pytest.approx(3.1097, 0.0001)
+        assert _accumulated_traffic.utilitarian == pytest.approx(3.1097, 0.0001)
         assert _accumulated_traffic.prioritarian == pytest.approx(2.4615, 0.0001)

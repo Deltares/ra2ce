@@ -78,4 +78,4 @@ class TestTrafficAnalysis:
         assert isinstance(_accumulated_traffic, AccumulatedTraffic)
         assert _accumulated_traffic.egalitarian == 1
         assert _accumulated_traffic.prioritarian == 0
-        assert _accumulated_traffic.regular == pytest.approx(3.1097, 0.0001)
+        assert _accumulated_traffic.utilitarian == pytest.approx(3.1097, 0.0001)
