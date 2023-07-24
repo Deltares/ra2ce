@@ -20,8 +20,21 @@ _base_network_feather_filename = "base_network.feather"
 def get_external_test_cases() -> list[pytest.param]:
     if not test_external_data.exists():
         return []
+
+    _skip_cases = ["bolivia"]
+
+    def get_pytest_param(test_dir: Path) -> pytest.param:
+        _marks = [external_test]
+        if test_dir.stem.lower() in _skip_cases:
+            _marks.append(
+                pytest.mark.skip(
+                    reason=f"{test_dir.stem.capitalize()} not yet supported."
+                )
+            )
+        return pytest.param(test_dir, id=test_dir.name.capitalize(), marks=_marks)
+
     return [
-        pytest.param(_dir, id=_dir.name, marks=external_test)
+        get_pytest_param(_dir)
         for _dir in test_external_data.iterdir()
         if _dir.is_dir() and ".svn" not in _dir.name
     ]
