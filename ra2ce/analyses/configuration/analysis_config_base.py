@@ -24,10 +24,10 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.analyses.configuration.analysis_ini_config_data import AnalysisIniConfigData
-from ra2ce.configuration.config_protocol import ConfigProtocol
+from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 
 
-class AnalysisConfigBase(ConfigProtocol):
+class AnalysisConfigBase(ConfigWrapperProtocol):
     ini_file: Path
     root_dir: Path
     config_data: Optional[AnalysisIniConfigData] = None

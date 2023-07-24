@@ -40,14 +40,14 @@ class ConfigWrapperProtocol(Protocol):  # pragma: no cover
         cls, ini_file: Path, config_data: IniConfigDataProtocol
     ) -> ConfigWrapperProtocol:
         """
-        Initializes a `ConfigProtocol` with the given parameters.
+        Initializes a `ConfigWrapperProtocol` with the given parameters.
 
         Args:
             ini_file (Path): Path to the ini file containing the analysis data.
             config_data (IniConfigDataProtocol): Ini data representation.
 
         Returns:
-            ConfigProtocol: Initialized instance.
+            ConfigWrapperProtocol: Initialized instance.
         """
         raise NotImplementedError()
 
