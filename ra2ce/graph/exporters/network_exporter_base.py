@@ -26,7 +26,7 @@ from typing import Any, List, Union
 import geopandas as gpd
 import networkx as nx
 
-from ra2ce.io.writers.ra2ce_exporter_protocol import Ra2ceExporterProtocol
+from ra2ce.common.io.writers.ra2ce_exporter_protocol import Ra2ceExporterProtocol
 
 MULTIGRAPH_TYPE = Union[
     nx.classes.multigraph.MultiGraph, nx.classes.multidigraph.MultiDiGraph

@@ -26,7 +26,7 @@ from shutil import copyfile
 from typing import List, Optional, Protocol, runtime_checkable
 
 from ra2ce.configuration.config_protocol import ConfigProtocol
-from ra2ce.io.readers.file_reader_protocol import FileReaderProtocol
+from ra2ce.common.io.readers.file_reader_protocol import FileReaderProtocol
 
 
 @runtime_checkable

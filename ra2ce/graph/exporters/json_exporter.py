@@ -25,7 +25,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from ra2ce.io.writers.ra2ce_exporter_protocol import Ra2ceExporterProtocol
+from ra2ce.common.io.writers.ra2ce_exporter_protocol import Ra2ceExporterProtocol
 
 
 class JsonExporter(Ra2ceExporterProtocol):

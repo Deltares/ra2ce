@@ -27,7 +27,7 @@ from pathlib import Path
 
 import numpy as np
 
-from ra2ce.io.readers.file_reader_protocol import FileReaderProtocol
+from ra2ce.common.io.readers.file_reader_protocol import FileReaderProtocol
 
 
 class IniFileReader(FileReaderProtocol):

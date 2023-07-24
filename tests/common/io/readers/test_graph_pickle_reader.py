@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from ra2ce.io.readers.graph_pickle_reader import GraphPickleReader
-from tests.io.readers import test_data_readers
+from ra2ce.common.io.readers.graph_pickle_reader import GraphPickleReader
+from tests.common.io.readers import test_data_readers
 
 
 class TestGraphPickleReader:
