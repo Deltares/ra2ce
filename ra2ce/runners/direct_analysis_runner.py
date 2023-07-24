@@ -23,7 +23,7 @@
 import logging
 
 from ra2ce.analyses.direct import analyses_direct
-from ra2ce.configuration import AnalysisConfigBase
+from ra2ce.analyses.configuration import AnalysisConfigBase
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 
@@ -34,7 +34,10 @@ class DirectAnalysisRunner(AnalysisRunner):
 
     @staticmethod
     def can_run(ra2ce_input: ConfigWrapper) -> bool:
-        if not ra2ce_input.analysis_config or "direct" not in ra2ce_input.analysis_config.config_data:
+        if (
+            not ra2ce_input.analysis_config
+            or "direct" not in ra2ce_input.analysis_config.config_data
+        ):
             return False
         if not ra2ce_input.network_config:
             return False

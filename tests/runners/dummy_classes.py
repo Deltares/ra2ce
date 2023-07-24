@@ -1,4 +1,4 @@
-from ra2ce.configuration import AnalysisConfigBase
+from ra2ce.analyses.configuration import AnalysisConfigBase
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 
