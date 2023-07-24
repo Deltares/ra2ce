@@ -1,3 +1,3 @@
 # Purpose of this module
 
-Configuration module contains **only** protocols (`typing.Protocol`) to represent, for instance a Network or an Analysis configuration (Ini files).
+Configuration module contains the configuration (concrete) classes and related required to run a `Ra2ce` workflow picking up the information configuration instances from the different modules `analyses` and `network`.
