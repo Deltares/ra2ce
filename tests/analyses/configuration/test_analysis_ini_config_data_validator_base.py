@@ -3,10 +3,10 @@ from typing import List
 
 import pytest
 
-from ra2ce.common.configuration.config_data_protocol import IniConfigDataProtocol
 from ra2ce.analyses.configuration.analysis_ini_config_data_validator_base import (
     IniConfigValidatorBase,
 )
+from ra2ce.common.configuration.config_data_protocol import IniConfigDataProtocol
 from ra2ce.common.validation.validation_report import ValidationReport
 from tests import test_data, test_results
 

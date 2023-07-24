@@ -576,9 +576,7 @@ def origins_from_raster(output_folder: Path, mask_fn, raster_fn) -> Path:
     mask = gpd.read_file(mask_fn[0])
     res = 1000  # in meter; TODO: put in config file or in network.ini
     out_array, out_meta = rescale_and_crop(raster_fn, mask, output_folder, res)
-    outputfile = export_raster_to_geotiff(
-        out_array, out_meta, output_folder, output_fn
-    )
+    outputfile = export_raster_to_geotiff(out_array, out_meta, output_folder, output_fn)
 
     out_array[out_array > 0] = 1
     print(

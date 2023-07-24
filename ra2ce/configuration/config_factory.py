@@ -29,11 +29,11 @@ from ra2ce.analyses.configuration.readers.analysis_config_reader_factory import 
     AnalysisConfigReaderFactory,
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper
-from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_data.network_config_data_reader import (
     NetworkConfigDataReader,
 )
+from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
 class ConfigFactory:

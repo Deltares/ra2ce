@@ -1,6 +1,4 @@
-from ra2ce.graph.network_config_data.network_config_data_validator import (
-    NetworkConfigDataValidator,
-)
+from ra2ce.common.validation.validation_report import ValidationReport
 from ra2ce.graph.network_config_data.network_config_data import (
     CleanupSection,
     HazardSection,
@@ -9,7 +7,9 @@ from ra2ce.graph.network_config_data.network_config_data import (
     OriginsDestinationsSection,
     ProjectSection,
 )
-from ra2ce.common.validation.validation_report import ValidationReport
+from ra2ce.graph.network_config_data.network_config_data_validator import (
+    NetworkConfigDataValidator,
+)
 
 
 class TestNetworkIniConfigurationValidator:

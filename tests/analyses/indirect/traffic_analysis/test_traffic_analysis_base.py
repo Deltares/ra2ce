@@ -1,7 +1,8 @@
+import pytest
+
 from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_base import (
     TrafficAnalysisBase,
 )
-import pytest
 
 
 class TestTrafficAnalysisBase:

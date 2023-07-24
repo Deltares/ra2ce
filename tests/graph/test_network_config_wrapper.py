@@ -2,13 +2,13 @@ import shutil
 
 import pytest
 
-from tests import test_results
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_wrapper import (
     NetworkConfigWrapper,
     hazard_handler,
     network_handler,
 )
+from tests import test_results
 
 
 def test_network_handler_given_invalid_network_then_raises():

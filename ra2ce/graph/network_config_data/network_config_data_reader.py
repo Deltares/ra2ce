@@ -1,10 +1,10 @@
 from configparser import ConfigParser
 from pathlib import Path
 from typing import Union
+
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     IniConfigurationReaderProtocol,
 )
-
 from ra2ce.graph.network_config_data.network_config_data import (
     CleanupSection,
     HazardSection,

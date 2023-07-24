@@ -19,16 +19,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from ra2ce.analyses.configuration.analysis_ini_config_data_validator_base import (
+    _expected_values,
+)
+from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
+from ra2ce.common.validation.validation_report import ValidationReport
 from ra2ce.graph.network_config_data.network_config_data import (
     HazardSection,
     NetworkConfigData,
     NetworkSection,
     ProjectSection,
-)
-from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
-from ra2ce.common.validation.validation_report import ValidationReport
-from ra2ce.analyses.configuration.analysis_ini_config_data_validator_base import (
-    _expected_values,
 )
 
 

@@ -27,15 +27,15 @@ from pathlib import Path
 from typing import Dict, Optional
 
 from geopandas import gpd
-from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 
+from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
+from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph.hazard import Hazard
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_data.network_config_data_validator import (
     NetworkConfigDataValidator,
 )
 from ra2ce.graph.networks import Network
-from ra2ce.common.io.readers import GraphPickleReader
 
 
 def network_handler(config: NetworkConfigData, files: dict) -> Optional[dict]:

@@ -1,6 +1,6 @@
 import pytest
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.runners.analysis_runner_factory import AnalysisRunnerFactory
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 from ra2ce.runners.indirect_analysis_runner import IndirectAnalysisRunner

@@ -21,8 +21,8 @@
 
 
 import logging
-from pathlib import Path
 import time
+from pathlib import Path
 from typing import Any, List, Tuple, Union
 
 import geopandas as gpd
@@ -32,13 +32,11 @@ import pandas as pd
 import pyproj
 from osgeo import gdal
 from rasterstats import point_query, zonal_stats
-from ra2ce.graph.network_config_data.network_config_data import (
-    NetworkConfigData,
-)
 
-from ra2ce.graph import networks_utils as ntu
 from ra2ce.common.io.readers import GraphPickleReader
+from ra2ce.graph import networks_utils as ntu
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 
 
 class Hazard:
