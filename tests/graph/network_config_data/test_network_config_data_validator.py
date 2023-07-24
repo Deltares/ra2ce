@@ -9,7 +9,7 @@ from ra2ce.graph.network_config_data.network_config_data import (
     OriginsDestinationsSection,
     ProjectSection,
 )
-from ra2ce.validation.validation_report import ValidationReport
+from ra2ce.common.validation.validation_report import ValidationReport
 
 
 class TestNetworkIniConfigurationValidator:

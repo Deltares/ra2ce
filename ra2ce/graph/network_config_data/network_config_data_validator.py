@@ -25,8 +25,8 @@ from ra2ce.graph.network_config_data.network_config_data import (
     NetworkSection,
     ProjectSection,
 )
-from ra2ce.validation.ra2ce_validator_protocol import Ra2ceIoValidator
-from ra2ce.validation.validation_report import ValidationReport
+from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
+from ra2ce.common.validation.validation_report import ValidationReport
 from ra2ce.configuration.validators.ini_config_validator_base import _expected_values
 
 

@@ -11,7 +11,7 @@ from ra2ce.configuration.analysis.analysis_ini_config_validator import (
     AnalysisIniConfigValidator,
     AnalysisWithoutNetworkConfigValidator,
 )
-from ra2ce.validation.validation_report import ValidationReport
+from ra2ce.common.validation.validation_report import ValidationReport
 from tests import test_data
 
 
