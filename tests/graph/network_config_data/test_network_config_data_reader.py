@@ -1,6 +1,6 @@
 from configparser import ConfigParser
-from ra2ce.configuration.readers.ini_config_reader_base import (
-    IniConfigurationReaderProtocol,
+from ra2ce.common.configuration.ini_configuration_reader_protocol import (
+    IniConfigurationReaderProtocol
 )
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_data.network_config_data_reader import (
