@@ -23,7 +23,7 @@
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.configuration import AnalysisConfigBase
+from ra2ce.analyses.configuration import AnalysisConfigBase
 from ra2ce.analyses.configuration.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
