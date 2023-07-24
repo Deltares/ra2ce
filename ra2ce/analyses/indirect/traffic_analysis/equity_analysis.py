@@ -20,8 +20,9 @@
 """
 
 import geopandas as gpd
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass import (
     AccumulatedTraffic,
 )

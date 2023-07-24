@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 from pathlib import Path
+
 import geopandas as gpd
 import pandas as pd
 import pytest
+
 from tests import test_data
 
 _equity_test_data = test_data.joinpath("equity_data")

@@ -32,13 +32,13 @@ import osmnx
 import pandas as pd
 import pyproj
 from shapely.geometry import MultiLineString
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 
-from ra2ce.graph import networks_utils as nut
-from ra2ce.graph.segmentation import Segmentation
 from ra2ce.common.io.readers import GraphPickleReader
+from ra2ce.graph import networks_utils as nut
 from ra2ce.graph.exporters.json_exporter import JsonExporter
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.graph.segmentation import Segmentation
 
 
 class Network:

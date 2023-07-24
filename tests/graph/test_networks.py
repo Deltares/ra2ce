@@ -1,17 +1,17 @@
 import shutil
+from pathlib import Path
 from typing import Iterator
 
+import geopandas as gpd
+import networkx as nx
 import pytest
+
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_data.network_config_data_reader import (
     NetworkConfigDataReader,
 )
-
 from ra2ce.graph.networks import Network
-from tests import test_results, slow_test, test_data
-from pathlib import Path
-import networkx as nx
-import geopandas as gpd
+from tests import slow_test, test_data, test_results
 
 # Just to make sonar-cloud stop complaining.
 _network_ini_name = "network.ini"

@@ -2,8 +2,8 @@ import shutil
 
 import pytest
 
-from ra2ce.graph.exporters.json_exporter import JsonExporter
 from ra2ce.common.io.writers.ra2ce_exporter_protocol import Ra2ceExporterProtocol
+from ra2ce.graph.exporters.json_exporter import JsonExporter
 from tests import test_results
 
 

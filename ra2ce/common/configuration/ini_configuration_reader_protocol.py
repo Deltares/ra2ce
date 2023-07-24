@@ -19,11 +19,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from typing import Protocol, runtime_checkable
-from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
-
-from ra2ce.common.io.readers.file_reader_protocol import FileReaderProtocol
 from pathlib import Path
+from typing import Protocol, runtime_checkable
+
+from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
+from ra2ce.common.io.readers.file_reader_protocol import FileReaderProtocol
 
 
 @runtime_checkable

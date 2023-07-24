@@ -20,19 +20,18 @@
 """
 
 
+import logging
 from pathlib import Path
+from shutil import copyfile
 
-from ra2ce.common.configuration.ini_configuration_reader_protocol import (
-    IniConfigurationReaderProtocol,
-)
 from ra2ce.analyses.configuration.analysis_ini_config_data_validator_base import (
     DirectAnalysisNameList,
     IndirectAnalysisNameList,
 )
+from ra2ce.common.configuration.ini_configuration_reader_protocol import (
+    IniConfigurationReaderProtocol,
+)
 from ra2ce.common.io.readers.ini_file_reader import IniFileReader
-import logging
-from pathlib import Path
-from shutil import copyfile
 
 
 class AnalysisConfigReaderBase(IniConfigurationReaderProtocol):

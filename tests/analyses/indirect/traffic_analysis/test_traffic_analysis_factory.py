@@ -1,7 +1,9 @@
-import pytest
-import pandas as pd
-import geopandas as gpd
 from pathlib import Path
+
+import geopandas as gpd
+import pandas as pd
+import pytest
+
 from ra2ce.analyses.indirect.traffic_analysis.equity_analysis import EquityAnalysis
 from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis import TrafficAnalysis
 from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_base import (
@@ -10,12 +12,11 @@ from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_base import (
 from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
 )
-
 from tests import test_data, test_results
 from tests.analyses.indirect.traffic_analysis import (
-    valid_traffic_analysis_input,
     TrafficAnalysisInput,
     import_from_csv,
+    valid_traffic_analysis_input,
 )
 
 

@@ -19,14 +19,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from abc import abstractmethod, ABC
+import ast
 import itertools
 import operator
+from abc import ABC, abstractmethod
 from typing import Any
+
+import geopandas as gpd
 import numpy as np
 import pandas as pd
-import geopandas as gpd
-import ast
+
 from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass import (
     AccumulatedTraffic,
 )

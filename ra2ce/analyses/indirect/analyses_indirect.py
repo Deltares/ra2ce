@@ -41,8 +41,8 @@ from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDest
 from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
 )
-from ra2ce.graph.networks_utils import graph_to_gpkg
 from ra2ce.common.io.readers.graph_pickle_reader import GraphPickleReader
+from ra2ce.graph.networks_utils import graph_to_gpkg
 
 
 class IndirectAnalyses:

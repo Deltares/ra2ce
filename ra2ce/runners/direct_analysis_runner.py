@@ -22,8 +22,8 @@
 
 import logging
 
-from ra2ce.analyses.direct import analyses_direct
 from ra2ce.analyses.configuration import AnalysisConfigBase
+from ra2ce.analyses.direct import analyses_direct
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 

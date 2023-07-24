@@ -4,11 +4,10 @@ from pathlib import Path
 from typing import Dict, Iterator, Optional
 
 import pytest
+from click.testing import CliRunner
 
 from ra2ce import main
-
-from tests import slow_test, test_data, external_test, test_external_data
-from click.testing import CliRunner
+from tests import external_test, slow_test, test_data, test_external_data
 
 # Just to make sonar-cloud stop complaining.
 _network_ini_name = "network.ini"

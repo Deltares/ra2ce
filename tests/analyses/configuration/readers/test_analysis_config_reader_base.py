@@ -1,13 +1,13 @@
 import shutil
 
 import pytest
+
 from ra2ce.analyses.configuration.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     IniConfigurationReaderProtocol,
 )
-
 from tests import test_results
 
 
