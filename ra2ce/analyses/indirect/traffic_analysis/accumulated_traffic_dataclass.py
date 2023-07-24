@@ -25,22 +25,26 @@ from typing import Union
 
 @dataclass
 class AccumulatedTraffic:
-    regular: float = 0.0
+    utilitarian: float = 0.0
     egalitarian: float = 0.0
     prioritarian: float = 0.0
 
     def __add__(
         self, other: Union[AccumulatedTraffic, float, int]
     ) -> AccumulatedTraffic:
+        """
+        Overloading of the add (`operator.add` or simply `+`).
+        This overload ensures we correctly add the `AccumulatedTraffic` attributes (`utilitarian`, `egalitarian`, `prioritarian`).
+        """
         if isinstance(other, AccumulatedTraffic):
             return AccumulatedTraffic(
-                regular=self.regular + other.regular,
+                utilitarian=self.utilitarian + other.utilitarian,
                 prioritarian=self.prioritarian + other.prioritarian,
                 egalitarian=self.egalitarian + other.egalitarian,
             )
         elif isinstance(other, float) or isinstance(other, int):
             return AccumulatedTraffic(
-                regular=self.regular + other,
+                utilitarian=self.utilitarian + other,
                 prioritarian=self.prioritarian + other,
                 egalitarian=self.egalitarian + other,
             )
@@ -54,15 +58,19 @@ class AccumulatedTraffic:
     def __mul__(
         self, other: Union[AccumulatedTraffic, float, int]
     ) -> AccumulatedTraffic:
+        """
+        Overloading of the multiply (`operator.mul` or simply `*`).
+        This overload ensures we correctly multiply the `AccumulatedTraffic` attributes (`utilitarian`, `egalitarian`, `prioritarian`).
+        """
         if isinstance(other, AccumulatedTraffic):
             return AccumulatedTraffic(
-                regular=self.regular * other.regular,
+                utilitarian=self.utilitarian * other.utilitarian,
                 prioritarian=self.prioritarian * other.prioritarian,
                 egalitarian=self.egalitarian * other.egalitarian,
             )
         elif isinstance(other, float) or isinstance(other, int):
             return AccumulatedTraffic(
-                regular=self.regular * other,
+                utilitarian=self.utilitarian * other,
                 prioritarian=self.prioritarian * other,
                 egalitarian=self.egalitarian * other,
             )

@@ -30,23 +30,23 @@ from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_base import (
 
 
 class TrafficAnalysis(TrafficAnalysisBase):
-    gdf: gpd.GeoDataFrame
+    road_network: gpd.GeoDataFrame
     od_table: gpd.GeoDataFrame
     destinations_names: str
 
     def __init__(
         self,
-        gdf: gpd.GeoDataFrame,
+        road_network: gpd.GeoDataFrame,
         od_table: gpd.GeoDataFrame,
         destination_names: str,
     ) -> None:
         """
         Args:
-            gdf (gpd.GeoDataFrame): Geodataframe containing the overall network information.
+            road_network (gpd.GeoDataFrame): Geodataframe containing the overall network information.
             od_table (gpd.GeoDataFrame): GeoDataFrame representing the Origins - Destinations table.
             destination_names (str): Destination nodes.
         """
-        self.gdf = gdf
+        self.road_network = road_network
         self.od_table = od_table
         self.destinations_names = destination_names
 
@@ -54,7 +54,7 @@ class TrafficAnalysis(TrafficAnalysisBase):
         self, o_node: str, total_d_nodes: int
     ) -> AccumulatedTraffic:
         _accumulated_traffic = AccumulatedTraffic(egalitarian=1)
-        _accumulated_traffic.regular = self._get_recorded_traffic_in_node(
+        _accumulated_traffic.utilitarian = self._get_recorded_traffic_in_node(
             o_node, "values", total_d_nodes
         )
         return _accumulated_traffic
@@ -68,7 +68,7 @@ class TrafficAnalysis(TrafficAnalysisBase):
             return (
                 u_node,
                 v_node,
-                traffic_values.regular,
+                traffic_values.utilitarian,
                 traffic_values.egalitarian,
             )
 

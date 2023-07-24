@@ -35,19 +35,26 @@ class EquityAnalysis(TrafficAnalysisBase):
     Specialization from `TrafficAnalysisBase` which takes into account the equity data (weights per region).
     """
 
-    gdf: gpd.GeoDataFrame
+    road_network: gpd.GeoDataFrame
     od_table: gpd.GeoDataFrame
     equity_data: pd.DataFrame
     destinations_names: str
 
     def __init__(
         self,
-        gdf: gpd.GeoDataFrame,
+        road_network: gpd.GeoDataFrame,
         od_table: gpd.GeoDataFrame,
         destination_names: str,
         equity_data: pd.DataFrame,
     ) -> None:
-        self.gdf = gdf
+        """
+        Args:
+            road_network (gpd.GeoDataFrame): Geodataframe containing the overall network information.
+            od_table (gpd.GeoDataFrame): GeoDataFrame representing the Origins - Destinations table.
+            destination_names (str): Destination nodes.
+            equity_data ( pd.DataFrame): Pandas DataFrame representing the equity traffic data.
+        """
+        self.road_network = road_network
         self.od_table = od_table
         self.destinations_names = destination_names
         self.equity_data = equity_data
@@ -66,7 +73,7 @@ class EquityAnalysis(TrafficAnalysisBase):
         self, o_node: str, total_d_nodes: int
     ) -> AccumulatedTraffic:
         _accumulated_traffic = AccumulatedTraffic(egalitarian=1)
-        _accumulated_traffic.regular = self._get_recorded_traffic_in_node(
+        _accumulated_traffic.utilitarian = self._get_recorded_traffic_in_node(
             o_node, "values", total_d_nodes
         )
         _accumulated_traffic.prioritarian = self._get_recorded_traffic_in_node(
@@ -83,7 +90,7 @@ class EquityAnalysis(TrafficAnalysisBase):
             return (
                 u_node,
                 v_node,
-                traffic_values.regular,
+                traffic_values.utilitarian,
                 traffic_values.egalitarian,
                 traffic_values.prioritarian,
             )
