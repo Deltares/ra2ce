@@ -19,7 +19,7 @@ class TestTrafficAnalysis:
         valid_traffic_analysis_input: TrafficAnalysisInput,
     ) -> TrafficAnalysis:
         yield TrafficAnalysis(
-            valid_traffic_analysis_input.gdf_data,
+            valid_traffic_analysis_input.road_network,
             valid_traffic_analysis_input.od_table_data,
             valid_traffic_analysis_input.destination_names,
         )
@@ -78,4 +78,4 @@ class TestTrafficAnalysis:
         assert isinstance(_accumulated_traffic, AccumulatedTraffic)
         assert _accumulated_traffic.egalitarian == 1
         assert _accumulated_traffic.prioritarian == 0
-        assert _accumulated_traffic.regular == pytest.approx(3.1097, 0.0001)
+        assert _accumulated_traffic.utilitarian == pytest.approx(3.1097, 0.0001)

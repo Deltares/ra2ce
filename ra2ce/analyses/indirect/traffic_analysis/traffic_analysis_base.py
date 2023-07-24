@@ -19,8 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from abc import abstractmethod
-import abc
+from abc import abstractmethod, ABC
 import itertools
 import operator
 from typing import Any
@@ -33,8 +32,8 @@ from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass impo
 )
 
 
-class TrafficAnalysisBase(abc.ABC):
-    gdf: gpd.GeoDataFrame
+class TrafficAnalysisBase(ABC):
+    road_network: gpd.GeoDataFrame
     od_table: gpd.GeoDataFrame
     destinations_names: str
 
@@ -42,13 +41,13 @@ class TrafficAnalysisBase(abc.ABC):
         self,
     ) -> pd.DataFrame:
         """
-        Gets the optimal routes based on regular, egalitarian and prioritarian traffic.
+        Gets the optimal routes based on utilitarian, egalitarian and prioritarian traffic.
 
         Returns:
             pd.DataFrame: Datafarme with the traffic indices for each of analysis.
         """
-        origin_nodes = np.unique(self.gdf["origin"])
-        destination_nodes = np.unique(self.gdf["destination"])
+        origin_nodes = np.unique(self.road_network["origin"])
+        destination_nodes = np.unique(self.road_network["destination"])
 
         unique_destination_nodes = np.unique(list(self.od_table["d_id"].fillna("0")))
         count_destination_nodes = len([x for x in unique_destination_nodes if x != "0"])
@@ -81,8 +80,9 @@ class TrafficAnalysisBase(abc.ABC):
         return node_key.split("_")
 
     def _get_opt_path_values(self, o_node: str, d_node: str) -> list[Any]:
-        _opt_path_value = self.gdf.loc[
-            (self.gdf["origin"] == o_node) & (self.gdf["destination"] == d_node),
+        _opt_path_value = self.road_network.loc[
+            (self.road_network["origin"] == o_node)
+            & (self.road_network["destination"] == d_node),
             "opt_path",
         ].values[0]
         if isinstance(_opt_path_value, list):
@@ -109,7 +109,7 @@ class TrafficAnalysisBase(abc.ABC):
         # When do we want to 'multiply' the accumulated values?
         # When do we want to 'add' the accumulated values?
         _accumulated_traffic = AccumulatedTraffic(
-            regular=1, egalitarian=1, prioritarian=1
+            utilitarian=1, egalitarian=1, prioritarian=1
         )
         _intermediate_nodes = 0
         for _node in nodes_list:
@@ -119,7 +119,8 @@ class TrafficAnalysisBase(abc.ABC):
             _node_traffic = self._get_accumulated_traffic_from_node(
                 _node, count_destination_nodes
             )
-            # Multiplication (*) or Addition (+) operations to acummulate traffic.
+            # Multiplication ( 'operator.mul' or *) or Addition ( 'operator.add' or +) operations to acummulate traffic.
+            # This will trigger the overloaded methods in `AccumulatedTraffic`.
             _acummulated_operator = (
                 operator.mul if _intermediate_nodes == 0 else operator.add
             )
