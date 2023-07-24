@@ -12,7 +12,7 @@ from ra2ce.analyses.configuration.analysis_with_network_config import (
 from ra2ce.analyses.configuration.analysis_without_network_config import (
     AnalysisWithoutNetworkConfiguration,
 )
-from ra2ce.configuration.ini_config_protocol import IniConfigDataProtocol
+from ra2ce.common.configuration.config_data_protocol import IniConfigDataProtocol
 from tests import test_data
 
 
