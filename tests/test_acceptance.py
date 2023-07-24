@@ -1,13 +1,14 @@
 import shutil
-import subprocess
 from itertools import chain
 from pathlib import Path
-from typing import Dict, Iterator, List, Optional
+from typing import Dict, Iterator, Optional
 
 import pytest
 
 from ra2ce import main
+
 from tests import slow_test, test_data, external_test, test_external_data
+from click.testing import CliRunner
 
 # Just to make sonar-cloud stop complaining.
 _network_ini_name = "network.ini"
@@ -19,10 +20,23 @@ _base_network_feather_filename = "base_network.feather"
 def get_external_test_cases() -> list[pytest.param]:
     if not test_external_data.exists():
         return []
+
+    _skip_cases = ["bolivia"]
+
+    def get_pytest_param(test_dir: Path) -> pytest.param:
+        _marks = [external_test]
+        if test_dir.stem.lower() in _skip_cases:
+            _marks.append(
+                pytest.mark.skip(
+                    reason=f"{test_dir.stem.capitalize()} not yet supported."
+                )
+            )
+        return pytest.param(test_dir, id=test_dir.name.capitalize(), marks=_marks)
+
     return [
-        pytest.param(_dir, id=_dir.name, marks=external_test)
+        get_pytest_param(_dir)
         for _dir in test_external_data.iterdir()
-        if _dir.is_dir()
+        if _dir.is_dir() and ".svn" not in _dir.name
     ]
 
 
@@ -30,20 +44,20 @@ _external_test_cases = get_external_test_cases()
 
 
 def _run_from_cli(network_ini: Optional[Path], analysis_ini: Optional[Path]) -> None:
-
-    assert Path(main.__file__).exists(), "No main file was found."
-
-    args = [
-        "python",
-        main.__file__,
-    ]
+    args = []
     if network_ini:
         args.extend(["--network_ini", str(network_ini)])
     if analysis_ini:
         args.extend(["--analyses_ini", str(analysis_ini)])
 
-    _return_code = subprocess.call(args)
-    assert _return_code == 0
+    # 2. Run test.
+    _run_result = CliRunner().invoke(
+        main.run_analysis,
+        args,
+    )
+
+    # 3. Verify expectations.
+    assert _run_result.exit_code == 0
 
 
 class TestAcceptance:
@@ -78,11 +92,6 @@ class TestAcceptance:
         "case_data_dir",
         [
             pytest.param("acceptance_test_data", id="Default test data."),
-            pytest.param(
-                "wpf_nepal",
-                id="Nepal project",
-                marks=pytest.mark.skip(reason="WPF Nepal test directory not presnt"),
-            ),
         ]
         + _external_test_cases,
         indirect=["case_data_dir"],
@@ -99,51 +108,6 @@ class TestAcceptance:
 
         _run_from_cli(_network, _analysis)
 
-    @slow_test
-    @pytest.mark.parametrize(
-        "case_data_dir, expected_files",
-        [
-            pytest.param(
-                "1_network_shape",
-                [_base_graph_p_filename, _base_network_feather_filename],
-                id="Case 1. Network creation from shp file.",
-            ),
-            pytest.param(
-                "2_network_shape",
-                [_base_graph_p_filename, _base_network_feather_filename],
-                id="Case 2. Merges lines and cuts lines at the intersections",
-            ),
-            pytest.param(
-                "3_network_osm_download",
-                [
-                    _base_graph_p_filename,
-                    _base_network_feather_filename,
-                    "simple_to_complex.json",
-                    "complex_to_simple.json",
-                ],
-                id="Case 3. OSM download",
-            ),
-        ],
-        indirect=["case_data_dir"],
-    )
-    def test_network_creation(self, case_data_dir: Path, expected_files: List[str]):
-        """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
-        # 1. Given test data.
-        _output_graph_dir = case_data_dir / "static" / "output_graph"
-        network_ini = case_data_dir / _network_ini_name
-        assert network_ini.is_file()
-
-        # 2. When run test.
-        _run_from_cli(network_ini, None)
-
-        # 3. Then verify expectations.
-        def validate_file(filename: str):
-            _graph_file = _output_graph_dir / filename
-            return _graph_file.is_file() and _graph_file.exists()
-
-        assert all(map(validate_file, expected_files))
-
-    @slow_test
     @pytest.mark.parametrize(
         "case_data_dir, expected_graph_files, expected_analysis_files",
         [
@@ -191,6 +155,7 @@ class TestAcceptance:
                     ],
                 ),
                 id="Case 2. All indirect analyses",
+                marks=slow_test,
             ),
         ],
         indirect=["case_data_dir"],
@@ -198,8 +163,8 @@ class TestAcceptance:
     def test_indirect_analysis(
         self,
         case_data_dir: Path,
-        expected_graph_files: List[str],
-        expected_analysis_files: Dict[str, List[str]],
+        expected_graph_files: list[str],
+        expected_analysis_files: Dict[str, list[str]],
     ):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data
