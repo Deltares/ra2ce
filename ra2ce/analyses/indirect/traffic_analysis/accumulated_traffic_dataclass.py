@@ -48,12 +48,11 @@ class AccumulatedTraffic:
                 prioritarian=self.prioritarian + other,
                 egalitarian=self.egalitarian + other,
             )
-        else:
-            raise NotImplementedError(
-                "It is not possible to sum {} with a value of type {}.".format(
-                    AccumulatedTraffic.__name__, type(other).__name__
-                )
+        raise NotImplementedError(
+            "It is not possible to sum {} with a value of type {}.".format(
+                AccumulatedTraffic.__name__, type(other).__name__
             )
+        )
 
     def __mul__(
         self, other: Union[AccumulatedTraffic, float, int]
@@ -74,9 +73,8 @@ class AccumulatedTraffic:
                 prioritarian=self.prioritarian * other,
                 egalitarian=self.egalitarian * other,
             )
-        else:
-            raise NotImplementedError(
-                "It is not possible to multiply {} with a value of type {}.".format(
-                    AccumulatedTraffic.__name__, type(other).__name__
-                )
+        raise NotImplementedError(
+            "It is not possible to multiply {} with a value of type {}.".format(
+                AccumulatedTraffic.__name__, type(other).__name__
             )
+        )
