@@ -1,4 +1,4 @@
-from ra2ce.validation.validation_report import ValidationReport
+from ra2ce.common.validation.validation_report import ValidationReport
 
 
 class TestValidationReport:

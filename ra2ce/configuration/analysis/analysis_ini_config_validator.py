@@ -23,7 +23,7 @@
 from ra2ce.configuration.validators.ini_config_validator_base import (
     IniConfigValidatorBase,
 )
-from ra2ce.validation.validation_report import ValidationReport
+from ra2ce.common.validation.validation_report import ValidationReport
 
 
 class AnalysisIniConfigValidator(IniConfigValidatorBase):
