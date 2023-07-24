@@ -3,7 +3,7 @@ import shutil
 import pytest
 
 from ra2ce.analyses.configuration.analysis_config_base import AnalysisConfigBase
-from ra2ce.configuration.config_protocol import ConfigProtocol
+from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 from tests import test_data, test_results
 
 
@@ -11,7 +11,7 @@ class TestAnalysisConfigBase:
     def test_initialize(self):
         _analysis = AnalysisConfigBase()
         assert isinstance(_analysis, AnalysisConfigBase)
-        assert isinstance(_analysis, ConfigProtocol)
+        assert isinstance(_analysis, ConfigWrapperProtocol)
 
     def test_get_data_output(self):
         # 1. Define test data.

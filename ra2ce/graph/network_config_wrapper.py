@@ -27,8 +27,8 @@ from pathlib import Path
 from typing import Dict, Optional
 
 from geopandas import gpd
+from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 
-from ra2ce.configuration.config_protocol import ConfigProtocol
 from ra2ce.graph.hazard import Hazard
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_data.network_config_data_validator import (
@@ -63,7 +63,7 @@ def hazard_handler(
     return graphs
 
 
-class NetworkConfigWrapper(ConfigProtocol):
+class NetworkConfigWrapper(ConfigWrapperProtocol):
     files: Dict[str, Path] = {}
     config_data: NetworkConfigData
 
