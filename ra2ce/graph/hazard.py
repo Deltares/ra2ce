@@ -33,13 +33,12 @@ import pyproj
 from osgeo import gdal
 from rasterstats import point_query, zonal_stats
 from ra2ce.graph.network_config_data.network_config_data import (
-    HazardSection,
     NetworkConfigData,
 )
 
-import ra2ce.graph.networks_utils as ntu
+from ra2ce.graph import networks_utils as ntu
 from ra2ce.io.readers import GraphPickleReader
-from ra2ce.io.writers.network_exporter_factory import NetworkExporterFactory
+from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
 
 
 class Hazard:

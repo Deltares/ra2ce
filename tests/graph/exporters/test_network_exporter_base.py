@@ -1,6 +1,6 @@
 import pytest
 
-from ra2ce.io.writers.network_exporter_base import NetworkExporterBase
+from ra2ce.graph.exporters.network_exporter_base import NetworkExporterBase
 from ra2ce.io.writers.ra2ce_exporter_protocol import Ra2ceExporterProtocol
 from tests import test_results
 
@@ -20,7 +20,6 @@ class TestNetworkExporterBase:
         # 2. Run test.
         _exporter_base = NetworkExporterBase("a_name", [export_type])
         _result = _exporter_base.export(_output_dir, None)
-        
+
         # 3. Verify expectations.
         assert _result is None
-        

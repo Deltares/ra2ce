@@ -26,7 +26,10 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.graph.networks_utils import graph_to_gpkg
-from ra2ce.io.writers.network_exporter_base import MULTIGRAPH_TYPE, NetworkExporterBase
+from ra2ce.graph.exporters.network_exporter_base import (
+    MULTIGRAPH_TYPE,
+    NetworkExporterBase,
+)
 
 
 class MultiGraphNetworkExporter(NetworkExporterBase):

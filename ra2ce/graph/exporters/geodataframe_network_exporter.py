@@ -25,7 +25,7 @@ from pathlib import Path
 
 import geopandas as gpd
 
-from ra2ce.io.writers.network_exporter_base import NetworkExporterBase
+from ra2ce.graph.exporters.network_exporter_base import NetworkExporterBase
 
 
 class GeoDataFrameNetworkExporter(NetworkExporterBase):
