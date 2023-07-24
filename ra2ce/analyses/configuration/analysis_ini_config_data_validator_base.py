@@ -23,7 +23,7 @@
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from ra2ce.configuration.ini_config_protocol import IniConfigDataProtocol
+from ra2ce.common.configuration.config_data_protocol import IniConfigDataProtocol
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
 

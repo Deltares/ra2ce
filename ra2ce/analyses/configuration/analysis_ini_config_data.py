@@ -26,7 +26,7 @@ from ra2ce.analyses.configuration.analysis_ini_config_validator import (
     AnalysisIniConfigValidator,
     AnalysisWithoutNetworkConfigValidator,
 )
-from ra2ce.configuration.ini_config_protocol import IniConfigDataProtocol
+from ra2ce.common.configuration.config_data_protocol import IniConfigDataProtocol
 
 
 class AnalysisIniConfigData(IniConfigDataProtocol):
