@@ -4,7 +4,7 @@ import pytest
 
 from ra2ce.graph.exporters.multi_graph_network_exporter import MultiGraphNetworkExporter
 from ra2ce.graph.exporters.network_exporter_base import NetworkExporterBase
-from ra2ce.io.writers.ra2ce_exporter_protocol import Ra2ceExporterProtocol
+from ra2ce.common.io.writers.ra2ce_exporter_protocol import Ra2ceExporterProtocol
 from tests import test_results
 
 

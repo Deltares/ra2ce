@@ -29,7 +29,7 @@ from ra2ce.configuration.validators.ini_config_validator_base import (
     DirectAnalysisNameList,
     IndirectAnalysisNameList,
 )
-from ra2ce.io.readers.ini_file_reader import IniFileReader
+from ra2ce.common.io.readers.ini_file_reader import IniFileReader
 
 
 class AnalysisConfigReaderBase(IniConfigurationReaderBase):

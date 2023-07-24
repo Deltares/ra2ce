@@ -1,5 +1,5 @@
-from ra2ce.io.readers.ini_file_reader import IniFileReader
-from tests.io.readers import test_data_readers
+from ra2ce.common.io.readers.ini_file_reader import IniFileReader
+from tests.common.io.readers import test_data_readers
 
 
 class TestIniFileReader:

@@ -25,7 +25,7 @@ import pickle
 from pathlib import Path
 from typing import Any
 
-from ra2ce.io.readers.file_reader_protocol import FileReaderProtocol
+from ra2ce.common.io.readers.file_reader_protocol import FileReaderProtocol
 
 
 class GraphPickleReader(FileReaderProtocol):
