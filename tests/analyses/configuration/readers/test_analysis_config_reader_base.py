@@ -1,24 +1,26 @@
 import shutil
 
 import pytest
-
-from ra2ce.configuration.readers.ini_config_reader_base import (
-    IniConfigurationReaderBase,
+from ra2ce.analyses.configuration.readers.analysis_config_reader_base import (
+    AnalysisConfigReaderBase,
+)
+from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     IniConfigurationReaderProtocol,
 )
-from tests import test_data, test_results
+
+from tests import test_results
 
 
-class TestIniConfigurationReaderBase:
+class TestAnalysisConfigReaderBase:
     @pytest.fixture(autouse=False)
-    def valid_reader(self) -> IniConfigurationReaderBase:
-        _reader = IniConfigurationReaderBase()
-        assert isinstance(_reader, IniConfigurationReaderBase)
+    def valid_reader(self) -> AnalysisConfigReaderBase:
+        _reader = AnalysisConfigReaderBase()
+        assert isinstance(_reader, AnalysisConfigReaderBase)
         assert isinstance(_reader, IniConfigurationReaderProtocol)
         return _reader
 
     def test_copy_output_files_no_file_doesnot_raise(
-        self, valid_reader: IniConfigurationReaderBase, request: pytest.FixtureRequest
+        self, valid_reader: AnalysisConfigReaderBase, request: pytest.FixtureRequest
     ):
         # 1. Define test data.
         _dir_name = "output"
@@ -42,7 +44,7 @@ class TestIniConfigurationReaderBase:
         assert not _test_file.exists()
 
     def test_create_config_dir_creates_dir_if_does_not_exist(
-        self, valid_reader: IniConfigurationReaderBase, request: pytest.FixtureRequest
+        self, valid_reader: AnalysisConfigReaderBase, request: pytest.FixtureRequest
     ):
         # 1. Define test data.
         _dir_name = "missing_dir"
@@ -64,7 +66,7 @@ class TestIniConfigurationReaderBase:
         assert _expected_dir.exists()
 
     def test_parse_path_list_non_existing_file(
-        self, valid_reader: IniConfigurationReaderBase, request: pytest.FixtureRequest
+        self, valid_reader: AnalysisConfigReaderBase, request: pytest.FixtureRequest
     ):
         # 1. Define test data.
         _config_data = {
@@ -84,7 +86,7 @@ class TestIniConfigurationReaderBase:
         assert _result[0] == _expected_path
 
     def test_parse_path_existing_file(
-        self, valid_reader: IniConfigurationReaderBase, request: pytest.FixtureRequest
+        self, valid_reader: AnalysisConfigReaderBase, request: pytest.FixtureRequest
     ):
         # 1. Define test data.
         _config_data = {
