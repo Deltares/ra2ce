@@ -35,19 +35,26 @@ class EquityAnalysis(TrafficAnalysisBase):
     Specialization from `TrafficAnalysisBase` which takes into account the equity data (weights per region).
     """
 
-    gdf: gpd.GeoDataFrame
+    road_network: gpd.GeoDataFrame
     od_table: gpd.GeoDataFrame
     equity_data: pd.DataFrame
     destinations_names: str
 
     def __init__(
         self,
-        gdf: gpd.GeoDataFrame,
+        road_network: gpd.GeoDataFrame,
         od_table: gpd.GeoDataFrame,
         destination_names: str,
         equity_data: pd.DataFrame,
     ) -> None:
-        self.gdf = gdf
+        """
+        Args:
+            road_network (gpd.GeoDataFrame): Geodataframe containing the overall network information.
+            od_table (gpd.GeoDataFrame): GeoDataFrame representing the Origins - Destinations table.
+            destination_names (str): Destination nodes.
+            equity_data ( pd.DataFrame): Pandas DataFrame representing the equity traffic data.
+        """
+        self.road_network = road_network
         self.od_table = od_table
         self.destinations_names = destination_names
         self.equity_data = equity_data
