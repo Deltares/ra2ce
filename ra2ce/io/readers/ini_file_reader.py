@@ -31,6 +31,10 @@ from ra2ce.io.readers.file_reader_protocol import FileReaderProtocol
 
 
 class IniFileReader(FileReaderProtocol):
+    """
+    DEPRECATED: Implement instead your own reader such as done for the networks (`ra2ce.graph.network_config_data.network_config_data_reader.py`)
+    """
+
     def read(self, ini_file: Path) -> dict:
         return self._parse_config(ini_file)
 
