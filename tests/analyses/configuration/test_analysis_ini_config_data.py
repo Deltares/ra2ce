@@ -1,6 +1,6 @@
 import pytest
 
-from ra2ce.configuration.analysis.analysis_ini_config_data import (
+from ra2ce.analyses.configuration.analysis_ini_config_data import (
     AnalysisIniConfigData,
     AnalysisWithNetworkIniConfigData,
     AnalysisWithoutNetworkIniConfigData,
