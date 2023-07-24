@@ -1,12 +1,16 @@
-import networkx as nx
 import pytest
 from geopandas import GeoDataFrame
 from networkx.classes import multidigraph, multigraph
 
-from ra2ce.io.writers.geodataframe_network_exporter import GeoDataFrameNetworkExporter
-from ra2ce.io.writers.multi_graph_network_exporter import MultiGraphNetworkExporter
-from ra2ce.io.writers.network_exporter_base import NETWORK_TYPE, NetworkExporterBase
-from ra2ce.io.writers.network_exporter_factory import NetworkExporterFactory
+from ra2ce.graph.exporters.geodataframe_network_exporter import (
+    GeoDataFrameNetworkExporter,
+)
+from ra2ce.graph.exporters.multi_graph_network_exporter import MultiGraphNetworkExporter
+from ra2ce.graph.exporters.network_exporter_base import (
+    NETWORK_TYPE,
+    NetworkExporterBase,
+)
+from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
 
 
 class TestNetworkExporterFactory:
