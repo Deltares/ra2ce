@@ -2,7 +2,7 @@ import shutil
 
 import pytest
 
-from ra2ce.configuration.analysis.analysis_config_base import AnalysisConfigBase
+from ra2ce.analyses.configuration.analysis_config_base import AnalysisConfigBase
 from ra2ce.configuration.config_protocol import ConfigProtocol
 from tests import test_data, test_results
 

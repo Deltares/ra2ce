@@ -1,7 +1,7 @@
 import pytest
 
-from ra2ce.configuration.analysis.analysis_ini_config_data import AnalysisIniConfigData
-from ra2ce.configuration.analysis.analysis_without_network_config import (
+from ra2ce.analyses.configuration.analysis_ini_config_data import AnalysisIniConfigData
+from ra2ce.analyses.configuration.analysis_without_network_config import (
     AnalysisWithoutNetworkConfiguration,
 )
 from tests import acceptance_test_data

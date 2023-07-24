@@ -1,1 +1,1 @@
-from ra2ce.configuration.analysis import AnalysisConfigBase, AnalysisIniConfigData
+from ra2ce.analyses.configuration import AnalysisConfigBase, AnalysisIniConfigData

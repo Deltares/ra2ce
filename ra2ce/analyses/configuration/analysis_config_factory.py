@@ -24,16 +24,16 @@ from optparse import Option
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.configuration.analysis.analysis_config_base import AnalysisConfigBase
-from ra2ce.configuration.analysis.analysis_ini_config_data import (
+from ra2ce.analyses.configuration.analysis_config_base import AnalysisConfigBase
+from ra2ce.analyses.configuration.analysis_ini_config_data import (
     AnalysisIniConfigData,
     AnalysisWithNetworkIniConfigData,
     AnalysisWithoutNetworkIniConfigData,
 )
-from ra2ce.configuration.analysis.analysis_with_network_config import (
+from ra2ce.analyses.configuration.analysis_with_network_config import (
     AnalysisWithNetworkConfiguration,
 )
-from ra2ce.configuration.analysis.analysis_without_network_config import (
+from ra2ce.analyses.configuration.analysis_without_network_config import (
     AnalysisWithoutNetworkConfiguration,
 )
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper

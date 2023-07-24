@@ -1,6 +1,6 @@
 import pytest
 
-from ra2ce.configuration.analysis.readers.analysis_with_network_config_reader import (
+from ra2ce.analyses.configuration.readers.analysis_with_network_config_reader import (
     AnalysisWithNetworkConfigReader,
 )
 
