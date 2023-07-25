@@ -38,9 +38,9 @@ class AnalysisConfigData(ConfigDataProtocol):
         raise NotImplementedError("Implement in concrete classes")
 
 
-class AnalysisWithNetworkConfigData(AnalysisConfigData):
+class AnalysisConfigDataWithNetwork(AnalysisConfigData):
     @classmethod
-    def from_dict(cls, dict_values: dict) -> AnalysisWithNetworkConfigData:
+    def from_dict(cls, dict_values: dict) -> AnalysisConfigDataWithNetwork:
         _new_analysis_ini_config_data = cls()
         _new_analysis_ini_config_data.update(**dict_values)
         return _new_analysis_ini_config_data
@@ -50,9 +50,9 @@ class AnalysisWithNetworkConfigData(AnalysisConfigData):
         return _validation_report.is_valid()
 
 
-class AnalysisWithoutNetworkConfigData(AnalysisConfigData):
+class AnalysisConfigDataWithoutNetwork(AnalysisConfigData):
     @classmethod
-    def from_dict(cls, dict_values: dict) -> AnalysisWithoutNetworkConfigData:
+    def from_dict(cls, dict_values: dict) -> AnalysisConfigDataWithoutNetwork:
         _new_analysis_ini_config_data = cls()
         _new_analysis_ini_config_data.update(**dict_values)
         return _new_analysis_ini_config_data

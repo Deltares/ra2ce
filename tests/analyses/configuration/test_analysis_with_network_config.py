@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
-from ra2ce.analyses.analysis_config_data.analysis_with_network_config_data import (
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_with_network import (
     AnalysisWithNetworkConfiguration,
 )
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper

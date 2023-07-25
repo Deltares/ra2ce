@@ -22,11 +22,11 @@
 
 from pathlib import Path
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data_base import (
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
     AnalysisConfigWrapperBase,
 )
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
-    AnalysisWithNetworkConfigData,
+    AnalysisConfigDataWithNetwork,
 )
 from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
@@ -42,11 +42,11 @@ class AnalysisWithNetworkConfigReader(AnalysisConfigReaderBase):
                 "Network data mandatory for an AnalysisIniConfigurationReader reader."
             )
 
-    def read(self, ini_file: Path) -> AnalysisWithNetworkConfigData:
+    def read(self, ini_file: Path) -> AnalysisConfigDataWithNetwork:
         if not ini_file or not ini_file.exists():
             return None
         _root_path = AnalysisConfigWrapperBase.get_network_root_dir(ini_file)
         _config_data = self._import_configuration(_root_path, ini_file)
         _config_data = self._convert_analysis_types(_config_data)
         self._copy_output_files(ini_file, _config_data)
-        return AnalysisWithNetworkConfigData.from_dict(_config_data)
+        return AnalysisConfigDataWithNetwork.from_dict(_config_data)

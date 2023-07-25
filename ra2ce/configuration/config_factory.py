@@ -23,10 +23,10 @@
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data_base import (
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
     AnalysisConfigWrapperBase,
 )
-from ra2ce.analyses.analysis_config_data.analysis_config_data_factory import (
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_factory import (
     AnalysisConfigFactory,
 )
 from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_factory import (

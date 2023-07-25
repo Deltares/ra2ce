@@ -22,7 +22,7 @@
 
 from typing import Protocol, runtime_checkable
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data_base import (
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
     AnalysisConfigWrapperBase,
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper
