@@ -1,7 +1,7 @@
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigDataWithNetwork,
 )
-from ra2ce.analyses.analysis_config_data.analysis_config_data_validator import (
+from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_without_network import (
     AnalysisConfigDataValidatorWithoutNetwork,
 )
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator

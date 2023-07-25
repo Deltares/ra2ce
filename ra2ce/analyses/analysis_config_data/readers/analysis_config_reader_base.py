@@ -24,7 +24,7 @@ import logging
 from pathlib import Path
 from shutil import copyfile
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_base import (
+from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_without_network import (
     DirectAnalysisNameList,
     IndirectAnalysisNameList,
 )
