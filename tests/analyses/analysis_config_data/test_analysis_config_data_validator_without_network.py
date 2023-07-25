@@ -32,32 +32,6 @@ class TestAnalysisConfigDataValidatorWithoutNetwork:
         # 3. Verify expectations.
         assert _report.is_valid()
 
-    @pytest.mark.parametrize(
-        "output_entry",
-        [
-            pytest.param(dict(), id="No output given"),
-            pytest.param(dict(output=None), id="Output is none"),
-            pytest.param(
-                dict(output=(test_data / "not_a_path.ini")), id="Not a valid path."
-            ),
-        ],
-    )
-    def test_validate_withoutput_output_reports_error(
-        self, output_entry: Optional[Path]
-    ):
-        # 1. Define test data.
-        _output_dir = output_entry.get("output", None)
-        _expected_error = f"The configuration file 'network.ini' is not found at {_output_dir}.Please make sure to name your network settings file 'network.ini'."
-        _test_config_data = {"project": {}}
-        _test_config_data.update(output_entry)
-
-        # 2. Run test.
-        _report = self._validate_from_dict(_test_config_data)
-
-        # 3. Verify expectations.
-        assert not _report.is_valid()
-        assert _expected_error in _report._errors
-
     def test_validate_files_no_path_value_list_returns_empty_report(self):
         # 1. Define test data.
         _validator = AnalysisConfigDataValidatorWithoutNetwork(

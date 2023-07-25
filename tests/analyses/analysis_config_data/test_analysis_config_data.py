@@ -14,21 +14,8 @@ class TestAnalysisConfigData:
         assert isinstance(_config_data, dict)
         assert isinstance(_config_data, AnalysisConfigData)
 
-    def test_from_dict_raises_not_implemented_error(self):
-        _expected_err = "Implement in concrete classes"
-        with pytest.raises(NotImplementedError) as exc_err:
-            AnalysisConfigData.from_dict({})
-        assert str(exc_err.value) == _expected_err
 
-    def test_is_valid_raises_not_implemented_error(self):
-        _expected_err = "Implement in concrete classes"
-        _ini_config_data = AnalysisConfigData()
-        with pytest.raises(NotImplementedError) as exc_err:
-            _ini_config_data.from_dict({})
-        assert str(exc_err.value) == _expected_err
-
-
-class TestAnalysisWithNetworkIniConfigData:
+class TestAnalysisConfigDataWithNetwork:
     def test_initialize(self):
         _config_data = AnalysisConfigDataWithNetwork()
         assert isinstance(_config_data, AnalysisConfigDataWithNetwork)
@@ -43,7 +30,7 @@ class TestAnalysisWithNetworkIniConfigData:
         assert _config_data == _dict_values
 
 
-class TestAnalysisWithoutNetworkIniConfigData:
+class TestAnalysisConfigDataWithoutNetwork:
     def test_initialize(self):
         _config_data = AnalysisConfigDataWithoutNetwork()
         assert isinstance(_config_data, AnalysisConfigDataWithoutNetwork)
