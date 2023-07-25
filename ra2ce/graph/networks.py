@@ -51,7 +51,7 @@ class Network:
         config: A dictionary with the configuration details on how to create and adjust the network.
     """
 
-    def __init__(self, config, files):
+    def __init__(self, config: dict, files: dict):
         # General
         self.config = config
         self.output_path = config["static"] / "output_graph"
