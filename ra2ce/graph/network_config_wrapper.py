@@ -37,32 +37,6 @@ from ra2ce.graph.network_config_data.network_config_data_validator import (
 )
 from ra2ce.graph.networks import Network
 
-
-def network_handler(config: NetworkConfigData, files: dict) -> Optional[dict]:
-    try:
-        network = Network(config, files)
-        graphs = network.create()
-        return graphs
-
-    except BaseException as e:
-        logging.exception(
-            f"RA2CE crashed. Check the logfile for the Traceback message: {e}"
-        )
-        raise e
-
-
-def hazard_handler(
-    config: NetworkConfigData, graphs: dict, files: dict
-) -> Optional[dict]:
-    if not config.hazard.hazard_map:
-        return None
-
-    # There is a hazard map or multiple hazard maps that should be intersected with the graph.
-    hazard = Hazard(config, graphs, files)
-    graphs = hazard.create()
-    return graphs
-
-
 class NetworkConfigWrapper(ConfigWrapperProtocol):
     files: Dict[str, Path] = {}
     config_data: NetworkConfigData
@@ -177,8 +151,8 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         return _graphs
 
     def configure_network(self) -> None:
-        # Call Network Handler (to rework)
-        self.graphs = network_handler(self.config_data, self.files)
+        network = Network(self.config_data, self.files)
+        self.graphs = network.create()
 
     def configure_hazard(self) -> None:
         # Call Hazard Handler (to rework)
@@ -186,7 +160,13 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
             self.graphs = self.read_graphs_from_config(
                 self.config_data.static_path.joinpath("output_graph")
             )
-        self.graphs = hazard_handler(self.config_data, self.graphs, self.files)
+
+        if not self.config_data.hazard.hazard_map:
+            return
+
+        # There is a hazard map or multiple hazard maps that should be intersected with the graph.
+        hazard = Hazard(self.config_data, self.graphs, self.files)
+        self.graphs = hazard.create()
 
     def is_valid(self) -> bool:
         _file_is_valid = self.ini_file.is_file() and self.ini_file.suffix == ".ini"

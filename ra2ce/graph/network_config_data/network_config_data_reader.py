@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Union
 
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
-    IniConfigurationReaderProtocol,
+    ConfigDataReaderProtocol,
 )
 from ra2ce.graph.network_config_data.network_config_data import (
     CleanupSection,
@@ -16,7 +16,7 @@ from ra2ce.graph.network_config_data.network_config_data import (
 )
 
 
-class NetworkConfigDataReader(IniConfigurationReaderProtocol):
+class NetworkConfigDataReader(ConfigDataReaderProtocol):
     _parser: ConfigParser
 
     def __init__(self) -> None:

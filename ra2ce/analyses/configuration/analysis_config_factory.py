@@ -26,9 +26,9 @@ from typing import Optional
 
 from ra2ce.analyses.configuration.analysis_config_base import AnalysisConfigBase
 from ra2ce.analyses.configuration.analysis_ini_config_data import (
-    AnalysisIniConfigData,
-    AnalysisWithNetworkIniConfigData,
-    AnalysisWithoutNetworkIniConfigData,
+    AnalysisConfigData,
+    AnalysisWithNetworkConfigData,
+    AnalysisWithoutNetworkConfigData,
 )
 from ra2ce.analyses.configuration.analysis_with_network_config import (
     AnalysisWithNetworkConfiguration,
@@ -47,7 +47,7 @@ class AnalysisConfigFactory:
     @staticmethod
     def get_analysis_config(
         ini_file: Path,
-        analysis_ini_config: AnalysisIniConfigData,
+        analysis_ini_config: AnalysisConfigData,
         network_config: Optional[NetworkConfigWrapper],
     ) -> AnalysisConfigBase:
         """
@@ -64,11 +64,11 @@ class AnalysisConfigFactory:
         Returns:
             AnalysisConfigBase: Concrete `AnalysisConfigBase` DataObjectModel for the given data.
         """
-        if isinstance(analysis_ini_config, AnalysisWithNetworkIniConfigData):
+        if isinstance(analysis_ini_config, AnalysisWithNetworkConfigData):
             return AnalysisWithNetworkConfiguration.from_data_with_network(
                 ini_file, analysis_ini_config, network_config
             )
-        elif isinstance(analysis_ini_config, AnalysisWithoutNetworkIniConfigData):
+        elif isinstance(analysis_ini_config, AnalysisWithoutNetworkConfigData):
             return AnalysisWithoutNetworkConfiguration.from_data(
                 ini_file, analysis_ini_config
             )

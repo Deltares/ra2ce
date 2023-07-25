@@ -23,7 +23,7 @@
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from ra2ce.common.configuration.config_data_protocol import IniConfigDataProtocol
+from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
 
@@ -75,7 +75,7 @@ _expected_values: Dict[str, List[Any]] = {
 
 
 class IniConfigValidatorBase(Ra2ceIoValidator):
-    def __init__(self, config_data: IniConfigDataProtocol) -> None:
+    def __init__(self, config_data: ConfigDataProtocol) -> None:
         self._config = config_data
 
     def validate(self) -> ValidationReport:

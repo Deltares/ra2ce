@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
-    IniConfigurationReaderProtocol,
+    ConfigDataReaderProtocol,
 )
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_data.network_config_data_reader import (
@@ -17,7 +17,7 @@ class TestNetworkConfigDataReader:
     def test_initialize(self):
         _reader = NetworkConfigDataReader()
         assert isinstance(_reader, NetworkConfigDataReader)
-        assert isinstance(_reader, IniConfigurationReaderProtocol)
+        assert isinstance(_reader, ConfigDataReaderProtocol)
         assert isinstance(_reader._parser, ConfigParser)
 
     @pytest.fixture

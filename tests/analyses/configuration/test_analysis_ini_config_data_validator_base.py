@@ -6,14 +6,14 @@ import pytest
 from ra2ce.analyses.configuration.analysis_ini_config_data_validator_base import (
     IniConfigValidatorBase,
 )
-from ra2ce.common.configuration.config_data_protocol import IniConfigDataProtocol
+from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.common.validation.validation_report import ValidationReport
 from tests import test_data, test_results
 
 
-class DummyConfigData(IniConfigDataProtocol):
+class DummyConfigData(ConfigDataProtocol):
     @classmethod
-    def from_dict(cls, dict_values) -> IniConfigDataProtocol:
+    def from_dict(cls, dict_values) -> ConfigDataProtocol:
         _dummy_dict = cls()
         _dummy_dict.update(**dict_values)
         return _dummy_dict

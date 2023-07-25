@@ -6,7 +6,7 @@ from ra2ce.analyses.configuration.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
-    IniConfigurationReaderProtocol,
+    ConfigDataReaderProtocol,
 )
 from tests import test_results
 
@@ -16,7 +16,7 @@ class TestAnalysisConfigReaderBase:
     def valid_reader(self) -> AnalysisConfigReaderBase:
         _reader = AnalysisConfigReaderBase()
         assert isinstance(_reader, AnalysisConfigReaderBase)
-        assert isinstance(_reader, IniConfigurationReaderProtocol)
+        assert isinstance(_reader, ConfigDataReaderProtocol)
         return _reader
 
     def test_copy_output_files_no_file_doesnot_raise(

@@ -1,6 +1,6 @@
 import pytest
 
-from ra2ce.analyses.configuration.analysis_ini_config_data import AnalysisIniConfigData
+from ra2ce.analyses.configuration.analysis_ini_config_data import AnalysisConfigData
 from ra2ce.analyses.configuration.analysis_without_network_config import (
     AnalysisWithoutNetworkConfiguration,
 )
@@ -11,7 +11,7 @@ class TestAnalysisWithoutNetworkConfiguration:
     def test_init(self):
         _config = AnalysisWithoutNetworkConfiguration()
         assert isinstance(_config, AnalysisWithoutNetworkConfiguration)
-        assert isinstance(_config.config_data, AnalysisIniConfigData)
+        assert isinstance(_config.config_data, AnalysisConfigData)
 
     def test_given_no_ini_file_when_from_data_raises(self):
         with pytest.raises(FileNotFoundError):
@@ -20,7 +20,7 @@ class TestAnalysisWithoutNetworkConfiguration:
             )
 
     def test_given_valid_file_when_is_valid_then_true(self):
-        class MockedConfigData(AnalysisIniConfigData):
+        class MockedConfigData(AnalysisConfigData):
             def is_valid(self) -> bool:
                 return True
 
@@ -34,7 +34,7 @@ class TestAnalysisWithoutNetworkConfiguration:
         assert _config.is_valid()
 
     def test_given_invalid_file_when_is_valid_then_false(self):
-        class MockedConfigData(AnalysisIniConfigData):
+        class MockedConfigData(AnalysisConfigData):
             def is_valid(self) -> bool:
                 return False
 

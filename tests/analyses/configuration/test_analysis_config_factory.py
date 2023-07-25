@@ -2,9 +2,9 @@ import pytest
 
 from ra2ce.analyses.configuration.analysis_config_factory import AnalysisConfigFactory
 from ra2ce.analyses.configuration.analysis_ini_config_data import (
-    AnalysisIniConfigData,
-    AnalysisWithNetworkIniConfigData,
-    AnalysisWithoutNetworkIniConfigData,
+    AnalysisConfigData,
+    AnalysisWithNetworkConfigData,
+    AnalysisWithoutNetworkConfigData,
 )
 from ra2ce.analyses.configuration.analysis_with_network_config import (
     AnalysisWithNetworkConfiguration,
@@ -12,13 +12,13 @@ from ra2ce.analyses.configuration.analysis_with_network_config import (
 from ra2ce.analyses.configuration.analysis_without_network_config import (
     AnalysisWithoutNetworkConfiguration,
 )
-from ra2ce.common.configuration.config_data_protocol import IniConfigDataProtocol
+from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from tests import test_data
 
 
 class TestAnalysisConfigFactory:
     def test_given_unknown_type_get_analysis_config_raises(self):
-        class UnknownAnalysisIniConfigData(IniConfigDataProtocol):
+        class UnknownAnalysisIniConfigData(ConfigDataProtocol):
             pass
 
         # 1. Given test data
@@ -43,9 +43,9 @@ class TestAnalysisConfigFactory:
     ):
         # 1. Given test data.
         _ini_file_path = test_data / "simple_inputs" / "analysis.ini"
-        _config_data = AnalysisWithNetworkIniConfigData()
+        _config_data = AnalysisWithNetworkConfigData()
         _expected_type = AnalysisWithNetworkConfiguration
-        assert isinstance(_config_data, AnalysisIniConfigData)
+        assert isinstance(_config_data, AnalysisConfigData)
 
         # 2. Run test.
         _ini_config = AnalysisConfigFactory.get_analysis_config(
@@ -61,13 +61,13 @@ class TestAnalysisConfigFactory:
     ):
         # 1. Given test data.
         _ini_file_path = test_data / "simple_inputs" / "analysis.ini"
-        _config_data = AnalysisWithoutNetworkIniConfigData()
+        _config_data = AnalysisWithoutNetworkConfigData()
 
         _config_data["static"] = test_data / "simple_inputs" / "static"
         assert _config_data["static"].is_dir()
 
         _expected_type = AnalysisWithoutNetworkConfiguration
-        assert isinstance(_config_data, AnalysisIniConfigData)
+        assert isinstance(_config_data, AnalysisConfigData)
 
         # 2. Run test.
         _ini_config = AnalysisConfigFactory.get_analysis_config(
