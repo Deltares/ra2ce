@@ -20,20 +20,21 @@
 """
 
 
-from optparse import Option
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.analyses.analysis_config_data.analysis_config_base import AnalysisConfigBase
-from ra2ce.analyses.analysis_config_data.analysis_ini_config_data import (
+from ra2ce.analyses.analysis_config_data.analysis_config_data_base import (
+    AnalysisConfigWrapperBase,
+)
+from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisWithNetworkConfigData,
     AnalysisWithoutNetworkConfigData,
 )
-from ra2ce.analyses.analysis_config_data.analysis_with_network_config import (
+from ra2ce.analyses.analysis_config_data.analysis_with_network_config_data import (
     AnalysisWithNetworkConfiguration,
 )
-from ra2ce.analyses.analysis_config_data.analysis_without_network_config import (
+from ra2ce.analyses.analysis_config_data.analysis_without_network_config_data import (
     AnalysisWithoutNetworkConfiguration,
 )
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
@@ -49,9 +50,9 @@ class AnalysisConfigFactory:
         ini_file: Path,
         analysis_ini_config: AnalysisConfigData,
         network_config: Optional[NetworkConfigWrapper],
-    ) -> AnalysisConfigBase:
+    ) -> AnalysisConfigWrapperBase:
         """
-        Converts an `AnalysisIniConfigData` into the matching concrete class of `AnalysisConfigBase`.
+        Converts an `AnalysisIniConfigData` into the matching concrete class of `AnalysisConfigWrapperBase`.
 
         Args:
             ini_file (Path): Source `*.ini` file path to the FileObjectModel.
@@ -62,7 +63,7 @@ class AnalysisConfigFactory:
             NotImplementedError: When the `AnalysisIniConfigData` type has not been yet mapped to a DataObjectModel.
 
         Returns:
-            AnalysisConfigBase: Concrete `AnalysisConfigBase` DataObjectModel for the given data.
+            AnalysisConfigWrapperBase: Concrete `AnalysisConfigWrapperBase` DataObjectModel for the given data.
         """
         if isinstance(analysis_ini_config, AnalysisWithNetworkConfigData):
             return AnalysisWithNetworkConfiguration.from_data_with_network(

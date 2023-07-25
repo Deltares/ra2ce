@@ -25,11 +25,14 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from ra2ce.analyses.analysis_config_data import AnalysisConfigBase, AnalysisConfigData
+from ra2ce.analyses.analysis_config_data.analysis_config_data_base import (
+    AnalysisConfigWrapperBase,
+    AnalysisConfigData,
+)
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
-class AnalysisWithoutNetworkConfiguration(AnalysisConfigBase):
+class AnalysisWithoutNetworkConfiguration(AnalysisConfigWrapperBase):
     def __init__(self) -> None:
         self.config_data = AnalysisConfigData()
 

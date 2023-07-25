@@ -20,7 +20,9 @@
 """
 
 
-from ra2ce.analyses.analysis_config_data import AnalysisConfigBase
+from ra2ce.analyses.analysis_config_data.analysis_config_data_base import (
+    AnalysisConfigWrapperBase,
+)
 from ra2ce.analyses.indirect import analyses_indirect
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
@@ -37,7 +39,7 @@ class IndirectAnalysisRunner(AnalysisRunner):
             or "indirect" in ra2ce_input.analysis_config.config_data
         )
 
-    def run(self, analysis_config: AnalysisConfigBase) -> None:
+    def run(self, analysis_config: AnalysisConfigWrapperBase) -> None:
         analyses_indirect.IndirectAnalyses(
             analysis_config.config_data, analysis_config.graphs
         ).execute()

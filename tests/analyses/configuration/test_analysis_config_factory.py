@@ -1,17 +1,17 @@
 import pytest
 
-from ra2ce.analyses.analysis_config_data.analysis_config_factory import (
+from ra2ce.analyses.analysis_config_data.analysis_config_data_factory import (
     AnalysisConfigFactory,
 )
-from ra2ce.analyses.analysis_config_data.analysis_ini_config_data import (
+from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisWithNetworkConfigData,
     AnalysisWithoutNetworkConfigData,
 )
-from ra2ce.analyses.analysis_config_data.analysis_with_network_config import (
+from ra2ce.analyses.analysis_config_data.analysis_with_network_config_data import (
     AnalysisWithNetworkConfiguration,
 )
-from ra2ce.analyses.analysis_config_data.analysis_without_network_config import (
+from ra2ce.analyses.analysis_config_data.analysis_without_network_config_data import (
     AnalysisWithoutNetworkConfiguration,
 )
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol

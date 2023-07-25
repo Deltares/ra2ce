@@ -23,8 +23,10 @@
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.analyses.analysis_config_data.analysis_config_base import AnalysisConfigBase
-from ra2ce.analyses.analysis_config_data.analysis_config_factory import (
+from ra2ce.analyses.analysis_config_data.analysis_config_data_base import (
+    AnalysisConfigWrapperBase,
+)
+from ra2ce.analyses.analysis_config_data.analysis_config_data_factory import (
     AnalysisConfigFactory,
 )
 from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_factory import (
@@ -72,7 +74,7 @@ class ConfigFactory:
     @staticmethod
     def get_analysis_config_data(
         analysis_ini: Path, network_config: Optional[NetworkConfigData]
-    ) -> Optional[AnalysisConfigBase]:
+    ) -> Optional[AnalysisConfigWrapperBase]:
         if not analysis_ini:
             return None
         _ini_config_data = AnalysisConfigReaderFactory().read(

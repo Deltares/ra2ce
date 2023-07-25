@@ -23,7 +23,9 @@
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.analyses.analysis_config_data import AnalysisConfigBase
+from ra2ce.analyses.analysis_config_data.analysis_config_data_base import (
+    AnalysisConfigWrapperBase,
+)
 from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
@@ -47,6 +49,6 @@ class AnalysisConfigReaderFactory:
 
     def read(
         self, ini_file: Path, network_config: Optional[NetworkConfigData]
-    ) -> AnalysisConfigBase:
+    ) -> AnalysisConfigWrapperBase:
         _reader = self.get_reader(network_config)
         return _reader.read(ini_file)

@@ -3,7 +3,7 @@ from typing import List
 
 import pytest
 
-from ra2ce.analyses.analysis_config_data.analysis_ini_config_data_validator_base import (
+from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_base import (
     IniConfigValidatorBase,
 )
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
