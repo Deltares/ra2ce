@@ -4,8 +4,8 @@ from typing import Optional
 import pytest
 
 from ra2ce.analyses.configuration.analysis_ini_config_data import (
-    AnalysisWithNetworkIniConfigData,
-    AnalysisWithoutNetworkIniConfigData,
+    AnalysisWithNetworkConfigData,
+    AnalysisWithoutNetworkConfigData,
 )
 from ra2ce.analyses.configuration.analysis_ini_config_validator import (
     AnalysisIniConfigValidator,
@@ -17,12 +17,12 @@ from tests import test_data
 
 class TestAnalysisIniConfigValidator:
     def _validate_from_dict(self, dict_values: dict) -> ValidationReport:
-        _test_config_data = AnalysisWithNetworkIniConfigData.from_dict(dict_values)
+        _test_config_data = AnalysisWithNetworkConfigData.from_dict(dict_values)
         _validator = AnalysisIniConfigValidator(_test_config_data)
         return _validator.validate()
 
     def test_init_validator(self):
-        _test_config_data = AnalysisWithNetworkIniConfigData()
+        _test_config_data = AnalysisWithNetworkConfigData()
         _validator = AnalysisIniConfigValidator(_test_config_data)
         assert _validator
 
@@ -34,7 +34,7 @@ class TestAnalysisIniConfigValidator:
 
 class TestAnalysisWithoutNetworkConfigValidator:
     def _validate_from_dict(self, dict_values: dict) -> ValidationReport:
-        _test_config_data = AnalysisWithoutNetworkIniConfigData.from_dict(dict_values)
+        _test_config_data = AnalysisWithoutNetworkConfigData.from_dict(dict_values)
         _validator = AnalysisWithoutNetworkConfigValidator(_test_config_data)
         return _validator.validate()
 

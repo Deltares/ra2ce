@@ -21,11 +21,10 @@
 
 
 from pathlib import Path
-from typing import Optional
 
 from ra2ce.analyses.configuration.analysis_config_base import AnalysisConfigBase
 from ra2ce.analyses.configuration.analysis_ini_config_data import (
-    AnalysisWithNetworkIniConfigData,
+    AnalysisWithNetworkConfigData,
 )
 from ra2ce.analyses.configuration.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
@@ -41,13 +40,11 @@ class AnalysisWithNetworkConfigReader(AnalysisConfigReaderBase):
                 "Network data mandatory for an AnalysisIniConfigurationReader reader."
             )
 
-    def read(
-        self, ini_file: Optional[Path]
-    ) -> Optional[AnalysisWithNetworkIniConfigData]:
+    def read(self, ini_file: Path) -> AnalysisWithNetworkConfigData:
         if not ini_file or not ini_file.exists():
             return None
         _root_path = AnalysisConfigBase.get_network_root_dir(ini_file)
         _config_data = self._import_configuration(_root_path, ini_file)
         _config_data = self._convert_analysis_types(_config_data)
         self._copy_output_files(ini_file, _config_data)
-        return AnalysisWithNetworkIniConfigData.from_dict(_config_data)
+        return AnalysisWithNetworkConfigData.from_dict(_config_data)

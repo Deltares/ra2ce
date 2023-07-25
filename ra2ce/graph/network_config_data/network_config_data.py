@@ -24,6 +24,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
+
 
 @dataclass
 class ProjectSection:
@@ -83,7 +85,7 @@ class CleanupSection:
 
 
 @dataclass
-class NetworkConfigData:
+class NetworkConfigData(ConfigDataProtocol):
     input_path: Path = None
     output_path: Path = None
     static_path: Path = None

@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from ra2ce.analyses.configuration import AnalysisConfigBase, AnalysisIniConfigData
+from ra2ce.analyses.configuration import AnalysisConfigBase, AnalysisConfigData
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
@@ -33,11 +33,11 @@ class AnalysisWithNetworkConfiguration(AnalysisConfigBase):
     _network_config: NetworkConfigData
 
     def __init__(self) -> None:
-        self.config_data = AnalysisIniConfigData()
+        self.config_data = AnalysisConfigData()
 
     @classmethod
     def from_data(
-        cls, ini_file: Path, config_data: AnalysisIniConfigData
+        cls, ini_file: Path, config_data: AnalysisConfigData
     ) -> AnalysisWithNetworkConfiguration:
         """
         Initializes an `AnalysisWithNetworkConfiguration` with the given parameters.
@@ -63,7 +63,7 @@ class AnalysisWithNetworkConfiguration(AnalysisConfigBase):
     def from_data_with_network(
         cls,
         ini_file: Path,
-        config_data: AnalysisIniConfigData,
+        config_data: AnalysisConfigData,
         network_config: NetworkConfigWrapper,
     ) -> AnalysisWithNetworkConfiguration:
         """

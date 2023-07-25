@@ -26,21 +26,21 @@ from ra2ce.analyses.configuration.analysis_ini_config_validator import (
     AnalysisIniConfigValidator,
     AnalysisWithoutNetworkConfigValidator,
 )
-from ra2ce.common.configuration.config_data_protocol import IniConfigDataProtocol
+from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 
 
-class AnalysisIniConfigData(IniConfigDataProtocol):
+class AnalysisConfigData(ConfigDataProtocol):
     @classmethod
-    def from_dict(cls, dict_values) -> IniConfigDataProtocol:
+    def from_dict(cls, dict_values: dict) -> ConfigDataProtocol:
         raise NotImplementedError("Implement in concrete classes")
 
     def is_valid(self) -> bool:
         raise NotImplementedError("Implement in concrete classes")
 
 
-class AnalysisWithNetworkIniConfigData(AnalysisIniConfigData):
+class AnalysisWithNetworkConfigData(AnalysisConfigData):
     @classmethod
-    def from_dict(cls, dict_values) -> AnalysisWithNetworkIniConfigData:
+    def from_dict(cls, dict_values: dict) -> AnalysisWithNetworkConfigData:
         _new_analysis_ini_config_data = cls()
         _new_analysis_ini_config_data.update(**dict_values)
         return _new_analysis_ini_config_data
@@ -50,9 +50,9 @@ class AnalysisWithNetworkIniConfigData(AnalysisIniConfigData):
         return _validation_report.is_valid()
 
 
-class AnalysisWithoutNetworkIniConfigData(AnalysisIniConfigData):
+class AnalysisWithoutNetworkConfigData(AnalysisConfigData):
     @classmethod
-    def from_dict(cls, dict_values) -> AnalysisWithoutNetworkIniConfigData:
+    def from_dict(cls, dict_values: dict) -> AnalysisWithoutNetworkConfigData:
         _new_analysis_ini_config_data = cls()
         _new_analysis_ini_config_data.update(**dict_values)
         return _new_analysis_ini_config_data

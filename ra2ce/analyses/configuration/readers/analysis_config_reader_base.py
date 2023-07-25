@@ -29,12 +29,12 @@ from ra2ce.analyses.configuration.analysis_ini_config_data_validator_base import
     IndirectAnalysisNameList,
 )
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
-    IniConfigurationReaderProtocol,
+    ConfigDataReaderProtocol,
 )
 from ra2ce.common.io.readers.ini_file_reader import IniFileReader
 
 
-class AnalysisConfigReaderBase(IniConfigurationReaderProtocol):
+class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
     def _convert_analysis_types(self, config: dict) -> dict:
         def set_analysis_values(config_type: str):
             if config_type in config:

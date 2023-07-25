@@ -25,19 +25,19 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, List, Optional, Protocol, runtime_checkable
 
-from ra2ce.common.configuration.config_data_protocol import IniConfigDataProtocol
+from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 
 
 @runtime_checkable
 class ConfigWrapperProtocol(Protocol):  # pragma: no cover
     ini_file: Path
     root_dir: Path
-    config_data: Optional[IniConfigDataProtocol] = None
+    config_data: Optional[ConfigDataProtocol] = None
     graphs: List[Any] = []
 
     @classmethod
     def from_data(
-        cls, ini_file: Path, config_data: IniConfigDataProtocol
+        cls, ini_file: Path, config_data: ConfigDataProtocol
     ) -> ConfigWrapperProtocol:
         """
         Initializes a `ConfigWrapperProtocol` with the given parameters.

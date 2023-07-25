@@ -25,17 +25,17 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from ra2ce.analyses.configuration import AnalysisConfigBase, AnalysisIniConfigData
+from ra2ce.analyses.configuration import AnalysisConfigBase, AnalysisConfigData
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
 class AnalysisWithoutNetworkConfiguration(AnalysisConfigBase):
     def __init__(self) -> None:
-        self.config_data = AnalysisIniConfigData()
+        self.config_data = AnalysisConfigData()
 
     @classmethod
     def from_data(
-        cls, ini_file: Path, config_data: AnalysisIniConfigData
+        cls, ini_file: Path, config_data: AnalysisConfigData
     ) -> AnalysisWithoutNetworkConfiguration:
         """
         Initializes an `AnalysisWithoutNetworkConfiguration` with the given parameters.

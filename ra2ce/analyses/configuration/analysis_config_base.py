@@ -23,14 +23,14 @@
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.analyses.configuration.analysis_ini_config_data import AnalysisIniConfigData
+from ra2ce.analyses.configuration.analysis_ini_config_data import AnalysisConfigData
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 
 
 class AnalysisConfigBase(ConfigWrapperProtocol):
     ini_file: Path
     root_dir: Path
-    config_data: Optional[AnalysisIniConfigData] = None
+    config_data: Optional[AnalysisConfigData] = None
 
     @staticmethod
     def get_network_root_dir(filepath: Path) -> Path:

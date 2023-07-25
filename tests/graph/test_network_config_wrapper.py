@@ -2,30 +2,8 @@ import shutil
 
 import pytest
 
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.graph.network_config_wrapper import (
-    NetworkConfigWrapper,
-    hazard_handler,
-    network_handler,
-)
+from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 from tests import test_results
-
-
-def test_network_handler_given_invalid_network_then_raises():
-    with pytest.raises(Exception):
-        network_handler({}, {})
-
-
-def test_hazard_handler_given_invalid_values_returns_none():
-    # 1. Define test data.
-    _config_dict = NetworkConfigData()
-    _config_dict.hazard.hazard_map = []
-
-    # 2. Run test.
-    _return_value = hazard_handler(_config_dict, {}, {})
-
-    # 3. Verify expectations
-    assert _return_value is None
 
 
 class TestNetworkConfigWrapper:

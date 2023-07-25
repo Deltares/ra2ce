@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from ra2ce.analyses.configuration import AnalysisIniConfigData
+from ra2ce.analyses.configuration import AnalysisConfigData
 from ra2ce.analyses.configuration.analysis_with_network_config import (
     AnalysisWithNetworkConfiguration,
 )
@@ -18,7 +18,7 @@ class TestAnalysisWithNetworkConfig:
     def test_initialize(self):
         _config = AnalysisWithNetworkConfiguration()
         assert isinstance(_config, AnalysisWithNetworkConfiguration)
-        assert isinstance(_config.config_data, AnalysisIniConfigData)
+        assert isinstance(_config.config_data, AnalysisConfigData)
 
     @pytest.fixture(autouse=False)
     def valid_analysis_ini(self) -> Path:
@@ -28,7 +28,7 @@ class TestAnalysisWithNetworkConfig:
 
     def test_from_data(self, valid_analysis_ini: Path):
         # 1. Define test data.
-        _config_data = AnalysisIniConfigData()
+        _config_data = AnalysisConfigData()
 
         # 2. Run test.
         _config = AnalysisWithNetworkConfiguration.from_data(
@@ -42,7 +42,7 @@ class TestAnalysisWithNetworkConfig:
 
     def test_from_data_with_network(self, valid_analysis_ini: Path):
         # 1. Define test data.
-        _config_data = AnalysisIniConfigData()
+        _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
 
         # 2. Run test.
@@ -58,7 +58,7 @@ class TestAnalysisWithNetworkConfig:
 
     def test_configure(self, valid_analysis_ini: Path):
         # 1. Define test data.
-        _config_data = AnalysisIniConfigData()
+        _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
         _config = AnalysisWithNetworkConfiguration.from_data_with_network(
             valid_analysis_ini, _config_data, _network_config
@@ -69,7 +69,7 @@ class TestAnalysisWithNetworkConfig:
 
     def test_is_valid(self, valid_analysis_ini: Path):
         # 1. Define test data.
-        class DummyConfigData(AnalysisIniConfigData):
+        class DummyConfigData(AnalysisConfigData):
             def is_valid(self) -> bool:
                 return True
 
