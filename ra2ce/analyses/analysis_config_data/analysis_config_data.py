@@ -21,42 +21,24 @@
 
 
 from __future__ import annotations
-
-from ra2ce.analyses.analysis_config_data.analysis_config_data_validator import (
-    AnalysisConfigDataValidatorWithoutNetwork,
-    AnalysisWithoutNetworkConfigValidator,
-)
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 
 
 class AnalysisConfigData(ConfigDataProtocol):
     @classmethod
-    def from_dict(cls, dict_values: dict) -> ConfigDataProtocol:
-        raise NotImplementedError("Implement in concrete classes")
-
-    def is_valid(self) -> bool:
-        raise NotImplementedError("Implement in concrete classes")
+    def from_dict(cls, dict_values: dict) -> AnalysisConfigData:
+        _new_analysis_ini_config_data = cls()
+        _new_analysis_ini_config_data.update(**dict_values)
+        return _new_analysis_ini_config_data
 
 
 class AnalysisConfigDataWithNetwork(AnalysisConfigData):
     @classmethod
     def from_dict(cls, dict_values: dict) -> AnalysisConfigDataWithNetwork:
-        _new_analysis_ini_config_data = cls()
-        _new_analysis_ini_config_data.update(**dict_values)
-        return _new_analysis_ini_config_data
-
-    def is_valid(self) -> bool:
-        _validation_report = AnalysisConfigDataValidatorWithoutNetwork(self).validate()
-        return _validation_report.is_valid()
+        return super().from_dict(dict_values)
 
 
 class AnalysisConfigDataWithoutNetwork(AnalysisConfigData):
     @classmethod
     def from_dict(cls, dict_values: dict) -> AnalysisConfigDataWithoutNetwork:
-        _new_analysis_ini_config_data = cls()
-        _new_analysis_ini_config_data.update(**dict_values)
-        return _new_analysis_ini_config_data
-
-    def is_valid(self) -> bool:
-        _validation_report = AnalysisWithoutNetworkConfigValidator(self).validate()
-        return _validation_report.is_valid()
+        return super().from_dict(dict_values)
