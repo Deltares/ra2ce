@@ -7,23 +7,23 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigDataWithNetwork,
     AnalysisConfigDataWithoutNetwork,
 )
-from ra2ce.analyses.analysis_config_data.analysis_config_data_validator import (
-    AnalysisIniConfigValidator,
-    AnalysisWithoutNetworkConfigValidator,
+from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_without_network import (
+    AnalysisConfigDataValidatorWithoutNetwork,
 )
+
 from ra2ce.common.validation.validation_report import ValidationReport
 from tests import test_data
 
 
-class TestAnalysisIniConfigValidator:
+class TestAnalysisConfigDataValidator:
     def _validate_from_dict(self, dict_values: dict) -> ValidationReport:
         _test_config_data = AnalysisConfigDataWithNetwork.from_dict(dict_values)
-        _validator = AnalysisIniConfigValidator(_test_config_data)
+        _validator = AnalysisConfigDataValidatorWithoutNetwork(_test_config_data)
         return _validator.validate()
 
     def test_init_validator(self):
         _test_config_data = AnalysisConfigDataWithNetwork()
-        _validator = AnalysisIniConfigValidator(_test_config_data)
+        _validator = AnalysisConfigDataValidatorWithoutNetwork(_test_config_data)
         assert _validator
 
     def test_validate_with_required_headers(self):
@@ -32,10 +32,10 @@ class TestAnalysisIniConfigValidator:
         assert _validator.is_valid()
 
 
-class TestAnalysisWithoutNetworkConfigValidator:
+class TestAnalysisConfigDataValidatorWithoutNetwork:
     def _validate_from_dict(self, dict_values: dict) -> ValidationReport:
         _test_config_data = AnalysisConfigDataWithoutNetwork.from_dict(dict_values)
-        _validator = AnalysisWithoutNetworkConfigValidator(_test_config_data)
+        _validator = AnalysisConfigDataValidatorWithoutNetwork(_test_config_data)
         return _validator.validate()
 
     def test_validate_with_required_headers(self):

@@ -1,7 +1,7 @@
 import pytest
 
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_factory import (
-    AnalysisConfigFactory,
+    AnalysisConfigWrapperFactory,
 )
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
@@ -9,10 +9,10 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigDataWithoutNetwork,
 )
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_with_network import (
-    AnalysisWithNetworkConfiguration,
+    AnalysisConfigWrapperWithNetwork,
 )
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_without_network import (
-    AnalysisWithoutNetworkConfiguration,
+    AnalysisConfigWrapperWithoutNetwork,
 )
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from tests import test_data
@@ -33,7 +33,7 @@ class TestAnalysisConfigFactory:
 
         # 2. Run test
         with pytest.raises(NotImplementedError) as exc_err:
-            AnalysisConfigFactory.get_analysis_config(
+            AnalysisConfigWrapperFactory.get_analysis_config(
                 _a_path, _uknown_ini_config_data, None
             )
 
@@ -46,11 +46,11 @@ class TestAnalysisConfigFactory:
         # 1. Given test data.
         _ini_file_path = test_data / "simple_inputs" / "analysis.ini"
         _config_data = AnalysisConfigDataWithNetwork()
-        _expected_type = AnalysisWithNetworkConfiguration
+        _expected_type = AnalysisConfigWrapperWithNetwork
         assert isinstance(_config_data, AnalysisConfigData)
 
         # 2. Run test.
-        _ini_config = AnalysisConfigFactory.get_analysis_config(
+        _ini_config = AnalysisConfigWrapperFactory.get_analysis_config(
             _ini_file_path, _config_data, None
         )
 
@@ -68,11 +68,11 @@ class TestAnalysisConfigFactory:
         _config_data["static"] = test_data / "simple_inputs" / "static"
         assert _config_data["static"].is_dir()
 
-        _expected_type = AnalysisWithoutNetworkConfiguration
+        _expected_type = AnalysisConfigWrapperWithoutNetwork
         assert isinstance(_config_data, AnalysisConfigData)
 
         # 2. Run test.
-        _ini_config = AnalysisConfigFactory.get_analysis_config(
+        _ini_config = AnalysisConfigWrapperFactory.get_analysis_config(
             _ini_file_path, _config_data, None
         )
 

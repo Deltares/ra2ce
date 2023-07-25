@@ -4,20 +4,20 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
 )
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_without_network import (
-    AnalysisWithoutNetworkConfiguration,
+    AnalysisConfigWrapperWithoutNetwork,
 )
 from tests import acceptance_test_data
 
 
 class TestAnalysisWithoutNetworkConfiguration:
     def test_init(self):
-        _config = AnalysisWithoutNetworkConfiguration()
-        assert isinstance(_config, AnalysisWithoutNetworkConfiguration)
+        _config = AnalysisConfigWrapperWithoutNetwork()
+        assert isinstance(_config, AnalysisConfigWrapperWithoutNetwork)
         assert isinstance(_config.config_data, AnalysisConfigData)
 
     def test_given_no_ini_file_when_from_data_raises(self):
         with pytest.raises(FileNotFoundError):
-            AnalysisWithoutNetworkConfiguration.from_data(
+            AnalysisConfigWrapperWithoutNetwork.from_data(
                 acceptance_test_data / "non_existing_file.txt", None
             )
 
@@ -27,7 +27,7 @@ class TestAnalysisWithoutNetworkConfiguration:
                 return True
 
         # 1. Define test data.
-        _config = AnalysisWithoutNetworkConfiguration()
+        _config = AnalysisConfigWrapperWithoutNetwork()
         _config.config_data = MockedConfigData()
         _config.ini_file = acceptance_test_data / "analyses.ini"
         assert _config.ini_file.exists()
@@ -41,7 +41,7 @@ class TestAnalysisWithoutNetworkConfiguration:
                 return False
 
         # 1. Define test data.
-        _config = AnalysisWithoutNetworkConfiguration()
+        _config = AnalysisConfigWrapperWithoutNetwork()
         _config.config_data = MockedConfigData()
         _config.ini_file = acceptance_test_data / "not_a_file.ini"
         assert not _config.ini_file.exists()

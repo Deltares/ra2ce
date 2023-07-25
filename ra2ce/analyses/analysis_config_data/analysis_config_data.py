@@ -23,7 +23,7 @@
 from __future__ import annotations
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data_validator import (
-    AnalysisIniConfigValidator,
+    AnalysisConfigDataValidatorWithoutNetwork,
     AnalysisWithoutNetworkConfigValidator,
 )
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
@@ -46,7 +46,7 @@ class AnalysisConfigDataWithNetwork(AnalysisConfigData):
         return _new_analysis_ini_config_data
 
     def is_valid(self) -> bool:
-        _validation_report = AnalysisIniConfigValidator(self).validate()
+        _validation_report = AnalysisConfigDataValidatorWithoutNetwork(self).validate()
         return _validation_report.is_valid()
 
 

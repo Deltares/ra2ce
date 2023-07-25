@@ -32,15 +32,15 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigDataWithoutNetwork,
 )
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_with_network import (
-    AnalysisWithNetworkConfiguration,
+    AnalysisConfigWrapperWithNetwork,
 )
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_without_network import (
-    AnalysisWithoutNetworkConfiguration,
+    AnalysisConfigWrapperWithoutNetwork,
 )
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
-class AnalysisConfigFactory:
+class AnalysisConfigWrapperFactory:
     """
     Factory to help determine which AnalysisConfig should be created based on the input given.
     """
@@ -66,11 +66,11 @@ class AnalysisConfigFactory:
             AnalysisConfigWrapperBase: Concrete `AnalysisConfigWrapperBase` DataObjectModel for the given data.
         """
         if isinstance(analysis_ini_config, AnalysisConfigDataWithNetwork):
-            return AnalysisWithNetworkConfiguration.from_data_with_network(
+            return AnalysisConfigWrapperWithNetwork.from_data_with_network(
                 ini_file, analysis_ini_config, network_config
             )
         elif isinstance(analysis_ini_config, AnalysisConfigDataWithoutNetwork):
-            return AnalysisWithoutNetworkConfiguration.from_data(
+            return AnalysisConfigWrapperWithoutNetwork.from_data(
                 ini_file, analysis_ini_config
             )
         else:

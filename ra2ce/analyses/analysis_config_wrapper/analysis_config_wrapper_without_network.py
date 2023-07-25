@@ -32,14 +32,14 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisCon
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
-class AnalysisWithoutNetworkConfiguration(AnalysisConfigWrapperBase):
+class AnalysisConfigWrapperWithoutNetwork(AnalysisConfigWrapperBase):
     def __init__(self) -> None:
         self.config_data = AnalysisConfigData()
 
     @classmethod
     def from_data(
         cls, ini_file: Path, config_data: AnalysisConfigData
-    ) -> AnalysisWithoutNetworkConfiguration:
+    ) -> AnalysisConfigWrapperWithoutNetwork:
         """
         Initializes an `AnalysisWithoutNetworkConfiguration` with the given parameters.
 

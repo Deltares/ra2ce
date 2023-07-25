@@ -32,7 +32,7 @@ from ra2ce.graph.network_config_data.network_config_data import NetworkConfigDat
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
-class AnalysisWithNetworkConfiguration(AnalysisConfigWrapperBase):
+class AnalysisConfigWrapperWithNetwork(AnalysisConfigWrapperBase):
     _network_config: NetworkConfigData
 
     def __init__(self) -> None:
@@ -41,7 +41,7 @@ class AnalysisWithNetworkConfiguration(AnalysisConfigWrapperBase):
     @classmethod
     def from_data(
         cls, ini_file: Path, config_data: AnalysisConfigData
-    ) -> AnalysisWithNetworkConfiguration:
+    ) -> AnalysisConfigWrapperWithNetwork:
         """
         Initializes an `AnalysisWithNetworkConfiguration` with the given parameters.
 
@@ -68,7 +68,7 @@ class AnalysisWithNetworkConfiguration(AnalysisConfigWrapperBase):
         ini_file: Path,
         config_data: AnalysisConfigData,
         network_config: NetworkConfigWrapper,
-    ) -> AnalysisWithNetworkConfiguration:
+    ) -> AnalysisConfigWrapperWithNetwork:
         """
         Initializes this class with a network_configuration.
 

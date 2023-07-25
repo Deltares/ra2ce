@@ -7,7 +7,7 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
 )
 
 
-class TestAnalysisIniConfigData:
+class TestAnalysisConfigData:
     def test_initialize(self):
         _config_data = AnalysisConfigData()
         # At this moment it's not really mapped as a FOM.
