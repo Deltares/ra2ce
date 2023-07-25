@@ -27,7 +27,7 @@ from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import 
     AnalysisConfigWrapperBase,
 )
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_factory import (
-    AnalysisConfigFactory,
+    AnalysisConfigWrapperFactory,
 )
 from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_factory import (
     AnalysisConfigReaderFactory,
@@ -80,6 +80,6 @@ class ConfigFactory:
         _ini_config_data = AnalysisConfigReaderFactory().read(
             analysis_ini, network_config
         )
-        return AnalysisConfigFactory.get_analysis_config(
+        return AnalysisConfigWrapperFactory.get_analysis_config(
             analysis_ini, _ini_config_data, network_config
         )

@@ -20,10 +20,12 @@
 """
 
 
+from abc import abstractmethod, abstractclassmethod
 from pathlib import Path
 from typing import Optional
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 
 
@@ -61,3 +63,18 @@ class AnalysisConfigWrapperBase(ConfigWrapperProtocol):
 
         _create_output_folders("direct")
         _create_output_folders("indirect")
+
+    @classmethod
+    @abstractclassmethod
+    def from_data(
+        cls, ini_file: Path, config_data: ConfigDataProtocol
+    ) -> ConfigWrapperProtocol:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def configure(self) -> None:
+        raise NotImplementedError()
+
+    @abstractmethod
+    def is_valid(self) -> bool:
+        raise NotImplementedError()

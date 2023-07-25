@@ -19,9 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_base import (
-    _expected_values,
-)
+from typing import Any
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
 from ra2ce.graph.network_config_data.network_config_data import (
@@ -30,6 +28,38 @@ from ra2ce.graph.network_config_data.network_config_data import (
     NetworkSection,
     ProjectSection,
 )
+
+NetworkDictValues: dict[str, list[Any]] = {
+    "source": ["OSM PBF", "OSM download", "shapefile", "pickle"],
+    "polygon": ["file", None],
+    "directed": [True, False, None],
+    "network_type": ["walk", "bike", "drive", "drive_service", "all", None],
+    "road_types": [
+        "motorway",
+        "motorway_link",
+        "trunk",
+        "trunk_link",
+        "primary",
+        "primary_link",
+        "secondary",
+        "secondary_link",
+        "tertiary",
+        "tertiary_link",
+        "unclassified",
+        "residential",
+        "road",
+        None,
+    ],
+    "origins": ["file", None],
+    "destinations": ["file", None],
+    "save_shp": [True, False, None],
+    "save_csv": [True, False, None],
+    "hazard_map": ["file", None],
+    "aggregate_wl": ["max", "min", "mean", None],
+    "weighing": ["distance", "time", None],
+    "save_traffic": [True, False, None],
+    "locations": ["file", None],
+}
 
 
 class NetworkConfigDataValidator(Ra2ceIoValidator):
@@ -58,7 +88,7 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
         return _report
 
     def _wrong_value(self, key: str) -> str:
-        _accepted_values = ",".join(_expected_values[key])
+        _accepted_values = ",".join(NetworkDictValues[key])
         return (
             f"Wrong input to property [ {key} ], has to be one of: {_accepted_values}."
         )
@@ -79,19 +109,19 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
         # Validate source
         if (
             network_section.source
-            and network_section.source not in _expected_values["source"]
+            and network_section.source not in NetworkDictValues["source"]
         ):
             _network_report.error(self._wrong_value("source"))
 
         # Validate network_type
         if (
             network_section.network_type
-            and network_section.network_type not in _expected_values["network_type"]
+            and network_section.network_type not in NetworkDictValues["network_type"]
         ):
             _network_report.error(self._wrong_value("network_type"))
 
         # Validate road types.
-        _expected_road_types = _expected_values["road_types"]
+        _expected_road_types = NetworkDictValues["road_types"]
         for road_type in filter(
             lambda x: x not in _expected_road_types, network_section.road_types
         ):
@@ -108,7 +138,7 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
         if not hazard_section.aggregate_wl:
             return _hazard_report
 
-        if hazard_section.aggregate_wl not in _expected_values["aggregate_wl"]:
+        if hazard_section.aggregate_wl not in NetworkDictValues["aggregate_wl"]:
             _hazard_report.error(self._wrong_value("aggregate_wl"))
 
         return _hazard_report
