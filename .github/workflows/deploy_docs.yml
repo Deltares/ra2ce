@@ -28,7 +28,7 @@ jobs:
           activate-environment: ra2ce_env
 
       - name: Install dependencies
-        run: poetry install --only docs
+        run: poetry install --without dev,test
 
       - name: Build docs
         run: |

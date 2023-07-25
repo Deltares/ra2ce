@@ -16,4 +16,3 @@ class TestIndirectAnalyses:
 
         # 3. Verify final expectations.
         assert isinstance(_indirect_analyses, IndirectAnalyses)
-        
