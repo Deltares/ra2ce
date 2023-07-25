@@ -20,11 +20,12 @@
 """
 
 
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 from ra2ce.common.validation.validation_report import ValidationReport
 
 
+@runtime_checkable
 class Ra2ceIoValidator(Protocol):
     def validate(self) -> ValidationReport:
         """

@@ -7,7 +7,8 @@ from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_with_network
     AnalysisConfigWrapperWithNetwork,
 )
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
-from tests import test_data
+from tests import test_data, test_results
+import shutil
 
 
 class TestAnalysisWithNetworkConfig:
@@ -67,16 +68,24 @@ class TestAnalysisWithNetworkConfig:
         # 2. Run test.
         _config.configure()
 
-    def test_is_valid(self, valid_analysis_ini: Path):
-        # 1. Define test data.
-        class DummyConfigData(AnalysisConfigData):
-            def is_valid(self) -> bool:
-                return True
+    def test_initialize_output_dirs_with_valid_data(
+        self, request: pytest.FixtureRequest
+    ):
+        # 1. Define test data
+        _analysis = AnalysisConfigWrapperWithNetwork()
+        _output_dir = test_results / request.node.name
+        _analysis.config_data = {
+            "direct": [{"analysis": "test_direct"}],
+            "indirect": [{"analysis": "test_indirect"}],
+            "output": _output_dir,
+        }
+        if _output_dir.exists():
+            shutil.rmtree(_output_dir)
 
-        # 2. Run test.
-        _result = AnalysisConfigWrapperWithNetwork.from_data(
-            valid_analysis_ini, DummyConfigData()
-        ).is_valid()
+        # 2. Run test
+        _analysis.initialize_output_dirs()
 
-        # 3. Verify expectations
-        assert _result is True
+        # 3. Verify expectations.
+        assert _output_dir.exists()
+        assert _output_dir.joinpath("test_direct").exists()
+        assert _output_dir.joinpath("test_indirect").exists()
