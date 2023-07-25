@@ -112,8 +112,8 @@ class OsmNetworkWrapper:
     def get_clean_graph(complex_graph):
         complex_graph = OsmNetworkWrapper.drop_duplicates(complex_graph)
         complex_graph = nut.add_missing_geoms_graph(graph=complex_graph, geom_name="geometry").to_directed()
-        complex_graph = OsmNetworkWrapper.snap_nodes(graph=complex_graph, threshold=0.000025)
-        # complex_graph =
+        complex_graph = OsmNetworkWrapper.snap_nodes_to_nodes(graph=complex_graph, threshold=0.000025)
+        # OsmNetworkWrapper.snap_nodes_to_edges(graph=complex_graph, threshold=0.000025)
         return complex_graph
 
     @staticmethod
@@ -186,9 +186,13 @@ class OsmNetworkWrapper:
         return None
 
     @staticmethod
-    def snap_nodes(graph, threshold):
+    def snap_nodes_to_nodes(graph, threshold):
         return consolidate_intersections(G=graph, rebuild_graph=True,
                                          tolerance=threshold, dead_ends=False)
+
+    @staticmethod
+    def snap_nodes_to_edges(graph, threshold):
+        pass
 
 
 @dataclass
