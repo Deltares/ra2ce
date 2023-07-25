@@ -28,7 +28,7 @@ from typing import Optional
 
 from shapely.errors import ShapelyDeprecationWarning
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data_base import (
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
     AnalysisConfigWrapperBase,
 )
 from ra2ce.configuration.config_factory import ConfigFactory

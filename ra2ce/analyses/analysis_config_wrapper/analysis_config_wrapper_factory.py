@@ -23,18 +23,18 @@
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data_base import (
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
     AnalysisConfigWrapperBase,
 )
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisWithNetworkConfigData,
-    AnalysisWithoutNetworkConfigData,
+    AnalysisConfigDataWithNetwork,
+    AnalysisConfigDataWithoutNetwork,
 )
-from ra2ce.analyses.analysis_config_data.analysis_with_network_config_data import (
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_with_network import (
     AnalysisWithNetworkConfiguration,
 )
-from ra2ce.analyses.analysis_config_data.analysis_without_network_config_data import (
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_without_network import (
     AnalysisWithoutNetworkConfiguration,
 )
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
@@ -65,11 +65,11 @@ class AnalysisConfigFactory:
         Returns:
             AnalysisConfigWrapperBase: Concrete `AnalysisConfigWrapperBase` DataObjectModel for the given data.
         """
-        if isinstance(analysis_ini_config, AnalysisWithNetworkConfigData):
+        if isinstance(analysis_ini_config, AnalysisConfigDataWithNetwork):
             return AnalysisWithNetworkConfiguration.from_data_with_network(
                 ini_file, analysis_ini_config, network_config
             )
-        elif isinstance(analysis_ini_config, AnalysisWithoutNetworkConfigData):
+        elif isinstance(analysis_ini_config, AnalysisConfigDataWithoutNetwork):
             return AnalysisWithoutNetworkConfiguration.from_data(
                 ini_file, analysis_ini_config
             )

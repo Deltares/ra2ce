@@ -1,17 +1,17 @@
 import pytest
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data_factory import (
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_factory import (
     AnalysisConfigFactory,
 )
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisWithNetworkConfigData,
-    AnalysisWithoutNetworkConfigData,
+    AnalysisConfigDataWithNetwork,
+    AnalysisConfigDataWithoutNetwork,
 )
-from ra2ce.analyses.analysis_config_data.analysis_with_network_config_data import (
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_with_network import (
     AnalysisWithNetworkConfiguration,
 )
-from ra2ce.analyses.analysis_config_data.analysis_without_network_config_data import (
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_without_network import (
     AnalysisWithoutNetworkConfiguration,
 )
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
@@ -45,7 +45,7 @@ class TestAnalysisConfigFactory:
     ):
         # 1. Given test data.
         _ini_file_path = test_data / "simple_inputs" / "analysis.ini"
-        _config_data = AnalysisWithNetworkConfigData()
+        _config_data = AnalysisConfigDataWithNetwork()
         _expected_type = AnalysisWithNetworkConfiguration
         assert isinstance(_config_data, AnalysisConfigData)
 
@@ -63,7 +63,7 @@ class TestAnalysisConfigFactory:
     ):
         # 1. Given test data.
         _ini_file_path = test_data / "simple_inputs" / "analysis.ini"
-        _config_data = AnalysisWithoutNetworkConfigData()
+        _config_data = AnalysisConfigDataWithoutNetwork()
 
         _config_data["static"] = test_data / "simple_inputs" / "static"
         assert _config_data["static"].is_dir()

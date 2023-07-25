@@ -2,8 +2,8 @@ import pytest
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisWithNetworkConfigData,
-    AnalysisWithoutNetworkConfigData,
+    AnalysisConfigDataWithNetwork,
+    AnalysisConfigDataWithoutNetwork,
 )
 
 
@@ -30,29 +30,29 @@ class TestAnalysisIniConfigData:
 
 class TestAnalysisWithNetworkIniConfigData:
     def test_initialize(self):
-        _config_data = AnalysisWithNetworkConfigData()
-        assert isinstance(_config_data, AnalysisWithNetworkConfigData)
+        _config_data = AnalysisConfigDataWithNetwork()
+        assert isinstance(_config_data, AnalysisConfigDataWithNetwork)
         assert isinstance(_config_data, AnalysisConfigData)
 
     def test_from_dict(self):
         _dict_values = {"the answer": 42}
-        _config_data = AnalysisWithNetworkConfigData.from_dict(_dict_values)
+        _config_data = AnalysisConfigDataWithNetwork.from_dict(_dict_values)
 
-        assert isinstance(_config_data, AnalysisWithNetworkConfigData)
-        assert isinstance(_config_data, AnalysisWithNetworkConfigData)
+        assert isinstance(_config_data, AnalysisConfigDataWithNetwork)
+        assert isinstance(_config_data, AnalysisConfigDataWithNetwork)
         assert _config_data == _dict_values
 
 
 class TestAnalysisWithoutNetworkIniConfigData:
     def test_initialize(self):
-        _config_data = AnalysisWithoutNetworkConfigData()
-        assert isinstance(_config_data, AnalysisWithoutNetworkConfigData)
+        _config_data = AnalysisConfigDataWithoutNetwork()
+        assert isinstance(_config_data, AnalysisConfigDataWithoutNetwork)
         assert isinstance(_config_data, AnalysisConfigData)
 
     def test_from_dict(self):
         _dict_values = {"the answer": 42}
-        _config_data = AnalysisWithoutNetworkConfigData.from_dict(_dict_values)
+        _config_data = AnalysisConfigDataWithoutNetwork.from_dict(_dict_values)
 
-        assert isinstance(_config_data, AnalysisWithoutNetworkConfigData)
-        assert isinstance(_config_data, AnalysisWithoutNetworkConfigData)
+        assert isinstance(_config_data, AnalysisConfigDataWithoutNetwork)
+        assert isinstance(_config_data, AnalysisConfigDataWithoutNetwork)
         assert _config_data == _dict_values
