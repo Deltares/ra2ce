@@ -128,50 +128,55 @@ class OsmNetworkWrapper:
         return unique_graph
 
     @staticmethod
-    def drop_duplicates_in_nodes(unique_elements: set, unique_graph, graph: MultiDiGraph):
+    def drop_duplicates_in_nodes(unique_elements: Union[set, None], unique_graph: Union[MultiDiGraph, None],
+                                 graph: MultiDiGraph):
+        if unique_elements is None:
+            unique_elements = set()
         if unique_graph is None:
             unique_graph = nx.MultiDiGraph()
         for node, data in graph.nodes(data=True):
             if data['x'] is None or data['y'] is None:
                 raise ValueError("Incompatible coordinate keys. Check the keys which define the x and y coordinates")
             else:
-                x, y = data['x'], data['y']  # Assuming 'x' and 'y' attributes store the geometry
-                geometry = (x, y)
-                if geometry not in unique_elements:
+                x, y = data['x'], data['y']
+                coord = (x, y)
+                if coord not in unique_elements:
                     node_attributes = {
                         key: value for key, value in data.items()
                     }
                     unique_graph.add_node(node, **node_attributes)
-                    unique_elements.add(geometry)
+                    unique_elements.add(coord)
         return unique_graph
 
     @staticmethod
-    def drop_duplicates_in_edges(unique_elements, unique_graph, graph):
+    def drop_duplicates_in_edges(unique_elements: Union[set, None], unique_graph: Union[MultiDiGraph, None],
+                                 graph: MultiDiGraph):
         """
         checks if both extremities are in the unique_graph (u has not the same coor of v, no line from u to itself is
         allowed). Checks if an edge is already made between such extremities with the given id and coordinates before
         considering it in the unique graph
         """
+        if unique_elements is None or len(unique_elements) == 0:
+            raise ValueError("""unique_elements cannot be None or empty. 
+            Provide a set with all unique node coordinates as tuples of (x, y)""")
         if unique_graph is None:
-            raise ValueError("""
-            unique_graph cannot be None. First perform the drop_duplicates_in_nodes on the graph to generate a 
-            unique_graph
-            """)
+            raise ValueError("""unique_graph cannot be None. Provide a graph with unique nodes or perform the 
+        drop_duplicates_in_nodes on the graph to generate a unique_graph""")
         for u, v, data in graph.edges(data=True):
-
             extremities_data = ExtremitiesData.get_extremities_data_for_sub_graph(from_node_id=u, to_node_id=v,
                                                                                   sub_graph=unique_graph,
                                                                                   graph=graph,
                                                                                   shared_elements=unique_elements)
-            if extremities_data.from_to_id is not None and extremities_data.from_to_coor is not None:
-                if (extremities_data.from_to_id, extremities_data.to_from_id) not in unique_elements and \
-                        (extremities_data.from_to_coor, extremities_data.to_from_coor) not in unique_elements:
-                    edge_attributes = {
-                        key: value for key, value in data.items()
-                    }
-                    unique_graph.add_edge(extremities_data.from_id, extremities_data.to_id, **edge_attributes)
-                    unique_elements.add((extremities_data.from_to_id, extremities_data.to_from_id))
-                    unique_elements.add((extremities_data.from_to_coor, extremities_data.to_from_coor))
+            if extremities_data.from_id != extremities_data.to_id:  # excluding a self-directed link
+                if extremities_data.from_to_id is not None and extremities_data.from_to_coor is not None:
+                    if (extremities_data.from_to_id, extremities_data.to_from_id) not in unique_elements and \
+                            (extremities_data.from_to_coor, extremities_data.to_from_coor) not in unique_elements:
+                        edge_attributes = {
+                            key: value for key, value in data.items()
+                        }
+                        unique_graph.add_edge(extremities_data.from_id, extremities_data.to_id, **edge_attributes)
+                        unique_elements.add((extremities_data.from_to_id, extremities_data.to_from_id))
+                        unique_elements.add((extremities_data.from_to_coor, extremities_data.to_from_coor))
 
         return unique_graph
 
@@ -205,12 +210,14 @@ class ExtremitiesData:
     to_from_coor: Union[None, tuple] = None
 
     @staticmethod
-    def get_extremities_data_for_sub_graph(from_node_id, to_node_id, sub_graph, graph, shared_elements):
+    def get_extremities_data_for_sub_graph(from_node_id: int, to_node_id: int, sub_graph: MultiDiGraph,
+                                           graph: MultiDiGraph, shared_elements: Union[set, None]):
         """Both extremities should be in the unique_graph still makes an edge between similar node to u (the node
         with u coordinates and different id, included in the unique_graph) and v Here, sub_graph is the unique_graph
         and graph is complex_graph Shared elements are shared btw sub_graph and graph, which are elements to include
         when dropping duplicates"""
-
+        if shared_elements is None:
+            shared_elements = set()
         if from_node_id in sub_graph.nodes() and to_node_id in sub_graph.nodes():
             return ExtremitiesData.arrange_extremities_data(
                 from_node_id=from_node_id, to_node_id=to_node_id, graph=sub_graph
@@ -225,7 +232,7 @@ class ExtremitiesData:
                 return ExtremitiesData()
             else:
                 return ExtremitiesData.arrange_extremities_data(from_node_id=from_node_id_prime, to_node_id=to_node_id,
-                                                                graph=sub_graph)
+                                                            graph=sub_graph)
 
         elif from_node_id in sub_graph.nodes() and \
                 (graph.nodes[to_node_id]['x'], graph.nodes[to_node_id]['y']) in shared_elements:
@@ -237,7 +244,7 @@ class ExtremitiesData:
                 return ExtremitiesData()
             else:
                 return ExtremitiesData.arrange_extremities_data(from_node_id=from_node_id, to_node_id=to_node_id_prime,
-                                                                graph=sub_graph)
+                                                            graph=sub_graph)
         else:
             return ExtremitiesData()
 
