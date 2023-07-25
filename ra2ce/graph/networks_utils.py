@@ -1045,7 +1045,7 @@ def graph_check_create_unique_ids(
     ):
 
         i = 0
-        for u, v, k in graph.edges(keys=True):
+        for u, v, k in graph.edges(data=True):
             graph[u][v][k][new_id_name] = i
             i += 1
         logging.info(
@@ -1065,7 +1065,7 @@ def graph_create_unique_ids(graph: nx.Graph, new_id_name: str = "rfid") -> nx.Gr
         return graph
     # TODO: decide if we always add a new ID (in iGraph this is different)
     # if len(set([str(e[-1][new_id_name]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
-    for i, (u, v, k) in enumerate(graph.edges(keys=True)):
+    for i, (u, v, k) in enumerate(graph.edges(data=True)):
         graph[u][v][k][new_id_name] = i + 1
     logging.info("Added a new unique identifier field '{}'.".format(new_id_name))
     return graph
@@ -1080,7 +1080,7 @@ def add_missing_geoms_graph(graph: nx.Graph, geom_name: str = "geometry") -> nx.
         graph.nodes[nd][geom_name] = Point(graph.nodes[nd]["x"], graph.nodes[nd]["y"])
 
     edges_without_geom = [
-        e for e in graph.edges.data(keys=True) if geom_name not in e[-1]
+        e for e in graph.edges.data(data=True) if geom_name not in e[-1]
     ]
     for ed in edges_without_geom:
         graph[ed[0]][ed[1]][ed[2]][geom_name] = LineString(
@@ -1519,7 +1519,7 @@ def graph_link_simple_id_to_complex(graph_simple, new_id):
     # Iterate over the simple, because this already has the corresponding complex information
     lookup_dict = {}
     # keys are the ids of the simple graph, values are lists with all matching complex id's
-    for u, v, k in tqdm.tqdm(graph_simple.edges(keys=True)):
+    for u, v, k in tqdm.tqdm(graph_simple.edges(data=True)):
         key_1 = graph_simple[u][v][k]["{}".format(new_id)]
         value_1 = graph_simple[u][v][k]["{}_c".format(new_id)]
         lookup_dict[key_1] = value_1
