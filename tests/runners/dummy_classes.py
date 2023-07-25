@@ -1,9 +1,11 @@
-from ra2ce.analyses.analysis_config_data import AnalysisConfigBase
+from ra2ce.analyses.analysis_config_data.analysis_config_data_base import (
+    AnalysisConfigWrapperBase,
+)
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
-class DummyAnalysisConfig(AnalysisConfigBase):
+class DummyAnalysisConfig(AnalysisConfigWrapperBase):
     def __init__(self) -> None:
         self.config_data = {}
 

@@ -3,7 +3,9 @@ from typing import Optional
 
 import pytest
 
-from ra2ce.analyses.analysis_config_data import AnalysisConfigBase
+from ra2ce.analyses.analysis_config_data.analysis_config_data_base import (
+    AnalysisConfigWrapperBase,
+)
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data
@@ -40,7 +42,7 @@ class TestConfigWrapper:
         # 1. Define test data.
         _input_config = ConfigWrapper()
         _input_config.network_config = NetworkConfigWrapper()
-        _input_config.analysis_config = AnalysisConfigBase()
+        _input_config.analysis_config = AnalysisConfigWrapperBase()
         _input_config.network_config.ini_file = network_ini
         _input_config.analysis_config.ini_file = analysis_ini
 
@@ -63,7 +65,7 @@ class TestConfigWrapper:
         assert not _input_config.is_valid_input()
 
     def test_is_valid_input_given_invalid_network_config(self):
-        class MockedAnalysis(AnalysisConfigBase):
+        class MockedAnalysis(AnalysisConfigWrapperBase):
             def is_valid(self) -> bool:
                 return True
 
@@ -83,7 +85,7 @@ class TestConfigWrapper:
         assert _result is False
 
     def test_is_valid_input_given_invalid_root_directories(self):
-        class MockedAnalysis(AnalysisConfigBase):
+        class MockedAnalysis(AnalysisConfigWrapperBase):
             @property
             def root_dir(self) -> Path:
                 return test_data / "a_path"
@@ -111,7 +113,7 @@ class TestConfigWrapper:
         assert _result is False
 
     def test_is_valid_given_valid_analysis_no_network_config(self):
-        class MockedAnalysis(AnalysisConfigBase):
+        class MockedAnalysis(AnalysisConfigWrapperBase):
             def is_valid(self) -> bool:
                 return True
 
@@ -127,7 +129,7 @@ class TestConfigWrapper:
         assert _result is True
 
     def test_is_valid_given_valid_analysis_valid_network_config(self):
-        class MockedAnalysis(AnalysisConfigBase):
+        class MockedAnalysis(AnalysisConfigWrapperBase):
             @property
             def root_dir(self) -> Path:
                 return test_data

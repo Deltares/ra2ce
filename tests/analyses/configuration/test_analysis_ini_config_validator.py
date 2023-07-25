@@ -3,11 +3,11 @@ from typing import Optional
 
 import pytest
 
-from ra2ce.analyses.analysis_config_data.analysis_ini_config_data import (
+from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisWithNetworkConfigData,
     AnalysisWithoutNetworkConfigData,
 )
-from ra2ce.analyses.analysis_config_data.analysis_ini_config_validator import (
+from ra2ce.analyses.analysis_config_data.analysis_config_data_validator import (
     AnalysisIniConfigValidator,
     AnalysisWithoutNetworkConfigValidator,
 )

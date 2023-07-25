@@ -28,7 +28,9 @@ from typing import Optional
 
 from shapely.errors import ShapelyDeprecationWarning
 
-from ra2ce.analyses.analysis_config_data import AnalysisConfigBase
+from ra2ce.analyses.analysis_config_data.analysis_config_data_base import (
+    AnalysisConfigWrapperBase,
+)
 from ra2ce.configuration.config_factory import ConfigFactory
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
@@ -58,7 +60,7 @@ class Ra2ceHandler:
         if network:
             _output_config = NetworkConfigWrapper.get_data_output(network)
         elif analysis:
-            _output_config = AnalysisConfigBase.get_data_output(analysis)
+            _output_config = AnalysisConfigWrapperBase.get_data_output(analysis)
         else:
             raise ValueError(
                 "No valid location provided to start logging. Either network or analysis are required."
