@@ -19,7 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from ra2ce.analyses.configuration.analysis_ini_config_data_validator_base import (
+from ra2ce.analyses.analysis_config_data.analysis_ini_config_data_validator_base import (
     _expected_values,
 )
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator

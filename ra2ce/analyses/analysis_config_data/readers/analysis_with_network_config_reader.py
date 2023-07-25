@@ -22,11 +22,11 @@
 
 from pathlib import Path
 
-from ra2ce.analyses.configuration.analysis_config_base import AnalysisConfigBase
-from ra2ce.analyses.configuration.analysis_ini_config_data import (
+from ra2ce.analyses.analysis_config_data.analysis_config_base import AnalysisConfigBase
+from ra2ce.analyses.analysis_config_data.analysis_ini_config_data import (
     AnalysisWithNetworkConfigData,
 )
-from ra2ce.analyses.configuration.readers.analysis_config_reader_base import (
+from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper

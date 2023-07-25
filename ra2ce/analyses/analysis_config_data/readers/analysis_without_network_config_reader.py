@@ -23,11 +23,11 @@
 import logging
 from pathlib import Path
 
-from ra2ce.analyses.configuration import AnalysisConfigBase
-from ra2ce.analyses.configuration.analysis_ini_config_data import (
+from ra2ce.analyses.analysis_config_data import AnalysisConfigBase
+from ra2ce.analyses.analysis_config_data.analysis_ini_config_data import (
     AnalysisWithoutNetworkConfigData,
 )
-from ra2ce.analyses.configuration.readers.analysis_config_reader_base import (
+from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
 from ra2ce.graph.network_config_data.network_config_data_reader import (

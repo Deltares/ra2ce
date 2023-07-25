@@ -22,7 +22,7 @@
 
 from __future__ import annotations
 
-from ra2ce.analyses.configuration.analysis_ini_config_validator import (
+from ra2ce.analyses.analysis_config_data.analysis_ini_config_validator import (
     AnalysisIniConfigValidator,
     AnalysisWithoutNetworkConfigValidator,
 )
