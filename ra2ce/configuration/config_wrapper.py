@@ -26,7 +26,7 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.analyses.configuration import AnalysisConfigBase
+from ra2ce.analyses.analysis_config_data import AnalysisConfigBase
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 

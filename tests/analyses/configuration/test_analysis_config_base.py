@@ -2,7 +2,7 @@ import shutil
 
 import pytest
 
-from ra2ce.analyses.configuration.analysis_config_base import AnalysisConfigBase
+from ra2ce.analyses.analysis_config_data.analysis_config_base import AnalysisConfigBase
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 from tests import test_data, test_results
 

@@ -23,7 +23,7 @@
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.analyses.configuration.analysis_ini_config_data import AnalysisConfigData
+from ra2ce.analyses.analysis_config_data.analysis_ini_config_data import AnalysisConfigData
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 
 

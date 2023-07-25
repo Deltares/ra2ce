@@ -2,7 +2,7 @@ import shutil
 
 import pytest
 
-from ra2ce.analyses.configuration.readers.analysis_config_reader_base import (
+from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (

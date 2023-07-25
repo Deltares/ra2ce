@@ -25,7 +25,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from ra2ce.analyses.configuration import AnalysisConfigBase, AnalysisConfigData
+from ra2ce.analyses.analysis_config_data import AnalysisConfigBase, AnalysisConfigData
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
