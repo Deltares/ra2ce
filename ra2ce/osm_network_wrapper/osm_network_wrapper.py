@@ -62,7 +62,6 @@ class OsmNetworkWrapper:
         self.get_clean_graph(_complex_graph)
         return _complex_graph
 
-
     def get_graph_from_osm_download(self, polygon: BaseGeometry, link_type: str, network_type: str) -> MultiDiGraph:
         """
         Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
