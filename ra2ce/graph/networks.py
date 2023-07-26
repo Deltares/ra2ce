@@ -27,6 +27,7 @@ import geopandas as gpd
 import networkx as nx
 import pandas as pd
 import pyproj
+import momepy
 from shapely.geometry import MultiLineString
 
 import ra2ce.graph.networks_utils as nut
@@ -35,6 +36,7 @@ from ra2ce.graph.segmentation import Segmentation
 from ra2ce.io.readers import GraphPickleReader
 from ra2ce.io.writers import JsonExporter
 from ra2ce.io.writers.network_exporter_factory import NetworkExporterFactory
+from ra2ce.graph.vector_network_wrapper import VectorNetworkWrapper
 
 
 class Network:
@@ -79,11 +81,24 @@ class Network:
             self.region_var = None
 
         # Cleanup
-        self.snapping = config["cleanup"]["snapping_threshold"]
-        self.segmentation_length = config["cleanup"]["segmentation_length"]
+        _cleanup_options = config.get("cleanup", {})
+        if any(_cleanup_options.items()) and any(
+            [v for k, v in _cleanup_options.items()]
+        ):
+            _cleanup_options["cleanup"] = True
+        self._setup_cleanup_options(_cleanup_options)
 
         # files
         self.files = files
+
+    def _setup_cleanup_options(self, opt: dict):
+        # TODO: remove the attributes once cleanup function is used
+        self.cleanup = opt.get("cleanup", False)
+        self.snapping = opt.get("snapping_threshold", None)
+        self.segmentation_length = opt.get("segmentation_length", None)
+        self.merge_lines = opt.get("merge_lines", None)
+        self.merge_on_id = opt.get("merge_on_id", None)
+        self.cut_at_intersections = opt.get("cut_at_intersections", None)
 
     def network_shp(
         self, crs: int = 4326
@@ -177,6 +192,7 @@ class Network:
         # create tuples from the adjecent nodes and add as column in geodataframe
         edges_complex = nut.join_nodes_edges(nodes, edges, id_name)
         edges_complex.crs = crs  # set the right CRS
+        edges_complex.dropna(subset=["node_A", "node_B"], inplace=True)
 
         assert (
             edges_complex["node_A"].isnull().sum() == 0
@@ -201,7 +217,33 @@ class Network:
         # Exporting complex graph because the shapefile should be kept the same as much as possible.
         return graph_complex, edges_complex
 
-    def _export_linking_tables(self, linking_tables: list[Any]) -> None:
+
+    def network_cleanshp(self) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+        """Creates a (graph) network from a clean shapefile (primary_file - no further advance cleanup is needed)
+
+        Returns the same geometries for the network (GeoDataFrame) as for the graph (NetworkX graph), because
+        it is assumed that the user wants to keep the same geometries as their shapefile input.
+
+        Returns:
+            graph_complex (NetworkX graph): The resulting graph.
+            edges_complex (GeoDataFrame): The resulting network.
+        """
+        # initialise vector network wrapper
+        vector_network_wrapper = VectorNetworkWrapper(config=self.config)
+
+        # setup network using the wrapper
+        (
+            graph_complex,
+            edges_complex,
+        ) = vector_network_wrapper.setup_network_from_vector()
+
+        # Set the CRS of the graph and network to wrapper crs
+        self.base_graph_crs = vector_network_wrapper.crs
+        self.base_network_crs = vector_network_wrapper.crs
+
+        return graph_complex, edges_complex
+
+    def _export_linking_tables(self, linking_tables: List[Any]) -> None:
         _exporter = JsonExporter()
         _output_dir = self.config["static"] / "output_graph"
         _exporter.export(
@@ -518,7 +560,10 @@ class Network:
             # Create the network from the network source
             if self.config["network"]["source"] == "shapefile":
                 logging.info("Start creating a network from the submitted shapefile.")
-                base_graph, network_gdf = self.network_shp()
+                if self.cleanup:
+                    base_graph, network_gdf = self.network_shp()
+                else:
+                    base_graph, network_gdf = self.network_cleanshp()
 
             elif self.config["network"]["source"] == "OSM PBF":
                 logging.info(
@@ -577,7 +622,6 @@ class Network:
             self._export_network_files(base_graph, "base_graph", to_save)
             self._export_network_files(network_gdf, "base_network", to_save)
         else:
-
             logging.info(
                 "Apparently, you already did create a network with ra2ce earlier. "
                 + "Ra2ce will use this: {}".format(self.files["base_graph"])
