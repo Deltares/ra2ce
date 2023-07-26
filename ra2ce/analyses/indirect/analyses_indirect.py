@@ -1026,7 +1026,7 @@ class IndirectAnalyses:
             # intersect = intersect.loc[intersect[hazard_name] > analysis['threshold_locations']]
 
             # get location stats
-            df_aggregation = self._summerize_locations(
+            df_aggregation = self._summarize_locations(
                 locations_hz,
                 cat_col=analysis["category_field_name"],
                 hazard_id=hazard_name[:-3],
@@ -1082,7 +1082,7 @@ class IndirectAnalyses:
         )
         return network[["edge_fid", "geometry"]]
 
-    def _summerize_locations(
+    def _summarize_locations(
         self, locations: gpd.GeoDataFrame, cat_col: str, hazard_id: str
     ) -> pd.DataFrame:
         """

@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import List, Union, Tuple
+from typing import Union
 
 import networkx as nx
 import pandas as pd
@@ -52,24 +52,23 @@ class VectorNetworkWrapper:
         self._setup_global(config)
         self.network_dict = self._get_network_opt(config["network"])
 
-    def _parse_ini_value(self, value: str):
-        """Parses a string value from an ini file.
+    def _parse_ini_stringlist(self, value: str):
+        """Parses a string with "," into a list from an ini file.
 
         Args:
             value (str): Value to parse.
 
         Returns:
-            str or list of str: If the value contains a comma, it is split and returned
-                as a list, otherwise the original value is returned. Returns None if
-                the value is an empty string.
+            list of str If the value contains a comma, it is split and returned
+                as a list, otherwise the original value is returned.
+                None if the value is an empty string.
         """
-        if value == "":
+        if not value:
             return None
-
-        if isinstance(value, str) and "," in value:
-            return [v for v in value.split(",")]
-
-        return value
+        elif isinstance(value, str) and "," in value:
+            return value.split(",")
+        else:
+            return value
 
     def _setup_global(self, config: dict):
         """Sets up project properties based on provided configuration.
@@ -81,17 +80,14 @@ class VectorNetworkWrapper:
         self.output_path = config.get("output")
 
         project_config = config.get("project")
-        name = self._parse_ini_value(project_config.get("name", "project_name"))
-        region = self._parse_ini_value(project_config.get("region", None))
-        crs = self._parse_ini_value(project_config.get("crs", 4326))
+        name = project_config.get("name", "project_name")
+        region = project_config.get("region", None)
+        crs = project_config.get("crs", 4326)
         self.name = name
         self.crs = CRS.from_user_input(crs)
-        if not region:
-            self.region = region
-        else:
-            self.region = self._read_files([Path(region)])
+        self.region = self._read_files([Path(region)]) if region else region
 
-    def _parse_ini_filename(self, filename: str) -> List[Path]:
+    def _parse_ini_filenamelist(self, filename: str) -> list[Path]:
         """Makes a list of file paths by joining with input path and checks validity of files.
 
         Args:
@@ -100,12 +96,10 @@ class VectorNetworkWrapper:
         Returns:
             List[Path]: List of file paths.
         """
-        if isinstance(filename, str):
-            file_names = filename.split(",")
-        else:
+        if not isinstance(filename, str):
             logger.error("file names are not valid.")
 
-        file_paths = [self.input_path.joinpath(f.strip()) for f in file_names]
+        file_paths = [self.input_path.joinpath(f.strip()) for f in filename.split(",")]
 
         for f in file_paths:
             if not f.resolve().is_file():
@@ -123,13 +117,13 @@ class VectorNetworkWrapper:
             dict: Dictionary of network options.
         """
 
-        files = self._parse_ini_filename(network_config.get("primary_file", None))
-        file_id = self._parse_ini_value(
-            network_config.get("file_id", None)
-        )  # TODO only needed when cleanup based on fid
-        file_filter = self._parse_ini_value(network_config.get("filter", None))
-        file_crs = self._parse_ini_value(network_config.get("crs", self.crs))  # assumes
-        is_directed = self._parse_ini_value(network_config.get("directed", False))
+        files = self._parse_ini_filenamelist(network_config.get("primary_file", ""))
+        file_id = self._parse_ini_stringlist(
+            network_config.get("file_id", "")
+        )  # only needed when cleanup based on fid
+        file_filter = self._parse_ini_stringlist(network_config.get("filter", ""))
+        file_crs = CRS.from_user_input(network_config.get("crs", self.crs))
+        is_directed = network_config.get("directed", False)
         return dict(
             files=files,
             file_id=file_id,
@@ -139,16 +133,15 @@ class VectorNetworkWrapper:
         )
 
     @staticmethod
-    def setup_graph_from_vector(gdf: gpd.GeoDataFrame, is_directed: bool) -> nx.Graph:
-        """Creates a simple graph with node and edge geometries based on a given GeoDataFrame.
+    def setup_digraph_from_vector(gdf: gpd.GeoDataFrame) -> nx.DiGraph:
+        """Creates a simple directed graph with node and edge geometries based on a given GeoDataFrame.
 
         Args:
             gdf (gpd.GeoDataFrame): Input GeoDataFrame containing line geometries.
                 Allow both LineString and MultiLineString.
-            is_directed (bool): Whether the graph should be directed.
 
         Returns:
-            nx.Graph: NetworkX graph object with "crs", "approach" as graph properties.
+            nx.DiGraph: NetworkX graph object with "crs", "approach" as graph properties.
         """
 
         # simple geometry handeling
@@ -169,14 +162,26 @@ class VectorNetworkWrapper:
                 ),  # **row TODO: check if we do need all columns
             )
 
-        if is_directed:
-            return digraph
+        return digraph
+
+    @staticmethod
+    def setup_graph_from_vector(gdf: gpd.GeoDataFrame) -> nx.Graph:
+        """Creates a simple undirected graph with node and edge geometries based on a given GeoDataFrame.
+
+        Args:
+            gdf (gpd.GeoDataFrame): Input GeoDataFrame containing line geometries.
+                Allow both LineString and MultiLineString.
+
+        Returns:
+            nx.Graph: NetworkX graph object with "crs", "approach" as graph properties.
+        """
+        digraph = VectorNetworkWrapper.setup_digraph_from_vector(gdf)
         return digraph.to_undirected()
 
     @staticmethod
     def setup_network_edges_and_nodes_from_graph(
         graph: nx.Graph,
-    ) -> gpd.GeoDataFrame:
+    ) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
         """Sets up network nodes and edges from a given graph.
 
         Args:
@@ -204,7 +209,7 @@ class VectorNetworkWrapper:
 
     def setup_network_from_vector(
         self,
-    ) -> Tuple[nx.MultiGraph, gpd.GeoDataFrame]:
+    ) -> tuple[nx.MultiGraph, gpd.GeoDataFrame]:
         """Sets up a network from vector files.
 
         Returns:
@@ -219,9 +224,10 @@ class VectorNetworkWrapper:
             vector_filenames=files, crs=file_crs
         )
         gdf = VectorNetworkWrapper.clean_vector(gdf)
-        graph = VectorNetworkWrapper.setup_graph_from_vector(
-            gdf, is_directed=is_directed
-        )
+        if is_directed:
+            graph = VectorNetworkWrapper.setup_digraph_from_vector(gdf)
+        else:
+            graph = VectorNetworkWrapper.setup_graph_from_vector(gdf)
         edges, nodes = VectorNetworkWrapper.setup_network_edges_and_nodes_from_graph(
             graph
         )
@@ -229,7 +235,7 @@ class VectorNetworkWrapper:
         return graph_complex, edges
 
     def _read_vector_to_project_region_and_crs(
-        self, vector_filenames: List[Path], crs: Union[int, str]
+        self, vector_filenames: list[Path], crs: CRS
     ) -> gpd.GeoDataFrame:
         """Reads a vector file or a list of vector files.
 
@@ -238,7 +244,7 @@ class VectorNetworkWrapper:
 
         Args:
             vector_filenames (list[Path]): List of Path to the vector files.
-            crs (Union[int, str]): Coordinate reference system for the files. Allow only one crs for all  `vector_filenames`.
+            crs (CRS): Coordinate reference system for the files. Allow only one crs for all  `vector_filenames`.
 
         Returns:
             gpd.GeoDataFrame: GeoDataFrame representing the vector data.
@@ -250,7 +256,7 @@ class VectorNetworkWrapper:
 
         # set crs and reproject if needed
         if not gdf.crs and crs:
-            gdf = gdf.set_crs(CRS.from_user_input(crs))
+            gdf = gdf.set_crs(crs)
             logger.info("setting crs as default EPSG:4326. specify crs if incorrect")
 
         if self.crs:
@@ -263,7 +269,7 @@ class VectorNetworkWrapper:
             logger.info("clip vector file to project region")
 
         # validate
-        if len(gdf) == 0:
+        if not any(gdf):
             logger.warning("No vector features found within project region")
             return None
 
