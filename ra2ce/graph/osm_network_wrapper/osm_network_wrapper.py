@@ -53,7 +53,7 @@ class OsmNetworkWrapper:
                 "No or invalid polygon file is introduced for OSM download"
             )
         polygon_file = self.output_path.parent.joinpath(
-            "network", self.network_dict["polygon"]
+            "network", self.network_dict["polygon"][0]
         )
         if not polygon_file.exists():
             raise FileNotFoundError("No polygon_file file found")
