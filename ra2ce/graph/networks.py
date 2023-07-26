@@ -19,19 +19,18 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 import os
 from typing import Any, List, Tuple
 
 import geopandas as gpd
 import networkx as nx
-import osmnx
 import pandas as pd
 import pyproj
 from shapely.geometry import MultiLineString
 
 import ra2ce.graph.networks_utils as nut
+from ra2ce.graph.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrapper
 from ra2ce.graph.segmentation import Segmentation
 from ra2ce.io.readers import GraphPickleReader
 from ra2ce.io.writers import JsonExporter
@@ -202,11 +201,15 @@ class Network:
         # Exporting complex graph because the shapefile should be kept the same as much as possible.
         return graph_complex, edges_complex
 
-    def _export_linking_tables(self, linking_tables: List[Any]) -> None:
+    def _export_linking_tables(self, linking_tables: list[Any]) -> None:
         _exporter = JsonExporter()
         _output_dir = self.config["static"] / "output_graph"
-        _exporter.export(_output_dir / "simple_to_complex.json", linking_tables[0])
-        _exporter.export(_output_dir / "complex_to_simple.json", linking_tables[1])
+        _exporter.export(
+            _output_dir.joinpath("simple_to_complex.json"), linking_tables[0]
+        )
+        _exporter.export(
+            _output_dir.joinpath("complex_to_simple.json"), linking_tables[1]
+        )
 
     def network_trails_import(
         self, crs: int = 4326
@@ -288,52 +291,15 @@ class Network:
 
         return graph_complex, edges_complex
 
-    def network_osm_download(self) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
-        """Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
+    def network_osm_download(self) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+        """
+        Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
 
         Returns:
-            graph_simple (NetworkX graph): Simplified graph (for use in the indirect analyses).
-            complex_edges (GeoDataFrame): Complex graph (for use in the direct analyses).
+            tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]: Tuple of Simplified graph (for use in the indirect analyses) and Complex graph (for use in the direct analyses).
         """
-        poly_dict = nut.read_geojson(
-            self.config["network"]["polygon"][0]
-        )  # It can only read in one geojson
-        poly = nut.geojson_to_shp(poly_dict)
-
-        if not self.config["network"]["road_types"]:
-            # The user specified only the network type.
-            graph_complex = osmnx.graph_from_polygon(
-                polygon=poly,
-                network_type=self.config["network"]["network_type"],
-                simplify=False,
-                retain_all=True,
-            )
-        elif not self.config["network"]["network_type"]:
-            # The user specified only the road types.
-            cf = '["highway"~"{}"]'.format(
-                self.config["network"]["road_types"].replace(",", "|")
-            )
-            graph_complex = osmnx.graph_from_polygon(
-                polygon=poly, custom_filter=cf, simplify=False, retain_all=True
-            )
-        else:
-            # The user specified the network type and road types.
-            cf = '["highway"~"{}"]'.format(
-                self.config["network"]["road_types"].replace(",", "|")
-            )
-            graph_complex = osmnx.graph_from_polygon(
-                polygon=poly,
-                network_type=self.config["network"]["network_type"],
-                custom_filter=cf,
-                simplify=False,
-                retain_all=True,
-            )
-
-        logging.info(
-            "graph downloaded from OSM with {:,} nodes and {:,} edges".format(
-                len(list(graph_complex.nodes())), len(list(graph_complex.edges()))
-            )
-        )
+        osm_network = OsmNetworkWrapper(self.config, "")
+        graph_complex = osm_network.get_clean_graph_from_osm()
 
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
