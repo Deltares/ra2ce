@@ -24,7 +24,7 @@ from osmnx import consolidate_intersections
 from shapely.geometry.base import BaseGeometry
 
 import ra2ce.graph.networks_utils as nut
-from ra2ce.graph.osm_network_wrapper.ExtremitiesData import ExtremitiesData
+from ra2ce.graph.osm_network_wrapper.extremities_data import ExtremitiesData
 
 
 class OsmNetworkWrapper:
