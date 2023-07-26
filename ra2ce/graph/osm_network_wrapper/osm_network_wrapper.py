@@ -69,16 +69,16 @@ class OsmNetworkWrapper:
         _complex_graph = self._download_clean_graph_from_osm(
             polygon=nut.geojson_to_shp(poly_dict),
             network_type=self.network_dict.get("network_type", ""),
-            link_type=self.network_dict.get("road_type", ""),
+            road_types=self.network_dict.get("road_types", ""),
         )
         return _complex_graph
 
     def _download_clean_graph_from_osm(
-        self, polygon: BaseGeometry, link_type: str, network_type: str
+        self, polygon: BaseGeometry, road_types: str, network_type: str
     ) -> MultiDiGraph:
-        if not link_type and not network_type:
+        if not road_types and not network_type:
             raise ValueError("Either of the link_type or network_type should be known")
-        elif not link_type:
+        elif not road_types:
             # The user specified only the network type.
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon,
@@ -88,12 +88,12 @@ class OsmNetworkWrapper:
             )
         elif not network_type:
             # The user specified only the road types.
-            cf = f'["highway"~"{link_type.replace(",", "|")}"]'
+            cf = f'["highway"~"{road_types.replace(",", "|")}"]'
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon, custom_filter=cf, simplify=False, retain_all=True
             )
-        elif link_type and network_type:
-            cf = f'["highway"~"{link_type.replace(",", "|")}"]'
+        elif road_types and network_type:
+            cf = f'["highway"~"{road_types.replace(",", "|")}"]'
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon,
                 network_type=network_type,
@@ -110,7 +110,7 @@ class OsmNetworkWrapper:
             )
         )
         _complex_graph.graph["crs"] = self.graph_crs
-        self.get_clean_graph(_complex_graph)
+        # self.get_clean_graph(_complex_graph)
         return _complex_graph
 
     @staticmethod
@@ -141,7 +141,9 @@ class OsmNetworkWrapper:
         return unique_graph
 
     @staticmethod
-    def drop_duplicates_in_nodes(unique_elements: set, graph: MultiDiGraph) -> MultiDiGraph:
+    def drop_duplicates_in_nodes(
+        unique_elements: set, graph: MultiDiGraph
+    ) -> MultiDiGraph:
         if unique_elements is None or not isinstance(unique_elements, set):
             raise ValueError("unique_elements should be a set")
 

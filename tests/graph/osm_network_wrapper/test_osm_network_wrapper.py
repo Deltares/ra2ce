@@ -115,7 +115,7 @@ class TestOsmNetworkWrapper:
         graph_complex = _osm_network._download_clean_graph_from_osm(
             polygon=_valid_network_polygon_fixture,
             network_type=_network_type,
-            link_type=_link_type,
+            road_types=_link_type,
         )
 
         # 3. Verify expectations
