@@ -1,6 +1,5 @@
 import shutil
 from typing import Iterator
-
 import pytest
 
 from ra2ce.graph.networks import Network

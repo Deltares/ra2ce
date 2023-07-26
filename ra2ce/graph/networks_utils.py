@@ -19,7 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import itertools
 import logging
 import os
@@ -1044,7 +1043,7 @@ def graph_check_create_unique_ids(
         graph.edges()
     ):
         i = 0
-        for u, v, k in graph.edges(keys=True):
+        for u, v, k in graph.edges(data=True):
             graph[u][v][k][new_id_name] = i
             i += 1
         logging.info(
@@ -1079,10 +1078,10 @@ def add_missing_geoms_graph(graph: nx.Graph, geom_name: str = "geometry") -> nx.
         graph.nodes[nd][geom_name] = Point(graph.nodes[nd]["x"], graph.nodes[nd]["y"])
 
     edges_without_geom = [
-        e for e in graph.edges.data(keys=True) if geom_name not in e[-1]
+        e for e in graph.edges.data(data=True) if geom_name not in e[-1]
     ]
     for ed in edges_without_geom:
-        graph[ed[0]][ed[1]][ed[2]][geom_name] = LineString(
+        graph[ed[0]][ed[1]][0][geom_name] = LineString(
             [graph.nodes[ed[0]][geom_name], graph.nodes[ed[1]][geom_name]]
         )
 
