@@ -141,12 +141,11 @@ class OsmNetworkWrapper:
         return unique_graph
 
     @staticmethod
-    def drop_duplicates_in_nodes(unique_elements: set, graph: MultiDiGraph):
+    def drop_duplicates_in_nodes(unique_elements: set, graph: MultiDiGraph) -> MultiDiGraph:
         if unique_elements is None or not isinstance(unique_elements, set):
             raise ValueError("unique_elements should be a set")
 
         unique_graph = nx.MultiDiGraph()
-
         for node, data in graph.nodes(data=True):
             if data["x"] is None or data["y"] is None:
                 raise ValueError(
@@ -159,6 +158,8 @@ class OsmNetworkWrapper:
                 node_attributes = {key: value for key, value in data.items()}
                 unique_graph.add_node(node, **node_attributes)
                 unique_elements.add(coord)
+        # Copy the graph dictionary from the source one.
+        unique_graph.graph = graph.graph
         return unique_graph
 
     @staticmethod
