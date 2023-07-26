@@ -1,3 +1,9 @@
+## v0.5.1 (2023-07-26)
+
+### Feat
+
+- Implement multi-link isolated locations with distinction between flooded and isolated.
+
 ## v0.5.0 (2023-07-24)
 
 ### Feat
