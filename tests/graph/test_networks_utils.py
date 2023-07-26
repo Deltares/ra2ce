@@ -394,7 +394,7 @@ class TestAddMissingGeomsGraph:
 
         # 3. Verify final expectations
         assert _return_graph == _graph
-        _items = list(_return_graph.edges.data(keys=True))
+        _items = list(_return_graph.edges.data(data=True))
         assert len(_items) == 1
         _data = _items[0][-1]
         assert isinstance(_data, dict)
