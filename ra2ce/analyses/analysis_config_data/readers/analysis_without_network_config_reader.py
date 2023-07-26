@@ -37,7 +37,7 @@ from ra2ce.graph.network_config_data.network_config_data_reader import (
 )
 
 
-class AnalysisWithoutNetworkConfigReader(AnalysisConfigReaderBase):
+class AnalysisConfigReaderWithoutNetwork(AnalysisConfigReaderBase):
     def read(self, ini_file: Path) -> AnalysisConfigDataWithoutNetwork:
         if not ini_file or not ini_file.exists():
             return None
