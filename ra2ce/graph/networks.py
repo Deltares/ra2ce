@@ -295,7 +295,7 @@ class Network:
             tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]: Tuple of Simplified graph (for use in the indirect analyses) and Complex graph (for use in the direct analyses).
         """
         osm_network = OsmNetworkWrapper(self.config, "")
-        graph_complex = osm_network.download_graph_from_osm()
+        graph_complex = osm_network.get_clean_graph_from_osm()
 
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(

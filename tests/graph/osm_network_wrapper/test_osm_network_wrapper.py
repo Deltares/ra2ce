@@ -49,22 +49,21 @@ class TestOsmNetworkWrapper:
             or 'Config["network"] should be a dictionary'
         )
 
-    def test_get_graph_from_osm_download_with_invalid_polygon_arg(
+    def test__download_clean_graph_from_osm_with_invalid_polygon_arg(
         self, _config_fixture: dict
     ):
-        _files = []
         _osm_network = OsmNetworkWrapper(config=_config_fixture, graph_crs="")
         _polygon = None
         _link_type = "road_link"
         _network_type = "drive"
         with pytest.raises(AttributeError) as exc_err:
-            _osm_network.get_graph_from_osm_download(
+            _osm_network._download_clean_graph_from_osm(
                 _polygon, _link_type, _network_type
             )
 
         assert str(exc_err.value) == "'NoneType' object has no attribute 'is_valid'"
 
-    def test_get_graph_from_osm_download_with_invalid_polygon_arg_geometry(
+    def test__download_clean_graph_from_osm_with_invalid_polygon_arg_geometry(
         self, _config_fixture: dict
     ):
         _osm_network = OsmNetworkWrapper(config=_config_fixture, graph_crs="")
@@ -72,7 +71,7 @@ class TestOsmNetworkWrapper:
         _link_type = "road_link"
         _network_type = "drive"
         with pytest.raises(TypeError) as exc_err:
-            _osm_network.get_graph_from_osm_download(
+            _osm_network._download_clean_graph_from_osm(
                 _polygon, _link_type, _network_type
             )
 
@@ -81,7 +80,7 @@ class TestOsmNetworkWrapper:
             == "Geometry must be a shapely Polygon or MultiPolygon. If you requested graph from place name, make sure your query resolves to a Polygon or MultiPolygon, and not some other geometry, like a Point. See OSMnx documentation for details."
         )
 
-    def test_get_graph_from_osm_download_with_invalid_network_type_arg(
+    def test__download_clean_graph_from_osm_with_invalid_network_type_arg(
         self, _config_fixture: dict
     ):
         _osm_network = OsmNetworkWrapper(config=_config_fixture, graph_crs="")
@@ -89,7 +88,7 @@ class TestOsmNetworkWrapper:
         _link_type = ""
         _network_type = "drv"
         with pytest.raises(ValueError) as exc_err:
-            _osm_network.get_graph_from_osm_download(
+            _osm_network._download_clean_graph_from_osm(
                 _polygon, _link_type, _network_type
             )
 
@@ -104,7 +103,7 @@ class TestOsmNetworkWrapper:
         yield nut.geojson_to_shp(_polygon_dict)
 
     @slow_test
-    def test_get_graph_from_osm_download_output(
+    def test__download_clean_graph_from_osm_output(
         self, _config_fixture: dict, _valid_network_polygon_fixture: BaseGeometry
     ):
         # 1. Define test data.
@@ -113,7 +112,7 @@ class TestOsmNetworkWrapper:
         _network_type = "drive"
 
         # 2. Run test.
-        graph_complex = _osm_network.get_graph_from_osm_download(
+        graph_complex = _osm_network._download_clean_graph_from_osm(
             polygon=_valid_network_polygon_fixture,
             network_type=_network_type,
             link_type=_link_type,
@@ -154,10 +153,12 @@ class TestOsmNetworkWrapper:
             ),
         ],
     )
-    def test_download_graph_from_osm_with_invalid_polygon_parameter(self, config: dict):
+    def test_get_clean_graph_from_osm_with_invalid_polygon_parameter(
+        self, config: dict
+    ):
         _osm_network = OsmNetworkWrapper(config=config, graph_crs="")
         with pytest.raises(FileNotFoundError) as exc_err:
-            _osm_network.download_graph_from_osm()
+            _osm_network.get_clean_graph_from_osm()
 
         assert (
             str(exc_err.value)
@@ -181,6 +182,9 @@ class TestOsmNetworkWrapper:
         _valid_graph.add_edge(1, 4, x=[1, 2], y=[10, 40])
         _valid_graph.add_edge(5, 3, x=[3, 1], y=[50, 10])
         _valid_graph.add_edge(5, 5, x=[3, 3], y=[50, 50])
+
+        # Add a valid CRS value.
+        _valid_graph.graph["crs"] = "EPSG:4326"
 
         return _valid_graph
 
@@ -276,3 +280,15 @@ class TestOsmNetworkWrapper:
 
         # 3. Verify results
         assert graphs_equal(unique_graph, _expected_unique_graph_fixture)
+
+    def test_snap_nodes_to_nodes(self, _valid_graph_fixture: MultiDiGraph):
+        # 1. Define test data.
+        _threshold = 0.00002
+
+        # 2. Run test.
+        _result_graph = OsmNetworkWrapper.snap_nodes_to_nodes(
+            _valid_graph_fixture, _threshold
+        )
+
+        # 3. Verify expectations.
+        assert isinstance(_result_graph, MultiDiGraph)
