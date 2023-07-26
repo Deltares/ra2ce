@@ -959,9 +959,16 @@ class IndirectAnalyses:
         """
         network = graph_to_gdf(graph)[0]
         # TODO: add making "edges_fid" (internal convention) to graph_to_gdf
-        network["edge_fid"] = (
-            network["node_A"].astype(str) + "_" + network["node_B"].astype(str)
-        )
+        if all(
+            c_idx in network.columns for c_idx in ["node_A", "node_B"]
+        ):  # shapefiles
+            network["edge_fid"] = [
+                f"{na}_{nb}" for na, nb in network[["node_A", "node_B"]].values
+            ]
+        elif all(c_idx in network.columns for c_idx in ["u", "v"]):  # osm
+            network["edge_fid"] = [
+                f"{na}_{nb}" for na, nb in network[["u", "v"]].values
+            ]
         return network[["edge_fid", "geometry"]]
 
     def _summarize_locations(
