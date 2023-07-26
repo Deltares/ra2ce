@@ -7,7 +7,7 @@ from shapely.geometry.base import BaseGeometry
 
 from tests import test_data, slow_test
 import ra2ce.graph.networks_utils as nut
-from ra2ce.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrapper
+from ra2ce.graph.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrapper
 
 
 class TestOsmNetworkWrapper:
@@ -17,9 +17,7 @@ class TestOsmNetworkWrapper:
 
         yield {
             "static": _test_dir / "static",
-            "network": {
-                "polygon": "_test_polygon.geojson"
-            },
+            "network": {"polygon": "_test_polygon.geojson"},
             "origins_destinations": {
                 "origins": None,
                 "destinations": None,
@@ -32,49 +30,68 @@ class TestOsmNetworkWrapper:
             "cleanup": {"snapping_threshold": None, "segmentation_length": None},
         }
 
-    @pytest.mark.parametrize("config", [
-        pytest.param(None, id="None"),
-        pytest.param({}, id="{}"),
-        pytest.param({"network": {}}, id='"Config["network"]" = None'),
-        pytest.param({"network": "string"}, id='"invalid type(Config["network"])"')
-    ])
+    @pytest.mark.parametrize(
+        "config",
+        [
+            pytest.param(None, id="None"),
+            pytest.param({}, id="{}"),
+            pytest.param({"network": {}}, id='"Config["network"]" = None'),
+            pytest.param({"network": "string"}, id='"invalid type(Config["network"])"'),
+        ],
+    )
     def test_osm_network_wrapper_initialisation_with_invalid_config(self, config: dict):
         _files = []
         with pytest.raises(ValueError) as exc_err:
             OsmNetworkWrapper(config=config, graph_crs="")
-        assert str(exc_err.value) == "Config cannot be None" or \
-               "A network dictionary is required for creating a OsmNetworkWrapper object" or \
-               'Config["network"] should be a dictionary'
+        assert (
+            str(exc_err.value) == "Config cannot be None"
+            or "A network dictionary is required for creating a OsmNetworkWrapper object"
+            or 'Config["network"] should be a dictionary'
+        )
 
-    def test_get_graph_from_osm_download_with_invalid_polygon_arg(self, _config_fixture: dict):
+    def test_get_graph_from_osm_download_with_invalid_polygon_arg(
+        self, _config_fixture: dict
+    ):
         _files = []
         _osm_network = OsmNetworkWrapper(config=_config_fixture, graph_crs="")
         _polygon = None
         _link_type = "road_link"
         _network_type = "drive"
         with pytest.raises(AttributeError) as exc_err:
-            _osm_network.get_graph_from_osm_download(_polygon, _link_type, _network_type)
+            _osm_network.get_graph_from_osm_download(
+                _polygon, _link_type, _network_type
+            )
 
         assert str(exc_err.value) == "'NoneType' object has no attribute 'is_valid'"
 
-    def test_get_graph_from_osm_download_with_invalid_polygon_arg_geometry(self, _config_fixture: dict):
+    def test_get_graph_from_osm_download_with_invalid_polygon_arg_geometry(
+        self, _config_fixture: dict
+    ):
         _osm_network = OsmNetworkWrapper(config=_config_fixture, graph_crs="")
         _polygon = LineString([[0, 0], [1, 0], [1, 1]])
         _link_type = "road_link"
         _network_type = "drive"
         with pytest.raises(TypeError) as exc_err:
-            _osm_network.get_graph_from_osm_download(_polygon, _link_type, _network_type)
+            _osm_network.get_graph_from_osm_download(
+                _polygon, _link_type, _network_type
+            )
 
-        assert str(
-            exc_err.value) == "Geometry must be a shapely Polygon or MultiPolygon. If you requested graph from place name, make sure your query resolves to a Polygon or MultiPolygon, and not some other geometry, like a Point. See OSMnx documentation for details."
+        assert (
+            str(exc_err.value)
+            == "Geometry must be a shapely Polygon or MultiPolygon. If you requested graph from place name, make sure your query resolves to a Polygon or MultiPolygon, and not some other geometry, like a Point. See OSMnx documentation for details."
+        )
 
-    def test_get_graph_from_osm_download_with_invalid_network_type_arg(self, _config_fixture: dict):
+    def test_get_graph_from_osm_download_with_invalid_network_type_arg(
+        self, _config_fixture: dict
+    ):
         _osm_network = OsmNetworkWrapper(config=_config_fixture, graph_crs="")
-        _polygon = Polygon([(0., 0.), (0., 1.), (1., 1.), (1., 0.), (0., 0.)])
+        _polygon = Polygon([(0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)])
         _link_type = ""
         _network_type = "drv"
         with pytest.raises(ValueError) as exc_err:
-            _osm_network.get_graph_from_osm_download(_polygon, _link_type, _network_type)
+            _osm_network.get_graph_from_osm_download(
+                _polygon, _link_type, _network_type
+            )
 
             assert str(exc_err.value) == f'Unrecognized network_type "{_network_type}"'
 
@@ -87,8 +104,9 @@ class TestOsmNetworkWrapper:
         yield nut.geojson_to_shp(_polygon_dict)
 
     @slow_test
-    def test_get_graph_from_osm_download_output(self, _config_fixture: dict,
-                                                _valid_network_polygon_fixture: BaseGeometry):
+    def test_get_graph_from_osm_download_output(
+        self, _config_fixture: dict, _valid_network_polygon_fixture: BaseGeometry
+    ):
         # 1. Define test data.
         _osm_network = OsmNetworkWrapper(config=_config_fixture, graph_crs="")
         _link_type = ""
@@ -98,7 +116,7 @@ class TestOsmNetworkWrapper:
         graph_complex = _osm_network.get_graph_from_osm_download(
             polygon=_valid_network_polygon_fixture,
             network_type=_network_type,
-            link_type=_link_type
+            link_type=_link_type,
         )
 
         # 3. Verify expectations
@@ -109,25 +127,43 @@ class TestOsmNetworkWrapper:
 
         assert isinstance(graph_complex, Graph)
         assert _osm_id_node_to_validate in list(graph_complex.nodes.keys())
-        assert _osm_id_edge_to_validate in list(map(lambda x: x["osmid"], graph_complex.edges.values()))
+        assert _osm_id_edge_to_validate in list(
+            map(lambda x: x["osmid"], graph_complex.edges.values())
+        )
 
-    @pytest.mark.parametrize("config", [
-        pytest.param({
-            "static": test_data.joinpath("graph", "test_osm_network_wrapper", "static"),
-            "network": {"polygon": None}
-        }, id="None polygon file"),
-        pytest.param({
-            "static": test_data.joinpath("graph", "test_osm_network_wrapper", "static"),
-            "network": {"polygon": "invalid_name"}
-        }, id="Invalid polygon file name")
-    ])
+    @pytest.mark.parametrize(
+        "config",
+        [
+            pytest.param(
+                {
+                    "static": test_data.joinpath(
+                        "graph", "test_osm_network_wrapper", "static"
+                    ),
+                    "network": {"polygon": None},
+                },
+                id="None polygon file",
+            ),
+            pytest.param(
+                {
+                    "static": test_data.joinpath(
+                        "graph", "test_osm_network_wrapper", "static"
+                    ),
+                    "network": {"polygon": "invalid_name"},
+                },
+                id="Invalid polygon file name",
+            ),
+        ],
+    )
     def test_download_graph_from_osm_with_invalid_polygon_parameter(self, config: dict):
         _osm_network = OsmNetworkWrapper(config=config, graph_crs="")
         with pytest.raises(FileNotFoundError) as exc_err:
             _osm_network.download_graph_from_osm()
 
-        assert str(exc_err.value) == "No or invalid polygon file is introduced for OSM download" or \
-               "No polygon_file file found"
+        assert (
+            str(exc_err.value)
+            == "No or invalid polygon file is introduced for OSM download"
+            or "No polygon_file file found"
+        )
 
     @pytest.fixture
     def _valid_graph_fixture(self) -> MultiDiGraph:
@@ -163,38 +199,65 @@ class TestOsmNetworkWrapper:
 
         return _valid_unique_graph
 
-    def test_drop_duplicates_in_nodes(self, _valid_graph_fixture: MultiDiGraph,
-                                      _expected_unique_graph_fixture: MultiDiGraph):
-        unique_graph = OsmNetworkWrapper.drop_duplicates_in_nodes(graph=_valid_graph_fixture, unique_elements=set())
+    def test_drop_duplicates_in_nodes(
+        self,
+        _valid_graph_fixture: MultiDiGraph,
+        _expected_unique_graph_fixture: MultiDiGraph,
+    ):
+        unique_graph = OsmNetworkWrapper.drop_duplicates_in_nodes(
+            graph=_valid_graph_fixture, unique_elements=set()
+        )
 
         assert unique_graph.nodes() == _expected_unique_graph_fixture.nodes()
 
-    @pytest.mark.parametrize("unique_elements", [
-        pytest.param(None, id="None unique_elements"),
-        pytest.param(set(), id="Empty unique_elements"),
-        pytest.param({1, 2}, id="Non-tuple elements")
-    ])
-    def test_drop_duplicates_in_edges_invalid_unique_elements_input(self, unique_elements: set,
-                                                                    _valid_graph_fixture: MultiDiGraph,
-                                                                    _expected_unique_graph_fixture: MultiDiGraph):
+    @pytest.mark.parametrize(
+        "unique_elements",
+        [
+            pytest.param(None, id="None unique_elements"),
+            pytest.param(set(), id="Empty unique_elements"),
+            pytest.param({1, 2}, id="Non-tuple elements"),
+        ],
+    )
+    def test_drop_duplicates_in_edges_invalid_unique_elements_input(
+        self,
+        unique_elements: set,
+        _valid_graph_fixture: MultiDiGraph,
+        _expected_unique_graph_fixture: MultiDiGraph,
+    ):
         with pytest.raises(ValueError) as exc_err:
-            OsmNetworkWrapper.drop_duplicates_in_edges(graph=_valid_graph_fixture,
-                                                       unique_elements=unique_elements, unique_graph=None)
+            OsmNetworkWrapper.drop_duplicates_in_edges(
+                graph=_valid_graph_fixture,
+                unique_elements=unique_elements,
+                unique_graph=None,
+            )
 
-        assert str(exc_err.value) == """unique_elements cannot be None, empty, or have non-tuple elements. 
+        assert (
+            str(exc_err.value)
+            == """unique_elements cannot be None, empty, or have non-tuple elements. 
             Provide a set with all unique node coordinates as tuples of (x, y)"""
+        )
 
-    def test_drop_duplicates_in_edges_invalid_unique_graph_input(self, _valid_graph_fixture: MultiDiGraph,
-                                                                 _expected_unique_graph_fixture: MultiDiGraph):
+    def test_drop_duplicates_in_edges_invalid_unique_graph_input(
+        self,
+        _valid_graph_fixture: MultiDiGraph,
+        _expected_unique_graph_fixture: MultiDiGraph,
+    ):
         with pytest.raises(ValueError) as exc_err:
-            OsmNetworkWrapper.drop_duplicates_in_edges(graph=_valid_graph_fixture,
-                                                       unique_elements={(1, 2)}, unique_graph=None)
+            OsmNetworkWrapper.drop_duplicates_in_edges(
+                graph=_valid_graph_fixture, unique_elements={(1, 2)}, unique_graph=None
+            )
 
-        assert str(exc_err.value) == """unique_graph cannot be None. Provide a graph with unique nodes or perform the 
+        assert (
+            str(exc_err.value)
+            == """unique_graph cannot be None. Provide a graph with unique nodes or perform the 
         drop_duplicates_in_nodes on the graph to generate a unique_graph"""
+        )
 
-    def test_drop_duplicates_in_edges(self, _valid_graph_fixture: MultiDiGraph,
-                                      _expected_unique_graph_fixture: MultiDiGraph):
+    def test_drop_duplicates_in_edges(
+        self,
+        _valid_graph_fixture: MultiDiGraph,
+        _expected_unique_graph_fixture: MultiDiGraph,
+    ):
         # 1. Define test data.
         unique_elements = {(1, 10), (2, 20), (4, 40), (5, 50)}
 
@@ -205,9 +268,11 @@ class TestOsmNetworkWrapper:
         unique_graph.add_node(5, x=3, y=50)
 
         # 2. Run test.
-        unique_graph = OsmNetworkWrapper.drop_duplicates_in_edges(graph=_valid_graph_fixture,
-                                                                  unique_elements=unique_elements,
-                                                                  unique_graph=unique_graph)
+        unique_graph = OsmNetworkWrapper.drop_duplicates_in_edges(
+            graph=_valid_graph_fixture,
+            unique_elements=unique_elements,
+            unique_graph=unique_graph,
+        )
 
         # 3. Verify results
         assert graphs_equal(unique_graph, _expected_unique_graph_fixture)

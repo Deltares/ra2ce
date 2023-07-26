@@ -30,7 +30,7 @@ import pyproj
 from shapely.geometry import MultiLineString
 
 import ra2ce.graph.networks_utils as nut
-from ra2ce.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrapper
+from ra2ce.graph.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrapper
 from ra2ce.graph.segmentation import Segmentation
 from ra2ce.io.readers import GraphPickleReader
 from ra2ce.io.writers import JsonExporter
