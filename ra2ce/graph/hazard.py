@@ -541,6 +541,52 @@ class Hazard:
         )  # Check if this is the right name
         return graph
 
+    def get_point_hazard_from_network(
+        self, points: gpd.GeoDataFrame, network: gpd.GeoDataFrame
+    ) -> gpd.GeoDataFrame:
+        """get hazard informations for points at nearest network locations.
+
+        Args:
+            points (gpd.GeoDataFrame): points of interest, will be snapped to the network by nearest distance method.
+            network (gpd.GeoDataFrame): network of interest
+
+        Returns:
+            gpd.GeoDataFrame: points with relation to network and hazard informations
+
+        Raise:
+            error: if node id columns do not exisit in the network
+        """
+
+        # TODO: use the same convention for shapefiles and osm
+        if all(
+            c_idx in network.columns for c_idx in ["node_A", "node_B"]
+        ):  # shapefiles
+            network["edge_fid"] = [
+                f"{na}_{nb}" for na, nb in network[["node_A", "node_B"]].values
+            ]
+        elif all(c_idx in network.columns for c_idx in ["u", "v"]):  # osm
+            network["edge_fid"] = [
+                f"{na}_{nb}" for na, nb in network[["u", "v"]].values
+            ]
+        else:
+            logging.error(
+                "Node id columns are not found in the network. Support node_A, node_B or u, v"
+            )
+
+        # check for crs
+        if points.crs.is_geographic:
+            crs = points.crs
+            points = points.to_crs(3857)
+            network = network.to_crs(points.crs)
+
+        points = gpd.sjoin_nearest(
+            points, network, how="left", distance_col="edges_distance"
+        )
+        if any(points["edges_distance"].isna()) > 0:
+            logging.warning("Not all points are snapped to the network.")
+
+        return points.to_crs(crs)
+
     def get_hazard_name_table(self) -> pd.DataFrame:
         all_agg_types = {
             "max": "maximum",
@@ -725,6 +771,42 @@ class Hazard:
         od_path = self._output_graph_dir.joinpath("origin_destination_table.feather")
         od = gpd.read_feather(od_path)
         return od
+
+    def hazard_intersect_with_reprojection(
+        self, gdf: gpd.GeoDataFrame
+    ) -> gpd.GeoDataFrame:
+        """Intersect geodataframe and hazard with reprojection"""
+        # Check if the graph needs to be reprojected
+        hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
+        gdf_crs = pyproj.CRS.from_user_input(gdf.crs)
+
+        if (
+            hazard_crs != gdf_crs
+        ):  # Temporarily reproject the graph to the CRS of the hazard
+            logging.warning(
+                """Hazard crs {} and gdf crs {} are inconsistent,
+                                            we try to reproject the gdf crs""".format(
+                    hazard_crs, gdf_crs
+                )
+            )
+            extent_gdf = gdf.total_bounds
+            logging.info("Gdf extent before reprojecting: {}".format(extent_gdf))
+            gdf_reprojected = gdf.to_crs(hazard_crs)
+            extent_gdf_reprojected = gdf_reprojected.total_bounds
+            logging.info(
+                "Gdf extent after reprojecting: {}".format(extent_gdf_reprojected)
+            )
+
+            # Do the actual hazard intersect
+            gdf_reprojected = self.hazard_intersect(gdf_reprojected)
+
+            # reassign crs
+            gdf_output = gdf_reprojected.to_crs(gdf_crs)
+
+        else:
+            gdf_output = self.hazard_intersect(gdf)
+
+        return gdf_output
 
     def create(self):
         """Overlays the different possible graph and network objects with the hazard data
@@ -940,12 +1022,10 @@ class Hazard:
                 self.graphs["base_network_hazard"] = gdf_reprojected.copy()
                 del gdf_reprojected
             else:
-                self.graphs["base_network_hazard"] = self.hazard_intersect(
-                    self.graphs["base_network"]
+                # read previously created file
+                self.graphs["base_network_hazard"] = gpd.read_feather(
+                    self.files["base_network_hazard"]
                 )
-
-            # Save graphs/network with hazard
-            self._export_network_files("base_network_hazard", types_to_export)
 
         #### Step 4: hazard overlay of the locations that are checked for isolation ###
         if self._isolation_locations:
@@ -955,43 +1035,15 @@ class Hazard:
             locations_crs = pyproj.CRS.from_user_input(locations.crs)
             hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
 
-            if (
-                hazard_crs != locations_crs
-            ):  # Temporarily reproject the locations to the CRS of the hazard
-                logging.warning(
-                    """Hazard crs {} and location crs {} are inconsistent,
-                                                we try to reproject the location crs""".format(
-                        hazard_crs, locations_crs
-                    )
-                )
-                extent_locations = locations.total_bounds
-                logging.info(
-                    "Gdf extent before reprojecting: {}".format(extent_locations)
-                )
-                locations_reprojected = locations.copy().to_crs(hazard_crs)
-                extent_locations_reprojected = locations_reprojected.total_bounds
-                logging.info(
-                    "Gdf extent after reprojecting: {}".format(
-                        extent_locations_reprojected
-                    )
-                )
-
-                # Do the actual hazard intersect
-                locations_reprojected = self.point_hazard_intersect(
-                    locations_reprojected
-                )
-
-                # Assign the original geometries to the reprojected raster
-                original_geometries = locations["geometry"]
-                locations_reprojected["geometry"] = original_geometries
-                locations = locations_reprojected.copy()
-                del locations_reprojected
-            else:
-                locations = self.point_hazard_intersect(locations)
+            # get hazard at locations from network based on nearest
+            logging.info("Get hazard at locations from network.")
+            locations_hazard = self.get_point_hazard_from_network(
+                locations, self.graphs["base_network_hazard"]
+            )
 
             _exporter = NetworkExporterFactory()
             _exporter.export(
-                network=locations,
+                network=locations_hazard,
                 basename="locations_hazard",
                 output_dir=self._output_graph_dir,
                 export_types=["pickle"],

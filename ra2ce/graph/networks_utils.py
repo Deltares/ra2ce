@@ -1042,7 +1042,6 @@ def graph_check_create_unique_ids(
     if len(set([str(e[-1][id_name]) for e in graph.edges.data(keys=True)])) < len(
         graph.edges()
     ):
-
         i = 0
         for u, v, k in graph.edges(data=True):
             graph[u][v][k][new_id_name] = i
@@ -1396,7 +1395,7 @@ def get_graph_edges_extent(
     ].bounds
 
     # Compare with the bounds of all other edges to see if there are linestrings with more extreme bounds
-    for (_, _, geom) in network_graph.edges.data("geometry"):
+    for _, _, geom in network_graph.edges.data("geometry"):
         # print(u, v, geom)
         (
             minx,
@@ -1853,3 +1852,14 @@ def get_valid_mean(x_value: float) -> Optional[float]:
     if not isinstance(x_value, float):
         return np.nan
     return x_value.mean()  # You know it's a valid type, so return the mean.
+
+
+def buffer_geometry(
+    gdf: gpd.GeoDataFrame, buffer: float, cap_stype: int = 3
+) -> gpd.GeoDataFrame:
+    """buffer the geometry of the geodataframe"""
+    gdf["geometry"] = gdf["geometry"].buffer(
+        buffer,
+        cap_style=cap_stype,
+    )
+    return gdf
