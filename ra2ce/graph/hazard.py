@@ -826,8 +826,8 @@ class Hazard:
         types_to_export = ["pickle"] if not self._save_shp else ["pickle", "shp"]
 
         if (
-            self.files["base_graph"] is None
-            and self.files["origins_destinations_graph"] is None
+            not self.files["base_graph"]
+            and not self.files["origins_destinations_graph"]
         ):
             logging.warning(
                 "Either a base graph or OD graph is missing to intersect the hazard with. "
