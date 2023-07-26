@@ -131,40 +131,44 @@ class TestOsmNetworkWrapper:
         )
 
     @pytest.mark.parametrize(
-        "config",
+        "polygon_values",
         [
-            pytest.param(
-                {
-                    "static": test_data.joinpath(
-                        "graph", "test_osm_network_wrapper", "static"
-                    ),
-                    "network": {"polygon": None},
-                },
-                id="None polygon file",
-            ),
-            pytest.param(
-                {
-                    "static": test_data.joinpath(
-                        "graph", "test_osm_network_wrapper", "static"
-                    ),
-                    "network": {"polygon": "invalid_name"},
-                },
-                id="Invalid polygon file name",
-            ),
+            pytest.param([""], id="Empty polygon file value"),
+            pytest.param(["Not a valid name"], id="Invalid polygon file name"),
         ],
     )
-    def test_get_clean_graph_from_osm_with_invalid_polygon_parameter(
-        self, config: dict
+    def test_get_clean_graph_from_osm_with_invalid_polygon_parameter_filename(
+        self, polygon_values
     ):
-        _osm_network = OsmNetworkWrapper(config=config, graph_crs="")
+        _config_dict = {
+            "static": test_data.joinpath("graph", "test_osm_network_wrapper", "static"),
+            "network": {"polygon": polygon_values},
+        }
+        _osm_network = OsmNetworkWrapper(config=_config_dict, graph_crs="")
         with pytest.raises(FileNotFoundError) as exc_err:
             _osm_network.get_clean_graph_from_osm()
 
-        assert (
-            str(exc_err.value)
-            == "No or invalid polygon file is introduced for OSM download"
-            or "No polygon_file file found"
-        )
+        assert str(exc_err.value) == "No polygon_file file found."
+
+    @pytest.mark.parametrize(
+        "polygon_value",
+        [
+            pytest.param(None, id="None polygon file"),
+            pytest.param([], id="Invalid polygon file name"),
+        ],
+    )
+    def test_get_clean_graph_from_osm_with_invalid_polygon_parameter(
+        self, polygon_value
+    ):
+        _config_dict = {
+            "static": test_data.joinpath("graph", "test_osm_network_wrapper", "static"),
+            "network": {"polygon": polygon_value},
+        }
+        _osm_network = OsmNetworkWrapper(config=_config_dict, graph_crs="")
+        with pytest.raises(ValueError) as exc_err:
+            _osm_network.get_clean_graph_from_osm()
+
+        assert str(exc_err.value) == "No valid value provided for polygon file."
 
     @pytest.fixture
     def _valid_graph_fixture(self) -> MultiDiGraph:
