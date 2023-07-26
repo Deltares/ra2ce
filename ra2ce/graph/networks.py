@@ -201,11 +201,15 @@ class Network:
         # Exporting complex graph because the shapefile should be kept the same as much as possible.
         return graph_complex, edges_complex
 
-    def _export_linking_tables(self, linking_tables: List[Any]) -> None:
+    def _export_linking_tables(self, linking_tables: list[Any]) -> None:
         _exporter = JsonExporter()
         _output_dir = self.config["static"] / "output_graph"
-        _exporter.export(_output_dir / "simple_to_complex.json", linking_tables[0])
-        _exporter.export(_output_dir / "complex_to_simple.json", linking_tables[1])
+        _exporter.export(
+            _output_dir.joinpath("simple_to_complex.json"), linking_tables[0]
+        )
+        _exporter.export(
+            _output_dir.joinpath("complex_to_simple.json"), linking_tables[1]
+        )
 
     def network_trails_import(
         self, crs: int = 4326
