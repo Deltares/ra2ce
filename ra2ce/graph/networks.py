@@ -97,15 +97,6 @@ class Network:
         # files
         self.files = files
 
-    def _setup_cleanup_options(self, opt: dict):
-        # TODO: remove the attributes once cleanup function is used
-        self.cleanup = opt.get("cleanup", False)
-        self.snapping = opt.get("snapping_threshold", None)
-        self.segmentation_length = opt.get("segmentation_length", None)
-        self.merge_lines = opt.get("merge_lines", None)
-        self.merge_on_id = opt.get("merge_on_id", None)
-        self.cut_at_intersections = opt.get("cut_at_intersections", None)
-
     def network_shp(
         self, crs: int = 4326
     ) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
@@ -539,6 +530,14 @@ class Network:
         )
         self.files[graph_name] = _exporter.get_pickle_path()
 
+    def _any_cleanup_enabled(self) -> bool:
+        return (
+            self._cleanup.snapping_threshold
+            or self._cleanup.pruning_threshold
+            or self._cleanup.merge_lines
+            or self._cleanup.cut_at_intersections
+        )
+
     def create(self) -> dict:
         """Handler function with the logic to call the right functions to create a network.
 
@@ -556,7 +555,7 @@ class Network:
             # Create the network from the network source
             if self._network_config.source == "shapefile":
                 logging.info("Start creating a network from the submitted shapefile.")
-                if self.cleanup:
+                if self._any_cleanup_enabled():
                     base_graph, network_gdf = self.network_shp()
                 else:
                     base_graph, network_gdf = self.network_cleanshp()
