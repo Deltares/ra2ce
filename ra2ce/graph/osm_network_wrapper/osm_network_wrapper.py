@@ -41,48 +41,41 @@ class OsmNetworkWrapper:
             )
         if not isinstance(config.get("network"), dict):
             raise ValueError('Config["network"] should be a dictionary')
+
         self.network_dict = config["network"]
         self.output_path = config["static"] / "output_graph"
         self.graph_crs = graph_crs
         if not self.graph_crs:
             self.graph_crs = "EPSG:4326"
 
-    def download_graph_from_osm(self) -> MultiDiGraph:
-        if not self.network_dict.get("polygon", None):
-            raise FileNotFoundError(
-                "No or invalid polygon file is introduced for OSM download"
-            )
-        polygon_file = self.output_path.parent.joinpath(
-            "network", self.network_dict["polygon"][0]
-        )
-        if not polygon_file.exists():
-            raise FileNotFoundError("No polygon_file file found")
-        poly_dict = nut.read_geojson(
-            geojson_file=polygon_file
-        )  # It can only read in one geojson
+    def get_clean_graph_from_osm(self) -> MultiDiGraph:
+        """
+        Creates a network from a polygon by by downloading via the OSM API in its extent.
 
-        _complex_graph = self.get_graph_from_osm_download(
+        Raises:
+            FileNotFoundError: When no valid polygon file is provided.
+
+        Returns:
+            MultiDiGraph: Complex (clean) graph after download from OSM, for use in the direct analyses and input to derive simplified network.
+        """
+        # It can only read in one geojson
+        polygon_file = self.output_path.parent.joinpath(
+            "network", self.network_dict.get("polygon", [])[0]
+        )
+        if not polygon_file.is_file():
+            raise FileNotFoundError("No polygon_file file found.")
+
+        poly_dict = nut.read_geojson(geojson_file=polygon_file)
+        _complex_graph = self._download_clean_graph_from_osm(
             polygon=nut.geojson_to_shp(poly_dict),
             network_type=self.network_dict.get("network_type", ""),
             link_type=self.network_dict.get("road_type", ""),
         )
-        _complex_graph.graph["crs"] = self.graph_crs
-        self.get_clean_graph(_complex_graph)
         return _complex_graph
 
-    def get_graph_from_osm_download(
+    def _download_clean_graph_from_osm(
         self, polygon: BaseGeometry, link_type: str, network_type: str
     ) -> MultiDiGraph:
-        """
-        Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
-        Args:
-            polygon: Shapely Polygon or Multipolygon geometry
-            link_type: string, e.g., "highway,motorway"
-            network_type: string {"all_private", "all", "bike", "drive", "drive_service", "walk"}
-        Returns:
-            complex_graph (NetworkX graph): Complex graph (for use in the direct analyses and
-            input to derive simplified network).
-        """
         if not link_type and not network_type:
             raise ValueError("Either of the link_type or network_type should be known")
         elif not link_type:
@@ -116,8 +109,8 @@ class OsmNetworkWrapper:
                 len(list(_complex_graph.nodes())), len(list(_complex_graph.edges()))
             )
         )
+        _complex_graph.graph["crs"] = self.graph_crs
         self.get_clean_graph(_complex_graph)
-
         return _complex_graph
 
     @staticmethod
@@ -234,11 +227,11 @@ class OsmNetworkWrapper:
         return unique_graph
 
     @staticmethod
-    def snap_nodes_to_nodes(graph, threshold):
+    def snap_nodes_to_nodes(graph: MultiDiGraph, threshold: float) -> MultiDiGraph:
         return consolidate_intersections(
             G=graph, rebuild_graph=True, tolerance=threshold, dead_ends=False
         )
 
     @staticmethod
-    def snap_nodes_to_edges(graph, threshold):
+    def snap_nodes_to_edges(graph: MultiDiGraph, threshold: float):
         raise NotImplementedError("Next thing to do!")
