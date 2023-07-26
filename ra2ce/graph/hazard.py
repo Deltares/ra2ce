@@ -992,6 +992,7 @@ class Hazard:
 
         #### Step 3: iterate overlay of the GeoPandas Dataframe (if any) ###
         if self.files["base_network"] and not self.files["base_network_hazard"]:
+            logging.info("Iterating overlay of GeoPandas Dataframe.")
             # Check if the graph needs to be reprojected
             hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
             gdf_crs = pyproj.CRS.from_user_input(self.graphs["base_network"].crs)
@@ -1023,9 +1024,15 @@ class Hazard:
                 del gdf_reprojected
             else:
                 # read previously created file
-                self.graphs["base_network_hazard"] = gpd.read_feather(
-                    self.files["base_network_hazard"]
-                )
+                logging.info("Setting 'base_network_hazard' graph.")
+                if self.files["base_network_hazard"]:
+                    self.graphs["base_network_hazard"] = gpd.read_feather(
+                        self.files["base_network_hazard"]
+                    )
+                else:
+                    self.graphs["base_network_hazard"] = self.hazard_intersect(
+                        self.graphs["base_network"]
+                    )
 
         #### Step 4: hazard overlay of the locations that are checked for isolation ###
         if self._isolation_locations:
