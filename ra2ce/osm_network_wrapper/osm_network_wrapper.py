@@ -52,11 +52,16 @@ class OsmNetworkWrapper:
         if not polygon_file.exists():
             raise FileNotFoundError("No polygon_file file found")
         poly_dict = nut.read_geojson(geojson_file=polygon_file)  # It can only read in one geojson
-        return self.get_graph_from_osm_download(
+
+        _complex_graph = self.get_graph_from_osm_download(
             polygon=nut.geojson_to_shp(poly_dict),
             network_type=self.network_dict.get("network_type", ""),
             link_type=self.network_dict.get("road_type", "")
         )
+        _complex_graph.graph["crs"] = self.graph_crs
+        self.get_clean_graph(_complex_graph)
+        return _complex_graph
+
 
     def get_graph_from_osm_download(self, polygon: BaseGeometry, link_type: str, network_type: str) -> MultiDiGraph:
         """
@@ -105,8 +110,8 @@ class OsmNetworkWrapper:
                 len(list(_complex_graph.nodes())), len(list(_complex_graph.edges()))
             )
         )
-        _complex_graph.graph["crs"] = self.graph_crs
         self.get_clean_graph(_complex_graph)
+
         return _complex_graph
 
     @staticmethod
@@ -114,7 +119,6 @@ class OsmNetworkWrapper:
         complex_graph = OsmNetworkWrapper.drop_duplicates(complex_graph)
         complex_graph = nut.add_missing_geoms_graph(graph=complex_graph, geom_name="geometry").to_directed()
         complex_graph = OsmNetworkWrapper.snap_nodes_to_nodes(graph=complex_graph, threshold=0.000025)
-        OsmNetworkWrapper.snap_nodes_to_edges(graph=complex_graph, threshold=0.000025)
         return complex_graph
 
     @staticmethod
