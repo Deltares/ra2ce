@@ -21,6 +21,6 @@ Or navigate directly to another section:
    user_guide/user_guide
    examples/examples
    collaboration/collaboration
-   changelog
+   changelog_wrapper
 
 Lost..? Try the :ref:`search`.
