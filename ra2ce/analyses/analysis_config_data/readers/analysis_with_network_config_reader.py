@@ -34,7 +34,7 @@ from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_base imp
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
-class AnalysisWithNetworkConfigReader(AnalysisConfigReaderBase):
+class AnalysisConfigReaderWithNetwork(AnalysisConfigReaderBase):
     def __init__(self, network_data: NetworkConfigWrapper) -> None:
         self._network_data = network_data
         if not network_data:

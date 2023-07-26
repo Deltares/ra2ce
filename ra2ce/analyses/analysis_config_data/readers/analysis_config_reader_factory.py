@@ -30,10 +30,10 @@ from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_base imp
     AnalysisConfigReaderBase,
 )
 from ra2ce.analyses.analysis_config_data.readers.analysis_with_network_config_reader import (
-    AnalysisWithNetworkConfigReader,
+    AnalysisConfigReaderWithNetwork,
 )
 from ra2ce.analyses.analysis_config_data.readers.analysis_without_network_config_reader import (
-    AnalysisWithoutNetworkConfigReader,
+    AnalysisConfigReaderWithoutNetwork,
 )
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 
@@ -44,8 +44,8 @@ class AnalysisConfigReaderFactory:
         network_config: Optional[NetworkConfigData],
     ) -> AnalysisConfigReaderBase:
         if network_config:
-            return AnalysisWithNetworkConfigReader(network_config)
-        return AnalysisWithoutNetworkConfigReader()
+            return AnalysisConfigReaderWithNetwork(network_config)
+        return AnalysisConfigReaderWithoutNetwork()
 
     def read(
         self, ini_file: Path, network_config: Optional[NetworkConfigData]
