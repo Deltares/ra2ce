@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ra2ce"
-version = "0.5.0"
+version = "0.5.1"
 description = "Risk Assessment and Adaptation for Critical infrastructurE (RA2CE)."
 authors = ["Margreet van Marle <Margreet.vanMarle@deltares.nl>"]
 maintainers = [
@@ -49,6 +49,8 @@ osmnx = "0.16.*"
 scipy = "^1.9.1"
 GDAL = "3.5.1"
 fiona = "1.8.21"
+pygeos = "^0.14"
+momepy = "0.5.0"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.10.1"
@@ -107,7 +109,7 @@ line_length = 88
 name = "cz_conventional_commits"
 changelog_file = "docs/changelog.md"
 update_changelog_on_bump = true
-version = "0.5.0"
+version = "0.5.1"
 tag_format = "v$major.$minor.$patch"
 version_files= [
     "ra2ce/__init__.py",
