@@ -78,9 +78,10 @@ class OsmNetworkWrapper:
     def _download_clean_graph_from_osm(
         self, polygon: BaseGeometry, road_types: list[str], network_type: str
     ) -> MultiDiGraph:
-        if not road_types and not network_type:
+        _available_road_types = road_types and any(road_types)
+        if not _available_road_types and not network_type:
             raise ValueError("Either of the link_type or network_type should be known")
-        elif not road_types:
+        elif not _available_road_types:
             # The user specified only the network type.
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon,
@@ -95,6 +96,7 @@ class OsmNetworkWrapper:
                 polygon=polygon, custom_filter=cf, simplify=False, retain_all=True
             )
         else:
+            # _available_road_types and network_type
             cf = f'["highway"~"{"|".join(road_types)}"]'
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon,
