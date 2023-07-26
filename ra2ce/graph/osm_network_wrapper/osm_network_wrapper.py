@@ -59,6 +59,9 @@ class OsmNetworkWrapper:
             MultiDiGraph: Complex (clean) graph after download from OSM, for use in the direct analyses and input to derive simplified network.
         """
         # It can only read in one geojson
+        if not self.network_dict.get("polygon", []):
+            raise ValueError("No valid value provided for polygon file.")
+
         polygon_file = self.output_path.parent.joinpath(
             "network", self.network_dict.get("polygon", [])[0]
         )
