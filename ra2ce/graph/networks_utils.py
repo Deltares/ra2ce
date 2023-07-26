@@ -77,7 +77,7 @@ def draw_progress_bar(percent: float, bar_length: int = 20):
 
 
 def merge_lines_automatic(
-        lines_gdf: gpd.GeoDataFrame, id_name: str, aadt_names: List[str], crs_: pyproj.CRS
+    lines_gdf: gpd.GeoDataFrame, id_name: str, aadt_names: List[str], crs_: pyproj.CRS
 ) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
     """Automatically merge lines based on a config file
     Args:
@@ -152,9 +152,9 @@ def merge_lines_automatic(
                 while not full_line.equals(mline):
                     for line2, j in lines_fids:
                         if (
-                                line2.within(mline)
-                                and not line2.equals(mline)
-                                and line != line2
+                            line2.within(mline)
+                            and not line2.equals(mline)
+                            and line != line2
                         ):
                             line_set_merged.append(line2)
                             fid_set_merged.append(j)
@@ -182,9 +182,9 @@ def merge_lines_automatic(
                         i for i in aadts_set_merged if not all(v is None for v in i)
                     ]
                     if (
-                            len(aadts_set_merged) > 1
-                            and isinstance(aadts_set_merged[0], list)
-                            and yes_to_all == "all"
+                        len(aadts_set_merged) > 1
+                        and isinstance(aadts_set_merged[0], list)
+                        and yes_to_all == "all"
                     ):
                         if all_type == "max":
                             aadts_set_merged = [
@@ -234,11 +234,11 @@ def merge_lines_automatic(
                         {
                             a: aadt_val
                             for a, aadt_val in zip(
-                            aadt_names,
-                            lines_gdf.loc[lines_gdf[id_name] == i][aadt_names].iloc[
-                                0
-                            ],
-                        )
+                                aadt_names,
+                                lines_gdf.loc[lines_gdf[id_name] == i][aadt_names].iloc[
+                                    0
+                                ],
+                            )
                         }
                     )
                 add_idx = 0 if merged.empty else max(merged.index) + 1
@@ -305,10 +305,10 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
 
 
 def snap_endpoints_lines(
-        lines_gdf: gpd.GeoDataFrame,
-        max_dist: Union[int, float],
-        id_name: str,
-        crs: pyproj.CRS,
+    lines_gdf: gpd.GeoDataFrame,
+    max_dist: Union[int, float],
+    id_name: str,
+    crs: pyproj.CRS,
 ) -> gpd.GeoDataFrame:
     """Snap endpoints of lines with endpoints or vertices of other lines
     if they are at most max_dist apart. Choose the closest endpoint or vertice.
@@ -410,7 +410,7 @@ def find_isolated_endpoints(linesIds: list, lines: list) -> list:
     isolated_endpoints = []
     for i, id_line in enumerate(zip(linesIds, lines)):
         ids, line = id_line
-        other_lines = lines[:i] + lines[i + 1:]
+        other_lines = lines[:i] + lines[i + 1 :]
         for q in [0, -1]:
             if isinstance(line, LineString):
                 endpoint = Point(line.coords[q])
@@ -422,7 +422,7 @@ def find_isolated_endpoints(linesIds: list, lines: list) -> list:
                 endpoints = [Point(l.coords[q]) for l in line]
                 for endpnt in endpoints:
                     if any(
-                            endpnt.touches(another_line) for another_line in other_lines
+                        endpnt.touches(another_line) for another_line in other_lines
                     ):
                         continue
                     else:
@@ -431,7 +431,7 @@ def find_isolated_endpoints(linesIds: list, lines: list) -> list:
 
 
 def nearest_neighbor_within(
-        search_points: list, spatial_index, point: Point, max_distance: Union[float, int]
+    search_points: list, spatial_index, point: Point, max_distance: Union[float, int]
 ) -> Point:
     """Find nearest point among others up to a maximum distance.
 
@@ -601,7 +601,7 @@ def cut_lines(lines_gdf, nodes, id_name: str, tolerance, crs_):
                 pnt
                 for pnt in list(nodes["geometry"])
                 if (line.distance(pnt) < tolerance)
-                   & (line.boundary.distance(pnt) > tolerance)
+                & (line.boundary.distance(pnt) > tolerance)
             ]
         elif isinstance(line, MultiLineString):
             points_to_cut = []
@@ -611,7 +611,7 @@ def cut_lines(lines_gdf, nodes, id_name: str, tolerance, crs_):
                         pnt
                         for pnt in list(nodes["geometry"])
                         if (ln.distance(pnt) < tolerance)
-                           & (ln.boundary.distance(pnt) > tolerance)
+                        & (ln.boundary.distance(pnt) > tolerance)
                     ]
                 )
 
@@ -727,7 +727,7 @@ def cut(line, distance) -> Tuple[LineString, LineString]:
 
 
 def join_nodes_edges(
-        gdf_nodes: gpd.GeoDataFrame, gdf_edges: gpd.GeoDataFrame, id_name: str
+    gdf_nodes: gpd.GeoDataFrame, gdf_edges: gpd.GeoDataFrame, id_name: str
 ) -> gpd.GeoDataFrame:
     """Creates tuples from the adjecent nodes and add as column in geodataframe.
     Args:
@@ -995,7 +995,7 @@ def create_simplified_graph(graph_complex, new_id: str = "rfid"):
 
 
 def gdf_check_create_unique_ids(
-        gdf: gpd.GeoDataFrame, id_name: str, new_id_name: str = "rfid"
+    gdf: gpd.GeoDataFrame, id_name: str, new_id_name: str = "rfid"
 ) -> Tuple[gpd.GeoDataFrame, str]:
     """
     Check if the ID's are unique per edge: if not, add an own ID called 'fid'
@@ -1025,7 +1025,7 @@ def gdf_check_create_unique_ids(
 
 
 def graph_check_create_unique_ids(
-        graph: Graph, id_name: str, new_id_name: str = "rfid"
+    graph: Graph, id_name: str, new_id_name: str = "rfid"
 ) -> Tuple[Graph, str]:
     """
     TODO: This is not really being used. It could be removed.
@@ -1040,7 +1040,7 @@ def graph_check_create_unique_ids(
         Tuple[Graph, str]: Resulting graph and used ID.
     """
     if len(set([str(e[-1][id_name]) for e in graph.edges.data(keys=True)])) < len(
-            graph.edges()
+        graph.edges()
     ):
 
         i = 0
@@ -1064,7 +1064,7 @@ def graph_create_unique_ids(graph: nx.Graph, new_id_name: str = "rfid") -> nx.Gr
         return graph
     # TODO: decide if we always add a new ID (in iGraph this is different)
     # if len(set([str(e[-1][new_id_name]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
-    for i, (u, v, k) in enumerate(graph.edges(data=True)):
+    for i, (u, v, k) in enumerate(graph.edges(keys=True)):
         graph[u][v][k][new_id_name] = i + 1
     logging.info("Added a new unique identifier field '{}'.".format(new_id_name))
     return graph
@@ -1117,7 +1117,7 @@ def read_geojson(geojson_file: Path) -> dict:
 
 
 def graph_from_gdf(
-        gdf: gpd.GeoDataFrame, gdf_nodes, name: str = "network", node_id: str = "ID"
+    gdf: gpd.GeoDataFrame, gdf_nodes, name: str = "network", node_id: str = "ID"
 ) -> nx.MultiGraph:
     # create a Graph object
     _created_graph = nx.MultiGraph(crs=gdf.crs)
@@ -1141,10 +1141,10 @@ def graph_from_gdf(
 
 
 def graph_to_gdf(
-        graph_to_convert: nx.classes.graph.Graph,
-        save_nodes=False,
-        save_edges=True,
-        to_save=False,
+    graph_to_convert: nx.classes.graph.Graph,
+    save_nodes=False,
+    save_edges=True,
+    to_save=False,
 ):
     """Takes in a networkx graph object and returns edges and nodes as geodataframes
     Arguments:
@@ -1380,7 +1380,7 @@ def get_extent(dataset):
 
 
 def get_graph_edges_extent(
-        network_graph: nx.classes.Graph,
+    network_graph: nx.classes.Graph,
 ) -> Tuple[float, float, float, float]:
     """Inspects all geometries of the edges of a graph and returns the most extreme coordinates
 
@@ -1417,7 +1417,7 @@ def get_graph_edges_extent(
 
 
 def reproject_graph(
-        original_graph: nx.classes.Graph, crs_in: str, crs_out: str
+    original_graph: nx.classes.Graph, crs_in: str, crs_out: str
 ) -> nx.classes.Graph:
     """
     Reprojects the shapely geometry data (of a NetworkX graph) to a different projection
@@ -1518,7 +1518,7 @@ def graph_link_simple_id_to_complex(graph_simple, new_id):
     # Iterate over the simple, because this already has the corresponding complex information
     lookup_dict = {}
     # keys are the ids of the simple graph, values are lists with all matching complex id's
-    for u, v, k in tqdm.tqdm(graph_simple.edges(data=True)):
+    for u, v, k in tqdm.tqdm(graph_simple.edges(keys=True)):
         key_1 = graph_simple[u][v][k]["{}".format(new_id)]
         value_1 = graph_simple[u][v][k]["{}_c".format(new_id)]
         lookup_dict[key_1] = value_1
@@ -1540,7 +1540,7 @@ def graph_link_simple_id_to_complex(graph_simple, new_id):
 
 
 def add_simple_id_to_graph_complex(
-        complex_graph: nx.classes.Graph, complex_to_simple, new_id
+    complex_graph: nx.classes.Graph, complex_to_simple, new_id
 ) -> nx.classes.Graph:
     """Adds the appropriate ID of the simple graph to each edge of the complex graph as a new attribute 'rfid'
 
@@ -1627,9 +1627,9 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
                 ns = []
                 for ss in s:
                     if (
-                            not any(c.isalpha() for c in ss)
-                            and (";" not in ss)
-                            and ("|" not in ss)
+                        not any(c.isalpha() for c in ss)
+                        and (";" not in ss)
+                        and ("|" not in ss)
                     ):
                         ns.append(int(ss))
                     elif not any(c.isalpha() for c in ss) and ";" in ss:
@@ -1644,9 +1644,9 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
                     continue
             elif isinstance(s, str):
                 if (
-                        not any(c.isalpha() for c in s)
-                        and (";" not in s)
-                        and ("|" not in s)
+                    not any(c.isalpha() for c in s)
+                    and (";" not in s)
+                    and ("|" not in s)
                 ):
                     ss = int(s)
                 elif not any(c.isalpha() for c in s) and ";" in s:
@@ -1723,9 +1723,9 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
                 ns = []
                 for ms in max_speed:
                     if (
-                            not any(c.isalpha() for c in ms)
-                            and (";" not in ms)
-                            and ("|" not in ms)
+                        not any(c.isalpha() for c in ms)
+                        and (";" not in ms)
+                        and ("|" not in ms)
                     ):
                         ns.append(int(ms))
                     elif not any(c.isalpha() for c in ms) and ";" in ms:
@@ -1745,9 +1745,9 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
                     )
             elif isinstance(max_speed, str):
                 if (
-                        not any(c.isalpha() for c in max_speed)
-                        and (";" not in max_speed)
-                        and ("|" not in max_speed)
+                    not any(c.isalpha() for c in max_speed)
+                    and (";" not in max_speed)
+                    and ("|" not in max_speed)
                 ):
                     graph[u][v][k]["avgspeed"] = round(int(max_speed), 0)
                 elif not any(c.isalpha() for c in max_speed) and ";" in max_speed:
@@ -1775,10 +1775,10 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
                     [
                         s
                         for r, s in zip(
-                        avg_road_speed["road_types"], avg_road_speed["avg_speed"]
-                    )
+                            avg_road_speed["road_types"], avg_road_speed["avg_speed"]
+                        )
                         if set(road_type[2:-2].split("', '"))
-                           == set(r[2:-2].split("', '"))
+                        == set(r[2:-2].split("', '"))
                     ][0]
                 )
                 graph[u][v][k]["avgspeed"] = round(avg_speed, 0)

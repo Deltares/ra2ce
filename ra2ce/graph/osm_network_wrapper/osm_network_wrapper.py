@@ -46,7 +46,7 @@ class OsmNetworkWrapper:
         self.output_path = config["static"] / "output_graph"
         self.graph_crs = graph_crs
         if not self.graph_crs:
-            self.graph_crs = "EPSG:4326"
+            self.graph_crs = "epsg:4326"
 
     def get_clean_graph_from_osm(self) -> MultiDiGraph:
         """
