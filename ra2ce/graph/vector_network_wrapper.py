@@ -52,7 +52,7 @@ class VectorNetworkWrapper:
         self._setup_global(config)
         self.network_dict = self._get_network_opt(config["network"])
 
-    def _parse_ini_stringlist(self, value: str):
+    def _parse_ini_stringlist(self, value: str) -> Union[str, list, None]:
         """Parses a string with "," into a list from an ini file.
 
         Args:
@@ -70,7 +70,7 @@ class VectorNetworkWrapper:
         else:
             return value
 
-    def _setup_global(self, config: dict):
+    def _setup_global(self, config: dict) -> None:
         """Sets up project properties based on provided configuration.
 
         Args:
