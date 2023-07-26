@@ -92,7 +92,7 @@ class OsmNetworkWrapper:
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon, custom_filter=cf, simplify=False, retain_all=True
             )
-        elif road_types and network_type:
+        else:
             cf = f'["highway"~"{road_types.replace(",", "|")}"]'
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon,
@@ -101,16 +101,15 @@ class OsmNetworkWrapper:
                 simplify=False,
                 retain_all=True,
             )
-        else:
-            # The user specified the network type and road types.
-            raise ValueError("This case is not supported")
+
         logging.info(
             "graph downloaded from OSM with {:,} nodes and {:,} edges".format(
                 len(list(_complex_graph.nodes())), len(list(_complex_graph.edges()))
             )
         )
-        _complex_graph.graph["crs"] = self.graph_crs
-        # self.get_clean_graph(_complex_graph)
+        if "crs" not in _complex_graph.graph.keys():
+            _complex_graph.graph["crs"] = self.graph_crs
+        self.get_clean_graph(_complex_graph)
         return _complex_graph
 
     @staticmethod
