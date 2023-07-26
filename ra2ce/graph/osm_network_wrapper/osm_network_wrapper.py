@@ -60,9 +60,11 @@ class OsmNetworkWrapper:
             MultiDiGraph: Complex (clean) graph after download from OSM, for use in the direct analyses and input to derive simplified network.
         """
         # It can only read in one geojson
+        if not isinstance(self.polygon_path, Path):
+            raise ValueError("No valid value provided for polygon file.")
         if not self.polygon_path.is_file():
             raise FileNotFoundError(
-                "No polygon_file file provided at {}.".format(self.polygon_path)
+                "No polygon_file file found at {}.".format(self.polygon_path)
             )
 
         poly_dict = nut.read_geojson(geojson_file=self.polygon_path)
