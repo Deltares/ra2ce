@@ -84,6 +84,11 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
                 config_data.origins_destinations.region
             )
 
+        if _select_to_correct(config_data.network.polygon):
+            config_data.network.polygon = _network_directory.joinpath(
+                config_data.network.polygon
+            )
+
         config_data.network.primary_file = _correct_list(
             _network_directory, config_data.network.primary_file
         )

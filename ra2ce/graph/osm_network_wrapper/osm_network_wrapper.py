@@ -26,17 +26,12 @@ from osmnx import consolidate_intersections
 from shapely.geometry.base import BaseGeometry
 from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
 from ra2ce.graph.exporters.json_exporter import JsonExporter
-
+import pandas as pd
 import ra2ce.graph.networks_utils as nut
 from ra2ce.graph.osm_network_wrapper.extremities_data import ExtremitiesData
 
 
 class OsmNetworkWrapper(NetworkWrapperProtocol):
-    network_type: str
-    road_types: list[str]
-    graph_crs: str
-    polygon_path: Path
-
     def __init__(
         self,
         network_type: str,
@@ -81,7 +76,40 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         if not self.is_directed and isinstance(graph_simple, MultiDiGraph):
             graph_simple = graph_simple.to_undirected()
 
+        # Check if all geometries between nodes are there, if not, add them as a straight line.
+        graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
+        graph_simple = self._get_avg_speed(graph_simple)
         return graph_simple, edges_complex
+
+    def _get_avg_speed(
+        self, original_graph: nx.classes.graph.Graph
+    ) -> nx.classes.graph.Graph:
+        if all(["length" in e for u, v, e in original_graph.edges.data()]) and any(
+            ["maxspeed" in e for u, v, e in original_graph.edges.data()]
+        ):
+            # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
+            path_avg_speed = self.output_graph_dir.joinpath("avg_speed.csv")
+            if path_avg_speed.is_file():
+                avg_speeds = pd.read_csv(path_avg_speed)
+            else:
+                avg_speeds = nut.calc_avg_speed(
+                    original_graph,
+                    "highway",
+                    save_csv=True,
+                    save_path=path_avg_speed,
+                )
+            original_graph = nut.assign_avg_speed(original_graph, avg_speeds, "highway")
+
+            # make a time value of seconds, length of road streches is in meters
+            for u, v, k, edata in original_graph.edges.data(keys=True):
+                hours = (edata["length"] / 1000) / edata["avgspeed"]
+                original_graph[u][v][k]["time"] = round(hours * 3600, 0)
+
+            return original_graph
+        logging.info(
+            "No attributes found in the graph to estimate average speed per network segment."
+        )
+        return original_graph
 
     def _export_linking_tables(self, linking_tables: tuple[Any]) -> None:
         _exporter = JsonExporter()
