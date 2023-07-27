@@ -235,6 +235,7 @@ class Network:
             graph_crs="",
             polygon_path=self._network_dir.joinpath(self._network_config.polygon),
             directed=self._network_config.directed,
+            output_graph_dir=self.output_graph_dir,
         )
         graph_simple, edges_complex = osm_network.get_network()
 

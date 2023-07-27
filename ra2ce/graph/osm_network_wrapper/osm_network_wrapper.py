@@ -44,12 +44,14 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         graph_crs: str,
         polygon_path: Path,
         directed: bool,
+        output_graph_dir: Path,
     ) -> None:
         self.network_type = network_type
         self.road_types = road_types
         self.polygon_path = polygon_path
         self.is_directed = directed
         self.graph_crs = graph_crs
+        self.output_graph_dir = output_graph_dir
         if not graph_crs:
             # Set default value
             self.graph_crs = "epsg:4326"
