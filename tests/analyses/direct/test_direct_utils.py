@@ -68,7 +68,11 @@ class TestDirectUtils:
         # 1. Define test data.
         _left_line = LineString([[0, 0], [1, 0], [2, 0]])
         _right_line = LineString([[3, 0], [2, 1], [2, 2]])
-        _data = {"road_type": ["name1", "name2"], "geometry": [_left_line, _right_line], "lanes": [0, 1]}
+        _data = {
+            "road_type": ["name1", "name2"],
+            "geometry": [_left_line, _right_line],
+            "lanes": [0, 1],
+        }
         _test_gdf = gpd.GeoDataFrame(_data, crs="EPSG:4326")
 
         # 2. Run test.

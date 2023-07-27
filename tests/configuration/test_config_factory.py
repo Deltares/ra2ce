@@ -1,6 +1,10 @@
-from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
+    AnalysisConfigWrapperBase,
+)
 from ra2ce.configuration.config_factory import ConfigFactory
 from ra2ce.configuration.config_wrapper import ConfigWrapper
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data
 
 
@@ -20,8 +24,9 @@ class TestConfigFactory:
         # 3. Verify final expectations.
         assert _input_config
         assert isinstance(_input_config, ConfigWrapper)
-        assert isinstance(_input_config.analysis_config, AnalysisConfigBase)
-        assert isinstance(_input_config.network_config, NetworkConfig)
+        assert isinstance(_input_config.analysis_config, AnalysisConfigWrapperBase)
+        assert isinstance(_input_config.network_config, NetworkConfigWrapper)
+        assert isinstance(_input_config.network_config.config_data, NetworkConfigData)
 
     def test_from_input_paths_given_only_analysis(self):
         # 1. Define test data.
@@ -37,7 +42,7 @@ class TestConfigFactory:
         # 3. Verify final expectations.
         assert _input_config
         assert isinstance(_input_config, ConfigWrapper)
-        assert isinstance(_input_config.analysis_config, AnalysisConfigBase)
+        assert isinstance(_input_config.analysis_config, AnalysisConfigWrapperBase)
         assert not _input_config.network_config
 
     def test_from_input_paths_given_only_network(self):
@@ -54,5 +59,6 @@ class TestConfigFactory:
         # 3. Verify final expectations.
         assert _input_config
         assert isinstance(_input_config, ConfigWrapper)
-        assert isinstance(_input_config.network_config, NetworkConfig)
+        assert isinstance(_input_config.network_config, NetworkConfigWrapper)
+        assert isinstance(_input_config.network_config.config_data, NetworkConfigData)
         assert not _input_config.analysis_config

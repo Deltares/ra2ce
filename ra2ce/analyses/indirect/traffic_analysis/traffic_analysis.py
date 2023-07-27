@@ -19,8 +19,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import pandas as pd
 import geopandas as gpd
+import pandas as pd
+
 from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass import (
     AccumulatedTraffic,
 )

@@ -41,8 +41,8 @@ from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDest
 from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
 )
-from ra2ce.graph.networks_utils import graph_to_gpkg, graph_to_gdf, buffer_geometry
-from ra2ce.io.readers.graph_pickle_reader import GraphPickleReader
+from ra2ce.common.io.readers.graph_pickle_reader import GraphPickleReader
+from ra2ce.graph.networks_utils import buffer_geometry, graph_to_gdf, graph_to_gpkg
 
 
 class IndirectAnalyses:
@@ -1249,25 +1249,24 @@ class IndirectAnalyses:
                 )
                 df.to_csv(df_path, index=False)
             else:
-                logging.error(
-                    f"Analysis {analysis['analysis']} does not exist in RA2CE. Please choose an existing analysis."
-                )
-                sys.exit()
+                _error = f"Analysis {analysis['analysis']} does not exist in RA2CE. Please choose an existing analysis."
+                logging.error(_error)
+                raise ValueError(_error)
 
             if not gdf.empty:
                 # Not for all analyses a gdf is created as output.
                 if analysis["save_shp"]:
-                    gpkg_path = output_path / (
+                    gpkg_path = output_path.joinpath(
                         analysis["name"].replace(" ", "_") + ".gpkg"
                     )
                     save_gdf(gdf, gpkg_path)
                     if opt_routes:
-                        gpkg_path = output_path / (
+                        gpkg_path = output_path.joinpath(
                             analysis["name"].replace(" ", "_") + "_optimal_routes.gpkg"
                         )
                         save_gdf(gdf, gpkg_path)
                 if analysis["save_csv"]:
-                    csv_path = output_path / (
+                    csv_path = output_path.joinpath(
                         analysis["name"].replace(" ", "_") + ".csv"
                     )
                     gdf.to_csv(csv_path, index=False)
