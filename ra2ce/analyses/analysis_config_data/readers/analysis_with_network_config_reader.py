@@ -44,7 +44,7 @@ class AnalysisConfigReaderWithNetwork(AnalysisConfigReaderBase):
 
     def read(self, ini_file: Path) -> AnalysisConfigDataWithNetwork:
         if not ini_file or not ini_file.exists():
-            return None
+            raise ValueError("No analysis ini file provided.")
         _root_path = AnalysisConfigWrapperBase.get_network_root_dir(ini_file)
         _config_data = self._import_configuration(_root_path, ini_file)
         _config_data = self._convert_analysis_types(_config_data)
