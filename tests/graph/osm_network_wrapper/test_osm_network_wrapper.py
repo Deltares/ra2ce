@@ -7,7 +7,7 @@ from shapely.geometry import LineString, Polygon
 from shapely.geometry.base import BaseGeometry
 from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
 
-from tests import test_data, slow_test
+from tests import test_data, slow_test, test_results
 import ra2ce.graph.networks_utils as nut
 from ra2ce.graph.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrapper
 
@@ -20,6 +20,7 @@ class TestOsmNetworkWrapper:
             graph_crs="",
             polygon_path=Path(),
             directed=False,
+            output_graph_dir=test_results.joinpath("test_osm_network_wrapper")
         )
         assert isinstance(_wrapper, OsmNetworkWrapper)
         assert isinstance(_wrapper, NetworkWrapperProtocol)
@@ -29,12 +30,16 @@ class TestOsmNetworkWrapper:
     def _network_wrapper_without_polygon(self) -> OsmNetworkWrapper:
         _network_type = "drive"
         _road_types = ["road_link"]
+        _output_dir = test_results.joinpath("test_osm_network_wrapper")
+        if not _output_dir.exists():
+            _output_dir.mkdir(parents=True)
         yield OsmNetworkWrapper(
             network_type=_network_type,
             road_types=_road_types,
             graph_crs="",
             polygon_path=None,
             directed=True,
+            output_graph_dir=_output_dir
         )
 
     def test_download_clean_graph_from_osm_with_invalid_polygon_arg(
