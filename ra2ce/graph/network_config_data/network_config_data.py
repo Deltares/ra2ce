@@ -37,8 +37,8 @@ class ProjectSection:
 class NetworkSection:
     directed: bool = False
     source: str = ""  # should be enum
-    primary_file: str = ""  # TODO. Unclear whether this is `Path` or `list[Path]`
-    diversion_file: str = ""  # TODO. Unclear whether this is `Path` or `list[Path]`
+    primary_file: list[Path] = field(default_factory=list)
+    diversion_file: list[Path] = field(default_factory=list)
     file_id: str = ""
     polygon: str = ""  # TODO. Unclear whether this is `str`` or `Path`
     network_type: str = ""  # Should be enum
@@ -105,6 +105,12 @@ class NetworkConfigData(ConfigDataProtocol):
         if not self.static_path:
             return None
         return self.static_path.joinpath("output_graph")
+
+    @property
+    def network_dir(self) -> Optional[Path]:
+        if not self.static_path:
+            return None
+        return self.static_path.joinpath("network")
 
     def to_dict(self) -> dict:
         _dict = self.__dict__

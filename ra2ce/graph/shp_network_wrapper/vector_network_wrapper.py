@@ -8,10 +8,11 @@ import momepy
 
 from shapely.geometry import Point
 from pyproj import CRS
+from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
 import ra2ce.graph.networks_utils as nut
 
 
-class VectorNetworkWrapper:
+class VectorNetworkWrapper(NetworkWrapperProtocol):
     """A class for handling and manipulating vector files.
 
     Provides methods for reading vector data, cleaning it, and setting up graph and
@@ -44,7 +45,7 @@ class VectorNetworkWrapper:
         self.region_path = region_path
         self.directed = is_directed
 
-    def get_network_from_vector(
+    def get_network(
         self,
     ) -> tuple[nx.MultiGraph, gpd.GeoDataFrame]:
         """Gets a network built from vector files.

@@ -5,6 +5,7 @@ from networkx import Graph, MultiDiGraph
 from networkx.utils import graphs_equal
 from shapely.geometry import LineString, Polygon
 from shapely.geometry.base import BaseGeometry
+from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
 
 from tests import test_data, slow_test
 import ra2ce.graph.networks_utils as nut
@@ -13,8 +14,15 @@ from ra2ce.graph.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrappe
 
 class TestOsmNetworkWrapper:
     def test_initialize_without_graph_crs(self):
-        _wrapper = OsmNetworkWrapper("a_network", ["r"], "", Path())
+        _wrapper = OsmNetworkWrapper(
+            network_type="a_network",
+            road_types=["r"],
+            graph_crs="",
+            polygon_path=Path(),
+            directed=False,
+        )
         assert isinstance(_wrapper, OsmNetworkWrapper)
+        assert isinstance(_wrapper, NetworkWrapperProtocol)
         assert _wrapper.graph_crs == "epsg:4326"
 
     @pytest.fixture
@@ -26,6 +34,7 @@ class TestOsmNetworkWrapper:
             road_types=_road_types,
             graph_crs="",
             polygon_path=None,
+            directed=True,
         )
 
     def test_download_clean_graph_from_osm_with_invalid_polygon_arg(

@@ -24,6 +24,11 @@ from pathlib import Path
 from pyproj import CRS
 import geopandas as gpd
 import pandas as pd
+from ra2ce.graph.network_config_data.network_config_data import (
+    NetworkSection,
+    CleanupSection,
+)
+from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
 import ra2ce.graph.networks_utils as nut
 from shapely.geometry import MultiLineString
 import logging
@@ -32,21 +37,13 @@ import networkx as nx
 from ra2ce.graph.segmentation import Segmentation
 
 
-class ShpNetworkWrapper:
-    primary_files: list[Path]
-    region_path: Path
-    crs: CRS
-    directed: bool
-    file_id: str
-
+class ShpNetworkWrapper(NetworkWrapperProtocol):
     def __init__(
         self,
-        primary_files: list[Path],
-        diversion_files: list[Path],
+        network_options: NetworkSection,
+        cleanup_options: CleanupSection,
         region_path: Path,
         crs_value: str,
-        is_directed: bool,
-        file_id: str,
     ) -> None:
         """Initializes the VectorNetworkWrapper object.
 
@@ -57,14 +54,23 @@ class ShpNetworkWrapper:
             ValueError: If the config is None or doesn't contain a network dictionary,
                 or if config['network'] is not a dictionary.
         """
-        self.primary_files = primary_files
-        self.diversion_files = diversion_files
+        # Network options
+        self.primary_files = network_options.primary_files
+        self.diversion_files = network_options.diversion_files
+        self.directed = network_options.directed
+        self.file_id = network_options.file_id
+
+        # Cleanup options
+        self.merge_lines = cleanup_options.merge_lines
+        self.snapping_threshold = cleanup_options.snapping_threshold
+        self.segmentation_length = cleanup_options.segmentation_length
+        self.cut_at_intersections = cleanup_options.cut_at_intersections
+
+        # Other
         self.crs = CRS.from_user_input(crs_value if crs_value else "epsg:4326")
         self.region_path = region_path
-        self.directed = is_directed
-        self.file_id = file_id
 
-    def read_merge_shp(self) -> gpd.GeoDataFrame:
+    def _read_merge_shp(self) -> gpd.GeoDataFrame:
         """Imports shapefile(s) and saves attributes in a pandas dataframe.
 
         Returns:
@@ -117,7 +123,7 @@ class ShpNetworkWrapper:
         self, edges: gpd.GeoDataFrame, id_name: str
     ) -> tuple[nx.MultiGraph, gpd.GeoDataFrame]:
         # Get the unique points at the end of lines and at intersections to create nodes
-        nodes = nut.create_nodes(edges, self.crs, self._cleanup.cut_at_intersections)
+        nodes = nut.create_nodes(edges, self.crs, self.cut_at_intersections)
         logging.info("Function [create_nodes]: executed")
 
         edges = nut.cut_lines(
@@ -147,21 +153,17 @@ class ShpNetworkWrapper:
 
     def get_network(
         self,
-        merge_lines: bool,
-        snapping_threshold: bool,
         output_graph_dir: Path,
         project_name: str,
-        segmentation_length: float,
-    ):
-        lines = self.read_merge_shp()
-
+    ) -> tuple[nx.MultiGraph, gpd.GeoDataFrame]:
+        edges = self._read_merge_shp()
+        lines_merged = gpd.GeoDataFrame()
         # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
         # The list of fid's is reduced by the fid's that are not anymore in the merged lines
-        edges, lines_merged = lines, gpd.GeoDataFrame()
-        if merge_lines:
+        if self.merge_lines:
             aadt_names = []
             edges, lines_merged = nut.merge_lines_automatic(
-                lines, self.file_id, aadt_names, self.crs
+                edges, self.file_id, aadt_names, self.crs
             )
             logging.info(
                 "Function [merge_lines_automatic]: executed with properties {}".format(
@@ -171,14 +173,14 @@ class ShpNetworkWrapper:
 
         edges, id_name = nut.gdf_check_create_unique_ids(edges, self.file_id)
 
-        if snapping_threshold:
+        if self.snapping_threshold:
             # TODO: snapping threshold it's a bool yet here we expect a float.
             edges = nut.snap_endpoints_lines(
-                edges, snapping_threshold, id_name, self.crs
+                edges, self.snapping_threshold, id_name, self.crs
             )
             logging.info(
                 "Function [snap_endpoints_lines]: executed with threshold = {}".format(
-                    snapping_threshold
+                    self.snapping_threshold
                 )
             )
 
@@ -198,8 +200,8 @@ class ShpNetworkWrapper:
 
         graph_complex, edges_complex = self._get_complex_graph_and_edges(edges, id_name)
 
-        if not math.isnan(segmentation_length):
-            edges_complex = Segmentation(edges_complex, segmentation_length)
+        if not math.isnan(self.segmentation_length):
+            edges_complex = Segmentation(edges_complex, self.segmentation_length)
             edges_complex = edges_complex.apply_segmentation()
             if edges_complex.crs is None:  # The CRS might have dissapeared.
                 edges_complex.crs = self.crs  # set the right CRS

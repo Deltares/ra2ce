@@ -1,6 +1,6 @@
 from configparser import ConfigParser
 from pathlib import Path
-from typing import Union
+from typing import Any, Union
 
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
@@ -58,6 +58,15 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
                 return _select_to_correct(path_value[0])
             return not path_value.exists()
 
+        def _correct_list(path_root: Path, path_value_list: list[Path]) -> list[Path]:
+            _corrected_list = []
+            for _path_value in path_value_list:
+                if not _path_value.exists():
+                    _corrected_list.append(path_root.joinpath(_path_value))
+                else:
+                    _corrected_list.append(_path_value)
+            return _corrected_list
+
         # Relative to network directory.
         _network_directory = config_data.static_path.joinpath("network")
         if _select_to_correct(config_data.origins_destinations.origins):
@@ -70,15 +79,23 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
                 config_data.origins_destinations.destinations
             )
 
+        if _select_to_correct(config_data.origins_destinations.region):
+            config_data.origins_destinations.region = _network_directory.joinpath(
+                config_data.origins_destinations.region
+            )
+
+        config_data.network.primary_file = _correct_list(
+            _network_directory, config_data.network.primary_file
+        )
+        config_data.network.diversion_file = _correct_list(
+            _network_directory, config_data.network.diversion_file
+        )
+
         # Relative to hazard directory.
         _hazard_directory = config_data.static_path.joinpath("hazard")
-        if _select_to_correct(config_data.hazard.hazard_map):
-            config_data.hazard.hazard_map = list(
-                map(
-                    lambda x: _hazard_directory.joinpath(x),
-                    config_data.hazard.hazard_map,
-                )
-            )
+        config_data.hazard.hazard_map = _correct_list(
+            _hazard_directory, config_data.hazard.hazard_map
+        )
 
     def _get_str_as_path(self, str_value: Union[str, Path]) -> Path:
         if str_value and not isinstance(str_value, Path):
@@ -107,9 +124,23 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
     def get_project_section(self) -> ProjectSection:
         return ProjectSection(**self._parser["project"])
 
+    def _get_path_list(
+        self, section_name: str, property: str, fallback_opt: Any
+    ) -> list[Path]:
+        _value_list = self._parser.getlist(
+            section_name, property, fallback=fallback_opt
+        )
+        return list(map(self._get_str_as_path, _value_list))
+
     def get_network_section(self) -> NetworkSection:
         _section = "network"
         _network_section = NetworkSection(**self._parser[_section])
+        _network_section.primary_file = self._get_path_list(
+            _section, "primary_file", _network_section.primary_file
+        )
+        _network_section.diversion_file = self._get_path_list(
+            _section, "diversion_file", _network_section.diversion_file
+        )
         _network_section.directed = self._parser.getboolean(
             _section, "directed", fallback=_network_section.directed
         )
