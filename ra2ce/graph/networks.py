@@ -575,7 +575,11 @@ class Network:
             elif self._network_config.source == "OSM download":
                 logging.info("Start downloading a network from OSM.")
                 base_graph, network_gdf = self.network_osm_download()
-
+                # Graph & Network from OSM download
+                # Check if all geometries between nodes are there, if not, add them as a straight line.
+                base_graph = nut.add_missing_geoms_graph(
+                    base_graph, geom_name="geometry"
+                )
             elif self._network_config.source == "pickle":
                 logging.info("Start importing a network from pickle")
                 base_graph = GraphPickleReader().read(
@@ -588,13 +592,6 @@ class Network:
                 # Assuming the same CRS for both the network and graph
                 self.base_graph_crs = pyproj.CRS.from_user_input(network_gdf.crs)
                 self.base_network_crs = pyproj.CRS.from_user_input(network_gdf.crs)
-
-            if self._network_config.source == "OSM download":
-                # Graph & Network from OSM download
-                # Check if all geometries between nodes are there, if not, add them as a straight line.
-                base_graph = nut.add_missing_geoms_graph(
-                    base_graph, geom_name="geometry"
-                )
 
             # Set the road lengths to meters for both the base_graph and network_gdf
             # TODO: rename "length" column to "length [m]" to be explicit

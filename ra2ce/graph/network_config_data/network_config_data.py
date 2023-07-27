@@ -23,6 +23,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Optional
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 
@@ -47,8 +48,8 @@ class NetworkSection:
 
 @dataclass
 class OriginsDestinationsSection:
-    origins: Path = None
-    destinations: Path = None
+    origins: Optional[Path] = None
+    destinations: Optional[Path] = None
     origins_names: str = ""
     destinations_names: str = ""
     id_name_origin_destination: str = ""
@@ -57,7 +58,7 @@ class OriginsDestinationsSection:
         1  # fraction of things/people going out of the origin to the destination
     )
     category: str = ""
-    region: Path = None
+    region: Optional[Path] = None
     region_var: str = ""
 
 
@@ -86,9 +87,9 @@ class CleanupSection:
 
 @dataclass
 class NetworkConfigData(ConfigDataProtocol):
-    input_path: Path = None
-    output_path: Path = None
-    static_path: Path = None
+    input_path: Optional[Path] = None
+    output_path: Optional[Path] = None
+    static_path: Optional[Path] = None
 
     project: ProjectSection = field(default_factory=lambda: ProjectSection())
     network: NetworkSection = field(default_factory=lambda: NetworkSection())
@@ -100,7 +101,7 @@ class NetworkConfigData(ConfigDataProtocol):
     cleanup: CleanupSection = field(default_factory=lambda: CleanupSection())
 
     @property
-    def output_graph_dir(self) -> Path:
+    def output_graph_dir(self) -> Optional[Path]:
         if not self.static_path:
             return None
         return self.static_path.joinpath("output_graph")
