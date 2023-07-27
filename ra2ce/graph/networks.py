@@ -24,7 +24,6 @@ from typing import Any
 
 import geopandas as gpd
 import networkx as nx
-import pandas as pd
 import pyproj
 
 from ra2ce.common.io.readers import GraphPickleReader
@@ -233,7 +232,7 @@ class Network:
             network_type=self._network_config.network_type,
             road_types=self._network_config.road_types,
             graph_crs="",
-            polygon_path=self._network_dir.joinpath(self._network_config.polygon),
+            polygon_path=self._network_config.polygon,
             directed=self._network_config.directed,
             output_graph_dir=self.output_graph_dir,
         )
@@ -309,37 +308,6 @@ class Network:
 
         return out_fn
 
-    def get_avg_speed(
-        self, original_graph: nx.classes.graph.Graph
-    ) -> nx.classes.graph.Graph:
-        if all(["length" in e for u, v, e in original_graph.edges.data()]) and any(
-            ["maxspeed" in e for u, v, e in original_graph.edges.data()]
-        ):
-            # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
-            path_avg_speed = self.output_graph_dir.joinpath("avg_speed.csv")
-            if path_avg_speed.is_file():
-                avg_speeds = pd.read_csv(path_avg_speed)
-            else:
-                avg_speeds = nut.calc_avg_speed(
-                    original_graph,
-                    "highway",
-                    save_csv=True,
-                    save_path=path_avg_speed,
-                )
-            original_graph = nut.assign_avg_speed(original_graph, avg_speeds, "highway")
-
-            # make a time value of seconds, length of road streches is in meters
-            for u, v, k, edata in original_graph.edges.data(keys=True):
-                hours = (edata["length"] / 1000) / edata["avgspeed"]
-                original_graph[u][v][k]["time"] = round(hours * 3600, 0)
-
-            return original_graph
-        else:
-            logging.info(
-                "No attributes found in the graph to estimate average speed per network segment."
-            )
-            return original_graph
-
     def _export_network_files(
         self, network: Any, graph_name: str, types_to_export: list[str]
     ):
@@ -392,13 +360,6 @@ class Network:
             elif self._network_config.source == "OSM download":
                 logging.info("Start downloading a network from OSM.")
                 base_graph, network_gdf = self.network_osm_download()
-                # Graph & Network from OSM download
-                # Check if all geometries between nodes are there, if not, add them as a straight line.
-                base_graph = nut.add_missing_geoms_graph(
-                    base_graph, geom_name="geometry"
-                )
-                base_graph = self.get_avg_speed(base_graph)
-
             elif self._network_config.source == "pickle":
                 logging.info("Start importing a network from pickle")
                 base_graph = GraphPickleReader().read(

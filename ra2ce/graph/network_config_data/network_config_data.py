@@ -40,7 +40,7 @@ class NetworkSection:
     primary_file: list[Path] = field(default_factory=list)
     diversion_file: list[Path] = field(default_factory=list)
     file_id: str = ""
-    polygon: str = ""  # TODO. Unclear whether this is `str`` or `Path`
+    polygon: Optional[Path] = None
     network_type: str = ""  # Should be enum
     road_types: list[str] = field(default_factory=list)
     save_shp: bool = False
