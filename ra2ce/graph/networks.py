@@ -29,7 +29,6 @@ import geopandas as gpd
 import networkx as nx
 import pandas as pd
 import pyproj
-from shapely.geometry import MultiLineString
 
 from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as nut
@@ -38,6 +37,7 @@ from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactor
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrapper
 from ra2ce.graph.segmentation import Segmentation
+from ra2ce.graph.shp_network_wrapper.shp_network_wrapper import ShpNetworkWrapper
 from ra2ce.graph.shp_network_wrapper.vector_network_wrapper import VectorNetworkWrapper
 
 
@@ -50,11 +50,6 @@ class Network:
     Attributes:
         config: A dictionary with the configuration details on how to create and adjust the network.
     """
-
-    output_graph_dir: Path
-    files: dict
-    base_graph_crs: Any
-    base_network_crs: Any
 
     def __init__(self, network_config: NetworkConfigData, files: dict):
         # General
@@ -96,6 +91,17 @@ class Network:
         # files
         self.files = files
 
+    def _get_shp_paths(self, shp_str: str) -> Path:
+        return self._network_dir.joinpath(shp_str)
+
+    def _create_network_from_shp(
+        self,
+    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+        logging.info("Start creating a network from the submitted shapefile.")
+        if self._any_cleanup_enabled():
+            return self.network_shp()
+        return self.network_cleanshp()
+
     def network_shp(
         self, crs: int = 4326
     ) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
@@ -112,102 +118,24 @@ class Network:
             edges_complex (GeoDataFrame): The resulting network.
         """
         # Make a pyproj CRS from the EPSG code
-        crs = pyproj.CRS.from_user_input(crs)
-
-        lines = self.read_merge_shp(crs)
-
-        logging.info(
-            "Function [read_merge_shp]: executed with {} {}".format(
-                self._network_config.primary_file,
-                self._network_config.diversion_file,
-            )
+        _shp_network_wrapper = ShpNetworkWrapper(
+            primary_files=list(
+                map(self._get_shp_paths, self._network_config.primary_file.split(","))
+            ),
+            diversion_files=list(
+                map(self._get_shp_paths, self._network_config.diversion_file.split(","))
+            ),
+            region_path=None,
+            crs_value=crs,
+            is_directed=self._network_config.directed,
         )
-
-        # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
-        # The list of fid's is reduced by the fid's that are not anymore in the merged lines
-        if self._cleanup.merge_lines:
-            aadt_names = []
-            edges, lines_merged = nut.merge_lines_automatic(
-                lines, self._network_config.file_id, aadt_names, crs
-            )
-            logging.info(
-                "Function [merge_lines_automatic]: executed with properties {}".format(
-                    list(edges.columns)
-                )
-            )
-        else:
-            edges, lines_merged = lines, gpd.GeoDataFrame()
-
-        edges, id_name = nut.gdf_check_create_unique_ids(
-            edges, self._network_config.file_id
+        graph_complex, edges_complex = _shp_network_wrapper.get_network(
+            self._cleanup.merge_lines,
+            self._cleanup.snapping_threshold,
+            self.output_graph_dir,
+            self.project_name,
+            self._cleanup.segmentation_length,
         )
-
-        if self._cleanup.snapping_threshold:
-            edges = nut.snap_endpoints_lines(
-                edges, self._cleanup.snapping_threshold, id_name, crs
-            )
-            logging.info(
-                "Function [snap_endpoints_lines]: executed with threshold = {}".format(
-                    self._cleanup.snapping_threshold
-                )
-            )
-
-        # merge merged lines if there are any merged lines
-        if not lines_merged.empty:
-            # save the merged lines to a shapefile - CHECK if there are lines merged that should not be merged (e.g. main + secondary road)
-            lines_merged.set_geometry(
-                col="geometry", inplace=True
-            )  # To ensure the object is a GeoDataFrame and not a Series
-            lines_merged.to_file(
-                os.path.join(
-                    self.output_graph_dir,
-                    "{}_lines_that_merged.shp".format(self.project_name),
-                )
-            )
-            logging.info(
-                "Function [edges_to_shp]: saved at {}".format(
-                    os.path.join(
-                        self.output_graph_dir,
-                        "{}_lines_that_merged".format(self.project_name),
-                    )
-                )
-            )
-
-        # Get the unique points at the end of lines and at intersections to create nodes
-        nodes = nut.create_nodes(edges, crs, self._cleanup.cut_at_intersections)
-        logging.info("Function [create_nodes]: executed")
-
-        edges = nut.cut_lines(
-            edges, nodes, id_name, tolerance=0.00001, crs_=crs
-        )  ## PAY ATTENTION TO THE TOLERANCE, THE UNIT IS DEGREES
-        logging.info("Function [cut_lines]: executed")
-
-        if not edges.crs:
-            edges.crs = crs
-
-        # create tuples from the adjecent nodes and add as column in geodataframe
-        edges_complex = nut.join_nodes_edges(nodes, edges, id_name)
-        edges_complex.crs = crs  # set the right CRS
-        edges_complex.dropna(subset=["node_A", "node_B"], inplace=True)
-
-        assert (
-            edges_complex["node_A"].isnull().sum() == 0
-        ), "Some edges cannot be assigned nodes, please check your input shapefile."
-        assert (
-            edges_complex["node_B"].isnull().sum() == 0
-        ), "Some edges cannot be assigned nodes, please check your input shapefile."
-
-        # Create networkx graph from geodataframe
-        graph_complex = nut.graph_from_gdf(edges_complex, nodes, node_id="node_fid")
-        logging.info("Function [graph_from_gdf]: executed")
-
-        if not math.isnan(self._cleanup.segmentation_length):
-            edges_complex = Segmentation(
-                edges_complex, self._cleanup.segmentation_length
-            )
-            edges_complex = edges_complex.apply_segmentation()
-            if edges_complex.crs is None:  # The CRS might have dissapeared.
-                edges_complex.crs = crs  # set the right CRS
 
         self.base_graph_crs = pyproj.CRS.from_user_input(crs)
         self.base_network_crs = pyproj.CRS.from_user_input(crs)
@@ -246,14 +174,6 @@ class Network:
         self.base_network_crs = vector_network_wrapper.crs
 
         return graph_complex, edges_complex
-
-    def _create_network_from_shp(
-        self,
-    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
-        logging.info("Start creating a network from the submitted shapefile.")
-        if self._any_cleanup_enabled():
-            return self.network_shp()
-        return self.network_cleanshp()
 
     def _export_linking_tables(self, linking_tables: List[Any]) -> None:
         _exporter = JsonExporter()
@@ -439,68 +359,6 @@ class Network:
         )
 
         return out_fn
-
-    def _get_shp_paths(self, shp_str: str) -> Path:
-        return self._network_dir.joinpath(shp_str)
-
-    def read_merge_shp(self, crs_: pyproj.CRS) -> gpd.GeoDataFrame:
-        """Imports shapefile(s) and saves attributes in a pandas dataframe.
-
-        Args:
-            crs_ (int): the EPSG number of the coordinate reference system that is used
-        Returns:
-            lines (list of shapely LineStrings): full list of linestrings
-            properties (pandas dataframe): attributes of shapefile(s), in order of the linestrings in lines
-        """
-
-        # read shapefiles and add to list with path
-
-        shapefiles_analysis = list(
-            map(self._get_shp_paths, self._network_config.primary_file.split(","))
-        )
-        shapefiles_diversion = list(
-            map(self._get_shp_paths, self._network_config.diversion_file.split(","))
-        )
-
-        # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
-        lines = [gpd.read_file(shp) for shp in shapefiles_analysis]
-
-        if self._network_config.diversion_file:
-            lines.extend(
-                [
-                    nut.check_crs_gdf(gpd.read_file(shp), crs_)
-                    for shp in shapefiles_diversion
-                ]
-            )
-        lines = pd.concat(lines)
-
-        lines.crs = crs_
-
-        # Check if there are any multilinestrings and convert them to linestrings.
-        if lines["geometry"].apply(lambda row: isinstance(row, MultiLineString)).any():
-            mls_idx = lines.loc[
-                lines["geometry"].apply(lambda row: isinstance(row, MultiLineString))
-            ].index
-            for idx in mls_idx:
-                # Multilinestrings to linestrings
-                new_rows_geoms = list(lines.iloc[idx]["geometry"].geoms)
-                for nrg in new_rows_geoms:
-                    dict_attributes = dict(lines.iloc[idx])
-                    dict_attributes["geometry"] = nrg
-                    lines.loc[max(lines.index) + 1] = dict_attributes
-
-            lines = lines.drop(labels=mls_idx, axis=0)
-
-        # append the length of the road stretches
-        lines["length"] = lines["geometry"].apply(lambda x: nut.line_length(x, crs_))
-
-        logging.info(
-            "Shapefile(s) loaded with attributes: {}.".format(
-                list(lines.columns.values)
-            )
-        )  # fill in parameter names
-
-        return lines
 
     def get_avg_speed(
         self, original_graph: nx.classes.graph.Graph

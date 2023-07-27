@@ -1,6 +1,5 @@
 import logging
 from pathlib import Path
-from typing import Union
 
 import networkx as nx
 import pandas as pd
