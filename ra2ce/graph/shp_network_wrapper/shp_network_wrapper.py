@@ -145,7 +145,14 @@ class ShpNetworkWrapper:
         logging.info("Function [graph_from_gdf]: executed")
         return graph_complex, edges_complex
 
-    def get_network(self, merge_lines: bool, snapping_threshold: bool):
+    def get_network(
+        self,
+        merge_lines: bool,
+        snapping_threshold: bool,
+        output_graph_dir: Path,
+        project_name: str,
+        segmentation_length: float,
+    ):
         lines = self.read_merge_shp()
 
         # Check which of the lines are merged, also for the fid. The fid of the first line with a traffic count is taken.
