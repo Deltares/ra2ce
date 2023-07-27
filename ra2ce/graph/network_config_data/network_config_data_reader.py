@@ -155,6 +155,7 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
         _network_section.road_types = self._parser.getlist(
             _section, "road_types", fallback=_network_section.road_types
         )
+        _network_section.polygon = self._get_str_as_path(_network_section.polygon)
         return _network_section
 
     def get_origins_destinations_section(self) -> OriginsDestinationsSection:
