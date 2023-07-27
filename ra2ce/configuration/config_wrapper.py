@@ -33,8 +33,12 @@ from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
 class ConfigWrapper:
-    network_config: Optional[NetworkConfigWrapper] = None
-    analysis_config: AnalysisConfigWrapperBase = None
+    network_config: NetworkConfigWrapper
+    analysis_config: AnalysisConfigWrapperBase
+
+    def __init__(self) -> None:
+        self.network_config = None
+        self.analysis_config = None
 
     def get_root_dir(self) -> Path:
         if self.network_config.ini_file:

@@ -29,10 +29,10 @@ from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import 
 from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
-from ra2ce.analyses.analysis_config_data.readers.analysis_with_network_config_reader import (
+from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_with_network import (
     AnalysisConfigReaderWithNetwork,
 )
-from ra2ce.analyses.analysis_config_data.readers.analysis_without_network_config_reader import (
+from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_without_network import (
     AnalysisConfigReaderWithoutNetwork,
 )
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
