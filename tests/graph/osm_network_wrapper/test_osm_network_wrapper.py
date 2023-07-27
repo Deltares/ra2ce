@@ -1,3 +1,4 @@
+from pathlib import Path
 import networkx as nx
 import pytest
 from networkx import Graph, MultiDiGraph
@@ -11,68 +12,43 @@ from ra2ce.graph.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrappe
 
 
 class TestOsmNetworkWrapper:
+    def test_initialize_without_graph_crs(self):
+        _wrapper = OsmNetworkWrapper("a_network", ["r"], "", Path())
+        assert isinstance(_wrapper, OsmNetworkWrapper)
+        assert _wrapper.graph_crs == "epsg:4326"
+
     @pytest.fixture
-    def _config_fixture(self) -> dict:
-        _test_dir = test_data / "graph" / "test_osm_network_wrapper"
-
-        yield {
-            "static": _test_dir / "static",
-            "network": {"polygon": "_test_polygon.geojson"},
-            "origins_destinations": {
-                "origins": None,
-                "destinations": None,
-                "origins_names": None,
-                "destinations_names": None,
-                "id_name_origin_destination": None,
-                "category": "dummy_category",
-                "region": "",
-            },
-            "cleanup": {"snapping_threshold": None, "segmentation_length": None},
-        }
-
-    @pytest.mark.parametrize(
-        "config",
-        [
-            pytest.param(None, id="None"),
-            pytest.param({}, id="{}"),
-            pytest.param({"network": {}}, id='"Config["network"]" = None'),
-            pytest.param({"network": "string"}, id='"invalid type(Config["network"])"'),
-        ],
-    )
-    def test_osm_network_wrapper_initialisation_with_invalid_config(self, config: dict):
-        _files = []
-        with pytest.raises(ValueError) as exc_err:
-            OsmNetworkWrapper(config=config, graph_crs="")
-        assert (
-            str(exc_err.value) == "Config cannot be None"
-            or "A network dictionary is required for creating a OsmNetworkWrapper object"
-            or 'Config["network"] should be a dictionary'
+    def _network_wrapper_without_polygon(self) -> OsmNetworkWrapper:
+        _network_type = "drive"
+        _road_types = ["road_link"]
+        yield OsmNetworkWrapper(
+            network_type=_network_type,
+            road_types=_road_types,
+            graph_crs="",
+            polygon_path=None,
         )
 
-    def test__download_clean_graph_from_osm_with_invalid_polygon_arg(
-        self, _config_fixture: dict
+    def test_download_clean_graph_from_osm_with_invalid_polygon_arg(
+        self, _network_wrapper_without_polygon: OsmNetworkWrapper
     ):
-        _osm_network = OsmNetworkWrapper(config=_config_fixture, graph_crs="")
-        _polygon = None
-        _link_type = "road_link"
-        _network_type = "drive"
         with pytest.raises(AttributeError) as exc_err:
-            _osm_network._download_clean_graph_from_osm(
-                _polygon, _link_type, _network_type
+            _network_wrapper_without_polygon._download_clean_graph_from_osm(
+                None,
+                _network_wrapper_without_polygon.road_types,
+                _network_wrapper_without_polygon.network_type,
             )
 
         assert str(exc_err.value) == "'NoneType' object has no attribute 'is_valid'"
 
-    def test__download_clean_graph_from_osm_with_invalid_polygon_arg_geometry(
-        self, _config_fixture: dict
+    def test_download_clean_graph_from_osm_with_invalid_polygon_arg_geometry(
+        self, _network_wrapper_without_polygon: OsmNetworkWrapper
     ):
-        _osm_network = OsmNetworkWrapper(config=_config_fixture, graph_crs="")
         _polygon = LineString([[0, 0], [1, 0], [1, 1]])
-        _link_type = "road_link"
-        _network_type = "drive"
         with pytest.raises(TypeError) as exc_err:
-            _osm_network._download_clean_graph_from_osm(
-                _polygon, _link_type, _network_type
+            _network_wrapper_without_polygon._download_clean_graph_from_osm(
+                _polygon,
+                _network_wrapper_without_polygon.road_types,
+                _network_wrapper_without_polygon.network_type,
             )
 
         assert (
@@ -80,16 +56,14 @@ class TestOsmNetworkWrapper:
             == "Geometry must be a shapely Polygon or MultiPolygon. If you requested graph from place name, make sure your query resolves to a Polygon or MultiPolygon, and not some other geometry, like a Point. See OSMnx documentation for details."
         )
 
-    def test__download_clean_graph_from_osm_with_invalid_network_type_arg(
-        self, _config_fixture: dict
+    def test_download_clean_graph_from_osm_with_invalid_network_type_arg(
+        self, _network_wrapper_without_polygon: OsmNetworkWrapper
     ):
-        _osm_network = OsmNetworkWrapper(config=_config_fixture, graph_crs="")
-        _polygon = Polygon([(0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)])
-        _link_type = ""
         _network_type = "drv"
+        _polygon = Polygon([(0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)])
         with pytest.raises(ValueError) as exc_err:
-            _osm_network._download_clean_graph_from_osm(
-                _polygon, _link_type, _network_type
+            _network_wrapper_without_polygon._download_clean_graph_from_osm(
+                _polygon, [""], _network_type
             )
 
             assert str(exc_err.value) == f'Unrecognized network_type "{_network_type}"'
@@ -103,16 +77,17 @@ class TestOsmNetworkWrapper:
         yield nut.geojson_to_shp(_polygon_dict)
 
     @slow_test
-    def test__download_clean_graph_from_osm_output(
-        self, _config_fixture: dict, _valid_network_polygon_fixture: BaseGeometry
+    def test_download_clean_graph_from_osm_output(
+        self,
+        _network_wrapper_without_polygon: OsmNetworkWrapper,
+        _valid_network_polygon_fixture: BaseGeometry,
     ):
         # 1. Define test data.
-        _osm_network = OsmNetworkWrapper(config=_config_fixture, graph_crs="")
         _link_type = ""
         _network_type = "drive"
 
         # 2. Run test.
-        graph_complex = _osm_network._download_clean_graph_from_osm(
+        graph_complex = _network_wrapper_without_polygon._download_clean_graph_from_osm(
             polygon=_valid_network_polygon_fixture,
             network_type=_network_type,
             road_types=_link_type,
@@ -130,43 +105,24 @@ class TestOsmNetworkWrapper:
             map(lambda x: x["osmid"], graph_complex.edges.values())
         )
 
-    @pytest.mark.parametrize(
-        "polygon_values",
-        [
-            pytest.param([""], id="Empty polygon file value"),
-            pytest.param(["Not a valid name"], id="Invalid polygon file name"),
-        ],
-    )
-    def test_get_clean_graph_from_osm_with_invalid_polygon_parameter_filename(
-        self, polygon_values
+    def test_get_clean_graph_from_osm_with_invalid_polygon_path_filename(
+        self, _network_wrapper_without_polygon: OsmNetworkWrapper
     ):
-        _config_dict = {
-            "static": test_data.joinpath("graph", "test_osm_network_wrapper", "static"),
-            "network": {"polygon": polygon_values},
-        }
-        _osm_network = OsmNetworkWrapper(config=_config_dict, graph_crs="")
+        _polygon_path = Path("Not_a_valid_path")
+        _network_wrapper_without_polygon.polygon_path = _polygon_path
         with pytest.raises(FileNotFoundError) as exc_err:
-            _osm_network.get_clean_graph_from_osm()
+            _network_wrapper_without_polygon.get_clean_graph_from_osm()
 
-        assert str(exc_err.value) == "No polygon_file file found."
+        assert str(exc_err.value) == "No polygon_file file found at {}.".format(
+            _polygon_path
+        )
 
-    @pytest.mark.parametrize(
-        "polygon_value",
-        [
-            pytest.param(None, id="None polygon file"),
-            pytest.param([], id="Invalid polygon file name"),
-        ],
-    )
-    def test_get_clean_graph_from_osm_with_invalid_polygon_parameter(
-        self, polygon_value
+    def test_get_clean_graph_from_osm_with_no_polygon_path(
+        self, _network_wrapper_without_polygon: OsmNetworkWrapper
     ):
-        _config_dict = {
-            "static": test_data.joinpath("graph", "test_osm_network_wrapper", "static"),
-            "network": {"polygon": polygon_value},
-        }
-        _osm_network = OsmNetworkWrapper(config=_config_dict, graph_crs="")
+        _network_wrapper_without_polygon.polygon_path = None
         with pytest.raises(ValueError) as exc_err:
-            _osm_network.get_clean_graph_from_osm()
+            _network_wrapper_without_polygon.get_clean_graph_from_osm()
 
         assert str(exc_err.value) == "No valid value provided for polygon file."
 

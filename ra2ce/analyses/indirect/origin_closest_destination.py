@@ -31,7 +31,7 @@ import pandas as pd
 from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
 
-from ra2ce.io.readers.graph_pickle_reader import GraphPickleReader
+from ra2ce.common.io.readers.graph_pickle_reader import GraphPickleReader
 
 
 class OriginClosestDestination:
@@ -62,11 +62,12 @@ class OriginClosestDestination:
         )
         self.analysis = analysis
         self.config = config
+
         self.hazard_names = hazard_names
 
         self.destination_names = None
         self.destination_key = None
-        if "category" in config["origins_destinations"]:
+        if config["origins_destinations"].get("category", None):
             self.destination_key = "category"
             self.destination_key_value = config["origins_destinations"]["category"]
 

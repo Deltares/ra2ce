@@ -22,30 +22,31 @@ import osmnx
 from networkx import MultiDiGraph
 from osmnx import consolidate_intersections
 from shapely.geometry.base import BaseGeometry
+from ra2ce.graph.network_config_data.network_config_data import NetworkSection
 
 import ra2ce.graph.networks_utils as nut
 from ra2ce.graph.osm_network_wrapper.extremities_data import ExtremitiesData
 
 
 class OsmNetworkWrapper:
-    network_dict: dict
-    output_path: Path
+    network_type: str
+    road_types: list[str]
     graph_crs: str
+    polygon_path: Path
 
-    def __init__(self, config: dict, graph_crs: str) -> None:
-        if not config:
-            raise ValueError("Config cannot be None")
-        if not config.get("network", {}):
-            raise ValueError(
-                "A network dictionary is required for creating a OsmNetworkWrapper object."
-            )
-        if not isinstance(config.get("network"), dict):
-            raise ValueError('Config["network"] should be a dictionary')
-
-        self.network_dict = config["network"]
-        self.output_path = config["static"] / "output_graph"
+    def __init__(
+        self,
+        network_type: str,
+        road_types: list[str],
+        graph_crs: str,
+        polygon_path: Path,
+    ) -> None:
+        self.network_type = network_type
+        self.road_types = road_types
+        self.polygon_path = polygon_path
         self.graph_crs = graph_crs
-        if not self.graph_crs:
+        if not graph_crs:
+            # Set default value
             self.graph_crs = "epsg:4326"
 
     def get_clean_graph_from_osm(self) -> MultiDiGraph:
@@ -59,29 +60,28 @@ class OsmNetworkWrapper:
             MultiDiGraph: Complex (clean) graph after download from OSM, for use in the direct analyses and input to derive simplified network.
         """
         # It can only read in one geojson
-        if not self.network_dict.get("polygon", []):
+        if not isinstance(self.polygon_path, Path):
             raise ValueError("No valid value provided for polygon file.")
+        if not self.polygon_path.is_file():
+            raise FileNotFoundError(
+                "No polygon_file file found at {}.".format(self.polygon_path)
+            )
 
-        polygon_file = self.output_path.parent.joinpath(
-            "network", self.network_dict.get("polygon", [])[0]
-        )
-        if not polygon_file.is_file():
-            raise FileNotFoundError("No polygon_file file found.")
-
-        poly_dict = nut.read_geojson(geojson_file=polygon_file)
+        poly_dict = nut.read_geojson(geojson_file=self.polygon_path)
         _complex_graph = self._download_clean_graph_from_osm(
             polygon=nut.geojson_to_shp(poly_dict),
-            network_type=self.network_dict.get("network_type", ""),
-            road_types=self.network_dict.get("road_types", ""),
+            network_type=self.network_type,
+            road_types=self.road_types,
         )
         return _complex_graph
 
     def _download_clean_graph_from_osm(
-        self, polygon: BaseGeometry, road_types: str, network_type: str
+        self, polygon: BaseGeometry, road_types: list[str], network_type: str
     ) -> MultiDiGraph:
-        if not road_types and not network_type:
+        _available_road_types = road_types and any(road_types)
+        if not _available_road_types and not network_type:
             raise ValueError("Either of the link_type or network_type should be known")
-        elif not road_types:
+        elif not _available_road_types:
             # The user specified only the network type.
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon,
@@ -91,12 +91,13 @@ class OsmNetworkWrapper:
             )
         elif not network_type:
             # The user specified only the road types.
-            cf = f'["highway"~"{road_types.replace(",", "|")}"]'
+            cf = f'["highway"~"{"|".join(road_types)}"]'
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon, custom_filter=cf, simplify=False, retain_all=True
             )
         else:
-            cf = f'["highway"~"{road_types.replace(",", "|")}"]'
+            # _available_road_types and network_type
+            cf = f'["highway"~"{"|".join(road_types)}"]'
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon,
                 network_type=network_type,

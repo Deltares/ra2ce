@@ -22,18 +22,20 @@
 
 # -*- coding: utf-8 -*-
 import logging
-import sys
 import warnings
 from pathlib import Path
 from typing import Optional
 
 from shapely.errors import ShapelyDeprecationWarning
 
-from ra2ce.configuration import AnalysisConfigBase, NetworkConfig
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
+    AnalysisConfigWrapperBase,
+)
 from ra2ce.configuration.config_factory import ConfigFactory
 from ra2ce.configuration.config_wrapper import ConfigWrapper
+from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 from ra2ce.ra2ce_logging import Ra2ceLogger
-from ra2ce.runners import AnalysisRunner, AnalysisRunnerFactory
+from ra2ce.runners import AnalysisRunnerFactory
 
 warnings.filterwarnings(
     action="ignore", message=".*initial implementation of Parquet.*"
@@ -56,9 +58,9 @@ class Ra2ceHandler:
     ) -> None:
         _output_config = None
         if network:
-            _output_config = NetworkConfig.get_data_output(network)
+            _output_config = NetworkConfigWrapper.get_data_output(network)
         elif analysis:
-            _output_config = AnalysisConfigBase.get_data_output(analysis)
+            _output_config = AnalysisConfigWrapperBase.get_data_output(analysis)
         else:
             raise ValueError(
                 "No valid location provided to start logging. Either network or analysis are required."
@@ -73,13 +75,9 @@ class Ra2ceHandler:
         Runs a Ra2ce analysis based on the provided network and analysis files.
         """
         if not self.input_config.is_valid_input():
-            logging.error("Error validating input files. Ra2ce will close now.")
-            sys.exit(1)
-        try:
-            _runner = AnalysisRunnerFactory.get_runner(self.input_config)
-            _runner.run(self.input_config.analysis_config)
-        except BaseException as e:
-            logging.exception(
-                f"RA2CE crashed. Check the logfile for the Traceback message: {e}"
-            )
-            sys.exit(1)
+            _error = "Error validating input files. Ra2ce will close now."
+            logging.error(_error)
+            raise ValueError(_error)
+
+        _runner = AnalysisRunnerFactory.get_runner(self.input_config)
+        _runner.run(self.input_config.analysis_config)
