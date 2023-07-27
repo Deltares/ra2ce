@@ -4,6 +4,7 @@ import pytest
 import geopandas as gpd
 import networkx as nx
 from shapely.geometry import LineString, Point, MultiLineString
+from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
 
 from tests import test_data
 from ra2ce.graph.shp_network_wrapper.vector_network_wrapper import VectorNetworkWrapper
@@ -49,6 +50,7 @@ class TestVectorNetworkWrapper:
 
         # 3. Verify expectations.
         assert isinstance(_wrapper, VectorNetworkWrapper)
+        assert isinstance(_wrapper, NetworkWrapperProtocol)
         assert _wrapper.primary_files == _primary_files
         assert _wrapper.region_path == _region
         assert str(_wrapper.crs) == "epsg:4326"
@@ -104,7 +106,7 @@ class TestVectorNetworkWrapper:
         _valid_wrapper.region_path = region_path
 
         # When
-        graph, edges = _valid_wrapper.get_network_from_vector()
+        graph, edges = _valid_wrapper.get_network()
 
         # Then
         assert isinstance(graph, nx.MultiGraph)

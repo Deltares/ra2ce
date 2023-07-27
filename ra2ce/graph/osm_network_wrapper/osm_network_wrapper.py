@@ -16,19 +16,22 @@
 """
 import logging
 from pathlib import Path
+from typing import Any
 
 import networkx as nx
 import osmnx
-from networkx import MultiDiGraph
+from geopandas import GeoDataFrame
+from networkx import MultiDiGraph, MultiGraph
 from osmnx import consolidate_intersections
 from shapely.geometry.base import BaseGeometry
-from ra2ce.graph.network_config_data.network_config_data import NetworkSection
+from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
+from ra2ce.graph.exporters.json_exporter import JsonExporter
 
 import ra2ce.graph.networks_utils as nut
 from ra2ce.graph.osm_network_wrapper.extremities_data import ExtremitiesData
 
 
-class OsmNetworkWrapper:
+class OsmNetworkWrapper(NetworkWrapperProtocol):
     network_type: str
     road_types: list[str]
     graph_crs: str
@@ -40,14 +43,52 @@ class OsmNetworkWrapper:
         road_types: list[str],
         graph_crs: str,
         polygon_path: Path,
+        directed: bool,
     ) -> None:
         self.network_type = network_type
         self.road_types = road_types
         self.polygon_path = polygon_path
+        self.is_directed = directed
         self.graph_crs = graph_crs
         if not graph_crs:
             # Set default value
             self.graph_crs = "epsg:4326"
+
+    def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
+        """
+        Gets an indirected graph
+
+        Returns:
+            tuple[MultiGraph, GeoDataFrame]: _description_
+        """
+        graph_complex = self.get_clean_graph_from_osm()
+
+        # Create 'graph_simple'
+        graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
+            graph_complex
+        )
+
+        # Create 'edges_complex', convert complex graph to geodataframe
+        logging.info("Start converting the graph to a geodataframe")
+        edges_complex, node_complex = nut.graph_to_gdf(graph_complex)
+        logging.info("Finished converting the graph to a geodataframe")
+
+        # Save the link tables linking complex and simple IDs
+        self._export_linking_tables(link_tables)
+
+        if not self.is_directed and isinstance(graph_simple, MultiDiGraph):
+            graph_simple = graph_simple.to_undirected()
+
+        return graph_simple, edges_complex
+
+    def _export_linking_tables(self, linking_tables: tuple[Any]) -> None:
+        _exporter = JsonExporter()
+        _exporter.export(
+            self.output_graph_dir.joinpath("simple_to_complex.json"), linking_tables[0]
+        )
+        _exporter.export(
+            self.output_graph_dir.joinpath("complex_to_simple.json"), linking_tables[1]
+        )
 
     def get_clean_graph_from_osm(self) -> MultiDiGraph:
         """

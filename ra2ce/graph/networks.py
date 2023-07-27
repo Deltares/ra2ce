@@ -20,10 +20,7 @@
 """
 
 import logging
-import math
-import os
-from pathlib import Path
-from typing import Any, List, Tuple
+from typing import Any
 
 import geopandas as gpd
 import networkx as nx
@@ -32,7 +29,6 @@ import pyproj
 
 from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as nut
-from ra2ce.graph.exporters.json_exporter import JsonExporter
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrapper
@@ -54,12 +50,12 @@ class Network:
     def __init__(self, network_config: NetworkConfigData, files: dict):
         # General
         self.project_name = network_config.project.name
-        self.output_graph_dir = network_config.static_path.joinpath("output_graph")
+        self.output_graph_dir = network_config.output_graph_dir
         if not self.output_graph_dir.is_dir():
             self.output_graph_dir.mkdir(parents=True)
 
         # Network
-        self._network_dir = network_config.static_path.joinpath("network")
+        self._network_dir = network_config.network_dir
         self.base_graph_crs = None  # Initiate variable
         self.base_network_crs = None  # Initiate variable
 
@@ -76,13 +72,7 @@ class Network:
         )
         self.origin_count = _origins_destinations.origin_count
         self.od_category = _origins_destinations.category
-        self.region = (
-            None
-            if not _origins_destinations.region
-            else network_config.static_path.joinpath(
-                "network", _origins_destinations.region
-            )
-        )
+        self.region = _origins_destinations.region
         self.region_var = _origins_destinations.region_var
 
         # Cleanup
@@ -90,9 +80,6 @@ class Network:
 
         # files
         self.files = files
-
-    def _get_shp_paths(self, shp_str: str) -> Path:
-        return self._network_dir.joinpath(shp_str)
 
     def _create_network_from_shp(
         self,
@@ -104,7 +91,7 @@ class Network:
 
     def network_shp(
         self, crs: int = 4326
-    ) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """Creates a (graph) network from a shapefile.
 
         Returns the same geometries for the network (GeoDataFrame) as for the graph (NetworkX graph), because
@@ -119,22 +106,14 @@ class Network:
         """
         # Make a pyproj CRS from the EPSG code
         _shp_network_wrapper = ShpNetworkWrapper(
-            primary_files=list(
-                map(self._get_shp_paths, self._network_config.primary_file.split(","))
-            ),
-            diversion_files=list(
-                map(self._get_shp_paths, self._network_config.diversion_file.split(","))
-            ),
-            region_path=None,
+            network_options=self._network_config,
+            cleanup_options=self._cleanup,
+            region_path=self.region,
             crs_value=crs,
-            is_directed=self._network_config.directed,
         )
         graph_complex, edges_complex = _shp_network_wrapper.get_network(
-            self._cleanup.merge_lines,
-            self._cleanup.snapping_threshold,
             self.output_graph_dir,
             self.project_name,
-            self._cleanup.segmentation_length,
         )
 
         self.base_graph_crs = pyproj.CRS.from_user_input(crs)
@@ -143,7 +122,7 @@ class Network:
         # Exporting complex graph because the shapefile should be kept the same as much as possible.
         return graph_complex, edges_complex
 
-    def network_cleanshp(self) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+    def network_cleanshp(self) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """Creates a (graph) network from a clean shapefile (primary_file - no further advance cleanup is needed)
 
         Returns the same geometries for the network (GeoDataFrame) as for the graph (NetworkX graph), because
@@ -155,9 +134,7 @@ class Network:
         """
         # initialise vector network wrapper
         vector_network_wrapper = VectorNetworkWrapper(
-            list(
-                map(self._get_shp_paths, self._network_config.primary_file.split(","))
-            ),
+            self._network_config.primary_file,
             self.region,
             "",
             self._network_config.directed,
@@ -167,7 +144,7 @@ class Network:
         (
             graph_complex,
             edges_complex,
-        ) = vector_network_wrapper.get_network_from_vector()
+        ) = vector_network_wrapper.get_network()
 
         # Set the CRS of the graph and network to wrapper crs
         self.base_graph_crs = vector_network_wrapper.crs
@@ -175,18 +152,9 @@ class Network:
 
         return graph_complex, edges_complex
 
-    def _export_linking_tables(self, linking_tables: List[Any]) -> None:
-        _exporter = JsonExporter()
-        _exporter.export(
-            self.output_graph_dir.joinpath("simple_to_complex.json"), linking_tables[0]
-        )
-        _exporter.export(
-            self.output_graph_dir.joinpath("complex_to_simple.json"), linking_tables[1]
-        )
-
     def network_trails_import(
         self, crs: int = 4326
-    ) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """Creates a network which has been prepared in the TRAILS package
 
         #Todo: we might later simply import the whole trails code as a package, and directly use these functions
@@ -210,13 +178,11 @@ class Network:
         # Make a pyproj CRS from the EPSG code
         crs = pyproj.CRS.from_user_input(crs)
 
-        edge_file = self._network_dir.joinpath(self._network_config.primary_file)
+        edge_file = self._network_config.primary_file[0]
         edges = gpd.read_feather(edge_file)
         edges = edges.set_crs(crs)
 
-        corresponding_node_file = self._network_dir.joinpath(
-            self._network_config.primary_file.replace("edges", "nodes")
-        )
+        corresponding_node_file = edge_file.replace("edges", "nodes")
         assert (
             corresponding_node_file.exists()
         ), "The node file could not be found while importing from TRAILS"
@@ -268,29 +234,11 @@ class Network:
             road_types=self._network_config.road_types,
             graph_crs="",
             polygon_path=self._network_dir.joinpath(self._network_config.polygon),
+            directed=self._network_config.directed,
         )
-        graph_complex = osm_network.get_clean_graph_from_osm()
-
-        # Create 'graph_simple'
-        graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
-            graph_complex
-        )
-
-        # Create 'edges_complex', convert complex graph to geodataframe
-        logging.info("Start converting the graph to a geodataframe")
-        edges_complex, node_complex = nut.graph_to_gdf(graph_complex)
-        logging.info("Finished converting the graph to a geodataframe")
-
-        # Save the link tables linking complex and simple IDs
-        self._export_linking_tables(link_tables)
-
-        # If the user wants to use undirected graphs, turn into an undirected graph (default).
-        if not self._network_config.directed:
-            if type(graph_simple) == nx.classes.multidigraph.MultiDiGraph:
-                graph_simple = graph_simple.to_undirected()
+        graph_simple, edges_complex = osm_network.get_network()
 
         # No segmentation required, the non-simplified road segments from OSM are already small enough
-
         self.base_graph_crs = pyproj.CRS.from_user_input(
             "EPSG:4326"
         )  # Graphs from OSM download are always in this CRS.
@@ -392,7 +340,7 @@ class Network:
             return original_graph
 
     def _export_network_files(
-        self, network: Any, graph_name: str, types_to_export: List[str]
+        self, network: Any, graph_name: str, types_to_export: list[str]
     ):
         _exporter = NetworkExporterFactory()
         _exporter.export(
@@ -448,6 +396,8 @@ class Network:
                 base_graph = nut.add_missing_geoms_graph(
                     base_graph, geom_name="geometry"
                 )
+                base_graph = self.get_avg_speed(base_graph)
+
             elif self._network_config.source == "pickle":
                 logging.info("Start importing a network from pickle")
                 base_graph = GraphPickleReader().read(
@@ -474,9 +424,6 @@ class Network:
             network_gdf["length"] = network_gdf["geometry"].apply(
                 lambda x: nut.line_length(x, self.base_network_crs)
             )
-
-            if self._network_config.source == "OSM download":
-                base_graph = self.get_avg_speed(base_graph)
 
             # Save the graph and geodataframe
             self._export_network_files(base_graph, "base_graph", to_save)
