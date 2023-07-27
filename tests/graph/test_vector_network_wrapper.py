@@ -1,13 +1,11 @@
 import pytest
 
-from pathlib import Path
-
 import geopandas as gpd
 import networkx as nx
 from shapely.geometry import LineString, Point, MultiLineString
 
 from tests import test_data
-from ra2ce.graph.vector_network_wrapper import VectorNetworkWrapper
+from ra2ce.graph.shp_network_wrapper.vector_network_wrapper import VectorNetworkWrapper
 
 _test_dir = test_data / "vector_network_wrapper"
 

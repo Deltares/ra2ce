@@ -14,13 +14,12 @@ _network_ini_name = "network.ini"
 _analysis_ini_name = "analyses.ini"
 _base_graph_p_filename = "base_graph.p"
 _base_network_feather_filename = "base_network.feather"
+_skip_cases = []
 
 
 def get_external_test_cases() -> list[pytest.param]:
     if not test_external_data.exists():
         return []
-
-    _skip_cases = ["bolivia"]
 
     def get_pytest_param(test_dir: Path) -> pytest.param:
         _marks = [external_test]

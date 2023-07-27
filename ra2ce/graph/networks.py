@@ -39,7 +39,7 @@ from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactor
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrapper
 from ra2ce.graph.segmentation import Segmentation
-from ra2ce.graph.vector_network_wrapper import VectorNetworkWrapper
+from ra2ce.graph.shp_network_wrapper.vector_network_wrapper import VectorNetworkWrapper
 
 
 class Network:
@@ -240,6 +240,14 @@ class Network:
         self.base_network_crs = vector_network_wrapper.crs
 
         return graph_complex, edges_complex
+
+    def _create_network_from_shp(
+        self,
+    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+        logging.info("Start creating a network from the submitted shapefile.")
+        if self._any_cleanup_enabled():
+            return self.network_shp()
+        return self.network_cleanshp()
 
     def _export_linking_tables(self, linking_tables: List[Any]) -> None:
         _exporter = JsonExporter()
@@ -554,12 +562,7 @@ class Network:
         if not (self.files["base_graph"] or self.files["base_network"]):
             # Create the network from the network source
             if self._network_config.source == "shapefile":
-                logging.info("Start creating a network from the submitted shapefile.")
-                if self._any_cleanup_enabled():
-                    base_graph, network_gdf = self.network_shp()
-                else:
-                    base_graph, network_gdf = self.network_cleanshp()
-
+                base_graph, network_gdf = self._create_network_from_shp()
             elif self._network_config.source == "OSM PBF":
                 logging.info(
                     """The original OSM PBF import is no longer supported. 
