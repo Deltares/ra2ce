@@ -29,7 +29,6 @@ import geopandas as gpd
 import networkx as nx
 import pandas as pd
 import pyproj
-import momepy
 from shapely.geometry import MultiLineString
 
 from ra2ce.common.io.readers import GraphPickleReader
@@ -227,13 +226,20 @@ class Network:
             edges_complex (GeoDataFrame): The resulting network.
         """
         # initialise vector network wrapper
-        vector_network_wrapper = VectorNetworkWrapper(config=self.config)
+        vector_network_wrapper = VectorNetworkWrapper(
+            list(
+                map(self._get_shp_paths, self._network_config.primary_file.split(","))
+            ),
+            self.region,
+            "",
+            self._network_config.directed,
+        )
 
         # setup network using the wrapper
         (
             graph_complex,
             edges_complex,
-        ) = vector_network_wrapper.setup_network_from_vector()
+        ) = vector_network_wrapper.get_network_from_vector()
 
         # Set the CRS of the graph and network to wrapper crs
         self.base_graph_crs = vector_network_wrapper.crs
@@ -434,6 +440,9 @@ class Network:
 
         return out_fn
 
+    def _get_shp_paths(self, shp_str: str) -> Path:
+        return self._network_dir.joinpath(shp_str)
+
     def read_merge_shp(self, crs_: pyproj.CRS) -> gpd.GeoDataFrame:
         """Imports shapefile(s) and saves attributes in a pandas dataframe.
 
@@ -445,14 +454,12 @@ class Network:
         """
 
         # read shapefiles and add to list with path
-        def get_shp_paths(shp_str: str) -> Path:
-            return self._network_dir.joinpath(shp_str)
 
         shapefiles_analysis = list(
-            map(get_shp_paths, self._network_config.primary_file.split(","))
+            map(self._get_shp_paths, self._network_config.primary_file.split(","))
         )
         shapefiles_diversion = list(
-            map(get_shp_paths, self._network_config.diversion_file.split(","))
+            map(self._get_shp_paths, self._network_config.diversion_file.split(","))
         )
 
         # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions

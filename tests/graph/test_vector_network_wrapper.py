@@ -169,7 +169,7 @@ class TestVectorNetworkWrapper:
         test_wrapper = VectorNetworkWrapper(_config_fixture)
 
         # When
-        graph, edges = test_wrapper.setup_network_from_vector()
+        graph, edges = test_wrapper.get_network_from_vector()
 
         # Then
         assert isinstance(graph, nx.MultiGraph)
@@ -181,7 +181,7 @@ class TestVectorNetworkWrapper:
         test_wrapper = VectorNetworkWrapper(_config_fixture)
 
         # When
-        graph, edges = test_wrapper.setup_network_from_vector()
+        graph, edges = test_wrapper.get_network_from_vector()
 
         # Then
         assert isinstance(graph, nx.MultiGraph)

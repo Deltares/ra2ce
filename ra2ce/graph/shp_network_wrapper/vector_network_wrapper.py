@@ -9,9 +9,11 @@ import momepy
 
 from shapely.geometry import Point
 from pyproj import CRS
+from ra2ce.graph.network_config_data.network_config_data import (
+    NetworkConfigData,
+    NetworkSection,
+)
 import ra2ce.graph.networks_utils as nut
-
-logger = logging.getLogger()
 
 
 class VectorNetworkWrapper:
@@ -21,14 +23,18 @@ class VectorNetworkWrapper:
     network.
     """
 
-    name: str
-    region: gpd.GeoDataFrame
+    primary_files: list[Path]
+    region_path: Path
     crs: CRS
-    input_path: Path
-    output_path: Path
-    network_dict: dict
+    directed: bool
 
-    def __init__(self, config: dict) -> None:
+    def __init__(
+        self,
+        primary_files: list[Path],
+        region_path: Path,
+        crs_value: str,
+        is_directed: bool,
+    ) -> None:
         """Initializes the VectorNetworkWrapper object.
 
         Args:
@@ -38,99 +44,93 @@ class VectorNetworkWrapper:
             ValueError: If the config is None or doesn't contain a network dictionary,
                 or if config['network'] is not a dictionary.
         """
+        self.primary_files = primary_files
+        self.crs = CRS.from_user_input(crs_value if crs_value else "epsg:4326")
+        self.region_path = region_path
+        self.directed = is_directed
 
-        if not config:
-            raise ValueError("Config cannot be None")
-        if not config.get("network", {}):
-            raise ValueError(
-                "A network dictionary is required for creating a "
-                + f"{self.__class__.__name__} object."
-            )
-        if not isinstance(config.get("network"), dict):
-            raise ValueError('Config["network"] should be a dictionary')
-
-        self._setup_global(config)
-        self.network_dict = self._get_network_opt(config["network"])
-
-    def _parse_ini_stringlist(self, value: str) -> Union[str, list, None]:
-        """Parses a string with "," into a list from an ini file.
-
-        Args:
-            value (str): Value to parse.
+    def get_network_from_vector(
+        self,
+    ) -> tuple[nx.MultiGraph, gpd.GeoDataFrame]:
+        """Gets a network built from vector files.
 
         Returns:
-            list of str If the value contains a comma, it is split and returned
-                as a list, otherwise the original value is returned.
-                None if the value is an empty string.
+            nx.MultiGraph: MultiGraph representing the graph.
+            gpd.GeoDataFrame: GeoDataFrame representing the network.
         """
-        if not value:
-            return None
-        elif isinstance(value, str) and "," in value:
-            return value.split(",")
-        else:
-            return value
-
-    def _setup_global(self, config: dict) -> None:
-        """Sets up project properties based on provided configuration.
-
-        Args:
-            config (dict): Project configuration dictionary.
-        """
-        self.input_path = config.get("static").joinpath("network")
-        self.output_path = config.get("output")
-
-        project_config = config.get("project")
-        name = project_config.get("name", "project_name")
-        region = project_config.get("region", None)
-        crs = project_config.get("crs", 4326)
-        self.name = name
-        self.crs = CRS.from_user_input(crs)
-        self.region = self._read_files([Path(region)]) if region else region
-
-    def _parse_ini_filenamelist(self, filename: str) -> list[Path]:
-        """Makes a list of file paths by joining with input path and checks validity of files.
-
-        Args:
-            filename (str): String of file names separated by comma (",").
-
-        Returns:
-            List[Path]: List of file paths.
-        """
-        if not isinstance(filename, str):
-            logger.error("file names are not valid.")
-
-        file_paths = [self.input_path.joinpath(f.strip()) for f in filename.split(",")]
-
-        for f in file_paths:
-            if not f.resolve().is_file():
-                logger.error(f"vector file {f} is not found.")
-
-        return file_paths
-
-    def _get_network_opt(self, network_config: dict) -> dict:
-        """Retrieves network options used in this wrapper from provided configuration.
-
-        Args:
-            network_config (dict): Network configuration dictionary.
-
-        Returns:
-            dict: Dictionary of network options.
-        """
-
-        files = self._parse_ini_filenamelist(network_config.get("primary_file", ""))
-        file_id = self._parse_ini_stringlist(
-            network_config.get("file_id", "")
-        )  # only needed when cleanup based on fid
-        file_filter = self._parse_ini_stringlist(network_config.get("filter", ""))
-        file_crs = CRS.from_user_input(network_config.get("crs", self.crs))
-        is_directed = network_config.get("directed", False)
-        return dict(
-            files=files,
-            file_id=file_id,
-            file_filter=file_filter,
-            file_crs=file_crs,
-            is_directed=is_directed,
+        gdf = self._read_vector_to_project_region_and_crs(
+            vector_filenames=self.primary_files, crs=self.crs
         )
+        gdf = self.clean_vector(gdf)
+        if self.directed:
+            graph = self.setup_digraph_from_vector(gdf)
+        else:
+            graph = self.setup_graph_from_vector(gdf)
+        edges, nodes = self.setup_network_edges_and_nodes_from_graph(graph)
+        graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
+        return graph_complex, edges
+
+    def _read_vector_to_project_region_and_crs(
+        self, vector_filenames: list[Path], crs: CRS
+    ) -> gpd.GeoDataFrame:
+        """Reads a vector file or a list of vector files.
+
+        Clips for project region and reproject to project crs if available.
+        Explodes multi geometry into single geometry.
+
+        Args:
+            vector_filenames (list[Path]): List of Path to the vector files.
+            crs (CRS): Coordinate reference system for the files. Allow only one crs for all  `vector_filenames`.
+
+        Returns:
+            gpd.GeoDataFrame: GeoDataFrame representing the vector data.
+        """
+        gdf = self._read_files(vector_filenames)
+        if gdf is None:
+            logging.info("no file is read.")
+            return None
+
+        # set crs and reproject if needed
+        if not gdf.crs and crs:
+            gdf = gdf.set_crs(crs)
+            logging.info("setting crs as default EPSG:4326. specify crs if incorrect")
+
+        if self.crs:
+            gdf = gdf.to_crs(self.crs)
+            logging.info("reproject vector file to project crs")
+
+        # clip for region
+        if self.region_path:
+            _region_path = self._read_files([self.region_path])
+            gdf = gpd.overlay(
+                gdf, _region_path, how="intersection", keep_geom_type=True
+            )
+            logging.info("clip vector file to project region")
+
+        # validate
+        if not any(gdf):
+            logging.warning("No vector features found within project region")
+            return None
+
+        return gdf
+
+    def _read_files(self, file_list: list[Path]) -> gpd.GeoDataFrame:
+        """Reads a list of files into a GeoDataFrame.
+
+        Args:
+            file_list (list[Path]): List of file paths.
+
+        Returns:
+            gpd.GeoDataFrame: GeoDataFrame representing the data.
+        """
+        # read file
+        gdf = gpd.GeoDataFrame(pd.concat(list(map(gpd.read_file, file_list))))
+        logging.info(
+            "Read files {} into a 'GeoDataFrame'.".format(
+                ", ".join(map(str, file_list))
+            )
+        )
+        return gdf
 
     @staticmethod
     def setup_digraph_from_vector(gdf: gpd.GeoDataFrame) -> nx.DiGraph:
@@ -149,7 +149,7 @@ class VectorNetworkWrapper:
 
         # to graph
         digraph = nx.DiGraph(crs=gdf.crs, approach="primal")
-        for index, row in gdf.iterrows():
+        for _, row in gdf.iterrows():
             from_node = row.geometry.coords[0]
             to_node = row.geometry.coords[-1]
             digraph.add_node(from_node, geometry=Point(from_node))
@@ -206,92 +206,6 @@ class VectorNetworkWrapper:
         if not edges.crs:
             edges.crs = graph.graph["crs"]
         return edges, nodes
-
-    def setup_network_from_vector(
-        self,
-    ) -> tuple[nx.MultiGraph, gpd.GeoDataFrame]:
-        """Sets up a network from vector files.
-
-        Returns:
-            nx.MultiGraph: MultiGraph representing the graph.
-            gpd.GeoDataFrame: GeoDataFrame representing the network.
-        """
-        files = self.network_dict["files"]
-        file_crs = self.network_dict["file_crs"]
-        is_directed = self.network_dict["is_directed"]
-
-        gdf = self._read_vector_to_project_region_and_crs(
-            vector_filenames=files, crs=file_crs
-        )
-        gdf = VectorNetworkWrapper.clean_vector(gdf)
-        if is_directed:
-            graph = VectorNetworkWrapper.setup_digraph_from_vector(gdf)
-        else:
-            graph = VectorNetworkWrapper.setup_graph_from_vector(gdf)
-        edges, nodes = VectorNetworkWrapper.setup_network_edges_and_nodes_from_graph(
-            graph
-        )
-        graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
-        return graph_complex, edges
-
-    def _read_vector_to_project_region_and_crs(
-        self, vector_filenames: list[Path], crs: CRS
-    ) -> gpd.GeoDataFrame:
-        """Reads a vector file or a list of vector files.
-
-        Clips for project region and reproject to project crs if available.
-        Explodes multi geometry into single geometry.
-
-        Args:
-            vector_filenames (list[Path]): List of Path to the vector files.
-            crs (CRS): Coordinate reference system for the files. Allow only one crs for all  `vector_filenames`.
-
-        Returns:
-            gpd.GeoDataFrame: GeoDataFrame representing the vector data.
-        """
-        gdf = self._read_files(vector_filenames)
-        if gdf is None:
-            logger.info("no file is read.")
-            return None
-
-        # set crs and reproject if needed
-        if not gdf.crs and crs:
-            gdf = gdf.set_crs(crs)
-            logger.info("setting crs as default EPSG:4326. specify crs if incorrect")
-
-        if self.crs:
-            gdf = gdf.to_crs(self.crs)
-            logger.info("reproject vector file to project crs")
-
-        # clip for region
-        if self.region is not None:
-            gdf = gpd.overlay(gdf, self.region, how="intersection", keep_geom_type=True)
-            logger.info("clip vector file to project region")
-
-        # validate
-        if not any(gdf):
-            logger.warning("No vector features found within project region")
-            return None
-
-        return gdf
-
-    def _read_files(self, file_list: list[Path]) -> gpd.GeoDataFrame:
-        """Reads a list of files into a GeoDataFrame.
-
-        Args:
-            file_list (list[Path]): List of file paths.
-
-        Returns:
-            gpd.GeoDataFrame: GeoDataFrame representing the data.
-        """
-        # read file
-        if isinstance(file_list, list):
-            gdf = gpd.GeoDataFrame(pd.concat([gpd.read_file(_fn) for _fn in file_list]))
-            logger.info("read vector files.")
-        else:
-            gdf = None
-            logger.info("no file is read.")
-        return gdf
 
     @staticmethod
     def clean_vector(gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
