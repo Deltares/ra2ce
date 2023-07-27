@@ -1,3 +1,4 @@
+from pathlib import Path
 import pytest
 
 import geopandas as gpd
@@ -12,34 +13,12 @@ _test_dir = test_data / "vector_network_wrapper"
 
 class TestVectorNetworkWrapper:
     @pytest.fixture
-    def _config_fixture(self) -> dict:
-        yield {
-            "project": {
-                "name": "test",
-                "crs": 4326,
-            },
-            "network": {
-                "directed": False,
-                "source": "shapefile",
-                "primary_file": "_test_lines.geojson",
-                "diversion_file": None,
-                "file_id": "fid",
-                "polygon": None,
-                "network_type": None,
-                "road_types": None,
-                "save_shp": False,
-            },
-            "static": _test_dir / "static",
-            "output": _test_dir / "output",
-        }
-
-    @pytest.fixture
-    def points_gdf(self):
+    def points_gdf(self) -> gpd.GeoDataFrame:
         points = [Point(-122.3, 47.6), Point(-122.2, 47.5), Point(-122.1, 47.6)]
         return gpd.GeoDataFrame(geometry=points, crs=4326)
 
     @pytest.fixture
-    def lines_gdf(self):
+    def lines_gdf(self) -> gpd.GeoDataFrame:
         points = [Point(-122.3, 47.6), Point(-122.2, 47.5), Point(-122.1, 47.6)]
         lines = [LineString([points[0], points[1]]), LineString([points[1], points[2]])]
         return gpd.GeoDataFrame(geometry=lines, crs=4326)
@@ -59,135 +38,79 @@ class TestVectorNetworkWrapper:
 
         return graph
 
-    @pytest.mark.parametrize(
-        "config",
-        [
-            pytest.param(None, id="NONE as dictionary"),
-            pytest.param({}, id="Empty dictionary"),
-            pytest.param({"network": {}}, id='Empty "network" in Config'),
-            pytest.param({"network": "string"}, id='Invalid "network" type in Config'),
-        ],
-    )
-    def test_init(self, config: dict):
-        with pytest.raises(ValueError) as exc_err:
-            VectorNetworkWrapper(config=config)
-        assert str(exc_err.value) in [
-            "Config cannot be None",
-            "A network dictionary is required for creating a VectorNetworkWrapper object.",
-            'Config["network"] should be a dictionary',
-        ]
+    def test_init_without_crs_sts_default(self):
+        # 1. Define test data.
+        _primary_files = [Path("dummy_primary")]
+        _region = Path("dummy_region")
+        _crs_value = ""
 
-    def test_parse_ini_stringlist_with_comma_separated_string(self, _config_fixture):
+        # 2. Run test.
+        _wrapper = VectorNetworkWrapper(_primary_files, _region, _crs_value, False)
+
+        # 3. Verify expectations.
+        assert isinstance(_wrapper, VectorNetworkWrapper)
+        assert _wrapper.primary_files == _primary_files
+        assert _wrapper.region_path == _region
+        assert str(_wrapper.crs) == "epsg:4326"
+
+    @pytest.fixture
+    def _valid_wrapper(self) -> VectorNetworkWrapper:
+        _network_dir = _test_dir.joinpath("static", "network")
+        yield VectorNetworkWrapper(
+            primary_files=[_network_dir.joinpath("_test_lines.geojson")],
+            region_path=None,
+            crs_value=4326,
+            is_directed=False,
+        )
+
+    def test_read_vector_to_project_region_and_crs(
+        self, _valid_wrapper: VectorNetworkWrapper
+    ):
         # Given
-        test_wrapper = VectorNetworkWrapper(_config_fixture)
-        ini_value = "a,b,c"
+        assert not _valid_wrapper.directed
 
         # When
-        result = test_wrapper._parse_ini_stringlist(ini_value)
-
-        # Then
-        assert result == ["a", "b", "c"]
-
-    def test_parse_ini_stringlist_with_single_string(self, _config_fixture):
-        # Given
-        test_wrapper = VectorNetworkWrapper(_config_fixture)
-        ini_value = "abc"
-
-        # When
-        result = test_wrapper._parse_ini_stringlist(ini_value)
-
-        # Then
-        assert result == "abc"
-
-    def test_parse_ini_stringlist_with_empty_string(self, _config_fixture):
-        # Given
-        test_wrapper = VectorNetworkWrapper(_config_fixture)
-        ini_value = ""
-
-        # When
-        result = test_wrapper._parse_ini_stringlist(ini_value)
-
-        # Then
-        assert result is None
-
-    def test_parse_ini_filenamelist(self, _config_fixture):
-        # Given
-        test_wrapper = VectorNetworkWrapper(_config_fixture)
-        ini_value = "_test_lines.geojson, dummy.geojson"
-
-        # When
-        file_paths = test_wrapper._parse_ini_filenamelist(ini_value)
-
-        # Then
-        assert file_paths[0].is_file()
-
-    def test_setup_global(self, _config_fixture):
-        test_wrapper = VectorNetworkWrapper(_config_fixture)
-        test_wrapper._setup_global(_config_fixture)
-        assert test_wrapper.name == "test"
-        assert test_wrapper.region is None
-        assert test_wrapper.crs.to_epsg() == 4326
-        assert test_wrapper.input_path == _test_dir / "static/network"
-        assert test_wrapper.output_path == _test_dir / "output"
-
-    def test_get_network_opt(self, _config_fixture):
-        test_wrapper = VectorNetworkWrapper(_config_fixture)
-        network_dict = test_wrapper._get_network_opt(_config_fixture["network"])
-        assert network_dict["files"][0].is_file()
-        assert network_dict["file_id"] == "fid"
-        assert network_dict["file_crs"].to_epsg() == 4326
-        assert network_dict["is_directed"] is False
-
-    def test_read_vector_to_project_region_and_crs(self, _config_fixture):
-        # Given
-        test_wrapper = VectorNetworkWrapper(_config_fixture)
-        files = test_wrapper.network_dict["files"]
-        file_crs = test_wrapper.network_dict["file_crs"]
-
-        # When
-        vector = test_wrapper._read_vector_to_project_region_and_crs(files, file_crs)
+        vector = _valid_wrapper._read_vector_to_project_region_and_crs()
 
         # Then
         assert isinstance(vector, gpd.GeoDataFrame)
 
-    def test_read_vector_to_project_region_and_crs_with_region(self, _config_fixture):
+    def test_read_vector_to_project_region_and_crs_with_region(
+        self, _valid_wrapper: VectorNetworkWrapper
+    ):
         # Given
-        _config_fixture["project"]["region"] = _test_dir / "_test_polygon.geojson"
-        test_wrapper = VectorNetworkWrapper(_config_fixture)
-        files = test_wrapper.network_dict["files"]
-        file_crs = test_wrapper.network_dict["file_crs"]
+        _valid_wrapper.region_path = _test_dir / "_test_polygon.geojson"
+        _expected_region = gpd.read_file(_valid_wrapper.region_path)
+        assert isinstance(_expected_region, gpd.GeoDataFrame)
 
         # When
-        vector = test_wrapper._read_vector_to_project_region_and_crs(files, file_crs)
+        vector = _valid_wrapper._read_vector_to_project_region_and_crs()
 
         # Then
-        assert vector.crs == test_wrapper.region.crs
-        assert test_wrapper.region.covers(vector.unary_union).all()
+        assert vector.crs == _expected_region.crs
+        assert _expected_region.covers(vector.unary_union).all()
 
-    def test_setup_network_from_vector(self, _config_fixture):
+    @pytest.mark.parametrize(
+        "region_path",
+        [
+            pytest.param(None, id="No region"),
+            pytest.param(_test_dir / "_test_polygon.geojson", id="With region"),
+        ],
+    )
+    def test_get_network_from_vector(
+        self, _valid_wrapper: VectorNetworkWrapper, region_path: Path
+    ):
         # Given
-        test_wrapper = VectorNetworkWrapper(_config_fixture)
+        _valid_wrapper.region_path = region_path
 
         # When
-        graph, edges = test_wrapper.get_network_from_vector()
-
-        # Then
-        assert isinstance(graph, nx.MultiGraph)
-        assert isinstance(edges, gpd.GeoDataFrame)
-
-    def test_setup_network_from_vector_with_region(self, _config_fixture):
-        # Given
-        _config_fixture["project"]["region"] = _test_dir / "_test_polygon.geojson"
-        test_wrapper = VectorNetworkWrapper(_config_fixture)
-
-        # When
-        graph, edges = test_wrapper.get_network_from_vector()
+        graph, edges = _valid_wrapper.get_network_from_vector()
 
         # Then
         assert isinstance(graph, nx.MultiGraph)
         assert isinstance(edges, gpd.GeoDataFrame)
 
-    def test_clean_vector(self, lines_gdf):
+    def test_clean_vector(self, lines_gdf: gpd.GeoDataFrame):
         # Given
         gdf1 = VectorNetworkWrapper.explode_and_deduplicate_geometries(lines_gdf)
 
@@ -199,9 +122,9 @@ class TestVectorNetworkWrapper:
         # Then
         assert gdf1.equals(gdf2)
 
-    def test_setup_graph_from_vector(self, lines_gdf):
+    def test_get_indirect_graph_from_vector(self, lines_gdf: gpd.GeoDataFrame):
         # When
-        graph = VectorNetworkWrapper.setup_graph_from_vector(lines_gdf)
+        graph = VectorNetworkWrapper.get_indirect_graph_from_vector(lines_gdf)
 
         # Then
         assert graph.nodes(data="geometry") is not None
@@ -209,18 +132,18 @@ class TestVectorNetworkWrapper:
         assert graph.graph["crs"] == lines_gdf.crs
         assert isinstance(graph, nx.Graph) and not isinstance(graph, nx.DiGraph)
 
-    def test_setup_digraph_from_vector(self, lines_gdf):
+    def test_get_direct_graph_from_vector(self, lines_gdf: gpd.GeoDataFrame):
         # When
-        graph = VectorNetworkWrapper.setup_digraph_from_vector(lines_gdf)
+        graph = VectorNetworkWrapper.get_direct_graph_from_vector(lines_gdf)
 
         # Then
         assert isinstance(graph, nx.DiGraph)
 
-    def test_setup_network_edges_and_nodes_from_graph(
+    def test_get_network_edges_and_nodes_from_graph(
         self, mock_graph, points_gdf, lines_gdf
     ):
         # When
-        edges, nodes = VectorNetworkWrapper.setup_network_edges_and_nodes_from_graph(
+        edges, nodes = VectorNetworkWrapper.get_network_edges_and_nodes_from_graph(
             mock_graph
         )
 

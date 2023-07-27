@@ -9,10 +9,6 @@ import momepy
 
 from shapely.geometry import Point
 from pyproj import CRS
-from ra2ce.graph.network_config_data.network_config_data import (
-    NetworkConfigData,
-    NetworkSection,
-)
 import ra2ce.graph.networks_utils as nut
 
 
@@ -58,41 +54,25 @@ class VectorNetworkWrapper:
             nx.MultiGraph: MultiGraph representing the graph.
             gpd.GeoDataFrame: GeoDataFrame representing the network.
         """
-        gdf = self._read_vector_to_project_region_and_crs(
-            vector_filenames=self.primary_files, crs=self.crs
-        )
+        gdf = self._read_vector_to_project_region_and_crs()
         gdf = self.clean_vector(gdf)
         if self.directed:
-            graph = self.setup_digraph_from_vector(gdf)
+            graph = self.get_direct_graph_from_vector(gdf)
         else:
-            graph = self.setup_graph_from_vector(gdf)
-        edges, nodes = self.setup_network_edges_and_nodes_from_graph(graph)
+            graph = self.get_indirect_graph_from_vector(gdf)
+        edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
         graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
         return graph_complex, edges
 
-    def _read_vector_to_project_region_and_crs(
-        self, vector_filenames: list[Path], crs: CRS
-    ) -> gpd.GeoDataFrame:
-        """Reads a vector file or a list of vector files.
-
-        Clips for project region and reproject to project crs if available.
-        Explodes multi geometry into single geometry.
-
-        Args:
-            vector_filenames (list[Path]): List of Path to the vector files.
-            crs (CRS): Coordinate reference system for the files. Allow only one crs for all  `vector_filenames`.
-
-        Returns:
-            gpd.GeoDataFrame: GeoDataFrame representing the vector data.
-        """
-        gdf = self._read_files(vector_filenames)
+    def _read_vector_to_project_region_and_crs(self) -> gpd.GeoDataFrame:
+        gdf = self._read_files(self.primary_files)
         if gdf is None:
             logging.info("no file is read.")
             return None
 
         # set crs and reproject if needed
-        if not gdf.crs and crs:
-            gdf = gdf.set_crs(crs)
+        if not gdf.crs and self.crs:
+            gdf = gdf.set_crs(self.crs)
             logging.info("setting crs as default EPSG:4326. specify crs if incorrect")
 
         if self.crs:
@@ -101,10 +81,8 @@ class VectorNetworkWrapper:
 
         # clip for region
         if self.region_path:
-            _region_path = self._read_files([self.region_path])
-            gdf = gpd.overlay(
-                gdf, _region_path, how="intersection", keep_geom_type=True
-            )
+            _region_gpd = self._read_files([self.region_path])
+            gdf = gpd.overlay(gdf, _region_gpd, how="intersection", keep_geom_type=True)
             logging.info("clip vector file to project region")
 
         # validate
@@ -133,7 +111,7 @@ class VectorNetworkWrapper:
         return gdf
 
     @staticmethod
-    def setup_digraph_from_vector(gdf: gpd.GeoDataFrame) -> nx.DiGraph:
+    def get_direct_graph_from_vector(gdf: gpd.GeoDataFrame) -> nx.DiGraph:
         """Creates a simple directed graph with node and edge geometries based on a given GeoDataFrame.
 
         Args:
@@ -165,7 +143,7 @@ class VectorNetworkWrapper:
         return digraph
 
     @staticmethod
-    def setup_graph_from_vector(gdf: gpd.GeoDataFrame) -> nx.Graph:
+    def get_indirect_graph_from_vector(gdf: gpd.GeoDataFrame) -> nx.Graph:
         """Creates a simple undirected graph with node and edge geometries based on a given GeoDataFrame.
 
         Args:
@@ -175,11 +153,11 @@ class VectorNetworkWrapper:
         Returns:
             nx.Graph: NetworkX graph object with "crs", "approach" as graph properties.
         """
-        digraph = VectorNetworkWrapper.setup_digraph_from_vector(gdf)
+        digraph = VectorNetworkWrapper.get_direct_graph_from_vector(gdf)
         return digraph.to_undirected()
 
     @staticmethod
-    def setup_network_edges_and_nodes_from_graph(
+    def get_network_edges_and_nodes_from_graph(
         graph: nx.Graph,
     ) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
         """Sets up network nodes and edges from a given graph.
