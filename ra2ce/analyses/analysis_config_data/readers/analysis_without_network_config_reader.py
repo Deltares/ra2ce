@@ -40,7 +40,7 @@ from ra2ce.graph.network_config_data.network_config_data_reader import (
 class AnalysisConfigReaderWithoutNetwork(AnalysisConfigReaderBase):
     def read(self, ini_file: Path) -> AnalysisConfigDataWithoutNetwork:
         if not ini_file or not ini_file.exists():
-            return None
+            raise ValueError("No analysis ini file provided.")
         _analisis_config_dict = self._get_analysis_config_data(ini_file)
         _output_network_ini_file = _analisis_config_dict["output"] / "network.ini"
         _network_config = NetworkConfigDataReader().read(_output_network_ini_file)
