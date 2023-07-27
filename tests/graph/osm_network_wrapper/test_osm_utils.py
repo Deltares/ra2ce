@@ -2,7 +2,7 @@ import shutil
 
 import pytest
 
-from ra2ce.graph.osm_utils import from_shapefile_to_poly
+from ra2ce.graph.osm_network_wrapper.osm_utils import from_shapefile_to_poly
 from tests import test_data, test_results
 
 
