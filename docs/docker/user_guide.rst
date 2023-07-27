@@ -19,13 +19,13 @@ following::
 
     $ git clone git@github.com:Deltares/ra2ce.git
     $ cd ra2ce
-    $ docker build -t myra2ce:latest .
+    $ docker build -t race:latest .
 
 These instructions will build a docker image. After a good while, you should end up with::
 
     $ docker images
     REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
-    ra2ce        latest    616f672677f2   19 hours ago   1.01GB
+    race         latest    616f672677f2   19 hours ago   1.01GB
 
 Remark that this is a local image only (it only exists on the server or laptop you build it). To share it with other team members, you should push this to a docker hub. This operation entails the following.
 
@@ -43,9 +43,46 @@ a.  Login to your dockerhub account (go to https://hub.docker.com/ if you don't 
 
 b.  Retag the image::
 
-    $ docker tag ra2ce:latest willemdeltares/ra2ce/ra2ce:latest
+    $ docker tag race:latest willemdeltares/race:latest
 
 c.  Pushing the image to the dockerhub::
+
+    $ sudo docker push willemdeltares/race:latest
+
+If all is well, you can login to the dockerhub account and see the image yourself.
+
+
+Simple run
+------------
+
+On probably another laptop you can do the following::
+
+    noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker pull willemdeltares/race:latest
+    latest: Pulling from willemdeltares/race
+    4db1b89c0bd1: Pull complete
+    d78e3c519d33: Pull complete
+    8219ddbde264: Pull complete
+    ....
+    d86857fa3e39: Pull complete
+    3a05d3e367e1: Pull complete
+    Digest: sha256:1c1cee508e498e7e58e01661b3c4047e458e936720ce11b8a242fae8375b1c7f
+    Status: Downloaded newer image for willemdeltares/race:latest
+    docker.io/willemdeltares/race:latest
+
+    noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker run -it --rm willemdeltares/race:latest bash
+    (base) 51d9aa2fdffd:~$ micromamba list
+    List of packages in environment: "/opt/conda"
+
+    (base) 51d9aa2fdffd:~$ micromamba env list
+      Name       Active  Path
+    ────────────────────────────────────────────────
+      base       *       /opt/conda
+      ra2ce_env          /opt/conda/envs/ra2ce_env
+
+    (base) 51d9aa2fdffd:~$ micromamba activate ra2ce_env
+    (ra2ce_env) 51d9aa2fdffd:~$ exit
+    exit
+
 
 
 
