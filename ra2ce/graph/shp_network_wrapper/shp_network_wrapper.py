@@ -55,8 +55,8 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
                 or if config['network'] is not a dictionary.
         """
         # Network options
-        self.primary_files = network_options.primary_files
-        self.diversion_files = network_options.diversion_files
+        self.primary_files = network_options.primary_file
+        self.diversion_files = network_options.diversion_file
         self.directed = network_options.directed
         self.file_id = network_options.file_id
 
