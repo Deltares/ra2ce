@@ -154,11 +154,11 @@ class TestAcceptance:
                     ],
                 ),
                 id="Case 2. All indirect analyses",
-                marks=slow_test,
             ),
         ],
         indirect=["case_data_dir"],
     )
+    @pytest.mark.slow_test
     def test_indirect_analysis(
         self,
         case_data_dir: Path,
