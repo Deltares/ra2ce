@@ -32,3 +32,7 @@ When running a development environment with Anaconda, the user may follow these 
   conda activate ra2ce_env
   poetry install
 ::
+
+Docker
++++++++++++++++++++++++++++
+You may install ra2ce using `Docker`. Please refer to our :ref:`docker_user_guide` for it.
