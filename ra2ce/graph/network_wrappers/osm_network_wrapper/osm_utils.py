@@ -20,6 +20,7 @@
 """
 
 from pathlib import Path
+from typing import Union, Tuple
 
 import geopandas as gpd
 import numpy as np
@@ -180,7 +181,7 @@ def get_node_nearest_edge(graph: MultiDiGraph, node: tuple, return_geom=True, re
                     "nearest_edge": (u, v, data, key)}
 
 
-def _is_endpoint_simplified(graph: MultiDiGraph, node: int, strict=True) -> bool:
+def _is_endnode_simplified(graph: MultiDiGraph, node: int) -> bool:
     """
     Based on osmnx. osmnx rules 3 and 4 are removed. Hence, the name _is_endpoint_simplified.
     """
@@ -198,3 +199,43 @@ def _is_endpoint_simplified(graph: MultiDiGraph, node: int, strict=True) -> bool
     elif graph.out_degree(node) == 0 or graph.in_degree(node) == 0:
         # if node has no incoming edges or no outgoing edges, it is an endpoint
         return True
+
+
+def break_edge(graph: MultiDiGraph, u: int, v: int, new_node: Point, new_node_data: dict):
+    # Get the original edge data
+    edge_data = graph.get_edge_data(u, v)
+    if edge_data is None:
+        raise ValueError("Edge not found in the graph")
+
+    # Check if the new_node already exists in the nodes of the graph
+    if find_existing_node(graph, new_node)[0] is None:
+        new_node_id = max(graph.nodes) + 1
+        graph.add_node(new_node_id, x=new_node.x, y=new_node.y, geometry=new_node, **new_node_data)
+    else:
+        new_node_id = find_existing_node(graph, new_node)[0]
+    # ToDo: Create a check, if edge exists, do nothing, otherwise make links
+    # ToDo: Check if the break_edge function works properly
+    # Add the two new edges
+    graph.add_edge(u, new_node_id, **edge_data[0])
+    graph.add_edge(new_node_id, v, **edge_data[0])
+
+    # Remove the original edge
+    graph.remove_edge(u, v)
+
+
+def remove_key(element_data: dict, keys_to_exclude: list):
+    # Remove geometry information from the the new_node_data
+    for key in keys_to_exclude:
+        element_data.pop(key)
+    return element_data
+
+
+def find_existing_node(graph: MultiDiGraph, new_node: Point) -> Union[Tuple[int, dict], Tuple[None, None]]:
+    for node, data in graph.nodes(data=True):
+        # Assuming the x and y coordinates are stored in data as 'x' and 'y'
+        if not data.get('geometry', ''):
+            raise ValueError("Nodes should have geometry")
+
+        if data['geometry'] == new_node:
+            return node, data
+    return None, None

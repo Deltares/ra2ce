@@ -25,7 +25,7 @@ from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
 from shapely.geometry.base import BaseGeometry
 from ra2ce.graph.network_wrappers.osm_network_wrapper.osm_utils import (
-    get_node_nearest_edge, _is_endpoint_simplified,
+    get_node_nearest_edge, _is_endnode_simplified, break_edge, remove_key
 )
 
 import ra2ce.graph.networks_utils as nut
@@ -80,10 +80,10 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         return graph_simple, edges_complex
 
     def _get_avg_speed(
-        self, original_graph: nx.classes.graph.Graph
+            self, original_graph: nx.classes.graph.Graph
     ) -> nx.classes.graph.Graph:
         if all(["length" in e for u, v, e in original_graph.edges.data()]) and any(
-            ["maxspeed" in e for u, v, e in original_graph.edges.data()]
+                ["maxspeed" in e for u, v, e in original_graph.edges.data()]
         ):
             # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
             path_avg_speed = self.output_graph_dir.joinpath("avg_speed.csv")
@@ -146,7 +146,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         return _complex_graph
 
     def _download_clean_graph_from_osm(
-        self, polygon: BaseGeometry, road_types: list[str], network_type: str
+            self, polygon: BaseGeometry, road_types: list[str], network_type: str
     ) -> MultiDiGraph:
         _available_road_types = road_types and any(road_types)
         if not _available_road_types and not network_type:
@@ -215,7 +215,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
     @staticmethod
     def drop_duplicates_in_nodes(
-        unique_elements: set, graph: MultiDiGraph
+            unique_elements: set, graph: MultiDiGraph
     ) -> MultiDiGraph:
         if unique_elements is None or not isinstance(unique_elements, set):
             raise ValueError("unique_elements should be a set")
@@ -239,7 +239,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
     @staticmethod
     def drop_duplicates_in_edges(
-        unique_elements: set, unique_graph: MultiDiGraph, graph: MultiDiGraph
+            unique_elements: set, unique_graph: MultiDiGraph, graph: MultiDiGraph
     ):
         """
         Checks if both extremities are in the unique_graph (u has not the same coor of v, no line from u to itself is
@@ -247,9 +247,9 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         considering it in the unique graph
         """
         if (
-            not unique_elements
-            or not any(unique_elements)
-            or not all(isinstance(item, tuple) for item in unique_elements)
+                not unique_elements
+                or not any(unique_elements)
+                or not all(isinstance(item, tuple) for item in unique_elements)
         ):
             raise ValueError(
                 """unique_elements cannot be None, empty, or have non-tuple elements. 
@@ -264,9 +264,9 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         def validity_check(extremities_tuple) -> bool:
             extremities = extremities_tuple[0]
             return not (
-                extremities.from_to_id is None
-                or extremities.from_to_coor is None
-                or extremities.from_id == extremities.to_id
+                    extremities.from_to_id is None
+                    or extremities.from_to_coor is None
+                    or extremities.from_id == extremities.to_id
             )
 
         def valid_extremity_data(u, v, data) -> tuple[ExtremitiesData, dict]:
@@ -281,8 +281,8 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
             return _extremities_data, data
 
         for _extremity_data, _edge_data in filter(
-            validity_check,
-            map(lambda edge: valid_extremity_data(*edge), graph.edges(data=True)),
+                validity_check,
+                map(lambda edge: valid_extremity_data(*edge), graph.edges(data=True)),
         ):
             _id_combination = (_extremity_data.from_to_id, _extremity_data.to_from_id)
             _coor_combination = (
@@ -290,8 +290,8 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
                 _extremity_data.to_from_coor,
             )
             if all(
-                _combination not in unique_elements
-                for _combination in [_id_combination, _coor_combination]
+                    _combination not in unique_elements
+                    for _combination in [_id_combination, _coor_combination]
             ):
                 edge_attributes = {key: value for key, value in _edge_data.items()}
                 unique_graph.add_edge(
@@ -310,7 +310,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
     @staticmethod
     def snap_nodes_to_edges(graph: MultiDiGraph, threshold: float):
-        end_nodes = [node for node in graph.nodes(data=True) if _is_endpoint_simplified(graph, node[0])]
+        end_nodes = [node for node in graph.nodes(data=True) if _is_endnode_simplified(graph, node[0])]
 
         if not graph.graph or not graph.graph['crs']:
             graph.graph['crs'] = "epsg:4326"
@@ -326,10 +326,15 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
                                                  get_node_nearest_edge(graph, end_node), end_nodes)):
             node_geom, nearest_edge_geom = node_nearest_edge_data['node'][1]['geometry'], \
                 node_nearest_edge_data['nearest_edge'][3]
-
+            node_data = node_nearest_edge_data['node'][1]
             projected_node_on_nearest_edge = nearest_edge_geom.interpolate(nearest_edge_geom.project(node_geom))
+            new_node_data = node_data.copy()
+            new_node_data = remove_key(new_node_data, ['geometry', 'x', 'y'])
+            break_edge(graph=graph, u=node_nearest_edge_data['nearest_edge'][0],
+                       v=node_nearest_edge_data['nearest_edge'][1], new_node=projected_node_on_nearest_edge,
+                       new_node_data=new_node_data)
             print(projected_node_on_nearest_edge)
-        # ToDo: Check the interpolate/project hard-coed values. => e.g. I get 1.99 instead of 2
+        # ToDo: Complete break_edge
         # ToDo: Make sure the directions make sense after clustering; both for snap_edges.
         raise NotImplementedError("Next thing to do!")
 
