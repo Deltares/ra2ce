@@ -24,6 +24,9 @@ import pandas as pd
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
 from shapely.geometry.base import BaseGeometry
+from ra2ce.graph.network_wrappers.osm_network_wrapper.osm_utils import (
+    get_node_nearest_edge,
+)
 
 import ra2ce.graph.networks_utils as nut
 from ra2ce.graph.exporters.json_exporter import JsonExporter
@@ -32,7 +35,6 @@ from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapper
 from ra2ce.graph.network_wrappers.osm_network_wrapper.extremities_data import (
     ExtremitiesData,
 )
-from ra2ce.graph.osm_network_wrapper.osmnx_wrapper import OsmnxWrapper
 
 
 class OsmNetworkWrapper(NetworkWrapperProtocol):
@@ -308,7 +310,6 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
     @staticmethod
     def snap_nodes_to_edges(graph: MultiDiGraph, threshold: float):
-        osmnx_wrapper = OsmnxWrapper()
         end_points = set(
             [node for node in graph.nodes() if nut._is_endpoint(graph, node)]
         )
@@ -326,7 +327,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         for node_nearest_edge_data in filter(
             threshold_check,
             map(
-                lambda node: osmnx_wrapper.get_node_nearest_edge(
+                lambda node: get_node_nearest_edge(
                     graph, (graph.nodes[node]["x"], graph.nodes[node]["y"])
                 ),
                 end_points,
