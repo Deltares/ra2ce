@@ -23,6 +23,7 @@ import osmnx
 import pandas as pd
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
+from osmnx.simplification import _is_endpoint
 from shapely.geometry.base import BaseGeometry
 from ra2ce.graph.network_wrappers.osm_network_wrapper.osm_utils import (
     get_node_nearest_edge,
@@ -50,7 +51,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
     def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
         """
-        Gets an indirected graph
+        Gets an undirected graph
 
         Returns:
             tuple[MultiGraph, GeoDataFrame]: _description_
@@ -98,7 +99,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
                 )
             original_graph = nut.assign_avg_speed(original_graph, avg_speeds, "highway")
 
-            # make a time value of seconds, length of road streches is in meters
+            # make a time value of seconds, length of road stretches is in meters
             for u, v, k, edata in original_graph.edges.data(keys=True):
                 hours = (edata["length"] / 1000) / edata["avgspeed"]
                 original_graph[u][v][k]["time"] = round(hours * 3600, 0)
@@ -310,33 +311,28 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
     @staticmethod
     def snap_nodes_to_edges(graph: MultiDiGraph, threshold: float):
-        end_points = set(
-            [node for node in graph.nodes() if nut._is_endpoint(graph, node)]
-        )
+        end_nodes = list()
+        for node in graph.nodes(data=True):
+            if _is_endpoint(graph, node[0]):
+                end_nodes.append(node)
 
-        if not graph.graph or not graph.graph["crs"]:
-            graph.graph["crs"] = "epsg:4326"
+        if not graph.graph or not graph.graph['crs']:
+            graph.graph['crs'] = "epsg:4326"
 
-        nut.add_missing_geoms_graph(graph=graph, geom_name="geometry").to_directed()
+        nut.add_missing_geoms_graph(graph=graph, geom_name='geometry').to_directed()
 
         def threshold_check(node_nearest_ed: dict):
-            (node, nearest_ed) = next(iter(node_nearest_ed.items()))
-            distance = nearest_ed[-1]
+            distance = node_nearest_ed['nearest_edge'][-1]
             return distance < threshold
 
-        for node_nearest_edge_data in filter(
-            threshold_check,
-            map(
-                lambda node: get_node_nearest_edge(
-                    graph, (graph.nodes[node]["x"], graph.nodes[node]["y"])
-                ),
-                end_points,
-            ),
-        ):
-            (node, nearest_edge) = next(iter(node_nearest_edge_data.items()))
-            # nearest_edge
-            # projected_node = .interpolate(shply_line.project(row.geometry))
-            print(node_nearest_edge_data)
+        for node_nearest_edge_data in filter(threshold_check,
+                                             map(lambda end_node:
+                                                 get_node_nearest_edge(graph, end_node), end_nodes)):
+            node_geom, nearest_edge_geom = node_nearest_edge_data['node'][1]['geometry'], \
+                node_nearest_edge_data['nearest_edge'][3]
+
+            projected_node_on_nearest_edge = nearest_edge_geom.interpolate(nearest_edge_geom.project(node_geom))
+            print(projected_node_on_nearest_edge)
 
         # ToDo: Make sure the directions make sense after clustering; both for snap_edges.
         raise NotImplementedError("Next thing to do!")
@@ -347,10 +343,10 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 # _valid_unique_graph.add_node(2, x=2, y=20)
 # _valid_unique_graph.add_node(4, x=2, y=40)
 # _valid_unique_graph.add_node(5, x=3, y=50)
-
+#
 # _valid_unique_graph.add_edge(1, 2, x=[1, 2], y=[10, 20])
 # _valid_unique_graph.add_edge(2, 4, x=[2, 2], y=[20, 40])
 # _valid_unique_graph.add_edge(1, 4, x=[1, 2], y=[10, 40])
 # _valid_unique_graph.add_edge(5, 1, x=[3, 1], y=[50, 10])
-
+#
 # OsmNetworkWrapper.snap_nodes_to_edges(_valid_unique_graph, threshold=100)

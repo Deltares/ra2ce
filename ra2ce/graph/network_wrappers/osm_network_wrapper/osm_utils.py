@@ -24,7 +24,7 @@ from pathlib import Path
 
 import geopandas as gpd
 import numpy as np
-from osmnx import graph_to_gdfs, get_nearest_edge, utils_graph, utils
+from osmnx import graph_to_gdfs, utils
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph
 from shapely.geometry import Point
@@ -106,17 +106,14 @@ def graph_to_gdf(graph, nodes=True, edges=True, node_geometry=True, fill_edge_ge
     return graph_gdf
 
 
-def get_node_nearest_edge(
-    graph: MultiDiGraph, node: tuple, return_geom=True, return_dist=True
-) -> dict[tuple, tuple]:
-    # nearest_edge = get_nearest_edge(graph, node, return_geom, return_dist)
-
+def get_node_nearest_edge(graph: MultiDiGraph, node: tuple, return_geom=True, return_dist=True) -> dict:
+    node_coor = (node[1]['x'], node[1]['y'])
     # get u, v, key, geom from all the graph edges
     gdf_edges = graph_to_gdf(graph, nodes=False, fill_edge_geometry=True)
     edges = gdf_edges[["u", "v", "data", "key", "geometry"]].values
 
     # convert lat,lng (y,x) node to x,y for shapely distance operation
-    xy_point = Point(reversed(node))
+    xy_point = Point(reversed(node_coor))
 
     # calculate euclidean distance from each edge's geometry to this node
     edge_distances = [(edge, xy_point.distance(edge[4])) for edge in edges]
@@ -128,37 +125,55 @@ def get_node_nearest_edge(
     # return results requested by caller
     if data == 0 and key == 0:
         if return_dist and return_geom:
-            return {node: (u, v, geom, dist)}
+            return {
+                "node": node,
+                "nearest_edge": (u, v, geom, dist)}
         elif return_dist:
-            return {node: (u, v, dist)}
+            return {
+                "node": node,
+                "nearest_edge": (u, v, dist)}
         elif return_geom:
-            return {node: (u, v, geom)}
+            return {"node": node,
+                    "nearest_edge": (u, v, geom)}
         else:
-            return {node: (u, v)}
+            return {"node": node,
+                    "nearest_edge": (u, v)}
     elif data == 0:
         if return_dist and return_geom:
-            return {node: (u, v, key, geom, dist)}
+            return {"node": node,
+                    "nearest_edge": (u, v, key, geom, dist)}
         elif return_dist:
-            return {node: (u, v, key, dist)}
+            return {"node": node,
+                    "nearest_edge": (u, v, key, dist)}
         elif return_geom:
-            return {node: (u, v, key, geom)}
+            return {"node": node,
+                    "nearest_edge": (u, v, key, geom)}
         else:
-            return {node: (u, v, key)}
+            return {"node": node,
+                    "nearest_edge": (u, v, key)}
     elif key == 0:
         if return_dist and return_geom:
-            return {node: (u, v, data, geom, dist)}
+            return {"node": node,
+                    "nearest_edge": (u, v, data, geom, dist)}
         elif return_dist:
-            return {node: (u, v, data, dist)}
+            return {"node": node,
+                    "nearest_edge": (u, v, data, dist)}
         elif return_geom:
-            return {node: (u, v, data, geom)}
+            return {"node": node,
+                    "nearest_edge": (u, v, data, geom)}
         else:
-            return {node: (u, v, data)}
+            return {"node": node,
+                    "nearest_edge": (u, v, data)}
     else:
         if return_dist and return_geom:
-            return {node: (u, v, data, key, geom, dist)}
+            return {"node": node,
+                    "nearest_edge": (u, v, data, key, geom, dist)}
         elif return_dist:
-            return {node: (u, v, data, key, dist)}
+            return {"node": node,
+                    "nearest_edge": (u, v, data, key, dist)}
         elif return_geom:
-            return {node: (u, v, data, key, geom)}
+            return {"node": node,
+                    "nearest_edge": (u, v, data, key, geom)}
         else:
-            return {node: (u, v, data, key)}
+            return {"node": node,
+                    "nearest_edge": (u, v, data, key)}
