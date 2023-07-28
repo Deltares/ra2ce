@@ -51,6 +51,7 @@ class Network:
 
     def __init__(self, network_config: NetworkConfigData, files: dict):
         # General
+        self._config_data = network_config
         self.project_name = network_config.project.name
         self.output_graph_dir = network_config.output_graph_dir
         if not self.output_graph_dir.is_dir():
@@ -92,84 +93,22 @@ class Network:
         )
 
     def _create_network_from_shp(
-        self, crs_value: int
+        self,
     ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         logging.info("Start creating a network from the submitted shapefile.")
         if self._any_cleanup_enabled():
-            return self.network_shp(crs_value)
-        return self.network_cleanshp()
+            return ShpNetworkWrapper(self._config_data).get_network()
+        return VectorNetworkWrapper(self._config_data).get_network()
 
-    def network_shp(self, crs: int) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
-        """Creates a (graph) network from a shapefile.
-
-        Returns the same geometries for the network (GeoDataFrame) as for the graph (NetworkX graph), because
-        it is assumed that the user wants to keep the same geometries as their shapefile input.
-
-        Args:
-            crs (int): the EPSG number of the coordinate reference system that is used
-
-        Returns:
-            graph_complex (NetworkX graph): The resulting graph.
-            edges_complex (GeoDataFrame): The resulting network.
-        """
-        # Make a pyproj CRS from the EPSG code
-        _shp_network_wrapper = ShpNetworkWrapper(
-            network_options=self._network_config,
-            cleanup_options=self._cleanup,
-            region_path=self.region,
-            crs_value=crs,
-        )
-        graph_complex, edges_complex = _shp_network_wrapper.get_network(
-            self.output_graph_dir,
-            self.project_name,
-        )
-
-        # Exporting complex graph because the shapefile should be kept the same as much as possible.
-        return graph_complex, edges_complex
-
-    def network_cleanshp(self) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
-        """Creates a (graph) network from a clean shapefile (primary_file - no further advance cleanup is needed)
-
-        Returns the same geometries for the network (GeoDataFrame) as for the graph (NetworkX graph), because
-        it is assumed that the user wants to keep the same geometries as their shapefile input.
-
-        Returns:
-            graph_complex (NetworkX graph): The resulting graph.
-            edges_complex (GeoDataFrame): The resulting network.
-        """
-        # initialise vector network wrapper
-        vector_network_wrapper = VectorNetworkWrapper(
-            network_data=self._network_config,
-            region_path=self.region,
-            crs_value="",
-        )
-
-        # setup network using the wrapper
-        (
-            graph_complex,
-            edges_complex,
-        ) = vector_network_wrapper.get_network()
-
-        return graph_complex, edges_complex
-
-    def network_osm_download(
-        self, crs: int
-    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+    def network_osm_download(self) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """
         Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
 
         Returns:
             tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]: Tuple of Simplified graph (for use in the indirect analyses) and Complex graph (for use in the direct analyses).
         """
-        osm_network = OsmNetworkWrapper(
-            network_data=self._network_config,
-            graph_crs=crs,
-            output_graph_dir=self.output_graph_dir,
-        )
-        graph_simple, edges_complex = osm_network.get_network()
 
-        # No segmentation required, the non-simplified road segments from OSM are already small enough
-        return graph_simple, edges_complex
+        return OsmNetworkWrapper(self._config_data).get_network()
 
     def add_od_nodes(
         self, graph: nx.classes.graph.Graph, crs: pyproj.CRS
@@ -244,17 +183,15 @@ class Network:
         self.files[graph_name] = _exporter.get_pickle_path()
 
     def _create_new_network_and_graph(
-        self, source: str, crs_value: int
+        self, source: str
     ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         # Create the network from the network source
         if source == "shapefile":
-            return self._create_network_from_shp(crs_value)
+            return self._create_network_from_shp()
         elif source == "OSM PBF":
-            return TrailsNetworkWrapper(
-                network_data=self._network_config, crs_value=crs_value
-            ).get_network()
+            return TrailsNetworkWrapper(self._config_data).get_network()
         elif source == "OSM download":
-            return self.network_osm_download(crs_value)
+            return self.network_osm_download()
         elif source == "pickle":
             logging.info("Start importing a network from pickle")
             base_graph = GraphPickleReader().read(
@@ -268,7 +205,7 @@ class Network:
     def _get_new_network_and_graph(
         self, source: str, export_types: list[str]
     ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
-        _base_graph, _network_gdf = self._create_new_network_and_graph(source, 4326)
+        _base_graph, _network_gdf = self._create_new_network_and_graph(source)
 
         # Set the road lengths to meters for both the base_graph and network_gdf
         # TODO: rename "length" column to "length [m]" to be explicit

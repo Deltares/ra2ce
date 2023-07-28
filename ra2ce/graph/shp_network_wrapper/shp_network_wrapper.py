@@ -20,14 +20,9 @@
 """
 
 import math
-from pathlib import Path
-from pyproj import CRS
 import geopandas as gpd
 import pandas as pd
-from ra2ce.graph.network_config_data.network_config_data import (
-    NetworkSection,
-    CleanupSection,
-)
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
 import ra2ce.graph.networks_utils as nut
 from shapely.geometry import MultiLineString
@@ -40,35 +35,28 @@ from ra2ce.graph.segmentation import Segmentation
 class ShpNetworkWrapper(NetworkWrapperProtocol):
     def __init__(
         self,
-        network_options: NetworkSection,
-        cleanup_options: CleanupSection,
-        region_path: Path,
-        crs_value: str,
+        config_data: NetworkConfigData,
     ) -> None:
-        """Initializes the VectorNetworkWrapper object.
+        _network_options = config_data.network
+        _cleanup_options = config_data.cleanup
 
-        Args:
-            config (dict): Configuration dictionary.
+        self.project_name = config_data.project.name
+        self.crs = config_data.crs
 
-        Raises:
-            ValueError: If the config is None or doesn't contain a network dictionary,
-                or if config['network'] is not a dictionary.
-        """
         # Network options
-        self.primary_files = network_options.primary_file
-        self.diversion_files = network_options.diversion_file
-        self.directed = network_options.directed
-        self.file_id = network_options.file_id
+        self.primary_files = _network_options.primary_file
+        self.diversion_files = _network_options.diversion_file
+        self.directed = _network_options.directed
+        self.file_id = _network_options.file_id
 
         # Cleanup options
-        self.merge_lines = cleanup_options.merge_lines
-        self.snapping_threshold = cleanup_options.snapping_threshold
-        self.segmentation_length = cleanup_options.segmentation_length
-        self.cut_at_intersections = cleanup_options.cut_at_intersections
+        self.merge_lines = _cleanup_options.merge_lines
+        self.snapping_threshold = _cleanup_options.snapping_threshold
+        self.segmentation_length = _cleanup_options.segmentation_length
+        self.cut_at_intersections = _cleanup_options.cut_at_intersections
 
-        # Other
-        self.crs = CRS.from_user_input(crs_value if crs_value else "epsg:4326")
-        self.region_path = region_path
+        # Origins Destinations
+        self.region_path = config_data.origins_destinations.region
 
     def _read_merge_shp(self) -> gpd.GeoDataFrame:
         """Imports shapefile(s) and saves attributes in a pandas dataframe.
@@ -153,8 +141,6 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
 
     def get_network(
         self,
-        output_graph_dir: Path,
-        project_name: str,
     ) -> tuple[nx.MultiGraph, gpd.GeoDataFrame]:
         edges = self._read_merge_shp()
         lines_merged = gpd.GeoDataFrame()
@@ -190,8 +176,8 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
             lines_merged.set_geometry(
                 col="geometry", inplace=True
             )  # To ensure the object is a GeoDataFrame and not a Series
-            _emerged_lines_file = output_graph_dir.joinpath(
-                f"{project_name}_lines_that_merged.shp"
+            _emerged_lines_file = self.output_graph_dir.joinpath(
+                f"{self.project_name}_lines_that_merged.shp"
             )
             lines_merged.to_file(_emerged_lines_file)
             logging.info(

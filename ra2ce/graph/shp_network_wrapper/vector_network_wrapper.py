@@ -28,8 +28,7 @@ import geopandas as gpd
 import momepy
 
 from shapely.geometry import Point
-from pyproj import CRS
-from ra2ce.graph.network_config_data.network_config_data import NetworkSection
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
 import ra2ce.graph.networks_utils as nut
 
@@ -43,23 +42,16 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
     def __init__(
         self,
-        network_data: NetworkSection,
-        region_path: Path,
-        crs_value: str,
+        config_data: NetworkConfigData,
     ) -> None:
-        """Initializes the VectorNetworkWrapper object.
+        self.crs = config_data.crs
 
-        Args:
-            config (dict): Configuration dictionary.
+        # Network options
+        self.primary_files = config_data.network.primary_file
+        self.directed = config_data.network.directed
 
-        Raises:
-            ValueError: If the config is None or doesn't contain a network dictionary,
-                or if config['network'] is not a dictionary.
-        """
-        self.primary_files = network_data.primary_file
-        self.directed = network_data.directed
-        self.crs = CRS.from_user_input(crs_value if crs_value else "epsg:4326")
-        self.region_path = region_path
+        # Origins Destinations
+        self.region_path = config_data.origins_destinations.region
 
     def get_network(
         self,

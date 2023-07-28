@@ -1,10 +1,14 @@
 from pathlib import Path
+from pyproj import CRS
 import pytest
 
 import geopandas as gpd
 import networkx as nx
 from shapely.geometry import LineString, Point, MultiLineString
-from ra2ce.graph.network_config_data.network_config_data import NetworkSection
+from ra2ce.graph.network_config_data.network_config_data import (
+    NetworkConfigData,
+    NetworkSection,
+)
 from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
 
 from tests import test_data
@@ -40,37 +44,35 @@ class TestVectorNetworkWrapper:
 
         return graph
 
-    def test_init_without_crs_sts_default(self):
+    def test_initialize(self):
         # 1. Define test data.
-        _network_data = NetworkSection(
-            primary_file=[Path("dummy_primary")], directed=False
-        )
-        _primary_files = [Path("dummy_primary")]
-        _region = Path("dummy_region")
-        _crs_value = ""
+        _config_data = NetworkConfigData()
+        _config_data.network.primary_file = [Path("dummy_primary")]
+        _config_data.network.directed = False
+        _config_data.origins_destinations.region = Path("dummy_region")
 
         # 2. Run test.
-        _wrapper = VectorNetworkWrapper(
-            network_data=_network_data, region_path=_region, crs_value=_crs_value
-        )
+        _wrapper = VectorNetworkWrapper(_config_data)
 
         # 3. Verify expectations.
         assert isinstance(_wrapper, VectorNetworkWrapper)
         assert isinstance(_wrapper, NetworkWrapperProtocol)
-        assert _wrapper.primary_files == _primary_files
-        assert _wrapper.region_path == _region
-        assert str(_wrapper.crs) == "epsg:4326"
+        assert _wrapper.primary_files == _config_data.network.primary_file
+        assert _wrapper.region_path == _config_data.origins_destinations.region
+        assert _wrapper.crs.to_epsg() == 4326
 
     @pytest.fixture
     def _valid_wrapper(self) -> VectorNetworkWrapper:
         _network_dir = _test_dir.joinpath("static", "network")
-        _network_data = NetworkSection(
-            primary_file=[_network_dir.joinpath("_test_lines.geojson")], directed=False
-        )
+        _config_data = NetworkConfigData()
+        _config_data.network.primary_file = [
+            _network_dir.joinpath("_test_lines.geojson")
+        ]
+        _config_data.network.directed = False
+        _config_data.origins_destinations.region = None
+        _config_data.crs = CRS.from_user_input(4326)
         yield VectorNetworkWrapper(
-            network_data=_network_data,
-            region_path=None,
-            crs_value=4326,
+            config_data=_config_data,
         )
 
     def test_read_vector_to_project_region_and_crs(
