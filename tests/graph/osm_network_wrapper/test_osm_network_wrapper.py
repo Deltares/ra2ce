@@ -5,7 +5,10 @@ from networkx import Graph, MultiDiGraph
 from networkx.utils import graphs_equal
 from shapely.geometry import LineString, Polygon
 from shapely.geometry.base import BaseGeometry
-from ra2ce.graph.network_config_data.network_config_data import NetworkSection
+from ra2ce.graph.network_config_data.network_config_data import (
+    NetworkConfigData,
+    NetworkSection,
+)
 from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
 
 from tests import test_data, slow_test, test_results
@@ -17,18 +20,15 @@ class TestOsmNetworkWrapper:
     def test_initialize_without_graph_crs(self):
         # 1. Define test data.
         _network_section = NetworkSection(network_type="a_network", road_types=["r"])
+        _network_config_data = NetworkConfigData(network=_network_section)
 
         # 2. Run test.
-        _wrapper = OsmNetworkWrapper(
-            network_data=_network_section,
-            output_graph_dir=test_results.joinpath("test_osm_network_wrapper"),
-            graph_crs="",
-        )
+        _wrapper = OsmNetworkWrapper(_network_config_data)
 
         # 3. Verify final expectations.
         assert isinstance(_wrapper, OsmNetworkWrapper)
         assert isinstance(_wrapper, NetworkWrapperProtocol)
-        assert _wrapper.graph_crs == "epsg:4326"
+        assert _wrapper.graph_crs.to_epsg() == 4326
 
     @pytest.fixture
     def _network_wrapper_without_polygon(self) -> OsmNetworkWrapper:
@@ -39,9 +39,7 @@ class TestOsmNetworkWrapper:
         if not _output_dir.exists():
             _output_dir.mkdir(parents=True)
         yield OsmNetworkWrapper(
-            network_data=_network_section,
-            output_graph_dir=_output_dir,
-            graph_crs="",
+            NetworkConfigData(network=_network_section, output_path=_output_dir)
         )
 
     def test_download_clean_graph_from_osm_with_invalid_polygon_arg(

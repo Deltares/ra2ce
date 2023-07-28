@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
+from pyproj import CRS
 
 
 @dataclass
@@ -90,7 +91,8 @@ class NetworkConfigData(ConfigDataProtocol):
     input_path: Optional[Path] = None
     output_path: Optional[Path] = None
     static_path: Optional[Path] = None
-
+    # CRS is not yet supported in the ini file, it might be relocated to a subsection.
+    crs: CRS = field(default_factory=lambda: CRS.from_user_input(4326))
     project: ProjectSection = field(default_factory=lambda: ProjectSection())
     network: NetworkSection = field(default_factory=lambda: NetworkSection())
     origins_destinations: OriginsDestinationsSection = field(
@@ -114,6 +116,7 @@ class NetworkConfigData(ConfigDataProtocol):
 
     def to_dict(self) -> dict:
         _dict = self.__dict__
+        _dict["crs"] = self.crs.to_epsg()
         _dict["project"] = self.project.__dict__
         _dict["network"] = self.network.__dict__
         _dict["origins_destinations"] = self.origins_destinations.__dict__

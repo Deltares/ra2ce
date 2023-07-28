@@ -22,13 +22,11 @@
 from geopandas import GeoDataFrame
 from networkx import MultiGraph
 from ra2ce.graph.network_config_data.network_config_data import (
-    CleanupSection,
-    NetworkSection,
+    NetworkConfigData,
 )
 from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
 from ra2ce.graph.networks_utils import graph_from_gdf
 from ra2ce.graph.segmentation import Segmentation
-from pyproj import CRS
 import logging
 import geopandas as gpd
 
@@ -36,18 +34,16 @@ import geopandas as gpd
 class TrailsNetworkWrapper(NetworkWrapperProtocol):
     def __init__(
         self,
-        network_data: NetworkSection,
-        cleanup_section: CleanupSection,
-        crs_value: str,
+        config_data: NetworkConfigData
     ) -> None:
         logging.info(
             """The original OSM PBF import is no longer supported. 
                 Instead, the beta version of package TRAILS is used. 
                 First stable release of TRAILS is expected in 2023."""
         )
-        self.primary_files = network_data.primary_file
-        self.segmentation_length = cleanup_section.segmentation_length
-        self.crs = CRS.from_user_input(crs_value if crs_value else "epsg:4326")
+        self.primary_files = config_data.network.primary_file
+        self.segmentation_length = config_data.cleanup.segmentation_length
+        self.crs = config_data.crs
 
     def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
         """Creates a network which has been prepared in the TRAILS package

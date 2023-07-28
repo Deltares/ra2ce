@@ -25,6 +25,7 @@ from networkx import MultiDiGraph, MultiGraph
 from osmnx import consolidate_intersections
 from shapely.geometry.base import BaseGeometry
 from ra2ce.graph.network_config_data.network_config_data import (
+    NetworkConfigData,
     NetworkSection,
 )
 from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
@@ -37,16 +38,16 @@ from ra2ce.graph.osm_network_wrapper.extremities_data import ExtremitiesData
 class OsmNetworkWrapper(NetworkWrapperProtocol):
     def __init__(
         self,
-        network_data: NetworkSection,
-        output_graph_dir: Path,
-        graph_crs: str,
+        config_data: NetworkConfigData
     ) -> None:
-        self.network_type = network_data.network_type
-        self.road_types = network_data.road_types
-        self.polygon_path = network_data.polygon
-        self.is_directed = network_data.directed
-        self.output_graph_dir = output_graph_dir
-        self.graph_crs = graph_crs if graph_crs else "epsg:4326"
+        self.output_graph_dir = config_data.output_graph_dir
+        self.graph_crs = config_data.crs
+
+        # Network options
+        self.network_type = config_data.network.network_type
+        self.road_types = config_data.network.road_types
+        self.polygon_path = config_data.network.polygon
+        self.is_directed = config_data.network.directed
 
     def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
         """
