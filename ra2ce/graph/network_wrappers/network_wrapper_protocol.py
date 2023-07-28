@@ -18,19 +18,19 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from typing import Protocol, runtime_checkable
+
+from geopandas import GeoDataFrame
+from networkx import MultiGraph
 
 
-class ConfigDataProtocol(dict):  # pragma: no cover
-    """
-    IniConfigProtocol, for now it's a dictionary until we start mapping its entries to real properties.
-    Then we will transform it into a protocol.
-    """
-
-    def to_dict(self) -> dict:
+@runtime_checkable
+class NetworkWrapperProtocol(Protocol):
+    def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
         """
-        Returns all defined properties as a raw dictionary, converting all custom classes and types.
+        Gets a network built within this wrapper instance. No arguments are accepted, the `__init__` method is meant to assign all required attributes for a wrapper.
 
         Returns:
-            dict: Dictionary representing the `ConfigDataProtocol` instance.
+            tuple[MultiGraph, GeoDataFrame]: Tuple of MultiGraph representing the graph and GeoDataFrame representing the network.
         """
         pass

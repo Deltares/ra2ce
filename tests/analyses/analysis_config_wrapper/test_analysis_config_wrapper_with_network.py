@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 
 import pytest
@@ -8,7 +9,6 @@ from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_with_network
 )
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data, test_results
-import shutil
 
 
 class TestAnalysisWithNetworkConfig:

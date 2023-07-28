@@ -25,6 +25,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+from pyproj import CRS
+
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 
 
@@ -37,10 +39,10 @@ class ProjectSection:
 class NetworkSection:
     directed: bool = False
     source: str = ""  # should be enum
-    primary_file: str = ""  # TODO. Unclear whether this is `Path` or `list[Path]`
-    diversion_file: str = ""  # TODO. Unclear whether this is `Path` or `list[Path]`
+    primary_file: list[Path] = field(default_factory=list)
+    diversion_file: list[Path] = field(default_factory=list)
     file_id: str = ""
-    polygon: str = ""  # TODO. Unclear whether this is `str`` or `Path`
+    polygon: Optional[Path] = None
     network_type: str = ""  # Should be enum
     road_types: list[str] = field(default_factory=list)
     save_shp: bool = False
@@ -90,7 +92,8 @@ class NetworkConfigData(ConfigDataProtocol):
     input_path: Optional[Path] = None
     output_path: Optional[Path] = None
     static_path: Optional[Path] = None
-
+    # CRS is not yet supported in the ini file, it might be relocated to a subsection.
+    crs: CRS = field(default_factory=lambda: CRS.from_user_input(4326))
     project: ProjectSection = field(default_factory=lambda: ProjectSection())
     network: NetworkSection = field(default_factory=lambda: NetworkSection())
     origins_destinations: OriginsDestinationsSection = field(
@@ -106,8 +109,15 @@ class NetworkConfigData(ConfigDataProtocol):
             return None
         return self.static_path.joinpath("output_graph")
 
+    @property
+    def network_dir(self) -> Optional[Path]:
+        if not self.static_path:
+            return None
+        return self.static_path.joinpath("network")
+
     def to_dict(self) -> dict:
         _dict = self.__dict__
+        _dict["crs"] = self.crs.to_epsg()
         _dict["project"] = self.project.__dict__
         _dict["network"] = self.network.__dict__
         _dict["origins_destinations"] = self.origins_destinations.__dict__
