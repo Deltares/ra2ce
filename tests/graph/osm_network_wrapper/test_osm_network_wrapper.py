@@ -5,6 +5,7 @@ from networkx import Graph, MultiDiGraph
 from networkx.utils import graphs_equal
 from shapely.geometry import LineString, Polygon
 from shapely.geometry.base import BaseGeometry
+from ra2ce.graph.network_config_data.network_config_data import NetworkSection
 from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
 
 from tests import test_data, slow_test, test_results
@@ -14,32 +15,33 @@ from ra2ce.graph.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrappe
 
 class TestOsmNetworkWrapper:
     def test_initialize_without_graph_crs(self):
+        # 1. Define test data.
+        _network_section = NetworkSection(network_type="a_network", road_types=["r"])
+
+        # 2. Run test.
         _wrapper = OsmNetworkWrapper(
-            network_type="a_network",
-            road_types=["r"],
+            network_data=_network_section,
+            output_graph_dir=test_results.joinpath("test_osm_network_wrapper"),
             graph_crs="",
-            polygon_path=Path(),
-            directed=False,
-            output_graph_dir=test_results.joinpath("test_osm_network_wrapper")
         )
+
+        # 3. Verify final expectations.
         assert isinstance(_wrapper, OsmNetworkWrapper)
         assert isinstance(_wrapper, NetworkWrapperProtocol)
         assert _wrapper.graph_crs == "epsg:4326"
 
     @pytest.fixture
     def _network_wrapper_without_polygon(self) -> OsmNetworkWrapper:
-        _network_type = "drive"
-        _road_types = ["road_link"]
+        _network_section = NetworkSection(
+            network_type="drive", road_types=["road_link"], directed=True
+        )
         _output_dir = test_results.joinpath("test_osm_network_wrapper")
         if not _output_dir.exists():
             _output_dir.mkdir(parents=True)
         yield OsmNetworkWrapper(
-            network_type=_network_type,
-            road_types=_road_types,
+            network_data=_network_section,
+            output_graph_dir=_output_dir,
             graph_crs="",
-            polygon_path=None,
-            directed=True,
-            output_graph_dir=_output_dir
         )
 
     def test_download_clean_graph_from_osm_with_invalid_polygon_arg(

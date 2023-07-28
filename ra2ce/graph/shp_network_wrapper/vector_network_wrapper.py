@@ -8,6 +8,7 @@ import momepy
 
 from shapely.geometry import Point
 from pyproj import CRS
+from ra2ce.graph.network_config_data.network_config_data import NetworkSection
 from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
 import ra2ce.graph.networks_utils as nut
 
@@ -19,17 +20,11 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
     network.
     """
 
-    primary_files: list[Path]
-    region_path: Path
-    crs: CRS
-    directed: bool
-
     def __init__(
         self,
-        primary_files: list[Path],
+        network_data: NetworkSection,
         region_path: Path,
         crs_value: str,
-        is_directed: bool,
     ) -> None:
         """Initializes the VectorNetworkWrapper object.
 
@@ -40,10 +35,10 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             ValueError: If the config is None or doesn't contain a network dictionary,
                 or if config['network'] is not a dictionary.
         """
-        self.primary_files = primary_files
+        self.primary_files = network_data.primary_file
+        self.directed = network_data.directed
         self.crs = CRS.from_user_input(crs_value if crs_value else "epsg:4326")
         self.region_path = region_path
-        self.directed = is_directed
 
     def get_network(
         self,
