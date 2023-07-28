@@ -9,11 +9,13 @@ from ra2ce.graph.network_config_data.network_config_data import (
     NetworkConfigData,
     NetworkSection,
 )
-from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
+from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
 
 from tests import test_data, slow_test, test_results
 import ra2ce.graph.networks_utils as nut
-from ra2ce.graph.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrapper
+from ra2ce.graph.network_wrappers.osm_network_wrapper.osm_network_wrapper import (
+    OsmNetworkWrapper,
+)
 
 
 class TestOsmNetworkWrapper:
