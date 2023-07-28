@@ -3,7 +3,7 @@ ENV HOME=/home/mambauser
 WORKDIR ${HOME}
 USER mambauser
 # RUN apt-get -qq update && apt-get install --yes --no-install-recommends libgdal-dev libgeos-dev libproj-dev && apt-get -qq purge && apt-get -qq clean && rm -rf /var/lib/apt/lists/*
-COPY .config/environment.yml pyproject.toml README.rst ${HOME}/
+COPY .config/environment.yml pyproject.toml README.md ${HOME}/
 RUN micromamba create -f environment.yml -y --no-pyc \
     && micromamba clean -ayf \
     && rm -rf ${HOME}/.cache \

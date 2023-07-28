@@ -1,24 +1,92 @@
-.. _user_guide:
+.. _docker_user_guide:
 
-User Guide
+Docker User Guide
 ==========
 
-Binder environment
+Introduction
 ---------------------------------
-Binder provides us an online web-tool capable of hosting a `conda` environment with the latest-greatest version of `RA2CE` already installed and ready to be used.
-In this environment you will find all our available examples as well as the possibility to create your own `Jupyter` notebooks or experiment with the `CLI` options.
+This user guide shows a couple of thing:
 
-- Our `ra2ce jupyter-binder <https://mybinder.org/v2/gh/Deltares/ra2ce/jupyter-binder>`_ environment.
-- More about `binder <https://mybinder.readthedocs.io/en/latest/>`_.
+a.  How to build a docker image from the ra2ce source tree and push it to a Dockerhub.
+b.  How to run a simple model inside a created container and save the generated data for later display.
+c.  (Future). How to get ra2ce plus displayer up and running in a standard Kubernetes environment.
+
+How to build a docker image from the ra2ce source tree
+------------------------------------------------------
+
+Assuming access to a Linux box with Docker installed, or a Docker Desktop with "Switch to Linux Containers". You can do the 
+following::
+
+    $ git clone git@github.com:Deltares/ra2ce.git
+    $ cd ra2ce
+    $ docker build -t race:latest .
+
+These instructions will build a docker image. After a good while, you should end up with::
+
+    $ docker images
+    REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
+    race         latest    616f672677f2   19 hours ago   1.01GB
+
+Remark that this is a local image only (it only exists on the server or laptop you build it). To share it with other team members, you should push this to a docker hub. This operation entails the following.
+
+a.  Login to your dockerhub account (go to https://hub.docker.com/ if you don't have that yet)::
+
+    $ docker login
+    Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
+    Username: willemdeltares
+    Password:
+    WARNING! Your password will be stored unencrypted in /u/noorduin/.docker/config.json.
+    Configure a credential helper to remove this warning. See
+    https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+    Login Succeeded
+
+b.  Retag the image::
+
+    $ docker tag race:latest willemdeltares/race:latest
+
+c.  Pushing the image to the dockerhub::
+
+    $ sudo docker push willemdeltares/race:latest
+
+If all is well, you can login to the dockerhub account and see the image yourself.
 
 
-Command-line interface operation
----------------------------------
-a.	To run both the network creation and analysis modules, run RA2CE with: ``python main.py --network_ini <path to network.ini file> --analyses_ini <path to analyses.ini file>``
-b.	To only run the network creation module, run RA2CE with: ``python main.py --network_ini <path to network.ini file>``
-c.	To only run the analysis module, run RA2CE with: ``python main.py --analyses_ini <path to analyses.ini file>``
+Simple run
+------------
 
-The user can also always ask for clarification of the input arguments with ``python main.py --help``.
+On probably another laptop you can do the following::
+
+    noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker pull willemdeltares/race:latest
+    latest: Pulling from willemdeltares/race
+    4db1b89c0bd1: Pull complete
+    d78e3c519d33: Pull complete
+    8219ddbde264: Pull complete
+    ....
+    d86857fa3e39: Pull complete
+    3a05d3e367e1: Pull complete
+    Digest: sha256:1c1cee508e498e7e58e01661b3c4047e458e936720ce11b8a242fae8375b1c7f
+    Status: Downloaded newer image for willemdeltares/race:latest
+    docker.io/willemdeltares/race:latest
+
+    noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker run -it --rm willemdeltares/race:latest bash
+    (base) 51d9aa2fdffd:~$ micromamba list
+    List of packages in environment: "/opt/conda"
+
+    (base) 51d9aa2fdffd:~$ micromamba env list
+      Name       Active  Path
+    ────────────────────────────────────────────────
+      base       *       /opt/conda
+      ra2ce_env          /opt/conda/envs/ra2ce_env
+
+    (base) 51d9aa2fdffd:~$ micromamba activate ra2ce_env
+    (ra2ce_env) 51d9aa2fdffd:~$ exit
+    exit
+
+
+
+
+ 
 
 
 Within a Python script
