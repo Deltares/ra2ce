@@ -40,6 +40,11 @@ class TrailsNetworkWrapper(NetworkWrapperProtocol):
         cleanup_section: CleanupSection,
         crs_value: str,
     ) -> None:
+        logging.info(
+            """The original OSM PBF import is no longer supported. 
+                Instead, the beta version of package TRAILS is used. 
+                First stable release of TRAILS is expected in 2023."""
+        )
         self.primary_files = network_data.primary_file
         self.segmentation_length = cleanup_section.segmentation_length
         self.crs = CRS.from_user_input(crs_value if crs_value else "epsg:4326")
