@@ -19,7 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 from pathlib import Path
 
 import geopandas as gpd
@@ -31,7 +30,6 @@ from shapely.geometry import Point
 
 
 def from_shapefile_to_poly(shapefile: Path, out_path: Path, outname: str = ""):
-
     """
     This function will create the .poly files from an input shapefile.
     If the shapefile contains multiple polygons, this function creates a seperate .polygon file for each region
@@ -107,19 +105,22 @@ def graph_to_gdf(graph, nodes=True, edges=True, node_geometry=True, fill_edge_ge
 
 
 def get_node_nearest_edge(graph: MultiDiGraph, node: tuple, return_geom=True, return_dist=True) -> dict:
+    """
+        Based on osmnx.
+    """
     node_coor = (node[1]['x'], node[1]['y'])
     # get u, v, key, geom from all the graph edges
     gdf_edges = graph_to_gdf(graph, nodes=False, fill_edge_geometry=True)
     edges = gdf_edges[["u", "v", "data", "key", "geometry"]].values
 
     # convert lat,lng (y,x) node to x,y for shapely distance operation
-    xy_point = Point(reversed(node_coor))
+    xy_point = Point(node_coor)
 
-    # calculate euclidean distance from each edge's geometry to this node
+    # calculate Euclidean distance from each edge's geometry to this node
     edge_distances = [(edge, xy_point.distance(edge[4])) for edge in edges]
 
-    # the nearest edge minimizes the distance to the node
-    (u, v, data, key, geom), dist = min(edge_distances, key=lambda x: x[1])
+    # the nearest edge minimizes the non-zero distance to the node
+    (u, v, data, key, geom), dist = min(edge_distances, key=lambda x: x[1] if x[1] > 0 else float('inf'))
     utils.log(f"Found nearest edge ({u, v, data, key}) to node {node}")
 
     # return results requested by caller
@@ -177,3 +178,23 @@ def get_node_nearest_edge(graph: MultiDiGraph, node: tuple, return_geom=True, re
         else:
             return {"node": node,
                     "nearest_edge": (u, v, data, key)}
+
+
+def _is_endpoint_simplified(graph: MultiDiGraph, node: int, strict=True) -> bool:
+    """
+    Based on osmnx. osmnx rules 3 and 4 are removed. Hence, the name _is_endpoint_simplified.
+    """
+    neighbors = set(list(graph.predecessors(node)) + list(graph.successors(node)))
+    n = len(neighbors)
+    d = graph.degree(node)
+
+    # rule 1
+    if node in neighbors:
+        # if the node appears in its list of neighbors, it self-loops
+        # this is always an endpoint.
+        return True
+
+    # rule 2
+    elif graph.out_degree(node) == 0 or graph.in_degree(node) == 0:
+        # if node has no incoming edges or no outgoing edges, it is an endpoint
+        return True

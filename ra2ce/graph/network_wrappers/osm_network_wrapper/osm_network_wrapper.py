@@ -23,10 +23,9 @@ import osmnx
 import pandas as pd
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
-from osmnx.simplification import _is_endpoint
 from shapely.geometry.base import BaseGeometry
 from ra2ce.graph.network_wrappers.osm_network_wrapper.osm_utils import (
-    get_node_nearest_edge,
+    get_node_nearest_edge, _is_endpoint_simplified,
 )
 
 import ra2ce.graph.networks_utils as nut
@@ -311,10 +310,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
     @staticmethod
     def snap_nodes_to_edges(graph: MultiDiGraph, threshold: float):
-        end_nodes = list()
-        for node in graph.nodes(data=True):
-            if _is_endpoint(graph, node[0]):
-                end_nodes.append(node)
+        end_nodes = [node for node in graph.nodes(data=True) if _is_endpoint_simplified(graph, node[0])]
 
         if not graph.graph or not graph.graph['crs']:
             graph.graph['crs'] = "epsg:4326"
@@ -333,20 +329,20 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
             projected_node_on_nearest_edge = nearest_edge_geom.interpolate(nearest_edge_geom.project(node_geom))
             print(projected_node_on_nearest_edge)
-
+        # ToDo: Check the interpolate/project hard-coed values. => e.g. I get 1.99 instead of 2
         # ToDo: Make sure the directions make sense after clustering; both for snap_edges.
         raise NotImplementedError("Next thing to do!")
 
 
-# _valid_unique_graph = nx.MultiDiGraph()
-# _valid_unique_graph.add_node(1, x=1, y=10)
-# _valid_unique_graph.add_node(2, x=2, y=20)
-# _valid_unique_graph.add_node(4, x=2, y=40)
-# _valid_unique_graph.add_node(5, x=3, y=50)
-#
-# _valid_unique_graph.add_edge(1, 2, x=[1, 2], y=[10, 20])
-# _valid_unique_graph.add_edge(2, 4, x=[2, 2], y=[20, 40])
-# _valid_unique_graph.add_edge(1, 4, x=[1, 2], y=[10, 40])
-# _valid_unique_graph.add_edge(5, 1, x=[3, 1], y=[50, 10])
-#
-# OsmNetworkWrapper.snap_nodes_to_edges(_valid_unique_graph, threshold=100)
+_valid_unique_graph = nx.MultiDiGraph()
+_valid_unique_graph.add_node(1, x=1, y=20)
+_valid_unique_graph.add_node(2, x=2, y=20)
+_valid_unique_graph.add_node(4, x=2, y=10)
+_valid_unique_graph.add_node(5, x=1, y=10)
+
+_valid_unique_graph.add_edge(1, 2, x=[1, 2], y=[20, 20])
+_valid_unique_graph.add_edge(2, 4, x=[2, 2], y=[20, 10])
+_valid_unique_graph.add_edge(1, 4, x=[1, 2], y=[20, 10])
+_valid_unique_graph.add_edge(5, 1, x=[1, 2], y=[10, 20])
+
+OsmNetworkWrapper.snap_nodes_to_edges(_valid_unique_graph, threshold=10)
