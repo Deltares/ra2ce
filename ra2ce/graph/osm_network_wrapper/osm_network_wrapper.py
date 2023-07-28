@@ -21,6 +21,8 @@ import networkx as nx
 import osmnx
 from networkx import MultiDiGraph
 from osmnx import consolidate_intersections
+from osmnx.simplification import _is_endpoint
+from osmnx_wrapper import OsmnxWrapper
 from shapely.geometry.base import BaseGeometry
 
 import ra2ce.graph.networks_utils as nut
@@ -41,7 +43,6 @@ class OsmNetworkWrapper:
             )
         if not isinstance(config.get("network"), dict):
             raise ValueError('Config["network"] should be a dictionary')
-
         self.network_dict = config["network"]
         self.output_path = config["static"] / "output_graph"
         self.graph_crs = graph_crs
@@ -50,13 +51,14 @@ class OsmNetworkWrapper:
 
     def get_clean_graph_from_osm(self) -> MultiDiGraph:
         """
-        Creates a network from a polygon by by downloading via the OSM API in its extent.
+        Creates a network from a polygon by downloading via the OSM API in its extent.
 
         Raises:
             FileNotFoundError: When no valid polygon file is provided.
 
         Returns:
-            MultiDiGraph: Complex (clean) graph after download from OSM, for use in the direct analyses and input to derive simplified network.
+            MultiDiGraph: Complex (clean) graph after download from OSM, for use in the direct analyses and input to
+            derive simplified network.
         """
         # It can only read in one geojson
         if not self.network_dict.get("polygon", []):
@@ -77,7 +79,7 @@ class OsmNetworkWrapper:
         return _complex_graph
 
     def _download_clean_graph_from_osm(
-        self, polygon: BaseGeometry, road_types: str, network_type: str
+            self, polygon: BaseGeometry, road_types: str, network_type: str
     ) -> MultiDiGraph:
         if not road_types and not network_type:
             raise ValueError("Either of the link_type or network_type should be known")
@@ -144,7 +146,7 @@ class OsmNetworkWrapper:
 
     @staticmethod
     def drop_duplicates_in_nodes(
-        unique_elements: set, graph: MultiDiGraph
+            unique_elements: set, graph: MultiDiGraph
     ) -> MultiDiGraph:
         if unique_elements is None or not isinstance(unique_elements, set):
             raise ValueError("unique_elements should be a set")
@@ -168,7 +170,7 @@ class OsmNetworkWrapper:
 
     @staticmethod
     def drop_duplicates_in_edges(
-        unique_elements: set, unique_graph: MultiDiGraph, graph: MultiDiGraph
+            unique_elements: set, unique_graph: MultiDiGraph, graph: MultiDiGraph
     ):
         """
         Checks if both extremities are in the unique_graph (u has not the same coor of v, no line from u to itself is
@@ -176,9 +178,9 @@ class OsmNetworkWrapper:
         considering it in the unique graph
         """
         if (
-            not unique_elements
-            or not any(unique_elements)
-            or not all(isinstance(item, tuple) for item in unique_elements)
+                not unique_elements
+                or not any(unique_elements)
+                or not all(isinstance(item, tuple) for item in unique_elements)
         ):
             raise ValueError(
                 """unique_elements cannot be None, empty, or have non-tuple elements. 
@@ -193,9 +195,9 @@ class OsmNetworkWrapper:
         def validity_check(extremities_tuple) -> bool:
             extremities = extremities_tuple[0]
             return not (
-                extremities.from_to_id is None
-                or extremities.from_to_coor is None
-                or extremities.from_id == extremities.to_id
+                    extremities.from_to_id is None
+                    or extremities.from_to_coor is None
+                    or extremities.from_id == extremities.to_id
             )
 
         def valid_extremity_data(u, v, data) -> tuple[ExtremitiesData, dict]:
@@ -210,8 +212,8 @@ class OsmNetworkWrapper:
             return _extremities_data, data
 
         for _extremity_data, _edge_data in filter(
-            validity_check,
-            map(lambda edge: valid_extremity_data(*edge), graph.edges(data=True)),
+                validity_check,
+                map(lambda edge: valid_extremity_data(*edge), graph.edges(data=True)),
         ):
             _id_combination = (_extremity_data.from_to_id, _extremity_data.to_from_id)
             _coor_combination = (
@@ -219,8 +221,8 @@ class OsmNetworkWrapper:
                 _extremity_data.to_from_coor,
             )
             if all(
-                _combination not in unique_elements
-                for _combination in [_id_combination, _coor_combination]
+                    _combination not in unique_elements
+                    for _combination in [_id_combination, _coor_combination]
             ):
                 edge_attributes = {key: value for key, value in _edge_data.items()}
                 unique_graph.add_edge(
@@ -232,11 +234,48 @@ class OsmNetworkWrapper:
         return unique_graph
 
     @staticmethod
-    def snap_nodes_to_nodes(graph: MultiDiGraph, threshold: float) -> MultiDiGraph:
+    def snap_nodes_to_nodes(graph: MultiDiGraph, threshold: float, rebuild_graph=True, dead_ends=False) -> MultiDiGraph:
         return consolidate_intersections(
-            G=graph, rebuild_graph=True, tolerance=threshold, dead_ends=False
+            G=graph, rebuild_graph=rebuild_graph, tolerance=threshold, dead_ends=dead_ends
         )
 
     @staticmethod
     def snap_nodes_to_edges(graph: MultiDiGraph, threshold: float):
+        osmnx_wrapper = OsmnxWrapper()
+        end_points = set([node for node in graph.nodes() if _is_endpoint(graph, node)])
+
+        if not graph.graph or not graph.graph["crs"]:
+            graph.graph["crs"] = "epsg:4326"
+
+        nut.add_missing_geoms_graph(graph=graph, geom_name="geometry").to_directed()
+
+        def threshold_check(node_nearest_ed: dict):
+            (node, nearest_ed) = next(iter(node_nearest_ed.items()))
+            distance = nearest_ed[-1]
+            return distance < threshold
+
+        for node_nearest_edge_data in filter(threshold_check,
+                                             map(lambda node: osmnx_wrapper.get_node_nearest_edge(
+                                                 graph, (graph.nodes[node]['x'], graph.nodes[node]['y'])),
+                                                 end_points)):
+            (node, nearest_edge) = next(iter(node_nearest_edge_data.items()))
+            # nearest_edge
+            # projected_node = .interpolate(shply_line.project(row.geometry))
+            print(node_nearest_edge_data)
+
+        # ToDo: Make sure the directions make sense after clustering; both for snap_edges.
         raise NotImplementedError("Next thing to do!")
+
+
+_valid_unique_graph = nx.MultiDiGraph()
+_valid_unique_graph.add_node(1, x=1, y=10)
+_valid_unique_graph.add_node(2, x=2, y=20)
+_valid_unique_graph.add_node(4, x=2, y=40)
+_valid_unique_graph.add_node(5, x=3, y=50)
+
+_valid_unique_graph.add_edge(1, 2, x=[1, 2], y=[10, 20])
+_valid_unique_graph.add_edge(2, 4, x=[2, 2], y=[20, 40])
+_valid_unique_graph.add_edge(1, 4, x=[1, 2], y=[10, 40])
+_valid_unique_graph.add_edge(5, 1, x=[3, 1], y=[50, 10])
+
+OsmNetworkWrapper.snap_nodes_to_edges(_valid_unique_graph, threshold=100)
