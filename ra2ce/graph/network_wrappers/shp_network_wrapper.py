@@ -42,6 +42,7 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
         _cleanup_options = config_data.cleanup
 
         self.project_name = config_data.project.name
+        self.output_graph_dir = config_data.output_graph_dir
         self.crs = config_data.crs
 
         # Network options
