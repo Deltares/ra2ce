@@ -31,9 +31,11 @@ from ra2ce.graph import networks_utils as nut
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrapper
-from ra2ce.graph.segmentation import Segmentation
 from ra2ce.graph.shp_network_wrapper.shp_network_wrapper import ShpNetworkWrapper
 from ra2ce.graph.shp_network_wrapper.vector_network_wrapper import VectorNetworkWrapper
+from ra2ce.graph.trails_network_wrapper.trails_network_wrapper import (
+    TrailsNetworkWrapper,
+)
 
 
 class Network:
@@ -79,6 +81,14 @@ class Network:
 
         # files
         self.files = files
+
+    def _any_cleanup_enabled(self) -> bool:
+        return (
+            self._cleanup.snapping_threshold
+            or self._cleanup.pruning_threshold
+            or self._cleanup.merge_lines
+            or self._cleanup.cut_at_intersections
+        )
 
     def _create_network_from_shp(
         self,
@@ -147,76 +157,6 @@ class Network:
         # Set the CRS of the graph and network to wrapper crs
         self.base_graph_crs = vector_network_wrapper.crs
         self.base_network_crs = vector_network_wrapper.crs
-
-        return graph_complex, edges_complex
-
-    def network_trails_import(
-        self, crs: int = 4326
-    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
-        """Creates a network which has been prepared in the TRAILS package
-
-        #Todo: we might later simply import the whole trails code as a package, and directly use these functions
-        #Todo: because TRAILS is still in beta version we better wait with that untill the first stable version is
-        # released
-
-        Returns:
-            graph_simple (NetworkX graph): Simplified graph (for use in the indirect analyses).
-            complex_edges (GeoDataFrame): Complex graph (for use in the direct analyses).
-        """
-
-        logging.info(
-            "TRAILS importer: Reads the provided primary edge file: {}, assumes there also is a_nodes file".format(
-                self._network_config.primary_file
-            )
-        )
-
-        logging.warning(
-            "Any coordinate projection information in the feather file will be overwritten (with default WGS84)"
-        )
-        # Make a pyproj CRS from the EPSG code
-        crs = pyproj.CRS.from_user_input(crs)
-
-        edge_file = self._network_config.primary_file[0]
-        edges = gpd.read_feather(edge_file)
-        edges = edges.set_crs(crs)
-
-        corresponding_node_file = edge_file.replace("edges", "nodes")
-        assert (
-            corresponding_node_file.exists()
-        ), "The node file could not be found while importing from TRAILS"
-        nodes = gpd.read_feather(corresponding_node_file)
-        nodes = nodes.set_crs(crs)
-        # nodes = pd.read_pickle(
-        #     corresponding_node_file
-        # )  # Todo: Throw exception if nodes file is not present
-
-        logging.info("TRAILS importer: start generating graph")
-        # tempfix to rename columns
-        edges = edges.rename({"from_id": "node_A", "to_id": "node_B"}, axis="columns")
-        node_id = "id"
-        graph_simple = nut.graph_from_gdf(edges, nodes, name="network", node_id=node_id)
-
-        logging.info("TRAILS importer: graph generating was succesfull.")
-        logging.warning(
-            "RA2CE will not clean-up your graph, assuming that it is already done in TRAILS"
-        )
-
-        if self._cleanup.segmentation_length:
-            logging.info("TRAILS importer: start segmentating graph")
-            to_segment = Segmentation(edges, self._cleanup.segmentation_length)
-            edges_simple_segmented = to_segment.apply_segmentation()
-            if edges_simple_segmented.crs is None:  # The CRS might have dissapeared.
-                edges_simple_segmented.crs = edges.crs  # set the right CRS
-                edges_complex = edges_simple_segmented
-
-        else:
-            edges_complex = edges
-
-        graph_complex = graph_simple  # NOTE THAT DIFFERENCE
-        # BETWEEN SIMPLE AND COMPLEX DOES NOT EXIST WHEN IMPORTING WITH TRAILS
-
-        # Todo: better control over metadata in trails
-        # Todo: better control over where things are saved in the pipeline
 
         return graph_complex, edges_complex
 
@@ -316,14 +256,6 @@ class Network:
         )
         self.files[graph_name] = _exporter.get_pickle_path()
 
-    def _any_cleanup_enabled(self) -> bool:
-        return (
-            self._cleanup.snapping_threshold
-            or self._cleanup.pruning_threshold
-            or self._cleanup.merge_lines
-            or self._cleanup.cut_at_intersections
-        )
-
     def create(self) -> dict:
         """Handler function with the logic to call the right functions to create a network.
 
@@ -349,7 +281,9 @@ class Network:
                 )
 
                 # base_graph, network_gdf = self.network_osm_pbf() #The old approach is depreciated
-                base_graph, network_gdf = self.network_trails_import()
+                base_graph, network_gdf = TrailsNetworkWrapper(
+                    network_data=self._network_config, crs_value=4326
+                ).get_network()
 
                 self.base_network_crs = network_gdf.crs
 
