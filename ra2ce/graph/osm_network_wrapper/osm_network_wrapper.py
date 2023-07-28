@@ -55,6 +55,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         Returns:
             tuple[MultiGraph, GeoDataFrame]: _description_
         """
+        logging.info("Start downloading a network from OSM.")
         graph_complex = self.get_clean_graph_from_osm()
 
         # Create 'graph_simple'

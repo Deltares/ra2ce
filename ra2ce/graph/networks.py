@@ -20,6 +20,7 @@
 """
 
 import logging
+from pathlib import Path
 from typing import Any
 
 import geopandas as gpd
@@ -91,16 +92,14 @@ class Network:
         )
 
     def _create_network_from_shp(
-        self,
+        self, crs_value: int
     ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         logging.info("Start creating a network from the submitted shapefile.")
         if self._any_cleanup_enabled():
-            return self.network_shp()
+            return self.network_shp(crs_value)
         return self.network_cleanshp()
 
-    def network_shp(
-        self, crs: int = 4326
-    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+    def network_shp(self, crs: int) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """Creates a (graph) network from a shapefile.
 
         Returns the same geometries for the network (GeoDataFrame) as for the graph (NetworkX graph), because
@@ -124,9 +123,6 @@ class Network:
             self.output_graph_dir,
             self.project_name,
         )
-
-        self.base_graph_crs = pyproj.CRS.from_user_input(crs)
-        self.base_network_crs = pyproj.CRS.from_user_input(crs)
 
         # Exporting complex graph because the shapefile should be kept the same as much as possible.
         return graph_complex, edges_complex
@@ -154,13 +150,11 @@ class Network:
             edges_complex,
         ) = vector_network_wrapper.get_network()
 
-        # Set the CRS of the graph and network to wrapper crs
-        self.base_graph_crs = vector_network_wrapper.crs
-        self.base_network_crs = vector_network_wrapper.crs
-
         return graph_complex, edges_complex
 
-    def network_osm_download(self) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+    def network_osm_download(
+        self, crs: int
+    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """
         Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
 
@@ -169,19 +163,12 @@ class Network:
         """
         osm_network = OsmNetworkWrapper(
             network_data=self._network_config,
-            graph_crs="",
+            graph_crs=crs,
             output_graph_dir=self.output_graph_dir,
         )
         graph_simple, edges_complex = osm_network.get_network()
 
         # No segmentation required, the non-simplified road segments from OSM are already small enough
-        self.base_graph_crs = pyproj.CRS.from_user_input(
-            "EPSG:4326"
-        )  # Graphs from OSM download are always in this CRS.
-        self.base_network_crs = pyproj.CRS.from_user_input(
-            "EPSG:4326"
-        )  # Graphs from OSM download are always in this CRS.
-
         return graph_simple, edges_complex
 
     def add_od_nodes(
@@ -256,6 +243,77 @@ class Network:
         )
         self.files[graph_name] = _exporter.get_pickle_path()
 
+    def _create_new_network_and_graph(
+        self, source: str, crs_value: int
+    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+        # Create the network from the network source
+        if source == "shapefile":
+            return self._create_network_from_shp(crs_value)
+        elif source == "OSM PBF":
+            return TrailsNetworkWrapper(
+                network_data=self._network_config, crs_value=crs_value
+            ).get_network()
+        elif source == "OSM download":
+            return self.network_osm_download(crs_value)
+        elif source == "pickle":
+            logging.info("Start importing a network from pickle")
+            base_graph = GraphPickleReader().read(
+                self.output_graph_dir.joinpath("base_graph.p")
+            )
+            network_gdf = gpd.read_feather(
+                self.output_graph_dir.joinpath("base_network.feather")
+            )
+            return base_graph, network_gdf
+
+    def _get_new_network_and_graph(
+        self, source: str, export_types: list[str]
+    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+        _base_graph, _network_gdf = self._create_new_network_and_graph(source, 4326)
+
+        # Set the road lengths to meters for both the base_graph and network_gdf
+        # TODO: rename "length" column to "length [m]" to be explicit
+        edges_lengths_meters = {
+            (e[0], e[1], e[2]): {
+                "length": nut.line_length(e[-1]["geometry"], _network_gdf.crs)
+            }
+            for e in _base_graph.edges.data(keys=True)
+        }
+        nx.set_edge_attributes(_base_graph, edges_lengths_meters)
+
+        _network_gdf["length"] = _network_gdf["geometry"].apply(
+            lambda x: nut.line_length(x, _network_gdf.crs)
+        )
+
+        # Save the graph and geodataframe
+        self._export_network_files(_base_graph, "base_graph", export_types)
+        self._export_network_files(_network_gdf, "base_network", export_types)
+        return _base_graph, _network_gdf
+
+    def _get_stored_network_and_graph(
+        self, base_graph_filepath: Path, base_network_filepath: Path
+    ):
+        logging.info(
+            "Apparently, you already did create a network with ra2ce earlier. "
+            + "Ra2ce will use this: {}".format(base_graph_filepath)
+        )
+
+        def check_base_file(file_type: str, file_path: Path):
+            if not isinstance(base_graph_filepath) or not base_graph_filepath.is_file():
+                raise FileNotFoundError(
+                    "No base {} file found at {}.".format(file_type, file_path)
+                )
+
+        check_base_file("graph", base_graph_filepath)
+        check_base_file("network", base_network_filepath)
+
+        _base_graph = GraphPickleReader().read(base_graph_filepath)
+        _network_gdf = gpd.read_feather(base_network_filepath)
+
+        # Assuming the same CRS for both the network and graph
+        self.base_graph_crs = _network_gdf.crs
+        self.base_network_crs = _network_gdf.crs
+        return _base_graph, _network_gdf
+
     def create(self) -> dict:
         """Handler function with the logic to call the right functions to create a network.
 
@@ -270,75 +328,13 @@ class Network:
 
         # For all graph and networks - check if it exists, otherwise, make the graph and/or network.
         if not (self.files["base_graph"] or self.files["base_network"]):
-            # Create the network from the network source
-            if self._network_config.source == "shapefile":
-                base_graph, network_gdf = self._create_network_from_shp()
-            elif self._network_config.source == "OSM PBF":
-                logging.info(
-                    """The original OSM PBF import is no longer supported. 
-                                Instead, the beta version of package TRAILS is used. 
-                                First stable release of TRAILS is expected in 2023."""
-                )
-
-                # base_graph, network_gdf = self.network_osm_pbf() #The old approach is depreciated
-                base_graph, network_gdf = TrailsNetworkWrapper(
-                    network_data=self._network_config, crs_value=4326
-                ).get_network()
-
-                self.base_network_crs = network_gdf.crs
-
-            elif self._network_config.source == "OSM download":
-                logging.info("Start downloading a network from OSM.")
-                base_graph, network_gdf = self.network_osm_download()
-            elif self._network_config.source == "pickle":
-                logging.info("Start importing a network from pickle")
-                base_graph = GraphPickleReader().read(
-                    self.output_graph_dir.joinpath("base_graph.p")
-                )
-                network_gdf = gpd.read_feather(
-                    self.output_graph_dir.joinpath("base_network.feather")
-                )
-
-                # Assuming the same CRS for both the network and graph
-                self.base_graph_crs = pyproj.CRS.from_user_input(network_gdf.crs)
-                self.base_network_crs = pyproj.CRS.from_user_input(network_gdf.crs)
-
-            # Set the road lengths to meters for both the base_graph and network_gdf
-            # TODO: rename "length" column to "length [m]" to be explicit
-            edges_lengths_meters = {
-                (e[0], e[1], e[2]): {
-                    "length": nut.line_length(e[-1]["geometry"], self.base_graph_crs)
-                }
-                for e in base_graph.edges.data(keys=True)
-            }
-            nx.set_edge_attributes(base_graph, edges_lengths_meters)
-
-            network_gdf["length"] = network_gdf["geometry"].apply(
-                lambda x: nut.line_length(x, self.base_network_crs)
+            base_graph, network_gdf = self._get_new_network_and_graph(
+                self._network_config.source, to_save
             )
-
-            # Save the graph and geodataframe
-            self._export_network_files(base_graph, "base_graph", to_save)
-            self._export_network_files(network_gdf, "base_network", to_save)
         else:
-            logging.info(
-                "Apparently, you already did create a network with ra2ce earlier. "
-                + "Ra2ce will use this: {}".format(self.files["base_graph"])
+            base_graph, network_gdf = self._get_stored_network_and_graph(
+                self.files["base_graph"], self.files["base_network"]
             )
-
-            if self.files["base_graph"] is not None:
-                base_graph = GraphPickleReader().read(self.files["base_graph"])
-            else:
-                base_graph = None
-
-            if self.files["base_network"] is not None:
-                network_gdf = gpd.read_feather(self.files["base_network"])
-            else:
-                network_gdf = None
-
-            # Assuming the same CRS for both the network and graph
-            self.base_graph_crs = pyproj.CRS.from_user_input(network_gdf.crs)
-            self.base_network_crs = pyproj.CRS.from_user_input(network_gdf.crs)
 
         # create origins destinations graph
         if (
