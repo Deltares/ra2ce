@@ -7,12 +7,11 @@ import networkx as nx
 from shapely.geometry import LineString, Point, MultiLineString
 from ra2ce.graph.network_config_data.network_config_data import (
     NetworkConfigData,
-    NetworkSection,
 )
-from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
+from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
 
 from tests import test_data
-from ra2ce.graph.shp_network_wrapper.vector_network_wrapper import VectorNetworkWrapper
+from ra2ce.graph.network_wrappers.vector_network_wrapper import VectorNetworkWrapper
 
 _test_dir = test_data / "vector_network_wrapper"
 

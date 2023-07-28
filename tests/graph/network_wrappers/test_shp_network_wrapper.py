@@ -2,8 +2,10 @@ from ra2ce.graph.network_config_data.network_config_data import (
     NetworkSection,
     CleanupSection,
 )
-from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
-from ra2ce.graph.shp_network_wrapper.shp_network_wrapper import ShpNetworkWrapper
+from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
+from ra2ce.graph.network_wrappers.shp_network_wrapper import (
+    ShpNetworkWrapper,
+)
 
 
 class TestShpNetworkWrapper:

@@ -31,7 +31,7 @@ from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as nut
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.graph.network_wrapper_factory import NetworkWrapperFactory
+from ra2ce.graph.network_wrappers.network_wrapper_factory import NetworkWrapperFactory
 
 
 class Network:
