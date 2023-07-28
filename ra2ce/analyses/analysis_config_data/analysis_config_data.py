@@ -21,6 +21,7 @@
 
 
 from __future__ import annotations
+
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 
 

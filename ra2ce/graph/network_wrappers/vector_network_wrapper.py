@@ -22,15 +22,15 @@
 import logging
 from pathlib import Path
 
-import networkx as nx
-import pandas as pd
 import geopandas as gpd
 import momepy
-
+import networkx as nx
+import pandas as pd
 from shapely.geometry import Point
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
+
 import ra2ce.graph.networks_utils as nut
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
 
 
 class VectorNetworkWrapper(NetworkWrapperProtocol):

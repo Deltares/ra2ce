@@ -1,18 +1,18 @@
+import logging
+
+import geopandas as gpd
 from geopandas import GeoDataFrame
 from networkx import MultiGraph
+
+from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
-from ra2ce.graph.network_wrappers.shp_network_wrapper import ShpNetworkWrapper
-from ra2ce.graph.network_wrappers.vector_network_wrapper import VectorNetworkWrapper
-import logging
 from ra2ce.graph.network_wrappers.osm_network_wrapper.osm_network_wrapper import (
     OsmNetworkWrapper,
 )
-from ra2ce.graph.network_wrappers.trails_network_wrapper import (
-    TrailsNetworkWrapper,
-)
-from ra2ce.common.io.readers import GraphPickleReader
-import geopandas as gpd
+from ra2ce.graph.network_wrappers.shp_network_wrapper import ShpNetworkWrapper
+from ra2ce.graph.network_wrappers.trails_network_wrapper import TrailsNetworkWrapper
+from ra2ce.graph.network_wrappers.vector_network_wrapper import VectorNetworkWrapper
 
 
 class NetworkWrapperFactory(NetworkWrapperProtocol):

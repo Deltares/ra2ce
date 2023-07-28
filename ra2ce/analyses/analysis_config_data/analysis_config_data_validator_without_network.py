@@ -21,16 +21,15 @@
 
 
 from pathlib import Path
+
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigDataWithoutNetwork,
 )
-
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
 from ra2ce.graph.network_config_data.network_config_data_validator import (
     NetworkDictValues,
 )
-
 
 IndirectAnalysisNameList: list[str] = [
     "single_link_redundancy",

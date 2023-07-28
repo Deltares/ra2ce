@@ -1,12 +1,12 @@
 import pytest
 
-from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_factory import (
-    AnalysisConfigWrapperFactory,
-)
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisConfigDataWithNetwork,
     AnalysisConfigDataWithoutNetwork,
+)
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_factory import (
+    AnalysisConfigWrapperFactory,
 )
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_with_network import (
     AnalysisConfigWrapperWithNetwork,

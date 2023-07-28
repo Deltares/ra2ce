@@ -19,23 +19,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import logging
+
+import geopandas as gpd
 from geopandas import GeoDataFrame
 from networkx import MultiGraph
-from ra2ce.graph.network_config_data.network_config_data import (
-    NetworkConfigData,
-)
-from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
+
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
 from ra2ce.graph.networks_utils import graph_from_gdf
 from ra2ce.graph.segmentation import Segmentation
-import logging
-import geopandas as gpd
 
 
 class TrailsNetworkWrapper(NetworkWrapperProtocol):
-    def __init__(
-        self,
-        config_data: NetworkConfigData
-    ) -> None:
+    def __init__(self, config_data: NetworkConfigData) -> None:
         logging.info(
             """The original OSM PBF import is no longer supported. 
                 Instead, the beta version of package TRAILS is used. 

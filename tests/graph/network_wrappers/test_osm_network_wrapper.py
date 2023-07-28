@@ -1,21 +1,22 @@
 from pathlib import Path
+
 import networkx as nx
 import pytest
 from networkx import Graph, MultiDiGraph
 from networkx.utils import graphs_equal
 from shapely.geometry import LineString, Polygon
 from shapely.geometry.base import BaseGeometry
+
+import ra2ce.graph.networks_utils as nut
 from ra2ce.graph.network_config_data.network_config_data import (
     NetworkConfigData,
     NetworkSection,
 )
 from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
-
-from tests import test_data, slow_test, test_results
-import ra2ce.graph.networks_utils as nut
 from ra2ce.graph.network_wrappers.osm_network_wrapper.osm_network_wrapper import (
     OsmNetworkWrapper,
 )
+from tests import slow_test, test_data, test_results
 
 
 class TestOsmNetworkWrapper:

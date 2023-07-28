@@ -1,4 +1,5 @@
 from typing import Protocol, runtime_checkable
+
 from geopandas import GeoDataFrame
 from networkx import MultiGraph
 

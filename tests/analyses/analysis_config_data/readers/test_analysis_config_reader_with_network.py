@@ -1,5 +1,6 @@
 from pathlib import Path
 from typing import Any
+
 import pytest
 
 from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_with_network import (
