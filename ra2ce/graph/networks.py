@@ -31,12 +31,7 @@ from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as nut
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.graph.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrapper
-from ra2ce.graph.shp_network_wrapper.shp_network_wrapper import ShpNetworkWrapper
-from ra2ce.graph.shp_network_wrapper.vector_network_wrapper import VectorNetworkWrapper
-from ra2ce.graph.trails_network_wrapper.trails_network_wrapper import (
-    TrailsNetworkWrapper,
-)
+from ra2ce.graph.network_wrapper_factory import NetworkWrapperFactory
 
 
 class Network:
@@ -78,37 +73,8 @@ class Network:
         self.region = _origins_destinations.region
         self.region_var = _origins_destinations.region_var
 
-        # Cleanup
-        self._cleanup = network_config.cleanup
-
         # files
         self.files = files
-
-    def _any_cleanup_enabled(self) -> bool:
-        return (
-            self._cleanup.snapping_threshold
-            or self._cleanup.pruning_threshold
-            or self._cleanup.merge_lines
-            or self._cleanup.cut_at_intersections
-        )
-
-    def _create_network_from_shp(
-        self,
-    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
-        logging.info("Start creating a network from the submitted shapefile.")
-        if self._any_cleanup_enabled():
-            return ShpNetworkWrapper(self._config_data).get_network()
-        return VectorNetworkWrapper(self._config_data).get_network()
-
-    def network_osm_download(self) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
-        """
-        Creates a network from a polygon by downloading via the OSM API in the extent of the polygon.
-
-        Returns:
-            tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]: Tuple of Simplified graph (for use in the indirect analyses) and Complex graph (for use in the direct analyses).
-        """
-
-        return OsmNetworkWrapper(self._config_data).get_network()
 
     def add_od_nodes(
         self, graph: nx.classes.graph.Graph, crs: pyproj.CRS
@@ -182,30 +148,12 @@ class Network:
         )
         self.files[graph_name] = _exporter.get_pickle_path()
 
-    def _create_new_network_and_graph(
-        self, source: str
-    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
-        # Create the network from the network source
-        if source == "shapefile":
-            return self._create_network_from_shp()
-        elif source == "OSM PBF":
-            return TrailsNetworkWrapper(self._config_data).get_network()
-        elif source == "OSM download":
-            return self.network_osm_download()
-        elif source == "pickle":
-            logging.info("Start importing a network from pickle")
-            base_graph = GraphPickleReader().read(
-                self.output_graph_dir.joinpath("base_graph.p")
-            )
-            network_gdf = gpd.read_feather(
-                self.output_graph_dir.joinpath("base_network.feather")
-            )
-            return base_graph, network_gdf
-
     def _get_new_network_and_graph(
-        self, source: str, export_types: list[str]
+        self, export_types: list[str]
     ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
-        _base_graph, _network_gdf = self._create_new_network_and_graph(source)
+        _base_graph, _network_gdf = NetworkWrapperFactory(
+            self._config_data
+        ).get_network()
 
         # Set the road lengths to meters for both the base_graph and network_gdf
         # TODO: rename "length" column to "length [m]" to be explicit
@@ -265,9 +213,7 @@ class Network:
 
         # For all graph and networks - check if it exists, otherwise, make the graph and/or network.
         if not (self.files["base_graph"] or self.files["base_network"]):
-            base_graph, network_gdf = self._get_new_network_and_graph(
-                self._network_config.source, to_save
-            )
+            base_graph, network_gdf = self._get_new_network_and_graph(to_save)
         else:
             base_graph, network_gdf = self._get_stored_network_and_graph(
                 self.files["base_graph"], self.files["base_network"]
