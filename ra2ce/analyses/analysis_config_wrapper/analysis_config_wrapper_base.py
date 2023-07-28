@@ -20,7 +20,7 @@
 """
 
 
-from abc import abstractmethod, abstractclassmethod
+from abc import abstractclassmethod, abstractmethod
 from pathlib import Path
 from typing import Optional
 

@@ -25,8 +25,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from pyproj import CRS
+
+from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 
 
 @dataclass

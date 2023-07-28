@@ -23,9 +23,6 @@
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
-    AnalysisConfigWrapperBase,
-)
 from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
@@ -34,6 +31,9 @@ from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_with_net
 )
 from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_without_network import (
     AnalysisConfigReaderWithoutNetwork,
+)
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
+    AnalysisConfigWrapperBase,
 )
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 

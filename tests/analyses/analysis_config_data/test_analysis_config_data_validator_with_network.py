@@ -1,3 +1,8 @@
+from pathlib import Path
+from typing import Optional
+
+import pytest
+
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigDataWithNetwork,
 )
@@ -6,10 +11,7 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_with_net
 )
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
-import pytest
 from tests import test_data
-from typing import Optional
-from pathlib import Path
 
 
 class TestAnalysisConfigDataValidatorWithNetwork:

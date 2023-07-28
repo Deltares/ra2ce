@@ -20,26 +20,22 @@ from typing import Any
 
 import networkx as nx
 import osmnx
+import pandas as pd
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
-from osmnx import consolidate_intersections
 from shapely.geometry.base import BaseGeometry
-from ra2ce.graph.network_config_data.network_config_data import (
-    NetworkConfigData,
-    NetworkSection,
-)
-from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
-from ra2ce.graph.exporters.json_exporter import JsonExporter
-import pandas as pd
+
 import ra2ce.graph.networks_utils as nut
-from ra2ce.graph.osm_network_wrapper.extremities_data import ExtremitiesData
+from ra2ce.graph.exporters.json_exporter import JsonExporter
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
+from ra2ce.graph.network_wrappers.osm_network_wrapper.extremities_data import (
+    ExtremitiesData,
+)
 
 
 class OsmNetworkWrapper(NetworkWrapperProtocol):
-    def __init__(
-        self,
-        config_data: NetworkConfigData
-    ) -> None:
+    def __init__(self, config_data: NetworkConfigData) -> None:
         self.output_graph_dir = config_data.output_graph_dir
         self.graph_crs = config_data.crs
 
@@ -304,7 +300,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
     @staticmethod
     def snap_nodes_to_nodes(graph: MultiDiGraph, threshold: float) -> MultiDiGraph:
-        return consolidate_intersections(
+        return osmnx.consolidate_intersections(
             G=graph, rebuild_graph=True, tolerance=threshold, dead_ends=False
         )
 

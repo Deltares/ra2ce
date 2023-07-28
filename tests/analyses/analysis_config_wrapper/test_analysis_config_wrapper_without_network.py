@@ -1,13 +1,12 @@
+import shutil
+
 import pytest
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
-)
+from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_without_network import (
     AnalysisConfigWrapperWithoutNetwork,
 )
 from tests import acceptance_test_data, test_results
-import shutil
 
 
 class TestAnalysisWithoutNetworkConfiguration:

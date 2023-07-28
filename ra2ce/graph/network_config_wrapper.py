@@ -37,6 +37,7 @@ from ra2ce.graph.network_config_data.network_config_data_validator import (
 )
 from ra2ce.graph.networks import Network
 
+
 class NetworkConfigWrapper(ConfigWrapperProtocol):
     files: Dict[str, Path] = {}
     config_data: NetworkConfigData

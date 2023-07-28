@@ -19,16 +19,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import math
-import geopandas as gpd
-import pandas as pd
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
-import ra2ce.graph.networks_utils as nut
-from shapely.geometry import MultiLineString
 import logging
-import networkx as nx
+import math
 
+import geopandas as gpd
+import networkx as nx
+import pandas as pd
+from shapely.geometry import MultiLineString
+
+import ra2ce.graph.networks_utils as nut
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
 from ra2ce.graph.segmentation import Segmentation
 
 
