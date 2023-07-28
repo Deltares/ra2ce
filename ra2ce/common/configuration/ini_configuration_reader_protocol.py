@@ -21,6 +21,7 @@
 
 from pathlib import Path
 from typing import Protocol, runtime_checkable
+
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.common.io.readers.file_reader_protocol import FileReaderProtocol
 

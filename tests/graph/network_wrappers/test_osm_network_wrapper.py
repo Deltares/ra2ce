@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import networkx as nx
 import pytest
 from networkx import Graph, MultiDiGraph
@@ -6,26 +7,42 @@ from networkx.utils import graphs_equal
 from shapely.geometry import LineString, Polygon
 from shapely.geometry.base import BaseGeometry
 
-from tests import test_data, slow_test
 import ra2ce.graph.networks_utils as nut
-from ra2ce.graph.osm_network_wrapper.osm_network_wrapper import OsmNetworkWrapper
+from ra2ce.graph.network_config_data.network_config_data import (
+    NetworkConfigData,
+    NetworkSection,
+)
+from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
+from ra2ce.graph.network_wrappers.osm_network_wrapper.osm_network_wrapper import (
+    OsmNetworkWrapper,
+)
+from tests import slow_test, test_data, test_results
 
 
 class TestOsmNetworkWrapper:
     def test_initialize_without_graph_crs(self):
-        _wrapper = OsmNetworkWrapper("a_network", ["r"], "", Path())
+        # 1. Define test data.
+        _network_section = NetworkSection(network_type="a_network", road_types=["r"])
+        _network_config_data = NetworkConfigData(network=_network_section)
+
+        # 2. Run test.
+        _wrapper = OsmNetworkWrapper(_network_config_data)
+
+        # 3. Verify final expectations.
         assert isinstance(_wrapper, OsmNetworkWrapper)
-        assert _wrapper.graph_crs == "epsg:4326"
+        assert isinstance(_wrapper, NetworkWrapperProtocol)
+        assert _wrapper.graph_crs.to_epsg() == 4326
 
     @pytest.fixture
     def _network_wrapper_without_polygon(self) -> OsmNetworkWrapper:
-        _network_type = "drive"
-        _road_types = ["road_link"]
+        _network_section = NetworkSection(
+            network_type="drive", road_types=["road_link"], directed=True
+        )
+        _output_dir = test_results.joinpath("test_osm_network_wrapper")
+        if not _output_dir.exists():
+            _output_dir.mkdir(parents=True)
         yield OsmNetworkWrapper(
-            network_type=_network_type,
-            road_types=_road_types,
-            graph_crs="",
-            polygon_path=None,
+            NetworkConfigData(network=_network_section, output_path=_output_dir)
         )
 
     def test_download_clean_graph_from_osm_with_invalid_polygon_arg(

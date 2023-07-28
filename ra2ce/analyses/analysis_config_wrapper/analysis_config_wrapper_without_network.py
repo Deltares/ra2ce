@@ -24,12 +24,14 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_without_network import AnalysisConfigDataValidatorWithoutNetwork
 
+from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_without_network import (
+    AnalysisConfigDataValidatorWithoutNetwork,
+)
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
     AnalysisConfigWrapperBase,
 )
-from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
@@ -77,5 +79,7 @@ class AnalysisConfigWrapperWithoutNetwork(AnalysisConfigWrapperBase):
 
     def is_valid(self) -> bool:
         _file_is_valid = self.ini_file.is_file() and self.ini_file.suffix == ".ini"
-        _validation_report = AnalysisConfigDataValidatorWithoutNetwork(self.config_data).validate()
+        _validation_report = AnalysisConfigDataValidatorWithoutNetwork(
+            self.config_data
+        ).validate()
         return _file_is_valid and _validation_report.is_valid()

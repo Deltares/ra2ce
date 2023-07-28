@@ -9,7 +9,6 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
 from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_without_network import (
     AnalysisConfigDataValidatorWithoutNetwork,
 )
-
 from ra2ce.common.validation.validation_report import ValidationReport
 from tests import test_data, test_results
 

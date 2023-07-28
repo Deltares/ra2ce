@@ -20,18 +20,18 @@
 """
 
 
-from pathlib import Path
 import shutil
+from pathlib import Path
 from typing import Optional
 
+from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_factory import (
+    AnalysisConfigReaderFactory,
+)
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
     AnalysisConfigWrapperBase,
 )
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_factory import (
     AnalysisConfigWrapperFactory,
-)
-from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_factory import (
-    AnalysisConfigReaderFactory,
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData

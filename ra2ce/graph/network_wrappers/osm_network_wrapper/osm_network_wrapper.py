@@ -16,38 +16,104 @@
 """
 import logging
 from pathlib import Path
+from typing import Any
 
 import networkx as nx
 import osmnx
-from networkx import MultiDiGraph
-from osmnx import consolidate_intersections
+import pandas as pd
+from geopandas import GeoDataFrame
+from networkx import MultiDiGraph, MultiGraph
 from shapely.geometry.base import BaseGeometry
-from ra2ce.graph.network_config_data.network_config_data import NetworkSection
 
 import ra2ce.graph.networks_utils as nut
-from ra2ce.graph.osm_network_wrapper.extremities_data import ExtremitiesData
+from ra2ce.graph.exporters.json_exporter import JsonExporter
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
+from ra2ce.graph.network_wrappers.osm_network_wrapper.extremities_data import (
+    ExtremitiesData,
+)
 
 
-class OsmNetworkWrapper:
-    network_type: str
-    road_types: list[str]
-    graph_crs: str
-    polygon_path: Path
+class OsmNetworkWrapper(NetworkWrapperProtocol):
+    def __init__(self, config_data: NetworkConfigData) -> None:
+        self.output_graph_dir = config_data.output_graph_dir
+        self.graph_crs = config_data.crs
 
-    def __init__(
-        self,
-        network_type: str,
-        road_types: list[str],
-        graph_crs: str,
-        polygon_path: Path,
-    ) -> None:
-        self.network_type = network_type
-        self.road_types = road_types
-        self.polygon_path = polygon_path
-        self.graph_crs = graph_crs
-        if not graph_crs:
-            # Set default value
-            self.graph_crs = "epsg:4326"
+        # Network options
+        self.network_type = config_data.network.network_type
+        self.road_types = config_data.network.road_types
+        self.polygon_path = config_data.network.polygon
+        self.is_directed = config_data.network.directed
+
+    def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
+        """
+        Gets an indirected graph
+
+        Returns:
+            tuple[MultiGraph, GeoDataFrame]: _description_
+        """
+        logging.info("Start downloading a network from OSM.")
+        graph_complex = self.get_clean_graph_from_osm()
+
+        # Create 'graph_simple'
+        graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
+            graph_complex
+        )
+
+        # Create 'edges_complex', convert complex graph to geodataframe
+        logging.info("Start converting the graph to a geodataframe")
+        edges_complex, node_complex = nut.graph_to_gdf(graph_complex)
+        logging.info("Finished converting the graph to a geodataframe")
+
+        # Save the link tables linking complex and simple IDs
+        self._export_linking_tables(link_tables)
+
+        if not self.is_directed and isinstance(graph_simple, MultiDiGraph):
+            graph_simple = graph_simple.to_undirected()
+
+        # Check if all geometries between nodes are there, if not, add them as a straight line.
+        graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
+        graph_simple = self._get_avg_speed(graph_simple)
+        return graph_simple, edges_complex
+
+    def _get_avg_speed(
+        self, original_graph: nx.classes.graph.Graph
+    ) -> nx.classes.graph.Graph:
+        if all(["length" in e for u, v, e in original_graph.edges.data()]) and any(
+            ["maxspeed" in e for u, v, e in original_graph.edges.data()]
+        ):
+            # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
+            path_avg_speed = self.output_graph_dir.joinpath("avg_speed.csv")
+            if path_avg_speed.is_file():
+                avg_speeds = pd.read_csv(path_avg_speed)
+            else:
+                avg_speeds = nut.calc_avg_speed(
+                    original_graph,
+                    "highway",
+                    save_csv=True,
+                    save_path=path_avg_speed,
+                )
+            original_graph = nut.assign_avg_speed(original_graph, avg_speeds, "highway")
+
+            # make a time value of seconds, length of road streches is in meters
+            for u, v, k, edata in original_graph.edges.data(keys=True):
+                hours = (edata["length"] / 1000) / edata["avgspeed"]
+                original_graph[u][v][k]["time"] = round(hours * 3600, 0)
+
+            return original_graph
+        logging.info(
+            "No attributes found in the graph to estimate average speed per network segment."
+        )
+        return original_graph
+
+    def _export_linking_tables(self, linking_tables: tuple[Any]) -> None:
+        _exporter = JsonExporter()
+        _exporter.export(
+            self.output_graph_dir.joinpath("simple_to_complex.json"), linking_tables[0]
+        )
+        _exporter.export(
+            self.output_graph_dir.joinpath("complex_to_simple.json"), linking_tables[1]
+        )
 
     def get_clean_graph_from_osm(self) -> MultiDiGraph:
         """
@@ -234,7 +300,7 @@ class OsmNetworkWrapper:
 
     @staticmethod
     def snap_nodes_to_nodes(graph: MultiDiGraph, threshold: float) -> MultiDiGraph:
-        return consolidate_intersections(
+        return osmnx.consolidate_intersections(
             G=graph, rebuild_graph=True, tolerance=threshold, dead_ends=False
         )
 

@@ -1,13 +1,14 @@
 from pathlib import Path
 from typing import Any
+
+import pytest
+
 from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
 from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_without_network import (
     AnalysisConfigReaderWithoutNetwork,
 )
-
-import pytest
 
 
 class TestAnalysisWithoutNetworkConfigReader:
