@@ -1,13 +1,11 @@
+import pandas as pd
+import pytest
+
 from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass import (
     AccumulatedTraffic,
 )
-from ra2ce.analyses.indirect.traffic_analysis.equity_analysis import (
-    EquityAnalysis,
-)
-from tests import slow_test, test_results, test_data
-import pytest
-import pandas as pd
-
+from ra2ce.analyses.indirect.traffic_analysis.equity_analysis import EquityAnalysis
+from tests import slow_test, test_data, test_results
 from tests.analyses.indirect.traffic_analysis import (
     TrafficAnalysisInput,
     valid_traffic_analysis_input,

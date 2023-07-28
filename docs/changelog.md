@@ -1,3 +1,18 @@
+## v0.6.0 (2023-07-28)
+
+### Feat
+
+- Created network wrappers as a separate module
+- Extracted logic to generate networks from different sources.
+- **osm_network_wrapper.py**: Adde network wrapper to get a clean network from OSM source.
+- Added dataclass to represent the Network configuration input data (ini file)
+
+## v0.5.1 (2023-07-26)
+
+### Feat
+
+- Implement multi-link isolated locations with distinction between flooded and isolated.
+
 ## v0.5.0 (2023-07-24)
 
 ### Feat

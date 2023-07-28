@@ -1,0 +1,175 @@
+"""
+                    GNU GENERAL PUBLIC LICENSE
+                      Version 3, 29 June 2007
+
+    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+    Copyright (C) 2023 Stichting Deltares
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+
+from __future__ import annotations
+
+import logging
+from pathlib import Path
+from typing import Dict, Optional
+
+from geopandas import gpd
+
+from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
+from ra2ce.common.io.readers import GraphPickleReader
+from ra2ce.graph.hazard import Hazard
+from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.graph.network_config_data.network_config_data_validator import (
+    NetworkConfigDataValidator,
+)
+from ra2ce.graph.networks import Network
+
+
+class NetworkConfigWrapper(ConfigWrapperProtocol):
+    files: Dict[str, Path] = {}
+    config_data: NetworkConfigData
+
+    def __init__(self) -> None:
+        self.config_data = NetworkConfigData()
+        self.files = {
+            "base_graph": None,
+            "base_network": None,
+            "base_network_hazard": None,
+            "origins_destinations_graph": None,
+            "base_graph_hazard": None,
+            "origins_destinations_graph_hazard": None,
+        }
+
+    @classmethod
+    def from_data(
+        cls, ini_file: Path, config_data: NetworkConfigData
+    ) -> NetworkConfigWrapper:
+        """
+        Initializes a `NetworkConfig` with the given parameters.
+
+        Args:
+            ini_file (Path): Path to the ini file containing the analysis data.
+            config_data (NetworkIniConfigData): Ini data representation.
+
+        Returns:
+            NetworkConfig: Initialized instance.
+        """
+        _new_network_config = cls()
+        _new_network_config.ini_file = ini_file
+        _new_network_config.config_data = config_data
+        _static_dir = config_data.static_path
+        if config_data.output_graph_dir and config_data.output_graph_dir.is_dir():
+            _new_network_config.files = _new_network_config._get_existent_network_files(
+                config_data.output_graph_dir
+            )
+        else:
+            logging.error(f"Static dir not found. Value provided: {_static_dir}")
+        return _new_network_config
+
+    @staticmethod
+    def get_network_root_dir(filepath: Path) -> Path:
+        return filepath.parent.parent
+
+    @staticmethod
+    def get_data_output(ini_file: Path) -> Optional[Path]:
+        return ini_file.parent / "output"
+
+    @staticmethod
+    def _get_existent_network_files(output_graph_dir: Path) -> dict:
+        """Checks if file of graph exist in network folder and adds filename to the files dict"""
+        _network_filenames = [
+            "base_graph.p",
+            "base_network.feather",
+            "origins_destinations_graph.p",
+            "base_graph_hazard.p",
+            "origins_destinations_graph_hazard.p",
+            "base_network_hazard.feather",
+        ]
+
+        def _get_file_entry(expected_file: Path) -> Optional[Path]:
+            _value = None
+            if expected_file and expected_file.is_file():
+                _value = expected_file
+                logging.info(f"Existing graph/network found: {expected_file}.")
+            return _value
+
+        return {
+            _ep.stem: _get_file_entry(_ep)
+            for _ep in map(lambda x: output_graph_dir / x, _network_filenames)
+        }
+
+    @property
+    def root_dir(self) -> Path:
+        return self.get_network_root_dir(self.ini_file)
+
+    @staticmethod
+    def read_graphs_from_config(static_output_dir: Path) -> dict:
+        _graphs = {}
+        _pickle_reader = GraphPickleReader()
+        if not static_output_dir.exists():
+            raise ValueError("Path does not exist: {}".format(static_output_dir))
+        # Load graphs
+        # TODO (fix): why still read hazard as neccessary if analysis of single link redundancy can run wihtout hazard?
+        for input_graph in ["base_graph", "origins_destinations_graph"]:
+            _input_graph_filename = static_output_dir.joinpath(f"{input_graph}.p")
+            if _input_graph_filename.is_file():
+                _graphs[input_graph] = _pickle_reader.read(_input_graph_filename)
+            else:
+                _graphs[input_graph] = None
+
+            _hazard_filename = static_output_dir.joinpath(f"{input_graph}_hazard.p")
+            if _hazard_filename.is_file():
+                _graphs[input_graph + "_hazard"] = _pickle_reader.read(_hazard_filename)
+            else:
+                _graphs[input_graph + "_hazard"] = None
+
+        # Load networks
+        filename = static_output_dir.joinpath("base_network.feather")
+        if filename.is_file():
+            _graphs["base_network"] = gpd.read_feather(filename)
+        else:
+            _graphs["base_network"] = None
+
+        filename = static_output_dir.joinpath("base_network_hazard.feather")
+        if filename.is_file():
+            _graphs["base_network_hazard"] = gpd.read_feather(filename)
+        else:
+            _graphs["base_network_hazard"] = None
+
+        return _graphs
+
+    def configure_network(self) -> None:
+        network = Network(self.config_data, self.files)
+        self.graphs = network.create()
+
+    def configure_hazard(self) -> None:
+        # Call Hazard Handler (to rework)
+        if not self.graphs:
+            self.graphs = self.read_graphs_from_config(
+                self.config_data.static_path.joinpath("output_graph")
+            )
+
+        if not self.config_data.hazard.hazard_map:
+            return
+
+        # There is a hazard map or multiple hazard maps that should be intersected with the graph.
+        hazard = Hazard(self.config_data, self.graphs, self.files)
+        self.graphs = hazard.create()
+
+    def is_valid(self) -> bool:
+        _file_is_valid = self.ini_file.is_file() and self.ini_file.suffix == ".ini"
+        _validation_report = NetworkConfigDataValidator(self.config_data).validate()
+        return _file_is_valid and _validation_report.is_valid()

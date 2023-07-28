@@ -1,7 +1,9 @@
 import subprocess
-from tests import test_examples, test_results
 from pathlib import Path
+
 import pytest
+
+from tests import test_examples, test_results
 
 _jupyter_examples = [
     pytest.param(

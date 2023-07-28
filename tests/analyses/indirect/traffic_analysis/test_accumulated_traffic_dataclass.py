@@ -1,7 +1,8 @@
+import pytest
+
 from ra2ce.analyses.indirect.traffic_analysis.accumulated_traffic_dataclass import (
     AccumulatedTraffic,
 )
-import pytest
 
 
 @pytest.fixture

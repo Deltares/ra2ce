@@ -4,24 +4,22 @@ from pathlib import Path
 from typing import Dict, Iterator, Optional
 
 import pytest
+from click.testing import CliRunner
 
 from ra2ce import main
-
-from tests import slow_test, test_data, external_test, test_external_data
-from click.testing import CliRunner
+from tests import external_test, slow_test, test_data, test_external_data
 
 # Just to make sonar-cloud stop complaining.
 _network_ini_name = "network.ini"
 _analysis_ini_name = "analyses.ini"
 _base_graph_p_filename = "base_graph.p"
 _base_network_feather_filename = "base_network.feather"
+_skip_cases = []
 
 
 def get_external_test_cases() -> list[pytest.param]:
     if not test_external_data.exists():
         return []
-
-    _skip_cases = ["bolivia"]
 
     def get_pytest_param(test_dir: Path) -> pytest.param:
         _marks = [external_test]
@@ -155,11 +153,11 @@ class TestAcceptance:
                     ],
                 ),
                 id="Case 2. All indirect analyses",
-                marks=slow_test,
             ),
         ],
         indirect=["case_data_dir"],
     )
+    @pytest.mark.slow_test
     def test_indirect_analysis(
         self,
         case_data_dir: Path,
