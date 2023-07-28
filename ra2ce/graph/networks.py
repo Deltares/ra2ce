@@ -155,6 +155,9 @@ class Network:
             self._config_data
         ).get_network()
 
+        self.base_graph_crs = _network_gdf.crs
+        self.base_network_crs = _network_gdf.crs
+
         # Set the road lengths to meters for both the base_graph and network_gdf
         # TODO: rename "length" column to "length [m]" to be explicit
         edges_lengths_meters = {
