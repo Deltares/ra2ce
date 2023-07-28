@@ -4,6 +4,7 @@ import pytest
 import geopandas as gpd
 import networkx as nx
 from shapely.geometry import LineString, Point, MultiLineString
+from ra2ce.graph.network_config_data.network_config_data import NetworkSection
 from ra2ce.graph.network_wrapper_protocol import NetworkWrapperProtocol
 
 from tests import test_data
@@ -41,12 +42,17 @@ class TestVectorNetworkWrapper:
 
     def test_init_without_crs_sts_default(self):
         # 1. Define test data.
+        _network_data = NetworkSection(
+            primary_file=[Path("dummy_primary")], directed=False
+        )
         _primary_files = [Path("dummy_primary")]
         _region = Path("dummy_region")
         _crs_value = ""
 
         # 2. Run test.
-        _wrapper = VectorNetworkWrapper(_primary_files, _region, _crs_value, False)
+        _wrapper = VectorNetworkWrapper(
+            network_data=_network_data, region_path=_region, crs_value=_crs_value
+        )
 
         # 3. Verify expectations.
         assert isinstance(_wrapper, VectorNetworkWrapper)
@@ -58,11 +64,13 @@ class TestVectorNetworkWrapper:
     @pytest.fixture
     def _valid_wrapper(self) -> VectorNetworkWrapper:
         _network_dir = _test_dir.joinpath("static", "network")
+        _network_data = NetworkSection(
+            primary_file=[_network_dir.joinpath("_test_lines.geojson")], directed=False
+        )
         yield VectorNetworkWrapper(
-            primary_files=[_network_dir.joinpath("_test_lines.geojson")],
+            network_data=_network_data,
             region_path=None,
             crs_value=4326,
-            is_directed=False,
         )
 
     def test_read_vector_to_project_region_and_crs(

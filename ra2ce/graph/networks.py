@@ -133,10 +133,9 @@ class Network:
         """
         # initialise vector network wrapper
         vector_network_wrapper = VectorNetworkWrapper(
-            self._network_config.primary_file,
-            self.region,
-            "",
-            self._network_config.directed,
+            network_data=self._network_config,
+            region_path=self.region,
+            crs_value="",
         )
 
         # setup network using the wrapper
@@ -229,11 +228,8 @@ class Network:
             tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]: Tuple of Simplified graph (for use in the indirect analyses) and Complex graph (for use in the direct analyses).
         """
         osm_network = OsmNetworkWrapper(
-            network_type=self._network_config.network_type,
-            road_types=self._network_config.road_types,
+            network_data=self._network_config,
             graph_crs="",
-            polygon_path=self._network_config.polygon,
-            directed=self._network_config.directed,
             output_graph_dir=self.output_graph_dir,
         )
         graph_simple, edges_complex = osm_network.get_network()
