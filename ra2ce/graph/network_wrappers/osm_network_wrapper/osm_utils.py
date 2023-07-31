@@ -201,7 +201,7 @@ def _is_endnode_simplified(graph: MultiDiGraph, node: int) -> bool:
         return True
 
 
-def break_edge(graph: MultiDiGraph, u: int, v: int, new_node: Point, new_node_data: dict):
+def modify_edges(graph: MultiDiGraph, u: int, v: int, new_node: Point, new_node_data: dict):
     # Get the original edge data
     edge_data = graph.get_edge_data(u, v)
     if edge_data is None:
@@ -213,15 +213,11 @@ def break_edge(graph: MultiDiGraph, u: int, v: int, new_node: Point, new_node_da
         graph.add_node(new_node_id, x=new_node.x, y=new_node.y, geometry=new_node, **new_node_data)
     else:
         new_node_id = find_existing_node(graph, new_node)[0]
-    # ToDo: Create a check, if edge exists, do nothing, otherwise make links
-    # ToDo: Check if the break_edge function works properly
-    # Add the two new edges
-    graph.add_edge(u, new_node_id, **edge_data[0])
-    graph.add_edge(new_node_id, v, **edge_data[0])
-
+    # Add the two new edges if do not exist already
+    graph = create_edge(graph, u=u, v=new_node_id)
+    graph = create_edge(graph, u=new_node_id, v=u)
     # Remove the original edge
     graph.remove_edge(u, v)
-
 
 def remove_key(element_data: dict, keys_to_exclude: list):
     # Remove geometry information from the the new_node_data
@@ -239,3 +235,12 @@ def find_existing_node(graph: MultiDiGraph, new_node: Point) -> Union[Tuple[int,
         if data['geometry'] == new_node:
             return node, data
     return None, None
+
+
+def create_edge(graph: MultiDiGraph, u: int, v: int) -> MultiDiGraph:
+    if graph.has_edge(u, v):
+        return graph
+    else:
+        edge_data = graph.get_edge_data(u, v)
+        graph.add_edge(u, v, **edge_data[0])
+        return graph
