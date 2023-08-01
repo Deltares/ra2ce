@@ -80,7 +80,39 @@ On probably another laptop you can do the following::
 Now go to http://localhost:8080 and give in the default password (if you don't know it, try the name of this project, lowercase with the 2 in it).
 
 
- 
+Mounting in projects
+------------------------
+
+When run as in "Simple run", you only get what is bundled within the Docker image of ra2ce itself. Above that, when the container is 
+stopped in some matter, the data is gone. to remidy this, we can mount in a custom based directory in the Docker Container. Like in the following:
+
+a.	Make a standard ra2ce project like this::
+
+    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs
+    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project
+    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/input
+    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/output
+    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/static
+    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/static/analysis.ini
+    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/static/hazard
+    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/static/network
+    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/static/network.ini
+	C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/static/output_graph
+	
+b.  Start the container as follows::
+
+    C:\Users\noorduin\development\ra2ce_inputs> docker run -d -v C:\Users\noorduin\development\ra2ce_inputs\project\:/home/mambauser/data -p 8081:8080 ra2ce:latest
+    9d95083de344c27a7009a65b57700e3db32eb72f33ebf605376a41587d19bd81
+	
+    C:\Users\noorduin\development\ra2ce_inputs> docker ps
+    CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS          PORTS                    NAMES
+    7c000d7ae8ae   ra2ce:latest   "/usr/local/bin/_ent…"   23 seconds ago   Up 22 seconds   0.0.0.0:8081->8080/tcp   adoring_roentgen
+    43ca6b0aef08   ra2ce:latest   "/usr/local/bin/_ent…"   2 hours ago      Up 2 hours      0.0.0.0:8080->8080/tcp   keen_bose
+    
+Notice that we have two ra2ce-applications now, one available on http://localhost:8080 and one new on http://localhost:8081. The first interface
+knows nothing of the second here. When you go to http://localhost:8081 you can see the data folder mounted in /home/mambauser.
+
+
 
 
 Within a Python script
