@@ -1,7 +1,7 @@
 .. _docker_user_guide:
 
 Docker User Guide
-==========
+=====================
 
 Introduction
 ---------------------------------
@@ -11,6 +11,8 @@ a.  How to build a docker image from the ra2ce source tree and push it to a Dock
 b.  How to run a simple model inside a created container and save the generated data for later display.
 c.  (Future). How to get ra2ce plus displayer up and running in a standard Kubernetes environment.
 
+Shown is the bash prompt, but when using Docker Desktop with Linux Containers enables, a Powershell also will do.
+
 How to build a docker image from the ra2ce source tree
 ------------------------------------------------------
 
@@ -19,13 +21,13 @@ following::
 
     $ git clone git@github.com:Deltares/ra2ce.git
     $ cd ra2ce
-    $ docker build -t race:latest .
+    $ docker build -t ra2ce:latest .
 
 These instructions will build a docker image. After a good while, you should end up with::
 
     $ docker images
-    REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
-    race         latest    616f672677f2   19 hours ago   1.01GB
+    REPOSITORY                   TAG       IMAGE ID       CREATED             SIZE
+    ra2ce                        latest    dd5dc5fe79ba   45 minutes ago      1.01GB
 
 Remark that this is a local image only (it only exists on the server or laptop you build it). To share it with other team members, you should push this to a docker hub. This operation entails the following.
 
@@ -43,11 +45,11 @@ a.  Login to your dockerhub account (go to https://hub.docker.com/ if you don't 
 
 b.  Retag the image::
 
-    $ docker tag race:latest willemdeltares/race:latest
+    $ docker tag ra2ce:latest willemdeltares/ra2ce:latest
 
 c.  Pushing the image to the dockerhub::
 
-    $ sudo docker push willemdeltares/race:latest
+    $ sudo docker push willemdeltares/ra2ce:latest
 
 If all is well, you can login to the dockerhub account and see the image yourself.
 
@@ -57,7 +59,7 @@ Simple run
 
 On probably another laptop you can do the following::
 
-    noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker pull willemdeltares/race:latest
+    noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker pull willemdeltares/ra2ce:latest
     latest: Pulling from willemdeltares/race
     4db1b89c0bd1: Pull complete
     d78e3c519d33: Pull complete
@@ -69,21 +71,13 @@ On probably another laptop you can do the following::
     Status: Downloaded newer image for willemdeltares/race:latest
     docker.io/willemdeltares/race:latest
 
-    noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker run -it --rm willemdeltares/race:latest bash
-    (base) 51d9aa2fdffd:~$ micromamba list
-    List of packages in environment: "/opt/conda"
+    noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker run -d -p 8080:8080 ra2ce:latest
+    
+	noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker ps
+    CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS          PORTS                    NAMES
+    43ca6b0aef08   ra2ce:latest   "/usr/local/bin/_ent…"   23 minutes ago   Up 23 minutes   0.0.0.0:8080->8080/tcp   keen_bose
 
-    (base) 51d9aa2fdffd:~$ micromamba env list
-      Name       Active  Path
-    ────────────────────────────────────────────────
-      base       *       /opt/conda
-      ra2ce_env          /opt/conda/envs/ra2ce_env
-
-    (base) 51d9aa2fdffd:~$ micromamba activate ra2ce_env
-    (ra2ce_env) 51d9aa2fdffd:~$ exit
-    exit
-
-
+Now go to http://localhost:8080 and give in the default password (if you don't know it, try the name of this project, lowercase with the 2 in it).
 
 
  
