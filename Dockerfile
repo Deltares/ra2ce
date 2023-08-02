@@ -4,8 +4,7 @@ FROM  mambaorg/micromamba:1.4-alpine AS full
 
 ENV HOME=/home/mambauser
 ENV ENV_NAME=ra2ce_env
-ENV JUPYTER_PORT=8080
-ARG JUPYTER_PORT=8080
+ENV PYTHONPATH="/home/mambauser:$PYTHONPATH"
 
 # Setting workspace vbariables
 
