@@ -88,20 +88,31 @@ stopped in some matter, the data is gone. to remidy this, we can mount in a cust
 
 a.	Make a standard ra2ce project like this::
 
-    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs
-    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project
-    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/input
-    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/output
-    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/static
-    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/static/analysis.ini
-    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/static/hazard
-    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/static/network
-    C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/static/network.ini
-	C:/Users/noorduin/development/ra2ce_inputs/ra2ce_inputs/project/static/output_graph
+    +--- example01
+	|   +--- .ipynb_checkpoints
+	|   |   +--- test-checkpoint.ipynb
+	|   +--- analysis.ini
+	|   +--- cache
+	|   +--- input
+	|   +--- network.ini
+	|   +--- output
+	|   |   +--- network.ini
+	|   +--- static
+	|   |   +--- hazard
+	|   |   +--- network
+	|   |   |   +--- Delft.geojson
+	|   |   +--- output_graph
+	|   |   |   +--- avg_speed.csv
+	|   |   |   +--- base_graph.p
+	|   |   |   +--- base_graph_edges.gpkg
+	|   |   |   +--- base_graph_nodes.gpkg
+	|   |   |   +--- complex_to_simple.json
+	|   |   |   +--- simple_to_complex.json
+	|   +--- test.ipynb
 	
 b.  Start the container as follows::
 
-    C:\Users\noorduin\development\ra2ce_inputs> docker run -d -v C:\Users\noorduin\development\ra2ce_inputs\project\:/home/mambauser/data -p 8081:8080 ra2ce:latest
+    C:\Users\noorduin\development\ra2ce_inputs> docker run -d -v C:\Users\noorduin\development\ra2ce_inputs\project\:/home/mambauser/sample -p 8081:8080 ra2ce:latest
     9d95083de344c27a7009a65b57700e3db32eb72f33ebf605376a41587d19bd81
 	
     C:\Users\noorduin\development\ra2ce_inputs> docker ps
