@@ -11,6 +11,20 @@ a.  How to build a docker image from the ra2ce source tree and push it to a Dock
 b.  How to run a simple model inside a created container and save the generated data for later display.
 c.  (Future). How to get ra2ce plus displayer up and running in a standard Kubernetes environment.
 
+In the addendum I will explain how to install Docker desktop on Windows and Docker on Ubuntu or Redhat like servers,
+but since this can be changed outside this repository, it is probably best to use:
+
+i.   For Windows-like systems: https://www.docker.com/products/docker-desktop/
+     There is a good alternative (https://podman-desktop.io/) which works a little differen, but with the same
+	 outcome (at least for ra2ce).
+	
+ii.	 For Ubuntu-like systems: https://docs.docker.com/engine/install/ubuntu/
+
+iii. For Redhat-like systems: https://docs.docker.com/desktop/install/linux-install/
+
+iv.  For MacOS there is: https://docs.docker.com/desktop/install/mac-install/ (the writer of this document doesn't have
+     much experience with a Mac.
+
 Shown is the bash prompt, but when using Docker Desktop with Linux Containers enables, a Powershell also will do.
 
 How to build a docker image from the ra2ce source tree
@@ -88,21 +102,21 @@ stopped in some matter, the data is gone. to remidy this, we can mount in a cust
 
 a.	Make a standard ra2ce project like this::
 
-    +--- example01
-	|   +--- .ipynb_checkpoints
-	|   |   +--- test-checkpoint.ipynb
-	|   +--- analysis.ini
-	|   +--- cache
-	|   +--- input
-	|   +--- network.ini
-	|   +--- output
-	|   |   +--- network.ini
-	|   +--- static
-	|   |   +--- hazard
-	|   |   +--- network
-	|   |   |   +--- Delft.geojson
-	|   |   +--- output_graph
-	|   +--- test.ipynb
+        +--- example01
+	    |   +--- .ipynb_checkpoints
+    	|   |   +--- test-checkpoint.ipynb
+    	|   +--- analysis.ini
+    	|   +--- cache
+    	|   +--- input
+    	|   +--- network.ini
+    	|   +--- output
+    	|   |   +--- network.ini
+    	|   +--- static
+    	|   |   +--- hazard
+    	|   |   +--- network
+    	|   |   |   +--- Delft.geojson
+    	|   |   +--- output_graph
+    	|   +--- test.ipynb
 	
 b.  Start the container as follows::
 
@@ -117,3 +131,38 @@ b.  Start the container as follows::
 Notice that we have two ra2ce-applications now, one available on http://localhost:8080 and one new on http://localhost:8081. The first interface
 knows nothing of the second here. When you go to http://localhost:8081 you can see the data folder mounted in /home/mambauser as a directory sample.
 From there, you can start test.ipynb.
+
+Addendum
+---------------------------------
+
+i.   Simple Docker Desktop setup on Windows:
+
+     **Step 1: BIOS Prerequisites**
+	 
+	 There is a setting in the BIOS (or a modern equivalent of that) that makes it possible to virtualize the CPU. 
+	 Unfortunately every Hardware Manufacturer has its own name for it and position in the BIOS.
+	 
+	 **Step 2: Containers and Hyper-V**
+
+	 Run the following in an Administrator's Powershell::
+	 
+	     PS C:> Enable-WindowsOptionalFeature -Online -FeatureName $("Microsoft-Hyper-V", "Containers") -All
+		 
+	 Then reboot your PC.
+	 
+	 **Step 2: Install wsl-1 and wsl-2
+	 
+	 See also: https://learn.microsoft.com/en-us/windows/wsl/install. Make sure that you reboot afterwards
+	 
+	 **Step 3: Install Docker desktop
+	 
+	 After step 1 and 2 it should be posssible to download and install Docker Desktop for Windows (see also
+	 https://docs.docker.com/desktop/install/windows-install/).
+	 
+	 **Step 4: Switch to Linux Containers**
+	 
+	 Ra2ce is based on a Linux image and it is hard too tell the default at forehand. If Docker Desktop is 
+	 started up correctly, there should be a Whale-like icon amongst your "Hidden Icons". When you right-click
+	 it you can swich to either Linux or Windows Containers. For Ra2ce it's important to choose "Linux containers".
+	 
+	 
