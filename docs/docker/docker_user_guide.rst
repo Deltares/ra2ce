@@ -106,13 +106,13 @@ a.	Make a standard ra2ce project like this::
 	
 b.  Start the container as follows::
 
-    C:\Users\noorduin\development\ra2ce_inputs> docker run -d -v C:\Users\noorduin\development\ra2ce_inputs\project\:/home/mambauser/sample -p 8081:8080 ra2ce:latest
-    9d95083de344c27a7009a65b57700e3db32eb72f33ebf605376a41587d19bd81
+        C:\Users\noorduin\development\ra2ce_inputs> docker run -d -v C:\Users\noorduin\development\ra2ce_inputs\project\:/home/mambauser/sample -p 8081:8080 ra2ce:latest
+        9d95083de344c27a7009a65b57700e3db32eb72f33ebf605376a41587d19bd81
 	
-    C:\Users\noorduin\development\ra2ce_inputs> docker ps
-    CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS          PORTS                    NAMES
-    7c000d7ae8ae   ra2ce:latest   "/usr/local/bin/_ent…"   23 seconds ago   Up 22 seconds   0.0.0.0:8081->8080/tcp   adoring_roentgen
-    43ca6b0aef08   ra2ce:latest   "/usr/local/bin/_ent…"   2 hours ago      Up 2 hours      0.0.0.0:8080->8080/tcp   keen_bose
+        C:\Users\noorduin\development\ra2ce_inputs> docker ps
+        CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS          PORTS                    NAMES
+        7c000d7ae8ae   ra2ce:latest   "/usr/local/bin/_ent…"   23 seconds ago   Up 22 seconds   0.0.0.0:8081->8080/tcp   adoring_roentgen
+		43ca6b0aef08   ra2ce:latest   "/usr/local/bin/_ent…"   2 hours ago      Up 2 hours      0.0.0.0:8080->8080/tcp   keen_bose
     
 Notice that we have two ra2ce-applications now, one available on http://localhost:8080 and one new on http://localhost:8081. The first interface
 knows nothing of the second here. When you go to http://localhost:8081 you can see the data folder mounted in /home/mambauser as a directory sample.
