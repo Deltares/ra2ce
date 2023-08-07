@@ -81,7 +81,7 @@ If all is well, you can login to the dockerhub account and see the image yoursel
 Simple run
 ------------
 
-On probably another laptop you can do the following::
+On probably another laptop you can do the following:
 
 .. parsed-literal::
 
