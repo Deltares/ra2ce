@@ -136,31 +136,31 @@ Addendum
 ---------------------------------
 
 i.   Simple Docker Desktop setup on Windows:
+     
+     **Step 1: BIOS Prerequisites**
+	 
+     There is a setting in the BIOS (or a modern equivalent of that) that makes it possible to virtualize the CPU. 
+     Unfortunately every Hardware Manufacturer has its own name for it and position in the BIOS.
+	 
+     **Step 2: Containers and Hyper-V**
 
-**Step 1: BIOS Prerequisites**
+     Run the following in an Administrator's Powershell::
 	 
-There is a setting in the BIOS (or a modern equivalent of that) that makes it possible to virtualize the CPU. 
-Unfortunately every Hardware Manufacturer has its own name for it and position in the BIOS.
-	 
-**Step 2: Containers and Hyper-V**
-
-Run the following in an Administrator's Powershell::
-	 
-    PS C:> Enable-WindowsOptionalFeature -Online -FeatureName $("Microsoft-Hyper-V", "Containers") -All
+          PS C:> Enable-WindowsOptionalFeature -Online -FeatureName $("Microsoft-Hyper-V", "Containers") -All
 		 
-Then reboot your PC.
+     Then reboot your PC.
 	 
-**Step 3: Install wsl-1 and wsl-2**
+     **Step 3: Install wsl-1 and wsl-2**
 	 
-See also: https://learn.microsoft.com/en-us/windows/wsl/install. Make sure that you reboot afterwards
+     See also: https://learn.microsoft.com/en-us/windows/wsl/install. Make sure that you reboot afterwards
 	 
-**Step 4: Install Docker desktop**
+     **Step 4: Install Docker desktop**
 	 
-After step 1 and 2 it should be posssible to download and install Docker Desktop for Windows (see also
-https://docs.docker.com/desktop/install/windows-install/).
+     After step 1 and 2 it should be posssible to download and install Docker Desktop for Windows (see also
+     https://docs.docker.com/desktop/install/windows-install/).
 	 
-**Step 5: Switch to Linux Containers**
+     **Step 5: Switch to Linux Containers**
 	 
-Ra2ce is based on a Linux image and it is hard too tell the default at forehand. If Docker Desktop is 
-started up correctly, there should be a Whale-like icon amongst your "Hidden Icons". When you right-click
-it you can swich to either Linux or Windows Containers. For Ra2ce it's important to choose "Linux containers".
+     Ra2ce is based on a Linux image and it is hard too tell the default at forehand. If Docker Desktop is 
+     started up correctly, there should be a Whale-like icon amongst your "Hidden Icons". When you right-click
+     it you can swich to either Linux or Windows Containers. For Ra2ce it's important to choose "Linux containers".
