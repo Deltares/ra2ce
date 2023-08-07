@@ -173,10 +173,8 @@ Addendum
 	 
      **Step 2: Containers and Hyper-V**
 
-     Run the following in an Administrator's Powershell:
+     Run the following in an Administrator's Powershell::
 	 
-.. parsed-literal::
-
           PS C:> Enable-WindowsOptionalFeature -Online -FeatureName $("Microsoft-Hyper-V", "Containers") -All
 		 
      Then reboot your PC.
