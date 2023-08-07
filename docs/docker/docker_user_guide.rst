@@ -31,13 +31,17 @@ How to build a docker image from the ra2ce source tree
 ------------------------------------------------------
 
 Assuming access to a Linux box with Docker installed, or a Docker Desktop with "Switch to Linux Containers". You can do the 
-following::
+following:
+
+.. parsed-literal::
 
     $ git clone git@github.com:Deltares/ra2ce.git
     $ cd ra2ce
     $ docker build -t ra2ce:latest .
 
-These instructions will build a docker image. After a good while, you should end up with::
+These instructions will build a docker image. After a good while, you should end up with:
+
+.. parsed-literal::
 
     $ docker images
     REPOSITORY                   TAG       IMAGE ID       CREATED             SIZE
@@ -45,7 +49,9 @@ These instructions will build a docker image. After a good while, you should end
 
 Remark that this is a local image only (it only exists on the server or laptop you build it). To share it with other team members, you should push this to a docker hub. This operation entails the following.
 
-a.  Login to your dockerhub account (go to https://hub.docker.com/ if you don't have that yet)::
+a.  Login to your dockerhub account (go to https://hub.docker.com/ if you don't have that yet):
+
+.. parsed-literal::
 
     $ docker login
     Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
@@ -57,11 +63,15 @@ a.  Login to your dockerhub account (go to https://hub.docker.com/ if you don't 
 
     Login Succeeded
 
-b.  Retag the image::
+b.  Retag the image:
+
+.. parsed-literal::
 
     $ docker tag ra2ce:latest willemdeltares/ra2ce:latest
 
-c.  Pushing the image to the dockerhub::
+c.  Pushing the image to the dockerhub:
+
+.. parsed-literal::
 
     $ sudo docker push willemdeltares/ra2ce:latest
 
@@ -72,6 +82,8 @@ Simple run
 ------------
 
 On probably another laptop you can do the following::
+
+.. parsed-literal::
 
     noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker pull willemdeltares/ra2ce:latest
     latest: Pulling from willemdeltares/race
@@ -98,9 +110,11 @@ Mounting in projects
 ------------------------
 
 When run as in "Simple run", you only get what is bundled within the Docker image of ra2ce itself. Above that, when the container is 
-stopped in some matter, the data is gone. to remidy this, we can mount in a custom based directory in the Docker Container. Like in the following:
+stopped in some matter, the data is gone. to remedy this, we can mount in a custom based directory in the Docker Container. Like in the following:
 
-a.	Make a standard ra2ce project like this::
+a.	Make a standard ra2ce project like this:
+
+.. parsed-literal::
 
         +--- example01
 	    |   +--- .ipynb_checkpoints
@@ -118,7 +132,9 @@ a.	Make a standard ra2ce project like this::
     	|   |   +--- output_graph
     	|   +--- test.ipynb
 	
-b.  Start the container as follows::
+b.  Start the container as follows:
+
+.. parsed-literal::
 
         C:\Users\noorduin\development\ra2ce_inputs> docker run -d -v C:\Users\noorduin\development\ra2ce_inputs\project\:/home/mambauser/sample -p 8081:8080 ra2ce:latest
         9d95083de344c27a7009a65b57700e3db32eb72f33ebf605376a41587d19bd81
@@ -132,10 +148,23 @@ Notice that we have two ra2ce-applications now, one available on http://localhos
 knows nothing of the second here. When you go to http://localhost:8081 you can see the data folder mounted in /home/mambauser as a directory sample.
 From there, you can start test.ipynb.
 
+Trouble shooting
+---------------------------------
+
+In the Docker world, there are a lot of things that go wrong (from forgetting the BIOS setting mentioned in the Addendum) to
+not enough user rights on Linux). It is best to refer to www.docker.com or one of there foras for those. Here, we focuss on the 
+errors and warning you could see in the combination Ra2ce and docker.
+
+1.	When I browse to http://localhost:8080 I can't see the interface. Or when I log in, I can't see the project.
+
+	Jupyter seems to be very cookie-aware. Try to delete the cookies or use a private browser-session.
+	
+
+
 Addendum
 ---------------------------------
 
-i.   Simple Docker Desktop setup on Windows:
+1.   Simple Docker Desktop setup on Windows:
      
      **Step 1: BIOS Prerequisites**
 	 
@@ -144,8 +173,10 @@ i.   Simple Docker Desktop setup on Windows:
 	 
      **Step 2: Containers and Hyper-V**
 
-     Run the following in an Administrator's Powershell::
+     Run the following in an Administrator's Powershell:
 	 
+.. parsed-literal::
+
           PS C:> Enable-WindowsOptionalFeature -Online -FeatureName $("Microsoft-Hyper-V", "Containers") -All
 		 
      Then reboot your PC.
