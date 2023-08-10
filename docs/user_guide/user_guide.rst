@@ -30,12 +30,11 @@ To use Risk Assessment and Adaptation for Critical infrastructurE in a project::
 
 Folder structure
 ---------------------------
-RA2CE can be run from anywhere, but it requires a certain folder structure for loading and saving data. RA2CE expects data to be stored separately per project, which can be defined in any way by the user, e.g. by its location in the world or the type of assessment. A project folder must contain the following subfolders: input, output, and static. It must also contain the network.ini and analyses.ini files. Within the subfolder static, RA2CE expects three subfolders: hazard, network, and output_graph. See below an example folder structure of “Project A”. This folder structure must be created and filled with data by the user before running RA2CE.
+RA2CE can be run from anywhere, but it requires a certain folder structure for loading and saving data. RA2CE expects data to be stored separately per project, which can be defined in any way by the user, e.g. by its location in the world or the type of assessment. A project folder must contain the following subfolders: output, and static. It must also contain the network.ini and analyses.ini files. Within the subfolder static, RA2CE expects three subfolders: hazard, network, and output_graph. See below an example folder structure of “Project A”. This folder structure must be created and filled with data by the user before running RA2CE.
 
 ::
 
     Project A               --- Example project name 
-    ├── input               --- Input data
     ├── output              --- Contains the analyses results
     ├── static              --- Contains files that generally do not change per run
     │   ├── hazard          --- Hazard data
@@ -50,8 +49,8 @@ RA2CE is developed to be used in four ways:
 
 •	Create one or multiple networks *(only run --network_ini)*
 •	Calculate the exposure of hazards on those networks *(only run --network_ini)*
-•	Execute one or multiple analyses on (a) network(s) *(only run --analyses_ini)*
 •	Create a network and execute analyses *(run --network_ini and --analyses_ini)*
+•   Execute one or multiple analyses on a previously created network *(run --analyses_ini)*
 
 To create a network, a network configuration file, also called initialization file, is required. We call this the network.ini file. To execute analyses, an analyses initialization file is required, we call this the analyses.ini file. Both initialization files are required if users want to create a network and execute analyses.
 
@@ -83,7 +82,7 @@ Indirect losses / Network criticality
 ======================================================   =====================
 Analyis                                                   Name in analyses.ini
 ======================================================   =====================
-Single link redundancy                                    single_link_redundancy
+Single link redundancy                                   single_link_redundancy
 Multi-link redundancy                                    multi_link_redundancy
 Origin-Destination, defined OD couples, no disruption    optimal_route_origin_destination
 Origin-Destination, defined OD couples, disruption       multi_link_origin_destination
@@ -93,22 +92,25 @@ Isolated locations                                       multi_link_isolated_loc
 ======================================================   =====================
 
 **Single link redundancy**
-This analysis removes each link of the network one at a time. For each disrupted link, a redundancy analysis is performed. It identifies the best existing alternative route or, if there is no redundancy, the lack of alternative routes. This is performed sequentially, for each link of the network. The redundancy of each link is expressed in total distance or time for the alternative route, difference in distance/time between the alternative route and the original route (additional distance/time), and if there is an alternative route available, or not.
+With this analysis, you gain insight into the criticality of the network. A redundancy analysis is performed for each seperate link. It identifies the best existing alternative route if that particular edge would be disrupted. If there is no redundancy, it identifies the lack of alternative routes. This is performed sequentially, for each link of the network. The redundancy of each link is expressed in 1) total distance or total time for the alternative route, 2) difference in distance/time between the alternative route and the original route, 3) and if there is an alternative route available, or not.
 
 **Multi-link redundancy**
-This analysis removes multiple disrupted links of the network. The disrupted links are indicated with an overlay of a hazard map and a threshold for disruption. For example, for flooding, the threshold could be a maximum of 0.5 m water on a road segment. For each disrupted link, a redundancy analysis is performed that identifies the best existing alternative route or, if there is no redundancy, the lack of alternative routes. The redundancy of each link is expressed in total distance or time for the alternative route, difference in distance/time between the alternative route and the original route (additional distance/time), and if there is an alternative route available, or not.
+This analysis can be performed when there is a hazard map. The hazard map indicates which links are disrupted. The analysis removes multiple disrupted links of the network. For each disrupted link, a redundancy analysis is performed that identifies the best existing alternative route. If there is no redundancy, the lack of alternative routes is specified. The redundancy of each link is expressed in 1) total distance or time for the alternative route, 2) difference in distance/time between the alternative route and the original route (additional distance/time), and 3) whether there is an alternative route available, or not. The user can specify the threshold (in meters) to indicate when a network is considered disrupted. For example, for flooding, the threshold could be a maximum of 0.5 m water on a network segment. Network segments with water depths < 0.5m will then not be considered as flooded.  
 
 **Origin-Destination, defined OD couples**
-This analysis finds the shortest (distance-weighed) or quickest (time-weighed) route between all Origins and all Destinations input by the user.
+This analysis finds the shortest (distance-weighed) or quickest (time-weighed) route between all Origins and all Destinations inputted by the user, with and without disruption. 
 
 **Origin-Destination, defined origins to closest destinations**
-This analysis finds the shortest (distance-weighed) or quickest (time-weighed) route from all Origins to the closest Destinations input by the user.
+This analysis finds the shortest (distance-weighed) or quickest (time-weighed) route from all Origins to the closest Destinations inputted by the user, with and without disruption. 
 
 **Isolated locations**
 This analysis finds the sections of the network that are fully isolated from the rest of the network (also named disconnected islands), because of network disruption due to a hazard.
 
 Initialization file templates
 ++++++++++++++++++++++++++++++
+
+Below are all possible input parameters a user can specify. However, there are different combinations of parameters required for different purposes. Use the :ref:`examplse` to get familiair with the different possible combinations to call RA2CE-functionality. 
+
 **network.ini**
 ::
 
