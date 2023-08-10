@@ -64,7 +64,8 @@ The types of possible input file formats to create a network are:
 •	OSM PBF file;
 •	Pickle – a python data format, also used to save graphs.
 
-Depending on the required analysis, more data might be needed.
+Depending on the required analysis, more data might be needed. More information about the 
+data requirements to create a network can be found in the :ref:`network_module`.
 
 Direct damages
 +++++++++++++++++++++++++++
