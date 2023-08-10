@@ -10,10 +10,15 @@ to local datasets.
 Network from OpenStreetMap
 ----------------------------
 
-The network module is built on top of the `osmnx` package. It uses the `osmnx`
+
+This functionality is built on top of the `osmnx` package. The method  uses the `osmnx`
 package to download and process the road network data. It then uses the
 `osmnx` package to calculate the accessibility metrics. The network module
 provides a wrapper around the `osmnx` package to make it easier to use.
+
+(:py:class:`~ra2ce.graph.network_wrappers.osm_network_wrapper.osm_network_wrapper.OsmNetworkWrapper`) 
+
+Reference to function :py:class:`~ra2ce.graph.network_wrappers.osm_network_wrapper.osm_network_wrapper.OsmNetworkWrapper`
 
 Network from vector data
 ----------------------------
