@@ -35,12 +35,12 @@ Getting started
 
     .. grid-item-card::
         :text-align: center
-        :link: faq
+        :link: network_module
         :link-type: ref
 
-        :octicon:`question;10em`
+        :octicon:`package-dependents;10em`
         +++
-        FAQ
+        Network module
 
     .. grid-item-card::
         :text-align: center
@@ -80,12 +80,12 @@ Getting started
 
     .. grid-item-card::
         :text-align: center
-        :link: model_builder
+        :link: faq
         :link-type: ref
 
-        :octicon:`package-dependents;10em`
+        :octicon:`question;10em`
         +++
-        Model builder
+        FAQ
 
 .. toctree::
    :caption: Table of Contents
