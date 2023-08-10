@@ -5,7 +5,7 @@ RA2CE
 
 This is the repository of RA2CE (*just say race!*) - the Resilience Assessment and Adaptation for Critical infrastructurE Toolkit Python Package eveloped by Deltares. RA2CE helps to quantify resilience of critical infrastructure networks, prioritize interventions and adaptation measures and select the most appropriate action perspective to increase resilience considering future conditions.
 
-**Contact** Margreet van Marle (Margreet.vanMarle@Deltares.nl)
+**Contact** Margreet van Marle (Margreet.vanMarle@Deltares.nl) or Thomas Bles (Thomas.Bles@Deltares.nl)
 
 
 Distribution
