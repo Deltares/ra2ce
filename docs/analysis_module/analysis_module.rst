@@ -48,7 +48,7 @@ With this analysis, you gain insight into the criticality of the network. A redu
 ::
 
     [project]
-name = beira
+    name = beira
 
     [network]
     directed = False
