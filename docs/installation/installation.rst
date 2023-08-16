@@ -11,6 +11,7 @@ command-line interface. It is recommended to install Anaconda, instead of
 `miniconda`, so that you have all required packages already available during the 
 following steps.
 
+
 CLI only
 +++++++++++++++++++++++++++
 If only interested in using the tool via command-line interface follow these steps:
@@ -23,6 +24,7 @@ Alternatively you can install a specific tag or commit hash from our repo by usi
   pip install git+https://github.com/Deltares/ra2ce.git@v0.3.1
 ::
 
+
 Development mode
 +++++++++++++++++++++++++++
 When running a development environment with Anaconda, the user may follow these steps in command line:
@@ -33,9 +35,11 @@ When running a development environment with Anaconda, the user may follow these 
   poetry install
 ::
 
+
 Docker
 +++++++++++++++++++++++++++
 You may install ra2ce using `Docker`. Please refer to our :ref:`docker_user_guide` for it.
+
 
 Binder environment
 +++++++++++++++++++++++++++
