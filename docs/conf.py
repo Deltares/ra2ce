@@ -61,8 +61,8 @@ master_doc = "index"
 
 # General information about the project.
 project = "Risk Assessment and Adaptation for Critical infrastructurE"
-copyright = "2020, Margreet van Marle"
-author = "Margreet van Marle"
+copyright = "2020, Deltares"
+author = "Margreet van Marle\\Frederique de Groen\\Lieke Meijer\\Sahand Asgarpour"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -95,6 +95,13 @@ todo_include_todos = False
 napoleon_numpy_docstring = True
 napoleon_google_docstring = False
 napoleon_preprocess_types = True
+
+# NOTE: the examples/ folder in the root should be copied to docs/examples/examples/ before running sphinx
+# # -- Copy notebooks to include in docs -------
+if os.path.isdir("_examples"):
+    remove_dir_content("_examples")
+os.makedirs("_examples")
+copy_tree("../examples", "_examples")
 
 # -- Options for HTML output -------------------------------------------
 

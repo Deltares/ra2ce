@@ -1,6 +1,6 @@
-.. _getting_started:
+.. _overview:
 
-Getting started
+Overview
 ===============
 
 .. grid:: 3
@@ -26,21 +26,30 @@ Getting started
 
     .. grid-item-card::
         :text-align: center
-        :link: user_guide
+        :link: examples
         :link-type: ref
 
-        :octicon:`book;10em`
+        :octicon:`eye;10em`
         +++
-        User guide
-
+        Examples
+    
     .. grid-item-card::
         :text-align: center
         :link: network_module
         :link-type: ref
 
-        :octicon:`package-dependents;10em`
+        :octicon:`share-android;10em`
         +++
-        Network module
+        Network user guide
+
+    .. grid-item-card::
+        :text-align: center
+        :link: analysis_module
+        :link-type: ref
+
+        :octicon:`git-compare;10em`
+        +++
+        Analysis user guide
 
     .. grid-item-card::
         :text-align: center
@@ -50,15 +59,6 @@ Getting started
         :octicon:`list-unordered;10em`
         +++
         Technical documentation
-
-    .. grid-item-card::
-        :text-align: center
-        :link: examples
-        :link-type: ref
-
-        :octicon:`graph;10em`
-        +++
-        Examples
 
     .. grid-item-card::
         :text-align: center
@@ -94,10 +94,10 @@ Getting started
 
    about/about.rst
    installation/installation.rst
-   user_guide/user_guide.rst
-   faq/faq.rst
-   technical_documentation/technical_documentation.rst
    examples/examples.rst
+   network_module/network_module.rst
+   analysis_module/analysis_module.rst 
+   technical_documentation/technical_documentation.rst
+   faq/faq.rst
    collaboration/collaboration.rst
    publications/publications.rst
-   model_builder/model_builder.rst

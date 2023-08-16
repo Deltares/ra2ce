@@ -36,3 +36,11 @@ When running a development environment with Anaconda, the user may follow these 
 Docker
 +++++++++++++++++++++++++++
 You may install ra2ce using `Docker`. Please refer to our :ref:`docker_user_guide` for it.
+
+Binder environment
++++++++++++++++++++++++++++
+Binder provides us an online web-tool capable of hosting a `conda` environment with the latest-greatest version of `RA2CE` already installed and ready to be used.
+In this environment you will find all our available examples as well as the possibility to create your own `Jupyter` notebooks or experiment with the `CLI` options.
+
+- Our `ra2ce jupyter-binder <https://mybinder.org/v2/gh/Deltares/ra2ce/jupyter-binder>`_ environment.
+- More about `binder <https://mybinder.readthedocs.io/en/latest/>`_.

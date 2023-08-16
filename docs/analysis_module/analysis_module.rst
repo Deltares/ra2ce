@@ -1,61 +1,11 @@
-.. _user_guide:
+.. _analysis_module:
 
-User Guide
-==========
+Analysis module
+================
 
-Binder environment
----------------------------------
-Binder provides us an online web-tool capable of hosting a `conda` environment with the latest-greatest version of `RA2CE` already installed and ready to be used.
-In this environment you will find all our available examples as well as the possibility to create your own `Jupyter` notebooks or experiment with the `CLI` options.
-
-- Our `ra2ce jupyter-binder <https://mybinder.org/v2/gh/Deltares/ra2ce/jupyter-binder>`_ environment.
-- More about `binder <https://mybinder.readthedocs.io/en/latest/>`_.
-
-
-Command-line interface operation
----------------------------------
-a.	To run both the network creation and analysis modules, run RA2CE with: ``python main.py --network_ini <path to network.ini file> --analyses_ini <path to analyses.ini file>``
-b.	To only run the network creation module, run RA2CE with: ``python main.py --network_ini <path to network.ini file>``
-c.	To only run the analysis module, run RA2CE with: ``python main.py --analyses_ini <path to analyses.ini file>``
-
-The user can also always ask for clarification of the input arguments with ``python main.py --help``.
-
-
-Within a Python script
----------------------------
-To use Risk Assessment and Adaptation for Critical infrastructurE in a project::
-
-    import ra2ce
-
-
-Folder structure
----------------------------
-RA2CE can be run from anywhere, but it requires a certain folder structure for loading and saving data. RA2CE expects data to be stored separately per project, which can be defined in any way by the user, e.g. by its location in the world or the type of assessment. A project folder must contain the following subfolders: output, and static. It must also contain the network.ini and analyses.ini files. Within the subfolder static, RA2CE expects three subfolders: hazard, network, and output_graph. See below an example folder structure of “Project A”. This folder structure must be created and filled with data by the user before running RA2CE.
-
-::
-
-    Project A               --- Example project name 
-    ├── output              --- Contains the analyses results
-    ├── static              --- Contains files that generally do not change per run
-    │   ├── hazard          --- Hazard data
-    │   ├── network         --- Network data, e.g. an OSM PBF or GeoJSON file
-    │   └── output_graph    --- The resulting network(s) intermediary files that can also be used for quality control
-    ├── network.ini         --- Configuration file for the network
-    ├── analyses.ini        --- Configuration file for the analyses
-
-Workflow
----------------------------
-RA2CE is developed to be used in four ways:
-
-•	Create one or multiple networks *(only run --network_ini)*
-•	Calculate the exposure of hazards on those networks *(only run --network_ini)*
-•	Create a network and execute analyses *(run --network_ini and --analyses_ini)*
-•   Execute one or multiple analyses on a previously created network *(run --analyses_ini)*
-
-To create a network, a network configuration file, also called initialization file, is required. We call this the network.ini file. To execute analyses, an analyses initialization file is required, we call this the analyses.ini file. Both initialization files are required if users want to create a network and execute analyses.
 
 Data requirements
-+++++++++++++++++++++++++++
+-------------------------------------
 The types of possible input file formats to create a network are:
 
 •	Shapefile of network;
@@ -67,7 +17,7 @@ Depending on the required analysis, more data might be needed. More information 
 data requirements to create a network can be found in the :ref:`network_module`.
 
 Direct damages
-+++++++++++++++++++++++++++
+-------------------------------------
 The ‘damage to the network’ depends on the intensity of the hazard in relation to how the network (and its assets) are built and its current condition (e.g. type, state of maintenance, dimensions). Here, the hazard intensity and asset condition are linked to a percentage of damage, via vulnerability functions/ fragility curves. To develop these vulnerability curves data is needed about replacements costs per asset type and the potential damage per hazard intensity. This data can be collected during a workshop with for example national road agencies and the technicians. The output of the analyses consist of damage maps per hazard (e.g. flooding, landslides), per return period or per event, per asset and per road segment.
 
 Possible (built-in) options for vulnerability curves include:
@@ -77,7 +27,7 @@ Possible (built-in) options for vulnerability curves include:
 - *TO BE IMPLEMENTED*: your own damage curves
 
 Indirect losses / Network criticality
-+++++++++++++++++++++++++++++++++++++
+-------------------------------------
 
 ======================================================   =====================
 Analyis                                                   Name in analyses.ini
@@ -107,9 +57,9 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 This analysis finds the sections of the network that are fully isolated from the rest of the network (also named disconnected islands), because of network disruption due to a hazard.
 
 Initialization file templates
-++++++++++++++++++++++++++++++
+-------------------------------------
 
-Below are all possible input parameters a user can specify. However, there are different combinations of parameters required for different purposes. Use the :ref:`examplse` to get familiair with the different possible combinations to call RA2CE-functionality. 
+Below are all possible input parameters a user can specify. However, there are different combinations of parameters required for different purposes. Use the :ref:`example` to get familiair with the different possible combinations to call RA2CE-functionality. 
 
 **network.ini**
 ::
