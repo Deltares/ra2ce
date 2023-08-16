@@ -18,6 +18,7 @@
 # absolute, like shown here.
 #
 import os
+import shutil
 import sys
 from distutils.dir_util import copy_tree
 import sphinx_autosummary_accessors
@@ -28,6 +29,24 @@ import ra2ce
 
 print("ra2ce", ra2ce)
 print("dir", dir(ra2ce))
+
+
+# -- Helper functions ---------------------------------
+def remove_dir_content(path: str) -> None:
+    for root, dirs, files in os.walk(path):
+        for f in files:
+            os.unlink(os.path.join(root, f))
+        for d in dirs:
+            shutil.rmtree(os.path.join(root, d))
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+
+# NOTE: the examples/ folder in the root should be copied to docs/_examples after running sphinx
+# # -- Copy notebooks to include in docs -------
+if os.path.isdir("_examples"):
+    remove_dir_content("_examples")
+os.makedirs("_examples")
+copy_tree("../examples", "_examples")
 
 # -- General configuration ---------------------------------------------
 
@@ -124,7 +143,7 @@ html_theme_options = {
         {
             "name": "Deltares",
             "url": "https://www.deltares.nl/en/",
-            "icon": "_resources/deltares-blue.svg",
+            "icon": "../../_resources/deltares-blue.svg",
             "type": "local",
         },
     ],
@@ -219,6 +238,5 @@ texinfo_documents = [
     ),
 ]
 
-# NOTE: the examples/ folder in the root should be copied to docs/_examples after running sphinx
-# # -- Copy notebooks to include in docs -------
-copy_tree("../examples", "build/html/_examples")
+# Allow errors in notebooks
+nbsphinx_allow_errors = True
