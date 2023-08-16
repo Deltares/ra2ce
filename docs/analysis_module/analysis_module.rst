@@ -59,7 +59,7 @@ This analysis finds the sections of the network that are fully isolated from the
 Initialization file templates
 -------------------------------------
 
-Below are all possible input parameters a user can specify. However, there are different combinations of parameters required for different purposes. Use the :ref:`example` to get familiair with the different possible combinations to call RA2CE-functionality. 
+Below are all possible input parameters a user can specify. However, there are different combinations of parameters required for different purposes. Use the :ref:`examples` to get familiair with the different possible combinations to call RA2CE-functionality. 
 
 **network.ini**
 ::

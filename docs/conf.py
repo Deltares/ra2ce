@@ -19,6 +19,7 @@
 #
 import os
 import sys
+from distutils.dir_util import copy_tree
 import sphinx_autosummary_accessors
 
 # This is not needed
@@ -45,6 +46,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "sphinx_autosummary_accessors",
+    "nbsphinx"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -95,13 +97,6 @@ todo_include_todos = False
 napoleon_numpy_docstring = True
 napoleon_google_docstring = False
 napoleon_preprocess_types = True
-
-# NOTE: the examples/ folder in the root should be copied to docs/examples/examples/ before running sphinx
-# # -- Copy notebooks to include in docs -------
-if os.path.isdir("_examples"):
-    remove_dir_content("_examples")
-os.makedirs("_examples")
-copy_tree("../examples", "_examples")
 
 # -- Options for HTML output -------------------------------------------
 
@@ -223,3 +218,7 @@ texinfo_documents = [
         "Miscellaneous",
     ),
 ]
+
+# NOTE: the examples/ folder in the root should be copied to docs/_examples after running sphinx
+# # -- Copy notebooks to include in docs -------
+copy_tree("../examples", "build/html/_examples")
