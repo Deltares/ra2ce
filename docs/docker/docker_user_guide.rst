@@ -1,7 +1,7 @@
 .. _docker_user_guide:
 
 Docker User Guide
-==========
+==================
 
 Introduction
 ---------------------------------

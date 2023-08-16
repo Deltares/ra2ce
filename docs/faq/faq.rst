@@ -3,8 +3,6 @@
 Frequently Asked Questions
 ==========================
 
-.. _faq:
-
 This page contains the most frequently asked questions about working with RA2CE.
 
 Installation
@@ -27,12 +25,12 @@ Set up RA2CE model
  | **Q**: Where do I store the input data for RA2CE?
 
 Create a folder on your local machine in the RA2CE folder structure with the input data in the correct folder. 
-See the :ref:`user_guide` for more information.
+See the :ref:`about` for more information.
 
  | **Q**: What should my .ini files look like?
 
-The :ref:`user_guide` contains all the possible parameters you can specify in the .ini files.
-The examples notebooks give you ideas on which parameters to intialize. This depends on the user's wishes for analyses. 
+The :ref:`network_module` and :ref:`analysis_module` contain all the possible parameters you can specify in the .ini files.
+These notebooks give you ideas on which parameters to intialize. This depends on the user's wishes for network creation and/or analyses. 
 
  | **Q**: What are the minimum data requirements to try a RA2CE model?
 
@@ -52,7 +50,9 @@ Initialization parameters
 
  | **Q**: How do I know which parameters to specify for the action I want to perform with RA2CE?
 
-The :ref:`user_guide` shows all the possible parameters you can use in the .ini files. The combination of paramaters depends on the purpose for which the user wants to use RA2CE. Using the :ref:`examples` the user can get familiair with possible input parameter combinations. 
+The :ref:`network_module` and :ref:`analysis_module` show all the possible parameters you can use in the .ini files. The combination 
+of paramaters depends on the purpose for which the user wants to use RA2CE. Using the :ref:`examples` the user can get familiair with 
+possible input parameter combinations. 
 
 Network creation
 ----------------------------
@@ -106,7 +106,7 @@ Specifying analysis
 
 You can specify the preferred analysis in the analyses.ini file. 
 You can choose any analysis and you can initialize multiple at the same time. 
-More information can be found in the :ref:`user_guide` under 'Initialization file templates'. 
+More information can be found in the :ref:`analysis_module` under 'Initialization file templates'. 
 There are also examples in the :ref:`examples` notebooks.
 
 Direct damage assessment
