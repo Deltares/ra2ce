@@ -44,6 +44,47 @@ Isolated locations                                       multi_link_isolated_loc
 **Single link redundancy**
 With this analysis, you gain insight into the criticality of the network. A redundancy analysis is performed for each seperate link. It identifies the best existing alternative route if that particular edge would be disrupted. If there is no redundancy, it identifies the lack of alternative routes. This is performed sequentially, for each link of the network. The redundancy of each link is expressed in 1) total distance or total time for the alternative route, 2) difference in distance/time between the alternative route and the original route, 3) and if there is an alternative route available, or not.
 
+**network.ini**
+::
+
+    [project]
+    name = beira
+
+    [network]
+    directed = False
+    source = OSM download
+    primary_file = None
+    diversion_file = None
+    file_id = rfid_c
+    polygon = Extent_Network_wgs84.geojson
+    network_type = drive
+    road_types = motorway,motorway_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,residential
+    save_shp = True
+
+    [origins_destinations]
+    origins = None
+    destinations = None
+    origins_names = A
+    destinations_names = B
+    id_name_origin_destination = OBJECTID
+    origin_count = PEOPLE
+    origin_out_fraction = 1
+
+**analyses.ini**
+::
+
+  [project]
+  name = example
+
+  [analysis1]
+  name = single link redundancy test
+  analysis = single_link_redundancy
+  weighing = distance
+  save_shp = True
+  save_csv = True
+
+
+
 **Multi-link redundancy**
 This analysis can be performed when there is a hazard map. The hazard map indicates which links are disrupted. The analysis removes multiple disrupted links of the network. For each disrupted link, a redundancy analysis is performed that identifies the best existing alternative route. If there is no redundancy, the lack of alternative routes is specified. The redundancy of each link is expressed in 1) total distance or time for the alternative route, 2) difference in distance/time between the alternative route and the original route (additional distance/time), and 3) whether there is an alternative route available, or not. The user can specify the threshold (in meters) to indicate when a network is considered disrupted. For example, for flooding, the threshold could be a maximum of 0.5 m water on a network segment. Network segments with water depths < 0.5m will then not be considered as flooded.  
 
