@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ra2ce
+  name: ra2ce
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ra2ce
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: ra2ce
+    spec:
+      containers:
+      - image: willemdeltares/ra2ce:latest
+        name: ra2ce
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ra2ce
+  name: ra2ce
+spec:
+  ports:
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: ra2ce
+  type: LoadBalancer
+status:
+  loadBalancer: {}
