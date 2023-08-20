@@ -1,7 +1,7 @@
 .. _docker_user_guide:
 
 Docker User Guide
-==========
+=====================
 
 Introduction
 ---------------------------------
@@ -11,25 +11,47 @@ a.  How to build a docker image from the ra2ce source tree and push it to a Dock
 b.  How to run a simple model inside a created container and save the generated data for later display.
 c.  (Future). How to get ra2ce plus displayer up and running in a standard Kubernetes environment.
 
+In the addendum I will explain how to install Docker desktop on Windows and Docker on Ubuntu or Redhat like servers,
+but since this can be changed outside this repository, it is probably best to use:
+
+i.   For Windows-like systems: https://www.docker.com/products/docker-desktop/
+     There is a good alternative (https://podman-desktop.io/) which works a little differen, but with the same
+     outcome (at least for ra2ce).
+	
+ii.	 For Ubuntu-like systems: https://docs.docker.com/engine/install/ubuntu/
+
+iii. For Redhat-like systems: https://docs.docker.com/desktop/install/linux-install/
+
+iv.  For MacOS there is: https://docs.docker.com/desktop/install/mac-install/ (the writer of this document doesn't have
+     much experience with a Mac.
+
+Shown is the bash prompt, but when using Docker Desktop with Linux Containers enables, a Powershell also will do.
+
 How to build a docker image from the ra2ce source tree
 ------------------------------------------------------
 
 Assuming access to a Linux box with Docker installed, or a Docker Desktop with "Switch to Linux Containers". You can do the 
-following::
+following:
+
+.. parsed-literal::
 
     $ git clone git@github.com:Deltares/ra2ce.git
     $ cd ra2ce
-    $ docker build -t race:latest .
+    $ docker build -t ra2ce:latest .
 
-These instructions will build a docker image. After a good while, you should end up with::
+These instructions will build a docker image. After a good while, you should end up with:
+
+.. parsed-literal::
 
     $ docker images
-    REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
-    race         latest    616f672677f2   19 hours ago   1.01GB
+    REPOSITORY                   TAG       IMAGE ID       CREATED             SIZE
+    ra2ce                        latest    dd5dc5fe79ba   45 minutes ago      1.01GB
 
 Remark that this is a local image only (it only exists on the server or laptop you build it). To share it with other team members, you should push this to a docker hub. This operation entails the following.
 
-a.  Login to your dockerhub account (go to https://hub.docker.com/ if you don't have that yet)::
+a.  Login to your dockerhub account (go to https://hub.docker.com/ if you don't have that yet):
+
+.. parsed-literal::
 
     $ docker login
     Login with your Docker ID to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com to create one.
@@ -41,13 +63,17 @@ a.  Login to your dockerhub account (go to https://hub.docker.com/ if you don't 
 
     Login Succeeded
 
-b.  Retag the image::
+b.  Retag the image:
 
-    $ docker tag race:latest willemdeltares/race:latest
+.. parsed-literal::
 
-c.  Pushing the image to the dockerhub::
+    $ docker tag ra2ce:latest willemdeltares/ra2ce:latest
 
-    $ sudo docker push willemdeltares/race:latest
+c.  Pushing the image to the dockerhub:
+
+.. parsed-literal::
+
+    $ sudo docker push willemdeltares/ra2ce:latest
 
 If all is well, you can login to the dockerhub account and see the image yourself.
 
@@ -55,9 +81,11 @@ If all is well, you can login to the dockerhub account and see the image yoursel
 Simple run
 ------------
 
-On probably another laptop you can do the following::
+On probably another laptop you can do the following:
 
-    noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker pull willemdeltares/race:latest
+.. parsed-literal::
+
+    noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker pull willemdeltares/ra2ce:latest
     latest: Pulling from willemdeltares/race
     4db1b89c0bd1: Pull complete
     d78e3c519d33: Pull complete
@@ -69,209 +97,99 @@ On probably another laptop you can do the following::
     Status: Downloaded newer image for willemdeltares/race:latest
     docker.io/willemdeltares/race:latest
 
-    noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker run -it --rm willemdeltares/race:latest bash
-    (base) 51d9aa2fdffd:~$ micromamba list
-    List of packages in environment: "/opt/conda"
+    noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker run -d -p 8080:8080 ra2ce:latest
+    
+	noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker ps
+    CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS          PORTS                    NAMES
+    43ca6b0aef08   ra2ce:latest   "/usr/local/bin/_ent…"   23 minutes ago   Up 23 minutes   0.0.0.0:8080->8080/tcp   keen_bose
 
-    (base) 51d9aa2fdffd:~$ micromamba env list
-      Name       Active  Path
-    ────────────────────────────────────────────────
-      base       *       /opt/conda
-      ra2ce_env          /opt/conda/envs/ra2ce_env
-
-    (base) 51d9aa2fdffd:~$ micromamba activate ra2ce_env
-    (ra2ce_env) 51d9aa2fdffd:~$ exit
-    exit
+Now go to http://localhost:8080 and give in the default password (if you don't know it, try the name of this project, lowercase with the 2 in it).
 
 
+Mounting in projects
+------------------------
+
+When run as in "Simple run", you only get what is bundled within the Docker image of ra2ce itself. Above that, when the container is 
+stopped in some matter, the data is gone. to remedy this, we can mount in a custom based directory in the Docker Container. Like in the following:
+
+a.	Make a standard ra2ce project like this:
+
+.. parsed-literal::
+
+        +--- example01
+	    |   +--- .ipynb_checkpoints
+    	|   |   +--- test-checkpoint.ipynb
+    	|   +--- analysis.ini
+    	|   +--- cache
+    	|   +--- input
+    	|   +--- network.ini
+    	|   +--- output
+    	|   |   +--- network.ini
+    	|   +--- static
+    	|   |   +--- hazard
+    	|   |   +--- network
+    	|   |   |   +--- Delft.geojson
+    	|   |   +--- output_graph
+    	|   +--- test.ipynb
+	
+b.  Start the container as follows:
+
+.. parsed-literal::
+
+        C:\Users\noorduin\development\ra2ce_inputs> docker run -d -v C:\Users\noorduin\development\ra2ce_inputs\project\:/home/mambauser/sample -p 8081:8080 ra2ce:latest
+        9d95083de344c27a7009a65b57700e3db32eb72f33ebf605376a41587d19bd81
+	
+        C:\Users\noorduin\development\ra2ce_inputs> docker ps
+        CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS          PORTS                    NAMES
+        7c000d7ae8ae   ra2ce:latest   "/usr/local/bin/_ent…"   23 seconds ago   Up 22 seconds   0.0.0.0:8081->8080/tcp   adoring_roentgen
+		43ca6b0aef08   ra2ce:latest   "/usr/local/bin/_ent…"   2 hours ago      Up 2 hours      0.0.0.0:8080->8080/tcp   keen_bose
+    
+Notice that we have two ra2ce-applications now, one available on http://localhost:8080 and one new on http://localhost:8081. The first interface
+knows nothing of the second here. When you go to http://localhost:8081 you can see the data folder mounted in /home/mambauser as a directory sample.
+From there, you can start test.ipynb.
+
+Trouble shooting
+---------------------------------
+
+In the Docker world, there are a lot of things that go wrong (from forgetting the BIOS setting mentioned in the Addendum) to
+not enough user rights on Linux). It is best to refer to www.docker.com or one of there foras for those. Here, we focuss on the 
+errors and warning you could see in the combination Ra2ce and docker.
+
+1.	When I browse to http://localhost:8080 I can't see the interface. Or when I log in, I can't see the project.
+
+	Jupyter seems to be very cookie-aware. Try to delete the cookies or use a private browser-session.
+	
 
 
- 
+Addendum
+---------------------------------
 
+1.   Simple Docker Desktop setup on Windows:
+     
+     **Step 1: BIOS Prerequisites**
+	 
+     There is a setting in the BIOS (or a modern equivalent of that) that makes it possible to virtualize the CPU. 
+     Unfortunately every Hardware Manufacturer has its own name for it and position in the BIOS.
+	 
+     **Step 2: Containers and Hyper-V**
 
-Within a Python script
----------------------------
-To use Risk Assessment and Adaptation for Critical infrastructurE in a project::
-
-    import ra2ce
-
-
-Folder structure
----------------------------
-RA2CE can be run from anywhere, but it requires a certain folder structure for loading and saving data. RA2CE expects data to be stored separately per project, which can be defined in any way by the user, e.g. by its location in the world or the type of assessment. A project folder must contain the following subfolders: input, output, and static. It must also contain the network.ini and analyses.ini files. Within the subfolder static, RA2CE expects three subfolders: hazard, network, and output_graph. See below an example folder structure of “Project A”. This folder structure must be created and filled with data by the user before running RA2CE.
-
-::
-
-    Project A               --- Example project name 
-    ├── input               --- Input data
-    ├── output              --- Contains the analyses results
-    ├── static              --- Contains files that generally do not change per run
-    │   ├── hazard          --- Hazard data
-    │   ├── network         --- Network data, e.g. an OSM PBF or GeoJSON file
-    │   └── output_graph    --- The resulting network(s) intermediary files that can also be used for quality control
-    ├── network.ini         --- Configuration file for the network
-    ├── analyses.ini        --- Configuration file for the analyses
-
-Workflow
----------------------------
-RA2CE is developed to be used in four ways:
-
-•	Create one or multiple networks *(only run --network_ini)*
-•	Calculate the exposure of hazards on those networks *(only run --network_ini)*
-•	Execute one or multiple analyses on (a) network(s) *(only run --analyses_ini)*
-•	Create a network and execute analyses *(run --network_ini and --analyses_ini)*
-
-To create a network, a network configuration file, also called initialization file, is required. We call this the network.ini file. To execute analyses, an analyses initialization file is required, we call this the analyses.ini file. Both initialization files are required if users want to create a network and execute analyses.
-
-Data requirements
-+++++++++++++++++++++++++++
-The types of possible input file formats to create a network are:
-
-•	Shapefile of network;
-•	GeoJSON polygon of area of interest for downloading a network from OSM;
-•	OSM PBF file;
-•	Pickle – a python data format, also used to save graphs.
-
-Depending on the required analysis, more data might be needed.
-
-Direct damages
-+++++++++++++++++++++++++++
-The ‘damage to the network’ depends on the intensity of the hazard in relation to how the network (and its assets) are built and its current condition (e.g. type, state of maintenance, dimensions). Here, the hazard intensity and asset condition are linked to a percentage of damage, via vulnerability functions/ fragility curves. To develop these vulnerability curves data is needed about replacements costs per asset type and the potential damage per hazard intensity. This data can be collected during a workshop with for example national road agencies and the technicians. The output of the analyses consist of damage maps per hazard (e.g. flooding, landslides), per return period or per event, per asset and per road segment.
-
-Possible (built-in) options for vulnerability curves include:
-
-- *Global*: Huizinga curves
-- *Europe*: OSdaMage functions
-- *TO BE IMPLEMENTED*: your own damage curves
-
-Indirect losses / Network criticality
-+++++++++++++++++++++++++++++++++++++
-
-======================================================   =====================
-Analyis                                                   Name in analyses.ini
-======================================================   =====================
-Single link redundancy                                    single_link_redundancy
-Multi-link redundancy                                    multi_link_redundancy
-Origin-Destination, defined OD couples, no disruption    optimal_route_origin_destination
-Origin-Destination, defined OD couples, disruption       multi_link_origin_destination
-Origin-Destination, O to closest D, no disruption        optimal_route_origin_closest_destination
-Origin-Destination,  O to closest D, disruption          multi_link_origin_closest_destination
-Isolated locations                                       multi_link_isolated_locations 
-======================================================   =====================
-
-**Single link redundancy**
-This analysis removes each link of the network one at a time. For each disrupted link, a redundancy analysis is performed. It identifies the best existing alternative route or, if there is no redundancy, the lack of alternative routes. This is performed sequentially, for each link of the network. The redundancy of each link is expressed in total distance or time for the alternative route, difference in distance/time between the alternative route and the original route (additional distance/time), and if there is an alternative route available, or not.
-
-**Multi-link redundancy**
-This analysis removes multiple disrupted links of the network. The disrupted links are indicated with an overlay of a hazard map and a threshold for disruption. For example, for flooding, the threshold could be a maximum of 0.5 m water on a road segment. For each disrupted link, a redundancy analysis is performed that identifies the best existing alternative route or, if there is no redundancy, the lack of alternative routes. The redundancy of each link is expressed in total distance or time for the alternative route, difference in distance/time between the alternative route and the original route (additional distance/time), and if there is an alternative route available, or not.
-
-**Origin-Destination, defined OD couples**
-This analysis finds the shortest (distance-weighed) or quickest (time-weighed) route between all Origins and all Destinations input by the user.
-
-**Origin-Destination, defined origins to closest destinations**
-This analysis finds the shortest (distance-weighed) or quickest (time-weighed) route from all Origins to the closest Destinations input by the user.
-
-**Isolated locations**
-This analysis finds the sections of the network that are fully isolated from the rest of the network (also named disconnected islands), because of network disruption due to a hazard.
-
-Initialization file templates
-++++++++++++++++++++++++++++++
-**network.ini**
-::
-
-    [project]
-    name = example
-
-    [network]
-    directed = False				# True / False
-    source = OSM download			# OSM PBF / OSM download / shapefile / pickle
-    primary_file = None				# <name + file extension or full path of file> / None			
-    diversion_file = None			# <name + file extension or full path of file> / None
-    file_id = None				# <field name of the ID attribute in the shapefile for network creating with a shapefile> / None
-    polygon = map.geojson			# <name + file extension of the geojson polygon file in the static/network folder> / None
-    network_type = drive			# drive / walk / bike / drive_service / all
-    road_types = motorway,motorway_link,trunk,trunk_link,primary, primary_link,secondary,secondary_link,tertiary,tertiary_link
-    save_shp = True				# True / False
-
-    [origins_destinations]
-    origins = origins.shp 			# <file name> / None
-    destinations = destinations.shp		# <file name> / None
-    origins_names = A				# <origin name> / None	
-    destinations_names = B			# <destination name> / None
-    id_name_origin_destination = OBJECTID	# <column name of origins/destinations data ID> / None
-    origin_count = None				# <column name> / None
-    origin_out_fraction = 1  			# fraction of things/people going out of the origin to the destination
-
-    [hazard]
-    hazard_map = None				# <name(s) of hazard maps in the static/hazard folder> / None
-    hazard_id = None				# <field name> / None
-    hazard_field_name = None			# <field name(s)> / None	
-    aggregate_wl = max				# max / min / mean
-    hazard_crs = None                           # EPSG code / projection that can be read by pyproj / None
-
-    [cleanup] # use only when the input file is a shapefile
-    snapping_threshold = None			# Numeric value / None
-    segmentation_length = None			# Numeric value / None
-    merge_lines = True				# True / False
-    merge_on_id = False				# True / False / None
-    cut_at_intersections = False			# True / False
-
-
-**analyses.ini**
-::
-
-  [project]
-  name = example
-
-  [analysis1]
-  name = single link redundancy test
-  analysis = single_link_redundancy
-  weighing = distance
-  save_shp = True
-  save_csv = True
-
-  [analysis2]
-  name = multi link redundancy test
-  analysis = multi_link_redundancy
-  aggregate_wl = max
-  threshold = 0.5
-  weighing = distance
-  save_shp = True
-  save_csv = True
-
-  [analysis3]
-  name = optimal origin dest test
-  analysis = optimal_route_origin_destination
-  weighing = distance
-  save_shp = True
-  save_csv = True
-
-  [analysis4]
-  name = multilink origin closest dest test
-  analysis = multi_link_origin_closest_destination
-  aggregate_wl = max
-  threshold = 0.5
-  weighing = distance
-  save_shp = True
-  save_csv = False
-
-  [analysis5]
-  name = multilink origin dest test
-  analysis = multi_link_origin_destination
-  aggregate_wl = max
-  threshold = 0.5
-  weighing = distance
-  save_shp = True
-  save_csv = True
-
-  [analysis6]
-  name = multilink isolated locations
-  analysis = multi_link_isolated_locations
-  aggregate_wl = max
-  threshold = 1
-  weighing = length
-  buffer_meters = 40
-  category_field_name = category
-  save_shp = True
-  save_csv = True
-
+     Run the following in an Administrator's Powershell::
+	 
+          PS C:> Enable-WindowsOptionalFeature -Online -FeatureName $("Microsoft-Hyper-V", "Containers") -All
+		 
+     Then reboot your PC.
+	 
+     **Step 3: Install wsl-1 and wsl-2**
+	 
+     See also: https://learn.microsoft.com/en-us/windows/wsl/install. Make sure that you reboot afterwards
+	 
+     **Step 4: Install Docker desktop**
+	 
+     After step 1 and 2 it should be posssible to download and install Docker Desktop for Windows (see also
+     https://docs.docker.com/desktop/install/windows-install/).
+	 
+     **Step 5: Switch to Linux Containers**
+	 
+     Ra2ce is based on a Linux image and it is hard too tell the default at forehand. If Docker Desktop is 
+     started up correctly, there should be a Whale-like icon amongst your "Hidden Icons". When you right-click
+     it you can swich to either Linux or Windows Containers. For Ra2ce it's important to choose "Linux containers".
