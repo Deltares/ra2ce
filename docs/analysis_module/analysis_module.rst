@@ -26,6 +26,76 @@ Possible (built-in) options for vulnerability curves include:
 - *Europe*: OSdaMage functions
 - *TO BE IMPLEMENTED*: your own damage curves
 
+**network.ini**
+::
+
+    [project]
+    name = example_direct
+
+    [network]
+    directed = False
+    source = OSM PBF
+    primary_file = file.gpkg
+    diversion_file = None
+    file_id = id
+    polygon = None
+    network_type = drive
+    road_types = motorway, motorway_link
+    save_shp = True
+
+    [origins_destinations]
+    origins = None
+    destinations = None
+    origins_names = None
+    destinations_names = None
+    id_name_origin_destination = None
+    origin_count = None
+
+    [hazard]
+    hazard_map = max_flood_depth.tif
+    hazard_id = None
+    hazard_crs = EPSG:4326
+    aggregate_wl = max
+
+**analysis.ini for an event-based case**
+::
+
+    [project]
+    name = example_direct
+    
+    [analysis1]
+    name = example's indirect analysis
+    analysis = direct
+    event_type = event
+    damage_curve = HZ/OSD/MAN
+    aggregate_wl = max
+    threshold = 0.5
+    weighing = length
+    buffer_meters = 500
+    category_field_name = category
+    save_shp = True
+    save_csv = True
+
+**analysis.ini for an occurring event with a wide range of possible return periods**
+::
+
+    [project]
+    name = example_direct
+
+    [analysis1]
+    name = example's indirect analysis
+    analysis = direct
+    event_type = return_period
+    risk_calculation = None/default/cut_from_YYYY_year/triangle_to_null_YYYY_year
+    damage_curve = HZ/OSD/MAN
+    aggregate_wl = max
+    threshold = 0.5
+    weighing = length
+    buffer_meters = 500
+    category_field_name = category
+    save_shp = True
+    save_csv = True
+
 Indirect losses / Network criticality
 -------------------------------------
 
@@ -48,7 +118,7 @@ With this analysis, you gain insight into the criticality of the network. A redu
 ::
 
     [project]
-    name = example
+    name = example_indirect
 
     [network]
     directed = False
@@ -74,10 +144,10 @@ With this analysis, you gain insight into the criticality of the network. A redu
 ::
 
   [project]
-  name = example
+  name = example_indirect
 
   [analysis1]
-  name = example's analysis
+  name = example's direct analysis
   analysis = single_link_redundancy
   weighing = distance
   save_shp = True
@@ -92,7 +162,7 @@ This analysis can be performed when there is a hazard map. The hazard map indica
 ::
 
     [project]
-    name = example
+    name = example_indirect
 
     [network]
     directed = False
@@ -125,10 +195,10 @@ This analysis can be performed when there is a hazard map. The hazard map indica
 ::
 
     [project]
-    name = example
+    name = example_indirect
 
     [analysis1]
-    name = example's analysis
+    name = example's direct analysis
     analysis = multi_link_redundancy
     weighing = time
     aggregate_wl = max
@@ -143,7 +213,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 ::
 
     [project]
-    name = example
+    name = example_indirect
 
     [network]
     directed = False
@@ -170,10 +240,10 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 ::
 
     [project]
-    name = example
+    name = example_indirect
 
     [analysis1]
-    name = example's analysis
+    name = example's direct analysis
     analysis = optimal_route_origin_destination
     weighing = distance
     save_shp = True
@@ -183,7 +253,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 ::
 
     [project]
-    name = example
+    name = example_indirect
 
     [network]
     directed = False
@@ -210,10 +280,10 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 ::
 
     [project]
-    name = example
+    name = example_indirect
 
     [analysis1]
-    name = example's analysis
+    name = example's direct analysis
     analysis = multi_link_origin_destination
     weighing = distance
     save_shp = True
@@ -226,7 +296,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 ::
 
     [project]
-    name = example
+    name = example_indirect
 
     [network]
     directed = False
@@ -253,10 +323,10 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 ::
 
     [project]
-    name = example
+    name = example_indirect
 
     [analysis1]
-    name = example's analysis
+    name = example's direct analysis
     analysis = optimal_route_origin_closest_destination
     weighing = distance
     save_shp = True
@@ -266,7 +336,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 ::
 
     [project]
-    name = example's analysis
+    name = example's direct analysis
 
     [network]
     directed = False
@@ -300,10 +370,10 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 ::
 
     [project]
-    name = example
+    name = example_indirect
 
     [analysis1]
-    name = example's analysis
+    name = example's direct analysis
     analysis = multi_link_origin_closest_destination
     aggregate_wl = max
     threshold = 1
@@ -318,7 +388,7 @@ This analysis finds the sections of the network that are fully isolated from the
 **network.ini**
 ::
     [project]
-    name = example
+    name = example_indirect
 
     [network]
     directed = False
@@ -354,10 +424,10 @@ This analysis finds the sections of the network that are fully isolated from the
 **analyses.ini**
 ::
     project]
-    name = example
+    name = example_indirect
 
     [analysis1]
-    name = example's analysis
+    name = example's direct analysis
     analysis = multi_link_isolated_locations
     aggregate_wl = max
     threshold = 1
