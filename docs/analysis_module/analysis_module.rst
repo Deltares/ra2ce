@@ -30,7 +30,7 @@ Indirect losses / Network criticality
 -------------------------------------
 
 ======================================================   =====================
-Analyis                                                   Name in analyses.ini
+Analysis                                                   Name in analyses.ini
 ======================================================   =====================
 Single link redundancy                                   single_link_redundancy
 Multi-link redundancy                                    multi_link_redundancy
@@ -48,7 +48,7 @@ With this analysis, you gain insight into the criticality of the network. A redu
 ::
 
     [project]
-    name = beira
+    name = example
 
     [network]
     directed = False
@@ -77,7 +77,7 @@ With this analysis, you gain insight into the criticality of the network. A redu
   name = example
 
   [analysis1]
-  name = single link redundancy test
+  name = example's analysis
   analysis = single_link_redundancy
   weighing = distance
   save_shp = True
@@ -88,20 +88,6 @@ With this analysis, you gain insight into the criticality of the network. A redu
 **Multi-link redundancy**
 This analysis can be performed when there is a hazard map. The hazard map indicates which links are disrupted. The analysis removes multiple disrupted links of the network. For each disrupted link, a redundancy analysis is performed that identifies the best existing alternative route. If there is no redundancy, the lack of alternative routes is specified. The redundancy of each link is expressed in 1) total distance or time for the alternative route, 2) difference in distance/time between the alternative route and the original route (additional distance/time), and 3) whether there is an alternative route available, or not. The user can specify the threshold (in meters) to indicate when a network is considered disrupted. For example, for flooding, the threshold could be a maximum of 0.5 m water on a network segment. Network segments with water depths < 0.5m will then not be considered as flooded.  
 
-**Origin-Destination, defined OD couples**
-This analysis finds the shortest (distance-weighed) or quickest (time-weighed) route between all Origins and all Destinations inputted by the user, with and without disruption. 
-
-**Origin-Destination, defined origins to closest destinations**
-This analysis finds the shortest (distance-weighed) or quickest (time-weighed) route from all Origins to the closest Destinations inputted by the user, with and without disruption. 
-
-**Isolated locations**
-This analysis finds the sections of the network that are fully isolated from the rest of the network (also named disconnected islands), because of network disruption due to a hazard.
-
-Initialization file templates
--------------------------------------
-
-Below are all possible input parameters a user can specify. However, there are different combinations of parameters required for different purposes. Use the :ref:`examples` to get familiair with the different possible combinations to call RA2CE-functionality. 
-
 **network.ini**
 ::
 
@@ -109,95 +95,274 @@ Below are all possible input parameters a user can specify. However, there are d
     name = example
 
     [network]
-    directed = False				# True / False
-    source = OSM download			# OSM PBF / OSM download / shapefile / pickle
-    primary_file = None				# <name + file extension or full path of file> / None			
-    diversion_file = None			# <name + file extension or full path of file> / None
-    file_id = None				# <field name of the ID attribute in the shapefile for network creating with a shapefile> / None
-    polygon = map.geojson			# <name + file extension of the geojson polygon file in the static/network folder> / None
-    network_type = drive			# drive / walk / bike / drive_service / all
-    road_types = motorway,motorway_link,trunk,trunk_link,primary, primary_link,secondary,secondary_link,tertiary,tertiary_link
-    save_shp = True				# True / False
+    directed = False
+    source = OSM download
+    primary_file = None
+    diversion_file = None
+    file_id = rfid_c
+    polygon = Extent_Network_wgs84.geojson
+    network_type = drive
+    road_types = motorway,motorway_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,residential
+    save_shp = True
 
     [origins_destinations]
-    origins = origins.shp 			# <file name> / None
-    destinations = destinations.shp		# <file name> / None
-    origins_names = A				# <origin name> / None	
-    destinations_names = B			# <destination name> / None
-    id_name_origin_destination = OBJECTID	# <column name of origins/destinations data ID> / None
-    origin_count = None				# <column name> / None
-    origin_out_fraction = 1  			# fraction of things/people going out of the origin to the destination
+    origins = None
+    destinations = None
+    origins_names = A
+    destinations_names = B
+    id_name_origin_destination = OBJECTID
+    origin_count = PEOPLE
+    origin_out_fraction = 1
 
     [hazard]
-    hazard_map = None				# <name(s) of hazard maps in the static/hazard folder> / None
-    hazard_id = None				# <field name> / None
-    hazard_field_name = None			# <field name(s)> / None	
-    aggregate_wl = max				# max / min / mean
-    hazard_crs = None                           # EPSG code / projection that can be read by pyproj / None
-
-    [cleanup] # use only when the input file is a shapefile
-    snapping_threshold = None			# Numeric value / None
-    segmentation_length = None			# Numeric value / None
-    merge_lines = True				# True / False
-    merge_on_id = False				# True / False / None
-    cut_at_intersections = False			# True / False
-
+    hazard_map = max_flood_depth.tif
+    hazard_id = None
+    hazard_field_name = waterdepth
+    aggregate_wl = max
+    hazard_crs = EPSG:32736
 
 **analyses.ini**
 ::
 
-  [project]
-  name = example
+    [project]
+    name = example
 
-  [analysis1]
-  name = single link redundancy test
-  analysis = single_link_redundancy
-  weighing = distance
-  save_shp = True
-  save_csv = True
+    [analysis1]
+    name = example's analysis
+    analysis = multi_link_redundancy
+    weighing = time
+    aggregate_wl = max
+    threshold = 0.5
+    save_shp = True
+    save_csv = True
 
-  [analysis2]
-  name = multi link redundancy test
-  analysis = multi_link_redundancy
-  aggregate_wl = max
-  threshold = 0.5
-  weighing = distance
-  save_shp = True
-  save_csv = True
+**Origin-Destination, defined OD couples**
+This analysis finds the shortest (distance-weighed) or quickest (time-weighed) route between all Origins and all Destinations inputted by the user, with and without disruption. 
 
-  [analysis3]
-  name = optimal origin dest test
-  analysis = optimal_route_origin_destination
-  weighing = distance
-  save_shp = True
-  save_csv = True
+**network.ini for the case without hazard**
+::
 
-  [analysis4]
-  name = multilink origin closest dest test
-  analysis = multi_link_origin_closest_destination
-  aggregate_wl = max
-  threshold = 0.5
-  weighing = distance
-  save_shp = True
-  save_csv = False
+    [project]
+    name = example
 
-  [analysis5]
-  name = multilink origin dest test
-  analysis = multi_link_origin_destination
-  aggregate_wl = max
-  threshold = 0.5
-  weighing = distance
-  save_shp = True
-  save_csv = True
+    [network]
+    directed = False
+    source = OSM download
+    primary_file = None
+    diversion_file = None
+    file_id = rfid_c
+    polygon = Extent_Network_wgs84.geojson
+    network_type = drive
+    road_types = motorway,motorway_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,residential
+    save_shp = True
 
-  [analysis6]
-  name = multilink isolated locations
-  analysis = multi_link_isolated_locations
-  aggregate_wl = max
-  threshold = 1
-  weighing = length
-  buffer_meters = 40
-  category_field_name = category
-  save_shp = True
-  save_csv = True
+    [origins_destinations]
+    origins = origins_worldpop_wgs84.shp
+    destinations = destinations_all_good_wgs84.shp
+    origins_names = A
+    destinations_names = B
+    id_name_origin_destination = OBJECTID
+    origin_count = POPULATION
+    origin_out_fraction = 1
+    category = category
 
+**analyses.ini for the case without hazard**
+::
+
+    [project]
+    name = example
+
+    [analysis1]
+    name = example's analysis
+    analysis = optimal_route_origin_destination
+    weighing = distance
+    save_shp = True
+    save_csv = True
+
+**network.ini for the case with hazard**
+::
+
+    [project]
+    name = example
+
+    [network]
+    directed = False
+    source = OSM download
+    primary_file = None
+    diversion_file = None
+    file_id = rfid_c
+    polygon = Extent_Network_wgs84.geojson
+    network_type = drive
+    road_types = motorway,motorway_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,residential
+    save_shp = True
+
+    [origins_destinations]
+    origins = origins_worldpop_wgs84.shp
+    destinations = destinations_all_good_wgs84.shp
+    origins_names = A
+    destinations_names = B
+    id_name_origin_destination = OBJECTID
+    origin_count = POPULATION
+    origin_out_fraction = 1
+    category = category
+
+**analyses.ini for the case with hazard**
+::
+
+    [project]
+    name = example
+
+    [analysis1]
+    name = example's analysis
+    analysis = multi_link_origin_destination
+    weighing = distance
+    save_shp = True
+    save_csv = True
+
+**Origin-Destination, defined origins to closest destinations**
+This analysis finds the shortest (distance-weighed) or quickest (time-weighed) route from all Origins to the closest Destinations inputted by the user, with and without disruption. 
+
+**network.ini for the case without hazard**
+::
+
+    [project]
+    name = example
+
+    [network]
+    directed = False
+    source = OSM download
+    primary_file = None
+    diversion_file = None
+    file_id = rfid_c
+    polygon = Extent_Network_wgs84.geojson
+    network_type = drive
+    road_types = motorway,motorway_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,residential
+    save_shp = True
+
+    [origins_destinations]
+    origins = origins_worldpop_wgs84.shp
+    destinations = destinations_all_good_wgs84.shp
+    origins_names = A
+    destinations_names = B
+    id_name_origin_destination = OBJECTID
+    origin_count = POPULATION
+    origin_out_fraction = 1
+    category = category
+
+**analyses.ini for the case without hazard**
+::
+
+    [project]
+    name = example
+
+    [analysis1]
+    name = example's analysis
+    analysis = optimal_route_origin_closest_destination
+    weighing = distance
+    save_shp = True
+    save_csv = True
+
+**network.ini for the case with hazard**
+::
+
+    [project]
+    name = example's analysis
+
+    [network]
+    directed = False
+    source = OSM download
+    primary_file = None
+    diversion_file = None
+    file_id = rfid_c
+    polygon = Extent_Network_wgs84.geojson
+    network_type = drive
+    road_types = motorway,motorway_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,residential
+    save_shp = True
+
+    [origins_destinations]
+    origins = origins_worldpop_wgs84.shp
+    destinations = destinations_all_good_wgs84.shp
+    origins_names = A
+    destinations_names = B
+    id_name_origin_destination = OBJECTID
+    origin_count = POPULATION
+    origin_out_fraction = 1
+    category = category
+
+    [hazard]
+    hazard_map = max_flood_depth.tif
+    hazard_id = None
+    hazard_field_name = waterdepth
+    aggregate_wl = max
+    hazard_crs = EPSG:32736
+
+**analyses.ini for the case with hazard**
+::
+
+    [project]
+    name = example
+
+    [analysis1]
+    name = example's analysis
+    analysis = multi_link_origin_closest_destination
+    aggregate_wl = max
+    threshold = 1
+    weighing = distance
+    calculate_route_without_disruption = True
+    save_shp = True
+    save_csv = True
+
+**Isolated locations**
+This analysis finds the sections of the network that are fully isolated from the rest of the network (also named disconnected islands), because of network disruption due to a hazard.
+
+**network.ini**
+::
+    [project]
+    name = example
+
+    [network]
+    directed = False
+    source = OSM download
+    primary_file = None
+    diversion_file = None
+    file_id = rfid_c
+    polygon = Extent_Network_wgs84.geojson
+    network_type = drive
+    road_types = motorway,motorway_link,trunk,trunk_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,unclassified,residential
+    save_shp = True
+
+    [origins_destinations]
+    origins = origins_worldpop_wgs84.shp
+    destinations = destinations_all_good_wgs84.shp
+    origins_names = A
+    destinations_names = B
+    id_name_origin_destination = OBJECTID
+    origin_count = POPULATION
+    origin_out_fraction = 1
+    category = category
+
+    [hazard]
+    hazard_map = max_flood_depth.tif
+    hazard_id = None
+    hazard_field_name = waterdepth
+    aggregate_wl = max
+    hazard_crs = EPSG:4326
+
+    [isolation]
+    locations = origins_worldpop_wgs84.shp
+
+**analyses.ini**
+::
+    project]
+    name = example
+
+    [analysis1]
+    name = example's analysis
+    analysis = multi_link_isolated_locations
+    aggregate_wl = max
+    threshold = 1
+    weighing = length
+    buffer_meters = 1000
+    category_field_name = category
+    save_shp = True
+    save_csv = True
