@@ -24,3 +24,5 @@ dependencies:
   # install jupyterlab and notebook
   - conda-forge::jupyterlab
   - conda-forge::notebook
+  # install boto3
+  - conda-forge::boto3
