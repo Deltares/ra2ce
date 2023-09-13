@@ -20,9 +20,10 @@
 """
 
 from dataclasses import dataclass
-from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_protocol import (
-    HazardIntersectBuilderProtocol,
+from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_base import (
+    HazardIntersectBuilderBase,
 )
+
 from networkx import Graph
 from geopandas import GeoDataFrame
 from ra2ce.graph.networks_utils import (
@@ -33,15 +34,10 @@ from pandas import read_csv
 
 
 @dataclass
-class HazardIntersectBuilderForTable(HazardIntersectBuilderProtocol):
+class HazardIntersectBuilderForTable(HazardIntersectBuilderBase):
     hazard_field_name: str = ""
     network_file_id: str = ""
     hazard_id: str = ""
-
-    def get_intersection(
-        self, hazard_overlay: GeoDataFrame | Graph
-    ) -> GeoDataFrame | Graph:
-        return super().get_intersection(hazard_overlay)
 
     def _from_network_x(self, hazard_overlay: Graph) -> Graph:
         """Joins a table with IDs and hazard information with the road segments with corresponding IDs."""

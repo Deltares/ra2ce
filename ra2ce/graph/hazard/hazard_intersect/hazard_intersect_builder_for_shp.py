@@ -23,24 +23,16 @@ from dataclasses import dataclass, field
 from geopandas import GeoDataFrame, read_file, sjoin
 from networkx import Graph
 from numpy import nanmean
-
-from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_protocol import (
-    HazardIntersectBuilderProtocol,
-)
+from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_base import HazardIntersectBuilderBase
 
 
 @dataclass
-class HazardIntersectBuilderForShp(HazardIntersectBuilderProtocol):
+class HazardIntersectBuilderForShp(HazardIntersectBuilderBase):
     hazard_field_name: str = ""
     hazard_aggregate_wl: str = ""
     hazard_names: list[str] = field(default_factory=list)
     ra2ce_names: list[str] = field(default_factory=list)
     hazard_shp_files: list[str] = field(default_factory=list)
-
-    def get_intersection(
-        self, hazard_overlay: GeoDataFrame | Graph
-    ) -> GeoDataFrame | Graph:
-        return super().get_intersection(hazard_overlay)
 
     def _from_networkx(self, hazard_overlay: Graph) -> Graph:
         """Overlays the hazard shapefile over the road segments NetworkX graph.
