@@ -36,10 +36,11 @@ from rasterstats import point_query, zonal_stats
 from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as ntu
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
+from ra2ce.graph.hazard.hazard_intersect_builder import HazardIntersectBuilder
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 
 
-class Hazard:
+class HazardOverlay:
     """Class where the hazard overlay happens.
 
     Attributes:
@@ -369,7 +370,7 @@ class Hazard:
 
         ## Intersect the origin and destination nodes with the hazard map (now only geotiff possible)
         # Verify the graph type (networkx)
-        assert type(graph).__module__.split(".")[0] == "networkx"
+        assert isinstance(graph, nx.classes.graph.Graph)
         extent_graph = ntu.get_graph_edges_extent(graph)
 
         # Get all node geometries
@@ -641,99 +642,12 @@ class Hazard:
         _hazard_files["table"] = get_filtered_files(".csv", ".json")
         return _hazard_files
 
-    def get_hazard_intersect_geodataframe_tif(
-        self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]
-    ):
-        """Logic to find the right hazard overlay function for the input to_overlay.
-
-        Args:
-            to_overlay (GeoDataFrame or NetworkX graph): Data that needs to be overlayed with a or multiple hazard maps.
-
-        Returns:
-            to_overlay (GeoDataFrame or NetworkX graph): The same data as input but with hazard values.
-
-        The hazard file paths are in self.hazard_files.
-        """
-        start = time.time()
-        to_overlay = self.overlay_hazard_raster_gdf(to_overlay)
-        end = time.time()
-        logging.info(f"Hazard raster intersect time: {str(round(end - start, 2))}s")
-        return to_overlay
-
-    def get_hazard_intersect_networkx_tif(
-        self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]
-    ):
-        start = time.time()
-        to_overlay = self.overlay_hazard_raster_graph(to_overlay)
-        end = time.time()
-        logging.info(f"Hazard raster intersect time: {str(round(end - start, 2))}s")
-        return to_overlay
-
-    def get_hazard_intersect_geodataframe_shp(
-        self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]
-    ):
-        start = time.time()
-        to_overlay = self.overlay_hazard_shp_gdf(to_overlay)
-        end = time.time()
-        logging.info(f"Hazard shapefile intersect time: {str(round(end - start, 2))}s")
-        return to_overlay
-
-    def get_hazard_intersect_networkx_shp(
-        self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]
-    ):
-        start = time.time()
-        to_overlay = self.overlay_hazard_shp_graph(to_overlay)
-        end = time.time()
-        logging.info(f"Hazard shapefile intersect time: {str(round(end - start, 2))}s")
-        return to_overlay
-
-    def get_hazard_intersect_geodataframe_table(
-        self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]
-    ):
-        start = time.time()
-        to_overlay = self.join_hazard_table_gdf(to_overlay)
-        end = time.time()
-        logging.info(f"Hazard table intersect time: {str(round(end - start, 2))}s")
-        return to_overlay
-
-    def get_hazard_intersect_networkx_table(
-        self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]
-    ):
-        start = time.time()
-        to_overlay = self.join_hazard_table_graph(to_overlay)
-        end = time.time()
-        logging.info(f"Hazard table intersect time: {str(round(end - start, 2))}s")
-        return to_overlay
-
     def hazard_intersect(
         self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]
     ) -> Union[gpd.GeoDataFrame, nx.classes.graph.Graph]:
         """Handler function that chooses the right function for overlaying the network with the hazard data."""
-        if self.hazard_files["tif"] and (type(to_overlay) == gpd.GeoDataFrame):
-            to_overlay = self.get_hazard_intersect_geodataframe_tif(to_overlay)
-        elif self.hazard_files["tif"] and (
-            type(to_overlay).__module__.split(".")[0] == "networkx"
-        ):
-            to_overlay = self.get_hazard_intersect_networkx_tif(to_overlay)
-        elif (self.hazard_files["shp"]) and (type(to_overlay) == gpd.GeoDataFrame):
-            to_overlay = self.get_hazard_intersect_geodataframe_shp(to_overlay)
-        elif (self.hazard_files["shp"]) and (
-            type(to_overlay).__module__.split(".")[0] == "networkx"
-        ):
-            to_overlay = self.get_hazard_intersect_networkx_shp(to_overlay)
-        elif (self.hazard_files["table"]) and (type(to_overlay) == gpd.GeoDataFrame):
-            to_overlay = self.get_hazard_intersect_geodataframe_table(to_overlay)
-        elif (self.hazard_files["table"]) and (
-            type(to_overlay).__module__.split(".")[0] == "networkx"
-        ):
-            to_overlay = self.get_hazard_intersect_networkx_table(to_overlay)
-        else:
-            logging.warning(
-                f"The overlay of the combination of hazard file(s) '{self.hazard_files}' and network type '{type(to_overlay)}' is not available."
-                f"Please check your input data."
-            )
-
-        return to_overlay
+        # To improve performance we need to initialize the variables
+        return HazardIntersectBuilder.build_intersection(self.hazard_files, to_overlay)
 
     def get_reproject_graph(
         self,

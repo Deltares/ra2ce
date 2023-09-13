@@ -1,10 +1,10 @@
 from pathlib import Path
 
-from ra2ce.graph.hazard import Hazard
+from ra2ce.graph.hazard.hazard_ovleray import HazardOverlay
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 
 
-class TestHazard:
+class TestHazardOverlay:
     def test_initialize(self):
         # 1. Define test data.
         _config = NetworkConfigData()
@@ -15,7 +15,7 @@ class TestHazard:
         _files = {}
 
         # 2. Run test.
-        _hazard = Hazard(_config, _graphs, _files)
+        _hazard = HazardOverlay(_config, _graphs, _files)
 
         # 3. Verify final expectations.
         assert isinstance(_hazard, Hazard)
