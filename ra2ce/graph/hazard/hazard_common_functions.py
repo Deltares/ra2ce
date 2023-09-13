@@ -1,8 +1,9 @@
 import logging
 from pathlib import Path
 from osgeo import gdal
-
+from networkx import Graph
 from ra2ce.graph.networks_utils import bounds_intersect_2d, get_extent
+
 
 def validate_extent_graph(extent_graph, tif_hazard_file: Path) -> None:
     """
@@ -25,9 +26,18 @@ def validate_extent_graph(extent_graph, tif_hazard_file: Path) -> None:
     )
 
     if not bounds_intersect_2d(extent_graph, extent_hazard):
-        logging.info(
-            "Raster extent: {}, Graph extent: {}".format(extent, extent_graph)
-        )
+        logging.info("Raster extent: {}, Graph extent: {}".format(extent, extent_graph))
         raise ValueError(
             "The hazard raster and the graph geometries do not overlap, check projection"
         )
+
+
+def get_edges_geoms(graph: Graph) -> list:
+    """
+    Gets all edges geometry from a provided graph.
+    """
+    return [
+        (u, v, k, edata)
+        for u, v, k, edata in graph.edges.data(keys=True)
+        if "geometry" in edata
+    ]

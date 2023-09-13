@@ -23,7 +23,9 @@ from dataclasses import dataclass, field
 from geopandas import GeoDataFrame, read_file, sjoin
 from networkx import Graph
 from numpy import nanmean
-from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_base import HazardIntersectBuilderBase
+from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_base import (
+    HazardIntersectBuilderBase,
+)
 
 
 @dataclass
@@ -45,7 +47,6 @@ class HazardIntersectBuilderForShp(HazardIntersectBuilderBase):
         """
         # TODO check if the CRS of the graph and shapefile match
 
-        # hfns = self._hazard_config.hazard_field_name
         hfns = self.hazard_field_name
 
         for i, (hn, rn, hfn) in enumerate(
