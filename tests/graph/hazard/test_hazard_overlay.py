@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ra2ce.graph.hazard.hazard_ovleray import HazardOverlay
+from ra2ce.graph.hazard.hazard_overlay import HazardOverlay
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 
 
