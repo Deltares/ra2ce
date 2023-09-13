@@ -21,7 +21,6 @@
 
 
 import logging
-import time
 from pathlib import Path
 from typing import Any, List, Tuple, Union
 
@@ -102,7 +101,7 @@ class HazardOverlay:
             tqdm,  # somehow this only works when importing here and not at the top of the file
         )
 
-        assert type(gdf) == gpd.GeoDataFrame, "Network is not a GeoDataFrame"
+        assert isinstance(gdf, gpd.GeoDataFrame), "Network is not a GeoDataFrame"
 
         # Make sure none of the geometries is a nonetype object (this will raise an error in zonal_stats)
         empty_entries = gdf.loc[gdf.geometry.isnull()]
@@ -190,7 +189,7 @@ class HazardOverlay:
         from tqdm import tqdm
 
         # Verify the graph type (networkx)
-        assert type(graph).__module__.split(".")[0] == "networkx"
+        assert isinstance(graph, nx.classes.graph.Graph)
         extent_graph = ntu.get_graph_edges_extent(graph)
 
         # Get all edge geometries
