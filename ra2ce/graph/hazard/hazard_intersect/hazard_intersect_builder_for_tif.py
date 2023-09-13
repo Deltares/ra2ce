@@ -25,10 +25,10 @@ from pathlib import Path
 from numpy import nan
 from rasterstats import zonal_stats
 from ra2ce.graph.hazard.hazard_common_functions import validate_extent_graph
-
-from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_protocol import (
-    HazardIntersectBuilderProtocol,
+from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_base import (
+    HazardIntersectBuilderBase,
 )
+
 from networkx import Graph, set_edge_attributes
 from geopandas import GeoDataFrame
 from ra2ce.graph.networks_utils import (
@@ -39,16 +39,11 @@ from ra2ce.graph.networks_utils import (
 
 
 @dataclass
-class HazardIntersectBuilderForTif(HazardIntersectBuilderProtocol):
+class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
     hazard_aggregate_wl: str = ""
     hazard_names: list[str] = field(default_factory=list)
     ra2ce_names: list[str] = field(default_factory=list)
     hazard_tif_files: list[Path] = field(default_factory=list)
-
-    def get_intersection(
-        self, hazard_overlay: GeoDataFrame | Graph
-    ) -> GeoDataFrame | Graph:
-        return super().get_intersection(hazard_overlay)
 
     def _from_networkx(self, hazard_overlay: Graph) -> Graph:
         """Overlays the hazard raster over the road segments graph.
