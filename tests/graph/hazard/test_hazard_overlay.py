@@ -18,7 +18,7 @@ class TestHazardOverlay:
         _hazard = HazardOverlay(_config, _graphs, _files)
 
         # 3. Verify final expectations.
-        assert isinstance(_hazard, Hazard)
+        assert isinstance(_hazard, HazardOverlay)
         assert any(_hazard.hazard_names)
         assert any(_hazard.ra2ce_names)
         assert any(_hazard.hazard_files)
