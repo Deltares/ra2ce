@@ -19,17 +19,27 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from dataclasses import dataclass, field
 from geopandas import GeoDataFrame, read_file, sjoin
 from networkx import Graph
 from numpy import nanmean
 
-from ra2ce.graph.hazard.hazard_intersect_builder_protocol import (
+from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_protocol import (
     HazardIntersectBuilderProtocol,
 )
 
 
+@dataclass
 class HazardIntersectBuilderForShp(HazardIntersectBuilderProtocol):
-    def get_intersection(self, hazard_overlay: GeoDataFrame | Graph) -> GeoDataFrame | Graph:
+    hazard_field_name: str = ""
+    hazard_aggregate_wl: str = ""
+    hazard_names: list[str] = field(default_factory=list)
+    ra2ce_names: list[str] = field(default_factory=list)
+    hazard_shp_files: list[str] = field(default_factory=list)
+
+    def get_intersection(
+        self, hazard_overlay: GeoDataFrame | Graph
+    ) -> GeoDataFrame | Graph:
         return super().get_intersection(hazard_overlay)
 
     def _from_networkx(self, hazard_overlay: Graph) -> Graph:
@@ -43,12 +53,13 @@ class HazardIntersectBuilderForShp(HazardIntersectBuilderProtocol):
         """
         # TODO check if the CRS of the graph and shapefile match
 
-        hfns = self._hazard_config.hazard_field_name
+        # hfns = self._hazard_config.hazard_field_name
+        hfns = self.hazard_field_name
 
         for i, (hn, rn, hfn) in enumerate(
             zip(self.hazard_names, self.ra2ce_names, hfns)
         ):
-            gdf = read_file(str(self.hazard_files["shp"][i]))
+            gdf = read_file(str(self.hazard_shp_files[i]))
             spatial_index = gdf.sindex
 
             for u, v, k, edata in hazard_overlay.edges.data(keys=True):
@@ -62,26 +73,24 @@ class HazardIntersectBuilderForShp(HazardIntersectBuilderProtocol):
                     ]
 
                     if not precise_matches.empty:
-                        if self._hazard_aggregate_wl == "max":
+                        if self.hazard_aggregate_wl == "max":
                             hazard_overlay[u][v][k][
-                                rn + "_" + self._hazard_aggregate_wl[:2]
+                                rn + "_" + self.hazard_aggregate_wl[:2]
                             ] = precise_matches[hfn].max()
-                        if self._hazard_aggregate_wl == "min":
+                        if self.hazard_aggregate_wl == "min":
                             hazard_overlay[u][v][k][
-                                rn + "_" + self._hazard_aggregate_wl[:2]
+                                rn + "_" + self.hazard_aggregate_wl[:2]
                             ] = precise_matches[hfn].min()
-                        if self._hazard_aggregate_wl == "mean":
+                        if self.hazard_aggregate_wl == "mean":
                             hazard_overlay[u][v][k][
-                                rn + "_" + self._hazard_aggregate_wl[:2]
+                                rn + "_" + self.hazard_aggregate_wl[:2]
                             ] = nanmean(precise_matches[hfn])
                     else:
                         hazard_overlay[u][v][k][
-                            rn + "_" + self._hazard_aggregate_wl[:2]
+                            rn + "_" + self.hazard_aggregate_wl[:2]
                         ] = 0
                 else:
-                    hazard_overlay[u][v][k][
-                        rn + "_" + self._hazard_aggregate_wl[:2]
-                    ] = 0
+                    hazard_overlay[u][v][k][rn + "_" + self.hazard_aggregate_wl[:2]] = 0
 
         return hazard_overlay
 
@@ -97,9 +106,9 @@ class HazardIntersectBuilderForShp(HazardIntersectBuilderProtocol):
         gdf_crs_original = hazard_overlay.crs
 
         for i, (hn, rn, hfn) in enumerate(
-            zip(self.hazard_names, self.ra2ce_names, self._hazard_field_name)
+            zip(self.hazard_names, self.ra2ce_names, self.hazard_field_name)
         ):
-            gdf_hazard = read_file(str(self.hazard_files["shp"][i]))
+            gdf_hazard = read_file(str(self.hazard_shp_files[i]))
 
             if hazard_overlay.crs != gdf_hazard.crs:
                 hazard_overlay = hazard_overlay.to_crs(gdf_hazard.crs)
@@ -108,7 +117,7 @@ class HazardIntersectBuilderForShp(HazardIntersectBuilderProtocol):
                 hazard_overlay, gdf_hazard[[hfn, "geometry"]], how="left"
             )
             hazard_overlay.rename(
-                columns={hfn: rn + "_" + self._hazard_aggregate_wl[:2]}, inplace=True
+                columns={hfn: rn + "_" + self.hazard_aggregate_wl[:2]}, inplace=True
             )
 
         if hazard_overlay.crs != gdf_crs_original:

@@ -19,11 +19,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from dataclasses import dataclass, field
 import logging
+from pathlib import Path
 from numpy import nan
 from rasterstats import zonal_stats
+from ra2ce.graph.hazard.hazard_common_functions import validate_extent_graph
 
-from ra2ce.graph.hazard.hazard_intersect_builder_protocol import (
+from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_protocol import (
     HazardIntersectBuilderProtocol,
 )
 from networkx import Graph, set_edge_attributes
@@ -35,11 +38,16 @@ from ra2ce.graph.networks_utils import (
 )
 
 
+@dataclass
 class HazardIntersectBuilderForTif(HazardIntersectBuilderProtocol):
-    def __init__(self) -> None:
-        pass
+    hazard_aggregate_wl: str = ""
+    hazard_names: list[str] = field(default_factory=list)
+    ra2ce_names: list[str] = field(default_factory=list)
+    hazard_tif_files: list[Path] = field(default_factory=list)
 
-    def get_intersection(self, hazard_overlay: GeoDataFrame | Graph) -> GeoDataFrame | Graph:
+    def get_intersection(
+        self, hazard_overlay: GeoDataFrame | Graph
+    ) -> GeoDataFrame | Graph:
         return super().get_intersection(hazard_overlay)
 
     def _from_networkx(self, hazard_overlay: Graph) -> Graph:
@@ -65,12 +73,12 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderProtocol):
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             # Check if the hazard and graph extents overlap
-            self._validate_extent_graph(extent_graph, i)
+            validate_extent_graph(extent_graph, self.hazard_tif_files[i])
             # Add a no-data value for the edges that do not have a geometry
             set_edge_attributes(
                 hazard_overlay,
                 {
-                    (u, v, k): {rn + "_" + self._hazard_aggregate_wl[:2]: nan}
+                    (u, v, k): {rn + "_" + self.hazard_aggregate_wl[:2]: nan}
                     for u, v, k, edata in hazard_overlay.edges.data(keys=True)
                     if "geometry" not in edata
                 },
@@ -81,8 +89,8 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderProtocol):
                 {"geometry": [edata["geometry"] for u, v, k, edata in edges_geoms]}
             )
             tqdm.pandas(desc="Graph hazard overlay with " + hn)
-            _tif_hazard_files = str(self.hazard_files["tif"][i])
-            if self._hazard_aggregate_wl == "mean":
+            _tif_hazard_files = str(self.hazard_tif_files[i])
+            if self.hazard_aggregate_wl == "mean":
                 flood_stats = gdf.geometry.progress_apply(
                     lambda x, _files_value=_tif_hazard_files: zonal_stats(
                         x,
@@ -97,21 +105,21 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderProtocol):
                         x,
                         _files_value,
                         all_touched=True,
-                        stats=f"{self._hazard_aggregate_wl}",
+                        stats=f"{self.hazard_aggregate_wl}",
                     )
                 )
 
             try:
                 flood_stats = flood_stats.apply(
-                    lambda x: x[0][self._hazard_aggregate_wl]
-                    if x[0][self._hazard_aggregate_wl]
+                    lambda x: x[0][self.hazard_aggregate_wl]
+                    if x[0][self.hazard_aggregate_wl]
                     else 0
                 )
                 set_edge_attributes(
                     hazard_overlay,
                     {
                         (edges[0], edges[1], edges[2]): {
-                            rn + "_" + self._hazard_aggregate_wl[:2]: x
+                            rn + "_" + self.hazard_aggregate_wl[:2]: x
                         }
                         for x, edges in zip(flood_stats, edges_geoms)
                     },
@@ -179,7 +187,7 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderProtocol):
             self._validate_extent_graph(extent_graph, i)
 
             tqdm.pandas(desc="Network hazard overlay with " + hn)
-            _hazard_files_str = str(self.hazard_files["tif"][i])
+            _hazard_files_str = str(self.hazard_tif_files[i])
             flood_stats = hazard_overlay.geometry.progress_apply(
                 lambda x, _hz_str=_hazard_files_str: zonal_stats(
                     x,
