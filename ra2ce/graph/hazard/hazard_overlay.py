@@ -35,7 +35,9 @@ from rasterstats import point_query, zonal_stats
 from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as ntu
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
-from ra2ce.graph.hazard.hazard_intersect_builder import HazardIntersectBuilder
+from ra2ce.graph.hazard.hazard_intersect_builder_for_shp import HazardIntersectBuilderForShp
+from ra2ce.graph.hazard.hazard_intersect_builder_for_table import HazardIntersectBuilderForTable
+from ra2ce.graph.hazard.hazard_intersect_builder_for_tif import HazardIntersectBuilderForTif
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 
 
@@ -87,66 +89,6 @@ class HazardOverlay:
             )
         )
         logging.info("Initialized hazard object.")
-
-    def overlay_hazard_raster_gdf(self, gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-        """Overlays the hazard raster over the road segments GeoDataFrame.
-
-        Args:
-            *graph* (GeoDataFrame) : GeoDataFrame that will be intersected with the hazard map raster.
-
-        Returns:
-
-        """
-        from tqdm import (
-            tqdm,  # somehow this only works when importing here and not at the top of the file
-        )
-
-        assert isinstance(gdf, gpd.GeoDataFrame), "Network is not a GeoDataFrame"
-
-        # Make sure none of the geometries is a nonetype object (this will raise an error in zonal_stats)
-        empty_entries = gdf.loc[gdf.geometry.isnull()]
-        if any(empty_entries):
-            logging.warning(
-                (
-                    "Some geometries have NoneType objects (no coordinate information), namely: {}.".format(
-                        empty_entries
-                    )
-                    + "This could be due to segmentation, and might cause an exception in hazard overlay"
-                )
-            )
-
-        for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
-            # Validate input
-            # Check if network and raster overlap
-            extent_graph = gdf.total_bounds
-            extent_graph = (
-                extent_graph[0],
-                extent_graph[2],
-                extent_graph[1],
-                extent_graph[3],
-            )
-            self._validate_extent_graph(extent_graph, i)
-
-            tqdm.pandas(desc="Network hazard overlay with " + hn)
-            _hazard_files_str = str(self.hazard_files["tif"][i])
-            flood_stats = gdf.geometry.progress_apply(
-                lambda x, _hz_str=_hazard_files_str: zonal_stats(
-                    x,
-                    _hz_str,
-                    all_touched=True,
-                    stats="min max",
-                    add_stats={"mean": ntu.get_valid_mean},
-                )
-            )
-            gdf[rn + "_mi"] = [x[0]["min"] for x in flood_stats]
-            gdf[rn + "_ma"] = [x[0]["max"] for x in flood_stats]
-            gdf[rn + "_me"] = [x[0]["mean"] for x in flood_stats]
-
-            tqdm.pandas(desc="Network fraction with hazard overlay with " + hn)
-            gdf[rn + "_fr"] = gdf.geometry.progress_apply(
-                lambda x, _hz_str=_hazard_files_str: ntu.fraction_flooded(x, _hz_str)
-            )
-        return gdf
 
     def _get_edges_geoms(self, graph: nx.Graph) -> List[Any]:
         # Get all edge geometries
@@ -268,88 +210,6 @@ class HazardOverlay:
                     for x, edges in zip(graph_fraction_flooded, edges_geoms)
                 },
             )
-
-        return graph
-
-    def overlay_hazard_shp_gdf(self, gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-        """Overlays the hazard shapefile over the road segments GeoDataFrame.
-
-        Args:
-            gdf (GeoDataFrame): the network geodataframe that should be overlayed with the hazard shapefile(s)
-
-        Returns:
-            gdf (GeoDataFrame): the network geodataframe with hazard shapefile(s) data joined
-
-        The gdf is reprojected to the hazard shapefile if necessary.
-        """
-        gdf_crs_original = gdf.crs
-
-        for i, (hn, rn, hfn) in enumerate(
-            zip(self.hazard_names, self.ra2ce_names, self._hazard_field_name)
-        ):
-            gdf_hazard = gpd.read_file(str(self.hazard_files["shp"][i]))
-
-            if gdf.crs != gdf_hazard.crs:
-                gdf = gdf.to_crs(gdf_hazard.crs)
-
-            gdf = gpd.sjoin(gdf, gdf_hazard[[hfn, "geometry"]], how="left")
-            gdf.rename(
-                columns={hfn: rn + "_" + self._hazard_aggregate_wl[:2]}, inplace=True
-            )
-
-        if gdf.crs != gdf_crs_original:
-            gdf = gdf.to_crs(gdf_crs_original)
-
-        return gdf
-
-    def overlay_hazard_shp_graph(
-        self, graph: nx.classes.graph.Graph
-    ) -> nx.classes.graph.Graph:
-        """Overlays the hazard shapefile over the road segments NetworkX graph.
-
-        Args:
-            graph (NetworkX graph): The graph that should be overlayed with the hazard shapefile(s)
-
-        Returns:
-            graph (NetworkX graph): The graph with hazard shapefile(s) data joined
-        """
-        # TODO check if the CRS of the graph and shapefile match
-
-        hfns = self._hazard_config.hazard_field_name
-
-        for i, (hn, rn, hfn) in enumerate(
-            zip(self.hazard_names, self.ra2ce_names, hfns)
-        ):
-            gdf = gpd.read_file(str(self.hazard_files["shp"][i]))
-            spatial_index = gdf.sindex
-
-            for u, v, k, edata in graph.edges.data(keys=True):
-                if "geometry" in edata:
-                    possible_matches_index = list(
-                        spatial_index.intersection(edata["geometry"].bounds)
-                    )
-                    possible_matches = gdf.iloc[possible_matches_index]
-                    precise_matches = possible_matches[
-                        possible_matches.intersects(edata["geometry"])
-                    ]
-
-                    if not precise_matches.empty:
-                        if self._hazard_aggregate_wl == "max":
-                            graph[u][v][k][
-                                rn + "_" + self._hazard_aggregate_wl[:2]
-                            ] = precise_matches[hfn].max()
-                        if self._hazard_aggregate_wl == "min":
-                            graph[u][v][k][
-                                rn + "_" + self._hazard_aggregate_wl[:2]
-                            ] = precise_matches[hfn].min()
-                        if self._hazard_aggregate_wl == "mean":
-                            graph[u][v][k][
-                                rn + "_" + self._hazard_aggregate_wl[:2]
-                            ] = np.nanmean(precise_matches[hfn])
-                    else:
-                        graph[u][v][k][rn + "_" + self._hazard_aggregate_wl[:2]] = 0
-                else:
-                    graph[u][v][k][rn + "_" + self._hazard_aggregate_wl[:2]] = 0
 
         return graph
 
@@ -489,58 +349,6 @@ class HazardOverlay:
 
         return gdf
 
-    def join_hazard_table_gdf(self, gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-        """Joins a table with IDs and hazard information with the road segments with corresponding IDs.
-
-        Args:
-
-        Returns:
-
-        """
-        for haz in self.hazard_files["table"]:
-            if haz.suffix in [".csv"]:
-                gdf = self.join_table(gdf, haz)
-        return gdf
-
-    def join_hazard_table_graph(
-        self, graph: nx.classes.graph.Graph
-    ) -> nx.classes.graph.Graph:
-        """Joins a table with IDs and hazard information with the road segments with corresponding IDs.
-
-        Args:
-
-        Returns:
-
-        """
-        gdf, gdf_nodes = ntu.graph_to_gdf(graph, save_nodes=True)
-        gdf = self.join_hazard_table_gdf(gdf)
-
-        # TODO: Check if the graph is created again correctly.
-        graph = ntu.graph_from_gdf(gdf, gdf_nodes)
-        return graph
-
-    def join_table(
-        self, graph: nx.classes.graph.Graph, hazard: str
-    ) -> nx.classes.graph.Graph:
-        df = pd.read_csv(hazard)
-        df = df[self._hazard_field_name]
-        graph = graph.merge(
-            df,
-            how="left",
-            left_on=self._network_file_id,
-            right_on=self._hazard_id,
-        )
-
-        graph.rename(
-            columns={
-                self._hazard_field_name: [
-                    n[:-3] for n in self.hazard_name_table[self._ra2ce_name_key]
-                ][0]
-            },
-            inplace=True,
-        )  # Check if this is the right name
-        return graph
-
     def get_point_hazard_from_network(
         self, points: gpd.GeoDataFrame, network: gpd.GeoDataFrame
     ) -> gpd.GeoDataFrame:
@@ -646,7 +454,18 @@ class HazardOverlay:
     ) -> Union[gpd.GeoDataFrame, nx.classes.graph.Graph]:
         """Handler function that chooses the right function for overlaying the network with the hazard data."""
         # To improve performance we need to initialize the variables
-        return HazardIntersectBuilder.build_intersection(self.hazard_files, to_overlay)
+        if self.hazard_files["tif"]:
+            return HazardIntersectBuilderForTif().get_intersection(to_overlay)
+        elif self.hazard_files["shp"]:
+            return HazardIntersectBuilderForShp().get_intersection(to_overlay)
+        elif self.hazard["table"]:
+            return HazardIntersectBuilderForTable().get_intersection(to_overlay)
+        
+        raise ValueError(
+                f"The overlay of the combination of hazard file(s) '{self.hazard_files}' and network type '{type(to_overlay)}' is not available."
+                f"Please check your input data."
+            )
+        
 
     def get_reproject_graph(
         self,
