@@ -19,7 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from ra2ce.graph.hazard.hazard_intersect_builder_protocol import (
+from dataclasses import dataclass
+from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_protocol import (
     HazardIntersectBuilderProtocol,
 )
 from networkx import Graph
@@ -31,9 +32,15 @@ from ra2ce.graph.networks_utils import (
 from pandas import read_csv
 
 
+@dataclass
 class HazardIntersectBuilderForTable(HazardIntersectBuilderProtocol):
+    hazard_field_name: str = ""
+    network_file_id: str = ""
+    hazard_id: str = ""
 
-    def get_intersection(self, hazard_overlay: GeoDataFrame | Graph) -> GeoDataFrame | Graph:
+    def get_intersection(
+        self, hazard_overlay: GeoDataFrame | Graph
+    ) -> GeoDataFrame | Graph:
         return super().get_intersection(hazard_overlay)
 
     def _from_network_x(self, hazard_overlay: Graph) -> Graph:
@@ -49,17 +56,17 @@ class HazardIntersectBuilderForTable(HazardIntersectBuilderProtocol):
         """Joins a table with IDs and hazard information with the road segments with corresponding IDs."""
         for haz in self.hazard_files["table"]:
             if haz.suffix in [".csv"]:
-                hazard_overlay = self.join_table(hazard_overlay, haz)
+                hazard_overlay = self._join_table(hazard_overlay, haz)
         return hazard_overlay
 
-    def join_table(self, graph: Graph, hazard: str) -> Graph:
+    def _join_table(self, graph: Graph, hazard: str) -> Graph:
         df = read_csv(hazard)
-        df = df[self._hazard_field_name]
+        df = df[self.hazard_field_name]
         graph = graph.merge(
             df,
             how="left",
-            left_on=self._network_file_id,
-            right_on=self._hazard_id,
+            left_on=self.network_file_id,
+            right_on=self.hazard_id,
         )
 
         graph.rename(

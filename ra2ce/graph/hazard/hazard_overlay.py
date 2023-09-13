@@ -29,15 +29,21 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 import pyproj
-from osgeo import gdal
 from rasterstats import point_query, zonal_stats
 
 from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as ntu
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
-from ra2ce.graph.hazard.hazard_intersect_builder_for_shp import HazardIntersectBuilderForShp
-from ra2ce.graph.hazard.hazard_intersect_builder_for_table import HazardIntersectBuilderForTable
-from ra2ce.graph.hazard.hazard_intersect_builder_for_tif import HazardIntersectBuilderForTif
+from ra2ce.graph.hazard.hazard_common_functions import validate_extent_graph
+from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_for_shp import (
+    HazardIntersectBuilderForShp,
+)
+from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_for_table import (
+    HazardIntersectBuilderForTable,
+)
+from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_for_tif import (
+    HazardIntersectBuilderForTif,
+)
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 
 
@@ -98,24 +104,6 @@ class HazardOverlay:
             if "geometry" in edata
         ]
 
-    def _validate_extent_graph(self, extent_graph, n_idx: int):
-        # Check if the hazard and graph extents overlap
-        extent = ntu.get_extent(gdal.Open(str(self.hazard_files["tif"][n_idx])))
-        extent_hazard = (
-            extent["minX"],
-            extent["maxX"],
-            extent["minY"],
-            extent["maxY"],
-        )
-
-        if not ntu.bounds_intersect_2d(extent_graph, extent_hazard):
-            logging.info(
-                "Raster extent: {}, Graph extent: {}".format(extent, extent_graph)
-            )
-            raise ValueError(
-                "The hazard raster and the graph geometries do not overlap, check projection"
-            )
-
     def overlay_hazard_raster_graph(
         self, graph: nx.classes.graph.Graph
     ) -> nx.classes.graph.Graph:
@@ -139,7 +127,7 @@ class HazardOverlay:
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             # Check if the hazard and graph extents overlap
-            self._validate_extent_graph(extent_graph, i)
+            validate_extent_graph(extent_graph, self.hazard_files["tif"][i])
             # Add a no-data value for the edges that do not have a geometry
             nx.set_edge_attributes(
                 graph,
@@ -241,7 +229,7 @@ class HazardOverlay:
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             # Check if the hazard and graph extents overlap
-            self._validate_extent_graph(extent_graph, i)
+            validate_extent_graph(extent_graph, self.hazard_files["tif"][i])
 
             # Read the hazard values at the nodes and write to the nodes.
             tqdm.pandas(desc="Destinations hazard overlay with " + hn)
@@ -455,17 +443,31 @@ class HazardOverlay:
         """Handler function that chooses the right function for overlaying the network with the hazard data."""
         # To improve performance we need to initialize the variables
         if self.hazard_files["tif"]:
-            return HazardIntersectBuilderForTif().get_intersection(to_overlay)
+            return HazardIntersectBuilderForTif(
+                hazard_aggregate_wl=self._hazard_aggregate_wl,
+                hazard_names=self.hazard_names,
+                ra2ce_names=self.ra2ce_names,
+                hazard_tif_files=self.hazard_files["tif"],
+            ).get_intersection(to_overlay)
         elif self.hazard_files["shp"]:
-            return HazardIntersectBuilderForShp().get_intersection(to_overlay)
+            return HazardIntersectBuilderForShp(
+                hazard_field_name=self._hazard_field_name,
+                hazard_aggregate_wl=self._hazard_aggregate_wl,
+                hazard_names=self.hazard_names,
+                ra2ce_names=self.ra2ce_names,
+                hazard_shp_files=self.hazard_files["shp"],
+            ).get_intersection(to_overlay)
         elif self.hazard["table"]:
-            return HazardIntersectBuilderForTable().get_intersection(to_overlay)
-        
+            return HazardIntersectBuilderForTable(
+                hazard_field_name=self._hazard_field_name,
+                network_file_id=self._network_file_id,
+                hazard_id=self._hazard_id,
+            ).get_intersection(to_overlay)
+
         raise ValueError(
-                f"The overlay of the combination of hazard file(s) '{self.hazard_files}' and network type '{type(to_overlay)}' is not available."
-                f"Please check your input data."
-            )
-        
+            f"The overlay of the combination of hazard file(s) '{self.hazard_files}' and network type '{type(to_overlay)}' is not available."
+            f"Please check your input data."
+        )
 
     def get_reproject_graph(
         self,
