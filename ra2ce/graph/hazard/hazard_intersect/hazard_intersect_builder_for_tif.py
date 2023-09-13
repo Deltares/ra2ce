@@ -24,7 +24,10 @@ import logging
 from pathlib import Path
 from numpy import nan
 from rasterstats import zonal_stats
-from ra2ce.graph.hazard.hazard_common_functions import validate_extent_graph
+from ra2ce.graph.hazard.hazard_common_functions import (
+    get_edges_geoms,
+    validate_extent_graph,
+)
 from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_base import (
     HazardIntersectBuilderBase,
 )
@@ -64,7 +67,7 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
         extent_graph = get_graph_edges_extent(hazard_overlay)
 
         # Get all edge geometries
-        edges_geoms = self._get_edges_geoms(hazard_overlay)
+        edges_geoms = get_edges_geoms(hazard_overlay)
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             # Check if the hazard and graph extents overlap
@@ -179,7 +182,7 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                 extent_graph[1],
                 extent_graph[3],
             )
-            self._validate_extent_graph(extent_graph, i)
+            validate_extent_graph(extent_graph, self.hazard_tif_files[i])
 
             tqdm.pandas(desc="Network hazard overlay with " + hn)
             _hazard_files_str = str(self.hazard_tif_files[i])

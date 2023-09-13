@@ -38,6 +38,7 @@ class HazardIntersectBuilderForTable(HazardIntersectBuilderBase):
     hazard_field_name: str = ""
     network_file_id: str = ""
     hazard_id: str = ""
+    ra2ce_name_key: str = "RA2CE name"
 
     def _from_network_x(self, hazard_overlay: Graph) -> Graph:
         """Joins a table with IDs and hazard information with the road segments with corresponding IDs."""
@@ -67,8 +68,8 @@ class HazardIntersectBuilderForTable(HazardIntersectBuilderBase):
 
         graph.rename(
             columns={
-                self._hazard_field_name: [
-                    n[:-3] for n in self.hazard_name_table[self._ra2ce_name_key]
+                self.hazard_field_name: [
+                    n[:-3] for n in self.hazard_name_table[self.ra2ce_name_key]
                 ][0]
             },
             inplace=True,

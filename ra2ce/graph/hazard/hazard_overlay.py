@@ -34,7 +34,10 @@ from rasterstats import point_query, zonal_stats
 from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as ntu
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
-from ra2ce.graph.hazard.hazard_common_functions import validate_extent_graph
+from ra2ce.graph.hazard.hazard_common_functions import (
+    get_edges_geoms,
+    validate_extent_graph,
+)
 from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_for_shp import (
     HazardIntersectBuilderForShp,
 )
@@ -96,14 +99,6 @@ class HazardOverlay:
         )
         logging.info("Initialized hazard object.")
 
-    def _get_edges_geoms(self, graph: nx.Graph) -> List[Any]:
-        # Get all edge geometries
-        return [
-            (u, v, k, edata)
-            for u, v, k, edata in graph.edges.data(keys=True)
-            if "geometry" in edata
-        ]
-
     def overlay_hazard_raster_graph(
         self, graph: nx.classes.graph.Graph
     ) -> nx.classes.graph.Graph:
@@ -123,7 +118,7 @@ class HazardOverlay:
         extent_graph = ntu.get_graph_edges_extent(graph)
 
         # Get all edge geometries
-        edges_geoms = self._get_edges_geoms(graph)
+        edges_geoms = get_edges_geoms(graph)
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             # Check if the hazard and graph extents overlap
@@ -225,7 +220,7 @@ class HazardOverlay:
         od_ids = [n[0] for n in od_nodes]
 
         # Get all edge geometries
-        edges_geoms = self._get_edges_geoms(graph)
+        edges_geoms = get_edges_geoms(graph)
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             # Check if the hazard and graph extents overlap
@@ -462,6 +457,7 @@ class HazardOverlay:
                 hazard_field_name=self._hazard_field_name,
                 network_file_id=self._network_file_id,
                 hazard_id=self._hazard_id,
+                ra2ce_name_key=self._ra2ce_name_key,
             ).get_intersection(to_overlay)
 
         raise ValueError(
