@@ -188,18 +188,13 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                 )
             )
 
+        extent_graph = hazard_overlay.total_bounds[:4]
+
         def overlay_geodataframe(
             hazard_tif_file: Path, hazard_name: str, ra2ce_name: str
         ):
             # Validate input
             # Check if network and raster overlap
-            extent_graph = hazard_overlay.total_bounds
-            extent_graph = (
-                extent_graph[0],
-                extent_graph[2],
-                extent_graph[1],
-                extent_graph[3],
-            )
             validate_extent_graph(extent_graph, hazard_tif_file)
 
             tqdm.pandas(desc="Network hazard overlay with " + hazard_name)
@@ -222,7 +217,9 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                 lambda x, _hz_str=_hazard_files_str: fraction_flooded(x, _hz_str)
             )
 
-        self._overlay_in_parallel(overlay_geodataframe)
+        # self._overlay_in_parallel(overlay_geodataframe)
+        for i, (hn, rn) in enumerate(self._combined_names):
+            overlay_geodataframe(self.hazard_tif_files[i], hn, rn)
 
         return hazard_overlay
 
