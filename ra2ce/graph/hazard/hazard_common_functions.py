@@ -5,12 +5,12 @@ from networkx import Graph
 from ra2ce.graph.networks_utils import bounds_intersect_2d, get_extent
 
 
-def validate_extent_graph(extent_graph, tif_hazard_file: Path) -> None:
+def validate_extent_graph(extent_graph: list[float], tif_hazard_file: Path) -> None:
     """
     Validates the given extent graph to a hazard file (*.tif)
 
     Args:
-        extent_graph (_type_): Graph to be validated.
+        extent_graph (list[float]): List of boundary points determening the extent of a graph.
         tif_hazard_file (Path): Hazard (*.tif) file.
 
     Raises:
