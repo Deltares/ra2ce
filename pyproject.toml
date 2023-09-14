@@ -51,6 +51,7 @@ GDAL = "3.5.1"
 fiona = "1.8.21"
 pygeos = "^0.14"
 momepy = "0.5.0"
+pyogrio = "^0.6.0"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.10.1"
