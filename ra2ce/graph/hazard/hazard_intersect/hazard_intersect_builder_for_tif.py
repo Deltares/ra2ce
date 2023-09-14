@@ -217,15 +217,15 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                 lambda x, _hz_str=_hazard_files_str: fraction_flooded(x, _hz_str)
             )
 
-        # self._overlay_in_parallel(overlay_geodataframe)
-        for i, (hn, rn) in enumerate(self._combined_names):
-            overlay_geodataframe(self.hazard_tif_files[i], hn, rn)
+        self._overlay_in_parallel(overlay_geodataframe)
+        # for i, (hn, rn) in enumerate(self._combined_names):
+        #     overlay_geodataframe(self.hazard_tif_files[i], hn, rn)
 
         return hazard_overlay
 
     def _overlay_in_parallel(self, overlay_func: Callable):
         # Run in parallel to boost performance.
-        Parallel(n_jobs=2)(
+        Parallel(n_jobs=2, require="sharedmem")(
             delayed(overlay_func)(self.hazard_tif_files[i], hn, rn)
             for i, (hn, rn) in enumerate(self._combined_names)
         )
