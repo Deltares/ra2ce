@@ -85,9 +85,10 @@ class HazardIntersectBuilderForShp(HazardIntersectBuilderBase):
                         race_name + "_" + self.hazard_aggregate_wl[:2]
                     ] = 0
 
-        # self._overlay_in_parallel(networkx_overlay)
-        for i, _ra2ce_name in self.ra2ce_names:
-            networkx_overlay(self.hazard_shp_files[i], _ra2ce_name)
+        # Run in parallel to boost performance.
+        self._overlay_in_parallel(networkx_overlay)
+        # for i, _ra2ce_name in self.ra2ce_names:
+        #     networkx_overlay(self.hazard_shp_files[i], _ra2ce_name)
         return hazard_overlay
 
     def _from_geodataframe(self, hazard_overlay: GeoDataFrame) -> GeoDataFrame:
@@ -121,9 +122,10 @@ class HazardIntersectBuilderForShp(HazardIntersectBuilderBase):
                 inplace=True,
             )
 
-        # self._overlay_in_parallel(geodataframe_overlay)
-        for i, _ra2ce_name in self.ra2ce_names:
-            geodataframe_overlay(self.hazard_shp_files[i], _ra2ce_name)
+        # Run in parallel to boost performance.
+        self._overlay_in_parallel(geodataframe_overlay)
+        # for i, _ra2ce_name in self.ra2ce_names:
+        #     geodataframe_overlay(self.hazard_shp_files[i], _ra2ce_name)
 
         if hazard_overlay.crs != gdf_crs_original:
             hazard_overlay = hazard_overlay.to_crs(gdf_crs_original)
@@ -132,7 +134,7 @@ class HazardIntersectBuilderForShp(HazardIntersectBuilderBase):
 
     def _overlay_in_parallel(self, overlay_func: Callable):
         # Run in parallel to boost performance.
-        Parallel(n_jobs=2)(
+        Parallel(n_jobs=2, require="sharedmem")(
             delayed(overlay_func)(self.hazard_shp_files[i], _ra2ce_name)
             for i, _ra2ce_name in enumerate(self.ra2ce_names)
         )
