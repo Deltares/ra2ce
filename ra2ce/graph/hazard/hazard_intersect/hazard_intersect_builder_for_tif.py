@@ -39,7 +39,7 @@ from ra2ce.graph.networks_utils import (
     get_graph_edges_extent,
     get_valid_mean,
 )
-import multiprocessing as mp
+from joblib import Parallel, delayed
 
 
 @dataclass
@@ -71,83 +71,85 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
         # Get all edge geometries
         edges_geoms = get_edges_geoms(hazard_overlay)
 
-        def overlay_network_x(names_combination: list[tuple[str, str]]):
-            for i, (hn, rn) in enumerate(names_combination):
-                # Check if the hazard and graph extents overlap
-                validate_extent_graph(extent_graph, self.hazard_tif_files[i])
-                # Add a no-data value for the edges that do not have a geometry
+        def overlay_network_x(i, hn, rn):
+            # Check if the hazard and graph extents overlap
+            validate_extent_graph(extent_graph, self.hazard_tif_files[i])
+            # Add a no-data value for the edges that do not have a geometry
+            set_edge_attributes(
+                hazard_overlay,
+                {
+                    (u, v, k): {rn + "_" + self.hazard_aggregate_wl[:2]: nan}
+                    for u, v, k, edata in hazard_overlay.edges.data(keys=True)
+                    if "geometry" not in edata
+                },
+            )
+
+            # Add the hazard values to the edges that do have a geometry
+            gdf = GeoDataFrame(
+                {"geometry": [edata["geometry"] for u, v, k, edata in edges_geoms]}
+            )
+            tqdm.pandas(desc="Graph hazard overlay with " + hn)
+            _tif_hazard_files = str(self.hazard_tif_files[i])
+            if self.hazard_aggregate_wl == "mean":
+                flood_stats = gdf.geometry.progress_apply(
+                    lambda x, _files_value=_tif_hazard_files: zonal_stats(
+                        x,
+                        _files_value,
+                        all_touched=True,
+                        add_stats={"mean": get_valid_mean},
+                    )
+                )
+            else:
+                flood_stats = gdf.geometry.progress_apply(
+                    lambda x, _files_value=_tif_hazard_files: zonal_stats(
+                        x,
+                        _files_value,
+                        all_touched=True,
+                        stats=f"{self.hazard_aggregate_wl}",
+                    )
+                )
+
+            try:
+                flood_stats = flood_stats.apply(
+                    lambda x: x[0][self.hazard_aggregate_wl]
+                    if x[0][self.hazard_aggregate_wl]
+                    else 0
+                )
                 set_edge_attributes(
                     hazard_overlay,
                     {
-                        (u, v, k): {rn + "_" + self.hazard_aggregate_wl[:2]: nan}
-                        for u, v, k, edata in hazard_overlay.edges.data(keys=True)
-                        if "geometry" not in edata
+                        (edges[0], edges[1], edges[2]): {
+                            rn + "_" + self.hazard_aggregate_wl[:2]: x
+                        }
+                        for x, edges in zip(flood_stats, edges_geoms)
                     },
                 )
-
-                # Add the hazard values to the edges that do have a geometry
-                gdf = GeoDataFrame(
-                    {"geometry": [edata["geometry"] for u, v, k, edata in edges_geoms]}
-                )
-                tqdm.pandas(desc="Graph hazard overlay with " + hn)
-                _tif_hazard_files = str(self.hazard_tif_files[i])
-                if self.hazard_aggregate_wl == "mean":
-                    flood_stats = gdf.geometry.progress_apply(
-                        lambda x, _files_value=_tif_hazard_files: zonal_stats(
-                            x,
-                            _files_value,
-                            all_touched=True,
-                            add_stats={"mean": get_valid_mean},
-                        )
-                    )
-                else:
-                    flood_stats = gdf.geometry.progress_apply(
-                        lambda x, _files_value=_tif_hazard_files: zonal_stats(
-                            x,
-                            _files_value,
-                            all_touched=True,
-                            stats=f"{self.hazard_aggregate_wl}",
-                        )
-                    )
-
-                try:
-                    flood_stats = flood_stats.apply(
-                        lambda x: x[0][self.hazard_aggregate_wl]
-                        if x[0][self.hazard_aggregate_wl]
-                        else 0
-                    )
-                    set_edge_attributes(
-                        hazard_overlay,
-                        {
-                            (edges[0], edges[1], edges[2]): {
-                                rn + "_" + self.hazard_aggregate_wl[:2]: x
-                            }
-                            for x, edges in zip(flood_stats, edges_geoms)
-                        },
-                    )
-                except KeyError:
-                    logging.warning(
-                        "No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'."
-                    )
-
-                # Get the fraction of the road that is intersecting with the hazard
-                tqdm.pandas(desc="Graph fraction with hazard overlay with " + hn)
-                graph_fraction_flooded = gdf.geometry.progress_apply(
-                    lambda x, _files_values=_tif_hazard_files: fraction_flooded(
-                        x, _files_values
-                    )
-                )
-                graph_fraction_flooded = graph_fraction_flooded.fillna(0)
-                set_edge_attributes(
-                    hazard_overlay,
-                    {
-                        (edges[0], edges[1], edges[2]): {rn + "_fr": x}
-                        for x, edges in zip(graph_fraction_flooded, edges_geoms)
-                    },
+            except KeyError:
+                logging.warning(
+                    "No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'."
                 )
 
-        _combined_names = list(zip(self.hazard_names, self.ra2ce_names))
-        overlay_network_x(_combined_names)
+            # Get the fraction of the road that is intersecting with the hazard
+            tqdm.pandas(desc="Graph fraction with hazard overlay with " + hn)
+            graph_fraction_flooded = gdf.geometry.progress_apply(
+                lambda x, _files_values=_tif_hazard_files: fraction_flooded(
+                    x, _files_values
+                )
+            )
+            graph_fraction_flooded = graph_fraction_flooded.fillna(0)
+            set_edge_attributes(
+                hazard_overlay,
+                {
+                    (edges[0], edges[1], edges[2]): {rn + "_fr": x}
+                    for x, edges in zip(graph_fraction_flooded, edges_geoms)
+                },
+            )
+
+        # overlay_network_x(_combined_names)
+        Parallel(n_jobs=2)(
+            delayed(overlay_network_x)(i, hn, rn)
+            for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names))
+        )
 
         return hazard_overlay
 
