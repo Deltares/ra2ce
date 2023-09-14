@@ -22,6 +22,7 @@
 from dataclasses import dataclass, field
 import logging
 from pathlib import Path
+from typing import Callable
 from numpy import nan
 from rasterstats import zonal_stats
 from ra2ce.graph.hazard.hazard_common_functions import (
@@ -49,6 +50,16 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
     ra2ce_names: list[str] = field(default_factory=list)
     hazard_tif_files: list[Path] = field(default_factory=list)
 
+    @property
+    def _combined_names(self) -> list[tuple[str, str]]:
+        """
+        Combines into tuples `hazard_names` and `ra2ce_names`.
+
+        Returns:
+            list[tuple[str, str]]: List of `str` tuples (hazard_name, ra2ce_name).
+        """
+        return list(zip(self.hazard_names, self.ra2ce_names))
+
     def _from_networkx(self, hazard_overlay: Graph) -> Graph:
         """Overlays the hazard raster over the road segments graph.
 
@@ -71,14 +82,14 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
         # Get all edge geometries
         edges_geoms = get_edges_geoms(hazard_overlay)
 
-        def overlay_network_x(i, hn, rn):
+        def overlay_network_x(hazard_tif_file: Path, hazard_name: str, ra2ce_name: str):
             # Check if the hazard and graph extents overlap
-            validate_extent_graph(extent_graph, self.hazard_tif_files[i])
+            validate_extent_graph(extent_graph, hazard_tif_file)
             # Add a no-data value for the edges that do not have a geometry
             set_edge_attributes(
                 hazard_overlay,
                 {
-                    (u, v, k): {rn + "_" + self.hazard_aggregate_wl[:2]: nan}
+                    (u, v, k): {ra2ce_name + "_" + self.hazard_aggregate_wl[:2]: nan}
                     for u, v, k, edata in hazard_overlay.edges.data(keys=True)
                     if "geometry" not in edata
                 },
@@ -88,8 +99,8 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
             gdf = GeoDataFrame(
                 {"geometry": [edata["geometry"] for u, v, k, edata in edges_geoms]}
             )
-            tqdm.pandas(desc="Graph hazard overlay with " + hn)
-            _tif_hazard_files = str(self.hazard_tif_files[i])
+            tqdm.pandas(desc="Graph hazard overlay with " + hazard_name)
+            _tif_hazard_files = str(hazard_tif_file)
             if self.hazard_aggregate_wl == "mean":
                 flood_stats = gdf.geometry.progress_apply(
                     lambda x, _files_value=_tif_hazard_files: zonal_stats(
@@ -119,7 +130,7 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                     hazard_overlay,
                     {
                         (edges[0], edges[1], edges[2]): {
-                            rn + "_" + self.hazard_aggregate_wl[:2]: x
+                            ra2ce_name + "_" + self.hazard_aggregate_wl[:2]: x
                         }
                         for x, edges in zip(flood_stats, edges_geoms)
                     },
@@ -130,7 +141,7 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                 )
 
             # Get the fraction of the road that is intersecting with the hazard
-            tqdm.pandas(desc="Graph fraction with hazard overlay with " + hn)
+            tqdm.pandas(desc="Graph fraction with hazard overlay with " + hazard_name)
             graph_fraction_flooded = gdf.geometry.progress_apply(
                 lambda x, _files_values=_tif_hazard_files: fraction_flooded(
                     x, _files_values
@@ -140,16 +151,13 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
             set_edge_attributes(
                 hazard_overlay,
                 {
-                    (edges[0], edges[1], edges[2]): {rn + "_fr": x}
+                    (edges[0], edges[1], edges[2]): {ra2ce_name + "_fr": x}
                     for x, edges in zip(graph_fraction_flooded, edges_geoms)
                 },
             )
 
-        # overlay_network_x(_combined_names)
-        Parallel(n_jobs=2)(
-            delayed(overlay_network_x)(i, hn, rn)
-            for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names))
-        )
+        # Run in parallel to boost performance.
+        self._overlay_in_parallel(overlay_network_x)
 
         return hazard_overlay
 
@@ -180,7 +188,9 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                 )
             )
 
-        for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
+        def overlay_geodataframe(
+            hazard_tif_file: Path, hazard_name: str, ra2ce_name: str
+        ):
             # Validate input
             # Check if network and raster overlap
             extent_graph = hazard_overlay.total_bounds
@@ -190,10 +200,10 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                 extent_graph[1],
                 extent_graph[3],
             )
-            validate_extent_graph(extent_graph, self.hazard_tif_files[i])
+            validate_extent_graph(extent_graph, hazard_tif_file)
 
-            tqdm.pandas(desc="Network hazard overlay with " + hn)
-            _hazard_files_str = str(self.hazard_tif_files[i])
+            tqdm.pandas(desc="Network hazard overlay with " + hazard_name)
+            _hazard_files_str = str(hazard_tif_file)
             flood_stats = hazard_overlay.geometry.progress_apply(
                 lambda x, _hz_str=_hazard_files_str: zonal_stats(
                     x,
@@ -203,12 +213,22 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                     add_stats={"mean": get_valid_mean},
                 )
             )
-            hazard_overlay[rn + "_mi"] = [x[0]["min"] for x in flood_stats]
-            hazard_overlay[rn + "_ma"] = [x[0]["max"] for x in flood_stats]
-            hazard_overlay[rn + "_me"] = [x[0]["mean"] for x in flood_stats]
+            hazard_overlay[ra2ce_name + "_mi"] = [x[0]["min"] for x in flood_stats]
+            hazard_overlay[ra2ce_name + "_ma"] = [x[0]["max"] for x in flood_stats]
+            hazard_overlay[ra2ce_name + "_me"] = [x[0]["mean"] for x in flood_stats]
 
-            tqdm.pandas(desc="Network fraction with hazard overlay with " + hn)
-            hazard_overlay[rn + "_fr"] = hazard_overlay.geometry.progress_apply(
+            tqdm.pandas(desc="Network fraction with hazard overlay with " + hazard_name)
+            hazard_overlay[ra2ce_name + "_fr"] = hazard_overlay.geometry.progress_apply(
                 lambda x, _hz_str=_hazard_files_str: fraction_flooded(x, _hz_str)
             )
+
+        self._overlay_in_parallel(overlay_geodataframe)
+
         return hazard_overlay
+
+    def _overlay_in_parallel(self, overlay_func: Callable):
+        # Run in parallel to boost performance.
+        Parallel(n_jobs=2)(
+            delayed(overlay_func)(self.hazard_tif_files[i], hn, rn)
+            for i, (hn, rn) in enumerate(self._combined_names)
+        )
