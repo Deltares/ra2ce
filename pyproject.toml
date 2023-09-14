@@ -125,9 +125,6 @@ markers = [
     "external_test_data: marks tests as a test whose required data comes from external sources (deselct with '-m \"not external_test_data\"')",
 ]
 
-[tool.pytest.ini_options]
-addopts = "-n 4"
-
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
