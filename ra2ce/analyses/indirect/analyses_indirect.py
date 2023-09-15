@@ -1257,7 +1257,7 @@ class IndirectAnalyses:
                 # Not for all analyses a gdf is created as output.
                 if analysis["save_shp"]:
                     gpkg_path = output_path.joinpath(
-                        analysis["name"].replace(" ", "_") + ".shp"
+                        analysis["name"].replace(" ", "_") + ".gpkg"
                     )
                     save_gdf(gdf, gpkg_path)
                     if opt_routes:
