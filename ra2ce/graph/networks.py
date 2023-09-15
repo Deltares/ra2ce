@@ -186,7 +186,7 @@ class Network:
         )
 
         def check_base_file(file_type: str, file_path: Path):
-            if not isinstance(base_graph_filepath) or not base_graph_filepath.is_file():
+            if not isinstance(base_graph_filepath, Path) or not base_graph_filepath.is_file():
                 raise FileNotFoundError(
                     "No base {} file found at {}.".format(file_type, file_path)
                 )
