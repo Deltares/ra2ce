@@ -42,8 +42,8 @@ class MultiGraphNetworkExporter(NetworkExporterBase):
         # TODO: This method should be a writer itself.
         graph_to_gpkg(
             export_data,
-            output_dir / (self._basename + "_edges.gpkg"),
-            output_dir / (self._basename + "_nodes.gpkg"),
+            output_dir / (self._basename + "_edges.shp"),
+            output_dir / (self._basename + "_nodes.shp"),
         )
         logging.info(
             f"Saved {self._basename + '_edges.shp'} and {self._basename + '_nodes.shp'} in {output_dir}."
