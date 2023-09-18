@@ -753,10 +753,8 @@ class IndirectAnalyses:
         gdf_ori_ = gdf_ori.copy()
 
         # read origin points
-        origin_fn = (
-            Path(self.config["static"])
-            / "output_graph"
-            / "origin_destination_table.gpkg"
+        origin_fn = Path(self.config["static"]).joinpath(
+            "output_graph", "origin_destination_table.gpkg"
         )
         origin = gpd.read_file(origin_fn)
         index = [type(x) == str for x in origin["o_id"]]
@@ -1018,16 +1016,16 @@ class IndirectAnalyses:
                 for to_save, save_name in zip(to_save_gdf, to_save_gdf_names):
                     if not to_save.empty:
                         gpkg_path = output_path / (
-                            analysis["name"].replace(" ", "_") + f"_{save_name}.gpkg"
+                            analysis["name"].replace(" ", "_") + f"_{save_name}.shp"
                         )
                         save_gdf(to_save, gpkg_path)
 
                 # Save the Graph
                 gpkg_path_nodes = output_path / (
-                    analysis["name"].replace(" ", "_") + "_results_nodes.gpkg"
+                    analysis["name"].replace(" ", "_") + "_results_nodes.shp"
                 )
                 gpkg_path_edges = output_path / (
-                    analysis["name"].replace(" ", "_") + "_results_edges.gpkg"
+                    analysis["name"].replace(" ", "_") + "_results_edges.shp"
                 )
                 graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
 
@@ -1282,13 +1280,12 @@ class IndirectAnalyses:
             )
 
 
-def save_gdf(gdf, save_path):
+def save_gdf(gdf: gpd.GeoDataFrame, save_path: Path):
     """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp
 
     Arguments:
         gdf [geodataframe]: geodataframe object to be converted
-        edge_shp [str]: output path including extension for edges shapefile
-        node_shp [str]: output path including extension for nodes shapefile
+        save_path [str]: output path including extension for edges shapefile
     Returns:
         None
     """
