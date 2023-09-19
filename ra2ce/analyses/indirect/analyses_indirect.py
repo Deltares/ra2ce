@@ -1302,7 +1302,9 @@ def save_gdf(gdf, save_path):
     logging.info("Results saved to: {}".format(save_path))
 
 
-def find_route_ods(graph, od_nodes, weighing):
+def find_route_ods(
+    graph: nx.classes.MultiGraph, od_nodes: list[tuple[tuple[int, str]]], weighing: str
+) -> gpd.GeoDataFrame:
     # create the routes between all OD pairs
     (
         o_node_list,
