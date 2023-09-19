@@ -967,7 +967,9 @@ def delete_duplicates(all_points: list[Point]) -> list[Point]:
     return uniquepoints
 
 
-def create_simplified_graph(graph_complex, new_id: str = "rfid"):
+def create_simplified_graph(
+    graph_complex: nx.classes.graph.Graph, new_id: str = "rfid"
+):
     """Create a simplified graph with unique ids from a complex graph"""
     logging.info("Simplifying graph")
     try:
@@ -988,10 +990,12 @@ def create_simplified_graph(graph_complex, new_id: str = "rfid"):
             graph_complex, complex_to_simple, new_id
         )
         logging.info("Simplified graph succesfully created")
-    except Exception:
+    except Exception as exc:
         graph_simple = None
         id_tables = None
-        logging.error("Did not create a simplified version of the graph")
+        logging.error(
+            "Did not create a simplified version of the graph ({})".format(exc)
+        )
     return graph_simple, graph_complex, id_tables
 
 
@@ -1493,7 +1497,7 @@ def filter_osm(osm_filter_path, o5m, filtered_o5m, tags=None):
     os.system(command)
 
 
-def graph_link_simple_id_to_complex(graph_simple, new_id):
+def graph_link_simple_id_to_complex(graph_simple: nx.classes.graph.Graph, new_id: str):
     """
     Create lookup tables (dicts) to match edges_ids of the complex and simple graph
     Optionally, saves these lookup tables as json files.
@@ -1514,7 +1518,7 @@ def graph_link_simple_id_to_complex(graph_simple, new_id):
     # Iterate over the simple, because this already has the corresponding complex information
     lookup_dict = {}
     # keys are the ids of the simple graph, values are lists with all matching complex id's
-    for u, v, k in tqdm.tqdm(graph_simple.edges(keys=True)):
+    for u, v, k in tqdm(graph_simple.edges(keys=True)):
         key_1 = graph_simple[u][v][k]["{}".format(new_id)]
         value_1 = graph_simple[u][v][k]["{}_c".format(new_id)]
         lookup_dict[key_1] = value_1
