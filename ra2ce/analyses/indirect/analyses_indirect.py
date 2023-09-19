@@ -1275,7 +1275,7 @@ class IndirectAnalyses:
             # Save the configuration for this analysis to the output folder.
             with open(output_path / "settings.txt", "w") as f:
                 for key in analysis:
-                    logging.info(key + " = " + str(analysis[key]), file=f)
+                    print(key + " = " + str(analysis[key]), file=f)
 
             endtime = time.time()
             logging.info(

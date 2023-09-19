@@ -1146,9 +1146,9 @@ def graph_from_gdf(
 
 def graph_to_gdf(
     graph_to_convert: nx.classes.graph.Graph,
-    save_nodes=False,
-    save_edges=True,
-    to_save=False,
+    save_nodes: bool = False,
+    save_edges: bool = True,
+    to_save: bool = False,
 ):
     """Takes in a networkx graph object and returns edges and nodes as geodataframes
     Arguments:
