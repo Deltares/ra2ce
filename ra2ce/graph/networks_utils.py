@@ -274,7 +274,7 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
                             distance.distance(latlon(a), latlon(b)).meters
                             for (a, b) in zip(l.coords, l.coords[1:])
                         )
-                        for l in line
+                        for l in line.geoms
                     ]
                 )
             else:
@@ -478,7 +478,9 @@ def nearest_neighbor_within(
     return closest_point
 
 
-def vertices_from_lines(lines, list_ids: List[str]) -> dict:
+def vertices_from_lines(
+    lines: list[BaseMultipartGeometry], list_ids: list[str]
+) -> dict:
     """Return dict of with values: unique vertices from list of LineStrings.
     keys: index of LineString in original list
     From shapely_tools:
@@ -490,7 +492,7 @@ def vertices_from_lines(lines, list_ids: List[str]) -> dict:
             vertices_dict[i] = [Point(p) for p in set(list(line.coords))]
         if isinstance(line, MultiLineString):
             all_vertices = []
-            for each_line in line:
+            for each_line in line.geoms:
                 all_vertices.extend([Point(p) for p in set(list(each_line.coords))])
             vertices_dict[i] = all_vertices
     return vertices_dict
