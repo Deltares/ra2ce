@@ -115,7 +115,7 @@ def merge_lines_automatic(
         lines_gdf.reset_index(inplace=True)
 
     elif len(merged_lines.geoms) == len(list_lines):
-        print("No lines are merged.")
+        logging.warning("No lines are merged.")
         return lines_gdf, gpd.GeoDataFrame()
     else:
         # The lines have no additional properties.
@@ -133,7 +133,7 @@ def merge_lines_automatic(
         columns=[id_name, "geometry"], crs=crs_, geometry="geometry"
     )
 
-    for mline in merged_lines:
+    for mline in merged_lines.geoms:
         for line, i in lines_fids:
             full_line = line
             if line.within(mline) and not line.equals(mline):
