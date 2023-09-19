@@ -36,8 +36,7 @@ import pandas as pd
 import pyproj
 import rasterio
 import rtree
-import tqdm
-import tqdm._tqdm_pandas
+from tqdm import tqdm
 from geopy import distance
 from networkx import Graph, set_edge_attributes
 from osgeo import gdal
@@ -46,6 +45,7 @@ from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
 from shapely.ops import linemerge, unary_union
+from shapely.geometry.base import BaseMultipartGeometry
 
 
 def convert_unit(unit: str) -> Optional[float]:
@@ -688,7 +688,7 @@ def split_line_with_points(line, points):
     return segments
 
 
-def cut(line, distance) -> Tuple[LineString, LineString]:
+def cut(line: BaseMultipartGeometry, distance: float) -> tuple[LineString, LineString]:
     # Cuts a line in two at a distance from its starting point
     # This is taken from shapely manual
     if (distance <= 0.0) | (distance >= line.length):
@@ -709,7 +709,7 @@ def cut(line, distance) -> Tuple[LineString, LineString]:
                     LineString([(cp.x, cp.y)] + [xy[0:2] for xy in coords[i:]]),
                 ]
     elif isinstance(line, MultiLineString):
-        for ln in line:
+        for ln in line.geoms:
             coords = list(ln.coords)
             for i, p in enumerate(coords):
                 pd = ln.project(Point(p))
@@ -1167,13 +1167,9 @@ def graph_to_gdf(
                         df[col] = df[col].astype(str)
 
     elif not save_nodes and save_edges:
-        edges = graph_to_gdfs(
-            graph_to_convert, nodes=save_nodes, edges=save_edges
-        )
+        edges = graph_to_gdfs(graph_to_convert, nodes=save_nodes, edges=save_edges)
     elif save_nodes and not save_edges:
-        nodes = graph_to_gdfs(
-            graph_to_convert, nodes=save_nodes, edges=save_edges
-        )
+        nodes = graph_to_gdfs(graph_to_convert, nodes=save_nodes, edges=save_edges)
 
     return edges, nodes
 
