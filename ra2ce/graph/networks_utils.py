@@ -32,7 +32,6 @@ import geojson
 import geopandas as gpd
 import networkx as nx
 import numpy as np
-import osmnx
 import pandas as pd
 import pyproj
 import rasterio
@@ -42,7 +41,7 @@ import tqdm._tqdm_pandas
 from geopy import distance
 from networkx import Graph, set_edge_attributes
 from osgeo import gdal
-from osmnx.simplification import simplify_graph
+from osmnx import graph_to_gdfs, simplify_graph
 from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
@@ -1156,7 +1155,7 @@ def graph_to_gdf(
 
     nodes, edges = None, None
     if save_nodes and save_edges:
-        nodes, edges = osmnx.graph_to_gdfs(
+        nodes, edges = graph_to_gdfs(
             graph_to_convert, nodes=save_nodes, edges=save_edges, node_geometry=False
         )
 
@@ -1168,11 +1167,11 @@ def graph_to_gdf(
                         df[col] = df[col].astype(str)
 
     elif not save_nodes and save_edges:
-        edges = osmnx.graph_to_gdfs(
+        edges = graph_to_gdfs(
             graph_to_convert, nodes=save_nodes, edges=save_edges
         )
     elif save_nodes and not save_edges:
-        nodes = osmnx.graph_to_gdfs(
+        nodes = graph_to_gdfs(
             graph_to_convert, nodes=save_nodes, edges=save_edges
         )
 
@@ -1195,7 +1194,7 @@ def graph_to_gpkg(origin_graph: nx.classes.graph.Graph, edge_gpkg, node_gpkg):
         origin_graph = nx.MultiGraph(origin_graph)
 
     # The nodes should have a geometry attribute (perhaps on top of the x and y attributes)
-    nodes, edges = osmnx.graph_to_gdfs(origin_graph, node_geometry=False)
+    nodes, edges = graph_to_gdfs(origin_graph, node_geometry=False)
 
     dfs = [edges, nodes]
     for df in dfs:
