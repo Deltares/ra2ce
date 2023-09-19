@@ -50,6 +50,7 @@ shapely = "^2.0.1"
 osmnx = "^1.6.0"
 geojson = "^3.0.1"
 tqdm = "^4.66.1"
+geopy = "^2.4.0"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.10.1"
