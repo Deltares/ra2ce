@@ -511,8 +511,8 @@ class IndirectAnalyses:
         return aggregated_results
 
     def _get_origin_destination_pairs(self, graph):
-        od_path = (
-            self.config["static"] / "output_graph" / "origin_destination_table.feather"
+        od_path = self.config["static"].joinpath(
+            "output_graph", "origin_destination_table.feather"
         )
         od = gpd.read_feather(od_path)
         od_pairs = [
@@ -540,7 +540,9 @@ class IndirectAnalyses:
             )
         return od_nodes
 
-    def optimal_route_origin_destination(self, graph, analysis):
+    def optimal_route_origin_destination(
+        self, graph: nx.classes.MultiGraph, analysis: dict
+    ):
         # create list of origin-destination pairs
         od_nodes = self._get_origin_destination_pairs(graph)
         pref_routes = find_route_ods(graph, od_nodes, analysis["weighing"])
@@ -1007,7 +1009,7 @@ class IndirectAnalyses:
             starttime = time.time()
             gdf = pd.DataFrame()
             opt_routes = None
-            output_path = self.config["output"] / analysis["analysis"]
+            output_path = self.config["output"].joinpath(analysis["analysis"])
 
             def _save_shp_analysis(
                 base_graph,
@@ -1016,16 +1018,16 @@ class IndirectAnalyses:
             ):
                 for to_save, save_name in zip(to_save_gdf, to_save_gdf_names):
                     if not to_save.empty:
-                        gpkg_path = output_path / (
+                        gpkg_path = output_path.joinpath(
                             analysis["name"].replace(" ", "_") + f"_{save_name}.gpkg"
                         )
                         save_gdf(to_save, gpkg_path)
 
                 # Save the Graph
-                gpkg_path_nodes = output_path / (
+                gpkg_path_nodes = output_path.joinpath(
                     analysis["name"].replace(" ", "_") + "_results_nodes.gpkg"
                 )
-                gpkg_path_edges = output_path / (
+                gpkg_path_edges = output_path.joinpath(
                     analysis["name"].replace(" ", "_") + "_results_edges.gpkg"
                 )
                 graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
@@ -1273,7 +1275,7 @@ class IndirectAnalyses:
             # Save the configuration for this analysis to the output folder.
             with open(output_path / "settings.txt", "w") as f:
                 for key in analysis:
-                    print(key + " = " + str(analysis[key]), file=f)
+                    logging.info(key + " = " + str(analysis[key]), file=f)
 
             endtime = time.time()
             logging.info(
@@ -1281,7 +1283,7 @@ class IndirectAnalyses:
             )
 
 
-def save_gdf(gdf, save_path):
+def save_gdf(gdf: gpd.GeoDataFrame, save_path: Path):
     """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp
 
     Arguments:
