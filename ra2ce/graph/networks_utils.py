@@ -26,7 +26,7 @@ import sys
 import warnings
 from pathlib import Path
 from statistics import mean
-from typing import List, Optional, Tuple, Union
+from typing import Optional
 
 import geojson
 import geopandas as gpd
@@ -76,8 +76,8 @@ def draw_progress_bar(percent: float, bar_length: int = 20):
 
 
 def merge_lines_automatic(
-    lines_gdf: gpd.GeoDataFrame, id_name: str, aadt_names: List[str], crs_: pyproj.CRS
-) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+    lines_gdf: gpd.GeoDataFrame, id_name: str, aadt_names: list[str], crs_: pyproj.CRS
+) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
     """Automatically merge lines based on a config file
     Args:
         lines_gdf (geodataframe): the network with edges that can possibly be merged
@@ -305,7 +305,7 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
 
 def snap_endpoints_lines(
     lines_gdf: gpd.GeoDataFrame,
-    max_dist: Union[int, float],
+    max_dist: int | float,
     id_name: str,
     crs: pyproj.CRS,
 ) -> gpd.GeoDataFrame:
@@ -430,7 +430,7 @@ def find_isolated_endpoints(linesIds: list, lines: list) -> list:
 
 
 def nearest_neighbor_within(
-    search_points: list, spatial_index, point: Point, max_distance: Union[float, int]
+    search_points: list, spatial_index, point: Point, max_distance: float | int
 ) -> Point:
     """Find nearest point among others up to a maximum distance.
 
@@ -949,15 +949,15 @@ def hazard_join_id_shp(roads, hazard_data_dict: dict):
     return roads
 
 
-def delete_duplicates(all_points: List[Point]) -> List[Point]:
+def delete_duplicates(all_points: list[Point]) -> list[Point]:
     """
     Delete duplicate points given they are 'almost' equals.
 
     Args:
-        all_points (List[Point]): List with potentially repeated points.
+        all_points (list[Point]): List with potentially repeated points.
 
     Returns:
-        List[Point]: List with unique points.
+        list[Point]: list with unique points.
     """
     points = [point for point in all_points]
     uniquepoints = []
@@ -997,7 +997,7 @@ def create_simplified_graph(graph_complex, new_id: str = "rfid"):
 
 def gdf_check_create_unique_ids(
     gdf: gpd.GeoDataFrame, id_name: str, new_id_name: str = "rfid"
-) -> Tuple[gpd.GeoDataFrame, str]:
+) -> tuple[gpd.GeoDataFrame, str]:
     """
     Check if the ID's are unique per edge: if not, add an own ID called 'fid'
 
@@ -1007,7 +1007,7 @@ def gdf_check_create_unique_ids(
         new_id_name (str, optional): Optinal new id name to give. Defaults to "rfid".
 
     Returns:
-        Tuple[gpd.GeoDataFrame, str]: Resulting dataframe and its ID.
+        tuple[gpd.GeoDataFrame, str]: Resulting dataframe and its ID.
     """
     check = list(gdf.index)
     logging.info("Started creating unique ids...")
@@ -1027,7 +1027,7 @@ def gdf_check_create_unique_ids(
 
 def graph_check_create_unique_ids(
     graph: Graph, id_name: str, new_id_name: str = "rfid"
-) -> Tuple[Graph, str]:
+) -> tuple[Graph, str]:
     """
     TODO: This is not really being used. It could be removed.
     Check if the ID's are unique per edge: if not, add an own ID called 'fid'
@@ -1038,7 +1038,7 @@ def graph_check_create_unique_ids(
         new_id_name (str, optional): Optional new id to set for repeated elements. Defaults to "rfid".
 
     Returns:
-        Tuple[Graph, str]: Resulting graph and used ID.
+        tuple[Graph, str]: Resulting graph and used ID.
     """
     if len(set([str(e[-1][id_name]) for e in graph.edges.data(keys=True)])) < len(
         graph.edges()
@@ -1377,7 +1377,7 @@ def get_extent(dataset):
 
 def get_graph_edges_extent(
     network_graph: nx.classes.Graph,
-) -> Tuple[float, float, float, float]:
+) -> tuple[float, float, float, float]:
     """Inspects all geometries of the edges of a graph and returns the most extreme coordinates
 
     Arguments:
