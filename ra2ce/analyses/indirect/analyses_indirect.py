@@ -541,7 +541,7 @@ class IndirectAnalyses:
             )
         return od_nodes
 
-    def optimal_route_origin_destination(self, graph, analysis):
+    def optimal_route_origin_destination(self, graph: nx.classes.MultiGraph, analysis: dict) -> gpd.GeoDataFrame:
         # create list of origin-destination pairs
         od_nodes = self._get_origin_destination_pairs(graph)
         pref_routes = find_route_ods(graph, od_nodes, analysis["weighing"])
@@ -1303,7 +1303,9 @@ def save_gdf(gdf, save_path):
     logging.info("Results saved to: {}".format(save_path))
 
 
-def find_route_ods(graph, od_nodes, weighing):
+def find_route_ods(
+    graph: nx.classes.MultiGraph, od_nodes: list[tuple[tuple[int, str]]], weighing: str
+) -> gpd.GeoDataFrame:
     # create the routes between all OD pairs
     (
         o_node_list,
@@ -1347,6 +1349,13 @@ def find_route_ods(graph, od_nodes, weighing):
                     match_list.append(_uv_graph_edge["rfid"])
 
             # compile the road segments into one geometry
+            pref_edges_line_strings = []
+            for geom in pref_edges:
+                if isinstance(geom, LineString):
+                    pref_edges_line_strings.append(geom)
+                elif isinstance(geom, MultiLineString):
+                    pref_edges_line_strings.extend(geom.geoms)
+            pref_edges = pref_edges_line_strings
             pref_edges = MultiLineString(pref_edges)
 
             # save all data to lists (of lists)
