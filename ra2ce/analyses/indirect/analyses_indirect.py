@@ -759,7 +759,7 @@ class IndirectAnalyses:
             / "output_graph"
             / "origin_destination_table.gpkg"
         )
-        origin = gpd.read_file(origin_fn)
+        origin = gpd.read_file(origin_fn, engine="pyogrio")
         index = [type(x) == str for x in origin["o_id"]]
         origin = origin[index]
         origin.reset_index(inplace=True, drop=True)
