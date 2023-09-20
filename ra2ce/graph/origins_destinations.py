@@ -121,7 +121,7 @@ def read_origin_destination_files(
     for dp, dn in zip(destination_paths, destination_names):
         destination_new = gpd.read_file(dp, crs=crs_)
         try:
-            assert destination_new[od_id]
+            destination_new[od_id] * 2  # Just for checking
         except Exception:
             destination_new[od_id] = destination_new.index
         destination_new = destination_new[destination_columns_add]
