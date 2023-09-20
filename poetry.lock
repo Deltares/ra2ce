@@ -725,18 +725,6 @@ files = [
 ]
 
 [[package]]
-name = "geojson"
-version = "3.0.1"
-description = "Python bindings and utilities for GeoJSON"
-category = "main"
-optional = false
-python-versions = ">=3.7, <3.12"
-files = [
-    {file = "geojson-3.0.1-py3-none-any.whl", hash = "sha256:e49df982b204ed481e4c1236c57f587adf71537301cf8faf7120ab27d73c7568"},
-    {file = "geojson-3.0.1.tar.gz", hash = "sha256:ff3d75acab60b1e66504a11f7ea12c104bad32ff3c410a807788663b966dee4a"},
-]
-
-[[package]]
 name = "geopandas"
 version = "0.14.0"
 description = "Geographic pandas extensions"
@@ -3472,4 +3460,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9, <3.11"
-content-hash = "896c1b0f8cbe7fd5f755aad4802b0f8aec9d2d6cce54e07a4d7298b98efda0ce"
+content-hash = "82092547ab8a4f1e0b9e4b90096b8c0f79478e2ec7a0bbe55ecda31fdd71289b"
