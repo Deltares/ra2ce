@@ -13,12 +13,12 @@ root_folder = Path(
 #     graph = pickle.load(handle)
 
 graph = nx.MultiDiGraph()
-graph.add_node(1, demand=-31, od_id="destination")
-graph.add_node(4, demand=31, od_id="origin")
+graph.add_node(1, demand=31, od_id="origin")
+graph.add_node(4, demand=-31, od_id="destination")
 graph.add_edge(1, 2, cost=3, capacity=40)
 graph.add_edge(1, 3, cost=6, capacity=10)
 graph.add_edge(2, 4, cost=1, capacity=20)
-graph.add_edge(3, 4, cost=2, capacity=10)
+graph.add_edge(3, 4, cost=2, capacity=5)
 
 directed_graph = _get_directed_graph(graph)
 multi_layer_graph = _create_layered_graph(directed_graph)
