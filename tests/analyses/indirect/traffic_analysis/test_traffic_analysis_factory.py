@@ -15,6 +15,7 @@ from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_factory import (
 from tests import test_results
 from tests.analyses.indirect.traffic_analysis import (
     TrafficAnalysisInput,
+    valid_traffic_analysis_input,
 )
 
 
