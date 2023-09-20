@@ -88,7 +88,7 @@ class TestVectorNetworkWrapper:
         self, _valid_wrapper: VectorNetworkWrapper
     ):
         # Given
-        _valid_wrapper.region_path = _test_dir / "_test_polygon.geojson"
+        _valid_wrapper.region_path = _test_dir.joinpath("_test_polygon.geojson")
         _expected_region = gpd.read_file(_valid_wrapper.region_path)
         assert isinstance(_expected_region, gpd.GeoDataFrame)
 
