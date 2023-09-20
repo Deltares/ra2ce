@@ -5,7 +5,6 @@ channels:
 dependencies:
   - conda-forge::python=3.10
   - conda-forge::gdal=3.5.1
-  - conda-forge::fiona
   # from here some dragons 
   - conda-forge::geopandas
   - conda-forge::rasterio

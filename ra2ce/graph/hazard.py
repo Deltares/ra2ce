@@ -287,7 +287,9 @@ class Hazard:
         for i, (hn, rn, hfn) in enumerate(
             zip(self.hazard_names, self.ra2ce_names, self._hazard_field_name)
         ):
-            gdf_hazard = gpd.read_file(str(self.hazard_files["shp"][i]))
+            gdf_hazard = gpd.read_file(
+                str(self.hazard_files["shp"][i]), engine="pyogrio"
+            )
 
             if gdf.crs != gdf_hazard.crs:
                 gdf = gdf.to_crs(gdf_hazard.crs)
@@ -320,7 +322,7 @@ class Hazard:
         for i, (hn, rn, hfn) in enumerate(
             zip(self.hazard_names, self.ra2ce_names, hfns)
         ):
-            gdf = gpd.read_file(str(self.hazard_files["shp"][i]))
+            gdf = gpd.read_file(str(self.hazard_files["shp"][i]), engine="pyogrio")
             spatial_index = gdf.sindex
 
             for u, v, k, edata in graph.edges.data(keys=True):
@@ -1037,7 +1039,7 @@ class Hazard:
         #### Step 4: hazard overlay of the locations that are checked for isolation ###
         if self._isolation_locations:
             logging.info("Detected isolated locations, checking for hazard overlay.")
-            locations = gpd.read_file(self._isolation_locations)
+            locations = gpd.read_file(self._isolation_locations, engine="pyogrio")
             locations["i_id"] = locations.index
             locations_crs = pyproj.CRS.from_user_input(locations.crs)
             hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)

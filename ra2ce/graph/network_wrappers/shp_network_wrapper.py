@@ -68,12 +68,12 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
             properties (pandas dataframe): attributes of shapefile(s), in order of the linestrings in lines
         """
         # concatenate all shapefile into one geodataframe and set analysis to 1 or 0 for diversions
-        lines = [gpd.read_file(shp) for shp in self.primary_files]
+        lines = [gpd.read_file(shp, engine="pyogrio") for shp in self.primary_files]
 
         if any(self.diversion_files):
             lines.extend(
                 [
-                    nut.check_crs_gdf(gpd.read_file(shp), self.crs)
+                    nut.check_crs_gdf(gpd.read_file(shp, engine="pyogrio"), self.crs)
                     for shp in self.diversion_files
                 ]
             )

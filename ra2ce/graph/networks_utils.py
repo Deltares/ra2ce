@@ -916,7 +916,7 @@ def hazard_join_id_shp(roads, hazard_data_dict: dict):
     attempts = 0
     while attempts < 3:
         try:
-            hazard = gpd.read_file(hazard_data_dict["path"][0])
+            hazard = gpd.read_file(hazard_data_dict["path"][0], engine="pyogrio")
             hazard = hazard[[col_id, col_val]]
             break
         except KeyError:
@@ -931,7 +931,9 @@ def hazard_join_id_shp(roads, hazard_data_dict: dict):
         attempts = 0
         while attempts < 3:
             try:
-                hazard2 = gpd.read_file(hazard_data_dict["path"][i], encoding="utf-8")
+                hazard2 = gpd.read_file(
+                    hazard_data_dict["path"][i], encoding="utf-8", engine="pyogrio"
+                )
                 hazard = pd.concat(
                     [hazard, hazard2[[col_id, col_val]]], ignore_index=True
                 )
@@ -1274,14 +1276,14 @@ def read_merge_shp(shp_file_analyse, id_name, shp_file_diversion=[], crs_=4326):
 
     # read the shapefile(s) for analysis
     for shp in shp_file_analyse:
-        lines_shp = gpd.read_file(shp)
+        lines_shp = gpd.read_file(shp, engine="pyogrio")
         lines_shp["to_analyse"] = 1
         lines.append(lines_shp)
 
     # read the shapefile(s) for only diversion
     if isinstance(shp_file_diversion, list):
         for shp2 in shp_file_diversion:
-            lines_shp = gpd.read_file(shp2)
+            lines_shp = gpd.read_file(shp2, engine="pyogrio")
             lines_shp["to_analyse"] = 0
             lines.append(lines_shp)
 
