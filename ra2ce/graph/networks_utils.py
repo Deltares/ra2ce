@@ -28,7 +28,6 @@ from pathlib import Path
 from statistics import mean
 from typing import Optional
 
-import geojson
 import geopandas as gpd
 import networkx as nx
 import numpy as np
@@ -45,7 +44,7 @@ from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
 from shapely.ops import linemerge, unary_union
-from shapely.geometry.base import BaseMultipartGeometry
+from shapely.geometry.base import BaseMultipartGeometry, BaseGeometry
 
 
 def convert_unit(unit: str) -> Optional[float]:
@@ -248,6 +247,24 @@ def merge_lines_automatic(
     return merged, lines_merged
 
 
+def get_distance(a_b_tuple: tuple[tuple[float, float], tuple[float, float]]) -> float:
+    """
+    Gets the distance (in meters) between two points given as a tuple thanks to geopy.distance functionality.
+    TODO: Investigate whether this function is really required, instead of GeoPandasDataFrame,
+     to reduce the usage of external dependencies.
+
+    Args:
+        a_b_tuple (tuple[float]): Tuple representing two points.
+
+    Returns:
+        float: Distance between two points in meters.
+    """
+    distance.geodesic.ELLIPSOID = "WGS-84"
+    from_a, to_b = a_b_tuple
+    latlon = lambda lonlat: (lonlat[1], lonlat[0])
+    return distance.distance(latlon(from_a), latlon(to_b)).meters
+
+
 def line_length(line: LineString, crs: pyproj.CRS) -> float:
     """Calculate length of a line in meters, given in geographic coordinates.
     Args:
@@ -258,22 +275,14 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
     """
     # Check if the coordinate system is projected or geographic
     if crs.is_geographic:
-        distance.geodesic.ELLIPSOID = "WGS-84"
         try:
             # Swap shapely (lonlat) to geopy (latlon) points
-            latlon = lambda lonlat: (lonlat[1], lonlat[0])
             if isinstance(line, LineString):
-                total_length = sum(
-                    distance.distance(latlon(a), latlon(b)).meters
-                    for (a, b) in zip(line.coords, line.coords[1:])
-                )
+                total_length = sum(map(get_distance, zip(line.coords, line.coords[1:])))
             elif isinstance(line, MultiLineString):
                 total_length = sum(
                     [
-                        sum(
-                            distance.distance(latlon(a), latlon(b)).meters
-                            for (a, b) in zip(l.coords, l.coords[1:])
-                        )
+                        sum(map(get_distance, zip(l.coords, l.coords[1:])))
                         for l in line.geoms
                     ]
                 )
@@ -1114,14 +1123,6 @@ def simplify_graph_count(complex_graph: nx.Graph) -> nx.Graph:
     return simple_graph
 
 
-def read_geojson(geojson_file: Path) -> dict:
-    """Read a GeoJSON file into a GeoJSON object.
-    From the script get_rcm.py from Martijn Kwant.
-    """
-    with open(geojson_file) as f:
-        return geojson.load(f)
-
-
 def graph_from_gdf(
     gdf: gpd.GeoDataFrame, gdf_nodes, name: str = "network", node_id: str = "ID"
 ) -> nx.MultiGraph:
@@ -1218,59 +1219,38 @@ def graph_to_gpkg(origin_graph: nx.classes.graph.Graph, edge_gpkg, node_gpkg):
     edges.to_file(edge_gpkg, driver="GPKG", encoding="utf-8")
 
 
-def geojson_to_shp(geojson_obj, feature_number=0):
-    """Convert a GeoJSON object to a Shapely Polygon.
-    Adjusted from the script get_rcm.py from Martijn Kwant.
-
-    In case of FeatureCollection, only one of the features is used (the first by default).
-    3D points are converted to 2D.
-
-    Parameters
-    ----------
-    geojson_obj : dict
-        a GeoJSON object
-    feature_number : int, optional
-        Feature to extract polygon from (in case of MultiPolygon
-        FeatureCollection), defaults to first Feature
-
-    Returns
-    -------
-    polygon coordinates
-        string of comma separated coordinate tuples (lon, lat) to be used by SentinelAPI
+@staticmethod
+def get_normalized_geojson_polygon(geojson_path: Path) -> BaseGeometry:
     """
-    if "coordinates" in geojson_obj:
-        geometry = geojson_obj
-    elif "geometry" in geojson_obj:
-        geometry = geojson_obj["geometry"]
-    else:
-        geometry = geojson_obj["features"][feature_number]["geometry"]
+    Converts a GeoJson object to a Shapely Polygon.
 
-    def ensure_2d(geometry):
-        if isinstance(geometry[0], (list, tuple)):
-            return list(map(ensure_2d, geometry))
-        else:
-            return geometry[:2]
+    Args:
+        geojson_path (Path): File containing a geojson object.
 
-    def check_bounds(geometry):
-        if isinstance(geometry[0], (list, tuple)):
-            return list(map(check_bounds, geometry))
-        else:
-            if geometry[0] > 180 or geometry[0] < -180:
-                raise ValueError(
-                    "Longitude is out of bounds, check your JSON format or data. The Coordinate Reference System should be in EPSG:4326."
-                )
-            if geometry[1] > 90 or geometry[1] < -90:
-                raise ValueError(
-                    "Latitude is out of bounds, check your JSON format or data. The Coordinate Reference System should be in EPSG:4326."
-                )
+    Raises:
+        ValueError: When the polygon longitude is out of bounds.
+        ValueError: When the polygon latitude is out of bounds.
+
+    Returns:
+        BaseGeometry: Resulting normalized (in lat and lon) polygon in shapely format.
+    """
+    _read_geojson = gpd.read_file(geojson_path)
+
+    def check_bounds(geometry: BaseGeometry):
+        if geometry.bounds[0] > 180 or geometry.bounds[2] < -180:
+            raise ValueError(
+                "Longitude is out of bounds, check your JSON format or data. The Coordinate Reference System should be in EPSG:4326."
+            )
+        if geometry.bounds[1] > 90 or geometry.bounds[3] < -90:
+            raise ValueError(
+                "Latitude is out of bounds, check your JSON format or data. The Coordinate Reference System should be in EPSG:4326."
+            )
 
     # Discard z-coordinate, if it exists
-    geometry["coordinates"] = ensure_2d(geometry["coordinates"])
-    check_bounds(geometry["coordinates"])
+    check_bounds(_read_geojson.geometry[0])
 
     # Create a shapely polygon from the coordinates.
-    poly = shape(geometry).buffer(0)
-    return poly
+    return shape(_read_geojson.geometry[0]).buffer(0)
 
 
 def read_merge_shp(shp_file_analyse, id_name, shp_file_diversion=[], crs_=4326):
