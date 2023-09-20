@@ -8,7 +8,6 @@ dependencies:
   # from here some dragons 
   - conda-forge::geopandas
   - conda-forge::rasterio
-  - conda-forge::geojson
   - conda-forge::osmnx
   - conda-forge::tqdm
   - conda-forge::geopy
