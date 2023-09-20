@@ -247,6 +247,24 @@ def merge_lines_automatic(
     return merged, lines_merged
 
 
+def get_distance(a_b_tuple: tuple[tuple[float, float], tuple[float, float]]) -> float:
+    """
+    Gets the distance (in meters) between two points given as a tuple thanks to geopy.distance functionality.
+    TODO: Investigate whether this function is really required, instead of GeoPandasDataFrame,
+     to reduce the usage of external dependencies.
+
+    Args:
+        a_b_tuple (tuple[float]): Tuple representing two points.
+
+    Returns:
+        float: Distance between two points in meters.
+    """
+    distance.geodesic.ELLIPSOID = "WGS-84"
+    from_a, to_b = a_b_tuple
+    latlon = lambda lonlat: (lonlat[1], lonlat[0])
+    return distance.distance(latlon(from_a), latlon(to_b)).meters
+
+
 def line_length(line: LineString, crs: pyproj.CRS) -> float:
     """Calculate length of a line in meters, given in geographic coordinates.
     Args:
@@ -259,12 +277,6 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
     if crs.is_geographic:
         try:
             # Swap shapely (lonlat) to geopy (latlon) points
-            def get_distance(a_b_tuple: tuple[float]) -> float:
-                distance.geodesic.ELLIPSOID = "WGS-84"
-                from_a, to_b = a_b_tuple
-                latlon = lambda lonlat: (lonlat[1], lonlat[0])
-                return distance.distance(latlon(from_a), latlon(to_b)).meters
-
             if isinstance(line, LineString):
                 total_length = sum(map(get_distance, zip(line.coords, line.coords[1:])))
             elif isinstance(line, MultiLineString):
