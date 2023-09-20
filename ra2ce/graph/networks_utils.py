@@ -257,22 +257,20 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
     """
     # Check if the coordinate system is projected or geographic
     if crs.is_geographic:
-        distance.geodesic.ELLIPSOID = "WGS-84"
         try:
             # Swap shapely (lonlat) to geopy (latlon) points
-            latlon = lambda lonlat: (lonlat[1], lonlat[0])
+            def get_distance(a_b_tuple: tuple[float]) -> float:
+                distance.geodesic.ELLIPSOID = "WGS-84"
+                from_a, to_b = a_b_tuple
+                latlon = lambda lonlat: (lonlat[1], lonlat[0])
+                return distance.distance(latlon(from_a), latlon(to_b)).meters
+
             if isinstance(line, LineString):
-                total_length = sum(
-                    distance.distance(latlon(a), latlon(b)).meters
-                    for (a, b) in zip(line.coords, line.coords[1:])
-                )
+                total_length = sum(map(get_distance, zip(line.coords, line.coords[1:])))
             elif isinstance(line, MultiLineString):
                 total_length = sum(
                     [
-                        sum(
-                            distance.distance(latlon(a), latlon(b)).meters
-                            for (a, b) in zip(l.coords, l.coords[1:])
-                        )
+                        sum(map(get_distance, zip(l.coords, l.coords[1:])))
                         for l in line.geoms
                     ]
                 )
