@@ -32,7 +32,15 @@ nx.draw(graph, with_labels=False, arrows=True, node_size=5, node_color='r', font
 plt.show()
 
 directed_graph = _get_directed_graph(graph)
-multi_layer_graph = _create_layered_graph(directed_graph)
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.axis('off')
+ax.axis('equal')
+nx.draw(directed_graph, with_labels=False, arrows=True, node_size=5, node_color='r', font_color='m')
+plt.show()
+
+# multi_layer_graph = _create_layered_graph(directed_graph)
 flow_dict = nx.min_cost_flow(directed_graph)
 
 a = 1

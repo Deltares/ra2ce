@@ -12,6 +12,7 @@ def _get_directed_graph(graph: MultiGraph) -> MultiDiGraph:
 
 
 def _create_layered_graph(graph: MultiDiGraph) -> MultiDiGraph:
+    # ToDo: add all nodes between actual and virtual g
     multi_layer_graph = nx.MultiDiGraph()
     virtual_graph = MultiDiGraph(graph)
     # make costs integer
@@ -22,7 +23,6 @@ def _create_layered_graph(graph: MultiDiGraph) -> MultiDiGraph:
         attr['capacity'] = int(attr['capacity'])
         multi_layer_graph.add_edge(u, v, **attr)
 
-    max_node_id_graph = max(graph.nodes())
     max_weight_graph = max(attr['weight'] for _, _, attr in graph.edges(data=True))
     max_capacity_graph = max(attr['capacity'] for _, _, attr in graph.edges(data=True))
 
