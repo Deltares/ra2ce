@@ -116,6 +116,9 @@ class TrafficAnalysisBase(ABC):
         _intermediate_nodes = 0
         for _node in nodes_list:
             if self.destinations_names in _node:
+                # TODO: This is potentially dangerous as it could make two times a multiplication of the
+                # accumulated traffic. Example given, nodes [ a, b, c, d], destination_names = b; a and c
+                # will multiply accumulated traffic, is that correct?
                 _intermediate_nodes -= 1
                 continue
             _node_traffic = self._get_accumulated_traffic_from_node(
