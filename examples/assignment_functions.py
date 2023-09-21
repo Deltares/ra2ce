@@ -5,15 +5,24 @@ from matplotlib import pyplot as plt
 from networkx import MultiGraph, MultiDiGraph, DiGraph
 
 
-def _get_directed_graph(graph: MultiGraph) -> MultiDiGraph:
-    multi_digraph = nx.MultiDiGraph()
+def _add_pos(graph: MultiGraph) -> MultiGraph:
+    g = nx.MultiGraph()
     for u, attr in graph.nodes(data=True):
         if 'geometry' in attr.keys():
             geom = attr['geometry']
             pos = (geom.x, geom.y)
         else:
             pos = ()
-        multi_digraph.add_node(u, pos=pos, **attr)
+        g.add_node(u, pos=pos, **attr)
+    for u, v, key, attr in graph.edges(keys=True, data=True):
+        g.add_edge(u, v, **attr)
+        g.add_edge(v, u, **attr)
+    return g
+
+def _get_directed_graph(graph: MultiGraph) -> MultiDiGraph:
+    multi_digraph = nx.MultiDiGraph()
+    for u, attr in graph.nodes(data=True):
+        multi_digraph.add_node(u, **attr)
     for u, v, key, attr in graph.edges(keys=True, data=True):
         multi_digraph.add_edge(u, v, **attr)
         multi_digraph.add_edge(v, u, **attr)
@@ -58,15 +67,15 @@ def _create_layered_graph(graph: MultiDiGraph) -> MultiDiGraph:
     return multi_layer_graph
 
 
-def draw_graph(g: Union[DiGraph, MultiDiGraph]):
+def draw_graph(g: Union[MultiGraph, DiGraph, MultiDiGraph]):
     fig = plt.figure()
     ax = fig.add_subplot(111)
     edge_labels = dict([((n1, n2), attr['capacity'])
                         for n1, n2, attr in g.edges(data=True)])
-    pos = nx.spring_layout(g)
-    nx.draw(g, pos, with_labels=True, arrows=True, node_size=5, node_color='r', font_color='m')
+    node_pos = dict([(n, attr['pos']) for n, attr in g.nodes(data=True)])
+    nx.draw(g, node_pos, with_labels=False, arrows=True, node_size=5, node_color='r', font_color='m')
     nx.draw_networkx_edge_labels(
-        g, pos,
+        g, node_pos,
         edge_labels=edge_labels,
         font_color='red'
     )
