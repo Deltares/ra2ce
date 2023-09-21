@@ -30,16 +30,10 @@ ax.axis('off')
 ax.axis('equal')
 nx.draw(graph, with_labels=False, arrows=True, node_size=5, node_color='r', font_color='m')
 plt.show()
-# nx.draw_networkx_edge_labels(G_Sewer, pos, edge_labels=Flows, label_pos=0.8, rotate=True, font_size=Font_Size_Graph)
 
-# ax.set_title(Case_Dict[G[0]] + ' ', **Font)
-# plt.savefig(Path.loc['Result', 'Location'] + Case_Dict[G[0]][-5:] + 'Graph_FLows_' + Parameter.loc['Rainfall_Event', 'Value'] + '.png')
-# plt.close(fig)
-
-
-# directed_graph = _get_directed_graph(graph)
-# multi_layer_graph = _create_layered_graph(directed_graph)
-# flow_dict = nx.min_cost_flow(directed_graph)
+directed_graph = _get_directed_graph(graph)
+multi_layer_graph = _create_layered_graph(directed_graph)
+flow_dict = nx.min_cost_flow(directed_graph)
 
 a = 1
 
