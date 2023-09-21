@@ -17,36 +17,39 @@ root_folder = Path(
 #     graph = pickle.load(handle)
 
 graph = nx.MultiGraph()
-graph.add_node(1, demand=-21, od_id="origin")
-graph.add_node(4, demand=21, od_id="destination")
-graph.add_edge(1, 2, weight=3, capacity=40)
+graph.add_node(1, demand=-2100, od_id="origin")
+graph.add_node(4, demand=2100, od_id="destination")
+graph.add_edge(1, 2, weight=3, capacity=10)
 graph.add_edge(1, 3, weight=6, capacity=10)
-graph.add_edge(2, 4, weight=1, capacity=20)
-graph.add_edge(3, 4, weight=2, capacity=5)
-
-fig = plt.figure()
-ax = fig.add_subplot(111)
-ax.axis('off')
-ax.axis('equal')
-nx.draw(graph, with_labels=False, arrows=True, node_size=5, node_color='r', font_color='m')
-plt.show()
+graph.add_edge(2, 4, weight=1, capacity=40)
+graph.add_edge(3, 4, weight=2, capacity=20)
 
 directed_graph = _get_directed_graph(graph)
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
-ax.axis('off')
-ax.axis('equal')
-nx.draw(directed_graph, with_labels=False, arrows=True, node_size=5, node_color='r', font_color='m')
+edge_labels = dict([((n1, n2), attr['capacity'])
+                    for n1, n2, attr in directed_graph.edges(data=True)])
+pos = nx.spring_layout(directed_graph)
+nx.draw(directed_graph, pos, with_labels=True, arrows=True, node_size=5, node_color='r', font_color='m')
+nx.draw_networkx_edge_labels(
+    directed_graph, pos,
+    edge_labels=edge_labels,
+    font_color='red'
+)
 plt.show()
 
-# multi_layer_graph = _create_layered_graph(directed_graph)
-flow_dict = nx.min_cost_flow(directed_graph)
+multi_layer_graph = _create_layered_graph(directed_graph)
 
+fig = plt.figure()
+ax = fig.add_subplot(111)
+edge_labels = dict([((n1, n2), attr['capacity'])
+                    for n1, n2, attr in multi_layer_graph.edges(data=True)])
+pos = nx.spring_layout(multi_layer_graph)
+nx.draw(multi_layer_graph, pos, with_labels=True, arrows=True, node_size=5, node_color='r', font_color='m')
+nx.draw_networkx_edge_labels(
+    multi_layer_graph, pos, label_pos=0.4, edge_labels=edge_labels, font_color='red')
+plt.show()
+
+flow_dict = nx.min_cost_flow(multi_layer_graph)
 a = 1
-
-
-
-
-
-

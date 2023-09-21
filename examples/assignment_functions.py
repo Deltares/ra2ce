@@ -4,10 +4,11 @@ from networkx import MultiGraph, MultiDiGraph
 
 def _get_directed_graph(graph: MultiGraph) -> MultiDiGraph:
     multi_digraph = nx.MultiDiGraph()
-    for u, v, key, attr in graph.edges(keys=True, data=True):
-        multi_digraph.add_edge(u, v, **attr)
     for u, attr in graph.nodes(data=True):
         multi_digraph.add_node(u, **attr)
+    for u, v, key, attr in graph.edges(keys=True, data=True):
+        multi_digraph.add_edge(u, v, **attr)
+        multi_digraph.add_edge(v, u, **attr)
     return multi_digraph
 
 
@@ -19,7 +20,7 @@ def _create_layered_graph(graph: MultiDiGraph) -> MultiDiGraph:
     for u, attr in graph.nodes(data=True):
         multi_layer_graph.add_node(u, **attr)
     for u, v, key, attr in graph.edges(keys=True, data=True):
-        attr['weight'] = int(round(attr['weight']*10e10, 0))
+        attr['weight'] = int(round(attr['weight']*10e6, 0))
         attr['capacity'] = int(attr['capacity'])
         multi_layer_graph.add_edge(u, v, **attr)
 
@@ -31,17 +32,28 @@ def _create_layered_graph(graph: MultiDiGraph) -> MultiDiGraph:
         attr = {k: v for k, v in attr.items() if k in attr.keys() and k not in ['demand', 'od_id']}
         multi_layer_graph.add_node((str(u)+'_d'), **attr)
     for u, v, key, attr in virtual_graph.edges(keys=True, data=True):
-        attr['weight'] = int(round(attr['weight'] * 10e10, 0))
+        attr['weight'] = int(round(attr['weight'] * 10e6, 0))
         attr['capacity'] = int(max_capacity_graph * 100)
         multi_layer_graph.add_edge((str(u)+'_d'), (str(v)+'_d'), **attr)
 
-    # create links between graph and virtual graph in the multi_layer graph
-    od_node_list = [n for n in graph.nodes(data=True) if "od_id" in n[-1]]
-    for od_node in od_node_list:
-        od_node_id_graph = od_node[0]
-        od_node_id_virtual_graph = (str(od_node[0])+'_d')
-        multi_layer_graph.add_edge(od_node_id_graph, od_node_id_virtual_graph,
+    # create links between graph and virtual graph in the multi_layer graph at each node
+    for node, attr in graph.nodes(data=True):
+        multi_layer_graph.add_edge(node, str(node)+'_d',
                                    weight=max_weight_graph + 1, capacity=max_capacity_graph * 100)
-        multi_layer_graph.add_edge(od_node_id_virtual_graph, od_node_id_graph,
+        multi_layer_graph.add_edge(str(node)+'_d', node,
                                    weight=0, capacity=max_capacity_graph * 100)
     return multi_layer_graph
+
+# def draw_graph():
+#     fig = plt.figure()
+#     ax = fig.add_subplot(111)
+#     edge_labels = dict([((n1, n2), attr['capacity'])
+#                         for n1, n2, attr in multi_layer_graph.edges(data=True)])
+#     pos = nx.spring_layout(multi_layer_graph)
+#     nx.draw(multi_layer_graph, pos, with_labels=True, arrows=True, node_size=5, node_color='r', font_color='m')
+#     nx.draw_networkx_edge_labels(
+#         multi_layer_graph, pos,
+#         edge_labels=edge_labels,
+#         font_color='red'
+#     )
+#     plt.show()
