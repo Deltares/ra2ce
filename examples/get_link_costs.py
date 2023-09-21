@@ -10,15 +10,15 @@ root_folder = Path(
 pickled_graph = root_folder / "input" / "updated_network.p"
 graph = GraphPickleReader().read(pickled_graph)
 
-# cost_function = 'free_flow_time'
-cost_function = 'distance'
+weight_function = 'free_flow_time'
+# weight_function = 'distance'
 
 for edge in graph.edges(data=True):
     edge_attr = edge[2]
-    if cost_function == 'free_flow_time':
-        edge_attr['cost'] = edge_attr['length'] / (edge_attr['avgspeed'] * 1000)
-    elif cost_function == 'distance':
-        edge_attr['cost'] = edge_attr['length']
+    if weight_function == 'free_flow_time':
+        edge_attr['weight'] = edge_attr['length'] / (edge_attr['avgspeed'] * 1000)
+    elif weight_function == 'distance':
+        edge_attr['weight'] = edge_attr['length']
     else:
         raise NotImplementedError('Cost function is not implemented yet')
 
