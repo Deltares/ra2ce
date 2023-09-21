@@ -30,23 +30,24 @@ od_graph = Path(r"C:\Users\groen_fe\OneDrive - Stichting Deltares\1_Projects\Moo
 graph = GraphPickleReader().read(od_graph)
 
 # gdf["osmid"] = gdf["osmid"].astype(str)
-# for e in graph.edges(data=True, keys=True):
+for e in graph.edges(data=True, keys=True):
     # graph[e[0]][e[1]][e[2]]["capacity"] = gdf.loc[gdf["osmid"] == str(e[-1]["osmid"]), 'capacity'].values[0]
+    graph[e[0]][e[1]][e[2]]["capacity"] = e[-1]["capacity"] * 0.5
 
-for n in graph.nodes(data=True):
-    if "od_id" in n[-1]:
-        if "NL" in n[-1]["od_id"]:
-            demand = graph.nodes[n[0]]["hourly_containers"]
-            graph.nodes[n[0]]["demand"] = demand / 1000 * 672
-        if "DE" in n[-1]["od_id"]:
-            demand = graph.nodes[n[0]]["hourly_containers"]
-            graph.nodes[n[0]]["demand"] = - round((demand / 1000 * 672), 0)
-            if n[0] == 1243218667:
-                graph.nodes[n[0]]["demand"] = - round((demand / 1000 * 672), 0) + 1
+# for n in graph.nodes(data=True):
+#     if "od_id" in n[-1]:
+#         if "NL" in n[-1]["od_id"]:
+#             demand = graph.nodes[n[0]]["hourly_containers"]
+#             graph.nodes[n[0]]["demand"] = demand / 1000 * 672
+#         if "DE" in n[-1]["od_id"]:
+#             demand = graph.nodes[n[0]]["hourly_containers"]
+#             graph.nodes[n[0]]["demand"] = - round((demand / 1000 * 672), 0)
+#             if n[0] == 1243218667:
+#                 graph.nodes[n[0]]["demand"] = - round((demand / 1000 * 672), 0) + 1
 
-[n for n in graph.nodes()]
-sum([n[-1]["demand"] for n in graph.nodes(data=True) if "od_id" in n[-1]])
+# [n for n in graph.nodes()]
+# sum([n[-1]["demand"] for n in graph.nodes(data=True) if "od_id" in n[-1]])
 
-exporter = MultiGraphNetworkExporter(basename="network_with_all_data", export_types=["shp", "pickle"])
+exporter = MultiGraphNetworkExporter(basename="network_with_all_data_0_5_capacity", export_types=["shp", "pickle"])
 exporter.export_to_shp(output_dir=Path(r"c:\Users\groen_fe\OneDrive - Stichting Deltares\1_Projects\Moonshot_5"), export_data=graph)
 exporter.export_to_pickle(output_dir=Path(r"c:\Users\groen_fe\OneDrive - Stichting Deltares\1_Projects\Moonshot_5"), export_data=graph)

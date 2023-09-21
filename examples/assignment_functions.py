@@ -29,19 +29,18 @@ def _get_directed_graph(graph: MultiGraph) -> MultiDiGraph:
     return multi_digraph
 
 
-def _create_layered_graph(graph: MultiDiGraph) -> MultiDiGraph:
-    # ToDo: add all nodes between actual and virtual g
+def _create_layered_graph(graph: MultiDiGraph, weight) -> MultiDiGraph:
     multi_layer_graph = nx.MultiDiGraph()
     virtual_graph = MultiDiGraph(graph)
     # make costs integer
     for u, attr in graph.nodes(data=True):
         multi_layer_graph.add_node(u, **attr)
     for u, v, key, attr in graph.edges(keys=True, data=True):
-        attr['weight'] = int(round(attr['weight'] * 10e6, 0))
+        attr[weight] = int(round(attr[weight] * 10e6, 0))
         attr['capacity'] = int(attr['capacity'])
         multi_layer_graph.add_edge(u, v, **attr)
 
-    max_weight_graph = max(attr['weight'] for _, _, attr in graph.edges(data=True))
+    max_weight_graph = max(attr[weight] for _, _, attr in graph.edges(data=True))
     max_capacity_graph = max(attr['capacity'] for _, _, attr in graph.edges(data=True))
 
     # add virtual graph to the multi_layer graph
@@ -54,7 +53,7 @@ def _create_layered_graph(graph: MultiDiGraph) -> MultiDiGraph:
             pos = ()
         multi_layer_graph.add_node((str(u) + '_d'), pos=pos, **attr)
     for u, v, key, attr in virtual_graph.edges(keys=True, data=True):
-        attr['weight'] = int(round(attr['weight'] * 10e6, 0))
+        attr[weight] = int(round(attr[weight] * 10e6, 0))
         attr['capacity'] = int(max_capacity_graph * 100)
         multi_layer_graph.add_edge((str(u) + '_d'), (str(v) + '_d'), **attr)
 
