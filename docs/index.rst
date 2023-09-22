@@ -18,6 +18,8 @@ Or navigate directly to another section:
 
    overview
    installation/installation
+   installation/docker_user_guide
+   user_guide/user_guide
    examples/examples
    network_module/network_module
    analysis_module/analysis_module
