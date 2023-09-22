@@ -544,7 +544,7 @@ class IndirectAnalyses:
     def optimal_route_origin_destination(self, graph: nx.classes.MultiGraph, analysis: dict) -> gpd.GeoDataFrame:
         # create list of origin-destination pairs
         od_nodes = self._get_origin_destination_pairs(graph)
-        pref_routes = chore: (graph, od_nodes, analysis["weighing"])
+        pref_routes = find_route_ods(graph, od_nodes, analysis["weighing"])
 
         # if shortest_route:
         #     pref_routes = pref_routes.loc[pref_routes.sort_values(analysis['weighing']).groupby('o_node').head(3).index]
