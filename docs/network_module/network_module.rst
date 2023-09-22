@@ -35,3 +35,7 @@ class to read and process the data (e.g., a GeoPackage) to a network. The second
 is to use the :py:class:`~ra2ce.graph.network_wrappers.shp_network_wrapper.ShpNetworkWrapper`
 class to read in a shapefile, clean it and process it to a network.
 
+Network overlay with hazard data
+----------------------------
+
+It is possible to perform overlays with hazard data and the network. RA2CE can handle any hazard data in .tif format. It will return information on where the hazard touches the network and give the hazard attribute to the network (e.g. flood depth on a road segment). RA2CE can use this information to determine the impact of a hazard on the network and on the routes between origins-destinations. Check the examples to see how to use it. 
