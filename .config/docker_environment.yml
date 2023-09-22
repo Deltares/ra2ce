@@ -26,4 +26,3 @@ dependencies:
   - conda-forge::notebook
   # install boto3
   - conda-forge::boto3
-  - conda-forge::pandoc
