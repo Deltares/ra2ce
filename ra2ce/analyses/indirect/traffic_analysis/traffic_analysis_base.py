@@ -109,44 +109,6 @@ class TrafficAnalysisBase(ABC):
             / count_destination_nodes
         )
 
-    def _get_accumulated_traffic_from_node_list(
-        self,
-        nodes_list: list[str],
-        count_destination_nodes: int,
-    ) -> AccumulatedTraffic:
-        # TODO: This algorithm is a consequence of having a 'dirty' graph network.
-        # This happens when a centroid snaps to more than one origin node.
-        # Ideally we clean up the graph network so said 'snapping' is only to one node.
-        _accumulated_traffic = AccumulatedTraffic(
-            utilitarian=1, egalitarian=1, prioritarian=1
-        )
-        _intermediate_nodes = 0
-        for _node in nodes_list:
-            if self.destinations_names in _node:
-                # TODO: This is potentially dangerous as it could make two times a multiplication of the
-                # accumulated traffic. Example given, nodes [ a, b, c, d], destination_names = b; a and c
-                # will multiply accumulated traffic, is that correct?
-                _intermediate_nodes -= 1
-                continue
-            _node_traffic = self._get_accumulated_traffic_from_node(
-                _node, count_destination_nodes
-            )
-            # Multiplication ( 'operator.mul' or *) or Addition ( 'operator.add' or +) operations to acummulate traffic.
-            # This will trigger the overloaded methods in `AccumulatedTraffic`.
-            _acummulated_operator = (
-                operator.mul if _intermediate_nodes == 0 else operator.add
-            )
-            _accumulated_traffic = _acummulated_operator(
-                _accumulated_traffic, _node_traffic
-            )
-            _intermediate_nodes += 1
-
-        # Set the remainig values
-        _accumulated_traffic.egalitarian = len(
-            list(filter(lambda x: self.destinations_names not in x, nodes_list))
-        )
-        return _accumulated_traffic
-
     @abstractmethod
     def _get_accumulated_traffic_from_node(
         self, target_node: str, total_d_nodes: int
