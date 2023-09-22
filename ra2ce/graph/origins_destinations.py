@@ -112,7 +112,8 @@ def read_origin_destination_files(
         else:
             origin_new = origin_new[[od_id, origin_count, "geometry"]]
         origin_new["o_id"] = on + "_" + origin_new[od_id].astype(str)
-        origin = origin.append(origin_new, ignore_index=True, sort=False)
+        origin_new.crs = origin.crs
+        origin = gpd.GeoDataFrame(pd.concat([origin, origin_new], ignore_index=True))
 
     destination_columns_add = [od_id, "geometry"]
     if category:
@@ -126,7 +127,8 @@ def read_origin_destination_files(
             destination_new[od_id] = destination_new.index
         destination_new = destination_new[destination_columns_add]
         destination_new["d_id"] = dn + "_" + destination_new[od_id].astype(str)
-        destination = destination.append(destination_new, ignore_index=True, sort=False)
+        destination_new.crs = destination.crs
+        destination = gpd.GeoDataFrame(pd.concat([destination, destination_new], ignore_index=True))
 
     od = pd.concat([origin, destination], sort=False)
 
