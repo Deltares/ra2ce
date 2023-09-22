@@ -147,7 +147,7 @@ With this analysis, you gain insight into the criticality of the network. A redu
   name = example_indirect
 
   [analysis1]
-  name = example's direct analysis
+  name = example_redundancy
   analysis = single_link_redundancy
   weighing = distance
   save_shp = True
@@ -198,7 +198,7 @@ This analysis can be performed when there is a hazard map. The hazard map indica
     name = example_indirect
 
     [analysis1]
-    name = example's direct analysis
+    name = example_redundancy_multi
     analysis = multi_link_redundancy
     weighing = time
     aggregate_wl = max
@@ -243,7 +243,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
     name = example_indirect
 
     [analysis1]
-    name = example's direct analysis
+    name = example_od
     analysis = optimal_route_origin_destination
     weighing = distance
     save_shp = True
@@ -283,7 +283,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
     name = example_indirect
 
     [analysis1]
-    name = example's direct analysis
+    name = example_od
     analysis = multi_link_origin_destination
     weighing = distance
     save_shp = True
@@ -326,7 +326,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
     name = example_indirect
 
     [analysis1]
-    name = example's direct analysis
+    name = example_od
     analysis = optimal_route_origin_closest_destination
     weighing = distance
     save_shp = True
@@ -336,7 +336,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 ::
 
     [project]
-    name = example's direct analysis
+    name = example_indirect
 
     [network]
     directed = False
@@ -373,7 +373,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
     name = example_indirect
 
     [analysis1]
-    name = example's direct analysis
+    name = example_od
     analysis = multi_link_origin_closest_destination
     aggregate_wl = max
     threshold = 1
@@ -427,7 +427,7 @@ This analysis finds the sections of the network that are fully isolated from the
     name = example_indirect
 
     [analysis1]
-    name = example's direct analysis
+    name = example_locations
     analysis = multi_link_isolated_locations
     aggregate_wl = max
     threshold = 1
