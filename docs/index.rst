@@ -18,6 +18,7 @@ Or navigate directly to another section:
 
    getting_started
    installation/installation
+   installation/docker_user_guide
    user_guide/user_guide
    examples/examples
    collaboration/collaboration
