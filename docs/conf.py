@@ -18,7 +18,9 @@
 # absolute, like shown here.
 #
 import os
+import shutil
 import sys
+from distutils.dir_util import copy_tree
 import sphinx_autosummary_accessors
 
 # This is not needed
@@ -27,6 +29,24 @@ import ra2ce
 
 print("ra2ce", ra2ce)
 print("dir", dir(ra2ce))
+
+
+# -- Helper functions ---------------------------------
+def remove_dir_content(path: str) -> None:
+    for root, dirs, files in os.walk(path):
+        for f in files:
+            os.unlink(os.path.join(root, f))
+        for d in dirs:
+            shutil.rmtree(os.path.join(root, d))
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+
+# NOTE: the examples/ folder in the root should be copied to docs/_examples after running sphinx
+# # -- Copy notebooks to include in docs -------
+if os.path.isdir("_examples"):
+    remove_dir_content("_examples")
+os.makedirs("_examples")
+copy_tree("../examples", "_examples")
 
 # -- General configuration ---------------------------------------------
 
@@ -45,6 +65,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "sphinx_autosummary_accessors",
+    "nbsphinx"
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -61,8 +82,8 @@ master_doc = "index"
 
 # General information about the project.
 project = "Risk Assessment and Adaptation for Critical infrastructurE"
-copyright = "2020, Margreet van Marle"
-author = "Margreet van Marle"
+copyright = "2020, Deltares"
+author = "Margreet van Marle\\Frederique de Groen\\Lieke Meijer\\Sahand Asgarpour"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -122,7 +143,7 @@ html_theme_options = {
         {
             "name": "Deltares",
             "url": "https://www.deltares.nl/en/",
-            "icon": "_resources/deltares-blue.svg",
+            "icon": "../../_resources/deltares-blue.svg",
             "type": "local",
         },
     ],
@@ -216,3 +237,6 @@ texinfo_documents = [
         "Miscellaneous",
     ),
 ]
+
+# Allow errors in notebooks
+nbsphinx_allow_errors = True

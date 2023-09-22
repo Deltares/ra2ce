@@ -17,8 +17,8 @@ Find more about the following topics in our [official documentation page](https:
 
 - [Contributing](https://deltares.github.io/ra2ce/collaboration/collaboration.html)
 - [Installation](https://deltares.github.io/ra2ce/installation/installation.html)
-- [User\'s guide](https://deltares.github.io/ra2ce/user_guide/user_guide.html)
-- 
+- [Network user guide](https://deltares.github.io/ra2ce/network_module/network_module.html)
+- [Analysis user guide](https://deltares.github.io/ra2ce/analysis_module/analysis_module.html)
 
 ## Distribution
 Ra2ce is shared with [GPL3 license](https://www.gnu.org/licenses/gpl-3.0.en.html), you may use and / or extend it by using the same license. For specific agreements we urge you to contact us.
