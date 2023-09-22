@@ -131,15 +131,6 @@ With this analysis, you gain insight into the criticality of the network. A redu
     road_types = motorway,motorway_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,residential
     save_shp = True
 
-    [origins_destinations]
-    origins = None
-    destinations = None
-    origins_names = A
-    destinations_names = B
-    id_name_origin_destination = OBJECTID
-    origin_count = PEOPLE
-    origin_out_fraction = 1
-
 **analyses.ini**
 ::
 
@@ -174,15 +165,6 @@ This analysis can be performed when there is a hazard map. The hazard map indica
     network_type = drive
     road_types = motorway,motorway_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,residential
     save_shp = True
-
-    [origins_destinations]
-    origins = None
-    destinations = None
-    origins_names = A
-    destinations_names = B
-    id_name_origin_destination = OBJECTID
-    origin_count = PEOPLE
-    origin_out_fraction = 1
 
     [hazard]
     hazard_map = max_flood_depth.tif
