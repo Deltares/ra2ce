@@ -1345,7 +1345,6 @@ def find_route_ods(graph, od_nodes, weighing):
                 if "rfid" in _uv_graph_edge:
                     match_list.append(_uv_graph_edge["rfid"])
 
-            # compile the road segments into one geometry
             pref_line_string_coords = [edge.coords for edge in pref_edges if isinstance(edge, LineString)]
             pref_multiline_string_coords = []
             for multi_line in pref_edges:
