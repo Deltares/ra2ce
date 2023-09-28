@@ -631,14 +631,14 @@ class IndirectAnalyses:
         gdf_ori["OD"] = gdf_ori["origin"] + gdf_ori["destination"]
         # origin
         gdf_ori["origin_count"] = gdf_ori["origin"].apply(lambda x: len(x.split(",")))
-        init_origins = gdf_ori.groupby("origin").mean()["origin_count"].sum()
+        init_origins = gdf_ori.groupby("origin")["origin_count"].sum()
         del gdf_ori["origin_count"]
         # destination
         gdf_ori["destination_count"] = gdf_ori["destination"].apply(
             lambda x: len(x.split(","))
         )
         init_destinations = (
-            gdf_ori.groupby("destination").mean()["destination_count"].sum()
+            gdf_ori.groupby("destination")["destination_count"].sum()
         )
         del gdf_ori["destination_count"]
         # od pairs
@@ -653,7 +653,7 @@ class IndirectAnalyses:
             gdf_ = gdf.loc[gdf["hazard"] == hz]
 
             gdf_["origin_count"] = gdf_["origin"].apply(lambda x: len(x.split(",")))
-            remaining_origins = gdf_.groupby("origin").mean()["origin_count"].sum()
+            remaining_origins = gdf_.groupby("origin")["origin_count"].sum()
             del gdf_["origin_count"]
             diff_origins = init_origins - remaining_origins
             abs_origin_disconnected.append(diff_origins)
@@ -663,7 +663,7 @@ class IndirectAnalyses:
                 lambda x: len(x.split(","))
             )
             remaining_destinations = (
-                gdf_.groupby("destination").mean()["destination_count"].sum()
+                gdf_.groupby("destination")["destination_count"].sum()
             )
             del gdf_["destination_count"]
             diff_destinations = init_destinations - remaining_destinations
