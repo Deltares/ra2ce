@@ -1348,21 +1348,11 @@ def find_route_ods(
                 if "rfid" in _uv_graph_edge:
                     match_list.append(_uv_graph_edge["rfid"])
 
-            pref_line_string_coords = [edge.coords for edge in pref_edges if isinstance(edge, LineString)]
-            pref_multiline_string_coords = []
-            for multi_line in pref_edges:
-                if isinstance(multi_line, MultiLineString):
-                    coordinates = []
-                    for line_string in multi_line.geoms:
-                        for point in line_string.coords:
-                            coordinates.append(point)
-                    pref_multiline_string_coords.append(coordinates)
+            combined_pref_edges = MultiLineString([])
+            for geometry in pref_edges:
+                combined_pref_edges = combined_pref_edges.union(geometry)
 
-            for line_coords in pref_multiline_string_coords:
-                line = LineString(line_coords)
-                pref_line_string_coords.append(line.coords)
-
-            pref_edges = MultiLineString(pref_line_string_coords)
+            pref_edges = MultiLineString(combined_pref_edges)
 
             # save all data to lists (of lists)
             o_node_list.append(o[0])
