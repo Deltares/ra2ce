@@ -540,13 +540,10 @@ class IndirectAnalyses:
             )
         return od_nodes
 
-    def optimal_route_origin_destination(self, graph, analysis):
+    def optimal_route_origin_destination(self, graph: nx.MultiGraph, analysis) -> gpd.geodataframe:
         # create list of origin-destination pairs
         od_nodes = self._get_origin_destination_pairs(graph)
         pref_routes = find_route_ods(graph, od_nodes, analysis["weighing"])
-
-        # if shortest_route:
-        #     pref_routes = pref_routes.loc[pref_routes.sort_values(analysis['weighing']).groupby('o_node').head(3).index]
         return pref_routes
 
     def optimal_route_od_link(
@@ -1302,7 +1299,7 @@ def save_gdf(gdf, save_path):
     logging.info("Results saved to: {}".format(save_path))
 
 
-def find_route_ods(graph, od_nodes, weighing):
+def find_route_ods(graph: nx.MultiGraph, od_nodes: list, weighing: str) -> gpd.geodataframe:
     # create the routes between all OD pairs
     (
         o_node_list,
@@ -1345,21 +1342,28 @@ def find_route_ods(graph, od_nodes, weighing):
                 if "rfid" in _uv_graph_edge:
                     match_list.append(_uv_graph_edge["rfid"])
 
-            pref_line_string_coords = [edge.coords for edge in pref_edges if isinstance(edge, LineString)]
-            pref_multiline_string_coords = []
-            for multi_line in pref_edges:
-                if isinstance(multi_line, MultiLineString):
-                    coordinates = []
-                    for line_string in multi_line.geoms:
-                        for point in line_string.coords:
-                            coordinates.append(point)
-                    pref_multiline_string_coords.append(coordinates)
+            # pref_line_string_coords = [edge.coords for edge in pref_edges if isinstance(edge, LineString)]
+            # pref_multiline_string_coords = []
+            # for multi_line in pref_edges:
+            #     if isinstance(multi_line, MultiLineString):
+            #         coordinates = []
+            #         for line_string in multi_line.geoms:
+            #             for point in line_string.coords:
+            #                 coordinates.append(point)
+            #         pref_multiline_string_coords.append(coordinates)
+            #
+            # for line_coords in pref_multiline_string_coords:
+            #     line = LineString(line_coords)
+            #     pref_line_string_coords.append(line.coords)
+            # pref_edges = MultiLineString(pref_line_string_coords)
 
-            for line_coords in pref_multiline_string_coords:
-                line = LineString(line_coords)
-                pref_line_string_coords.append(line.coords)
+            combined_pref_edges = MultiLineString([])
+            for geometry in pref_edges:
+                combined_pref_edges = combined_pref_edges.union(geometry)
 
-            pref_edges = MultiLineString(pref_line_string_coords)
+            if not combined_pref_edges.is_valid:
+                print(combined_pref_edges.is_valid)
+                print(o[0], d[0])
 
             # save all data to lists (of lists)
             o_node_list.append(o[0])
@@ -1369,7 +1373,8 @@ def find_route_ods(graph, od_nodes, weighing):
             opt_path_list.append(pref_nodes)
             weighing_list.append(pref_route)
             match_ids_list.append(match_list)
-            geometries_list.append(pref_edges)
+            geometries_list.append(combined_pref_edges)
+            # geometries_list.append(pref_edges)
 
     # Geodataframe to save all the optimal routes
     pref_routes = gpd.GeoDataFrame(
