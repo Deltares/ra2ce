@@ -301,8 +301,9 @@ def add_od_nodes(
     graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
     crs,
     category: Optional[str] = None,
-):
-    """Gets from each origin and destination the closest vertice on the graph edge.
+) -> tuple[gpd.GeoDataFrame, Union[nx.classes.Graph, nx.classes.MultiGraph]]:
+
+    """Gets from each origin and destination the closest vertices on the graph edge.
     Args:
         od [Geodataframe]: The GeoDataFrame with the origins and destinations
         graph [networkX graph]: networkX graph
@@ -313,7 +314,7 @@ def add_od_nodes(
     """
     logging.info("Finding vertices closest to Origins and Destinations")
 
-    # create dictionary of the roads geometries and identifyers
+    # create dictionary of the roads geometries and identifiers
     edge_list = [e for e in graph.edges.data(keys=True) if "geometry" in e[-1]]
     inverse_vertices_dict = {}
     all_vertices = []
