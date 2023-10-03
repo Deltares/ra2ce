@@ -299,7 +299,7 @@ def update_edges_with_new_node(
 def add_od_nodes(
     od: gpd.GeoDataFrame,
     graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
-    crs,
+    crs: pyproj.CRS,
     category: Optional[str] = None,
 ) -> tuple[gpd.GeoDataFrame, Union[nx.classes.Graph, nx.classes.MultiGraph]]:
 
