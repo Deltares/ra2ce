@@ -179,7 +179,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         )
         if "crs" not in _complex_graph.graph.keys():
             _complex_graph.graph["crs"] = self.graph_crs
-        self.get_clean_graph(_complex_graph)
+        _complex_graph = self.get_clean_graph(_complex_graph)
         return _complex_graph
 
     @staticmethod
