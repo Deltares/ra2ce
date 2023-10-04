@@ -33,6 +33,7 @@ import pyproj
 import rasterio
 import rasterio.mask
 import rasterio.transform
+from networkx import MultiGraph
 from rasterio import Affine
 from rasterio.warp import Resampling, calculate_default_transform, reproject
 from shapely.geometry import Point
@@ -151,6 +152,9 @@ def get_od(o_id, d_id):
     if not match_name == match_name:
         # match_name is nan, the point is not an origin but a destination
         match_name = d_id
+    if o_id is not None and d_id is not None:
+        # an od node is both origin and destination
+        match_name = o_id + "," + d_id
     return match_name
 
 
@@ -312,6 +316,13 @@ def add_od_nodes(
         od [Geodataframe]: The GeoDataFrame with the locations of the origins and destinations on the road vertices
         graph [networkX graph]: The networkX graph updated with origins and destinations
     """
+
+    def fill_empty_node_attributes(g: MultiGraph):
+        for node_id, node_data in g.nodes(data=True):
+            if 'x' not in node_data and 'geometry' in node_data and node_data['geometry']:
+                node_data['x'], node_data['y'] = node_data['geometry'].x, node_data['geometry'].y
+            node_data.setdefault('node_fid', node_data.get('id', node_id))
+
     logging.info("Finding vertices closest to Origins and Destinations")
 
     # create dictionary of the roads geometries and identifiers
@@ -350,13 +361,13 @@ def add_od_nodes(
     ):
         match_name = get_od(od_data[-2], od_data[-1])
 
-        # Find the vertice on the road that is closest to the origin or destination point
+        # Find the vertex on the road that is closest to the origin or destination point
         closest_node_on_road = closest_node(
             np.array((od_data[0], od_data[1])), all_vertices
         )
         match_od = Point(closest_node_on_road)
 
-        # Find the road to which this vertice belongs. If the vertice is on an end-point of a road, it cannot be found
+        # Find the road to which this vertex belongs. If the vertex is on an end-point of a road, it cannot be found
         # and it goes to the except statement.
         try:
             closest_u_v_k = inverse_vertices_dict[
@@ -413,7 +424,7 @@ def add_od_nodes(
             )
 
         except (KeyError, AssertionError):
-            # If the vertice is at the end of the road it won't be found in the inverse_vertices_dict,
+            # If the vertex is at the end of the road it won't be found in the inverse_vertices_dict,
             # so search in the inverse_nodes_dict.
             match_node = inverse_nodes_dict[
                 (closest_node_on_road[0], closest_node_on_road[1])
@@ -437,6 +448,8 @@ def add_od_nodes(
     od = gpd.GeoDataFrame(od)
     od = od.drop(columns=["OD"])
 
+    # fill-in x, y, and node_fid if empty in the graph.nodes
+    fill_empty_node_attributes(graph)
     return od, graph
 
 
