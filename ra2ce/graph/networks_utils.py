@@ -1072,7 +1072,7 @@ def graph_create_unique_ids(graph: nx.Graph, new_id_name: str = "rfid") -> nx.Gr
 def add_missing_geoms_graph(graph: nx.Graph, geom_name: str = "geometry") -> nx.Graph:
     # Not all nodes have geometry attributed (some only x and y coordinates) so add a geometry columns
     nodes_without_geom = [
-        n[0] for n in graph.nodes(data=True) if geom_name not in n[-1]
+        n[0] for n in graph.nodes(data=True) if geom_name not in n[-1] or n[-1][geom_name] is None
     ]
     for nd in nodes_without_geom:
         graph.nodes[nd][geom_name] = Point(graph.nodes[nd]["x"], graph.nodes[nd]["y"])

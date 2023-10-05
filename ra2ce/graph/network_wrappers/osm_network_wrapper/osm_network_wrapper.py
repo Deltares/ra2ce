@@ -300,9 +300,13 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
     @staticmethod
     def snap_nodes_to_nodes(graph: MultiDiGraph, threshold: float) -> MultiDiGraph:
-        return osmnx.consolidate_intersections(
+        graph = osmnx.consolidate_intersections(
             G=graph, rebuild_graph=True, tolerance=threshold, dead_ends=False
         )
+        graph = nut.add_missing_geoms_graph(
+            graph=graph, geom_name="geometry"
+        )
+        return graph
 
     @staticmethod
     def snap_nodes_to_edges(graph: MultiDiGraph, threshold: float):
