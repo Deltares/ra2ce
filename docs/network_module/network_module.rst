@@ -29,11 +29,13 @@ Examples of how to use this module can be found in the :ref:`examples`.
 Network from vector data
 ----------------------------
 
-There are two ways to create a network from vector data. The first is to clean the 
+There are three ways to create a network from vector data. The first is to clean the 
 data yourself before using the Network Module and to then use the :py:class:`~ra2ce.graph.network_wrappers.vector_network_wrapper.VectorNetworkWrapper`
 class to read and process the data (e.g., a GeoPackage) to a network. The second 
 is to use the :py:class:`~ra2ce.graph.network_wrappers.shp_network_wrapper.ShpNetworkWrapper`
 class to read in a shapefile, clean it and process it to a network.
+
+The user can also read in a pre-defined shapefile using the ra2ce_basics_shapefile example notebook, where the user can practice with pre-defined data and required folder structure and data format. 
 
 Network overlay with hazard data
 ----------------------------
