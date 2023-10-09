@@ -187,6 +187,8 @@ def update_edges_with_new_node(
         Point(line_b.coords[-1])
     ):
         edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b)
+        edge_data = {k: (node_a if k == 'from_id' else new_node_id if k == 'to_id' else v) for k, v in
+                     edge_data.items()}
         graph.add_edge(node_a, new_node_id, 0, **edge_data)
 
         # Update the inverse vertices dict
@@ -200,6 +202,8 @@ def update_edges_with_new_node(
         Point(line_b.coords[0])
     ):
         edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b)
+        edge_data = {k: (node_b if k == 'from_id' else new_node_id if k == 'to_id' else v) for k, v in
+                     edge_data.items()}
         graph.add_edge(node_b, new_node_id, 0, **edge_data)
 
         # Update the inverse vertices dict
@@ -213,6 +217,8 @@ def update_edges_with_new_node(
         Point(line_b.coords[0])
     ):
         edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b)
+        edge_data = {k: (node_a if k == 'from_id' else new_node_id if k == 'to_id' else v) for k, v in
+                     edge_data.items()}
         graph.add_edge(node_a, new_node_id, 0, **edge_data)
 
         # Update the inverse vertices dict
@@ -226,6 +232,9 @@ def update_edges_with_new_node(
         Point(line_b.coords[-1])
     ):
         edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b)
+        edge_data = {k: (node_b if k == 'from_id' else new_node_id if k == 'to_id' else v) for k, v in
+                     edge_data.items()}
+
         graph.add_edge(node_b, new_node_id, 0, **edge_data)
 
         # Update the inverse vertices dict
@@ -239,6 +248,8 @@ def update_edges_with_new_node(
         Point(line_a.coords[0])
     ):
         edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a)
+        edge_data = {k: (node_b if k == 'from_id' else new_node_id if k == 'to_id' else v) for k, v in
+                     edge_data.items()}
         graph.add_edge(node_b, new_node_id, 0, **edge_data)
 
         # Update the inverse vertices dict
@@ -252,6 +263,8 @@ def update_edges_with_new_node(
         Point(line_a.coords[-1])
     ):
         edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a)
+        edge_data = {k: (node_a if k == 'from_id' else new_node_id if k == 'to_id' else v) for k, v in
+                     edge_data.items()}
         graph.add_edge(node_a, new_node_id, 0, **edge_data)
 
         # Update the inverse vertices dict
@@ -265,6 +278,8 @@ def update_edges_with_new_node(
         Point(line_a.coords[-1])
     ):
         edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a)
+        edge_data = {k: (node_b if k == 'from_id' else new_node_id if k == 'to_id' else v) for k, v in
+                     edge_data.items()}
         graph.add_edge(node_b, new_node_id, 0, **edge_data)
 
         # Update the inverse vertices dict
@@ -278,6 +293,8 @@ def update_edges_with_new_node(
         Point(line_a.coords[0])
     ):
         edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a)
+        edge_data = {k: (node_a if k == 'from_id' else new_node_id if k == 'to_id' else v) for k, v in
+                     edge_data.items()}
         graph.add_edge(node_a, new_node_id, 0, **edge_data)
 
         # Update the inverse vertices dict
