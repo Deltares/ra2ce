@@ -65,6 +65,9 @@ class IndirectAnalyses:
             self.config["hazard_names"] = list(
                 set(self.hazard_names[self._file_name_key])
             )
+        else:
+            self.hazard_names = pd.DataFrame(data=None)
+            self.config["hazard_names"] = list()
 
     def single_link_redundancy(self, graph, analysis):
         """This is the function to analyse roads with a single link disruption and an alternative route.
@@ -1165,19 +1168,23 @@ class IndirectAnalyses:
                         destinations,
                     ) = analyzer.optimal_route_origin_closest_destination()
 
-                    (
-                        base_graph,
-                        origins,
-                        destinations,
-                        agg_results,
-                        opt_routes_with_hazard,
-                    ) = analyzer.multi_link_origin_closest_destination()
+                    if analyzer.config["files"]["origins_destinations_graph_hazard"] is None:
+                        origins = analyzer.load_origins()
+                        opt_routes_with_hazard = gpd.GeoDataFrame(data=None)
+                    else:
+                        (
+                            base_graph,
+                            origins,
+                            destinations,
+                            agg_results,
+                            opt_routes_with_hazard,
+                        ) = analyzer.multi_link_origin_closest_destination()
 
-                    (
-                        opt_routes_with_hazard
-                    ) = analyzer.difference_length_with_without_hazard(
-                        opt_routes_with_hazard, opt_routes_without_hazard
-                    )
+                        (
+                            opt_routes_with_hazard
+                        ) = analyzer.difference_length_with_without_hazard(
+                            opt_routes_with_hazard, opt_routes_without_hazard
+                        )
 
                 else:
                     (
@@ -1191,18 +1198,31 @@ class IndirectAnalyses:
 
                 if analysis["save_shp"]:
                     # Save the GeoDataFrames
-                    to_save_gdf = [
-                        origins,
-                        destinations,
-                        opt_routes_without_hazard,
-                        opt_routes_with_hazard,
-                    ]
-                    to_save_gdf_names = [
-                        "origins",
-                        "destinations",
-                        "optimal_routes_without_hazard",
-                        "optimal_routes_with_hazard",
-                    ]
+                    if analyzer.config["files"]["origins_destinations_graph_hazard"] is None:
+                        # There is no hazard introduced
+                        to_save_gdf = [
+                            origins,
+                            destinations,
+                            opt_routes_without_hazard,
+                        ]
+                        to_save_gdf_names = [
+                            "origins",
+                            "destinations",
+                            "optimal_routes_without_hazard"
+                        ]
+                    else:
+                        to_save_gdf = [
+                            origins,
+                            destinations,
+                            opt_routes_without_hazard,
+                            opt_routes_with_hazard,
+                        ]
+                        to_save_gdf_names = [
+                            "origins",
+                            "destinations",
+                            "optimal_routes_without_hazard",
+                            "optimal_routes_with_hazard",
+                        ]
                     _save_shp_analysis(base_graph, to_save_gdf, to_save_gdf_names)
                 if analysis["save_csv"]:
                     csv_path = output_path / (
@@ -1222,11 +1242,12 @@ class IndirectAnalyses:
                         del opt_routes_with_hazard["geometry"]
                         opt_routes_with_hazard.to_csv(csv_path, index=False)
 
-                agg_results.to_excel(
-                    output_path
-                    / (analysis["name"].replace(" ", "_") + "_results.xlsx"),
-                    index=False,
-                )
+                if analyzer.config["files"]["origins_destinations_graph_hazard"] is not None:
+                    agg_results.to_excel(
+                        output_path
+                        / (analysis["name"].replace(" ", "_") + "_results.xlsx"),
+                        index=False,
+                    )
             elif analysis["analysis"] == "losses":
                 if self.graphs["base_network_hazard"] is None:
                     gdf_in = gpd.read_feather(
