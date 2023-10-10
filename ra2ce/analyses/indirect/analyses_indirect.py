@@ -1154,80 +1154,92 @@ class IndirectAnalyses:
                     )
                     del opt_routes["geometry"]
                     opt_routes.to_csv(csv_path, index=False)
-            elif analysis["analysis"] == "multi_link_origin_closest_destination":
-                analyzer = OriginClosestDestination(
-                    self.config, analysis, self.hazard_names
-                )
-
-                if analysis.get("calculate_route_without_disruption", False):
-                    (
-                        base_graph,
-                        opt_routes_without_hazard,
-                        destinations,
-                    ) = analyzer.optimal_route_origin_closest_destination()
-
-                    (
-                        base_graph,
-                        origins,
-                        destinations,
-                        agg_results,
-                        opt_routes_with_hazard,
-                    ) = analyzer.multi_link_origin_closest_destination()
-
-                    (
-                        opt_routes_with_hazard
-                    ) = analyzer.difference_length_with_without_hazard(
-                        opt_routes_with_hazard, opt_routes_without_hazard
+                    elif analysis["analysis"] == "multi_link_origin_closest_destination":
+                    analyzer = OriginClosestDestination(
+                        self.config, analysis, self.hazard_names
                     )
 
-                else:
-                    (
-                        base_graph,
-                        origins,
-                        destinations,
-                        agg_results,
-                        opt_routes_with_hazard,
-                    ) = analyzer.multi_link_origin_closest_destination()
-                    opt_routes_without_hazard = gpd.GeoDataFrame()
+                    if analysis.get("calculate_route_without_disruption", False):
+                        (
+                            base_graph,
+                            opt_routes_without_hazard,
+                            destinations,
+                        ) = analyzer.optimal_route_origin_closest_destination()
 
-                if analysis["save_shp"]:
-                    # Save the GeoDataFrames
-                    to_save_gdf = [
-                        origins,
-                        destinations,
-                        opt_routes_without_hazard,
-                        opt_routes_with_hazard,
-                    ]
-                    to_save_gdf_names = [
-                        "origins",
-                        "destinations",
-                        "optimal_routes_without_hazard",
-                        "optimal_routes_with_hazard",
-                    ]
-                    _save_shp_analysis(base_graph, to_save_gdf, to_save_gdf_names)
-                if analysis["save_csv"]:
-                    csv_path = output_path / (
-                        analysis["name"].replace(" ", "_") + "_destinations.csv"
-                    )
-                    if "geometry" in destinations.columns:
-                        del destinations["geometry"]
-                    destinations.to_csv(csv_path, index=False)
+                        if analyzer.config["files"]["origins_destinations_graph_hazard"] is None:
+                            origins = analyzer.load_origins()
+                            opt_routes_with_hazard = gpd.GeoDataFrame(data=None)
+                        else:
+                            (
+                                base_graph,
+                                origins,
+                                destinations,
+                                agg_results,
+                                opt_routes_with_hazard,
+                            ) = analyzer.multi_link_origin_closest_destination()
 
-                    csv_path = output_path / (
-                        analysis["name"].replace(" ", "_") + "_optimal_routes.csv"
-                    )
-                    if not opt_routes_without_hazard.empty:
-                        del opt_routes_without_hazard["geometry"]
-                        opt_routes_without_hazard.to_csv(csv_path, index=False)
-                    if not opt_routes_with_hazard.empty:
-                        del opt_routes_with_hazard["geometry"]
-                        opt_routes_with_hazard.to_csv(csv_path, index=False)
+                            (
+                                opt_routes_with_hazard
+                            ) = analyzer.difference_length_with_without_hazard(
+                                opt_routes_with_hazard, opt_routes_without_hazard
+                            )
 
-                agg_results.to_excel(
-                    output_path
-                    / (analysis["name"].replace(" ", "_") + "_results.xlsx"),
-                    index=False,
-                )
+                    else:
+                        (
+                            base_graph,
+                            origins,
+                            destinations,
+                            agg_results,
+                            opt_routes_with_hazard,
+                        ) = analyzer.multi_link_origin_closest_destination()
+                        opt_routes_without_hazard = gpd.GeoDataFrame()
+
+                    if analysis["save_shp"]:
+                        # Save the GeoDataFrames
+                        if analyzer.config["files"]["origins_destinations_graph_hazard"] is None:
+                            # There is no hazard introduced
+                            to_save_gdf = [
+                                origins,
+                                destinations,
+                                opt_routes_without_hazard,
+                            ]
+                            to_save_gdf_names = [
+                                "origins",
+                                "destinations",
+                                "optimal_routes_without_hazard"
+                            ]
+                        else:
+                            to_save_gdf = [
+                                origins,
+                                destinations,
+                                opt_routes_without_hazard,
+                                opt_routes_with_hazard,
+                            ]
+                            to_save_gdf_names = [
+                                "origins",
+                                "destinations",
+                                "optimal_routes_without_hazard",
+                                "optimal_routes_with_hazard",
+                            ]
+                        _save_shp_analysis(base_graph, to_save_gdf, to_save_gdf_names)
+                    if analysis["save_csv"]:
+                        csv_path = output_path / (
+                                analysis["name"].replace(" ", "_") + "_destinations.csv"
+                        )
+                        if "geometry" in destinations.columns:
+                            del destinations["geometry"]
+                        destinations.to_csv(csv_path, index=False)
+
+                        csv_path = output_path / (
+                                analysis["name"].replace(" ", "_") + "_optimal_routes.csv"
+                        )
+                        if not opt_routes_without_hazard.empty:
+                            del opt_routes_without_hazard["geometry"]
+                            opt_routes_without_hazard.to_csv(csv_path, index=False)
+                        if not opt_routes_with_hazard.empty:
+                            del opt_routes_with_hazard["geometry"]
+                            opt_routes_with_hazard.to_csv(csv_path, index=False)
+                            
             elif analysis["analysis"] == "losses":
                 if self.graphs["base_network_hazard"] is None:
                     gdf_in = gpd.read_feather(
