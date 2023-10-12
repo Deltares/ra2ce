@@ -992,6 +992,7 @@ class Hazard:
 
         #### Step 3: iterate overlay of the GeoPandas Dataframe (if any) ###
         if self.files["base_network"] and not self.files["base_network_hazard"]:
+            # ToDo: Fix this => The logic here is broken. in the first condition it overlays the hazard, while in else, it doesn't
             logging.info("Iterating overlay of GeoPandas Dataframe.")
             # Check if the graph needs to be reprojected
             hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
