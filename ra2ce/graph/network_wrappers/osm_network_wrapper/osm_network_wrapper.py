@@ -188,9 +188,9 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         complex_graph = nut.add_missing_geoms_graph(
             graph=complex_graph, geom_name="geometry"
         ).to_directed()
-        complex_graph = OsmNetworkWrapper.snap_nodes_to_nodes(
-            graph=complex_graph, threshold=0.000025
-        )
+        # complex_graph = OsmNetworkWrapper.snap_nodes_to_nodes(
+        #     graph=complex_graph, threshold=0.000025
+        # )
         return complex_graph
 
     @staticmethod
