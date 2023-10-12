@@ -36,7 +36,7 @@ import rasterio.transform
 from networkx import MultiGraph
 from rasterio import Affine
 from rasterio.warp import Resampling, calculate_default_transform, reproject
-from shapely.geometry import Point
+from shapely.geometry import Point, MultiLineString
 from tqdm import tqdm
 
 from ra2ce.graph.networks_utils import cut, line_length
@@ -348,6 +348,12 @@ def add_od_nodes(
     all_vertices = []
     for line in edge_list:
         # Add all vertices except the end-points as they belong to multiple edges and nodes already exist at the end-points
+        # if isinstance(line, MultiLineString):
+        #     unique_coords = set(
+        #         (x, y)
+        #         for l in line.geoms
+        #         for (x, y) in set(list(list(l.coords)[1:-1]))
+        #     )
         inverse_vertices_dict.update(
             {
                 p: (line[0], line[1], line[2])
