@@ -43,7 +43,7 @@ class OriginClosestDestination:
     """
 
     def __init__(self, config: dict, analysis: dict, hazard_names: pd.DataFrame):
-        self.crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGABLE
+        self.crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGEABLE
         self.unit = "km"
         if "threshold" in analysis:
             self.network_threshold = analysis["threshold"]
