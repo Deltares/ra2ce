@@ -34,7 +34,7 @@ class TestGeodataframeNetworkExporter:
 
         # 3. Verify final expectations.
         assert _output_dir.is_dir()
-        assert (_output_dir / (_basename + ".shp")).is_file()
+        assert (_output_dir / (_basename + ".gpkg")).is_file()
 
     @pytest.mark.skip(reason="TODO: Needs to define GeoDataFrame dummydata.")
     def test_export_to_pickle(self, request: pytest.FixtureRequest):

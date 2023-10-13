@@ -114,7 +114,7 @@ class EffectivenessMeasures:
 
         # save as csv
         path, file = os.path.split(file_path)
-        df.to_csv(os.path.join(path, file.replace(".shp", ".csv")), index=False)
+        df.to_csv(os.path.join(path, file.replace(".gpkg", ".csv")), index=False)
         return df
 
     @staticmethod
