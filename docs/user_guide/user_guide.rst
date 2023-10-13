@@ -123,7 +123,7 @@ Initialization file templates
     polygon = map.geojson			# <name + file extension of the geojson polygon file in the static/network folder> / None
     network_type = drive			# drive / walk / bike / drive_service / all
     road_types = motorway,motorway_link,trunk,trunk_link,primary, primary_link,secondary,secondary_link,tertiary,tertiary_link
-    save_shp = True				# True / False
+    save_gpkg = True				# True / False
 
     [origins_destinations]
     origins = origins.shp 			# <file name> / None
@@ -159,7 +159,7 @@ Initialization file templates
   name = single link redundancy test
   analysis = single_link_redundancy
   weighing = distance
-  save_shp = True
+  save_gpkg = True
   save_csv = True
 
   [analysis2]
@@ -168,14 +168,14 @@ Initialization file templates
   aggregate_wl = max
   threshold = 0.5
   weighing = distance
-  save_shp = True
+  save_gpkg = True
   save_csv = True
 
   [analysis3]
   name = optimal origin dest test
   analysis = optimal_route_origin_destination
   weighing = distance
-  save_shp = True
+  save_gpkg = True
   save_csv = True
 
   [analysis4]
@@ -184,7 +184,7 @@ Initialization file templates
   aggregate_wl = max
   threshold = 0.5
   weighing = distance
-  save_shp = True
+  save_gpkg = True
   save_csv = False
 
   [analysis5]
@@ -193,7 +193,7 @@ Initialization file templates
   aggregate_wl = max
   threshold = 0.5
   weighing = distance
-  save_shp = True
+  save_gpkg = True
   save_csv = True
 
   [analysis6]
@@ -204,6 +204,6 @@ Initialization file templates
   weighing = length
   buffer_meters = 40
   category_field_name = category
-  save_shp = True
+  save_gpkg = True
   save_csv = True
 

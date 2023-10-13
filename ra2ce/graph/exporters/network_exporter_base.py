@@ -44,7 +44,7 @@ class NetworkExporterBase(Ra2ceExporterProtocol):
 
     def export_to_shp(self, output_dir: Path, export_data: NETWORK_TYPE) -> None:
         """
-        Exports the given data into a `*.shp` file.
+        Exports the given data into a `*.gpkg` file.
 
         Args:
             output_dir (Path): Output directory where the save the exported data.

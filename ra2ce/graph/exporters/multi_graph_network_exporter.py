@@ -42,11 +42,11 @@ class MultiGraphNetworkExporter(NetworkExporterBase):
         # TODO: This method should be a writer itself.
         graph_to_gpkg(
             export_data,
-            output_dir / (self._basename + "_edges.shp"),
-            output_dir / (self._basename + "_nodes.shp"),
+            output_dir / (self._basename + "_edges.gpkg"),
+            output_dir / (self._basename + "_nodes.gpkg"),
         )
         logging.info(
-            f"Saved {self._basename + '_edges.shp'} and {self._basename + '_nodes.shp'} in {output_dir}."
+            f"Saved {self._basename + '_edges.gpkg'} and {self._basename + '_nodes.gpkg'} in {output_dir}."
         )
 
     def export_to_pickle(self, output_dir: Path, export_data: MULTIGRAPH_TYPE) -> None:
