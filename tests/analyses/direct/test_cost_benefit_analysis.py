@@ -60,12 +60,12 @@ class TestCostBenefitAnalysis:
             "interest_rate": 42,
             "climate_factor": 24,
             "climate_period": 2.4,
-            "file_name": "filedoesnotexist.gpkg",
+            "file_name": "filedoesnotexist.shp",
         }
         with pytest.raises(FileNotFoundError) as exc_err:
             EffectivenessMeasures(_config, _analysis)
         assert str(exc_err.value) == str(
-            _config["input"] / "direct" / "filedoesnotexist.gpkg"
+            _config["input"] / "direct" / "filedoesnotexist.shp"
         )
 
     def test_init_raises_when_effectiveness_measures_does_not_exist(self):
