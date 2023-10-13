@@ -247,7 +247,7 @@ def rename_road_gdf_to_conventions(road_gdf_columns):
     ### Handle return period columns
     new_cols = []
     for c in cs:
-        if c.startswith("RP"):
+        if c.startswith("RP") or c.startswith("EV"):
             new_cols.append("F_" + c)
         else:
             new_cols.append(c)
