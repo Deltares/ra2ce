@@ -29,7 +29,7 @@ from ra2ce.graph.exporters.network_exporter_base import NetworkExporterBase
 
 
 class GeoDataFrameNetworkExporter(NetworkExporterBase):
-    def export_to_shp(self, output_dir: Path, export_data: gpd.GeoDataFrame) -> None:
+    def export_to_gpkg(self, output_dir: Path, export_data: gpd.GeoDataFrame) -> None:
         _output_shp_path = output_dir / (self._basename + ".gpkg")
         export_data.to_file(
             _output_shp_path, index=False
