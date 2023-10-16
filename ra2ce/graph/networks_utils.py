@@ -1849,9 +1849,9 @@ def clean_memory(list_delete: list) -> None:
         del to_delete
 
 
-def get_valid_mean(x_value: MaskedArray, properties: dict) -> Optional[float]:
-    # properties should not be removed. it is passed in zonal_stats. So properties should not be removed, else this
-    # will not be activated
+def get_valid_mean(x_value: MaskedArray, **kwargs) -> Optional[float]:
+    # **kwargs should not be removed. properties var is passed in zonal_stats. So properties should not be removed,
+    #  else this will not be activated
     if not isinstance(x_value, MaskedArray):
         return np.nan
     if x_value.mask.all():
