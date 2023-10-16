@@ -45,7 +45,7 @@ class NetworkSection:
     polygon: Optional[Path] = None
     network_type: str = ""  # Should be enum
     road_types: list[str] = field(default_factory=list)
-    save_shp: bool = False
+    save_gpkg: bool = False
 
 
 @dataclass
