@@ -67,10 +67,7 @@ class HazardOverlay:
         self._origins = config.origins_destinations.origins
         self._destinations = config.origins_destinations.destinations
         self._save_gpkg = config.network.save_gpkg
-        if len(config.isolation.locations) != 0:
-            self._isolation_locations = config.static_path.joinpath(
-                "network", config.isolation.locations
-            )
+        self._isolation_locations = config.static_path.joinpath("network", config.isolation.locations)
 
         # Hazard properties
         self._hazard_field_name = config.hazard.hazard_field_name
@@ -765,7 +762,7 @@ class HazardOverlay:
                     )
 
         #### Step 4: hazard overlay of the locations that are checked for isolation ###
-        if self._isolation_locations:
+        if self._isolation_locations.suffix:
             logging.info("Detected isolated locations, checking for hazard overlay.")
             locations = gpd.read_file(self._isolation_locations)
             locations["i_id"] = locations.index
