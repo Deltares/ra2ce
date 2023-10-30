@@ -765,26 +765,26 @@ class HazardOverlay:
                     )
 
         #### Step 4: hazard overlay of the locations that are checked for isolation ###
-        if self._isolation_locations:
-            logging.info("Detected isolated locations, checking for hazard overlay.")
-            locations = gpd.read_file(self._isolation_locations)
-            locations["i_id"] = locations.index
-            locations_crs = pyproj.CRS.from_user_input(locations.crs)
-            hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
-
-            # get hazard at locations from network based on nearest
-            logging.info("Get hazard at locations from network.")
-            locations_hazard = self.get_point_hazard_from_network(
-                locations, self.graphs["base_network_hazard"]
-            )
-
-            _exporter = NetworkExporterFactory()
-            _exporter.export(
-                network=locations_hazard,
-                basename="locations_hazard",
-                output_dir=self._output_graph_dir,
-                export_types=["pickle"],
-            )
+        # if self._isolation_locations:
+        #     logging.info("Detected isolated locations, checking for hazard overlay.")
+        #     locations = gpd.read_file(self._isolation_locations)
+        #     locations["i_id"] = locations.index
+        #     locations_crs = pyproj.CRS.from_user_input(locations.crs)
+        #     hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
+        #
+        #     # get hazard at locations from network based on nearest
+        #     logging.info("Get hazard at locations from network.")
+        #     locations_hazard = self.get_point_hazard_from_network(
+        #         locations, self.graphs["base_network_hazard"]
+        #     )
+        #
+        #     _exporter = NetworkExporterFactory()
+        #     _exporter.export(
+        #         network=locations_hazard,
+        #         basename="locations_hazard",
+        #         output_dir=self._output_graph_dir,
+        #         export_types=["pickle"],
+        #     )
 
         # Save the hazard name bookkeeping table.
         self.hazard_name_table.to_excel(
