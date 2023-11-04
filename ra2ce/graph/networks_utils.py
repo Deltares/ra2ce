@@ -689,7 +689,7 @@ def split_line_with_points(line, points):
     return segments
 
 
-def cut(line, distance) -> Tuple[LineString, LineString]:
+def cut(line, distance) -> list[LineString | None] | list[LineString]:
     # Cuts a line in two at a distance from its starting point
     # This is taken from shapely manual
     if (distance <= 0.0) | (distance >= line.length):
