@@ -83,7 +83,7 @@ master_doc = "index"
 # General information about the project.
 project = "Risk Assessment and Adaptation for Critical infrastructurE"
 copyright = "2020, Deltares"
-author = "Margreet van Marle\\Frederique de Groen\\Lieke Meijer\\Sahand Asgarpour"
+author = "Margreet van Marle\\Frederique de Groen\\Lieke Meijer\\Sahand Asgarpour\\Carles Soriano Perez"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
