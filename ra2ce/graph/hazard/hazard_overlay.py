@@ -766,7 +766,7 @@ class HazardOverlay:
         #### Step 4: hazard overlay of the locations that are checked for isolation ###
         if self._isolation_locations:
             logging.info("Detected isolated locations, checking for hazard overlay.")
-            locations = gpd.read_file(self._isolation_locations)
+            locations = gpd.read_file(self._isolation_locations, engine="pyogrio")
             locations["i_id"] = locations.index
             locations_crs = pyproj.CRS.from_user_input(locations.crs)
             hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
