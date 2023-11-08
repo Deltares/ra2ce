@@ -511,7 +511,31 @@ class IndirectAnalyses:
         aggregated_results = pd.concat(results, ignore_index=True)
         return aggregated_results
 
-    def _get_origin_destination_pairs(self, graph):
+    @staticmethod
+    def extract_od_nodes_from_graph(
+        graph: nx.classes.MultiGraph,
+    ) -> list[tuple[str, str]]:
+        """
+        Extracts all Origin - Destination nodes from the graph, prevents from entries
+        with list of nodes for a node.
+
+        Args:
+            graph (nx.classes.MultiGraph): Graph containing origin-destination nodes.
+
+        Returns:
+            list[tuple[str, str]]]: List containing tuples of origin - destination node combinations.
+        """
+        _od_nodes = []
+        for n, v in graph.nodes(data=True):
+            if "od_id" not in v:
+                continue
+            _o_node_list = list(map(lambda x: (n, x), v["od_id"].split(",")))
+            _od_nodes.extend(_o_node_list)
+        return _od_nodes
+
+    def _get_origin_destination_pairs(
+        self, graph: nx.classes.MultiGraph
+    ) -> list[tuple[int, str], tuple[int, str]]:
         od_path = (
             self.config["static"] / "output_graph" / "origin_destination_table.feather"
         )
@@ -521,7 +545,7 @@ class IndirectAnalyses:
             for a in od.loc[od["o_id"].notnull(), "o_id"]
             for b in od.loc[od["d_id"].notnull(), "d_id"]
         ]
-        all_nodes = [(n, v["od_id"]) for n, v in graph.nodes(data=True) if "od_id" in v]
+        all_nodes = self.extract_od_nodes_from_graph(graph)
         od_nodes = []
         for aa, bb in od_pairs:
             # it is possible that there are multiple origins/destinations at the same 'entry-point' in the road
@@ -541,7 +565,9 @@ class IndirectAnalyses:
             )
         return od_nodes
 
-    def optimal_route_origin_destination(self, graph, analysis):
+    def optimal_route_origin_destination(
+        self, graph: nx.classes.MultiGraph, analysis: dict
+    ) -> gpd.GeoDataFrame:
         # create list of origin-destination pairs
         od_nodes = self._get_origin_destination_pairs(graph)
         pref_routes = find_route_ods(graph, od_nodes, analysis["weighing"])
@@ -1300,7 +1326,11 @@ def save_gdf(gdf: gpd.GeoDataFrame, save_path: Path):
     logging.info("Results saved to: {}".format(save_path))
 
 
-def find_route_ods(graph, od_nodes, weighing):
+def find_route_ods(
+    graph: nx.classes.MultiGraph,
+    od_nodes: list[tuple[tuple[int, str], tuple[int, str]]],
+    weighing: str,
+) -> gpd.GeoDataFrame:
     # create the routes between all OD pairs
     (
         o_node_list,
@@ -1371,6 +1401,11 @@ def find_route_ods(graph, od_nodes, weighing):
         geometry="geometry",
         crs="epsg:4326",
     )
+    # Remove potential duplicates (o, d node) with a different Origin name.
+    _duplicate_columns = ["o_node", "d_node", "destination", "length", "geometry"]
+    pref_routes = pref_routes.drop_duplicates(
+        subset=_duplicate_columns, keep="first"
+    ).reset_index(drop=True)
     return pref_routes
 
 
