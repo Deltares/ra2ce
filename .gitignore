@@ -54,6 +54,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 tests/test_results/**
+pytest.ini
 
 # Coverages
 .scannerwork/
