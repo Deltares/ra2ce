@@ -42,9 +42,9 @@ class NetworkExporterBase(Ra2ceExporterProtocol):
         self._export_types = export_types
         self.pickle_path = None
 
-    def export_to_shp(self, output_dir: Path, export_data: NETWORK_TYPE) -> None:
+    def export_to_gpkg(self, output_dir: Path, export_data: NETWORK_TYPE) -> None:
         """
-        Exports the given data into a `*.shp` file.
+        Exports the given data into a `*.gpkg` file.
 
         Args:
             output_dir (Path): Output directory where the save the exported data.
@@ -75,4 +75,4 @@ class NetworkExporterBase(Ra2ceExporterProtocol):
             self.export_to_pickle(export_path, export_data)
 
         if "shp" in self._export_types:
-            self.export_to_shp(export_path, export_data)
+            self.export_to_gpkg(export_path, export_data)

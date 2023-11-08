@@ -21,7 +21,6 @@
 
 import copy
 import logging
-import sys
 import time
 from pathlib import Path
 from typing import List, Tuple
@@ -513,9 +512,33 @@ class IndirectAnalyses:
         aggregated_results = pd.concat(results, ignore_index=True)
         return aggregated_results
 
-    def _get_origin_destination_pairs(self, graph):
-        od_path = (
-                self.config["static"] / "output_graph" / "origin_destination_table.feather"
+    @staticmethod
+    def extract_od_nodes_from_graph(
+        graph: nx.classes.MultiGraph,
+    ) -> list[tuple[str, str]]:
+        """
+        Extracts all Origin - Destination nodes from the graph, prevents from entries
+        with list of nodes for a node.
+
+        Args:
+            graph (nx.classes.MultiGraph): Graph containing origin-destination nodes.
+
+        Returns:
+            list[tuple[str, str]]]: List containing tuples of origin - destination node combinations.
+        """
+        _od_nodes = []
+        for n, v in graph.nodes(data=True):
+            if "od_id" not in v:
+                continue
+            _o_node_list = list(map(lambda x: (n, x), v["od_id"].split(",")))
+            _od_nodes.extend(_o_node_list)
+        return _od_nodes
+
+    def _get_origin_destination_pairs(
+        self, graph: nx.classes.MultiGraph
+    ) -> list[tuple[int, str], tuple[int, str]]:
+        od_path = self.config["static"].joinpath(
+            "output_graph", "origin_destination_table.feather"
         )
         od = gpd.read_feather(od_path)
         od_pairs = [
@@ -523,7 +546,7 @@ class IndirectAnalyses:
             for a in od.loc[od["o_id"].notnull(), "o_id"]
             for b in od.loc[od["d_id"].notnull(), "d_id"]
         ]
-        all_nodes = [(n, v["od_id"]) for n, v in graph.nodes(data=True) if "od_id" in v]
+        all_nodes = self.extract_od_nodes_from_graph(graph)
         od_nodes = []
         for aa, bb in od_pairs:
             # it is possible that there are multiple origins/destinations at the same 'entry-point' in the road
@@ -543,7 +566,9 @@ class IndirectAnalyses:
             )
         return od_nodes
 
-    def optimal_route_origin_destination(self, graph: nx.MultiGraph, analysis) -> gpd.geodataframe:
+    def optimal_route_origin_destination(
+        self, graph: nx.classes.MultiGraph, analysis: dict
+    ) -> gpd.GeoDataFrame:
         # create list of origin-destination pairs
         od_nodes = self._get_origin_destination_pairs(graph)
         pref_routes = find_route_ods(graph, od_nodes, analysis["weighing"])
@@ -752,12 +777,10 @@ class IndirectAnalyses:
         gdf_ori_ = gdf_ori.copy()
 
         # read origin points
-        origin_fn = (
-                Path(self.config["static"])
-                / "output_graph"
-                / "origin_destination_table.gpkg"
+        origin_fn = Path(self.config["static"]).joinpath(
+            "output_graph", "origin_destination_table.gpkg"
         )
-        origin = gpd.read_file(origin_fn)
+        origin = gpd.read_file(origin_fn, engine="pyogrio")
         index = [type(x) == str for x in origin["o_id"]]
         origin = origin[index]
         origin.reset_index(inplace=True, drop=True)
@@ -890,7 +913,7 @@ class IndirectAnalyses:
             results_hz_roads.to_file(
                 self.config["output"]
                 / analysis["analysis"]
-                / f"flooded_and_isolated_roads_{hazard_name}.shp"
+                / f"flooded_and_isolated_roads_{hazard_name}.gpkg"
             )
 
             # relate the locations to network disruption due to hazard by spatial overlay
@@ -958,15 +981,12 @@ class IndirectAnalyses:
         """
         network = graph_to_gdf(graph)[0]
         # TODO: add making "edges_fid" (internal convention) to graph_to_gdf
-        if all(
-                c_idx in network.columns for c_idx in ["node_A", "node_B"]
-        ):  # shapefiles
+        if all(c_idx in network.index.names for c_idx in ["u", "v"]):
+            network["edge_fid"] = [f"{na}_{nb}" for (na, nb, _) in network.index]
+        elif all(c_idx in network.columns for c_idx in ["node_A", "node_B"]):
+            # shapefiles
             network["edge_fid"] = [
-                f"{na}_{nb}" for na, nb in network[["node_A", "node_B"]].values
-            ]
-        elif all(c_idx in network.columns for c_idx in ["u", "v"]):  # osm
-            network["edge_fid"] = [
-                f"{na}_{nb}" for na, nb in network[["u", "v"]].values
+                f"{na}_{nb}" for na, nb in network["node_A", "node_B"].values
             ]
         return network[["edge_fid", "geometry"]]
 
@@ -1007,26 +1027,26 @@ class IndirectAnalyses:
             starttime = time.time()
             gdf = pd.DataFrame()
             opt_routes = None
-            output_path = self.config["output"] / analysis["analysis"]
+            output_path = self.config["output"].joinpath(analysis["analysis"])
 
-            def _save_shp_analysis(
-                    base_graph,
-                    to_save_gdf: List[gpd.GeoDataFrame],
-                    to_save_gdf_names: List[str],
+            def _save_gpkg_analysis(
+                base_graph,
+                to_save_gdf: List[gpd.GeoDataFrame],
+                to_save_gdf_names: List[str],
             ):
                 for to_save, save_name in zip(to_save_gdf, to_save_gdf_names):
                     if not to_save.empty:
-                        gpkg_path = output_path / (
-                                analysis["name"].replace(" ", "_") + f"_{save_name}.gpkg"
+                        gpkg_path = output_path.joinpath(
+                            analysis["name"].replace(" ", "_") + f"_{save_name}.gpkg"
                         )
                         save_gdf(to_save, gpkg_path)
 
                 # Save the Graph
-                gpkg_path_nodes = output_path / (
-                        analysis["name"].replace(" ", "_") + "_results_nodes.gpkg"
+                gpkg_path_nodes = output_path.joinpath(
+                    analysis["name"].replace(" ", "_") + "_results_nodes.gpkg"
                 )
-                gpkg_path_edges = output_path / (
-                        analysis["name"].replace(" ", "_") + "_results_edges.gpkg"
+                gpkg_path_edges = output_path.joinpath(
+                    analysis["name"].replace(" ", "_") + "_results_edges.gpkg"
                 )
                 graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
 
@@ -1138,11 +1158,11 @@ class IndirectAnalyses:
                     opt_routes,
                     destinations,
                 ) = analyzer.optimal_route_origin_closest_destination()
-                if analysis["save_shp"]:
+                if analysis["save_gpkg"]:
                     # Save the GeoDataFrames
                     to_save_gdf = [destinations, opt_routes]
                     to_save_gdf_names = ["destinations", "optimal_routes"]
-                    _save_shp_analysis(base_graph, to_save_gdf, to_save_gdf_names)
+                    _save_gpkg_analysis(base_graph, to_save_gdf, to_save_gdf_names)
 
                 if analysis["save_csv"]:
                     csv_path = output_path / (
@@ -1196,34 +1216,21 @@ class IndirectAnalyses:
                     ) = analyzer.multi_link_origin_closest_destination()
                     opt_routes_without_hazard = gpd.GeoDataFrame()
 
-                if analysis["save_shp"]:
+                if analysis["save_gpkg"]:
                     # Save the GeoDataFrames
-                    if analyzer.config["files"]["origins_destinations_graph_hazard"] is None:
-                        # There is no hazard introduced
-                        to_save_gdf = [
-                            origins,
-                            destinations,
-                            opt_routes_without_hazard,
-                        ]
-                        to_save_gdf_names = [
-                            "origins",
-                            "destinations",
-                            "optimal_routes_without_hazard"
-                        ]
-                    else:
-                        to_save_gdf = [
-                            origins,
-                            destinations,
-                            opt_routes_without_hazard,
-                            opt_routes_with_hazard,
-                        ]
-                        to_save_gdf_names = [
-                            "origins",
-                            "destinations",
-                            "optimal_routes_without_hazard",
-                            "optimal_routes_with_hazard",
-                        ]
-                    _save_shp_analysis(base_graph, to_save_gdf, to_save_gdf_names)
+                    to_save_gdf = [
+                        origins,
+                        destinations,
+                        opt_routes_without_hazard,
+                        opt_routes_with_hazard,
+                    ]
+                    to_save_gdf_names = [
+                        "origins",
+                        "destinations",
+                        "optimal_routes_without_hazard",
+                        "optimal_routes_with_hazard",
+                    ]
+                    _save_gpkg_analysis(base_graph, to_save_gdf, to_save_gdf_names)
                 if analysis["save_csv"]:
                     csv_path = output_path / (
                             analysis["name"].replace(" ", "_") + "_destinations.csv"
@@ -1272,7 +1279,7 @@ class IndirectAnalyses:
 
             if not gdf.empty:
                 # Not for all analyses a gdf is created as output.
-                if analysis["save_shp"]:
+                if analysis["save_gpkg"]:
                     gpkg_path = output_path.joinpath(
                         analysis["name"].replace(" ", "_") + ".gpkg"
                     )
@@ -1299,13 +1306,12 @@ class IndirectAnalyses:
             )
 
 
-def save_gdf(gdf, save_path):
+def save_gdf(gdf: gpd.GeoDataFrame, save_path: Path):
     """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp
 
     Arguments:
         gdf [geodataframe]: geodataframe object to be converted
-        edge_shp [str]: output path including extension for edges shapefile
-        node_shp [str]: output path including extension for nodes shapefile
+        save_path [str]: output path including extension for edges shapefile
     Returns:
         None
     """
@@ -1320,7 +1326,11 @@ def save_gdf(gdf, save_path):
     logging.info("Results saved to: {}".format(save_path))
 
 
-def find_route_ods(graph: nx.MultiGraph, od_nodes: list, weighing: str) -> gpd.geodataframe:
+def find_route_ods(
+    graph: nx.classes.MultiGraph,
+    od_nodes: list[tuple[tuple[int, str], tuple[int, str]]],
+    weighing: str,
+) -> gpd.GeoDataFrame:
     # create the routes between all OD pairs
     (
         o_node_list,
@@ -1397,6 +1407,11 @@ def find_route_ods(graph: nx.MultiGraph, od_nodes: list, weighing: str) -> gpd.g
         geometry="geometry",
         crs="epsg:4326",
     )
+    # Remove potential duplicates (o, d node) with a different Origin name.
+    _duplicate_columns = ["o_node", "d_node", "destination", "length", "geometry"]
+    pref_routes = pref_routes.drop_duplicates(
+        subset=_duplicate_columns, keep="first"
+    ).reset_index(drop=True)
     return pref_routes
 
 

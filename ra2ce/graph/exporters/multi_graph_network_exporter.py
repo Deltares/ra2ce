@@ -35,7 +35,7 @@ from ra2ce.graph.networks_utils import graph_to_gpkg
 class MultiGraphNetworkExporter(NetworkExporterBase):
     pickle_path: Optional[Path]
 
-    def export_to_shp(self, output_dir: Path, export_data: MULTIGRAPH_TYPE) -> None:
+    def export_to_gpkg(self, output_dir: Path, export_data: MULTIGRAPH_TYPE) -> None:
         if not output_dir.is_dir():
             output_dir.mkdir(parents=True)
 
@@ -46,7 +46,7 @@ class MultiGraphNetworkExporter(NetworkExporterBase):
             output_dir / (self._basename + "_nodes.gpkg"),
         )
         logging.info(
-            f"Saved {self._basename + '_edges.shp'} and {self._basename + '_nodes.shp'} in {output_dir}."
+            f"Saved {self._basename + '_edges.gpkg'} and {self._basename + '_nodes.gpkg'} in {output_dir}."
         )
 
     def export_to_pickle(self, output_dir: Path, export_data: MULTIGRAPH_TYPE) -> None:
