@@ -15,7 +15,7 @@ class TestDirectAnalyses:
                 {
                     "name": "DummyExecute",
                     "analysis": "",
-                    "save_shp": False,
+                    "save_gpkg": False,
                     "save_csv": False,
                 }
             ],

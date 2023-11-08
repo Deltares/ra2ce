@@ -149,8 +149,8 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
         _network_section.directed = self._parser.getboolean(
             _section, "directed", fallback=_network_section.directed
         )
-        _network_section.save_shp = self._parser.getboolean(
-            _section, "save_shp", fallback=_network_section.save_shp
+        _network_section.save_gpkg = self._parser.getboolean(
+            _section, "save_gpkg", fallback=_network_section.save_gpkg
         )
         _network_section.road_types = self._parser.getlist(
             _section, "road_types", fallback=_network_section.road_types

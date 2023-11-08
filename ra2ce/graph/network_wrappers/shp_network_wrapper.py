@@ -179,7 +179,7 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
                 col="geometry", inplace=True
             )  # To ensure the object is a GeoDataFrame and not a Series
             _emerged_lines_file = self.output_graph_dir.joinpath(
-                f"{self.project_name}_lines_that_merged.shp"
+                f"{self.project_name}_lines_that_merged.gpkg"
             )
             lines_merged.to_file(_emerged_lines_file)
             logging.info(
