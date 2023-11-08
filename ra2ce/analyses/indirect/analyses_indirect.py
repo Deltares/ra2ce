@@ -882,7 +882,7 @@ class IndirectAnalyses:
             # get indirect graph - remove the edges that are impacted by hazard directly
             graph_hz_indirect.remove_edges_from(edges_hz_direct)
             # get indirect graph without the largest component, i.e. isolated graph
-            self.remove_edges_from_lagest_component(graph_hz_indirect)
+            self.remove_edges_from_largest_component(graph_hz_indirect)
 
             # get direct graph - romove the edges that are impacted by hazard indirectly
             graph_hz_direct.remove_edges_from(edges_hz_indirect)
@@ -944,7 +944,7 @@ class IndirectAnalyses:
 
         return locations_hz, aggregation
 
-    def remove_edges_from_lagest_component(self, disconnected_graph: nx.Graph) -> None:
+    def remove_edges_from_largest_component(self, disconnected_graph: nx.Graph) -> None:
         """
         This function removes all edges from the largest connected component of a graph.
 
