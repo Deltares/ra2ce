@@ -23,6 +23,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Optional
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_with_network import (
@@ -70,7 +71,7 @@ class AnalysisConfigWrapperWithNetwork(AnalysisConfigWrapperBase):
         cls,
         ini_file: Path,
         config_data: AnalysisConfigData,
-        network_config: NetworkConfigWrapper,
+        network_config: Optional[NetworkConfigWrapper],
     ) -> AnalysisConfigWrapperWithNetwork:
         """
         Initializes this class with a network_configuration.

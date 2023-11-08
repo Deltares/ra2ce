@@ -31,7 +31,6 @@ from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProt
 
 class AnalysisConfigWrapperBase(ConfigWrapperProtocol):
     ini_file: Path
-    root_dir: Path
     config_data: Optional[AnalysisConfigData] = None
 
     @staticmethod
