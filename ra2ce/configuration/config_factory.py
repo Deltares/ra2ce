@@ -69,13 +69,13 @@ class ConfigFactory:
     def get_network_config_data(network_ini: Path) -> Optional[NetworkConfigData]:
         if not network_ini:
             return None
-        _config_data = NetworkConfigDataReader().read(network_ini)
+        _network_config = NetworkConfigDataReader().read(network_ini)
         # Copy the network ini file to the output directory.
-        if not _config_data.output_path.exists():
-            _config_data.output_path.mkdir(parents=True)
-        _output_ini = _config_data.output_path.joinpath(network_ini.name)
+        if not _network_config.output_path.exists():
+            _network_config.output_path.mkdir(parents=True)
+        _output_ini = _network_config.output_path.joinpath(network_ini.name)
         shutil.copyfile(network_ini, _output_ini)
-        return NetworkConfigWrapper.from_data(network_ini, _config_data)
+        return NetworkConfigWrapper.from_data(network_ini, _network_config)
 
     @staticmethod
     def get_analysis_config_data(

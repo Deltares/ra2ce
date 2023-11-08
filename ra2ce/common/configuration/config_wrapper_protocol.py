@@ -31,9 +31,12 @@ from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 @runtime_checkable
 class ConfigWrapperProtocol(Protocol):  # pragma: no cover
     ini_file: Path
-    root_dir: Path
     config_data: Optional[ConfigDataProtocol] = None
     graphs: List[Any] = []
+
+    @property
+    def root_dir(self) -> Path:
+        pass
 
     @classmethod
     def from_data(

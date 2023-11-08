@@ -28,9 +28,9 @@ from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 class AnalysisConfigData(ConfigDataProtocol):
     @classmethod
     def from_dict(cls, dict_values: dict) -> AnalysisConfigData:
-        _new_analysis_ini_config_data = cls()
-        _new_analysis_ini_config_data.update(**dict_values)
-        return _new_analysis_ini_config_data
+        _analysis_config = cls()
+        _analysis_config.update(**dict_values)
+        return _analysis_config
 
 
 class AnalysisConfigDataWithNetwork(AnalysisConfigData):
