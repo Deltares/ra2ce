@@ -66,7 +66,7 @@ class HazardOverlay:
         self._output_dir = config.output_path
         self._origins = config.origins_destinations.origins
         self._destinations = config.origins_destinations.destinations
-        self._save_shp = config.network.save_shp
+        self._save_gpkg = config.network.save_gpkg
         self._isolation_locations = config.static_path.joinpath(
             "network", config.isolation.locations
         )
@@ -427,7 +427,7 @@ class HazardOverlay:
 
         _hazard_files = {}
         _hazard_files["tif"] = get_filtered_files(".tif")
-        _hazard_files["shp"] = get_filtered_files(".shp")
+        _hazard_files["shp"] = get_filtered_files(".gpkg")
         _hazard_files["table"] = get_filtered_files(".csv", ".json")
         return _hazard_files
 
@@ -552,7 +552,7 @@ class HazardOverlay:
             write all the objects
 
         """
-        types_to_export = ["pickle"] if not self._save_shp else ["pickle", "shp"]
+        types_to_export = ["pickle"] if not self._save_gpkg else ["pickle", "shp"]
 
         if (
             not self.files["base_graph"]
@@ -712,9 +712,9 @@ class HazardOverlay:
             )
 
             # Save the OD pairs (GeoDataFrame) as shapefile
-            if self._save_shp:
+            if self._save_gpkg:
                 ods_path = self._output_graph_dir.joinpath(
-                    "origin_destination_table.shp"
+                    "origin_destination_table.gpkg"
                 )
                 ods.to_file(ods_path, index=False)
                 logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
