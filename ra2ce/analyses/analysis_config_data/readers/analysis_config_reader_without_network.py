@@ -41,18 +41,18 @@ class AnalysisConfigReaderWithoutNetwork(AnalysisConfigReaderBase):
     def read(self, ini_file: Path) -> AnalysisConfigDataWithoutNetwork:
         if not isinstance(ini_file, Path) or not ini_file.is_file():
             raise ValueError("No analysis ini file 'Path' provided.")
-        _analisis_config_dict = self._get_analysis_config_data(ini_file)
-        _output_network_ini_file = _analisis_config_dict["output"] / "network.ini"
+        _analysis_config_dict = self._get_analysis_config_data(ini_file)
+        _output_network_ini_file = _analysis_config_dict["output"] / "network.ini"
         _network_config = NetworkConfigDataReader().read(_output_network_ini_file)
-        _analisis_config_dict.update(_network_config.to_dict())
-        _network = _analisis_config_dict.get("network", None)
+        _analysis_config_dict.update(_network_config.to_dict())
+        _network = _analysis_config_dict.get("network", None)
         if _network:
-            _analisis_config_dict["origins_destinations"] = _network.get(
+            _analysis_config_dict["origins_destinations"] = _network.get(
                 "origins_destinations", None
             )
         else:
             logging.warn(f"Not found network key for the Analysis {ini_file}")
-        return AnalysisConfigDataWithoutNetwork.from_dict(_analisis_config_dict)
+        return AnalysisConfigDataWithoutNetwork.from_dict(_analysis_config_dict)
 
     def _get_analysis_config_data(self, ini_file: Path) -> dict:
         _root_path = AnalysisConfigWrapperBase.get_network_root_dir(ini_file)
