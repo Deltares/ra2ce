@@ -77,7 +77,7 @@ def read_origin_destination_files(
         origin = gpd.GeoDataFrame(
             columns=[od_id, "o_id", "geometry", "region"], crs=crs_
         )
-        region = gpd.read_file(region_paths)
+        region = gpd.read_file(region_paths, engine="pyogrio")
         region = region[[region_var, "geometry"]]
     else:
         origin = gpd.GeoDataFrame(columns=[od_id, "o_id", "geometry"], crs=crs_)
@@ -98,7 +98,7 @@ def read_origin_destination_files(
         destination_names = [destination_names]
 
     for op, on in zip(origin_paths, origin_names):
-        origin_new = gpd.read_file(op, crs=crs_)
+        origin_new = gpd.read_file(op, crs=crs_, engine="pyogrio")
         try:
             origin_new[od_id] * 2  # just for checking
         except Exception:
@@ -119,7 +119,7 @@ def read_origin_destination_files(
         destination_columns_add.append(category)
 
     for dp, dn in zip(destination_paths, destination_names):
-        destination_new = gpd.read_file(dp, crs=crs_)
+        destination_new = gpd.read_file(dp, crs=crs_, engine="pyogrio")
         try:
             assert destination_new[od_id]
         except Exception:
@@ -573,7 +573,7 @@ def generate_points_from_raster(fn, out_fn):
 def origins_from_raster(output_folder: Path, mask_fn, raster_fn) -> Path:
     """Makes origin points from a population raster."""
     output_fn = output_folder / "origins_raster.tif"
-    mask = gpd.read_file(mask_fn[0])
+    mask = gpd.read_file(mask_fn[0], engine="pyogrio")
     res = 1000  # in meter; TODO: put in config file or in network.ini
     out_array, out_meta = rescale_and_crop(raster_fn, mask, output_folder, res)
     outputfile = export_raster_to_geotiff(out_array, out_meta, output_folder, output_fn)

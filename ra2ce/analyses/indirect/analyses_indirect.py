@@ -22,7 +22,6 @@
 
 import copy
 import logging
-import sys
 import time
 from pathlib import Path
 from typing import List, Tuple
@@ -536,8 +535,8 @@ class IndirectAnalyses:
     def _get_origin_destination_pairs(
         self, graph: nx.classes.MultiGraph
     ) -> list[tuple[int, str], tuple[int, str]]:
-        od_path = (
-            self.config["static"] / "output_graph" / "origin_destination_table.feather"
+        od_path = self.config["static"].joinpath(
+            "output_graph", "origin_destination_table.feather"
         )
         od = gpd.read_feather(od_path)
         od_pairs = [
@@ -782,7 +781,7 @@ class IndirectAnalyses:
         origin_fn = Path(self.config["static"]).joinpath(
             "output_graph", "origin_destination_table.gpkg"
         )
-        origin = gpd.read_file(origin_fn)
+        origin = gpd.read_file(origin_fn, engine="pyogrio")
         index = [type(x) == str for x in origin["o_id"]]
         origin = origin[index]
         origin.reset_index(inplace=True, drop=True)
@@ -983,15 +982,12 @@ class IndirectAnalyses:
         """
         network = graph_to_gdf(graph)[0]
         # TODO: add making "edges_fid" (internal convention) to graph_to_gdf
-        if all(
-            c_idx in network.columns for c_idx in ["node_A", "node_B"]
-        ):  # shapefiles
+        if all(c_idx in network.index.names for c_idx in ["u", "v"]):
+            network["edge_fid"] = [f"{na}_{nb}" for (na, nb, _) in network.index]
+        elif all(c_idx in network.columns for c_idx in ["node_A", "node_B"]):
+            # shapefiles
             network["edge_fid"] = [
-                f"{na}_{nb}" for na, nb in network[["node_A", "node_B"]].values
-            ]
-        elif all(c_idx in network.columns for c_idx in ["u", "v"]):  # osm
-            network["edge_fid"] = [
-                f"{na}_{nb}" for na, nb in network[["u", "v"]].values
+                f"{na}_{nb}" for na, nb in network["node_A", "node_B"].values
             ]
         return network[["edge_fid", "geometry"]]
 
@@ -1032,7 +1028,7 @@ class IndirectAnalyses:
             starttime = time.time()
             gdf = pd.DataFrame()
             opt_routes = None
-            output_path = self.config["output"] / analysis["analysis"]
+            output_path = self.config["output"].joinpath(analysis["analysis"])
 
             def _save_gpkg_analysis(
                 base_graph,
@@ -1041,16 +1037,16 @@ class IndirectAnalyses:
             ):
                 for to_save, save_name in zip(to_save_gdf, to_save_gdf_names):
                     if not to_save.empty:
-                        gpkg_path = output_path / (
+                        gpkg_path = output_path.joinpath(
                             analysis["name"].replace(" ", "_") + f"_{save_name}.gpkg"
                         )
                         save_gdf(to_save, gpkg_path)
 
                 # Save the Graph
-                gpkg_path_nodes = output_path / (
+                gpkg_path_nodes = output_path.joinpath(
                     analysis["name"].replace(" ", "_") + "_results_nodes.gpkg"
                 )
-                gpkg_path_edges = output_path / (
+                gpkg_path_edges = output_path.joinpath(
                     analysis["name"].replace(" ", "_") + "_results_edges.gpkg"
                 )
                 graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
