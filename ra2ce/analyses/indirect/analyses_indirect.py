@@ -887,19 +887,23 @@ class IndirectAnalyses:
             # get direct graph - romove the edges that are impacted by hazard indirectly
             graph_hz_direct.remove_edges_from(edges_hz_indirect)
 
-            # get isolated network
-            network_hz_indirect = self.get_network_with_edge_fid(graph_hz_indirect)
-            network_hz_indirect[f"i_type_{hazard_name[:-3]}"] = "isolated"
-            # reproject the datasets to be able to make a buffer in meters
-            network_hz_indirect = network_hz_indirect.set_crs(crs=crs)
-            network_hz_indirect.to_crs(crs=nearest_utm, inplace=True)
+            # get isolated network\
+            network_hz_indirect = gpd.GeoDataFrame()
+            if len(graph_hz_indirect.edges) > 0:
+                network_hz_indirect = self.get_network_with_edge_fid(graph_hz_indirect)
+                network_hz_indirect[f"i_type_{hazard_name[:-3]}"] = "isolated"
+                # reproject the datasets to be able to make a buffer in meters
+                network_hz_indirect = network_hz_indirect.set_crs(crs=crs)
+                network_hz_indirect.to_crs(crs=nearest_utm, inplace=True)
 
             # get flooded network
-            network_hz_direct = self.get_network_with_edge_fid(graph_hz_direct)
-            network_hz_direct[f"i_type_{hazard_name[:-3]}"] = "flooded"
-            # reproject the datasets to be able to make a buffer in meters
-            network_hz_direct = network_hz_direct.set_crs(crs=crs)
-            network_hz_direct.to_crs(crs=nearest_utm, inplace=True)
+            network_hz_direct = gpd.GeoDataFrame()
+            if len(graph_hz_direct.edges) > 0:
+                network_hz_direct = self.get_network_with_edge_fid(graph_hz_direct)
+                network_hz_direct[f"i_type_{hazard_name[:-3]}"] = "flooded"
+                # reproject the datasets to be able to make a buffer in meters
+                network_hz_direct = network_hz_direct.set_crs(crs=crs)
+                network_hz_direct.to_crs(crs=nearest_utm, inplace=True)
 
             # get hazard roads
             # merge buffer and set original crs
