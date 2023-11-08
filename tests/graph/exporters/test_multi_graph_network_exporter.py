@@ -15,7 +15,7 @@ class TestMultigraphNetworkExporter:
         assert isinstance(_exporter, NetworkExporterBase)
         assert isinstance(_exporter, Ra2ceExporterProtocol)
 
-    def test_export_to_shp_creates_dir(self, request: pytest.FixtureRequest):
+    def test_export_to_gpkg_creates_dir(self, request: pytest.FixtureRequest):
         """
         TODO: Create dummy export_data (MULTIGRAPH_TYPE) so we don't have to wrap it in a pytest.raises.
         """
@@ -29,7 +29,7 @@ class TestMultigraphNetworkExporter:
 
         # 2. Run test.
         with pytest.raises(Exception):
-            _exporter.export_to_shp(_test_dir, None)
+            _exporter.export_to_gpkg(_test_dir, None)
 
         # 3. Verify expectations.
         assert _test_dir.exists()

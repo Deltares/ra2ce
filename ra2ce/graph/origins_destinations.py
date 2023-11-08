@@ -585,7 +585,7 @@ def origins_from_raster(output_folder: Path, mask_fn, raster_fn) -> Path:
         + " origin points."
     )
 
-    out_fn = output_folder / "origins_points.shp"
+    out_fn = output_folder / "origins_points.gpkg"
     out_fn = generate_points_from_raster(outputfile, out_fn)
 
     return out_fn
