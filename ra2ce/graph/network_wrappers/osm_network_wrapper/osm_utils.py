@@ -47,7 +47,7 @@ def from_shapefile_to_poly(shapefile: Path, out_path: Path, outname: str = ""):
     Returns:
         .poly file for each region, in a new dir in the working directory (in the CRS of te input file)
     """
-    shp_file_gdf = gpd.read_file(str(shapefile))
+    shp_file_gdf = gpd.read_file(str(shapefile), engine="pyogrio")
 
     num = 0
     # iterate over the seperate polygons in the shapefile
