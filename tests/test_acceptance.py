@@ -89,7 +89,7 @@ class TestAcceptance:
     @pytest.mark.parametrize(
         "case_data_dir",
         [
-            pytest.param("acceptance_test_data", id="Default test data."),
+            pytest.param("acceptance_test_data", id="Default test data"),
         ]
         + _external_test_cases,
         indirect=["case_data_dir"],

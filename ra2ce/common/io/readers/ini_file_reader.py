@@ -39,8 +39,9 @@ class IniFileReader(FileReaderProtocol):
         return self._parse_config(ini_file)
 
     def _parse_config(self, path: Path = None, opt_cli=None) -> dict:
-        """Ajusted from HydroMT
-        source: https://github.com/Deltares/hydromt/blob/af4e5d858b0ac0883719ca59e522053053c21b82/hydromt/cli/cli_utils.py"""
+        """Adjusted from HydroMT
+        source: https://github.com/Deltares/hydromt/blob/af4e5d858b0ac0883719ca59e522053053c21b82/hydromt/cli/cli_utils.py
+        """
         opt = {}
         if path is not None and path.is_file():
             opt = self._configread(
@@ -81,7 +82,8 @@ class IniFileReader(FileReaderProtocol):
         """read model configuration from file and parse to dictionary
 
         Ajusted from HydroMT
-        source: https://github.com/Deltares/hydromt/blob/af4e5d858b0ac0883719ca59e522053053c21b82/hydromt/config.py"""
+        source: https://github.com/Deltares/hydromt/blob/af4e5d858b0ac0883719ca59e522053053c21b82/hydromt/config.py
+        """
         if cf is None:
             cf = ConfigParser(allow_no_value=True, inline_comment_prefixes=[";", "#"])
 
