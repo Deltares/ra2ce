@@ -180,7 +180,7 @@ class Losses:
         """
 
         traffic_data = self.load_df(
-            self.config["input"] / "losses", "traffic_intensities.csv"
+            self.config["input_path"] / "losses", "traffic_intensities.csv"
         )
         dict1 = {
             "AS_VTG": "evening_total",
@@ -199,7 +199,9 @@ class Losses:
         }
         traffic_data.rename(columns=dict1, inplace=True)
 
-        detour_data = self.load_df(self.config["input"] / "losses", "detour_data.csv")
+        detour_data = self.load_df(
+            self.config["input_path"] / "losses", "detour_data.csv"
+        )
         dict2 = {
             "VA_AV_HWN": "detour_time_evening",
             "VA_RD_HWN": "detour_time_remaining",
@@ -208,6 +210,8 @@ class Losses:
         }
         detour_data.rename(columns=dict2, inplace=True)
 
-        vehicle_loss_hours = self.vehicle_loss_hours(self.config["input"] / "losses")
+        vehicle_loss_hours = self.vehicle_loss_hours(
+            self.config["input_path"] / "losses"
+        )
         vlh = self.calc_vlh(traffic_data, vehicle_loss_hours, detour_data)
         return vlh

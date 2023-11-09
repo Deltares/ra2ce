@@ -56,19 +56,23 @@ class EffectivenessMeasures:
             )
             logging.error(_error)
             raise ValueError(_error)
-        elif not (config["input"] / "direct" / analysis["file_name"]).exists():
+        elif not (config["input_path"] / "direct" / analysis["file_name"]).exists():
             _error = "Effectiveness of measures calculation: Input file doesn't exist please place file in the following folder: {}".format(
-                config["input"] / "direct"
-            )
-            logging.error(_error)
-            raise FileNotFoundError(config["input"] / "direct" / analysis["file_name"])
-        elif not (config["input"] / "direct" / "effectiveness_measures.csv").exists():
-            _error = "Effectiveness of measures calculation: lookup table with effectiveness of measures doesnt exist. Please place the effectiveness_measures.csv file in the following folder: {}".format(
-                config["input"] / "direct"
+                config["input_path"] / "direct"
             )
             logging.error(_error)
             raise FileNotFoundError(
-                config["input"] / "direct" / "effectiveness_measures.csv"
+                config["input_path"] / "direct" / analysis["file_name"]
+            )
+        elif not (
+            config["input_path"] / "direct" / "effectiveness_measures.csv"
+        ).exists():
+            _error = "Effectiveness of measures calculation: lookup table with effectiveness of measures doesnt exist. Please place the effectiveness_measures.csv file in the following folder: {}".format(
+                config["input_path"] / "direct"
+            )
+            logging.error(_error)
+            raise FileNotFoundError(
+                config["input_path"] / "direct" / "effectiveness_measures.csv"
             )
 
     @staticmethod
@@ -234,7 +238,7 @@ class EffectivenessMeasures:
         df_total = self.calculate_effectiveness(df, name="standard")
 
         df_blockage = pd.read_csv(
-            self.config["input"] / "direct" / "blockage_costs.csv"
+            self.config["input_path"] / "direct" / "blockage_costs.csv"
         )
         df_total = df_total.merge(df_blockage, how="left", on="LinkNr")
         df_total["length"] = df_total[

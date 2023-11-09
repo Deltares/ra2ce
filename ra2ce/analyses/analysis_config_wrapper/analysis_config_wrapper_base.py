@@ -57,7 +57,7 @@ class AnalysisConfigWrapperBase(ConfigWrapperProtocol):
             if analysis_type not in self.config_data.keys():
                 return
             for a in self.config_data[analysis_type]:
-                output_path = self.config_data["output"] / a["analysis"]
+                output_path = self.config_data["output_path"] / a["analysis"]
                 output_path.mkdir(parents=True, exist_ok=True)
 
         _create_output_folders("direct")

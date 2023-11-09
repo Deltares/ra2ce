@@ -65,7 +65,7 @@ class TestCostBenefitAnalysis:
         with pytest.raises(FileNotFoundError) as exc_err:
             EffectivenessMeasures(_config, _analysis)
         assert str(exc_err.value) == str(
-            _config["input"] / "direct" / "filedoesnotexist.shp"
+            _config["input_path"] / "direct" / "filedoesnotexist.shp"
         )
 
     def test_init_raises_when_effectiveness_measures_does_not_exist(self):
@@ -79,11 +79,11 @@ class TestCostBenefitAnalysis:
             "climate_period": 2.4,
             "file_name": "origins.shp",
         }
-        assert (_config["input"] / "direct" / "origins.shp").exists()
+        assert (_config["input_path"] / "direct" / "origins.shp").exists()
         with pytest.raises(FileNotFoundError) as exc_err:
             EffectivenessMeasures(_config, _analysis)
         assert str(exc_err.value) == str(
-            _config["input"] / "direct" / "effectiveness_measures.csv"
+            _config["input_path"] / "direct" / "effectiveness_measures.csv"
         )
 
     @pytest.mark.parametrize(

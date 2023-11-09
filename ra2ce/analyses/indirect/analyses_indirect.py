@@ -58,9 +58,9 @@ class IndirectAnalyses:
     def __init__(self, config, graphs):
         self.config = config
         self.graphs = graphs
-        if self.config["output"].joinpath("hazard_names.xlsx").is_file():
+        if self.config["output_path"].joinpath("hazard_names.xlsx").is_file():
             self.hazard_names = pd.read_excel(
-                self.config["output"].joinpath("hazard_names.xlsx")
+                self.config["output_path"].joinpath("hazard_names.xlsx")
             )
             self.config["hazard_names"] = list(
                 set(self.hazard_names[self._file_name_key])
@@ -139,7 +139,9 @@ class IndirectAnalyses:
             gdf: The network in GeoDataFrame format.
             analysis: Dictionary of the configurations for the analysis.
         """
-        losses_fn = self.config["static"] / "hazard" / analysis["loss_per_distance"]
+        losses_fn = (
+            self.config["static_path"] / "hazard" / analysis["loss_per_distance"]
+        )
         losses_df = pd.read_excel(losses_fn, sheet_name="Sheet1")
 
         if analysis["loss_type"] == "uniform":
@@ -148,7 +150,9 @@ class IndirectAnalyses:
 
         if analysis["loss_type"] == "categorized":
             _disruption_file = (
-                self.config["static"] / "hazard" / analysis["disruption_per_category"]
+                self.config["static_path"]
+                / "hazard"
+                / analysis["disruption_per_category"]
             )
             _disruption_df = pd.read_excel(_disruption_file, sheet_name="Sheet1")
             self._single_link_losses_categorized(
@@ -387,12 +391,16 @@ class IndirectAnalyses:
         Returns:
             aggregated_results (GeoDataFrame): The results of the analysis aggregated into a table.
         """
-        losses_fn = self.config["static"] / "hazard" / analysis["loss_per_distance"]
+        losses_fn = (
+            self.config["static_path"] / "hazard" / analysis["loss_per_distance"]
+        )
         losses_df = pd.read_excel(losses_fn, sheet_name="Sheet1")
 
         if analysis["loss_type"] == "categorized":
             disruption_fn = (
-                self.config["static"] / "hazard" / analysis["disruption_per_category"]
+                self.config["static_path"]
+                / "hazard"
+                / analysis["disruption_per_category"]
             )
             disruption_df = pd.read_excel(disruption_fn, sheet_name="Sheet1")
             road_classes = [x for x in disruption_df.columns if "class" in x]
@@ -535,7 +543,7 @@ class IndirectAnalyses:
     def _get_origin_destination_pairs(
         self, graph: nx.classes.MultiGraph
     ) -> list[tuple[int, str], tuple[int, str]]:
-        od_path = self.config["static"].joinpath(
+        od_path = self.config["static_path"].joinpath(
             "output_graph", "origin_destination_table.feather"
         )
         od = gpd.read_feather(od_path)
@@ -778,7 +786,7 @@ class IndirectAnalyses:
         gdf_ori_ = gdf_ori.copy()
 
         # read origin points
-        origin_fn = Path(self.config["static"]).joinpath(
+        origin_fn = Path(self.config["static_path"]).joinpath(
             "output_graph", "origin_destination_table.gpkg"
         )
         origin = gpd.read_file(origin_fn, engine="pyogrio")
@@ -853,7 +861,7 @@ class IndirectAnalyses:
 
         # Load the point shapefile with the locations of which the isolated locations should be identified.
         locations = gpd.read_feather(
-            self.config["static"] / "output_graph" / "locations_hazard.feather"
+            self.config["static_path"] / "output_graph" / "locations_hazard.feather"
         )
         # TODO PUT CRS IN DOCUMENTATION OR MAKE CHANGABLE
         # reproject the datasets to be able to make a buffer in meters
@@ -912,7 +920,7 @@ class IndirectAnalyses:
             ).to_crs(crs=crs)
             # Save the output
             results_hz_roads.to_file(
-                self.config["output"]
+                self.config["output_path"]
                 / analysis["analysis"]
                 / f"flooded_and_isolated_roads_{hazard_name}.gpkg"
             )
@@ -1028,7 +1036,7 @@ class IndirectAnalyses:
             starttime = time.time()
             gdf = pd.DataFrame()
             opt_routes = None
-            output_path = self.config["output"].joinpath(analysis["analysis"])
+            output_path = self.config["output_path"].joinpath(analysis["analysis"])
 
             def _save_gpkg_analysis(
                 base_graph,
@@ -1069,13 +1077,13 @@ class IndirectAnalyses:
                     "origin_count" in self.config["origins_destinations"].keys()
                 ):
                     od_table = gpd.read_feather(
-                        self.config["static"]
+                        self.config["static_path"]
                         / "output_graph"
                         / "origin_destination_table.feather"
                     )
                     _equity_weights_file = None
                     if "equity_weight" in analysis.keys():
-                        _equity_weights_file = self.config["static"].joinpath(
+                        _equity_weights_file = self.config["static_path"].joinpath(
                             "network", analysis["equity_weight"]
                         )
                     route_traffic_df = self.optimal_route_od_link(
@@ -1086,7 +1094,7 @@ class IndirectAnalyses:
                         ),
                     )
                     impact_csv_path = (
-                        self.config["output"]
+                        self.config["output_path"]
                         / analysis["analysis"]
                         / (analysis["name"].replace(" ", "_") + "_link_traffic.csv")
                     )
@@ -1113,13 +1121,13 @@ class IndirectAnalyses:
                         regional_impact_summary_df,
                     ) = self.multi_link_origin_destination_regional_impact(gdf_ori)
                     impact_csv_path = (
-                        self.config["output"]
+                        self.config["output_path"]
                         / analysis["analysis"]
                         / (analysis["name"].replace(" ", "_") + "_regional_impact.csv")
                     )
                     regional_impact_df.to_csv(impact_csv_path, index=False)
                     impact_csv_path = (
-                        self.config["output"]
+                        self.config["output_path"]
                         / analysis["analysis"]
                         / (
                             analysis["name"].replace(" ", "_")
@@ -1130,14 +1138,14 @@ class IndirectAnalyses:
                 except Exception:
                     pass
                 impact_csv_path = (
-                    self.config["output"]
+                    self.config["output_path"]
                     / analysis["analysis"]
                     / (analysis["name"].replace(" ", "_") + "_impact.csv")
                 )
                 del gdf_ori["geometry"]
                 gdf_ori.to_csv(impact_csv_path, index=False)
                 impact_csv_path = (
-                    self.config["output"]
+                    self.config["output_path"]
                     / analysis["analysis"]
                     / (analysis["name"].replace(" ", "_") + "_impact_summary.csv")
                 )
