@@ -25,11 +25,11 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
             converters={"list": lambda x: [x.strip() for x in x.split(",")]},
         )
 
-    def read(self, file_to_parse: Path) -> NetworkConfigData:
-        self._parser.read(file_to_parse)
+    def read(self, ini_file: Path) -> NetworkConfigData:
+        self._parser.read(ini_file)
         self._remove_none_values()
 
-        _parent_dir = file_to_parse.parent
+        _parent_dir = ini_file.parent
 
         _config_data = NetworkConfigData(
             input_path=_parent_dir.joinpath("input"),
