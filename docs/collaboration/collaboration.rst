@@ -102,8 +102,8 @@ Acceptance tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Our test fixtures are ready to collect and run large models for manual validation. 
-To do so, you will have to place your model under our `Deltares SVN Repository <https://repos.deltares.nl/repos/GFS_incubator/branches/ra2ce_test_data>`_, 
-our `TeamCity configuration <https://dpcbuild.deltares.nl/buildConfiguration/Ra2ce_Ra2ceContinuousIntegrationBuild_RunExternalTests?mode=builds>`_ will then be able to run the models there located so long as they follow the conventioned described in said repository.
+To do so, you will have to place your model under our `Deltares SVN Repository <https://repos.deltares.nl/repos/GFS_incubator/branches/ra2ce_test_data>`_.
+Our `TeamCity configuration <https://dpcbuild.deltares.nl/buildConfiguration/Ra2ce_Ra2ceContinuousIntegrationBuild_RunExternalTests?mode=builds>`_ will then be able to run the models there located so long as they follow the conventions described in said repository.
 
 
 Write Documentation
