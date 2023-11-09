@@ -766,7 +766,7 @@ class HazardOverlay:
                     )
 
         #### Step 4: hazard overlay of the locations that are checked for isolation ###
-        if self._isolation_locations.suffix:
+        if self._isolation_locations:
             logging.info("Detected isolated locations, checking for hazard overlay.")
             locations = gpd.read_file(self._isolation_locations, engine="pyogrio")
             locations["i_id"] = locations.index
