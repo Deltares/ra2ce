@@ -136,7 +136,7 @@ Depending on the required analysis, more data might be needed.
 
 Direct damages
 +++++++++++++++++++++++++++
-The ‘damage to the network’ depends on the intensity of the hazard in relation to how the network (and its assets) are built and its current condition (e.g. type, state of maintenance, dimensions). Here, the hazard intensity and asset condition are linked to a percentage of damage, via vulnerability functions/ fragility curves. To develop these vulnerability curves data is needed about replacements costs per asset type and the potential damage per hazard intensity. This data can be collected during a workshop with for example national road agencies and the technicians. The output of the analyses consist of damage maps per hazard (e.g. flooding, landslides), per return period or per event, per asset and per road segment.
+The ‘damage to the network’ depends on the intensity of the hazard in relation to how the network (and its assets) are built and its current condition (e.g. type, state of maintenance, dimensions). Here, the hazard intensity and asset condition are linked to a percentage of damage, via vulnerability functions/ fragility curves. To develop these vulnerability curves data is needed about replacements costs per asset type and the potential damage per hazard intensity. This data can be collected during a workshop with for example national road agencies and the technicians. The output of the analyses consists of damage maps per hazard (e.g. flooding, landslides), per return period or per event, per asset and per road segment.
 
 Possible (built-in) options for vulnerability curves include:
 
@@ -191,7 +191,7 @@ Initialization file templates
     polygon = map.geojson			# <name + file extension of the geojson polygon file in the static/network folder> / None
     network_type = drive			# drive / walk / bike / drive_service / all
     road_types = motorway,motorway_link,trunk,trunk_link,primary, primary_link,secondary,secondary_link,tertiary,tertiary_link
-    save_shp = True				# True / False
+    save_gpkg = True				# True / False
 
     [origins_destinations]
     origins = origins.shp 			# <file name> / None
@@ -227,7 +227,7 @@ Initialization file templates
   name = single link redundancy test
   analysis = single_link_redundancy
   weighing = distance
-  save_shp = True
+  save_gpkg = True
   save_csv = True
 
   [analysis2]
@@ -236,14 +236,14 @@ Initialization file templates
   aggregate_wl = max
   threshold = 0.5
   weighing = distance
-  save_shp = True
+  save_gpkg = True
   save_csv = True
 
   [analysis3]
   name = optimal origin dest test
   analysis = optimal_route_origin_destination
   weighing = distance
-  save_shp = True
+  save_gpkg = True
   save_csv = True
 
   [analysis4]
@@ -252,7 +252,7 @@ Initialization file templates
   aggregate_wl = max
   threshold = 0.5
   weighing = distance
-  save_shp = True
+  save_gpkg = True
   save_csv = False
 
   [analysis5]
@@ -261,7 +261,7 @@ Initialization file templates
   aggregate_wl = max
   threshold = 0.5
   weighing = distance
-  save_shp = True
+  save_gpkg = True
   save_csv = True
 
   [analysis6]
@@ -272,6 +272,6 @@ Initialization file templates
   weighing = length
   buffer_meters = 40
   category_field_name = category
-  save_shp = True
+  save_gpkg = True
   save_csv = True
 

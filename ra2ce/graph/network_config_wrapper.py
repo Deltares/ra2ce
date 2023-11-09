@@ -30,7 +30,7 @@ from geopandas import gpd
 
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 from ra2ce.common.io.readers import GraphPickleReader
-from ra2ce.graph.hazard import Hazard
+from ra2ce.graph.hazard.hazard_overlay import HazardOverlay
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_data.network_config_data_validator import (
     NetworkConfigDataValidator,
@@ -166,7 +166,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
             return
 
         # There is a hazard map or multiple hazard maps that should be intersected with the graph.
-        hazard = Hazard(self.config_data, self.graphs, self.files)
+        hazard = HazardOverlay(self.config_data, self.graphs, self.files)
         self.graphs = hazard.create()
 
     def is_valid(self) -> bool:

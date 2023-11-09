@@ -22,6 +22,7 @@
 
 import logging
 import os
+from pathlib import Path
 
 import geopandas as gpd
 import numpy as np
@@ -71,17 +72,17 @@ class EffectivenessMeasures:
             )
 
     @staticmethod
-    def load_effectiveness_table(path):
+    def load_effectiveness_table(path: Path):
         """This function loads a CSV table containing effectiveness of the different aspects for a number of strategies"""
         file_path = path / "effectiveness_measures.csv"
         df_lookup = pd.read_csv(file_path, index_col="strategies")
         return df_lookup.transpose().to_dict()
 
     @staticmethod
-    def create_feature_table(file_path):
+    def create_feature_table(file_path: Path):
         """This function loads a table of features from the input folder"""
         logging.info("Loading feature dataframe...")
-        gdf = gpd.read_file(file_path)
+        gdf = gpd.read_file(file_path, engine="pyogrio")
         logging.info("Dataframe loaded...")
 
         # cleaning up dataframe
@@ -114,7 +115,7 @@ class EffectivenessMeasures:
 
         # save as csv
         path, file = os.path.split(file_path)
-        df.to_csv(os.path.join(path, file.replace(".shp", ".csv")), index=False)
+        df.to_csv(os.path.join(path, file.replace(".gpkg", ".csv")), index=False)
         return df
 
     @staticmethod
