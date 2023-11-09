@@ -39,7 +39,8 @@ class ConfigWrapper:
         self.network_config = None
         self.analysis_config = None
 
-    def get_root_dir(self) -> Path:
+    @property
+    def root_dir(self) -> Path:
         if self.network_config.ini_file:
             # TODO: What do we need this for?
             return self.network_config.root_dir

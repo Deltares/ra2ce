@@ -22,24 +22,54 @@
 
 from __future__ import annotations
 
+import math
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Optional
+
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 
 
+@dataclass
+class ProjectSection:
+    name: str = ""
+
+
+@dataclass
+class AnalysisSection:
+    name: str = ""
+    analysis: str = ""  # should be enum
+    aggregate_wl: str = ""  # should be enum
+    threshold: float = math.nan
+    weighing: str = ""  # should be enum
+    calculate_route_without_disruption: Optional[bool] = False
+    buffer_meters: float = math.nan
+    category_field_name: str = ""
+    save_gpkg: bool = False
+    save_csv: bool = False
+
+
+@dataclass
 class AnalysisConfigData(ConfigDataProtocol):
-    @classmethod
-    def from_dict(cls, dict_values: dict) -> AnalysisConfigData:
-        _analysis_config = cls()
-        _analysis_config.update(**dict_values)
-        return _analysis_config
+    root_path: Optional[Path] = None
+    input_path: Optional[Path] = None
+    output_path: Optional[Path] = None
+    static_path: Optional[Path] = None
+    project: ProjectSection = field(default_factory=lambda: ProjectSection())
+    direct: list[AnalysisSection] = field(default_factory=list)
+    indirect: list[AnalysisSection] = field(default_factory=list)
+
+    def to_dict(self) -> dict:
+        _dict = self.__dict__
+        _dict["project"] = self.project.__dict__
+        _dict["direct"] = [dv.__dict__ for dv in self.direct]
+        _dict["indirect"] = [dv.__dict__ for dv in self.indirect]
+        return _dict
 
 
 class AnalysisConfigDataWithNetwork(AnalysisConfigData):
-    @classmethod
-    def from_dict(cls, dict_values: dict) -> AnalysisConfigDataWithNetwork:
-        return super().from_dict(dict_values)
+    pass
 
 
 class AnalysisConfigDataWithoutNetwork(AnalysisConfigData):
-    @classmethod
-    def from_dict(cls, dict_values: dict) -> AnalysisConfigDataWithoutNetwork:
-        return super().from_dict(dict_values)
+    pass
