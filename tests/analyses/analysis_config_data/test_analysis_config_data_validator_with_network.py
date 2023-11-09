@@ -41,7 +41,7 @@ class TestAnalysisConfigDataValidatorWithNetwork:
     )
     def test_validate_without_output_reports_error(self, output_dict: dict):
         # 1. Define test data.
-        _output_dir = output_dict.get("output", None)
+        _output_dir = output_dict.get("output_path", None)
         _expected_error = f"The configuration file 'network.ini' is not found at {_output_dir}.Please make sure to name your network settings file 'network.ini'."
         _test_config_data = AnalysisConfigDataWithNetwork.from_dict(
             {"project": {}} | output_dict
