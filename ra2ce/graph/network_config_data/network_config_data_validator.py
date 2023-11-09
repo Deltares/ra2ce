@@ -53,7 +53,7 @@ NetworkDictValues: dict[str, list[Any]] = {
     ],
     "origins": ["file", None],
     "destinations": ["file", None],
-    "save_shp": [True, False, None],
+    "save_gpkg": [True, False, None],
     "save_csv": [True, False, None],
     "hazard_map": ["file", None],
     "aggregate_wl": ["max", "min", "mean", None],

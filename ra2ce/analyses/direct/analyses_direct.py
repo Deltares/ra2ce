@@ -75,8 +75,8 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
                 gdf = []
 
             output_path = self.config["output"] / analysis["analysis"]
-            if analysis["save_shp"]:
-                shp_path = output_path / (analysis["name"].replace(" ", "_") + ".shp")
+            if analysis["save_gpkg"]:
+                shp_path = output_path / (analysis["name"].replace(" ", "_") + ".gpkg")
                 save_gdf(gdf, shp_path)
             if analysis["save_csv"]:
                 csv_path = output_path / (analysis["name"].replace(" ", "_") + ".csv")
@@ -187,7 +187,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         else:
             df = em.load_table(
                 self.config["input"] / "direct",
-                analysis["file_name"].replace(".shp", ".csv"),
+                analysis["file_name"].replace(".gpkg", ".csv"),
             )
 
         df = em.calculate_strategy_effectiveness(df, effectiveness_dict)

@@ -21,11 +21,12 @@ from typing import Any
 import networkx as nx
 import osmnx
 import pandas as pd
-from geopandas import GeoDataFrame
+from geopandas import GeoDataFrame, read_file
 from networkx import MultiDiGraph, MultiGraph
 from shapely.geometry.base import BaseGeometry
 
 import ra2ce.graph.networks_utils as nut
+from shapely.geometry import shape
 from ra2ce.graph.exporters.json_exporter import JsonExporter
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
@@ -133,9 +134,9 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
                 "No polygon_file file found at {}.".format(self.polygon_path)
             )
 
-        poly_dict = nut.read_geojson(geojson_file=self.polygon_path)
+        _normalized_polygon = nut.get_normalized_geojson_polygon(self.polygon_path)
         _complex_graph = self._download_clean_graph_from_osm(
-            polygon=nut.geojson_to_shp(poly_dict),
+            polygon=_normalized_polygon,
             network_type=self.network_type,
             road_types=self.road_types,
         )

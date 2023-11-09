@@ -21,6 +21,7 @@
 
 import ast
 import itertools
+import logging
 import operator
 from abc import ABC, abstractmethod
 from typing import Any
@@ -60,9 +61,15 @@ class TrafficAnalysisBase(ABC):
                 opt_path = self._get_opt_path_values(o_node, d_node)
                 for u_node, v_node in itertools.pairwise(opt_path):
                     _nodes_key_name = self._get_node_key(u_node, v_node)
-                    _calculated_traffic = self._calculate_origin_node_traffic(
+                    if "," in o_node:
+                        logging.error(
+                            "List of nodes as 'origin node' is not accepted and will be skipped."
+                        )
+                        continue
+                    _calculated_traffic = self._get_accumulated_traffic_from_node(
                         o_node, count_destination_nodes
                     )
+
                     if "," in d_node:
                         _calculated_traffic *= len(d_node.split(","))
 
@@ -101,53 +108,6 @@ class TrafficAnalysisBase(ABC):
             ].values[0]
             / count_destination_nodes
         )
-
-    def _get_accumulated_traffic_from_node_list(
-        self,
-        nodes_list: list[str],
-        count_destination_nodes: int,
-    ) -> AccumulatedTraffic:
-        # TODO: This algorithm is not entirely clear (increase decrease of variable _intermediate_nodes)
-        # When do we want to 'multiply' the accumulated values?
-        # When do we want to 'add' the accumulated values?
-        _accumulated_traffic = AccumulatedTraffic(
-            utilitarian=1, egalitarian=1, prioritarian=1
-        )
-        _intermediate_nodes = 0
-        for _node in nodes_list:
-            if self.destinations_names in _node:
-                _intermediate_nodes -= 1
-                continue
-            _node_traffic = self._get_accumulated_traffic_from_node(
-                _node, count_destination_nodes
-            )
-            # Multiplication ( 'operator.mul' or *) or Addition ( 'operator.add' or +) operations to acummulate traffic.
-            # This will trigger the overloaded methods in `AccumulatedTraffic`.
-            _acummulated_operator = (
-                operator.mul if _intermediate_nodes == 0 else operator.add
-            )
-            _accumulated_traffic = _acummulated_operator(
-                _accumulated_traffic, _node_traffic
-            )
-            _intermediate_nodes += 1
-
-        # Set the remainig values
-        _accumulated_traffic.egalitarian = len(
-            list(filter(lambda x: self.destinations_names not in x, nodes_list))
-        )
-        return _accumulated_traffic
-
-    def _calculate_origin_node_traffic(
-        self,
-        origin_node: str,
-        total_d_nodes: int,
-    ) -> AccumulatedTraffic:
-        if "," in origin_node:
-            return self._get_accumulated_traffic_from_node_list(
-                origin_node.split(","), total_d_nodes
-            )
-
-        return self._get_accumulated_traffic_from_node(origin_node, total_d_nodes)
 
     @abstractmethod
     def _get_accumulated_traffic_from_node(
