@@ -63,7 +63,6 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
             starttime = time.time()
 
             if analysis["analysis"] == "direct":
-
                 gdf = self.road_damage(
                     analysis
                 )  # calls the coordinator for road damage calculation
@@ -74,7 +73,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
             else:
                 gdf = []
 
-            output_path = self.config["output"] / analysis["analysis"]
+            output_path = self.config["output_path"] / analysis["analysis"]
             if analysis["save_gpkg"]:
                 shp_path = output_path / (analysis["name"].replace(" ", "_") + ".gpkg")
                 save_gdf(gdf, shp_path)
@@ -126,13 +125,12 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         if analysis["damage_curve"] == "MAN":
             manual_damage_functions = ManualDamageFunctions()
             manual_damage_functions.find_damage_functions(
-                folder=(self.config["input"] / "damage_functions")
+                folder=(self.config["input_path"] / "damage_functions")
             )
             manual_damage_functions.load_damage_functions()
 
         # Choose between event or return period based analysis
         if analysis["event_type"] == "event":
-
             event_gdf = DamageNetworkEvents(road_gdf, val_cols)
             event_gdf.main(
                 damage_function=damage_function,
@@ -174,7 +172,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         """
         em = EffectivenessMeasures(self.config, analysis)
         effectiveness_dict = em.load_effectiveness_table(
-            self.config["input"] / "direct"
+            self.config["input_path"] / "direct"
         )
 
         if self.graphs["base_network_hazard"] is None:
@@ -182,11 +180,11 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
 
         if analysis["create_table"] is True:
             df = em.create_feature_table(
-                self.config["input"] / "direct" / analysis["file_name"]
+                self.config["input_path"] / "direct" / analysis["file_name"]
             )
         else:
             df = em.load_table(
-                self.config["input"] / "direct",
+                self.config["input_path"] / "direct",
                 analysis["file_name"].replace(".gpkg", ".csv"),
             )
 
@@ -194,7 +192,9 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         df = em.knmi_correction(df)
         df_cba, costs_dict = em.cost_benefit_analysis(effectiveness_dict)
         df_cba.round(2).to_csv(
-            self.config["output"] / analysis["analysis"] / "cost_benefit_analysis.csv",
+            self.config["output_path"]
+            / analysis["analysis"]
+            / "cost_benefit_analysis.csv",
             decimal=",",
             sep=";",
             index=False,
@@ -204,7 +204,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         df_costs = em.calculate_strategy_costs(df, costs_dict)
         df_costs = df_costs.astype(float).round(2)
         df_costs.to_csv(
-            self.config["output"] / analysis["analysis"] / "output_analysis.csv",
+            self.config["output_path"] / analysis["analysis"] / "output_analysis.csv",
             decimal=",",
             sep=";",
             index=False,

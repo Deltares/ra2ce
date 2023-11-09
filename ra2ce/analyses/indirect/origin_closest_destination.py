@@ -982,7 +982,9 @@ class OriginClosestDestination:
 
     def load_origins(self):
         od_path = (
-            self.config["static"] / "output_graph" / "origin_destination_table.feather"
+            self.config["static_path"]
+            / "output_graph"
+            / "origin_destination_table.feather"
         )
         od = gpd.read_feather(od_path)
         origin = od.loc[od["o_id"].notna()]
@@ -991,7 +993,9 @@ class OriginClosestDestination:
 
     def load_destinations(self):
         od_path = (
-            self.config["static"] / "output_graph" / "origin_destination_table.feather"
+            self.config["static_path"]
+            / "output_graph"
+            / "origin_destination_table.feather"
         )
         od = gpd.read_feather(od_path)
         destination = od.loc[od["d_id"].notna()]

@@ -73,7 +73,7 @@ class AnalysisConfigWrapperWithoutNetwork(AnalysisConfigWrapperBase):
 
     def configure(self) -> None:
         self.graphs = NetworkConfigWrapper.read_graphs_from_config(
-            self.config_data["static"] / "output_graph"
+            self.config_data["static_path"] / "output_graph"
         )
         self.initialize_output_dirs()
 
