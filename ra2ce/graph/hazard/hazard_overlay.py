@@ -21,7 +21,6 @@
 
 import logging
 from pathlib import Path
-from typing import Any, List, Tuple, Union
 
 import geopandas as gpd
 import networkx as nx
@@ -68,7 +67,12 @@ class HazardOverlay:
         self._destinations = config.origins_destinations.destinations
         self._save_gpkg = config.network.save_gpkg
         self._isolation_locations = config.static_path.joinpath("network", config.isolation.locations)
-
+        if config.static_path.joinpath("network", config.isolation.locations).is_file():
+            self._isolation_locations = config.static_path.joinpath(
+                "network", config.isolation.locations
+            )
+        else:
+            self._isolation_locations = None
         # Hazard properties
         self._hazard_field_name = config.hazard.hazard_field_name
         self._hazard_id = config.hazard.hazard_id
@@ -194,8 +198,8 @@ class HazardOverlay:
         return graph
 
     def od_hazard_intersect(
-            self, graph: nx.classes.graph.Graph, ods: gpd.GeoDataFrame
-    ) -> Tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+        self, graph: nx.classes.graph.Graph, ods: gpd.GeoDataFrame
+    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         """Overlays the origin and destination locations and edges with the hazard maps
 
         Args:
@@ -430,8 +434,8 @@ class HazardOverlay:
         return _hazard_files
 
     def hazard_intersect(
-            self, to_overlay: Union[gpd.GeoDataFrame, nx.classes.graph.Graph]
-    ) -> Union[gpd.GeoDataFrame, nx.classes.graph.Graph]:
+        self, to_overlay: gpd.GeoDataFrame | nx.classes.graph.Graph
+    ) -> gpd.GeoDataFrame | nx.classes.graph.Graph:
         """Handler function that chooses the right function for overlaying the network with the hazard data."""
         # To improve performance we need to initialize the variables
         if self.hazard_files["tif"]:
@@ -484,7 +488,7 @@ class HazardOverlay:
         nx.set_edge_attributes(_graph_new, original_geometries, "geometry")
         return _graph_new.copy()
 
-    def _export_network_files(self, graph_name: str, types_to_export: List[str]):
+    def _export_network_files(self, graph_name: str, types_to_export: list[str]):
         _exporter = NetworkExporterFactory()
         _exporter.export(
             network=self.graphs[graph_name],
@@ -764,7 +768,7 @@ class HazardOverlay:
         #### Step 4: hazard overlay of the locations that are checked for isolation ###
         if self._isolation_locations.suffix:
             logging.info("Detected isolated locations, checking for hazard overlay.")
-            locations = gpd.read_file(self._isolation_locations)
+            locations = gpd.read_file(self._isolation_locations, engine="pyogrio")
             locations["i_id"] = locations.index
             locations_crs = pyproj.CRS.from_user_input(locations.crs)
             hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)

@@ -1,0 +1,8 @@
+OBJECTID,POPULATION,d_id,category,EV1_ma,EV1_ma_PD1,EV1_ma_PD2
+0,,B_0,education,0.0,0.0,0.0
+1,,B_1,education,0.0,53244.69143865001,0.0
+2,,B_2,education,0.0,54990.60008432001,0.0
+3,,B_3,education,0.0,0.0,0.0
+4,,B_4,hospital,0.0,0.0,51034.219097119996
+5,,B_5,hospital,0.0,0.0,1.3040397829184914e+16
+6,,B_6,hospital,0.0,0.0,1.3040397829184914e+16
