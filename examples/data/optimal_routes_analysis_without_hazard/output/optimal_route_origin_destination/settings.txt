@@ -1,0 +1,5 @@
+name = optimal route origin destination
+analysis = optimal_route_origin_destination
+weighing = length
+save_shp = True
+save_csv = True

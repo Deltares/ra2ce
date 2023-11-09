@@ -90,8 +90,7 @@ class TestOsmNetworkWrapper:
         _test_input_directory = test_data.joinpath("graph", "test_osm_network_wrapper")
         _polygon_file = _test_input_directory.joinpath("_test_polygon.geojson")
         assert _polygon_file.exists()
-        _polygon_dict = nut.read_geojson(_polygon_file)
-        yield nut.geojson_to_shp(_polygon_dict)
+        yield nut.get_normalized_geojson_polygon(_polygon_file)
 
     @slow_test
     def test_download_clean_graph_from_osm_output(

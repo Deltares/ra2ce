@@ -128,8 +128,8 @@ Please, write documentation on each "public" class or method you create using `g
 
 In addition, we encourage you to extend our current documentation and examples to better describe the functionality you added.
 
-To locally validate your documentation changes, simply run :code:`poetry run docs\make html`, 
-you may then navigate to :code:`docs\build\html` and open the :code:`index.html` file in your preferred internet browser.
+To locally validate your documentation changes, simply run :code:`poetry run docs\\make html`, 
+you may then navigate to :code:`docs\\build\\html` and open the :code:`index.html` file in your preferred internet browser.
 
 .. tip:: 
     Risk Assessment and Adaptation for Critical infrastructurE could always use more documentation, whether as part of the
