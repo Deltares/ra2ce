@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString, Point
+from shapely.geometry.base import BaseGeometry
 
 from ra2ce.graph import networks_utils as nu
 from tests import test_data
@@ -366,7 +367,7 @@ class TestGraphCreateUniqueIds:
 
 
 class TestNetworksUtils:
-    def test_read_from_geojson(self):
+    def test_get_normalized_geojson_polygon_from_geojson(self):
         # 1. Define test data.
         _test_file = (
             test_data / "acceptance_test_data" / "static" / "network" / "map.geojson"
@@ -374,10 +375,15 @@ class TestNetworksUtils:
         assert _test_file.exists()
 
         # 2. Run test
-        _return_value = nu.read_geojson(_test_file)
+        _return_polygon = nu.get_normalized_geojson_polygon(_test_file)
 
         # 3. Verify expectations
-        assert isinstance(_return_value, dict)
+        assert isinstance(_return_polygon, BaseGeometry)
+        _tolerance = 1e-4
+        assert _return_polygon.bounds[0] == pytest.approx(-80.26371, _tolerance)
+        assert _return_polygon.bounds[1] == pytest.approx(26.164991, _tolerance)
+        assert _return_polygon.bounds[2] == pytest.approx(-80.145264, _tolerance)
+        assert _return_polygon.bounds[3] == pytest.approx(26.221675, _tolerance)
 
 
 class TestAddMissingGeomsGraph:
