@@ -61,7 +61,7 @@ class AnalysisConfigWrapperWithoutNetwork(AnalysisConfigWrapperBase):
             raise FileNotFoundError(ini_file)
         _new_analysis_config.ini_file = ini_file
         _new_analysis_config.config_data = config_data
-        _static_dir = config_data.get("static", None)
+        _static_dir = config_data.get("static_path", None)
         if _static_dir and _static_dir.is_dir():
             config_data.files = NetworkConfigWrapper._get_existent_network_files(
                 _static_dir / "output_graph"
