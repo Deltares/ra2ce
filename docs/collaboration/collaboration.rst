@@ -102,8 +102,8 @@ Acceptance tests
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Our test fixtures are ready to collect and run large models for manual validation. 
-To do so, you will have to place your model under our `Deltares SVN Repository <https://repos.deltares.nl/repos/GFS_incubator/branches/ra2ce_test_data>`_, 
-our `TeamCity configuration <https://dpcbuild.deltares.nl/buildConfiguration/Ra2ce_Ra2ceContinuousIntegrationBuild_RunExternalTests?mode=builds>`_ will then be able to run the models there located so long as they follow the conventioned described in said repository.
+To do so, you will have to place your model under our `Deltares SVN Repository <https://repos.deltares.nl/repos/GFS_incubator/branches/ra2ce_test_data>`_.
+Our `TeamCity configuration <https://dpcbuild.deltares.nl/buildConfiguration/Ra2ce_Ra2ceContinuousIntegrationBuild_RunExternalTests?mode=builds>`_ will then be able to run the models there located so long as they follow the conventions described in said repository.
 
 
 Write Documentation
@@ -128,8 +128,8 @@ Please, write documentation on each "public" class or method you create using `g
 
 In addition, we encourage you to extend our current documentation and examples to better describe the functionality you added.
 
-To locally validate your documentation changes, simply run :code:`poetry run docs\make html`, 
-you may then navigate to :code:`docs\build\html` and open the :code:`index.html` file in your preferred internet browser.
+To locally validate your documentation changes, simply run :code:`poetry run docs\\make html`, 
+you may then navigate to :code:`docs\\build\\html` and open the :code:`index.html` file in your preferred internet browser.
 
 .. tip:: 
     Risk Assessment and Adaptation for Critical infrastructurE could always use more documentation, whether as part of the

@@ -5,11 +5,9 @@ channels:
 dependencies:
   - conda-forge::python=3.10
   - conda-forge::gdal=3.5.1
-  - conda-forge::fiona
   # from here some dragons 
   - conda-forge::geopandas
   - conda-forge::rasterio
-  - conda-forge::geojson
   - conda-forge::osmnx
   - conda-forge::tqdm
   - conda-forge::geopy
@@ -26,3 +24,4 @@ dependencies:
   - conda-forge::notebook
   # install boto3
   - conda-forge::boto3
+  - conda-forge::pandoc

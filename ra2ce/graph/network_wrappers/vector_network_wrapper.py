@@ -110,7 +110,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             gpd.GeoDataFrame: GeoDataFrame representing the data.
         """
         # read file
-        gdf = gpd.GeoDataFrame(pd.concat(list(map(gpd.read_file, file_list))))
+        gdf = gpd.GeoDataFrame(pd.concat([gpd.read_file(_fl, engine="pyogrio") for _fl in file_list]))
         logging.info(
             "Read files {} into a 'GeoDataFrame'.".format(
                 ", ".join(map(str, file_list))

@@ -76,7 +76,7 @@ def read_origin_destination_files(
         origin = gpd.GeoDataFrame(
             columns=[od_id, "o_id", "geometry", "region"], crs=crs_
         )
-        region = gpd.read_file(region_paths)
+        region = gpd.read_file(region_paths, engine="pyogrio")
         region = region[[region_var, "geometry"]]
     else:
         origin = gpd.GeoDataFrame(columns=[od_id, "o_id", "geometry"], crs=crs_)
@@ -97,7 +97,7 @@ def read_origin_destination_files(
         destination_names = [destination_names]
 
     for op, on in zip(origin_paths, origin_names):
-        origin_new = gpd.read_file(op, crs=crs_)
+        origin_new = gpd.read_file(op, crs=crs_, engine="pyogrio")
         try:
             origin_new[od_id] * 2  # just for checking
         except Exception:
@@ -111,21 +111,23 @@ def read_origin_destination_files(
         else:
             origin_new = origin_new[[od_id, origin_count, "geometry"]]
         origin_new["o_id"] = on + "_" + origin_new[od_id].astype(str)
-        origin = pd.concat([origin, origin_new], ignore_index=True)
+        origin_new.crs = origin.crs
+        origin = gpd.GeoDataFrame(pd.concat([origin, origin_new], ignore_index=True))
 
     destination_columns_add = [od_id, "geometry"]
     if category:
         destination_columns_add.append(category)
 
     for dp, dn in zip(destination_paths, destination_names):
-        destination_new = gpd.read_file(dp, crs=crs_)
+        destination_new = gpd.read_file(dp, crs=crs_, engine="pyogrio")
         try:
             assert destination_new[od_id]
         except Exception:
             destination_new[od_id] = destination_new.index
         destination_new = destination_new[destination_columns_add]
         destination_new["d_id"] = dn + "_" + destination_new[od_id].astype(str)
-        destination = pd.concat([destination, destination_new], ignore_index=True)
+        destination_new.crs = destination.crs
+        destination = gpd.GeoDataFrame(pd.concat([destination, destination_new], ignore_index=True))
 
     od = pd.concat([origin, destination], sort=False)
 
@@ -654,7 +656,7 @@ def generate_points_from_raster(fn, out_fn):
 def origins_from_raster(output_folder: Path, mask_fn, raster_fn) -> Path:
     """Makes origin points from a population raster."""
     output_fn = output_folder / "origins_raster.tif"
-    mask = gpd.read_file(mask_fn[0])
+    mask = gpd.read_file(mask_fn[0], engine="pyogrio")
     res = 1000  # in meter; TODO: put in config file or in network.ini
     out_array, out_meta = rescale_and_crop(raster_fn, mask, output_folder, res)
     outputfile = export_raster_to_geotiff(out_array, out_meta, output_folder, output_fn)
