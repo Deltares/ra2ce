@@ -22,9 +22,11 @@
 
 import logging
 
+from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
+
 
 class DirectAnalyses:
-    def __init__(self, config):
+    def __init__(self, config: AnalysisConfigData):
         self.config = config
 
     def execute(self):

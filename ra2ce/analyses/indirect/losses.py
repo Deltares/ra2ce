@@ -23,18 +23,23 @@
 import numpy as np
 import pandas as pd
 
+from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
+    AnalysisSectionIndirect,
+)
+
 
 class Losses:
-    def __init__(self, config, analysis):
+    def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionIndirect):
         self.config = config
         self.analysis = analysis
-        self.duration = analysis["duration_event"]
-        self.duration_disr = analysis["duration_disruption"]
-        self.detour_traffic = analysis["fraction_detour"]
-        self.traffic_throughput = analysis["fraction_drivethrough"]
-        self.rest_capacity = analysis["rest_capacity"]
-        self.maximum = analysis["maximum_jam"]
-        self.partofday = analysis["partofday"]
+        self.duration = analysis.duration_event
+        self.duration_disr = analysis.duration_disruption
+        self.detour_traffic = analysis.fraction_detour
+        self.traffic_throughput = analysis.fraction_drivethrough
+        self.rest_capacity = analysis.rest_capacity
+        self.maximum = analysis.maximum_jam
+        self.partofday = analysis.partofday
 
     @staticmethod
     def vehicle_loss_hours(path):
@@ -180,7 +185,7 @@ class Losses:
         """
 
         traffic_data = self.load_df(
-            self.config["input_path"] / "losses", "traffic_intensities.csv"
+            self.config.input_path / "losses", "traffic_intensities.csv"
         )
         dict1 = {
             "AS_VTG": "evening_total",
@@ -199,9 +204,7 @@ class Losses:
         }
         traffic_data.rename(columns=dict1, inplace=True)
 
-        detour_data = self.load_df(
-            self.config["input_path"] / "losses", "detour_data.csv"
-        )
+        detour_data = self.load_df(self.config.input_path / "losses", "detour_data.csv")
         dict2 = {
             "VA_AV_HWN": "detour_time_evening",
             "VA_RD_HWN": "detour_time_remaining",
@@ -210,8 +213,6 @@ class Losses:
         }
         detour_data.rename(columns=dict2, inplace=True)
 
-        vehicle_loss_hours = self.vehicle_loss_hours(
-            self.config["input_path"] / "losses"
-        )
+        vehicle_loss_hours = self.vehicle_loss_hours(self.config.input_path / "losses")
         vlh = self.calc_vlh(traffic_data, vehicle_loss_hours, detour_data)
         return vlh

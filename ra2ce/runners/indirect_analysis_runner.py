@@ -35,8 +35,8 @@ class IndirectAnalysisRunner(AnalysisRunner):
     @staticmethod
     def can_run(ra2ce_input: ConfigWrapper) -> bool:
         return (
-            not ra2ce_input.analysis_config
-            or "indirect" in ra2ce_input.analysis_config.config_data
+            bool(ra2ce_input.analysis_config)
+            and ra2ce_input.analysis_config.config_data.indirect
         )
 
     def run(self, analysis_config: AnalysisConfigWrapperBase) -> None:

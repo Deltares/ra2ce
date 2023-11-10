@@ -21,6 +21,6 @@ class TestDirectAnalyses:
                 )
             ],
             output_path=test_data,
-        ).to_dict()
+        )
         _graphs = {}
         DirectAnalyses(_config, _graphs).execute()
