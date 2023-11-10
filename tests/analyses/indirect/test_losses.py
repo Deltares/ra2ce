@@ -3,6 +3,10 @@ import itertools
 import numpy as np
 import pandas as pd
 import pytest
+from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
+    AnalysisSectionIndirect,
+)
 
 from ra2ce.analyses.indirect.losses import Losses
 
@@ -10,16 +14,16 @@ from ra2ce.analyses.indirect.losses import Losses
 class TestLosses:
     def test_initialize(self):
         # 1. Define test data
-        _config = {}
-        _analyses = {
-            "duration_event": None,
-            "duration_disruption": None,
-            "fraction_detour": None,
-            "fraction_drivethrough": None,
-            "rest_capacity": None,
-            "maximum_jam": None,
-            "partofday": None,
-        }
+        _config = AnalysisConfigData
+        _analyses = AnalysisSectionIndirect(
+            duration_event=None,
+            duration_disruption=None,
+            fraction_detour=None,
+            fraction_drivethrough=None,
+            rest_capacity=None,
+            maximum_jam=None,
+            partofday=None,
+        )
 
         # 2. Run test.
         _losses = Losses(_config, _analyses)
@@ -29,16 +33,16 @@ class TestLosses:
 
     def test_traffic_shockwave(self):
         # 1. Define test data
-        _config = {}
-        _analyses = {
-            "duration_event": 60,
-            "duration_disruption": None,
-            "fraction_detour": None,
-            "fraction_drivethrough": 24,
-            "rest_capacity": 42,
-            "maximum_jam": None,
-            "partofday": None,
-        }
+        _config = AnalysisConfigData()
+        _analyses = AnalysisSectionIndirect(
+            duration_event=60,
+            duration_disruption=None,
+            fraction_detour=None,
+            fraction_drivethrough=24,
+            rest_capacity=42,
+            maximum_jam=None,
+            partofday=None,
+        )
         _losses = Losses(_config, _analyses)
         _capacity = pd.Series([42, 24, 12])
         _intensity = pd.Series([4.2, 2.4, 1.2])
@@ -60,16 +64,17 @@ class TestLosses:
     def test_calc_vlh(self, part_of_day: str):
         # 1. Define test data
         # TODO: Not sure of the input format values float of series?
-        _config = {}
-        _analyses = {
-            "duration_event": 60,
-            "duration_disruption": 15,
-            "fraction_detour": 1.24,
-            "fraction_drivethrough": 24,
-            "rest_capacity": 42,
-            "maximum_jam": 100,
-            "partofday": part_of_day,
-        }
+        _config = AnalysisConfigData()
+        _analyses = AnalysisSectionIndirect(
+            duration_event=60,
+            duration_disruption=15,
+            fraction_detour=1.24,
+            fraction_drivethrough=24,
+            rest_capacity=42,
+            maximum_jam=100,
+            partofday=part_of_day,
+        )
+
         _losses = Losses(_config, _analyses)
         _traffic_data = pd.DataFrame(
             {

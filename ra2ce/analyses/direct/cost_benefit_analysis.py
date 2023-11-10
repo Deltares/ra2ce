@@ -28,51 +28,54 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 
+from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
+    AnalysisSectionDirect,
+)
+
 
 class EffectivenessMeasures:
     """This is a namespace for methods to calculate effectiveness of measures"""
 
-    def __init__(self, config, analysis):
+    def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionDirect):
         self.analysis = analysis
         self.config = config
-        self.return_period = analysis["return_period"]  # years
-        self.repair_costs = analysis["repair_costs"]  # euro
-        self.evaluation_period = analysis["evaluation_period"]  # years
-        self.interest_rate = analysis["interest_rate"] / 100  # interest rate
-        self.climate_factor = analysis["climate_factor"] / analysis["climate_period"]
+        self.return_period = analysis.return_period  # years
+        self.repair_costs = analysis.repair_costs  # euro
+        self.evaluation_period = analysis.evaluation_period  # years
+        self.interest_rate = analysis.interest_rate / 100  # interest rate
+        self.climate_factor = analysis.climate_factor / analysis.climate_period
         self.btw = 1.21  # VAT multiplication factor to include taxes
 
         # perform checks on input while initializing class
-        self._validate_input_params(self.analysis, self.config)
+        self._validate_input_params(self.config, self.analysis)
 
-    def _validate_input_params(self, analysis: dict, config: dict) -> None:
-        if analysis["file_name"] is None:
+    def _validate_input_params(
+        self, config: AnalysisConfigData, analysis: AnalysisSectionDirect
+    ) -> None:
+        if analysis.file_name is None:
             _error = "Effectiveness of measures calculation: No input file configured. Please define an input file in the analysis.ini file."
             logging.error(_error)
             raise ValueError(_error)
-        elif analysis["file_name"].split(".")[1] != "shp":
+        elif analysis.file_name.split(".")[1] != "shp":
             _error = "Effectiveness of measures calculation: Wrong input file configured. Extension of input file is -{}-, needs to be -shp- (shapefile)".format(
-                analysis["file_name"].split(".")[1]
+                analysis.file_name.split(".")[1]
             )
             logging.error(_error)
             raise ValueError(_error)
-        elif not (config["input_path"] / "direct" / analysis["file_name"]).exists():
+        elif not (config.input_path / "direct" / analysis.file_name).exists():
             _error = "Effectiveness of measures calculation: Input file doesn't exist please place file in the following folder: {}".format(
-                config["input_path"] / "direct"
+                config.input_path / "direct"
             )
             logging.error(_error)
-            raise FileNotFoundError(
-                config["input_path"] / "direct" / analysis["file_name"]
-            )
-        elif not (
-            config["input_path"] / "direct" / "effectiveness_measures.csv"
-        ).exists():
+            raise FileNotFoundError(config.input_path / "direct" / analysis.file_name)
+        elif not (config.input_path / "direct" / "effectiveness_measures.csv").exists():
             _error = "Effectiveness of measures calculation: lookup table with effectiveness of measures doesnt exist. Please place the effectiveness_measures.csv file in the following folder: {}".format(
-                config["input_path"] / "direct"
+                config.input_path / "direct"
             )
             logging.error(_error)
             raise FileNotFoundError(
-                config["input_path"] / "direct" / "effectiveness_measures.csv"
+                config.input_path / "direct" / "effectiveness_measures.csv"
             )
 
     @staticmethod
@@ -238,7 +241,7 @@ class EffectivenessMeasures:
         df_total = self.calculate_effectiveness(df, name="standard")
 
         df_blockage = pd.read_csv(
-            self.config["input_path"] / "direct" / "blockage_costs.csv"
+            self.config.input_path / "direct" / "blockage_costs.csv"
         )
         df_total = df_total.merge(df_blockage, how="left", on="LinkNr")
         df_total["length"] = df_total[

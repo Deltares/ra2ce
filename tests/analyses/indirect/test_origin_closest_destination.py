@@ -1,11 +1,19 @@
+from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
+    AnalysisSectionIndirect,
+)
 from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDestination
+from ra2ce.graph.network_config_data.network_config_data import (
+    NetworkSection,
+    OriginsDestinationsSection,
+)
 
 
 class TestOriginClosestDestination:
     def test_init_with_category(self):
         # 1. Define test data.
-        _config_dict = {
-            "origins_destinations": dict(
+        _config_dict = AnalysisConfigData(
+            origins_destinations=OriginsDestinationsSection(
                 origins_names="",
                 destinations_names="",
                 id_name_origin_destination="",
@@ -13,9 +21,9 @@ class TestOriginClosestDestination:
                 origin_count="",
                 category="dummy_value",
             ),
-            "network": dict(file_id=""),
-        }
-        _analysis = dict(threshold="", weighing="")
+            network=NetworkSection(file_id=""),
+        )
+        _analysis = AnalysisSectionIndirect(threshold="", weighing="")
         _hazard_names = None
 
         # 2. Run test.
