@@ -28,6 +28,10 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
+from ra2ce.graph.network_config_data.network_config_data import (
+    NetworkSection,
+    OriginsDestinationsSection,
+)
 
 
 @dataclass
@@ -39,6 +43,14 @@ class ProjectSection:
 class AnalysisSectionIndirect:
     name: str = ""
     analysis: str = ""  # should be enum
+    disruption_per_category: str = ""
+    duration_event: float = math.nan
+    duration_disruption: float = math.nan
+    fraction_detour: float = math.nan
+    fraction_drivethrough: float = math.nan
+    rest_capacity: float = math.nan
+    maximum_jam: float = math.nan
+    partofday: str = ""
     aggregate_wl: str = ""  # should be enum
     threshold: float = math.nan
     weighing: str = ""  # should be enum
@@ -47,6 +59,7 @@ class AnalysisSectionIndirect:
     buffer_meters: float = math.nan
     category_field_name: str = ""
     file_name: Path = None
+    save_traffic: bool = False
     save_gpkg: bool = False
     save_csv: bool = False
 
@@ -55,6 +68,12 @@ class AnalysisSectionIndirect:
 class AnalysisSectionDirect:
     name: str = ""
     analysis: str = ""  # should be enum
+    return_period: float = math.nan
+    repair_costs: float = math.nan
+    evaluation_period: float = math.nan
+    interest_rate: float = math.nan
+    climate_factor: float = math.nan
+    climate_period: float = math.nan
     damage_curve: str = ""
     event_type: str = ""
     risk_calculation: str = ""
@@ -81,6 +100,10 @@ class AnalysisConfigData(ConfigDataProtocol):
     direct: list[AnalysisSectionDirect] = field(default_factory=list)
     indirect: list[AnalysisSectionIndirect] = field(default_factory=list)
     files: Optional[dict[str, Path]] = field(default_factory=dict)
+    origins_destinations: Optional[OriginsDestinationsSection] = field(
+        default_factory=lambda: OriginsDestinationsSection()
+    )
+    network: Optional[NetworkSection] = field(default_factory=lambda: NetworkSection())
 
     def to_dict(self) -> dict:
         _dict = self.__dict__
