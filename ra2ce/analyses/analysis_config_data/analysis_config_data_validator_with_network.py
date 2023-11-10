@@ -19,7 +19,7 @@ class AnalysisConfigDataValidatorWithNetwork(Ra2ceIoValidator):
         _output_network_dir = self._config.output_path
         if (
             not _output_network_dir
-            or not (_output_network_dir / "network.ini").is_file()
+            or not (_output_network_dir.joinpath("network.ini")).is_file()
         ):
             _base_report.error(
                 f"The configuration file 'network.ini' is not found at {_output_network_dir}."

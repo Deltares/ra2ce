@@ -24,7 +24,7 @@ import copy
 import logging
 import time
 from pathlib import Path
-from typing import Any, List, Tuple
+from typing import Any
 
 import geopandas as gpd
 import networkx as nx
@@ -846,7 +846,7 @@ class IndirectAnalyses:
 
     def multi_link_isolated_locations(
         self, graph: nx.Graph, analysis: AnalysisSectionIndirect, crs=4326
-    ) -> Tuple[gpd.GeoDataFrame, pd.DataFrame]:
+    ) -> tuple[gpd.GeoDataFrame, pd.DataFrame]:
         """
         This function identifies locations that are flooded or isolated due to the disruption of the network caused by a hazard.
         It iterates over multiple hazard scenarios, modifies the graph to represent direct and indirect impacts, and then
@@ -1043,8 +1043,8 @@ class IndirectAnalyses:
 
             def _save_gpkg_analysis(
                 base_graph,
-                to_save_gdf: List[gpd.GeoDataFrame],
-                to_save_gdf_names: List[str],
+                to_save_gdf: list[gpd.GeoDataFrame],
+                to_save_gdf_names: list[str],
             ):
                 for to_save, save_name in zip(to_save_gdf, to_save_gdf_names):
                     if not to_save.empty:
