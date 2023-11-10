@@ -20,7 +20,9 @@
 """
 
 
+import math
 from pathlib import Path
+from typing import Any
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigDataWithoutNetwork,
@@ -84,27 +86,16 @@ class AnalysisConfigDataValidatorWithoutNetwork(Ra2ceIoValidator):
                 )
         return _files_report
 
-    def _validate_headers(self, required_headers: list[str]) -> ValidationReport:
+    def _validate_header(self, header: Any) -> ValidationReport:
         _report = ValidationReport()
-        _available_keys = self._config.keys()
 
-        def _check_header(header: str) -> None:
-            if header not in _available_keys:
-                _report.error(
-                    f"Property [ {header} ] is not configured. Add property [ {header} ] to the *.ini file. "
-                )
-
-        list(map(_check_header, required_headers))
-        if not _report.is_valid():
-            return _report
-
-        # check if properties have correct input
-        # TODO: Decide whether also the non-used properties must be checked or those are not checked
-        # TODO: Decide how to check for multiple analyses (analysis1, analysis2, etc)
-
-        for header in required_headers:
-            # Now check the parameters per configured item.
-            for key, value in self._config[header].items():
+        if isinstance(header, list):
+            for _item in header:
+                _report.merge(self._validate_header(_item))
+        else:
+            for key, value in header.__dict__.items():
+                if not value:
+                    continue
                 if key not in AnalysisNetworkDictValues.keys():
                     continue
                 _expected_values_list = AnalysisNetworkDictValues[key]
@@ -123,12 +114,40 @@ class AnalysisConfigDataValidatorWithoutNetwork(Ra2ceIoValidator):
                         f"Wrong input to property [ {key} ], has to be one of: {_expected_values_list}"
                     )
 
+        return _report
+
+    def _validate_headers(self, required_headers: list[str]) -> ValidationReport:
+        _report = ValidationReport()
+        _available_keys = self._config.__dict__.keys()
+
+        def _check_header(header: str) -> None:
+            if header not in _available_keys:
+                _report.error(
+                    f"Property [ {header} ] is not configured. Add property [ {header} ] to the *.ini file. "
+                )
+
+        list(map(_check_header, required_headers))
+        if not _report.is_valid():
+            return _report
+
+        # check if properties have correct input
+        # TODO: Decide whether also the non-used properties must be checked or those are not checked
+        # TODO: Decide how to check for multiple analyses (analysis1, analysis2, etc)
+
+        for header in required_headers:
+            # Now check the parameters per configured item.
+            _attr = getattr(self._config, header)
+            if not _attr:
+                continue
+            else:
+                _report.merge(self._validate_header(_attr))
+
         if not _report.is_valid():
             _report.error(
                 "There are inconsistencies in the *.ini file. Please consult the log file for more information: {}".format(
-                    self._config["root_path"]
+                    self._config.root_path
                     / "data"
-                    / self._config["project"]["name"]
+                    / self._config.project.name
                     / "output"
                     / "RA2CE.log"
                 )
@@ -138,9 +157,7 @@ class AnalysisConfigDataValidatorWithoutNetwork(Ra2ceIoValidator):
 
     def validate(self) -> ValidationReport:
         _report = ValidationReport()
-        _required_headers = ["project"]
-        # Analysis are marked as [analysis1], [analysis2], ...
-        _required_headers.extend([a for a in self._config.keys() if "analysis" in a])
+        _required_headers = ["project", "direct", "indirect"]
 
         _report.merge(self._validate_headers(_required_headers))
         return _report

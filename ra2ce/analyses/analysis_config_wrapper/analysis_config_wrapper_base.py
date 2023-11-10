@@ -22,7 +22,7 @@
 
 from abc import abstractclassmethod, abstractmethod
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
@@ -32,6 +32,7 @@ from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProt
 class AnalysisConfigWrapperBase(ConfigWrapperProtocol):
     ini_file: Path
     config_data: Optional[AnalysisConfigData] = None
+    graphs: Optional[dict] = None
 
     @staticmethod
     def get_network_root_dir(filepath: Path) -> Path:
@@ -54,10 +55,10 @@ class AnalysisConfigWrapperBase(ConfigWrapperProtocol):
 
         def _create_output_folders(analysis_type: str) -> None:
             # Create the output folders
-            if analysis_type not in self.config_data.keys():
+            if not hasattr(self.config_data, analysis_type):
                 return
-            for a in self.config_data[analysis_type]:
-                output_path = self.config_data["output_path"] / a["analysis"]
+            for a in getattr(self.config_data, analysis_type):
+                output_path = self.config_data.output_path / a.analysis
                 output_path.mkdir(parents=True, exist_ok=True)
 
         _create_output_folders("direct")

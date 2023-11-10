@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analyses.direct.cost_benefit_analysis import EffectivenessMeasures
 from tests import test_data
 
@@ -16,7 +17,7 @@ class MockEffectivenessMeasures(EffectivenessMeasures):
 
 class TestCostBenefitAnalysis:
     def test_init_raises_when_file_name_not_defined(self):
-        _config = {"input": test_data}
+        _config = AnalysisConfigData(input_path=test_data).to_dict()
         _analysis = {
             "return_period": None,
             "repair_costs": None,
@@ -34,7 +35,7 @@ class TestCostBenefitAnalysis:
         )
 
     def test_init_raises_when_file_name_not_shp(self):
-        _config = {"input": test_data}
+        _config = AnalysisConfigData(input_path=test_data).to_dict()
         _analysis = {
             "return_period": None,
             "repair_costs": None,
@@ -52,7 +53,7 @@ class TestCostBenefitAnalysis:
         )
 
     def test_init_raises_when_direct_shp_file_does_not_exist(self):
-        _config = {"input": test_data}
+        _config = AnalysisConfigData(input_path=test_data).to_dict()
         _analysis = {
             "return_period": None,
             "repair_costs": None,
@@ -69,7 +70,7 @@ class TestCostBenefitAnalysis:
         )
 
     def test_init_raises_when_effectiveness_measures_does_not_exist(self):
-        _config = {"input": test_data}
+        _config = AnalysisConfigData(input_path=test_data).to_dict()
         _analysis = {
             "return_period": None,
             "repair_costs": None,

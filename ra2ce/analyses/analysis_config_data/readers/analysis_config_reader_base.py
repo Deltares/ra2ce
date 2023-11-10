@@ -24,7 +24,7 @@ import logging
 import re
 from configparser import ConfigParser
 from pathlib import Path
-from shutil import copy
+from shutil import copyfile
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
@@ -136,16 +136,22 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
     def _copy_output_files(
         self, from_path: Path, config_data: AnalysisConfigData
     ) -> None:
-        _output_dir = config_data.output_path
+        _output_dir = config_data.root_path.joinpath(config_data.project.name).joinpath(
+            "output"
+        )
+        config_data.output_path = _output_dir
         if not _output_dir.exists():
             _output_dir.mkdir(parents=True)
         try:
-            copy(from_path, _output_dir)
+            copyfile(
+                from_path,
+                config_data.output_path.joinpath("{}.ini".format(from_path.stem)),
+            )
         except FileNotFoundError as e:
             logging.warning(e)
 
     def _parse_path_list(
-        self, property_name: str, path_list: str, config_data: dict
+        self, property_name: str, path_list: str, config_data: AnalysisConfigData
     ) -> list[Path]:
         _list_paths = []
         for path_value in path_list.split(","):
@@ -154,9 +160,7 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
                 _list_paths.append(path_value)
                 continue
 
-            _project_name_dir = (
-                config_data["root_path"] / config_data["project"]["name"]
-            )
+            _project_name_dir = config_data.root_path / config_data.project.name
             abs_path = _project_name_dir / "static" / property_name / path_value
             try:
                 assert abs_path.is_file()
