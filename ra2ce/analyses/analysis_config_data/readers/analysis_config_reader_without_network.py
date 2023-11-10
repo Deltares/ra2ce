@@ -60,11 +60,9 @@ class AnalysisConfigReaderWithoutNetwork(AnalysisConfigReaderBase):
         _output_network_ini_file = _config_data.output_path.joinpath("network.ini")
         _network_config = NetworkConfigDataReader().read(_output_network_ini_file)
         _config_data.update(_network_config.to_dict())
-        _network = _config_data.get("network", None)
+        _network = _config_data.network
         if _network:
-            _config_data.origins_destinations = _network.get(
-                "origins_destinations", None
-            )
+            _config_data.origins_destinations = _network.origins_destinations
         else:
             logging.warn(f"Not found network key for the Analysis {ini_file}")
 
