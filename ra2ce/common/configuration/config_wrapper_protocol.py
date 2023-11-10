@@ -36,6 +36,9 @@ class ConfigWrapperProtocol(Protocol):  # pragma: no cover
 
     @property
     def root_dir(self) -> Path:
+        """
+        To be implemented
+        """
         pass
 
     @classmethod
