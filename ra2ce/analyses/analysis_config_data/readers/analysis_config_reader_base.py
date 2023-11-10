@@ -160,12 +160,14 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
                 _list_paths.append(path_value)
                 continue
 
-            _project_name_dir = config_data.root_path / config_data.project.name
-            abs_path = _project_name_dir / "static" / property_name / path_value
+            _project_name_dir = config_data.root_path.joinpath(config_data.project.name)
+            abs_path = _project_name_dir.joinpath("static", property_name, path_value)
             try:
                 assert abs_path.is_file()
             except AssertionError:
-                abs_path = _project_name_dir / "input" / property_name / path_value
+                abs_path = _project_name_dir.joinpath(
+                    "input", property_name, path_value
+                )
 
             _list_paths.append(abs_path)
         return _list_paths

@@ -28,8 +28,9 @@ class TestAnalysisConfigReaderBase:
     ):
         # 1. Define test data.
         _dir_name = "output"
-        _config_data = AnalysisConfigData(root_path=test_results)
-        _config_data.project = ProjectSection(name=request.node.name)
+        _config_data = AnalysisConfigData(
+            root_path=test_results, project=ProjectSection(name=request.node.name)
+        )
         _expected_dir = test_results / request.node.name / _dir_name
         if _expected_dir.exists():
             shutil.rmtree(_expected_dir)
@@ -49,10 +50,9 @@ class TestAnalysisConfigReaderBase:
         self, valid_reader: AnalysisConfigReaderBase, request: pytest.FixtureRequest
     ):
         # 1. Define test data.
-        _config_data = {
-            "root_path": test_results,
-            "project": {"name": request.node.name},
-        }
+        _config_data = AnalysisConfigData(
+            root_path=test_results, project=ProjectSection(name=request.node.name)
+        )
         _prop_name = "a_property"
         _path_list = "a"
         _expected_path = test_results / request.node.name / "input" / _prop_name / "a"
