@@ -35,7 +35,7 @@ from ra2ce.analyses.direct.damage_calculation import (
 
 class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
     """
-    Coordination classs for all direct damage analysis
+    Coordination class for all direct damage analysis
 
     Methods of this class are independent modules to do:
      - direct damage analysis
@@ -91,7 +91,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
 
     def road_damage(self, analysis: dict) -> gpd.GeoDataFrame:
         """
-        ### CONTROLER FOR CALCULATING THE ROAD DAMAGE
+        ### CONTROLLER FOR CALCULATING THE ROAD DAMAGE
 
         Arguments:
             *analysis* (dict) : contains part of the settings from the analysis ini
@@ -247,7 +247,7 @@ def rename_road_gdf_to_conventions(road_gdf_columns):
     ### Handle return period columns
     new_cols = []
     for c in cs:
-        if c.startswith("RP"):
+        if c.startswith("RP") or c.startswith("EV"):
             new_cols.append("F_" + c)
         else:
             new_cols.append(c)
