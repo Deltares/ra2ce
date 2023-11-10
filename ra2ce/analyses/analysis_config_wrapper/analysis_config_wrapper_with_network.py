@@ -90,9 +90,9 @@ class AnalysisConfigWrapperWithNetwork(AnalysisConfigWrapperBase):
 
     def configure(self) -> None:
         self.config_data.files = self._network_config.files
-        self.config_data.network = self._network_config.config_data.network.__dict__
+        self.config_data.network = self._network_config.config_data.network
         self.config_data.origins_destinations = (
-            self._network_config.config_data.origins_destinations.__dict__
+            self._network_config.config_data.origins_destinations
         )
 
         # When Network is present the graphs are retrieved from the already configured object.
