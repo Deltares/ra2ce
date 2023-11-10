@@ -3,7 +3,10 @@ from pathlib import Path
 
 import pytest
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
+    AnalysisSectionDirect,
+)
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_with_network import (
     AnalysisConfigWrapperWithNetwork,
 )
@@ -74,11 +77,11 @@ class TestAnalysisWithNetworkConfig:
         # 1. Define test data
         _analysis = AnalysisConfigWrapperWithNetwork()
         _output_dir = test_results / request.node.name
-        _analysis.config_data = {
-            "direct": [{"analysis": "test_direct"}],
-            "indirect": [{"analysis": "test_indirect"}],
-            "output": _output_dir,
-        }
+        _analysis.config_data = AnalysisConfigData(output_path=_output_dir)
+        _analysis.config_data.direct = [AnalysisSectionDirect(analysis="test_direct")]
+        _analysis.config_data.indirect = [
+            AnalysisSectionDirect(analysis="test_indirect")
+        ]
         if _output_dir.exists():
             shutil.rmtree(_output_dir)
 

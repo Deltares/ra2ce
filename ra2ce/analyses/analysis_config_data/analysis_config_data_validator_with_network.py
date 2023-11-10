@@ -16,7 +16,7 @@ class AnalysisConfigDataValidatorWithNetwork(Ra2ceIoValidator):
         _base_report = AnalysisConfigDataValidatorWithoutNetwork(
             self._config
         ).validate()
-        _output_network_dir = self._config.get("output", None)
+        _output_network_dir = self._config.output_path
         if (
             not _output_network_dir
             or not (_output_network_dir / "network.ini").is_file()

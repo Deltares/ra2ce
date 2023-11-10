@@ -50,13 +50,7 @@ class AnalysisConfigReaderWithNetwork(AnalysisConfigReaderBase):
 
     def read(self, ini_file: Path) -> AnalysisConfigDataWithNetwork:
         _config = super().read(ini_file)
-        _config_data = AnalysisConfigDataWithNetwork(
-            input_path=_config.input_path,
-            output_path=_config.output_path,
-            static_path=_config.static_path,
-            project=_config.project,
-            direct=_config.direct,
-            indirect=_config.indirect,
-        )
+        _config_data = AnalysisConfigDataWithNetwork(**_config.__dict__)
+
         self._copy_output_files(ini_file, _config_data)
         return _config_data

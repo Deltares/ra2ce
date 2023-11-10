@@ -53,14 +53,8 @@ class AnalysisConfigReaderWithoutNetwork(AnalysisConfigReaderBase):
             AnalysisConfigDataWithoutNetwork
         """
         _config = super().read(ini_file)
-        _config_data = AnalysisConfigDataWithoutNetwork(
-            input_path=_config.input_path,
-            output_path=_config.output_path,
-            static_path=_config.static_path,
-            project=_config.project,
-            direct=_config.direct,
-            indirect=_config.indirect,
-        )
+        _config_data = AnalysisConfigDataWithoutNetwork(**_config.__dict__)
+
         self._copy_output_files(ini_file, _config_data)
 
         _output_network_ini_file = _config_data.output_path.joinpath("network.ini")
@@ -68,7 +62,7 @@ class AnalysisConfigReaderWithoutNetwork(AnalysisConfigReaderBase):
         _config_data.update(_network_config.to_dict())
         _network = _config_data.get("network", None)
         if _network:
-            _config_data["origins_destinations"] = _network.get(
+            _config_data.origins_destinations = _network.get(
                 "origins_destinations", None
             )
         else:

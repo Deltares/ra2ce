@@ -2,6 +2,10 @@ import shutil
 
 import pytest
 
+from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
+    ProjectSection,
+)
 from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_base import (
     AnalysisConfigReaderBase,
 )
@@ -24,10 +28,8 @@ class TestAnalysisConfigReaderBase:
     ):
         # 1. Define test data.
         _dir_name = "output"
-        _config_data = {
-            "root_path": test_results,
-            "project": {"name": request.node.name},
-        }
+        _config_data = AnalysisConfigData(root_path=test_results)
+        _config_data.project = ProjectSection(name=request.node.name)
         _expected_dir = test_results / request.node.name / _dir_name
         if _expected_dir.exists():
             shutil.rmtree(_expected_dir)
@@ -42,28 +44,6 @@ class TestAnalysisConfigReaderBase:
         # 3. Verify expectations.
         assert _expected_dir.exists()
         assert not _test_file.exists()
-
-    def test_create_config_dir_creates_dir_if_does_not_exist(
-        self, valid_reader: AnalysisConfigReaderBase, request: pytest.FixtureRequest
-    ):
-        # 1. Define test data.
-        _dir_name = "missing_dir"
-        _config_data = {
-            "root_path": test_results,
-            "project": {"name": request.node.name},
-        }
-        _expected_dir = test_results / request.node.name / _dir_name
-        if _expected_dir.exists():
-            shutil.rmtree(_expected_dir)
-        assert not _expected_dir.exists()
-
-        # 2. Run test.
-        valid_reader._create_config_dir(_dir_name, _config_data)
-
-        # 3. Verify expectations.
-        assert _dir_name in _config_data.keys()
-        assert _config_data[_dir_name].exists()
-        assert _expected_dir.exists()
 
     def test_parse_path_list_non_existing_file(
         self, valid_reader: AnalysisConfigReaderBase, request: pytest.FixtureRequest

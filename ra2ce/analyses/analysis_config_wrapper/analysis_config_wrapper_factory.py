@@ -67,11 +67,11 @@ class AnalysisConfigWrapperFactory:
         """
         if isinstance(analysis_config, AnalysisConfigDataWithNetwork):
             return AnalysisConfigWrapperWithNetwork.from_data_with_network(
-                ini_file, analysis_config.to_dict(), network_config
+                ini_file, analysis_config, network_config
             )
         elif isinstance(analysis_config, AnalysisConfigDataWithoutNetwork):
             return AnalysisConfigWrapperWithoutNetwork.from_data(
-                ini_file, analysis_config.to_dict()
+                ini_file, analysis_config
             )
         else:
             raise NotImplementedError(

@@ -4,7 +4,10 @@ from typing import Optional
 import pytest
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
     AnalysisConfigDataWithoutNetwork,
+    AnalysisSectionDirect,
+    ProjectSection,
 )
 from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_without_network import (
     AnalysisConfigDataValidatorWithoutNetwork,
@@ -14,19 +17,20 @@ from tests import test_data, test_results
 
 
 class TestAnalysisConfigDataValidatorWithoutNetwork:
-    def _validate_from_dict(self, dict_values: dict) -> ValidationReport:
-        _test_config_data = AnalysisConfigDataWithoutNetwork.from_dict(dict_values)
-        _validator = AnalysisConfigDataValidatorWithoutNetwork(_test_config_data)
+    def _validate_config(self, config_data: AnalysisConfigData) -> ValidationReport:
+        _validator = AnalysisConfigDataValidatorWithoutNetwork(config_data)
         return _validator.validate()
 
     def test_validate_with_required_headers(self):
         # 1. Define test data.
-        _output_test_dir = test_data / "acceptance_test_data"
+        _output_test_dir = test_data.joinpath("acceptance_test_data")
         assert _output_test_dir.is_dir()
 
         # 2. Run test.
-        _test_config_data = {"project": {}, "output": _output_test_dir}
-        _report = self._validate_from_dict(_test_config_data)
+        _test_config_data = AnalysisConfigData(
+            project=None, output_path=_output_test_dir
+        )
+        _report = self._validate_config(_test_config_data)
 
         # 3. Verify expectations.
         assert _report.is_valid()
@@ -87,21 +91,20 @@ class TestAnalysisConfigDataValidatorWithoutNetwork:
         assert not _report.is_valid()
         assert len(_report._errors) == 1
 
-    def _validate_headers_from_dict(
-        self, dict_values: dict, required_headers: list[str]
+    def _validate_headers(
+        self, config_data: AnalysisConfigData, required_headers: list[str]
     ) -> ValidationReport:
-        _test_config_data = AnalysisConfigDataWithoutNetwork.from_dict(dict_values)
-        _validator = AnalysisConfigDataValidatorWithoutNetwork(_test_config_data)
+        _validator = AnalysisConfigDataValidatorWithoutNetwork(config_data)
         return _validator._validate_headers(required_headers)
 
     def test_validate_headers_fails_when_missing_expected_header(self):
         # 1. Define test data.
-        _test_config_data = {}
+        _test_config_data = AnalysisConfigData()
         _missing_header = "Deltares"
         _expected_err = f"Property [ {_missing_header} ] is not configured. Add property [ {_missing_header} ] to the *.ini file. "
 
         # 2. Run test.
-        _report = self._validate_headers_from_dict(
+        _report = self._validate_headers(
             _test_config_data, required_headers=[_missing_header]
         )
 
@@ -109,61 +112,18 @@ class TestAnalysisConfigDataValidatorWithoutNetwork:
         assert not _report.is_valid()
         assert _expected_err in _report._errors
 
-    def test_validate_headers_fails_when_wrong_file_value(
+    def test_validate_headers_fails_when_invalid_value(
         self, request: pytest.FixtureRequest
     ):
         # 1. Define test data.
-        _required_header = "file_header"
-        _test_config_data = {
-            "root_path": test_results,
-            "project": {"name": request.node.name},
-            _required_header: {"polygon": [Path("sth")]},
-        }
-
-        # 2. Run test.
-        _report = self._validate_headers_from_dict(
-            _test_config_data, required_headers=[_required_header]
+        _test_config_data = AnalysisConfigData(
+            root_path=test_results,
+            project=ProjectSection(name=request.node.name),
+            direct=[AnalysisSectionDirect(analysis="invalid_analysis_type")],
         )
 
-        # 3. Verify final expectations.
-        assert not _report.is_valid()
-        assert len(_report._errors) == 3
-
-    def test_validate_headers_fails_when_wrong_road_type(
-        self, request: pytest.FixtureRequest
-    ):
-        # 1. Define test data.
-        _required_header = "road_header"
-        _test_config_data = {
-            "root_path": test_results,
-            "project": {"name": request.node.name},
-            _required_header: {"road_types": "not a valid road type"},
-        }
-
         # 2. Run test.
-        _report = self._validate_headers_from_dict(
-            _test_config_data, required_headers=[_required_header]
-        )
-
-        # 3. Verify final expectations.
-        assert not _report.is_valid()
-        assert len(_report._errors) == 2
-
-    def test_validate_headers_fails_when_unexpected_value(
-        self, request: pytest.FixtureRequest
-    ):
-        # 1. Define test data.
-        _required_header = "unexpected_value"
-        _test_config_data = {
-            "root_path": test_results,
-            "project": {"name": request.node.name},
-            _required_header: {"network_type": "unmapped_value"},
-        }
-
-        # 2. Run test.
-        _report = self._validate_headers_from_dict(
-            _test_config_data, required_headers=[_required_header]
-        )
+        _report = self._validate_headers(_test_config_data, required_headers=["direct"])
 
         # 3. Verify final expectations.
         assert not _report.is_valid()
