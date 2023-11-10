@@ -38,6 +38,7 @@ import rtree
 from tqdm import tqdm
 from geopy import distance
 from networkx import Graph, set_edge_attributes
+from numpy.ma import MaskedArray
 from osgeo import gdal
 from osmnx import graph_to_gdfs, simplify_graph
 from rasterio.features import shapes
@@ -1832,10 +1833,14 @@ def clean_memory(list_delete: list) -> None:
         del to_delete
 
 
-def get_valid_mean(x_value: float) -> Optional[float]:
-    if not isinstance(x_value, float):
+def get_valid_mean(x_value: MaskedArray, **kwargs) -> Optional[float]:
+    # **kwargs should not be removed. properties var is passed in zonal_stats. So properties should not be removed,
+    #  else this will not be activated
+    if not isinstance(x_value, MaskedArray):
         return np.nan
-    return x_value.mean()  # You know it's a valid type, so return the mean.
+    if x_value.mask.all():
+        return np.nan
+    return np.mean(x_value)  # You know it's a valid type, so return the mean.
 
 
 def buffer_geometry(
