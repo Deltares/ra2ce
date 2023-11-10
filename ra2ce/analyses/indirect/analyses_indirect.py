@@ -334,12 +334,12 @@ class IndirectAnalyses:
 
                     # append to calculation dataframe
                     df_calculated = pd.concat([df_calculated, pd.DataFrame({
-                            "u": u,
-                            "v": v,
-                            "rfid": str(edata["rfid"]),
-                            "alt_dist": alt_dist,
+                            "u": [u],
+                            "v": [v],
+                            "rfid": [str(edata["rfid"])],
+                            "alt_dist": [alt_dist],
                             "alt_nodes": [alt_nodes],
-                            "connected": 1,
+                            "connected": [1],
                         })], ignore_index=True)
                 else:
                     # append to calculation dataframe
