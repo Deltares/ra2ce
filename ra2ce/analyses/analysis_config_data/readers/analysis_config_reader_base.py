@@ -91,6 +91,7 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
         return ProjectSection(**self._parser["project"])
 
     def _get_analysis_section(self, section_name: str) -> AnalysisSection:
+        # TODO expand
         _section = AnalysisSection(**self._parser[section_name])
         _section.threshold = self._parser.getfloat(
             section_name,
@@ -106,6 +107,12 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
             section_name,
             "buffer_meters",
             fallback=_section.buffer_meters,
+        )
+        _section.save_traffic = self._parser.getboolean(
+            section_name, "save_traffic", fallback=_section.save_traffic
+        )
+        _section.save_shp = self._parser.getboolean(
+            section_name, "save_shp", fallback=_section.save_shp
         )
         _section.save_gpkg = self._parser.getboolean(
             section_name, "save_gpkg", fallback=_section.save_gpkg
