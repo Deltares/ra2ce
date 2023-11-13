@@ -50,7 +50,7 @@ class OriginClosestDestination:
         self,
         config: AnalysisConfigData,
         analysis: AnalysisSectionIndirect,
-        hazard_names: pd.DataFrame,
+        hazard_names_df: pd.DataFrame,
     ):
         self.crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGEABLE
         self.unit = "km"
@@ -69,7 +69,7 @@ class OriginClosestDestination:
         self.analysis = analysis
         self.config = config
 
-        self.hazard_names = hazard_names
+        self.hazard_names = hazard_names_df
 
         self.destination_names = None
         self.destination_key = None

@@ -57,6 +57,7 @@ class IndirectAnalyses:
 
     config: AnalysisConfigData
     graphs: dict
+    hazard_names_df: pd.DataFrame
 
     _file_name_key = "File name"
     _ra2ce_name_key = "RA2CE name"
@@ -65,13 +66,14 @@ class IndirectAnalyses:
         self.config = config
         self.graphs = graphs
         if self.config.output_path.joinpath("hazard_names.xlsx").is_file():
-            self.hazard_names = pd.read_excel(
+            self.hazard_names_df = pd.read_excel(
                 self.config.output_path.joinpath("hazard_names.xlsx")
             )
-            # TODO Ardt hazard_names
-            self.config.hazard_names = list(set(self.hazard_names[self._file_name_key]))
+            self.config.hazard_names = list(
+                set(self.hazard_names_df[self._file_name_key])
+            )
         else:
-            self.hazard_names = pd.DataFrame(data=None)
+            self.hazard_names_df = pd.DataFrame(data=None)
             self.config.hazard_names = list()
 
     def single_link_redundancy(self, graph, analysis: AnalysisSectionIndirect):
@@ -300,8 +302,9 @@ class IndirectAnalyses:
         results = []
         master_graph = copy.deepcopy(graph)
         for hazard in self.config.hazard_names:
-            hazard_name = self.hazard_names.loc[
-                self.hazard_names[self._file_name_key] == hazard, self._ra2ce_name_key
+            hazard_name = self.hazard_names_df.loc[
+                self.hazard_names_df[self._file_name_key] == hazard,
+                self._ra2ce_name_key,
             ].values[0]
 
             graph = copy.deepcopy(master_graph)
@@ -412,8 +415,9 @@ class IndirectAnalyses:
 
         results = []
         for hazard in self.config.hazard_names:
-            hazard_name = self.hazard_names.loc[
-                self.hazard_names[self._file_name_key] == hazard, self._ra2ce_name_key
+            hazard_name = self.hazard_names_df.loc[
+                self.hazard_names_df[self._file_name_key] == hazard,
+                self._ra2ce_name_key,
             ].values[0]
 
             gdf_ = gdf.loc[gdf["hazard"] == hazard_name].copy()
@@ -604,8 +608,9 @@ class IndirectAnalyses:
 
         all_results = []
         for hazard in self.config.hazard_names:
-            hazard_name = self.hazard_names.loc[
-                self.hazard_names[self._file_name_key] == hazard, self._ra2ce_name_key
+            hazard_name = self.hazard_names_df.loc[
+                self.hazard_names_df[self._file_name_key] == hazard,
+                self._ra2ce_name_key,
             ].values[0]
 
             graph_hz = copy.deepcopy(graph)
@@ -871,8 +876,9 @@ class IndirectAnalyses:
         aggregation = pd.DataFrame()
         for i, hazard in enumerate(self.config.hazard_names):
             # for each hazard event
-            hazard_name = self.hazard_names.loc[
-                self.hazard_names[self._file_name_key] == hazard, self._ra2ce_name_key
+            hazard_name = self.hazard_names_df.loc[
+                self.hazard_names_df[self._file_name_key] == hazard,
+                self._ra2ce_name_key,
             ].values[0]
 
             graph_hz_direct = copy.deepcopy(graph)
@@ -1150,7 +1156,7 @@ class IndirectAnalyses:
                 gdf = self.multi_link_losses(gdf, analysis)
             elif analysis.analysis == "optimal_route_origin_closest_destination":
                 analyzer = OriginClosestDestination(
-                    self.config, analysis, self.hazard_names
+                    self.config, analysis, self.hazard_names_df
                 )
                 (
                     base_graph,
@@ -1177,7 +1183,7 @@ class IndirectAnalyses:
                     opt_routes.to_csv(csv_path, index=False)
             elif analysis.analysis == "multi_link_origin_closest_destination":
                 analyzer = OriginClosestDestination(
-                    self.config, analysis, self.hazard_names
+                    self.config, analysis, self.hazard_names_df
                 )
 
                 if analysis.calculate_route_without_disruption:
