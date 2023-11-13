@@ -52,7 +52,7 @@ class OriginClosestDestination:
         analysis: AnalysisSectionIndirect,
         hazard_names: pd.DataFrame,
     ):
-        self.crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGABLE
+        self.crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGEABLE
         self.unit = "km"
         self.network_threshold = analysis.threshold
         self.threshold_destinations = analysis.threshold_destinations
