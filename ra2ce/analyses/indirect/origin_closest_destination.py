@@ -54,9 +54,8 @@ class OriginClosestDestination:
     ):
         self.crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGABLE
         self.unit = "km"
-        if hasattr(analysis, "threshold"):
-            self.network_threshold = analysis.threshold
-        self.threshold_destinations = 0  # TODO MAKE PARAMETER IN ANALYSES.INI
+        self.network_threshold = analysis.threshold
+        self.threshold_destinations = analysis.threshold_destinations
         self.weighing = analysis.weighing
         self.o_name = config.origins_destinations.origins_names
         self.d_name = config.origins_destinations.destinations_names
