@@ -1085,7 +1085,7 @@ class IndirectAnalyses:
                         )
                     )
                     _equity_weights_file = None
-                    if "equity_weight" in analysis.keys() and analysis.equity_weight:
+                    if hasattr(analysis, "equity_weight") and analysis.equity_weight:
                         _equity_weights_file = self.config.static_path.joinpath(
                             "network", analysis.equity_weight
                         )
