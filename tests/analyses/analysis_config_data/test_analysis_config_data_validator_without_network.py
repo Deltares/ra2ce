@@ -119,11 +119,13 @@ class TestAnalysisConfigDataValidatorWithoutNetwork:
         _test_config_data = AnalysisConfigData(
             root_path=test_results,
             project=ProjectSection(name=request.node.name),
-            direct=[AnalysisSectionDirect(analysis="invalid_analysis_type")],
+            analyses=[AnalysisSectionDirect(analysis="invalid_analysis_type")],
         )
 
         # 2. Run test.
-        _report = self._validate_headers(_test_config_data, required_headers=["direct"])
+        _report = self._validate_headers(
+            _test_config_data, required_headers=["analyses"]
+        )
 
         # 3. Verify final expectations.
         assert not _report.is_valid()

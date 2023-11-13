@@ -8,7 +8,7 @@ from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 class DummyAnalysisConfig(AnalysisConfigWrapperBase):
     def __init__(self) -> None:
-        self.config_data = AnalysisConfigData(direct=[], indirect=[])
+        self.config_data = AnalysisConfigData(analyses=[])
 
     @classmethod
     def from_data(cls, **kwargs):

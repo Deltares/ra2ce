@@ -33,6 +33,20 @@ from ra2ce.graph.network_config_data.network_config_data import (
     OriginsDestinationsSection,
 )
 
+IndirectAnalysisNameList: list[str] = [
+    "single_link_redundancy",
+    "multi_link_redundancy",
+    "optimal_route_origin_destination",
+    "multi_link_origin_destination",
+    "optimal_route_origin_closest_destination",
+    "multi_link_origin_closest_destination",
+    "losses",
+    "single_link_losses",
+    "multi_link_losses",
+    "multi_link_isolated_locations",
+]
+DirectAnalysisNameList: list[str] = ["direct", "effectiveness_measures"]
+
 
 @dataclass
 class ProjectSection:
@@ -40,10 +54,22 @@ class ProjectSection:
 
 
 @dataclass
-class AnalysisSectionIndirect:
+class AnalysisSection:
     name: str = ""
     analysis: str = ""  # should be enum
+    save_gpkg: bool = False
+    save_csv: bool = False
+
+
+@dataclass
+class AnalysisSectionIndirect(AnalysisSection):
+    # general
+    weighing: str = ""  # should be enum
+    loss_per_distance: str = ""
+    loss_type: str = ""  # should be enum
     disruption_per_category: str = ""
+    traffic_cols: str = ""  # should be list?
+    # losses
     duration_event: float = math.nan
     duration_disruption: float = math.nan
     fraction_detour: float = math.nan
@@ -51,43 +77,35 @@ class AnalysisSectionIndirect:
     rest_capacity: float = math.nan
     maximum_jam: float = math.nan
     partofday: str = ""
+    # accessiblity analyses
     aggregate_wl: str = ""  # should be enum
     threshold: float = math.nan
-    weighing: str = ""  # should be enum
+    threshold_destinations: float = math.nan
+    uniform_duration: float = math.nan
+    gdp_percapita: float = math.nan
     equity_weight: str = ""
     calculate_route_without_disruption: bool = False
     buffer_meters: float = math.nan
+    threshold_locations: float = math.nan
     category_field_name: str = ""
-    file_name: Path = None
     save_traffic: bool = False
-    save_gpkg: bool = False
-    save_csv: bool = False
 
 
 @dataclass
-class AnalysisSectionDirect:
-    name: str = ""
-    analysis: str = ""  # should be enum
+class AnalysisSectionDirect(AnalysisSection):
+    # adaptation/effectiveness measures
     return_period: float = math.nan
     repair_costs: float = math.nan
     evaluation_period: float = math.nan
     interest_rate: float = math.nan
     climate_factor: float = math.nan
     climate_period: float = math.nan
+    # road damage
     damage_curve: str = ""
     event_type: str = ""
     risk_calculation: str = ""
-    loss_per_distance: str = ""
-    traffic_cols: str = ""
-    file_name: Path = None
-    save_shp: bool = False
-    save_gpkg: bool = False
-    save_csv: bool = False
-
-
-@dataclass
-class AnalysisSection(AnalysisSectionIndirect, AnalysisSectionDirect):
-    pass
+    create_table: bool = False
+    file_name: Optional[Path] = None
 
 
 @dataclass
@@ -97,8 +115,7 @@ class AnalysisConfigData(ConfigDataProtocol):
     output_path: Optional[Path] = None
     static_path: Optional[Path] = None
     project: ProjectSection = field(default_factory=lambda: ProjectSection())
-    direct: list[AnalysisSectionDirect] = field(default_factory=list)
-    indirect: list[AnalysisSectionIndirect] = field(default_factory=list)
+    analyses: list[AnalysisSection] = field(default_factory=list)
     files: Optional[dict[str, Path]] = field(default_factory=dict)
     origins_destinations: Optional[OriginsDestinationsSection] = field(
         default_factory=lambda: OriginsDestinationsSection()
@@ -112,6 +129,22 @@ class AnalysisConfigData(ConfigDataProtocol):
         _dict["indirect"] = [dv.__dict__ for dv in self.indirect]
         _dict["files"] = [dv.__dict__ for dv in self.files]
         return _dict
+
+    @property
+    def direct(self):
+        return list(
+            analysis
+            for analysis in self.analyses
+            if analysis.analysis in DirectAnalysisNameList
+        )
+
+    @property
+    def indirect(self):
+        return list(
+            analysis
+            for analysis in self.analyses
+            if analysis.analysis in IndirectAnalysisNameList
+        )
 
 
 class AnalysisConfigDataWithNetwork(AnalysisConfigData):

@@ -26,6 +26,8 @@ from typing import Any
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigDataWithoutNetwork,
+    IndirectAnalysisNameList,
+    DirectAnalysisNameList,
 )
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
@@ -33,19 +35,6 @@ from ra2ce.graph.network_config_data.network_config_data_validator import (
     NetworkDictValues,
 )
 
-IndirectAnalysisNameList: list[str] = [
-    "single_link_redundancy",
-    "multi_link_redundancy",
-    "optimal_route_origin_destination",
-    "multi_link_origin_destination",
-    "optimal_route_origin_closest_destination",
-    "multi_link_origin_closest_destination",
-    "losses",
-    "single_link_losses",
-    "multi_link_losses",
-    "multi_link_isolated_locations",
-]
-DirectAnalysisNameList: list[str] = ["direct", "effectiveness_measures"]
 AnalysisNetworkDictValues = NetworkDictValues | {
     "analysis": IndirectAnalysisNameList + DirectAnalysisNameList
 }
@@ -157,7 +146,7 @@ class AnalysisConfigDataValidatorWithoutNetwork(Ra2ceIoValidator):
 
     def validate(self) -> ValidationReport:
         _report = ValidationReport()
-        _required_headers = ["project", "direct", "indirect"]
+        _required_headers = ["project", "analyses"]
 
         _report.merge(self._validate_headers(_required_headers))
         return _report
