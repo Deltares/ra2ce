@@ -29,11 +29,11 @@ from shutil import copyfile
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSection,
-    ProjectSection,
-)
-from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_without_network import (
+    AnalysisSectionDirect,
+    AnalysisSectionIndirect,
     DirectAnalysisNameList,
     IndirectAnalysisNameList,
+    ProjectSection,
 )
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
     AnalysisConfigWrapperBase,
@@ -67,7 +67,6 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
             ini_file
         )
         _config_data.project.name = _parent_dir.name
-        # TODO self._correct_paths(_config_data)??
 
         return _config_data
 
@@ -83,20 +82,73 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
     def _get_sections(self) -> dict:
         return {
             "project": self.get_project_section(),
-            "direct": self.get_analysis_sections("direct"),
-            "indirect": self.get_analysis_sections("indirect"),
+            "analyses": self.get_analysis_sections(),
         }
 
     def get_project_section(self) -> ProjectSection:
         return ProjectSection(**self._parser["project"])
 
-    def _get_analysis_section(self, section_name: str) -> AnalysisSection:
-        # TODO expand
-        _section = AnalysisSection(**self._parser[section_name])
+    def _get_analysis_section_indirect(
+        self, section_name: str
+    ) -> AnalysisSectionIndirect:
+        _section = AnalysisSectionIndirect(**self._parser[section_name])
+        _section.save_gpkg = self._parser.getboolean(
+            section_name, "save_gpkg", fallback=_section.save_gpkg
+        )
+        _section.save_csv = self._parser.getboolean(
+            section_name, "save_csv", fallback=_section.save_csv
+        )
+        # losses
+        _section.duration_event = self._parser.getfloat(
+            section_name,
+            "duration_event",
+            fallback=_section.duration_event,
+        )
+        _section.duration_disruption = self._parser.getfloat(
+            section_name,
+            "duration_disruption",
+            fallback=_section.duration_disruption,
+        )
+        _section.fraction_detour = self._parser.getfloat(
+            section_name,
+            "fraction_detour",
+            fallback=_section.fraction_detour,
+        )
+        _section.fraction_drivethrough = self._parser.getfloat(
+            section_name,
+            "fraction_drivethrough",
+            fallback=_section.fraction_drivethrough,
+        )
+        _section.rest_capacity = self._parser.getfloat(
+            section_name,
+            "rest_capacity",
+            fallback=_section.rest_capacity,
+        )
+        _section.maximum_jam = self._parser.getfloat(
+            section_name,
+            "maximum_jam",
+            fallback=_section.maximum_jam,
+        )
+        # accessiblity analyses
         _section.threshold = self._parser.getfloat(
             section_name,
             "threshold",
             fallback=_section.threshold,
+        )
+        _section.threshold_destinations = self._parser.getfloat(
+            section_name,
+            "threshold_destinations",
+            fallback=_section.threshold_destinations,
+        )
+        _section.uniform_duration = self._parser.getfloat(
+            section_name,
+            "uniform_duration",
+            fallback=_section.uniform_duration,
+        )
+        _section.gdp_percapita = self._parser.getfloat(
+            section_name,
+            "gdp_percapita",
+            fallback=_section.gdp_percapita,
         )
         _section.calculate_route_without_disruption = self._parser.getboolean(
             section_name,
@@ -108,35 +160,87 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
             "buffer_meters",
             fallback=_section.buffer_meters,
         )
+        _section.threshold_locations = self._parser.getfloat(
+            section_name,
+            "threshold_locations",
+            fallback=_section.threshold_locations,
+        )
         _section.save_traffic = self._parser.getboolean(
             section_name, "save_traffic", fallback=_section.save_traffic
         )
-        _section.save_shp = self._parser.getboolean(
-            section_name, "save_shp", fallback=_section.save_shp
-        )
+
+        return _section
+
+    def _get_analysis_section_direct(self, section_name: str) -> AnalysisSectionDirect:
+        _section = AnalysisSectionDirect(**self._parser[section_name])
         _section.save_gpkg = self._parser.getboolean(
             section_name, "save_gpkg", fallback=_section.save_gpkg
         )
         _section.save_csv = self._parser.getboolean(
             section_name, "save_csv", fallback=_section.save_csv
         )
+        # adaptation/effectiveness measures
+        _section.return_period = self._parser.getfloat(
+            section_name,
+            "return_period",
+            fallback=_section.return_period,
+        )
+        _section.repair_costs = self._parser.getfloat(
+            section_name,
+            "repair_costs",
+            fallback=_section.repair_costs,
+        )
+        _section.evaluation_period = self._parser.getfloat(
+            section_name,
+            "evaluation_period",
+            fallback=_section.evaluation_period,
+        )
+        _section.return_pinterest_rateeriod = self._parser.getfloat(
+            section_name,
+            "interest_rate",
+            fallback=_section.interest_rate,
+        )
+        _section.climate_factor = self._parser.getfloat(
+            section_name,
+            "climate_factor",
+            fallback=_section.climate_factor,
+        )
+        _section.climate_period = self._parser.getfloat(
+            section_name,
+            "climate_period",
+            fallback=_section.climate_period,
+        )
+        # road damage
+        _section.create_table = self._parser.getboolean(
+            section_name,
+            "create_table",
+            fallback=_section.create_table,
+        )
         return _section
 
-    def get_analysis_sections(self, analysis_type: str) -> list[AnalysisSection]:
+    def get_analysis_sections(self) -> list[AnalysisSection]:
+        """
+        Extracts info from [analysis<n>] sections
+
+        Returns:
+            list[AnalysisSection]: List of analyses (both direct and indirect)
+        """
         _analysis_sections = []
 
-        _section_names = re.findall(r"(analysis\d)", " ".join(self._parser.keys()))
+        _section_names = list(
+            section_name
+            for section_name in self._parser.sections()
+            if "analysis" in section_name
+        )
         for _section_name in _section_names:
-            _analysis_name = self._parser.get(_section_name, "analysis")
-            if analysis_type == "direct" and _analysis_name in DirectAnalysisNameList:
-                _analysis_section = self._get_analysis_section(_section_name)
-                _analysis_sections.append(_analysis_section)
-            elif (
-                analysis_type == "indirect"
-                and _analysis_name in IndirectAnalysisNameList
-            ):
-                _analysis_section = self._get_analysis_section(_section_name)
-                _analysis_sections.append(_analysis_section)
+            _analysis_type = self._parser.get(_section_name, "analysis")
+            if _analysis_type in DirectAnalysisNameList:
+                _analysis_section = self._get_analysis_section_direct(_section_name)
+            elif _analysis_type in IndirectAnalysisNameList:
+                _analysis_section = self._get_analysis_section_indirect(_section_name)
+            else:
+                raise ValueError(f"Analysis {_analysis_type} not supported.")
+            _analysis_sections.append(_analysis_section)
 
         return _analysis_sections
 

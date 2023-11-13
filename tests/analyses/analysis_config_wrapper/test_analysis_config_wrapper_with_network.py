@@ -6,6 +6,7 @@ import pytest
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDirect,
+    AnalysisSectionIndirect,
 )
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_with_network import (
     AnalysisConfigWrapperWithNetwork,
@@ -78,9 +79,9 @@ class TestAnalysisWithNetworkConfig:
         _analysis = AnalysisConfigWrapperWithNetwork()
         _output_dir = test_results / request.node.name
         _analysis.config_data = AnalysisConfigData(output_path=_output_dir)
-        _analysis.config_data.direct = [AnalysisSectionDirect(analysis="test_direct")]
-        _analysis.config_data.indirect = [
-            AnalysisSectionDirect(analysis="test_indirect")
+        _analysis.config_data.analyses = [
+            AnalysisSectionDirect(analysis="effectiveness_measures"),
+            AnalysisSectionIndirect(analysis="single_link_redundancy"),
         ]
         if _output_dir.exists():
             shutil.rmtree(_output_dir)
@@ -90,5 +91,5 @@ class TestAnalysisWithNetworkConfig:
 
         # 3. Verify expectations.
         assert _output_dir.exists()
-        assert _output_dir.joinpath("test_direct").exists()
-        assert _output_dir.joinpath("test_indirect").exists()
+        assert _output_dir.joinpath("effectiveness_measures").exists()
+        assert _output_dir.joinpath("single_link_redundancy").exists()

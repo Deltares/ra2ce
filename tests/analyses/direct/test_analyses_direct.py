@@ -15,7 +15,7 @@ class TestDirectAnalyses:
 
     def test_execute(self):
         _config = AnalysisConfigData(
-            direct=[
+            analyses=[
                 AnalysisSectionDirect(
                     name="DummyExecute", analysis="", save_gpkg=False, save_csv=False
                 )
