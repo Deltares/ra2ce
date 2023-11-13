@@ -32,12 +32,11 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_with_net
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
     AnalysisConfigWrapperBase,
 )
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
 class AnalysisConfigWrapperWithNetwork(AnalysisConfigWrapperBase):
-    _network_config: NetworkConfigData
+    _network_config: NetworkConfigWrapper
 
     def __init__(self) -> None:
         self.config_data = AnalysisConfigData()

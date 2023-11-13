@@ -21,14 +21,13 @@
 
 
 import logging
-import re
 from configparser import ConfigParser
 from pathlib import Path
 from shutil import copyfile
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisSection,
+    AnalysisSectionBase,
     AnalysisSectionDirect,
     AnalysisSectionIndirect,
     DirectAnalysisNameList,
@@ -218,7 +217,7 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
         )
         return _section
 
-    def get_analysis_sections(self) -> list[AnalysisSection]:
+    def get_analysis_sections(self) -> list[AnalysisSectionBase]:
         """
         Extracts info from [analysis<n>] sections
 
