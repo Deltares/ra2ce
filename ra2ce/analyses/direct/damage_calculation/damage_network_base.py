@@ -27,6 +27,7 @@ import numpy as np
 import pandas as pd
 
 from ra2ce.analyses.direct.direct_lookup import LookUp as lookup
+from ra2ce.analyses.direct.direct_lookup import dataframe_lookup
 from ra2ce.analyses.direct.direct_utils import (
     clean_lane_data,
     create_summary_statistics,
@@ -229,7 +230,7 @@ class DamageNetworkBase(ABC):
 
         df = self._gdf_mask
         df["lanes"] = df["lanes"].astype(int)
-        df["max_dam_hz"] = df_max_damages_huizinga.lookup(df["lanes"], df["road_type"])
+        df["max_dam_hz"] = df.apply(dataframe_lookup, args=(df_max_damages_huizinga, ['lanes', 'road_type']), axis=1)
 
         for event in events:
             df["dam_{}_{}".format(event, curve_name)] = round(
@@ -249,7 +250,7 @@ class DamageNetworkBase(ABC):
 
         self.gdf[dam_cols] = df[dam_cols]
         logging.info(
-            "calculate_damage_HZ(): Damage calculation with the Huizinga damage functions was succesfull"
+            "calculate_damage_HZ(): Damage calculation with the Huizinga damage functions was successful"
         )
 
     def calculate_damage_OSdaMage(self, events):

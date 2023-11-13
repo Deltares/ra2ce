@@ -19,7 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import copy
 import logging
 import time
@@ -71,6 +70,9 @@ class IndirectAnalyses:
             )
             # TODO Ardt hazard_names
             self.config.hazard_names = list(set(self.hazard_names[self._file_name_key]))
+        else:
+            self.hazard_names = pd.DataFrame(data=None)
+            self.config.hazard_names = list()
 
     def single_link_redundancy(self, graph, analysis: AnalysisSectionIndirect):
         """This is the function to analyse roads with a single link disruption and an alternative route.
@@ -581,9 +583,6 @@ class IndirectAnalyses:
         # create list of origin-destination pairs
         od_nodes = self._get_origin_destination_pairs(graph)
         pref_routes = find_route_ods(graph, od_nodes, analysis.weighing)
-
-        # if shortest_route:
-        #     pref_routes = pref_routes.loc[pref_routes.sort_values(analysis.weighing).groupby('o_node').head(3).index]
         return pref_routes
 
     def optimal_route_od_link(
@@ -668,15 +667,13 @@ class IndirectAnalyses:
         gdf_ori["OD"] = gdf_ori["origin"] + gdf_ori["destination"]
         # origin
         gdf_ori["origin_count"] = gdf_ori["origin"].apply(lambda x: len(x.split(",")))
-        init_origins = gdf_ori.groupby("origin").mean()["origin_count"].sum()
+        init_origins = gdf_ori.groupby("origin")["origin_count"].sum()
         del gdf_ori["origin_count"]
         # destination
         gdf_ori["destination_count"] = gdf_ori["destination"].apply(
             lambda x: len(x.split(","))
         )
-        init_destinations = (
-            gdf_ori.groupby("destination").mean()["destination_count"].sum()
-        )
+        init_destinations = gdf_ori.groupby("destination")["destination_count"].sum()
         del gdf_ori["destination_count"]
         # od pairs
         init_od_pairs = init_origins * init_destinations
@@ -690,7 +687,7 @@ class IndirectAnalyses:
             gdf_ = gdf.loc[gdf["hazard"] == hz]
 
             gdf_["origin_count"] = gdf_["origin"].apply(lambda x: len(x.split(",")))
-            remaining_origins = gdf_.groupby("origin").mean()["origin_count"].sum()
+            remaining_origins = gdf_.groupby("origin")["origin_count"].sum()
             del gdf_["origin_count"]
             diff_origins = init_origins - remaining_origins
             abs_origin_disconnected.append(diff_origins)
@@ -699,9 +696,9 @@ class IndirectAnalyses:
             gdf_["destination_count"] = gdf_["destination"].apply(
                 lambda x: len(x.split(","))
             )
-            remaining_destinations = (
-                gdf_.groupby("destination").mean()["destination_count"].sum()
-            )
+            remaining_destinations = gdf_.groupby("destination")[
+                "destination_count"
+            ].sum()
             del gdf_["destination_count"]
             diff_destinations = init_destinations - remaining_destinations
             abs_destination_disconnected.append(diff_destinations)
@@ -1190,19 +1187,26 @@ class IndirectAnalyses:
                         destinations,
                     ) = analyzer.optimal_route_origin_closest_destination()
 
-                    (
-                        base_graph,
-                        origins,
-                        destinations,
-                        agg_results,
-                        opt_routes_with_hazard,
-                    ) = analyzer.multi_link_origin_closest_destination()
+                    if (
+                        analyzer.config["files"]["origins_destinations_graph_hazard"]
+                        is None
+                    ):
+                        origins = analyzer.load_origins()
+                        opt_routes_with_hazard = gpd.GeoDataFrame(data=None)
+                    else:
+                        (
+                            base_graph,
+                            origins,
+                            destinations,
+                            agg_results,
+                            opt_routes_with_hazard,
+                        ) = analyzer.multi_link_origin_closest_destination()
 
-                    (
-                        opt_routes_with_hazard
-                    ) = analyzer.difference_length_with_without_hazard(
-                        opt_routes_with_hazard, opt_routes_without_hazard
-                    )
+                        (
+                            opt_routes_with_hazard
+                        ) = analyzer.difference_length_with_without_hazard(
+                            opt_routes_with_hazard, opt_routes_without_hazard
+                        )
 
                 else:
                     (
@@ -1247,12 +1251,16 @@ class IndirectAnalyses:
                         del opt_routes_with_hazard["geometry"]
                         opt_routes_with_hazard.to_csv(csv_path, index=False)
 
-                agg_results.to_excel(
-                    _output_path.joinpath(
-                        analysis.name.replace(" ", "_") + "_results.xlsx"
-                    ),
-                    index=False,
-                )
+                if (
+                    analyzer.config.files["origins_destinations_graph_hazard"]
+                    is not None
+                ):
+                    agg_results.to_excel(
+                        _output_path.joinpath(
+                            analysis.name.replace(" ", "_") + "_results.xlsx"
+                        ),
+                        index=False,
+                    )
             elif analysis.analysis == "losses":
                 if self.graphs["base_network_hazard"] is None:
                     gdf_in = gpd.read_feather(self.config.files["base_network_hazard"])
@@ -1369,8 +1377,13 @@ def find_route_ods(
                 if "rfid" in _uv_graph_edge:
                     match_list.append(_uv_graph_edge["rfid"])
 
-            # compile the road segments into one geometry
-            pref_edges = MultiLineString(pref_edges)
+            combined_pref_edges = MultiLineString([])
+            for geometry in pref_edges:
+                combined_pref_edges = combined_pref_edges.union(geometry)
+
+            if not combined_pref_edges.is_valid:
+                print(combined_pref_edges.is_valid)
+                print(o[0], d[0])
 
             # save all data to lists (of lists)
             o_node_list.append(o[0])
@@ -1380,7 +1393,8 @@ def find_route_ods(
             opt_path_list.append(pref_nodes)
             weighing_list.append(pref_route)
             match_ids_list.append(match_list)
-            geometries_list.append(pref_edges)
+            geometries_list.append(combined_pref_edges)
+            # geometries_list.append(pref_edges)
 
     # Geodataframe to save all the optimal routes
     pref_routes = gpd.GeoDataFrame(
