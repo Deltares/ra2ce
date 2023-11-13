@@ -1701,26 +1701,25 @@ testing-docutils = ["pygments", "pytest (>=7,<8)", "pytest-param-files (>=0.3.4,
 
 [[package]]
 name = "nbclient"
-version = "0.9.0"
+version = "0.6.8"
 description = "A client library for executing notebooks. Formerly nbconvert's ExecutePreprocessor."
 category = "dev"
 optional = false
-python-versions = ">=3.8.0"
+python-versions = ">=3.7.0"
 files = [
-    {file = "nbclient-0.9.0-py3-none-any.whl", hash = "sha256:a3a1ddfb34d4a9d17fc744d655962714a866639acd30130e9be84191cd97cd15"},
-    {file = "nbclient-0.9.0.tar.gz", hash = "sha256:4b28c207877cf33ef3a9838cdc7a54c5ceff981194a82eac59d558f05487295e"},
+    {file = "nbclient-0.6.8-py3-none-any.whl", hash = "sha256:7cce8b415888539180535953f80ea2385cdbb444944cdeb73ffac1556fdbc228"},
+    {file = "nbclient-0.6.8.tar.gz", hash = "sha256:268fde3457cafe1539e32eb1c6d796bbedb90b9e92bacd3e43d83413734bb0e8"},
 ]
 
 [package.dependencies]
-jupyter-client = ">=6.1.12"
-jupyter-core = ">=4.12,<5.0.0 || >=5.1.0"
-nbformat = ">=5.1"
-traitlets = ">=5.4"
+jupyter-client = ">=6.1.5"
+nbformat = ">=5.0"
+nest-asyncio = "*"
+traitlets = ">=5.2.2"
 
 [package.extras]
-dev = ["pre-commit"]
-docs = ["autodoc-traits", "mock", "moto", "myst-parser", "nbclient[test]", "sphinx (>=1.7)", "sphinx-book-theme", "sphinxcontrib-spelling"]
-test = ["flaky", "ipykernel (>=6.19.3)", "ipython", "ipywidgets", "nbconvert (>=7.0.0)", "pytest (>=7.0)", "pytest-asyncio", "pytest-cov (>=4.0)", "testpath", "xmltodict"]
+sphinx = ["Sphinx (>=1.7)", "autodoc-traits", "mock", "moto", "myst-parser", "sphinx-book-theme"]
+test = ["black", "check-manifest", "flake8", "ipykernel", "ipython", "ipywidgets", "mypy", "nbconvert", "pip (>=18.1)", "pre-commit", "pytest (>=4.1)", "pytest-asyncio", "pytest-cov (>=2.6.1)", "setuptools (>=60.0)", "testpath", "twine (>=1.11.0)", "xmltodict"]
 
 [[package]]
 name = "nbconvert"
@@ -1782,6 +1781,25 @@ traitlets = ">=5.1"
 [package.extras]
 docs = ["myst-parser", "pydata-sphinx-theme", "sphinx", "sphinxcontrib-github-alt", "sphinxcontrib-spelling"]
 test = ["pep440", "pre-commit", "pytest", "testpath"]
+
+[[package]]
+name = "nbmake"
+version = "1.4.6"
+description = "Pytest plugin for testing notebooks"
+category = "dev"
+optional = false
+python-versions = ">=3.7.0,<4.0.0"
+files = [
+    {file = "nbmake-1.4.6-py3-none-any.whl", hash = "sha256:233603c9186c659cb42524de36b556197c352ede1f9daeaa1b1141dfad226218"},
+    {file = "nbmake-1.4.6.tar.gz", hash = "sha256:874c5b9d99922f88bf0c92a3b869e75bff154edba2538efef0a1d7ad2263f5fb"},
+]
+
+[package.dependencies]
+ipykernel = ">=5.4.0"
+nbclient = ">=0.6.6,<0.7.0"
+nbformat = ">=5.0.8,<6.0.0"
+Pygments = ">=2.7.3,<3.0.0"
+pytest = ">=6.1.0"
 
 [[package]]
 name = "nbsphinx"
@@ -3928,4 +3946,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9, <3.11"
-content-hash = "fa600d4056190ca8ba7abb20a9788162c0ee5a4ffde5ff248801e160a6f34308"
+content-hash = "07a96f055ddb1be25f0f17f6fd19a672a943b6c28747c39697e924259bd45543"
