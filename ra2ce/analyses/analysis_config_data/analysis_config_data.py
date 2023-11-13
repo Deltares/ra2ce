@@ -29,7 +29,7 @@ from typing import Optional
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.graph.network_config_data.network_config_data import (
-    NetworkSection,
+    NetworkConfigData,
     OriginsDestinationsSection,
 )
 
@@ -54,7 +54,7 @@ class ProjectSection:
 
 
 @dataclass
-class AnalysisSection:
+class AnalysisSectionBase:
     name: str = ""
     analysis: str = ""  # should be enum
     save_gpkg: bool = False
@@ -62,7 +62,7 @@ class AnalysisSection:
 
 
 @dataclass
-class AnalysisSectionIndirect(AnalysisSection):
+class AnalysisSectionIndirect(AnalysisSectionBase):
     # general
     weighing: str = ""  # should be enum
     loss_per_distance: str = ""
@@ -92,7 +92,7 @@ class AnalysisSectionIndirect(AnalysisSection):
 
 
 @dataclass
-class AnalysisSectionDirect(AnalysisSection):
+class AnalysisSectionDirect(AnalysisSectionBase):
     # adaptation/effectiveness measures
     return_period: float = math.nan
     repair_costs: float = math.nan
@@ -115,12 +115,14 @@ class AnalysisConfigData(ConfigDataProtocol):
     output_path: Optional[Path] = None
     static_path: Optional[Path] = None
     project: ProjectSection = field(default_factory=lambda: ProjectSection())
-    analyses: list[AnalysisSection] = field(default_factory=list)
+    analyses: list[AnalysisSectionBase] = field(default_factory=list)
     files: Optional[dict[str, Path]] = field(default_factory=dict)
     origins_destinations: Optional[OriginsDestinationsSection] = field(
         default_factory=lambda: OriginsDestinationsSection()
     )
-    network: Optional[NetworkSection] = field(default_factory=lambda: NetworkSection())
+    network: Optional[NetworkConfigData] = field(
+        default_factory=lambda: NetworkConfigData()
+    )
 
     def to_dict(self) -> dict:
         _dict = self.__dict__
