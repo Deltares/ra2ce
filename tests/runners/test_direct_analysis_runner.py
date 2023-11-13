@@ -19,7 +19,7 @@ class TestDirectAnalysisRunner:
 
     def test_given_direct_configuration_can_run(self, dummy_ra2ce_input: ConfigWrapper):
         # 1. Define test data.
-        dummy_ra2ce_input.analysis_config.config_data["direct"] = None
+        dummy_ra2ce_input.analysis_config.config_data.direct = "sth"
         dummy_ra2ce_input.network_config.config_data.hazard.hazard_map = "A value"
 
         # 2. Run test.
@@ -44,7 +44,7 @@ class TestDirectAnalysisRunner:
         self, dummy_ra2ce_input: ConfigWrapper
     ):
         # 1. Define test data.
-        dummy_ra2ce_input.analysis_config.config_data["direct"] = None
+        dummy_ra2ce_input.analysis_config.config_data.direct = "sth"
 
         # 2. Run test.
         _result = DirectAnalysisRunner.can_run(dummy_ra2ce_input)
@@ -56,7 +56,7 @@ class TestDirectAnalysisRunner:
         self, dummy_ra2ce_input: ConfigWrapper
     ):
         # 1. Define test data.
-        dummy_ra2ce_input.analysis_config.config_data["direct"] = "sth"
+        dummy_ra2ce_input.analysis_config.config_data.direct = "sth"
         dummy_ra2ce_input.network_config = None
 
         # 2. Run test.

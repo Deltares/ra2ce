@@ -1,4 +1,5 @@
 import pytest
+from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
 
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.runners.analysis_runner_factory import AnalysisRunnerFactory
@@ -22,7 +23,9 @@ class TestAnalysisRunnerFactory:
     ):
         # 1. Define test data.
         _config_wrapper = DummyRa2ceInput()
-        _config_wrapper.analysis_config.config_data = {"indirect": 42, "direct": 24}
+        _config_wrapper.analysis_config.config_data = AnalysisConfigData(
+            indirect=42, direct=24
+        )
         _config_wrapper.network_config.config_data = NetworkConfigData()
         _config_wrapper.network_config.config_data.hazard.hazard_map = 4224
 
