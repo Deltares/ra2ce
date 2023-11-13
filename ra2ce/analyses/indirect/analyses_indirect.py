@@ -1188,7 +1188,7 @@ class IndirectAnalyses:
                     ) = analyzer.optimal_route_origin_closest_destination()
 
                     if (
-                        analyzer.config["files"]["origins_destinations_graph_hazard"]
+                        analyzer.config.files["origins_destinations_graph_hazard"]
                         is None
                     ):
                         origins = analyzer.load_origins()
