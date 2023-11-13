@@ -28,7 +28,7 @@ class TestOriginClosestDestination:
 
         # 2. Run test.
         _ocd = OriginClosestDestination(
-            config=_config_dict, analysis=_analysis, hazard_names=_hazard_names
+            config=_config_dict, analysis=_analysis, hazard_names_df=_hazard_names
         )
 
         # 3. Verify expectations.

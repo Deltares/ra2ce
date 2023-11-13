@@ -123,6 +123,7 @@ class AnalysisConfigData(ConfigDataProtocol):
     network: Optional[NetworkConfigData] = field(
         default_factory=lambda: NetworkConfigData()
     )
+    hazard_names: Optional[list[str]] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         _dict = self.__dict__
