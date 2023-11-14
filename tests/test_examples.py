@@ -10,9 +10,15 @@ _excluded_examples = [
     # so that the filter below does its work
     "example_set_up_origin_destination_no_data",
 ]
-_supported_examples = lambda x: "DIY" not in x.stem or x.stem not in _excluded_examples
-_path_to_pytest_case = lambda x: pytest.param(x, id=x.stem.replace("_", " ").capitalize())
-_jupyter_examples = list(map(_path_to_pytest_case, filter(_supported_examples, test_examples.glob("*.ipynb"))))
+_supported_examples = lambda x: "DIY" not in x.stem and x.stem not in _excluded_examples
+_path_to_pytest_case = lambda x: pytest.param(
+    x, id=x.stem.replace("_", " ").capitalize()
+)
+_jupyter_examples = list(
+    map(
+        _path_to_pytest_case, filter(_supported_examples, test_examples.glob("*.ipynb"))
+    )
+)
 
 
 class TestExamples:
