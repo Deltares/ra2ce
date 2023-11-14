@@ -52,15 +52,10 @@ class AnalysisConfigWrapperBase(ConfigWrapperProtocol):
         """
         Initializes the required output directories for a Ra2ce analysis.
         """
-
-        def _create_output_folders(analysis_type: str) -> None:
-            # Create the output folders
-            for a in getattr(self.config_data, analysis_type):
-                output_path = self.config_data.output_path / a.analysis
-                output_path.mkdir(parents=True, exist_ok=True)
-
-        _create_output_folders("direct")
-        _create_output_folders("indirect")
+        # Create the output folders
+        for a in self.config_data.analyses:
+            output_path = self.config_data.output_path / a.analysis
+            output_path.mkdir(parents=True, exist_ok=True)
 
     @classmethod
     @abstractclassmethod
