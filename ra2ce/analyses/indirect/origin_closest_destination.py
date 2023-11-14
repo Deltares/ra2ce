@@ -24,6 +24,7 @@
 import copy
 import logging
 from typing import Optional, Union
+from pathlib import Path
 
 import geopandas as gpd
 import networkx as nx
@@ -80,7 +81,7 @@ class OriginClosestDestination:
         self.results_dict = {}
 
     @staticmethod
-    def read(graph_file):
+    def read(graph_file: Path):
         _pickle_reader = GraphPickleReader()
         g = _pickle_reader.read(graph_file)
         return g
