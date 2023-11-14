@@ -44,37 +44,6 @@ class AnalysisConfigDataValidatorWithoutNetwork(Ra2ceIoValidator):
     def __init__(self, config_data: AnalysisConfigDataWithoutNetwork) -> None:
         self._config = config_data
 
-    def _validate_road_types(self, road_type_value: str) -> ValidationReport:
-        _road_types_report = ValidationReport()
-        if not road_type_value:
-            return _road_types_report
-        _expected_road_types = AnalysisNetworkDictValues["road_types"]
-        _road_type_value_list = road_type_value.replace(" ", "").split(",")
-        for road_type in _road_type_value_list:
-            if road_type not in _expected_road_types:
-                _road_types_report.error(
-                    f"Wrong road type is configured ({road_type}), has to be one or multiple of: {_expected_road_types}"
-                )
-        return _road_types_report
-
-    def _validate_files(
-        self, header: str, path_value_list: list[Path]
-    ) -> ValidationReport:
-        # Value should be none or a list of paths, because it already
-        # checked that it's not none, we can assume it's a list of Paths.
-        _files_report = ValidationReport()
-        if not path_value_list:
-            return _files_report
-        for path_value in path_value_list:
-            if not path_value.is_file():
-                _files_report.error(
-                    f"Wrong input to property [ {header} ], file does not exist: {path_value}"
-                )
-                _files_report.error(
-                    f"If no file is needed, please insert value - None - for property - {header} -"
-                )
-        return _files_report
-
     def _validate_header(self, header: Any) -> ValidationReport:
         _report = ValidationReport()
 
@@ -88,16 +57,6 @@ class AnalysisConfigDataValidatorWithoutNetwork(Ra2ceIoValidator):
                 if key not in AnalysisNetworkDictValues.keys():
                     continue
                 _expected_values_list = AnalysisNetworkDictValues[key]
-                if "file" in _expected_values_list:
-                    # Value should be none or a list of paths, because it already
-                    # checked that it's not none, we can assume it's a list of Paths.
-                    _report.merge(self._validate_files(key, value))
-                    continue
-
-                if key == "road_types":
-                    _report.merge(self._validate_road_types(value))
-                    continue
-
                 if value not in _expected_values_list:
                     _report.error(
                         f"Wrong input to property [ {key} ], has to be one of: {_expected_values_list}"
@@ -121,7 +80,6 @@ class AnalysisConfigDataValidatorWithoutNetwork(Ra2ceIoValidator):
 
         # check if properties have correct input
         # TODO: Decide whether also the non-used properties must be checked or those are not checked
-        # TODO: Decide how to check for multiple analyses (analysis1, analysis2, etc)
 
         for header in required_headers:
             # Now check the parameters per configured item.
@@ -133,12 +91,8 @@ class AnalysisConfigDataValidatorWithoutNetwork(Ra2ceIoValidator):
 
         if not _report.is_valid():
             _report.error(
-                "There are inconsistencies in the *.ini file. Please consult the log file for more information: {}".format(
-                    self._config.root_path
-                    / "data"
-                    / self._config.project.name
-                    / "output"
-                    / "RA2CE.log"
+                "There are inconsistencies in the *.ini file. Please consult the log file for more information: {}.".format(
+                    self._config.output_path.joinpath("RA2CE.log")
                 )
             )
 
