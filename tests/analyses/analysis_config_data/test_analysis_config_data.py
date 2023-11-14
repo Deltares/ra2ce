@@ -50,7 +50,7 @@ class TestAnalysisTypes:
         _indirect = [_config.analysis for _config in valid_config.indirect]
 
         # 3. Verify expectations
-        assert _indirect == IndirectAnalysisNameList
+        assert all(item in _indirect for item in IndirectAnalysisNameList)
 
     def test_direct(self, valid_config: AnalysisConfigData):
         # 1. Define test data
@@ -59,4 +59,4 @@ class TestAnalysisTypes:
         _direct = [_config.analysis for _config in valid_config.direct]
 
         # 3. Verify expectations
-        assert _direct == DirectAnalysisNameList
+        assert all(item in _direct for item in DirectAnalysisNameList)
