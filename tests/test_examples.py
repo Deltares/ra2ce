@@ -25,7 +25,6 @@ class TestExamples:
                 exec_notebook=True,
                 exec_allow_errors=False,
                 diff_color_words=False,
-                force_regen=True,
                 exec_timeout=50,
                 cov_config=None,
                 cov_merge=None,
