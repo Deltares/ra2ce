@@ -68,7 +68,7 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     loss_per_distance: str = ""
     loss_type: str = ""  # should be enum
     disruption_per_category: str = ""
-    traffic_cols: str = ""  # should be list?
+    traffic_cols: list[str] = field(default_factory=list)
     # losses
     duration_event: float = math.nan
     duration_disruption: float = math.nan
