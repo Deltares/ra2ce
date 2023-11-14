@@ -11,14 +11,12 @@ _excluded_examples = [
     "example_set_up_origin_destination_no_data",
 ]
 _supported_examples = lambda x: "DIY" not in x.stem and x.stem not in _excluded_examples
-_path_to_pytest_case = lambda x: pytest.param(
-    x, id=x.stem.replace("_", " ").capitalize()
-)
-_jupyter_examples = list(
-    map(
-        _path_to_pytest_case, filter(_supported_examples, test_examples.glob("*.ipynb"))
+_jupyter_examples = [
+    pytest.param(
+        _jupyter_file, id=_jupyter_file.stem.replace("_", " ").capitalize()
     )
-)
+    for _jupyter_file in filter(_supported_examples, test_examples.glob("*.ipynb"))
+]
 
 
 class TestExamples:
