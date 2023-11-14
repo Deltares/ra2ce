@@ -37,7 +37,7 @@ class DirectAnalysisRunner(AnalysisRunner):
     @staticmethod
     def can_run(ra2ce_input: ConfigWrapper) -> bool:
         if (
-            not bool(ra2ce_input.analysis_config)
+            not ra2ce_input.analysis_config
             or not ra2ce_input.analysis_config.config_data.direct
         ):
             return False

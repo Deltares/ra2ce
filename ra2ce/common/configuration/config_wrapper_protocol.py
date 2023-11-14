@@ -23,7 +23,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Optional, Protocol, runtime_checkable
+from typing import Optional, Protocol, runtime_checkable
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 

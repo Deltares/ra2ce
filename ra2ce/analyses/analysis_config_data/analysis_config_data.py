@@ -102,8 +102,8 @@ class AnalysisSectionDirect(AnalysisSectionBase):
     climate_period: float = math.nan
     # road damage
     damage_curve: str = ""
-    event_type: str = ""
-    risk_calculation: str = ""
+    event_type: str = ""  # should be enum
+    risk_calculation: str = ""  # should be enum
     create_table: bool = False
     file_name: Optional[Path] = None
 
@@ -134,7 +134,7 @@ class AnalysisConfigData(ConfigDataProtocol):
         return _dict
 
     @property
-    def direct(self):
+    def direct(self) -> list[DirectAnalysisNameList]:
         return list(
             analysis
             for analysis in self.analyses
@@ -142,7 +142,7 @@ class AnalysisConfigData(ConfigDataProtocol):
         )
 
     @property
-    def indirect(self):
+    def indirect(self) -> list[IndirectAnalysisNameList]:
         return list(
             analysis
             for analysis in self.analyses

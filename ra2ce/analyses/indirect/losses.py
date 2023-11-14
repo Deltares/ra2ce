@@ -20,6 +20,7 @@
 """
 
 
+from pathlib import Path
 import numpy as np
 import pandas as pd
 
@@ -31,15 +32,14 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
 
 class Losses:
     def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionIndirect):
-        self.config = config
-        self.analysis = analysis
-        self.duration = analysis.duration_event
-        self.duration_disr = analysis.duration_disruption
-        self.detour_traffic = analysis.fraction_detour
-        self.traffic_throughput = analysis.fraction_drivethrough
-        self.rest_capacity = analysis.rest_capacity
-        self.maximum = analysis.maximum_jam
-        self.partofday = analysis.partofday
+        self.losses_input_path: Path = config.input_path.joinpath("losses")
+        self.duration: float = analysis.duration_event
+        self.duration_disr: float = analysis.duration_disruption
+        self.detour_traffic: float = analysis.fraction_detour
+        self.traffic_throughput: float = analysis.fraction_drivethrough
+        self.rest_capacity: float = analysis.rest_capacity
+        self.maximum: float = analysis.maximum_jam
+        self.partofday: str = analysis.partofday
 
     @staticmethod
     def vehicle_loss_hours(path):
@@ -183,10 +183,7 @@ class Losses:
         #TODO: if yes: read gdf
         #TODO: koppelen van VVU aan de directe schade berekeningen
         """
-
-        traffic_data = self.load_df(
-            self.config.input_path / "losses", "traffic_intensities.csv"
-        )
+        traffic_data = self.load_df(self.losses_input_path, "traffic_intensities.csv")
         dict1 = {
             "AS_VTG": "evening_total",
             "AS_FRGT": "evening_freight",
@@ -204,7 +201,7 @@ class Losses:
         }
         traffic_data.rename(columns=dict1, inplace=True)
 
-        detour_data = self.load_df(self.config.input_path / "losses", "detour_data.csv")
+        detour_data = self.load_df(_losses_input_path, "detour_data.csv")
         dict2 = {
             "VA_AV_HWN": "detour_time_evening",
             "VA_RD_HWN": "detour_time_remaining",
@@ -213,6 +210,6 @@ class Losses:
         }
         detour_data.rename(columns=dict2, inplace=True)
 
-        vehicle_loss_hours = self.vehicle_loss_hours(self.config.input_path / "losses")
+        vehicle_loss_hours = self.vehicle_loss_hours(_losses_input_path)
         vlh = self.calc_vlh(traffic_data, vehicle_loss_hours, detour_data)
         return vlh
