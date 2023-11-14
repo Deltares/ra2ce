@@ -186,12 +186,10 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         and a list of different aspects you want to check.
         """
         em = EffectivenessMeasures(self.config, analysis)
-        effectiveness_dict = em.load_effectiveness_table(
-            self.config.input_path.joinpath("direct")
-        )
+        effectiveness_dict = em.load_effectiveness_table()
 
         if self.graphs["base_network_hazard"] is None:
-            gdf_in = gpd.read_feather(self.config.files.base_network_hazard)
+            gdf_in = gpd.read_feather(self.config.files["base_network_hazard"])
 
         if analysis.create_table is True:
             df = em.create_feature_table(
