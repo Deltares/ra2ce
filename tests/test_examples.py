@@ -15,6 +15,7 @@ _jupyter_examples = [
 
 class TestExamples:
     @pytest.mark.parametrize("jupyter_example", _jupyter_examples)
+    @pytest.mark.slow_test
     def test_run_jupyter_from_examples_dir(self, jupyter_example: Path):
         try:
             _fixture = NBRegressionFixture(
