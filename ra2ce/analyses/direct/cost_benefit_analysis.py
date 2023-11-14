@@ -57,9 +57,9 @@ class EffectivenessMeasures:
             _error = "Effectiveness of measures calculation: No input file configured. Please define an input file in the analysis.ini file."
             logging.error(_error)
             raise ValueError(_error)
-        elif analysis.file_name.split(".")[1] != "shp":
-            _error = "Effectiveness of measures calculation: Wrong input file configured. Extension of input file is -{}-, needs to be -shp- (shapefile)".format(
-                analysis.file_name.split(".")[1]
+        elif analysis.file_name.suffix != ".shp":
+            _error = "Effectiveness of measures calculation: Wrong input file configured. Extension of input file is -{}-, needs to be -.shp- (shapefile)".format(
+                analysis.file_name.suffix
             )
             logging.error(_error)
             raise ValueError(_error)
