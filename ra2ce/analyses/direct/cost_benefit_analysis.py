@@ -46,6 +46,9 @@ class EffectivenessMeasures:
         self.interest_rate = analysis.interest_rate / 100  # interest rate
         self.climate_factor = analysis.climate_factor / analysis.climate_period
         self.btw = 1.21  # VAT multiplication factor to include taxes
+        self._measures_csv = config.input_path.joinpath(
+            "direct", "effectiveness_measures.csv"
+        )
 
         # perform checks on input while initializing class
         self._validate_input_params(self.config, self.analysis)
@@ -69,20 +72,16 @@ class EffectivenessMeasures:
             )
             logging.error(_error)
             raise FileNotFoundError(config.input_path / "direct" / analysis.file_name)
-        elif not (config.input_path / "direct" / "effectiveness_measures.csv").exists():
+        elif not self._measures_csv.exists():
             _error = "Effectiveness of measures calculation: lookup table with effectiveness of measures doesnt exist. Please place the effectiveness_measures.csv file in the following folder: {}".format(
                 config.input_path / "direct"
             )
             logging.error(_error)
-            raise FileNotFoundError(
-                config.input_path / "direct" / "effectiveness_measures.csv"
-            )
+            raise FileNotFoundError(self._measures_csv)
 
-    @staticmethod
-    def load_effectiveness_table(path: Path):
+    def load_effectiveness_table(self):
         """This function loads a CSV table containing effectiveness of the different aspects for a number of strategies"""
-        file_path = path / "effectiveness_measures.csv"
-        df_lookup = pd.read_csv(file_path, index_col="strategies")
+        df_lookup = pd.read_csv(self._measures_csv, index_col="strategies")
         return df_lookup.transpose().to_dict()
 
     @staticmethod
