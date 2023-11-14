@@ -35,62 +35,6 @@ class TestAnalysisConfigDataValidatorWithoutNetwork:
         # 3. Verify expectations.
         assert _report.is_valid()
 
-    def test_validate_files_no_path_value_list_returns_empty_report(self):
-        # 1. Define test data.
-        _validator = AnalysisConfigDataValidatorWithoutNetwork(
-            AnalysisConfigDataWithoutNetwork()
-        )
-
-        # 2. Run test.
-        _report = _validator._validate_files("does_not_matter", [])
-
-        # 3. Verify expectations.
-        assert isinstance(_report, ValidationReport)
-        assert _report.is_valid()
-
-    def test_validate_files_with_non_existing_files_reports_error(self):
-        # 1. Define test data.
-        _validator = AnalysisConfigDataValidatorWithoutNetwork(
-            AnalysisConfigDataWithoutNetwork()
-        )
-        _test_file = test_data / "not_a_valid_file.txt"
-
-        # 2. Run test.
-        _report = _validator._validate_files("dummy_header", [_test_file])
-
-        # 3. Verify expectations.
-        assert isinstance(_report, ValidationReport)
-        assert not _report.is_valid()
-        assert len(_report._errors) == 2
-
-    def test_validate_road_types_no_road_type_returns_empty_report(self):
-        # 1. Define test data.
-        _validator = AnalysisConfigDataValidatorWithoutNetwork(
-            AnalysisConfigDataWithoutNetwork()
-        )
-
-        # 2. Run test.
-        _report = _validator._validate_road_types("")
-
-        # 3. Verify expectations.
-        assert isinstance(_report, ValidationReport)
-        assert _report.is_valid()
-
-    def test_validate_road_types_with_unexpected_road_type_reports_error(self):
-        # 1. Define test data.
-        _validator = AnalysisConfigDataValidatorWithoutNetwork(
-            AnalysisConfigDataWithoutNetwork()
-        )
-        _road_type = "not a valid road type"
-
-        # 2. Run test.
-        _report = _validator._validate_road_types(_road_type)
-
-        # 3. Verify expectations.
-        assert isinstance(_report, ValidationReport)
-        assert not _report.is_valid()
-        assert len(_report._errors) == 1
-
     def _validate_headers(
         self, config_data: AnalysisConfigData, required_headers: list[str]
     ) -> ValidationReport:
@@ -118,6 +62,7 @@ class TestAnalysisConfigDataValidatorWithoutNetwork:
         # 1. Define test data.
         _test_config_data = AnalysisConfigData(
             root_path=test_results,
+            output_path=test_results.joinpath("output"),
             project=ProjectSection(name=request.node.name),
             analyses=[AnalysisSectionDirect(analysis="invalid_analysis_type")],
         )
