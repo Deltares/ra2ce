@@ -2,15 +2,19 @@ from pathlib import Path
 
 import pytest
 from tests import test_examples
-from pytest_notebook.nb_regression import NBRegressionFixture, NBRegressionError
-from pytest_notebook.notebook import NBConfigValidationError, load_notebook
+from pytest_notebook.notebook import load_notebook
 from pytest_notebook.execution import execute_notebook
 
+_jupyter_diy_examples = [
+    "pizza_course_material_DIY",
+    "example_set_up_origin_destination_no_data",
+]
 _jupyter_examples = [
     pytest.param(
         _jupyter_notebook, id=_jupyter_notebook.stem.replace("_", " ").capitalize()
     )
     for _jupyter_notebook in test_examples.glob("*.ipynb")
+    if _jupyter_notebook.stem not in _jupyter_diy_examples
 ]
 
 
