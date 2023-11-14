@@ -1,7 +1,7 @@
 import shutil
 from itertools import chain
 from pathlib import Path
-from typing import Dict, Iterator, Optional
+from typing import Iterator, Optional
 
 import pytest
 from click.testing import CliRunner
@@ -89,7 +89,7 @@ class TestAcceptance:
     @pytest.mark.parametrize(
         "case_data_dir",
         [
-            pytest.param("acceptance_test_data", id="Default test data."),
+            pytest.param("acceptance_test_data", id="Default test data"),
         ]
         + _external_test_cases,
         indirect=["case_data_dir"],
@@ -162,7 +162,7 @@ class TestAcceptance:
         self,
         case_data_dir: Path,
         expected_graph_files: list[str],
-        expected_analysis_files: Dict[str, list[str]],
+        expected_analysis_files: dict[str, list[str]],
     ):
         """To test the graph and network creation from a shapefile. Also applies line segmentation for the network."""
         # 1. Given test data

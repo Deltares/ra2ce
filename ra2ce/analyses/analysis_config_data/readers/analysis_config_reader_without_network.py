@@ -21,6 +21,7 @@
 
 
 import logging
+from configparser import ConfigParser
 from pathlib import Path
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
@@ -38,25 +39,31 @@ from ra2ce.graph.network_config_data.network_config_data_reader import (
 
 
 class AnalysisConfigReaderWithoutNetwork(AnalysisConfigReaderBase):
+    _parser: ConfigParser
+
     def read(self, ini_file: Path) -> AnalysisConfigDataWithoutNetwork:
-        if not isinstance(ini_file, Path) or not ini_file.is_file():
-            raise ValueError("No analysis ini file 'Path' provided.")
-        _analisis_config_dict = self._get_analysis_config_data(ini_file)
-        _output_network_ini_file = _analisis_config_dict["output"] / "network.ini"
+        """
+        Read the configuration from analysis.ini and append with data from network.ini.
+        The file network.ini should be in the output folder.
+
+        Args:
+            ini_file (Path): Path of analysis.ini
+
+        Returns:
+            AnalysisConfigDataWithoutNetwork
+        """
+        _config = super().read(ini_file)
+        _config_data = AnalysisConfigDataWithoutNetwork(**_config.__dict__)
+
+        self._copy_output_files(ini_file, _config_data)
+
+        _output_network_ini_file = _config_data.output_path.joinpath("network.ini")
         _network_config = NetworkConfigDataReader().read(_output_network_ini_file)
-        _analisis_config_dict.update(_network_config.to_dict())
-        _network = _analisis_config_dict.get("network", None)
+        _config_data.update(_network_config.to_dict())
+        _network = _config_data.network
         if _network:
-            _analisis_config_dict["origins_destinations"] = _network.get(
-                "origins_destinations", None
-            )
+            _config_data.origins_destinations = _network.origins_destinations
         else:
             logging.warn(f"Not found network key for the Analysis {ini_file}")
-        return AnalysisConfigDataWithoutNetwork.from_dict(_analisis_config_dict)
 
-    def _get_analysis_config_data(self, ini_file: Path) -> dict:
-        _root_path = AnalysisConfigWrapperBase.get_network_root_dir(ini_file)
-        _config_data = self._import_configuration(_root_path, ini_file)
-        _config_data = self._convert_analysis_types(_config_data)
-        self._copy_output_files(ini_file, _config_data)
         return _config_data

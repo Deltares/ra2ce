@@ -65,8 +65,8 @@ class TestAnalysisConfigFactory:
         _ini_file_path = test_data / "simple_inputs" / "analysis.ini"
         _config_data = AnalysisConfigDataWithoutNetwork()
 
-        _config_data["static"] = test_data / "simple_inputs" / "static"
-        assert _config_data["static"].is_dir()
+        _config_data.static_path = test_data / "simple_inputs" / "static"
+        assert _config_data.static_path.is_dir()
 
         _expected_type = AnalysisConfigWrapperWithoutNetwork
         assert isinstance(_config_data, AnalysisConfigData)

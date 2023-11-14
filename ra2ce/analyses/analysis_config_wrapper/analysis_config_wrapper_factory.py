@@ -48,7 +48,7 @@ class AnalysisConfigWrapperFactory:
     @staticmethod
     def get_analysis_config(
         ini_file: Path,
-        analysis_ini_config: AnalysisConfigData,
+        analysis_config: AnalysisConfigData,
         network_config: Optional[NetworkConfigWrapper],
     ) -> AnalysisConfigWrapperBase:
         """
@@ -65,15 +65,15 @@ class AnalysisConfigWrapperFactory:
         Returns:
             AnalysisConfigWrapperBase: Concrete `AnalysisConfigWrapperBase` DataObjectModel for the given data.
         """
-        if isinstance(analysis_ini_config, AnalysisConfigDataWithNetwork):
+        if isinstance(analysis_config, AnalysisConfigDataWithNetwork):
             return AnalysisConfigWrapperWithNetwork.from_data_with_network(
-                ini_file, analysis_ini_config, network_config
+                ini_file, analysis_config, network_config
             )
-        elif isinstance(analysis_ini_config, AnalysisConfigDataWithoutNetwork):
+        elif isinstance(analysis_config, AnalysisConfigDataWithoutNetwork):
             return AnalysisConfigWrapperWithoutNetwork.from_data(
-                ini_file, analysis_ini_config
+                ini_file, analysis_config
             )
         else:
             raise NotImplementedError(
-                f"Analysis type {type(analysis_ini_config)} not currently supported."
+                f"Analysis type {type(analysis_config)} not currently supported."
             )
