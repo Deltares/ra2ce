@@ -15,15 +15,21 @@ _jupyter_examples = [
 
 class TestExamples:
     @pytest.mark.parametrize("jupyter_example", _jupyter_examples)
-    @pytest.mark.slow_test
+    @pytest.mark.documentation
     def test_run_jupyter_from_examples_dir(self, jupyter_example: Path):
+        """
+        https://pytest-notebook.readthedocs.io/en/latest/user_guide/tutorial_intro.html
+        """
         try:
             _fixture = NBRegressionFixture(
                 exec_notebook=True,
                 exec_allow_errors=False,
                 diff_color_words=False,
                 force_regen=True,
-                exec_timeout=50
+                exec_timeout=50,
+                cov_config=None,
+                cov_merge=None,
+                cov_source=None,
             )
             _fixture.check(str(jupyter_example), raise_errors=True)
         except NBRegressionError:
