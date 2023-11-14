@@ -125,28 +125,16 @@ class AnalysisConfigData(ConfigDataProtocol):
     )
     hazard_names: Optional[list[str]] = field(default_factory=list)
 
-    def to_dict(self) -> dict:
-        _dict = self.__dict__
-        _dict["project"] = self.project.__dict__
-        _dict["direct"] = [dv.__dict__ for dv in self.direct]
-        _dict["indirect"] = [dv.__dict__ for dv in self.indirect]
-        _dict["files"] = [dv.__dict__ for dv in self.files]
-        return _dict
-
     @property
-    def direct(self) -> list[DirectAnalysisNameList]:
+    def direct(self) -> list[AnalysisSectionDirect]:
         return list(
-            analysis
-            for analysis in self.analyses
-            if analysis.analysis in DirectAnalysisNameList
+            filter(lambda x: isinstance(x, AnalysisSectionDirect), self.analyses)
         )
 
     @property
-    def indirect(self) -> list[IndirectAnalysisNameList]:
+    def indirect(self) -> list[AnalysisSectionIndirect]:
         return list(
-            analysis
-            for analysis in self.analyses
-            if analysis.analysis in IndirectAnalysisNameList
+            filter(lambda x: isinstance(x, AnalysisSectionIndirect), self.analyses)
         )
 
 
