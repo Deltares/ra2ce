@@ -1,4 +1,5 @@
 import itertools
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -14,7 +15,7 @@ from ra2ce.analyses.indirect.losses import Losses
 class TestLosses:
     def test_initialize(self):
         # 1. Define test data
-        _config = AnalysisConfigData
+        _config = AnalysisConfigData(input_path=Path("sth"))
         _analyses = AnalysisSectionIndirect(
             duration_event=None,
             duration_disruption=None,
@@ -33,7 +34,7 @@ class TestLosses:
 
     def test_traffic_shockwave(self):
         # 1. Define test data
-        _config = AnalysisConfigData()
+        _config = AnalysisConfigData(input_path=Path("sth"))
         _analyses = AnalysisSectionIndirect(
             duration_event=60,
             duration_disruption=None,
@@ -64,7 +65,7 @@ class TestLosses:
     def test_calc_vlh(self, part_of_day: str):
         # 1. Define test data
         # TODO: Not sure of the input format values float of series?
-        _config = AnalysisConfigData()
+        _config = AnalysisConfigData(input_path=Path("sth"))
         _analyses = AnalysisSectionIndirect(
             duration_event=60,
             duration_disruption=15,

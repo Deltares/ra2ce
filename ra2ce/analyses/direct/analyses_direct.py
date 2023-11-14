@@ -159,8 +159,10 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
                 manual_damage_functions=manual_damage_functions,
             )
 
-            if "risk_calculation" in analysis:  # Check if risk_calculation is demanded
-                if analysis.risk_calculation != "none":
+            if analysis.risk_calculation:
+                if (
+                    analysis.risk_calculation != "none"
+                ):  # Check if risk_calculation is demanded
                     return_period_gdf.control_risk_calculation(
                         mode=analysis.risk_calculation
                     )

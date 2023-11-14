@@ -55,8 +55,6 @@ class AnalysisConfigWrapperBase(ConfigWrapperProtocol):
 
         def _create_output_folders(analysis_type: str) -> None:
             # Create the output folders
-            if not hasattr(self.config_data, analysis_type):
-                return
             for a in getattr(self.config_data, analysis_type):
                 output_path = self.config_data.output_path / a.analysis
                 output_path.mkdir(parents=True, exist_ok=True)
