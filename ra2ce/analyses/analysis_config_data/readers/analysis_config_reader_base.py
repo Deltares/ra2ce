@@ -46,7 +46,10 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
     _parser: ConfigParser
 
     def __init__(self) -> None:
-        self._parser = ConfigParser(inline_comment_prefixes="#")
+        self._parser = ConfigParser(
+            inline_comment_prefixes="#",
+            converters={"list": lambda x: [x.strip() for x in x.split(",")]},
+        )
 
     def read(self, ini_file: Path) -> AnalysisConfigData:
         if not isinstance(ini_file, Path) or not ini_file.is_file():
@@ -98,6 +101,9 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
             section_name, "save_csv", fallback=_section.save_csv
         )
         # losses
+        _section.traffic_cols = self._parser.getlist(
+            section_name, "traffic_cols", fallback=_section.traffic_cols
+        )
         _section.duration_event = self._parser.getfloat(
             section_name,
             "duration_event",

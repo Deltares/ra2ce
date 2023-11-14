@@ -178,7 +178,7 @@ class IndirectAnalyses:
         losses_df: pd.DataFrame,
     ):
         for hz in self.config.hazard_names:
-            for col in analysis.traffic_cols.split(","):
+            for col in analysis.traffic_cols:
                 try:
                     assert gdf[col + "_detour_losses"]
                     assert gdf[col + "_nodetour_losses"]
@@ -255,7 +255,7 @@ class IndirectAnalyses:
                         0
                     ]
 
-            for col in analysis.traffic_cols.split(","):
+            for col in analysis.traffic_cols:
                 try:
                     assert gdf[col + "_detour_losses"]
                     assert gdf[col + "_nodetour_losses"]
@@ -424,7 +424,7 @@ class IndirectAnalyses:
             if (
                 analysis.loss_type == "uniform"
             ):  # assume uniform threshold for disruption
-                for col in analysis.traffic_cols.split(","):
+                for col in analysis.traffic_cols:
                     # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle] * duration_disruption[hour] / 24[hour/day]
                     gdf_.loc[gdf_["connected"] == 1, col + "_losses_detour"] = (
                         gdf_[col]
@@ -491,7 +491,7 @@ class IndirectAnalyses:
                             0
                         ]
 
-                for col in analysis.traffic_cols.split(","):
+                for col in analysis.traffic_cols:
                     # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle] * duration_disruption[hour] / 24[hour/day]
                     gdf_.loc[gdf_["connected"] == 1, col + "_losses_detour"] = (
                         gdf_[col]
