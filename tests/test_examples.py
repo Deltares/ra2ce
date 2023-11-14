@@ -35,6 +35,7 @@ class TestExamples:
             notebook=load_notebook(str(jupyter_example)),
             cwd=jupyter_example.parent,
             allow_errors=False,
+            timeout=300,
         )
 
         if _execution_result.exec_error:
