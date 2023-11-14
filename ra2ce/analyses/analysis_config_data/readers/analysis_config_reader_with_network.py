@@ -20,9 +20,11 @@
 """
 
 
+from configparser import ConfigParser
 from pathlib import Path
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
     AnalysisConfigDataWithNetwork,
 )
 from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_base import (
@@ -35,7 +37,11 @@ from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
 class AnalysisConfigReaderWithNetwork(AnalysisConfigReaderBase):
+    _parser: ConfigParser
+    _network_data: NetworkConfigWrapper
+
     def __init__(self, network_data: NetworkConfigWrapper) -> None:
+        super().__init__()
         self._network_data = network_data
         if not network_data:
             raise ValueError(
@@ -43,10 +49,8 @@ class AnalysisConfigReaderWithNetwork(AnalysisConfigReaderBase):
             )
 
     def read(self, ini_file: Path) -> AnalysisConfigDataWithNetwork:
-        if not isinstance(ini_file, Path) or not ini_file.is_file():
-            raise ValueError("No analysis ini file 'Path' provided.")
-        _root_path = AnalysisConfigWrapperBase.get_network_root_dir(ini_file)
-        _config_data = self._import_configuration(_root_path, ini_file)
-        _config_data = self._convert_analysis_types(_config_data)
+        _config = super().read(ini_file)
+        _config_data = AnalysisConfigDataWithNetwork(**_config.__dict__)
+
         self._copy_output_files(ini_file, _config_data)
-        return AnalysisConfigDataWithNetwork.from_dict(_config_data)
+        return _config_data

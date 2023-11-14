@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Optional
 
 from geopandas import gpd
 
@@ -39,7 +39,7 @@ from ra2ce.graph.networks import Network
 
 
 class NetworkConfigWrapper(ConfigWrapperProtocol):
-    files: Dict[str, Path] = {}
+    files: dict[str, Path] = {}
     config_data: NetworkConfigData
 
     def __init__(self) -> None:
