@@ -50,11 +50,19 @@ DirectAnalysisNameList: list[str] = ["direct", "effectiveness_measures"]
 
 @dataclass
 class ProjectSection:
+    """
+    Reflects all possible settings that a project section might contain.
+    """
+
     name: str = ""
 
 
 @dataclass
 class AnalysisSectionBase:
+    """
+    Reflects all common settings that direct and indirect analysis sections might contain.
+    """
+
     name: str = ""
     analysis: str = ""  # should be enum
     save_gpkg: bool = False
@@ -63,6 +71,10 @@ class AnalysisSectionBase:
 
 @dataclass
 class AnalysisSectionIndirect(AnalysisSectionBase):
+    """
+    Reflects all possible settings that an indirect analysis section might contain.
+    """
+
     # general
     weighing: str = ""  # should be enum
     loss_per_distance: str = ""
@@ -93,6 +105,10 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
 
 @dataclass
 class AnalysisSectionDirect(AnalysisSectionBase):
+    """
+    Reflects all possible settings that a direct analysis section might contain.
+    """
+
     # adaptation/effectiveness measures
     return_period: float = math.nan
     repair_costs: float = math.nan
@@ -110,6 +126,11 @@ class AnalysisSectionDirect(AnalysisSectionBase):
 
 @dataclass
 class AnalysisConfigData(ConfigDataProtocol):
+    """
+    Reflects all config data from analysis.ini with defaults set.
+    Additionally some attributes from the network config are added for completeness (files, origins_destinations, network, hazard_names)
+    """
+
     root_path: Optional[Path] = None
     input_path: Optional[Path] = None
     output_path: Optional[Path] = None
@@ -127,12 +148,24 @@ class AnalysisConfigData(ConfigDataProtocol):
 
     @property
     def direct(self) -> list[AnalysisSectionDirect]:
+        """
+        Get all direct analyses from config.
+
+        Returns:
+            list[AnalysisSectionDirect]: List of all direct analyses.
+        """
         return list(
             filter(lambda x: isinstance(x, AnalysisSectionDirect), self.analyses)
         )
 
     @property
     def indirect(self) -> list[AnalysisSectionIndirect]:
+        """
+        Get all indirect analyses from config.
+
+        Returns:
+            list[AnalysisSectionIndirect]: List of all indirect analyses.
+        """
         return list(
             filter(lambda x: isinstance(x, AnalysisSectionIndirect), self.analyses)
         )
