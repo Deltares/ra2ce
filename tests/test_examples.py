@@ -3,7 +3,8 @@ from pathlib import Path
 import pytest
 from tests import test_examples
 from pytest_notebook.nb_regression import NBRegressionFixture, NBRegressionError
-from pytest_notebook.notebook import NBConfigValidationError
+from pytest_notebook.notebook import NBConfigValidationError, load_notebook
+from pytest_notebook.execution import execute_notebook
 
 _jupyter_examples = [
     pytest.param(
@@ -18,23 +19,18 @@ class TestExamples:
     @pytest.mark.documentation
     def test_run_jupyter_from_examples_dir(self, jupyter_example: Path):
         """
+        Apparently it hangs on the "passing tests" when using the approach of:
         https://pytest-notebook.readthedocs.io/en/latest/user_guide/tutorial_intro.html
+        Therefore we just implement our own way of checking whether the examples run,
+        without comparing the results.
         """
-        try:
-            _fixture = NBRegressionFixture(
-                exec_notebook=True,
-                exec_allow_errors=False,
-                diff_color_words=False,
-                exec_timeout=50,
-                cov_config=None,
-                cov_merge=None,
-                cov_source=None,
-            )
-            _fixture.check(str(jupyter_example), raise_errors=True)
-        except NBRegressionError:
-            # We only verify whether the execution was succesful.
-            # We DO NOT compare the execution to the previous generated results.
-            pass
-        except NBConfigValidationError:
-            # These are the sort errors we are looking for :)
-            raise
+        _execution_result = execute_notebook(
+            notebook=load_notebook(str(jupyter_example)),
+            cwd=jupyter_example.parent,
+            allow_errors=False,
+        )
+
+        if _execution_result.exec_error:
+            # If execution errors were found then raise the exception so the
+            # output looks "beautiful", instead of using `pytest.raises(...)`
+            raise _execution_result.exec_error
