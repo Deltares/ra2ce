@@ -6,14 +6,16 @@ from pytest_notebook.notebook import load_notebook
 from pytest_notebook.execution import execute_notebook
 
 _jupyter_diy_examples = [
-    "pizza_course_material_DIY",
+    # Ideally we want to rename these files to have a `_DIY` suffix
+    # in their name. They would then be filtered out by the below
+    # `.glob("*[!_DIY].ipynb")` pattern.
     "example_set_up_origin_destination_no_data",
 ]
 _jupyter_examples = [
     pytest.param(
         _jupyter_notebook, id=_jupyter_notebook.stem.replace("_", " ").capitalize()
     )
-    for _jupyter_notebook in test_examples.glob("*.ipynb")
+    for _jupyter_notebook in test_examples.glob("*[!_DIY].ipynb")
     if _jupyter_notebook.stem not in _jupyter_diy_examples
 ]
 
