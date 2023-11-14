@@ -1,3 +1,4 @@
+from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
@@ -46,13 +47,13 @@ class TestCostBenefitAnalysis:
             interest_rate=42,
             climate_factor=24,
             climate_period=2.4,
-            file_name="just_a_file.txt",
+            file_name=Path("just_a_file.txt"),
         )
         with pytest.raises(ValueError) as exc_err:
             EffectivenessMeasures(_config, _analysis)
         assert (
             str(exc_err.value)
-            == "Effectiveness of measures calculation: Wrong input file configured. Extension of input file is -txt-, needs to be -shp- (shapefile)"
+            == "Effectiveness of measures calculation: Wrong input file configured. Extension of input file is -.txt-, needs to be -.shp- (shapefile)"
         )
 
     def test_init_raises_when_direct_shp_file_does_not_exist(self):
@@ -64,7 +65,7 @@ class TestCostBenefitAnalysis:
             interest_rate=42,
             climate_factor=24,
             climate_period=2.4,
-            file_name="filedoesnotexist.shp",
+            file_name=Path("filedoesnotexist.shp"),
         )
         with pytest.raises(FileNotFoundError) as exc_err:
             EffectivenessMeasures(_config, _analysis)
@@ -81,7 +82,7 @@ class TestCostBenefitAnalysis:
             interest_rate=42,
             climate_factor=24,
             climate_period=2.4,
-            file_name="origins.shp",
+            file_name=Path("origins.shp"),
         )
         assert (_config.input_path.joinpath("direct", "origins.shp")).exists()
         with pytest.raises(FileNotFoundError) as exc_err:
