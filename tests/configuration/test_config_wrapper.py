@@ -3,21 +3,15 @@ from typing import Optional, Type
 
 import pytest
 
-from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
-    AnalysisConfigWrapperBase,
-)
-from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_with_network import (
-    AnalysisConfigWrapperWithNetwork,
-)
-from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_without_network import (
-    AnalysisConfigWrapperWithoutNetwork,
+from ra2ce.analyses.analysis_config_wrapper import (
+    AnalysisConfigWrapper,
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data
 
 
-class MockedAnalysisBase(AnalysisConfigWrapperBase):
+class MockedAnalysisBase(AnalysisConfigWrapper):
     def configure(self) -> None:
         pass
 
@@ -54,11 +48,9 @@ class TestConfigWrapper:
     @pytest.mark.parametrize(
         "analysis_wrapper",
         [
+            pytest.param(AnalysisConfigWrapper, id="Analysis wrapper WITH network"),
             pytest.param(
-                AnalysisConfigWrapperWithNetwork, id="Analysis wrapper WITH network"
-            ),
-            pytest.param(
-                AnalysisConfigWrapperWithoutNetwork,
+                AnalysisConfigWrapper,
                 id="Analysis wrapper WITHOUT network",
             ),
         ],
@@ -67,7 +59,7 @@ class TestConfigWrapper:
         self,
         network_ini: Optional[Path],
         analysis_ini: Optional[Path],
-        analysis_wrapper: Type[AnalysisConfigWrapperBase],
+        analysis_wrapper: Type[AnalysisConfigWrapper],
     ):
         # 1. Define test data.
         _input_config = ConfigWrapper()

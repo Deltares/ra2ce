@@ -25,15 +25,15 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
-    AnalysisConfigWrapperBase,
+from ra2ce.analyses.analysis_config_wrapper import (
+    AnalysisConfigWrapper,
 )
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
 class ConfigWrapper:
     network_config: NetworkConfigWrapper
-    analysis_config: AnalysisConfigWrapperBase
+    analysis_config: AnalysisConfigWrapper
 
     def __init__(self) -> None:
         self.network_config = None
@@ -76,7 +76,6 @@ class ConfigWrapper:
 
     def configure(self) -> None:
         if self.network_config:
-            self.network_config.configure_network()
-            self.network_config.configure_hazard()
+            self.network_config.configure()
         if self.analysis_config:
             self.analysis_config.configure()
