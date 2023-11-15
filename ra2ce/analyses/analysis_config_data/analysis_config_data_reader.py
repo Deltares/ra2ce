@@ -24,6 +24,7 @@ import logging
 from configparser import ConfigParser
 from pathlib import Path
 from shutil import copyfile
+from typing import Optional
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
@@ -34,15 +35,22 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     IndirectAnalysisNameList,
     ProjectSection,
 )
-from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
-    AnalysisConfigWrapperBase,
+from ra2ce.analyses.analysis_config_wrapper import (
+    AnalysisConfigWrapper,
 )
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
 )
+from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
-class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
+class AnalysisConfigDataReader(ConfigDataReaderProtocol):
+    """
+    Reads the analysis configuration file analyses.ini.
+    Takes network_data as optional input. If not provided, it will read the network configuration
+    from the network.ini in the output folder.
+    """
+
     _parser: ConfigParser
 
     def __init__(self) -> None:
@@ -65,10 +73,10 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
             output_path=_parent_dir.joinpath("output"),
             **self._get_sections(),
         )
-        _config_data.root_path = AnalysisConfigWrapperBase.get_network_root_dir(
-            ini_file
-        )
+        _config_data.root_path = AnalysisConfigWrapper.get_network_root_dir(ini_file)
         _config_data.project.name = _parent_dir.name
+
+        self._copy_output_files(ini_file, _config_data)
 
         return _config_data
 
@@ -252,9 +260,7 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
     def _copy_output_files(
         self, from_path: Path, config_data: AnalysisConfigData
     ) -> None:
-        _output_dir = config_data.root_path.joinpath(config_data.project.name).joinpath(
-            "output"
-        )
+        _output_dir = config_data.root_path.joinpath(config_data.project.name, "output")
         config_data.output_path = _output_dir
         if not _output_dir.exists():
             _output_dir.mkdir(parents=True)
