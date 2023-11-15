@@ -1231,6 +1231,8 @@ class IndirectAnalyses:
                     )
                     if "geometry" in destinations.columns:
                         del destinations["geometry"]
+                    if not csv_path.parent.exists():
+                        csv_path.parent.mkdir(parents=True)
                     destinations.to_csv(csv_path, index=False)
 
                     csv_path = output_path / (
@@ -1316,6 +1318,8 @@ def save_gdf(gdf: gpd.GeoDataFrame, save_path: Path):
         if gdf[col].dtype == object and col != gdf.geometry.name:
             gdf[col] = gdf[col].astype(str)
 
+    if save_path.exists():
+        save_path.unlink()
     gdf.to_file(save_path, driver="GPKG")
     logging.info("Results saved to: {}".format(save_path))
 
