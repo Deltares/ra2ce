@@ -29,7 +29,7 @@ from typing import Optional
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.graph.network_config_data.network_config_data import (
-    NetworkConfigData,
+    NetworkSection,
     OriginsDestinationsSection,
 )
 
@@ -141,9 +141,7 @@ class AnalysisConfigData(ConfigDataProtocol):
     origins_destinations: Optional[OriginsDestinationsSection] = field(
         default_factory=lambda: OriginsDestinationsSection()
     )
-    network: Optional[NetworkConfigData] = field(
-        default_factory=lambda: NetworkConfigData()
-    )
+    network: Optional[NetworkSection] = field(default_factory=lambda: NetworkSection())
     hazard_names: Optional[list[str]] = field(default_factory=list)
 
     @property
@@ -169,11 +167,3 @@ class AnalysisConfigData(ConfigDataProtocol):
         return list(
             filter(lambda x: isinstance(x, AnalysisSectionIndirect), self.analyses)
         )
-
-
-class AnalysisConfigDataWithNetwork(AnalysisConfigData):
-    pass
-
-
-class AnalysisConfigDataWithoutNetwork(AnalysisConfigData):
-    pass
