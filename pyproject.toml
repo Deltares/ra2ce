@@ -59,6 +59,7 @@ flake8 = "^5.0.4"
 mypy = "^0.971"
 black = "^22.8.0"
 urllib3 = "1.26.15"
+pyinstaller = "^6.2.0"
 
 
 [tool.poetry.group.docs.dependencies]
