@@ -23,6 +23,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Optional
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_with_network import (
@@ -31,12 +32,11 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_with_net
 from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
     AnalysisConfigWrapperBase,
 )
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
 class AnalysisConfigWrapperWithNetwork(AnalysisConfigWrapperBase):
-    _network_config: NetworkConfigData
+    _network_config: NetworkConfigWrapper
 
     def __init__(self) -> None:
         self.config_data = AnalysisConfigData()
@@ -70,7 +70,7 @@ class AnalysisConfigWrapperWithNetwork(AnalysisConfigWrapperBase):
         cls,
         ini_file: Path,
         config_data: AnalysisConfigData,
-        network_config: NetworkConfigWrapper,
+        network_config: Optional[NetworkConfigWrapper],
     ) -> AnalysisConfigWrapperWithNetwork:
         """
         Initializes this class with a network_configuration.
@@ -88,11 +88,11 @@ class AnalysisConfigWrapperWithNetwork(AnalysisConfigWrapperBase):
         return _new_analysis
 
     def configure(self) -> None:
-        self.config_data["files"] = self._network_config.files
-        self.config_data["network"] = self._network_config.config_data.network.__dict__
-        self.config_data[
-            "origins_destinations"
-        ] = self._network_config.config_data.origins_destinations.__dict__
+        self.config_data.files = self._network_config.files
+        self.config_data.network = self._network_config.config_data.network
+        self.config_data.origins_destinations = (
+            self._network_config.config_data.origins_destinations
+        )
 
         # When Network is present the graphs are retrieved from the already configured object.
         self.graphs = self._network_config.graphs
