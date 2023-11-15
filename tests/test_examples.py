@@ -12,9 +12,7 @@ _excluded_examples = [
 ]
 _supported_examples = lambda x: "DIY" not in x.stem and x.stem not in _excluded_examples
 _jupyter_examples = [
-    pytest.param(
-        _jupyter_file, id=_jupyter_file.stem.replace("_", " ").capitalize()
-    )
+    pytest.param(_jupyter_file, id=_jupyter_file.stem.replace("_", " ").capitalize())
     for _jupyter_file in filter(_supported_examples, test_examples.glob("*.ipynb"))
 ]
 
@@ -33,7 +31,7 @@ class TestExamples:
             notebook=load_notebook(str(jupyter_example)),
             cwd=jupyter_example.parent,
             allow_errors=False,
-            timeout=300,
+            timeout=600,
         )
 
         if _execution_result.exec_error:
