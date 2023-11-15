@@ -53,6 +53,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+prof/*
 tests/test_results/**
 pytest.ini
 
