@@ -344,31 +344,26 @@ class IndirectAnalyses:
                     # save alternative route nodes
                     alt_nodes = nx.dijkstra_path(graph, u, v)
 
-                    # append to calculation dataframe
-                    df_calculated = df_calculated.append(
-                        {
-                            "u": u,
-                            "v": v,
-                            "rfid": str(edata["rfid"]),
-                            "alt_dist": alt_dist,
-                            "alt_nodes": alt_nodes,
-                            "connected": 1,
-                        },
-                        ignore_index=True,
-                    )
+                    # append to calculation dataframe. Lists from values to be consistent with the else operation
+                    df_calculated = pd.concat([df_calculated, pd.DataFrame({
+                        "u": [u],
+                        "v": [v],
+                        "rfid": [str(edata["rfid"])],
+                        "alt_dist": [alt_dist],
+                        "alt_nodes": [alt_nodes],
+                        "connected": [1],
+                    })], ignore_index=True)
                 else:
-                    # append to calculation dataframe
-                    df_calculated = df_calculated.append(
-                        {
-                            "u": u,
-                            "v": v,
-                            "rfid": str(edata["rfid"]),
-                            "alt_dist": np.NaN,
-                            "alt_nodes": np.NaN,
-                            "connected": 0,
-                        },
-                        ignore_index=True,
-                    )
+                    # append to calculation dataframe. Lists from values, otherwise cannot find any index for the newly
+                    # created DataFrame.
+                    df_calculated = pd.concat([df_calculated, pd.DataFrame({
+                        "u": [u],
+                        "v": [v],
+                        "rfid": [str(edata["rfid"])],
+                        "alt_dist": [np.NaN],
+                        "alt_nodes": [np.NaN],
+                        "connected": [0],
+                    })], ignore_index=True)
 
             # Merge the dataframes
             gdf = gdf.merge(df_calculated, how="left", on=["u", "v", "rfid"])
