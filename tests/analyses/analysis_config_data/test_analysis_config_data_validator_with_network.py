@@ -22,7 +22,7 @@ class TestAnalysisConfigDataValidatorWithNetwork:
         assert isinstance(_validator, Ra2ceIoValidator)
 
     def test_validate_with_required_headers(self):
-        _test_config_data = AnalysisConfigDataWithNetwork.from_dict({"project": {}})
+        _test_config_data = AnalysisConfigDataWithNetwork(project=None)
         _validation_report = AnalysisConfigDataValidatorWithNetwork(
             _test_config_data
         ).validate()
@@ -33,19 +33,17 @@ class TestAnalysisConfigDataValidatorWithNetwork:
         "output_dict",
         [
             pytest.param(dict(), id="No output given"),
-            pytest.param(dict(output=None), id="Output is none"),
+            pytest.param(dict(output_path=None), id="Output is none"),
             pytest.param(
-                dict(output=(test_data / "not_a_path.ini")), id="Not a valid path."
+                dict(output_path=(test_data / "not_a_path.ini")), id="Not a valid path."
             ),
         ],
     )
     def test_validate_without_output_reports_error(self, output_dict: dict):
         # 1. Define test data.
-        _output_dir = output_dict.get("output", None)
+        _output_dir = output_dict.get("output_path", None)
         _expected_error = f"The configuration file 'network.ini' is not found at {_output_dir}.Please make sure to name your network settings file 'network.ini'."
-        _test_config_data = AnalysisConfigDataWithNetwork.from_dict(
-            {"project": {}} | output_dict
-        )
+        _test_config_data = AnalysisConfigDataWithNetwork(output_path=_output_dir)
 
         # 2. Run test.
         _validation_report = AnalysisConfigDataValidatorWithNetwork(

@@ -1,7 +1,6 @@
 import logging
 import shutil
 from pathlib import Path
-from typing import List
 
 import pytest
 
@@ -9,7 +8,7 @@ from ra2ce.ra2ce_logging import Ra2ceLogger
 from tests import test_results
 
 
-def get_logged_text_lines(log_file: Path) -> List[str]:
+def get_logged_text_lines(log_file: Path) -> list[str]:
     _logged_text = log_file.read_text()
     assert _logged_text
     return _logged_text.splitlines(keepends=False)

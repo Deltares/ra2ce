@@ -1,5 +1,3 @@
-from typing import List
-
 import pytest
 from click.testing import CliRunner
 
@@ -36,7 +34,7 @@ class TestMainCli:
         ],
     )
     def test_given_invalid_paths_raises_value_error(
-        self, arguments: List[str], expected_error: str
+        self, arguments: list[str], expected_error: str
     ):
         _run_result = CliRunner().invoke(
             main.run_analysis,
