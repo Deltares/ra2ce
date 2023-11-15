@@ -24,14 +24,11 @@ import shutil
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.analyses.analysis_config_data.readers.analysis_config_reader_factory import (
-    AnalysisConfigReaderFactory,
+from ra2ce.analyses.analysis_config_data.analysis_config_data_reader import (
+    AnalysisConfigDataReader,
 )
-from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
-    AnalysisConfigWrapperBase,
-)
-from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_factory import (
-    AnalysisConfigWrapperFactory,
+from ra2ce.analyses.analysis_config_wrapper import (
+    AnalysisConfigWrapper,
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
@@ -66,7 +63,7 @@ class ConfigFactory:
         return _input_config
 
     @staticmethod
-    def get_network_config_data(network_ini: Path) -> Optional[NetworkConfigData]:
+    def get_network_config_data(network_ini: Path) -> Optional[NetworkConfigWrapper]:
         if not network_ini:
             return None
         _network_config = NetworkConfigDataReader().read(network_ini)
@@ -79,13 +76,11 @@ class ConfigFactory:
 
     @staticmethod
     def get_analysis_config_data(
-        analysis_ini: Path, network_config: Optional[NetworkConfigData]
-    ) -> Optional[AnalysisConfigWrapperBase]:
+        analysis_ini: Path, network_config: Optional[NetworkConfigWrapper]
+    ) -> Optional[AnalysisConfigWrapper]:
         if not analysis_ini:
             return None
-        _ini_config_data = AnalysisConfigReaderFactory().read(
-            analysis_ini, network_config
-        )
-        return AnalysisConfigWrapperFactory.get_analysis_config(
-            analysis_ini, _ini_config_data, network_config
+        _analysis_config = AnalysisConfigDataReader().read(analysis_ini)
+        return AnalysisConfigWrapper.from_data_with_network(
+            analysis_ini, _analysis_config, network_config
         )
