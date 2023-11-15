@@ -21,66 +21,253 @@
 
 
 import logging
+from configparser import ConfigParser
 from pathlib import Path
 from shutil import copyfile
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_without_network import (
+from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
+    AnalysisSectionBase,
+    AnalysisSectionDirect,
+    AnalysisSectionIndirect,
     DirectAnalysisNameList,
     IndirectAnalysisNameList,
+    ProjectSection,
+)
+from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
+    AnalysisConfigWrapperBase,
 )
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
 )
-from ra2ce.common.io.readers.ini_file_reader import IniFileReader
 
 
 class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
-    def _convert_analysis_types(self, config: dict) -> dict:
-        def set_analysis_values(config_type: str):
-            if config_type in config:
-                (config[config_type]).append(config[a])
+    _parser: ConfigParser
+
+    def __init__(self) -> None:
+        self._parser = ConfigParser(
+            inline_comment_prefixes="#",
+            converters={"list": lambda x: [x.strip() for x in x.split(",")]},
+        )
+
+    def read(self, ini_file: Path) -> AnalysisConfigData:
+        if not isinstance(ini_file, Path) or not ini_file.is_file():
+            raise ValueError("No analysis ini file 'Path' provided.")
+        self._parser.read(ini_file)
+        self._remove_none_values()
+
+        _parent_dir = ini_file.parent
+
+        _config_data = AnalysisConfigData(
+            input_path=_parent_dir.joinpath("input"),
+            static_path=_parent_dir.joinpath("static"),
+            output_path=_parent_dir.joinpath("output"),
+            **self._get_sections(),
+        )
+        _config_data.root_path = AnalysisConfigWrapperBase.get_network_root_dir(
+            ini_file
+        )
+        _config_data.project.name = _parent_dir.name
+
+        return _config_data
+
+    def _remove_none_values(self) -> None:
+        # Remove 'None' from values, replace them with empty strings
+        for _section in self._parser.sections():
+            _keys_with_none = [
+                k for k, v in self._parser[_section].items() if v == "None"
+            ]
+            for _key_with_none in _keys_with_none:
+                self._parser[_section].pop(_key_with_none)
+
+    def _get_sections(self) -> dict:
+        return {
+            "project": self.get_project_section(),
+            "analyses": self.get_analysis_sections(),
+        }
+
+    def get_project_section(self) -> ProjectSection:
+        return ProjectSection(**self._parser["project"])
+
+    def _get_analysis_section_indirect(
+        self, section_name: str
+    ) -> AnalysisSectionIndirect:
+        _section = AnalysisSectionIndirect(**self._parser[section_name])
+        _section.save_gpkg = self._parser.getboolean(
+            section_name, "save_gpkg", fallback=_section.save_gpkg
+        )
+        _section.save_csv = self._parser.getboolean(
+            section_name, "save_csv", fallback=_section.save_csv
+        )
+        # losses
+        _section.traffic_cols = self._parser.getlist(
+            section_name, "traffic_cols", fallback=_section.traffic_cols
+        )
+        _section.duration_event = self._parser.getfloat(
+            section_name,
+            "duration_event",
+            fallback=_section.duration_event,
+        )
+        _section.duration_disruption = self._parser.getfloat(
+            section_name,
+            "duration_disruption",
+            fallback=_section.duration_disruption,
+        )
+        _section.fraction_detour = self._parser.getfloat(
+            section_name,
+            "fraction_detour",
+            fallback=_section.fraction_detour,
+        )
+        _section.fraction_drivethrough = self._parser.getfloat(
+            section_name,
+            "fraction_drivethrough",
+            fallback=_section.fraction_drivethrough,
+        )
+        _section.rest_capacity = self._parser.getfloat(
+            section_name,
+            "rest_capacity",
+            fallback=_section.rest_capacity,
+        )
+        _section.maximum_jam = self._parser.getfloat(
+            section_name,
+            "maximum_jam",
+            fallback=_section.maximum_jam,
+        )
+        # accessiblity analyses
+        _section.threshold = self._parser.getfloat(
+            section_name,
+            "threshold",
+            fallback=_section.threshold,
+        )
+        _section.threshold_destinations = self._parser.getfloat(
+            section_name,
+            "threshold_destinations",
+            fallback=_section.threshold_destinations,
+        )
+        _section.uniform_duration = self._parser.getfloat(
+            section_name,
+            "uniform_duration",
+            fallback=_section.uniform_duration,
+        )
+        _section.gdp_percapita = self._parser.getfloat(
+            section_name,
+            "gdp_percapita",
+            fallback=_section.gdp_percapita,
+        )
+        _section.calculate_route_without_disruption = self._parser.getboolean(
+            section_name,
+            "calculate_route_without_disruption",
+            fallback=_section.calculate_route_without_disruption,
+        )
+        _section.buffer_meters = self._parser.getfloat(
+            section_name,
+            "buffer_meters",
+            fallback=_section.buffer_meters,
+        )
+        _section.threshold_locations = self._parser.getfloat(
+            section_name,
+            "threshold_locations",
+            fallback=_section.threshold_locations,
+        )
+        _section.save_traffic = self._parser.getboolean(
+            section_name, "save_traffic", fallback=_section.save_traffic
+        )
+
+        return _section
+
+    def _get_analysis_section_direct(self, section_name: str) -> AnalysisSectionDirect:
+        _section = AnalysisSectionDirect(**self._parser[section_name])
+        _section.save_gpkg = self._parser.getboolean(
+            section_name, "save_gpkg", fallback=_section.save_gpkg
+        )
+        _section.save_csv = self._parser.getboolean(
+            section_name, "save_csv", fallback=_section.save_csv
+        )
+        # adaptation/effectiveness measures
+        _section.return_period = self._parser.getfloat(
+            section_name,
+            "return_period",
+            fallback=_section.return_period,
+        )
+        _section.repair_costs = self._parser.getfloat(
+            section_name,
+            "repair_costs",
+            fallback=_section.repair_costs,
+        )
+        _section.evaluation_period = self._parser.getfloat(
+            section_name,
+            "evaluation_period",
+            fallback=_section.evaluation_period,
+        )
+        _section.return_pinterest_rateeriod = self._parser.getfloat(
+            section_name,
+            "interest_rate",
+            fallback=_section.interest_rate,
+        )
+        _section.climate_factor = self._parser.getfloat(
+            section_name,
+            "climate_factor",
+            fallback=_section.climate_factor,
+        )
+        _section.climate_period = self._parser.getfloat(
+            section_name,
+            "climate_period",
+            fallback=_section.climate_period,
+        )
+        # road damage
+        _section.create_table = self._parser.getboolean(
+            section_name,
+            "create_table",
+            fallback=_section.create_table,
+        )
+        return _section
+
+    def get_analysis_sections(self) -> list[AnalysisSectionBase]:
+        """
+        Extracts info from [analysis<n>] sections
+
+        Returns:
+            list[AnalysisSection]: List of analyses (both direct and indirect)
+        """
+        _analysis_sections = []
+
+        _section_names = list(
+            section_name
+            for section_name in self._parser.sections()
+            if "analysis" in section_name
+        )
+        for _section_name in _section_names:
+            _analysis_type = self._parser.get(_section_name, "analysis")
+            if _analysis_type in DirectAnalysisNameList:
+                _analysis_section = self._get_analysis_section_direct(_section_name)
+            elif _analysis_type in IndirectAnalysisNameList:
+                _analysis_section = self._get_analysis_section_indirect(_section_name)
             else:
-                config[config_type] = [config[a]]
+                raise ValueError(f"Analysis {_analysis_type} not supported.")
+            _analysis_sections.append(_analysis_section)
 
-        analyses_names = [a for a in config.keys() if "analysis" in a]
-        for a in analyses_names:
-            if any(t in config[a]["analysis"] for t in DirectAnalysisNameList):
-                set_analysis_values("direct")
-            elif any(t in config[a]["analysis"] for t in IndirectAnalysisNameList):
-                set_analysis_values("indirect")
-            del config[a]
+        return _analysis_sections
 
-        return config
-
-    def _import_configuration(self, root_path: Path, config_path: Path) -> dict:
-        # Read the configurations in network.ini and add the root path to the configuration dictionary.
-        if not config_path.is_file():
-            config_path = root_path / config_path
-        _config = IniFileReader().read(config_path)
-        _config["project"]["name"] = config_path.parent.name
-        _config["root_path"] = root_path
-
-        # Set the paths in the configuration Dict for ease of saving to those folders.
-        # The output path is set at a different step `IniConfigurationReaderBase::_copy_output_files`
-        _config["input"] = config_path.parent / "input"
-        _config["static"] = config_path.parent / "static"
-        return _config
-
-    def _copy_output_files(self, from_path: Path, config_data: dict) -> None:
-        self._create_config_dir("output", config_data)
+    def _copy_output_files(
+        self, from_path: Path, config_data: AnalysisConfigData
+    ) -> None:
+        _output_dir = config_data.root_path.joinpath(config_data.project.name).joinpath(
+            "output"
+        )
+        config_data.output_path = _output_dir
+        if not _output_dir.exists():
+            _output_dir.mkdir(parents=True)
         try:
-            copyfile(from_path, config_data["output"] / "{}.ini".format(from_path.stem))
+            copyfile(
+                from_path,
+                config_data.output_path.joinpath("{}.ini".format(from_path.stem)),
+            )
         except FileNotFoundError as e:
             logging.warning(e)
 
-    def _create_config_dir(self, dir_name: str, config_data: dict):
-        _dir = config_data["root_path"] / config_data["project"]["name"] / dir_name
-        if not _dir.exists():
-            _dir.mkdir(parents=True)
-        config_data[dir_name] = _dir
-
     def _parse_path_list(
-        self, property_name: str, path_list: str, config_data: dict
+        self, property_name: str, path_list: str, config_data: AnalysisConfigData
     ) -> list[Path]:
         _list_paths = []
         for path_value in path_list.split(","):
@@ -89,38 +276,14 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
                 _list_paths.append(path_value)
                 continue
 
-            _project_name_dir = (
-                config_data["root_path"] / config_data["project"]["name"]
-            )
-            abs_path = _project_name_dir / "static" / property_name / path_value
+            _project_name_dir = config_data.root_path.joinpath(config_data.project.name)
+            abs_path = _project_name_dir.joinpath("static", property_name, path_value)
             try:
                 assert abs_path.is_file()
             except AssertionError:
-                abs_path = _project_name_dir / "input" / property_name / path_value
+                abs_path = _project_name_dir.joinpath(
+                    "input", property_name, path_value
+                )
 
             _list_paths.append(abs_path)
         return _list_paths
-
-    def _update_path_values(self, config_data: dict) -> None:
-        """
-        TODO: Work in progress, for now it's happening during validation, which should not be the case.
-
-        Args:
-            config_data (dict): _description_
-        """
-        _file_types = {
-            "polygon": "network",
-            "hazard_map": "hazard",
-            "origins": "network",
-            "destinations": "network",
-            "locations": "network",
-        }
-        for config_header, value_dict in config_data.items():
-            if not isinstance(value_dict, dict):
-                continue
-            for header_prop, prop_value in value_dict.items():
-                _prop_name = _file_types.get(header_prop, None)
-                if _prop_name and prop_value:
-                    config_data[config_header][header_prop] = self._parse_path_list(
-                        _prop_name, prop_value, config_data
-                    )

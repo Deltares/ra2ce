@@ -79,9 +79,9 @@ class TestConfigWrapper:
         # 2. Run test.
         if not network_ini and not analysis_ini:
             with pytest.raises(ValueError):
-                _input_config.get_root_dir()
+                _input_config.root_dir
         else:
-            _root_dir = _input_config.get_root_dir()
+            _root_dir = _input_config.root_dir
             # 3. Verify expectations.
             assert _root_dir == test_data
 

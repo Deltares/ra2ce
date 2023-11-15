@@ -1,4 +1,5 @@
-from ra2ce.analyses.indirect.analyses_indirect import IndirectAnalyses, Losses
+from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analyses.indirect.analyses_indirect import IndirectAnalyses
 from tests import test_data
 
 
@@ -6,7 +7,7 @@ class TestIndirectAnalyses:
     def test_initialize(self):
         # 1. Define test data.
         _graphs = {}
-        _config = {"output": test_data}
+        _config = AnalysisConfigData(output_path=test_data)
 
         # 2. Run test.
         _indirect_analyses = IndirectAnalyses(_config, _graphs)
