@@ -508,7 +508,7 @@ class HazardOverlay:
     ) -> gpd.GeoDataFrame:
         """Intersect geodataframe and hazard with reprojection"""
         # Check if the graph needs to be reprojected
-        hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
+        hazard_crs = pyproj.CRS.from_user_input(self.config.hazard["hazard_crs"])
         gdf_crs = pyproj.CRS.from_user_input(gdf.crs)
 
         if (
