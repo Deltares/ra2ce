@@ -20,14 +20,12 @@
 """
 
 
-import math
-from pathlib import Path
 from typing import Any
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
-    AnalysisConfigDataWithoutNetwork,
-    IndirectAnalysisNameList,
+    AnalysisConfigData,
     DirectAnalysisNameList,
+    IndirectAnalysisNameList,
 )
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
@@ -40,8 +38,8 @@ AnalysisNetworkDictValues = NetworkDictValues | {
 }
 
 
-class AnalysisConfigDataValidatorWithoutNetwork(Ra2ceIoValidator):
-    def __init__(self, config_data: AnalysisConfigDataWithoutNetwork) -> None:
+class AnalysisConfigDataValidator(Ra2ceIoValidator):
+    def __init__(self, config_data: AnalysisConfigData) -> None:
         self._config = config_data
 
     def _validate_header(self, header: Any) -> ValidationReport:
@@ -69,7 +67,13 @@ class AnalysisConfigDataValidatorWithoutNetwork(Ra2ceIoValidator):
         _available_keys = self._config.__dict__.keys()
 
         def _check_header(header: str) -> None:
-            if header not in _available_keys:
+            """
+            Check if the section is provided and non-empty
+
+            Args:
+                header (str): section name
+            """
+            if header not in _available_keys or not getattr(self._config, header):
                 _report.error(
                     f"Property [ {header} ] is not configured. Add property [ {header} ] to the *.ini file. "
                 )
