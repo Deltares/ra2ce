@@ -34,15 +34,18 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     IndirectAnalysisNameList,
     ProjectSection,
 )
-from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
-    AnalysisConfigWrapperBase,
-)
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
 )
 
 
-class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
+class AnalysisConfigDataReader(ConfigDataReaderProtocol):
+    """
+    Reads the analysis configuration file analyses.ini.
+    Takes network_data as optional input. If not provided, it will read the network configuration
+    from the network.ini in the output folder.
+    """
+
     _parser: ConfigParser
 
     def __init__(self) -> None:
@@ -58,17 +61,16 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
         self._remove_none_values()
 
         _parent_dir = ini_file.parent
-
         _config_data = AnalysisConfigData(
+            root_path=_parent_dir.parent,
             input_path=_parent_dir.joinpath("input"),
             static_path=_parent_dir.joinpath("static"),
             output_path=_parent_dir.joinpath("output"),
             **self._get_sections(),
         )
-        _config_data.root_path = AnalysisConfigWrapperBase.get_network_root_dir(
-            ini_file
-        )
         _config_data.project.name = _parent_dir.name
+
+        self._copy_output_files(ini_file, _config_data)
 
         return _config_data
 
@@ -200,7 +202,7 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
             "evaluation_period",
             fallback=_section.evaluation_period,
         )
-        _section.return_pinterest_rateeriod = self._parser.getfloat(
+        _section.interest_rate = self._parser.getfloat(
             section_name,
             "interest_rate",
             fallback=_section.interest_rate,
@@ -252,9 +254,7 @@ class AnalysisConfigReaderBase(ConfigDataReaderProtocol):
     def _copy_output_files(
         self, from_path: Path, config_data: AnalysisConfigData
     ) -> None:
-        _output_dir = config_data.root_path.joinpath(config_data.project.name).joinpath(
-            "output"
-        )
+        _output_dir = config_data.root_path.joinpath(config_data.project.name, "output")
         config_data.output_path = _output_dir
         if not _output_dir.exists():
             _output_dir.mkdir(parents=True)
