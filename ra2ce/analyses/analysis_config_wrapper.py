@@ -47,18 +47,12 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
         self.graphs = None
 
     @staticmethod
-    def get_network_root_dir(filepath: Path) -> Path:
-        return filepath.parent.parent
-
-    @staticmethod
-    def get_data_output(ini_file: Path) -> Optional[Path]:
-        _root_path = AnalysisConfigWrapper.get_network_root_dir(ini_file)
-        _project_name = ini_file.parent.name
-        return _root_path.joinpath(_project_name, "output")
+    def get_data_output(ini_file: Path) -> Path:
+        return ini_file.parent.joinpath("output")
 
     @property
     def root_dir(self) -> Path:
-        return self.get_network_root_dir(self.ini_file)
+        return self.ini_file.parent.parent
 
     def initialize_output_dirs(self) -> None:
         """
