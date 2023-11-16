@@ -81,6 +81,11 @@ class ConfigFactory:
         if not analysis_ini:
             return None
         _analysis_config = AnalysisConfigDataReader().read(analysis_ini)
-        return AnalysisConfigWrapper.from_data_with_network(
-            analysis_ini, _analysis_config, network_config
-        )
+        if isinstance(network_config, NetworkConfigWrapper):
+            return AnalysisConfigWrapper.from_data_with_network(
+                analysis_ini, _analysis_config, network_config
+            )
+        else:
+            return AnalysisConfigWrapper.from_data_without_network(
+                analysis_ini, _analysis_config
+            )
