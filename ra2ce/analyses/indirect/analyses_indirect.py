@@ -1103,7 +1103,7 @@ class IndirectAnalyses:
                     )
                     _equity_weights_file = None
                     if analysis.equity_weight:
-                        _equity_files.origins_destinations_graph_hazardnpath(
+                        _equity_weights_file = self.config.static_path.joinpath(
                             "network", analysis.equity_weight
                         )
                     route_traffic_df = self.optimal_route_od_link(
