@@ -52,30 +52,6 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
             output_path.mkdir(parents=True, exist_ok=True)
 
     @classmethod
-    def from_data(
-        cls, ini_file: Path, config_data: AnalysisConfigData
-    ) -> AnalysisConfigWrapper:
-        """
-        Initializes an `AnalysisConfigWrapper` with the given parameters.
-
-        Args:
-            ini_file (Path): Path to the ini file containing the analysis data.
-            config_data (AnalysisIniConfigData): Ini data representation.
-
-        Raises:
-            FileNotFoundError: When the provided `ini file` cannot be found.
-
-        Returns:
-            AnalysisConfigWrapper: Initialized instance.
-        """
-        if not ini_file.is_file():
-            raise FileNotFoundError(ini_file)
-        _new_analysis = cls()
-        _new_analysis.ini_file = ini_file
-        _new_analysis.config_data = config_data
-        return _new_analysis
-
-    @classmethod
     def from_data_with_network(
         cls,
         ini_file: Path,
@@ -91,11 +67,20 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
             config_data (AnalysisIniConfigData): Ini data representation.
             network_config (NetworkConfig): Network configuration to be used on this analysis.
 
+        Raises:
+            FileNotFoundError: When the provided `ini file` cannot be found.
+
         Returns:
             AnalysisConfigWrapper: Initialized instance.
         """
-        _new_analysis = cls.from_data(ini_file, config_data)
+        if not ini_file.is_file():
+            raise FileNotFoundError(ini_file)
+        _new_analysis = cls()
+        _new_analysis.ini_file = ini_file
+        _new_analysis.config_data = config_data
 
+        if not isinstance(network_config, NetworkConfigWrapper):
+            raise ValueError("No valid network config provided.")
         _new_analysis.config_data.files = network_config.files
         _new_analysis.config_data.network = network_config.config_data.network
         _new_analysis.config_data.origins_destinations = (

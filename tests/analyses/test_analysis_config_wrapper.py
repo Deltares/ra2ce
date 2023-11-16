@@ -16,7 +16,7 @@ from tests import test_data, test_results
 class TestAnalysisConfigWrapper:
     def test_from_data_no_file_raises(self):
         with pytest.raises(FileNotFoundError):
-            AnalysisConfigWrapper.from_data(Path("not_a_file"), None)
+            AnalysisConfigWrapper.from_data_with_network(Path("not_a_file"), None, None)
 
     def test_initialize(self):
         _config = AnalysisConfigWrapper()
@@ -29,17 +29,15 @@ class TestAnalysisConfigWrapper:
         assert _ini_file.exists()
         return _ini_file
 
-    def test_from_data(self, valid_analysis_ini: Path):
+    def test_from_data_network_not_provided(self, valid_analysis_ini: Path):
         # 1. Define test data.
         _config_data = AnalysisConfigData()
 
         # 2. Run test.
-        _config = AnalysisConfigWrapper.from_data(valid_analysis_ini, _config_data)
-
-        # 3. Verify final expectations.
-        assert isinstance(_config, AnalysisConfigWrapper)
-        assert _config.config_data == _config_data
-        assert _config.ini_file == valid_analysis_ini
+        with pytest.raises(ValueError):
+            _config = AnalysisConfigWrapper.from_data_with_network(
+                valid_analysis_ini, _config_data, None
+            )
 
     def test_from_data_with_network(self, valid_analysis_ini: Path):
         # 1. Define test data.
@@ -59,7 +57,10 @@ class TestAnalysisConfigWrapper:
     def test_configure(self, valid_analysis_ini: Path):
         # 1. Define test data.
         _config_data = AnalysisConfigData()
-        _config = AnalysisConfigWrapper.from_data(valid_analysis_ini, _config_data)
+        _network_config = NetworkConfigWrapper()
+        _config = AnalysisConfigWrapper.from_data_with_network(
+            valid_analysis_ini, _config_data, _network_config
+        )
 
         # 2. Run test.
         _config.configure()
