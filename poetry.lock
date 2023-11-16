@@ -2903,6 +2903,23 @@ files = [
 ]
 
 [[package]]
+name = "pyinstaller-versionfile"
+version = "2.1.1"
+description = "Create a version file from a simple YAML config file"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "pyinstaller_versionfile-2.1.1-py3-none-any.whl", hash = "sha256:34892679ec655fa1190ec07d2eda7042c8b5e6c44f5c056ec3eb1471d9955c18"},
+    {file = "pyinstaller_versionfile-2.1.1.tar.gz", hash = "sha256:19c3ca9d2e2c48c7cf8af173951b5d76fe826392c11b06575554e28c862a6997"},
+]
+
+[package.dependencies]
+Jinja2 = "*"
+packaging = "*"
+PyYAML = "*"
+
+[[package]]
 name = "pyogrio"
 version = "0.6.0"
 description = "Vectorized spatial vector file format I/O using GDAL/OGR"
@@ -4688,4 +4705,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9, <3.11"
-content-hash = "f0b53bcc87c146a32b81d74bb53101640a0395057cc9aeecd1d1cac63b000f97"
+content-hash = "e6e54e6cfbac131c07bddba13901bc8f777d312793180932ce2cec86af85e77d"
