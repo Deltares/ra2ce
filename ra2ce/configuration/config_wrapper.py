@@ -55,15 +55,18 @@ class ConfigWrapper:
             logging.error("No valid network.ini file provided. Program will close.")
             return False
 
-        if self.network_config and self.analysis_config:
-            if (
+        if (
+            self.network_config
+            and self.analysis_config
+            and (
                 self.analysis_config.config_data.root_path
                 != self.network_config.config_data.root_path
-            ):
-                logging.error(
-                    "Root directory differs between network and analyses .ini files"
-                )
-                return False
+            )
+        ):
+            logging.error(
+                "Root directory differs between network and analyses .ini files"
+            )
+            return False
 
         return True
 
