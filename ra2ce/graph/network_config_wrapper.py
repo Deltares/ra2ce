@@ -85,12 +85,8 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         return _new_network_config
 
     @staticmethod
-    def get_network_root_dir(filepath: Path) -> Path:
-        return filepath.parent.parent
-
-    @staticmethod
-    def get_data_output(ini_file: Path) -> Optional[Path]:
-        return ini_file.parent / "output"
+    def get_data_output(ini_file: Path) -> Path:
+        return ini_file.parent.joinpath("output")
 
     @staticmethod
     def _get_existent_network_files(output_graph_dir: Path) -> dict:
@@ -118,7 +114,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
 
     @property
     def root_dir(self) -> Path:
-        return self.get_network_root_dir(self.ini_file)
+        return self.ini_file.parent.parent
 
     @staticmethod
     def read_graphs_from_config(static_output_dir: Path) -> dict:
