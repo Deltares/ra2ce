@@ -6,7 +6,7 @@ from typing import Iterator, Optional
 import pytest
 from click.testing import CliRunner
 
-from ra2ce import main
+from ra2ce import __main__
 from tests import external_test, slow_test, test_data, test_external_data
 
 # Just to make sonar-cloud stop complaining.
@@ -50,7 +50,7 @@ def _run_from_cli(network_ini: Optional[Path], analysis_ini: Optional[Path]) -> 
 
     # 2. Run test.
     _run_result = CliRunner().invoke(
-        main.run_analysis,
+        __main__.run_analysis,
         args,
     )
 
@@ -66,7 +66,7 @@ class TestAcceptance:
 
         try:
             import ra2ce
-            import ra2ce.main
+            import ra2ce.__main__
             import ra2ce.ra2ce_handler
         except ImportError as exc_err:
             pytest.fail(f"It was not possible to import required packages {exc_err}")
