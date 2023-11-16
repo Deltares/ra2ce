@@ -31,7 +31,7 @@ class TestRa2ceHandler:
         # 2. Run test.
         with pytest.raises(Exception):
             # It will raise an exception because the analysis folder does not
-            # contain any analysis.ini file, but we only care to see if the
+            # contain any analyses.ini file, but we only care to see if the
             # directory was correctly initialized.
             Ra2ceHandler(None, _analysis_dir)
 

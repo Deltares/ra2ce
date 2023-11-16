@@ -40,7 +40,7 @@ class TestConfigWrapper:
         "analysis_ini",
         [
             pytest.param(
-                test_data / "simple_inputs" / "analysis.ini", id="Valid analysis ini."
+                test_data / "simple_inputs" / "analyses.ini", id="Valid analysis ini."
             ),
             pytest.param(None, id="No INI analysis."),
         ],

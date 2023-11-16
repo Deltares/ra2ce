@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -35,7 +36,7 @@ class TestCostBenefitAnalysis:
             EffectivenessMeasures(_config, _analysis)
         assert (
             str(exc_err.value)
-            == "Effectiveness of measures calculation: No input file configured. Please define an input file in the analysis.ini file."
+            == "Effectiveness of measures calculation: No input file configured. Please define an input file in the analyses.ini file."
         )
 
     def test_init_raises_when_file_name_not_shp(self):

@@ -57,7 +57,7 @@ class EffectivenessMeasures:
         self, config: AnalysisConfigData, analysis: AnalysisSectionDirect
     ) -> None:
         if analysis.file_name is None:
-            _error = "Effectiveness of measures calculation: No input file configured. Please define an input file in the analysis.ini file."
+            _error = "Effectiveness of measures calculation: No input file configured. Please define an input file in the analyses.ini file."
             logging.error(_error)
             raise ValueError(_error)
         elif analysis.file_name.suffix != ".shp":

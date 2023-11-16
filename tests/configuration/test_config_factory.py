@@ -13,7 +13,7 @@ class TestConfigFactory:
         # 1. Define test data.
         _test_dir = test_data / "simple_inputs"
         assert _test_dir.is_dir()
-        _analysis_ini = _test_dir / "analysis.ini"
+        _analysis_ini = _test_dir / "analyses.ini"
         _network_ini = _test_dir / "network.ini"
 
         assert _analysis_ini.is_file() and _network_ini.is_file()
@@ -32,7 +32,7 @@ class TestConfigFactory:
         # 1. Define test data.
         _test_dir = test_data / "simple_inputs"
         assert _test_dir.is_dir()
-        _analysis_ini = _test_dir / "analysis.ini"
+        _analysis_ini = _test_dir / "analyses.ini"
 
         assert _analysis_ini.is_file()
 

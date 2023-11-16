@@ -127,7 +127,7 @@ class AnalysisSectionDirect(AnalysisSectionBase):
 @dataclass
 class AnalysisConfigData(ConfigDataProtocol):
     """
-    Reflects all config data from analysis.ini with defaults set.
+    Reflects all config data from analyses.ini with defaults set.
     Additionally some attributes from the network config are added for completeness (files, origins_destinations, network, hazard_names)
     """
 

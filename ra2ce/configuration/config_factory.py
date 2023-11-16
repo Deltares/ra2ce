@@ -48,7 +48,7 @@ class ConfigFactory:
 
         Args:
             network_ini (Path): Path to the  `network.ini` file.
-            analysis_ini (Path): Path to the `analysis.ini` file.
+            analysis_ini (Path): Path to the `analyses.ini` file.
 
         Returns:
             ConfigWrapper: Instantiated `ConfigWrapper`.
