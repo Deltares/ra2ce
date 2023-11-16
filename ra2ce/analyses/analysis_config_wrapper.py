@@ -40,13 +40,11 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
     ini_file: Path
     config_data: AnalysisConfigData
     graphs: Optional[dict]
-    _network_config: Optional[NetworkConfigWrapper]
 
     def __init__(self) -> None:
         self.ini_file = None
         self.config_data = AnalysisConfigData()
         self.graphs = None
-        self._network_config = None
 
     @staticmethod
     def get_network_root_dir(filepath: Path) -> Path:
@@ -111,14 +109,18 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
             config_data (AnalysisIniConfigData): Ini data representation.
             network_config (NetworkConfig): Network configuration to be used on this analysis.
 
-        Raises:
-            FileNotFoundError: When the provided `ini file` cannot be found.
-
         Returns:
             AnalysisConfigWrapper: Initialized instance.
         """
         _new_analysis = cls.from_data(ini_file, config_data)
-        _new_analysis._network_config = network_config
+        _new_analysis.config_data.files = network_config.files
+        _new_analysis.config_data.network = network_config.config_data.network
+        _new_analysis.config_data.origins_destinations = (
+            network_config.config_data.origins_destinations
+        )
+        # Graphs are retrieved from the already configured object
+        _new_analysis.graphs = network_config.graphs
+
         return _new_analysis
 
     @classmethod
@@ -135,42 +137,43 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
             ini_file (Path): Path to the ini file containing the analysis data.
             config_data (AnalysisIniConfigData): Ini data representation.
 
-        Raises:
-            FileNotFoundError: When the provided `ini file` cannot be found.
-
         Returns:
             AnalysisConfigWrapper: Initialized instance.
         """
         _new_analysis = cls.from_data(ini_file, config_data)
+
+        # Read existing files and graphs from static folder
         _static_dir = _new_analysis.config_data.static_path
         if _static_dir.is_dir():
-            config_data.files = NetworkConfigWrapper._get_existent_network_files(
-                _static_dir / "output_graph"
+            _new_analysis.config_data.files = (
+                NetworkConfigWrapper._get_existent_network_files(
+                    _static_dir / "output_graph"
+                )
+            )
+            _new_analysis.graphs = NetworkConfigWrapper.read_graphs_from_config(
+                _new_analysis.config_data.static_path.joinpath("output_graph")
             )
         else:
             logging.error(f"Static dir not found. Value provided: {_static_dir}")
-        _new_analysis.config_data.files = config_data.files
+
+        # Read network config file to get network and origin_destination settings
+        _output_network_ini_file = _new_analysis.config_data.output_path.joinpath(
+            "network.ini"
+        )
+        if _output_network_ini_file.is_file():
+            _network_config = NetworkConfigDataReader().read(_output_network_ini_file)
+            _new_analysis.config_data.network = _network_config.network
+            _new_analysis.config_data.origins_destinations = (
+                _network_config.origins_destinations
+            )
+        else:
+            logging.error(
+                f"Network configuration not found. Value provided: {_output_network_ini_file}"
+            )
+
         return _new_analysis
 
     def configure(self) -> None:
-        # If no network config provided, try reading it from the output folder
-        if not self._network_config:
-            self._network_config = NetworkConfigWrapper()
-            _output_network_ini_file = self.config_data.output_path.joinpath(
-                "network.ini"
-            )
-            self._network_config.config_data = NetworkConfigDataReader().read(
-                _output_network_ini_file
-            )
-        else:
-            # When Network is present the graphs are retrieved from the already configured object.
-            self.graphs = self._network_config.graphs
-            self.config_data.files = self._network_config.files
-            self.config_data.network = self._network_config.config_data.network
-            self.config_data.origins_destinations = (
-                self._network_config.config_data.origins_destinations
-            )
-
         self.initialize_output_dirs()
 
     def is_valid(self) -> bool:
