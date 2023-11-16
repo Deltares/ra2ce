@@ -55,15 +55,25 @@ class TestAnalysisConfigWrapper:
         assert isinstance(_config, AnalysisConfigWrapper)
         assert _config.config_data == _config_data
         assert _config.ini_file == valid_analysis_ini
-        assert _config._network_config == _network_config
+
+    def test_from_data_without_network(self, valid_analysis_ini: Path):
+        # 1. Define test data.
+        _config_data = AnalysisConfigData()
+
+        # 2. Run test.
+        _config = AnalysisConfigWrapper.from_data_without_network(
+            valid_analysis_ini, _config_data
+        )
+
+        # 3. Verify final expectations.
+        assert isinstance(_config, AnalysisConfigWrapper)
+        assert _config.config_data == _config_data
+        assert _config.ini_file == valid_analysis_ini
 
     def test_configure(self, valid_analysis_ini: Path):
         # 1. Define test data.
         _config_data = AnalysisConfigData()
-        _network_config = NetworkConfigWrapper()
-        _config = AnalysisConfigWrapper.from_data_with_network(
-            valid_analysis_ini, _config_data, _network_config
-        )
+        _config = AnalysisConfigWrapper.from_data(valid_analysis_ini, _config_data)
 
         # 2. Run test.
         _config.configure()

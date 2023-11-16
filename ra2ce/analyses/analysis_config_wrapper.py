@@ -144,7 +144,7 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
 
         # Read existing files and graphs from static folder
         _static_dir = _new_analysis.config_data.static_path
-        if _static_dir.is_dir():
+        if _static_dir and _static_dir.is_dir():
             _new_analysis.config_data.files = (
                 NetworkConfigWrapper._get_existent_network_files(
                     _static_dir / "output_graph"
@@ -157,9 +157,12 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
             logging.error(f"Static dir not found. Value provided: {_static_dir}")
 
         # Read network config file to get network and origin_destination settings
-        _output_network_ini_file = _new_analysis.config_data.output_path.joinpath(
-            "network.ini"
-        )
+        if _new_analysis.config_data.output_path:
+            _output_network_ini_file = _new_analysis.config_data.output_path.joinpath(
+                "network.ini"
+            )
+        else:
+            _output_network_ini_file = Path()
         if _output_network_ini_file.is_file():
             _network_config = NetworkConfigDataReader().read(_output_network_ini_file)
             _new_analysis.config_data.network = _network_config.network
