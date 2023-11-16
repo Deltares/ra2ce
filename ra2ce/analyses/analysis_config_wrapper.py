@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import Optional
 
@@ -99,10 +100,11 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
         cls,
         ini_file: Path,
         config_data: AnalysisConfigData,
-        network_config: Optional[NetworkConfigWrapper],
+        network_config: NetworkConfigWrapper,
     ) -> AnalysisConfigWrapper:
         """
-        Initializes an `AnalysisConfigWrapper` with the given parameters.
+        Initializes an `AnalysisConfigWrapper` with the given parameters,
+        with network_config as input from the network phase.
 
         Args:
             ini_file (Path): Path to the ini file containing the analysis data.
@@ -116,8 +118,38 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
             AnalysisConfigWrapper: Initialized instance.
         """
         _new_analysis = cls.from_data(ini_file, config_data)
-        if isinstance(network_config, NetworkConfigWrapper):
-            _new_analysis._network_config = network_config
+        _new_analysis._network_config = network_config
+        return _new_analysis
+
+    @classmethod
+    def from_data_without_network(
+        cls,
+        ini_file: Path,
+        config_data: AnalysisConfigData,
+    ) -> AnalysisConfigWrapper:
+        """
+        Initializes an `AnalysisConfigWrapper` with the given parameters,
+        without a given network_config.
+
+        Args:
+            ini_file (Path): Path to the ini file containing the analysis data.
+            config_data (AnalysisIniConfigData): Ini data representation.
+
+        Raises:
+            FileNotFoundError: When the provided `ini file` cannot be found.
+
+        Returns:
+            AnalysisConfigWrapper: Initialized instance.
+        """
+        _new_analysis = cls.from_data(ini_file, config_data)
+        _static_dir = _new_analysis.config_data.static_path
+        if _static_dir.is_dir():
+            config_data.files = NetworkConfigWrapper._get_existent_network_files(
+                _static_dir / "output_graph"
+            )
+        else:
+            logging.error(f"Static dir not found. Value provided: {_static_dir}")
+        _new_analysis.config_data.files = config_data.files
         return _new_analysis
 
     def configure(self) -> None:
@@ -130,14 +162,14 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
             self._network_config.config_data = NetworkConfigDataReader().read(
                 _output_network_ini_file
             )
-
-        # When Network is present the graphs are retrieved from the already configured object.
-        self.graphs = self._network_config.graphs
-        self.config_data.files = self._network_config.files
-        self.config_data.network = self._network_config.config_data.network
-        self.config_data.origins_destinations = (
-            self._network_config.config_data.origins_destinations
-        )
+        else:
+            # When Network is present the graphs are retrieved from the already configured object.
+            self.graphs = self._network_config.graphs
+            self.config_data.files = self._network_config.files
+            self.config_data.network = self._network_config.config_data.network
+            self.config_data.origins_destinations = (
+                self._network_config.config_data.origins_destinations
+            )
 
         self.initialize_output_dirs()
 
