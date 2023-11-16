@@ -26,13 +26,14 @@ from pathlib import Path
 from typing import Optional, Protocol, runtime_checkable
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
+from ra2ce.graph.graph_files import GraphFiles
 
 
 @runtime_checkable
 class ConfigWrapperProtocol(Protocol):  # pragma: no cover
     ini_file: Path
     config_data: Optional[ConfigDataProtocol] = None
-    graphs: Optional[dict] = None
+    graphs: Optional[GraphFiles] = None
 
     @classmethod
     def from_data(

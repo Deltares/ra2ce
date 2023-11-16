@@ -23,19 +23,19 @@
 # -*- coding: utf-8 -*-
 import copy
 import logging
-from typing import Optional, Union
 from pathlib import Path
+from typing import Optional, Union
 
 import geopandas as gpd
 import networkx as nx
 import pandas as pd
 from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
+
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
 )
-
 from ra2ce.common.io.readers.graph_pickle_reader import GraphPickleReader
 
 
@@ -88,7 +88,7 @@ class OriginClosestDestination:
 
     def optimal_route_origin_closest_destination(self):
         """Calculates per origin the location of its closest destination"""
-        graph = self.read(self.config.files["origins_destinations_graph"])
+        graph = self.read(self.config.files.origins_destinations_graph)
 
         # Load the origins and destinations
         origins = self.load_origins()
@@ -148,7 +148,7 @@ class OriginClosestDestination:
 
     def multi_link_origin_closest_destination(self):
         """Calculates per origin the location of its closest destination with hazard disruption"""
-        graph = self.read(self.config.files["origins_destinations_graph_hazard"])
+        graph = self.read(self.config.files.origins_destinations_graph_hazard)
 
         # Load the origins and destinations
         origins = self.load_origins()

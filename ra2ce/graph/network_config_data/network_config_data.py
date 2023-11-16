@@ -28,6 +28,7 @@ from typing import Optional
 from pyproj import CRS
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
+from ra2ce.graph.graph_files import GraphFiles
 
 
 @dataclass
@@ -97,7 +98,7 @@ class NetworkConfigData(ConfigDataProtocol):
     crs: CRS = field(default_factory=lambda: CRS.from_user_input(4326))
     project: ProjectSection = field(default_factory=lambda: ProjectSection())
     network: NetworkSection = field(default_factory=lambda: NetworkSection())
-    graphs: Optional[dict] = None
+    graphs: GraphFiles = field(default_factory=lambda: Files())
     origins_destinations: OriginsDestinationsSection = field(
         default_factory=lambda: OriginsDestinationsSection()
     )

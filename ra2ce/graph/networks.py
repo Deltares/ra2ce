@@ -30,6 +30,7 @@ import pyproj
 from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as nut
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
+from ra2ce.graph.graph_files import GraphFiles
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_wrappers.network_wrapper_factory import NetworkWrapperFactory
 
@@ -44,7 +45,7 @@ class Network:
         config: A dictionary with the configuration details on how to create and adjust the network.
     """
 
-    def __init__(self, network_config: NetworkConfigData, files: dict):
+    def __init__(self, network_config: NetworkConfigData, files: GraphFiles):
         # General
         self._config_data = network_config
         self.project_name = network_config.project.name
@@ -146,7 +147,7 @@ class Network:
             output_dir=self.output_graph_dir,
             export_types=types_to_export,
         )
-        self.files[graph_name] = _exporter.get_pickle_path()
+        setattr(self.files, graph_name, _exporter.get_pickle_path())
 
     def _get_new_network_and_graph(
         self, export_types: list[str]
@@ -186,7 +187,10 @@ class Network:
         )
 
         def check_base_file(file_type: str, file_path: Path):
-            if not isinstance(base_graph_filepath, Path) or not base_graph_filepath.is_file():
+            if (
+                not isinstance(base_graph_filepath, Path)
+                or not base_graph_filepath.is_file()
+            ):
                 raise FileNotFoundError(
                     "No base {} file found at {}.".format(file_type, file_path)
                 )
@@ -202,43 +206,45 @@ class Network:
         self.base_network_crs = _network_gdf.crs
         return _base_graph, _network_gdf
 
-    def create(self) -> dict:
+    def create(self) -> GraphFiles:
         """Handler function with the logic to call the right functions to create a network.
 
         Returns:
             (dict): A dict of a network (GeoDataFrame) and 1 (base NetworkX graph) or 2 graphs (base NetworkX and OD graph)
         """
         # Save the 'base' network as gpickle and if the user requested, also as shapefile.
-        to_save = ["pickle"] if not self._network_config.save_gpkg else ["pickle", "shp"]
+        to_save = (
+            ["pickle"] if not self._network_config.save_gpkg else ["pickle", "shp"]
+        )
         od_graph = None
         base_graph = None
         network_gdf = None
 
         # For all graph and networks - check if it exists, otherwise, make the graph and/or network.
-        if not (self.files["base_graph"] or self.files["base_network"]):
+        if not (self.files.base_graph or self.files.base_network):
             base_graph, network_gdf = self._get_new_network_and_graph(to_save)
         else:
             base_graph, network_gdf = self._get_stored_network_and_graph(
-                self.files["base_graph"], self.files["base_network"]
+                self.files.base_graph, self.files.base_network
             )
 
         # create origins destinations graph
         if (
             (self.origins)
             and (self.destinations)
-            and not self.files["origins_destinations_graph"]
+            and not self.files.origins_destinations_graph
         ):
             # reading the base graphs
-            if self.files["base_graph"] and base_graph:
-                base_graph = GraphPickleReader().read(self.files["base_graph"])
+            if self.files.base_graph and base_graph:
+                base_graph = GraphPickleReader().read(self.files.base_graph)
             # adding OD nodes
             if self.origins.suffix == ".tif":
                 self.origins = self.generate_origins_from_raster()
             od_graph = self.add_od_nodes(base_graph, self.base_graph_crs)
             self._export_network_files(od_graph, "origins_destinations_graph", to_save)
 
-        return {
-            "base_graph": base_graph,
-            "base_network": network_gdf,
-            "origins_destinations_graph": od_graph,
-        }
+        return GraphFiles(
+            base_graph=base_graph,
+            base_network=network_gdf,
+            origins_destinations_graph=od_graph,
+        )
