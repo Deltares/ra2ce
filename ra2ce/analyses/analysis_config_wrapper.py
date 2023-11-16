@@ -29,13 +29,14 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data_validator import (
     AnalysisConfigDataValidator,
 )
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
+from ra2ce.graph.graph_files import GraphFiles
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
 class AnalysisConfigWrapper(ConfigWrapperProtocol):
     ini_file: Path
     config_data: AnalysisConfigData
-    graphs: Optional[dict]
+    graphs: Optional[GraphFiles]
 
     def __init__(self) -> None:
         self.ini_file = None

@@ -30,6 +30,7 @@ from geopandas import gpd
 
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 from ra2ce.common.io.readers import GraphPickleReader
+from ra2ce.graph.graph_files import GraphFiles
 from ra2ce.graph.hazard.hazard_overlay import HazardOverlay
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_data.network_config_data_validator import (
@@ -41,21 +42,14 @@ from ra2ce.graph.networks import Network
 class NetworkConfigWrapper(ConfigWrapperProtocol):
     ini_file: Path
     config_data: NetworkConfigData
-    graphs: Optional[dict] = None
-    files: dict[str, Path] = {}
+    graphs: Optional[GraphFiles]
+    files: GraphFiles
 
     def __init__(self) -> None:
         self.ini_file = None
         self.config_data = NetworkConfigData()
-        self.graphs = {}
-        self.files = {
-            "base_graph": None,
-            "base_network": None,
-            "base_network_hazard": None,
-            "origins_destinations_graph": None,
-            "base_graph_hazard": None,
-            "origins_destinations_graph_hazard": None,
-        }
+        self.graphs = GraphFiles()
+        self.files = GraphFiles()
 
     @classmethod
     def from_data(
@@ -86,7 +80,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
 
     @staticmethod
     def get_existent_network_files(output_graph_dir: Path) -> dict:
-        """Checks if file of graph exist in network folder and adds filename to the files dict"""
+        """Checks if file of graph exist in network folder and adds filename to the files object"""
         _network_filenames = [
             "base_graph.p",
             "base_network.feather",
@@ -103,6 +97,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
                 logging.info(f"Existing graph/network found: {expected_file}.")
             return _value
 
+        # TODO Ardt
         return {
             _ep.stem: _get_file_entry(_ep)
             for _ep in map(lambda x: output_graph_dir / x, _network_filenames)
@@ -110,7 +105,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
 
     @staticmethod
     def read_graphs_from_config(static_output_dir: Path) -> dict:
-        _graphs = {}
+        _graphs = GraphFiles()
         _pickle_reader = GraphPickleReader()
         if not static_output_dir.exists():
             raise ValueError("Path does not exist: {}".format(static_output_dir))
@@ -119,28 +114,26 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         for input_graph in ["base_graph", "origins_destinations_graph"]:
             _input_graph_filename = static_output_dir.joinpath(f"{input_graph}.p")
             if _input_graph_filename.is_file():
-                _graphs[input_graph] = _pickle_reader.read(_input_graph_filename)
-            else:
-                _graphs[input_graph] = None
+                setattr(
+                    _graphs, input_graph, _pickle_reader.read(_input_graph_filename)
+                )
 
             _hazard_filename = static_output_dir.joinpath(f"{input_graph}_hazard.p")
             if _hazard_filename.is_file():
-                _graphs[input_graph + "_hazard"] = _pickle_reader.read(_hazard_filename)
-            else:
-                _graphs[input_graph + "_hazard"] = None
+                setattr(
+                    _graphs,
+                    input_graph + "_hazard",
+                    _pickle_reader.read(_hazard_filename),
+                )
 
         # Load networks
         filename = static_output_dir.joinpath("base_network.feather")
         if filename.is_file():
-            _graphs["base_network"] = gpd.read_feather(filename)
-        else:
-            _graphs["base_network"] = None
+            _graphs.base_network = gpd.read_feather(filename)
 
         filename = static_output_dir.joinpath("base_network_hazard.feather")
         if filename.is_file():
-            _graphs["base_network_hazard"] = gpd.read_feather(filename)
-        else:
-            _graphs["base_network_hazard"] = None
+            _graphs.base_network_hazard = gpd.read_feather(filename)
 
         return _graphs
 

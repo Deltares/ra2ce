@@ -37,6 +37,7 @@ from ra2ce.analyses.direct.damage_calculation import (
     DamageNetworkEvents,
     DamageNetworkReturnPeriods,
 )
+from ra2ce.graph.graph_files import GraphFiles
 
 
 class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
@@ -50,11 +51,11 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
     """
 
     config: AnalysisConfigData
-    graphs: dict
+    graphs: GraphFiles
 
-    def __init__(self, config: AnalysisConfigData, graphs: dict):
-        self.config = config
-        self.graphs = graphs
+    def __init__(self, config: AnalysisConfigData, graphs: GraphFiles):
+        self.config: AnalysisConfigData = config
+        self.graphs: GraphFiles = graphs
 
     def execute(self):
         """Main Coordinator of all direct damage analysis
@@ -117,11 +118,11 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         if (
             "base_network_hazard" not in self.graphs
         ):  # key is missing due to error in handler?
-            self.graphs["base_network_hazard"] = None
+            self.graphs.base_network_hazard = None
 
-        road_gdf = self.graphs["base_network_hazard"]
-        if self.graphs["base_network_hazard"] is None:
-            road_gdf = gpd.read_feather(self.config.files["base_network_hazard"])
+        road_gdf = self.graphs.base_network_hazard
+        if self.graphs.base_network_hazard is None:
+            road_gdf = gpd.read_feather(self.config.files.base_network_hazard)
 
         road_gdf.columns = rename_road_gdf_to_conventions(road_gdf.columns)
 
@@ -186,8 +187,8 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         em = EffectivenessMeasures(self.config, analysis)
         effectiveness_dict = em.load_effectiveness_table()
 
-        if self.graphs["base_network_hazard"] is None:
-            gdf_in = gpd.read_feather(self.config.files["base_network_hazard"])
+        if self.graphs.base_network_hazard is None:
+            gdf_in = gpd.read_feather(self.config.files.base_network_hazard)
 
         if analysis.create_table is True:
             df = em.create_feature_table(

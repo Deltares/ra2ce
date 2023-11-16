@@ -28,6 +28,7 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
+from ra2ce.graph.graph_files import GraphFiles
 from ra2ce.graph.network_config_data.network_config_data import (
     NetworkSection,
     OriginsDestinationsSection,
@@ -137,7 +138,7 @@ class AnalysisConfigData(ConfigDataProtocol):
     static_path: Optional[Path] = None
     project: ProjectSection = field(default_factory=lambda: ProjectSection())
     analyses: list[AnalysisSectionBase] = field(default_factory=list)
-    files: dict[str, Path] = field(default_factory=dict)
+    files: GraphFiles = field(default_factory=lambda: GraphFiles())
     origins_destinations: Optional[OriginsDestinationsSection] = field(
         default_factory=lambda: OriginsDestinationsSection()
     )
