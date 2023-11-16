@@ -39,16 +39,6 @@ class ConfigWrapper:
         self.network_config = None
         self.analysis_config = None
 
-    @property
-    def root_dir(self) -> Path:
-        if self.network_config.ini_file:
-            # TODO: What do we need this for?
-            return self.network_config.root_dir
-        elif self.analysis_config.ini_file:
-            return self.analysis_config.root_dir
-        else:
-            raise ValueError()
-
     def is_valid_input(self) -> bool:
         """
         Validates whether the input is valid. This require that at least the analysis ini file is given.
@@ -65,8 +55,11 @@ class ConfigWrapper:
             logging.error("No valid network.ini file provided. Program will close.")
             return False
 
-        if self.network_config:
-            if self.analysis_config.root_dir != self.network_config.root_dir:
+        if self.network_config and self.analysis_config:
+            if (
+                self.analysis_config.config_data.root_path
+                != self.network_config.config_data.root_path
+            ):
                 logging.error(
                     "Root directory differs between network and analyses .ini files"
                 )
