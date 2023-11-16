@@ -19,88 +19,82 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Optional
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
-from ra2ce.analyses.analysis_config_data.analysis_config_data_validator_with_network import (
-    AnalysisConfigDataValidatorWithNetwork,
+from ra2ce.analyses.analysis_config_data.analysis_config_data_validator import (
+    AnalysisConfigDataValidator,
 )
-from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
-    AnalysisConfigWrapperBase,
-)
+from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
-class AnalysisConfigWrapperWithNetwork(AnalysisConfigWrapperBase):
-    _network_config: NetworkConfigWrapper
+class AnalysisConfigWrapper(ConfigWrapperProtocol):
+    ini_file: Path
+    config_data: AnalysisConfigData
+    graphs: Optional[dict]
 
     def __init__(self) -> None:
+        self.ini_file = None
         self.config_data = AnalysisConfigData()
+        self.graphs = None
 
-    @classmethod
-    def from_data(
-        cls, ini_file: Path, config_data: AnalysisConfigData
-    ) -> AnalysisConfigWrapperWithNetwork:
+    def initialize_output_dirs(self) -> None:
         """
-        Initializes an `AnalysisWithNetworkConfiguration` with the given parameters.
-
-        Args:
-            ini_file (Path): Path to the ini file containing the analysis data.
-            config_data (AnalysisIniConfigData): Ini data representation.
-
-        Raises:
-            FileNotFoundError: When the provided `ini file` cannot be found.
-
-        Returns:
-            AnalysisWithNetworkConfiguration: Initialized instance.
+        #Initializes the required output directories for a Ra2ce analysis.
         """
-        if not ini_file.is_file():
-            raise FileNotFoundError(ini_file)
-        _new_analysis = cls()
-        _new_analysis.ini_file = ini_file
-        _new_analysis.config_data = config_data
-        return _new_analysis
+        # Create the output folders
+        for a in self.config_data.analyses:
+            output_path = self.config_data.output_path.joinpath(a.analysis)
+            output_path.mkdir(parents=True, exist_ok=True)
 
     @classmethod
     def from_data_with_network(
         cls,
         ini_file: Path,
         config_data: AnalysisConfigData,
-        network_config: Optional[NetworkConfigWrapper],
-    ) -> AnalysisConfigWrapperWithNetwork:
+        network_config: NetworkConfigWrapper,
+    ) -> AnalysisConfigWrapper:
         """
-        Initializes this class with a network_configuration.
+        Initializes an `AnalysisConfigWrapper` with the given parameters,
+        with network_config as input from the network phase.
 
         Args:
-            ini_file (Path): Ini file containing the data from the config_data.
+            ini_file (Path): Path to the ini file containing the analysis data.
             config_data (AnalysisIniConfigData): Ini data representation.
             network_config (NetworkConfig): Network configuration to be used on this analysis.
 
+        Raises:
+            FileNotFoundError: When the provided `ini file` cannot be found.
+
         Returns:
-            AnalysisWithNetworkConfiguration: Created instance.
+            AnalysisConfigWrapper: Initialized instance.
         """
-        _new_analysis = cls.from_data(ini_file, config_data)
-        _new_analysis._network_config = network_config
+        if not ini_file.is_file():
+            raise FileNotFoundError(ini_file)
+        _new_analysis = cls()
+        _new_analysis.ini_file = ini_file
+        _new_analysis.config_data = config_data
+
+        if not isinstance(network_config, NetworkConfigWrapper):
+            raise ValueError("No valid network config provided.")
+        _new_analysis.config_data.files = network_config.files
+        _new_analysis.config_data.network = network_config.config_data.network
+        _new_analysis.config_data.origins_destinations = (
+            network_config.config_data.origins_destinations
+        )
+        # Graphs are retrieved from the already configured object
+        _new_analysis.graphs = network_config.graphs
+
         return _new_analysis
 
     def configure(self) -> None:
-        self.config_data.files = self._network_config.files
-        self.config_data.network = self._network_config.config_data.network
-        self.config_data.origins_destinations = (
-            self._network_config.config_data.origins_destinations
-        )
-
-        # When Network is present the graphs are retrieved from the already configured object.
-        self.graphs = self._network_config.graphs
         self.initialize_output_dirs()
 
     def is_valid(self) -> bool:
         _file_is_valid = self.ini_file.is_file() and self.ini_file.suffix == ".ini"
-        _validation_report = AnalysisConfigDataValidatorWithNetwork(
-            self.config_data
-        ).validate()
+        _validation_report = AnalysisConfigDataValidator(self.config_data).validate()
         return _file_is_valid and _validation_report.is_valid()
