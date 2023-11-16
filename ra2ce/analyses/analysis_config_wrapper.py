@@ -21,7 +21,6 @@
 
 from __future__ import annotations
 
-import logging
 from pathlib import Path
 from typing import Optional
 
@@ -30,9 +29,6 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data_validator import (
     AnalysisConfigDataValidator,
 )
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
-from ra2ce.graph.network_config_data.network_config_data_reader import (
-    NetworkConfigDataReader,
-)
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
@@ -45,14 +41,6 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
         self.ini_file = None
         self.config_data = AnalysisConfigData()
         self.graphs = None
-
-    @staticmethod
-    def get_data_output(ini_file: Path) -> Path:
-        return ini_file.parent.joinpath("output")
-
-    @property
-    def root_dir(self) -> Path:
-        return self.ini_file.parent.parent
 
     def initialize_output_dirs(self) -> None:
         """
@@ -107,6 +95,7 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
             AnalysisConfigWrapper: Initialized instance.
         """
         _new_analysis = cls.from_data(ini_file, config_data)
+
         _new_analysis.config_data.files = network_config.files
         _new_analysis.config_data.network = network_config.config_data.network
         _new_analysis.config_data.origins_destinations = (
@@ -114,59 +103,6 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
         )
         # Graphs are retrieved from the already configured object
         _new_analysis.graphs = network_config.graphs
-
-        return _new_analysis
-
-    @classmethod
-    def from_data_without_network(
-        cls,
-        ini_file: Path,
-        config_data: AnalysisConfigData,
-    ) -> AnalysisConfigWrapper:
-        """
-        Initializes an `AnalysisConfigWrapper` with the given parameters,
-        without a given network_config.
-
-        Args:
-            ini_file (Path): Path to the ini file containing the analysis data.
-            config_data (AnalysisIniConfigData): Ini data representation.
-
-        Returns:
-            AnalysisConfigWrapper: Initialized instance.
-        """
-        _new_analysis = cls.from_data(ini_file, config_data)
-
-        # Read existing files and graphs from static folder
-        _static_dir = _new_analysis.config_data.static_path
-        if _static_dir and _static_dir.is_dir():
-            _new_analysis.config_data.files = (
-                NetworkConfigWrapper._get_existent_network_files(
-                    _static_dir / "output_graph"
-                )
-            )
-            _new_analysis.graphs = NetworkConfigWrapper.read_graphs_from_config(
-                _new_analysis.config_data.static_path.joinpath("output_graph")
-            )
-        else:
-            logging.error(f"Static dir not found. Value provided: {_static_dir}")
-
-        # Read network config file to get network and origin_destination settings
-        if _new_analysis.config_data.output_path:
-            _output_network_ini_file = _new_analysis.config_data.output_path.joinpath(
-                "network.ini"
-            )
-        else:
-            _output_network_ini_file = Path()
-        if _output_network_ini_file.is_file():
-            _network_config = NetworkConfigDataReader().read(_output_network_ini_file)
-            _new_analysis.config_data.network = _network_config.network
-            _new_analysis.config_data.origins_destinations = (
-                _network_config.origins_destinations
-            )
-        else:
-            logging.error(
-                f"Network configuration not found. Value provided: {_output_network_ini_file}"
-            )
 
         return _new_analysis
 

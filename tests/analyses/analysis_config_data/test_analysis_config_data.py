@@ -8,6 +8,7 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     IndirectAnalysisNameList,
     ProjectSection,
 )
+from tests import test_results
 
 
 class TestAnalysisConfigData:
@@ -43,3 +44,14 @@ class TestAnalysisConfigData:
 
         # 3. Verify expectations
         assert all(item in _direct for item in DirectAnalysisNameList)
+
+    def test_get_data_output(self):
+        # 1. Define test data
+        _test_ini = test_results / "non_existing.ini"
+        _expected_value = test_results / "output"
+
+        # 2. Run test
+        _return_value = AnalysisConfigData.get_data_output(_test_ini)
+
+        # 3. Verify expectations.
+        assert _return_value == _expected_value

@@ -75,7 +75,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         _new_network_config.ini_file = ini_file
         _new_network_config.config_data = config_data
         if config_data.output_graph_dir and config_data.output_graph_dir.is_dir():
-            _new_network_config.files = _new_network_config._get_existent_network_files(
+            _new_network_config.files = _new_network_config.get_existent_network_files(
                 config_data.output_graph_dir
             )
         else:
@@ -85,11 +85,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         return _new_network_config
 
     @staticmethod
-    def get_data_output(ini_file: Path) -> Path:
-        return ini_file.parent.joinpath("output")
-
-    @staticmethod
-    def _get_existent_network_files(output_graph_dir: Path) -> dict:
+    def get_existent_network_files(output_graph_dir: Path) -> dict:
         """Checks if file of graph exist in network folder and adds filename to the files dict"""
         _network_filenames = [
             "base_graph.p",
@@ -112,10 +108,6 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
             for _ep in map(lambda x: output_graph_dir / x, _network_filenames)
         }
 
-    @property
-    def root_dir(self) -> Path:
-        return self.ini_file.parent.parent
-
     @staticmethod
     def read_graphs_from_config(static_output_dir: Path) -> dict:
         _graphs = {}
@@ -123,7 +115,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         if not static_output_dir.exists():
             raise ValueError("Path does not exist: {}".format(static_output_dir))
         # Load graphs
-        # TODO (fix): why still read hazard as neccessary if analysis of single link redundancy can run wihtout hazard?
+        # TODO (fix): why still read hazard as neccessary if analysis of single link redundancy can run without hazard?
         for input_graph in ["base_graph", "origins_destinations_graph"]:
             _input_graph_filename = static_output_dir.joinpath(f"{input_graph}.p")
             if _input_graph_filename.is_file():

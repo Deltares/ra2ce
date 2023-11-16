@@ -20,10 +20,12 @@
 """
 
 
+import logging
 import shutil
 from pathlib import Path
 from typing import Optional
 
+from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analyses.analysis_config_data.analysis_config_data_reader import (
     AnalysisConfigDataReader,
 )
@@ -31,7 +33,6 @@ from ra2ce.analyses.analysis_config_wrapper import (
     AnalysisConfigWrapper,
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_data.network_config_data_reader import (
     NetworkConfigDataReader,
 )
@@ -82,10 +83,61 @@ class ConfigFactory:
             return None
         _analysis_config = AnalysisConfigDataReader().read(analysis_ini)
         if isinstance(network_config, NetworkConfigWrapper):
-            return AnalysisConfigWrapper.from_data_with_network(
+            return ConfigFactory.get_analysis_config_with_network(
                 analysis_ini, _analysis_config, network_config
             )
         else:
-            return AnalysisConfigWrapper.from_data_without_network(
+            return ConfigFactory.get_analysis_config_without_network(
                 analysis_ini, _analysis_config
             )
+
+    @staticmethod
+    def get_analysis_config_with_network(
+        analysis_ini: Path,
+        config_data: AnalysisConfigData,
+        network_config: NetworkConfigWrapper,
+    ):
+        return AnalysisConfigWrapper().from_data_with_network(
+            analysis_ini, config_data, network_config
+        )
+
+    @staticmethod
+    def get_analysis_config_without_network(
+        analysis_ini: Path,
+        config_data: AnalysisConfigData,
+    ):
+        _network_config = NetworkConfigWrapper()
+
+        # Read existing files and graphs from static folder
+        _static_dir = config_data.static_path
+        if _static_dir and _static_dir.is_dir():
+            _network_config.files = NetworkConfigWrapper.get_existent_network_files(
+                _static_dir.joinpath("output_graph")
+            )
+            _network_config.graphs = NetworkConfigWrapper.read_graphs_from_config(
+                _static_dir.joinpath("output_graph")
+            )
+        else:
+            logging.error(f"Static dir not found. Value provided: {_static_dir}")
+
+        # Read network config file to get network and origin_destination settings
+        if _network_config.config_data.output_path:
+            _output_network_ini_file = _network_config.config_data.output_path.joinpath(
+                "network.ini"
+            )
+        else:
+            _output_network_ini_file = Path()
+        if _output_network_ini_file.is_file():
+            _network_data = NetworkConfigDataReader().read(_output_network_ini_file)
+            _network_config.config_data.network = _network_data.network
+            _network_config.config_data.origins_destinations = (
+                _network_data.origins_destinations
+            )
+        else:
+            logging.error(
+                f"Network configuration not found. Value provided: {_output_network_ini_file}"
+            )
+
+        return AnalysisConfigWrapper().from_data_with_network(
+            analysis_ini, config_data, _network_config
+        )
