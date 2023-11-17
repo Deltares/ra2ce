@@ -107,7 +107,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         ### CONTROLLER FOR CALCULATING THE ROAD DAMAGE
 
         Arguments:
-            *analysis* (dict) : contains part of the settings from the analysis ini
+            *analysis* (AnalysisSectionDirect) : contains part of the settings from the analysis ini
 
         Returns:
             *result_gdf* (GeoDataFrame) : The original hazard dataframe with the result of the damage calculations added
