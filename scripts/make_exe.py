@@ -77,7 +77,7 @@ def build_cli():
             f"--paths={str(_ra2ce_dir)}",
             f"--paths={str(_root_dir)}",
             *get_hidden_imports(),
-            # f"--workpath={str(_workpath)}",
+            f"--workpath={str(_workpath)}",
             f"--specpath={str(_workpath)}",
             # "--add-data={}:README.md".format(str(_root_dir.joinpath("README.md"))),
             "--icon={}".format(str(_logo)),
