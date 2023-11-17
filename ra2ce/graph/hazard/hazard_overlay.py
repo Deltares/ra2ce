@@ -569,7 +569,7 @@ class HazardOverlay:
 
         # Iterate over the three graph/network types to load the file if necessary (when not yet loaded in memory).
         for input_graph in ["base_graph", "base_network", "origins_destinations_graph"]:
-            file_path = getattr(self.file, input_graph)
+            file_path = getattr(self.files, input_graph)
 
             if file_path is not None or getattr(self.graphs, input_graph) is not None:
                 if (
@@ -587,7 +587,7 @@ class HazardOverlay:
 
         #### Step 1: hazard overlay of the base graph (NetworkX) ###
         if self.files.base_graph:
-            if not self.files.base_graph_hazard is None:
+            if self.files.base_graph_hazard is None:
                 graph = self.graphs.base_graph
 
                 # Check if the graph needs to be reprojected
@@ -732,7 +732,7 @@ class HazardOverlay:
                 logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
 
         #### Step 3: iterate overlay of the GeoPandas Dataframe (if any) ###
-        if self.files.base_network and not self.file.base_network_hazard:
+        if self.files.base_network and not self.files.base_network_hazard:
             logging.info("Iterating overlay of GeoPandas Dataframe.")
             # Check if the graph needs to be reprojected
             hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
