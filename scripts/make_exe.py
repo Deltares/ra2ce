@@ -15,7 +15,7 @@ _cli_name = "ra2ce_cli"
 
 def get_version_file() -> Path:
 
-    _version_file = _workpath.joinpath("version.rc")
+    _version_file = Path(__file__).parent.joinpath("version.rc")
     if not _version_file.parent.exists():
         _version_file.parent.mkdir()
     _version_file.touch(exist_ok=True)
@@ -60,6 +60,13 @@ def get_hidden_imports() -> list[str]:
 def build_cli():
 
     _ra2ce_dir = Path(cli_module.__file__).parent
+    _logo = _root_dir.joinpath("docs", "_resources", "ra2ce_logo.ico")
+
+    if not _logo.exists():
+        from PIL import Image
+
+        img = Image.open(_logo.with_suffix(".png"))
+        img.save(_logo)
 
     PyInstaller.__main__.run(
         [
@@ -70,10 +77,10 @@ def build_cli():
             f"--paths={str(_ra2ce_dir)}",
             f"--paths={str(_root_dir)}",
             *get_hidden_imports(),
-            f"--workpath={str(_workpath)}",
+            # f"--workpath={str(_workpath)}",
             f"--specpath={str(_workpath)}",
             # "--add-data={}:README.md".format(str(_root_dir.joinpath("README.md"))),
-            # f"--icon={str(convert_icon)}",
+            "--icon={}".format(str(_logo)),
             "--copy-metadata=ra2ce",
             f"--version-file={str(get_version_file())}",
             "--noconfirm",
