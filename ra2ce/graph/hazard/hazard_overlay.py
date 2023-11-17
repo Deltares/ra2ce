@@ -431,7 +431,11 @@ class HazardOverlay:
             _filter = lambda x: x.suffix in list(suffix)
             return list(filter(_filter, self._hazard_map))
 
-        _hazard_files = HazardFiles(tif=get_filtered_files(".tif"), shp=get_filtered_files(".gpkg"), table=get_filtered_files(".csv", ".json"))
+        _hazard_files = HazardFiles(
+            tif=get_filtered_files(".tif"),
+            shp=get_filtered_files(".gpkg"),
+            table=get_filtered_files(".csv", ".json"),
+        )
         return _hazard_files
 
     def hazard_intersect(
@@ -697,7 +701,7 @@ class HazardOverlay:
 
             else:
                 (
-                    self.graphs.origins_destinations_graph_hazard
+                    self.graphs.origins_destinations_graph_hazard,
                     ods,
                 ) = self.od_hazard_intersect(graph, ods)
 
