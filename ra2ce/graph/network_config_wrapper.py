@@ -97,11 +97,14 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
                 logging.info(f"Existing graph/network found: {expected_file}.")
             return _value
 
-        # TODO Ardt
-        return {
-            _ep.stem: _get_file_entry(_ep)
-            for _ep in map(lambda x: output_graph_dir / x, _network_filenames)
-        }
+        return GraphFiles(
+            **{
+                _ep.stem: _get_file_entry(_ep)
+                for _ep in map(
+                    lambda x: output_graph_dir.joinpath(x), _network_filenames
+                )
+            }
+        )
 
     @staticmethod
     def read_graphs_from_config(static_output_dir: Path) -> GraphFiles:
