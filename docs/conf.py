@@ -123,7 +123,7 @@ napoleon_preprocess_types = True
 # a list of builtin themes.
 #
 html_theme = "pydata_sphinx_theme"
-html_logo = "_resources/ra2ce_temp_logo.svg"
+html_logo = "_resources/ra2ce_logo.svg"
 
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
@@ -137,7 +137,7 @@ html_theme_options = {
         {
             "name": "GitHub",
             "url": "https://github.com/Deltares/ra2ce",  # required
-            "icon": "https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg",
+            "icon": "../../_resources/ra2ce_banner.png",
             "type": "url",
         },
         {
