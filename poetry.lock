@@ -47,7 +47,7 @@ files = [
 name = "altgraph"
 version = "0.17.4"
 description = "Python graph (network) package"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 files = [
@@ -1123,7 +1123,7 @@ files = [
 name = "importlib-metadata"
 version = "6.8.0"
 description = "Read metadata from Python packages"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.8"
 files = [
@@ -1710,7 +1710,7 @@ tests = ["black", "codecov", "coverage", "geodatasets", "geopandas", "matplotlib
 name = "macholib"
 version = "1.16.3"
 description = "Mach-O header analysis and editing"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 files = [
@@ -2445,7 +2445,7 @@ files = [
 name = "pefile"
 version = "2023.2.7"
 description = "Python PE parsing module"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6.0"
 files = [
@@ -2858,7 +2858,7 @@ plugins = ["importlib-metadata"]
 name = "pyinstaller"
 version = "6.2.0"
 description = "PyInstaller bundles a Python application and all its dependencies into a single package."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "<3.13,>=3.8"
 files = [
@@ -2894,7 +2894,7 @@ hook-testing = ["execnet (>=1.5.0)", "psutil", "pytest (>=2.7.3)"]
 name = "pyinstaller-hooks-contrib"
 version = "2023.10"
 description = "Community maintained hooks for PyInstaller"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -3191,7 +3191,7 @@ files = [
 name = "pywin32-ctypes"
 version = "0.2.2"
 description = "A (partial) reimplementation of pywin32 using ctypes/cffi"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -4705,4 +4705,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9, <3.11"
-content-hash = "e6e54e6cfbac131c07bddba13901bc8f777d312793180932ce2cec86af85e77d"
+content-hash = "83f8ffedacd5e6179869fe5d003032c3f95b904634c88b715c65ac6551f8efba"

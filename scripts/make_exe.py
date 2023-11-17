@@ -77,7 +77,7 @@ def build_cli():
             "--copy-metadata=ra2ce",
             f"--version-file={str(get_version_file())}",
             "--noconfirm",
-            "--onefile",
+            # "--onefile",
             "--clean",
         ]
     )
