@@ -2,6 +2,7 @@ import shutil
 
 import pytest
 
+from ra2ce.graph.graph_files import GraphFiles
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 from tests import test_results
 
@@ -34,11 +35,11 @@ class TestNetworkConfigWrapper:
         _result = NetworkConfigWrapper.read_graphs_from_config(_test_dir)
 
         # 3. Verify expectations
-        assert isinstance(_result, dict)
-        assert _result["base_graph"] is None
-        assert _result["base_graph_hazard"] is None
-        assert _result["origins_destinations_graph"] is None
-        assert _result["origins_destinations_graph_hazard"] is None
-        assert _result["base_network"] is None
-        assert _result["base_network_hazard"] is None
+        assert isinstance(_result, GraphFiles)
+        assert _result.base_graph is None
+        assert _result.base_graph_hazard is None
+        assert _result.origins_destinations_graph is None
+        assert _result.origins_destinations_graph_hazard is None
+        assert _result.base_network is None
+        assert _result.base_network_hazard is None
         shutil.rmtree(_test_dir)

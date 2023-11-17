@@ -79,7 +79,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         return _new_network_config
 
     @staticmethod
-    def get_existent_network_files(output_graph_dir: Path) -> dict:
+    def get_existent_network_files(output_graph_dir: Path) -> GraphFiles:
         """Checks if file of graph exist in network folder and adds filename to the files object"""
         _network_filenames = [
             "base_graph.p",
@@ -104,7 +104,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         }
 
     @staticmethod
-    def read_graphs_from_config(static_output_dir: Path) -> dict:
+    def read_graphs_from_config(static_output_dir: Path) -> GraphFiles:
         _graphs = GraphFiles()
         _pickle_reader = GraphPickleReader()
         if not static_output_dir.exists():

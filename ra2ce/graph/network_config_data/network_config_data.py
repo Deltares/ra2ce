@@ -98,7 +98,7 @@ class NetworkConfigData(ConfigDataProtocol):
     crs: CRS = field(default_factory=lambda: CRS.from_user_input(4326))
     project: ProjectSection = field(default_factory=lambda: ProjectSection())
     network: NetworkSection = field(default_factory=lambda: NetworkSection())
-    graphs: GraphFiles = field(default_factory=lambda: Files())
+    graphs: GraphFiles = field(default_factory=lambda: GraphFiles())
     origins_destinations: OriginsDestinationsSection = field(
         default_factory=lambda: OriginsDestinationsSection()
     )
