@@ -897,7 +897,7 @@ class IndirectAnalyses:
             # get direct graph - romove the edges that are impacted by hazard indirectly
             graph_hz_direct.remove_edges_from(edges_hz_indirect)
 
-            # get isolated network\
+            # get isolated network
             network_hz_indirect = gpd.GeoDataFrame()
             if len(graph_hz_indirect.edges) > 0:
                 network_hz_indirect = self.get_network_with_edge_fid(graph_hz_indirect)
@@ -931,6 +931,7 @@ class IndirectAnalyses:
             )
 
             # relate the locations to network disruption due to hazard by spatial overlay
+            results_hz_roads.reset_index(inplace=True)
             locations_hz = gpd.overlay(
                 locations, results_hz_roads, how="intersection", keep_geom_type=True
             )
