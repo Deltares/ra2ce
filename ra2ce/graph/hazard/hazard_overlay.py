@@ -576,8 +576,9 @@ class HazardOverlay:
                     getattr(self.graphs, input_graph) is None
                     and input_graph != "base_network"
                 ):
-                    setattr
-                    (self.graphs, input_graph, GraphPickleReader().read(file_path))
+                    setattr(
+                        self.graphs, input_graph, GraphPickleReader().read(file_path)
+                    )
                 elif (
                     getattr(self.graphs, input_graph) is None
                     and input_graph == "base_network"
