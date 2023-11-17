@@ -104,8 +104,8 @@ class TestDirectDamage:
         damage_function = "HZ"
 
         # This test roughly follows the DirectDamage.road_damage() controller in analyses_direct.py
-        test_input = event_input_output["input"]
-        test_ref_output = event_input_output["output"]
+        test_input = event_input_output["input_path"]
+        test_ref_output = event_input_output["output_path"]
 
         road_gdf = test_input
 
@@ -286,8 +286,8 @@ class TestDirectDamage:
         damage_function = "MAN"
 
         # This test roughly follows the DirectDamage.road_damage() controller in analyses_direct.py
-        test_input = event_input_output["input"]
-        test_ref_output = event_input_output["output"]
+        test_input = event_input_output["input_path"]
+        test_ref_output = event_input_output["output_path"]
 
         road_gdf = test_input
 

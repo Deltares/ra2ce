@@ -21,7 +21,7 @@
 
 
 from pathlib import Path
-from typing import List, Type
+from typing import Type
 
 import geopandas as gpd
 import networkx as nx
@@ -42,7 +42,7 @@ class NetworkExporterFactory:
         network: NETWORK_TYPE,
         basename: str,
         output_dir: Path,
-        export_types: List[str],
+        export_types: list[str],
     ) -> None:
         _exporter_type = self.get_exporter(network)
         self._exporter = _exporter_type(basename, export_types)
