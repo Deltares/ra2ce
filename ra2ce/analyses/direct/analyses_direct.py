@@ -76,8 +76,11 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
 
             output_path = self.config["output"] / analysis["analysis"]
             if analysis["save_gpkg"]:
-                shp_path = output_path / (analysis["name"].replace(" ", "_") + ".gpkg")
-                save_gdf(gdf, shp_path)
+                gpkg_path = output_path / (analysis["name"].replace(" ", "_") + ".gpkg")
+                save_gdf(gdf, gpkg_path, "GPKG")
+            if analysis["save_shp"]:
+                shp_path = output_path / (analysis["name"].replace(" ", "_") + ".shp")
+                save_gdf(gdf, shp_path, 'ESRI Shapefile')
             if analysis["save_csv"]:
                 csv_path = output_path / (analysis["name"].replace(" ", "_") + ".csv")
                 del gdf["geometry"]
@@ -214,7 +217,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         return gdf
 
 
-def save_gdf(gdf, save_path):
+def save_gdf(gdf, save_path, driver):
     """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp
 
     Arguments:
@@ -231,7 +234,9 @@ def save_gdf(gdf, save_path):
         if gdf[col].dtype == object and col != gdf.geometry.name:
             gdf[col] = gdf[col].astype(str)
 
-    gdf.to_file(save_path, driver="ESRI Shapefile", encoding="utf-8")
+    if save_path.exists():
+        save_path.unlink()
+    gdf.to_file(save_path, driver=driver)
     logging.info("Results saved to: {}".format(save_path))
 
 
