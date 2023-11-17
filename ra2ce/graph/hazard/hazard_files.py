@@ -6,6 +6,6 @@ from attr import dataclass
 
 @dataclass
 class HazardFiles:
-    tif: list[Optional[Path]] = None
-    shp: list[Optional[Path]] = None
-    table: list[Optional[Path]] = None
+    tif: Optional[list[Path]] = None
+    shp: Optional[list[Path]] = None
+    table: Optional[list[Path]] = None
