@@ -298,7 +298,8 @@ class IndirectAnalyses:
             graph = copy.deepcopy(master_graph)
             # Create a geodataframe from the full graph
             gdf = osmnx.graph_to_gdfs(master_graph, nodes=False)
-            gdf["rfid"] = gdf["rfid"].astype(str)
+            if "rfid" in gdf:
+                gdf["rfid"] = gdf["rfid"].astype(str)
 
             # Create the edgelist that consist of edges that should be removed
             edges_remove = [
@@ -314,46 +315,35 @@ class IndirectAnalyses:
 
             graph.remove_edges_from(edges_remove)
 
-            # dataframe for saving the calculations of the alternative routes
-            df_calculated = pd.DataFrame(
-                columns=["u", "v", "rfid", "alt_dist", "alt_nodes", "connected"]
-            )
+            columns = ["u", "v", "alt_dist", "alt_nodes", "connected"]
 
-            for i, edges in enumerate(edges_remove):
+            if "rfid" in gdf:
+                columns.insert(2, "rfid")
+
+            df_calculated = pd.DataFrame(columns=columns)
+
+            for edges in edges_remove:
                 u, v, k, edata = edges
 
-                # check if the nodes are still connected
                 if nx.has_path(graph, u, v):
-                    # calculate the alternative distance if that edge is unavailable
-                    alt_dist = nx.dijkstra_path_length(
-                        graph, u, v, weight=analysis["weighing"]
-                    )
-
-                    # save alternative route nodes
+                    alt_dist = nx.dijkstra_path_length(graph, u, v, weight=analysis["weighing"])
                     alt_nodes = nx.dijkstra_path(graph, u, v)
-
-                    # append to calculation dataframe
-                    df_calculated = pd.concat([df_calculated, pd.DataFrame({
-                            "u": [u],
-                            "v": [v],
-                            "rfid": [str(edata["rfid"])],
-                            "alt_dist": [alt_dist],
-                            "alt_nodes": [alt_nodes],
-                            "connected": [1],
-                        })], ignore_index=True)
+                    connected = 1
                 else:
-                    # append to calculation dataframe
-                    df_calculated = pd.concat([df_calculated, pd.DataFrame({
-                            "u": [u],
-                            "v": [v],
-                            "rfid": [str(edata["rfid"])],
-                            "alt_dist": [np.NaN],
-                            "alt_nodes": [np.NaN],
-                            "connected": [0],
-                        })], ignore_index=True)
+                    alt_dist, alt_nodes, connected = np.NaN, np.NaN, 0
+
+                data = {"u": [u], "v": [v], "alt_dist": [alt_dist], "alt_nodes": [alt_nodes], "connected": [connected]}
+
+                if "rfid" in gdf:
+                    data["rfid"] = [str(edata["rfid"])]
+
+                df_calculated = pd.concat([df_calculated, pd.DataFrame(data)], ignore_index=True)
 
             # Merge the dataframes
-            gdf = gdf.merge(df_calculated, how="left", on=["u", "v", "rfid"])
+            if "rfid" in gdf:
+                gdf = gdf.merge(df_calculated, how="left", on=["u", "v", "rfid"])
+            else:
+                gdf = gdf.merge(df_calculated, how="left", on=["u", "v"])
 
             # calculate the difference in distance
             # previously here you would find if dist == dist which is a critical bug. Replaced by just verifying dist is a value.
@@ -508,7 +498,7 @@ class IndirectAnalyses:
 
     @staticmethod
     def extract_od_nodes_from_graph(
-        graph: nx.classes.MultiGraph,
+            graph: nx.classes.MultiGraph,
     ) -> list[tuple[str, str]]:
         """
         Extracts all Origin - Destination nodes from the graph, prevents from entries
@@ -529,7 +519,7 @@ class IndirectAnalyses:
         return _od_nodes
 
     def _get_origin_destination_pairs(
-        self, graph: nx.classes.MultiGraph
+            self, graph: nx.classes.MultiGraph
     ) -> list[tuple[int, str], tuple[int, str]]:
         od_path = self.config["static"].joinpath(
             "output_graph", "origin_destination_table.feather"
@@ -561,7 +551,7 @@ class IndirectAnalyses:
         return od_nodes
 
     def optimal_route_origin_destination(
-        self, graph: nx.classes.MultiGraph, analysis: dict
+            self, graph: nx.classes.MultiGraph, analysis: dict
     ) -> gpd.GeoDataFrame:
         # create list of origin-destination pairs
         od_nodes = self._get_origin_destination_pairs(graph)
@@ -1024,9 +1014,9 @@ class IndirectAnalyses:
             output_path = self.config["output"].joinpath(analysis["analysis"])
 
             def _save_gpkg_analysis(
-                base_graph,
-                to_save_gdf: List[gpd.GeoDataFrame],
-                to_save_gdf_names: List[str],
+                    base_graph,
+                    to_save_gdf: List[gpd.GeoDataFrame],
+                    to_save_gdf_names: List[str],
             ):
                 for to_save, save_name in zip(to_save_gdf, to_save_gdf_names):
                     if not to_save.empty:
@@ -1325,9 +1315,9 @@ def save_gdf(gdf: gpd.GeoDataFrame, save_path: Path):
 
 
 def find_route_ods(
-    graph: nx.classes.MultiGraph,
-    od_nodes: list[tuple[tuple[int, str], tuple[int, str]]],
-    weighing: str,
+        graph: nx.classes.MultiGraph,
+        od_nodes: list[tuple[tuple[int, str], tuple[int, str]]],
+        weighing: str,
 ) -> gpd.GeoDataFrame:
     # create the routes between all OD pairs
     (
