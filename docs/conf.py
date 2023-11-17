@@ -41,6 +41,7 @@ def remove_dir_content(path: str) -> None:
     if os.path.isdir(path):
         shutil.rmtree(path)
 
+
 # NOTE: the examples/ folder in the root should be copied to docs/_examples after running sphinx
 # # -- Copy notebooks to include in docs -------
 if os.path.isdir("_examples"):
@@ -65,7 +66,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "sphinx_autosummary_accessors",
-    "nbsphinx"
+    "nbsphinx",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
