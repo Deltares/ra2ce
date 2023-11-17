@@ -16,8 +16,10 @@ _cli_name = "ra2ce_cli"
 def get_version_file() -> Path:
 
     _version_file = _workpath.joinpath("version.rc")
-    if not _workpath.parent.exists():
-        _workpath.parent.mkdir()
+    if not _version_file.parent.exists():
+        _version_file.parent.mkdir()
+    _version_file.touch(exist_ok=True)
+
     create_versionfile(
         _version_file,
         version=__version__,
