@@ -6,6 +6,7 @@ import geopandas as gpd
 import networkx as nx
 import pytest
 
+from ra2ce.graph.graph_files import GraphFiles
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_data.network_config_data_reader import (
     NetworkConfigDataReader,
@@ -97,18 +98,18 @@ class TestNetworks:
         _config_data.output_path = _test_dir.joinpath("output")
         _config_data.static_path = case_data_dir.joinpath("static")
         _output_graph_dir = case_data_dir.joinpath("static", "output_graph")
-        _files_dict = {"base_graph": None, "base_network": None}
+        _files = GraphFiles(base_graph=None, base_network=None)
 
         # 2. When run test.
-        _network_controller = Network(_config_data, _files_dict).create()
+        _network_controller = Network(_config_data, _files).create()
 
         # 3. Then verify expectations.
         def validate_file(filename: str):
             _graph_file = _output_graph_dir / filename
             return _graph_file.is_file() and _graph_file.exists()
 
-        assert isinstance(_network_controller, dict)
-        assert isinstance(_network_controller["base_graph"], nx.MultiGraph)
-        assert isinstance(_network_controller["base_network"], gpd.GeoDataFrame)
-        assert _network_controller["origins_destinations_graph"] is None
+        assert isinstance(_network_controller, GraphFiles)
+        assert isinstance(_network_controller.base_graph, nx.MultiGraph)
+        assert isinstance(_network_controller.base_network, gpd.GeoDataFrame)
+        assert _network_controller.origins_destinations_graph is None
         assert all(map(validate_file, expected_files))

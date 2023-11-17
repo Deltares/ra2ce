@@ -21,4 +21,4 @@ class TestHazardOverlay:
         assert isinstance(_hazard, HazardOverlay)
         assert any(_hazard.hazard_names)
         assert any(_hazard.ra2ce_names)
-        assert any(_hazard.hazard_files)
+        assert any(_hazard.hazard_files.table)
