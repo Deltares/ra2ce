@@ -23,7 +23,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, List, Optional, Protocol, runtime_checkable
+from typing import Optional, Protocol, runtime_checkable
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 
@@ -31,9 +31,8 @@ from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 @runtime_checkable
 class ConfigWrapperProtocol(Protocol):  # pragma: no cover
     ini_file: Path
-    root_dir: Path
     config_data: Optional[ConfigDataProtocol] = None
-    graphs: List[Any] = []
+    graphs: Optional[dict] = None
 
     @classmethod
     def from_data(

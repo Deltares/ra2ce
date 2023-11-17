@@ -23,11 +23,17 @@
 import os
 from collections import OrderedDict
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pandas as pd
+from pandas import DataFrame
 from scipy.interpolate import interp1d
 
+
+def dataframe_lookup(row: pd.Series, lookup_df: DataFrame, columns: list) -> Any:
+    row_values = [row[column] for column in columns]
+    return lookup_df.loc[tuple(row_values)]
 
 class LookUp:
     """ " This namespace contains several lookup tables, used e.g. for road damage calculation."""

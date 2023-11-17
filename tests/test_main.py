@@ -1,9 +1,7 @@
-from typing import List
-
 import pytest
 from click.testing import CliRunner
 
-from ra2ce import main
+from ra2ce import __main__
 from tests import test_data
 
 test_dir = test_data / "acceptance_test_data"
@@ -36,10 +34,10 @@ class TestMainCli:
         ],
     )
     def test_given_invalid_paths_raises_value_error(
-        self, arguments: List[str], expected_error: str
+        self, arguments: list[str], expected_error: str
     ):
         _run_result = CliRunner().invoke(
-            main.run_analysis,
+            __main__.run_analysis,
             arguments,
         )
         assert _run_result.exit_code == 1
@@ -51,7 +49,7 @@ class TestMainCli:
         _analysis_file = test_dir / "analyses.ini"
         assert _analysis_file.is_file()
         _run_result = CliRunner().invoke(
-            main.run_analysis,
+            __main__.run_analysis,
             ["--analyses_ini", str(_analysis_file)],
         )
         assert _run_result.exit_code == 0

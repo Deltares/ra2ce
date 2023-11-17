@@ -29,6 +29,7 @@ import numpy as np
 import pandas as pd
 import pyproj
 from rasterstats import point_query, zonal_stats
+from tqdm import tqdm
 
 from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as ntu
@@ -210,8 +211,6 @@ class HazardOverlay:
             graph (NetworkX graph): The origin-destination graph hazard raster(s) data joined to both the origin- and
             destination nodes and the edges.
         """
-        from tqdm import tqdm
-
         ## Intersect the origin and destination nodes with the hazard map (now only geotiff possible)
         # Verify the graph type (networkx)
         assert isinstance(graph, nx.classes.graph.Graph)
@@ -509,7 +508,7 @@ class HazardOverlay:
     ) -> gpd.GeoDataFrame:
         """Intersect geodataframe and hazard with reprojection"""
         # Check if the graph needs to be reprojected
-        hazard_crs = pyproj.CRS.from_user_input(self.config["hazard"]["hazard_crs"])
+        hazard_crs = pyproj.CRS.from_user_input(self.config.hazard["hazard_crs"])
         gdf_crs = pyproj.CRS.from_user_input(gdf.crs)
 
         if (

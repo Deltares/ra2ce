@@ -9,7 +9,7 @@
 
 # RA2CE
 
-This is the repository of RA2CE (*just say race!*) - the Resilience Assessment and Adaptation for Critical infrastructurE Toolkit Python Package eveloped by Deltares. RA2CE helps to quantify resilience of critical infrastructure networks, prioritize interventions and adaptation measures and select the most appropriate action perspective to increase resilience considering future conditions.
+This is the repository of RA2CE (*just say race!*) - the Resilience Assessment and Adaptation for Critical infrastructurE Toolkit Python Package developed by Deltares. RA2CE helps to quantify resilience of critical infrastructure networks, prioritize interventions and adaptation measures and select the most appropriate action perspective to increase resilience considering future conditions.
 
 **Contact** Margreet van Marle (Margreet.vanMarle@Deltares.nl)
 
@@ -21,7 +21,7 @@ Find more about the following topics in our [official documentation page](https:
 - [Analysis user guide](https://deltares.github.io/ra2ce/analysis_module/analysis_module.html)
 
 ## Distribution
-Ra2ce is shared with [GPL3 license](https://www.gnu.org/licenses/gpl-3.0.en.html), you may use and / or extend it by using the same license. For specific agreements we urge you to contact us.
+Ra2ce is shared with [GPL3 license](https://www.gnu.org/licenses/gpl-3.0.en.html), you may use and/or extend it by using the same license. For specific agreements we urge you to contact us.
 
 ## Usage
 If you wish to run ra2ce locally we recommend to have a look at the [installation section](#installation). 

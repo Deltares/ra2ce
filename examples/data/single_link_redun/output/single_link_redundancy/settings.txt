@@ -1,5 +1,0 @@
-name = beira_redundancy
-analysis = single_link_redundancy
-weighing = length
-save_gpkg = True
-save_csv = True
