@@ -67,6 +67,13 @@ def build_cli():
     Generates an `.exe` file (with a related binaries directory) using `PyInstaller`.
     """
     _ra2ce_dir = Path(cli_module.__file__).parent
+    _logo = _root_dir.joinpath("docs", "_resources", "ra2ce_logo.ico")
+
+    if not _logo.exists():
+        from PIL import Image
+
+        img = Image.open(_logo.with_suffix(".png"))
+        img.save(_logo)
 
     PyInstaller.__main__.run(
         [
@@ -79,6 +86,7 @@ def build_cli():
             *get_hidden_imports(),
             f"--workpath={str(_workpath)}",
             f"--specpath={str(_workpath)}",
+            "--icon={}".format(str(_logo)),
             "--copy-metadata=ra2ce",
             f"--version-file={str(get_version_file())}",
             "--noconfirm",
