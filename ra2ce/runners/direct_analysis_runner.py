@@ -22,8 +22,8 @@
 
 import logging
 
-from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
-    AnalysisConfigWrapperBase,
+from ra2ce.analyses.analysis_config_wrapper import (
+    AnalysisConfigWrapper,
 )
 from ra2ce.analyses.direct import analyses_direct
 from ra2ce.configuration.config_wrapper import ConfigWrapper
@@ -51,7 +51,7 @@ class DirectAnalysisRunner(AnalysisRunner):
             return False
         return True
 
-    def run(self, analysis_config: AnalysisConfigWrapperBase) -> None:
+    def run(self, analysis_config: AnalysisConfigWrapper) -> None:
         analyses_direct.DirectAnalyses(
             analysis_config.config_data, analysis_config.graphs
         ).execute()
