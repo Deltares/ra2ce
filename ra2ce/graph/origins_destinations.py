@@ -205,7 +205,8 @@ def update_edges_with_new_node(
     if Point(graph.nodes[node_b]["geometry"].coords[0]).almost_equals(
             Point(line_b.coords[0])
     ):
-        if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
+        if node_a =
+        = node_b and graph.has_edge(*(node_a, new_node_id, 0)):
             if line_b != graph.edges[(node_a, new_node_id, 0)]['geometry']:
                 k_new = 1
             else:
