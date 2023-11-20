@@ -34,13 +34,6 @@ class ConfigWrapperProtocol(Protocol):  # pragma: no cover
     config_data: Optional[ConfigDataProtocol] = None
     graphs: Optional[dict] = None
 
-    @property
-    def root_dir(self) -> Path:
-        """
-        The root path of the files.
-        """
-        pass
-
     @classmethod
     def from_data(
         cls, ini_file: Path, config_data: ConfigDataProtocol

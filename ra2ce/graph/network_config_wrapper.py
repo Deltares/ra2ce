@@ -39,11 +39,15 @@ from ra2ce.graph.networks import Network
 
 
 class NetworkConfigWrapper(ConfigWrapperProtocol):
-    files: dict[str, Path] = {}
+    ini_file: Path
     config_data: NetworkConfigData
+    graphs: Optional[dict] = None
+    files: dict[str, Path] = {}
 
     def __init__(self) -> None:
+        self.ini_file = None
         self.config_data = NetworkConfigData()
+        self.graphs = {}
         self.files = {
             "base_graph": None,
             "base_network": None,
@@ -70,25 +74,18 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         _new_network_config = cls()
         _new_network_config.ini_file = ini_file
         _new_network_config.config_data = config_data
-        _static_dir = config_data.static_path
         if config_data.output_graph_dir and config_data.output_graph_dir.is_dir():
-            _new_network_config.files = _new_network_config._get_existent_network_files(
+            _new_network_config.files = _new_network_config.get_existent_network_files(
                 config_data.output_graph_dir
             )
         else:
-            logging.error(f"Static dir not found. Value provided: {_static_dir}")
+            logging.error(
+                f"Graph dir not found. Value provided: {config_data.output_graph_dir}"
+            )
         return _new_network_config
 
     @staticmethod
-    def get_network_root_dir(filepath: Path) -> Path:
-        return filepath.parent.parent
-
-    @staticmethod
-    def get_data_output(ini_file: Path) -> Optional[Path]:
-        return ini_file.parent / "output"
-
-    @staticmethod
-    def _get_existent_network_files(output_graph_dir: Path) -> dict:
+    def get_existent_network_files(output_graph_dir: Path) -> dict:
         """Checks if file of graph exist in network folder and adds filename to the files dict"""
         _network_filenames = [
             "base_graph.p",
@@ -111,10 +108,6 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
             for _ep in map(lambda x: output_graph_dir / x, _network_filenames)
         }
 
-    @property
-    def root_dir(self) -> Path:
-        return self.get_network_root_dir(self.ini_file)
-
     @staticmethod
     def read_graphs_from_config(static_output_dir: Path) -> dict:
         _graphs = {}
@@ -122,7 +115,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         if not static_output_dir.exists():
             raise ValueError("Path does not exist: {}".format(static_output_dir))
         # Load graphs
-        # TODO (fix): why still read hazard as neccessary if analysis of single link redundancy can run wihtout hazard?
+        # TODO (fix): why still read hazard as neccessary if analysis of single link redundancy can run without hazard?
         for input_graph in ["base_graph", "origins_destinations_graph"]:
             _input_graph_filename = static_output_dir.joinpath(f"{input_graph}.p")
             if _input_graph_filename.is_file():
@@ -150,6 +143,10 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
             _graphs["base_network_hazard"] = None
 
         return _graphs
+
+    def configure(self) -> None:
+        self.configure_network()
+        self.configure_hazard()
 
     def configure_network(self) -> None:
         network = Network(self.config_data, self.files)

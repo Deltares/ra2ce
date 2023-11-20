@@ -892,24 +892,28 @@ class IndirectAnalyses:
             # get indirect graph - remove the edges that are impacted by hazard directly
             graph_hz_indirect.remove_edges_from(edges_hz_direct)
             # get indirect graph without the largest component, i.e. isolated graph
-            self.remove_edges_from_lagest_component(graph_hz_indirect)
+            self.remove_edges_from_largest_component(graph_hz_indirect)
 
             # get direct graph - romove the edges that are impacted by hazard indirectly
             graph_hz_direct.remove_edges_from(edges_hz_indirect)
 
             # get isolated network
-            network_hz_indirect = self.get_network_with_edge_fid(graph_hz_indirect)
-            network_hz_indirect[f"i_type_{hazard_name[:-3]}"] = "isolated"
-            # reproject the datasets to be able to make a buffer in meters
-            network_hz_indirect = network_hz_indirect.set_crs(crs=crs)
-            network_hz_indirect.to_crs(crs=nearest_utm, inplace=True)
+            network_hz_indirect = gpd.GeoDataFrame()
+            if len(graph_hz_indirect.edges) > 0:
+                network_hz_indirect = self.get_network_with_edge_fid(graph_hz_indirect)
+                network_hz_indirect[f"i_type_{hazard_name[:-3]}"] = "isolated"
+                # reproject the datasets to be able to make a buffer in meters
+                network_hz_indirect = network_hz_indirect.set_crs(crs=crs)
+                network_hz_indirect.to_crs(crs=nearest_utm, inplace=True)
 
             # get flooded network
-            network_hz_direct = self.get_network_with_edge_fid(graph_hz_direct)
-            network_hz_direct[f"i_type_{hazard_name[:-3]}"] = "flooded"
-            # reproject the datasets to be able to make a buffer in meters
-            network_hz_direct = network_hz_direct.set_crs(crs=crs)
-            network_hz_direct.to_crs(crs=nearest_utm, inplace=True)
+            network_hz_direct = gpd.GeoDataFrame()
+            if len(graph_hz_direct.edges) > 0:
+                network_hz_direct = self.get_network_with_edge_fid(graph_hz_direct)
+                network_hz_direct[f"i_type_{hazard_name[:-3]}"] = "flooded"
+                # reproject the datasets to be able to make a buffer in meters
+                network_hz_direct = network_hz_direct.set_crs(crs=crs)
+                network_hz_direct.to_crs(crs=nearest_utm, inplace=True)
 
             # get hazard roads
             # merge buffer and set original crs
@@ -927,6 +931,7 @@ class IndirectAnalyses:
             )
 
             # relate the locations to network disruption due to hazard by spatial overlay
+            results_hz_roads.reset_index(inplace=True)
             locations_hz = gpd.overlay(
                 locations, results_hz_roads, how="intersection", keep_geom_type=True
             )
@@ -954,7 +959,7 @@ class IndirectAnalyses:
 
         return locations_hz, aggregation
 
-    def remove_edges_from_lagest_component(self, disconnected_graph: nx.Graph) -> None:
+    def remove_edges_from_largest_component(self, disconnected_graph: nx.Graph) -> None:
         """
         This function removes all edges from the largest connected component of a graph.
 

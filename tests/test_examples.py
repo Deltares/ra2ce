@@ -5,12 +5,7 @@ from tests import test_examples
 from pytest_notebook.notebook import load_notebook
 from pytest_notebook.execution import execute_notebook
 
-_excluded_examples = [
-    # Ideally we want to rename these files to have a `_DIY` suffix
-    # so that the filter below does its work
-    "example_set_up_origin_destination_no_data",
-]
-_supported_examples = lambda x: "DIY" not in x.stem and x.stem not in _excluded_examples
+_supported_examples = lambda x: "DIY" not in x.stem
 _jupyter_examples = [
     pytest.param(_jupyter_file, id=_jupyter_file.stem.replace("_", " ").capitalize())
     for _jupyter_file in filter(_supported_examples, test_examples.glob("*.ipynb"))

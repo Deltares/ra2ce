@@ -7,17 +7,6 @@ from tests import test_results
 
 
 class TestNetworkConfigWrapper:
-    def test_get_data_output(self):
-        # 1. Define test data
-        _test_ini = test_results / "non_existing.ini"
-        _expected_value = test_results / "output"
-
-        # 2. Run test
-        _return_value = NetworkConfigWrapper.get_data_output(_test_ini)
-
-        # 3. Verify expectations.
-        assert _return_value == _expected_value
-
     def test_read_graphs_from_config_without_output_dir_raises(
         self, request: pytest.FixtureRequest
     ):
