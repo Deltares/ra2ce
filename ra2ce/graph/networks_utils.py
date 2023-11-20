@@ -700,6 +700,7 @@ def split_line_with_points(line, points):
     return segments
 
 
+
 def cut(line: BaseMultipartGeometry, distance: float) -> tuple[LineString, LineString]:
     # Cuts a line in two at a distance from its starting point
     # This is taken from shapely manual
@@ -1216,6 +1217,13 @@ def graph_to_gpkg(origin_graph: nx.classes.graph.Graph, edge_gpkg, node_gpkg):
     logging.info("Saving edges as shapefile: {}".format(edge_gpkg))
 
     # The encoding utf-8 might result in an empty shapefile if the wrong encoding is used.
+    for entity in [nodes, edges]:
+        if 'osmid' in entity:
+            # Otherwise it gives this error: cannot insert osmid, already exist
+            entity['osmid_original'] = entity.pop('osmid')
+    for _path in [node_gpkg, edge_gpkg]:
+        if _path.exists():
+            _path.unlink()
     nodes.to_file(node_gpkg, driver="GPKG", encoding="utf-8")
     edges.to_file(edge_gpkg, driver="GPKG", encoding="utf-8")
 

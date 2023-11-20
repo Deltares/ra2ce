@@ -19,13 +19,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 import os
 from pathlib import Path
 from typing import Optional, Union
 
 import geopandas as gpd
+import networkx
 import networkx as nx
 import numpy as np
 import pandas as pd
@@ -33,6 +33,7 @@ import pyproj
 import rasterio
 import rasterio.mask
 import rasterio.transform
+import shapely
 from rasterio import Affine
 from rasterio.warp import Resampling, calculate_default_transform, reproject
 from shapely.geometry import Point
@@ -46,16 +47,16 @@ TODO: This whole file should be throughouly tested / redesigned.
 
 
 def read_origin_destination_files(
-    origin_paths: Union[str, list],
-    origin_names: Union[str, list],
-    destination_paths: Union[str, list],
-    destination_names: Union[str, list],
-    od_id: str,
-    origin_count: str,
-    crs_: pyproj.CRS,
-    category: str,
-    region_paths: Optional[str],
-    region_var: Optional[str],
+        origin_paths: Union[str, list],
+        origin_names: Union[str, list],
+        destination_paths: Union[str, list],
+        destination_names: Union[str, list],
+        od_id: str,
+        origin_count: str,
+        crs_: pyproj.CRS,
+        category: str,
+        region_paths: Optional[str],
+        region_var: Optional[str],
 ):
     """Reads the Origin and Destination point shapefiles and creates one big OD GeoDataFrame.
     Args:
@@ -166,121 +167,178 @@ def add_data_to_existing_node(graph, node, match_name):
 
 
 def update_edges_with_new_node(
-    graph,
-    edge_data,
-    node_a,
-    node_b,
-    k,
-    line_a,
-    line_b,
-    new_node_id,
-    graph_crs,
-    inverse_vertices_dict,
+        graph: networkx.MultiGraph,
+        edge_data: dict,
+        node_a: int,
+        node_b: int,
+        k: int,
+        line_a: shapely.LineString,
+        line_b: shapely.LineString,
+        new_node_id: int,
+        graph_crs: pyproj.CRS,
+        inverse_vertices_dict: dict,
 ):
     # Check which line is connected to which node. There can be 8 different combinations and there should be two
     # edges added to the graph.
     cnt = 0
 
     if Point(graph.nodes[node_a]["geometry"].coords[0]).almost_equals(
-        Point(line_b.coords[-1])
+            Point(line_b.coords[-1])
     ):
+        if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
+            if line_b != graph.edges[(node_a, new_node_id, 0)]['geometry']:
+                k_new = 1
+            else:
+                k_new = 0
+        else:
+            k_new = 0
         edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b)
-        graph.add_edge(node_a, new_node_id, 0, **edge_data)
+        graph.add_edge(node_a, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_a, new_node_id, 0) for p in set(list(line_b.coords[1:-1]))}
+            {p: (node_a, new_node_id, k_new) for p in set(list(line_b.coords[1:-1]))}
         )
 
         cnt += 1
 
     if Point(graph.nodes[node_b]["geometry"].coords[0]).almost_equals(
-        Point(line_b.coords[0])
+            Point(line_b.coords[0])
     ):
+        if node_a =
+        = node_b and graph.has_edge(*(node_a, new_node_id, 0)):
+            if line_b != graph.edges[(node_a, new_node_id, 0)]['geometry']:
+                k_new = 1
+            else:
+                k_new = 0
+        else:
+            k_new = 0
         edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b)
-        graph.add_edge(node_b, new_node_id, 0, **edge_data)
+        graph.add_edge(node_b, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_b, new_node_id, 0) for p in set(list(line_b.coords[1:-1]))}
+            {p: (node_b, new_node_id, k_new) for p in set(list(line_b.coords[1:-1]))}
         )
 
         cnt += 1
 
     if Point(graph.nodes[node_a]["geometry"].coords[0]).almost_equals(
-        Point(line_b.coords[0])
+            Point(line_b.coords[0])
     ):
+        if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
+            if line_b != graph.edges[(node_a, new_node_id, 0)]['geometry']:
+                k_new = 1
+            else:
+                k_new = 0
+        else:
+            k_new = 0
         edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b)
-        graph.add_edge(node_a, new_node_id, 0, **edge_data)
+        graph.add_edge(node_a, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_a, new_node_id, 0) for p in set(list(line_b.coords[1:-1]))}
+            {p: (node_a, new_node_id, k_new) for p in set(list(line_b.coords[1:-1]))}
         )
 
         cnt += 1
 
     if Point(graph.nodes[node_b]["geometry"].coords[0]).almost_equals(
-        Point(line_b.coords[-1])
+            Point(line_b.coords[-1])
     ):
+        if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
+            if line_b != graph.edges[(node_a, new_node_id, 0)]['geometry']:
+                k_new = 1
+            else:
+                k_new = 0
+        else:
+            k_new = 0
         edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b)
-        graph.add_edge(node_b, new_node_id, 0, **edge_data)
+        graph.add_edge(node_b, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_b, new_node_id, 0) for p in set(list(line_b.coords[1:-1]))}
+            {p: (node_b, new_node_id, k_new) for p in set(list(line_b.coords[1:-1]))}
         )
 
         cnt += 1
 
     if Point(graph.nodes[node_b]["geometry"].coords[0]).almost_equals(
-        Point(line_a.coords[0])
+            Point(line_a.coords[0])
     ):
+        if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
+            if line_a != graph.edges[(node_a, new_node_id, 0)]['geometry']:
+                k_new = 1
+            else:
+                k_new = 0
+        else:
+            k_new = 0
         edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a)
-        graph.add_edge(node_b, new_node_id, 0, **edge_data)
+        graph.add_edge(node_b, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_b, new_node_id, 0) for p in set(list(line_a.coords[1:-1]))}
+            {p: (node_b, new_node_id, k_new) for p in set(list(line_a.coords[1:-1]))}
         )
 
         cnt += 1
 
     if Point(graph.nodes[node_a]["geometry"].coords[0]).almost_equals(
-        Point(line_a.coords[-1])
+            Point(line_a.coords[-1])
     ):
+        if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
+            if line_a != graph.edges[(node_a, new_node_id, 0)]['geometry']:
+                k_new = 1
+            else:
+                k_new = 0
+        else:
+            k_new = 0
         edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a)
-        graph.add_edge(node_a, new_node_id, 0, **edge_data)
+        graph.add_edge(node_a, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_a, new_node_id, 0) for p in set(list(line_a.coords[1:-1]))}
+            {p: (node_a, new_node_id, k_new) for p in set(list(line_a.coords[1:-1]))}
         )
 
         cnt += 1
 
     if Point(graph.nodes[node_b]["geometry"].coords[0]).almost_equals(
-        Point(line_a.coords[-1])
+            Point(line_a.coords[-1])
     ):
+        if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
+            if line_a != graph.edges[(node_a, new_node_id, 0)]['geometry']:
+                k_new = 1
+            else:
+                k_new = 0
+        else:
+            k_new = 0
         edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a)
-        graph.add_edge(node_b, new_node_id, 0, **edge_data)
+        graph.add_edge(node_b, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_b, new_node_id, 0) for p in set(list(line_a.coords[1:-1]))}
+            {p: (node_b, new_node_id, k_new) for p in set(list(line_a.coords[1:-1]))}
         )
 
         cnt += 1
 
     if Point(graph.nodes[node_a]["geometry"].coords[0]).almost_equals(
-        Point(line_a.coords[0])
+            Point(line_a.coords[0])
     ):
+        if node_a == node_b and graph.has_edge(*(node_a, new_node_id, 0)):
+            if line_a != graph.edges[(node_a, new_node_id, 0)]['geometry']:
+                k_new = 1
+            else:
+                k_new = 0
+        else:
+            k_new = 0
         edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a)
-        graph.add_edge(node_a, new_node_id, 0, **edge_data)
+        graph.add_edge(node_a, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_a, new_node_id, 0) for p in set(list(line_a.coords[1:-1]))}
+            {p: (node_a, new_node_id, k_new) for p in set(list(line_a.coords[1:-1]))}
         )
 
         cnt += 1
@@ -299,11 +357,35 @@ def update_edges_with_new_node(
 
 
 def add_od_nodes(
-    od: gpd.GeoDataFrame,
-    graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
-    crs,
-    category: Optional[str] = None,
+        od: gpd.GeoDataFrame,
+        graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
+        crs,
+        category: Optional[str] = None,
 ):
+    def find_closest_node(
+            closest_node_on_road: np.ndarray, inverse_vertices_dict: dict, inverse_nodes_dict: dict,
+            graph: Union[nx.classes.Graph, nx.classes.MultiGraph]) -> dict[tuple[float, float], int]:
+
+        closest_u_v_k = inverse_vertices_dict.get((closest_node_on_road[0], closest_node_on_road[1]), None)
+        if closest_u_v_k:
+            closest_u_data = graph.nodes[closest_u_v_k[0]]
+            closest_v_data = graph.nodes[closest_u_v_k[1]]
+            closest_node_on_extremities = closest_node(
+                np.array((closest_node_on_road[0], closest_node_on_road[1])),
+                np.array(
+                    [[closest_u_data['x'], closest_u_data['y']], [closest_v_data['x'], closest_v_data['y']]]
+                )
+            )
+            closest_node_on_extremities_id = get_node_id_from_position(graph, *closest_node_on_extremities)
+            inverse_nodes_dict[
+                (closest_node_on_road[0], closest_node_on_road[1])] = closest_node_on_extremities_id
+
+        return inverse_nodes_dict
+
+    def get_node_id_from_position(g: Union[nx.classes.Graph], x: float, y: float) -> Union[float, None]:
+        nodes = [(node, data) for node, data in g.nodes(data=True) if data.get('x') == x and data.get('y') == y]
+        return nodes[0][0] if nodes else None
+
     """Gets from each origin and destination the closest vertice on the graph edge.
     Args:
         od [Geodataframe]: The GeoDataFrame with the origins and destinations
@@ -319,17 +401,20 @@ def add_od_nodes(
     edge_list = [e for e in graph.edges.data(keys=True) if "geometry" in e[-1]]
     inverse_vertices_dict = {}
     all_vertices = []
+    checked_lines = set()
     for line in edge_list:
-        # Add all vertices except the end-points as they belong to multiple edges and nodes already exist at the end-points
-        inverse_vertices_dict.update(
-            {
-                p: (line[0], line[1], line[2])
-                for p in set(list(line[-1]["geometry"].coords[1:-1]))
-            }
-        )
-
-        # create list of all points to search in
-        all_vertices.extend([p for p in set(list(line[-1]["geometry"].coords))])
+        # Convert LineString to a hashable type (tuple) for set lookup
+        geometry_coords = line[-1]["geometry"].coords
+        coords = tuple(sorted([coord for coord in geometry_coords]))
+        if coords in checked_lines:
+            graph.remove_edge(*line[0:3])
+            continue
+        else:
+            inverse_vertices_dict.update(
+                {p: (line[0], line[1], line[2]) for p in set(geometry_coords[1:-1])}
+            )
+            all_vertices.extend(set(geometry_coords))
+            checked_lines.add(coords)
 
     # Make an array from the list
     all_vertices = np.array(all_vertices)
@@ -341,23 +426,21 @@ def add_od_nodes(
 
     # Get the maximum node id
     max_node_id = max([n for n in graph.nodes()])
-
     od_list = []
     for i, od_data in tqdm(
-        enumerate(
-            list(zip(od["geometry"].x, od["geometry"].y, od["o_id"], od["d_id"]))
-        ),
-        desc="Adding Origin-Destination nodes to graph",
+            enumerate(
+                list(zip(od["geometry"].x, od["geometry"].y, od["o_id"], od["d_id"]))
+            ),
+            desc="Adding Origin-Destination nodes to graph",
     ):
         match_name = get_od(od_data[-2], od_data[-1])
 
-        # Find the vertice on the road that is closest to the origin or destination point
+        # Find the vertex on the road that is closest to the origin or destination point
         closest_node_on_road = closest_node(
             np.array((od_data[0], od_data[1])), all_vertices
         )
         match_od = Point(closest_node_on_road)
-
-        # Find the road to which this vertice belongs. If the vertice is on an end-point of a road, it cannot be found
+        # Find the road to which this vertex belongs. If the vertex is on an end-point of a road, it cannot be found,
         # and it goes to the except statement.
         try:
             closest_u_v_k = inverse_vertices_dict[
@@ -369,6 +452,9 @@ def add_od_nodes(
             match_geom = match_edge["geometry"]
 
             new_lines = split_line_with_points(match_geom, [match_od])
+            if len(new_lines) == 1:
+                inverse_nodes_dict = find_closest_node(closest_node_on_road, inverse_vertices_dict, inverse_nodes_dict,
+                                                       graph)
 
             assert len(new_lines) == 2
             assert len([match_od]) == 1
@@ -414,7 +500,7 @@ def add_od_nodes(
             )
 
         except (KeyError, AssertionError):
-            # If the vertice is at the end of the road it won't be found in the inverse_vertices_dict,
+            # If the vertex is at the end of the road it won't be found in the inverse_vertices_dict,
             # so search in the inverse_nodes_dict.
             match_node = inverse_nodes_dict[
                 (closest_node_on_road[0], closest_node_on_road[1])
@@ -465,20 +551,18 @@ def split_line_with_points(line, points):
 
 
 def rescale_and_crop(path_name, gdf, output_folder: Path, res: int = 500):
-
     dst_crs = rasterio.crs.CRS.from_dict(gdf.crs.to_dict())
 
     # Rescale and reproject raster to gdf crs
     _output_origins_raster_tif = output_folder / "origins_raster_reprojected.tif"
 
     with rasterio.open(path_name) as src:
-
         transform, width, height = calculate_default_transform(
             src.crs, dst_crs, src.width, src.height, *src.bounds
         )
 
         m2degree = (
-            1 / 111000
+                1 / 111000
         )  # approximate conversion from meter to 1 degree of EPSG:4326; TODO: make flexible depending on the input crs
         transform = Affine(
             res * m2degree,
@@ -536,7 +620,7 @@ def rescale_and_crop(path_name, gdf, output_folder: Path, res: int = 500):
 def export_raster_to_geotiff(array, meta, dir_path: Path, filename: str) -> Path:
     cropped_outputfile = dir_path / filename
     with rasterio.open(
-        cropped_outputfile, "w", **meta, compress="LZW", tiled=True
+            cropped_outputfile, "w", **meta, compress="LZW", tiled=True
     ) as dest:
         dest.write(array)
     return cropped_outputfile
