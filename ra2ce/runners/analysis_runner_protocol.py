@@ -22,8 +22,8 @@
 
 from typing import Protocol, runtime_checkable
 
-from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
-    AnalysisConfigWrapperBase,
+from ra2ce.analyses.analysis_config_wrapper import (
+    AnalysisConfigWrapper,
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 
@@ -43,11 +43,11 @@ class AnalysisRunner(Protocol):
         """
         pass
 
-    def run(self, analysis_config: AnalysisConfigWrapperBase) -> None:
+    def run(self, analysis_config: AnalysisConfigWrapper) -> None:
         """
         Runs this `AnalysisRunner` with the given analysis configuration.
 
         Args:
-            analysis_config (AnalysisConfigWrapperBase): Analysis configuration representation to be run on this `AnalysisRunner`.
+            analysis_config (AnalysisConfigWrapper): Analysis configuration representation to be run on this `AnalysisRunner`.
         """
         pass

@@ -89,6 +89,7 @@ class CleanupSection:
 
 @dataclass
 class NetworkConfigData(ConfigDataProtocol):
+    root_path: Optional[Path] = None
     input_path: Optional[Path] = None
     output_path: Optional[Path] = None
     static_path: Optional[Path] = None
@@ -96,6 +97,7 @@ class NetworkConfigData(ConfigDataProtocol):
     crs: CRS = field(default_factory=lambda: CRS.from_user_input(4326))
     project: ProjectSection = field(default_factory=lambda: ProjectSection())
     network: NetworkSection = field(default_factory=lambda: NetworkSection())
+    graphs: Optional[dict] = None
     origins_destinations: OriginsDestinationsSection = field(
         default_factory=lambda: OriginsDestinationsSection()
     )
@@ -114,6 +116,10 @@ class NetworkConfigData(ConfigDataProtocol):
         if not self.static_path:
             return None
         return self.static_path.joinpath("network")
+
+    @staticmethod
+    def get_data_output(ini_file: Path) -> Path:
+        return ini_file.parent.joinpath("output")
 
     def to_dict(self) -> dict:
         _dict = self.__dict__

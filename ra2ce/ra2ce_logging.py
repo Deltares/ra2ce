@@ -31,7 +31,7 @@ class Ra2ceLogger:
     def __init__(self, logging_dir: Path, logger_name: str) -> None:
         if not logging_dir.is_dir():
             logging_dir.mkdir(parents=True)
-        self.log_file = logging_dir / f"{logger_name}.log"
+        self.log_file = logging_dir.joinpath(f"{logger_name}.log")
         if not self.log_file.is_file():
             self.log_file.touch()
 
