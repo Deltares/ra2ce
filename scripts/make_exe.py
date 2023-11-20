@@ -1,6 +1,6 @@
 from pathlib import Path
 import PyInstaller.__main__
-from ra2ce import main as cli_module
+from ra2ce import __main__ as cli_module
 from ra2ce import __version__
 from os import environ
 from pyinstaller_versionfile import create_versionfile
