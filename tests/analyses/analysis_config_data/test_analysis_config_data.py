@@ -2,13 +2,13 @@ import pytest
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisConfigDataWithNetwork,
-    AnalysisConfigDataWithoutNetwork,
     AnalysisSectionDirect,
     AnalysisSectionIndirect,
     DirectAnalysisNameList,
     IndirectAnalysisNameList,
+    ProjectSection,
 )
+from tests import test_results
 
 
 class TestAnalysisConfigData:
@@ -18,25 +18,9 @@ class TestAnalysisConfigData:
         assert isinstance(_config_data, dict)
         assert isinstance(_config_data, AnalysisConfigData)
 
-
-class TestAnalysisConfigDataWithNetwork:
-    def test_initialize(self):
-        _config_data = AnalysisConfigDataWithNetwork()
-        assert isinstance(_config_data, AnalysisConfigDataWithNetwork)
-        assert isinstance(_config_data, AnalysisConfigData)
-
-
-class TestAnalysisConfigDataWithoutNetwork:
-    def test_initialize(self):
-        _config_data = AnalysisConfigDataWithoutNetwork()
-        assert isinstance(_config_data, AnalysisConfigDataWithoutNetwork)
-        assert isinstance(_config_data, AnalysisConfigData)
-
-
-class TestAnalysisTypes:
     @pytest.fixture
     def valid_config(self) -> AnalysisConfigData:
-        _config = AnalysisConfigData()
+        _config = AnalysisConfigData(project=ProjectSection())
         for _indirect in IndirectAnalysisNameList:
             _config.analyses.append(AnalysisSectionIndirect(analysis=_indirect))
         for _direct in DirectAnalysisNameList:
@@ -60,3 +44,14 @@ class TestAnalysisTypes:
 
         # 3. Verify expectations
         assert all(item in _direct for item in DirectAnalysisNameList)
+
+    def test_get_data_output(self):
+        # 1. Define test data
+        _test_ini = test_results / "non_existing.ini"
+        _expected_value = test_results / "output"
+
+        # 2. Run test
+        _return_value = AnalysisConfigData.get_data_output(_test_ini)
+
+        # 3. Verify expectations.
+        assert _return_value == _expected_value
