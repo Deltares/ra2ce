@@ -14,7 +14,12 @@ _cli_name = "ra2ce_cli"
 
 
 def get_version_file() -> Path:
+    """
+    Generates a file representing the version attributes to add in the .exe.
 
+    Returns:
+        Path: Location of the generated version file.
+    """
     _version_file = _workpath.joinpath("version.rc")
     if not _version_file.parent.exists():
         _version_file.parent.mkdir()
@@ -58,7 +63,9 @@ def get_hidden_imports() -> list[str]:
 
 
 def build_cli():
-
+    """
+    Generates an `.exe` file (with a related binaries directory) using `PyInstaller`.
+    """
     _ra2ce_dir = Path(cli_module.__file__).parent
 
     PyInstaller.__main__.run(
@@ -72,12 +79,9 @@ def build_cli():
             *get_hidden_imports(),
             f"--workpath={str(_workpath)}",
             f"--specpath={str(_workpath)}",
-            # "--add-data={}:README.md".format(str(_root_dir.joinpath("README.md"))),
-            # f"--icon={str(convert_icon)}",
             "--copy-metadata=ra2ce",
             f"--version-file={str(get_version_file())}",
             "--noconfirm",
-            # "--onefile",
             "--clean",
         ]
     )
