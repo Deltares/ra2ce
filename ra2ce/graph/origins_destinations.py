@@ -195,7 +195,7 @@ def update_edges_with_new_node(
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_a, new_node_id, k_new) for p in set(list(line_b.coords[1:-1]))}
+            {(p[0], p[1]): (node_a, new_node_id, k_new) for p in set(list(line_b.coords[1:-1]))}
         )
 
         cnt += 1
@@ -215,7 +215,7 @@ def update_edges_with_new_node(
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_b, new_node_id, k_new) for p in set(list(line_b.coords[1:-1]))}
+            {(p[0], p[1]): (node_b, new_node_id, k_new) for p in set(list(line_b.coords[1:-1]))}
         )
 
         cnt += 1
@@ -235,7 +235,7 @@ def update_edges_with_new_node(
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_a, new_node_id, k_new) for p in set(list(line_b.coords[1:-1]))}
+            {(p[0], p[1]): (node_a, new_node_id, k_new) for p in set(list(line_b.coords[1:-1]))}
         )
 
         cnt += 1
@@ -255,7 +255,7 @@ def update_edges_with_new_node(
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_b, new_node_id, k_new) for p in set(list(line_b.coords[1:-1]))}
+            {(p[0], p[1]): (node_b, new_node_id, k_new) for p in set(list(line_b.coords[1:-1]))}
         )
 
         cnt += 1
@@ -275,7 +275,7 @@ def update_edges_with_new_node(
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_b, new_node_id, k_new) for p in set(list(line_a.coords[1:-1]))}
+            {(p[0], p[1]): (node_b, new_node_id, k_new) for p in set(list(line_a.coords[1:-1]))}
         )
 
         cnt += 1
@@ -295,7 +295,7 @@ def update_edges_with_new_node(
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_a, new_node_id, k_new) for p in set(list(line_a.coords[1:-1]))}
+            {(p[0], p[1]): (node_a, new_node_id, k_new) for p in set(list(line_a.coords[1:-1]))}
         )
 
         cnt += 1
@@ -315,7 +315,7 @@ def update_edges_with_new_node(
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_b, new_node_id, k_new) for p in set(list(line_a.coords[1:-1]))}
+            {(p[0], p[1]): (node_b, new_node_id, k_new) for p in set(list(line_a.coords[1:-1]))}
         )
 
         cnt += 1
@@ -335,7 +335,7 @@ def update_edges_with_new_node(
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
-            {p: (node_a, new_node_id, k_new) for p in set(list(line_a.coords[1:-1]))}
+            {(p[0], p[1]): (node_a, new_node_id, k_new) for p in set(list(line_a.coords[1:-1]))}
         )
 
         cnt += 1
@@ -402,15 +402,16 @@ def add_od_nodes(
     for line in edge_list:
         # Convert LineString to a hashable type (tuple) for set lookup
         geometry_coords = line[-1]["geometry"].coords
-        coords = tuple(sorted([coord for coord in geometry_coords]))
+        # coords = tuple(sorted([coord for coord in geometry_coords]))
+        coords = tuple(sorted([(coord[0], coord[1]) for coord in geometry_coords]))
+        coords_all_vertices = tuple(sorted(tuple(pair) for pair in zip(geometry_coords.xy[0], geometry_coords.xy[1])))
         if coords in checked_lines:
             graph.remove_edge(*line[0:3])
             continue
         else:
             inverse_vertices_dict.update(
-                {p: (line[0], line[1], line[2]) for p in set(geometry_coords[1:-1])}
-            )
-            all_vertices.extend(set(geometry_coords))
+                {(p[0], p[1]): (line[0], line[1], line[2]) for p in set(geometry_coords[1:-1])})
+            all_vertices.extend(coords_all_vertices)
             checked_lines.add(coords)
 
     # Make an array from the list
@@ -418,7 +419,8 @@ def add_od_nodes(
 
     # Also create an inverse nodes dict of the node geometries as keys and node ID's as values
     inverse_nodes_dict = {
-        node[-1]["geometry"].coords[0]: node[0] for node in graph.nodes.data()
+        tuple(node[-1]["geometry"].coords[0][:2]): node[0]
+        for node in graph.nodes.data()
     }
 
     # Get the maximum node id
