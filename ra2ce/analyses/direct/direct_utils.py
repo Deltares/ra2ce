@@ -122,6 +122,16 @@ def create_summary_statistics(gdf: GeoDataFrame) -> dict:
     # Todo: in the future we can make it more generic, so that we can easily get the mode/mean/whatever
 
     dictionary = dict(gdf.groupby("road_type")["lanes"].agg(pd.Series.mode))
+
+    # get a default value if any key of the dictionary became empty (because the mode operation on the 'lanes' column
+    # for a road type results in an empty array
+    non_empty_modes = [value for value in dictionary.values() if isinstance(value, float) and value > 0]
+    default_value = np.mean(non_empty_modes)
+
+    # Replace empty arrays with the calculated average
+    for key, value in dictionary.items():
+        if isinstance(value, np.ndarray) and len(value) == 0:
+            dictionary[key] = default_value
     return dictionary
 
 

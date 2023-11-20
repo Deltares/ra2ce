@@ -84,10 +84,10 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
 
             _output_path = self.config.output_path.joinpath(analysis.analysis)
             if analysis.save_gpkg:
-                shp_path = _output_path.joinpath(
+                gpkg_path = _output_path.joinpath(
                     analysis.name.replace(" ", "_") + ".gpkg"
                 )
-                save_gdf(gdf, shp_path)
+                save_gdf(gdf, gpkg_path, "GPKG")
             if analysis.save_csv:
                 csv_path = _output_path.joinpath(
                     analysis.name.replace(" ", "_") + ".csv"
@@ -225,13 +225,13 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         return gdf
 
 
-def save_gdf(gdf: gpd.GeoDataFrame, save_path: Path):
+def save_gdf(gdf: gpd.GeoDataFrame, save_path: Path, driver: str):
     """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp
 
     Arguments:
         gdf [geodataframe]: geodataframe object to be converted
-        edge_shp [str]: output path including extension for edges shapefile
-        node_shp [str]: output path including extension for nodes shapefile
+        save_path [Path]: path to save
+        driver [str]: defines the file format
     Returns:
         None
     """
@@ -242,7 +242,9 @@ def save_gdf(gdf: gpd.GeoDataFrame, save_path: Path):
         if gdf[col].dtype == object and col != gdf.geometry.name:
             gdf[col] = gdf[col].astype(str)
 
-    gdf.to_file(save_path, driver="ESRI Shapefile", encoding="utf-8")
+    if save_path.exists():
+        save_path.unlink()
+    gdf.to_file(save_path, driver=driver)
     logging.info("Results saved to: {}".format(save_path))
 
 
