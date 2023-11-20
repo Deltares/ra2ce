@@ -11,11 +11,10 @@ class TestHazardOverlay:
         _config.static_path = Path("static")
         _config.hazard.aggregate_wl = "max"
         _config.hazard.hazard_map = [Path("file_01.csv")]
-        _graphs = {}
-        _files = {}
+        _graph_files = {}
 
         # 2. Run test.
-        _hazard = HazardOverlay(_config, _graphs, _files)
+        _hazard = HazardOverlay(_config, _graph_files)
 
         # 3. Verify final expectations.
         assert isinstance(_hazard, HazardOverlay)
