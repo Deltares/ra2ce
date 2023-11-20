@@ -29,7 +29,7 @@ from typing import Optional
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.graph.network_config_data.network_config_data import (
-    NetworkConfigData,
+    NetworkSection,
     OriginsDestinationsSection,
 )
 
@@ -137,14 +137,12 @@ class AnalysisConfigData(ConfigDataProtocol):
     static_path: Optional[Path] = None
     project: ProjectSection = field(default_factory=lambda: ProjectSection())
     analyses: list[AnalysisSectionBase] = field(default_factory=list)
-    files: Optional[dict[str, Path]] = field(default_factory=dict)
+    files: dict[str, Path] = field(default_factory=dict)
     origins_destinations: Optional[OriginsDestinationsSection] = field(
         default_factory=lambda: OriginsDestinationsSection()
     )
-    network: Optional[NetworkConfigData] = field(
-        default_factory=lambda: NetworkConfigData()
-    )
-    hazard_names: Optional[list[str]] = field(default_factory=list)
+    network: NetworkSection = field(default_factory=lambda: NetworkSection())
+    hazard_names: list[str] = field(default_factory=list)
 
     @property
     def direct(self) -> list[AnalysisSectionDirect]:
@@ -170,10 +168,6 @@ class AnalysisConfigData(ConfigDataProtocol):
             filter(lambda x: isinstance(x, AnalysisSectionIndirect), self.analyses)
         )
 
-
-class AnalysisConfigDataWithNetwork(AnalysisConfigData):
-    pass
-
-
-class AnalysisConfigDataWithoutNetwork(AnalysisConfigData):
-    pass
+    @staticmethod
+    def get_data_output(ini_file: Path) -> Path:
+        return ini_file.parent.joinpath("output")
