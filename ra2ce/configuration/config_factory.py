@@ -114,7 +114,7 @@ class ConfigFactory:
             _network_config.files = NetworkConfigWrapper.get_existent_network_files(
                 _static_dir.joinpath("output_graph")
             )
-            _network_config.graphs = NetworkConfigWrapper.read_graphs_from_config(
+            _network_config.graph_files = NetworkConfigWrapper.read_graphs_from_config(
                 _static_dir.joinpath("output_graph")
             )
         else:
