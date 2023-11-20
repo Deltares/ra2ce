@@ -73,5 +73,10 @@ class ConfigWrapper:
     def configure(self) -> None:
         if self.network_config:
             self.network_config.configure()
+            self.analysis_config = AnalysisConfigWrapper.from_data_with_network(
+                self.analysis_config.ini_file,
+                self.analysis_config.config_data,
+                self.network_config
+            )
         if self.analysis_config:
             self.analysis_config.configure()
