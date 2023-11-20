@@ -22,9 +22,10 @@
 import logging
 import os
 from pathlib import Path
-from typing import Optional, Union, Tuple, Dict, Any
+from typing import Optional, Union
 
 import geopandas as gpd
+import networkx
 import networkx as nx
 import numpy as np
 import pandas as pd
@@ -32,6 +33,7 @@ import pyproj
 import rasterio
 import rasterio.mask
 import rasterio.transform
+import shapely
 from rasterio import Affine
 from rasterio.warp import Resampling, calculate_default_transform, reproject
 from shapely.geometry import Point
@@ -165,16 +167,16 @@ def add_data_to_existing_node(graph, node, match_name):
 
 
 def update_edges_with_new_node(
-        graph,
-        edge_data,
-        node_a,
-        node_b,
-        k,
-        line_a,
-        line_b,
-        new_node_id,
-        graph_crs,
-        inverse_vertices_dict,
+        graph: networkx.MultiGraph,
+        edge_data: dict,
+        node_a: int,
+        node_b: int,
+        k: int,
+        line_a: shapely.LineString,
+        line_b: shapely.LineString,
+        new_node_id: int,
+        graph_crs: pyproj.CRS,
+        inverse_vertices_dict: dict,
 ):
     # Check which line is connected to which node. There can be 8 different combinations and there should be two
     # edges added to the graph.
@@ -361,7 +363,7 @@ def add_od_nodes(
 ):
     def find_closest_node(
             closest_node_on_road: np.ndarray, inverse_vertices_dict: dict, inverse_nodes_dict: dict,
-            graph: Union[nx.classes.Graph, nx.classes.MultiGraph]) -> Dict[Tuple[float, float], int]:
+            graph: Union[nx.classes.Graph, nx.classes.MultiGraph]) -> dict[tuple[float, float], int]:
 
         closest_u_v_k = inverse_vertices_dict.get((closest_node_on_road[0], closest_node_on_road[1]), None)
         if closest_u_v_k:
