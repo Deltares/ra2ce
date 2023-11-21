@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from ra2ce.graph.graph_files_collection import GraphFileProtocol, GraphFilesCollection
+from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
 from tests import test_data
 
 

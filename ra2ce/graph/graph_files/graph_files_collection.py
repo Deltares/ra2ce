@@ -1,88 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
 from pathlib import Path
-from typing import Any, Protocol, runtime_checkable
 
-from geopandas import GeoDataFrame, read_feather
+from geopandas import GeoDataFrame
 from networkx import MultiGraph
 
-from ra2ce.common.io.readers.graph_pickle_reader import GraphPickleReader
-
-
-class GraphFileEnum(Enum):
-    BASE_GRAPH = 1
-    BASE_GRAPH_HAZARD = 2
-    ORIGINS_DESTINATIONS_GRAPH = 3
-    ORIGINS_DESTINATIONS_GRAPH_HAZARD = 4
-    BASE_NETWORK = 5
-    BASE_NETWORK_HAZARD = 6
-
-
-@runtime_checkable
-class GraphFileProtocol(Protocol):
-    default_filename: Path
-    file: Path
-    graph: MultiGraph | GeoDataFrame
-
-    def read_graph_file(self, file: Path) -> MultiGraph | GeoDataFrame:
-        """
-        Read a graph file
-
-        Args:
-            file (Path): Path to the file
-
-        Returns:
-            MultiGraph | GeoDataFrame: the graph
-        """
-        pass
-
-    def read_graph(self) -> MultiGraph | GeoDataFrame:
-        """
-        Read a graph file that is already known in the object
-
-        Args: None
-
-        Returns:
-            MultiGraph | GeoDataFrame: the graph
-        """
-        pass
-
-
-@dataclass
-class GraphFile(GraphFileProtocol):
-    default_filename: Path = None
-    file: Path = None
-    graph: MultiGraph = None
-
-    def read_graph_file(self, file: Path) -> MultiGraph:
-        self.file = file
-        self.read_graph()
-        return self.graph
-
-    def read_graph(self) -> MultiGraph:
-        if self.file.is_file():
-            _pickle_reader = GraphPickleReader()
-            self.graph = _pickle_reader.read(self.file)
-        return self.graph
-
-
-@dataclass
-class NetworkFile(GraphFileProtocol):
-    default_filename: Path = None
-    file: Path = None
-    graph: GeoDataFrame = None
-
-    def read_graph_file(self, file: Path) -> MultiGraph:
-        self.file = file
-        self.read_graph()
-        return self.graph
-
-    def read_graph(self) -> MultiGraph:
-        if self.file.is_file():
-            self.graph = read_feather(self.file)
-        return self.graph
+from ra2ce.graph.graph_files.graph_file import GraphFile
+from ra2ce.graph.graph_files.graph_files_enum import GraphFileEnum
+from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
+from ra2ce.graph.graph_files.network_file import NetworkFile
 
 
 @dataclass
