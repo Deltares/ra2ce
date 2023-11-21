@@ -431,7 +431,6 @@ def add_od_nodes(
         coords = tuple(sorted([coord for coord in geometry_coords]))
         if coords in checked_lines:
             graph.remove_edge(*line[0:3])
-            continue
         else:
             inverse_vertices_dict.update(
                 {p: (line[0], line[1], line[2]) for p in set(geometry_coords[1:-1])}
