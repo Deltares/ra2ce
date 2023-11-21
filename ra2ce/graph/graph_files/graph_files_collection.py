@@ -1,88 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
 from pathlib import Path
-from typing import Any, Protocol, runtime_checkable
 
-from geopandas import GeoDataFrame, read_feather
+from geopandas import GeoDataFrame
 from networkx import MultiGraph
 
-from ra2ce.common.io.readers.graph_pickle_reader import GraphPickleReader
-
-
-class GraphFileEnum(Enum):
-    BASE_GRAPH = 1
-    BASE_GRAPH_HAZARD = 2
-    ORIGINS_DESTINATIONS_GRAPH = 3
-    ORIGINS_DESTINATIONS_GRAPH_HAZARD = 4
-    BASE_NETWORK = 5
-    BASE_NETWORK_HAZARD = 6
-
-
-@runtime_checkable
-class GraphFileProtocol(Protocol):
-    default_filename: Path
-    file: Path
-    graph: MultiGraph | GeoDataFrame
-
-    def read_graph_file(self, file: Path) -> MultiGraph | GeoDataFrame:
-        """
-        Read a graph file
-
-        Args:
-            file (Path): Path to the file
-
-        Returns:
-            MultiGraph | GeoDataFrame: the graph
-        """
-        pass
-
-    def read_graph(self) -> MultiGraph | GeoDataFrame:
-        """
-        Read a graph file that is already known in the object
-
-        Args: None
-
-        Returns:
-            MultiGraph | GeoDataFrame: the graph
-        """
-        pass
-
-
-@dataclass
-class GraphFile(GraphFileProtocol):
-    default_filename: Path = None
-    file: Path = None
-    graph: MultiGraph = None
-
-    def read_graph_file(self, file: Path) -> MultiGraph:
-        self.file = file
-        self.read_graph()
-        return self.graph
-
-    def read_graph(self) -> MultiGraph:
-        if self.file.is_file():
-            _pickle_reader = GraphPickleReader()
-            self.graph = _pickle_reader.read(self.file)
-        return self.graph
-
-
-@dataclass
-class NetworkFile(GraphFileProtocol):
-    default_filename: Path = None
-    file: Path = None
-    graph: GeoDataFrame = None
-
-    def read_graph_file(self, file: Path) -> GeoDataFrame:
-        self.file = file
-        self.read_graph()
-        return self.graph
-
-    def read_graph(self) -> GeoDataFrame:
-        if self.file.is_file():
-            self.graph = read_feather(self.file)
-        return self.graph
+from ra2ce.graph.graph_files.graph_file import GraphFile
+from ra2ce.graph.graph_files.graph_files_enum import GraphFilesEnum
+from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
+from ra2ce.graph.graph_files.network_file import NetworkFile
 
 
 @dataclass
@@ -146,12 +73,12 @@ class GraphFilesCollection:
             self.base_network_hazard.default_filename.name,
         ]
 
-    def get_graph_file(self, type: str) -> GraphFileProtocol:
+    def get_graph_file(self, type: GraphFilesEnum) -> GraphFileProtocol:
         """
         Get the graph (object)
 
         Args:
-            type (str): Type of graph
+            type (GraphFileEnum): Type of graph file
 
         Raises:
             ValueError: If the type is not one of the known types
@@ -159,27 +86,27 @@ class GraphFilesCollection:
         Returns:
             GraphFileProtocol: Graph object of that specific type
         """
-        if type.upper() == GraphFileEnum.BASE_GRAPH.name:
+        if type == GraphFilesEnum.BASE_GRAPH:
             return self.base_graph
-        elif type.upper() == GraphFileEnum.BASE_GRAPH_HAZARD.name:
+        elif type == GraphFilesEnum.BASE_GRAPH_HAZARD:
             return self.base_graph_hazard
-        elif type.upper() == GraphFileEnum.ORIGINS_DESTINATIONS_GRAPH.name:
+        elif type == GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH:
             return self.origins_destinations_graph
-        elif type.upper() == GraphFileEnum.ORIGINS_DESTINATIONS_GRAPH_HAZARD.name:
+        elif type == GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH_HAZARD:
             return self.origins_destinations_graph_hazard
-        elif type.upper() == GraphFileEnum.BASE_NETWORK.name:
+        elif type == GraphFilesEnum.BASE_NETWORK:
             return self.base_network
-        elif type.upper() == GraphFileEnum.BASE_NETWORK_HAZARD.name:
+        elif type == GraphFilesEnum.BASE_NETWORK_HAZARD:
             return self.base_network_hazard
         else:
             raise ValueError(f"Unknown graph type {type} provided.")
 
-    def get_graph(self, type: str) -> GraphFileProtocol:
+    def get_graph(self, type: GraphFilesEnum) -> GraphFileProtocol:
         """
         Get the graph
 
         Args:
-            type (str): Type of graph
+            type (GraphFilesEnum): Type of graph file
 
         Returns:
             GraphFileProtocol: Graph of that specific type
@@ -187,12 +114,12 @@ class GraphFilesCollection:
         _graph_file = self.get_graph_file(type)
         return _graph_file.graph
 
-    def get_file(self, type: str) -> Path:
+    def get_file(self, type: GraphFilesEnum) -> Path:
         """
         Get the file path to the graph
 
         Args:
-            type (str): Type of graph
+            type (GraphFilesEnum): Type of graph file
 
         Returns:
             Path: Path to the graph file
@@ -201,12 +128,12 @@ class GraphFilesCollection:
         return _graph_file.file
 
     @classmethod
-    def set_files(cls, files: dict[str, Path]) -> GraphFilesCollection:
+    def set_files(cls, files: dict[GraphFilesEnum, Path]) -> GraphFilesCollection:
         """
         Create a new collection with 1 or more graph files
 
         Args:
-            files (dict[str, Path]): Dict containing the types and paths to the files
+            files (dict[GraphFilesEnum, Path]): Dict containing the types and paths to the files
 
         Returns:
             GraphFilesCollection: Collection of graph files
@@ -216,28 +143,28 @@ class GraphFilesCollection:
             _collection.set_file(_type, _path)
         return _collection
 
-    def set_file(self, type: str, file: Path) -> None:
+    def set_file(self, type: GraphFilesEnum, file: Path) -> None:
         """
         Set a path to a graph via the collection based on type of graph
 
         Args:
-            type (str): Type of graph
+            type (GraphFilesEnum): Type of graph file
             file (Path): Path of the graph
 
         Raises:
             ValueError: If the type is not one of the known types
         """
-        if type.upper() == GraphFileEnum.BASE_GRAPH.name:
+        if type == GraphFilesEnum.BASE_GRAPH:
             self.base_graph.file = file
-        elif type.upper() == GraphFileEnum.BASE_GRAPH_HAZARD.name:
+        elif type == GraphFilesEnum.BASE_GRAPH_HAZARD:
             self.base_graph_hazard.file = file
-        elif type.upper() == GraphFileEnum.ORIGINS_DESTINATIONS_GRAPH.name:
+        elif type == GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH:
             self.origins_destinations_graph.file = file
-        elif type.upper() == GraphFileEnum.ORIGINS_DESTINATIONS_GRAPH_HAZARD.name:
+        elif type == GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH_HAZARD:
             self.origins_destinations_graph_hazard.file = file
-        elif type.upper() == GraphFileEnum.BASE_NETWORK.name:
+        elif type == GraphFilesEnum.BASE_NETWORK:
             self.base_network.file = file
-        elif type.upper() == GraphFileEnum.BASE_NETWORK_HAZARD.name:
+        elif type == GraphFilesEnum.BASE_NETWORK_HAZARD:
             self.base_network_hazard.file = file
         else:
             raise ValueError(f"Unknown graph file type {type} provided.")

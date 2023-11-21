@@ -28,7 +28,6 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
-from ra2ce.graph.graph_files_collection import GraphFilesCollection
 from ra2ce.graph.network_config_data.network_config_data import (
     NetworkSection,
     OriginsDestinationsSection,
