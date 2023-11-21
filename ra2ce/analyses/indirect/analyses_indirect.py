@@ -43,7 +43,7 @@ from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDest
 from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
 )
-from ra2ce.graph.graph_files_collection import GraphFilesCollection
+from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.graph.networks_utils import buffer_geometry, graph_to_gdf, graph_to_gpkg
 
 

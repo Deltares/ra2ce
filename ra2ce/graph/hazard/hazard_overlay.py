@@ -33,7 +33,7 @@ from tqdm import tqdm
 from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as ntu
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
-from ra2ce.graph.graph_files_collection import GraphFilesCollection
+from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.graph.hazard.hazard_common_functions import (
     get_edges_geoms,
     validate_extent_graph,

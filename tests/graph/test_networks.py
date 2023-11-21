@@ -6,7 +6,7 @@ import geopandas as gpd
 import networkx as nx
 import pytest
 
-from ra2ce.graph.graph_files_collection import GraphFilesCollection
+from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_data.network_config_data_reader import (
     NetworkConfigDataReader,
