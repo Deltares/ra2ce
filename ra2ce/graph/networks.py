@@ -149,7 +149,7 @@ class Network:
             output_dir=self.output_graph_dir,
             export_types=types_to_export,
         )
-        self.graph_files.set_files({graph_name: _exporter.get_pickle_path()})
+        self.graph_files.set_file(graph_name, _exporter.get_pickle_path())
 
     def _get_new_network_and_graph(
         self, export_types: list[str]
@@ -238,7 +238,7 @@ class Network:
             and (self.destinations)
             and not self.graph_files.origins_destinations_graph.file
         ):
-            # reading the base graphs
+            # reading the base graphs # TODO Ardt: why read same file again?
             if self.graph_files.base_graph.file and base_graph:
                 self.graph_files.base_graph.read_graph(None)
             # adding OD nodes

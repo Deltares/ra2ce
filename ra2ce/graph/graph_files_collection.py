@@ -144,21 +144,24 @@ class GraphFilesCollection:
     def set_files(cls, files: dict[str, Path]) -> GraphFilesCollection:
         _collection = cls()
         for _file, _path in files.items():
-            if _file.upper() == GraphFileEnum.BASE_GRAPH.name:
-                _collection.base_graph.file = _path
-            elif _file.upper() == GraphFileEnum.BASE_GRAPH_HAZARD.name:
-                _collection.base_graph_hazard.file = _path
-            elif _file.upper() == GraphFileEnum.ORIGINS_DESTINATIONS_GRAPH.name:
-                _collection.origins_destinations_graph.file = _path
-            elif _file.upper() == GraphFileEnum.ORIGINS_DESTINATIONS_GRAPH_HAZARD.name:
-                _collection.origins_destinations_graph_hazard.file = _path
-            elif _file.upper() == GraphFileEnum.BASE_NETWORK.name:
-                _collection.base_network.file = _path
-            elif _file.upper() == GraphFileEnum.BASE_NETWORK_HAZARD.name:
-                _collection.base_network_hazard.file = _path
-            else:
-                raise ValueError(f"Unknown graph file {_file} provided.")
+            _collection.set_file(_file, _path)
         return _collection
+
+    def set_file(self, type: str, file: Path) -> None:
+        if type.upper() == GraphFileEnum.BASE_GRAPH.name:
+            self.base_graph.file = file
+        elif type.upper() == GraphFileEnum.BASE_GRAPH_HAZARD.name:
+            self.base_graph_hazard.file = file
+        elif type.upper() == GraphFileEnum.ORIGINS_DESTINATIONS_GRAPH.name:
+            self.origins_destinations_graph.file = file
+        elif type.upper() == GraphFileEnum.ORIGINS_DESTINATIONS_GRAPH_HAZARD.name:
+            self.origins_destinations_graph_hazard.file = file
+        elif type.upper() == GraphFileEnum.BASE_NETWORK.name:
+            self.base_network.file = file
+        elif type.upper() == GraphFileEnum.BASE_NETWORK_HAZARD.name:
+            self.base_network_hazard.file = file
+        else:
+            raise ValueError(f"Unknown graph file type {type} provided.")
 
     def read_graph(self, file: Path) -> None:
         if file.name == self.base_graph.default_filename.name:
