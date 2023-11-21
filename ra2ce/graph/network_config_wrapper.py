@@ -79,23 +79,8 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
     @staticmethod
     def get_existent_network_files(output_graph_dir: Path) -> GraphFilesCollection:
         """Checks if file of graph exist in network folder and adds filename to the graph object"""
-        _network_filenames = GraphFilesCollection().get_default_filenames()
-
-        def _get_file_entry(expected_file: Path) -> Optional[Path]:
-            _value = None
-            if expected_file and expected_file.is_file():
-                _value = expected_file
-                logging.info(f"Existing graph/network found: {expected_file}.")
-            return _value
-
-        return GraphFilesCollection.set_files(
-            {
-                GraphFilesEnum[_ep.stem.upper()]: _get_file_entry(_ep)
-                for _ep in map(
-                    lambda x: output_graph_dir.joinpath(x), _network_filenames
-                )
-            }
-        )
+        _graph_files = GraphFilesCollection()
+        return _graph_files.set_files(output_graph_dir)
 
     @staticmethod
     def read_graphs_from_config(static_output_dir: Path) -> GraphFilesCollection:

@@ -17,15 +17,6 @@ class TestGraphFilesCollection:
         assert isinstance(_collection.base_graph, GraphFileProtocol)
         assert _collection.base_graph.file == None
 
-    def test_get_default_filenames(self):
-        # 1. Define test data
-
-        # 2. Execute test
-        _filenames = GraphFilesCollection().get_default_filenames()
-
-        # 3. Verify results
-        assert len(_filenames) == 6
-
     def test_set_file(self):
         # 1. Define test data
         _type = GraphFilesEnum.BASE_GRAPH
@@ -40,25 +31,15 @@ class TestGraphFilesCollection:
 
     def test_set_files(self):
         # 1. Define test data
-        _files = {
-            GraphFilesEnum.BASE_GRAPH: Path("a"),
-            GraphFilesEnum.BASE_GRAPH_HAZARD: Path("b"),
-            GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH: Path("c"),
-            GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH_HAZARD: Path("d"),
-            GraphFilesEnum.BASE_NETWORK: Path("e"),
-            GraphFilesEnum.BASE_NETWORK_HAZARD: Path("f"),
-        }
+        _dir = test_data.joinpath("readers_test_data")
+        _file = _dir.joinpath("base_graph.p")
+        _collection = GraphFilesCollection()
 
         # 2. Execute test
-        _collection = GraphFilesCollection().set_files(_files)
+        _collection.set_files(_dir)
 
         # 3. Verify results
-        assert _collection.base_graph.file == Path("a")
-        assert _collection.base_graph_hazard.file == Path("b")
-        assert _collection.origins_destinations_graph.file == Path("c")
-        assert _collection.origins_destinations_graph_hazard.file == Path("d")
-        assert _collection.base_network.file == Path("e")
-        assert _collection.base_network_hazard.file == Path("f")
+        _collection.base_graph.file = _file
 
     def test_read_graph_on_graph(self):
         # 1. Define test data
@@ -85,3 +66,25 @@ class TestGraphFilesCollection:
         assert _collection.base_graph.file == _file
         assert _collection.base_graph.graph == _graph
         assert _graph
+
+    def test_has_graphs_without_graphs(self):
+        # 1. Define test data
+        _collection = GraphFilesCollection()
+
+        # 2. Execute test
+        _result = _collection.has_graphs()
+
+        # 3. Verify results
+        assert not _result
+
+    def test_has_graphs_with_graphs(self):
+        # 1. Define test data
+        _file = test_data.joinpath("readers_test_data", "base_graph.p")
+        _collection = GraphFilesCollection()
+        _collection.base_graph.read_graph(_file)
+
+        # 2. Execute test
+        _result = _collection.has_graphs()
+
+        # 3. Verify results
+        assert _result
