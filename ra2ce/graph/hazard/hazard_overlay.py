@@ -689,7 +689,7 @@ class HazardOverlay:
                 ) = self.od_hazard_intersect(graph_reprojected, ods_reprojected)
 
                 # Assign the original geometries to the reprojected dataset
-                self.graph_files.origins_destinations_graph_hazard = (
+                self.graph_files.origins_destinations_graph_hazard.graph = (
                     self.get_original_geoms_graph(graph, od_graph_hazard_reprojected)
                 )
                 ods = ods_hazard_reprojected.to_crs(ods.crs)
@@ -706,7 +706,7 @@ class HazardOverlay:
 
             else:
                 (
-                    self.graph_files.origins_destinations_graph_hazard,
+                    self.graph_files.origins_destinations_graph_hazard.graph,
                     ods,
                 ) = self.od_hazard_intersect(graph, ods)
 
