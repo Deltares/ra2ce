@@ -37,7 +37,7 @@ from ra2ce.graph.hazard.hazard_common_functions import (
     get_edges_geoms,
     validate_extent_graph,
 )
-from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_for_shp import (
+from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg import (
     HazardIntersectBuilderForGpkg,
 )
 from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_for_table import (
