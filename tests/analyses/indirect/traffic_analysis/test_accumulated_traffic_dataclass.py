@@ -32,7 +32,7 @@ addition_cases = [
 
 class TestAccumulatedTrafficDataclass:
     def test_multiply_wrong_type_raises_error(self):
-        with pytest.raises(NotImplementedError) as exc_err:
+        with pytest.raises(TypeError) as exc_err:
             AccumulatedTraffic() * "Lorem ipsum"
         assert (
             str(exc_err.value)
@@ -40,7 +40,7 @@ class TestAccumulatedTrafficDataclass:
         )
 
     def test_addition_wrong_type_raises_error(self):
-        with pytest.raises(NotImplementedError) as exc_err:
+        with pytest.raises(TypeError) as exc_err:
             AccumulatedTraffic() + "Lorem ipsum"
         assert (
             str(exc_err.value)

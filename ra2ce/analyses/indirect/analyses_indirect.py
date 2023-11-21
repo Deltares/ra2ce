@@ -338,18 +338,28 @@ class IndirectAnalyses:
                 u, v, k, edata = edges
 
                 if nx.has_path(graph, u, v):
-                    alt_dist = nx.dijkstra_path_length(graph, u, v, weight=analysis.weighing)
+                    alt_dist = nx.dijkstra_path_length(
+                        graph, u, v, weight=analysis.weighing
+                    )
                     alt_nodes = nx.dijkstra_path(graph, u, v)
                     connected = 1
                 else:
                     alt_dist, alt_nodes, connected = np.NaN, np.NaN, 0
 
-                data = {"u": [u], "v": [v], "alt_dist": [alt_dist], "alt_nodes": [alt_nodes], "connected": [connected]}
+                data = {
+                    "u": [u],
+                    "v": [v],
+                    "alt_dist": [alt_dist],
+                    "alt_nodes": [alt_nodes],
+                    "connected": [connected],
+                }
 
                 if "rfid" in gdf:
                     data["rfid"] = [str(edata["rfid"])]
 
-                df_calculated = pd.concat([df_calculated, pd.DataFrame(data)], ignore_index=True)
+                df_calculated = pd.concat(
+                    [df_calculated, pd.DataFrame(data)], ignore_index=True
+                )
             # Merge the dataframes
             if "rfid" in gdf:
                 gdf = gdf.merge(df_calculated, how="left", on=["u", "v", "rfid"])
@@ -512,7 +522,7 @@ class IndirectAnalyses:
 
     @staticmethod
     def extract_od_nodes_from_graph(
-            graph: nx.classes.MultiGraph,
+        graph: nx.classes.MultiGraph,
     ) -> list[tuple[str, str]]:
         """
         Extracts all Origin - Destination nodes from the graph, prevents from entries
@@ -533,7 +543,7 @@ class IndirectAnalyses:
         return _od_nodes
 
     def _get_origin_destination_pairs(
-            self, graph: nx.classes.MultiGraph
+        self, graph: nx.classes.MultiGraph
     ) -> list[tuple[int, str], tuple[int, str]]:
         od_path = self.config.static_path.joinpath(
             "output_graph", "origin_destination_table.feather"
@@ -778,7 +788,7 @@ class IndirectAnalyses:
             "output_graph", "origin_destination_table.gpkg"
         )
         origin = gpd.read_file(origin_fn, engine="pyogrio")
-        index = [type(x) == str for x in origin["o_id"]]
+        index = [isinstance(x, str) for x in origin["o_id"]]
         origin = origin[index]
         origin.reset_index(inplace=True, drop=True)
 
@@ -1329,9 +1339,9 @@ def save_gdf(gdf: gpd.GeoDataFrame, save_path: Path):
 
 
 def find_route_ods(
-        graph: nx.classes.MultiGraph,
-        od_nodes: list[tuple[tuple[int, str], tuple[int, str]]],
-        weighing: str,
+    graph: nx.classes.MultiGraph,
+    od_nodes: list[tuple[tuple[int, str], tuple[int, str]]],
+    weighing: str,
 ) -> gpd.GeoDataFrame:
     # create the routes between all OD pairs
     (
