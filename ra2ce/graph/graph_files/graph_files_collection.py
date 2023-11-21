@@ -12,29 +12,39 @@ from ra2ce.graph.graph_files.network_file import NetworkFile
 @dataclass
 class GraphFilesCollection:
     base_graph: GraphFile = field(
-        default_factory=lambda: GraphFile(default_filename=Path("base_graph.p"))
+        default_factory=lambda: GraphFile(
+            default_filename=Path(GraphFilesEnum.BASE_GRAPH.name.lower() + ".p")
+        )
     )
     base_graph_hazard: GraphFile = field(
-        default_factory=lambda: GraphFile(default_filename=Path("base_graph_hazard.p"))
+        default_factory=lambda: GraphFile(
+            default_filename=Path(GraphFilesEnum.BASE_GRAPH_HAZARD.name.lower() + ".p")
+        )
     )
     origins_destinations_graph: GraphFile = field(
         default_factory=lambda: GraphFile(
-            default_filename=Path("origins_destinations_graph.p")
+            default_filename=Path(
+                GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH.name.lower() + ".p"
+            )
         )
     )
     origins_destinations_graph_hazard: GraphFile = field(
         default_factory=lambda: GraphFile(
-            default_filename=Path("origins_destinations_graph_hazard.p")
+            default_filename=Path(
+                GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH_HAZARD.name.lower() + ".p"
+            )
         )
     )
     base_network: NetworkFile = field(
         default_factory=lambda: NetworkFile(
-            default_filename=Path("base_network.feather")
+            default_filename=Path(GraphFilesEnum.BASE_NETWORK.name.lower() + ".feather")
         )
     )
     base_network_hazard: NetworkFile = field(
         default_factory=lambda: NetworkFile(
-            default_filename=Path("base_network_hazard.feather")
+            default_filename=Path(
+                GraphFilesEnum.BASE_NETWORK_HAZARD.name.lower() + ".feather"
+            )
         )
     )
 
