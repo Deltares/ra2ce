@@ -74,5 +74,5 @@ class NetworkExporterBase(Ra2ceExporterProtocol):
         if "pickle" in self._export_types:
             self.export_to_pickle(export_path, export_data)
 
-        if "shp" in self._export_types:
+        if "gpkg" in self._export_types:
             self.export_to_gpkg(export_path, export_data)

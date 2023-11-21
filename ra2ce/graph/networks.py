@@ -186,7 +186,10 @@ class Network:
         )
 
         def check_base_file(file_type: str, file_path: Path):
-            if not isinstance(base_graph_filepath, Path) or not base_graph_filepath.is_file():
+            if (
+                not isinstance(base_graph_filepath, Path)
+                or not base_graph_filepath.is_file()
+            ):
                 raise FileNotFoundError(
                     "No base {} file found at {}.".format(file_type, file_path)
                 )
@@ -209,7 +212,9 @@ class Network:
             (dict): A dict of a network (GeoDataFrame) and 1 (base NetworkX graph) or 2 graphs (base NetworkX and OD graph)
         """
         # Save the 'base' network as gpickle and if the user requested, also as shapefile.
-        to_save = ["pickle"] if not self._network_config.save_gpkg else ["pickle", "shp"]
+        to_save = (
+            ["pickle"] if not self._network_config.save_gpkg else ["pickle", "gpkg"]
+        )
         od_graph = None
         base_graph = None
         network_gdf = None
