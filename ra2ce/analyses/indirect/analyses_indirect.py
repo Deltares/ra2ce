@@ -1188,7 +1188,7 @@ class IndirectAnalyses:
                     opt_routes.to_csv(csv_path, index=False)
             elif analysis.analysis == "multi_link_origin_closest_destination":
                 analyzer = OriginClosestDestination(
-                    self.config, analysis, self.hazard_names_df
+                    self.config, analysis, self.graph_files, self.hazard_names_df
                 )
 
                 if analysis.calculate_route_without_disruption:
