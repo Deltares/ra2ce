@@ -26,6 +26,15 @@ from networkx import Graph
 
 class HazardIntersectBuilderProtocol(Protocol):
     def get_intersection(
-        self, hazard_overlay: GeoDataFrame| Graph
+        self, hazard_overlay: GeoDataFrame | Graph
     ) -> GeoDataFrame | Graph:
+        """
+        Retrieves the resulting network from intersecting the hazard layer with a graph.
+
+        Args:
+            hazard_overlay (GeoDataFrame | Graph): Layer containing hazards.
+
+        Returns:
+            GeoDataFrame | Graph: Intersected graph with hazards.
+        """
         pass
