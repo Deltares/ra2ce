@@ -629,7 +629,9 @@ class HazardOverlay:
                     )
 
                 # Save graphs/network with hazard
-                self._export_network_files("base_graph_hazard", types_to_export)
+                self._export_network_files(
+                    GraphFilesEnum.BASE_GRAPH_HAZARD, types_to_export
+                )
             else:
                 _hazard_base_graph = self._output_graph_dir.joinpath(
                     "base_graph_hazard.p"
