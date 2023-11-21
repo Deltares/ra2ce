@@ -169,7 +169,7 @@ class GraphFilesCollection:
         else:
             raise ValueError(f"Unknown graph file type {type} provided.")
 
-    def read_graph_file(self, file: Path) -> MultiGraph | GeoDataFrame:
+    def read_graph_file(self, file: Path) -> None:
         """
         Read a graph file via the collection
 
@@ -179,21 +179,19 @@ class GraphFilesCollection:
         Raises:
             ValueError: If the type is not one of the known types
 
-        Returns:
-            MultiGraph | GeoDataFrame: The graph
+        Returns: None
         """
         if file.name == self.base_graph.default_filename.name:
-            _graph = self.base_graph.read_graph_file(file)
+            self.base_graph.read_graph_file(file)
         elif file.name == self.base_graph_hazard.default_filename.name:
-            _graph = self.base_graph_hazard.read_graph_file(file)
+            self.base_graph_hazard.read_graph_file(file)
         elif file.name == self.origins_destinations_graph.default_filename.name:
-            _graph = self.origins_destinations_graph.read_graph_file(file)
+            self.origins_destinations_graph.read_graph_file(file)
         elif file.name == self.origins_destinations_graph_hazard.default_filename.name:
-            _graph = self.origins_destinations_graph_hazard.read_graph_file(file)
+            self.origins_destinations_graph_hazard.read_graph_file(file)
         elif file.name == self.base_network.default_filename.name:
-            _graph = self.base_network.read_graph_file(file)
+            self.base_network.read_graph_file(file)
         elif file.name == self.base_network_hazard.default_filename.name:
-            _graph = self.base_network_hazard.read_graph_file(file)
+            self.base_network_hazard.read_graph_file(file)
         else:
             raise ValueError(f"Unknown graph file {file} provided.")
-        return _graph
