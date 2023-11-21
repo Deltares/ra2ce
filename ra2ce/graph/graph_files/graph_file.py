@@ -13,13 +13,13 @@ class GraphFile(GraphFileProtocol):
     file: Path = None
     graph: MultiGraph = None
 
-    def read_graph_file(self, file: Path) -> MultiGraph:
+    def read_graph(self, file: Path) -> None:
         self.file = file
-        self.read_graph()
-        return self.graph
-
-    def read_graph(self) -> MultiGraph:
         if self.file.is_file():
             _pickle_reader = GraphPickleReader()
             self.graph = _pickle_reader.read(self.file)
+
+    def get_graph(self) -> MultiGraph:
+        if not self.graph:
+            self.read_graph(self.file)
         return self.graph
