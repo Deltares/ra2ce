@@ -19,7 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 from pathlib import Path
 
@@ -74,13 +73,15 @@ class HazardOverlay:
         self._origins = config.origins_destinations.origins
         self._destinations = config.origins_destinations.destinations
         self._save_gpkg = config.network.save_gpkg
+        self._isolation_locations = config.static_path.joinpath(
+            "network", config.isolation.locations
+        )
         if config.static_path.joinpath("network", config.isolation.locations).is_file():
             self._isolation_locations = config.static_path.joinpath(
                 "network", config.isolation.locations
             )
         else:
             self._isolation_locations = None
-
         # Hazard properties
         self._hazard_field_name = config.hazard.hazard_field_name
         self._hazard_id = config.hazard.hazard_id
