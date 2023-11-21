@@ -87,22 +87,19 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         _graph_files = GraphFilesCollection()
         if not static_output_dir.exists():
             raise ValueError("Path does not exist: {}".format(static_output_dir))
-        # Load graphs
-        # TODO (fix): why still read hazard as neccessary if analysis of single link redundancy can run without hazard?
+        # Load graphs 
+        # TODO (fix): why still read hazard as necessary if analysis of single link redundancy can run without hazard?
         for input_graph in [
-            GraphFilesEnum.BASE_GRAPH.name.lower(),
-            GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH.name.lower(),
+            GraphFilesEnum.BASE_GRAPH,
+            GraphFilesEnum.BASE_GRAPH_HAZARD,
+            GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH,
+            GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH_HAZARD,
         ]:
             _graph_files.read_graph(static_output_dir.joinpath(f"{input_graph}.p"))
-            _graph_files.read_graph(
-                static_output_dir.joinpath(f"{input_graph}_hazard.p")
-            )
 
         # Load networks
-        _graph_files.read_graph(static_output_dir.joinpath("base_network.feather"))
-        _graph_files.read_graph(
-            static_output_dir.joinpath("base_network_hazard.feather")
-        )
+        for input_graph in [GraphFilesEnum.BASE_NETWORK, GraphFilesEnum.BASE_NETWORK_HAZARD]
+            _graph_files.read_graph(static_output_dir.joinpath(f"{input_graph}.feather"))
 
         return _graph_files
 
