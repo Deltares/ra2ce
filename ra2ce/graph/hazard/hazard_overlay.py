@@ -781,7 +781,6 @@ class HazardOverlay:
             logging.info("Detected isolated locations, checking for hazard overlay.")
             locations = gpd.read_file(self._isolation_locations, engine="pyogrio")
             locations["i_id"] = locations.index
-            hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
 
             # get hazard at locations from network based on nearest
             logging.info("Get hazard at locations from network.")
