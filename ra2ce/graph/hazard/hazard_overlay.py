@@ -30,10 +30,10 @@ import pyproj
 from rasterstats import point_query, zonal_stats
 from tqdm import tqdm
 
-from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as ntu
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
 from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.graph.graph_files.graph_files_enum import GraphFilesEnum
 from ra2ce.graph.hazard.hazard_common_functions import (
     get_edges_geoms,
     validate_extent_graph,
@@ -495,15 +495,17 @@ class HazardOverlay:
         nx.set_edge_attributes(_graph_new, original_geometries, "geometry")
         return _graph_new.copy()
 
-    def _export_network_files(self, graph_name: str, types_to_export: list[str]):
+    def _export_network_files(
+        self, graph_type: GraphFilesEnum, types_to_export: list[str]
+    ):
         _exporter = NetworkExporterFactory()
         _exporter.export(
-            network=self.graph_files.get_graph(graph_name),
-            basename=graph_name,
+            network=self.graph_files.get_graph(graph_type),
+            basename=graph_type.name.lower(),
             output_dir=self._output_graph_dir,
             export_types=types_to_export,
         )
-        self.graph_files.set_file(graph_name, _exporter.get_pickle_path())
+        self.graph_files.set_file(graph_type, _exporter.get_pickle_path())
 
     def load_origins_destinations(self):
         od_path = self._output_graph_dir.joinpath("origin_destination_table.feather")
@@ -572,7 +574,11 @@ class HazardOverlay:
             )
 
         # Iterate over the three graph/network types to load the file if necessary (when not yet loaded in memory).
-        for input_graph in ["base_graph", "base_network", "origins_destinations_graph"]:
+        for input_graph in [
+            GraphFilesEnum.BASE_GRAPH,
+            GraphFilesEnum.BASE_NETWORK,
+            GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH,
+        ]:
             file_path = self.graph_files.get_file(input_graph)
             if (
                 file_path is not None
@@ -704,7 +710,7 @@ class HazardOverlay:
 
             # Save graphs/network with hazard
             self._export_network_files(
-                "origins_destinations_graph_hazard", types_to_export
+                GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH_HAZARD, types_to_export
             )
 
             # Save the OD pairs (GeoDataFrame) as pickle

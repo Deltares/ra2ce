@@ -28,6 +28,7 @@ from typing import Optional
 
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.graph.graph_files.graph_files_enum import GraphFilesEnum
 from ra2ce.graph.hazard.hazard_overlay import HazardOverlay
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_data.network_config_data_validator import (
@@ -89,7 +90,7 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
 
         return GraphFilesCollection.set_files(
             {
-                _ep.stem: _get_file_entry(_ep)
+                GraphFilesEnum[_ep.stem.upper()]: _get_file_entry(_ep)
                 for _ep in map(
                     lambda x: output_graph_dir.joinpath(x), _network_filenames
                 )
@@ -98,24 +99,27 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
 
     @staticmethod
     def read_graphs_from_config(static_output_dir: Path) -> GraphFilesCollection:
-        _graphs = GraphFilesCollection()
+        _graph_files = GraphFilesCollection()
         if not static_output_dir.exists():
             raise ValueError("Path does not exist: {}".format(static_output_dir))
         # Load graphs
         # TODO (fix): why still read hazard as neccessary if analysis of single link redundancy can run without hazard?
-        for input_graph in ["base_graph", "origins_destinations_graph"]:
-            _graphs.read_graph_file(static_output_dir.joinpath(f"{input_graph}.p"))
-            _graphs.read_graph_file(
+        for input_graph in [
+            GraphFilesEnum.BASE_GRAPH.name.lower(),
+            GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH.name.lower(),
+        ]:
+            _graph_files.read_graph_file(static_output_dir.joinpath(f"{input_graph}.p"))
+            _graph_files.read_graph_file(
                 static_output_dir.joinpath(f"{input_graph}_hazard.p")
             )
 
         # Load networks
-        _graphs.read_graph_file(static_output_dir.joinpath("base_network.feather"))
-        _graphs.read_graph_file(
+        _graph_files.read_graph_file(static_output_dir.joinpath("base_network.feather"))
+        _graph_files.read_graph_file(
             static_output_dir.joinpath("base_network_hazard.feather")
         )
 
-        return _graphs
+        return _graph_files
 
     def configure(self) -> None:
         self.configure_network()
