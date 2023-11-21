@@ -104,12 +104,16 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         # Load graphs
         # TODO (fix): why still read hazard as neccessary if analysis of single link redundancy can run without hazard?
         for input_graph in ["base_graph", "origins_destinations_graph"]:
-            _graphs.read_graph(static_output_dir.joinpath(f"{input_graph}.p"))
-            _graphs.read_graph(static_output_dir.joinpath(f"{input_graph}_hazard.p"))
+            _graphs.read_graph_file(static_output_dir.joinpath(f"{input_graph}.p"))
+            _graphs.read_graph_file(
+                static_output_dir.joinpath(f"{input_graph}_hazard.p")
+            )
 
         # Load networks
-        _graphs.read_graph(static_output_dir.joinpath("base_network.feather"))
-        _graphs.read_graph(static_output_dir.joinpath("base_network_hazard.feather"))
+        _graphs.read_graph_file(static_output_dir.joinpath("base_network.feather"))
+        _graphs.read_graph_file(
+            static_output_dir.joinpath("base_network_hazard.feather")
+        )
 
         return _graphs
 
