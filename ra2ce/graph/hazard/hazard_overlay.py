@@ -584,7 +584,7 @@ class HazardOverlay:
                 file_path is not None
                 and self.graph_files.get_graph(input_graph) is None
             ):
-                self.graph_files.read_graph_file(file_path)
+                self.graph_files.read_graph(file_path)
 
         #### Step 1: hazard overlay of the base graph (NetworkX) ###
         if self.graph_files.base_graph.file:
@@ -637,8 +637,8 @@ class HazardOverlay:
                     "base_graph_hazard.p"
                 )
                 # Try to find the base graph hazard file
-                _graph = self.graph_files.read_graph_file(_hazard_base_graph)
-                if not _graph:
+                self.graph_files.base_graph_hazard.read_graph(_hazard_base_graph)
+                if not self.graph_files.base_graph_hazard.get_graph():
                     # File not found
                     logging.warning(
                         f"Base graph hazard file not found at {_hazard_base_graph}"
@@ -778,7 +778,7 @@ class HazardOverlay:
                 # read previously created file
                 logging.info("Setting 'base_network_hazard' graph.")
                 if self.graph_files.base_network_hazard.file:
-                    self.graph_files.base_network_hazard.read_graph()
+                    self.graph_files.base_network_hazard.get_graph()
                 else:
                     self.graph_files.base_network_hazard.graph = self.hazard_intersect(
                         self.graph_files.base_network.graph

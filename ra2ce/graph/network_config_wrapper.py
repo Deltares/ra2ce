@@ -108,14 +108,14 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
             GraphFilesEnum.BASE_GRAPH.name.lower(),
             GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH.name.lower(),
         ]:
-            _graph_files.read_graph_file(static_output_dir.joinpath(f"{input_graph}.p"))
-            _graph_files.read_graph_file(
+            _graph_files.read_graph(static_output_dir.joinpath(f"{input_graph}.p"))
+            _graph_files.read_graph(
                 static_output_dir.joinpath(f"{input_graph}_hazard.p")
             )
 
         # Load networks
-        _graph_files.read_graph_file(static_output_dir.joinpath("base_network.feather"))
-        _graph_files.read_graph_file(
+        _graph_files.read_graph(static_output_dir.joinpath("base_network.feather"))
+        _graph_files.read_graph(
             static_output_dir.joinpath("base_network_hazard.feather")
         )
 

@@ -77,7 +77,7 @@ class Network:
         self.region = _origins_destinations.region
         self.region_var = _origins_destinations.region_var
 
-        # grapsh
+        # graphs
         self.graph_files = graph_files
 
     def add_od_nodes(
@@ -243,7 +243,7 @@ class Network:
         ):
             # reading the base graphs # TODO Ardt: why read same file again?
             if self.graph_files.base_graph.file and base_graph:
-                self.graph_files.base_graph.read_graph()
+                self.graph_files.base_graph.get_graph()
             # adding OD nodes
             if self.origins.suffix == ".tif":
                 self.origins = self.generate_origins_from_raster()

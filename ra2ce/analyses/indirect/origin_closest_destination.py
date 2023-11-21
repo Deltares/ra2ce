@@ -83,7 +83,7 @@ class OriginClosestDestination:
 
     def optimal_route_origin_closest_destination(self):
         """Calculates per origin the location of its closest destination"""
-        graph = self.graph_files.origins_destinations_graph.read_graph()
+        graph = self.graph_files.origins_destinations_graph.get_graph()
 
         # Load the origins and destinations
         origins = self.load_origins()
@@ -143,7 +143,7 @@ class OriginClosestDestination:
 
     def multi_link_origin_closest_destination(self):
         """Calculates per origin the location of its closest destination with hazard disruption"""
-        graph = self.graph_files.origins_destinations_graph_hazard.read_graph()
+        graph = self.graph_files.origins_destinations_graph_hazard.get_graph()
 
         # Load the origins and destinations
         origins = self.load_origins()

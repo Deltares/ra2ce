@@ -60,39 +60,28 @@ class TestGraphFilesCollection:
         assert _collection.base_network.file == Path("e")
         assert _collection.base_network_hazard.file == Path("f")
 
-    def test_read_graph_file_on_graph(self):
-        # 1. Define test data
-        _file = test_data.joinpath("readers_test_data", "base_graph.p")
-        _collection = GraphFilesCollection()
-
-        # 2. Execute test
-        _collection.base_graph.read_graph_file(_file)
-
-        # 3. Verify results
-        assert _collection.base_graph.file == _file
-        assert _collection.base_graph.graph
-
     def test_read_graph_on_graph(self):
         # 1. Define test data
         _file = test_data.joinpath("readers_test_data", "base_graph.p")
         _collection = GraphFilesCollection()
-        _collection.base_graph.file = _file
 
         # 2. Execute test
-        _collection.base_graph.read_graph()
+        _collection.base_graph.read_graph(_file)
 
         # 3. Verify results
         assert _collection.base_graph.file == _file
         assert _collection.base_graph.graph
 
-    def test_read_graph_file_on_collection(self):
+    def test_get_graph_on_graph(self):
         # 1. Define test data
         _file = test_data.joinpath("readers_test_data", "base_graph.p")
         _collection = GraphFilesCollection()
+        _collection.base_graph.read_graph(_file)
 
         # 2. Execute test
-        _collection.read_graph_file(_file)
+        _graph = _collection.base_graph.get_graph()
 
         # 3. Verify results
         assert _collection.base_graph.file == _file
-        assert _collection.base_graph.graph
+        assert _collection.base_graph.graph == _graph
+        assert _graph

@@ -11,21 +11,21 @@ class GraphFileProtocol(Protocol):
     file: Path
     graph: MultiGraph | GeoDataFrame
 
-    def read_graph_file(self, file: Path) -> MultiGraph | GeoDataFrame:
+    def read_graph(self, file: Path) -> None:
         """
         Read a graph file
 
         Args:
             file (Path): Path to the file
 
-        Returns:
-            MultiGraph | GeoDataFrame: the graph
+        Returns: None
         """
         pass
 
-    def read_graph(self) -> MultiGraph | GeoDataFrame:
+    def get_graph(self) -> MultiGraph | GeoDataFrame:
         """
-        Read a graph file that is already known in the object
+        Gets a graph file that is already known in the object.
+        It is read if not done yet.
 
         Args: None
 

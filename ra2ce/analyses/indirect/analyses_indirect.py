@@ -1068,13 +1068,13 @@ class IndirectAnalyses:
                 # The name is different in the graph.
                 analysis.weighing = "length"
             if analysis.analysis == "single_link_redundancy":
-                g = self.graph_files.base_graph.read_graph()
+                g = self.graph_files.base_graph.get_graph()
                 gdf = self.single_link_redundancy(g, analysis)
             elif analysis.analysis == "multi_link_redundancy":
-                g = self.graph_files.base_graph_hazard.read_graph()
+                g = self.graph_files.base_graph_hazard.get_graph()
                 gdf = self.multi_link_redundancy(g, analysis)
             elif analysis.analysis == "optimal_route_origin_destination":
-                g = self.graph_files.origins_destinations_graph.read_graph()
+                g = self.graph_files.origins_destinations_graph.get_graph()
                 gdf = self.optimal_route_origin_destination(g, analysis)
 
                 if analysis.save_traffic and hasattr(
@@ -1102,7 +1102,7 @@ class IndirectAnalyses:
                     )
                     route_traffic_df.to_csv(impact_csv_path, index=False)
             elif analysis.analysis == "multi_link_origin_destination":
-                g = self.graph_files.origins_destinations_graph_hazard.read_graph()
+                g = self.graph_files.origins_destinations_graph_hazard.get_graph()
                 gdf = self.multi_link_origin_destination(g, analysis)
                 gdf_not_disrupted = self.optimal_route_origin_destination(g, analysis)
                 (
@@ -1138,7 +1138,7 @@ class IndirectAnalyses:
                 )
                 disruption_impact_df.to_csv(impact_csv_path, index=False)
             elif analysis.analysis in ["single_link_losses", "multi_link_losses)"]:
-                g = self.graph_files.base_graph_hazard.read_graph()
+                g = self.graph_files.base_graph_hazard.get_graph()
                 gdf = self.single_link_redundancy(g, analysis)
                 gdf = self.single_link_losses(gdf, analysis)
             elif analysis.analysis == "optimal_route_origin_closest_destination":
@@ -1252,13 +1252,13 @@ class IndirectAnalyses:
                     )
             elif analysis.analysis == "losses":
                 if self.graph_files.base_network_hazard.graph is None:
-                    gdf_in = self.graph_files.base_graph_hazard.read_graph()
+                    gdf_in = self.graph_files.base_graph_hazard.get_graph()
 
                 losses = Losses(self.config, analysis)
                 df = losses.calculate_losses_from_table()
                 gdf = gdf_in.merge(df, how="left", on="LinkNr")
             elif analysis.analysis == "multi_link_isolated_locations":
-                g = self.graph_files.base_graph_hazard.read_graph()
+                g = self.graph_files.base_graph_hazard.get_graph()
                 gdf, df = self.multi_link_isolated_locations(g, analysis)
 
                 df_path = _output_path / (

@@ -3,9 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from geopandas import GeoDataFrame
-from networkx import MultiGraph
-
 from ra2ce.graph.graph_files.graph_file import GraphFile
 from ra2ce.graph.graph_files.graph_files_enum import GraphFilesEnum
 from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
@@ -169,7 +166,7 @@ class GraphFilesCollection:
         else:
             raise ValueError(f"Unknown graph file type {type} provided.")
 
-    def read_graph_file(self, file: Path) -> None:
+    def read_graph(self, file: Path) -> None:
         """
         Read a graph file via the collection
 
@@ -182,16 +179,16 @@ class GraphFilesCollection:
         Returns: None
         """
         if file.name == self.base_graph.default_filename.name:
-            self.base_graph.read_graph_file(file)
+            self.base_graph.read_graph(file)
         elif file.name == self.base_graph_hazard.default_filename.name:
-            self.base_graph_hazard.read_graph_file(file)
+            self.base_graph_hazard.read_graph(file)
         elif file.name == self.origins_destinations_graph.default_filename.name:
-            self.origins_destinations_graph.read_graph_file(file)
+            self.origins_destinations_graph.read_graph(file)
         elif file.name == self.origins_destinations_graph_hazard.default_filename.name:
-            self.origins_destinations_graph_hazard.read_graph_file(file)
+            self.origins_destinations_graph_hazard.read_graph(file)
         elif file.name == self.base_network.default_filename.name:
-            self.base_network.read_graph_file(file)
+            self.base_network.read_graph(file)
         elif file.name == self.base_network_hazard.default_filename.name:
-            self.base_network_hazard.read_graph_file(file)
+            self.base_network_hazard.read_graph(file)
         else:
             raise ValueError(f"Unknown graph file {file} provided.")
