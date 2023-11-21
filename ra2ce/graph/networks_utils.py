@@ -700,6 +700,7 @@ def split_line_with_points(line, points):
     return segments
 
 
+
 def cut(line: BaseMultipartGeometry, distance: float) -> tuple[LineString, LineString]:
     # Cuts a line in two at a distance from its starting point
     # This is taken from shapely manual
@@ -1216,6 +1217,13 @@ def graph_to_gpkg(origin_graph: nx.classes.graph.Graph, edge_gpkg, node_gpkg):
     logging.info("Saving edges as shapefile: {}".format(edge_gpkg))
 
     # The encoding utf-8 might result in an empty shapefile if the wrong encoding is used.
+    for entity in [nodes, edges]:
+        if 'osmid' in entity:
+            # Otherwise it gives this error: cannot insert osmid, already exist
+            entity['osmid_original'] = entity.pop('osmid')
+    for _path in [node_gpkg, edge_gpkg]:
+        if _path.exists():
+            _path.unlink()
     nodes.to_file(node_gpkg, driver="GPKG", encoding="utf-8")
     edges.to_file(edge_gpkg, driver="GPKG", encoding="utf-8")
 
@@ -1654,12 +1662,19 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
         for i in df.loc[df["avg_speed"] == 0].index:
             if df["road_types"].iloc[i] in exceptions:
                 if any(rt in df["road_types"].iloc[i] for rt in df["road_types"]):
-                    road_type, avg_speed = [
-                        (rt, avg_s)
-                        for rt, avg_s in zip(df["road_types"], df["avg_speed"])
-                        if rt in df["road_types"].iloc[i] and avg_s != 0
-                    ][0]
-                    df["avg_speed"].iloc[i] = avg_speed
+                    try:
+                        road_type, avg_speed = [
+                            (rt, avg_s)
+                            for rt, avg_s in zip(df["road_types"], df["avg_speed"])
+                            if rt in df["road_types"].iloc[i] and avg_s != 0
+                        ][0]
+                        df["avg_speed"].iloc[i] = avg_speed
+                    except IndexError as e:
+                        logging.warning(
+                            f"Road type '{df['road_types'].iloc[i]}' cannot be assigned any average speed. Please check the average speed CSV ({save_path}), enter the right average speed for this road type, and run RA2CE again."
+                        )
+                        logging.error("Index error: {}".format(e))
+                        df["avg_speed"].iloc[i] = 0
             else:
                 # if any(rt in df['road_types'].iloc[i] for rt in df['road_types']):
                 if "link" in df["road_types"].iloc[i]:

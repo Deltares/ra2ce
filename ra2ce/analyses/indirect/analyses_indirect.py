@@ -312,7 +312,8 @@ class IndirectAnalyses:
             graph = copy.deepcopy(master_graph)
             # Create a geodataframe from the full graph
             gdf = osmnx.graph_to_gdfs(master_graph, nodes=False)
-            gdf["rfid"] = gdf["rfid"].astype(str)
+            if "rfid" in gdf:
+                gdf["rfid"] = gdf["rfid"].astype(str)
 
             # Create the edgelist that consist of edges that should be removed
             edges_remove = [
@@ -328,63 +329,44 @@ class IndirectAnalyses:
 
             graph.remove_edges_from(edges_remove)
 
-            # dataframe for saving the calculations of the alternative routes
-            df_calculated = pd.DataFrame(
-                columns=["u", "v", "rfid", "alt_dist", "alt_nodes", "connected"]
-            )
+            columns = ["u", "v", "alt_dist", "alt_nodes", "connected"]
 
-            for i, edges in enumerate(edges_remove):
+            if "rfid" in gdf:
+                columns.insert(2, "rfid")
+
+            df_calculated = pd.DataFrame(columns=columns)
+
+            for edges in edges_remove:
                 u, v, k, edata = edges
 
-                # check if the nodes are still connected
                 if nx.has_path(graph, u, v):
-                    # calculate the alternative distance if that edge is unavailable
                     alt_dist = nx.dijkstra_path_length(
                         graph, u, v, weight=analysis.weighing
                     )
-
-                    # save alternative route nodes
                     alt_nodes = nx.dijkstra_path(graph, u, v)
-
-                    # append to calculation dataframe. Lists from values to be consistent with the else operation
-                    df_calculated = pd.concat(
-                        [
-                            df_calculated,
-                            pd.DataFrame(
-                                {
-                                    "u": [u],
-                                    "v": [v],
-                                    "rfid": [str(edata["rfid"])],
-                                    "alt_dist": [alt_dist],
-                                    "alt_nodes": [alt_nodes],
-                                    "connected": [1],
-                                }
-                            ),
-                        ],
-                        ignore_index=True,
-                    )
+                    connected = 1
                 else:
-                    # append to calculation dataframe. Lists from values, otherwise cannot find any index for the newly
-                    # created DataFrame.
-                    df_calculated = pd.concat(
-                        [
-                            df_calculated,
-                            pd.DataFrame(
-                                {
-                                    "u": [u],
-                                    "v": [v],
-                                    "rfid": [str(edata["rfid"])],
-                                    "alt_dist": [np.NaN],
-                                    "alt_nodes": [np.NaN],
-                                    "connected": [0],
-                                }
-                            ),
-                        ],
-                        ignore_index=True,
-                    )
+                    alt_dist, alt_nodes, connected = np.NaN, np.NaN, 0
 
+                data = {
+                    "u": [u],
+                    "v": [v],
+                    "alt_dist": [alt_dist],
+                    "alt_nodes": [alt_nodes],
+                    "connected": [connected],
+                }
+
+                if "rfid" in gdf:
+                    data["rfid"] = [str(edata["rfid"])]
+
+                df_calculated = pd.concat(
+                    [df_calculated, pd.DataFrame(data)], ignore_index=True
+                )
             # Merge the dataframes
-            gdf = gdf.merge(df_calculated, how="left", on=["u", "v", "rfid"])
+            if "rfid" in gdf:
+                gdf = gdf.merge(df_calculated, how="left", on=["u", "v", "rfid"])
+            else:
+                gdf = gdf.merge(df_calculated, how="left", on=["u", "v"])
 
             # calculate the difference in distance
             # previously here you would find if dist == dist which is a critical bug. Replaced by just verifying dist is a value.
@@ -910,24 +892,28 @@ class IndirectAnalyses:
             # get indirect graph - remove the edges that are impacted by hazard directly
             graph_hz_indirect.remove_edges_from(edges_hz_direct)
             # get indirect graph without the largest component, i.e. isolated graph
-            self.remove_edges_from_lagest_component(graph_hz_indirect)
+            self.remove_edges_from_largest_component(graph_hz_indirect)
 
             # get direct graph - romove the edges that are impacted by hazard indirectly
             graph_hz_direct.remove_edges_from(edges_hz_indirect)
 
             # get isolated network
-            network_hz_indirect = self.get_network_with_edge_fid(graph_hz_indirect)
-            network_hz_indirect[f"i_type_{hazard_name[:-3]}"] = "isolated"
-            # reproject the datasets to be able to make a buffer in meters
-            network_hz_indirect = network_hz_indirect.set_crs(crs=crs)
-            network_hz_indirect.to_crs(crs=nearest_utm, inplace=True)
+            network_hz_indirect = gpd.GeoDataFrame()
+            if len(graph_hz_indirect.edges) > 0:
+                network_hz_indirect = self.get_network_with_edge_fid(graph_hz_indirect)
+                network_hz_indirect[f"i_type_{hazard_name[:-3]}"] = "isolated"
+                # reproject the datasets to be able to make a buffer in meters
+                network_hz_indirect = network_hz_indirect.set_crs(crs=crs)
+                network_hz_indirect.to_crs(crs=nearest_utm, inplace=True)
 
             # get flooded network
-            network_hz_direct = self.get_network_with_edge_fid(graph_hz_direct)
-            network_hz_direct[f"i_type_{hazard_name[:-3]}"] = "flooded"
-            # reproject the datasets to be able to make a buffer in meters
-            network_hz_direct = network_hz_direct.set_crs(crs=crs)
-            network_hz_direct.to_crs(crs=nearest_utm, inplace=True)
+            network_hz_direct = gpd.GeoDataFrame()
+            if len(graph_hz_direct.edges) > 0:
+                network_hz_direct = self.get_network_with_edge_fid(graph_hz_direct)
+                network_hz_direct[f"i_type_{hazard_name[:-3]}"] = "flooded"
+                # reproject the datasets to be able to make a buffer in meters
+                network_hz_direct = network_hz_direct.set_crs(crs=crs)
+                network_hz_direct.to_crs(crs=nearest_utm, inplace=True)
 
             # get hazard roads
             # merge buffer and set original crs
@@ -945,6 +931,7 @@ class IndirectAnalyses:
             )
 
             # relate the locations to network disruption due to hazard by spatial overlay
+            results_hz_roads.reset_index(inplace=True)
             locations_hz = gpd.overlay(
                 locations, results_hz_roads, how="intersection", keep_geom_type=True
             )
@@ -972,7 +959,7 @@ class IndirectAnalyses:
 
         return locations_hz, aggregation
 
-    def remove_edges_from_lagest_component(self, disconnected_graph: nx.Graph) -> None:
+    def remove_edges_from_largest_component(self, disconnected_graph: nx.Graph) -> None:
         """
         This function removes all edges from the largest connected component of a graph.
 
@@ -1242,6 +1229,8 @@ class IndirectAnalyses:
                     )
                     if "geometry" in destinations.columns:
                         del destinations["geometry"]
+                    if not csv_path.parent.exists():
+                        csv_path.parent.mkdir(parents=True)
                     destinations.to_csv(csv_path, index=False)
 
                     csv_path = _output_path.joinpath(
@@ -1326,6 +1315,8 @@ def save_gdf(gdf: gpd.GeoDataFrame, save_path: Path):
         if gdf[col].dtype == object and col != gdf.geometry.name:
             gdf[col] = gdf[col].astype(str)
 
+    if save_path.exists():
+        save_path.unlink()
     gdf.to_file(save_path, driver="GPKG")
     logging.info("Results saved to: {}".format(save_path))
 

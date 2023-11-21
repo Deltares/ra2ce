@@ -144,3 +144,8 @@ dmypy.json
 /.idea
 /logs
 /tests/local_data
+
+# Examples data
+examples/data/isolated_locations/static/output_graph/
+examples/data/isolated_locations/static/output/
+examples/cache/
