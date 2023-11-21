@@ -14,8 +14,16 @@ Offline example access
 ----------------------
 Bellow you can access some of the main examples and go through them in an off-line manner.
 
-1. `RA2CE basics  <../_examples/example_ra2ce_basics.ipynb>`_
+.. toctree::
+   :maxdepth: 1
+   :caption: Examples
 
-2. `Single link redundancy  <../_examples/example_single_link_redundancy.ipynb>`_
-
-3. `Origin-destination analysis  <../_examples/example_origin_destination_analysis.ipynb>`_
+   ../_examples/example_ra2ce_basics
+   ../_examples/example_single_link_redundancy
+   ../_examples/example_origin_destination_analysis
+   ../_examples/example_direct_damage
+   ../_examples/example_hazard_overlay
+   ../_examples/example_isolated_locations
+   ../_examples/example_optimal_route_origin_destination
+   ../_examples/example_origin_destination_analysis
+   ../_examples/example_ra2ce_basics_fromgpkg
