@@ -497,12 +497,12 @@ class HazardOverlay:
     def _export_network_files(self, graph_name: str, types_to_export: list[str]):
         _exporter = NetworkExporterFactory()
         _exporter.export(
-            network=getattr(self.graph_files, graph_name),
+            network=self.graph_files.get_graph(graph_name),
             basename=graph_name,
             output_dir=self._output_graph_dir,
             export_types=types_to_export,
         )
-        self.graph_files.set_files({graph_name: _exporter.get_pickle_path()})
+        self.graph_files.set_file(graph_name, _exporter.get_pickle_path())
 
     def load_origins_destinations(self):
         od_path = self._output_graph_dir.joinpath("origin_destination_table.feather")
