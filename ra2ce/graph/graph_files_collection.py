@@ -24,22 +24,28 @@ class GraphFileEnum(Enum):
 class GraphFileProtocol(Protocol):
     default_filename: Path
     file: Path
-    graph: GeoDataFrame | Any
+    graph: MultiGraph | GeoDataFrame
 
-    def read_graph_file(self, file: Path) -> GraphFileProtocol:
+    def read_graph_file(self, file: Path) -> MultiGraph | GeoDataFrame:
         """
         Read a graph file
 
         Args:
             file (Path): Path to the file
+
+        Returns:
+            MultiGraph | GeoDataFrame: the graph
         """
         pass
 
-    def read_graph(self) -> GraphFileProtocol:
+    def read_graph(self) -> MultiGraph | GeoDataFrame:
         """
         Read a graph file that is already known in the object
 
         Args: None
+
+        Returns:
+            MultiGraph | GeoDataFrame: the graph
         """
         pass
 
@@ -50,12 +56,12 @@ class GraphFile(GraphFileProtocol):
     file: Path = None
     graph: MultiGraph = None
 
-    def read_graph_file(self, file: Path) -> GraphFileProtocol:
+    def read_graph_file(self, file: Path) -> MultiGraph:
         self.file = file
         self.read_graph()
         return self.graph
 
-    def read_graph(self) -> GraphFileProtocol:
+    def read_graph(self) -> MultiGraph:
         if self.file.is_file():
             _pickle_reader = GraphPickleReader()
             self.graph = _pickle_reader.read(self.file)
@@ -68,12 +74,12 @@ class NetworkFile(GraphFileProtocol):
     file: Path = None
     graph: GeoDataFrame = None
 
-    def read_graph_file(self, file: Path) -> GraphFileProtocol:
+    def read_graph_file(self, file: Path) -> MultiGraph:
         self.file = file
         self.read_graph()
         return self.graph
 
-    def read_graph(self) -> GraphFileProtocol:
+    def read_graph(self) -> MultiGraph:
         if self.file.is_file():
             self.graph = read_feather(self.file)
         return self.graph
@@ -129,7 +135,7 @@ class GraphFilesCollection:
         Get the default file names for all types
 
         Returns:
-            list[str]: list of all default filenames
+            list[str]: List of all default filenames
         """
         return [
             self.base_graph.default_filename.name,
@@ -145,13 +151,13 @@ class GraphFilesCollection:
         Get the graph (object)
 
         Args:
-            type (str): type of graph
+            type (str): Type of graph
 
         Raises:
-            ValueError: if the type is not one of the known types
+            ValueError: If the type is not one of the known types
 
         Returns:
-            GraphFileProtocol: graph object of that specific type
+            GraphFileProtocol: Graph object of that specific type
         """
         if type.upper() == GraphFileEnum.BASE_GRAPH.name:
             return self.base_graph
@@ -173,10 +179,10 @@ class GraphFilesCollection:
         Get the graph
 
         Args:
-            type (str): type of graph
+            type (str): Type of graph
 
         Returns:
-            GraphFileProtocol: graph of that specific type
+            GraphFileProtocol: Graph of that specific type
         """
         _graph_file = self.get_graph_file(type)
         return _graph_file.graph
@@ -186,10 +192,10 @@ class GraphFilesCollection:
         Get the file path to the graph
 
         Args:
-            type (str): type of graph
+            type (str): Type of graph
 
         Returns:
-            Path: path to the graph file
+            Path: Path to the graph file
         """
         _graph_file = self.get_graph_file(type)
         return _graph_file.file
@@ -197,13 +203,13 @@ class GraphFilesCollection:
     @classmethod
     def set_files(cls, files: dict[str, Path]) -> GraphFilesCollection:
         """
-        Create a new collection with 1 or more files
+        Create a new collection with 1 or more graph files
 
         Args:
-            files (dict[str, Path]): dict containing the types and paths to the files
+            files (dict[str, Path]): Dict containing the types and paths to the files
 
         Returns:
-            GraphFilesCollection: collection of graph files
+            GraphFilesCollection: Collection of graph files
         """
         _collection = cls()
         for _type, _path in files.items():
@@ -211,6 +217,16 @@ class GraphFilesCollection:
         return _collection
 
     def set_file(self, type: str, file: Path) -> None:
+        """
+        Set a path to a graph via the collection based on type of graph
+
+        Args:
+            type (str): Type of graph
+            file (Path): Path of the graph
+
+        Raises:
+            ValueError: If the type is not one of the known types
+        """
         if type.upper() == GraphFileEnum.BASE_GRAPH.name:
             self.base_graph.file = file
         elif type.upper() == GraphFileEnum.BASE_GRAPH_HAZARD.name:
@@ -226,7 +242,19 @@ class GraphFilesCollection:
         else:
             raise ValueError(f"Unknown graph file type {type} provided.")
 
-    def read_graph_file(self, file: Path) -> GraphFileProtocol:
+    def read_graph_file(self, file: Path) -> MultiGraph | GeoDataFrame:
+        """
+        Read a graph file via the collection
+
+        Args:
+            file (Path): Path fo the graph
+
+        Raises:
+            ValueError: If the type is not one of the known types
+
+        Returns:
+            MultiGraph | GeoDataFrame: The graph
+        """
         if file.name == self.base_graph.default_filename.name:
             _graph = self.base_graph.read_graph_file(file)
         elif file.name == self.base_graph_hazard.default_filename.name:
