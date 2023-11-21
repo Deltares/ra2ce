@@ -152,7 +152,6 @@ html_theme_options = {
         "text": "RA2CE",
     },
     "navbar_end": ["navbar-icon-links"],  # remove dark mode switch
-    "display_version": True,
 }
 
 html_context = {
@@ -242,3 +241,5 @@ texinfo_documents = [
 
 # Allow errors in notebooks
 nbsphinx_allow_errors = True
+# Do not execute the scripts during the build process.
+nbsphinx_execute = 'never'
