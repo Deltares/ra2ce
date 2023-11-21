@@ -573,21 +573,11 @@ class HazardOverlay:
         # Iterate over the three graph/network types to load the file if necessary (when not yet loaded in memory).
         for input_graph in ["base_graph", "base_network", "origins_destinations_graph"]:
             file_path = self.graph_files.get_file(input_graph)
-
             if (
                 file_path is not None
-                or self.graph_files.get_graph(input_graph) is not None
+                and self.graph_files.get_graph(input_graph) is None
             ):
-                if (
-                    input_graph != "base_network"
-                    and self.graph_files.get_graph(input_graph) is None
-                ):
-                    self.graph_files.read_graph(file_path)
-                elif (
-                    input_graph == "base_network"
-                    and self.graph_files.get_graph(input_graph) is None
-                ):
-                    self.graph_files.read_graph(file_path)
+                self.graph_files.read_graph_file(file_path)
 
         #### Step 1: hazard overlay of the base graph (NetworkX) ###
         if self.graph_files.base_graph.file:
@@ -638,8 +628,8 @@ class HazardOverlay:
                     "base_graph_hazard.p"
                 )
                 # Try to find the base graph hazard file
-                self.graph_files.read_graph(_hazard_base_graph)
-                if not self.graph_files.base_graph_hazard.graph:
+                _graph = self.graph_files.read_graph_file(_hazard_base_graph)
+                if not _graph:
                     # File not found
                     logging.warning(
                         f"Base graph hazard file not found at {_hazard_base_graph}"
@@ -779,7 +769,7 @@ class HazardOverlay:
                 # read previously created file
                 logging.info("Setting 'base_network_hazard' graph.")
                 if self.graph_files.base_network_hazard.file:
-                    self.graph_files.base_network_hazard.read_graph(None)
+                    self.graph_files.base_network_hazard.read_graph()
                 else:
                     self.graph_files.base_network_hazard.graph = self.hazard_intersect(
                         self.graph_files.base_network.graph

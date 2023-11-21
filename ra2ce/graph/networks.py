@@ -240,7 +240,7 @@ class Network:
         ):
             # reading the base graphs # TODO Ardt: why read same file again?
             if self.graph_files.base_graph.file and base_graph:
-                self.graph_files.base_graph.read_graph(None)
+                self.graph_files.base_graph.read_graph()
             # adding OD nodes
             if self.origins.suffix == ".tif":
                 self.origins = self.generate_origins_from_raster()

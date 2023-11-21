@@ -116,8 +116,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         # Open the network with hazard data
         road_gdf = self.graph_files.base_network_hazard.graph
         if self.graph_files.base_network_hazard.graph is None:
-            self.graph_files.base_network_hazard.read_graph(None)
-            road_gdf = self.graph_files.base_network_hazard.graph
+            road_gdf = self.graph_files.base_network_hazard.read_graph()
 
         road_gdf.columns = rename_road_gdf_to_conventions(road_gdf.columns)
 
@@ -183,8 +182,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         effectiveness_dict = em.load_effectiveness_table()
 
         if self.graph_files.base_network_hazard.graph is None:
-            self.graph_files.base_network_hazard.read_graph(None)
-            gdf_in = self.graph_files.base_network_hazard.graph
+            gdf_in = self.graph_files.base_network_hazard.read_graph()
 
         if analysis.create_table is True:
             df = em.create_feature_table(
