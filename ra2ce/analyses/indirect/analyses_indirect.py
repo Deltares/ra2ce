@@ -1251,15 +1251,13 @@ class IndirectAnalyses:
                         index=False,
                     )
             elif analysis.analysis == "losses":
-                if self.graph_files.base_network_hazard.graph is None:
-                    gdf_in = self.graph_files.base_graph_hazard.get_graph()
-
+                gdf_in = self.graph_files.base_graph_hazard.get_graph()
                 losses = Losses(self.config, analysis)
                 df = losses.calculate_losses_from_table()
                 gdf = gdf_in.merge(df, how="left", on="LinkNr")
             elif analysis.analysis == "multi_link_isolated_locations":
                 g = self.graph_files.base_graph_hazard.get_graph()
-                gdf, df = self.multi_link_isolated_locations(g, analysis)
+                (gdf, df) = self.multi_link_isolated_locations(g, analysis)
 
                 df_path = _output_path / (
                     analysis.name.replace(" ", "_") + "_results.csv"
