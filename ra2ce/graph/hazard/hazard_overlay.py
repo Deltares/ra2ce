@@ -550,11 +550,10 @@ class HazardOverlay:
 
         Arguments:
             None
-            (implicit) : (self.graphs) : GraphFile object with the graph names as keys, and values the graphs
-                        attributes: base_graph, base_network, origins_destinations_graph
+            (implicit) : (self.graphs_files) : GraphFile object with the graph names and files as attributes
 
         Returns:
-            self.graph : same object, but with new keys _hazard, which are copies of the graphs but with hazard data
+            self.graph_files : same object, but with new graphs _hazard, which are copies of the graphs but with hazard data
 
         Effect:
             write all the objects
@@ -619,8 +618,10 @@ class HazardOverlay:
                     )
 
                     # Assign the original geometries to the reprojected raster
-                    self.graph_files.base_graph_hazard = self.get_original_geoms_graph(
-                        graph, base_graph_hazard_reprojected
+                    self.graph_files.base_graph_hazard.graph = (
+                        self.get_original_geoms_graph(
+                            graph, base_graph_hazard_reprojected
+                        )
                     )
 
                     # Clean up memory
@@ -743,7 +744,9 @@ class HazardOverlay:
             logging.info("Iterating overlay of GeoPandas Dataframe.")
             # Check if the graph needs to be reprojected
             hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
-            gdf_crs = pyproj.CRS.from_user_input(self.graph_files.base_network.crs)
+            gdf_crs = pyproj.CRS.from_user_input(
+                self.graph_files.base_network.graph.crs
+            )
 
             if (
                 hazard_crs != gdf_crs
@@ -754,9 +757,9 @@ class HazardOverlay:
                         hazard_crs, gdf_crs
                     )
                 )
-                extent_gdf = self.graph_files.base_network.total_bounds
+                extent_gdf = self.graph_files.base_network.graph.total_bounds
                 logging.info("Gdf extent before reprojecting: {}".format(extent_gdf))
-                gdf_reprojected = self.graph_files.base_network.copy().to_crs(
+                gdf_reprojected = self.graph_files.base_network.graph.copy().to_crs(
                     hazard_crs
                 )
                 extent_gdf_reprojected = gdf_reprojected.total_bounds
@@ -768,9 +771,9 @@ class HazardOverlay:
                 gdf_reprojected = self.hazard_intersect(gdf_reprojected)
 
                 # Assign the original geometries to the reprojected raster
-                original_geometries = self.graph_files.base_network["geometry"]
+                original_geometries = self.graph_files.base_network.graph["geometry"]
                 gdf_reprojected["geometry"] = original_geometries
-                self.graph_files.base_network_hazard = gdf_reprojected.copy()
+                self.graph_files.base_network_hazard.graph = gdf_reprojected.copy()
                 del gdf_reprojected
             else:
                 # read previously created file
@@ -779,7 +782,7 @@ class HazardOverlay:
                     self.graph_files.base_network_hazard.read_graph(None)
                 else:
                     self.graph_files.base_network_hazard.graph = self.hazard_intersect(
-                        self.graph_files.base_network
+                        self.graph_files.base_network.graph
                     )
 
         #### Step 4: hazard overlay of the locations that are checked for isolation ###

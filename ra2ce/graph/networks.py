@@ -212,7 +212,7 @@ class Network:
         """Handler function with the logic to call the right functions to create a network.
 
         Returns:
-            (dict): A dict of a network (GeoDataFrame) and 1 (base NetworkX graph) or 2 graphs (base NetworkX and OD graph)
+            (GraphFilesCollection): A collection of a network (GeoDataFrame) and 1 (base NetworkX graph) or 2 graphs (base NetworkX and OD graph)
         """
         # Save the 'base' network as gpickle and if the user requested, also as shapefile.
         to_save = (
