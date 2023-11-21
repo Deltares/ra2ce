@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.graph.graph_files.graph_files_enum import GraphFilesEnum
 from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
 from tests import test_data
 
@@ -27,7 +28,7 @@ class TestGraphFilesCollection:
 
     def test_set_file(self):
         # 1. Define test data
-        _type = "base_graph"
+        _type = GraphFilesEnum.BASE_GRAPH
         _file = "dummy"
         _collection = GraphFilesCollection()
 
@@ -40,16 +41,16 @@ class TestGraphFilesCollection:
     def test_set_files(self):
         # 1. Define test data
         _files = {
-            "base_graph": Path("a"),
-            "base_graph_hazard": Path("b"),
-            "origins_destinations_graph": Path("c"),
-            "origins_destinations_graph_hazard": Path("d"),
-            "base_network": Path("e"),
-            "base_network_hazard": Path("f"),
+            GraphFilesEnum.BASE_GRAPH: Path("a"),
+            GraphFilesEnum.BASE_GRAPH_HAZARD: Path("b"),
+            GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH: Path("c"),
+            GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH_HAZARD: Path("d"),
+            GraphFilesEnum.BASE_NETWORK: Path("e"),
+            GraphFilesEnum.BASE_NETWORK_HAZARD: Path("f"),
         }
 
         # 2. Execute test
-        _collection = GraphFilesCollection.set_files(_files)
+        _collection = GraphFilesCollection().set_files(_files)
 
         # 3. Verify results
         assert _collection.base_graph.file == Path("a")
