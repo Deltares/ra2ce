@@ -41,7 +41,7 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
     def __init__(self) -> None:
         self.ini_file = None
         self.config_data = AnalysisConfigData()
-        self.graph_files = None
+        self.graph_files = GraphFilesCollection()
 
     def initialize_output_dirs(self) -> None:
         """
