@@ -65,7 +65,11 @@ class GraphFilesCollection:
             GraphFileProtocol: Graph object of that specific graph_file_type
         """
         _gf = next(
-            (gf for gf in self._graph_collection if gf.file.stem == graph_file_type)
+            (
+                gf
+                for gf in self._graph_collection
+                if Path(gf.name).stem == graph_file_type
+            )
         )
         if _gf is None:
             raise ValueError(f"Unknown graph file type {graph_file_type} provided.")
