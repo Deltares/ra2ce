@@ -192,7 +192,7 @@ class Network:
             file_type: str, file_path: Path | None
         ) -> nx.MultiGraph | GeoDataFrame:
             graph = self.graph_files.get_graph(file_type)
-            if not graph:
+            if graph is None:
                 raise FileNotFoundError(
                     "No base {} file found at {}.".format(file_type, file_path)
                 )
