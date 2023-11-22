@@ -196,16 +196,11 @@ class Losses:
         #     "day_total",
         # ]
 
-        traffic_data.rename(columns=dict1, inplace=True)
-
         criticality_data = self.load_df(self.losses_input_path, "criticality_data.csv")
-        dict2 = {
-            "diff_time": "detour_time_evening",
-            "VA_RD_HWN": "detour_time_remaining",
-            "VA_OS_HWN": "detour_time_morning",
-            "VA_Etm_HWN": "detour_time_day",
-        }
-        criticality_data.rename(columns=dict2, inplace=True)
+        # criticality_data_attribute = [
+        #     "diff_time",
+        #     "diff_distance"
+        # ]
 
         vehicle_loss_hours = self.vehicle_loss_hours(self.losses_input_path / "vehicle_loss_hours.csv")
         vlh = self.calc_vlh(traffic_data, vehicle_loss_hours, criticality_data)
