@@ -213,8 +213,11 @@ class Network:
         """
         # Save the 'base' network as gpickle and if the user requested, also as shapefile.
         to_save = (
-            ["pickle"] if not self._network_config.save_gpkg else ["pickle", "shp"]
+            ["pickle"] if not self._network_config.save_gpkg else ["pickle", "gpkg"]
         )
+        od_graph = None
+        base_graph = None
+        network_gdf = None
 
         # For all graph and networks - check if it exists, otherwise, make the graph and/or network.
         if not (self.graph_files.base_graph.file or self.graph_files.base_network.file):
