@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from geopandas import GeoDataFrame
-from pandas import read_feather
+from geopandas import GeoDataFrame, read_feather
 
 from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
 
