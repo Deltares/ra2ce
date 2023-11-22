@@ -42,17 +42,15 @@ class Losses:
         self.partofday: str = analysis.partofday
 
     @staticmethod
-    def vehicle_loss_hours(path):
+    def vehicle_loss_hours(file_path: Path) -> dict:
         """This function is to calculate vehicle loss hours based on an input table
         with value of time per type of transport, usage and value_of_reliability"""
-
-        file_path = path / "vehicle_loss_hours.csv"
         df_lookup = pd.read_csv(file_path, index_col="transport_type")
         lookup_dict = df_lookup.transpose().to_dict()
         return lookup_dict
 
     @staticmethod
-    def load_df(path, file):
+    def load_df(path: Path, file: str):
         """This method reads the dataframe created from a .csv"""
         file_path = path / file
         df = pd.read_csv(file_path, index_col="LinkNr")
@@ -72,8 +70,8 @@ class Losses:
     def calc_vlh(
         self,
         traffic_data: pd.DataFrame,
-        vehicle_loss_hours: pd.Series,
-        detour_data: pd.DataFrame,
+        vehicle_loss_hours: dict,
+        criticality_data: pd.DataFrame,
     ) -> pd.DataFrame:
         vlh = pd.DataFrame(
             index=traffic_data.index,
@@ -90,10 +88,10 @@ class Losses:
 
         if self.partofday == "daily":
             intensity = traffic_data["day_total"] / 24
-            detour_time = detour_data["detour_time_day"]
+            detour_time = criticality_data["detour_time_day"]
         if self.partofday == "evening":
             intensity = traffic_data["evening_total"]
-            detour_time = detour_data["detour_time_evening"]
+            detour_time = criticality_data["detour_time_evening"]
 
         vlh = self.traffic_shockwave(vlh, capacity, intensity)
         vlh["vlh_traffic"] = vlh["vlh_traffic"].apply(
@@ -185,31 +183,31 @@ class Losses:
         """
         traffic_data = self.load_df(self.losses_input_path, "traffic_intensities.csv")
         dict1 = {
-            "AS_VTG": "evening_total",
-            "AS_FRGT": "evening_freight",
-            "AS_COMM": "evening_commute",
-            "AS_BUSS": "evening_business",
-            "AS_OTHR": "evening_other",
-            "ET_FRGT": "day_freight",
-            "ET_COMM": "day_commute",
-            "ET_BUSS": "day_business",
-            "ET_OTHR": "day_other",
-            "ET_VTG": "day_total",
-            "afstand": "distance",
-            "H_Cap": "capacity",
-            "H_Stroken": "lanes",
+            "EV_TOT": "evening_total",
+            "EV_FRGT": "evening_freight",
+            "EV_COMM": "evening_commute",
+            "EV_BUSS": "evening_business",
+            "EV_OTHR": "evening_other",
+            "D_FRGT": "day_freight",
+            "D_COMM": "day_commute",
+            "D_BUSS": "day_business",
+            "D_OTHR": "day_other",
+            "D_TOT": "day_total",
+            "distance": "distance",
+            "CAP": "capacity",
+            "lanes": "lanes",
         }
         traffic_data.rename(columns=dict1, inplace=True)
 
-        detour_data = self.load_df(_losses_input_path, "detour_data.csv")
+        criticality_data = self.load_df(self.losses_input_path, "criticality_data.csv")
         dict2 = {
-            "VA_AV_HWN": "detour_time_evening",
+            "diff_time": "detour_time_evening",
             "VA_RD_HWN": "detour_time_remaining",
             "VA_OS_HWN": "detour_time_morning",
             "VA_Etm_HWN": "detour_time_day",
         }
-        detour_data.rename(columns=dict2, inplace=True)
+        criticality_data.rename(columns=dict2, inplace=True)
 
-        vehicle_loss_hours = self.vehicle_loss_hours(_losses_input_path)
-        vlh = self.calc_vlh(traffic_data, vehicle_loss_hours, detour_data)
+        vehicle_loss_hours = self.vehicle_loss_hours(self.losses_input_path / "vehicle_loss_hours.csv")
+        vlh = self.calc_vlh(traffic_data, vehicle_loss_hours, criticality_data)
         return vlh
