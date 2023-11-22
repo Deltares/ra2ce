@@ -562,8 +562,8 @@ class HazardOverlay:
         types_to_export = ["pickle"] if not self._save_gpkg else ["pickle", "gpkg"]
 
         if (
-            not self.files["base_graph"]
-            and not self.files["origins_destinations_graph"]
+            not self.graph_files.base_graph.file
+            and not self.graph_files.origins_destinations_graph.file
         ):
             logging.warning(
                 "Either a base graph or OD graph is missing to intersect the hazard with. "
@@ -637,10 +637,10 @@ class HazardOverlay:
 
         #### Step 2: hazard overlay of the origins_destinations (NetworkX) ###
         if (
-            self.files["origins_destinations_graph"]
+            self.graph_files.origins_destinations_graph.file
             and self._origins
             and self._destinations
-            and (not self.files["origins_destinations_graph_hazard"])
+            and (not self.graph_files.origins_destinations_graph_hazard.file)
         ):
             graph = self.graph_files.origins_destinations_graph.graph
             ods = self.load_origins_destinations()
