@@ -215,9 +215,6 @@ class Network:
         to_save = (
             ["pickle"] if not self._network_config.save_gpkg else ["pickle", "gpkg"]
         )
-        od_graph = None
-        base_graph = None
-        network_gdf = None
 
         # For all graph and networks - check if it exists, otherwise, make the graph and/or network.
         if not (self.graph_files.base_graph.file or self.graph_files.base_network.file):
@@ -236,7 +233,6 @@ class Network:
             # adding OD nodes
             if self.origins.suffix == ".tif":
                 self.origins = self.generate_origins_from_raster()
-            # TODO Ardt: the next call modifies base_graph; is that intended?
             od_graph = self.add_od_nodes(base_graph, self.base_graph_crs)
             self._export_network_files(od_graph, "origins_destinations_graph", to_save)
 
