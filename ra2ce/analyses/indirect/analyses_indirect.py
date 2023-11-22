@@ -327,7 +327,7 @@ class IndirectAnalyses:
 
             graph.remove_edges_from(edges_remove)
 
-            columns = ["u", "v", "alt_dist", "alt_nodes", "connected"]
+            columns = ["u", "v", "alt_dist", "alt_time", "alt_nodes", "connected"]
 
             if "rfid" in gdf:
                 columns.insert(2, "rfid")
@@ -336,15 +336,17 @@ class IndirectAnalyses:
 
             for edges in edges_remove:
                 u, v, k, edata = edges
-
+                edges["time"] = (edges["length"]*1e-3) / edata["avgspeed"] # in hours
                 if nx.has_path(graph, u, v):
                     alt_dist = nx.dijkstra_path_length(graph, u, v, weight=analysis.weighing)
+                    alt_time = (alt_dist*1e-3) / edata["avgspeed"]  # in hours
                     alt_nodes = nx.dijkstra_path(graph, u, v)
                     connected = 1
                 else:
-                    alt_dist, alt_nodes, connected = np.NaN, np.NaN, 0
+                    alt_dist, alt_time, alt_nodes, connected = np.NaN, np.NaN, np.NaN, 0
 
-                data = {"u": [u], "v": [v], "alt_dist": [alt_dist], "alt_nodes": [alt_nodes], "connected": [connected]}
+                data = {"u": [u], "v": [v], "alt_dist": [alt_dist], "alt_time": [alt_time], "alt_nodes": [alt_nodes],
+                        "connected": [connected]}
 
                 if "rfid" in gdf:
                     data["rfid"] = [str(edata["rfid"])]
@@ -356,11 +358,15 @@ class IndirectAnalyses:
             else:
                 gdf = gdf.merge(df_calculated, how="left", on=["u", "v"])
 
-            # calculate the difference in distance
-            # previously here you would find if dist == dist which is a critical bug. Replaced by just verifying dist is a value.
+            # calculate the differences in distance and time
+            # previously here you find if dist==dist which is a critical bug. Replaced by verifying dist is a value.
             gdf["diff_dist"] = [
-                dist - length if dist else np.NaN
-                for (dist, length) in zip(gdf["alt_dist"], gdf[analysis.weighing])
+                alt - base if alt else np.NaN
+                for (alt, base) in zip(gdf["alt_dist"], gdf["distance"])
+            ]
+            gdf["diff_time"] = [
+                alt - base if alt else np.NaN
+                for (alt, base) in zip(gdf["alt_time"], gdf["time"])
             ]
 
             gdf["hazard"] = hazard_name
