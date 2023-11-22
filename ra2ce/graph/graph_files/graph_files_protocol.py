@@ -7,16 +7,25 @@ from networkx import MultiGraph
 
 @runtime_checkable
 class GraphFileProtocol(Protocol):
-    default_filename: Path
-    file: Path
+    name: str
+    folder: Path
     graph: MultiGraph | GeoDataFrame
 
-    def read_graph(self, file: Path) -> None:
+    @property
+    def file(self) -> Path | None:
+        """
+        Return the path to the graph
+
+        Returns:
+            Path | None: _description_
+        """
+
+    def read_graph(self, folder: Path) -> None:
         """
         Read a graph file
 
         Args:
-            file (Path): Path to the file
+            folder (Path): Folder of the graph
 
         Returns: None
         """

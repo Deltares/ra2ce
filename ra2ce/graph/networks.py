@@ -31,7 +31,6 @@ from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as nut
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
 from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
-from ra2ce.graph.graph_files.graph_files_enum import GraphFilesEnum
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_wrappers.network_wrapper_factory import NetworkWrapperFactory
 
@@ -141,16 +140,16 @@ class Network:
         return out_fn
 
     def _export_network_files(
-        self, network: Any, graph_type: GraphFilesEnum, types_to_export: list[str]
+        self, network: Any, graph_type: str, types_to_export: list[str]
     ):
         _exporter = NetworkExporterFactory()
         _exporter.export(
             network=network,
-            basename=graph_type.name.lower(),
+            basename=graph_type,
             output_dir=self.output_graph_dir,
             export_types=types_to_export,
         )
-        self.graph_files.set_file(graph_type, _exporter.get_pickle_path())
+        self.graph_files.set_file(_exporter.get_pickle_path())
 
     def _get_new_network_and_graph(
         self, export_types: list[str]
@@ -177,10 +176,8 @@ class Network:
         )
 
         # Save the graph and geodataframe
-        self._export_network_files(_base_graph, GraphFilesEnum.BASE_GRAPH, export_types)
-        self._export_network_files(
-            _network_gdf, GraphFilesEnum.BASE_NETWORK, export_types
-        )
+        self._export_network_files(_base_graph, "base_graph", export_types)
+        self._export_network_files(_network_gdf, "base_network", export_types)
         return (_base_graph, _network_gdf)
 
     def _get_stored_network_and_graph(
@@ -243,14 +240,12 @@ class Network:
         ):
             # reading the base graphs # TODO Ardt: why read same file again?
             if self.graph_files.base_graph.file and base_graph:
-                self.graph_files.base_graph.get_graph()
+                base_graph = self.graph_files.base_graph.get_graph()
             # adding OD nodes
             if self.origins.suffix == ".tif":
                 self.origins = self.generate_origins_from_raster()
             od_graph = self.add_od_nodes(base_graph, self.base_graph_crs)
-            self._export_network_files(
-                od_graph, GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH, to_save
-            )
+            self._export_network_files(od_graph, "origins_destinations_graph", to_save)
             self.graph_files.origins_destinations_graph.graph = od_graph
 
         return self.graph_files
