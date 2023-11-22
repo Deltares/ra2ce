@@ -38,8 +38,8 @@ from ra2ce.graph.hazard.hazard_common_functions import (
     validate_extent_graph,
 )
 from ra2ce.graph.hazard.hazard_files import HazardFiles
-from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_for_shp import (
-    HazardIntersectBuilderForShp,
+from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg import (
+    HazardIntersectBuilderForGpkg,
 )
 from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_for_table import (
     HazardIntersectBuilderForTable,
@@ -434,7 +434,7 @@ class HazardOverlay:
 
         _hazard_files = HazardFiles(
             tif=get_filtered_files(".tif"),
-            shp=get_filtered_files(".gpkg"),
+            gpkg=get_filtered_files(".gpkg"),
             table=get_filtered_files(".csv", ".json"),
         )
         return _hazard_files
@@ -451,13 +451,13 @@ class HazardOverlay:
                 ra2ce_names=self.ra2ce_names,
                 hazard_tif_files=self.hazard_files.tif,
             ).get_intersection(to_overlay)
-        elif self.hazard_files.shp:
-            return HazardIntersectBuilderForShp(
+        elif self.hazard_files.gpkg:
+            return HazardIntersectBuilderForGpkg(
                 hazard_field_name=self._hazard_field_name,
                 hazard_aggregate_wl=self._hazard_aggregate_wl,
                 hazard_names=self.hazard_names,
                 ra2ce_names=self.ra2ce_names,
-                hazard_shp_files=self.hazard_files.shp,
+                hazard_gpkg_files=self.hazard_files.gpkg,
             ).get_intersection(to_overlay)
         elif self.hazard["table"]:
             return HazardIntersectBuilderForTable(
@@ -559,11 +559,11 @@ class HazardOverlay:
             write all the objects
 
         """
-        types_to_export = ["pickle"] if not self._save_gpkg else ["pickle", "shp"]
+        types_to_export = ["pickle"] if not self._save_gpkg else ["pickle", "gpkg"]
 
         if (
-            not self.graph_files.base_graph.file
-            and not self.graph_files.origins_destinations_graph.file
+            not self.files["base_graph"]
+            and not self.files["origins_destinations_graph"]
         ):
             logging.warning(
                 "Either a base graph or OD graph is missing to intersect the hazard with. "
@@ -637,10 +637,10 @@ class HazardOverlay:
 
         #### Step 2: hazard overlay of the origins_destinations (NetworkX) ###
         if (
-            self.graph_files.origins_destinations_graph.file
+            self.files["origins_destinations_graph"]
             and self._origins
             and self._destinations
-            and not self.graph_files.origins_destinations_graph_hazard.file
+            and (not self.files["origins_destinations_graph_hazard"])
         ):
             graph = self.graph_files.origins_destinations_graph.graph
             ods = self.load_origins_destinations()
