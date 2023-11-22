@@ -56,7 +56,7 @@ class HazardOverlay:
 
     Attributes:
         network: GeoDataFrame of the network.
-        graphs: NetworkX graphs.
+        graph_files: NetworkX graphs.
     """
 
     _ra2ce_name_key = "RA2CE name"
@@ -90,7 +90,7 @@ class HazardOverlay:
         self._hazard_aggregate_wl = config.hazard.aggregate_wl
         self._hazard_directory = config.static_path.joinpath("hazard")
 
-        # graphs
+        # graph files
         self.graph_files = graph_files
 
         # files
