@@ -32,18 +32,18 @@ from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_base import (
 
 
 @dataclass
-class HazardIntersectBuilderForShp(HazardIntersectBuilderBase):
+class HazardIntersectBuilderForGpkg(HazardIntersectBuilderBase):
     hazard_field_name: str = ""
     hazard_aggregate_wl: str = ""
     hazard_names: list[str] = field(default_factory=list)
     ra2ce_names: list[str] = field(default_factory=list)
-    hazard_shp_files: list[str] = field(default_factory=list)
+    hazard_gpkg_files: list[str] = field(default_factory=list)
 
     def _from_networkx(self, hazard_overlay: Graph) -> Graph:
-        """Overlays the hazard shapefile over the road segments NetworkX graph.
+        """Overlays the hazard `gpkg` file over the road segments NetworkX graph.
 
         Args:
-            hazard_overlay (NetworkX graph): The graph that should be overlayed with the hazard shapefile(s)
+            hazard_overlay (NetworkX graph): The graph that should be overlayed with the hazard `gpkg` file(s).
 
         Returns:
             hazard_overlay (NetworkX graph): The graph with hazard shapefile(s) data joined
@@ -135,6 +135,6 @@ class HazardIntersectBuilderForShp(HazardIntersectBuilderBase):
     def _overlay_in_parallel(self, overlay_func: Callable):
         # Run in parallel to boost performance.
         Parallel(n_jobs=2, require="sharedmem")(
-            delayed(overlay_func)(self.hazard_shp_files[i], _ra2ce_name)
+            delayed(overlay_func)(self.hazard_gpkg_files[i], _ra2ce_name)
             for i, _ra2ce_name in enumerate(self.ra2ce_names)
         )
