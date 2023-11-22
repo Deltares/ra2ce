@@ -888,8 +888,11 @@ class IndirectAnalyses:
             edges_hz_direct = [
                 e
                 for e in edges
-                if (e[-1][hazard_name] > float(analysis.threshold))
-                & ("bridge" not in e[-1])
+                if e[-1][hazard_name]
+                and (
+                    (e[-1][hazard_name] > float(analysis.threshold))
+                    & ("bridge" not in e[-1])
+                )
             ]
             edges_hz_indirect = [e for e in edges if e not in edges_hz_direct]
 
