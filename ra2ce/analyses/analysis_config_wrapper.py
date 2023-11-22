@@ -22,7 +22,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analyses.analysis_config_data.analysis_config_data_validator import (
@@ -36,7 +35,7 @@ from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 class AnalysisConfigWrapper(ConfigWrapperProtocol):
     ini_file: Path
     config_data: AnalysisConfigData
-    graph_files: Optional[GraphFilesCollection]
+    graph_files: GraphFilesCollection
 
     def __init__(self) -> None:
         self.ini_file = None
