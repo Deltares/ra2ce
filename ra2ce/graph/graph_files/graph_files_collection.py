@@ -3,6 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from geopandas import GeoDataFrame
+from networkx import MultiGraph
+
 from ra2ce.graph.graph_files.graph_file import GraphFile
 from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
 from ra2ce.graph.graph_files.network_file import NetworkFile
@@ -75,7 +78,7 @@ class GraphFilesCollection:
             raise ValueError(f"Unknown graph file type {graph_file_type} provided.")
         return _gf
 
-    def get_graph(self, graph_file_type: str) -> GraphFileProtocol:
+    def get_graph(self, graph_file_type: str) -> MultiGraph | GeoDataFrame:
         """
         Get the graph
 
@@ -125,7 +128,7 @@ class GraphFilesCollection:
 
     def set_file(self, file: Path) -> None:
         """
-        Set a path to a graph via the collection based on type of graph
+        Set a path to a graph via the collection
 
         Args:
             file (Path): Path of the graph
@@ -139,6 +142,28 @@ class GraphFilesCollection:
         if _gf is None:
             raise ValueError(f"Unknown graph file {file} provided.")
         _gf.folder = file.parent
+
+    def set_graph(self, graph_file_type: str, graph: MultiGraph | GeoDataFrame):
+        """
+        Set a graph via the collection bsaed on type of graph
+
+        Args:
+            graph_file_type (str): Type of graph file
+            graph (MultiGraph | GeoDataFrame): The graph
+
+        Raises:
+            ValueError: If the graph_file_type is not one of the known types
+        """
+        _gf = next(
+            (
+                gf
+                for gf in self._graph_collection
+                if Path(gf.name).stem == graph_file_type
+            )
+        )
+        if _gf is None:
+            raise ValueError(f"Unknown graph file type {graph_file_type} provided.")
+        _gf.graph = graph
 
     def read_graph(self, file: Path) -> None:
         """

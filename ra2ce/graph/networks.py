@@ -21,13 +21,11 @@
 
 import logging
 from pathlib import Path
-from typing import Any
 
-import geopandas as gpd
 import networkx as nx
 import pyproj
+from geopandas import GeoDataFrame
 
-from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as nut
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
 from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
@@ -112,7 +110,7 @@ class Network:
             self.region_var,
         )
 
-        ods, graph = add_od_nodes(ods, graph, crs, self.od_category)
+        (ods, graph) = add_od_nodes(ods, graph, crs, self.od_category)
         ods.crs = crs
 
         # Save the OD pairs (GeoDataFrame) as pickle
@@ -140,7 +138,10 @@ class Network:
         return out_fn
 
     def _export_network_files(
-        self, network: Any, graph_type: str, types_to_export: list[str]
+        self,
+        network: nx.MultiGraph | GeoDataFrame,
+        graph_type: str,
+        types_to_export: list[str],
     ):
         _exporter = NetworkExporterFactory()
         _exporter.export(
@@ -150,10 +151,9 @@ class Network:
             export_types=types_to_export,
         )
         self.graph_files.set_file(_exporter.get_pickle_path())
+        self.graph_files.set_graph(graph_type, network)
 
-    def _get_new_network_and_graph(
-        self, export_types: list[str]
-    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+    def _get_new_network_and_graph(self, export_types: list[str]) -> None:
         (_base_graph, _network_gdf) = NetworkWrapperFactory(
             self._config_data
         ).get_network()
@@ -178,35 +178,32 @@ class Network:
         # Save the graph and geodataframe
         self._export_network_files(_base_graph, "base_graph", export_types)
         self._export_network_files(_network_gdf, "base_network", export_types)
-        return (_base_graph, _network_gdf)
 
-    def _get_stored_network_and_graph(
-        self, base_graph_filepath: Path, base_network_filepath: Path
-    ):
+    def _get_stored_network_and_graph(self) -> None:
+        base_graph_filepath = self.graph_files.base_graph.file
+        base_network_filepath = self.graph_files.base_network.file
+
         logging.info(
             "Apparently, you already did create a network with ra2ce earlier. "
             + "Ra2ce will use this: {}".format(base_graph_filepath)
         )
 
-        def check_base_file(file_type: str, file_path: Path):
-            if (
-                not isinstance(base_graph_filepath, Path)
-                or not base_graph_filepath.is_file()
-            ):
+        def read_graph(
+            file_type: str, file_path: Path | None
+        ) -> nx.MultiGraph | GeoDataFrame:
+            graph = self.graph_files.get_graph(file_type)
+            if not graph:
                 raise FileNotFoundError(
                     "No base {} file found at {}.".format(file_type, file_path)
                 )
+            return graph
 
-        check_base_file("graph", base_graph_filepath)
-        check_base_file("network", base_network_filepath)
-
-        _base_graph = GraphPickleReader().read(base_graph_filepath)
-        _network_gdf = gpd.read_feather(base_network_filepath)
+        _base_graph = read_graph("base_graph", base_graph_filepath)
+        _network_gdf = read_graph("base_network", base_network_filepath)
 
         # Assuming the same CRS for both the network and graph
         self.base_graph_crs = _network_gdf.crs
         self.base_network_crs = _network_gdf.crs
-        return _base_graph, _network_gdf
 
     def create(self) -> GraphFilesCollection:
         """Handler function with the logic to call the right functions to create a network.
@@ -218,19 +215,12 @@ class Network:
         to_save = (
             ["pickle"] if not self._network_config.save_gpkg else ["pickle", "shp"]
         )
-        od_graph = None
-        base_graph = None
-        network_gdf = None
 
         # For all graph and networks - check if it exists, otherwise, make the graph and/or network.
         if not (self.graph_files.base_graph.file or self.graph_files.base_network.file):
-            base_graph, network_gdf = self._get_new_network_and_graph(to_save)
+            self._get_new_network_and_graph(to_save)
         else:
-            base_graph, network_gdf = self._get_stored_network_and_graph(
-                self.graph_files.base_graph.file, self.graph_files.base_network.file
-            )
-        self.graph_files.base_graph.graph = base_graph
-        self.graph_files.base_network.graph = network_gdf
+            self._get_stored_network_and_graph()
 
         # create origins destinations graph
         if (
@@ -238,14 +228,13 @@ class Network:
             and (self.destinations)
             and not self.graph_files.origins_destinations_graph.file
         ):
-            # reading the base graphs # TODO Ardt: why read same file again?
-            if self.graph_files.base_graph.file and base_graph:
-                base_graph = self.graph_files.base_graph.get_graph()
+            # fetch the base graph
+            base_graph = self.graph_files.base_graph.get_graph()
             # adding OD nodes
             if self.origins.suffix == ".tif":
                 self.origins = self.generate_origins_from_raster()
+            # TODO Ardt: the next call modifies base_graph; is that intended?
             od_graph = self.add_od_nodes(base_graph, self.base_graph_crs)
             self._export_network_files(od_graph, "origins_destinations_graph", to_save)
-            self.graph_files.origins_destinations_graph.graph = od_graph
 
         return self.graph_files
