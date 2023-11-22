@@ -28,7 +28,6 @@ from typing import Optional
 
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
-from ra2ce.graph.graph_files.graph_files_enum import GraphFilesEnum
 from ra2ce.graph.hazard.hazard_overlay import HazardOverlay
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_data.network_config_data_validator import (
@@ -84,27 +83,10 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
 
     @staticmethod
     def read_graphs_from_config(static_output_dir: Path) -> GraphFilesCollection:
-        _graph_files = GraphFilesCollection()
         if not static_output_dir.exists():
             raise ValueError("Path does not exist: {}".format(static_output_dir))
         # Load graphs
-        # TODO (fix): why still read hazard as necessary if analysis of single link redundancy can run without hazard?
-        for input_graph in [
-            GraphFilesEnum.BASE_GRAPH,
-            GraphFilesEnum.BASE_GRAPH_HAZARD,
-            GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH,
-            GraphFilesEnum.ORIGINS_DESTINATIONS_GRAPH_HAZARD,
-        ]:
-            _graph_files.read_graph(static_output_dir.joinpath(f"{input_graph}.p"))
-
-        # Load networks
-        for input_graph in [
-            GraphFilesEnum.BASE_NETWORK,
-            GraphFilesEnum.BASE_NETWORK_HAZARD,
-        ]:
-            _graph_files.read_graph(
-                static_output_dir.joinpath(f"{input_graph}.feather")
-            )
+        _graph_files = GraphFilesCollection.set_files(static_output_dir)
 
         return _graph_files
 
