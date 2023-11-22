@@ -33,7 +33,7 @@ from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 class ConfigWrapperProtocol(Protocol):  # pragma: no cover
     ini_file: Path
     config_data: Optional[ConfigDataProtocol] = None
-    graphs: Optional[GraphFilesCollection] = None
+    graph_files: Optional[GraphFilesCollection] = None
 
     @classmethod
     def from_data(
