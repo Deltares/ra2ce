@@ -51,8 +51,8 @@ class IndirectAnalyses:
     """Indirect analyses that can be done with NetworkX graphs.
 
     Attributes:
-        config: A dictionary with the configuration details on how to create and adjust the network.
-        graphs: A dictionary with one or multiple NetworkX graphs.
+        config: An object with the configuration details on how to create and adjust the network.
+        graph files: An object with one or multiple NetworkX graphs.
     """
 
     config: AnalysisConfigData
@@ -76,7 +76,9 @@ class IndirectAnalyses:
             self.hazard_names_df = pd.DataFrame(data=None)
             self.config.hazard_names = list()
 
-    def single_link_redundancy(self, graph, analysis: AnalysisSectionIndirect):
+    def single_link_redundancy(
+        self, graph: nx.Graph, analysis: AnalysisSectionIndirect
+    ):
         """This is the function to analyse roads with a single link disruption and an alternative route.
 
         Args:
@@ -286,7 +288,7 @@ class IndirectAnalyses:
             )
 
     def multi_link_redundancy(
-        self, graph: GraphFilesCollection, analysis: AnalysisSectionIndirect
+        self, graph: nx.classes.MultiGraph, analysis: AnalysisSectionIndirect
     ):
         """Calculates the multi-link redundancy of a NetworkX graph.
 
@@ -597,7 +599,9 @@ class IndirectAnalyses:
             equity,
         ).optimal_route_od_link()
 
-    def multi_link_origin_destination(self, graph, analysis: AnalysisSectionIndirect):
+    def multi_link_origin_destination(
+        self, graph: nx.classes.MultiGraph, analysis: AnalysisSectionIndirect
+    ):
         """Calculates the connectivity between origins and destinations"""
         od_nodes = self._get_origin_destination_pairs(graph)
 
