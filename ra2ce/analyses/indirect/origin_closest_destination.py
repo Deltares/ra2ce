@@ -42,8 +42,8 @@ class OriginClosestDestination:
     """The origin closest destination analyses using NetworkX graphs.
 
     Attributes:
-        config: A dictionary with the configuration details on how to create and adjust the network.
-        graphs: A dictionary with one or multiple NetworkX graphs.
+        config: An object with the configuration details on how to create and adjust the network.
+        graph_files: An object with one or multiple NetworkX graphs.
     """
 
     def __init__(

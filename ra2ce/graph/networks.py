@@ -43,7 +43,7 @@ class Network:
     feather or gpickle files. Origin-destination nodes can be added.
 
     Attributes:
-        config: A dictionary with the configuration details on how to create and adjust the network.
+        config: An object with the configuration details on how to create and adjust the network.
     """
 
     def __init__(
@@ -77,7 +77,7 @@ class Network:
         self.region = _origins_destinations.region
         self.region_var = _origins_destinations.region_var
 
-        # graphs
+        # graph files
         self.graph_files = graph_files
 
     def add_od_nodes(
