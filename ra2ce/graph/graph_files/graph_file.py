@@ -26,6 +26,6 @@ class GraphFile(GraphFileProtocol):
             self.graph = _pickle_reader.read(self.file)
 
     def get_graph(self) -> MultiGraph:
-        if not self.graph:
+        if self.graph is None:
             self.read_graph(self.folder)
         return self.graph

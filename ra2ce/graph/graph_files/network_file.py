@@ -24,6 +24,6 @@ class NetworkFile(GraphFileProtocol):
             self.graph = read_feather(self.file)
 
     def get_graph(self) -> GeoDataFrame:
-        if not self.graph:
+        if self.graph is None:
             self.read_graph(self.folder)
         return self.graph
