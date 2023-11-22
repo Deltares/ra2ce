@@ -182,21 +182,20 @@ class Losses:
         #TODO: koppelen van VVU aan de directe schade berekeningen
         """
         traffic_data = self.load_df(self.losses_input_path, "traffic_intensities.csv")
-        dict1 = {
-            "EV_TOT": "evening_total",
-            "EV_FRGT": "evening_freight",
-            "EV_COMM": "evening_commute",
-            "EV_BUSS": "evening_business",
-            "EV_OTHR": "evening_other",
-            "D_FRGT": "day_freight",
-            "D_COMM": "day_commute",
-            "D_BUSS": "day_business",
-            "D_OTHR": "day_other",
-            "D_TOT": "day_total",
-            "distance": "distance",
-            "CAP": "capacity",
-            "lanes": "lanes",
-        }
+        # traffic_intensities_attributes = [
+        #     "link_id"
+        #     "evening_total",
+        #     "evening_freight",
+        #     "evening_commute",
+        #     "evening_business",
+        #     "evening_other",
+        #     "day_freight",
+        #     "day_commute",
+        #     "day_business",
+        #     "day_other",
+        #     "day_total",
+        # ]
+
         traffic_data.rename(columns=dict1, inplace=True)
 
         criticality_data = self.load_df(self.losses_input_path, "criticality_data.csv")
