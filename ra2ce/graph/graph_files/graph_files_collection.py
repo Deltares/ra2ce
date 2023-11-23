@@ -140,7 +140,7 @@ class GraphFilesCollection:
             ValueError: If the graph_file_type is not one of the known types
         """
         _gf = next(
-            (gf for gf in self._graph_collection if Path(gf.name).stem == file.stem),
+            (gf for gf in self._graph_collection if gf.name == file.name),
             None,
         )
         if _gf is None:
