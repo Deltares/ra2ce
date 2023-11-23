@@ -149,7 +149,7 @@ class GraphFilesCollection:
 
     def set_graph(self, graph_file_type: str, graph: MultiGraph | GeoDataFrame):
         """
-        Set a graph via the collection bsaed on type of graph
+        Set a graph via the collection based on type of graph
 
         Args:
             graph_file_type (str): Type of graph file
