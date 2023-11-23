@@ -50,11 +50,13 @@ class GraphFilesCollection:
         Returns:
             bool: True if any graph already read
         """
-        return any(
-            iter([x for x in self._graph_collection if x.graph is not None]),
-        )
 
-    def get_graph_file(self, graph_file_type: str) -> GraphFileProtocol:
+        def has_graph(gf: GraphFileProtocol) -> bool:
+            return gf.graph is not None
+
+        return any(filter(has_graph, self._graph_collection))
+
+    def _get_graph_file(self, graph_file_type: str) -> GraphFileProtocol:
         """
         Get the graph (object)
 
@@ -72,7 +74,8 @@ class GraphFilesCollection:
                 gf
                 for gf in self._graph_collection
                 if Path(gf.name).stem == graph_file_type
-            )
+            ),
+            None,
         )
         if _gf is None:
             raise ValueError(f"Unknown graph file type {graph_file_type} provided.")
@@ -88,7 +91,7 @@ class GraphFilesCollection:
         Returns:
             GraphFileProtocol: Graph of that specific graph_file_type
         """
-        _graph_file = self.get_graph_file(graph_file_type)
+        _graph_file = self._get_graph_file(graph_file_type)
         return _graph_file.graph
 
     def get_file(self, graph_file_type: str) -> Path | None:
@@ -101,7 +104,7 @@ class GraphFilesCollection:
         Returns:
             Path: Path to the graph file
         """
-        _graph_file = self.get_graph_file(graph_file_type)
+        _graph_file = self._get_graph_file(graph_file_type)
         return _graph_file.file
 
     @classmethod
@@ -137,7 +140,8 @@ class GraphFilesCollection:
             ValueError: If the graph_file_type is not one of the known types
         """
         _gf = next(
-            (gf for gf in self._graph_collection if Path(gf.name).stem == file.stem)
+            (gf for gf in self._graph_collection if Path(gf.name).stem == file.stem),
+            None,
         )
         if _gf is None:
             raise ValueError(f"Unknown graph file {file} provided.")
@@ -154,13 +158,7 @@ class GraphFilesCollection:
         Raises:
             ValueError: If the graph_file_type is not one of the known types
         """
-        _gf = next(
-            (
-                gf
-                for gf in self._graph_collection
-                if Path(gf.name).stem == graph_file_type
-            )
-        )
+        _gf = self._get_graph_file(graph_file_type)
         if _gf is None:
             raise ValueError(f"Unknown graph file type {graph_file_type} provided.")
         _gf.graph = graph
@@ -177,9 +175,7 @@ class GraphFilesCollection:
 
         Returns: None
         """
-        _gf = next(
-            (gf for gf in self._graph_collection if Path(gf.name).name == file.name)
-        )
+        _gf = next((gf for gf in self._graph_collection if gf.name == file.name), None)
         if _gf is None:
             raise ValueError(f"Unknown graph file {file} provided.")
         _gf.read_graph(file.parent)
