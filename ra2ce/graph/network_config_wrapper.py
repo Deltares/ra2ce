@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Optional
 
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
@@ -63,7 +62,9 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         _new_network_config = cls()
         _new_network_config.ini_file = ini_file
         _new_network_config.config_data = config_data
-        if config_data.output_graph_dir and config_data.output_graph_dir.is_dir():
+        if config_data.graph_files.has_graphs():
+            _new_network_config.graph_files = config_data.graph_files
+        elif config_data.output_graph_dir and config_data.output_graph_dir.is_dir():
             _new_network_config.graph_files = (
                 _new_network_config.get_existent_network_files(
                     config_data.output_graph_dir

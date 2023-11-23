@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
 from tests import test_data
@@ -7,9 +9,7 @@ from tests import test_data
 
 class TestGraphFilesCollection:
     def test_initialize(self):
-        # 1. Define test data
-
-        # 2. Execute test
+        # 1 - 2. Define and run test data
         _collection = GraphFilesCollection()
 
         # 3. Verify results
@@ -88,3 +88,70 @@ class TestGraphFilesCollection:
 
         # 3. Verify results
         assert _result
+
+    def test_get_graph_file_given_unknown_type_raises_value_error(self):
+        # 1. Define test data.
+        _unknown_type = "unknown_graphfile.sth"
+        _collection = GraphFilesCollection()
+
+        # 2. Run test.
+        with pytest.raises(ValueError) as exc_err:
+            _collection._get_graph_file(_unknown_type)
+
+        # 3. Verify expectations.
+        assert (
+            str(exc_err.value) == f"Unknown graph file type {_unknown_type} provided."
+        )
+
+    def test_set_file_given_unknown_graph_file_raises_value_error(self):
+        # 1. Define test data.
+        _unknown_type = "unknown_graphfile.sth"
+        _collection = GraphFilesCollection()
+        _filepath = test_data.joinpath(_unknown_type)
+
+        # 2. Run test.
+        with pytest.raises(ValueError) as exc_err:
+            _collection.set_file(_filepath)
+
+        # 3. Verify expectations.
+        assert str(exc_err.value) == f"Unknown graph file {_filepath} provided."
+
+    def test_set_graph_given_unknown_type_raises_value_error(self):
+        # 1. Define test data.
+        _unknown_type = "unknown_graphfile.sth"
+        _collection = GraphFilesCollection()
+
+        # 2. Run test.
+        with pytest.raises(ValueError) as exc_err:
+            _collection.set_graph(_unknown_type, None)
+
+        # 3. Verify expectations.
+        assert (
+            str(exc_err.value) == f"Unknown graph file type {_unknown_type} provided."
+        )
+
+    def test_set_graph_given_known_type_sets_new_graph(self):
+        # 1. Define test data.
+        _collection = GraphFilesCollection()
+        _graph_type = Path(_collection.base_graph.name).stem
+        _dummy_graph_value = "JustNotNone"
+        
+        assert _collection.base_graph.graph is None
+
+        # 2. Run test.
+        _collection.set_graph(_graph_type, _dummy_graph_value)
+
+        # 3. Verify expectations.
+        assert _collection.base_graph.graph == _dummy_graph_value
+
+    def test_read_graph_given_unknown_graph_file_raises_value_error(self):
+        _unknown_type = "unknown_graphfile.sth"
+        _collection = GraphFilesCollection()
+        _filepath = test_data.joinpath(_unknown_type)
+
+        # 2. Run test.
+        with pytest.raises(ValueError) as exc_err:
+            _collection.read_graph(_filepath)
+
+        # 3. Verify expectations.
+        assert str(exc_err.value) == f"Unknown graph file {_filepath} provided."
