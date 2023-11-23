@@ -91,8 +91,8 @@ class GraphFilesCollection:
         Returns:
             GraphFileProtocol: Graph of that specific graph_file_type
         """
-        _graph_file = self._get_graph_file(graph_file_type)
-        return _graph_file.graph
+        _gf = self._get_graph_file(graph_file_type)
+        return _gf.get_graph()
 
     def get_file(self, graph_file_type: str) -> Path | None:
         """
@@ -104,8 +104,8 @@ class GraphFilesCollection:
         Returns:
             Path: Path to the graph file
         """
-        _graph_file = self._get_graph_file(graph_file_type)
-        return _graph_file.file
+        _gf = self._get_graph_file(graph_file_type)
+        return _gf.file
 
     @classmethod
     def set_files(cls, parent_dir: Path) -> GraphFilesCollection:
