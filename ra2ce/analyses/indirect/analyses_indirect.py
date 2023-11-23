@@ -336,7 +336,7 @@ class IndirectAnalyses:
 
             for edges in edges_remove:
                 u, v, k, edata = edges
-                edata["time"] = (edata["length"]*1e-3) / edata["avgspeed"] # in hours
+                edata["time"] = (edata["length"]*1e-3) / edata["avgspeed"] # in hours and avg speed in km/h
                 if nx.has_path(graph, u, v):
                     alt_dist = nx.dijkstra_path_length(graph, u, v, weight=analysis.weighing)
                     alt_time = (alt_dist*1e-3) / edata["avgspeed"]  # in hours

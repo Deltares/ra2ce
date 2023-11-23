@@ -73,6 +73,10 @@ class Losses:
         vehicle_loss_hours: dict,
         criticality_data: pd.DataFrame,
     ) -> pd.DataFrame:
+
+        # TODO: vlh dataframe, the line are all the segments of the road network
+        # TODO: we need somehow to loop over all the vehicle types and calculate the vlh for each type (and each segment)
+
         vlh = pd.DataFrame(
             index=traffic_data.index,
             columns=[
@@ -101,6 +105,7 @@ class Losses:
             lambda x: np.where(x > self.maximum, self.maximum, x)
         )
         # all values above maximum, limit to maximum
+        #TODO: integration here of time and traffic_throughput.
         vlh["vlh_detour"] = (
             intensity * ((1 - self.traffic_throughput) * self.duration) * detour_time
         ) / 60
