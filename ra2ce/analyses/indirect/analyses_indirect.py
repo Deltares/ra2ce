@@ -43,7 +43,7 @@ from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDest
 from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
 )
-from ra2ce.common.io.readers.graph_pickle_reader import GraphPickleReader
+from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.graph.networks_utils import buffer_geometry, graph_to_gdf, graph_to_gpkg
 
 
@@ -51,20 +51,20 @@ class IndirectAnalyses:
     """Indirect analyses that can be done with NetworkX graphs.
 
     Attributes:
-        config: A dictionary with the configuration details on how to create and adjust the network.
-        graphs: A dictionary with one or multiple NetworkX graphs.
+        config: An object with the configuration details on how to create and adjust the network.
+        graph files: An object with one or multiple NetworkX graphs.
     """
 
     config: AnalysisConfigData
-    graphs: dict
+    graph_files: GraphFilesCollection
     hazard_names_df: pd.DataFrame
 
     _file_name_key = "File name"
     _ra2ce_name_key = "RA2CE name"
 
-    def __init__(self, config: AnalysisConfigData, graphs: list[Any]):
+    def __init__(self, config: AnalysisConfigData, graph_files: GraphFilesCollection):
         self.config = config
-        self.graphs = graphs
+        self.graph_files = graph_files
         if self.config.output_path.joinpath("hazard_names.xlsx").is_file():
             self.hazard_names_df = pd.read_excel(
                 self.config.output_path.joinpath("hazard_names.xlsx")
@@ -76,7 +76,9 @@ class IndirectAnalyses:
             self.hazard_names_df = pd.DataFrame(data=None)
             self.config.hazard_names = list()
 
-    def single_link_redundancy(self, graph, analysis: AnalysisSectionIndirect):
+    def single_link_redundancy(
+        self, graph: nx.Graph, analysis: AnalysisSectionIndirect
+    ):
         """This is the function to analyse roads with a single link disruption and an alternative route.
 
         Args:
@@ -285,7 +287,9 @@ class IndirectAnalyses:
                 axis=1,
             )
 
-    def multi_link_redundancy(self, graph: dict, analysis: AnalysisSectionIndirect):
+    def multi_link_redundancy(
+        self, graph: nx.classes.MultiGraph, analysis: AnalysisSectionIndirect
+    ):
         """Calculates the multi-link redundancy of a NetworkX graph.
 
         The function removes all links of a variable that have a minimum value
@@ -338,18 +342,28 @@ class IndirectAnalyses:
                 u, v, k, edata = edges
 
                 if nx.has_path(graph, u, v):
-                    alt_dist = nx.dijkstra_path_length(graph, u, v, weight=analysis.weighing)
+                    alt_dist = nx.dijkstra_path_length(
+                        graph, u, v, weight=analysis.weighing
+                    )
                     alt_nodes = nx.dijkstra_path(graph, u, v)
                     connected = 1
                 else:
                     alt_dist, alt_nodes, connected = np.NaN, np.NaN, 0
 
-                data = {"u": [u], "v": [v], "alt_dist": [alt_dist], "alt_nodes": [alt_nodes], "connected": [connected]}
+                data = {
+                    "u": [u],
+                    "v": [v],
+                    "alt_dist": [alt_dist],
+                    "alt_nodes": [alt_nodes],
+                    "connected": [connected],
+                }
 
                 if "rfid" in gdf:
                     data["rfid"] = [str(edata["rfid"])]
 
-                df_calculated = pd.concat([df_calculated, pd.DataFrame(data)], ignore_index=True)
+                df_calculated = pd.concat(
+                    [df_calculated, pd.DataFrame(data)], ignore_index=True
+                )
             # Merge the dataframes
             if "rfid" in gdf:
                 gdf = gdf.merge(df_calculated, how="left", on=["u", "v", "rfid"])
@@ -512,7 +526,7 @@ class IndirectAnalyses:
 
     @staticmethod
     def extract_od_nodes_from_graph(
-            graph: nx.classes.MultiGraph,
+        graph: nx.classes.MultiGraph,
     ) -> list[tuple[str, str]]:
         """
         Extracts all Origin - Destination nodes from the graph, prevents from entries
@@ -533,7 +547,7 @@ class IndirectAnalyses:
         return _od_nodes
 
     def _get_origin_destination_pairs(
-            self, graph: nx.classes.MultiGraph
+        self, graph: nx.classes.MultiGraph
     ) -> list[tuple[int, str], tuple[int, str]]:
         od_path = self.config.static_path.joinpath(
             "output_graph", "origin_destination_table.feather"
@@ -585,7 +599,9 @@ class IndirectAnalyses:
             equity,
         ).optimal_route_od_link()
 
-    def multi_link_origin_destination(self, graph, analysis: AnalysisSectionIndirect):
+    def multi_link_origin_destination(
+        self, graph: nx.classes.MultiGraph, analysis: AnalysisSectionIndirect
+    ):
         """Calculates the connectivity between origins and destinations"""
         od_nodes = self._get_origin_destination_pairs(graph)
 
@@ -839,7 +855,7 @@ class IndirectAnalyses:
 
         Args:
             graph (nx.Graph): The original graph representing the network, with additional hazard information.
-            analysis (dict): The configuration of the analysis, which contains the threshold for considering a hazard impact significant.
+            analysis (AnalysisSectionIndirect): The configuration of the analysis, which contains the threshold for considering a hazard impact significant.
             crs (int, optional): The coordinate reference system used for geographical data. Defaults to 4326 (WGS84).
 
         Returns:
@@ -872,8 +888,11 @@ class IndirectAnalyses:
             edges_hz_direct = [
                 e
                 for e in edges
-                if (e[-1][hazard_name] > float(analysis.threshold))
-                & ("bridge" not in e[-1])
+                if e[-1][hazard_name]
+                and (
+                    (e[-1][hazard_name] > float(analysis.threshold))
+                    & ("bridge" not in e[-1])
+                )
             ]
             edges_hz_indirect = [e for e in edges if e not in edges_hz_direct]
 
@@ -1022,7 +1041,6 @@ class IndirectAnalyses:
 
     def execute(self):
         """Executes the indirect analysis."""
-        _pickle_reader = GraphPickleReader()
         for analysis in self.config.indirect:
             logging.info(
                 f"----------------------------- Started analyzing '{analysis.name}'  -----------------------------"
@@ -1056,15 +1074,14 @@ class IndirectAnalyses:
             if analysis.weighing == "distance":
                 # The name is different in the graph.
                 analysis.weighing = "length"
-            _config_files = self.config.files
             if analysis.analysis == "single_link_redundancy":
-                g = _pickle_reader.read(_config_files["base_graph"])
+                g = self.graph_files.base_graph.get_graph()
                 gdf = self.single_link_redundancy(g, analysis)
             elif analysis.analysis == "multi_link_redundancy":
-                g = _pickle_reader.read(_config_files["base_graph_hazard"])
+                g = self.graph_files.base_graph_hazard.get_graph()
                 gdf = self.multi_link_redundancy(g, analysis)
             elif analysis.analysis == "optimal_route_origin_destination":
-                g = _pickle_reader.read(_config_files["origins_destinations_graph"])
+                g = self.graph_files.origins_destinations_graph.get_graph()
                 gdf = self.optimal_route_origin_destination(g, analysis)
 
                 if analysis.save_traffic and hasattr(
@@ -1092,16 +1109,9 @@ class IndirectAnalyses:
                     )
                     route_traffic_df.to_csv(impact_csv_path, index=False)
             elif analysis.analysis == "multi_link_origin_destination":
-                g = _pickle_reader.read(
-                    self.config.files["origins_destinations_graph_hazard"]
-                )
+                g = self.graph_files.origins_destinations_graph_hazard.get_graph()
                 gdf = self.multi_link_origin_destination(g, analysis)
-                g_not_disrupted = _pickle_reader.read(
-                    self.config.files["origins_destinations_graph_hazard"]
-                )
-                gdf_not_disrupted = self.optimal_route_origin_destination(
-                    g_not_disrupted, analysis
-                )
+                gdf_not_disrupted = self.optimal_route_origin_destination(g, analysis)
                 (
                     disruption_impact_df,
                     gdf_ori,
@@ -1134,17 +1144,13 @@ class IndirectAnalyses:
                     (analysis.name.replace(" ", "_") + "_impact_summary.csv"),
                 )
                 disruption_impact_df.to_csv(impact_csv_path, index=False)
-            elif analysis.analysis == "single_link_losses":
-                g = _pickle_reader.read(self.config.files["base_graph_hazard"])
+            elif analysis.analysis in ["single_link_losses", "multi_link_losses)"]:
+                g = self.graph_files.base_graph_hazard.get_graph()
                 gdf = self.single_link_redundancy(g, analysis)
                 gdf = self.single_link_losses(gdf, analysis)
-            elif analysis.analysis == "multi_link_losses":
-                g = _pickle_reader.read(self.config.files["base_graph_hazard"])
-                gdf = self.multi_link_redundancy(g, analysis)
-                gdf = self.multi_link_losses(gdf, analysis)
             elif analysis.analysis == "optimal_route_origin_closest_destination":
                 analyzer = OriginClosestDestination(
-                    self.config, analysis, self.hazard_names_df
+                    self.config, analysis, self.graph_files, self.hazard_names_df
                 )
                 (
                     base_graph,
@@ -1171,7 +1177,7 @@ class IndirectAnalyses:
                     opt_routes.to_csv(csv_path, index=False)
             elif analysis.analysis == "multi_link_origin_closest_destination":
                 analyzer = OriginClosestDestination(
-                    self.config, analysis, self.hazard_names_df
+                    self.config, analysis, self.graph_files, self.hazard_names_df
                 )
 
                 if analysis.calculate_route_without_disruption:
@@ -1181,10 +1187,7 @@ class IndirectAnalyses:
                         destinations,
                     ) = analyzer.optimal_route_origin_closest_destination()
 
-                    if (
-                        analyzer.config.files["origins_destinations_graph_hazard"]
-                        is None
-                    ):
+                    if self.graph_files.origins_destinations_graph_hazard.file is None:
                         origins = analyzer.load_origins()
                         opt_routes_with_hazard = gpd.GeoDataFrame(data=None)
                     else:
@@ -1247,10 +1250,7 @@ class IndirectAnalyses:
                         del opt_routes_with_hazard["geometry"]
                         opt_routes_with_hazard.to_csv(csv_path, index=False)
 
-                if (
-                    analyzer.config.files["origins_destinations_graph_hazard"]
-                    is not None
-                ):
+                if self.graph_files.origins_destinations_graph_hazard.file is not None:
                     agg_results.to_excel(
                         _output_path.joinpath(
                             analysis.name.replace(" ", "_") + "_results.xlsx"
@@ -1258,15 +1258,13 @@ class IndirectAnalyses:
                         index=False,
                     )
             elif analysis.analysis == "losses":
-                if self.graphs["base_network_hazard"] is None:
-                    gdf_in = gpd.read_feather(self.config.files["base_network_hazard"])
-
+                gdf_in = self.graph_files.base_graph_hazard.get_graph()
                 losses = Losses(self.config, analysis)
                 df = losses.calculate_losses_from_table()
                 gdf = gdf_in.merge(df, how="left", on="LinkNr")
             elif analysis.analysis == "multi_link_isolated_locations":
-                g = _pickle_reader.read(self.config.files["base_graph_hazard"])
-                gdf, df = self.multi_link_isolated_locations(g, analysis)
+                g = self.graph_files.base_graph_hazard.get_graph()
+                (gdf, df) = self.multi_link_isolated_locations(g, analysis)
 
                 df_path = _output_path / (
                     analysis.name.replace(" ", "_") + "_results.csv"
@@ -1329,9 +1327,9 @@ def save_gdf(gdf: gpd.GeoDataFrame, save_path: Path):
 
 
 def find_route_ods(
-        graph: nx.classes.MultiGraph,
-        od_nodes: list[tuple[tuple[int, str], tuple[int, str]]],
-        weighing: str,
+    graph: nx.classes.MultiGraph,
+    od_nodes: list[tuple[tuple[int, str], tuple[int, str]]],
+    weighing: str,
 ) -> gpd.GeoDataFrame:
     # create the routes between all OD pairs
     (

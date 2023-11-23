@@ -30,13 +30,14 @@ import pyproj
 from rasterstats import point_query, zonal_stats
 from tqdm import tqdm
 
-from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as ntu
 from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
+from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.graph.hazard.hazard_common_functions import (
     get_edges_geoms,
     validate_extent_graph,
 )
+from ra2ce.graph.hazard.hazard_files import HazardFiles
 from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg import (
     HazardIntersectBuilderForGpkg,
 )
@@ -54,12 +55,16 @@ class HazardOverlay:
 
     Attributes:
         network: GeoDataFrame of the network.
-        graphs: NetworkX graphs.
+        graph_files: NetworkX graphs.
     """
 
     _ra2ce_name_key = "RA2CE name"
 
-    def __init__(self, config: NetworkConfigData, graphs: dict, files: dict):
+    def __init__(
+        self,
+        config: NetworkConfigData,
+        graph_files: GraphFilesCollection,
+    ):
         # Sections properties
         self._network_file_id = config.network.file_id
         self._output_graph_dir = config.static_path.joinpath("output_graph")
@@ -84,11 +89,10 @@ class HazardOverlay:
         self._hazard_aggregate_wl = config.hazard.aggregate_wl
         self._hazard_directory = config.static_path.joinpath("hazard")
 
-        # graphs
-        self.graphs = graphs
+        # graph files
+        self.graph_files = graph_files
 
         # files
-        self.files = files
         self.hazard_files = self._get_hazard_files()
 
         # bookkeeping for the hazard map names
@@ -126,7 +130,7 @@ class HazardOverlay:
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             # Check if the hazard and graph extents overlap
-            validate_extent_graph(extent_graph, self.hazard_files["tif"][i])
+            validate_extent_graph(extent_graph, self.hazard_files.tif[i])
             # Add a no-data value for the edges that do not have a geometry
             nx.set_edge_attributes(
                 graph,
@@ -142,7 +146,7 @@ class HazardOverlay:
                 {"geometry": [edata["geometry"] for u, v, k, edata in edges_geoms]}
             )
             tqdm.pandas(desc="Graph hazard overlay with " + hn)
-            _tif_hazard_files = str(self.hazard_files["tif"][i])
+            _tif_hazard_files = str(self.hazard_files.tif[i])
             if self._hazard_aggregate_wl == "mean":
                 flood_stats = gdf.geometry.progress_apply(
                     lambda x, _files_value=_tif_hazard_files: zonal_stats(
@@ -226,11 +230,11 @@ class HazardOverlay:
 
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             # Check if the hazard and graph extents overlap
-            validate_extent_graph(extent_graph, self.hazard_files["tif"][i])
+            validate_extent_graph(extent_graph, self.hazard_files.tif[i])
 
             # Read the hazard values at the nodes and write to the nodes.
             tqdm.pandas(desc="Destinations hazard overlay with " + hn)
-            _tif_hazard_files = str(self.hazard_files["tif"][i])
+            _tif_hazard_files = str(self.hazard_files.tif[i])
             flood_stats = ods.geometry.progress_apply(
                 lambda x, _file_values=_tif_hazard_files: point_query(x, _file_values)
             )
@@ -324,7 +328,7 @@ class HazardOverlay:
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
             # Read the hazard values at the nodes and write to the nodes.
             tqdm.pandas(desc="Potentially isolated locations hazard overlay with " + hn)
-            _tif_hazard_files = str(self.hazard_files["tif"][i])
+            _tif_hazard_files = str(self.hazard_files.tif[i])
             flood_stats = gdf.geometry.progress_apply(
                 lambda x, _file_values=_tif_hazard_files: point_query(x, _file_values)
             )
@@ -417,10 +421,10 @@ class HazardOverlay:
         df["Full path"] = [haz for haz in self._hazard_map for _ in chosen_agg_types]
         return df
 
-    def _get_hazard_files(self) -> dict:
+    def _get_hazard_files(self) -> HazardFiles:
         """Sorts the hazard files into tif, shp, and csv/json
 
-        This function returns a dict of hazard files sorted per type.
+        This function returns a HazardFiles object sorted per type.
         {key = hazard file type (tif / shp / table (csv/json) : value = list of file paths}
         """
 
@@ -428,10 +432,11 @@ class HazardOverlay:
             _filter = lambda x: x.suffix in list(suffix)
             return list(filter(_filter, self._hazard_map))
 
-        _hazard_files = {}
-        _hazard_files["tif"] = get_filtered_files(".tif")
-        _hazard_files["gpkg"] = get_filtered_files(".gpkg")
-        _hazard_files["table"] = get_filtered_files(".csv", ".json")
+        _hazard_files = HazardFiles(
+            tif=get_filtered_files(".tif"),
+            gpkg=get_filtered_files(".gpkg"),
+            table=get_filtered_files(".csv", ".json"),
+        )
         return _hazard_files
 
     def hazard_intersect(
@@ -439,20 +444,20 @@ class HazardOverlay:
     ) -> gpd.GeoDataFrame | nx.classes.graph.Graph:
         """Handler function that chooses the right function for overlaying the network with the hazard data."""
         # To improve performance we need to initialize the variables
-        if self.hazard_files["tif"]:
+        if self.hazard_files.tif:
             return HazardIntersectBuilderForTif(
                 hazard_aggregate_wl=self._hazard_aggregate_wl,
                 hazard_names=self.hazard_names,
                 ra2ce_names=self.ra2ce_names,
-                hazard_tif_files=self.hazard_files["tif"],
+                hazard_tif_files=self.hazard_files.tif,
             ).get_intersection(to_overlay)
-        elif self.hazard_files["gpkg"]:
+        elif self.hazard_files.gpkg:
             return HazardIntersectBuilderForGpkg(
                 hazard_field_name=self._hazard_field_name,
                 hazard_aggregate_wl=self._hazard_aggregate_wl,
                 hazard_names=self.hazard_names,
                 ra2ce_names=self.ra2ce_names,
-                hazard_gpkg_files=self.hazard_files["gpkg"],
+                hazard_gpkg_files=self.hazard_files.gpkg,
             ).get_intersection(to_overlay)
         elif self.hazard["table"]:
             return HazardIntersectBuilderForTable(
@@ -489,15 +494,15 @@ class HazardOverlay:
         nx.set_edge_attributes(_graph_new, original_geometries, "geometry")
         return _graph_new.copy()
 
-    def _export_network_files(self, graph_name: str, types_to_export: list[str]):
+    def _export_network_files(self, graph_type: str, types_to_export: list[str]):
         _exporter = NetworkExporterFactory()
         _exporter.export(
-            network=self.graphs[graph_name],
-            basename=graph_name,
+            network=self.graph_files.get_graph(graph_type),
+            basename=graph_type,
             output_dir=self._output_graph_dir,
             export_types=types_to_export,
         )
-        self.files[graph_name] = _exporter.get_pickle_path()
+        self.graph_files.set_file(_exporter.get_pickle_path())
 
     def load_origins_destinations(self):
         od_path = self._output_graph_dir.joinpath("origin_destination_table.feather")
@@ -545,11 +550,10 @@ class HazardOverlay:
 
         Arguments:
             None
-            (implicit) : (self.graphs) : dictionary with the graph names as keys, and values the graphs
-                        keys: ['base_graph', 'base_network', 'origins_destinations_graph']
+            (implicit) : (self.graphs_files) : GraphFile object with the graph names and files as attributes
 
         Returns:
-            self.graph : same dictionary, but with new keys _hazard, which are copies of the graphs but with hazard data
+            self.graph_files : same object, but with new graphs _hazard, which are copies of the graphs but with hazard data
 
         Effect:
             write all the objects
@@ -558,8 +562,8 @@ class HazardOverlay:
         types_to_export = ["pickle"] if not self._save_gpkg else ["pickle", "gpkg"]
 
         if (
-            not self.files["base_graph"]
-            and not self.files["origins_destinations_graph"]
+            not self.graph_files.base_graph.file
+            and not self.graph_files.origins_destinations_graph.file
         ):
             logging.warning(
                 "Either a base graph or OD graph is missing to intersect the hazard with. "
@@ -568,18 +572,17 @@ class HazardOverlay:
 
         # Iterate over the three graph/network types to load the file if necessary (when not yet loaded in memory).
         for input_graph in ["base_graph", "base_network", "origins_destinations_graph"]:
-            file_path = self.files[input_graph]
-
-            if file_path is not None or self.graphs[input_graph] is not None:
-                if self.graphs[input_graph] is None and input_graph != "base_network":
-                    self.graphs[input_graph] = GraphPickleReader().read(file_path)
-                elif self.graphs[input_graph] is None and input_graph == "base_network":
-                    self.graphs[input_graph] = gpd.read_feather(file_path)
+            file_path = self.graph_files.get_file(input_graph)
+            if (
+                file_path is not None
+                and self.graph_files.get_graph(input_graph) is None
+            ):
+                self.graph_files.read_graph(file_path)
 
         #### Step 1: hazard overlay of the base graph (NetworkX) ###
-        if self.files["base_graph"]:
-            if self.files["base_graph_hazard"] is None:
-                graph = self.graphs["base_graph"]
+        if self.graph_files.base_graph.file:
+            if self.graph_files.base_graph_hazard.file is None:
+                graph = self.graph_files.base_graph.graph
 
                 # Check if the graph needs to be reprojected
                 hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
@@ -605,14 +608,18 @@ class HazardOverlay:
                     )
 
                     # Assign the original geometries to the reprojected raster
-                    self.graphs["base_graph_hazard"] = self.get_original_geoms_graph(
-                        graph, base_graph_hazard_reprojected
+                    self.graph_files.base_graph_hazard.graph = (
+                        self.get_original_geoms_graph(
+                            graph, base_graph_hazard_reprojected
+                        )
                     )
 
                     # Clean up memory
                     ntu.clean_memory([graph_reprojected, base_graph_hazard_reprojected])
                 else:
-                    self.graphs["base_graph_hazard"] = self.hazard_intersect(graph)
+                    self.graph_files.base_graph_hazard.graph = self.hazard_intersect(
+                        graph
+                    )
 
                 # Save graphs/network with hazard
                 self._export_network_files("base_graph_hazard", types_to_export)
@@ -620,12 +627,9 @@ class HazardOverlay:
                 _hazard_base_graph = self._output_graph_dir.joinpath(
                     "base_graph_hazard.p"
                 )
-                try:
-                    # Try to find the base graph hazard file
-                    self.graphs["base_graph_hazard"] = GraphPickleReader().read(
-                        _hazard_base_graph
-                    )
-                except FileNotFoundError:
+                # Try to find the base graph hazard file
+                self.graph_files.base_graph_hazard.read_graph(_hazard_base_graph.parent)
+                if not self.graph_files.base_graph_hazard.get_graph():
                     # File not found
                     logging.warning(
                         f"Base graph hazard file not found at {_hazard_base_graph}"
@@ -633,12 +637,12 @@ class HazardOverlay:
 
         #### Step 2: hazard overlay of the origins_destinations (NetworkX) ###
         if (
-            self.files["origins_destinations_graph"]
+            self.graph_files.origins_destinations_graph.file
             and self._origins
             and self._destinations
-            and (not self.files["origins_destinations_graph_hazard"])
+            and (not self.graph_files.origins_destinations_graph_hazard.file)
         ):
-            graph = self.graphs["origins_destinations_graph"]
+            graph = self.graph_files.origins_destinations_graph.graph
             ods = self.load_origins_destinations()
 
             # Check if the graph needs to be reprojected
@@ -676,9 +680,9 @@ class HazardOverlay:
                 ) = self.od_hazard_intersect(graph_reprojected, ods_reprojected)
 
                 # Assign the original geometries to the reprojected dataset
-                self.graphs[
-                    "origins_destinations_graph_hazard"
-                ] = self.get_original_geoms_graph(graph, od_graph_hazard_reprojected)
+                self.graph_files.origins_destinations_graph_hazard.graph = (
+                    self.get_original_geoms_graph(graph, od_graph_hazard_reprojected)
+                )
                 ods = ods_hazard_reprojected.to_crs(ods.crs)
 
                 # Clean up memory
@@ -693,7 +697,7 @@ class HazardOverlay:
 
             else:
                 (
-                    self.graphs["origins_destinations_graph_hazard"],
+                    self.graph_files.origins_destinations_graph_hazard.graph,
                     ods,
                 ) = self.od_hazard_intersect(graph, ods)
 
@@ -723,11 +727,16 @@ class HazardOverlay:
                 logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
 
         #### Step 3: iterate overlay of the GeoPandas Dataframe (if any) ###
-        if self.files["base_network"] and not self.files["base_network_hazard"]:
+        if (
+            self.graph_files.base_network.file
+            and not self.graph_files.base_network_hazard.file
+        ):
             logging.info("Iterating overlay of GeoPandas Dataframe.")
             # Check if the graph needs to be reprojected
             hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
-            gdf_crs = pyproj.CRS.from_user_input(self.graphs["base_network"].crs)
+            gdf_crs = pyproj.CRS.from_user_input(
+                self.graph_files.base_network.graph.crs
+            )
 
             if (
                 hazard_crs != gdf_crs
@@ -738,9 +747,11 @@ class HazardOverlay:
                         hazard_crs, gdf_crs
                     )
                 )
-                extent_gdf = self.graphs["base_network"].total_bounds
+                extent_gdf = self.graph_files.base_network.graph.total_bounds
                 logging.info("Gdf extent before reprojecting: {}".format(extent_gdf))
-                gdf_reprojected = self.graphs["base_network"].copy().to_crs(hazard_crs)
+                gdf_reprojected = self.graph_files.base_network.graph.copy().to_crs(
+                    hazard_crs
+                )
                 extent_gdf_reprojected = gdf_reprojected.total_bounds
                 logging.info(
                     "Gdf extent after reprojecting: {}".format(extent_gdf_reprojected)
@@ -750,20 +761,18 @@ class HazardOverlay:
                 gdf_reprojected = self.hazard_intersect(gdf_reprojected)
 
                 # Assign the original geometries to the reprojected raster
-                original_geometries = self.graphs["base_network"]["geometry"]
+                original_geometries = self.graph_files.base_network.graph["geometry"]
                 gdf_reprojected["geometry"] = original_geometries
-                self.graphs["base_network_hazard"] = gdf_reprojected.copy()
+                self.graph_files.base_network_hazard.graph = gdf_reprojected.copy()
                 del gdf_reprojected
             else:
                 # read previously created file
                 logging.info("Setting 'base_network_hazard' graph.")
-                if self.files["base_network_hazard"]:
-                    self.graphs["base_network_hazard"] = gpd.read_feather(
-                        self.files["base_network_hazard"]
-                    )
+                if self.graph_files.base_network_hazard.file:
+                    self.graph_files.base_network_hazard.get_graph()
                 else:
-                    self.graphs["base_network_hazard"] = self.hazard_intersect(
-                        self.graphs["base_network"]
+                    self.graph_files.base_network_hazard.graph = self.hazard_intersect(
+                        self.graph_files.base_network.graph
                     )
 
         #### Step 4: hazard overlay of the locations that are checked for isolation ###
@@ -771,13 +780,11 @@ class HazardOverlay:
             logging.info("Detected isolated locations, checking for hazard overlay.")
             locations = gpd.read_file(self._isolation_locations, engine="pyogrio")
             locations["i_id"] = locations.index
-            locations_crs = pyproj.CRS.from_user_input(locations.crs)
-            hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
 
             # get hazard at locations from network based on nearest
             logging.info("Get hazard at locations from network.")
             locations_hazard = self.get_point_hazard_from_network(
-                locations, self.graphs["base_network_hazard"]
+                locations, self.graph_files.base_network_hazard.graph
             )
 
             _exporter = NetworkExporterFactory()
@@ -793,4 +800,4 @@ class HazardOverlay:
             self._output_dir.joinpath("hazard_names.xlsx"), index=False
         )
 
-        return self.graphs
+        return self.graph_files
