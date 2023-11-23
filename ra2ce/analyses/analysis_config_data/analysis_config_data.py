@@ -137,7 +137,6 @@ class AnalysisConfigData(ConfigDataProtocol):
     static_path: Optional[Path] = None
     project: ProjectSection = field(default_factory=lambda: ProjectSection())
     analyses: list[AnalysisSectionBase] = field(default_factory=list)
-    files: dict[str, Path] = field(default_factory=dict)
     origins_destinations: Optional[OriginsDestinationsSection] = field(
         default_factory=lambda: OriginsDestinationsSection()
     )

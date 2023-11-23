@@ -25,3 +25,4 @@ jobs:
           BRANCH: jupyter-binder
           FOLDER: examples
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SQUASH_HISTORY: true

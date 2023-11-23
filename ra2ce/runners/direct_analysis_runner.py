@@ -53,5 +53,5 @@ class DirectAnalysisRunner(AnalysisRunner):
 
     def run(self, analysis_config: AnalysisConfigWrapper) -> None:
         analyses_direct.DirectAnalyses(
-            analysis_config.config_data, analysis_config.graphs
+            analysis_config.config_data, analysis_config.graph_files
         ).execute()

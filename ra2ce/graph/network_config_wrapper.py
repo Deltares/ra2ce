@@ -26,10 +26,8 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from geopandas import gpd
-
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
-from ra2ce.common.io.readers import GraphPickleReader
+from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.graph.hazard.hazard_overlay import HazardOverlay
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_config_data.network_config_data_validator import (
@@ -41,21 +39,12 @@ from ra2ce.graph.networks import Network
 class NetworkConfigWrapper(ConfigWrapperProtocol):
     ini_file: Path
     config_data: NetworkConfigData
-    graphs: Optional[dict] = None
-    files: dict[str, Path] = {}
+    graph_files: GraphFilesCollection
 
     def __init__(self) -> None:
         self.ini_file = None
         self.config_data = NetworkConfigData()
-        self.graphs = {}
-        self.files = {
-            "base_graph": None,
-            "base_network": None,
-            "base_network_hazard": None,
-            "origins_destinations_graph": None,
-            "base_graph_hazard": None,
-            "origins_destinations_graph_hazard": None,
-        }
+        self.graph_files = GraphFilesCollection()
 
     @classmethod
     def from_data(
@@ -75,8 +64,10 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         _new_network_config.ini_file = ini_file
         _new_network_config.config_data = config_data
         if config_data.output_graph_dir and config_data.output_graph_dir.is_dir():
-            _new_network_config.files = _new_network_config.get_existent_network_files(
-                config_data.output_graph_dir
+            _new_network_config.graph_files = (
+                _new_network_config.get_existent_network_files(
+                    config_data.output_graph_dir
+                )
             )
         else:
             logging.error(
@@ -85,77 +76,32 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         return _new_network_config
 
     @staticmethod
-    def get_existent_network_files(output_graph_dir: Path) -> dict:
-        """Checks if file of graph exist in network folder and adds filename to the files dict"""
-        _network_filenames = [
-            "base_graph.p",
-            "base_network.feather",
-            "origins_destinations_graph.p",
-            "base_graph_hazard.p",
-            "origins_destinations_graph_hazard.p",
-            "base_network_hazard.feather",
-        ]
-
-        def _get_file_entry(expected_file: Path) -> Optional[Path]:
-            _value = None
-            if expected_file and expected_file.is_file():
-                _value = expected_file
-                logging.info(f"Existing graph/network found: {expected_file}.")
-            return _value
-
-        return {
-            _ep.stem: _get_file_entry(_ep)
-            for _ep in map(lambda x: output_graph_dir / x, _network_filenames)
-        }
+    def get_existent_network_files(output_graph_dir: Path) -> GraphFilesCollection:
+        """Checks if file of graph exist in network folder and adds filename to the graph object"""
+        _graph_files = GraphFilesCollection()
+        return _graph_files.set_files(output_graph_dir)
 
     @staticmethod
-    def read_graphs_from_config(static_output_dir: Path) -> dict:
-        _graphs = {}
-        _pickle_reader = GraphPickleReader()
+    def read_graphs_from_config(static_output_dir: Path) -> GraphFilesCollection:
         if not static_output_dir.exists():
             raise ValueError("Path does not exist: {}".format(static_output_dir))
         # Load graphs
-        # TODO (fix): why still read hazard as neccessary if analysis of single link redundancy can run without hazard?
-        for input_graph in ["base_graph", "origins_destinations_graph"]:
-            _input_graph_filename = static_output_dir.joinpath(f"{input_graph}.p")
-            if _input_graph_filename.is_file():
-                _graphs[input_graph] = _pickle_reader.read(_input_graph_filename)
-            else:
-                _graphs[input_graph] = None
+        _graph_files = GraphFilesCollection.set_files(static_output_dir)
 
-            _hazard_filename = static_output_dir.joinpath(f"{input_graph}_hazard.p")
-            if _hazard_filename.is_file():
-                _graphs[input_graph + "_hazard"] = _pickle_reader.read(_hazard_filename)
-            else:
-                _graphs[input_graph + "_hazard"] = None
-
-        # Load networks
-        filename = static_output_dir.joinpath("base_network.feather")
-        if filename.is_file():
-            _graphs["base_network"] = gpd.read_feather(filename)
-        else:
-            _graphs["base_network"] = None
-
-        filename = static_output_dir.joinpath("base_network_hazard.feather")
-        if filename.is_file():
-            _graphs["base_network_hazard"] = gpd.read_feather(filename)
-        else:
-            _graphs["base_network_hazard"] = None
-
-        return _graphs
+        return _graph_files
 
     def configure(self) -> None:
         self.configure_network()
         self.configure_hazard()
 
     def configure_network(self) -> None:
-        network = Network(self.config_data, self.files)
-        self.graphs = network.create()
+        network = Network(self.config_data, self.graph_files)
+        self.graph_files = network.create()
 
     def configure_hazard(self) -> None:
         # Call Hazard Handler (to rework)
-        if not self.graphs:
-            self.graphs = self.read_graphs_from_config(
+        if not self.graph_files.has_graphs():
+            self.graph_files = self.read_graphs_from_config(
                 self.config_data.static_path.joinpath("output_graph")
             )
 
@@ -163,8 +109,8 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
             return
 
         # There is a hazard map or multiple hazard maps that should be intersected with the graph.
-        hazard = HazardOverlay(self.config_data, self.graphs, self.files)
-        self.graphs = hazard.create()
+        hazard = HazardOverlay(self.config_data, self.graph_files)
+        self.graph_files = hazard.create()
 
     def is_valid(self) -> bool:
         _file_is_valid = self.ini_file.is_file() and self.ini_file.suffix == ".ini"
