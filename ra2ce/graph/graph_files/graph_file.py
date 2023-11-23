@@ -9,6 +9,10 @@ from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
 
 @dataclass
 class GraphFile(GraphFileProtocol):
+    """
+    Not this class resembles NetworkFile to a large extent
+    """
+
     name: str = ""
     folder: Path = None
     graph: MultiGraph = None
