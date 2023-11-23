@@ -24,33 +24,33 @@
 import copy
 import logging
 from typing import Optional, Union
-from pathlib import Path
 
 import geopandas as gpd
 import networkx as nx
 import pandas as pd
 from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
+
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
 )
-
-from ra2ce.common.io.readers.graph_pickle_reader import GraphPickleReader
+from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 
 
 class OriginClosestDestination:
     """The origin closest destination analyses using NetworkX graphs.
 
     Attributes:
-        config: A dictionary with the configuration details on how to create and adjust the network.
-        graphs: A dictionary with one or multiple NetworkX graphs.
+        config: An object with the configuration details on how to create and adjust the network.
+        graph_files: An object with one or multiple NetworkX graphs.
     """
 
     def __init__(
         self,
         config: AnalysisConfigData,
         analysis: AnalysisSectionIndirect,
+        graph_files: GraphFilesCollection,
         hazard_names_df: pd.DataFrame,
     ):
         self.crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGEABLE
@@ -69,6 +69,7 @@ class OriginClosestDestination:
         )
         self.analysis = analysis
         self.config = config
+        self.graph_files = graph_files
 
         self.hazard_names = hazard_names_df
 
@@ -80,15 +81,9 @@ class OriginClosestDestination:
 
         self.results_dict = {}
 
-    @staticmethod
-    def read(graph_file: Path):
-        _pickle_reader = GraphPickleReader()
-        g = _pickle_reader.read(graph_file)
-        return g
-
     def optimal_route_origin_closest_destination(self):
         """Calculates per origin the location of its closest destination"""
-        graph = self.read(self.config.files["origins_destinations_graph"])
+        graph = self.graph_files.origins_destinations_graph.get_graph()
 
         # Load the origins and destinations
         origins = self.load_origins()
@@ -148,7 +143,7 @@ class OriginClosestDestination:
 
     def multi_link_origin_closest_destination(self):
         """Calculates per origin the location of its closest destination with hazard disruption"""
-        graph = self.read(self.config.files["origins_destinations_graph_hazard"])
+        graph = self.graph_files.origins_destinations_graph_hazard.get_graph()
 
         # Load the origins and destinations
         origins = self.load_origins()

@@ -114,17 +114,15 @@ class ConfigFactory:
             _network_config.files = NetworkConfigWrapper.get_existent_network_files(
                 _static_dir.joinpath("output_graph")
             )
-            _network_config.graphs = NetworkConfigWrapper.read_graphs_from_config(
+            _network_config.graph_files = NetworkConfigWrapper.read_graphs_from_config(
                 _static_dir.joinpath("output_graph")
             )
         else:
             logging.error(f"Static dir not found. Value provided: {_static_dir}")
 
         # Read network config file to get network and origin_destination settings
-        if _network_config.config_data.output_path:
-            _output_network_ini_file = _network_config.config_data.output_path.joinpath(
-                "network.ini"
-            )
+        if config_data.output_path:
+            _output_network_ini_file = config_data.output_path.joinpath("network.ini")
         else:
             _output_network_ini_file = Path()
         if _output_network_ini_file.is_file():

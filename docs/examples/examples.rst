@@ -25,5 +25,4 @@ Bellow you can access some of the main examples and go through them in an off-li
    ../_examples/example_hazard_overlay
    ../_examples/example_isolated_locations
    ../_examples/example_optimal_route_origin_destination
-   ../_examples/example_origin_destination_analysis
    ../_examples/example_ra2ce_basics_fromgpkg

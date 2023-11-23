@@ -37,6 +37,7 @@ from ra2ce.analyses.direct.damage_calculation import (
     DamageNetworkEvents,
     DamageNetworkReturnPeriods,
 )
+from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 
 
 class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
@@ -50,11 +51,11 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
     """
 
     config: AnalysisConfigData
-    graphs: dict
+    graph_files: GraphFilesCollection
 
-    def __init__(self, config: AnalysisConfigData, graphs: dict):
+    def __init__(self, config: AnalysisConfigData, graph_files: GraphFilesCollection):
         self.config = config
-        self.graphs = graphs
+        self.graph_files = graph_files
 
     def execute(self):
         """Main Coordinator of all direct damage analysis
@@ -106,23 +107,14 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         ### CONTROLLER FOR CALCULATING THE ROAD DAMAGE
 
         Arguments:
-            *analysis* (dict) : contains part of the settings from the analysis ini
+            *analysis* (AnalysisSectionDirect) : contains part of the settings from the analysis ini
 
         Returns:
             *result_gdf* (GeoDataFrame) : The original hazard dataframe with the result of the damage calculations added
 
         """
         # Open the network with hazard data
-        # Dirty fix, Todo: figure out why this key does not exist under certaint conditions
-        if (
-            "base_network_hazard" not in self.graphs
-        ):  # key is missing due to error in handler?
-            self.graphs["base_network_hazard"] = None
-
-        road_gdf = self.graphs["base_network_hazard"]
-        if self.graphs["base_network_hazard"] is None:
-            road_gdf = gpd.read_feather(self.config.files["base_network_hazard"])
-
+        road_gdf = self.graph_files.base_network_hazard.get_graph()
         road_gdf.columns = rename_road_gdf_to_conventions(road_gdf.columns)
 
         # Find the hazard columns; these may be events or return periods
@@ -186,8 +178,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         em = EffectivenessMeasures(self.config, analysis)
         effectiveness_dict = em.load_effectiveness_table()
 
-        if self.graphs["base_network_hazard"] is None:
-            gdf_in = gpd.read_feather(self.config.files["base_network_hazard"])
+        gdf_in = self.graph_files.base_network_hazard.get_graph()
 
         if analysis.create_table is True:
             df = em.create_feature_table(

@@ -1,8 +1,5 @@
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Type
-
-import pytest
-from attr import dataclass
 
 from ra2ce.analyses.analysis_config_wrapper import (
     AnalysisConfigWrapper,
