@@ -23,8 +23,9 @@ class NetworkFile(GraphFileProtocol):
         return self.folder.joinpath(self.name)
 
     def read_graph(self, folder: Path) -> None:
-        self.folder = folder
-        if self.file and self.file.is_file():
+        _file = folder.joinpath(self.name)
+        if _file and _file.is_file():
+            self.folder = folder
             self.graph = read_feather(self.file)
 
     def get_graph(self) -> GeoDataFrame:
