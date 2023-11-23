@@ -159,8 +159,6 @@ class GraphFilesCollection:
             ValueError: If the graph_file_type is not one of the known types
         """
         _gf = self._get_graph_file(graph_file_type)
-        if _gf is None:
-            raise ValueError(f"Unknown graph file type {graph_file_type} provided.")
         _gf.graph = graph
 
     def read_graph(self, file: Path) -> None:
