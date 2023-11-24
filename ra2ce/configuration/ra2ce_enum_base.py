@@ -33,4 +33,6 @@ class Ra2ceEnumBase(Enum):
         Returns:
             str: Value as known in the config.
         """
+        if self.name == "INVALID":
+            return None
         return self.name.lower()

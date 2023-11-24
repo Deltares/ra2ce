@@ -38,6 +38,7 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
 )
+from ra2ce.analyses.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analyses.indirect.losses import Losses
 from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDestination
 from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_factory import (
@@ -112,7 +113,7 @@ class IndirectAnalyses:
             if nx.has_path(graph, u, v):
                 # calculate the alternative distance if that edge is unavailable
                 alt_dist = nx.dijkstra_path_length(
-                    graph, u, v, weight=analysis.weighing
+                    graph, u, v, weight=analysis.weighing.config_value
                 )
                 alt_dist_list.append(alt_dist)
 
@@ -121,7 +122,7 @@ class IndirectAnalyses:
                 alt_nodes_list.append(alt_nodes)
 
                 # calculate the difference in distance
-                dif_dist_list.append(alt_dist - data[analysis.weighing])
+                dif_dist_list.append(alt_dist - data[analysis.weighing.config_value])
 
                 detour_exist_list.append(1)
             else:
@@ -343,7 +344,7 @@ class IndirectAnalyses:
 
                 if nx.has_path(graph, u, v):
                     alt_dist = nx.dijkstra_path_length(
-                        graph, u, v, weight=analysis.weighing
+                        graph, u, v, weight=analysis.weighing.config_value
                     )
                     alt_nodes = nx.dijkstra_path(graph, u, v)
                     connected = 1
@@ -374,7 +375,9 @@ class IndirectAnalyses:
             # previously here you would find if dist == dist which is a critical bug. Replaced by just verifying dist is a value.
             gdf["diff_dist"] = [
                 dist - length if dist else np.NaN
-                for (dist, length) in zip(gdf["alt_dist"], gdf[analysis.weighing])
+                for (dist, length) in zip(
+                    gdf["alt_dist"], gdf[analysis.weighing.config_value]
+                )
             ]
 
             gdf["hazard"] = hazard_name
@@ -1071,9 +1074,9 @@ class IndirectAnalyses:
                 )
                 graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
 
-            if analysis.weighing == "distance":
+            if analysis.weighing == WeighingEnum.DISTANCE:
                 # The name is different in the graph.
-                analysis.weighing = "length"
+                analysis.weighing = WeighingEnum.LENGTH
             if analysis.analysis == "single_link_redundancy":
                 g = self.graph_files.base_graph.get_graph()
                 gdf = self.single_link_redundancy(g, analysis)
@@ -1329,7 +1332,7 @@ def save_gdf(gdf: gpd.GeoDataFrame, save_path: Path):
 def find_route_ods(
     graph: nx.classes.MultiGraph,
     od_nodes: list[tuple[tuple[int, str], tuple[int, str]]],
-    weighing: str,
+    weighing: WeighingEnum,
 ) -> gpd.GeoDataFrame:
     # create the routes between all OD pairs
     (
@@ -1345,10 +1348,14 @@ def find_route_ods(
     for o, d in tqdm(od_nodes, desc="Finding optimal routes."):
         if nx.has_path(graph, o[0], d[0]):
             # calculate the length of the preferred route
-            pref_route = nx.dijkstra_path_length(graph, o[0], d[0], weight=weighing)
+            pref_route = nx.dijkstra_path_length(
+                graph, o[0], d[0], weight=weighing.config_value
+            )
 
             # save preferred route nodes
-            pref_nodes = nx.dijkstra_path(graph, o[0], d[0], weight=weighing)
+            pref_nodes = nx.dijkstra_path(
+                graph, o[0], d[0], weight=weighing.config_value
+            )
 
             # found out which edges belong to the preferred path
             edgesinpath = list(zip(pref_nodes[0:], pref_nodes[1:]))
@@ -1359,7 +1366,8 @@ def find_route_ods(
                 # get edge with the lowest weighing if there are multiple edges that connect u and v
                 _uv_graph = graph[u][v]
                 edge_key = sorted(
-                    _uv_graph, key=lambda x, _fgraph=_uv_graph: _fgraph[x][weighing]
+                    _uv_graph,
+                    key=lambda x, _fgraph=_uv_graph: _fgraph[x][weighing.config_value],
                 )[0]
                 _uv_graph_edge = _uv_graph[edge_key]
                 if "geometry" in _uv_graph_edge:
