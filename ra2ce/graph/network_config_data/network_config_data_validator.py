@@ -57,7 +57,6 @@ NetworkDictValues: dict[str, list[Any]] = {
     "save_csv": [True, False, None],
     "hazard_map": ["file", None],
     "aggregate_wl": ["max", "min", "mean", None],
-    "weighing": ["distance", "length", "time", None],
     "save_traffic": [True, False, None],
     "locations": ["file", None],
 }
