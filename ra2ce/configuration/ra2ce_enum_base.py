@@ -4,6 +4,10 @@ from enum import Enum
 
 
 class Ra2ceEnumBase(Enum):
+    """
+    Acts as protocol for enums defined within Ra2ce.
+    """
+
     @classmethod
     def get_enum(cls, input: str) -> Ra2ceEnumBase:
         """
