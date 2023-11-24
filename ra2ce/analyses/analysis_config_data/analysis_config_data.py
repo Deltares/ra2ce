@@ -85,7 +85,7 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     duration_event: float = math.nan
     duration_disruption: float = math.nan
     fraction_detour: float = math.nan
-    fraction_drivethrough: float = math.nan
+    fraction_drivethrough: float = 0
     rest_capacity: float = math.nan
     maximum_jam: float = math.nan
     partofday: str = ""
