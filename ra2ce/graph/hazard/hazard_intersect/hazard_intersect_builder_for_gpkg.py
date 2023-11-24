@@ -23,7 +23,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 from geopandas import GeoDataFrame, read_file, sjoin
-from joblib import Parallel, delayed
 from networkx import Graph
 from numpy import nanmean
 from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_base import (
