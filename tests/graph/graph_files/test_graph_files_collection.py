@@ -39,7 +39,9 @@ class TestGraphFilesCollection:
             _collection.set_file(_filepath)
 
         # 3. Verify expectations.
-        assert str(exc_err.value) == f"Unknown graph file {_filepath} provided."
+        assert (
+            str(exc_err.value) == f"Unknown graph file type {_filepath.stem} provided."
+        )
 
     def test_set_files(self):
         # 1. Define test data
