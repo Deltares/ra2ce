@@ -34,6 +34,7 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     IndirectAnalysisNameList,
     ProjectSection,
 )
+from ra2ce.analyses.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
 )
@@ -101,6 +102,9 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         _section.save_csv = self._parser.getboolean(
             section_name, "save_csv", fallback=_section.save_csv
+        )
+        _section.weighing = WeighingEnum.get_enum(
+            self._parser.get(section_name, "weighing")
         )
         # losses
         _section.traffic_cols = self._parser.getlist(
