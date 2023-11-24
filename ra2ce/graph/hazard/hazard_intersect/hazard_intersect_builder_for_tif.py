@@ -22,9 +22,9 @@
 from dataclasses import dataclass, field
 import logging
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Generator
 from numpy import nan
-from rasterstats import zonal_stats
+from rasterstats import gen_zonal_stats, zonal_stats
 from ra2ce.graph.hazard.hazard_common_functions import (
     get_edges_geoms,
     validate_extent_graph,
@@ -203,7 +203,7 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
             tqdm.pandas(desc="Network hazard overlay with " + hazard_name)
             _hazard_files_str = str(hazard_tif_file)
             flood_stats = hazard_overlay.geometry.progress_apply(
-                lambda x, _hz_str=_hazard_files_str: zonal_stats(
+                lambda x, _hz_str=_hazard_files_str: gen_zonal_stats(
                     x,
                     _hz_str,
                     all_touched=True,
@@ -211,9 +211,17 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                     add_stats={"mean": get_valid_mean},
                 )
             )
-            hazard_overlay[ra2ce_name + "_mi"] = [x[0]["min"] for x in flood_stats]
-            hazard_overlay[ra2ce_name + "_ma"] = [x[0]["max"] for x in flood_stats]
-            hazard_overlay[ra2ce_name + "_me"] = [x[0]["mean"] for x in flood_stats]
+
+            def _get_attributes(gen_flood_stat: Generator) -> tuple:
+                # Just get the first element of the generator
+                _flood_stat = next(gen_flood_stat)
+                return _flood_stat["min"], _flood_stat["max"], _flood_stat["mean"]
+
+            (
+                hazard_overlay[ra2ce_name + "_mi"],
+                hazard_overlay[ra2ce_name + "_ma"],
+                hazard_overlay[ra2ce_name + "_me"],
+            ) = zip(*(_get_attributes(fs) for fs in flood_stats))
 
             tqdm.pandas(desc="Network fraction with hazard overlay with " + hazard_name)
             hazard_overlay[ra2ce_name + "_fr"] = hazard_overlay.geometry.progress_apply(
