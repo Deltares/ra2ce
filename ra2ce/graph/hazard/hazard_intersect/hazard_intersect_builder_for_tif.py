@@ -35,6 +35,9 @@ from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_base import (
 
 from networkx import Graph, set_edge_attributes
 from geopandas import GeoDataFrame
+from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_parallel_run import (
+    get_hazard_parallel_process,
+)
 from ra2ce.graph.networks_utils import (
     fraction_flooded,
     get_graph_edges_extent,
@@ -231,7 +234,10 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
 
     def _overlay_in_parallel(self, overlay_func: Callable):
         # Run in parallel to boost performance.
-        Parallel(n_jobs=2, require="sharedmem")(
-            delayed(overlay_func)(self.hazard_tif_files[i], hn, rn)
-            for i, (hn, rn) in enumerate(self._combined_names)
+        get_hazard_parallel_process(
+            overlay_func,
+            lambda delayed_func: (
+                delayed_func(self.hazard_tif_files[i], hn, rn)
+                for i, (hn, rn) in enumerate(self._combined_names)
+            ),
         )
