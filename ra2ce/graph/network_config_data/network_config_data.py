@@ -28,6 +28,7 @@ from typing import Optional
 from pyproj import CRS
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
+from ra2ce.graph.network_config_data.enums.network_type_enum import NetworkTypeEnum
 from ra2ce.graph.network_config_data.enums.source_enum import SourceEnum
 
 
@@ -44,8 +45,8 @@ class NetworkSection:
     diversion_file: list[Path] = field(default_factory=list)
     file_id: str = ""
     polygon: Optional[Path] = None
-    network_type: str = ""  # Should be enum
-    road_types: list[str] = field(default_factory=list)
+    network_type: Optional[NetworkTypeEnum] = None
+    road_types: Optional[list[str]] = None
     save_gpkg: bool = False
 
 

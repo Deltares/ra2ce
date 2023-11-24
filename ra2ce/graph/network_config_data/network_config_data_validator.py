@@ -35,7 +35,6 @@ from ra2ce.graph.network_config_data.network_config_data import (
 NetworkDictValues: dict[str, list[Any]] = {
     "polygon": ["file", None],
     "directed": [True, False, None],
-    "network_type": ["walk", "bike", "drive", "drive_service", "all", None],
     "road_types": [
         "motorway",
         "motorway_link",
@@ -104,10 +103,10 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
             f"Wrong input to property [ {key} ], has to be one of: {_accepted_values}."
         )
 
-    def _validate_enum(self, enum: Ra2ceEnumBase) -> ValidationReport:
+    def _validate_enum(self, enum: Ra2ceEnumBase, key: str) -> ValidationReport:
         _report = ValidationReport()
-        if enum.name == "INVALID":
-            _report.error(self._wrong_enum("source", enum))
+        if enum == enum.INVALID:
+            _report.error(self._wrong_enum(key, enum))
         return _report
 
     def _validate_project_section(
@@ -124,14 +123,12 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
         _network_report = ValidationReport()
 
         # Validate source
-        _network_report.merge(self._validate_enum(network_section.source))
+        _network_report.merge(self._validate_enum(network_section.source, "source"))
 
         # Validate network_type
-        if (
-            network_section.network_type
-            and network_section.network_type not in NetworkDictValues["network_type"]
-        ):
-            _network_report.error(self._wrong_value("network_type"))
+        _network_report.merge(
+            self._validate_enum(network_section.network_type, "network_type")
+        )
 
         # Validate road types.
         _expected_road_types = NetworkDictValues["road_types"]

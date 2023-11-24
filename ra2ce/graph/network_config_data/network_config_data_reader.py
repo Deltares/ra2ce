@@ -1,11 +1,11 @@
 from configparser import ConfigParser
-from enum import Enum
 from pathlib import Path
 from typing import Any, Union
 
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
 )
+from ra2ce.graph.network_config_data.enums.network_type_enum import NetworkTypeEnum
 from ra2ce.graph.network_config_data.enums.source_enum import SourceEnum
 from ra2ce.graph.network_config_data.network_config_data import (
     CleanupSection,
@@ -140,15 +140,12 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
         )
         return list(map(self._get_str_as_path, _value_list))
 
-    def _get_enum(
-        self, section_name: str, property: str, enum_type: type(Enum)
-    ) -> Enum:
-        return enum_type.get_enum(self._parser.get(section_name, property))
-
     def get_network_section(self) -> NetworkSection:
         _section = "network"
         _network_section = NetworkSection(**self._parser[_section])
-        _network_section.source = self._get_enum(_section, "source", SourceEnum)
+        _network_section.source = SourceEnum.get_enum(
+            self._parser.get(_section, property)
+        )
         _network_section.primary_file = self._get_path_list(
             _section, "primary_file", _network_section.primary_file
         )
@@ -160,6 +157,9 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
         )
         _network_section.save_gpkg = self._parser.getboolean(
             _section, "save_gpkg", fallback=_network_section.save_gpkg
+        )
+        _network_section.network_type = NetworkTypeEnum.get_enum(
+            self._parser.get(_section, property)
         )
         _network_section.road_types = self._parser.getlist(
             _section, "road_types", fallback=_network_section.road_types
