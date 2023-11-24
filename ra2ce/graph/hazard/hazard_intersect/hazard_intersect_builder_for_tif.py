@@ -22,9 +22,9 @@
 from dataclasses import dataclass, field
 import logging
 from pathlib import Path
-from typing import Callable, Generator
+from typing import Callable
 from numpy import nan
-from rasterstats import gen_zonal_stats, zonal_stats
+from rasterstats import zonal_stats
 from ra2ce.graph.hazard.hazard_common_functions import (
     get_edges_geoms,
     validate_extent_graph,
@@ -41,6 +41,7 @@ from ra2ce.graph.networks_utils import (
     get_valid_mean,
 )
 from joblib import Parallel, delayed
+from tqdm import tqdm
 
 
 @dataclass
@@ -71,9 +72,9 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
             *graph* (NetworkX Graph) : NetworkX graph with hazard values
         """
         # TODO apply multiprocessing?
-        from tqdm import (
-            tqdm,  # somehow this only works when importing here and not at the top of the file
-        )
+        # from tqdm import (
+        #     tqdm,  # somehow this only works when importing here and not at the top of the file
+        # )
 
         # Verify the graph type (networkx)
         assert isinstance(hazard_overlay, Graph)
@@ -169,10 +170,6 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
         Returns:
 
         """
-        from tqdm import (
-            tqdm,  # somehow this only works when importing here and not at the top of the file
-        )
-
         assert isinstance(hazard_overlay, GeoDataFrame), "Network is not a GeoDataFrame"
 
         # Make sure none of the geometries is a nonetype object (this will raise an error in zonal_stats)
