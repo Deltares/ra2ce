@@ -45,6 +45,8 @@ class Losses:
         self.losses_input_path: Path = config.input_path.joinpath("losses")
         self.duration: float = analysis.duration_event
         self.duration_disr: float = analysis.duration_disruption
+        self.duration_disruption_steps: pd.DataFrame = self.load_df(
+            self.losses_input_path / "duration_disruption_steps.csv")
         self.detour_traffic: float = analysis.fraction_detour
         self.traffic_throughput: float = analysis.fraction_drivethrough
         self.rest_capacity: float = analysis.rest_capacity
@@ -201,7 +203,8 @@ class Losses:
         vlh = pd.DataFrame(
             index=traffic_data.index,
             columns=[
-                "",
+                "disruption_duration",
+                "disruption_recovery"
                 "vlh_detour_business",
                 "vlh_detour_commute",
                 "vlh_detour_freight",
@@ -213,14 +216,15 @@ class Losses:
         )
         diff_event_disr = self.duration - self.duration_disr
 
-        prefix = partofday_prefixes.get(self.partofday, None)
+        duration_disruption_steps = []
+        partofday_prefix = partofday_prefixes.get(self.partofday, None)
 
-        if prefix:
-            intensity_business = traffic_data[f"{prefix}_business"] / 24
-            intensity_commute = traffic_data[f"{prefix}_commute"] / 24
-            intensity_freight = traffic_data[f"{prefix}_freight"] / 24
-            intensity_other = traffic_data[f"{prefix}_other"] / 24
-            intensity_total = traffic_data[f"{prefix}_total"] / 24
+        if partofday_prefix:
+            intensity_business = traffic_data[f"{partofday_prefix}_business"] / 24
+            intensity_commute = traffic_data[f"{partofday_prefix}_commute"] / 24
+            intensity_freight = traffic_data[f"{partofday_prefix}_freight"] / 24
+            intensity_other = traffic_data[f"{partofday_prefix}_other"] / 24
+            intensity_total = traffic_data[f"{partofday_prefix}_total"] / 24
         else:
             intensity_business = intensity_commute = intensity_freight = intensity_other = intensity_total = None
 
@@ -346,3 +350,8 @@ class Losses:
 
         vlh = self.calc_vlh(traffic_data, values_of_time, criticality_data)
         return vlh
+
+# relevant duration_disruption_steps_attributes = [
+#   
+#
+# ]
