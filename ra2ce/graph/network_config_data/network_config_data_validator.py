@@ -19,6 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from enum import Enum
 from typing import Any
 
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
@@ -31,7 +32,6 @@ from ra2ce.graph.network_config_data.network_config_data import (
 )
 
 NetworkDictValues: dict[str, list[Any]] = {
-    "source": ["OSM PBF", "OSM download", "shapefile", "pickle"],
     "polygon": ["file", None],
     "directed": [True, False, None],
     "network_type": ["walk", "bike", "drive", "drive_service", "all", None],
@@ -94,6 +94,18 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
             f"Wrong input to property [ {key} ], has to be one of: {_accepted_values}."
         )
 
+    def _wrong_enum(self, key: str, enum: Enum) -> str:
+        _accepted_values = ",".join([member.name for member in enum].pop(-1))
+        return (
+            f"Wrong input to property [ {key} ], has to be one of: {_accepted_values}."
+        )
+
+    def _validate_enum(self, enum: Enum) -> ValidationReport:
+        _report = ValidationReport()
+        if enum.name == "INVALID":
+            _report.error(self._wrong_enum("source"))
+        return _report
+
     def _validate_project_section(
         self, project_section: ProjectSection
     ) -> ValidationReport:
@@ -108,11 +120,7 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
         _network_report = ValidationReport()
 
         # Validate source
-        if (
-            network_section.source
-            and network_section.source not in NetworkDictValues["source"]
-        ):
-            _network_report.error(self._wrong_value("source"))
+        _network_report.merge(self._validate_enum(network_section.source))
 
         # Validate network_type
         if (
