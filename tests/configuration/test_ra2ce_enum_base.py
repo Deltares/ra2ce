@@ -46,6 +46,7 @@ class TestRa2ceEnumBase:
         [
             pytest.param(MockEnum.FIRST, "first", id="simple"),
             pytest.param(MockEnum.SECOND_ITEM, "second_item", id="with underscore"),
+            pytest.param(MockEnum.INVALID, None, id="invalid"),
         ],
     )
     def test_get_config_value(self, enum: Ra2ceEnumBase, expected_value: str):

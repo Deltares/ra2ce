@@ -2,6 +2,7 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
 )
+from ra2ce.analyses.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDestination
 from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.graph.network_config_data.network_config_data import (
@@ -24,7 +25,7 @@ class TestOriginClosestDestination:
             ),
             network=NetworkSection(file_id=""),
         )
-        _analysis = AnalysisSectionIndirect(threshold="", weighing="")
+        _analysis = AnalysisSectionIndirect(threshold="", weighing=WeighingEnum.INVALID)
         _graph_files = GraphFilesCollection()
         _hazard_names = None
 

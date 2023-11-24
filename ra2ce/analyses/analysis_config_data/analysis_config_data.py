@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+from ra2ce.analyses.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.graph.network_config_data.network_config_data import (
     NetworkSection,
@@ -76,7 +77,7 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     """
 
     # general
-    weighing: str = ""  # should be enum
+    weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.INVALID)
     loss_per_distance: str = ""
     loss_type: str = ""  # should be enum
     disruption_per_category: str = ""
