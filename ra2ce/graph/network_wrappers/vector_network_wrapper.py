@@ -143,6 +143,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             digraph.add_edge(
                 from_node,
                 to_node,
+                avgspeed=row.pop("avgspeed"),
                 geometry=row.pop(
                     "geometry"
                 ),  # **row TODO: check if we do need all columns
