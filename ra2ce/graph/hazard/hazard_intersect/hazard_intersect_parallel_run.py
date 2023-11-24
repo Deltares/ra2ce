@@ -24,7 +24,9 @@ from joblib import Parallel, delayed
 from typing import Callable
 
 
-def get_hazard_parallel_process(delegated_func: Callable, func_iterable: Callable) -> None:
+def get_hazard_parallel_process(
+    delegated_func: Callable, func_iterable: Callable
+) -> None:
     """
     Runs in parallel a delegated process which will consume using the `delayed` method together
     with its associated parameters to retrieve from `func_iterable`.
