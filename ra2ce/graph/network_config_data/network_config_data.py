@@ -29,6 +29,7 @@ from pyproj import CRS
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.graph.network_config_data.enums.source_enum import SourceEnum
 
 
 @dataclass
@@ -39,7 +40,7 @@ class ProjectSection:
 @dataclass
 class NetworkSection:
     directed: bool = False
-    source: str = ""  # should be enum
+    source: SourceEnum = field(default_factory=lambda: SourceEnum["INVALID"])
     primary_file: list[Path] = field(default_factory=list)
     diversion_file: list[Path] = field(default_factory=list)
     file_id: str = ""
