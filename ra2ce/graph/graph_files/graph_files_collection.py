@@ -13,6 +13,11 @@ from ra2ce.graph.graph_files.network_file import NetworkFile
 
 @dataclass
 class GraphFilesCollection:
+    """
+    Class containing a collection of the graphs and the paths to the files.
+    The names of the graph file are assumed to be standardized (e.g. "base_graph.p").
+    """
+
     base_graph: GraphFile = field(
         default_factory=lambda: GraphFile(name="base_graph.p")
     )
@@ -139,12 +144,7 @@ class GraphFilesCollection:
         Raises:
             ValueError: If the graph_file_type is not one of the known types
         """
-        _gf = next(
-            (gf for gf in self._graph_collection if gf.name == file.name),
-            None,
-        )
-        if _gf is None:
-            raise ValueError(f"Unknown graph file {file} provided.")
+        _gf = self._get_graph_file(file.stem)
         _gf.folder = file.parent
 
     def set_graph(self, graph_file_type: str, graph: MultiGraph | GeoDataFrame):
