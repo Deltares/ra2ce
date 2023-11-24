@@ -203,7 +203,7 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
             tqdm.pandas(desc="Network hazard overlay with " + hazard_name)
             _hazard_files_str = str(hazard_tif_file)
             flood_stats = hazard_overlay.geometry.progress_apply(
-                lambda x, _hz_str=_hazard_files_str: gen_zonal_stats(
+                lambda x, _hz_str=_hazard_files_str: zonal_stats(
                     x,
                     _hz_str,
                     all_touched=True,
@@ -212,16 +212,16 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                 )
             )
 
-            def _get_attributes(gen_flood_stat: Generator) -> tuple:
+            def _get_attributes(gen_flood_stat: list[dict]) -> tuple:
                 # Just get the first element of the generator
-                _flood_stat = next(gen_flood_stat)
+                _flood_stat = gen_flood_stat[0]
                 return _flood_stat["min"], _flood_stat["max"], _flood_stat["mean"]
 
             (
                 hazard_overlay[ra2ce_name + "_mi"],
                 hazard_overlay[ra2ce_name + "_ma"],
                 hazard_overlay[ra2ce_name + "_me"],
-            ) = zip(*(_get_attributes(fs) for fs in flood_stats))
+            ) = zip(*map(_get_attributes, flood_stats))
 
             tqdm.pandas(desc="Network fraction with hazard overlay with " + hazard_name)
             hazard_overlay[ra2ce_name + "_fr"] = hazard_overlay.geometry.progress_apply(
