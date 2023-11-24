@@ -24,6 +24,7 @@ from typing import Any
 
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
+from ra2ce.graph.network_config_data.enums.source_enum import SourceEnum
 from ra2ce.graph.network_config_data.network_config_data import (
     HazardSection,
     NetworkConfigData,
@@ -70,7 +71,7 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
     def _validate_shp_input(self, network_config: NetworkSection) -> ValidationReport:
         """Checks if a file id is configured when using the option to create network from shapefile"""
         _shp_report = ValidationReport()
-        if network_config.source == "shapefile" and not network_config.file_id:
+        if network_config.source == SourceEnum.SHAPEFILE and not network_config.file_id:
             _shp_report.error(
                 "Not possible to create network - Shapefile used as source, but no file_id configured in the network.ini file"
             )
@@ -89,13 +90,14 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
         return _report
 
     def _wrong_value(self, key: str) -> str:
-        _accepted_values = ",".join(NetworkDictValues[key])
+        _accepted_values = ", ".join(NetworkDictValues[key])
         return (
             f"Wrong input to property [ {key} ], has to be one of: {_accepted_values}."
         )
 
     def _wrong_enum(self, key: str, enum: Enum) -> str:
-        _accepted_values = ",".join([member.name for member in enum].pop(-1))
+        # Remove last value INVALID
+        _accepted_values = ", ".join([member.old_name for member in type(enum)][:-1])
         return (
             f"Wrong input to property [ {key} ], has to be one of: {_accepted_values}."
         )
@@ -103,7 +105,7 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
     def _validate_enum(self, enum: Enum) -> ValidationReport:
         _report = ValidationReport()
         if enum.name == "INVALID":
-            _report.error(self._wrong_enum("source"))
+            _report.error(self._wrong_enum("source", enum))
         return _report
 
     def _validate_project_section(
