@@ -136,6 +136,8 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         # to graph
         digraph = nx.DiGraph(crs=gdf.crs, approach="primal")
         for _, row in gdf.iterrows():
+            link_id = row.get("link_id", None)
+
             from_node = row.geometry.coords[0]
             to_node = row.geometry.coords[-1]
             digraph.add_node(from_node, geometry=Point(from_node))
@@ -143,6 +145,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             digraph.add_edge(
                 from_node,
                 to_node,
+                link_id=link_id,
                 avgspeed=row.pop("avgspeed"),
                 geometry=row.pop(
                     "geometry"
