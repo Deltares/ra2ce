@@ -19,9 +19,6 @@ class SourceEnum(Ra2ceEnumBase):
 
     @property
     def config_value(self) -> str:
-        """
-        Converts the enum name back to the input name
-        """
         _parts = self.name.split("_")
         return " ".join(
             [_part if len(_part) == 3 else _part.lower() for _part in _parts]
