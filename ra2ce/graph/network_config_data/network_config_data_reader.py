@@ -143,14 +143,7 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
     def _get_enum(
         self, section_name: str, property: str, enum_type: type(Enum)
     ) -> Enum:
-        def _str_to_enum(input: str) -> str:
-            return input.replace(" ", "_").upper()
-
-        try:
-            _enum = enum_type[_str_to_enum(self._parser.get(section_name, property))]
-        except KeyError:
-            _enum = enum_type["INVALID"]
-        return _enum
+        return enum_type.get_enum(self._parser.get(section_name, property))
 
     def get_network_section(self) -> NetworkSection:
         _section = "network"

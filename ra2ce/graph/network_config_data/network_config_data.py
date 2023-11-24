@@ -39,7 +39,7 @@ class ProjectSection:
 @dataclass
 class NetworkSection:
     directed: bool = False
-    source: SourceEnum = field(default_factory=lambda: SourceEnum["INVALID"])
+    source: SourceEnum = field(default_factory=lambda: SourceEnum.INVALID)
     primary_file: list[Path] = field(default_factory=list)
     diversion_file: list[Path] = field(default_factory=list)
     file_id: str = ""
