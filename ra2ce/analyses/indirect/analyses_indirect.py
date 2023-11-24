@@ -586,7 +586,7 @@ class IndirectAnalyses:
     ) -> gpd.GeoDataFrame:
         # create list of origin-destination pairs
         od_nodes = self._get_origin_destination_pairs(graph)
-        pref_routes = find_route_ods(graph, od_nodes, analysis.weighing)
+        pref_routes = find_route_ods(graph, od_nodes, analysis.weighing.config_value)
         return pref_routes
 
     def optimal_route_od_link(
@@ -634,7 +634,9 @@ class IndirectAnalyses:
             # igraph_hz = ig.Graph.from_networkx(igraph_hz)
 
             # Find the routes
-            od_routes = find_route_ods(graph_hz, od_nodes, analysis.weighing)
+            od_routes = find_route_ods(
+                graph_hz, od_nodes, analysis.weighing.config_value
+            )
             od_routes["hazard"] = hazard_name
             all_results.append(od_routes)
 
@@ -1332,7 +1334,7 @@ def save_gdf(gdf: gpd.GeoDataFrame, save_path: Path):
 def find_route_ods(
     graph: nx.classes.MultiGraph,
     od_nodes: list[tuple[tuple[int, str], tuple[int, str]]],
-    weighing: WeighingEnum,
+    weighing: str,
 ) -> gpd.GeoDataFrame:
     # create the routes between all OD pairs
     (
@@ -1348,14 +1350,10 @@ def find_route_ods(
     for o, d in tqdm(od_nodes, desc="Finding optimal routes."):
         if nx.has_path(graph, o[0], d[0]):
             # calculate the length of the preferred route
-            pref_route = nx.dijkstra_path_length(
-                graph, o[0], d[0], weight=weighing.config_value
-            )
+            pref_route = nx.dijkstra_path_length(graph, o[0], d[0], weight=weighing)
 
             # save preferred route nodes
-            pref_nodes = nx.dijkstra_path(
-                graph, o[0], d[0], weight=weighing.config_value
-            )
+            pref_nodes = nx.dijkstra_path(graph, o[0], d[0], weight=weighing)
 
             # found out which edges belong to the preferred path
             edgesinpath = list(zip(pref_nodes[0:], pref_nodes[1:]))
@@ -1367,7 +1365,7 @@ def find_route_ods(
                 _uv_graph = graph[u][v]
                 edge_key = sorted(
                     _uv_graph,
-                    key=lambda x, _fgraph=_uv_graph: _fgraph[x][weighing.config_value],
+                    key=lambda x, _fgraph=_uv_graph: _fgraph[x][weighing],
                 )[0]
                 _uv_graph_edge = _uv_graph[edge_key]
                 if "geometry" in _uv_graph_edge:
