@@ -56,7 +56,7 @@ class TestNetworkIniConfigurationValidator:
         # 1. Define test data.
         _expected_err = "Not possible to create network - Shapefile used as source, but no file_id configured in the network.ini file"
         _test_config_data = NetworkConfigData(
-            network=NetworkSection(source="shapefile")
+            network=NetworkSection(source=SourceEnum.SHAPEFILE)
         )
 
         # 2. Run test.
