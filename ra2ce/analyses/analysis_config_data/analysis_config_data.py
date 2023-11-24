@@ -89,6 +89,8 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     rest_capacity: float = math.nan
     maximum_jam: float = math.nan
     partofday: str = ""
+    resilience_curve_file: str = ""
+    disruption_steps_file: str = ""
     # accessiblity analyses
     aggregate_wl: str = ""  # should be enum
     threshold: float = math.nan

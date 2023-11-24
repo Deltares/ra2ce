@@ -18,10 +18,13 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+from ast import literal_eval
 from pathlib import Path
+from typing import Optional
+
 import numpy as np
 import pandas as pd
+import geopandas as gpd
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
@@ -39,19 +42,26 @@ trip_types = [
     "other"
 ]
 
+road_types = ["motorway", "primary", "secondary", "tertiary", "residential", "secondary_unpaved",
+              "tertiary_unpaved", "residential_unpaved", "tunnel", "bridge", "culvert"]
+
 
 class Losses:
     def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionIndirect):
         self.losses_input_path: Path = config.input_path.joinpath("losses")
         self.duration: float = analysis.duration_event
         self.duration_disr: float = analysis.duration_disruption
-        self.duration_disruption_steps: pd.DataFrame = self.load_df(
-            self.losses_input_path / "duration_disruption_steps.csv")
         self.detour_traffic: float = analysis.fraction_detour
         self.traffic_throughput: float = analysis.fraction_drivethrough
         self.rest_capacity: float = analysis.rest_capacity
         self.maximum: float = analysis.maximum_jam
         self.partofday: str = analysis.partofday
+        self.network: gpd.GeoDataFrame = self.load_gdf(self.losses_input_path, "network.geojson")
+        self.traffic_data = self.load_df_from_csv(self.losses_input_path, "traffic_intensities.csv")  # per day
+        self.criticality_data = self.load_df_from_csv(self.losses_input_path, "criticality_data.csv")
+        self.resilience_curve = self.load_df_from_csv(self.losses_input_path, analysis.resilience_curve_file, "",
+                                                      ["disruption_steps", "functionality_loss_ratio"])
+        self.values_of_time = self.load_df_from_csv(self.losses_input_path, "values_of_time.csv", "")
 
     @staticmethod
     def values_of_time(file_path: Path) -> dict:
@@ -62,11 +72,24 @@ class Losses:
         return lookup_dict
 
     @staticmethod
-    def load_df(path: Path, file: str):
+    def load_df_from_csv(path: Path, file: str, index_col: str = "link_id", columns_to_interpret=None):
+        if columns_to_interpret is None:
+            columns_to_interpret = []
+        file_path = path / file
+        if len(index_col) == 0:
+            df = pd.read_csv(file_path)
+        else:
+            df = pd.read_csv(file_path, index_col=index_col)
+        if len(columns_to_interpret) > 0:
+            df[columns_to_interpret] = df[columns_to_interpret].applymap(literal_eval)
+        return df
+
+    @staticmethod
+    def load_gdf(path: Path, file: str):
         """This method reads the dataframe created from a .csv"""
         file_path = path / file
-        df = pd.read_csv(file_path, index_col="link_id")
-        return df
+        gdf = gpd.read_file(file_path, index_col="link_id")
+        return gdf
 
     def traffic_shockwave(
             self, vlh: pd.DataFrame, capacity: pd.Series, intensity: pd.Series
@@ -193,18 +216,17 @@ class Losses:
     def calc_vlh(
             self,
             traffic_data: pd.DataFrame,
-            values_of_time: dict,
             criticality_data: pd.DataFrame,
     ) -> pd.DataFrame:
 
         # TODO: vlh dataframe, the line are all the segments of the road network
         # TODO: we need somehow to loop over all the vehicle types and calculate the vlh for each type(and each segment)
-
+        #
         vlh = pd.DataFrame(
             index=traffic_data.index,
             columns=[
-                "disruption_duration",
-                "disruption_recovery"
+                "link_type",
+                "inundation_height"
                 "vlh_detour_business",
                 "vlh_detour_commute",
                 "vlh_detour_freight",
@@ -214,11 +236,8 @@ class Losses:
                 "currency_vlh",
             ],
         )
-        diff_event_disr = self.duration - self.duration_disr
-
-        duration_disruption_steps = []
+        # read the intensities
         partofday_prefix = partofday_prefixes.get(self.partofday, None)
-
         if partofday_prefix:
             intensity_business = traffic_data[f"{partofday_prefix}_business"] / 24
             intensity_commute = traffic_data[f"{partofday_prefix}_commute"] / 24
@@ -228,85 +247,30 @@ class Losses:
         else:
             intensity_business = intensity_commute = intensity_freight = intensity_other = intensity_total = None
 
-        detour_time = criticality_data["diff_time"]
+        # Read the performance_change stating the functionality drop
+        performance_change = criticality_data["diff_time"]
 
-        # vlh = self.traffic_shockwave(vlh, capacity, intensity) vlh["vlh_traffic"]
+        # find the link_type and the inundation height
+        vlh = pd.merge(vlh, self.network[['link_id', 'link_type']], left_index=True, right_on='link_id')
 
-        # TODO: integration here of time and traffic_throughput.
-        # ToDo: differentiate between types of vehicle
-        # ToDo: add stepwise event duration and recovery % introduced by the user:
-        #  duration = [x, y, z], recovery = [a%, b%, c%]
-        for trip_type in trip_types:
-            trip_intensity = f"intensity_{trip_type}"
-            intensity_column = globals().get(trip_intensity, None)
-            if intensity_column is not None:
-                vlh[f"vlh_detour_{trip_type}"] = (intensity_column * ((1 - self.traffic_throughput) * self.duration) *
-                                                  vlh[f"detour_time_{trip_type}"]) / 60
-        duration = get_duration()
+        events = self.criticality_data.filter(regex='^EV')
+        vlh = pd.merge(vlh, self.criticality_data[['link_id'] + list(events.columns)],
+                       left_index=True, right_on='link_id')
 
-        if (
-                diff_event_disr > 0
-        ):  # when the event is done, but the disruption continues after the event. Calculate extra detour times
-            temp = (
-                    diff_event_disr * (detour_time * self.detour_traffic * detour_time) / 60
-            )
-            temp = temp.apply(
-                lambda x: np.where(x < 0, 0, x)
-            )  # all values below 0 -> 0
-            vlh["vlh_detour"] = vlh["vlh_detour"] + temp
+        for link_id, vlh_row in vlh.iterrows():
+            for trip_type in trip_types:
+                variable_name = f"vot_{trip_type}"
+                globals()[variable_name] = \
+                    self.values_of_time.loc[self.values_of_time["trip_types"] == trip_type, "value_of_time"].item()
 
-        vlh["vlh_total"] = vlh["vlh_traffic"] + vlh["vlh_detour"]
+                trip_intensity = f"intensity_{trip_type}"
+                intensity_column = globals().get(trip_intensity, None)
+                if intensity_column is not None:
+                    # vlh[f"vlh_detour_{trip_type}"] = (intensity_column * (
+                    #             (1 - self.traffic_throughput) * self.duration) *
+                    #                                   vlh[f"detour_time_{trip_type}"]) / 60
+                    pass
 
-        if self.partofday == "daily":
-            vlh["currency_per_hour"] = (
-                    (
-                            traffic_data["day_freight"]
-                            / traffic_data["day_total"]
-                            * values_of_time["freight"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["day_commute"]
-                            / traffic_data["day_total"]
-                            * values_of_time["commute"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["day_business"]
-                            / traffic_data["day_total"]
-                            * values_of_time["business"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["day_other"]
-                            / traffic_data["day_total"]
-                            * values_of_time["other"]["value_of_time"]
-                    )
-            )
-            # to calculate costs per unit traffi per hour. This is weighted based on the traffic mix and value of each traffic type
-
-        if self.partofday == "evening":
-            vlh["currency_per_hour"] = (
-                    (
-                            traffic_data["evening_freight"]
-                            / traffic_data["evening_total"]
-                            * values_of_time["freight"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["evening_commute"]
-                            / traffic_data["evening_total"]
-                            * values_of_time["commute"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["evening_business"]
-                            / traffic_data["evening_total"]
-                            * values_of_time["business"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["evening_other"]
-                            / traffic_data["evening_total"]
-                            * values_of_time["other"]["value_of_time"]
-                    )
-            )
-            # to calculate costs per unit traffi per hour. This is weighted based on the traffic mix and value of each traffic type
-        vlh["currency_vlh"] = vlh["currency_per_hour"] * vlh["vlh_total"]
         return vlh
 
     def calculate_losses_from_table(self):
@@ -317,41 +281,51 @@ class Losses:
         #TODO: if yes: read gdf
         #TODO: koppelen van VVU aan de directe schade berekeningen
         """
-        traffic_data = self.load_df(self.losses_input_path, "traffic_intensities.csv")  # intensities per day
-        # relevant traffic_intensities_attributes = [
-        #     "link_id"
-        #     "evening_total",
-        #     "evening_freight",
-        #     "evening_commute",
-        #     "evening_business",
-        #     "evening_other",
-        #     "day_freight",
-        #     "day_commute",
-        #     "day_business",
-        #     "day_other",
-        #     "day_total",
-        # ]
-
-        criticality_data = self.load_df(self.losses_input_path, "criticality_data.csv")
-        # relevant criticality_data_attributes = [
-        #     "link_id",
-        #     "alt_dist", (km)
-        #     "alt_time", (hr)
-        #     "diff_dist", (km)
-        #     "diff_time", (hr)
-        # ]
-
-        values_of_time = self.values_of_time(self.losses_input_path / "values_of_time.csv")
-        # relevant values_of_time = [
-        #     "transport_type",
-        #     "value_of_time",
-        #     "occupants",
-        # ]
-
-        vlh = self.calc_vlh(traffic_data, values_of_time, criticality_data)
+        vlh = self.calc_vlh(self.traffic_data, self.values_of_time, self.criticality_data)
         return vlh
 
-# relevant duration_disruption_steps_attributes = [
-#   
-#
+
+#  must-have network (.geojson): input road network = [
+# "link_id",
+# "avgspeed",
+# "link_type",
+# "geometry",
+# ]
+
+link_type = ["motorway", "primary", "secondary", "tertiary", "residential", "secondary_unpaved",
+             "tertiary_unpaved", "residential_unpaved", "tunnel", "bridge", "culvert"]
+
+# must-have traffic_intensities attributes = [
+#     "link_id"
+#     "evening_total",
+#     "evening_freight",
+#     "evening_commute",
+#     "evening_business",
+#     "evening_other",
+#     "day_freight",
+#     "day_commute",
+#     "day_business",
+#     "day_other",
+#     "day_total",
+# ]
+
+# must-have values_of_time: ina currency attributes= [
+#     "transport_type",
+#     "value_of_time",
+#     "occupants",
+# ]
+
+# ToDo: make sure the "link_id" is kept in the result
+# must-have criticality_data attributes = [
+#     "link_id",
+#     "alt_dist", (km)
+#     "alt_time", (hr)
+#     "diff_dist", (km)
+#     "diff_time", (hr)
+# ]
+
+# must-have resilience_curve attributes: total recovery duration is defined in days (by the user) = [
+#   link_type_inundation_height	: e.g., motorway_0_0.2 (link_type_inundation_range)
+#   duration_steps
+#   functionality_loss_steps
 # ]
