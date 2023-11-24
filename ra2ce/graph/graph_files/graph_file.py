@@ -9,6 +9,10 @@ from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
 
 @dataclass
 class GraphFile(GraphFileProtocol):
+    """
+    Note this class resembles NetworkFile to a large extent
+    """
+
     name: str = ""
     folder: Path = None
     graph: MultiGraph = None
@@ -20,8 +24,11 @@ class GraphFile(GraphFileProtocol):
         return self.folder.joinpath(self.name)
 
     def read_graph(self, folder: Path) -> None:
-        self.folder = folder
-        if self.file and self.file.is_file():
+        if not folder:
+            return
+        _file = folder.joinpath(self.name)
+        if _file and _file.is_file():
+            self.folder = folder
             _pickle_reader = GraphPickleReader()
             self.graph = _pickle_reader.read(self.file)
 

@@ -8,6 +8,10 @@ from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
 
 @dataclass
 class NetworkFile(GraphFileProtocol):
+    """
+    Note this class resembles GraphFile to a large extent
+    """
+
     name: str = ""
     folder: Path = None
     graph: GeoDataFrame = None
@@ -19,8 +23,11 @@ class NetworkFile(GraphFileProtocol):
         return self.folder.joinpath(self.name)
 
     def read_graph(self, folder: Path) -> None:
-        self.folder = folder
-        if self.file and self.file.is_file():
+        if not folder:
+            return
+        _file = folder.joinpath(self.name)
+        if _file and _file.is_file():
+            self.folder = folder
             self.graph = read_feather(self.file)
 
     def get_graph(self) -> GeoDataFrame:
