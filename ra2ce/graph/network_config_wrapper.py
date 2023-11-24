@@ -22,7 +22,6 @@
 
 from __future__ import annotations
 
-import logging
 from pathlib import Path
 from typing import Optional
 
@@ -63,23 +62,16 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
         _new_network_config = cls()
         _new_network_config.ini_file = ini_file
         _new_network_config.config_data = config_data
-        if config_data.output_graph_dir and config_data.output_graph_dir.is_dir():
-            _new_network_config.graph_files = (
-                _new_network_config.get_existent_network_files(
-                    config_data.output_graph_dir
+        if config_data.output_graph_dir:
+            if config_data.output_graph_dir.is_dir():
+                _new_network_config.graph_files = (
+                    _new_network_config.read_graphs_from_config(
+                        config_data.output_graph_dir
+                    )
                 )
-            )
-        else:
-            logging.error(
-                f"Graph dir not found. Value provided: {config_data.output_graph_dir}"
-            )
+            else:
+                config_data.output_graph_dir.mkdir(parents=True)
         return _new_network_config
-
-    @staticmethod
-    def get_existent_network_files(output_graph_dir: Path) -> GraphFilesCollection:
-        """Checks if file of graph exist in network folder and adds filename to the graph object"""
-        _graph_files = GraphFilesCollection()
-        return _graph_files.set_files(output_graph_dir)
 
     @staticmethod
     def read_graphs_from_config(static_output_dir: Path) -> GraphFilesCollection:
