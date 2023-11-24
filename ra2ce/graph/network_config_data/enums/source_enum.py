@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from enum import Enum
+from ra2ce.configuration.ra2ce_enum_base import Ra2ceEnumBase
 
 
-class SourceEnum(Enum):
+class SourceEnum(Ra2ceEnumBase):
     OSB_BPF = 1
     OSM_DOWNLOAD = 2
     SHAPEFILE = 3
@@ -18,7 +18,7 @@ class SourceEnum(Enum):
             return cls.INVALID
 
     @property
-    def old_name(self) -> str:
+    def config_value(self) -> str:
         """
         Converts the enum name back to the input name
         """
