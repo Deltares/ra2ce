@@ -42,7 +42,7 @@ class Losses:
         self.partofday: str = analysis.partofday
 
     @staticmethod
-    def vehicle_loss_hours(file_path: Path) -> dict:
+    def values_of_time(file_path: Path) -> dict:
         """This function is to calculate vehicle loss hours based on an input table
         with value of time per type of transport, usage and value_of_reliability"""
         df_lookup = pd.read_csv(file_path, index_col="transport_type")
@@ -70,7 +70,7 @@ class Losses:
     def calc_vlh(
         self,
         traffic_data: pd.DataFrame,
-        vehicle_loss_hours: dict,
+        values_of_time: dict,
         criticality_data: pd.DataFrame,
     ) -> pd.DataFrame:
         vlh = pd.DataFrame(
@@ -126,22 +126,22 @@ class Losses:
                 (
                     traffic_data["day_freight"]
                     / traffic_data["day_total"]
-                    * vehicle_loss_hours["freight"]["vehicle_loss_hour"]
+                    * values_of_time["freight"]["value_of_time"]
                 )
                 + (
                     traffic_data["day_commute"]
                     / traffic_data["day_total"]
-                    * vehicle_loss_hours["commute"]["vehicle_loss_hour"]
+                    * values_of_time["commute"]["value_of_time"]
                 )
                 + (
                     traffic_data["day_business"]
                     / traffic_data["day_total"]
-                    * vehicle_loss_hours["business"]["vehicle_loss_hour"]
+                    * values_of_time["business"]["value_of_time"]
                 )
                 + (
                     traffic_data["day_other"]
                     / traffic_data["day_total"]
-                    * vehicle_loss_hours["other"]["vehicle_loss_hour"]
+                    * values_of_time["other"]["value_of_time"]
                 )
             )
             # to calculate costs per unit traffi per hour. This is weighted based on the traffic mix and value of each traffic type
@@ -151,22 +151,22 @@ class Losses:
                 (
                     traffic_data["evening_freight"]
                     / traffic_data["evening_total"]
-                    * vehicle_loss_hours["freight"]["vehicle_loss_hour"]
+                    * values_of_time["freight"]["value_of_time"]
                 )
                 + (
                     traffic_data["evening_commute"]
                     / traffic_data["evening_total"]
-                    * vehicle_loss_hours["commute"]["vehicle_loss_hour"]
+                    * values_of_time["commute"]["value_of_time"]
                 )
                 + (
                     traffic_data["evening_business"]
                     / traffic_data["evening_total"]
-                    * vehicle_loss_hours["business"]["vehicle_loss_hour"]
+                    * values_of_time["business"]["value_of_time"]
                 )
                 + (
                     traffic_data["evening_other"]
                     / traffic_data["evening_total"]
-                    * vehicle_loss_hours["other"]["vehicle_loss_hour"]
+                    * values_of_time["other"]["value_of_time"]
                 )
             )
             # to calculate costs per unit traffi per hour. This is weighted based on the traffic mix and value of each traffic type
@@ -182,7 +182,7 @@ class Losses:
         #TODO: koppelen van VVU aan de directe schade berekeningen
         """
         traffic_data = self.load_df(self.losses_input_path, "traffic_intensities.csv")
-        # traffic_intensities_attributes = [
+        # relevant traffic_intensities_attributes = [
         #     "link_id"
         #     "evening_total",
         #     "evening_freight",
@@ -197,11 +197,20 @@ class Losses:
         # ]
 
         criticality_data = self.load_df(self.losses_input_path, "criticality_data.csv")
-        # criticality_data_attribute = [
+        # relevant criticality_data_attributes = [
+        #     "link_id",
+        #     "alt_dist",
+        #     "alt_time",
+        #     "diff_dist"
         #     "diff_time",
-        #     "diff_distance"
         # ]
 
-        vehicle_loss_hours = self.vehicle_loss_hours(self.losses_input_path / "vehicle_loss_hours.csv")
-        vlh = self.calc_vlh(traffic_data, vehicle_loss_hours, criticality_data)
+        values_of_time = self.values_of_time(self.losses_input_path / "values_of_time.csv")
+        # relevant values_of_time = [
+        #     "transport_type",
+        #     "value_of_time",
+        #     "occupants"
+        # ]
+
+        vlh = self.calc_vlh(traffic_data, values_of_time, criticality_data)
         return vlh
