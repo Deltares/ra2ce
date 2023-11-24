@@ -107,7 +107,7 @@ class TestLosses:
         )
 
         # 2. Run test.
-        _result = _losses.calc_vlh(_traffic_data, _vehicle_loss_hours, _detour_data)
+        _result = _losses.calc_vlh_with_shockwave(_traffic_data, _vehicle_loss_hours, _detour_data)
 
         # 3. Verify final expectations.
         assert isinstance(_result, pd.DataFrame)
