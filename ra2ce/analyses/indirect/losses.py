@@ -20,7 +20,6 @@
 """
 from ast import literal_eval
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -31,10 +30,6 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
 
-partofday_prefixes = {
-    "daily": "day",
-    "evening": "evening",
-}
 trip_types = [
     "business"
     "commute"
@@ -56,12 +51,15 @@ class Losses:
         self.rest_capacity: float = analysis.rest_capacity
         self.maximum: float = analysis.maximum_jam
         self.partofday: str = analysis.partofday
+        self.performance_metric = analysis.performance
         self.network: gpd.GeoDataFrame = self.load_gdf(self.losses_input_path, "network.geojson")
-        self.traffic_data = self.load_df_from_csv(self.losses_input_path, "traffic_intensities.csv")  # per day
+        self.intensities = self.load_df_from_csv(self.losses_input_path, "traffic_intensities.csv")  # per day
+        # ToDo: make sure the "link_id" is kept in the result of the criticality analysis
         self.criticality_data = self.load_df_from_csv(self.losses_input_path, "criticality_data.csv")
         self.resilience_curve: pd.DataFrame = self.load_df_from_csv(self.losses_input_path,
                                                                     analysis.resilience_curve_file,
-                                                                    ["disruption_steps", "functionality_loss_ratio"])
+                                                                    columns_to_interpret=["disruption_steps",
+                                                                                          "functionality_loss_ratio"])
         self.values_of_time = self.load_df_from_csv(self.losses_input_path, "values_of_time.csv", "")
         self.link_types: list = self._get_link_types_heights_ranges()[0]
         self.inundation_height_ranges: pd.DataFrame = self._get_link_types_heights_ranges()[1]
@@ -111,9 +109,6 @@ class Losses:
             values_of_time: dict,
             criticality_data: pd.DataFrame,
     ) -> pd.DataFrame:
-
-        # TODO: vlh dataframe, the line are all the segments of the road network
-        # TODO: we need somehow to loop over all the vehicle types and calculate the vlh for each type (and each segment)
 
         vlh = pd.DataFrame(
             index=traffic_data.index,
@@ -224,75 +219,65 @@ class Losses:
                     return f"{x}_{y}"
             raise ValueError(f"No matching range found for height {height}")
 
-        # TODO: vlh dataframe, the line are all the segments of the road network
-        # TODO: we need somehow to loop over all the vehicle types and calculate the vlh for each type(and each segment)
+        def _set_vot_intensity_per_trip_purpose(purposes: list):
+            for purpose in purposes:
+                vot_var_name = f"vot_{purpose}"
+                partofday_trip_purpose_name = self.partofday + f"_{purpose}"
+                partofday_trip_purpose_intensity_name = "intensity_" + partofday_trip_purpose_name
+                # read and set the vot's
+                globals()[vot_var_name] = \
+                    self.values_of_time.loc[self.values_of_time["trip_types"] == purpose, "value_of_time"].item()
+                # read and set the intensities
+                globals()[partofday_trip_purpose_intensity_name] = self.intensities[partofday_trip_purpose_name] / 24
         # shape vlh
         vlh = pd.DataFrame(
-            index=self.traffic_data.index,
-            columns=[
-                "link_type",
-                "inundation_height"
-                "vlh_detour_total",
-                "currency_per_hour",
-                "currency_vlh",
-            ],
+            index=self.intensities.index,  # "link_type"
         )
-        vlh_detour_trip_types = [
-            "vlh_detour_business",
-            "vlh_detour_commute",
-            "vlh_detour_freight",
-            "vlh_detour_other"
-        ]
         events = self.criticality_data.filter(regex='^EV')
-
-        # read the intensities
-        partofday_prefix = partofday_prefixes.get(self.partofday, None)
-        if partofday_prefix:
-            intensity_business = self.traffic_data[f"{partofday_prefix}_business"] / 24
-            intensity_commute = self.traffic_data[f"{partofday_prefix}_commute"] / 24
-            intensity_freight = self.traffic_data[f"{partofday_prefix}_freight"] / 24
-            intensity_other = self.traffic_data[f"{partofday_prefix}_other"] / 24
-            intensity_total = self.traffic_data[f"{partofday_prefix}_total"] / 24
-        else:
-            intensity_business = intensity_commute = intensity_freight = intensity_other = intensity_total = None
-
         # Read the performance_change stating the functionality drop
-        performance_change = self.criticality_data["diff_time"]
+        performance_change = self.criticality_data[self.performance_metric]
 
         # find the link_type and the inundation height
         vlh = pd.merge(vlh, self.network[['link_id', 'link_type']], left_index=True, right_on='link_id')
         vlh = pd.merge(vlh, self.criticality_data[['link_id'] + list(events.columns)],
                        left_index=True, right_on='link_id')
+
+        # set vot values for trip_types
+        _set_vot_intensity_per_trip_purpose(trip_types)
+
+        # for each link and for each event calculate vlh
         for link_id, vlh_row in vlh.iterrows():
             for event in events:
-                #  get duration_steps and functionality_loss_ratio from resilience_curve
+                vlh_event_total = 0
                 row_inundation_range = _get_range(vlh_row[event])
-                link_type_inundation_range = vlh_row["link_type"] + "_" + row_inundation_range
-                for trip_type in trip_types:
-                    variable_name = f"vot_{trip_type}"
-                    globals()[variable_name] = \
-                        self.values_of_time.loc[self.values_of_time["trip_types"] == trip_type, "value_of_time"].item()
+                link_type_inundation_range = f"{vlh_row['link_type']}_{row_inundation_range}"
 
-                    trip_intensity = f"intensity_{trip_type}"
-                    intensity_column = globals().get(trip_intensity, None)
-                    if intensity_column is not None:
-                        for vlh_detour_trip_type in vlh_detour_trip_types:
-                            vlh_detour_trip_type_event = f"{vlh_detour_trip_type}_{event}"
-                        # vlh[vlh_detour_trip_type_event] = (intensity_column * (
-                        #             (1 - self.traffic_throughput) * self.duration) *
-                        #                                   vlh[f"detour_time_{trip_type}"]) / 60
-                        pass
+                # get stepwise recovery curve data
+                relevant_curve = self.resilience_curve[
+                    self.resilience_curve["link_type_inundation_height"] == link_type_inundation_range
+                    ]
+                duration_steps: list = relevant_curve["duration_steps"].item()
+                functionality_loss_ratios: list = relevant_curve["functionality_loss_ratio"].item()
+
+                # get vlh_trip_type_event
+                for trip_type in trip_types:
+                    intensity_trip_type = globals().get(f"intensity_{trip_type}")
+                    vlh_trip_type_event = sum(
+                        intensity_trip_type * duration * loss_ratio * performance_change
+                        for duration, loss_ratio in zip(duration_steps, functionality_loss_ratios)
+                    )
+
+                    vlh[f"vlh_{trip_type}_{event}"] = vlh_trip_type_event
+                    vlh_event_total += vlh_trip_type_event
+                vlh[f"vlh_{event}_total"] = vlh_event_total
 
         return vlh
 
-    def calculate_losses_from_table(self):
-        """This function opens an existing table with traffic data and value of time to calculate losses based on detouring values. It also includes
-        a traffic jam estimation.
-        #TODO: check if gdf already exists from effectiveness measures.
-        #TODO: If not: read feather file.
-        #TODO: if yes: read gdf
-        #TODO: koppelen van VVU aan de directe schade berekeningen
-        """
+    def calculate_losses_from_table(self) -> pd.DataFrame:
+        """This function opens an existing table with traffic data and value of time to calculate losses based on
+        detouring values. It also includes
+            a traffic jam estimation.
+            """
         vlh = self.calc_vlh()
         return vlh
 
@@ -350,7 +335,6 @@ link_type = ["motorway", "primary", "secondary", "tertiary", "residential", "sec
 #     "occupants",
 # ]
 
-# ToDo: make sure the "link_id" is kept in the result
 # must-have criticality_data attributes = [
 #     "link_id",
 #     "alt_dist", (km)

@@ -88,10 +88,11 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     fraction_drivethrough: float = 0
     rest_capacity: float = math.nan
     maximum_jam: float = math.nan
-    partofday: str = ""
+    partofday: str = "day"  # "day, "evening"
+    performance: str = "diff_time"  # "diff_time" or "diff_dist" relates to the used criticality metric
     resilience_curve_file: str = ""
     disruption_steps_file: str = ""
-    # accessiblity analyses
+    # accessibility analyses
     aggregate_wl: str = ""  # should be enum
     threshold: float = math.nan
     threshold_destinations: float = math.nan
