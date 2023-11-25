@@ -312,8 +312,8 @@ class Losses:
 # "geometry",
 # ]
 
-link_type = ["motorway", "primary", "secondary", "tertiary", "residential", "secondary_unpaved",
-             "tertiary_unpaved", "residential_unpaved", "tunnel", "bridge", "culvert"]
+# link_type = ["motorway", "primary", "secondary", "tertiary", "residential", "secondary_unpaved",
+#              "tertiary_unpaved", "residential_unpaved", "tunnel", "bridge", "culvert"]
 
 # must-have traffic_intensities attributes = [
 #     "link_id"
