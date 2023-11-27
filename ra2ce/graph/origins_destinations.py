@@ -190,7 +190,8 @@ def update_edges_with_new_node(
                 k_new = 0
         else:
             k_new = 0
-        edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b)
+        edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b, node_A=node_a, node_B=new_node_id,
+                         edge_fid=f"{node_a}_{new_node_id}")
         graph.add_edge(node_a, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
@@ -210,7 +211,8 @@ def update_edges_with_new_node(
                 k_new = 0
         else:
             k_new = 0
-        edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b)
+        edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b, node_A=node_b, node_B=new_node_id,
+                         edge_fid=f"{node_b}_{new_node_id}")
         graph.add_edge(node_b, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
@@ -230,7 +232,8 @@ def update_edges_with_new_node(
                 k_new = 0
         else:
             k_new = 0
-        edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b)
+        edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b, node_A=node_a, node_B=new_node_id,
+                         edge_fid=f"{node_b}_{new_node_id}")
         graph.add_edge(node_a, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
@@ -250,7 +253,8 @@ def update_edges_with_new_node(
                 k_new = 0
         else:
             k_new = 0
-        edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b)
+        edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b, node_A=node_b, node_B=new_node_id,
+                         edge_fid=f"{node_b}_{new_node_id}")
         graph.add_edge(node_b, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
@@ -270,7 +274,8 @@ def update_edges_with_new_node(
                 k_new = 0
         else:
             k_new = 0
-        edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a)
+        edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a, node_A=node_b, node_B=new_node_id,
+                         edge_fid=f"{node_b}_{new_node_id}")
         graph.add_edge(node_b, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
@@ -290,7 +295,8 @@ def update_edges_with_new_node(
                 k_new = 0
         else:
             k_new = 0
-        edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a)
+        edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a, node_A=node_a, node_B=new_node_id,
+                         edge_fid=f"{node_a}_{new_node_id}")
         graph.add_edge(node_a, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
@@ -310,7 +316,8 @@ def update_edges_with_new_node(
                 k_new = 0
         else:
             k_new = 0
-        edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a)
+        edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a, node_A=node_b, node_B=new_node_id,
+                         edge_fid=f"{node_b}_{new_node_id}")
         graph.add_edge(node_b, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
@@ -330,7 +337,8 @@ def update_edges_with_new_node(
                 k_new = 0
         else:
             k_new = 0
-        edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a)
+        edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a, node_A=node_a, node_B=new_node_id,
+                         edge_fid=f"{node_a}_{new_node_id}")
         graph.add_edge(node_a, new_node_id, k_new, **edge_data)
 
         # Update the inverse vertices dict
@@ -392,6 +400,45 @@ def add_od_nodes(
         od [Geodataframe]: The GeoDataFrame with the locations of the origins and destinations on the road vertices
         graph [networkX graph]: The networkX graph updated with origins and destinations
     """
+
+    def update_or_add_node(
+            graph: nx.Graph,
+            new_node_id: int,
+            match_od: Point,
+            match_name: str,
+            category: Optional[str],
+            od_data: list,  # Specify the correct type for od_data
+            od: pd.DataFrame,  # Import pandas as pd and specify the correct type for od
+            i: int
+    ) -> None:
+        existing_node_id = None
+
+        for node_id, node_data in graph.nodes(data=True):
+            if "geometry" in node_data and node_data["geometry"] == match_od:
+                existing_node_id = node_id
+                break
+
+        if existing_node_id is not None:
+            # Update the existing node's "od_id" attribute
+            existing_od_id = graph.nodes[existing_node_id].get("od_id", "")
+            if existing_od_id and existing_od_id != match_name:
+                # Append ", match_name" to the existing "od_id"
+                graph.nodes[existing_node_id]["od_id"] = f"{existing_od_id}, {match_name}"
+        else:
+            # Node with the same geometry doesn't exist, add a new node to the graph
+            node_info = {
+                "node_fid": new_node_id,
+                "y": match_od.coords[0][1],
+                "x": match_od.coords[0][0],
+                "geometry": match_od,
+                "od_id": match_name,
+            }
+            if category and od_data[-1] == od_data[-1]:
+                node_info["category"] = od.iloc[i][category]
+
+            # Add the new node to the graph
+            graph.add_node(new_node_id, **node_info)
+
     logging.info("Finding vertices closest to Origins and Destinations")
 
     # create dictionary of the roads geometries and identifyers
@@ -441,6 +488,9 @@ def add_od_nodes(
         match_od = Point(closest_node_on_road)
         # Find the road to which this vertex belongs. If the vertex is on an end-point of a road, it cannot be found,
         # and it goes to the except statement.
+        # ToDo: avoid adding links on top of each-other
+        # ToDo: make sure the direction of the lines remain the same when making new nodes and lines
+        #  e.g.: u, v => u_new, v
         try:
             closest_u_v_k = inverse_vertices_dict[
                 (closest_node_on_road[0], closest_node_on_road[1])
@@ -463,20 +513,22 @@ def add_od_nodes(
             new_node_id = max_node_id + 1
             max_node_id = new_node_id
 
-            node_info = {
-                "node_fid": new_node_id,  # Check if this attribute always exists
-                "y": match_od.coords[0][1],
-                "x": match_od.coords[0][0],
-                "geometry": match_od,
-                "od_id": match_name,
-            }
-            if category and od_data[-1] == od_data[-1]:
-                # If the user wants to calculate the routes to multiple locations with categories
-                # and if the current location is a destination (od_data[-1] is not NaN)
-                node_info["category"] = od.iloc[i][category]
-
-            # Add the new node to the graph
-            graph.add_node(new_node_id, **node_info)
+            # node_info = {
+            #     "node_fid": new_node_id,  # Check if this attribute always exists
+            #     "y": match_od.coords[0][1],
+            #     "x": match_od.coords[0][0],
+            #     "geometry": match_od,
+            #     "od_id": match_name,
+            # }
+            # if category and od_data[-1] == od_data[-1]:
+            #     # If the user wants to calculate the routes to multiple locations with categories
+            #     # and if the current location is a destination (od_data[-1] is not NaN)
+            #     node_info["category"] = od.iloc[i][category]
+            #
+            # # Add the new node to the graph
+            # graph.add_node(new_node_id, **node_info)
+            # ToDO: avoid adding nodes on top of each-other => O_x,O_y,...
+            update_or_add_node(graph, new_node_id, match_od, match_name, category, od_data, od, i)
 
             # Update the inverse_nodes_dict with the new node
             inverse_nodes_dict[match_od.coords[0]] = new_node_id
