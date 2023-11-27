@@ -23,7 +23,6 @@ from dataclasses import dataclass, field
 import logging
 from pathlib import Path
 from typing import Callable
-from joblib import Parallel, delayed
 from numpy import nan
 from rasterstats import zonal_stats
 from ra2ce.graph.hazard.hazard_common_functions import (
