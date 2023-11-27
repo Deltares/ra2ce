@@ -144,7 +144,7 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
         _section = "network"
         _network_section = NetworkSection(**self._parser[_section])
         _network_section.source = SourceEnum.get_enum(
-            self._parser.get(_section, property)
+            self._parser.get(_section, "source")
         )
         _network_section.primary_file = self._get_path_list(
             _section, "primary_file", _network_section.primary_file
@@ -159,7 +159,7 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
             _section, "save_gpkg", fallback=_network_section.save_gpkg
         )
         _network_section.network_type = NetworkTypeEnum.get_enum(
-            self._parser.get(_section, property)
+            self._parser.get(_section, "network_type")
         )
         _network_section.road_types = self._parser.getlist(
             _section, "road_types", fallback=_network_section.road_types
