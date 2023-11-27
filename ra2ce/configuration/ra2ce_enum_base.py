@@ -20,9 +20,32 @@ class Ra2ceEnumBase(Enum):
             Ra2ceEnumBase: Enumeration instance.
         """
         try:
+            if not input:
+                return cls.NONE
             return cls[input.upper()]
         except KeyError:
             return cls.INVALID
+
+    @classmethod
+    def is_valid(cls, enum: Ra2ceEnumBase | None) -> bool:
+        """
+        Check if given value is valid.
+
+        Args:
+            key (str): Enum key (name)
+
+        Returns:
+            bool: If the given key is not a valid key
+        """
+        if enum is None:
+            if hasattr(cls, "NONE"):
+                return True
+            else:
+                return False
+        elif enum.name == "INVALID":
+            return False
+        else:
+            return True
 
     @property
     def config_value(self) -> str:
@@ -33,6 +56,6 @@ class Ra2ceEnumBase(Enum):
         Returns:
             str: Value as known in the config.
         """
-        if self.name == "INVALID":
+        if self.name == "NONE":
             return None
         return self.name.lower()

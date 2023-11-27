@@ -24,6 +24,7 @@ from typing import Any
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
 from ra2ce.configuration.ra2ce_enum_base import Ra2ceEnumBase
+from ra2ce.graph.network_config_data.enums.network_type_enum import NetworkTypeEnum
 from ra2ce.graph.network_config_data.enums.source_enum import SourceEnum
 from ra2ce.graph.network_config_data.network_config_data import (
     HazardSection,
@@ -93,19 +94,19 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
             f"Wrong input to property [ {key} ], has to be one of: {_accepted_values}."
         )
 
-    def _wrong_enum(self, key: str, enum: Ra2ceEnumBase) -> str:
+    def _wrong_enum(self, key: str, enum_type: type[Ra2ceEnumBase]) -> str:
         # Remove last value INVALID
-        _accepted_values = ", ".join(
-            [member.config_value for member in type(enum)][:-1]
-        )
+        _accepted_values = ", ".join([member.config_value for member in enum_type][:-1])
         return (
             f"Wrong input to property [ {key} ], has to be one of: {_accepted_values}."
         )
 
-    def _validate_enum(self, enum: Ra2ceEnumBase, key: str) -> ValidationReport:
+    def _validate_enum(
+        self, enum: Ra2ceEnumBase, key: str, enum_type: type[Ra2ceEnumBase]
+    ) -> ValidationReport:
         _report = ValidationReport()
-        if enum == enum.INVALID:
-            _report.error(self._wrong_enum(key, enum))
+        if not enum_type.is_valid(enum):
+            _report.error(self._wrong_enum(key, enum_type))
         return _report
 
     def _validate_project_section(
@@ -113,7 +114,7 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
     ) -> ValidationReport:
         _report = ValidationReport()
         if not project_section:
-            _report.error(self._report_section_not_found("project"))
+            _report.error("Project section not found.")
         return _report
 
     def _validate_network_section(
@@ -122,11 +123,15 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
         _network_report = ValidationReport()
 
         # Validate source
-        _network_report.merge(self._validate_enum(network_section.source, "source"))
+        _network_report.merge(
+            self._validate_enum(network_section.source, "source", SourceEnum)
+        )
 
         # Validate network_type
         _network_report.merge(
-            self._validate_enum(network_section.network_type, "network_type")
+            self._validate_enum(
+                network_section.network_type, "network_type", NetworkTypeEnum
+            )
         )
 
         # Validate road types.
