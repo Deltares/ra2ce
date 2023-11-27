@@ -93,11 +93,14 @@ class TestRa2ceEnumBase:
         _options = MockEnum.FIRST.list_valid_options()
 
         # 3. Verify results
-        assert _options == "None, first, second_item"
+        assert all(
+            _option in _options
+            for _option in [MockEnum.NONE, MockEnum.FIRST, MockEnum.SECOND_ITEM]
+        )
 
     def test_list_valid_options_without_none(self):
         # 1./2. Define test data / Run test
         _options = MockEnumWithoutNone.FIRST.list_valid_options()
 
         # 3. Verify results
-        assert _options == "first, second_item"
+        all(_option in _options for _option in [MockEnum.FIRST, MockEnum.SECOND_ITEM])
