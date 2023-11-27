@@ -13,7 +13,7 @@ class RoadTypeEnum(Ra2ceEnumBase):
     SECONDARY_LINK = 8
     TERTIARY = 9
     TERTIARY_LINK = 10
-    UNCLASSIFIED = 11
-    RESIDENTIAL = 12
-    ROAD = 13
+    RESIDENTIAL = 11
+    ROAD = 12
+    UNCLASSIFIED = 98
     INVALID = 99
