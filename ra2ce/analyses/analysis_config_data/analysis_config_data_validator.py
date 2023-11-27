@@ -58,7 +58,7 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
                     # enumerations
                     _expected_values_list = value.list_valid_options()
                 else:
-                    # other items with limited value options
+                    # other items with limited value options (should become enumerations)
                     if key not in AnalysisNetworkDictValues.keys():
                         continue
                     _expected_values_list = AnalysisNetworkDictValues[key]

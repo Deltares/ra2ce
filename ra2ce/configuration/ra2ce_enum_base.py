@@ -41,14 +41,17 @@ class Ra2ceEnumBase(Enum):
         else:
             return True
 
-    def list_valid_options(self) -> str:
+    def list_valid_options(self) -> list[Ra2ceEnumBase]:
         """
         List the enum options as allowed in the config.
 
         Returns:
-            str: Concatenated options, separated by ", "
+            list[str | None]: Concatenated options, separated by ", "
         """
-        return ", ".join([str(_enum.config_value) for _enum in type(self)][:-1])
+        return [_enum for _enum in type(self)][:-1]
+
+    def __str__(self) -> str:
+        return self.name
 
     @property
     def config_value(self) -> str | None:

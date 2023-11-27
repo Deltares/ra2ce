@@ -104,7 +104,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             section_name, "save_csv", fallback=_section.save_csv
         )
         _section.weighing = WeighingEnum.get_enum(
-            self._parser.get(section_name, "weighing")
+            self._parser.get(section_name, "weighing", fallback=None)
         )
         # losses
         _section.traffic_cols = self._parser.getlist(
