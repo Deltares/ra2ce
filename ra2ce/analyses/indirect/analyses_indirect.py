@@ -191,7 +191,10 @@ class IndirectAnalyses:
                 # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle]  * duration_disruption[hour] / 24[hour/day]
                 gdf.loc[
                     (gdf["detour"] == 1)
-                    & (gdf[hz + "_" + analysis.aggregate_wl.config_value] > analysis.threshold),
+                    & (
+                        gdf[hz + "_" + analysis.aggregate_wl.config_value]
+                        > analysis.threshold
+                    ),
                     col + "_detour_losses",
                 ] += (
                     gdf[col]
@@ -203,7 +206,10 @@ class IndirectAnalyses:
                 # no_detour_losses = traffic_per_day[veh/day] * occupancy[person/veh] * gdp_percapita_per_day[USD/person] * duration_disruption[hour] / 24[hour/day]
                 gdf.loc[
                     (gdf["detour"] == 0)
-                    & (gdf[hz + "_" + analysis.aggregate_wl.config_value] > analysis.threshold),
+                    & (
+                        gdf[hz + "_" + analysis.aggregate_wl.config_value]
+                        > analysis.threshold
+                    ),
                     col + "_nodetour_losses",
                 ] += (
                     gdf[col]
@@ -481,7 +487,10 @@ class IndirectAnalyses:
                     for road_cat in all_road_categories:
                         gdf_.loc[
                             (gdf_[hz + "_" + analysis.aggregate_wl.config_value] > lb)
-                            & (gdf_[hz + "_" + analysis.aggregate_wl.config_value] <= ub)
+                            & (
+                                gdf_[hz + "_" + analysis.aggregate_wl.config_value]
+                                <= ub
+                            )
                             & (gdf_["class_identifier"] == road_cat),
                             "duration_disruption",
                         ] = disruption_df_.loc[
@@ -1076,9 +1085,6 @@ class IndirectAnalyses:
                 )
                 graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
 
-            if analysis.weighing == WeighingEnum.DISTANCE:
-                # The name is different in the graph.
-                analysis.weighing = WeighingEnum.LENGTH
             if analysis.analysis == "single_link_redundancy":
                 g = self.graph_files.base_graph.get_graph()
                 gdf = self.single_link_redundancy(g, analysis)

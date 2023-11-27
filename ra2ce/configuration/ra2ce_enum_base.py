@@ -6,6 +6,8 @@ from enum import Enum
 class Ra2ceEnumBase(Enum):
     """
     Base class for enums defined within Ra2ce.
+    NONE = 0: Optional entry
+    INVALID = 99: Mandatory entry
     """
 
     @classmethod
@@ -18,11 +20,13 @@ class Ra2ceEnumBase(Enum):
 
         Returns:
             Ra2ceEnumBase: Enumeration instance.
+            NONE: This entry is used if the config is missing.
+            INVALID: This entry is used if the config value is invalid.
         """
         try:
             if not input:
                 return cls.NONE
-            return cls[input.upper()]
+            return cls[input.upper().strip()]
         except (AttributeError, KeyError):
             return cls.INVALID
 
@@ -38,8 +42,7 @@ class Ra2ceEnumBase(Enum):
         """
         if self.name == "INVALID":
             return False
-        else:
-            return True
+        return True
 
     def list_valid_options(self) -> list[Ra2ceEnumBase]:
         """
