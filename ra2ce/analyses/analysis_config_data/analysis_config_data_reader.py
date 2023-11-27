@@ -34,6 +34,7 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     IndirectAnalysisNameList,
     ProjectSection,
 )
+from ra2ce.analyses.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
 )
@@ -102,6 +103,12 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         _section.save_csv = self._parser.getboolean(
             section_name, "save_csv", fallback=_section.save_csv
         )
+        _weighing = self._parser.get(section_name, "weighing", fallback=None)
+        # Map distance -> length
+        if _weighing == "distance":
+            _section.weighing = WeighingEnum.LENGTH
+        else:
+            _section.weighing = WeighingEnum.get_enum(_weighing)
         # losses
         _section.traffic_cols = self._parser.getlist(
             section_name, "traffic_cols", fallback=_section.traffic_cols

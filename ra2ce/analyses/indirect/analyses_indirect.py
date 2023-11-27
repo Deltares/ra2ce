@@ -38,6 +38,7 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
 )
+from ra2ce.analyses.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analyses.indirect.losses import Losses
 from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDestination
 from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_factory import (
@@ -112,7 +113,7 @@ class IndirectAnalyses:
             if nx.has_path(graph, u, v):
                 # calculate the alternative distance if that edge is unavailable
                 alt_dist = nx.dijkstra_path_length(
-                    graph, u, v, weight=analysis.weighing
+                    graph, u, v, weight=analysis.weighing.config_value
                 )
                 alt_dist_list.append(alt_dist)
 
@@ -121,7 +122,7 @@ class IndirectAnalyses:
                 alt_nodes_list.append(alt_nodes)
 
                 # calculate the difference in distance
-                dif_dist_list.append(alt_dist - data[analysis.weighing])
+                dif_dist_list.append(alt_dist - data[analysis.weighing.config_value])
 
                 detour_exist_list.append(1)
             else:
@@ -190,7 +191,10 @@ class IndirectAnalyses:
                 # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle]  * duration_disruption[hour] / 24[hour/day]
                 gdf.loc[
                     (gdf["detour"] == 1)
-                    & (gdf[hz + "_" + analysis.aggregate_wl] > analysis.threshold),
+                    & (
+                        gdf[hz + "_" + analysis.aggregate_wl.config_value]
+                        > analysis.threshold
+                    ),
                     col + "_detour_losses",
                 ] += (
                     gdf[col]
@@ -202,7 +206,10 @@ class IndirectAnalyses:
                 # no_detour_losses = traffic_per_day[veh/day] * occupancy[person/veh] * gdp_percapita_per_day[USD/person] * duration_disruption[hour] / 24[hour/day]
                 gdf.loc[
                     (gdf["detour"] == 0)
-                    & (gdf[hz + "_" + analysis.aggregate_wl] > analysis.threshold),
+                    & (
+                        gdf[hz + "_" + analysis.aggregate_wl.config_value]
+                        > analysis.threshold
+                    ),
                     col + "_nodetour_losses",
                 ] += (
                     gdf[col]
@@ -246,8 +253,8 @@ class IndirectAnalyses:
                     ub = 1e10
                 for road_cat in _all_road_categories:
                     gdf.loc[
-                        (gdf[hz + "_" + analysis.aggregate_wl] > lb)
-                        & (gdf[hz + "_" + analysis.aggregate_wl] <= ub)
+                        (gdf[hz + "_" + analysis.aggregate_wl.config_value] > lb)
+                        & (gdf[hz + "_" + analysis.aggregate_wl.config_value] <= ub)
                         & (gdf["class_identifier"] == road_cat),
                         "duration_disruption",
                     ] = disruption_df_.loc[
@@ -343,7 +350,7 @@ class IndirectAnalyses:
 
                 if nx.has_path(graph, u, v):
                     alt_dist = nx.dijkstra_path_length(
-                        graph, u, v, weight=analysis.weighing
+                        graph, u, v, weight=analysis.weighing.config_value
                     )
                     alt_nodes = nx.dijkstra_path(graph, u, v)
                     connected = 1
@@ -374,7 +381,9 @@ class IndirectAnalyses:
             # previously here you would find if dist == dist which is a critical bug. Replaced by just verifying dist is a value.
             gdf["diff_dist"] = [
                 dist - length if dist else np.NaN
-                for (dist, length) in zip(gdf["alt_dist"], gdf[analysis.weighing])
+                for (dist, length) in zip(
+                    gdf["alt_dist"], gdf[analysis.weighing.config_value]
+                )
             ]
 
             gdf["hazard"] = hazard_name
@@ -477,8 +486,11 @@ class IndirectAnalyses:
                         ub = 1e10
                     for road_cat in all_road_categories:
                         gdf_.loc[
-                            (gdf_[hz + "_" + analysis.aggregate_wl] > lb)
-                            & (gdf_[hz + "_" + analysis.aggregate_wl] <= ub)
+                            (gdf_[hz + "_" + analysis.aggregate_wl.config_value] > lb)
+                            & (
+                                gdf_[hz + "_" + analysis.aggregate_wl.config_value]
+                                <= ub
+                            )
                             & (gdf_["class_identifier"] == road_cat),
                             "duration_disruption",
                         ] = disruption_df_.loc[
@@ -583,7 +595,7 @@ class IndirectAnalyses:
     ) -> gpd.GeoDataFrame:
         # create list of origin-destination pairs
         od_nodes = self._get_origin_destination_pairs(graph)
-        pref_routes = find_route_ods(graph, od_nodes, analysis.weighing)
+        pref_routes = find_route_ods(graph, od_nodes, analysis.weighing.config_value)
         return pref_routes
 
     def optimal_route_od_link(
@@ -631,7 +643,9 @@ class IndirectAnalyses:
             # igraph_hz = ig.Graph.from_networkx(igraph_hz)
 
             # Find the routes
-            od_routes = find_route_ods(graph_hz, od_nodes, analysis.weighing)
+            od_routes = find_route_ods(
+                graph_hz, od_nodes, analysis.weighing.config_value
+            )
             od_routes["hazard"] = hazard_name
             all_results.append(od_routes)
 
@@ -1071,9 +1085,6 @@ class IndirectAnalyses:
                 )
                 graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
 
-            if analysis.weighing == "distance":
-                # The name is different in the graph.
-                analysis.weighing = "length"
             if analysis.analysis == "single_link_redundancy":
                 g = self.graph_files.base_graph.get_graph()
                 gdf = self.single_link_redundancy(g, analysis)
@@ -1359,7 +1370,8 @@ def find_route_ods(
                 # get edge with the lowest weighing if there are multiple edges that connect u and v
                 _uv_graph = graph[u][v]
                 edge_key = sorted(
-                    _uv_graph, key=lambda x, _fgraph=_uv_graph: _fgraph[x][weighing]
+                    _uv_graph,
+                    key=lambda x, _fgraph=_uv_graph: _fgraph[x][weighing],
                 )[0]
                 _uv_graph_edge = _uv_graph[edge_key]
                 if "geometry" in _uv_graph_edge:
