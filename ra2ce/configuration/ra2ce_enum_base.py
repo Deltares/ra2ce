@@ -48,7 +48,7 @@ class Ra2ceEnumBase(Enum):
             return True
 
     @property
-    def config_value(self) -> str:
+    def config_value(self) -> str | None:
         """
         Reconstruct the name as it is known in the config.
         This could entail replacement of " " by "_" and lower() operations.
