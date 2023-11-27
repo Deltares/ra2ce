@@ -77,7 +77,7 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     """
 
     # general
-    weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.INVALID)
+    weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
     loss_per_distance: str = ""
     loss_type: str = ""  # should be enum
     disruption_per_category: str = ""
