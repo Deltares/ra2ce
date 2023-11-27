@@ -160,7 +160,7 @@ def get_od(o_id: str, d_id: str) -> str:
         return o_id
     if d_id not in _nan_values:
         # `o_id` was nan, so it was a destination, not an origin.
-        # therefore we reutrn `d_id`
+        # therefore we return `d_id`
         return d_id
     return np.nan
 
