@@ -7,3 +7,13 @@ class WeighingEnum(Ra2ceEnumBase):
     LENGTH = 2
     TIME = 3
     INVALID = 99
+
+    @classmethod
+    def get_enum(cls, input: str | None) -> Ra2ceEnumBase:
+        """
+        Correct "distance" to "length"
+        """
+        if input and input == "distance":
+            input = "length"
+        _enum = super().get_enum(input)
+        return _enum
