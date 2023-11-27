@@ -64,7 +64,7 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
                     _expected_values_list = AnalysisNetworkDictValues[key]
                 if value not in _expected_values_list:
                     _report.error(
-                        f"Wrong input to property [ {key} ], has to be one of: {_expected_values_list}"
+                        f"Wrong input to property [ {key} ]; has to be one of: {_expected_values_list}."
                     )
 
         return _report
