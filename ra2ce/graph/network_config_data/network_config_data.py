@@ -28,6 +28,7 @@ from typing import Optional
 from pyproj import CRS
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
+from ra2ce.graph.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from ra2ce.graph.network_config_data.enums.network_type_enum import NetworkTypeEnum
 from ra2ce.graph.network_config_data.enums.road_type_enum import RoadTypeEnum
 from ra2ce.graph.network_config_data.enums.source_enum import SourceEnum
@@ -77,7 +78,7 @@ class HazardSection:
     hazard_map: list[Path] = field(default_factory=list)
     hazard_id: str = ""
     hazard_field_name: list[str] = field(default_factory=list)
-    aggregate_wl: str = ""  # Should be enum
+    aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     hazard_crs: str = ""
 
 

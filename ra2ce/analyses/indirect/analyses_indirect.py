@@ -191,7 +191,7 @@ class IndirectAnalyses:
                 # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle]  * duration_disruption[hour] / 24[hour/day]
                 gdf.loc[
                     (gdf["detour"] == 1)
-                    & (gdf[hz + "_" + analysis.aggregate_wl] > analysis.threshold),
+                    & (gdf[hz + "_" + analysis.aggregate_wl.config_value] > analysis.threshold),
                     col + "_detour_losses",
                 ] += (
                     gdf[col]
@@ -203,7 +203,7 @@ class IndirectAnalyses:
                 # no_detour_losses = traffic_per_day[veh/day] * occupancy[person/veh] * gdp_percapita_per_day[USD/person] * duration_disruption[hour] / 24[hour/day]
                 gdf.loc[
                     (gdf["detour"] == 0)
-                    & (gdf[hz + "_" + analysis.aggregate_wl] > analysis.threshold),
+                    & (gdf[hz + "_" + analysis.aggregate_wl.config_value] > analysis.threshold),
                     col + "_nodetour_losses",
                 ] += (
                     gdf[col]
@@ -247,8 +247,8 @@ class IndirectAnalyses:
                     ub = 1e10
                 for road_cat in _all_road_categories:
                     gdf.loc[
-                        (gdf[hz + "_" + analysis.aggregate_wl] > lb)
-                        & (gdf[hz + "_" + analysis.aggregate_wl] <= ub)
+                        (gdf[hz + "_" + analysis.aggregate_wl.config_value] > lb)
+                        & (gdf[hz + "_" + analysis.aggregate_wl.config_value] <= ub)
                         & (gdf["class_identifier"] == road_cat),
                         "duration_disruption",
                     ] = disruption_df_.loc[
@@ -480,8 +480,8 @@ class IndirectAnalyses:
                         ub = 1e10
                     for road_cat in all_road_categories:
                         gdf_.loc[
-                            (gdf_[hz + "_" + analysis.aggregate_wl] > lb)
-                            & (gdf_[hz + "_" + analysis.aggregate_wl] <= ub)
+                            (gdf_[hz + "_" + analysis.aggregate_wl.config_value] > lb)
+                            & (gdf_[hz + "_" + analysis.aggregate_wl.config_value] <= ub)
                             & (gdf_["class_identifier"] == road_cat),
                             "duration_disruption",
                         ] = disruption_df_.loc[

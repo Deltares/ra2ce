@@ -5,6 +5,7 @@ from typing import Any, Union
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
 )
+from ra2ce.graph.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from ra2ce.graph.network_config_data.enums.network_type_enum import NetworkTypeEnum
 from ra2ce.graph.network_config_data.enums.road_type_enum import RoadTypeEnum
 from ra2ce.graph.network_config_data.enums.source_enum import SourceEnum
@@ -203,6 +204,9 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
         )
         _hazard_section.hazard_field_name = self._parser.getlist(
             _section, "hazard_field_name", fallback=_hazard_section.hazard_field_name
+        )
+        _hazard_section.aggregate_wl = AggregateWlEnum.get_enum(
+            self._parser.get(_section, "aggregate_wl", fallback=None)
         )
         return _hazard_section
 

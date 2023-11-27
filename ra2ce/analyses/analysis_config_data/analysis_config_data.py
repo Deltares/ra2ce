@@ -29,6 +29,7 @@ from typing import Optional
 
 from ra2ce.analyses.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
+from ra2ce.graph.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from ra2ce.graph.network_config_data.network_config_data import (
     NetworkSection,
     OriginsDestinationsSection,
@@ -91,7 +92,7 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     maximum_jam: float = math.nan
     partofday: str = ""
     # accessiblity analyses
-    aggregate_wl: str = ""  # should be enum
+    aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     threshold: float = math.nan
     threshold_destinations: float = math.nan
     uniform_duration: float = math.nan
