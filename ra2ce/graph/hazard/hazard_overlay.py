@@ -86,7 +86,7 @@ class HazardOverlay:
         self._hazard_id = config.hazard.hazard_id
         self._hazard_map = config.hazard.hazard_map
         self._hazard_crs = config.hazard.hazard_crs
-        self._hazard_aggregate_wl = config.hazard.aggregate_wl
+        self._hazard_aggregate_wl = config.hazard.aggregate_wl.config_value
         self._hazard_directory = config.static_path.joinpath("hazard")
 
         # graph files

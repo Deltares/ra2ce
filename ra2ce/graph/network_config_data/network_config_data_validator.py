@@ -40,7 +40,6 @@ NetworkDictValues: dict[str, list[Any]] = {
     "save_gpkg": [True, False, None],
     "save_csv": [True, False, None],
     "hazard_map": ["file", None],
-    "aggregate_wl": ["max", "min", "mean", None],
     "save_traffic": [True, False, None],
     "locations": ["file", None],
 }
@@ -123,11 +122,9 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
     ) -> ValidationReport:
         _hazard_report = ValidationReport()
 
-        if not hazard_section.aggregate_wl:
-            return _hazard_report
-
-        if hazard_section.aggregate_wl not in NetworkDictValues["aggregate_wl"]:
-            _hazard_report.error(self._wrong_value("aggregate_wl"))
+        _hazard_report.merge(
+            self._validate_enum(hazard_section.aggregate_wl, "aggregate_wl")
+        )
 
         return _hazard_report
 
