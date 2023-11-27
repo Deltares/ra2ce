@@ -74,14 +74,14 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
     def _wrong_value(self, key: str) -> str:
         _accepted_values = ", ".join(NetworkDictValues[key])
         return (
-            f"Wrong input to property [ {key} ], has to be one of: {_accepted_values}."
+            f"Wrong input to property [ {key} ]; has to be one of: {_accepted_values}."
         )
 
     def _wrong_enum(self, key: str, enum: Ra2ceEnumBase) -> str:
         # Remove last value INVALID
         _accepted_values = enum.list_valid_options()
         return (
-            f"Wrong input to property [ {key} ], has to be one of: {_accepted_values}."
+            f"Wrong input to property [ {key} ]; has to be one of: {_accepted_values}."
         )
 
     def _validate_enum(self, enum: Ra2ceEnumBase, key: str) -> ValidationReport:
@@ -114,7 +114,7 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
         # Validate road types.
         if any(_type.is_valid() for _type in network_section.road_types):
             _network_report.error(
-                f"Wrong road type(s) configured; has to be one or multiple of: {list(_type.config_value for _type in network_section.road_types[0].list_valid_options())}"
+                f"Wrong road type(s) configured; has to be one or multiple of: {[_type.config_value for _type in network_section.road_types[0].list_valid_options()]}"
             )
         return _network_report
 
