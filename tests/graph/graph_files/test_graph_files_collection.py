@@ -39,7 +39,9 @@ class TestGraphFilesCollection:
             _collection.set_file(_filepath)
 
         # 3. Verify expectations.
-        assert str(exc_err.value) == f"Unknown graph file {_filepath} provided."
+        assert (
+            str(exc_err.value) == f"Unknown graph file type {_filepath.stem} provided."
+        )
 
     def test_set_files(self):
         # 1. Define test data
@@ -51,6 +53,31 @@ class TestGraphFilesCollection:
 
         # 3. Verify results
         assert _collection.base_graph.file == _file
+
+    def test_get_file(self):
+        # 1. Define test data
+        _type = "base_graph"
+        _file = test_data.joinpath("readers_test_data", f"{_type}.p")
+        _collection = GraphFilesCollection()
+        _collection.set_file(_file)
+
+        # 2. Execute test
+        _f = _collection.get_file(_type)
+
+        # 3. Verify results
+        assert _f == _file
+
+    def test_get_file_given_unknown_type_raises_value_error(self):
+        # 1. Define test data
+        _type = "unknown_type"
+        _collection = GraphFilesCollection()
+
+        # 2. Execute test
+        with pytest.raises(ValueError) as exc_err:
+            _f = _collection.get_file(_type)
+
+        # 3. Verify results
+        assert str(exc_err.value) == f"Unknown graph file type {_type} provided."
 
     def test_read_graph(self):
         # 1. Define test data

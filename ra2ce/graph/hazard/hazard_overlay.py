@@ -568,19 +568,10 @@ class HazardOverlay:
                 "Check your network folder."
             )
 
-        # Iterate over the three graph/network types to load the file if necessary (when not yet loaded in memory).
-        for input_graph in ["base_graph", "base_network", "origins_destinations_graph"]:
-            file_path = self.graph_files.get_file(input_graph)
-            if (
-                file_path is not None
-                and self.graph_files.get_graph(input_graph) is None
-            ):
-                self.graph_files.read_graph(file_path)
-
         #### Step 1: hazard overlay of the base graph (NetworkX) ###
         if self.graph_files.base_graph.file:
             if self.graph_files.base_graph_hazard.file is None:
-                graph = self.graph_files.base_graph.graph
+                graph = self.graph_files.base_graph.get_graph()
 
                 # Check if the graph needs to be reprojected
                 hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
@@ -621,17 +612,6 @@ class HazardOverlay:
 
                 # Save graphs/network with hazard
                 self._export_network_files("base_graph_hazard", types_to_export)
-            else:
-                _hazard_base_graph = self._output_graph_dir.joinpath(
-                    "base_graph_hazard.p"
-                )
-                # Try to find the base graph hazard file
-                self.graph_files.base_graph_hazard.read_graph(_hazard_base_graph.parent)
-                if not self.graph_files.base_graph_hazard.get_graph():
-                    # File not found
-                    logging.warning(
-                        f"Base graph hazard file not found at {_hazard_base_graph}"
-                    )
 
         #### Step 2: hazard overlay of the origins_destinations (NetworkX) ###
         if (
@@ -640,7 +620,7 @@ class HazardOverlay:
             and self._destinations
             and (not self.graph_files.origins_destinations_graph_hazard.file)
         ):
-            graph = self.graph_files.origins_destinations_graph.graph
+            graph = self.graph_files.origins_destinations_graph.get_graph()
             ods = self.load_origins_destinations()
 
             # Check if the graph needs to be reprojected
@@ -733,7 +713,7 @@ class HazardOverlay:
             # Check if the graph needs to be reprojected
             hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
             gdf_crs = pyproj.CRS.from_user_input(
-                self.graph_files.base_network.graph.crs
+                self.graph_files.base_network.get_graph().crs
             )
 
             if (
@@ -745,7 +725,7 @@ class HazardOverlay:
                         hazard_crs, gdf_crs
                     )
                 )
-                extent_gdf = self.graph_files.base_network.graph.total_bounds
+                extent_gdf = self.graph_files.base_network.get_graph().total_bounds
                 logging.info("Gdf extent before reprojecting: {}".format(extent_gdf))
                 gdf_reprojected = self.graph_files.base_network.graph.copy().to_crs(
                     hazard_crs
@@ -759,18 +739,18 @@ class HazardOverlay:
                 gdf_reprojected = self.hazard_intersect(gdf_reprojected)
 
                 # Assign the original geometries to the reprojected raster
-                original_geometries = self.graph_files.base_network.graph["geometry"]
+                original_geometries = self.graph_files.base_network.get_graph()[
+                    "geometry"
+                ]
                 gdf_reprojected["geometry"] = original_geometries
                 self.graph_files.base_network_hazard.graph = gdf_reprojected.copy()
                 del gdf_reprojected
             else:
                 # read previously created file
                 logging.info("Setting 'base_network_hazard' graph.")
-                if self.graph_files.base_network_hazard.file:
-                    self.graph_files.base_network_hazard.get_graph()
-                else:
+                if not self.graph_files.base_network_hazard.file:
                     self.graph_files.base_network_hazard.graph = self.hazard_intersect(
-                        self.graph_files.base_network.graph
+                        self.graph_files.base_network.get_graph()
                     )
 
         #### Step 4: hazard overlay of the locations that are checked for isolation ###
@@ -782,7 +762,7 @@ class HazardOverlay:
             # get hazard at locations from network based on nearest
             logging.info("Get hazard at locations from network.")
             locations_hazard = self.get_point_hazard_from_network(
-                locations, self.graph_files.base_network_hazard.graph
+                locations, self.graph_files.base_network_hazard.get_graph()
             )
 
             _exporter = NetworkExporterFactory()
