@@ -107,9 +107,12 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         _section.save_csv = self._parser.getboolean(
             section_name, "save_csv", fallback=_section.save_csv
         )
-        _section.weighing = WeighingEnum.get_enum(
-            self._parser.get(section_name, "weighing", fallback=None)
-        )
+        _weighing = self._parser.get(section_name, "weighing", fallback=None)
+        # Map distance -> length
+        if _weighing == "distance":
+            _section.weighing = WeighingEnum.LENGTH
+        else:
+            _section.weighing = WeighingEnum.get_enum(_weighing)
         # losses
         _section.traffic_cols = self._parser.getlist(
             section_name, "traffic_cols", fallback=_section.traffic_cols
