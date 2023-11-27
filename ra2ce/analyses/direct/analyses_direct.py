@@ -31,6 +31,7 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDirect,
 )
+from ra2ce.analyses.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analyses.direct.cost_benefit_analysis import EffectivenessMeasures
 from ra2ce.analyses.direct.damage.manual_damage_functions import ManualDamageFunctions
 from ra2ce.analyses.direct.damage_calculation import (
@@ -72,18 +73,20 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
             )
             starttime = time.time()
 
-            if analysis.analysis == "direct":
+            if analysis.analysis == AnalysisEnum.DIRECT:
                 gdf = self.road_damage(
                     analysis
                 )  # calls the coordinator for road damage calculation
 
-            elif analysis.analysis == "effectiveness_measures":
+            elif analysis.analysis == AnalysisEnum.EFFECTIVENESS_MEASURES:
                 gdf = self.effectiveness_measures(analysis)
 
             else:
                 gdf = []
 
-            _output_path = self.config.output_path.joinpath(analysis.analysis)
+            _output_path = self.config.output_path.joinpath(
+                analysis.analysis.config_value
+            )
             if analysis.save_gpkg:
                 gpkg_path = _output_path.joinpath(
                     analysis.name.replace(" ", "_") + ".gpkg"
@@ -195,7 +198,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         df_cba, costs_dict = em.cost_benefit_analysis(effectiveness_dict)
         df_cba.round(2).to_csv(
             self.config.output_path.joinpath(
-                analysis.analysis, "cost_benefit_analysis.csv"
+                analysis.analysis.config_value, "cost_benefit_analysis.csv"
             ),
             decimal=",",
             sep=";",
@@ -206,7 +209,9 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         df_costs = em.calculate_strategy_costs(df, costs_dict)
         df_costs = df_costs.astype(float).round(2)
         df_costs.to_csv(
-            self.config.output_path.joinpath(analysis.analysis, "output_analysis.csv"),
+            self.config.output_path.joinpath(
+                analysis.analysis.config_value, "output_analysis.csv"
+            ),
             decimal=",",
             sep=";",
             index=False,

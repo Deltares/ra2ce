@@ -111,7 +111,9 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
         )
 
         # Validate road types.
-        if any(not _type.is_valid() for _type in network_section.road_types):
+        if network_section.road_types and any(
+            not _type.is_valid() for _type in network_section.road_types
+        ):
             _network_report.error(
                 f"Wrong road type(s) configured; has to be one or multiple of: {[_type.config_value for _type in network_section.road_types[0].list_valid_options()]}"
             )
