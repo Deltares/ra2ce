@@ -25,7 +25,7 @@ from pathlib import Path
 from typing import Callable
 from joblib import Parallel, delayed
 from numpy import nan
-from rasterstats import zonal_stats, gen_zonal_stats
+from rasterstats import zonal_stats
 from ra2ce.graph.hazard.hazard_common_functions import (
     get_edges_geoms,
     validate_extent_graph,
@@ -202,17 +202,15 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
 
             tqdm.pandas(desc="Network hazard overlay with " + hazard_name)
             _hazard_files_str = str(hazard_tif_file)
-            flood_stats = Parallel(n_jobs=-1, prefer="threads")(
-                delayed(zonal_stats)(
-                    **dict(
-                        vectors=_geom_vector,
-                        raster=_hazard_files_str,
-                        all_touched=True,
-                        stats="min max",
-                        add_stats={"mean": get_valid_mean},
-                    )
+            # Performance sinkhole
+            flood_stats = hazard_overlay.geometry.progress_apply(
+                lambda _geom_vector: zonal_stats(
+                    vectors=_geom_vector,
+                    raster=_hazard_files_str,
+                    all_touched=True,
+                    stats="min max",
+                    add_stats={"mean": get_valid_mean},
                 )
-                for _geom_vector in hazard_overlay.geometry
             )
 
             def _get_attributes(gen_flood_stat: list[dict]) -> tuple:
@@ -224,14 +222,7 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                 hazard_overlay[ra2ce_name + "_mi"],
                 hazard_overlay[ra2ce_name + "_ma"],
                 hazard_overlay[ra2ce_name + "_me"],
-            ) = list(
-                zip(
-                    *Parallel(n_jobs=-1, prefer="threads")(
-                        delayed(_get_attributes)(list(_flood_stat))
-                        for _flood_stat in flood_stats
-                    )
-                )
-            )
+            ) = list(zip(*map(_get_attributes, flood_stats)))
 
             tqdm.pandas(desc="Network fraction with hazard overlay with " + hazard_name)
             hazard_overlay[ra2ce_name + "_fr"] = hazard_overlay.geometry.progress_apply(
