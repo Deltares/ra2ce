@@ -23,7 +23,9 @@ from tests import slow_test, test_data, test_results
 class TestOsmNetworkWrapper:
     def test_initialize_without_graph_crs(self):
         # 1. Define test data.
-        _network_section = NetworkSection(network_type="a_network", road_types=["r"])
+        _network_section = NetworkSection(
+            network_type=NetworkTypeEnum.ALL, road_types=["r"]
+        )
         _network_config_data = NetworkConfigData(network=_network_section)
 
         # 2. Run test.
