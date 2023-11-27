@@ -45,9 +45,7 @@ class NetworkSection:
     diversion_file: list[Path] = field(default_factory=list)
     file_id: str = ""
     polygon: Optional[Path] = None
-    network_type: Optional[NetworkTypeEnum] = field(
-        default_factory=lambda: NetworkTypeEnum.NONE
-    )
+    network_type: NetworkTypeEnum = field(default_factory=lambda: NetworkTypeEnum.NONE)
     road_types: list[str] = field(default_factory=list)
     save_gpkg: bool = False
 

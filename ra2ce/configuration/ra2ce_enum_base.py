@@ -9,7 +9,7 @@ class Ra2ceEnumBase(Enum):
     """
 
     @classmethod
-    def get_enum(cls, input: str) -> Ra2ceEnumBase:
+    def get_enum(cls, input: str | None) -> Ra2ceEnumBase:
         """
         Create an enum from a given input string.
 
@@ -23,11 +23,10 @@ class Ra2ceEnumBase(Enum):
             if not input:
                 return cls.NONE
             return cls[input.upper()]
-        except KeyError:
+        except (AttributeError, KeyError):
             return cls.INVALID
 
-    @classmethod
-    def is_valid(cls, enum: Ra2ceEnumBase | None) -> bool:
+    def is_valid(self) -> bool:
         """
         Check if given value is valid.
 
@@ -37,15 +36,19 @@ class Ra2ceEnumBase(Enum):
         Returns:
             bool: If the given key is not a valid key
         """
-        if enum is None:
-            if hasattr(cls, "NONE"):
-                return True
-            else:
-                return False
-        elif enum.name == "INVALID":
+        if self.name == "INVALID":
             return False
         else:
             return True
+
+    def list_valid_options(self) -> str:
+        """
+        List the enum options as allowed in the config.
+
+        Returns:
+            str: Concatenated options, separated by ", "
+        """
+        return ", ".join([str(_enum.config_value) for _enum in type(self)][:-1])
 
     @property
     def config_value(self) -> str | None:
