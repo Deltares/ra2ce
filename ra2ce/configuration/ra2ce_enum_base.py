@@ -50,9 +50,6 @@ class Ra2ceEnumBase(Enum):
         """
         return [_enum for _enum in type(self)][:-1]
 
-    def __str__(self) -> str:
-        return self.name
-
     @property
     def config_value(self) -> str | None:
         """
