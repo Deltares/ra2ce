@@ -166,7 +166,7 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
         _network_section.road_types = list(
             map(
                 RoadTypeEnum.get_enum,
-                self._parser.getlist(_section, "road_types", fallback=[None]),
+                self._parser.getlist(_section, "road_types", fallback=[]),
             )
         )
         _network_section.polygon = self._get_str_as_path(_network_section.polygon)
