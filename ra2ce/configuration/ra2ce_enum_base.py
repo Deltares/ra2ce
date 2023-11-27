@@ -6,8 +6,8 @@ from enum import Enum
 class Ra2ceEnumBase(Enum):
     """
     Base class for enums defined within Ra2ce.
-    NONE = 0: Optional entry
-    INVALID = 99: Mandatory entry
+    NONE = 0: Optional entry (config is optional and missing)
+    INVALID = 99: Mandatory entry (config contains invalid value)
     """
 
     @classmethod
