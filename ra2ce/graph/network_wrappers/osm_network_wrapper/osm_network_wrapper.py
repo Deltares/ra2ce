@@ -21,12 +21,11 @@ from typing import Any
 import networkx as nx
 import osmnx
 import pandas as pd
-from geopandas import GeoDataFrame, read_file
+from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
 from shapely.geometry.base import BaseGeometry
 
 import ra2ce.graph.networks_utils as nut
-from shapely.geometry import shape
 from ra2ce.graph.exporters.json_exporter import JsonExporter
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
@@ -40,8 +39,8 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         self.output_graph_dir = config_data.output_graph_dir
         self.graph_crs = config_data.crs
 
-        # Network options
-        self.network_type = config_data.network.network_type
+        # Network
+        self.network_type = config_data.network.network_type.config_value
         self.road_types = config_data.network.road_types
         self.polygon_path = config_data.network.polygon
         self.is_directed = config_data.network.directed
