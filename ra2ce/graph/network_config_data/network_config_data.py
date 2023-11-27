@@ -48,7 +48,7 @@ class NetworkSection:
     file_id: str = ""
     polygon: Optional[Path] = None
     network_type: NetworkTypeEnum = field(default_factory=lambda: NetworkTypeEnum.NONE)
-    road_types: list[RoadTypeEnum] = field(default_factory=lambda: list)
+    road_types: list[RoadTypeEnum] = field(default_factory=list)
     save_gpkg: bool = False
 
 
