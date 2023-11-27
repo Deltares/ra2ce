@@ -188,7 +188,7 @@ class Network:
             + "Ra2ce will use this: {}".format(base_graph_filepath)
         )
 
-        def read_graph(
+        def get_graph(
             file_type: str, file_path: Path | None
         ) -> nx.MultiGraph | GeoDataFrame:
             graph = self.graph_files.get_graph(file_type)
@@ -198,8 +198,8 @@ class Network:
                 )
             return graph
 
-        _base_graph = read_graph("base_graph", base_graph_filepath)
-        _network_gdf = read_graph("base_network", base_network_filepath)
+        _base_graph = get_graph("base_graph", base_graph_filepath)
+        _network_gdf = get_graph("base_network", base_network_filepath)
 
         # Assuming the same CRS for both the network and graph
         self.base_graph_crs = _network_gdf.crs

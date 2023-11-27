@@ -29,13 +29,9 @@ from typing import Optional
 from shapely.errors import ShapelyDeprecationWarning
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
-from ra2ce.analyses.analysis_config_wrapper import (
-    AnalysisConfigWrapper,
-)
 from ra2ce.configuration.config_factory import ConfigFactory
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 from ra2ce.ra2ce_logging import Ra2ceLogger
 from ra2ce.runners import AnalysisRunnerFactory
 
@@ -49,7 +45,7 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
 class Ra2ceHandler:
-    input_config: Optional[ConfigWrapper] = None
+    input_config: ConfigWrapper
 
     def __init__(self, network: Optional[Path], analysis: Optional[Path]) -> None:
         self._initialize_logger(network, analysis)
@@ -76,6 +72,8 @@ class Ra2ceHandler:
         """
         Runs a Ra2ce analysis based on the provided network and analysis files.
         """
+        if not self.input_config.analysis_config:
+            return
         if not self.input_config.is_valid_input():
             _error = "Error validating input files. Ra2ce will close now."
             logging.error(_error)
