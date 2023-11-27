@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+from ra2ce.analyses.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analyses.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.graph.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
@@ -66,7 +67,7 @@ class AnalysisSectionBase:
     """
 
     name: str = ""
-    analysis: str = ""  # should be enum
+    analysis: AnalysisEnum = field(default_factory=lambda: AnalysisEnum.INVALID)
     save_gpkg: bool = False
     save_csv: bool = False
 
