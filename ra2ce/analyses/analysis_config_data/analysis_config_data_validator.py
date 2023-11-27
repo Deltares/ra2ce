@@ -55,10 +55,8 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
                 if not value:
                     continue
                 if isinstance(value, Ra2ceEnumBase):
-                    # enumerations (skip last INVALID entry)
-                    _expected_values_list = [
-                        member.config_value for member in type(value)
-                    ][:-1]
+                    # enumerations
+                    _expected_values_list = value.list_valid_options()
                 else:
                     # other items with limited value options
                     if key not in AnalysisNetworkDictValues.keys():

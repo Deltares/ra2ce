@@ -4,6 +4,13 @@ from ra2ce.configuration.ra2ce_enum_base import Ra2ceEnumBase
 
 
 class MockEnum(Ra2ceEnumBase):
+    NONE = 0
+    FIRST = 1
+    SECOND_ITEM = 2
+    INVALID = 99
+
+
+class MockEnumWithoutNone(Ra2ceEnumBase):
     FIRST = 1
     SECOND_ITEM = 2
     INVALID = 99
@@ -23,6 +30,7 @@ class TestRa2ceEnumBase:
         [
             pytest.param("first", MockEnum.FIRST, id="simple"),
             pytest.param("second_item", MockEnum.SECOND_ITEM, id="with underscore"),
+            pytest.param(None, MockEnum.NONE, id="None"),
             pytest.param("unknown", MockEnum.INVALID, id="invalid"),
         ],
     )
@@ -32,6 +40,13 @@ class TestRa2ceEnumBase:
 
         # 3. Verify results
         assert _enum == expected_outcome
+
+    def test_get_enum_without_none(self):
+        # 1./2. Define test data / Run test
+        _enum = MockEnumWithoutNone.get_enum(None)
+
+        # 3. Verify results
+        assert _enum == MockEnumWithoutNone.INVALID
 
     def test_get_config_name_base_raises(self):
         # 1./2. Define test data / Run test
@@ -46,7 +61,8 @@ class TestRa2ceEnumBase:
         [
             pytest.param(MockEnum.FIRST, "first", id="simple"),
             pytest.param(MockEnum.SECOND_ITEM, "second_item", id="with underscore"),
-            pytest.param(MockEnum.INVALID, None, id="invalid"),
+            pytest.param(MockEnum.NONE, None, id="None"),
+            pytest.param(MockEnum.INVALID, "invalid", id="invalid"),
         ],
     )
     def test_get_config_value(self, enum: Ra2ceEnumBase, expected_value: str):
@@ -55,3 +71,33 @@ class TestRa2ceEnumBase:
 
         # 3. Verify results
         assert _value == expected_value
+
+    @pytest.mark.parametrize(
+        "enum, expected_value",
+        [
+            pytest.param(MockEnum.FIRST, True, id="simple"),
+            pytest.param(MockEnum.SECOND_ITEM, True, id="with underscore"),
+            pytest.param(MockEnum.NONE, True, id="None"),
+            pytest.param(MockEnum.INVALID, False, id="invalid"),
+        ],
+    )
+    def test_is_valid(self, enum: Ra2ceEnumBase, expected_value: bool):
+        # 1./2. Define test data / Run test
+        _valid = enum.is_valid()
+
+        # 3. Verify results
+        assert _valid == expected_value
+
+    def test_list_valid_options(self):
+        # 1./2. Define test data / Run test
+        _options = MockEnum.FIRST.list_valid_options()
+
+        # 3. Verify results
+        assert _options == "None, first, second_item"
+
+    def test_list_valid_options_without_none(self):
+        # 1./2. Define test data / Run test
+        _options = MockEnumWithoutNone.FIRST.list_valid_options()
+
+        # 3. Verify results
+        assert _options == "first, second_item"

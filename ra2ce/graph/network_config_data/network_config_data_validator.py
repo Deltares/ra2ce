@@ -94,19 +94,17 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
             f"Wrong input to property [ {key} ], has to be one of: {_accepted_values}."
         )
 
-    def _wrong_enum(self, key: str, enum_type: type[Ra2ceEnumBase]) -> str:
+    def _wrong_enum(self, key: str, enum: Ra2ceEnumBase) -> str:
         # Remove last value INVALID
-        _accepted_values = ", ".join([member.config_value for member in enum_type][:-1])
+        _accepted_values = enum.list_valid_options()
         return (
             f"Wrong input to property [ {key} ], has to be one of: {_accepted_values}."
         )
 
-    def _validate_enum(
-        self, enum: Ra2ceEnumBase, key: str, enum_type: type[Ra2ceEnumBase]
-    ) -> ValidationReport:
+    def _validate_enum(self, enum: Ra2ceEnumBase, key: str) -> ValidationReport:
         _report = ValidationReport()
-        if not enum_type.is_valid(enum):
-            _report.error(self._wrong_enum(key, enum_type))
+        if not enum.is_valid():
+            _report.error(self._wrong_enum(key, enum))
         return _report
 
     def _validate_project_section(
@@ -123,15 +121,11 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
         _network_report = ValidationReport()
 
         # Validate source
-        _network_report.merge(
-            self._validate_enum(network_section.source, "source", SourceEnum)
-        )
+        _network_report.merge(self._validate_enum(network_section.source, "source"))
 
         # Validate network_type
         _network_report.merge(
-            self._validate_enum(
-                network_section.network_type, "network_type", NetworkTypeEnum
-            )
+            self._validate_enum(network_section.network_type, "network_type")
         )
 
         # Validate road types.
