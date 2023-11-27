@@ -35,22 +35,6 @@ from ra2ce.graph.network_config_data.network_config_data import (
 NetworkDictValues: dict[str, list[Any]] = {
     "polygon": ["file", None],
     "directed": [True, False, None],
-    "road_types": [
-        "motorway",
-        "motorway_link",
-        "trunk",
-        "trunk_link",
-        "primary",
-        "primary_link",
-        "secondary",
-        "secondary_link",
-        "tertiary",
-        "tertiary_link",
-        "unclassified",
-        "residential",
-        "road",
-        None,
-    ],
     "origins": ["file", None],
     "destinations": ["file", None],
     "save_gpkg": [True, False, None],
@@ -128,12 +112,9 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
         )
 
         # Validate road types.
-        _expected_road_types = NetworkDictValues["road_types"]
-        for road_type in filter(
-            lambda x: x not in _expected_road_types, network_section.road_types
-        ):
+        if any(_type.is_valid() for _type in network_section.road_types):
             _network_report.error(
-                f"Wrong road type is configured ({road_type}), has to be one or multiple of: {_expected_road_types}"
+                f"Wrong road type(s) configured; has to be one or multiple of: {list(_type.config_value for _type in network_section.road_types[0].list_valid_options())}"
             )
         return _network_report
 

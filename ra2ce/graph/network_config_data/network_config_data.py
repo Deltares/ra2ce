@@ -29,6 +29,7 @@ from pyproj import CRS
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.graph.network_config_data.enums.network_type_enum import NetworkTypeEnum
+from ra2ce.graph.network_config_data.enums.road_type_enum import RoadTypeEnum
 from ra2ce.graph.network_config_data.enums.source_enum import SourceEnum
 
 
@@ -46,7 +47,7 @@ class NetworkSection:
     file_id: str = ""
     polygon: Optional[Path] = None
     network_type: NetworkTypeEnum = field(default_factory=lambda: NetworkTypeEnum.NONE)
-    road_types: list[str] = field(default_factory=list)
+    road_types: list[RoadTypeEnum] = field(default_factory=lambda: [RoadTypeEnum.NONE])
     save_gpkg: bool = False
 
 

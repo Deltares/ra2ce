@@ -9,6 +9,7 @@ from shapely.geometry.base import BaseGeometry
 
 import ra2ce.graph.networks_utils as nut
 from ra2ce.graph.network_config_data.enums.network_type_enum import NetworkTypeEnum
+from ra2ce.graph.network_config_data.enums.road_type_enum import RoadTypeEnum
 from ra2ce.graph.network_config_data.network_config_data import (
     NetworkConfigData,
     NetworkSection,
@@ -24,7 +25,8 @@ class TestOsmNetworkWrapper:
     def test_initialize_without_graph_crs(self):
         # 1. Define test data.
         _network_section = NetworkSection(
-            network_type=NetworkTypeEnum.ALL, road_types=["r"]
+            network_type=NetworkTypeEnum.ALL,
+            road_types=[RoadTypeEnum.PRIMARY],
         )
         _network_config_data = NetworkConfigData(network=_network_section)
 
@@ -39,7 +41,9 @@ class TestOsmNetworkWrapper:
     @pytest.fixture
     def _network_wrapper_without_polygon(self) -> OsmNetworkWrapper:
         _network_section = NetworkSection(
-            network_type=NetworkTypeEnum.DRIVE, road_types=["road_link"], directed=True
+            network_type=NetworkTypeEnum.DRIVE,
+            road_types=[RoadTypeEnum.ROAD],
+            directed=True,
         )
         _output_dir = test_results.joinpath("test_osm_network_wrapper")
         if not _output_dir.exists():

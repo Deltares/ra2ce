@@ -41,7 +41,9 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
         # Network
         self.network_type = config_data.network.network_type.config_value
-        self.road_types = config_data.network.road_types
+        self.road_types = list(
+            _enum.config_value for _enum in config_data.network.road_types
+        )
         self.polygon_path = config_data.network.polygon
         self.is_directed = config_data.network.directed
 
