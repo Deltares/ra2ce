@@ -57,7 +57,7 @@ class OriginClosestDestination:
         self.unit = "km"
         self.network_threshold = analysis.threshold
         self.threshold_destinations = analysis.threshold_destinations
-        self.weighing = analysis.weighing
+        self.weighing = analysis.weighing.config_value
         self.o_name = config.origins_destinations.origins_names
         self.d_name = config.origins_destinations.destinations_names
         self.od_id = config.origins_destinations.id_name_origin_destination

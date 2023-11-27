@@ -23,7 +23,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
 from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
