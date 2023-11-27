@@ -23,11 +23,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 from geopandas import GeoDataFrame, read_file, sjoin
-from joblib import Parallel, delayed
 from networkx import Graph
 from numpy import nanmean
 from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_base import (
     HazardIntersectBuilderBase,
+)
+from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_parallel_run import (
+    get_hazard_parallel_process,
 )
 
 
@@ -134,7 +136,10 @@ class HazardIntersectBuilderForGpkg(HazardIntersectBuilderBase):
 
     def _overlay_in_parallel(self, overlay_func: Callable):
         # Run in parallel to boost performance.
-        Parallel(n_jobs=2, require="sharedmem")(
-            delayed(overlay_func)(self.hazard_gpkg_files[i], _ra2ce_name)
-            for i, _ra2ce_name in enumerate(self.ra2ce_names)
+        get_hazard_parallel_process(
+            overlay_func,
+            lambda delayed_func: (
+                delayed_func(self.hazard_gpkg_files[i], _ra2ce_name)
+                for i, _ra2ce_name in enumerate(self.ra2ce_names)
+            ),
         )

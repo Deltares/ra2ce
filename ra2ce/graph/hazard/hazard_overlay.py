@@ -119,7 +119,6 @@ class HazardOverlay:
         Returns:
             *graph* (NetworkX Graph) : NetworkX graph with hazard values
         """
-        from tqdm import tqdm
 
         # Verify the graph type (networkx)
         assert isinstance(graph, nx.classes.graph.Graph)
@@ -322,7 +321,6 @@ class HazardOverlay:
         Returns:
             gdf (GeoDataFrame): the point geodataframe with hazard raster(s) data joined
         """
-        from tqdm import tqdm
 
         ## Intersect the origin and destination nodes with the hazard map (now only geotiff possible)
         for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
