@@ -8,6 +8,7 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     IndirectAnalysisNameList,
     ProjectSection,
 )
+from ra2ce.analyses.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from tests import test_results
 
 
@@ -22,16 +23,20 @@ class TestAnalysisConfigData:
     def valid_config(self) -> AnalysisConfigData:
         _config = AnalysisConfigData(project=ProjectSection())
         for _indirect in IndirectAnalysisNameList:
-            _config.analyses.append(AnalysisSectionIndirect(analysis=_indirect))
+            _config.analyses.append(
+                AnalysisSectionIndirect(analysis=AnalysisEnum.get_enum(_indirect))
+            )
         for _direct in DirectAnalysisNameList:
-            _config.analyses.append(AnalysisSectionDirect(analysis=_direct))
+            _config.analyses.append(
+                AnalysisSectionDirect(analysis=AnalysisEnum.get_enum(_direct))
+            )
         yield _config
 
     def test_indirect(self, valid_config: AnalysisConfigData):
         # 1. Define test data
 
         # 2. Run test
-        _indirect = [_config.analysis for _config in valid_config.indirect]
+        _indirect = [_config.analysis.config_value for _config in valid_config.indirect]
 
         # 3. Verify expectations
         assert all(item in _indirect for item in IndirectAnalysisNameList)
@@ -40,7 +45,7 @@ class TestAnalysisConfigData:
         # 1. Define test data
 
         # 2. Run test
-        _direct = [_config.analysis for _config in valid_config.direct]
+        _direct = [_config.analysis.config_value for _config in valid_config.direct]
 
         # 3. Verify expectations
         assert all(item in _direct for item in DirectAnalysisNameList)

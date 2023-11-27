@@ -1,7 +1,9 @@
 import pytest
+
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
+from ra2ce.analyses.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.indirect_analysis_runner import IndirectAnalysisRunner
 from tests.runners.dummy_classes import DummyRa2ceInput
@@ -23,7 +25,7 @@ class TestIndirectAnalysisRunner:
     ):
         # 1. Define test data.
         dummy_ra2ce_input.analysis_config.config_data.analyses = [
-            AnalysisSectionIndirect(analysis="single_link_redundancy")
+            AnalysisSectionIndirect(analysis=AnalysisEnum.SINGLE_LINK_REDUNDANCY)
         ]
 
         # 2. Run test.
