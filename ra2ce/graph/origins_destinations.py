@@ -160,10 +160,11 @@ def get_od(o_id, d_id):
 
 def add_data_to_existing_node(graph, node, match_name):
     if "od_id" in graph.nodes[node]:
-        # the node already has a origin/destination attribute
-        graph.nodes[node]["od_id"] = graph.nodes[node]["od_id"] + "," + match_name
+        # the node already has an origin/destination attribute
+        existing_od_id = str(graph.nodes[node]["od_id"])
+        graph.nodes[node]["od_id"] = existing_od_id + "," + str(match_name)
     else:
-        graph.nodes[node]["od_id"] = match_name
+        graph.nodes[node]["od_id"] = str(match_name)
     return graph
 
 
@@ -346,24 +347,24 @@ def add_od_nodes(
     inverse_vertices_dict = {}
     all_vertices = []
     for line in edge_list:
-    # Add all vertices except the end-points as they belong to multiple edges and nodes already exist at the end-points
+        # Handle MultiLineString geometries
         if isinstance(line[-1]['geometry'], MultiLineString):
-            line_list = [
-                    l
-                    for l in line[-1]['geometry'].geoms
-                ]
-            line[-1]['geometry'] = linemerge(line_list)
-
-        inverse_vertices_dict.update(
-            {
-                p: (line[0], line[1], line[2])
-                for p in set(list(line[-1]["geometry"].coords[1:-1]))
-            }
-        )
+            for linestring in line[-1]['geometry'].geoms:
+                for p in set(list(linestring.coords[1:-1])):
+                    inverse_vertices_dict[p] = (line[0], line[1], line[2])
+                    all_vertices.append(p)
+        else:
+            # Handle regular LineString geometries
+            for p in set(list(line[-1]['geometry'].coords[1:-1])):
+                inverse_vertices_dict[p] = (line[0], line[1], line[2])
+                all_vertices.append(p)
 
         # create list of all points to search in
-        all_vertices.extend([p for p in set(list(line[-1]["geometry"].coords))])
-
+        if isinstance(line[-1]['geometry'], MultiLineString):
+            all_vertices.extend([p for linestring in line[-1]["geometry"].geoms for p in set(list(linestring.coords))])
+        else:
+            # Handle regular LineString geometries
+            all_vertices.extend([p for p in set(list(line[-1]['geometry'].coords))])
     # Make an array from the list
     all_vertices = np.array(all_vertices)
 
