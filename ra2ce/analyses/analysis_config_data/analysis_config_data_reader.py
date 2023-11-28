@@ -34,7 +34,12 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     IndirectAnalysisNameList,
     ProjectSection,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_enum import AnalysisEnum
+from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+    AnalysisDirectEnum,
+)
+from ra2ce.analyses.analysis_config_data.enums.analysis_indirect_enum import (
+    AnalysisIndirectEnum,
+)
 from ra2ce.analyses.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
@@ -98,7 +103,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         self, section_name: str
     ) -> AnalysisSectionIndirect:
         _section = AnalysisSectionIndirect(**self._parser[section_name])
-        _section.analysis = AnalysisEnum.get_enum(
+        _section.analysis = AnalysisIndirectEnum.get_enum(
             self._parser.get(section_name, "analysis", fallback=None)
         )
         _section.save_gpkg = self._parser.getboolean(
@@ -191,7 +196,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
 
     def _get_analysis_section_direct(self, section_name: str) -> AnalysisSectionDirect:
         _section = AnalysisSectionDirect(**self._parser[section_name])
-        _section.analysis = AnalysisEnum.get_enum(
+        _section.analysis = AnalysisDirectEnum.get_enum(
             self._parser.get(section_name, "analysis", fallback=None)
         )
         _section.save_gpkg = self._parser.getboolean(

@@ -31,7 +31,9 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDirect,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_enum import AnalysisEnum
+from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+    AnalysisDirectEnum,
+)
 from ra2ce.analyses.direct.cost_benefit_analysis import EffectivenessMeasures
 from ra2ce.analyses.direct.damage.manual_damage_functions import ManualDamageFunctions
 from ra2ce.analyses.direct.damage_calculation import (
@@ -73,12 +75,12 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
             )
             starttime = time.time()
 
-            if analysis.analysis == AnalysisEnum.DIRECT:
+            if analysis.analysis == AnalysisDirectEnum.DIRECT:
                 gdf = self.road_damage(
                     analysis
                 )  # calls the coordinator for road damage calculation
 
-            elif analysis.analysis == AnalysisEnum.EFFECTIVENESS_MEASURES:
+            elif analysis.analysis == AnalysisDirectEnum.EFFECTIVENESS_MEASURES:
                 gdf = self.effectiveness_measures(analysis)
 
             else:

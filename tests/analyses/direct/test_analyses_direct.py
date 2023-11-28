@@ -2,7 +2,9 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDirect,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_enum import AnalysisEnum
+from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+    AnalysisDirectEnum,
+)
 from ra2ce.analyses.direct.analyses_direct import DirectAnalyses
 from tests import test_data
 
@@ -19,7 +21,7 @@ class TestDirectAnalyses:
             analyses=[
                 AnalysisSectionDirect(
                     name="DummyExecute",
-                    analysis=AnalysisEnum.INVALID,
+                    analysis=AnalysisDirectEnum.INVALID,
                     save_gpkg=False,
                     save_csv=False,
                 )

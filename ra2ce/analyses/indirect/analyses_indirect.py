@@ -23,7 +23,6 @@ import copy
 import logging
 import time
 from pathlib import Path
-from typing import Any
 
 import geopandas as gpd
 import networkx as nx
@@ -38,7 +37,9 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_enum import AnalysisEnum
+from ra2ce.analyses.analysis_config_data.enums.analysis_indirect_enum import (
+    AnalysisIndirectEnum,
+)
 from ra2ce.analyses.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analyses.indirect.losses import Losses
 from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDestination
@@ -1089,13 +1090,16 @@ class IndirectAnalyses:
                 )
                 graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
 
-            if analysis.analysis == AnalysisEnum.SINGLE_LINK_REDUNDANCY:
+            if analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY:
                 g = self.graph_files.base_graph.get_graph()
                 gdf = self.single_link_redundancy(g, analysis)
-            elif analysis.analysis == AnalysisEnum.MULTI_LINK_REDUNDANCY:
+            elif analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_REDUNDANCY:
                 g = self.graph_files.base_graph_hazard.get_graph()
                 gdf = self.multi_link_redundancy(g, analysis)
-            elif analysis.analysis == AnalysisEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION:
+            elif (
+                analysis.analysis
+                == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION
+            ):
                 g = self.graph_files.origins_destinations_graph.get_graph()
                 gdf = self.optimal_route_origin_destination(g, analysis)
 
@@ -1123,7 +1127,9 @@ class IndirectAnalyses:
                         (analysis.name.replace(" ", "_") + "_link_traffic.csv"),
                     )
                     route_traffic_df.to_csv(impact_csv_path, index=False)
-            elif analysis.analysis == AnalysisEnum.MULTI_LINK_ORIGIN_DESTINATION:
+            elif (
+                analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_DESTINATION
+            ):
                 g = self.graph_files.origins_destinations_graph_hazard.get_graph()
                 gdf = self.multi_link_origin_destination(g, analysis)
                 gdf_not_disrupted = self.optimal_route_origin_destination(g, analysis)
@@ -1160,15 +1166,15 @@ class IndirectAnalyses:
                 )
                 disruption_impact_df.to_csv(impact_csv_path, index=False)
             elif analysis.analysis in [
-                AnalysisEnum.SINGLE_LINK_LOSSES,
-                AnalysisEnum.MULTI_LINK_LOSSES,
+                AnalysisIndirectEnum.SINGLE_LINK_LOSSES,
+                AnalysisIndirectEnum.MULTI_LINK_LOSSES,
             ]:
                 g = self.graph_files.base_graph_hazard.get_graph()
                 gdf = self.single_link_redundancy(g, analysis)
                 gdf = self.single_link_losses(gdf, analysis)
             elif (
                 analysis.analysis
-                == AnalysisEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
+                == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
             ):
                 analyzer = OriginClosestDestination(
                     self.config, analysis, self.graph_files, self.hazard_names_df
@@ -1197,7 +1203,8 @@ class IndirectAnalyses:
                     del opt_routes["geometry"]
                     opt_routes.to_csv(csv_path, index=False)
             elif (
-                analysis.analysis == AnalysisEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
+                analysis.analysis
+                == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
             ):
                 analyzer = OriginClosestDestination(
                     self.config, analysis, self.graph_files, self.hazard_names_df
@@ -1280,12 +1287,14 @@ class IndirectAnalyses:
                         ),
                         index=False,
                     )
-            elif analysis.analysis == AnalysisEnum.LOSSES:
+            elif analysis.analysis == AnalysisIndirectEnum.LOSSES:
                 gdf_in = self.graph_files.base_graph_hazard.get_graph()
                 losses = Losses(self.config, analysis)
                 df = losses.calculate_losses_from_table()
                 gdf = gdf_in.merge(df, how="left", on="LinkNr")
-            elif analysis.analysis == AnalysisEnum.MULTI_LINK_ISOLATED_LOCATIONS:
+            elif (
+                analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS
+            ):
                 g = self.graph_files.base_graph_hazard.get_graph()
                 (gdf, df) = self.multi_link_isolated_locations(g, analysis)
 
