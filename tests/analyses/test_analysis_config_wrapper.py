@@ -8,6 +8,12 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisSectionDirect,
     AnalysisSectionIndirect,
 )
+from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+    AnalysisDirectEnum,
+)
+from ra2ce.analyses.analysis_config_data.enums.analysis_indirect_enum import (
+    AnalysisIndirectEnum,
+)
 from ra2ce.analyses.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data, test_results
@@ -73,8 +79,10 @@ class TestAnalysisConfigWrapper:
         _output_dir = test_results / request.node.name
         _analysis.config_data = AnalysisConfigData(output_path=_output_dir)
         _analysis.config_data.analyses = [
-            AnalysisSectionDirect(analysis="effectiveness_measures"),
-            AnalysisSectionIndirect(analysis="single_link_redundancy"),
+            AnalysisSectionDirect(analysis=AnalysisDirectEnum.EFFECTIVENESS_MEASURES),
+            AnalysisSectionIndirect(
+                analysis=AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY
+            ),
         ]
         if _output_dir.exists():
             shutil.rmtree(_output_dir)
