@@ -56,7 +56,7 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
                     continue
                 if isinstance(value, Ra2ceEnumBase):
                     # enumerations
-                    _expected_values_list = value.list_valid_options()
+                    _expected_values_list = type(value).list_valid_options()
                 else:
                     # other items with limited value options (should become enumerations)
                     if key not in AnalysisNetworkDictValues.keys():

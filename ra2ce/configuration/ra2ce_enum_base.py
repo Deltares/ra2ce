@@ -44,14 +44,15 @@ class Ra2ceEnumBase(Enum):
             return False
         return True
 
-    def list_valid_options(self) -> list[Ra2ceEnumBase]:
+    @classmethod
+    def list_valid_options(cls) -> list[Ra2ceEnumBase]:
         """
         List the enum options as allowed in the config.
 
         Returns:
             list[str | None]: Concatenated options, separated by ", "
         """
-        return [_enum for _enum in type(self)][:-1]
+        return [_enum for _enum in cls][:-1]
 
     def __str__(self) -> str:
         """

@@ -42,18 +42,11 @@ from ra2ce.graph.network_config_data.network_config_data import (
 )
 
 IndirectAnalysisNameList: list[str] = [
-    "single_link_redundancy",
-    "multi_link_redundancy",
-    "optimal_route_origin_destination",
-    "multi_link_origin_destination",
-    "optimal_route_origin_closest_destination",
-    "multi_link_origin_closest_destination",
-    "losses",
-    "single_link_losses",
-    "multi_link_losses",
-    "multi_link_isolated_locations",
+    _enum.config_value for _enum in AnalysisIndirectEnum.list_valid_options()
 ]
-DirectAnalysisNameList: list[str] = ["direct", "effectiveness_measures"]
+DirectAnalysisNameList: list[str] = [
+    _enum.config_value for _enum in AnalysisDirectEnum.list_valid_options()
+]
 
 
 @dataclass
