@@ -401,11 +401,11 @@ def snap_endpoints_lines(
     return lines_gdf
 
 
-def find_isolated_endpoints(linesIds: list, lines: list) -> list:
+def find_isolated_endpoints(lines_ids: list[str], lines: list) -> list:
     """Find endpoints of lines that don't touch another line.
 
     Args:
-        linesIds: a list of the IDs of lines
+        lines_ids: a list of the IDs of lines
         lines: a list of LineStrings or a MultiLineString
 
     Returns:
@@ -417,7 +417,7 @@ def find_isolated_endpoints(linesIds: list, lines: list) -> list:
         Build on library from https://github.com/ojdo/python-tools/blob/master/shapelytools.py
     """
     isolated_endpoints = []
-    for i, id_line in enumerate(zip(linesIds, lines)):
+    for i, id_line in enumerate(zip(lines_ids, lines)):
         ids, line = id_line
         other_lines = lines[:i] + lines[i + 1 :]
         for q in [0, -1]:

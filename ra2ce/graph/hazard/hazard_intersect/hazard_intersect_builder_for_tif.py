@@ -35,12 +35,15 @@ from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_base import (
 
 from networkx import Graph, set_edge_attributes
 from geopandas import GeoDataFrame
+from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_parallel_run import (
+    get_hazard_parallel_process,
+)
 from ra2ce.graph.networks_utils import (
     fraction_flooded,
     get_graph_edges_extent,
     get_valid_mean,
 )
-from joblib import Parallel, delayed
+from tqdm import tqdm
 
 
 @dataclass
@@ -71,9 +74,9 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
             *graph* (NetworkX Graph) : NetworkX graph with hazard values
         """
         # TODO apply multiprocessing?
-        from tqdm import (
-            tqdm,  # somehow this only works when importing here and not at the top of the file
-        )
+        # from tqdm import (
+        #     tqdm,  # somehow this only works when importing here and not at the top of the file
+        # )
 
         # Verify the graph type (networkx)
         assert isinstance(hazard_overlay, Graph)
@@ -169,10 +172,6 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
         Returns:
 
         """
-        from tqdm import (
-            tqdm,  # somehow this only works when importing here and not at the top of the file
-        )
-
         assert isinstance(hazard_overlay, GeoDataFrame), "Network is not a GeoDataFrame"
 
         # Make sure none of the geometries is a nonetype object (this will raise an error in zonal_stats)
@@ -202,18 +201,27 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
 
             tqdm.pandas(desc="Network hazard overlay with " + hazard_name)
             _hazard_files_str = str(hazard_tif_file)
+            # Performance sinkhole
             flood_stats = hazard_overlay.geometry.progress_apply(
-                lambda x, _hz_str=_hazard_files_str: zonal_stats(
-                    x,
-                    _hz_str,
+                lambda _geom_vector: zonal_stats(
+                    vectors=_geom_vector,
+                    raster=_hazard_files_str,
                     all_touched=True,
                     stats="min max",
                     add_stats={"mean": get_valid_mean},
                 )
             )
-            hazard_overlay[ra2ce_name + "_mi"] = [x[0]["min"] for x in flood_stats]
-            hazard_overlay[ra2ce_name + "_ma"] = [x[0]["max"] for x in flood_stats]
-            hazard_overlay[ra2ce_name + "_me"] = [x[0]["mean"] for x in flood_stats]
+
+            def _get_attributes(gen_flood_stat: list[dict]) -> tuple:
+                # Just get the first element of the generator
+                _flood_stat = gen_flood_stat[0]
+                return _flood_stat["min"], _flood_stat["max"], _flood_stat["mean"]
+
+            (
+                hazard_overlay[ra2ce_name + "_mi"],
+                hazard_overlay[ra2ce_name + "_ma"],
+                hazard_overlay[ra2ce_name + "_me"],
+            ) = list(zip(*map(_get_attributes, flood_stats)))
 
             tqdm.pandas(desc="Network fraction with hazard overlay with " + hazard_name)
             hazard_overlay[ra2ce_name + "_fr"] = hazard_overlay.geometry.progress_apply(
@@ -226,7 +234,10 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
 
     def _overlay_in_parallel(self, overlay_func: Callable):
         # Run in parallel to boost performance.
-        Parallel(n_jobs=2, require="sharedmem")(
-            delayed(overlay_func)(self.hazard_tif_files[i], hn, rn)
-            for i, (hn, rn) in enumerate(self._combined_names)
+        get_hazard_parallel_process(
+            overlay_func,
+            lambda delayed_func: (
+                delayed_func(self.hazard_tif_files[i], hn, rn)
+                for i, (hn, rn) in enumerate(self._combined_names)
+            ),
         )
