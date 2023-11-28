@@ -19,22 +19,22 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from typing import Protocol
-from geopandas import GeoDataFrame
-from networkx import Graph
+# This file contains the common utils to run a method in parallel
+from joblib import Parallel, delayed
+from typing import Callable
 
 
-class HazardIntersectBuilderProtocol(Protocol):
-    def get_intersection(
-        self, hazard_overlay: GeoDataFrame | Graph
-    ) -> GeoDataFrame | Graph:
-        """
-        Retrieves the resulting network from intersecting the hazard layer with a graph.
+def get_hazard_parallel_process(
+    delegated_func: Callable, func_iterable: Callable
+) -> None:
+    """
+    Runs in parallel a delegated process which will consume using the `delayed` method together
+    with its associated parameters to retrieve from `func_iterable`.
 
-        Args:
-            hazard_overlay (GeoDataFrame | Graph): Layer containing hazards.
-
-        Returns:
-            GeoDataFrame | Graph: Intersected graph with hazards.
-        """
-        pass
+    Args:
+        delegated_func (Callable): Method signature which will be run in parallel.
+        func_iterable (Callable): Method generating the arguments required for `delegated_func`.
+    """
+    return Parallel(n_jobs=2, require="sharedmem")(
+        func_iterable(delayed(delegated_func))
+    )
