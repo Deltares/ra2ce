@@ -211,9 +211,9 @@ def update_edges_with_new_node(
                 k_new = 0
         else:
             k_new = 0
-        edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b, node_A=node_b, node_B=new_node_id,
-                         edge_fid=f"{node_b}_{new_node_id}")
-        graph.add_edge(node_b, new_node_id, k_new, **edge_data)
+        edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b, node_A=new_node_id, node_B=node_b,
+                         edge_fid=f"{new_node_id}_{node_b}")
+        graph.add_edge(new_node_id, node_b, k_new, **edge_data)  # changed the u, v order
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
@@ -253,9 +253,9 @@ def update_edges_with_new_node(
                 k_new = 0
         else:
             k_new = 0
-        edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b, node_A=node_b, node_B=new_node_id,
-                         edge_fid=f"{node_b}_{new_node_id}")
-        graph.add_edge(node_b, new_node_id, k_new, **edge_data)
+        edge_data.update(length=line_length(line_b, graph_crs), geometry=line_b, node_A=new_node_id, node_B=node_b,
+                         edge_fid=f"{new_node_id}_{node_b}")
+        graph.add_edge(new_node_id, node_b, k_new, **edge_data)  # changed the u, v order
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
@@ -274,9 +274,9 @@ def update_edges_with_new_node(
                 k_new = 0
         else:
             k_new = 0
-        edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a, node_A=node_b, node_B=new_node_id,
-                         edge_fid=f"{node_b}_{new_node_id}")
-        graph.add_edge(node_b, new_node_id, k_new, **edge_data)
+        edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a, node_A=new_node_id, node_B=node_b,
+                         edge_fid=f"{new_node_id}_{node_b}")
+        graph.add_edge(new_node_id, node_b, k_new, **edge_data)  # changed the u, v order
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
@@ -316,9 +316,9 @@ def update_edges_with_new_node(
                 k_new = 0
         else:
             k_new = 0
-        edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a, node_A=node_b, node_B=new_node_id,
-                         edge_fid=f"{node_b}_{new_node_id}")
-        graph.add_edge(node_b, new_node_id, k_new, **edge_data)
+        edge_data.update(length=line_length(line_a, graph_crs), geometry=line_a, node_A=new_node_id, node_B=node_b,
+                         edge_fid=f"{new_node_id}_{node_b}")
+        graph.add_edge(new_node_id, node_b, k_new, **edge_data)  # changed the u, v order
 
         # Update the inverse vertices dict
         inverse_vertices_dict.update(
@@ -410,7 +410,7 @@ def add_od_nodes(
             od_data: list,  # Specify the correct type for od_data
             od: pd.DataFrame,  # Import pandas as pd and specify the correct type for od
             i: int
-    ) -> None:
+    ) -> nx.Graph:
         existing_node_id = None
 
         for node_id, node_data in graph.nodes(data=True):
@@ -438,6 +438,7 @@ def add_od_nodes(
 
             # Add the new node to the graph
             graph.add_node(new_node_id, **node_info)
+            return graph
 
     logging.info("Finding vertices closest to Origins and Destinations")
 
@@ -488,7 +489,7 @@ def add_od_nodes(
         match_od = Point(closest_node_on_road)
         # Find the road to which this vertex belongs. If the vertex is on an end-point of a road, it cannot be found,
         # and it goes to the except statement.
-        # ToDo: avoid adding links on top of each-other
+        # ToDo: avoid adding links on top of each-other => remove u,v when creating u_new, v for instance
         # ToDo: make sure the direction of the lines remain the same when making new nodes and lines
         #  e.g.: u, v => u_new, v
         try:
