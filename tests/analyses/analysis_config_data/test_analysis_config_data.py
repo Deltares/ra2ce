@@ -8,7 +8,12 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     IndirectAnalysisNameList,
     ProjectSection,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_enum import AnalysisEnum
+from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+    AnalysisDirectEnum,
+)
+from ra2ce.analyses.analysis_config_data.enums.analysis_indirect_enum import (
+    AnalysisIndirectEnum,
+)
 from tests import test_results
 
 
@@ -24,11 +29,13 @@ class TestAnalysisConfigData:
         _config = AnalysisConfigData(project=ProjectSection())
         for _indirect in IndirectAnalysisNameList:
             _config.analyses.append(
-                AnalysisSectionIndirect(analysis=AnalysisEnum.get_enum(_indirect))
+                AnalysisSectionIndirect(
+                    analysis=AnalysisIndirectEnum.get_enum(_indirect)
+                )
             )
         for _direct in DirectAnalysisNameList:
             _config.analyses.append(
-                AnalysisSectionDirect(analysis=AnalysisEnum.get_enum(_direct))
+                AnalysisSectionDirect(analysis=AnalysisDirectEnum.get_enum(_direct))
             )
         yield _config
 
