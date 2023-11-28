@@ -1,10 +1,13 @@
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisSectionBase,
+    AnalysisSectionDirect,
     ProjectSection,
 )
 from ra2ce.analyses.analysis_config_data.analysis_config_data_validator import (
     AnalysisConfigDataValidator,
+)
+from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+    AnalysisDirectEnum,
 )
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
@@ -35,7 +38,7 @@ class TestAnalysisConfigDataValidator:
         # 2. Run test.
         _test_config_data = AnalysisConfigData(
             project=ProjectSection(),
-            analyses=AnalysisSectionBase(),
+            analyses=AnalysisSectionDirect(analysis=AnalysisDirectEnum.DIRECT),
             output_path=_output_test_dir,
         )
         _report = self._validate_config(_test_config_data)
@@ -70,7 +73,7 @@ class TestAnalysisConfigDataValidator:
             root_path=test_results,
             output_path=test_results.joinpath("output"),
             project=ProjectSection(),
-            analyses=[AnalysisSectionBase(analysis="invalid_analysis_type")],
+            analyses=[AnalysisSectionDirect(analysis="invalid_analysis_type")],
         )
 
         # 2. Run test.

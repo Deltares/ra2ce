@@ -48,7 +48,7 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
         """
         # Create the output folders
         for a in self.config_data.analyses:
-            output_path = self.config_data.output_path.joinpath(a.analysis)
+            output_path = self.config_data.output_path.joinpath(a.analysis.config_value)
             output_path.mkdir(parents=True, exist_ok=True)
 
     @classmethod
