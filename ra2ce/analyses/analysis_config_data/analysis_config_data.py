@@ -41,12 +41,12 @@ from ra2ce.graph.network_config_data.network_config_data import (
     OriginsDestinationsSection,
 )
 
-IndirectAnalysisNameList: list[str] = [
-    _enum.config_value for _enum in AnalysisIndirectEnum.list_valid_options()
-]
-DirectAnalysisNameList: list[str] = [
-    _enum.config_value for _enum in AnalysisDirectEnum.list_valid_options()
-]
+IndirectAnalysisNameList: list[str] = list(
+    map(str, AnalysisIndirectEnum.list_valid_options())
+)
+DirectAnalysisNameList: list[str] = list(
+    map(str, AnalysisDirectEnum.list_valid_options())
+)
 
 
 @dataclass
