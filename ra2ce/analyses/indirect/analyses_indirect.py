@@ -1459,7 +1459,7 @@ def find_route_ods(
         crs="epsg:4326",
     )
     # Remove potential duplicates (o, d node) with a different Origin name.
-    _duplicate_columns = ["o_node", "d_node", "destination", "length", "geometry"]
+    _duplicate_columns = ["o_node", "d_node", "destination", weighing, "geometry"]
     pref_routes = pref_routes.drop_duplicates(
         subset=_duplicate_columns, keep="first"
     ).reset_index(drop=True)

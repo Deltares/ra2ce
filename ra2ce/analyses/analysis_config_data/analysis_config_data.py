@@ -92,7 +92,7 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     rest_capacity: float = math.nan
     maximum_jam: float = math.nan
     partofday: str = ""
-    # accessiblity analyses
+    # accessibility analyses
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     threshold: float = math.nan
     threshold_destinations: float = math.nan
