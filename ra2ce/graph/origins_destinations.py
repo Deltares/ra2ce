@@ -466,11 +466,10 @@ def add_od_nodes(
     checked_lines = set()
     for line in edge_list:
         line_data = (line[0], line[1], line[2])
-        line_geom = line[-1]["geometry"]
         # Handle MultiLineString geometries
-        if isinstance(line_geom, MultiLineString):
-            for geom in line_geom.geoms:
-                geometry_coords = geom.coords
+        if isinstance(line[-1]["geometry"], MultiLineString):
+            for line_geom in line[-1]["geometry"].geoms:
+                geometry_coords = line_geom.coords
                 coords = tuple(sorted([coord for coord in geometry_coords]))
                 if coords in checked_lines:
                     graph.remove_edge(*line[0:3])
@@ -482,6 +481,7 @@ def add_od_nodes(
                     checked_lines.add(coords)
         else:
             # Handle regular LineString geometries
+            line_geom = line[-1]["geometry"]
             geometry_coords = line_geom.coords
             coords = tuple(sorted([coord for coord in geometry_coords]))
             if coords in checked_lines:
