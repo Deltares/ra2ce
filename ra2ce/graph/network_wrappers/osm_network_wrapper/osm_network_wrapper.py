@@ -39,9 +39,11 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         self.output_graph_dir = config_data.output_graph_dir
         self.graph_crs = config_data.crs
 
-        # Network options
-        self.network_type = config_data.network.network_type
-        self.road_types = config_data.network.road_types
+        # Network
+        self.network_type = config_data.network.network_type.config_value
+        self.road_types = list(
+            _enum.config_value for _enum in config_data.network.road_types
+        )
         self.polygon_path = config_data.network.polygon
         self.is_directed = config_data.network.directed
 
@@ -133,9 +135,9 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
                 "No polygon_file file found at {}.".format(self.polygon_path)
             )
 
-        poly_dict = nut.read_geojson(geojson_file=self.polygon_path)
+        _normalized_polygon = nut.get_normalized_geojson_polygon(self.polygon_path)
         _complex_graph = self._download_clean_graph_from_osm(
-            polygon=nut.geojson_to_shp(poly_dict),
+            polygon=_normalized_polygon,
             network_type=self.network_type,
             road_types=self.road_types,
         )

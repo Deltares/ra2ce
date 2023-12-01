@@ -59,7 +59,7 @@ class MaxDamageByRoadTypeByLane:
 
         """
         self.name = path.stem
-        self.raw_data = pd.read_csv(path, index_col="Road_type \ lanes", sep=sep)
+        self.raw_data = pd.read_csv(path, index_col=r"Road_type \ lanes", sep=sep)
         self.origin_path = path  # to track the original path from which the object was constructed; maybe also date?
 
         ###Determine units

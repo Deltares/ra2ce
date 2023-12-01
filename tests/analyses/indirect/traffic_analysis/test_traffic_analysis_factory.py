@@ -12,10 +12,9 @@ from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_base import (
 from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
 )
-from tests import test_data, test_results
+from tests import test_results
 from tests.analyses.indirect.traffic_analysis import (
     TrafficAnalysisInput,
-    import_from_csv,
     valid_traffic_analysis_input,
 )
 

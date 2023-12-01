@@ -24,30 +24,20 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Optional
 
-from ra2ce.analyses.analysis_config_wrapper.analysis_config_wrapper_base import (
-    AnalysisConfigWrapperBase,
+from ra2ce.analyses.analysis_config_wrapper import (
+    AnalysisConfigWrapper,
 )
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
 class ConfigWrapper:
     network_config: NetworkConfigWrapper
-    analysis_config: AnalysisConfigWrapperBase
+    analysis_config: AnalysisConfigWrapper
 
     def __init__(self) -> None:
         self.network_config = None
         self.analysis_config = None
-
-    def get_root_dir(self) -> Path:
-        if self.network_config.ini_file:
-            # TODO: What do we need this for?
-            return self.network_config.root_dir
-        elif self.analysis_config.ini_file:
-            return self.analysis_config.root_dir
-        else:
-            raise ValueError()
 
     def is_valid_input(self) -> bool:
         """
@@ -65,18 +55,23 @@ class ConfigWrapper:
             logging.error("No valid network.ini file provided. Program will close.")
             return False
 
-        if self.network_config:
-            if self.analysis_config.root_dir != self.network_config.root_dir:
-                logging.error(
-                    "Root directory differs between network and analyses .ini files"
-                )
-                return False
+        if (
+            self.network_config
+            and self.analysis_config
+            and (
+                self.analysis_config.config_data.root_path
+                != self.network_config.config_data.root_path
+            )
+        ):
+            logging.error(
+                "Root directory differs between network and analyses .ini files"
+            )
+            return False
 
         return True
 
     def configure(self) -> None:
         if self.network_config:
-            self.network_config.configure_network()
-            self.network_config.configure_hazard()
+            self.network_config.configure()
         if self.analysis_config:
             self.analysis_config.configure()

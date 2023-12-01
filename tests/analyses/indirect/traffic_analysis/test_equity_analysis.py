@@ -51,7 +51,7 @@ class TestEquityAnalysis:
             },
         )
         assert isinstance(_expected_result, pd.DataFrame)
-        assert len(_expected_result.values) == 359
+        assert len(_expected_result.values) == 358
 
         # 2. Run test.
         _result = valid_equity_analysis.optimal_route_od_link()

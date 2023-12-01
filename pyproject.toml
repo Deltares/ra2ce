@@ -24,13 +24,12 @@ packages = [{include = "ra2ce"}]
 
 [tool.poetry.scripts]
 run_ra2ce = "ra2ce.run:main"
+build-cli = "scripts.make_exe:build_cli"
 
 [tool.poetry.dependencies]
 python = "^3.9, <3.11"
 affine = "^2.3.1"
 click = "^8.1.3"
-geojson = "^2.5.0"
-geopy = "^2.2.0"
 numpy = "^1.23.3"
 networkx = "^2.8.6"
 pandas = "^1.4.4"
@@ -39,18 +38,21 @@ rasterio = "^1.3.2"
 rasterstats = "^0.17.0"
 Rtree = "^1.0.0"
 seaborn = "^0.12.0"
-Shapely = "^1.8.4"
-tqdm = "^4.64.1"
 openpyxl = "^3.0.10"
 xlrd = "^2.0.1"
 xarray = "^2022.6.0"
-geopandas = "^0.11.1"
-osmnx = "0.16.*"
 scipy = "^1.9.1"
 GDAL = "3.5.1"
-fiona = "1.8.21"
 pygeos = "^0.14"
 momepy = "0.5.0"
+geopandas = "^0.14.0"
+shapely = "^2.0.1"
+osmnx = "^1.6.0"
+tqdm = "^4.66.1"
+geopy = "^2.4.0"
+pyogrio = "^0.6.0"
+joblib = "^1.3.2"
+pyinstaller = "^6.2.0"
 
 [tool.poetry.group.dev.dependencies]
 isort = "^5.10.1"
@@ -59,6 +61,8 @@ flake8 = "^5.0.4"
 mypy = "^0.971"
 black = "^22.8.0"
 urllib3 = "1.26.15"
+pyinstaller = "^6.2.0"
+pyinstaller-versionfile = "^2.1.1"
 
 
 [tool.poetry.group.docs.dependencies]
@@ -71,13 +75,24 @@ sphinx-copybutton = "^0.5.2"
 sphinx-rtd-theme = "^1.2.0"
 sphinx-autosummary-accessors = "^2023.4.0"
 sphinx-design = "^0.4.1"
+ipykernel = "^6.25.1"
+pandoc = "^2.3"
+pillow = "^10.1.0"
 
+[tool.poetry.group.jupyter.dependencies]
+# These dependencies are required for binder (`examples\environment.yml`).
+folium = "^0.15.0"
+matplotlib = "^3.8.1"
+mapclassify = "^2.6.1"
 
 [tool.poetry.group.test.dependencies]
 pytest-cov = "^3.0.0"
 pytest = "^7.1.3"
 teamcity-messages = "^1.32"
 testbook = "^0.4.2"
+pytest-xdist = "^3.3.1"
+pytest-profiling = "^1.7.0"
+pytest-notebook = "^0.9.0"
 
 [tool.black]
 line-length = 88
@@ -118,6 +133,7 @@ version_files= [
 [tool.pytest]
 markers = [
     "slow_test: marks tests as a long computation time test (deselect with '-m \"not slow\"')",
+    "documentation: marks tests which relate to documentation such as jupyter notebooks (deselct with '-m \"not documentation\"')",
     "external_test_data: marks tests as a test whose required data comes from external sources (deselct with '-m \"not external_test_data\"')",
 ]
 

@@ -26,27 +26,26 @@ import sys
 import warnings
 from pathlib import Path
 from statistics import mean
-from typing import List, Optional, Tuple, Union
+from typing import Optional
 
-import geojson
 import geopandas as gpd
 import networkx as nx
 import numpy as np
-import osmnx
 import pandas as pd
 import pyproj
 import rasterio
 import rtree
-import tqdm
-import tqdm._tqdm_pandas
+from tqdm import tqdm
 from geopy import distance
 from networkx import Graph, set_edge_attributes
+from numpy.ma import MaskedArray
 from osgeo import gdal
-from osmnx.simplification import simplify_graph
+from osmnx import graph_to_gdfs, simplify_graph
 from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
 from shapely.ops import linemerge, unary_union
+from shapely.geometry.base import BaseMultipartGeometry, BaseGeometry
 
 
 def convert_unit(unit: str) -> Optional[float]:
@@ -77,8 +76,8 @@ def draw_progress_bar(percent: float, bar_length: int = 20):
 
 
 def merge_lines_automatic(
-    lines_gdf: gpd.GeoDataFrame, id_name: str, aadt_names: List[str], crs_: pyproj.CRS
-) -> Tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+    lines_gdf: gpd.GeoDataFrame, id_name: str, aadt_names: list[str], crs_: pyproj.CRS
+) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
     """Automatically merge lines based on a config file
     Args:
         lines_gdf (geodataframe): the network with edges that can possibly be merged
@@ -116,7 +115,7 @@ def merge_lines_automatic(
         lines_gdf.reset_index(inplace=True)
 
     elif len(merged_lines.geoms) == len(list_lines):
-        print("No lines are merged.")
+        logging.warning("No lines are merged.")
         return lines_gdf, gpd.GeoDataFrame()
     else:
         # The lines have no additional properties.
@@ -134,7 +133,7 @@ def merge_lines_automatic(
         columns=[id_name, "geometry"], crs=crs_, geometry="geometry"
     )
 
-    for mline in merged_lines:
+    for mline in merged_lines.geoms:
         for line, i in lines_fids:
             full_line = line
             if line.within(mline) and not line.equals(mline):
@@ -249,6 +248,24 @@ def merge_lines_automatic(
     return merged, lines_merged
 
 
+def get_distance(a_b_tuple: tuple[tuple[float, float], tuple[float, float]]) -> float:
+    """
+    Gets the distance (in meters) between two points given as a tuple thanks to geopy.distance functionality.
+    TODO: Investigate whether this function is really required, instead of GeoPandasDataFrame,
+     to reduce the usage of external dependencies.
+
+    Args:
+        a_b_tuple (tuple[float]): Tuple representing two points.
+
+    Returns:
+        float: Distance between two points in meters.
+    """
+    distance.geodesic.ELLIPSOID = "WGS-84"
+    from_a, to_b = a_b_tuple
+    latlon = lambda lonlat: (lonlat[1], lonlat[0])
+    return distance.distance(latlon(from_a), latlon(to_b)).meters
+
+
 def line_length(line: LineString, crs: pyproj.CRS) -> float:
     """Calculate length of a line in meters, given in geographic coordinates.
     Args:
@@ -259,23 +276,15 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
     """
     # Check if the coordinate system is projected or geographic
     if crs.is_geographic:
-        distance.geodesic.ELLIPSOID = "WGS-84"
         try:
             # Swap shapely (lonlat) to geopy (latlon) points
-            latlon = lambda lonlat: (lonlat[1], lonlat[0])
             if isinstance(line, LineString):
-                total_length = sum(
-                    distance.distance(latlon(a), latlon(b)).meters
-                    for (a, b) in zip(line.coords, line.coords[1:])
-                )
+                total_length = sum(map(get_distance, zip(line.coords, line.coords[1:])))
             elif isinstance(line, MultiLineString):
                 total_length = sum(
                     [
-                        sum(
-                            distance.distance(latlon(a), latlon(b)).meters
-                            for (a, b) in zip(l.coords, l.coords[1:])
-                        )
-                        for l in line
+                        sum(map(get_distance, zip(l.coords, l.coords[1:])))
+                        for l in line.geoms
                     ]
                 )
             else:
@@ -306,7 +315,7 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
 
 def snap_endpoints_lines(
     lines_gdf: gpd.GeoDataFrame,
-    max_dist: Union[int, float],
+    max_dist: int | float,
     id_name: str,
     crs: pyproj.CRS,
 ) -> gpd.GeoDataFrame:
@@ -392,11 +401,11 @@ def snap_endpoints_lines(
     return lines_gdf
 
 
-def find_isolated_endpoints(linesIds: list, lines: list) -> list:
+def find_isolated_endpoints(lines_ids: list[str], lines: list) -> list:
     """Find endpoints of lines that don't touch another line.
 
     Args:
-        linesIds: a list of the IDs of lines
+        lines_ids: a list of the IDs of lines
         lines: a list of LineStrings or a MultiLineString
 
     Returns:
@@ -408,7 +417,7 @@ def find_isolated_endpoints(linesIds: list, lines: list) -> list:
         Build on library from https://github.com/ojdo/python-tools/blob/master/shapelytools.py
     """
     isolated_endpoints = []
-    for i, id_line in enumerate(zip(linesIds, lines)):
+    for i, id_line in enumerate(zip(lines_ids, lines)):
         ids, line = id_line
         other_lines = lines[:i] + lines[i + 1 :]
         for q in [0, -1]:
@@ -431,7 +440,7 @@ def find_isolated_endpoints(linesIds: list, lines: list) -> list:
 
 
 def nearest_neighbor_within(
-    search_points: list, spatial_index, point: Point, max_distance: Union[float, int]
+    search_points: list, spatial_index, point: Point, max_distance: float | int
 ) -> Point:
     """Find nearest point among others up to a maximum distance.
 
@@ -479,7 +488,9 @@ def nearest_neighbor_within(
     return closest_point
 
 
-def vertices_from_lines(lines, list_ids: List[str]) -> dict:
+def vertices_from_lines(
+    lines: list[BaseMultipartGeometry], list_ids: list[str]
+) -> dict:
     """Return dict of with values: unique vertices from list of LineStrings.
     keys: index of LineString in original list
     From shapely_tools:
@@ -491,7 +502,7 @@ def vertices_from_lines(lines, list_ids: List[str]) -> dict:
             vertices_dict[i] = [Point(p) for p in set(list(line.coords))]
         if isinstance(line, MultiLineString):
             all_vertices = []
-            for each_line in line:
+            for each_line in line.geoms:
                 all_vertices.extend([Point(p) for p in set(list(each_line.coords))])
             vertices_dict[i] = all_vertices
     return vertices_dict
@@ -689,7 +700,8 @@ def split_line_with_points(line, points):
     return segments
 
 
-def cut(line, distance) -> Tuple[LineString, LineString]:
+
+def cut(line: BaseMultipartGeometry, distance: float) -> tuple[LineString, LineString]:
     # Cuts a line in two at a distance from its starting point
     # This is taken from shapely manual
     if (distance <= 0.0) | (distance >= line.length):
@@ -710,7 +722,7 @@ def cut(line, distance) -> Tuple[LineString, LineString]:
                     LineString([(cp.x, cp.y)] + [xy[0:2] for xy in coords[i:]]),
                 ]
     elif isinstance(line, MultiLineString):
-        for ln in line:
+        for ln in line.geoms:
             coords = list(ln.coords)
             for i, p in enumerate(coords):
                 pd = ln.project(Point(p))
@@ -906,7 +918,7 @@ def hazard_join_id_shp(roads, hazard_data_dict: dict):
     attempts = 0
     while attempts < 3:
         try:
-            hazard = gpd.read_file(hazard_data_dict["path"][0])
+            hazard = gpd.read_file(hazard_data_dict["path"][0], engine="pyogrio")
             hazard = hazard[[col_id, col_val]]
             break
         except KeyError:
@@ -921,7 +933,9 @@ def hazard_join_id_shp(roads, hazard_data_dict: dict):
         attempts = 0
         while attempts < 3:
             try:
-                hazard2 = gpd.read_file(hazard_data_dict["path"][i], encoding="utf-8")
+                hazard2 = gpd.read_file(
+                    hazard_data_dict["path"][i], encoding="utf-8", engine="pyogrio"
+                )
                 hazard = pd.concat(
                     [hazard, hazard2[[col_id, col_val]]], ignore_index=True
                 )
@@ -948,15 +962,15 @@ def hazard_join_id_shp(roads, hazard_data_dict: dict):
     return roads
 
 
-def delete_duplicates(all_points: List[Point]) -> List[Point]:
+def delete_duplicates(all_points: list[Point]) -> list[Point]:
     """
     Delete duplicate points given they are 'almost' equals.
 
     Args:
-        all_points (List[Point]): List with potentially repeated points.
+        all_points (list[Point]): List with potentially repeated points.
 
     Returns:
-        List[Point]: List with unique points.
+        list[Point]: list with unique points.
     """
     points = [point for point in all_points]
     uniquepoints = []
@@ -966,7 +980,9 @@ def delete_duplicates(all_points: List[Point]) -> List[Point]:
     return uniquepoints
 
 
-def create_simplified_graph(graph_complex, new_id: str = "rfid"):
+def create_simplified_graph(
+    graph_complex: nx.classes.graph.Graph, new_id: str = "rfid"
+):
     """Create a simplified graph with unique ids from a complex graph"""
     logging.info("Simplifying graph")
     try:
@@ -987,16 +1003,18 @@ def create_simplified_graph(graph_complex, new_id: str = "rfid"):
             graph_complex, complex_to_simple, new_id
         )
         logging.info("Simplified graph succesfully created")
-    except Exception:
+    except Exception as exc:
         graph_simple = None
         id_tables = None
-        logging.error("Did not create a simplified version of the graph")
+        logging.error(
+            "Did not create a simplified version of the graph ({})".format(exc)
+        )
     return graph_simple, graph_complex, id_tables
 
 
 def gdf_check_create_unique_ids(
     gdf: gpd.GeoDataFrame, id_name: str, new_id_name: str = "rfid"
-) -> Tuple[gpd.GeoDataFrame, str]:
+) -> tuple[gpd.GeoDataFrame, str]:
     """
     Check if the ID's are unique per edge: if not, add an own ID called 'fid'
 
@@ -1006,7 +1024,7 @@ def gdf_check_create_unique_ids(
         new_id_name (str, optional): Optinal new id name to give. Defaults to "rfid".
 
     Returns:
-        Tuple[gpd.GeoDataFrame, str]: Resulting dataframe and its ID.
+        tuple[gpd.GeoDataFrame, str]: Resulting dataframe and its ID.
     """
     check = list(gdf.index)
     logging.info("Started creating unique ids...")
@@ -1026,7 +1044,7 @@ def gdf_check_create_unique_ids(
 
 def graph_check_create_unique_ids(
     graph: Graph, id_name: str, new_id_name: str = "rfid"
-) -> Tuple[Graph, str]:
+) -> tuple[Graph, str]:
     """
     TODO: This is not really being used. It could be removed.
     Check if the ID's are unique per edge: if not, add an own ID called 'fid'
@@ -1037,7 +1055,7 @@ def graph_check_create_unique_ids(
         new_id_name (str, optional): Optional new id to set for repeated elements. Defaults to "rfid".
 
     Returns:
-        Tuple[Graph, str]: Resulting graph and used ID.
+        tuple[Graph, str]: Resulting graph and used ID.
     """
     if len(set([str(e[-1][id_name]) for e in graph.edges.data(keys=True)])) < len(
         graph.edges()
@@ -1107,14 +1125,6 @@ def simplify_graph_count(complex_graph: nx.Graph) -> nx.Graph:
     return simple_graph
 
 
-def read_geojson(geojson_file: Path) -> dict:
-    """Read a GeoJSON file into a GeoJSON object.
-    From the script get_rcm.py from Martijn Kwant.
-    """
-    with open(geojson_file) as f:
-        return geojson.load(f)
-
-
 def graph_from_gdf(
     gdf: gpd.GeoDataFrame, gdf_nodes, name: str = "network", node_id: str = "ID"
 ) -> nx.MultiGraph:
@@ -1141,9 +1151,9 @@ def graph_from_gdf(
 
 def graph_to_gdf(
     graph_to_convert: nx.classes.graph.Graph,
-    save_nodes=False,
-    save_edges=True,
-    to_save=False,
+    save_nodes: bool = False,
+    save_edges: bool = True,
+    to_save: bool = False,
 ):
     """Takes in a networkx graph object and returns edges and nodes as geodataframes
     Arguments:
@@ -1156,7 +1166,7 @@ def graph_to_gdf(
 
     nodes, edges = None, None
     if save_nodes and save_edges:
-        nodes, edges = osmnx.graph_to_gdfs(
+        nodes, edges = graph_to_gdfs(
             graph_to_convert, nodes=save_nodes, edges=save_edges, node_geometry=False
         )
 
@@ -1168,13 +1178,9 @@ def graph_to_gdf(
                         df[col] = df[col].astype(str)
 
     elif not save_nodes and save_edges:
-        edges = osmnx.graph_to_gdfs(
-            graph_to_convert, nodes=save_nodes, edges=save_edges
-        )
+        edges = graph_to_gdfs(graph_to_convert, nodes=save_nodes, edges=save_edges)
     elif save_nodes and not save_edges:
-        nodes = osmnx.graph_to_gdfs(
-            graph_to_convert, nodes=save_nodes, edges=save_edges
-        )
+        nodes = graph_to_gdfs(graph_to_convert, nodes=save_nodes, edges=save_edges)
 
     return edges, nodes
 
@@ -1195,7 +1201,7 @@ def graph_to_gpkg(origin_graph: nx.classes.graph.Graph, edge_gpkg, node_gpkg):
         origin_graph = nx.MultiGraph(origin_graph)
 
     # The nodes should have a geometry attribute (perhaps on top of the x and y attributes)
-    nodes, edges = osmnx.graph_to_gdfs(origin_graph, node_geometry=False)
+    nodes, edges = graph_to_gdfs(origin_graph, node_geometry=False)
 
     dfs = [edges, nodes]
     for df in dfs:
@@ -1211,63 +1217,49 @@ def graph_to_gpkg(origin_graph: nx.classes.graph.Graph, edge_gpkg, node_gpkg):
     logging.info("Saving edges as shapefile: {}".format(edge_gpkg))
 
     # The encoding utf-8 might result in an empty shapefile if the wrong encoding is used.
+    for entity in [nodes, edges]:
+        if 'osmid' in entity:
+            # Otherwise it gives this error: cannot insert osmid, already exist
+            entity['osmid_original'] = entity.pop('osmid')
+    for _path in [node_gpkg, edge_gpkg]:
+        if _path.exists():
+            _path.unlink()
     nodes.to_file(node_gpkg, driver="GPKG", encoding="utf-8")
     edges.to_file(edge_gpkg, driver="GPKG", encoding="utf-8")
 
 
-def geojson_to_shp(geojson_obj, feature_number=0):
-    """Convert a GeoJSON object to a Shapely Polygon.
-    Adjusted from the script get_rcm.py from Martijn Kwant.
-
-    In case of FeatureCollection, only one of the features is used (the first by default).
-    3D points are converted to 2D.
-
-    Parameters
-    ----------
-    geojson_obj : dict
-        a GeoJSON object
-    feature_number : int, optional
-        Feature to extract polygon from (in case of MultiPolygon
-        FeatureCollection), defaults to first Feature
-
-    Returns
-    -------
-    polygon coordinates
-        string of comma separated coordinate tuples (lon, lat) to be used by SentinelAPI
+@staticmethod
+def get_normalized_geojson_polygon(geojson_path: Path) -> BaseGeometry:
     """
-    if "coordinates" in geojson_obj:
-        geometry = geojson_obj
-    elif "geometry" in geojson_obj:
-        geometry = geojson_obj["geometry"]
-    else:
-        geometry = geojson_obj["features"][feature_number]["geometry"]
+    Converts a GeoJson object to a Shapely Polygon.
 
-    def ensure_2d(geometry):
-        if isinstance(geometry[0], (list, tuple)):
-            return list(map(ensure_2d, geometry))
-        else:
-            return geometry[:2]
+    Args:
+        geojson_path (Path): File containing a geojson object.
 
-    def check_bounds(geometry):
-        if isinstance(geometry[0], (list, tuple)):
-            return list(map(check_bounds, geometry))
-        else:
-            if geometry[0] > 180 or geometry[0] < -180:
-                raise ValueError(
-                    "Longitude is out of bounds, check your JSON format or data. The Coordinate Reference System should be in EPSG:4326."
-                )
-            if geometry[1] > 90 or geometry[1] < -90:
-                raise ValueError(
-                    "Latitude is out of bounds, check your JSON format or data. The Coordinate Reference System should be in EPSG:4326."
-                )
+    Raises:
+        ValueError: When the polygon longitude is out of bounds.
+        ValueError: When the polygon latitude is out of bounds.
+
+    Returns:
+        BaseGeometry: Resulting normalized (in lat and lon) polygon in shapely format.
+    """
+    _read_geojson = gpd.read_file(geojson_path)
+
+    def check_bounds(geometry: BaseGeometry):
+        if geometry.bounds[0] > 180 or geometry.bounds[2] < -180:
+            raise ValueError(
+                "Longitude is out of bounds, check your JSON format or data. The Coordinate Reference System should be in EPSG:4326."
+            )
+        if geometry.bounds[1] > 90 or geometry.bounds[3] < -90:
+            raise ValueError(
+                "Latitude is out of bounds, check your JSON format or data. The Coordinate Reference System should be in EPSG:4326."
+            )
 
     # Discard z-coordinate, if it exists
-    geometry["coordinates"] = ensure_2d(geometry["coordinates"])
-    check_bounds(geometry["coordinates"])
+    check_bounds(_read_geojson.geometry[0])
 
     # Create a shapely polygon from the coordinates.
-    poly = shape(geometry).buffer(0)
-    return poly
+    return shape(_read_geojson.geometry[0]).buffer(0)
 
 
 def read_merge_shp(shp_file_analyse, id_name, shp_file_diversion=[], crs_=4326):
@@ -1293,14 +1285,14 @@ def read_merge_shp(shp_file_analyse, id_name, shp_file_diversion=[], crs_=4326):
 
     # read the shapefile(s) for analysis
     for shp in shp_file_analyse:
-        lines_shp = gpd.read_file(shp)
+        lines_shp = gpd.read_file(shp, engine="pyogrio")
         lines_shp["to_analyse"] = 1
         lines.append(lines_shp)
 
     # read the shapefile(s) for only diversion
     if isinstance(shp_file_diversion, list):
         for shp2 in shp_file_diversion:
-            lines_shp = gpd.read_file(shp2)
+            lines_shp = gpd.read_file(shp2, engine="pyogrio")
             lines_shp["to_analyse"] = 0
             lines.append(lines_shp)
 
@@ -1380,7 +1372,7 @@ def get_extent(dataset):
 
 def get_graph_edges_extent(
     network_graph: nx.classes.Graph,
-) -> Tuple[float, float, float, float]:
+) -> tuple[float, float, float, float]:
     """Inspects all geometries of the edges of a graph and returns the most extreme coordinates
 
     Arguments:
@@ -1496,7 +1488,7 @@ def filter_osm(osm_filter_path, o5m, filtered_o5m, tags=None):
     os.system(command)
 
 
-def graph_link_simple_id_to_complex(graph_simple, new_id):
+def graph_link_simple_id_to_complex(graph_simple: nx.classes.graph.Graph, new_id: str):
     """
     Create lookup tables (dicts) to match edges_ids of the complex and simple graph
     Optionally, saves these lookup tables as json files.
@@ -1517,7 +1509,7 @@ def graph_link_simple_id_to_complex(graph_simple, new_id):
     # Iterate over the simple, because this already has the corresponding complex information
     lookup_dict = {}
     # keys are the ids of the simple graph, values are lists with all matching complex id's
-    for u, v, k in tqdm.tqdm(graph_simple.edges(keys=True)):
+    for u, v, k in tqdm(graph_simple.edges(keys=True)):
         key_1 = graph_simple[u][v][k]["{}".format(new_id)]
         value_1 = graph_simple[u][v][k]["{}_c".format(new_id)]
         lookup_dict[key_1] = value_1
@@ -1670,12 +1662,19 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
         for i in df.loc[df["avg_speed"] == 0].index:
             if df["road_types"].iloc[i] in exceptions:
                 if any(rt in df["road_types"].iloc[i] for rt in df["road_types"]):
-                    road_type, avg_speed = [
-                        (rt, avg_s)
-                        for rt, avg_s in zip(df["road_types"], df["avg_speed"])
-                        if rt in df["road_types"].iloc[i] and avg_s != 0
-                    ][0]
-                    df["avg_speed"].iloc[i] = avg_speed
+                    try:
+                        road_type, avg_speed = [
+                            (rt, avg_s)
+                            for rt, avg_s in zip(df["road_types"], df["avg_speed"])
+                            if rt in df["road_types"].iloc[i] and avg_s != 0
+                        ][0]
+                        df["avg_speed"].iloc[i] = avg_speed
+                    except IndexError as e:
+                        logging.warning(
+                            f"Road type '{df['road_types'].iloc[i]}' cannot be assigned any average speed. Please check the average speed CSV ({save_path}), enter the right average speed for this road type, and run RA2CE again."
+                        )
+                        logging.error("Index error: {}".format(e))
+                        df["avg_speed"].iloc[i] = 0
             else:
                 # if any(rt in df['road_types'].iloc[i] for rt in df['road_types']):
                 if "link" in df["road_types"].iloc[i]:
@@ -1848,10 +1847,14 @@ def clean_memory(list_delete: list) -> None:
         del to_delete
 
 
-def get_valid_mean(x_value: float) -> Optional[float]:
-    if not isinstance(x_value, float):
+def get_valid_mean(x_value: MaskedArray, **kwargs) -> Optional[float]:
+    # **kwargs should not be removed. properties var is passed in zonal_stats. So properties should not be removed,
+    #  else this will not be activated
+    if not isinstance(x_value, MaskedArray):
         return np.nan
-    return x_value.mean()  # You know it's a valid type, so return the mean.
+    if x_value.mask.all():
+        return np.nan
+    return np.mean(x_value)  # You know it's a valid type, so return the mean.
 
 
 def buffer_geometry(
