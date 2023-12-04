@@ -33,7 +33,7 @@ import pyproj
 import rasterio
 import rasterio.mask
 import rasterio.transform
-import shapely
+from shapely.geometry import LineString
 from rasterio import Affine
 from rasterio.warp import Resampling, calculate_default_transform, reproject
 from shapely.geometry import Point
@@ -180,8 +180,8 @@ def update_edges_with_new_node(
     node_a: int,
     node_b: int,
     k: int,
-    line_a: shapely.LineString,
-    line_b: shapely.LineString,
+    line_a: LineString,
+    line_b: LineString,
     new_node_id: int,
     graph_crs: pyproj.CRS,
     inverse_vertices_dict: dict,
