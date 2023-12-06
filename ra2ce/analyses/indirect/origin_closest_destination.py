@@ -406,10 +406,12 @@ class OriginClosestDestination:
         # Attribute to the origins that don't have access that they do not have any access
         if len(other) > 0:
             for oth in other:
-                origins.loc[
-                    origins[self.od_id] == int(oth[-1].split("_")[-1]),
-                    col_name,
-                ] = "no access"
+                od_id_list = oth[-1].split(",")
+                for od_id in od_id_list:
+                    origins.loc[
+                        origins[self.od_id] == int(od_id.split("_")[-1]),
+                        col_name,
+                    ] = "no access"
         return origins
 
     def get_nr_without_access(

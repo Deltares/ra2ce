@@ -289,7 +289,7 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
                 )
             else:
                 logging.error(
-                    "The road strech is not a Shapely LineString or MultiLineString so the length cannot be computed."
+                    "The road stretch is not a Shapely LineString or MultiLineString so the length cannot be computed."
                     "Please check your data network data."
                 )
                 return np.nan
