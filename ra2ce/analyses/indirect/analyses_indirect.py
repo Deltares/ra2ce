@@ -556,8 +556,13 @@ class IndirectAnalyses:
         for n, v in graph.nodes(data=True):
             if "od_id" not in v:
                 continue
-            _o_node_list = list(map(lambda x: (n, x), v["od_id"].split(",")))
-            _od_nodes.extend(_o_node_list)
+            # Check if v["od_id"] is a non-null string
+            if isinstance(v["od_id"], str):
+                _o_node_list = list(map(lambda x: (n, x), v["od_id"].split(",")))
+                _od_nodes.extend(_o_node_list)
+            elif pd.isna(v["od_id"]):
+                # Handle the case where v["od_id"] is a NaN float
+                _od_nodes.append((n, 'nan'))
         return _od_nodes
 
     def _get_origin_destination_pairs(
