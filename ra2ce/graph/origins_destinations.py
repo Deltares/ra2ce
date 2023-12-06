@@ -180,6 +180,8 @@ def update_edges_with_new_node(
         graph_crs,
         inverse_vertices_dict,
 ):
+    # ToDo: make sure the direction of the lines remain the same when making new nodes and lines
+    #  e.g.: u, v => u_new, v
     # Check which line is connected to which node. There can be 8 different combinations and there should be two
     # edges added to the graph.
     cnt = 0
@@ -540,8 +542,6 @@ def add_od_nodes(
             match_od_point = Point(closest_node_on_road)
             # Find the road to which this vertex belongs. If the vertex is on an end-point of a road, it cannot be found
             # and it goes to the except statement.
-            # ToDo: make sure the direction of the lines remain the same when making new nodes and lines
-            #  e.g.: u, v => u_new, v
             try:
                 closest_u_v_k = inverse_vertices_dict[
                     (closest_node_on_road[0], closest_node_on_road[1])
