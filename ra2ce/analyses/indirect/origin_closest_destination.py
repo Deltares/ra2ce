@@ -23,7 +23,7 @@
 # -*- coding: utf-8 -*-
 import copy
 import logging
-from typing import Optional, Union
+from typing import Optional, Union, Any
 
 import geopandas as gpd
 import networkx as nx
@@ -539,20 +539,21 @@ class OriginClosestDestination:
         )
 
     def _find_optimal_routes(
-        self,
-        list_no_path: list,
-        n_ndat: tuple,
-        disrupted_graph,
-        hazard_name: str,
-        list_disrupted_destinations: list,
-        pref_routes: gpd.GeoDataFrame,
-        dest_name: str,
-        name_save: str,
-        optimal_routes: list,
-        origins,
-        base_graph,
-        destinations,
-    ) -> Optional[gpd.GeoDataFrame]:
+            self,
+            node_checked_has_path: dict,
+            list_no_path: list,
+            n_ndat: tuple,
+            disrupted_graph,
+            hazard_name: str,
+            list_disrupted_destinations: list,
+            pref_routes: gpd.GeoDataFrame,
+            dest_name: str,
+            name_save: str,
+            optimal_routes: list,
+            origins,
+            base_graph,
+            destinations,
+    ) -> tuple[Any, dict]:
         """
         Refactored method to avoid duplication of code between `find_closest_location` and `find_multiple_closest_locations` with subtile differences:
         - The first would not use a `dest_name` attribute.
