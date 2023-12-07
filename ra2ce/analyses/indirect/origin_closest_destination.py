@@ -23,7 +23,7 @@
 # -*- coding: utf-8 -*-
 import copy
 import logging
-from typing import Optional, Union
+from typing import Optional, Union, Any
 
 import geopandas as gpd
 import networkx as nx
@@ -494,8 +494,10 @@ class OriginClosestDestination:
         optimal_routes = []
         list_disrupted_destinations = []
         list_no_path = []
+        node_checked_has_path = {}
         for n_ndat in tqdm(disrupted_graph.nodes.data(), desc="Finding optimal routes"):
             _new_origins = self._find_optimal_routes(
+                node_checked_has_path,
                 list_no_path,
                 n_ndat,
                 disrupted_graph,
@@ -539,20 +541,21 @@ class OriginClosestDestination:
         )
 
     def _find_optimal_routes(
-        self,
-        list_no_path: list,
-        n_ndat: tuple,
-        disrupted_graph,
-        hazard_name: str,
-        list_disrupted_destinations: list,
-        pref_routes: gpd.GeoDataFrame,
-        dest_name: str,
-        name_save: str,
-        optimal_routes: list,
-        origins,
-        base_graph,
-        destinations,
-    ) -> Optional[gpd.GeoDataFrame]:
+            self,
+            node_checked_has_path: dict,
+            list_no_path: list,
+            n_ndat: tuple,
+            disrupted_graph,
+            hazard_name: str,
+            list_disrupted_destinations: list,
+            pref_routes: gpd.GeoDataFrame,
+            dest_name: str,
+            name_save: str,
+            optimal_routes: list,
+            origins,
+            base_graph,
+            destinations,
+    ) -> tuple[Any, dict]:
         """
         Refactored method to avoid duplication of code between `find_closest_location` and `find_multiple_closest_locations` with subtile differences:
         - The first would not use a `dest_name` attribute.
@@ -564,6 +567,7 @@ class OriginClosestDestination:
         n, ndat = n_ndat
         if self.od_key in ndat and self.o_name in ndat[self.od_key]:
             if nx.has_path(disrupted_graph, n, dest_name):
+                node_checked_has_path.setdefault(ndat[self.od_key], []).append(n)
                 path = nx.shortest_path(
                     disrupted_graph,
                     source=n,
@@ -578,8 +582,8 @@ class OriginClosestDestination:
                 if hazard_name:
                     try:
                         if (
-                            disrupted_graph.nodes[closest_dest][hazard_name]
-                            > self.threshold_destinations
+                                disrupted_graph.nodes[closest_dest][hazard_name]
+                                > self.threshold_destinations
                         ):
                             list_disrupted_destinations.append(
                                 (
@@ -648,9 +652,10 @@ class OriginClosestDestination:
                         )
                     )
             else:
-                list_no_path.append((n, ndat[self.od_key]))
+                if ndat[self.od_key] not in node_checked_has_path:
+                    list_no_path.append((n, ndat[self.od_key]))
 
-        return self.update_origins(origins, list_no_path, name_save.format("A"))
+        return self.update_origins(origins, list_no_path, name_save.format("A")), node_checked_has_path
 
     def find_multiple_closest_locations(
         self,
@@ -705,11 +710,13 @@ class OriginClosestDestination:
 
             list_disrupted_destinations = []
             list_no_path = []
+            node_checked_has_path = {}
             for n_ndat in tqdm(
                 disrupted_graph.nodes.data(),
                 desc=f"Finding optimal routes to {dest_name}",
             ):
                 _new_origins = self._find_optimal_routes(
+                    node_checked_has_path,
                     list_no_path,
                     n_ndat,
                     disrupted_graph,
