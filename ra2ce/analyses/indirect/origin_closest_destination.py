@@ -496,7 +496,7 @@ class OriginClosestDestination:
         list_no_path = []
         node_checked_has_path = {}
         for n_ndat in tqdm(disrupted_graph.nodes.data(), desc="Finding optimal routes"):
-            _new_origins = self._find_optimal_routes(
+            _new_origins, node_checked_has_path = self._find_optimal_routes(
                 node_checked_has_path,
                 list_no_path,
                 n_ndat,
@@ -715,7 +715,7 @@ class OriginClosestDestination:
                 disrupted_graph.nodes.data(),
                 desc=f"Finding optimal routes to {dest_name}",
             ):
-                _new_origins = self._find_optimal_routes(
+                _new_origins, node_checked_has_path = self._find_optimal_routes(
                     node_checked_has_path,
                     list_no_path,
                     n_ndat,
