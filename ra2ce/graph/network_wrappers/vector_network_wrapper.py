@@ -26,6 +26,7 @@ import geopandas as gpd
 import momepy
 import networkx as nx
 import pandas as pd
+from tqdm import tqdm
 from shapely.geometry import Point
 
 import ra2ce.graph.networks_utils as nut
@@ -44,6 +45,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         self,
         config_data: NetworkConfigData,
     ) -> None:
+        self._config_data = config_data
         self.crs = config_data.crs
 
         # Network options
@@ -70,6 +72,9 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             graph = self.get_indirect_graph_from_vector(gdf)
         edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
         graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
+        if self._config_data.cleanup.delete_duplicate_nodes:
+            graph_complex = self._delete_duplicate_nodes(graph_complex)
+            edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
         return graph_complex, edges
 
     def _read_vector_to_project_region_and_crs(self) -> gpd.GeoDataFrame:
@@ -117,6 +122,46 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             )
         )
         return gdf
+
+    @staticmethod
+    def _delete_duplicate_nodes(graph_complex: nx.MultiGraph) -> nx.MultiGraph:
+        # Create a mapping from location to a representative node
+        location_to_representative = {}
+
+        # Iterate through nodes and add representative nodes to the mapping
+        for node, data in tqdm(graph_complex.nodes(data=True), desc="Creating graph with removed node duplicates"):
+            location = (round(data['geometry'].x, 7), round(data['geometry'].y, 7))
+            if location not in location_to_representative:
+                location_to_representative[location] = node
+
+        # Create an updated graph with representative nodes
+        updated_graph = nx.MultiGraph()
+        updated_graph.add_nodes_from((representative_node, {'geometry': Point(location)})
+                                     for location, representative_node in location_to_representative.items())
+
+        # Add edges to the updated_graph
+        for u, v, data in tqdm(graph_complex.edges(data=True), desc="Adding edges to the updated graph"):
+            u_representative = location_to_representative.get((round(graph_complex.nodes[u]['geometry'].x, 7),
+                                                               round(graph_complex.nodes[u]['geometry'].y, 7)))
+            v_representative = location_to_representative.get((round(graph_complex.nodes[v]['geometry'].x, 7),
+                                                               round(graph_complex.nodes[v]['geometry'].y, 7)))
+
+            if u_representative is not None and v_representative is not None:
+                # Add representative nodes if they don't exist in the updated graph
+                if not updated_graph.has_node(u_representative):
+                    updated_graph.add_node(u_representative,
+                                           geometry=Point((round(graph_complex.nodes[u]['geometry'].x, 7),
+                                                           round(graph_complex.nodes[u]['geometry'].y, 7))))
+
+                if not updated_graph.has_node(v_representative):
+                    updated_graph.add_node(v_representative,
+                                           geometry=Point((round(graph_complex.nodes[v]['geometry'].x, 7),
+                                                           round(graph_complex.nodes[v]['geometry'].y, 7))))
+
+                # Add edges to the updated graph
+                updated_graph.add_edge(u_representative, v_representative, **data)
+
+        return updated_graph
 
     @staticmethod
     def get_direct_graph_from_vector(gdf: gpd.GeoDataFrame) -> nx.DiGraph:
