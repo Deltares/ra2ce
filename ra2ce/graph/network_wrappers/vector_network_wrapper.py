@@ -26,6 +26,7 @@ import geopandas as gpd
 import momepy
 import networkx as nx
 import pandas as pd
+import pyproj
 from tqdm import tqdm
 from shapely.geometry import Point
 
@@ -136,8 +137,10 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         # Create an updated graph with representative nodes
         updated_graph = nx.MultiGraph()
-        updated_graph.add_nodes_from((representative_node, {'geometry': Point(location)})
-                                     for location, representative_node in location_to_representative.items())
+
+        updated_graph.add_nodes_from(
+            (representative_node, {'geometry': Point(location)})
+            for location, representative_node in location_to_representative.items())
 
         # Add edges to the updated_graph
         for u, v, data in tqdm(graph_complex.edges(data=True), desc="Adding edges to the updated graph"):
@@ -161,6 +164,9 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
                 # Add edges to the updated graph
                 updated_graph.add_edge(u_representative, v_representative, **data)
 
+        # Set the CRS for updated_graph equal to the CRS of graph_complex
+        updated_graph.graph['crs'] = graph_complex.graph.get('crs', pyproj.CRS('EPSG:4326'))
+        updated_graph.graph['name'] = graph_complex.graph.get('name', None)
         return updated_graph
 
     @staticmethod
