@@ -192,7 +192,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
             graph=complex_graph, geom_name="geometry"
         ).to_directed()
         complex_graph = OsmNetworkWrapper.snap_nodes_to_nodes(
-            graph=complex_graph, threshold=0.000025
+            graph=complex_graph, threshold=0.00005
         )
         return complex_graph
 
