@@ -496,7 +496,7 @@ class OriginClosestDestination:
         list_no_path = []
         node_checked_has_path = {}
         for n_ndat in tqdm(disrupted_graph.nodes.data(), desc="Finding optimal routes"):
-            _new_origins, node_checked_has_path = self._find_optimal_routes(
+            _found_optimal_routes = self._find_optimal_routes(
                 node_checked_has_path,
                 list_no_path,
                 n_ndat,
@@ -511,6 +511,11 @@ class OriginClosestDestination:
                 base_graph,
                 destinations,
             )
+
+            if _found_optimal_routes:
+                _new_origins, node_checked_has_path = _found_optimal_routes
+            else:
+                _new_origins = None
 
             if _new_origins is not None:
                 origins = _new_origins
@@ -555,7 +560,7 @@ class OriginClosestDestination:
             origins,
             base_graph,
             destinations,
-    ) -> tuple[Any, dict]:
+    ) -> Union[tuple[Any, dict], None]:
         """
         Refactored method to avoid duplication of code between `find_closest_location` and `find_multiple_closest_locations` with subtile differences:
         - The first would not use a `dest_name` attribute.
@@ -715,7 +720,7 @@ class OriginClosestDestination:
                 disrupted_graph.nodes.data(),
                 desc=f"Finding optimal routes to {dest_name}",
             ):
-                _new_origins, node_checked_has_path = self._find_optimal_routes(
+                _found_optimal_routes = self._find_optimal_routes(
                     node_checked_has_path,
                     list_no_path,
                     n_ndat,
@@ -730,6 +735,10 @@ class OriginClosestDestination:
                     base_graph,
                     destinations,
                 )
+                if _found_optimal_routes:
+                    _new_origins, node_checked_has_path = _found_optimal_routes
+                else:
+                    _new_origins = None
 
                 if _new_origins is not None:
                     origins = _new_origins
