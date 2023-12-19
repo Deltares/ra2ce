@@ -429,7 +429,7 @@ class HazardOverlay:
 
         _hazard_files = {}
         _hazard_files["tif"] = get_filtered_files(".tif")
-        _hazard_files["shp"] = get_filtered_files(".gpkg")
+        _hazard_files["shp"] = get_filtered_files(".shp")
         _hazard_files["table"] = get_filtered_files(".csv", ".json")
         return _hazard_files
 
