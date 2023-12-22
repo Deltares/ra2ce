@@ -26,6 +26,8 @@ from typing import Any
 import geopandas as gpd
 import networkx as nx
 import pyproj
+import osmnx
+import copy
 
 from ra2ce.common.io.readers import GraphPickleReader
 from ra2ce.graph import networks_utils as nut
@@ -151,6 +153,15 @@ class Network:
     def _get_new_network_and_graph(
         self, export_types: list[str]
     ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+        def _include_attributes(attributes: list, graph: nx.Graph) -> nx.Graph:
+            gdf_nodes, gdf_edges = osmnx.graph_to_gdfs(graph)
+            updated_graph = copy.deepcopy(graph)
+            for attribute in attributes:
+                attribute_values_gdf = gdf_edges[attribute]
+                for (u, v, key), attribute_values in attribute_values_gdf.items():
+                    updated_graph[u][v][key]["bridge"] = attribute_values
+            return updated_graph
+
         _base_graph, _network_gdf = NetworkWrapperFactory(
             self._config_data
         ).get_network()
@@ -171,6 +182,8 @@ class Network:
         _network_gdf["length"] = _network_gdf["geometry"].apply(
             lambda x: nut.line_length(x, _network_gdf.crs)
         )
+
+        _base_graph = _include_attributes(attributes=["bridge"], graph=_base_graph)
 
         # Save the graph and geodataframe
         self._export_network_files(_base_graph, "base_graph", export_types)
