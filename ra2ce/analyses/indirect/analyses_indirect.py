@@ -303,7 +303,8 @@ class IndirectAnalyses:
 
             # Create the edgelist that consist of edges that should be removed
             edges_remove = [
-                e for e in graph.edges.data(keys=True) if hazard_name in e[-1]
+                e for e in graph.edges.data(keys=True)
+                if hazard_name in e[-1]
             ]
             edges_remove = [e for e in edges_remove if (e[-1][hazard_name] is not None)]
             edges_remove = [

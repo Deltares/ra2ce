@@ -38,6 +38,7 @@ NetworkDictValues: dict[str, list[Any]] = {
     "road_types": [
         "motorway",
         "motorway_link",
+        "motorway_junction",
         "trunk",
         "trunk_link",
         "primary",
@@ -48,6 +49,7 @@ NetworkDictValues: dict[str, list[Any]] = {
         "tertiary_link",
         "unclassified",
         "residential",
+        "living_street",
         "road",
         None,
     ],
