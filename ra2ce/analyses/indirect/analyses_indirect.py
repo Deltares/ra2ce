@@ -302,10 +302,11 @@ class IndirectAnalyses:
                 gdf["rfid"] = gdf["rfid"].astype(str)
 
             # Create the edgelist that consist of edges that should be removed
-            edges_remove = [
-                e for e in graph.edges.data(keys=True)
-                if hazard_name in e[-1] and e[-1]['bridge'] != "yes"
-            ]
+            edges_remove = []
+            for e in graph.edges.data(keys=True):
+                if (hazard_name in e[-1]) and (
+                        ('bridge' not in e[-1]) or ('bridge' in e[-1] and e[-1]['bridge'] != "yes")):
+                    edges_remove.append(e)
             edges_remove = [e for e in edges_remove if (e[-1][hazard_name] is not None)]
             edges_remove = [
                 e
