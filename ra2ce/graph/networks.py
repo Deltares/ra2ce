@@ -193,7 +193,7 @@ class Network:
             lambda x: nut.line_length(x, _network_gdf.crs)
         )
 
-        _base_graph = _include_attributes(attributes=["bridge"], graph=_base_graph)
+        _base_graph = _include_attributes(attributes=["fid", "avgspeed", "bridge", "tunnel"], graph=_base_graph)
 
         # Save the graph and geodataframe
         self._export_network_files(_base_graph, "base_graph", export_types)

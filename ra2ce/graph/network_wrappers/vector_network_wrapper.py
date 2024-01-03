@@ -68,9 +68,11 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         gdf = self._read_vector_to_project_region_and_crs()
         gdf = self.clean_vector(gdf)
         if self.directed:
-            graph = self.get_direct_graph_from_vector(gdf)
+            graph = self.get_direct_graph_from_vector(
+                gdf, edge_attributes_to_include=["fid", "avgspeed", "bridge", "tunnel"])
         else:
-            graph = self.get_indirect_graph_from_vector(gdf)
+            graph = self.get_indirect_graph_from_vector(
+                gdf, edge_attributes_to_include=["fid", "avgspeed", "bridge", "tunnel"])
         edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
         graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
         if self._config_data.cleanup.delete_duplicate_nodes:
@@ -170,18 +172,20 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         return updated_graph
 
     @staticmethod
-    def get_direct_graph_from_vector(gdf: gpd.GeoDataFrame) -> nx.DiGraph:
+    def get_direct_graph_from_vector(gdf: gpd.GeoDataFrame, edge_attributes_to_include=None) -> nx.DiGraph:
         """Creates a simple directed graph with node and edge geometries based on a given GeoDataFrame.
 
         Args:
+            edge_attributes_to_include: Attributes needed to be included from gdf in the graph
             gdf (gpd.GeoDataFrame): Input GeoDataFrame containing line geometries.
                 Allow both LineString and MultiLineString.
 
         Returns:
             nx.DiGraph: NetworkX graph object with "crs", "approach" as graph properties.
         """
-
-        # simple geometry handeling
+        if edge_attributes_to_include is None:
+            edge_attributes_to_include = []
+        # simple geometry handling
         gdf = VectorNetworkWrapper.explode_and_deduplicate_geometries(gdf)
 
         # to graph
@@ -198,21 +202,29 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
                     "geometry"
                 ),  # **row TODO: check if we do need all columns
             )
-
+            if len(edge_attributes_to_include) > 0:
+                for edge_attribute_to_include in edge_attributes_to_include:
+                    edge_attribute = row[edge_attribute_to_include] if edge_attribute_to_include in row else None
+                    if edge_attribute:
+                        edge_data = digraph[from_node][to_node]
+                        edge_data[edge_attribute_to_include] = edge_attribute
         return digraph
 
     @staticmethod
-    def get_indirect_graph_from_vector(gdf: gpd.GeoDataFrame) -> nx.Graph:
+    def get_indirect_graph_from_vector(gdf: gpd.GeoDataFrame, edge_attributes_to_include=None) -> nx.Graph:
         """Creates a simple undirected graph with node and edge geometries based on a given GeoDataFrame.
 
         Args:
+            edge_attributes_to_include: Attributes needed to be included from gdf in the graph
             gdf (gpd.GeoDataFrame): Input GeoDataFrame containing line geometries.
                 Allow both LineString and MultiLineString.
 
         Returns:
             nx.Graph: NetworkX graph object with "crs", "approach" as graph properties.
         """
-        digraph = VectorNetworkWrapper.get_direct_graph_from_vector(gdf)
+        if edge_attributes_to_include is None:
+            edge_attributes_to_include = []
+        digraph = VectorNetworkWrapper.get_direct_graph_from_vector(gdf, edge_attributes_to_include)
         return digraph.to_undirected()
 
     @staticmethod
