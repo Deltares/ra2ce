@@ -154,6 +154,16 @@ class Network:
         self, export_types: list[str]
     ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         def _include_attributes(attributes: list, graph: nx.Graph) -> nx.Graph:
+            def _add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
+                for node, data in graph.nodes(data=True):
+                    if 'x' not in data or 'y' not in data:
+                        # Use 'geometry' or provide default values if it's not present
+                        geometry = data.get('geometry', (0.0, 0.0))
+                        data.setdefault('x', round(geometry.x, 7))
+                        data.setdefault('y', round(geometry.y, 7))
+                return graph
+
+            graph = _add_x_y_to_nodes(graph)
             gdf_nodes, gdf_edges = osmnx.graph_to_gdfs(graph)
             updated_graph = copy.deepcopy(graph)
             for attribute in attributes:
