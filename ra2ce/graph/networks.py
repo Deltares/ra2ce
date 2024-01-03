@@ -79,7 +79,7 @@ class Network:
         self.files = files
 
     def add_od_nodes(
-        self, graph: nx.classes.graph.Graph, crs: pyproj.CRS
+            self, graph: nx.classes.graph.Graph, crs: pyproj.CRS
     ) -> nx.classes.graph.Graph:
         """Adds origins and destinations nodes from shapefiles to the graph.
 
@@ -139,7 +139,7 @@ class Network:
         return out_fn
 
     def _export_network_files(
-        self, network: Any, graph_name: str, types_to_export: list[str]
+            self, network: Any, graph_name: str, types_to_export: list[str]
     ):
         _exporter = NetworkExporterFactory()
         _exporter.export(
@@ -151,7 +151,7 @@ class Network:
         self.files[graph_name] = _exporter.get_pickle_path()
 
     def _get_new_network_and_graph(
-        self, export_types: list[str]
+            self, export_types: list[str]
     ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         def _include_attributes(attributes: list, graph: nx.Graph) -> nx.Graph:
             def _add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
@@ -163,6 +163,11 @@ class Network:
                         data.setdefault('y', round(geometry.y, 7))
                 return graph
 
+            # If required_attributes are provided, check if all edges already have them
+            if attributes and all(all(attr in edge_data for attr in attributes) for _, _, edge_data in
+                                  graph.edges(data=True)):
+                # If all required attributes are present, return the original graph
+                return graph
             graph = _add_x_y_to_nodes(graph)
             gdf_nodes, gdf_edges = osmnx.graph_to_gdfs(graph)
             updated_graph = copy.deepcopy(graph)
@@ -201,7 +206,7 @@ class Network:
         return _base_graph, _network_gdf
 
     def _get_stored_network_and_graph(
-        self, base_graph_filepath: Path, base_network_filepath: Path
+            self, base_graph_filepath: Path, base_network_filepath: Path
     ):
         logging.info(
             "Apparently, you already did create a network with ra2ce earlier. "
@@ -247,9 +252,9 @@ class Network:
 
         # create origins destinations graph
         if (
-            (self.origins)
-            and (self.destinations)
-            and not self.files["origins_destinations_graph"]
+                (self.origins)
+                and (self.destinations)
+                and not self.files["origins_destinations_graph"]
         ):
             # reading the base graphs
             if self.files["base_graph"] and base_graph:
