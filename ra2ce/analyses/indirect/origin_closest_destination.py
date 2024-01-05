@@ -193,7 +193,6 @@ class OriginClosestDestination:
                 e
                 for e in edges_remove
                 if (e[-1][hazard_name] > float(self.network_threshold))
-                & ("bridge" not in e[-1])
             ]
             h.remove_edges_from(edges_remove)
 
