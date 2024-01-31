@@ -21,16 +21,20 @@
 
 import logging
 from pathlib import Path
+from typing import Any, Tuple
 
 import geopandas as gpd
 import momepy
 import networkx as nx
 import pandas as pd
 import pyproj
+from geopandas import GeoDataFrame
 from tqdm import tqdm
 from shapely.geometry import Point
+from networkx import MultiDiGraph, Graph
 
 import ra2ce.graph.networks_utils as nut
+from ra2ce.graph.exporters.json_exporter import JsonExporter
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
 
@@ -43,8 +47,8 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
     """
 
     def __init__(
-        self,
-        config_data: NetworkConfigData,
+            self,
+            config_data: NetworkConfigData,
     ) -> None:
         self._config_data = config_data
         self.crs = config_data.crs
@@ -55,10 +59,11 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         # Origins Destinations
         self.region_path = config_data.origins_destinations.region
+        self.output_graph_dir = config_data.output_graph_dir
 
     def get_network(
-        self,
-    ) -> tuple[nx.MultiGraph, gpd.GeoDataFrame]:
+            self,
+    ) -> tuple[Graph, GeoDataFrame]:
         """Gets a network built from vector files.
 
         Returns:
@@ -75,10 +80,35 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
                 gdf, edge_attributes_to_include=["avgspeed", "bridge", "tunnel"])
         edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
         graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
+        graph_complex = graph_complex.to_directed()  # simplification function requires MultiDiGraph
         if self._config_data.cleanup.delete_duplicate_nodes:
             graph_complex = self._delete_duplicate_nodes(graph_complex)
-            edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
-        return graph_complex, edges
+            # edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
+
+        logging.info("Start converting the complex graph to a simple graph")
+        # Create 'graph_simple'
+        graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
+            graph_complex
+        )
+
+        # Create 'edges_complex', convert complex graph to geodataframe
+        logging.info("Start converting the graph to a geodataframe")
+        edges_complex, node_complex = nut.graph_to_gdf(graph_complex)
+        logging.info("Finished converting the graph to a geodataframe")
+
+        # Save the link tables linking complex and simple IDs
+        self._export_linking_tables(link_tables)
+
+        if not self.directed and isinstance(graph_simple, MultiDiGraph):
+            graph_simple = graph_simple.to_undirected()
+
+        # Check if all geometries between nodes are there, if not, add them as a straight line.
+        graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
+        graph_simple = self._get_avg_speed(graph_simple)
+        logging.info("Finished converting the complex graph to a simple graph")
+        return graph_simple, edges_complex
+
+        # return graph_complex, edges
 
     def _read_vector_to_project_region_and_crs(self) -> gpd.GeoDataFrame:
         gdf = self._read_files(self.primary_files)
@@ -229,7 +259,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
     @staticmethod
     def get_network_edges_and_nodes_from_graph(
-        graph: nx.Graph,
+            graph: nx.Graph,
     ) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
         """Sets up network nodes and edges from a given graph.
 
@@ -245,7 +275,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         # TODO ths function use conventions. Good to make consistant convention with osm
         nodes, edges = momepy.nx_to_gdf(graph, nodeID="node_fid")
         edges["edge_fid"] = (
-            edges["node_start"].astype(str) + "_" + edges["node_end"].astype(str)
+                edges["node_start"].astype(str) + "_" + edges["node_end"].astype(str)
         )
         edges.rename(
             {"node_start": "node_A", "node_end": "node_B"}, axis=1, inplace=True
@@ -288,3 +318,42 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             )
         ]
         return gpd
+
+    def _export_linking_tables(self, linking_tables: tuple[Any]) -> None:
+        _exporter = JsonExporter()
+        _exporter.export(
+            self.output_graph_dir.joinpath("simple_to_complex.json"), linking_tables[0]
+        )
+        _exporter.export(
+            self.output_graph_dir.joinpath("complex_to_simple.json"), linking_tables[1]
+        )
+
+    def _get_avg_speed(
+            self, original_graph: nx.classes.graph.Graph
+    ) -> nx.classes.graph.Graph:
+        if all(["length" in e for u, v, e in original_graph.edges.data()]) and any(
+                ["maxspeed" in e for u, v, e in original_graph.edges.data()]
+        ):
+            # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
+            path_avg_speed = self.output_graph_dir.joinpath("avg_speed.csv")
+            if path_avg_speed.is_file():
+                avg_speeds = pd.read_csv(path_avg_speed)
+            else:
+                avg_speeds = nut.calc_avg_speed(
+                    original_graph,
+                    "highway",
+                    save_csv=True,
+                    save_path=path_avg_speed,
+                )
+            original_graph = nut.assign_avg_speed(original_graph, avg_speeds, "highway")
+
+            # make a time value of seconds, length of road streches is in meters
+            for u, v, k, edata in original_graph.edges.data(keys=True):
+                hours = (edata["length"] / 1000) / edata["avgspeed"]
+                original_graph[u][v][k]["time"] = round(hours * 3600, 0)
+
+            return original_graph
+        logging.info(
+            "No attributes found in the graph to estimate average speed per network segment."
+        )
+        return original_graph

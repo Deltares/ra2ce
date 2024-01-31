@@ -40,7 +40,9 @@ from geopy import distance
 from networkx import Graph, set_edge_attributes
 from numpy.ma import MaskedArray
 from osgeo import gdal
-from osmnx import graph_to_gdfs, simplify_graph
+from osmnx import graph_to_gdfs
+from osmnx.simplification import _remove_rings, utils, _get_paths_to_simplify
+from osmnx._errors import GraphSimplificationError
 from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
@@ -76,7 +78,7 @@ def draw_progress_bar(percent: float, bar_length: int = 20):
 
 
 def merge_lines_automatic(
-    lines_gdf: gpd.GeoDataFrame, id_name: str, aadt_names: list[str], crs_: pyproj.CRS
+        lines_gdf: gpd.GeoDataFrame, id_name: str, aadt_names: list[str], crs_: pyproj.CRS
 ) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
     """Automatically merge lines based on a config file
     Args:
@@ -151,9 +153,9 @@ def merge_lines_automatic(
                 while not full_line.equals(mline):
                     for line2, j in lines_fids:
                         if (
-                            line2.within(mline)
-                            and not line2.equals(mline)
-                            and line != line2
+                                line2.within(mline)
+                                and not line2.equals(mline)
+                                and line != line2
                         ):
                             line_set_merged.append(line2)
                             fid_set_merged.append(j)
@@ -181,9 +183,9 @@ def merge_lines_automatic(
                         i for i in aadts_set_merged if not all(v is None for v in i)
                     ]
                     if (
-                        len(aadts_set_merged) > 1
-                        and isinstance(aadts_set_merged[0], list)
-                        and yes_to_all == "all"
+                            len(aadts_set_merged) > 1
+                            and isinstance(aadts_set_merged[0], list)
+                            and yes_to_all == "all"
                     ):
                         if all_type == "max":
                             aadts_set_merged = [
@@ -233,11 +235,11 @@ def merge_lines_automatic(
                         {
                             a: aadt_val
                             for a, aadt_val in zip(
-                                aadt_names,
-                                lines_gdf.loc[lines_gdf[id_name] == i][aadt_names].iloc[
-                                    0
-                                ],
-                            )
+                            aadt_names,
+                            lines_gdf.loc[lines_gdf[id_name] == i][aadt_names].iloc[
+                                0
+                            ],
+                        )
                         }
                     )
                 add_idx = 0 if merged.empty else max(merged.index) + 1
@@ -314,10 +316,10 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
 
 
 def snap_endpoints_lines(
-    lines_gdf: gpd.GeoDataFrame,
-    max_dist: int | float,
-    id_name: str,
-    crs: pyproj.CRS,
+        lines_gdf: gpd.GeoDataFrame,
+        max_dist: int | float,
+        id_name: str,
+        crs: pyproj.CRS,
 ) -> gpd.GeoDataFrame:
     """Snap endpoints of lines with endpoints or vertices of other lines
     if they are at most max_dist apart. Choose the closest endpoint or vertice.
@@ -419,7 +421,7 @@ def find_isolated_endpoints(linesIds: list, lines: list) -> list:
     isolated_endpoints = []
     for i, id_line in enumerate(zip(linesIds, lines)):
         ids, line = id_line
-        other_lines = lines[:i] + lines[i + 1 :]
+        other_lines = lines[:i] + lines[i + 1:]
         for q in [0, -1]:
             if isinstance(line, LineString):
                 endpoint = Point(line.coords[q])
@@ -431,7 +433,7 @@ def find_isolated_endpoints(linesIds: list, lines: list) -> list:
                 endpoints = [Point(l.coords[q]) for l in line]
                 for endpnt in endpoints:
                     if any(
-                        endpnt.touches(another_line) for another_line in other_lines
+                            endpnt.touches(another_line) for another_line in other_lines
                     ):
                         continue
                     else:
@@ -440,7 +442,7 @@ def find_isolated_endpoints(linesIds: list, lines: list) -> list:
 
 
 def nearest_neighbor_within(
-    search_points: list, spatial_index, point: Point, max_distance: float | int
+        search_points: list, spatial_index, point: Point, max_distance: float | int
 ) -> Point:
     """Find nearest point among others up to a maximum distance.
 
@@ -489,7 +491,7 @@ def nearest_neighbor_within(
 
 
 def vertices_from_lines(
-    lines: list[BaseMultipartGeometry], list_ids: list[str]
+        lines: list[BaseMultipartGeometry], list_ids: list[str]
 ) -> dict:
     """Return dict of with values: unique vertices from list of LineStrings.
     keys: index of LineString in original list
@@ -612,7 +614,7 @@ def cut_lines(lines_gdf, nodes, id_name: str, tolerance, crs_):
                 pnt
                 for pnt in list(nodes["geometry"])
                 if (line.distance(pnt) < tolerance)
-                & (line.boundary.distance(pnt) > tolerance)
+                   & (line.boundary.distance(pnt) > tolerance)
             ]
         elif isinstance(line, MultiLineString):
             points_to_cut = []
@@ -622,7 +624,7 @@ def cut_lines(lines_gdf, nodes, id_name: str, tolerance, crs_):
                         pnt
                         for pnt in list(nodes["geometry"])
                         if (ln.distance(pnt) < tolerance)
-                        & (ln.boundary.distance(pnt) > tolerance)
+                           & (ln.boundary.distance(pnt) > tolerance)
                     ]
                 )
 
@@ -700,7 +702,6 @@ def split_line_with_points(line, points):
     return segments
 
 
-
 def cut(line: BaseMultipartGeometry, distance: float) -> tuple[LineString, LineString]:
     # Cuts a line in two at a distance from its starting point
     # This is taken from shapely manual
@@ -739,7 +740,7 @@ def cut(line: BaseMultipartGeometry, distance: float) -> tuple[LineString, LineS
 
 
 def join_nodes_edges(
-    gdf_nodes: gpd.GeoDataFrame, gdf_edges: gpd.GeoDataFrame, id_name: str
+        gdf_nodes: gpd.GeoDataFrame, gdf_edges: gpd.GeoDataFrame, id_name: str
 ) -> gpd.GeoDataFrame:
     """Creates tuples from the adjecent nodes and add as column in geodataframe.
     Args:
@@ -981,11 +982,11 @@ def delete_duplicates(all_points: list[Point]) -> list[Point]:
 
 
 def create_simplified_graph(
-    graph_complex: nx.classes.graph.Graph, new_id: str = "rfid"
+        graph_complex: nx.classes.graph.Graph, new_id: str = "rfid"
 ):
     """Create a simplified graph with unique ids from a complex graph"""
-    logging.info("Simplifying graph")
     try:
+        logging.info("Simplifying graph")
         graph_complex = graph_create_unique_ids(graph_complex, "{}_c".format(new_id))
 
         # Create simplified graph and add unique ids
@@ -1013,7 +1014,7 @@ def create_simplified_graph(
 
 
 def gdf_check_create_unique_ids(
-    gdf: gpd.GeoDataFrame, id_name: str, new_id_name: str = "rfid"
+        gdf: gpd.GeoDataFrame, id_name: str, new_id_name: str = "rfid"
 ) -> tuple[gpd.GeoDataFrame, str]:
     """
     Check if the ID's are unique per edge: if not, add an own ID called 'fid'
@@ -1043,7 +1044,7 @@ def gdf_check_create_unique_ids(
 
 
 def graph_check_create_unique_ids(
-    graph: Graph, id_name: str, new_id_name: str = "rfid"
+        graph: Graph, id_name: str, new_id_name: str = "rfid"
 ) -> tuple[Graph, str]:
     """
     TODO: This is not really being used. It could be removed.
@@ -1058,7 +1059,7 @@ def graph_check_create_unique_ids(
         tuple[Graph, str]: Resulting graph and used ID.
     """
     if len(set([str(e[-1][id_name]) for e in graph.edges.data(keys=True)])) < len(
-        graph.edges()
+            graph.edges()
     ):
         i = 0
         for u, v, k in graph.edges(data=True):
@@ -1125,8 +1126,154 @@ def simplify_graph_count(complex_graph: nx.Graph) -> nx.Graph:
     return simple_graph
 
 
+def simplify_graph(G, strict=True, remove_rings=True, track_merged=False):
+    """
+    this is an OSMNX function with the same name, modified to check if geometry arrtibute exists in the nodes of each
+    path to simplify.
+
+        Simplify a graph's topology by removing interstitial nodes.
+
+        Simplifies graph topology by removing all nodes that are not intersections
+        or dead-ends. Create an edge directly between the end points that
+        encapsulate them, but retain the geometry of the original edges, saved as
+        a new `geometry` attribute on the new edge. Note that only simplified
+        edges receive a `geometry` attribute. Some of the resulting consolidated
+        edges may comprise multiple OSM ways, and if so, their multiple attribute
+        values are stored as a list. Optionally, the simplified edges can receive
+        a `merged_edges` attribute that contains a list of all the (u, v) node
+        pairs that were merged together.
+
+        Parameters
+        ----------
+        G : networkx.MultiDiGraph
+            input graph
+        strict : bool
+            if False, allow nodes to be end points even if they fail all other
+            rules but have incident edges with different OSM IDs. Lets you keep
+            nodes at elbow two-way intersections, but sometimes individual blocks
+            have multiple OSM IDs within them too.
+        remove_rings : bool
+            if True, remove isolated self-contained rings that have no endpoints
+        track_merged : bool
+            if True, add `merged_edges` attribute on simplified edges, containing
+            a list of all the (u, v) node pairs that were merged together
+
+        Returns
+        -------
+        G : networkx.MultiDiGraph
+            topologically simplified graph, with a new `geometry` attribute on
+            each simplified edge
+    """
+    if "simplified" in G.graph and G.graph["simplified"]:  # pragma: no cover
+        msg = "This graph has already been simplified, cannot simplify it again."
+        raise GraphSimplificationError(msg)
+
+    utils.log("Begin topologically simplifying the graph...")
+
+    # define edge segment attributes to sum upon edge simplification
+    attrs_to_sum = {"length", "travel_time"}
+
+    # make a copy to not mutate original graph object caller passed in
+    G = G.copy()
+    initial_node_count = len(G)
+    initial_edge_count = len(G.edges)
+    all_nodes_to_remove = []
+    all_edges_to_add = []
+
+    # generate each path that needs to be simplified
+    for path in _get_paths_to_simplify(G, strict=strict):
+        # add the interstitial edges we're removing to a list so we can retain
+        # their spatial geometry
+        merged_edges = []
+        path_attributes = {}
+        for u, v in zip(path[:-1], path[1:]):
+            if track_merged:
+                # keep track of the edges that were merged
+                merged_edges.append((u, v))
+
+            # there should rarely be multiple edges between interstitial nodes
+            # usually happens if OSM has duplicate ways digitized for just one
+            # street... we will keep only one of the edges (see below)
+            edge_count = G.number_of_edges(u, v)
+            if edge_count != 1:
+                utils.log(f"Found {edge_count} edges between {u} and {v} when simplifying")
+
+            # get edge between these nodes: if multiple edges exist between
+            # them (see above), we retain only one in the simplified graph
+            # We can't assume that there exists an edge from u to v
+            # with key=0, so we get a list of all edges from u to v
+            # and just take the first one.
+            edge_data = list(G.get_edge_data(u, v).values())[0]
+            for attr in edge_data:
+                if attr in path_attributes:
+                    # if this key already exists in the dict, append it to the
+                    # value list
+                    path_attributes[attr].append(edge_data[attr])
+                else:
+                    # if this key doesn't already exist, set the value to a list
+                    # containing the one value
+                    path_attributes[attr] = [edge_data[attr]]
+
+        # consolidate the path's edge segments' attribute values
+        for attr in path_attributes:
+            if attr in attrs_to_sum:
+                # if this attribute must be summed, sum it now
+                path_attributes[attr] = sum(path_attributes[attr])
+            elif attr != 'geometry' and len(set(path_attributes[attr])) == 1:
+                # if there's only 1 unique value in this attribute list,
+                # consolidate it to the single value (the zero-th):
+                path_attributes[attr] = path_attributes[attr][0]
+            elif attr != 'geometry':
+                # otherwise, if there are multiple values, keep one of each
+                path_attributes[attr] = list(set(path_attributes[attr]))
+
+        # construct the new consolidated edge's geometry for this path
+        if all("geometry" in G.nodes[node] for node in path):
+            # Check if all nodes in the path have "geometry" attribute
+            # Use existing geometries to create LineString
+            path_attributes["geometry"] = LineString([G.nodes[node]["geometry"] for node in path])
+        elif all("x" in G.nodes[node] and "y" in G.nodes[node] for node in path):
+            # Create LineString using x and y coordinates
+            path_attributes["geometry"] = LineString(
+                [Point((G.nodes[node]["x"], G.nodes[node]["y"])) for node in path]
+            )
+        else:
+            raise ValueError("All nodes in the path must have 'geometry' or 'x' and 'y' attributes.")
+
+        if track_merged:
+            # add the merged edges as a new attribute of the simplified edge
+            path_attributes["merged_edges"] = merged_edges
+
+        # add the nodes and edge to their lists for processing at the end
+        all_nodes_to_remove.extend(path[1:-1])
+        all_edges_to_add.append(
+            {"origin": path[0], "destination": path[-1], "attr_dict": path_attributes}
+        )
+
+    # for each edge to add in the list we assembled, create a new edge between
+    # the origin and destination
+    for edge in all_edges_to_add:
+        G.add_edge(edge["origin"], edge["destination"], **edge["attr_dict"])
+
+    # finally remove all the interstitial nodes between the new edges
+    G.remove_nodes_from(set(all_nodes_to_remove))
+
+    if remove_rings:
+        G = _remove_rings(G)
+
+    # mark the graph as having been simplified
+    G.graph["simplified"] = True
+
+    msg = (
+        f"Simplified graph: {initial_node_count:,} to {len(G):,} nodes, "
+        f"{initial_edge_count:,} to {len(G.edges):,} edges"
+    )
+    utils.log(msg)
+    return G
+
+
 def graph_from_gdf(
-    gdf: gpd.GeoDataFrame, gdf_nodes, name: str = "network", node_id: str = "ID"
+        gdf: gpd.GeoDataFrame, gdf_nodes, name: str = "network", node_id: str = "ID"
 ) -> nx.MultiGraph:
     # create a Graph object
     _created_graph = nx.MultiGraph(crs=gdf.crs)
@@ -1150,10 +1297,10 @@ def graph_from_gdf(
 
 
 def graph_to_gdf(
-    graph_to_convert: nx.classes.graph.Graph,
-    save_nodes: bool = False,
-    save_edges: bool = True,
-    to_save: bool = False,
+        graph_to_convert: nx.classes.graph.Graph,
+        save_nodes: bool = False,
+        save_edges: bool = True,
+        to_save: bool = False,
 ):
     """Takes in a networkx graph object and returns edges and nodes as geodataframes
     Arguments:
@@ -1371,7 +1518,7 @@ def get_extent(dataset):
 
 
 def get_graph_edges_extent(
-    network_graph: nx.classes.Graph,
+        network_graph: nx.classes.Graph,
 ) -> tuple[float, float, float, float]:
     """Inspects all geometries of the edges of a graph and returns the most extreme coordinates
 
@@ -1408,7 +1555,7 @@ def get_graph_edges_extent(
 
 
 def reproject_graph(
-    original_graph: nx.classes.Graph, crs_in: str, crs_out: str
+        original_graph: nx.classes.Graph, crs_in: str, crs_out: str
 ) -> nx.classes.Graph:
     """
     Reprojects the shapely geometry data (of a NetworkX graph) to a different projection
@@ -1531,7 +1678,7 @@ def graph_link_simple_id_to_complex(graph_simple: nx.classes.graph.Graph, new_id
 
 
 def add_simple_id_to_graph_complex(
-    complex_graph: nx.classes.Graph, complex_to_simple, new_id
+        complex_graph: nx.classes.Graph, complex_to_simple, new_id
 ) -> nx.classes.Graph:
     """Adds the appropriate ID of the simple graph to each edge of the complex graph as a new attribute 'rfid'
 
@@ -1618,9 +1765,9 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
                 ns = []
                 for ss in s:
                     if (
-                        not any(c.isalpha() for c in ss)
-                        and (";" not in ss)
-                        and ("|" not in ss)
+                            not any(c.isalpha() for c in ss)
+                            and (";" not in ss)
+                            and ("|" not in ss)
                     ):
                         ns.append(int(ss))
                     elif not any(c.isalpha() for c in ss) and ";" in ss:
@@ -1635,9 +1782,9 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
                     continue
             elif isinstance(s, str):
                 if (
-                    not any(c.isalpha() for c in s)
-                    and (";" not in s)
-                    and ("|" not in s)
+                        not any(c.isalpha() for c in s)
+                        and (";" not in s)
+                        and ("|" not in s)
                 ):
                     ss = int(s)
                 elif not any(c.isalpha() for c in s) and ";" in s:
@@ -1714,9 +1861,9 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
                 ns = []
                 for ms in max_speed:
                     if (
-                        not any(c.isalpha() for c in ms)
-                        and (";" not in ms)
-                        and ("|" not in ms)
+                            not any(c.isalpha() for c in ms)
+                            and (";" not in ms)
+                            and ("|" not in ms)
                     ):
                         ns.append(int(ms))
                     elif not any(c.isalpha() for c in ms) and ";" in ms:
@@ -1736,9 +1883,9 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
                     )
             elif isinstance(max_speed, str):
                 if (
-                    not any(c.isalpha() for c in max_speed)
-                    and (";" not in max_speed)
-                    and ("|" not in max_speed)
+                        not any(c.isalpha() for c in max_speed)
+                        and (";" not in max_speed)
+                        and ("|" not in max_speed)
                 ):
                     graph[u][v][k]["avgspeed"] = round(int(max_speed), 0)
                 elif not any(c.isalpha() for c in max_speed) and ";" in max_speed:
@@ -1766,10 +1913,10 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
                     [
                         s
                         for r, s in zip(
-                            avg_road_speed["road_types"], avg_road_speed["avg_speed"]
-                        )
+                        avg_road_speed["road_types"], avg_road_speed["avg_speed"]
+                    )
                         if set(road_type[2:-2].split("', '"))
-                        == set(r[2:-2].split("', '"))
+                           == set(r[2:-2].split("', '"))
                     ][0]
                 )
                 graph[u][v][k]["avgspeed"] = round(avg_speed, 0)
@@ -1851,7 +1998,7 @@ def get_valid_mean(x_value: MaskedArray, **kwargs) -> Optional[float]:
 
 
 def buffer_geometry(
-    gdf: gpd.GeoDataFrame, buffer: float, cap_stype: int = 3
+        gdf: gpd.GeoDataFrame, buffer: float, cap_stype: int = 3
 ) -> gpd.GeoDataFrame:
     """buffer the geometry of the geodataframe"""
     gdf["geometry"] = gdf["geometry"].buffer(
