@@ -1,5 +1,20 @@
 # Changelog
 
+## v0.7.0 (2023-12-05)
+
+### Feat
+
+- Example notebook is updated
+- notebooks are added
+- origin closest destination now can be ran without hazard infor in the network and analysis configs
+
+### Fix
+
+- docu typos
+- `find_route_ods` now returns a geodataframe without duplicate entries or origin_nodes with multiple names
+- Changed output suffix.
+- save_shp is updated to the output export shapefile
+
 ## v0.6.0 (2023-07-28)
 
 ### Feat

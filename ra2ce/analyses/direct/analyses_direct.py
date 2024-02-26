@@ -31,12 +31,16 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDirect,
 )
+from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+    AnalysisDirectEnum,
+)
 from ra2ce.analyses.direct.cost_benefit_analysis import EffectivenessMeasures
 from ra2ce.analyses.direct.damage.manual_damage_functions import ManualDamageFunctions
 from ra2ce.analyses.direct.damage_calculation import (
     DamageNetworkEvents,
     DamageNetworkReturnPeriods,
 )
+from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 
 
 class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
@@ -50,11 +54,11 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
     """
 
     config: AnalysisConfigData
-    graphs: dict
+    graph_files: GraphFilesCollection
 
-    def __init__(self, config: AnalysisConfigData, graphs: dict):
+    def __init__(self, config: AnalysisConfigData, graph_files: GraphFilesCollection):
         self.config = config
-        self.graphs = graphs
+        self.graph_files = graph_files
 
     def execute(self):
         """Main Coordinator of all direct damage analysis
@@ -71,18 +75,20 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
             )
             starttime = time.time()
 
-            if analysis.analysis == "direct":
+            if analysis.analysis == AnalysisDirectEnum.DIRECT:
                 gdf = self.road_damage(
                     analysis
                 )  # calls the coordinator for road damage calculation
 
-            elif analysis.analysis == "effectiveness_measures":
+            elif analysis.analysis == AnalysisDirectEnum.EFFECTIVENESS_MEASURES:
                 gdf = self.effectiveness_measures(analysis)
 
             else:
                 gdf = []
 
-            _output_path = self.config.output_path.joinpath(analysis.analysis)
+            _output_path = self.config.output_path.joinpath(
+                analysis.analysis.config_value
+            )
             if analysis.save_gpkg:
                 gpkg_path = _output_path.joinpath(
                     analysis.name.replace(" ", "_") + ".gpkg"
@@ -106,23 +112,14 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         ### CONTROLLER FOR CALCULATING THE ROAD DAMAGE
 
         Arguments:
-            *analysis* (dict) : contains part of the settings from the analysis ini
+            *analysis* (AnalysisSectionDirect) : contains part of the settings from the analysis ini
 
         Returns:
             *result_gdf* (GeoDataFrame) : The original hazard dataframe with the result of the damage calculations added
 
         """
         # Open the network with hazard data
-        # Dirty fix, Todo: figure out why this key does not exist under certaint conditions
-        if (
-            "base_network_hazard" not in self.graphs
-        ):  # key is missing due to error in handler?
-            self.graphs["base_network_hazard"] = None
-
-        road_gdf = self.graphs["base_network_hazard"]
-        if self.graphs["base_network_hazard"] is None:
-            road_gdf = gpd.read_feather(self.config.files["base_network_hazard"])
-
+        road_gdf = self.graph_files.base_network_hazard.get_graph()
         road_gdf.columns = rename_road_gdf_to_conventions(road_gdf.columns)
 
         # Find the hazard columns; these may be events or return periods
@@ -186,8 +183,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         em = EffectivenessMeasures(self.config, analysis)
         effectiveness_dict = em.load_effectiveness_table()
 
-        if self.graphs["base_network_hazard"] is None:
-            gdf_in = gpd.read_feather(self.config.files["base_network_hazard"])
+        gdf_in = self.graph_files.base_network_hazard.get_graph()
 
         if analysis.create_table is True:
             df = em.create_feature_table(
@@ -204,7 +200,7 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         df_cba, costs_dict = em.cost_benefit_analysis(effectiveness_dict)
         df_cba.round(2).to_csv(
             self.config.output_path.joinpath(
-                analysis.analysis, "cost_benefit_analysis.csv"
+                analysis.analysis.config_value, "cost_benefit_analysis.csv"
             ),
             decimal=",",
             sep=";",
@@ -215,7 +211,9 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
         df_costs = em.calculate_strategy_costs(df, costs_dict)
         df_costs = df_costs.astype(float).round(2)
         df_costs.to_csv(
-            self.config.output_path.joinpath(analysis.analysis, "output_analysis.csv"),
+            self.config.output_path.joinpath(
+                analysis.analysis.config_value, "output_analysis.csv"
+            ),
             decimal=",",
             sep=";",
             index=False,

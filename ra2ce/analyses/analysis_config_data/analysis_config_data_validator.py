@@ -29,6 +29,7 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
 )
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
+from ra2ce.configuration.ra2ce_enum_base import Ra2ceEnumBase
 from ra2ce.graph.network_config_data.network_config_data_validator import (
     NetworkDictValues,
 )
@@ -49,15 +50,21 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
             for _item in header:
                 _report.merge(self._validate_header(_item))
         else:
+            # check keys with predescribed values
             for key, value in header.__dict__.items():
                 if not value:
                     continue
-                if key not in AnalysisNetworkDictValues.keys():
-                    continue
-                _expected_values_list = AnalysisNetworkDictValues[key]
+                if isinstance(value, Ra2ceEnumBase):
+                    # enumerations
+                    _expected_values_list = value.list_valid_options()
+                else:
+                    # other items with limited value options (should become enumerations)
+                    if key not in AnalysisNetworkDictValues.keys():
+                        continue
+                    _expected_values_list = AnalysisNetworkDictValues[key]
                 if value not in _expected_values_list:
                     _report.error(
-                        f"Wrong input to property [ {key} ], has to be one of: {_expected_values_list}"
+                        f"Wrong input to property [ {key} ]; has to be one of: {_expected_values_list}."
                     )
 
         return _report

@@ -23,41 +23,41 @@
 # -*- coding: utf-8 -*-
 import copy
 import logging
-from typing import Optional, Union
-from pathlib import Path
+from typing import Optional, Union, Tuple, Any
 
 import geopandas as gpd
 import networkx as nx
 import pandas as pd
 from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
+
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
 )
-
-from ra2ce.common.io.readers.graph_pickle_reader import GraphPickleReader
+from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 
 
 class OriginClosestDestination:
     """The origin closest destination analyses using NetworkX graphs.
 
     Attributes:
-        config: A dictionary with the configuration details on how to create and adjust the network.
-        graphs: A dictionary with one or multiple NetworkX graphs.
+        config: An object with the configuration details on how to create and adjust the network.
+        graph_files: An object with one or multiple NetworkX graphs.
     """
 
     def __init__(
         self,
         config: AnalysisConfigData,
         analysis: AnalysisSectionIndirect,
+        graph_files: GraphFilesCollection,
         hazard_names_df: pd.DataFrame,
     ):
         self.crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGEABLE
         self.unit = "km"
         self.network_threshold = analysis.threshold
         self.threshold_destinations = analysis.threshold_destinations
-        self.weighing = analysis.weighing
+        self.weighing = analysis.weighing.config_value
         self.o_name = config.origins_destinations.origins_names
         self.d_name = config.origins_destinations.destinations_names
         self.od_id = config.origins_destinations.id_name_origin_destination
@@ -69,6 +69,7 @@ class OriginClosestDestination:
         )
         self.analysis = analysis
         self.config = config
+        self.graph_files = graph_files
 
         self.hazard_names = hazard_names_df
 
@@ -80,15 +81,9 @@ class OriginClosestDestination:
 
         self.results_dict = {}
 
-    @staticmethod
-    def read(graph_file: Path):
-        _pickle_reader = GraphPickleReader()
-        g = _pickle_reader.read(graph_file)
-        return g
-
     def optimal_route_origin_closest_destination(self):
         """Calculates per origin the location of its closest destination"""
-        graph = self.read(self.config.files["origins_destinations_graph"])
+        graph = self.graph_files.origins_destinations_graph.get_graph()
 
         # Load the origins and destinations
         origins = self.load_origins()
@@ -148,7 +143,7 @@ class OriginClosestDestination:
 
     def multi_link_origin_closest_destination(self):
         """Calculates per origin the location of its closest destination with hazard disruption"""
-        graph = self.read(self.config.files["origins_destinations_graph_hazard"])
+        graph = self.graph_files.origins_destinations_graph_hazard.get_graph()
 
         # Load the origins and destinations
         origins = self.load_origins()
@@ -499,8 +494,10 @@ class OriginClosestDestination:
         optimal_routes = []
         list_disrupted_destinations = []
         list_no_path = []
+        node_checked_has_path = dict()
         for n_ndat in tqdm(disrupted_graph.nodes.data(), desc="Finding optimal routes"):
-            _new_origins = self._find_optimal_routes(
+            _new_origins, node_checked_has_path = self._find_optimal_routes(
+                node_checked_has_path,
                 list_no_path,
                 n_ndat,
                 disrupted_graph,
@@ -545,6 +542,7 @@ class OriginClosestDestination:
 
     def _find_optimal_routes(
         self,
+        node_checked_has_path: dict,
         list_no_path: list,
         n_ndat: tuple,
         disrupted_graph,
@@ -557,7 +555,7 @@ class OriginClosestDestination:
         origins,
         base_graph,
         destinations,
-    ) -> Optional[gpd.GeoDataFrame]:
+    ) -> tuple[Any, dict]:
         """
         Refactored method to avoid duplication of code between `find_closest_location` and `find_multiple_closest_locations` with subtile differences:
         - The first would not use a `dest_name` attribute.
@@ -569,6 +567,7 @@ class OriginClosestDestination:
         n, ndat = n_ndat
         if self.od_key in ndat and self.o_name in ndat[self.od_key]:
             if nx.has_path(disrupted_graph, n, dest_name):
+                node_checked_has_path.setdefault(ndat[self.od_key], []).append(n)
                 path = nx.shortest_path(
                     disrupted_graph,
                     source=n,
@@ -653,9 +652,10 @@ class OriginClosestDestination:
                         )
                     )
             else:
-                list_no_path.append((n, ndat[self.od_key]))
+                if ndat[self.od_key] not in node_checked_has_path:
+                    list_no_path.append((n, ndat[self.od_key]))
 
-        return self.update_origins(origins, list_no_path, name_save.format("A"))
+        return self.update_origins(origins, list_no_path, name_save.format("A")), node_checked_has_path
 
     def find_multiple_closest_locations(
         self,
@@ -710,11 +710,13 @@ class OriginClosestDestination:
 
             list_disrupted_destinations = []
             list_no_path = []
+            node_checked_has_path = dict()
             for n_ndat in tqdm(
                 disrupted_graph.nodes.data(),
                 desc=f"Finding optimal routes to {dest_name}",
             ):
-                _new_origins = self._find_optimal_routes(
+                _new_origins, node_checked_has_path = self._find_optimal_routes(
+                    node_checked_has_path,
                     list_no_path,
                     n_ndat,
                     disrupted_graph,
