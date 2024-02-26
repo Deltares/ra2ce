@@ -1,10 +1,16 @@
 import pytest
+
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDirect,
     AnalysisSectionIndirect,
 )
-
+from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+    AnalysisDirectEnum,
+)
+from ra2ce.analyses.analysis_config_data.enums.analysis_indirect_enum import (
+    AnalysisIndirectEnum,
+)
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.runners.analysis_runner_factory import AnalysisRunnerFactory
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
@@ -28,8 +34,12 @@ class TestAnalysisRunnerFactory:
         _config_wrapper = DummyRa2ceInput()
         _config_wrapper.analysis_config.config_data = AnalysisConfigData(
             analyses=[
-                AnalysisSectionDirect(analysis="effectiveness_measures"),
-                AnalysisSectionIndirect(analysis="single_link_redundancy"),
+                AnalysisSectionDirect(
+                    analysis=AnalysisDirectEnum.EFFECTIVENESS_MEASURES
+                ),
+                AnalysisSectionIndirect(
+                    analysis=AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY
+                ),
             ]
         )
         _config_wrapper.network_config.config_data = NetworkConfigData()

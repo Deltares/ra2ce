@@ -27,25 +27,26 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+    AnalysisDirectEnum,
+)
+from ra2ce.analyses.analysis_config_data.enums.analysis_indirect_enum import (
+    AnalysisIndirectEnum,
+)
+from ra2ce.analyses.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
+from ra2ce.graph.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from ra2ce.graph.network_config_data.network_config_data import (
     NetworkSection,
     OriginsDestinationsSection,
 )
 
-IndirectAnalysisNameList: list[str] = [
-    "single_link_redundancy",
-    "multi_link_redundancy",
-    "optimal_route_origin_destination",
-    "multi_link_origin_destination",
-    "optimal_route_origin_closest_destination",
-    "multi_link_origin_closest_destination",
-    "losses",
-    "single_link_losses",
-    "multi_link_losses",
-    "multi_link_isolated_locations",
-]
-DirectAnalysisNameList: list[str] = ["direct", "effectiveness_measures"]
+IndirectAnalysisNameList: list[str] = list(
+    map(str, AnalysisIndirectEnum.list_valid_options())
+)
+DirectAnalysisNameList: list[str] = list(
+    map(str, AnalysisDirectEnum.list_valid_options())
+)
 
 
 @dataclass
@@ -64,7 +65,6 @@ class AnalysisSectionBase:
     """
 
     name: str = ""
-    analysis: str = ""  # should be enum
     save_gpkg: bool = False
     save_csv: bool = False
 
@@ -75,8 +75,11 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     Reflects all possible settings that an indirect analysis section might contain.
     """
 
+    analysis: AnalysisIndirectEnum = field(
+        default_factory=lambda: AnalysisIndirectEnum.INVALID
+    )
     # general
-    weighing: str = ""  # should be enum
+    weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
     loss_per_distance: str = ""
     loss_type: str = ""  # should be enum
     disruption_per_category: str = ""
@@ -93,7 +96,7 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     resilience_curve_file: str = ""
     disruption_steps_file: str = ""
     # accessibility analyses
-    aggregate_wl: str = ""  # should be enum
+    aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     threshold: float = math.nan
     threshold_destinations: float = math.nan
     uniform_duration: float = math.nan
@@ -112,6 +115,9 @@ class AnalysisSectionDirect(AnalysisSectionBase):
     Reflects all possible settings that a direct analysis section might contain.
     """
 
+    analysis: AnalysisDirectEnum = field(
+        default_factory=lambda: AnalysisDirectEnum.INVALID
+    )
     # adaptation/effectiveness measures
     return_period: float = math.nan
     repair_costs: float = math.nan
@@ -140,7 +146,6 @@ class AnalysisConfigData(ConfigDataProtocol):
     static_path: Optional[Path] = None
     project: ProjectSection = field(default_factory=lambda: ProjectSection())
     analyses: list[AnalysisSectionBase] = field(default_factory=list)
-    files: dict[str, Path] = field(default_factory=dict)
     origins_destinations: Optional[OriginsDestinationsSection] = field(
         default_factory=lambda: OriginsDestinationsSection()
     )

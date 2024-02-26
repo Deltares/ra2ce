@@ -33,7 +33,7 @@ import pyproj
 import rasterio
 import rasterio.mask
 import rasterio.transform
-import shapely
+from shapely.geometry import LineString
 from rasterio import Affine
 from rasterio.warp import Resampling, calculate_default_transform, reproject
 from shapely.geometry import Point
@@ -144,19 +144,25 @@ def closest_node(node: np.ndarray, nodes: np.ndarray) -> np.ndarray:
     return nodes[np.argmin(dist_2)]
 
 
-def get_od(o_id, d_id):
+def get_od(o_id: str, d_id: str) -> str:
     """
-    TODO: VERY UNCLEAR what this method is meant to do.
-    FIX: Solve below logic, it is not a correct paradigm. ADD TESTS AND TYPE HINTS.
+    Gets a valid origin id node from the given pair.
+
+    Args:
+        o_id (str): Id for the `origin` node.
+        d_id (str): Id for the `destination` node.
+
+    Returns:
+        str | np.nan: Valid value to represent the origin - destination node.
     """
-    match_name = o_id
-    if o_id == "nan":
-        # convert string nans to np.nans to be able to differentiate between origins and destinations in the next step.
-        match_name = np.nan
-    if not match_name == match_name:
-        # match_name is nan, the point is not an origin but a destination
-        match_name = d_id
-    return match_name
+    _nan_values = ["nan", np.nan]
+    if o_id not in _nan_values:
+        return o_id
+    if d_id not in _nan_values:
+        # `o_id` was nan, so it was a destination, not an origin.
+        # therefore we return `d_id`
+        return d_id
+    return np.nan
 
 
 def add_data_to_existing_node(graph, node, match_name):
@@ -174,8 +180,8 @@ def update_edges_with_new_node(
     node_a: int,
     node_b: int,
     k: int,
-    line_a: shapely.LineString,
-    line_b: shapely.LineString,
+    line_a: LineString,
+    line_b: LineString,
     new_node_id: int,
     graph_crs: pyproj.CRS,
     inverse_vertices_dict: dict,
@@ -425,7 +431,6 @@ def add_od_nodes(
         coords = tuple(sorted([coord for coord in geometry_coords]))
         if coords in checked_lines:
             graph.remove_edge(*line[0:3])
-            continue
         else:
             inverse_vertices_dict.update(
                 {p: (line[0], line[1], line[2]) for p in set(geometry_coords[1:-1])}

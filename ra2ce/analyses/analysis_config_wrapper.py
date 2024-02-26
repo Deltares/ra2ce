@@ -22,25 +22,25 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analyses.analysis_config_data.analysis_config_data_validator import (
     AnalysisConfigDataValidator,
 )
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
+from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
 
 
 class AnalysisConfigWrapper(ConfigWrapperProtocol):
     ini_file: Path
     config_data: AnalysisConfigData
-    graphs: Optional[dict]
+    graph_files: GraphFilesCollection
 
     def __init__(self) -> None:
         self.ini_file = None
         self.config_data = AnalysisConfigData()
-        self.graphs = None
+        self.graph_files = GraphFilesCollection()
 
     def initialize_output_dirs(self) -> None:
         """
@@ -48,7 +48,7 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
         """
         # Create the output folders
         for a in self.config_data.analyses:
-            output_path = self.config_data.output_path.joinpath(a.analysis)
+            output_path = self.config_data.output_path.joinpath(a.analysis.config_value)
             output_path.mkdir(parents=True, exist_ok=True)
 
     @classmethod
@@ -81,13 +81,12 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
 
         if not isinstance(network_config, NetworkConfigWrapper):
             raise ValueError("No valid network config provided.")
-        _new_analysis.config_data.files = network_config.files
         _new_analysis.config_data.network = network_config.config_data.network
         _new_analysis.config_data.origins_destinations = (
             network_config.config_data.origins_destinations
         )
         # Graphs are retrieved from the already configured object
-        _new_analysis.graphs = network_config.graphs
+        _new_analysis.graph_files = network_config.graph_files
 
         return _new_analysis
 
