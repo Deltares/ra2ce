@@ -34,7 +34,7 @@ import rasterio
 import rasterio.mask
 import rasterio.transform
 from networkx import MultiGraph
-import shapely
+from shapely.geometry import LineString
 from rasterio import Affine
 from rasterio.warp import Resampling, calculate_default_transform, reproject
 from shapely.geometry import Point, MultiLineString, LineString

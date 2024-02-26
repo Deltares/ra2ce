@@ -16,13 +16,14 @@
 """
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, Union
 
 import networkx as nx
 import osmnx
 import pandas as pd
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
+from shapely.geometry import LineString
 from shapely.geometry.base import BaseGeometry
 
 import ra2ce.graph.networks_utils as nut
@@ -191,7 +192,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
             graph=complex_graph, geom_name="geometry"
         ).to_directed()
         complex_graph = OsmNetworkWrapper.snap_nodes_to_nodes(
-            graph=complex_graph, threshold=0.000025
+            graph=complex_graph, threshold=0.00005
         )
         return complex_graph
 
@@ -313,3 +314,4 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
     @staticmethod
     def snap_nodes_to_edges(graph: MultiDiGraph, threshold: float):
         raise NotImplementedError("Next thing to do!")
+
