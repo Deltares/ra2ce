@@ -23,7 +23,7 @@
 # -*- coding: utf-8 -*-
 import copy
 import logging
-from typing import Optional, Union, Any
+from typing import Optional, Union, Tuple, Any
 
 import geopandas as gpd
 import networkx as nx
@@ -31,57 +31,59 @@ import pandas as pd
 from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
 
-from ra2ce.common.io.readers.graph_pickle_reader import GraphPickleReader
+from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
+    AnalysisSectionIndirect,
+)
+from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 
 
 class OriginClosestDestination:
     """The origin closest destination analyses using NetworkX graphs.
 
     Attributes:
-        config: A dictionary with the configuration details on how to create and adjust the network.
-        graphs: A dictionary with one or multiple NetworkX graphs.
+        config: An object with the configuration details on how to create and adjust the network.
+        graph_files: An object with one or multiple NetworkX graphs.
     """
 
-    def __init__(self, config: dict, analysis: dict, hazard_names: pd.DataFrame):
+    def __init__(
+        self,
+        config: AnalysisConfigData,
+        analysis: AnalysisSectionIndirect,
+        graph_files: GraphFilesCollection,
+        hazard_names_df: pd.DataFrame,
+    ):
         self.crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGEABLE
         self.unit = "km"
-        if "threshold" in analysis:
-            self.network_threshold = analysis["threshold"]
-        self.threshold_destinations = 0  # TODO MAKE PARAMETER IN ANALYSES.INI
-        self.weighing = analysis["weighing"]
-        self.o_name = config["origins_destinations"]["origins_names"]
-        self.d_name = config["origins_destinations"]["destinations_names"]
-        self.od_id = config["origins_destinations"]["id_name_origin_destination"]
-        self.origin_out_fraction = config["origins_destinations"]["origin_out_fraction"]
-        self.origin_count = config["origins_destinations"]["origin_count"]
+        self.network_threshold = analysis.threshold
+        self.threshold_destinations = analysis.threshold_destinations
+        self.weighing = analysis.weighing.config_value
+        self.o_name = config.origins_destinations.origins_names
+        self.d_name = config.origins_destinations.destinations_names
+        self.od_id = config.origins_destinations.id_name_origin_destination
+        self.origin_out_fraction = config.origins_destinations.origin_out_fraction
+        self.origin_count = config.origins_destinations.origin_count
         self.od_key = "od_id"
         self.id_name = (
-            config["network"]["file_id"]
-            if config["network"]["file_id"] is not None
-            else "rfid"
+            config.network.file_id if config.network.file_id is not None else "rfid"
         )
         self.analysis = analysis
         self.config = config
+        self.graph_files = graph_files
 
-        self.hazard_names = hazard_names
+        self.hazard_names = hazard_names_df
 
         self.destination_names = None
         self.destination_key = None
-        if config["origins_destinations"].get("category", None):
+        if config.origins_destinations.category:
             self.destination_key = "category"
-            self.destination_key_value = config["origins_destinations"]["category"]
+            self.destination_key_value = config.origins_destinations.category
 
         self.results_dict = {}
 
-    @staticmethod
-    def read(graph_file):
-        _pickle_reader = GraphPickleReader()
-        g = _pickle_reader.read(graph_file)
-        return g
-
     def optimal_route_origin_closest_destination(self):
         """Calculates per origin the location of its closest destination"""
-        graph = self.read(self.config["files"]["origins_destinations_graph"])
+        graph = self.graph_files.origins_destinations_graph.get_graph()
 
         # Load the origins and destinations
         origins = self.load_origins()
@@ -95,7 +97,7 @@ class OriginClosestDestination:
 
         if self.destination_key:
             self.destination_names = list(
-                destinations[self.config["origins_destinations"]["category"]].unique()
+                destinations[self.config.origins_destinations.category].unique()
             )
             self.destination_names_short = {
                 dn: f"D{i+1}" for i, dn in enumerate(self.destination_names)
@@ -141,7 +143,7 @@ class OriginClosestDestination:
 
     def multi_link_origin_closest_destination(self):
         """Calculates per origin the location of its closest destination with hazard disruption"""
-        graph = self.read(self.config["files"]["origins_destinations_graph_hazard"])
+        graph = self.graph_files.origins_destinations_graph_hazard.get_graph()
 
         # Load the origins and destinations
         origins = self.load_origins()
@@ -152,7 +154,7 @@ class OriginClosestDestination:
 
         if self.destination_key:
             self.destination_names = list(
-                destinations[self.config["origins_destinations"]["category"]].unique()
+                destinations[self.config.origins_destinations.category].unique()
             )
             self.destination_names_short = {
                 dn: f"D{i+1}" for i, dn in enumerate(self.destination_names)
@@ -167,7 +169,7 @@ class OriginClosestDestination:
             self.hazard_names.loc[
                 self.hazard_names["File name"] == hazard, "RA2CE name"
             ].values[0]
-            for hazard in self.config["hazard_names"]
+            for hazard in self.config.hazard_names
         ]
         hazards.sort()
         for hazard_name in hazards:
@@ -546,21 +548,21 @@ class OriginClosestDestination:
         )
 
     def _find_optimal_routes(
-            self,
-            node_checked_has_path: dict,
-            list_no_path: list,
-            n_ndat: tuple,
-            disrupted_graph,
-            hazard_name: str,
-            list_disrupted_destinations: list,
-            pref_routes: gpd.GeoDataFrame,
-            dest_name: str,
-            name_save: str,
-            optimal_routes: list,
-            origins,
-            base_graph,
-            destinations,
-    ) -> Union[tuple[Any, dict], None]:
+        self,
+        node_checked_has_path: dict,
+        list_no_path: list,
+        n_ndat: tuple,
+        disrupted_graph,
+        hazard_name: str,
+        list_disrupted_destinations: list,
+        pref_routes: gpd.GeoDataFrame,
+        dest_name: str,
+        name_save: str,
+        optimal_routes: list,
+        origins,
+        base_graph,
+        destinations,
+    ) -> tuple[Any, dict]:
         """
         Refactored method to avoid duplication of code between `find_closest_location` and `find_multiple_closest_locations` with subtile differences:
         - The first would not use a `dest_name` attribute.
@@ -715,7 +717,7 @@ class OriginClosestDestination:
 
             list_disrupted_destinations = []
             list_no_path = []
-            node_checked_has_path = {}
+            node_checked_has_path = dict()
             for n_ndat in tqdm(
                 disrupted_graph.nodes.data(),
                 desc=f"Finding optimal routes to {dest_name}",
@@ -1000,7 +1002,9 @@ class OriginClosestDestination:
 
     def load_origins(self):
         od_path = (
-            self.config["static"] / "output_graph" / "origin_destination_table.feather"
+            self.config.static_path
+            / "output_graph"
+            / "origin_destination_table.feather"
         )
         od = gpd.read_feather(od_path)
         origin = od.loc[od["o_id"].notna()]
@@ -1009,7 +1013,9 @@ class OriginClosestDestination:
 
     def load_destinations(self):
         od_path = (
-            self.config["static"] / "output_graph" / "origin_destination_table.feather"
+            self.config.static_path
+            / "output_graph"
+            / "origin_destination_table.feather"
         )
         od = gpd.read_feather(od_path)
         destination = od.loc[od["d_id"].notna()]

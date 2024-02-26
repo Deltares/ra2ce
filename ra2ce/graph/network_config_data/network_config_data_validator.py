@@ -23,6 +23,8 @@ from typing import Any
 
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
+from ra2ce.configuration.ra2ce_enum_base import Ra2ceEnumBase
+from ra2ce.graph.network_config_data.enums.source_enum import SourceEnum
 from ra2ce.graph.network_config_data.network_config_data import (
     HazardSection,
     NetworkConfigData,
@@ -31,7 +33,6 @@ from ra2ce.graph.network_config_data.network_config_data import (
 )
 
 NetworkDictValues: dict[str, list[Any]] = {
-    "source": ["OSM PBF", "OSM download", "shapefile", "pickle"],
     "polygon": ["file", None],
     "directed": [True, False, None],
     "network_type": ["walk", "bike", "drive", "drive_service", "all", None],
@@ -58,8 +59,6 @@ NetworkDictValues: dict[str, list[Any]] = {
     "save_gpkg": [True, False, None],
     "save_csv": [True, False, None],
     "hazard_map": ["file", None],
-    "aggregate_wl": ["max", "min", "mean", None],
-    "weighing": ["distance", "time", None],
     "save_traffic": [True, False, None],
     "locations": ["file", None],
 }
@@ -72,7 +71,7 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
     def _validate_shp_input(self, network_config: NetworkSection) -> ValidationReport:
         """Checks if a file id is configured when using the option to create network from shapefile"""
         _shp_report = ValidationReport()
-        if network_config.source == "shapefile" and not network_config.file_id:
+        if network_config.source == SourceEnum.SHAPEFILE and not network_config.file_id:
             _shp_report.error(
                 "Not possible to create network - Shapefile used as source, but no file_id configured in the network.ini file"
             )
@@ -91,17 +90,30 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
         return _report
 
     def _wrong_value(self, key: str) -> str:
-        _accepted_values = ",".join(NetworkDictValues[key])
+        _accepted_values = ", ".join(NetworkDictValues[key])
         return (
-            f"Wrong input to property [ {key} ], has to be one of: {_accepted_values}."
+            f"Wrong input to property [ {key} ]; has to be one of: {_accepted_values}."
         )
+
+    def _wrong_enum(self, key: str, enum: Ra2ceEnumBase) -> str:
+        # Remove last value INVALID
+        _accepted_values = enum.list_valid_options()
+        return (
+            f"Wrong input to property [ {key} ]; has to be one of: {_accepted_values}."
+        )
+
+    def _validate_enum(self, enum: Ra2ceEnumBase, key: str) -> ValidationReport:
+        _report = ValidationReport()
+        if not enum.is_valid():
+            _report.error(self._wrong_enum(key, enum))
+        return _report
 
     def _validate_project_section(
         self, project_section: ProjectSection
     ) -> ValidationReport:
         _report = ValidationReport()
         if not project_section:
-            _report.error(self._report_section_not_found("project"))
+            _report.error("Project section not found.")
         return _report
 
     def _validate_network_section(
@@ -110,26 +122,19 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
         _network_report = ValidationReport()
 
         # Validate source
-        if (
-            network_section.source
-            and network_section.source not in NetworkDictValues["source"]
-        ):
-            _network_report.error(self._wrong_value("source"))
+        _network_report.merge(self._validate_enum(network_section.source, "source"))
 
         # Validate network_type
-        if (
-            network_section.network_type
-            and network_section.network_type not in NetworkDictValues["network_type"]
-        ):
-            _network_report.error(self._wrong_value("network_type"))
+        _network_report.merge(
+            self._validate_enum(network_section.network_type, "network_type")
+        )
 
         # Validate road types.
-        _expected_road_types = NetworkDictValues["road_types"]
-        for road_type in filter(
-            lambda x: x not in _expected_road_types, network_section.road_types
+        if network_section.road_types and any(
+            not _type.is_valid() for _type in network_section.road_types
         ):
             _network_report.error(
-                f"Wrong road type is configured ({road_type}), has to be one or multiple of: {_expected_road_types}"
+                f"Wrong road type(s) configured; has to be one or multiple of: {[_type.config_value for _type in network_section.road_types[0].list_valid_options()]}"
             )
         return _network_report
 
@@ -138,11 +143,9 @@ class NetworkConfigDataValidator(Ra2ceIoValidator):
     ) -> ValidationReport:
         _hazard_report = ValidationReport()
 
-        if not hazard_section.aggregate_wl:
-            return _hazard_report
-
-        if hazard_section.aggregate_wl not in NetworkDictValues["aggregate_wl"]:
-            _hazard_report.error(self._wrong_value("aggregate_wl"))
+        _hazard_report.merge(
+            self._validate_enum(hazard_section.aggregate_wl, "aggregate_wl")
+        )
 
         return _hazard_report
 

@@ -41,6 +41,7 @@ def remove_dir_content(path: str) -> None:
     if os.path.isdir(path):
         shutil.rmtree(path)
 
+
 # NOTE: the examples/ folder in the root should be copied to docs/_examples after running sphinx
 # # -- Copy notebooks to include in docs -------
 if os.path.isdir("_examples"):
@@ -65,7 +66,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "sphinx_autosummary_accessors",
-    "nbsphinx"
+    "nbsphinx",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -123,7 +124,7 @@ napoleon_preprocess_types = True
 # a list of builtin themes.
 #
 html_theme = "pydata_sphinx_theme"
-html_logo = "_resources/ra2ce_temp_logo.svg"
+html_logo = "_resources/ra2ce_logo.svg"
 
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
@@ -137,7 +138,7 @@ html_theme_options = {
         {
             "name": "GitHub",
             "url": "https://github.com/Deltares/ra2ce",  # required
-            "icon": "https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg",
+            "icon": "../../_resources/ra2ce_banner.png",
             "type": "url",
         },
         {
@@ -240,3 +241,5 @@ texinfo_documents = [
 
 # Allow errors in notebooks
 nbsphinx_allow_errors = True
+# Do not execute the scripts during the build process.
+nbsphinx_execute = 'never'

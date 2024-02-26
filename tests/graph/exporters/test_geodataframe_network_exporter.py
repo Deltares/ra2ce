@@ -13,7 +13,7 @@ from tests import test_results
 class TestGeodataframeNetworkExporter:
     def test_initialize(self):
         _basename = "dummy_test"
-        _exporter = GeoDataFrameNetworkExporter(_basename, ["pickle", "shp"])
+        _exporter = GeoDataFrameNetworkExporter(_basename, ["pickle", "gpkg"])
         assert isinstance(_exporter, GeoDataFrameNetworkExporter)
         assert isinstance(_exporter, NetworkExporterBase)
 
@@ -25,7 +25,7 @@ class TestGeodataframeNetworkExporter:
             shutil.rmtree(_output_dir)
 
         _basename = "dummy_test"
-        _exporter = GeoDataFrameNetworkExporter(_basename, ["pickle", "shp"])
+        _exporter = GeoDataFrameNetworkExporter(_basename, ["pickle", "gpkg"])
 
         _export_data = GeoDataFrame()
 
@@ -44,7 +44,7 @@ class TestGeodataframeNetworkExporter:
             shutil.rmtree(_output_dir)
 
         _basename = "dummy_test"
-        _exporter = GeoDataFrameNetworkExporter(_basename, ["pickle", "shp"])
+        _exporter = GeoDataFrameNetworkExporter(_basename, ["pickle", "gpkg"])
 
         _export_data = GeoDataFrame()
 

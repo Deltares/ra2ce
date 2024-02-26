@@ -25,6 +25,9 @@ from typing import Any
 
 
 class ValidationReport:
+    _errors: list[str]
+    _warns: list[str]
+
     def __init__(self) -> None:
         self._errors = []
         self._warns = []

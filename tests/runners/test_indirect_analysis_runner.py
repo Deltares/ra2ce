@@ -1,3 +1,12 @@
+import pytest
+
+from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+    AnalysisSectionIndirect,
+)
+from ra2ce.analyses.analysis_config_data.enums.analysis_indirect_enum import (
+    AnalysisIndirectEnum,
+)
+from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.indirect_analysis_runner import IndirectAnalysisRunner
 from tests.runners.dummy_classes import DummyRa2ceInput
 
@@ -7,25 +16,35 @@ class TestIndirectAnalysisRunner:
         _runner = IndirectAnalysisRunner()
         assert str(_runner) == "Indirect Analysis Runner"
 
-    def test_given_direct_configuration_can_run(self):
+    @pytest.fixture
+    def dummy_ra2ce_input(self):
+        _ra2ce_input = DummyRa2ceInput()
+        assert isinstance(_ra2ce_input, ConfigWrapper)
+        yield _ra2ce_input
+
+    def test_given_indirect_configuration_can_run(
+        self, dummy_ra2ce_input: ConfigWrapper
+    ):
         # 1. Define test data.
-        _input_config = DummyRa2ceInput()
-        assert _input_config
-        _input_config.analysis_config.config_data["indirect"] = None
+        dummy_ra2ce_input.analysis_config.config_data.analyses = [
+            AnalysisSectionIndirect(
+                analysis=AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY
+            )
+        ]
 
         # 2. Run test.
-        _result = IndirectAnalysisRunner.can_run(_input_config)
+        _result = IndirectAnalysisRunner.can_run(dummy_ra2ce_input)
 
         # 3. Verify expectations.
         assert _result
 
-    def test_given_wrong_analysis_configuration_cannot_run(self):
+    def test_given_wrong_analysis_configuration_cannot_run(
+        self, dummy_ra2ce_input: ConfigWrapper
+    ):
         # 1. Define test data.
-        _input_config = DummyRa2ceInput()
-        assert _input_config
 
         # 2. Run test.
-        _result = IndirectAnalysisRunner.can_run(_input_config)
+        _result = IndirectAnalysisRunner.can_run(dummy_ra2ce_input)
 
         # 3. Verify expectations.
         assert not _result

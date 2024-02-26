@@ -28,6 +28,10 @@ from typing import Optional
 from pyproj import CRS
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
+from ra2ce.graph.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
+from ra2ce.graph.network_config_data.enums.network_type_enum import NetworkTypeEnum
+from ra2ce.graph.network_config_data.enums.road_type_enum import RoadTypeEnum
+from ra2ce.graph.network_config_data.enums.source_enum import SourceEnum
 
 
 @dataclass
@@ -38,13 +42,13 @@ class ProjectSection:
 @dataclass
 class NetworkSection:
     directed: bool = False
-    source: str = ""  # should be enum
+    source: SourceEnum = field(default_factory=lambda: SourceEnum.INVALID)
     primary_file: list[Path] = field(default_factory=list)
     diversion_file: list[Path] = field(default_factory=list)
     file_id: str = ""
     polygon: Optional[Path] = None
-    network_type: str = ""  # Should be enum
-    road_types: list[str] = field(default_factory=list)
+    network_type: NetworkTypeEnum = field(default_factory=lambda: NetworkTypeEnum.NONE)
+    road_types: list[RoadTypeEnum] = field(default_factory=list)
     save_gpkg: bool = False
 
 
@@ -74,7 +78,7 @@ class HazardSection:
     hazard_map: list[Path] = field(default_factory=list)
     hazard_id: str = ""
     hazard_field_name: list[str] = field(default_factory=list)
-    aggregate_wl: str = ""  # Should be enum
+    aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     hazard_crs: str = ""
 
 
@@ -90,6 +94,7 @@ class CleanupSection:
 
 @dataclass
 class NetworkConfigData(ConfigDataProtocol):
+    root_path: Optional[Path] = None
     input_path: Optional[Path] = None
     output_path: Optional[Path] = None
     static_path: Optional[Path] = None
@@ -115,6 +120,10 @@ class NetworkConfigData(ConfigDataProtocol):
         if not self.static_path:
             return None
         return self.static_path.joinpath("network")
+
+    @staticmethod
+    def get_data_output(ini_file: Path) -> Path:
+        return ini_file.parent.joinpath("output")
 
     def to_dict(self) -> dict:
         _dict = self.__dict__

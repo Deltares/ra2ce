@@ -26,6 +26,7 @@ from geopandas import GeoDataFrame
 from networkx import MultiGraph
 
 from ra2ce.common.io.readers import GraphPickleReader
+from ra2ce.graph.network_config_data.enums.source_enum import SourceEnum
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
 from ra2ce.graph.network_wrappers.osm_network_wrapper.osm_network_wrapper import (
@@ -52,15 +53,15 @@ class NetworkWrapperFactory(NetworkWrapperProtocol):
     def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
         logging.info("Start creating a network from the submitted shapefile.")
         source = self._config_data.network.source
-        if source == "shapefile":
+        if source == SourceEnum.SHAPEFILE:
             if self._any_cleanup_enabled():
                 return ShpNetworkWrapper(self._config_data).get_network()
             return VectorNetworkWrapper(self._config_data).get_network()
-        elif source == "OSM PBF":
+        elif source == SourceEnum.OSB_BPF:
             return TrailsNetworkWrapper(self._config_data).get_network()
-        elif source == "OSM download":
+        elif source == SourceEnum.OSM_DOWNLOAD:
             return OsmNetworkWrapper(self._config_data).get_network()
-        elif source == "pickle":
+        elif source == SourceEnum.PICKLE:
             logging.info("Start importing a network from pickle")
             base_graph = GraphPickleReader().read(
                 self.output_graph_dir.joinpath("base_graph.p")
