@@ -1,3 +1,10 @@
+from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
+    AnalysisSectionDirect,
+)
+from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+    AnalysisDirectEnum,
+)
 from ra2ce.analyses.direct.analyses_direct import DirectAnalyses
 from tests import test_data
 
@@ -10,16 +17,16 @@ class TestDirectAnalyses:
         assert isinstance(_analyses, DirectAnalyses)
 
     def test_execute(self):
-        _config = {
-            "direct": [
-                {
-                    "name": "DummyExecute",
-                    "analysis": "",
-                    "save_gpkg": False,
-                    "save_csv": False,
-                }
+        _config = AnalysisConfigData(
+            analyses=[
+                AnalysisSectionDirect(
+                    name="DummyExecute",
+                    analysis=AnalysisDirectEnum.INVALID,
+                    save_gpkg=False,
+                    save_csv=False,
+                )
             ],
-            "output": test_data,
-        }
+            output_path=test_data,
+        )
         _graphs = {}
         DirectAnalyses(_config, _graphs).execute()

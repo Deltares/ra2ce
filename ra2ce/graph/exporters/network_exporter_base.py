@@ -21,7 +21,7 @@
 
 
 from pathlib import Path
-from typing import Any, List, Union
+from typing import Any, Union
 
 import geopandas as gpd
 import networkx as nx
@@ -35,9 +35,9 @@ NETWORK_TYPE = Union[gpd.GeoDataFrame, MULTIGRAPH_TYPE]
 
 
 class NetworkExporterBase(Ra2ceExporterProtocol):
-    _export_types: List[str] = ["pickle"]
+    _export_types: list[str] = ["pickle"]
 
-    def __init__(self, basename: str, export_types: List[str]) -> None:
+    def __init__(self, basename: str, export_types: list[str]) -> None:
         self._basename = basename
         self._export_types = export_types
         self.pickle_path = None
@@ -74,5 +74,5 @@ class NetworkExporterBase(Ra2ceExporterProtocol):
         if "pickle" in self._export_types:
             self.export_to_pickle(export_path, export_data)
 
-        if "shp" in self._export_types:
+        if "gpkg" in self._export_types:
             self.export_to_gpkg(export_path, export_data)

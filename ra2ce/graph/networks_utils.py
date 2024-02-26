@@ -26,7 +26,7 @@ import sys
 import warnings
 from pathlib import Path
 from statistics import mean
-from typing import Optional
+from typing import Optional, Union
 
 import geopandas as gpd
 import networkx as nx
@@ -38,6 +38,7 @@ import rtree
 from tqdm import tqdm
 from geopy import distance
 from networkx import Graph, set_edge_attributes
+from numpy.ma import MaskedArray
 from osgeo import gdal
 from osmnx import graph_to_gdfs, simplify_graph
 from rasterio.features import shapes
@@ -400,11 +401,11 @@ def snap_endpoints_lines(
     return lines_gdf
 
 
-def find_isolated_endpoints(linesIds: list, lines: list) -> list:
+def find_isolated_endpoints(lines_ids: list[str], lines: list) -> list:
     """Find endpoints of lines that don't touch another line.
 
     Args:
-        linesIds: a list of the IDs of lines
+        lines_ids: a list of the IDs of lines
         lines: a list of LineStrings or a MultiLineString
 
     Returns:
@@ -416,7 +417,7 @@ def find_isolated_endpoints(linesIds: list, lines: list) -> list:
         Build on library from https://github.com/ojdo/python-tools/blob/master/shapelytools.py
     """
     isolated_endpoints = []
-    for i, id_line in enumerate(zip(linesIds, lines)):
+    for i, id_line in enumerate(zip(lines_ids, lines)):
         ids, line = id_line
         other_lines = lines[:i] + lines[i + 1 :]
         for q in [0, -1]:
@@ -697,6 +698,7 @@ def split_line_with_points(line, points):
 
     segments.append(current_line)
     return segments
+
 
 
 def cut(line: BaseMultipartGeometry, distance: float) -> tuple[LineString, LineString]:
@@ -1087,6 +1089,12 @@ def graph_create_unique_ids(graph: nx.Graph, new_id_name: str = "rfid") -> nx.Gr
 
 def add_missing_geoms_graph(graph: nx.Graph, geom_name: str = "geometry") -> nx.Graph:
     # Not all nodes have geometry attributed (some only x and y coordinates) so add a geometry columns
+    def get_node_by_attribute(graph: nx.Graph, node_number: int) -> dict:
+        for node, data in graph.nodes(data=True):
+            if node == node_number:
+                return data
+        return dict()
+
     nodes_without_geom = [
         n[0] for n in graph.nodes(data=True) if geom_name not in n[-1]
     ]
@@ -1094,13 +1102,13 @@ def add_missing_geoms_graph(graph: nx.Graph, geom_name: str = "geometry") -> nx.
         graph.nodes[nd][geom_name] = Point(graph.nodes[nd]["x"], graph.nodes[nd]["y"])
 
     edges_without_geom = [
-        e for e in graph.edges.data(data=True) if geom_name not in e[-1]
+        e for e in graph.edges.data(keys=True, data=True) if geom_name not in e[-1]
     ]
     for ed in edges_without_geom:
-        graph[ed[0]][ed[1]][0][geom_name] = LineString(
-            [graph.nodes[ed[0]][geom_name], graph.nodes[ed[1]][geom_name]]
-        )
-
+        if graph.nodes[ed[0]].get(geom_name, None) and graph.nodes[ed[1]].get(geom_name, None):
+            graph[ed[0]][ed[1]][ed[2]][geom_name] = LineString(
+                [graph.nodes[ed[0]][geom_name], graph.nodes[ed[1]][geom_name]]
+            )
     return graph
 
 
@@ -1215,6 +1223,13 @@ def graph_to_gpkg(origin_graph: nx.classes.graph.Graph, edge_gpkg, node_gpkg):
     logging.info("Saving edges as shapefile: {}".format(edge_gpkg))
 
     # The encoding utf-8 might result in an empty shapefile if the wrong encoding is used.
+    for entity in [nodes, edges]:
+        if 'osmid' in entity:
+            # Otherwise it gives this error: cannot insert osmid, already exist
+            entity['osmid_original'] = entity.pop('osmid')
+    for _path in [node_gpkg, edge_gpkg]:
+        if _path.exists():
+            _path.unlink()
     nodes.to_file(node_gpkg, driver="GPKG", encoding="utf-8")
     edges.to_file(edge_gpkg, driver="GPKG", encoding="utf-8")
 
@@ -1653,12 +1668,19 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
         for i in df.loc[df["avg_speed"] == 0].index:
             if df["road_types"].iloc[i] in exceptions:
                 if any(rt in df["road_types"].iloc[i] for rt in df["road_types"]):
-                    road_type, avg_speed = [
-                        (rt, avg_s)
-                        for rt, avg_s in zip(df["road_types"], df["avg_speed"])
-                        if rt in df["road_types"].iloc[i] and avg_s != 0
-                    ][0]
-                    df["avg_speed"].iloc[i] = avg_speed
+                    try:
+                        road_type, avg_speed = [
+                            (rt, avg_s)
+                            for rt, avg_s in zip(df["road_types"], df["avg_speed"])
+                            if rt in df["road_types"].iloc[i] and avg_s != 0
+                        ][0]
+                        df["avg_speed"].iloc[i] = avg_speed
+                    except IndexError as e:
+                        logging.warning(
+                            f"Road type '{df['road_types'].iloc[i]}' cannot be assigned any average speed. Please check the average speed CSV ({save_path}), enter the right average speed for this road type, and run RA2CE again."
+                        )
+                        logging.error("Index error: {}".format(e))
+                        df["avg_speed"].iloc[i] = 0
             else:
                 # if any(rt in df['road_types'].iloc[i] for rt in df['road_types']):
                 if "link" in df["road_types"].iloc[i]:
@@ -1831,10 +1853,14 @@ def clean_memory(list_delete: list) -> None:
         del to_delete
 
 
-def get_valid_mean(x_value: float) -> Optional[float]:
-    if not isinstance(x_value, float):
+def get_valid_mean(x_value: MaskedArray, **kwargs) -> Optional[float]:
+    # **kwargs should not be removed. properties var is passed in zonal_stats. So properties should not be removed,
+    #  else this will not be activated
+    if not isinstance(x_value, MaskedArray):
         return np.nan
-    return x_value.mean()  # You know it's a valid type, so return the mean.
+    if x_value.mask.all():
+        return np.nan
+    return np.mean(x_value)  # You know it's a valid type, so return the mean.
 
 
 def buffer_geometry(

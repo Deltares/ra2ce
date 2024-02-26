@@ -16,20 +16,20 @@
 """
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, Union
 
 import networkx as nx
 import osmnx
 import pandas as pd
-from geopandas import GeoDataFrame, read_file
+from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
+from shapely.geometry import LineString
 from shapely.geometry.base import BaseGeometry
 from ra2ce.graph.network_wrappers.osm_network_wrapper.osm_utils import (
     get_node_nearest_edge, _is_endnode_simplified, modify_edges, remove_key
 )
 
 import ra2ce.graph.networks_utils as nut
-from shapely.geometry import shape
 from ra2ce.graph.exporters.json_exporter import JsonExporter
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
@@ -43,9 +43,11 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         self.output_graph_dir = config_data.output_graph_dir
         self.graph_crs = config_data.crs
 
-        # Network options
-        self.network_type = config_data.network.network_type
-        self.road_types = config_data.network.road_types
+        # Network
+        self.network_type = config_data.network.network_type.config_value
+        self.road_types = list(
+            _enum.config_value for _enum in config_data.network.road_types
+        )
         self.polygon_path = config_data.network.polygon
         self.is_directed = config_data.network.directed
 
@@ -194,7 +196,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
             graph=complex_graph, geom_name="geometry"
         ).to_directed()
         complex_graph = OsmNetworkWrapper.snap_nodes_to_nodes(
-            graph=complex_graph, threshold=0.000025
+            graph=complex_graph, threshold=0.00005
         )
         return complex_graph
 
@@ -337,17 +339,3 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         # ToDo: Make sure the directions make sense after clustering; both for snap_edges
         # ToDo: Create tests for modify_edges and snap_nodes_to_edges functions
         raise NotImplementedError("Next thing to do!")
-
-
-# _valid_unique_graph = nx.MultiDiGraph()
-# _valid_unique_graph.add_node(1, x=1, y=20)
-# _valid_unique_graph.add_node(2, x=2, y=20)
-# _valid_unique_graph.add_node(4, x=2, y=10)
-# _valid_unique_graph.add_node(5, x=1, y=10)
-#
-# _valid_unique_graph.add_edge(1, 2, x=[1, 2], y=[20, 20])
-# _valid_unique_graph.add_edge(2, 4, x=[2, 2], y=[20, 10])
-# _valid_unique_graph.add_edge(1, 4, x=[1, 2], y=[20, 10])
-# _valid_unique_graph.add_edge(5, 1, x=[1, 2], y=[10, 20])
-#
-# OsmNetworkWrapper.snap_nodes_to_edges(_valid_unique_graph, threshold=10)

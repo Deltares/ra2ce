@@ -2,9 +2,19 @@ import pytest
 
 from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisConfigDataWithNetwork,
-    AnalysisConfigDataWithoutNetwork,
+    AnalysisSectionDirect,
+    AnalysisSectionIndirect,
+    DirectAnalysisNameList,
+    IndirectAnalysisNameList,
+    ProjectSection,
 )
+from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+    AnalysisDirectEnum,
+)
+from ra2ce.analyses.analysis_config_data.enums.analysis_indirect_enum import (
+    AnalysisIndirectEnum,
+)
+from tests import test_results
 
 
 class TestAnalysisConfigData:
@@ -14,32 +24,46 @@ class TestAnalysisConfigData:
         assert isinstance(_config_data, dict)
         assert isinstance(_config_data, AnalysisConfigData)
 
+    @pytest.fixture
+    def valid_config(self) -> AnalysisConfigData:
+        _config = AnalysisConfigData(project=ProjectSection())
+        for _indirect in IndirectAnalysisNameList:
+            _config.analyses.append(
+                AnalysisSectionIndirect(
+                    analysis=AnalysisIndirectEnum.get_enum(_indirect)
+                )
+            )
+        for _direct in DirectAnalysisNameList:
+            _config.analyses.append(
+                AnalysisSectionDirect(analysis=AnalysisDirectEnum.get_enum(_direct))
+            )
+        yield _config
 
-class TestAnalysisConfigDataWithNetwork:
-    def test_initialize(self):
-        _config_data = AnalysisConfigDataWithNetwork()
-        assert isinstance(_config_data, AnalysisConfigDataWithNetwork)
-        assert isinstance(_config_data, AnalysisConfigData)
+    def test_indirect(self, valid_config: AnalysisConfigData):
+        # 1. Define test data
 
-    def test_from_dict(self):
-        _dict_values = {"the answer": 42}
-        _config_data = AnalysisConfigDataWithNetwork.from_dict(_dict_values)
+        # 2. Run test
+        _indirect = [_config.analysis.config_value for _config in valid_config.indirect]
 
-        assert isinstance(_config_data, AnalysisConfigDataWithNetwork)
-        assert isinstance(_config_data, AnalysisConfigDataWithNetwork)
-        assert _config_data == _dict_values
+        # 3. Verify expectations
+        assert all(item in _indirect for item in IndirectAnalysisNameList)
 
+    def test_direct(self, valid_config: AnalysisConfigData):
+        # 1. Define test data
 
-class TestAnalysisConfigDataWithoutNetwork:
-    def test_initialize(self):
-        _config_data = AnalysisConfigDataWithoutNetwork()
-        assert isinstance(_config_data, AnalysisConfigDataWithoutNetwork)
-        assert isinstance(_config_data, AnalysisConfigData)
+        # 2. Run test
+        _direct = [_config.analysis.config_value for _config in valid_config.direct]
 
-    def test_from_dict(self):
-        _dict_values = {"the answer": 42}
-        _config_data = AnalysisConfigDataWithoutNetwork.from_dict(_dict_values)
+        # 3. Verify expectations
+        assert all(item in _direct for item in DirectAnalysisNameList)
 
-        assert isinstance(_config_data, AnalysisConfigDataWithoutNetwork)
-        assert isinstance(_config_data, AnalysisConfigDataWithoutNetwork)
-        assert _config_data == _dict_values
+    def test_get_data_output(self):
+        # 1. Define test data
+        _test_ini = test_results / "non_existing.ini"
+        _expected_value = test_results / "output"
+
+        # 2. Run test
+        _return_value = AnalysisConfigData.get_data_output(_test_ini)
+
+        # 3. Verify expectations.
+        assert _return_value == _expected_value
