@@ -18,7 +18,9 @@
 # absolute, like shown here.
 #
 import os
+import shutil
 import sys
+from distutils.dir_util import copy_tree
 import sphinx_autosummary_accessors
 
 # This is not needed
@@ -27,6 +29,25 @@ import ra2ce
 
 print("ra2ce", ra2ce)
 print("dir", dir(ra2ce))
+
+
+# -- Helper functions ---------------------------------
+def remove_dir_content(path: str) -> None:
+    for root, dirs, files in os.walk(path):
+        for f in files:
+            os.unlink(os.path.join(root, f))
+        for d in dirs:
+            shutil.rmtree(os.path.join(root, d))
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+
+
+# NOTE: the examples/ folder in the root should be copied to docs/_examples after running sphinx
+# # -- Copy notebooks to include in docs -------
+if os.path.isdir("_examples"):
+    remove_dir_content("_examples")
+os.makedirs("_examples")
+copy_tree("../examples", "_examples")
 
 # -- General configuration ---------------------------------------------
 
@@ -45,6 +66,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autosummary",
     "sphinx_autosummary_accessors",
+    "nbsphinx",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -61,8 +83,8 @@ master_doc = "index"
 
 # General information about the project.
 project = "Risk Assessment and Adaptation for Critical infrastructurE"
-copyright = "2020, Margreet van Marle"
-author = "Margreet van Marle"
+copyright = "2020, Deltares"
+author = "Margreet van Marle\\Frederique de Groen\\Lieke Meijer\\Sahand Asgarpour\\Carles Soriano Perez"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -102,7 +124,7 @@ napoleon_preprocess_types = True
 # a list of builtin themes.
 #
 html_theme = "pydata_sphinx_theme"
-html_logo = "_resources/ra2ce_temp_logo.svg"
+html_logo = "_resources/ra2ce_logo.svg"
 
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
@@ -116,13 +138,13 @@ html_theme_options = {
         {
             "name": "GitHub",
             "url": "https://github.com/Deltares/ra2ce",  # required
-            "icon": "https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg",
+            "icon": "../../_resources/ra2ce_banner.png",
             "type": "url",
         },
         {
             "name": "Deltares",
             "url": "https://www.deltares.nl/en/",
-            "icon": "_resources/deltares-blue.svg",
+            "icon": "../../_resources/deltares-blue.svg",
             "type": "local",
         },
     ],
@@ -216,3 +238,8 @@ texinfo_documents = [
         "Miscellaneous",
     ),
 ]
+
+# Allow errors in notebooks
+nbsphinx_allow_errors = True
+# Do not execute the scripts during the build process.
+nbsphinx_execute = 'never'

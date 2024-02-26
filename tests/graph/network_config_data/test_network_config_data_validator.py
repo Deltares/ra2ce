@@ -1,4 +1,5 @@
 from ra2ce.common.validation.validation_report import ValidationReport
+from ra2ce.graph.network_config_data.enums.source_enum import SourceEnum
 from ra2ce.graph.network_config_data.network_config_data import (
     CleanupSection,
     HazardSection,
@@ -23,7 +24,7 @@ class TestNetworkIniConfigurationValidator:
         _test_config_data = NetworkConfigData(
             **{
                 "project": ProjectSection(name=""),
-                "network": NetworkSection(source="pickle"),
+                "network": NetworkSection(source=SourceEnum.PICKLE),
                 "origins_destinations": OriginsDestinationsSection(),
                 "hazard": HazardSection(),
                 "cleanup": CleanupSection(),
@@ -55,7 +56,7 @@ class TestNetworkIniConfigurationValidator:
         # 1. Define test data.
         _expected_err = "Not possible to create network - Shapefile used as source, but no file_id configured in the network.ini file"
         _test_config_data = NetworkConfigData(
-            network=NetworkSection(source="shapefile")
+            network=NetworkSection(source=SourceEnum.SHAPEFILE)
         )
 
         # 2. Run test.

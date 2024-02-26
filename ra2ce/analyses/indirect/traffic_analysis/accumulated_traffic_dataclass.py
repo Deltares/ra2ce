@@ -49,7 +49,7 @@ class AccumulatedTraffic:
                 prioritarian=self.prioritarian + other,
                 egalitarian=self.egalitarian + other,
             )
-        raise NotImplementedError(
+        raise TypeError(
             "It is not possible to sum {} with a value of type {}.".format(
                 AccumulatedTraffic.__name__, type(other).__name__
             )
@@ -74,7 +74,7 @@ class AccumulatedTraffic:
                 prioritarian=self.prioritarian * other,
                 egalitarian=self.egalitarian * other,
             )
-        raise NotImplementedError(
+        raise TypeError(
             "It is not possible to multiply {} with a value of type {}.".format(
                 AccumulatedTraffic.__name__, type(other).__name__
             )

@@ -16,13 +16,14 @@
 """
 import logging
 from pathlib import Path
-from typing import Any
+from typing import Any, Union
 
 import networkx as nx
 import osmnx
 import pandas as pd
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
+from shapely.geometry import LineString
 from shapely.geometry.base import BaseGeometry
 
 import ra2ce.graph.networks_utils as nut
@@ -39,9 +40,11 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         self.output_graph_dir = config_data.output_graph_dir
         self.graph_crs = config_data.crs
 
-        # Network options
-        self.network_type = config_data.network.network_type
-        self.road_types = config_data.network.road_types
+        # Network
+        self.network_type = config_data.network.network_type.config_value
+        self.road_types = list(
+            _enum.config_value for _enum in config_data.network.road_types
+        )
         self.polygon_path = config_data.network.polygon
         self.is_directed = config_data.network.directed
 
@@ -133,9 +136,9 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
                 "No polygon_file file found at {}.".format(self.polygon_path)
             )
 
-        poly_dict = nut.read_geojson(geojson_file=self.polygon_path)
+        _normalized_polygon = nut.get_normalized_geojson_polygon(self.polygon_path)
         _complex_graph = self._download_clean_graph_from_osm(
-            polygon=nut.geojson_to_shp(poly_dict),
+            polygon=_normalized_polygon,
             network_type=self.network_type,
             road_types=self.road_types,
         )
@@ -189,7 +192,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
             graph=complex_graph, geom_name="geometry"
         ).to_directed()
         complex_graph = OsmNetworkWrapper.snap_nodes_to_nodes(
-            graph=complex_graph, threshold=0.000025
+            graph=complex_graph, threshold=0.00005
         )
         return complex_graph
 
@@ -307,3 +310,4 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
     @staticmethod
     def snap_nodes_to_edges(graph: MultiDiGraph, threshold: float):
         raise NotImplementedError("Next thing to do!")
+

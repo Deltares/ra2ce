@@ -8,6 +8,8 @@ from shapely.geometry import LineString, Polygon
 from shapely.geometry.base import BaseGeometry
 
 import ra2ce.graph.networks_utils as nut
+from ra2ce.graph.network_config_data.enums.network_type_enum import NetworkTypeEnum
+from ra2ce.graph.network_config_data.enums.road_type_enum import RoadTypeEnum
 from ra2ce.graph.network_config_data.network_config_data import (
     NetworkConfigData,
     NetworkSection,
@@ -22,7 +24,10 @@ from tests import slow_test, test_data, test_results
 class TestOsmNetworkWrapper:
     def test_initialize_without_graph_crs(self):
         # 1. Define test data.
-        _network_section = NetworkSection(network_type="a_network", road_types=["r"])
+        _network_section = NetworkSection(
+            network_type=NetworkTypeEnum.ALL,
+            road_types=[RoadTypeEnum.PRIMARY],
+        )
         _network_config_data = NetworkConfigData(network=_network_section)
 
         # 2. Run test.
@@ -36,7 +41,9 @@ class TestOsmNetworkWrapper:
     @pytest.fixture
     def _network_wrapper_without_polygon(self) -> OsmNetworkWrapper:
         _network_section = NetworkSection(
-            network_type="drive", road_types=["road_link"], directed=True
+            network_type=NetworkTypeEnum.DRIVE,
+            road_types=[RoadTypeEnum.ROAD],
+            directed=True,
         )
         _output_dir = test_results.joinpath("test_osm_network_wrapper")
         if not _output_dir.exists():
@@ -90,8 +97,7 @@ class TestOsmNetworkWrapper:
         _test_input_directory = test_data.joinpath("graph", "test_osm_network_wrapper")
         _polygon_file = _test_input_directory.joinpath("_test_polygon.geojson")
         assert _polygon_file.exists()
-        _polygon_dict = nut.read_geojson(_polygon_file)
-        yield nut.geojson_to_shp(_polygon_dict)
+        yield nut.get_normalized_geojson_polygon(_polygon_file)
 
     @slow_test
     def test_download_clean_graph_from_osm_output(
@@ -101,12 +107,12 @@ class TestOsmNetworkWrapper:
     ):
         # 1. Define test data.
         _link_type = ""
-        _network_type = "drive"
+        _network_type = NetworkTypeEnum.DRIVE
 
         # 2. Run test.
         graph_complex = _network_wrapper_without_polygon._download_clean_graph_from_osm(
             polygon=_valid_network_polygon_fixture,
-            network_type=_network_type,
+            network_type=_network_type.config_value,
             road_types=_link_type,
         )
 

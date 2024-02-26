@@ -1,4 +1,5 @@
-.. currentmodule:: ra2ce
+.. automodule:: ra2ce
+    :members:
 
 .. _technical_documentation:
 
