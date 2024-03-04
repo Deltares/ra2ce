@@ -80,7 +80,7 @@ class IndirectAnalyses:
             self.config.hazard_names = list()
 
     def single_link_redundancy(
-        self, graph: nx.Graph, analysis: AnalysisSectionIndirect
+            self, graph: nx.Graph, analysis: AnalysisSectionIndirect
     ):
         """This is the function to analyse roads with a single link disruption and an alternative route.
 
@@ -194,8 +194,8 @@ class IndirectAnalyses:
                 gdf.loc[
                     (gdf["detour"] == 1)
                     & (
-                        gdf[hz + "_" + analysis.aggregate_wl.config_value]
-                        > analysis.threshold
+                            gdf[hz + "_" + analysis.aggregate_wl.config_value]
+                            > analysis.threshold
                     ),
                     col + "_detour_losses",
                 ] += (
@@ -209,8 +209,8 @@ class IndirectAnalyses:
                 gdf.loc[
                     (gdf["detour"] == 0)
                     & (
-                        gdf[hz + "_" + analysis.aggregate_wl.config_value]
-                        > analysis.threshold
+                            gdf[hz + "_" + analysis.aggregate_wl.config_value]
+                            > analysis.threshold
                     ),
                     col + "_nodetour_losses",
                 ] += (
@@ -297,7 +297,7 @@ class IndirectAnalyses:
             )
 
     def multi_link_redundancy(
-        self, graph: nx.classes.MultiGraph, analysis: AnalysisSectionIndirect
+            self, graph: nx.classes.MultiGraph, analysis: AnalysisSectionIndirect
     ):
         """Calculates the multi-link redundancy of a NetworkX graph.
 
@@ -351,10 +351,10 @@ class IndirectAnalyses:
                 u, v, k, edata = edges
                 edata["time"] = (edata["length"] * 1e-3) / edata["avgspeed"]  # in hours and avg speed in km/h
                 if nx.has_path(graph, u, v):
-                    alt_dist = nx.dijkstra_path_length(graph, u, v, weight=analysis.weighing.config_value)
+                    alt_dist = nx.dijkstra_path_length(graph, u, v, weight="length")
                     alt_time = (alt_dist * 1e-3) / edata["avgspeed"]  # in hours
                     alt_nodes = nx.dijkstra_path(graph, u, v)
-                    time = edata["time"]
+                    time = round(edata["time"], 2)
                     connected = 1
                 else:
                     alt_dist, alt_time, alt_nodes, time, connected = np.NaN, np.NaN, np.NaN, np.NaN, 0
@@ -373,6 +373,7 @@ class IndirectAnalyses:
                 df_calculated = pd.concat(
                     [df_calculated, pd.DataFrame(data)], ignore_index=True
                 )
+            df_calculated['alt_dist'] = pd.to_numeric(df_calculated['alt_dist'], errors='coerce')
             # Merge the dataframes
             if "rfid" in gdf:
                 gdf = gdf.merge(df_calculated, how="left", on=["u", "v", "rfid"])
@@ -494,8 +495,8 @@ class IndirectAnalyses:
                         gdf_.loc[
                             (gdf_[hz + "_" + analysis.aggregate_wl.config_value] > lb)
                             & (
-                                gdf_[hz + "_" + analysis.aggregate_wl.config_value]
-                                <= ub
+                                    gdf_[hz + "_" + analysis.aggregate_wl.config_value]
+                                    <= ub
                             )
                             & (gdf_["class_identifier"] == road_cat),
                             "duration_disruption",
@@ -544,7 +545,7 @@ class IndirectAnalyses:
 
     @staticmethod
     def extract_od_nodes_from_graph(
-        graph: nx.classes.MultiGraph,
+            graph: nx.classes.MultiGraph,
     ) -> list[tuple[str, str]]:
         """
         Extracts all Origin - Destination nodes from the graph, prevents from entries
@@ -565,7 +566,7 @@ class IndirectAnalyses:
         return _od_nodes
 
     def _get_origin_destination_pairs(
-        self, graph: nx.classes.MultiGraph
+            self, graph: nx.classes.MultiGraph
     ) -> list[tuple[int, str], tuple[int, str]]:
         od_path = self.config.static_path.joinpath(
             "output_graph", "origin_destination_table.feather"
@@ -618,7 +619,7 @@ class IndirectAnalyses:
         ).optimal_route_od_link()
 
     def multi_link_origin_destination(
-        self, graph: nx.classes.MultiGraph, analysis: AnalysisSectionIndirect
+            self, graph: nx.classes.MultiGraph, analysis: AnalysisSectionIndirect
     ):
         """Calculates the connectivity between origins and destinations"""
         od_nodes = self._get_origin_destination_pairs(graph)
@@ -909,10 +910,10 @@ class IndirectAnalyses:
                 e
                 for e in edges
                 if e[-1][hazard_name]
-                and (
-                    (e[-1][hazard_name] > float(analysis.threshold))
-                    & ("bridge" not in e[-1])
-                )
+                   and (
+                           (e[-1][hazard_name] > float(analysis.threshold))
+                           & ("bridge" not in e[-1])
+                   )
             ]
             edges_hz_indirect = [e for e in edges if e not in edges_hz_direct]
 
@@ -1101,8 +1102,8 @@ class IndirectAnalyses:
                 g = self.graph_files.base_graph_hazard.get_graph()
                 gdf = self.multi_link_redundancy(g, analysis)
             elif (
-                analysis.analysis
-                == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION
+                    analysis.analysis
+                    == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION
             ):
                 g = self.graph_files.origins_destinations_graph.get_graph()
                 gdf = self.optimal_route_origin_destination(g, analysis)
@@ -1132,7 +1133,7 @@ class IndirectAnalyses:
                     )
                     route_traffic_df.to_csv(impact_csv_path, index=False)
             elif (
-                analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_DESTINATION
+                    analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_DESTINATION
             ):
                 g = self.graph_files.origins_destinations_graph_hazard.get_graph()
                 gdf = self.multi_link_origin_destination(g, analysis)
@@ -1177,8 +1178,8 @@ class IndirectAnalyses:
                 gdf = self.single_link_redundancy(g, analysis)
                 gdf = self.single_link_losses(gdf, analysis)
             elif (
-                analysis.analysis
-                == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
+                    analysis.analysis
+                    == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
             ):
                 analyzer = OriginClosestDestination(
                     self.config, analysis, self.graph_files, self.hazard_names_df
@@ -1207,8 +1208,8 @@ class IndirectAnalyses:
                     del opt_routes["geometry"]
                     opt_routes.to_csv(csv_path, index=False)
             elif (
-                analysis.analysis
-                == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
+                    analysis.analysis
+                    == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
             ):
                 analyzer = OriginClosestDestination(
                     self.config, analysis, self.graph_files, self.hazard_names_df
@@ -1297,7 +1298,7 @@ class IndirectAnalyses:
                 df = losses.calculate_losses_from_table()
                 gdf = gdf_in.merge(df, how="left", on="LinkNr")
             elif (
-                analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS
+                    analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS
             ):
                 g = self.graph_files.base_graph_hazard.get_graph()
                 (gdf, df) = self.multi_link_isolated_locations(g, analysis)
@@ -1363,9 +1364,9 @@ def save_gdf(gdf: gpd.GeoDataFrame, save_path: Path):
 
 
 def find_route_ods(
-    graph: nx.classes.MultiGraph,
-    od_nodes: list[tuple[tuple[int, str], tuple[int, str]]],
-    weighing: str,
+        graph: nx.classes.MultiGraph,
+        od_nodes: list[tuple[tuple[int, str], tuple[int, str]]],
+        weighing: str,
 ) -> gpd.GeoDataFrame:
     # create the routes between all OD pairs
     (
