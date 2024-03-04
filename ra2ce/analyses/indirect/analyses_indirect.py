@@ -50,6 +50,86 @@ from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.graph.networks_utils import buffer_geometry, graph_to_gdf, graph_to_gpkg
 
 
+def single_link_redundancy(
+        graph: nx.Graph, analysis: AnalysisSectionIndirect
+):
+    """This is the function to analyse roads with a single link disruption and an alternative route.
+
+    Args:
+        graph: The NetworkX graph to calculate the single link redundancy on.
+        analysis: Dictionary of the configurations for the analysis.
+    """
+    # TODO adjust to the right names of the RA2CE tool
+    # if 'road_usage_data_path' in InputDict:
+    #     road_usage_data = pd.read_excel(InputDict.road_usage_data_path)
+    #     road_usage_data.dropna(axis=0, how='all', subset=['vehicle_type'], inplace=True)
+    #     aadt_names = [aadt_name for aadt_name in road_usage_data['attribute_name'] if aadt_name == aadt_name]
+    # else:
+    #     aadt_names = None
+    #     road_usage_data = pd.DataFrame()
+
+    # create a geodataframe from the graph
+    gdf = osmnx.graph_to_gdfs(graph, nodes=False)
+
+    # list for the length of the alternative routes
+    time_list =[]
+    alt_value_list = []
+    alt_nodes_list = []
+    diff_value_list = []
+    detour_exist_list = []
+    for e_remove in list(graph.edges.data(keys=True)):
+        u, v, k, data = e_remove
+
+        # if data['highway'] in attr_list:
+        # remove the edge
+        graph.remove_edge(u, v, k)
+        data["time"] = round((data["length"] * 1e-3) / data["avgspeed"], 2)  # in hours and avg speed in km/h
+        time = round(data["time"], 2)
+        if nx.has_path(graph, u, v):
+            # calculate the alternative distance if that edge is unavailable
+            alt_dist = nx.dijkstra_path_length(
+                graph, u, v, weight="length"
+            )
+            alt_nodes = nx.dijkstra_path(graph, u, v)
+            if analysis.weighing.config_value == "time":
+                alt_time = (alt_dist * 1e-3) / data["avgspeed"]  # in hours
+                alt_value = alt_time
+                time_list.append(time)
+            else:
+                alt_value = alt_dist
+
+            # append alternative route information
+            alt_value_list.append(alt_value)
+            alt_nodes_list.append(alt_nodes)
+            diff_value_list.append(round(alt_value - data[analysis.weighing.config_value], 2))
+            detour_exist_list.append(1)
+        else:
+            if analysis.weighing.config_value == "time":
+                time_list.append(time)
+                alt_value_list.append(time)
+            else:
+                alt_value_list.append(np.NaN)
+            alt_nodes_list.append(np.NaN)
+            diff_value_list.append(np.NaN)
+            detour_exist_list.append(0)
+
+        # add edge again to the graph
+        graph.add_edge(u, v, k, **data)
+
+    # Add the new columns to the geodataframe
+    if analysis.weighing.config_value == "time":
+        gdf["time"] = time_list
+    gdf[f"alt_{analysis.weighing.config_value}"] = alt_value_list
+    gdf["alt_nodes"] = alt_nodes_list
+    gdf[f"diff_{analysis.weighing.config_value}"] = diff_value_list
+    gdf["detour"] = detour_exist_list
+
+    # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
+    # todo: input here this option
+
+    return gdf
+
+
 class IndirectAnalyses:
     """Indirect analyses that can be done with NetworkX graphs.
 
@@ -78,84 +158,6 @@ class IndirectAnalyses:
         else:
             self.hazard_names_df = pd.DataFrame(data=None)
             self.config.hazard_names = list()
-
-    def single_link_redundancy(
-            self, graph: nx.Graph, analysis: AnalysisSectionIndirect
-    ):
-        """This is the function to analyse roads with a single link disruption and an alternative route.
-
-        Args:
-            graph: The NetworkX graph to calculate the single link redundancy on.
-            analysis: Dictionary of the configurations for the analysis.
-        """
-        # TODO adjust to the right names of the RA2CE tool
-        # if 'road_usage_data_path' in InputDict:
-        #     road_usage_data = pd.read_excel(InputDict.road_usage_data_path)
-        #     road_usage_data.dropna(axis=0, how='all', subset=['vehicle_type'], inplace=True)
-        #     aadt_names = [aadt_name for aadt_name in road_usage_data['attribute_name'] if aadt_name == aadt_name]
-        # else:
-        #     aadt_names = None
-        #     road_usage_data = pd.DataFrame()
-
-        # create a geodataframe from the graph
-        gdf = osmnx.graph_to_gdfs(graph, nodes=False)
-
-        # list for the length of the alternative routes
-        time_list =[]
-        alt_value_list = []
-        alt_nodes_list = []
-        diff_value_list = []
-        detour_exist_list = []
-        for e_remove in list(graph.edges.data(keys=True)):
-            u, v, k, data = e_remove
-
-            # if data['highway'] in attr_list:
-            # remove the edge
-            graph.remove_edge(u, v, k)
-            time = round((data["length"] * 1e-3) / data["avgspeed"], 2)  # in hours and avg speed in km/h
-            if nx.has_path(graph, u, v):
-                # calculate the alternative distance if that edge is unavailable
-                alt_dist = nx.dijkstra_path_length(
-                    graph, u, v, weight="length"
-                )
-                alt_nodes = nx.dijkstra_path(graph, u, v)
-                if analysis.weighing.config_value == "time":
-                    alt_time = (alt_dist * 1e-3) / data["avgspeed"]  # in hours
-                    alt_value = alt_time
-                    time_list.append(time)
-                else:
-                    alt_value = alt_dist
-
-                # append alternative route information
-                alt_value_list.append(alt_value)
-                alt_nodes_list.append(alt_nodes)
-                diff_value_list.append(round(alt_value - data[analysis.weighing.config_value], 2))
-                detour_exist_list.append(1)
-            else:
-                if analysis.weighing.config_value == "time":
-                    time_list.append(time)
-                    alt_value_list.append(time)
-                else:
-                    alt_value_list.append(np.NaN)
-                alt_nodes_list.append(np.NaN)
-                diff_value_list.append(np.NaN)
-                detour_exist_list.append(0)
-
-            # add edge again to the graph
-            graph.add_edge(u, v, k, **data)
-
-        # Add the new columns to the geodataframe
-        if analysis.weighing.config_value == "time":
-            gdf["time"] = time_list
-        gdf[f"alt_{analysis.weighing.config_value}"] = alt_value_list
-        gdf["alt_nodes"] = alt_nodes_list
-        gdf[f"diff_{analysis.weighing.config_value}"] = diff_value_list
-        gdf["detour"] = detour_exist_list
-
-        # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
-        # todo: input here this option
-
-        return gdf
 
     def single_link_losses(
             self, gdf: gpd.GeoDataFrame, analysis: AnalysisSectionIndirect
@@ -1115,7 +1117,7 @@ class IndirectAnalyses:
 
             if analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY:
                 g = self.graph_files.base_graph.get_graph()
-                gdf = self.single_link_redundancy(g, analysis)
+                gdf = single_link_redundancy(g, analysis)
             elif analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_REDUNDANCY:
                 g = self.graph_files.base_graph_hazard.get_graph()
                 gdf = self.multi_link_redundancy(g, analysis)
@@ -1193,7 +1195,7 @@ class IndirectAnalyses:
                 AnalysisIndirectEnum.MULTI_LINK_LOSSES,
             ]:
                 g = self.graph_files.base_graph_hazard.get_graph()
-                gdf = self.single_link_redundancy(g, analysis)
+                gdf = single_link_redundancy(g, analysis)
                 gdf = self.single_link_losses(gdf, analysis)
             elif (
                     analysis.analysis
