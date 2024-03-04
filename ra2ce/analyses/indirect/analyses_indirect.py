@@ -112,6 +112,7 @@ class IndirectAnalyses:
             # if data['highway'] in attr_list:
             # remove the edge
             graph.remove_edge(u, v, k)
+            time = round(data["time"], 2)
             if nx.has_path(graph, u, v):
                 # calculate the alternative distance if that edge is unavailable
                 alt_dist = nx.dijkstra_path_length(
@@ -119,7 +120,6 @@ class IndirectAnalyses:
                 )
                 alt_nodes = nx.dijkstra_path(graph, u, v)
                 if analysis.weighing.config_value == "time":
-                    time = round(data["time"], 2)
                     alt_time = (alt_dist * 1e-3) / data["avgspeed"]  # in hours
                     alt_value = alt_time
                     time_list.append(time)
@@ -133,8 +133,10 @@ class IndirectAnalyses:
                 detour_exist_list.append(1)
             else:
                 if analysis.weighing.config_value == "time":
-                    time_list.append(np.NaN)
-                alt_value_list.append(np.NaN)
+                    time_list.append(time)
+                    alt_value_list.append(time)
+                else:
+                    alt_value_list.append(np.NaN)
                 alt_nodes_list.append(np.NaN)
                 diff_value_list.append(np.NaN)
                 detour_exist_list.append(0)
@@ -358,12 +360,12 @@ class IndirectAnalyses:
             for edges in edges_remove:
                 u, v, k, edata = edges
                 edata["time"] = (edata["length"] * 1e-3) / edata["avgspeed"]  # in hours and avg speed in km/h
+                time = round(edata["time"], 2)
                 if nx.has_path(graph, u, v):
                     alt_dist = nx.dijkstra_path_length(graph, u, v, weight="length")
                     alt_nodes = nx.dijkstra_path(graph, u, v)
                     connected = 1
                     if analysis.weighing.config_value == "time":
-                        time = round(edata["time"], 2)
                         alt_time = round((alt_dist * 1e-3) / edata["avgspeed"], 2)  # in hours
                         alt_value = alt_time
                     else:
@@ -371,8 +373,12 @@ class IndirectAnalyses:
 
                 else:
                     if analysis.weighing.config_value == "time":
-                        time = np.NaN
-                    alt_value, alt_nodes, connected = np.NaN, np.NaN, 0
+                        time = time
+                        alt_value = time
+                    else:
+                        alt_value = np.NaN
+
+                    alt_nodes, connected =  np.NaN, 0
 
                 data = {"u": [u],
                         "v": [v],
