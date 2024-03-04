@@ -112,7 +112,7 @@ class IndirectAnalyses:
             # if data['highway'] in attr_list:
             # remove the edge
             graph.remove_edge(u, v, k)
-            time = round(data["time"], 2)
+            time = round((data["length"] * 1e-3) / data["avgspeed"], 2)  # in hours and avg speed in km/h
             if nx.has_path(graph, u, v):
                 # calculate the alternative distance if that edge is unavailable
                 alt_dist = nx.dijkstra_path_length(
@@ -359,8 +359,7 @@ class IndirectAnalyses:
 
             for edges in edges_remove:
                 u, v, k, edata = edges
-                edata["time"] = (edata["length"] * 1e-3) / edata["avgspeed"]  # in hours and avg speed in km/h
-                time = round(edata["time"], 2)
+                time = round((edata["length"] * 1e-3) / edata["avgspeed"], 2)  # in hours and avg speed in km/h
                 if nx.has_path(graph, u, v):
                     alt_dist = nx.dijkstra_path_length(graph, u, v, weight="length")
                     alt_nodes = nx.dijkstra_path(graph, u, v)
