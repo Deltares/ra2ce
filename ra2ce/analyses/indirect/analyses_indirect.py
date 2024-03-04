@@ -101,9 +101,10 @@ class IndirectAnalyses:
         gdf = osmnx.graph_to_gdfs(graph, nodes=False)
 
         # list for the length of the alternative routes
-        alt_dist_list = []
+        time_list =[]
+        alt_value_list = []
         alt_nodes_list = []
-        dif_dist_list = []
+        diff_value_list = []
         detour_exist_list = []
         for e_remove in list(graph.edges.data(keys=True)):
             u, v, k, data = e_remove
@@ -111,35 +112,42 @@ class IndirectAnalyses:
             # if data['highway'] in attr_list:
             # remove the edge
             graph.remove_edge(u, v, k)
-
             if nx.has_path(graph, u, v):
                 # calculate the alternative distance if that edge is unavailable
                 alt_dist = nx.dijkstra_path_length(
-                    graph, u, v, weight=analysis.weighing.config_value
+                    graph, u, v, weight="length"
                 )
-                alt_dist_list.append(alt_dist)
-
-                # append alternative route nodes
                 alt_nodes = nx.dijkstra_path(graph, u, v)
+                if analysis.weighing.config_value == "time":
+                    time = round(data["time"], 2)
+                    alt_time = (alt_dist * 1e-3) / data["avgspeed"]  # in hours
+                    alt_value = alt_time
+                    time_list.append(time)
+                else:
+                    alt_value = alt_dist
+
+                # append alternative route information
+                alt_value_list.append(alt_value)
                 alt_nodes_list.append(alt_nodes)
-
-                # calculate the difference in distance
-                dif_dist_list.append(alt_dist - data[analysis.weighing.config_value])
-
+                diff_value_list.append(round(alt_value - data[analysis.weighing.config_value], 2))
                 detour_exist_list.append(1)
             else:
-                alt_dist_list.append(np.NaN)
+                if analysis.weighing.config_value == "time":
+                    time_list.append(np.NaN)
+                alt_value_list.append(np.NaN)
                 alt_nodes_list.append(np.NaN)
-                dif_dist_list.append(np.NaN)
+                diff_value_list.append(np.NaN)
                 detour_exist_list.append(0)
 
             # add edge again to the graph
             graph.add_edge(u, v, k, **data)
 
         # Add the new columns to the geodataframe
-        gdf["alt_dist"] = alt_dist_list
+        if analysis.weighing.config_value == "time":
+            gdf["time"] = time_list
+        gdf[f"alt_{analysis.weighing.config_value}"] = alt_value_list
         gdf["alt_nodes"] = alt_nodes_list
-        gdf["diff_dist"] = dif_dist_list
+        gdf[f"diff_{analysis.weighing.config_value}"] = diff_value_list
         gdf["detour"] = detour_exist_list
 
         # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
@@ -340,7 +348,7 @@ class IndirectAnalyses:
 
             graph.remove_edges_from(edges_remove)
 
-            columns = ["u", "v", "alt_dist", "alt_time", "alt_nodes", "connected"]
+            columns = ["u", "v", f"alt_{analysis.weighing.config_value}", "alt_nodes", "connected"]
 
             if "rfid" in gdf:
                 columns.insert(2, "rfid")
@@ -352,20 +360,28 @@ class IndirectAnalyses:
                 edata["time"] = (edata["length"] * 1e-3) / edata["avgspeed"]  # in hours and avg speed in km/h
                 if nx.has_path(graph, u, v):
                     alt_dist = nx.dijkstra_path_length(graph, u, v, weight="length")
-                    alt_time = (alt_dist * 1e-3) / edata["avgspeed"]  # in hours
                     alt_nodes = nx.dijkstra_path(graph, u, v)
-                    time = round(edata["time"], 2)
                     connected = 1
+                    if analysis.weighing.config_value == "time":
+                        time = round(edata["time"], 2)
+                        alt_time = round((alt_dist * 1e-3) / edata["avgspeed"], 2)  # in hours
+                        alt_value = alt_time
+                    else:
+                        alt_value = alt_dist
+
                 else:
-                    alt_dist, alt_time, alt_nodes, time, connected = np.NaN, np.NaN, np.NaN, np.NaN, 0
+                    if analysis.weighing.config_value == "time":
+                        time = np.NaN
+                    alt_value, alt_nodes, connected = np.NaN, np.NaN, 0
 
                 data = {"u": [u],
                         "v": [v],
-                        "alt_dist": [alt_dist],
-                        "alt_time": [alt_time],
+                        f"alt_{analysis.weighing.config_value}": [alt_value],
                         "alt_nodes": [alt_nodes],
-                        "time": [time],
                         "connected": [connected]}
+
+                if analysis.weighing.config_value == "time":
+                    data["time"] = [time]
 
                 if "rfid" in gdf:
                     data["rfid"] = [str(edata["rfid"])]
@@ -373,7 +389,9 @@ class IndirectAnalyses:
                 df_calculated = pd.concat(
                     [df_calculated, pd.DataFrame(data)], ignore_index=True
                 )
-            df_calculated['alt_dist'] = pd.to_numeric(df_calculated['alt_dist'], errors='coerce')
+            df_calculated[f'alt_{analysis.weighing.config_value}'] = pd.to_numeric(
+                df_calculated[f'alt_{analysis.weighing.config_value}'], errors='coerce')
+
             # Merge the dataframes
             if "rfid" in gdf:
                 gdf = gdf.merge(df_calculated, how="left", on=["u", "v", "rfid"])
@@ -382,16 +400,11 @@ class IndirectAnalyses:
 
             # calculate the differences in distance and time
             # previously here you find if dist==dist which is a critical bug. Replaced by verifying dist is a value.
-            if analysis.weighing.config_value == "distance":
-                gdf["diff_dist"] = [
-                    alt - base if alt else np.NaN
-                    for (alt, base) in zip(gdf["alt_dist"], gdf["distance"])
-                ]
-            elif analysis.weighing.config_value == "time":
-                gdf["diff_time"] = [
-                    alt - base if alt else np.NaN
-                    for (alt, base) in zip(gdf["alt_time"], gdf["time"])
-                ]
+            gdf[f'diff_{analysis.weighing.config_value}'] = [
+                round(alt - base, 2) if alt else np.NaN
+                for (alt, base) in zip(gdf[f'alt_{analysis.weighing.config_value}'],
+                                       gdf[f'{analysis.weighing.config_value}'])
+            ]
 
             gdf["hazard"] = hazard_name
 
