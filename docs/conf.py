@@ -44,6 +44,8 @@ def remove_dir_content(path: str) -> None:
 
 # NOTE: the examples/ folder in the root should be copied to docs/_examples after running sphinx
 # # -- Copy notebooks to include in docs -------
+if os.path.isdir("build"):
+    remove_dir_content("build")
 if os.path.isdir("_examples"):
     remove_dir_content("_examples")
 os.makedirs("_examples")
