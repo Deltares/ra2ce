@@ -1,14 +1,23 @@
 .. _design_principles:
 
-=================
 Design Principles
 =================
 
 Throughout RA2CE different design choices are made to achieve a software as easy as possible to understand whilst hosting the domain knowledge of our experts. 
 
-****************
+Implementation decisions
+-------------------------
+
+Some concrete cases require to be highlighted to avoid creating related issues and specifying the concrete direction we want to go on as a team.
+
+Replacing Geopy with Geopandas
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+We tried replacing `geopy <https://geopy.readthedocs.io/en/stable/>`_ with similar functionality of `Geopandas <https://geopandas.org/en/stable/>`_. 
+However, this did not seem to be a valid alternative as the accuracy and simplicity of geopy outweights the benefit of replacing it with similar extensive logic as can be seen in this `example <https://autogis-site.readthedocs.io/en/2019/notebooks/L2/calculating-distances.html>`_. 
+
+
 Code standards
-****************
+---------------
 
 In general, we try to adhere to the `Zen of Python <https://peps.python.org/pep-0020/#id3>`_ and `Google convention <https://google.github.io/styleguide/pyguide.html>`_.
 
@@ -29,7 +38,7 @@ Code formatting happens in its majority with a Github workflow which is enforced
     poetry run isort . && poetry run black.
 
 Naming conventions
-==================
+^^^^^^^^^^^^^^^^^^
 In general we use the following standards:
 
 - `PascalCase <https://en.wiktionary.org/wiki/Pascal_case#English>`_, for class names.
@@ -48,7 +57,7 @@ Although in Python 'private' and 'public' is a vague definition, we often use th
 
 
 Module (file) content
-=====================
+^^^^^^^^^^^^^^^^^^^^^
 
 One file consists of one (and only one) class.
 
@@ -57,7 +66,7 @@ One file consists of one (and only one) class.
 
 
 Describing an item
-=====================
+^^^^^^^^^^^^^^^^^^
 
 - Packages can be further describe with `README.md` files.
 - Modules are described with docstrings using the `google docstring convention <https://gist.github.com/redlotus/3bc387c2591e3e908c9b63b97b11d24e>`_
@@ -68,6 +77,6 @@ Describing an item
 
 
 Protocols over Base classes.
-============================
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 We prefer using `protocols <https://docs.python.org/3/library/typing.html#typing.Protocol>`_ over `base classes <https://docs.python.org/3/library/abc.html>`_ (abstract class) to enforce the `Single Responsibility Principle <https://en.wikipedia.org/wiki/Single_responsibility_principle>`_ as much as possible.
