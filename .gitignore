@@ -47,6 +47,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+cache
 nosetests.xml
 coverage.xml
 *.cover
@@ -147,5 +148,5 @@ dmypy.json
 
 # Examples data
 examples/data/*/static/output_graph/
-examples/data/*/static/output/
+examples/data/*/output/
 examples/cache/
