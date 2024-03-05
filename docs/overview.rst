@@ -99,7 +99,6 @@ Overview
    network_module/network_module.rst
    analysis_module/analysis_module.rst 
    collaboration/collaboration.rst
-   collaboration/design_principles.rst
    technical_documentation/technical_documentation.rst
    faq/faq.rst
    publications/publications.rst
