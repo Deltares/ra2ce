@@ -19,13 +19,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 from pathlib import Path
 
 import geopandas as gpd
 
-from ra2ce.graph.exporters.network_exporter_base import NetworkExporterBase
+from ra2ce.network.exporters.network_exporter_base import NetworkExporterBase
 
 
 class GeoDataFrameNetworkExporter(NetworkExporterBase):

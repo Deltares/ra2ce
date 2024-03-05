@@ -22,13 +22,15 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
+
 from geopandas import GeoDataFrame, read_file, sjoin
 from networkx import Graph
 from numpy import nanmean
-from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_base import (
+
+from ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base import (
     HazardIntersectBuilderBase,
 )
-from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_parallel_run import (
+from ra2ce.network.hazard.hazard_intersect.hazard_intersect_parallel_run import (
     get_hazard_parallel_process,
 )
 
@@ -50,6 +52,7 @@ class HazardIntersectBuilderForGpkg(HazardIntersectBuilderBase):
         Returns:
             hazard_overlay (NetworkX graph): The graph with hazard shapefile(s) data joined
         """
+
         # TODO check if the CRS of the graph and shapefile match
         def networkx_overlay(hazard_shp_file: Path, race_name: str):
             gdf = read_file(str(hazard_shp_file))

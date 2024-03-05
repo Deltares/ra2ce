@@ -6,8 +6,8 @@ import pytest
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
 )
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.graph.network_config_data.network_config_data_reader import (
+from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_config_data.network_config_data_reader import (
     NetworkConfigDataReader,
 )
 from tests import test_data

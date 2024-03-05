@@ -2,8 +2,8 @@ import shutil
 
 import pytest
 
-from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
-from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
+from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from tests import test_results
 
 

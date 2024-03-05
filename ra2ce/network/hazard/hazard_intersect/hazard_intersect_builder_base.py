@@ -19,23 +19,38 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from geopandas import GeoDataFrame
-from networkx import Graph
-from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_protocol import HazardIntersectBuilderProtocol
 from abc import ABC, abstractmethod
 
+from geopandas import GeoDataFrame
+from networkx import Graph
+
+from ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_protocol import (
+    HazardIntersectBuilderProtocol,
+)
+
+
 class HazardIntersectBuilderBase(ABC, HazardIntersectBuilderProtocol):
-    def get_intersection(self, hazard_overlay: GeoDataFrame | Graph) -> GeoDataFrame | Graph:
+    def get_intersection(
+        self, hazard_overlay: GeoDataFrame | Graph
+    ) -> GeoDataFrame | Graph:
         if isinstance(hazard_overlay, GeoDataFrame):
             return self._from_geodataframe(hazard_overlay)
-        elif isinstance(hazard_overlay, Graph): 
+        elif isinstance(hazard_overlay, Graph):
             return self._from_networkx(hazard_overlay)
-        raise ValueError("No hazard intersection can be built with overlay type {}.".format(type(hazard_overlay).__name__))
+        raise ValueError(
+            "No hazard intersection can be built with overlay type {}.".format(
+                type(hazard_overlay).__name__
+            )
+        )
 
     @abstractmethod
-    def _from_networkx(self, hazard_overlay: GeoDataFrame | Graph) -> GeoDataFrame | Graph:
+    def _from_networkx(
+        self, hazard_overlay: GeoDataFrame | Graph
+    ) -> GeoDataFrame | Graph:
         pass
 
     @abstractmethod
-    def _from_geodataframe(self, hazard_overlay: GeoDataFrame | Graph) -> GeoDataFrame | Graph:
+    def _from_geodataframe(
+        self, hazard_overlay: GeoDataFrame | Graph
+    ) -> GeoDataFrame | Graph:
         pass

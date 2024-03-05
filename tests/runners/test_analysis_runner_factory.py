@@ -11,7 +11,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.runners.analysis_runner_factory import AnalysisRunnerFactory
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 from tests.runners.dummy_classes import DummyRa2ceInput

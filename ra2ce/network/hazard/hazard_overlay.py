@@ -30,24 +30,24 @@ import pyproj
 from rasterstats import point_query, zonal_stats
 from tqdm import tqdm
 
-from ra2ce.graph import networks_utils as ntu
-from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
-from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
-from ra2ce.graph.hazard.hazard_common_functions import (
+from ra2ce.network import networks_utils as ntu
+from ra2ce.network.exporters.network_exporter_factory import NetworkExporterFactory
+from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.network.hazard.hazard_common_functions import (
     get_edges_geoms,
     validate_extent_graph,
 )
-from ra2ce.graph.hazard.hazard_files import HazardFiles
-from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg import (
+from ra2ce.network.hazard.hazard_files import HazardFiles
+from ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_gpkg import (
     HazardIntersectBuilderForGpkg,
 )
-from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_for_table import (
+from ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_table import (
     HazardIntersectBuilderForTable,
 )
-from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_for_tif import (
+from ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_for_tif import (
     HazardIntersectBuilderForTif,
 )
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 
 
 class HazardOverlay:
@@ -167,9 +167,11 @@ class HazardOverlay:
 
             try:
                 flood_stats = flood_stats.apply(
-                    lambda x: x[0][self._hazard_aggregate_wl]
-                    if x[0][self._hazard_aggregate_wl]
-                    else 0
+                    lambda x: (
+                        x[0][self._hazard_aggregate_wl]
+                        if x[0][self._hazard_aggregate_wl]
+                        else 0
+                    )
                 )
                 nx.set_edge_attributes(
                     graph,

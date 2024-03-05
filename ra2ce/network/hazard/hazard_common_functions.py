@@ -21,9 +21,11 @@
 
 import logging
 from pathlib import Path
-from osgeo import gdal
+
 from networkx import Graph
-from ra2ce.graph.networks_utils import bounds_intersect_2d, get_extent
+from osgeo import gdal
+
+from ra2ce.network.networks_utils import bounds_intersect_2d, get_extent
 
 
 def validate_extent_graph(extent_graph: list[float], tif_hazard_file: Path) -> None:

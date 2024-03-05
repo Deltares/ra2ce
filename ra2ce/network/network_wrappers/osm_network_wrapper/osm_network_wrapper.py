@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+
 import logging
 from pathlib import Path
 from typing import Any, Union
@@ -26,11 +27,13 @@ from networkx import MultiDiGraph, MultiGraph
 from shapely.geometry import LineString
 from shapely.geometry.base import BaseGeometry
 
-import ra2ce.graph.networks_utils as nut
-from ra2ce.graph.exporters.json_exporter import JsonExporter
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
-from ra2ce.graph.network_wrappers.osm_network_wrapper.extremities_data import (
+import ra2ce.network.networks_utils as nut
+from ra2ce.network.exporters.json_exporter import JsonExporter
+from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_wrappers.network_wrapper_protocol import (
+    NetworkWrapperProtocol,
+)
+from ra2ce.network.network_wrappers.osm_network_wrapper.extremities_data import (
     ExtremitiesData,
 )
 
@@ -310,4 +313,3 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
     @staticmethod
     def snap_nodes_to_edges(graph: MultiDiGraph, threshold: float):
         raise NotImplementedError("Next thing to do!")
-

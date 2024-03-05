@@ -6,9 +6,9 @@ from pathlib import Path
 from geopandas import GeoDataFrame
 from networkx import MultiGraph
 
-from ra2ce.graph.graph_files.graph_file import GraphFile
-from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
-from ra2ce.graph.graph_files.network_file import NetworkFile
+from ra2ce.network.graph_files.graph_file import GraphFile
+from ra2ce.network.graph_files.graph_files_protocol import GraphFileProtocol
+from ra2ce.network.graph_files.network_file import NetworkFile
 
 
 @dataclass

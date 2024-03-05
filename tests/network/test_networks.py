@@ -6,12 +6,12 @@ import geopandas as gpd
 import networkx as nx
 import pytest
 
-from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.graph.network_config_data.network_config_data_reader import (
+from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_config_data.network_config_data_reader import (
     NetworkConfigDataReader,
 )
-from ra2ce.graph.networks import Network
+from ra2ce.network.networks import Network
 from tests import slow_test, test_data, test_results
 
 # Just to make sonar-cloud stop complaining.

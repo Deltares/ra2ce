@@ -25,10 +25,10 @@ from geopandas import GeoDataFrame
 from networkx import Graph
 from pandas import read_csv
 
-from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_base import (
+from ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base import (
     HazardIntersectBuilderBase,
 )
-from ra2ce.graph.networks_utils import (
+from ra2ce.network.networks_utils import (
     graph_from_gdf,
     graph_to_gdf,
 )

@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
-from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
+from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.network.graph_files.graph_files_protocol import GraphFileProtocol
 from tests import test_data
 
 

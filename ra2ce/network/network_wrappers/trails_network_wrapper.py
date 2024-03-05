@@ -25,10 +25,12 @@ import geopandas as gpd
 from geopandas import GeoDataFrame
 from networkx import MultiGraph
 
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
-from ra2ce.graph.networks_utils import graph_from_gdf
-from ra2ce.graph.segmentation import Segmentation
+from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_wrappers.network_wrapper_protocol import (
+    NetworkWrapperProtocol,
+)
+from ra2ce.network.networks_utils import graph_from_gdf
+from ra2ce.network.segmentation import Segmentation
 
 
 class TrailsNetworkWrapper(NetworkWrapperProtocol):

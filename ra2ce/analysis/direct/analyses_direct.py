@@ -39,7 +39,7 @@ from ra2ce.analysis.direct.damage_calculation import (
     DamageNetworkEvents,
     DamageNetworkReturnPeriods,
 )
-from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
 
 
 class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION

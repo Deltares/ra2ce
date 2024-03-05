@@ -1,6 +1,6 @@
 from ra2ce.common.validation.validation_report import ValidationReport
-from ra2ce.graph.network_config_data.enums.source_enum import SourceEnum
-from ra2ce.graph.network_config_data.network_config_data import (
+from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
+from ra2ce.network.network_config_data.network_config_data import (
     CleanupSection,
     HazardSection,
     NetworkConfigData,
@@ -8,7 +8,7 @@ from ra2ce.graph.network_config_data.network_config_data import (
     OriginsDestinationsSection,
     ProjectSection,
 )
-from ra2ce.graph.network_config_data.network_config_data_validator import (
+from ra2ce.network.network_config_data.network_config_data_validator import (
     NetworkConfigDataValidator,
 )
 

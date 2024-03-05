@@ -28,8 +28,8 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data_validator import (
     AnalysisConfigDataValidator,
 )
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
-from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
-from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
+from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 
 
 class AnalysisConfigWrapper(ConfigWrapperProtocol):

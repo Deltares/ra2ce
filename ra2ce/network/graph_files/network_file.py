@@ -3,7 +3,7 @@ from pathlib import Path
 
 from geopandas import GeoDataFrame, read_feather
 
-from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
+from ra2ce.network.graph_files.graph_files_protocol import GraphFileProtocol
 
 
 @dataclass

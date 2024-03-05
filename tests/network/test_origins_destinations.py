@@ -1,6 +1,6 @@
 import numpy as np
 
-from ra2ce.graph.origins_destinations import closest_node
+from ra2ce.network.origins_destinations import closest_node
 
 
 class TestOriginsDestinations:

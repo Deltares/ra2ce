@@ -19,17 +19,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 import pickle
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.graph.exporters.network_exporter_base import (
+from ra2ce.network.exporters.network_exporter_base import (
     MULTIGRAPH_TYPE,
     NetworkExporterBase,
 )
-from ra2ce.graph.networks_utils import graph_to_gpkg
+from ra2ce.network.networks_utils import graph_to_gpkg
 
 
 class MultiGraphNetworkExporter(NetworkExporterBase):
