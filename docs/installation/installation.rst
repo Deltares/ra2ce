@@ -48,3 +48,12 @@ In this environment you will find all our available examples as well as the poss
 
 - Our `ra2ce jupyter-binder <https://mybinder.org/v2/gh/Deltares/ra2ce/jupyter-binder>`_ environment.
 - More about `binder <https://mybinder.readthedocs.io/en/latest/>`_.
+
+
+
+.. toctree::
+   :caption: Table of Contents
+   :maxdepth: 2
+   :hidden:
+
+   docker_user_guide.rst
