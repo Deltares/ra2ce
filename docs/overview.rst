@@ -94,10 +94,12 @@ Overview
 
    about/about.rst
    installation/installation.rst
+   installation/docker_user_guide.rst
    examples/examples.rst
    network_module/network_module.rst
    analysis_module/analysis_module.rst 
+   collaboration/collaboration.rst
+   collaboration/design_principles.rst
    technical_documentation/technical_documentation.rst
    faq/faq.rst
-   collaboration/collaboration.rst
    publications/publications.rst

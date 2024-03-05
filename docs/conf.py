@@ -64,6 +64,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.githubpages",
     "sphinx.ext.napoleon",
+    "sphinx.ext.autosectionlabel",
     "sphinx.ext.autosummary",
     "sphinx_autosummary_accessors",
     "nbsphinx",
@@ -242,4 +243,4 @@ texinfo_documents = [
 # Allow errors in notebooks
 nbsphinx_allow_errors = True
 # Do not execute the scripts during the build process.
-nbsphinx_execute = 'never'
+nbsphinx_execute = "never"
