@@ -94,7 +94,6 @@ Overview
 
    about/about.rst
    installation/installation.rst
-   installation/docker_user_guide.rst
    examples/examples.rst
    network_module/network_module.rst
    analysis_module/analysis_module.rst 
