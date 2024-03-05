@@ -1,9 +1,9 @@
 import pytest
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_indirect_enum import (
+from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper

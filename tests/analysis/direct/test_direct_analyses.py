@@ -2,7 +2,7 @@
 import pandas as pd
 import pytest
 
-from ra2ce.analyses.direct.damage_calculation import DamageNetworkEvents
+from ra2ce.analysis.direct.damage_calculation import DamageNetworkEvents
 
 
 class TestDirectAnalyses:

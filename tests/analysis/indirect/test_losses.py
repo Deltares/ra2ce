@@ -4,12 +4,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
-from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
 )
-
-from ra2ce.analyses.indirect.losses import Losses
+from ra2ce.analysis.indirect.losses import Losses
 
 
 class TestLosses:

@@ -1,6 +1,6 @@
 import pytest
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDirect,
     AnalysisSectionIndirect,
@@ -8,10 +8,10 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     IndirectAnalysisNameList,
     ProjectSection,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
     AnalysisDirectEnum,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_indirect_enum import (
+from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
 from tests import test_results
@@ -28,13 +28,13 @@ class TestAnalysisConfigData:
     def valid_config(self) -> AnalysisConfigData:
         _config = AnalysisConfigData(project=ProjectSection())
         for _indirect in IndirectAnalysisNameList:
-            _config.analyses.append(
+            _config.analysis.append(
                 AnalysisSectionIndirect(
                     analysis=AnalysisIndirectEnum.get_enum(_indirect)
                 )
             )
         for _direct in DirectAnalysisNameList:
-            _config.analyses.append(
+            _config.analysis.append(
                 AnalysisSectionDirect(analysis=AnalysisDirectEnum.get_enum(_direct))
             )
         yield _config

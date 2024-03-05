@@ -1,7 +1,7 @@
-from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
 )
-from ra2ce.analyses.analysis_config_wrapper import (
+from ra2ce.analysis.analysis_config_wrapper import (
     AnalysisConfigWrapper,
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper

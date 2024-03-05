@@ -1,13 +1,14 @@
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDirect,
 )
-from ra2ce.analyses.direct.cost_benefit_analysis import EffectivenessMeasures
+from ra2ce.analysis.direct.cost_benefit_analysis import EffectivenessMeasures
 from tests import test_data
 
 

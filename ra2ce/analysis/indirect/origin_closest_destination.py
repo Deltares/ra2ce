@@ -19,7 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 # -*- coding: utf-8 -*-
 import copy
 import logging
@@ -31,7 +30,7 @@ import pandas as pd
 from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
 )
@@ -435,16 +434,19 @@ class OriginClosestDestination:
         ]
 
         pp_no_access = [
-            round(
-                (
-                    origins.loc[
-                        origins[self.od_id].isin(origins_no_access), self.origin_count
-                    ]
-                    * self.origin_out_fraction
-                ).sum()
+            (
+                round(
+                    (
+                        origins.loc[
+                            origins[self.od_id].isin(origins_no_access),
+                            self.origin_count,
+                        ]
+                        * self.origin_out_fraction
+                    ).sum()
+                )
+                if len(origins_no_access) > 0
+                else 0
             )
-            if len(origins_no_access) > 0
-            else 0
         ]
 
         self.results_dict[f"Nr. no access{add_key_name}"] = pp_no_access

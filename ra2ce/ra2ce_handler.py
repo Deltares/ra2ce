@@ -19,7 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 # -*- coding: utf-8 -*-
 import logging
 import warnings
@@ -28,7 +27,7 @@ from typing import Optional
 
 from shapely.errors import ShapelyDeprecationWarning
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.configuration.config_factory import ConfigFactory
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData

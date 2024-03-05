@@ -1,4 +1,4 @@
-from ra2ce.analyses.direct.road_damage import DirectAnalyses
+from ra2ce.analysis.direct.road_damage import DirectAnalyses
 
 
 class TestRoadDamage:

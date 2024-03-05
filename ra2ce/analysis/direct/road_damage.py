@@ -19,10 +19,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 
 
 class DirectAnalyses:
