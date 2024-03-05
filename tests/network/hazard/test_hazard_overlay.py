@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from ra2ce.graph.hazard.hazard_overlay import HazardOverlay
-from ra2ce.graph.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.hazard.hazard_overlay import HazardOverlay
+from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
+from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 
 
 class TestHazardOverlay:

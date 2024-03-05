@@ -4,7 +4,7 @@ from pathlib import Path
 from networkx import MultiGraph
 
 from ra2ce.common.io.readers.graph_pickle_reader import GraphPickleReader
-from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
+from ra2ce.network.graph_files.graph_files_protocol import GraphFileProtocol
 
 
 @dataclass

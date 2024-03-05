@@ -7,15 +7,17 @@ from networkx.utils import graphs_equal
 from shapely.geometry import LineString, Polygon
 from shapely.geometry.base import BaseGeometry
 
-import ra2ce.graph.networks_utils as nut
-from ra2ce.graph.network_config_data.enums.network_type_enum import NetworkTypeEnum
-from ra2ce.graph.network_config_data.enums.road_type_enum import RoadTypeEnum
-from ra2ce.graph.network_config_data.network_config_data import (
+import ra2ce.network.networks_utils as nut
+from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
+from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
+from ra2ce.network.network_config_data.network_config_data import (
     NetworkConfigData,
     NetworkSection,
 )
-from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
-from ra2ce.graph.network_wrappers.osm_network_wrapper.osm_network_wrapper import (
+from ra2ce.network.network_wrappers.network_wrapper_protocol import (
+    NetworkWrapperProtocol,
+)
+from ra2ce.network.network_wrappers.osm_network_wrapper.osm_network_wrapper import (
     OsmNetworkWrapper,
 )
 from tests import slow_test, test_data, test_results

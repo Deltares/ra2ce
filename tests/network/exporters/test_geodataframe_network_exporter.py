@@ -3,10 +3,10 @@ import shutil
 import pytest
 from geopandas import GeoDataFrame
 
-from ra2ce.graph.exporters.geodataframe_network_exporter import (
+from ra2ce.network.exporters.geodataframe_network_exporter import (
     GeoDataFrameNetworkExporter,
 )
-from ra2ce.graph.exporters.network_exporter_base import NetworkExporterBase
+from ra2ce.network.exporters.network_exporter_base import NetworkExporterBase
 from tests import test_results
 
 

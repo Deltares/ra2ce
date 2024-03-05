@@ -1,7 +1,7 @@
 from networkx import MultiGraph
 
-from ra2ce.graph.graph_files.graph_file import GraphFile
-from ra2ce.graph.graph_files.graph_files_protocol import GraphFileProtocol
+from ra2ce.network.graph_files.graph_file import GraphFile
+from ra2ce.network.graph_files.graph_files_protocol import GraphFileProtocol
 from tests import test_data
 
 _GRAPH_FOLDER = test_data.joinpath(r"simple_inputs\static\output_graph")

@@ -19,31 +19,32 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from dataclasses import dataclass, field
 import logging
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
+
+from geopandas import GeoDataFrame
+from networkx import Graph, set_edge_attributes
 from numpy import nan
 from rasterstats import zonal_stats
-from ra2ce.graph.hazard.hazard_common_functions import (
+from tqdm import tqdm
+
+from ra2ce.network.hazard.hazard_common_functions import (
     get_edges_geoms,
     validate_extent_graph,
 )
-from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_builder_base import (
+from ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base import (
     HazardIntersectBuilderBase,
 )
-
-from networkx import Graph, set_edge_attributes
-from geopandas import GeoDataFrame
-from ra2ce.graph.hazard.hazard_intersect.hazard_intersect_parallel_run import (
+from ra2ce.network.hazard.hazard_intersect.hazard_intersect_parallel_run import (
     get_hazard_parallel_process,
 )
-from ra2ce.graph.networks_utils import (
+from ra2ce.network.networks_utils import (
     fraction_flooded,
     get_graph_edges_extent,
     get_valid_mean,
 )
-from tqdm import tqdm
 
 
 @dataclass
@@ -125,9 +126,11 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
 
             try:
                 flood_stats = flood_stats.apply(
-                    lambda x: x[0][self.hazard_aggregate_wl]
-                    if x[0][self.hazard_aggregate_wl]
-                    else 0
+                    lambda x: (
+                        x[0][self.hazard_aggregate_wl]
+                        if x[0][self.hazard_aggregate_wl]
+                        else 0
+                    )
                 )
                 set_edge_attributes(
                     hazard_overlay,

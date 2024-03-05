@@ -19,14 +19,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 from decimal import Decimal
 
 import geopandas as gpd
 from shapely.geometry import LineString, MultiLineString, Point
 
-from ra2ce.graph.networks_utils import cut as network_cut
+from ra2ce.network.networks_utils import cut as network_cut
 
 
 class Segmentation:  # Todo: more naturally, this would be METHOD of the network class.

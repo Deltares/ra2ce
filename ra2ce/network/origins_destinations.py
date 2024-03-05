@@ -33,13 +33,12 @@ import pyproj
 import rasterio
 import rasterio.mask
 import rasterio.transform
-from shapely.geometry import LineString
 from rasterio import Affine
 from rasterio.warp import Resampling, calculate_default_transform, reproject
-from shapely.geometry import Point
+from shapely.geometry import LineString, Point
 from tqdm import tqdm
 
-from ra2ce.graph.networks_utils import cut, line_length
+from ra2ce.network.networks_utils import cut, line_length
 
 """
 TODO: This whole file should be throughouly tested / redesigned.
@@ -393,9 +392,9 @@ def add_od_nodes(
             closest_node_on_extremities_id = get_node_id_from_position(
                 graph, *closest_node_on_extremities
             )
-            inverse_nodes_dict[
-                (closest_node_on_road[0], closest_node_on_road[1])
-            ] = closest_node_on_extremities_id
+            inverse_nodes_dict[(closest_node_on_road[0], closest_node_on_road[1])] = (
+                closest_node_on_extremities_id
+            )
 
         return inverse_nodes_dict
 

@@ -15,7 +15,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
+from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data, test_results
 
 

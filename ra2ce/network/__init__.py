@@ -1,1 +1,1 @@
-from ra2ce.graph.networks_utils import *
+from ra2ce.network.networks_utils import *

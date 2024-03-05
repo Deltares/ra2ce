@@ -3,7 +3,7 @@ import math
 import pytest
 from shapely.geometry import LineString
 
-from ra2ce.graph.segmentation import Segmentation
+from ra2ce.network.segmentation import Segmentation
 
 
 class TestSegmentation:

@@ -7,7 +7,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data_reader import (
     AnalysisConfigDataReader,
 )
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
-from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper
+from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data, test_results
 
 

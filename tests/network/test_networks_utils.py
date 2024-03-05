@@ -8,7 +8,7 @@ from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString, Point
 from shapely.geometry.base import BaseGeometry
 
-from ra2ce.graph import networks_utils as nu
+from ra2ce.network import networks_utils as nu
 from tests import test_data
 
 

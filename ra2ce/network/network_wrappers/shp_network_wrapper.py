@@ -27,10 +27,12 @@ import networkx as nx
 import pandas as pd
 from shapely.geometry import MultiLineString
 
-import ra2ce.graph.networks_utils as nut
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
-from ra2ce.graph.segmentation import Segmentation
+import ra2ce.network.networks_utils as nut
+from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_wrappers.network_wrapper_protocol import (
+    NetworkWrapperProtocol,
+)
+from ra2ce.network.segmentation import Segmentation
 
 
 class ShpNetworkWrapper(NetworkWrapperProtocol):

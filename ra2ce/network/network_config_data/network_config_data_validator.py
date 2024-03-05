@@ -24,8 +24,8 @@ from typing import Any
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
 from ra2ce.configuration.ra2ce_enum_base import Ra2ceEnumBase
-from ra2ce.graph.network_config_data.enums.source_enum import SourceEnum
-from ra2ce.graph.network_config_data.network_config_data import (
+from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
+from ra2ce.network.network_config_data.network_config_data import (
     HazardSection,
     NetworkConfigData,
     NetworkSection,

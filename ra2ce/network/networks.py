@@ -26,11 +26,11 @@ import networkx as nx
 import pyproj
 from geopandas import GeoDataFrame
 
-from ra2ce.graph import networks_utils as nut
-from ra2ce.graph.exporters.network_exporter_factory import NetworkExporterFactory
-from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.graph.network_wrappers.network_wrapper_factory import NetworkWrapperFactory
+from ra2ce.network import networks_utils as nut
+from ra2ce.network.exporters.network_exporter_factory import NetworkExporterFactory
+from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_wrappers.network_wrapper_factory import NetworkWrapperFactory
 
 
 class Network:
@@ -89,7 +89,7 @@ class Network:
         Returns:
             graph (NetworkX graph): the NetworkX graph with OD nodes
         """
-        from ra2ce.graph.origins_destinations import (
+        from ra2ce.network.origins_destinations import (
             add_od_nodes,
             read_origin_destination_files,
         )
@@ -127,7 +127,7 @@ class Network:
 
     def generate_origins_from_raster(self):
         """Adds origins and destinations nodes from shapefiles to the graph."""
-        from ra2ce.graph.origins_destinations import origins_from_raster
+        from ra2ce.network.origins_destinations import origins_from_raster
 
         out_fn = origins_from_raster(
             self._network_dir,

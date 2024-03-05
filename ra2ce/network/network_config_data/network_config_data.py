@@ -28,10 +28,10 @@ from typing import Optional
 from pyproj import CRS
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
-from ra2ce.graph.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
-from ra2ce.graph.network_config_data.enums.network_type_enum import NetworkTypeEnum
-from ra2ce.graph.network_config_data.enums.road_type_enum import RoadTypeEnum
-from ra2ce.graph.network_config_data.enums.source_enum import SourceEnum
+from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
+from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
+from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
+from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
 
 
 @dataclass

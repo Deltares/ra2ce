@@ -30,7 +30,7 @@ from shapely.errors import ShapelyDeprecationWarning
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.configuration.config_factory import ConfigFactory
 from ra2ce.configuration.config_wrapper import ConfigWrapper
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.ra2ce_logging import Ra2ceLogger
 from ra2ce.runners import AnalysisRunnerFactory
 

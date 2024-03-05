@@ -28,9 +28,11 @@ import networkx as nx
 import pandas as pd
 from shapely.geometry import Point
 
-import ra2ce.graph.networks_utils as nut
-from ra2ce.graph.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.graph.network_wrappers.network_wrapper_protocol import NetworkWrapperProtocol
+import ra2ce.network.networks_utils as nut
+from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_wrappers.network_wrapper_protocol import (
+    NetworkWrapperProtocol,
+)
 
 
 class VectorNetworkWrapper(NetworkWrapperProtocol):
@@ -110,7 +112,9 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             gpd.GeoDataFrame: GeoDataFrame representing the data.
         """
         # read file
-        gdf = gpd.GeoDataFrame(pd.concat([gpd.read_file(_fl, engine="pyogrio") for _fl in file_list]))
+        gdf = gpd.GeoDataFrame(
+            pd.concat([gpd.read_file(_fl, engine="pyogrio") for _fl in file_list])
+        )
         logging.info(
             "Read files {} into a 'GeoDataFrame'.".format(
                 ", ".join(map(str, file_list))
