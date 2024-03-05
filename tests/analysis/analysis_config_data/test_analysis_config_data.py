@@ -28,13 +28,13 @@ class TestAnalysisConfigData:
     def valid_config(self) -> AnalysisConfigData:
         _config = AnalysisConfigData(project=ProjectSection())
         for _indirect in IndirectAnalysisNameList:
-            _config.analysis.append(
+            _config.analyses.append(
                 AnalysisSectionIndirect(
                     analysis=AnalysisIndirectEnum.get_enum(_indirect)
                 )
             )
         for _direct in DirectAnalysisNameList:
-            _config.analysis.append(
+            _config.analyses.append(
                 AnalysisSectionDirect(analysis=AnalysisDirectEnum.get_enum(_direct))
             )
         yield _config
