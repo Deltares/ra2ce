@@ -1,4 +1,4 @@
-from ra2ce.analyses.direct.damage.max_damage import MaxDamageByRoadTypeByLane
+from ra2ce.analysis.direct.damage.max_damage import MaxDamageByRoadTypeByLane
 
 
 class TestMaxDamageByRoadTypeByLane:

@@ -19,13 +19,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 from __future__ import annotations
 
 import logging
 from pathlib import Path
 
-from ra2ce.analyses.analysis_config_wrapper import (
+from ra2ce.analysis.analysis_config_wrapper import (
     AnalysisConfigWrapper,
 )
 from ra2ce.graph.network_config_wrapper import NetworkConfigWrapper

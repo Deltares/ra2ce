@@ -3,11 +3,11 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from ra2ce.analyses.direct.damage.manual_damage_functions import ManualDamageFunctions
-from ra2ce.analyses.direct.damage_calculation.damage_network_events import (
+from ra2ce.analysis.direct.damage.manual_damage_functions import ManualDamageFunctions
+from ra2ce.analysis.direct.damage_calculation.damage_network_events import (
     DamageNetworkEvents,
 )
-from ra2ce.analyses.direct.damage_calculation.damage_network_return_periods import (
+from ra2ce.analysis.direct.damage_calculation.damage_network_return_periods import (
     DamageNetworkReturnPeriods,
 )
 from tests import test_data

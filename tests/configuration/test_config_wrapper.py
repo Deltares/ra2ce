@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from ra2ce.analyses.analysis_config_wrapper import (
+from ra2ce.analysis.analysis_config_wrapper import (
     AnalysisConfigWrapper,
 )
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol

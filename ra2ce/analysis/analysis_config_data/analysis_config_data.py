@@ -19,7 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 from __future__ import annotations
 
 import math
@@ -27,13 +26,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
     AnalysisDirectEnum,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_indirect_enum import (
+from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
-from ra2ce.analyses.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.graph.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from ra2ce.graph.network_config_data.network_config_data import (

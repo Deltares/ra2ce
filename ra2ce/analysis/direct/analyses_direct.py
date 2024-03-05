@@ -19,7 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 import time
 from pathlib import Path
@@ -27,16 +26,16 @@ from typing import Any
 
 import geopandas as gpd
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDirect,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
     AnalysisDirectEnum,
 )
-from ra2ce.analyses.direct.cost_benefit_analysis import EffectivenessMeasures
-from ra2ce.analyses.direct.damage.manual_damage_functions import ManualDamageFunctions
-from ra2ce.analyses.direct.damage_calculation import (
+from ra2ce.analysis.direct.cost_benefit_analysis import EffectivenessMeasures
+from ra2ce.analysis.direct.damage.manual_damage_functions import ManualDamageFunctions
+from ra2ce.analysis.direct.damage_calculation import (
     DamageNetworkEvents,
     DamageNetworkReturnPeriods,
 )

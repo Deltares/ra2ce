@@ -19,11 +19,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 from pathlib import Path
 
-from ra2ce.analyses.direct.damage.damage_function_road_type_lane import (
+from ra2ce.analysis.direct.damage.damage_function_road_type_lane import (
     DamageFunctionByRoadTypeByLane,
 )
 

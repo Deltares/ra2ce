@@ -1,5 +1,5 @@
-from ra2ce.analyses.analysis_config_data.analysis_config_data import AnalysisConfigData
-from ra2ce.analyses.indirect.analyses_indirect import IndirectAnalyses
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.indirect.analyses_indirect import IndirectAnalyses
 from tests import test_data
 
 

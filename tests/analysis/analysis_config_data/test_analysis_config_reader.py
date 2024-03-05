@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data_reader import (
+from ra2ce.analysis.analysis_config_data.analysis_config_data_reader import (
     AnalysisConfigDataReader,
 )
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol

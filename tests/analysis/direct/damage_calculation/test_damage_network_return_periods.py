@@ -2,10 +2,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from ra2ce.analyses.direct.damage_calculation.damage_network_base import (
+from ra2ce.analysis.direct.damage_calculation.damage_network_base import (
     DamageNetworkBase,
 )
-from ra2ce.analyses.direct.damage_calculation.damage_network_return_periods import (
+from ra2ce.analysis.direct.damage_calculation.damage_network_return_periods import (
     DamageNetworkReturnPeriods,
 )
 

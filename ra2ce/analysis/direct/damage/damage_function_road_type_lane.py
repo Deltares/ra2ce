@@ -19,14 +19,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 from pathlib import Path
 
 import pandas as pd
 
-from ra2ce.analyses.direct.damage.damage_fraction_uniform import DamageFractionUniform
-from ra2ce.analyses.direct.damage.max_damage import MaxDamageByRoadTypeByLane
+from ra2ce.analysis.direct.damage.damage_fraction_uniform import DamageFractionUniform
+from ra2ce.analysis.direct.damage.max_damage import MaxDamageByRoadTypeByLane
 
 
 class DamageFunctionByRoadTypeByLane:

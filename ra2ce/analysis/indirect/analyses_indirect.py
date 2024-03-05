@@ -33,17 +33,17 @@ from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_indirect_enum import (
+from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
-from ra2ce.analyses.analysis_config_data.enums.weighing_enum import WeighingEnum
-from ra2ce.analyses.indirect.losses import Losses
-from ra2ce.analyses.indirect.origin_closest_destination import OriginClosestDestination
-from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_factory import (
+from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.indirect.losses import Losses
+from ra2ce.analysis.indirect.origin_closest_destination import OriginClosestDestination
+from ra2ce.analysis.indirect.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
 )
 from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
@@ -1229,10 +1229,10 @@ class IndirectAnalyses:
                             opt_routes_with_hazard,
                         ) = analyzer.multi_link_origin_closest_destination()
 
-                        (
-                            opt_routes_with_hazard
-                        ) = analyzer.difference_length_with_without_hazard(
-                            opt_routes_with_hazard, opt_routes_without_hazard
+                        (opt_routes_with_hazard) = (
+                            analyzer.difference_length_with_without_hazard(
+                                opt_routes_with_hazard, opt_routes_without_hazard
+                            )
                         )
 
                 else:

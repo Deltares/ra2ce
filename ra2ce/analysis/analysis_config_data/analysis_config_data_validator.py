@@ -19,10 +19,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 from typing import Any
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     DirectAnalysisNameList,
     IndirectAnalysisNameList,
