@@ -62,12 +62,12 @@ Overview
 
     .. grid-item-card::
         :text-align: center
-        :link: collaboration
+        :link: contributing
         :link-type: ref
 
         :octicon:`people;10em`
         +++
-        Collaboration
+        Contributing
     
     .. grid-item-card::
         :text-align: center
@@ -97,7 +97,7 @@ Overview
    examples/examples.rst
    network_module/network_module.rst
    analysis_module/analysis_module.rst 
-   collaboration/collaboration.rst
+   contributing/index.rst
    technical_documentation/technical_documentation.rst
    faq/faq.rst
    publications/publications.rst

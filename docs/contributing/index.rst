@@ -1,4 +1,4 @@
-.. _collaboration:
+.. _contributing:
 
 Contributing
 ============
