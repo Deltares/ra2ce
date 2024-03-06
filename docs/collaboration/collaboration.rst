@@ -156,4 +156,5 @@ If you are proposing a feature:
    :maxdepth: 1
    :hidden:
 
-   design_principles.rst
+   design_principles
+   implementation_decisions
