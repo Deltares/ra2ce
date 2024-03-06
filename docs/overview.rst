@@ -67,7 +67,7 @@ Overview
 
         :octicon:`people;10em`
         +++
-        Collaboration
+        Contributing
     
     .. grid-item-card::
         :text-align: center
