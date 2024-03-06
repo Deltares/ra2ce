@@ -281,7 +281,7 @@ class TestOsmNetworkWrapper:
     ):
         # 1. Define test data.
         _network_config_data = self._get_dummy_network_config_data()
-        _network_config_data.network.network_type = NetworkTypeEnum.DRIVE
+        _network_config_data.network.network_type = NetworkTypeEnum.DRIVE.config_value
         _network_config_data.network.road_types = ""
 
         # 2. Run test.
