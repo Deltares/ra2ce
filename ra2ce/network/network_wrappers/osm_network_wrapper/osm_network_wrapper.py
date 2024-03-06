@@ -17,14 +17,13 @@
 
 import logging
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 import networkx as nx
 import osmnx
 import pandas as pd
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
-from shapely.geometry import LineString
 from shapely.geometry.base import BaseGeometry
 
 import ra2ce.network.networks_utils as nut
@@ -39,31 +38,27 @@ from ra2ce.network.network_wrappers.osm_network_wrapper.extremities_data import 
 
 
 class OsmNetworkWrapper(NetworkWrapperProtocol):
+
+    polygon: BaseGeometry
+
     def __init__(self, config_data: NetworkConfigData) -> None:
         self.output_graph_dir = config_data.output_graph_dir
         self.graph_crs = config_data.crs
 
         # Network
-        self.network_type = config_data.network.network_type.config_value
+        self.network_type = config_data.network.network_type
         self.road_types = list(
             _enum.config_value for _enum in config_data.network.road_types
         )
-        self.polygon_path = config_data.network.polygon
+        self.polygon = self._get_clean_graph_from_osm(config_data.network.polygon)
         self.is_directed = config_data.network.directed
 
     def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
-        """
-        Gets an indirected graph
-
-        Returns:
-            tuple[MultiGraph, GeoDataFrame]: _description_
-        """
         logging.info("Start downloading a network from OSM.")
-        graph_complex = self.get_clean_graph_from_osm()
 
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
-            graph_complex
+            self.polygon
         )
 
         # Create 'edges_complex', convert complex graph to geodataframe
@@ -121,25 +116,25 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
             self.output_graph_dir.joinpath("complex_to_simple.json"), linking_tables[1]
         )
 
-    def get_clean_graph_from_osm(self) -> MultiDiGraph:
+    def _get_clean_graph_from_osm(self, polygon_path: Path) -> MultiDiGraph | None:
         """
-        Creates a network from a polygon by by downloading via the OSM API in its extent.
+        Creates a network from a polygon by downloading via the OSM API in its extent.
 
-        Raises:
-            FileNotFoundError: When no valid polygon file is provided.
+        Args:
+            polygon_path (Path): Path where the polygon file can be found.
 
         Returns:
             MultiDiGraph: Complex (clean) graph after download from OSM, for use in the direct analyses and input to derive simplified network.
         """
         # It can only read in one geojson
-        if not isinstance(self.polygon_path, Path):
-            raise ValueError("No valid value provided for polygon file.")
-        if not self.polygon_path.is_file():
-            raise FileNotFoundError(
-                "No polygon_file file found at {}.".format(self.polygon_path)
-            )
+        if not isinstance(polygon_path, Path):
+            logging.warning("No valid value provided for polygon file.")
+            return None
+        elif not polygon_path.is_file():
+            logging.error("No polygon_file file found at {}.".format(polygon_path))
+            return None
 
-        _normalized_polygon = nut.get_normalized_geojson_polygon(self.polygon_path)
+        _normalized_polygon = nut.get_normalized_geojson_polygon(polygon_path)
         _complex_graph = self._download_clean_graph_from_osm(
             polygon=_normalized_polygon,
             network_type=self.network_type,
