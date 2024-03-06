@@ -136,7 +136,7 @@ class TestOsmNetworkWrapper:
         _polygon_path = Path("Not_a_valid_path")
         _network_wrapper_without_polygon.polygon_path = _polygon_path
         with pytest.raises(FileNotFoundError) as exc_err:
-            _network_wrapper_without_polygon.get_clean_graph_from_osm()
+            _network_wrapper_without_polygon._get_clean_graph_from_osm()
 
         assert str(exc_err.value) == "No polygon_file file found at {}.".format(
             _polygon_path
@@ -147,7 +147,7 @@ class TestOsmNetworkWrapper:
     ):
         _network_wrapper_without_polygon.polygon_path = None
         with pytest.raises(ValueError) as exc_err:
-            _network_wrapper_without_polygon.get_clean_graph_from_osm()
+            _network_wrapper_without_polygon._get_clean_graph_from_osm()
 
         assert str(exc_err.value) == "No valid value provided for polygon file."
 
