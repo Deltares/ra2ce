@@ -89,7 +89,7 @@ Overview
 
 .. toctree::
    :caption: Table of Contents
-   :maxdepth: 2
+   :maxdepth: 1
    :hidden:
 
    about/about.rst
@@ -97,7 +97,7 @@ Overview
    examples/examples.rst
    network_module/network_module.rst
    analysis_module/analysis_module.rst 
+   collaboration/collaboration.rst
    technical_documentation/technical_documentation.rst
    faq/faq.rst
-   collaboration/collaboration.rst
    publications/publications.rst
