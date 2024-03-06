@@ -19,14 +19,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 from __future__ import annotations
 
 from pathlib import Path
 from typing import Optional, Protocol, runtime_checkable
 
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
-from ra2ce.graph.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
 
 
 @runtime_checkable
