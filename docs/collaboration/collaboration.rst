@@ -6,6 +6,8 @@ Contributing
 Contributions are welcome, and they are greatly appreciated! Every little bit
 helps, and credit will always be given.
 
+In addition to the content of this file, please check our :ref:`design_principles` subchapter.
+
 
 Guidelines
 -----------------------
@@ -148,3 +150,11 @@ If you are proposing a feature:
 * Remember that this is a volunteer-driven project, and that contributions
   are welcome :)
 
+
+.. toctree::
+   :caption: Table of Contents
+   :maxdepth: 1
+   :hidden:
+
+   design_principles
+   implementation_decisions
