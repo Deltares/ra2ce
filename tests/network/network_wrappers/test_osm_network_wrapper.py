@@ -40,8 +40,8 @@ class TestOsmNetworkWrapper:
         assert isinstance(_wrapper, NetworkWrapperProtocol)
         assert _wrapper.graph_crs.to_epsg() == 4326
 
-    @pytest.fixture
-    def _network_wrapper_without_polygon(self) -> OsmNetworkWrapper:
+    @staticmethod
+    def _get_dummy_network_config_data() -> NetworkConfigData:
         _network_section = NetworkSection(
             network_type=NetworkTypeEnum.DRIVE,
             road_types=[RoadTypeEnum.ROAD],
@@ -50,9 +50,11 @@ class TestOsmNetworkWrapper:
         _output_dir = test_results.joinpath("test_osm_network_wrapper")
         if not _output_dir.exists():
             _output_dir.mkdir(parents=True)
-        yield OsmNetworkWrapper(
-            NetworkConfigData(network=_network_section, output_path=_output_dir)
-        )
+        return NetworkConfigData(network=_network_section, output_path=_output_dir)
+
+    @pytest.fixture
+    def _network_wrapper_without_polygon(self) -> OsmNetworkWrapper:
+        yield OsmNetworkWrapper(self._get_dummy_network_config_data())
 
     def test_download_clean_graph_from_osm_with_invalid_polygon_arg(
         self, _network_wrapper_without_polygon: OsmNetworkWrapper
@@ -272,3 +274,21 @@ class TestOsmNetworkWrapper:
 
         # 3. Verify expectations.
         assert isinstance(_result_graph, MultiDiGraph)
+
+    @slow_test
+    def test_given_valid_base_geometry_with_polygon(
+        self, _valid_network_polygon_fixture: BaseGeometry
+    ):
+        # 1. Define test data.
+        _network_config_data = self._get_dummy_network_config_data()
+        _network_config_data.network.network_type = NetworkTypeEnum.DRIVE
+        _network_config_data.network.road_types = ""
+
+        # 2. Run test.
+        _wrapper = OsmNetworkWrapper.with_polygon(
+            _network_config_data, _valid_network_polygon_fixture
+        )
+
+        # 3. Verify expectations.
+        assert isinstance(_wrapper, OsmNetworkWrapper)
+        assert isinstance(_wrapper.polygon_graph, MultiDiGraph)

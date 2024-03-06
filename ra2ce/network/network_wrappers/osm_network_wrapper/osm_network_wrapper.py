@@ -40,7 +40,7 @@ from ra2ce.network.network_wrappers.osm_network_wrapper.extremities_data import 
 
 class OsmNetworkWrapper(NetworkWrapperProtocol):
 
-    polygon_graph: BaseGeometry
+    polygon_graph: MultiDiGraph
 
     def __init__(self, config_data: NetworkConfigData) -> None:
         self.output_graph_dir = config_data.output_graph_dir
