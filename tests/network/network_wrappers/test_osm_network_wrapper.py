@@ -130,26 +130,21 @@ class TestOsmNetworkWrapper:
             map(lambda x: x["osmid"], graph_complex.edges.values())
         )
 
-    def test_get_clean_graph_from_osm_with_invalid_polygon_path_filename(
-        self, _network_wrapper_without_polygon: OsmNetworkWrapper
+    @pytest.mark.parametrize(
+        "polygon_path",
+        [
+            pytest.param(Path("Not_a_valid_path"), id="Not a valid path"),
+            pytest.param(None, id="Path is None"),
+        ],
+    )
+    def test_get_clean_graph_from_osm_with_invalid_polygon_path(
+        self, _network_wrapper_without_polygon: OsmNetworkWrapper, polygon_path: Path
     ):
-        _polygon_path = Path("Not_a_valid_path")
-        _network_wrapper_without_polygon.polygon_path = _polygon_path
-        with pytest.raises(FileNotFoundError) as exc_err:
-            _network_wrapper_without_polygon._get_clean_graph_from_osm()
-
-        assert str(exc_err.value) == "No polygon_file file found at {}.".format(
-            _polygon_path
+        _result = _network_wrapper_without_polygon._get_clean_graph_from_osm(
+            polygon_path
         )
 
-    def test_get_clean_graph_from_osm_with_no_polygon_path(
-        self, _network_wrapper_without_polygon: OsmNetworkWrapper
-    ):
-        _network_wrapper_without_polygon.polygon_path = None
-        with pytest.raises(ValueError) as exc_err:
-            _network_wrapper_without_polygon._get_clean_graph_from_osm()
-
-        assert str(exc_err.value) == "No valid value provided for polygon file."
+        assert _result is None
 
     @pytest.fixture
     def _valid_graph_fixture(self) -> MultiDiGraph:
