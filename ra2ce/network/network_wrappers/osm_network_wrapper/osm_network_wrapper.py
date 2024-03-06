@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from __future__ import annotations
 import logging
 from pathlib import Path
 from typing import Any
@@ -39,7 +40,7 @@ from ra2ce.network.network_wrappers.osm_network_wrapper.extremities_data import 
 
 class OsmNetworkWrapper(NetworkWrapperProtocol):
 
-    polygon: BaseGeometry
+    polygon_graph: BaseGeometry
 
     def __init__(self, config_data: NetworkConfigData) -> None:
         self.output_graph_dir = config_data.output_graph_dir
@@ -50,15 +51,39 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         self.road_types = list(
             _enum.config_value for _enum in config_data.network.road_types
         )
-        self.polygon = self._get_clean_graph_from_osm(config_data.network.polygon)
+        self.polygon_graph = self._get_clean_graph_from_osm(config_data.network.polygon)
         self.is_directed = config_data.network.directed
+
+    @classmethod
+    def with_polygon(
+        cls, config_data: NetworkConfigData, polygon: BaseGeometry
+    ) -> OsmNetworkWrapper:
+        """
+        Gets an `OsmNetworkWrapper` with the given `polygon` transformed into a
+        clean graph as the `polygon_graph` property.
+
+        Args:
+            config_data (NetworkConfigData): Basic configuration data which contain information required the different methods of this wrapper.
+            polygon (BaseGeometry): Base polygon from which to generate the graph.
+
+        Returns:
+            OsmNetworkWrapper: Wrapper with valid `polygon_graph` property.
+        """
+        _wrapper = cls(config_data)
+        _clean_graph = _wrapper._download_clean_graph_from_osm(
+            polygon=polygon,
+            network_type=_wrapper.network_type,
+            road_types=_wrapper.road_types,
+        )
+        _wrapper.polygon_graph = _clean_graph
+        return _wrapper
 
     def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
         logging.info("Start downloading a network from OSM.")
 
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
-            self.polygon
+            self.polygon_graph
         )
 
         # Create 'edges_complex', convert complex graph to geodataframe
