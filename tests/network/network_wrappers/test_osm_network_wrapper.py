@@ -1,8 +1,9 @@
 from pathlib import Path
 
 import networkx as nx
+from geopandas import GeoDataFrame
 import pytest
-from networkx import Graph, MultiDiGraph
+from networkx import Graph, MultiDiGraph, MultiGraph
 from networkx.utils import graphs_equal
 from shapely.geometry import LineString, Polygon
 from shapely.geometry.base import BaseGeometry
@@ -292,3 +293,27 @@ class TestOsmNetworkWrapper:
         # 3. Verify expectations.
         assert isinstance(_wrapper, OsmNetworkWrapper)
         assert isinstance(_wrapper.polygon_graph, MultiDiGraph)
+
+    @slow_test
+    def test_given_no_output_graph_dir_when_get_network(self):
+        # 1. Define test data.
+        _test_input_directory = test_data.joinpath("graph", "test_osm_network_wrapper")
+        _polygon_file = _test_input_directory.joinpath("_test_polygon.geojson")
+        assert _polygon_file.exists()
+
+        _network_config_data = self._get_dummy_network_config_data()
+        _network_config_data.network.polygon = _polygon_file
+        _network_config_data.network.network_type = NetworkTypeEnum.DRIVE.config_value
+        _network_config_data.network.road_types = ""
+        # `output_graph_dir` is a property indirectly derived from `static_path`.
+        _network_config_data.static_path = None
+
+        # 2. Run test.
+        _wrapper = OsmNetworkWrapper(_network_config_data)
+        _result_mg, _result_gdf = _wrapper.get_network()
+
+        # 3. Verify expectations.
+        assert isinstance(_wrapper, OsmNetworkWrapper)
+        assert isinstance(_wrapper.polygon_graph, MultiDiGraph)
+        assert isinstance(_result_mg, MultiGraph)
+        assert isinstance(_result_gdf, GeoDataFrame)

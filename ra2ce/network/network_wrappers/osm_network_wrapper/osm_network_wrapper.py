@@ -124,9 +124,16 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
     def _set_avg_speed_to_graph(
         self, original_graph: nx.classes.graph.Graph
     ) -> nx.classes.graph.Graph:
-        if all(["length" in e for u, v, e in original_graph.edges.data()]) and any(
-            ["maxspeed" in e for u, v, e in original_graph.edges.data()]
-        ):
+
+        _length_array, _maxspeed_array = list(
+            zip(
+                *(
+                    ("length" in e, "maxspeed" in e)
+                    for _, _, e in original_graph.edges.data()
+                )
+            )
+        )
+        if all(_length_array) and any(_maxspeed_array):
             # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
             _avg_speeds = self._get_avg_speeds(original_graph)
             original_graph = nut.assign_avg_speed(
