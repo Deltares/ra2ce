@@ -274,10 +274,10 @@ class Losses:
         return vlh
 
     def calculate_losses_from_table(self) -> pd.DataFrame:
-        """This function opens an existing table with traffic data and value of time to calculate losses based on
-        detouring values. It also includes
-            a traffic jam estimation.
-            """
+        """
+        This function opens an existing table with traffic data and value of time to calculate losses based on
+        detouring values. It also includes a traffic jam estimation.
+        """
         vlh = self.calc_vlh()
         return vlh
 
