@@ -19,6 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from ast import literal_eval
+from enum import Enum
 from pathlib import Path
 
 import numpy as np
@@ -50,7 +51,7 @@ class Losses:
         self.traffic_throughput: float = analysis.fraction_drivethrough
         self.rest_capacity: float = analysis.rest_capacity
         self.maximum: float = analysis.maximum_jam
-        self.partofday: str = analysis.partofday
+        self.partofday: Enum = analysis.partofday
         self.performance_metric = analysis.performance
         self.network: gpd.GeoDataFrame = self.load_gdf(self.losses_input_path, "network.geojson")
         self.intensities = self.load_df_from_csv(self.losses_input_path, "traffic_intensities.csv")  # per day
