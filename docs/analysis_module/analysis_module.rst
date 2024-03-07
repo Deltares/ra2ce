@@ -405,7 +405,7 @@ This analysis finds the sections of the network that are fully isolated from the
 
 **analyses.ini**
 ::
-    project]
+    [project]
     name = example_indirect
 
     [analysis1]
