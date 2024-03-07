@@ -23,7 +23,7 @@
 # -*- coding: utf-8 -*-
 import copy
 import logging
-from typing import Optional, Union, Tuple, Any
+from typing import Optional, Union
 
 import geopandas as gpd
 import networkx as nx
@@ -496,7 +496,7 @@ class OriginClosestDestination:
         list_no_path = []
         node_checked_has_path = dict()
         for n_ndat in tqdm(disrupted_graph.nodes.data(), desc="Finding optimal routes"):
-            _new_origins, node_checked_has_path = self._find_optimal_routes(
+            _new_origins = self._find_optimal_routes(
                 node_checked_has_path,
                 list_no_path,
                 n_ndat,
@@ -655,7 +655,7 @@ class OriginClosestDestination:
                 if ndat[self.od_key] not in node_checked_has_path:
                     list_no_path.append((n, ndat[self.od_key]))
 
-        return self.update_origins(origins, list_no_path, name_save.format("A")), node_checked_has_path
+        return self.update_origins(origins, list_no_path, name_save.format("A"))
 
     def find_multiple_closest_locations(
         self,
@@ -715,7 +715,7 @@ class OriginClosestDestination:
                 disrupted_graph.nodes.data(),
                 desc=f"Finding optimal routes to {dest_name}",
             ):
-                _new_origins, node_checked_has_path = self._find_optimal_routes(
+                _new_origins = self._find_optimal_routes(
                     node_checked_has_path,
                     list_no_path,
                     n_ndat,
