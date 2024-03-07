@@ -24,7 +24,7 @@
 import copy
 import logging
 from collections import defaultdict
-from typing import Optional, Union
+from typing import Optional, Any
 
 import geopandas as gpd
 import networkx as nx
@@ -452,8 +452,8 @@ class OriginClosestDestination:
 
     def find_closest_location(
         self,
-        disrupted_graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
-        base_graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
+        disrupted_graph: nx.classes.Graph | nx.classes.MultiGraph,
+        base_graph: nx.classes.Graph | nx.classes.MultiGraph,
         origins: gpd.GeoDataFrame,
         destinations: gpd.GeoDataFrame,
         column_name: str,
@@ -661,8 +661,8 @@ class OriginClosestDestination:
 
     def find_multiple_closest_locations(
         self,
-        disrupted_graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
-        base_graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
+        disrupted_graph: nx.classes.Graph | nx.classes.MultiGraph,
+        base_graph: nx.classes.Graph | nx.classes.MultiGraph,
         origins: gpd.GeoDataFrame,
         destinations: gpd.GeoDataFrame,
         column_name: str,
@@ -764,8 +764,8 @@ class OriginClosestDestination:
 
     def calc_pref_routes_closest_dest(
         self,
-        graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
-        base_graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
+        graph: nx.classes.Graph | nx.classes.MultiGraph,
+        base_graph: nx.classes.Graph | nx.classes.MultiGraph,
         origin_closest_dest,
         origins,
     ):
@@ -867,8 +867,8 @@ class OriginClosestDestination:
 
     def calc_routes_closest_dest(
         self,
-        graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
-        base_graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
+        graph: nx.classes.Graph | nx.classes.MultiGraph,
+        base_graph: nx.classes.Graph | nx.classes.MultiGraph,
         list_closest: list,
         origin: gpd.GeoDataFrame,
         dest: gpd.GeoDataFrame,
