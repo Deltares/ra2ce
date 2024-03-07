@@ -72,7 +72,7 @@ def single_link_redundancy(
     gdf = osmnx.graph_to_gdfs(graph, nodes=False)
 
     # list for the length of the alternative routes
-    time_list =[]
+    time_list = []
     alt_value_list = []
     alt_nodes_list = []
     diff_value_list = []
@@ -379,7 +379,7 @@ class IndirectAnalyses:
                     else:
                         alt_value = np.NaN
 
-                    alt_nodes, connected =  np.NaN, 0
+                    alt_nodes, connected = np.NaN, 0
 
                 data = {"u": [u],
                         "v": [v],
