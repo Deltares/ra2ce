@@ -373,7 +373,7 @@ class IndirectAnalyses:
                         alt_value = alt_dist
 
                 else:
-                    if analysis.weighing.config_value == "time":
+                    if analysis.weighing == WeighingEnum.TIME:
                         time = time
                         alt_value = time
                     else:
