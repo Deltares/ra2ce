@@ -366,7 +366,7 @@ class IndirectAnalyses:
                     alt_dist = nx.dijkstra_path_length(graph, u, v, weight="length")
                     alt_nodes = nx.dijkstra_path(graph, u, v)
                     connected = 1
-                    if analysis.weighing.config_value == "time":
+                    if analysis.weighing == WeighingEnum.TIME:
                         alt_time = round((alt_dist * 1e-3) / edata["avgspeed"], 2)  # in hours
                         alt_value = alt_time
                     else:
