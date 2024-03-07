@@ -18,6 +18,7 @@ Bellow you can access some of the main examples and go through them in an off-li
    :maxdepth: 1
    :caption: Examples
 
+   ../_examples/README
    ../_examples/example_ra2ce_basics
    ../_examples/example_single_link_redundancy
    ../_examples/example_origin_destination_analysis
