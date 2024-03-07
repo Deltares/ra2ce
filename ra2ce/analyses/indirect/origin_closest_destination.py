@@ -23,6 +23,7 @@
 # -*- coding: utf-8 -*-
 import copy
 import logging
+from collections import defaultdict
 from typing import Optional, Union
 
 import geopandas as gpd
@@ -567,6 +568,7 @@ class OriginClosestDestination:
         n, ndat = n_ndat
         if self.od_key in ndat and self.o_name in ndat[self.od_key]:
             if nx.has_path(disrupted_graph, n, dest_name):
+                node_checked_has_path[ndat[self.od_key]].append(n)
                 node_checked_has_path.setdefault(ndat[self.od_key], []).append(n)
                 path = nx.shortest_path(
                     disrupted_graph,
@@ -710,7 +712,7 @@ class OriginClosestDestination:
 
             list_disrupted_destinations = []
             list_no_path = []
-            node_checked_has_path = dict()
+            node_checked_has_path = defaultdict(list)
             for n_ndat in tqdm(
                 disrupted_graph.nodes.data(),
                 desc=f"Finding optimal routes to {dest_name}",
