@@ -66,10 +66,10 @@ class NetworkWrapperFactory(NetworkWrapperProtocol):
         elif source == SourceEnum.PICKLE:
             logging.info("Start importing a network from pickle")
             base_graph = GraphPickleReader().read(
-                self.output_graph_dir.joinpath("base_graph.p")
+                self._config_data.output_graph_dir.joinpath("base_graph.p")
             )
             network_gdf = gpd.read_feather(
-                self.output_graph_dir.joinpath("base_network.feather")
+                self._config_data.output_graph_dir.joinpath("base_network.feather")
             )
             return base_graph, network_gdf
         raise ValueError(f"Source {source} is not supported.")
