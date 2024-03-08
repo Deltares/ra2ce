@@ -175,7 +175,9 @@ class DirectAnalyses:  ### THIS SHOULD ONLY DO COORDINATION
             )
         )
 
-    def effectiveness_measures(self, analysis: AnalysisSectionDirect):
+    def effectiveness_measures(
+        self, analysis: AnalysisSectionDirect
+    ) -> gpd.GeoDataFrame:
         """This function calculated the efficiency of measures. Input is a csv file with efficiency
         and a list of different aspects you want to check.
         """
