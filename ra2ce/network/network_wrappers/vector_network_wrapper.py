@@ -150,7 +150,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
                 from_node,
                 to_node,
                 link_id=link_id,
-                avgspeed=row.pop("avgspeed"),
+                avgspeed=row.pop("avgspeed") if "avgspeed" in row else None,
                 geometry=row.pop(
                     "geometry"
                 ),  # **row TODO: check if we do need all columns
