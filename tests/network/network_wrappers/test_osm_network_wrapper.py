@@ -84,17 +84,26 @@ class TestOsmNetworkWrapper:
             == "Geometry must be a shapely Polygon or MultiPolygon. If you requested graph from place name, make sure your query resolves to a Polygon or MultiPolygon, and not some other geometry, like a Point. See OSMnx documentation for details."
         )
 
+    @pytest.mark.parametrize(
+        "road_types",
+        [pytest.param(None, id="With None"), pytest.param([], id="With empty list")],
+    )
     def test_download_clean_graph_from_osm_with_invalid_network_type_arg(
-        self, _network_wrapper_without_polygon: OsmNetworkWrapper
+        self,
+        road_types: list | None,
+        _network_wrapper_without_polygon: OsmNetworkWrapper,
     ):
-        _network_type = "drv"
+        _network_type = NetworkTypeEnum.DRIVE
         _polygon = Polygon([(0.0, 0.0), (0.0, 1.0), (1.0, 1.0), (1.0, 0.0), (0.0, 0.0)])
         with pytest.raises(ValueError) as exc_err:
             _network_wrapper_without_polygon._download_clean_graph_from_osm(
-                _polygon, [""], _network_type
+                _polygon, road_types, _network_type
             )
 
-            assert str(exc_err.value) == f'Unrecognized network_type "{_network_type}"'
+            assert (
+                str(exc_err.value)
+                == f'Unrecognized network_type "{_network_type.config_value}"'
+            )
 
     @pytest.fixture
     def _valid_network_polygon_fixture(self) -> BaseGeometry:
@@ -110,13 +119,13 @@ class TestOsmNetworkWrapper:
         _valid_network_polygon_fixture: BaseGeometry,
     ):
         # 1. Define test data.
-        _link_type = ""
+        _link_type = []
         _network_type = NetworkTypeEnum.DRIVE
 
         # 2. Run test.
         graph_complex = _network_wrapper_without_polygon._download_clean_graph_from_osm(
             polygon=_valid_network_polygon_fixture,
-            network_type=_network_type.config_value,
+            network_type=_network_type,
             road_types=_link_type,
         )
 
@@ -281,7 +290,7 @@ class TestOsmNetworkWrapper:
     ):
         # 1. Define test data.
         _network_config_data = self._get_dummy_network_config_data()
-        _network_config_data.network.network_type = NetworkTypeEnum.DRIVE.config_value
+        _network_config_data.network.network_type = NetworkTypeEnum.DRIVE
         _network_config_data.network.road_types = ""
 
         # 2. Run test.
