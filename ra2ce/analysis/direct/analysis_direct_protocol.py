@@ -20,23 +20,26 @@
 """
 
 from pathlib import Path
-from typing import Optional, Protocol
+from typing import Optional
 
 from geopandas import GeoDataFrame
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisSectionBase
-from ra2ce.network.graph_files.graph_files_protocol import GraphFileProtocol
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
+    AnalysisSectionDirect,
+)
+from ra2ce.analysis.analysis_protocol import AnalysisProtocol
+from ra2ce.network.graph_files.network_file import NetworkFile
 
 
-class AnalysisProtocol(Protocol):
-    graph_file: GraphFileProtocol | None
-    analysis: AnalysisSectionBase
+class AnalysisDirectProtocol(AnalysisProtocol):
+    graph_file: NetworkFile
+    analysis: AnalysisSectionDirect
     input_path: Path
     output_path: Path
     result: Optional[GeoDataFrame]
 
     def __init__(
-        self, graph_file: GraphFileProtocol, analysis: AnalysisSectionBase
+        self, graph_file: NetworkFile, analysis: AnalysisSectionDirect
     ) -> None:
         pass
 
