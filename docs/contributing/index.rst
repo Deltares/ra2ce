@@ -47,7 +47,6 @@ Implement Features
 Look through the GitHub issues for features. Anything tagged with "enhancement"
 and "help wanted" is open to whoever wants to implement it.
 
-
 .. _Writing tests:
 
 Writing tests
@@ -150,6 +149,9 @@ If you are proposing a feature:
 * Remember that this is a volunteer-driven project, and that contributions
   are welcome :)
 
+..
+  The following table of contents is hidden as we don't need to display it.
+  However, it will bind those items to this one in the "section menu".
 
 .. toctree::
    :caption: Table of Contents
