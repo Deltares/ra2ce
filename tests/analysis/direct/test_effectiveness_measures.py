@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import pytest
 
@@ -8,7 +7,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDirect,
 )
-from ra2ce.analysis.direct.cost_benefit_analysis import EffectivenessMeasures
+from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
 from tests import test_data
 
 
@@ -20,9 +19,8 @@ class MockEffectivenessMeasures(EffectivenessMeasures):
         pass
 
 
-class TestCostBenefitAnalysis:
+class TestEffectivenessMeasures:
     def test_init_raises_when_file_name_not_defined(self):
-        _config = AnalysisConfigData(input_path=test_data)
         _analysis = AnalysisSectionDirect(
             return_period=None,
             repair_costs=None,
@@ -33,14 +31,13 @@ class TestCostBenefitAnalysis:
             file_name=None,
         )
         with pytest.raises(ValueError) as exc_err:
-            EffectivenessMeasures(_config, _analysis)
+            EffectivenessMeasures(None, _analysis, test_data, None)
         assert (
             str(exc_err.value)
             == "Effectiveness of measures calculation: No input file configured. Please define an input file in the analysis.ini file."
         )
 
     def test_init_raises_when_file_name_not_shp(self):
-        _config = AnalysisConfigData(input_path=test_data)
         _analysis = AnalysisSectionDirect(
             return_period=None,
             repair_costs=None,
@@ -51,14 +48,14 @@ class TestCostBenefitAnalysis:
             file_name=Path("just_a_file.txt"),
         )
         with pytest.raises(ValueError) as exc_err:
-            EffectivenessMeasures(_config, _analysis)
+            EffectivenessMeasures(None, _analysis, test_data, None)
         assert (
             str(exc_err.value)
             == "Effectiveness of measures calculation: Wrong input file configured. Extension of input file is -.txt-, needs to be -.shp- (shapefile)"
         )
 
     def test_init_raises_when_direct_shp_file_does_not_exist(self):
-        _config = AnalysisConfigData(input_path=test_data)
+        _config_data = AnalysisConfigData(input_path=test_data)
         _analysis = AnalysisSectionDirect(
             return_period=None,
             repair_costs=None,
@@ -69,13 +66,13 @@ class TestCostBenefitAnalysis:
             file_name=Path("filedoesnotexist.shp"),
         )
         with pytest.raises(FileNotFoundError) as exc_err:
-            EffectivenessMeasures(_config, _analysis)
+            EffectivenessMeasures(None, _analysis, test_data, None)
         assert str(exc_err.value) == str(
-            _config.input_path.joinpath("direct", "filedoesnotexist.shp")
+            _config_data.input_path.joinpath("direct", "filedoesnotexist.shp")
         )
 
     def test_init_raises_when_effectiveness_measures_does_not_exist(self):
-        _config = AnalysisConfigData(input_path=test_data)
+        _config_data = AnalysisConfigData(input_path=test_data)
         _analysis = AnalysisSectionDirect(
             return_period=None,
             repair_costs=None,
@@ -85,11 +82,11 @@ class TestCostBenefitAnalysis:
             climate_period=2.4,
             file_name=Path("origins.shp"),
         )
-        assert (_config.input_path.joinpath("direct", "origins.shp")).exists()
+        assert (_config_data.input_path.joinpath("direct", "origins.shp")).exists()
         with pytest.raises(FileNotFoundError) as exc_err:
-            EffectivenessMeasures(_config, _analysis)
+            EffectivenessMeasures(None, _analysis, test_data, None)
         assert str(exc_err.value) == str(
-            _config.input_path.joinpath("direct", "effectiveness_measures.csv")
+            _config_data.input_path.joinpath("direct", "effectiveness_measures.csv")
         )
 
     @pytest.mark.parametrize(
@@ -104,7 +101,7 @@ class TestCostBenefitAnalysis:
         # 1. Define test data.
         # 2. Run test.
         with pytest.raises(ValueError) as exc_err:
-            EffectivenessMeasures.knmi_correction(None, duration)
+            EffectivenessMeasures._knmi_correction(None, duration)
         # 3. Verify final expectations.
         assert str(exc_err.value) == "Wrong duration configured, has to be 10 or 60"
 
@@ -121,7 +118,7 @@ class TestCostBenefitAnalysis:
         _dataframe = pd.DataFrame(df_data)
 
         # 2. Run test.
-        _correction = EffectivenessMeasures.knmi_correction(_dataframe, duration)
+        _correction = EffectivenessMeasures._knmi_correction(_dataframe, duration)
 
         # 3. Verify final expectations.
         assert isinstance(_correction, pd.DataFrame)
@@ -147,7 +144,7 @@ class TestCostBenefitAnalysis:
         _dataframe = pd.DataFrame(df_data)
 
         # 2. Run test.
-        _correction = EffectivenessMeasures.calculate_effectiveness(
+        _correction = EffectivenessMeasures._calculate_effectiveness(
             _dataframe, "standard"
         )
 
@@ -170,7 +167,7 @@ class TestCostBenefitAnalysis:
 
         # 2. Run test.
         with pytest.raises(ValueError) as exc_err:
-            EffectivenessMeasures.calculate_strategy_costs(_dataframe, _costs_dict)
+            EffectivenessMeasures._calculate_strategy_costs(_dataframe, _costs_dict)
 
         # 3. Verify expectations.
         assert "Wrong column configured in effectiveness_measures csv file." in str(
@@ -206,7 +203,9 @@ class TestCostBenefitAnalysis:
         _dataframe = pd.DataFrame(df_data)
 
         # 2. Run test.
-        _costs = EffectivenessMeasures.calculate_strategy_costs(_dataframe, _costs_dict)
+        _costs = EffectivenessMeasures._calculate_strategy_costs(
+            _dataframe, _costs_dict
+        )
 
         # 3. Verify expectations.
         assert isinstance(_costs, pd.DataFrame)
@@ -266,7 +265,9 @@ class TestCostBenefitAnalysis:
         _dataframe = pd.DataFrame(df_data)
 
         # 2. Run test.
-        _return_df = _measures.calculate_cost_reduction(_dataframe, _effectiveness_dict)
+        _return_df = _measures._calculate_cost_reduction(
+            _dataframe, _effectiveness_dict
+        )
 
         # 3. Verify expectations
         assert isinstance(_return_df, pd.DataFrame)
