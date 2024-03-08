@@ -72,3 +72,4 @@ class NetworkWrapperFactory(NetworkWrapperProtocol):
                 self.output_graph_dir.joinpath("base_network.feather")
             )
             return base_graph, network_gdf
+        raise ValueError(f"Source {source} is not supported.")
