@@ -15,7 +15,7 @@ from ra2ce.analysis.direct.analysis_direct_protocol import (
 from ra2ce.network.graph_files.network_file import NetworkFile
 
 
-class EffectivenessMeasure(AnalysisDirectProtocol):
+class EffectivenessMeasures(AnalysisDirectProtocol):
     graph_file: NetworkFile
     analysis: AnalysisSectionDirect
     input_path: Path = None
@@ -120,7 +120,8 @@ class EffectivenessMeasure(AnalysisDirectProtocol):
         df = pd.read_csv(file_path)
         return df
 
-    def _knmi_correction(self, df: pd.DataFrame, duration: int = 60) -> pd.DataFrame:
+    @staticmethod
+    def _knmi_correction(df: pd.DataFrame, duration: int = 60) -> pd.DataFrame:
         """This function corrects the length of each segment depending on a KNMI factor.
         This factor is calculated using an exponential relation and was calculated using an analysis on all line elements
         a relation is establisched for a 10 minute or 60 minute rainfall period
@@ -149,8 +150,9 @@ class EffectivenessMeasure(AnalysisDirectProtocol):
         )
         return df
 
-    def calculate_effectiveness(
-        self, df: pd.DataFrame, name: str = "standard"
+    @staticmethod
+    def _calculate_effectiveness(
+        df: pd.DataFrame, name: str = "standard"
     ) -> pd.DataFrame:
         """This function calculates effectiveness, based on a number of columns:
         'dichtbij_m', 'ver_hoger_m', 'hwa_afw_ho_m', 'gw_hwa_m', slope_0015_m' and 'slope_001_m'
@@ -224,7 +226,7 @@ class EffectivenessMeasure(AnalysisDirectProtocol):
         ]
 
         # calculate standard effectiveness without factors
-        df_total = self.calculate_effectiveness(df, name="standard")
+        df_total = self._calculate_effectiveness(df, name="standard")
 
         df_blockage = pd.read_csv(self.input_path / "direct" / "blockage_costs.csv")
         df_total = df_total.merge(df_blockage, how="left", on="LinkNr")
@@ -243,7 +245,7 @@ class EffectivenessMeasure(AnalysisDirectProtocol):
                 df_temp[col + "_m"] = df_temp[col + "_m"] * (1 - lookup_dict[col])
 
             # calculate the effectiveness and add as a new column to total dataframe
-            df_new = self.calculate_effectiveness(df_temp, name=strategy)
+            df_new = self._calculate_effectiveness(df_temp, name=strategy)
             df_new = df_new.drop(
                 columns={
                     "length",
@@ -383,9 +385,8 @@ class EffectivenessMeasure(AnalysisDirectProtocol):
 
         return df_cba, costs_dict
 
-    def _calculate_strategy_costs(
-        self, df: pd.DataFrame, costs_dict: dict
-    ) -> pd.DataFrame:
+    @staticmethod
+    def _calculate_strategy_costs(df: pd.DataFrame, costs_dict: dict) -> pd.DataFrame:
         """Method to calculate costs, benefits with net present value"""
 
         costs = costs_dict["costs"]
