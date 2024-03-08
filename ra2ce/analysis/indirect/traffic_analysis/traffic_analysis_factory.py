@@ -24,9 +24,9 @@ from pathlib import Path
 import geopandas as gpd
 import pandas as pd
 
-from ra2ce.analyses.indirect.traffic_analysis.equity_analysis import EquityAnalysis
-from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis import TrafficAnalysis
-from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_base import (
+from ra2ce.analysis.indirect.traffic_analysis.equity_analysis import EquityAnalysis
+from ra2ce.analysis.indirect.traffic_analysis.traffic_analysis import TrafficAnalysis
+from ra2ce.analysis.indirect.traffic_analysis.traffic_analysis_base import (
     TrafficAnalysisBase,
 )
 

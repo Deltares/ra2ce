@@ -19,12 +19,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 from __future__ import annotations
 
 from pathlib import Path
 
-from ra2ce.analyses.direct.damage_calculation.damage_network_base import (
+from ra2ce.analysis.direct.damage_calculation.damage_network_base import (
     DamageNetworkBase,
 )
 

@@ -20,13 +20,15 @@
 """
 from ast import literal_eval
 from enum import Enum
+
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import geopandas as gpd
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
 )
@@ -69,6 +71,14 @@ class Losses:
     def values_of_time(file_path: Path) -> dict:
         """This function is to calculate vehicle loss hours based on an input table
         with value of time per type of transport, usage and value_of_reliability"""
+        self.partofday: str = analysis.partofday
+
+    @staticmethod
+    def vehicle_loss_hours(path):
+        """This function is to calculate vehicle loss hours based on an input table
+        with value of time per type of transport, usage and value_of_reliability"""
+
+        file_path = path / "vehicle_loss_hours.csv"
         df_lookup = pd.read_csv(file_path, index_col="transport_type")
         lookup_dict = df_lookup.transpose().to_dict()
         return lookup_dict

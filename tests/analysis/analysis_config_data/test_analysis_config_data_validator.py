@@ -1,12 +1,12 @@
-from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDirect,
     ProjectSection,
 )
-from ra2ce.analyses.analysis_config_data.analysis_config_data_validator import (
+from ra2ce.analysis.analysis_config_data.analysis_config_data_validator import (
     AnalysisConfigDataValidator,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
     AnalysisDirectEnum,
 )
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
