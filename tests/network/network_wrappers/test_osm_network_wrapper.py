@@ -292,7 +292,7 @@ class TestOsmNetworkWrapper:
         # 1. Define test data.
         _network_config_data = self._get_dummy_network_config_data()
         _network_config_data.network.network_type = NetworkTypeEnum.DRIVE
-        _network_config_data.network.road_types = ""
+        _network_config_data.network.road_types = []
 
         # 2. Run test.
         _wrapper = OsmNetworkWrapper.with_polygon(
@@ -312,8 +312,8 @@ class TestOsmNetworkWrapper:
 
         _network_config_data = self._get_dummy_network_config_data()
         _network_config_data.network.polygon = _polygon_file
-        _network_config_data.network.network_type = NetworkTypeEnum.DRIVE.config_value
-        _network_config_data.network.road_types = ""
+        _network_config_data.network.network_type = NetworkTypeEnum.DRIVE
+        _network_config_data.network.road_types = []
         # `output_graph_dir` is a property indirectly derived from `static_path`.
         _network_config_data.static_path = None
 
