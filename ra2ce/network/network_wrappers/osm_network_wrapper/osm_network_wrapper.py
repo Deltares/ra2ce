@@ -175,7 +175,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         road_types: list[RoadTypeEnum],
         network_type: NetworkTypeEnum,
     ) -> MultiDiGraph:
-        _available_road_types = road_types and any(_road_types_as_str)
+        _available_road_types = road_types and any(road_types)
         _road_types_as_str = (
             list(map(lambda x: x.config_value, road_types))
             if _available_road_types
