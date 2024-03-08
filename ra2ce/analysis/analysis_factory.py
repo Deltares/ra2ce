@@ -26,10 +26,10 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
     AnalysisDirectEnum,
 )
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.direct.direct_damage import DirectDamage
 from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasure
-from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
 
 
 class AnalysisFactory:
@@ -40,12 +40,12 @@ class AnalysisFactory:
     ) -> None:
         self.analysis = analysis
 
-    def get_analysis(self, graph_files: GraphFilesCollection) -> AnalysisProtocol:
+    def get_analysis(self, analysis_config: AnalysisConfigWrapper) -> AnalysisProtocol:
         """
-        Create an analysis based on the given analysis configuration and graph/network files.
+        Create an analysis based on the given analysis configuration.
 
         Args:
-            graph_files (GraphFilesCollection): Collection of graph/network files.
+            analysis_config (AnalysisConfigWrapper): Analysis configuration.
 
         Raises:
             NotImplementedError: The analysis type is not implemented.
@@ -54,9 +54,19 @@ class AnalysisFactory:
             AnalysisProtocol: The analysis to be executed.
         """
         if self.analysis.analysis == AnalysisDirectEnum.DIRECT:
-            return DirectDamage(graph_files.base_network_hazard, self.analysis)
+            return DirectDamage(
+                analysis_config.graph_files.base_network_hazard,
+                self.analysis,
+                analysis_config.config_data.input_path,
+                analysis_config.config_data.output_path,
+            )
         elif self.analysis.analysis == AnalysisDirectEnum.EFFECTIVENESS_MEASURES:
-            return EffectivenessMeasure(graph_files.base_network_hazard, self.analysis)
+            return EffectivenessMeasure(
+                analysis_config.graph_files.base_network_hazard,
+                self.analysis,
+                analysis_config.config_data.input_path,
+                analysis_config.config_data.output_path,
+            )
         elif True:
             pass
         raise NotImplementedError
