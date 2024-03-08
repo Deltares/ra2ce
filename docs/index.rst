@@ -20,9 +20,8 @@ Or navigate directly to another section:
 
    overview
    installation/installation
-   user_guide/user_guide
    examples/examples
-   collaboration/collaboration
+   contributing/index
    changelog_wrapper
 
 Lost..? Try the :ref:`search`.

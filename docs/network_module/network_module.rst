@@ -38,6 +38,6 @@ class to read in a shapefile, clean it and process it to a network.
 The user can also read in a pre-defined shapefile using the ra2ce_basics_shapefile example notebook, where the user can practice with pre-defined data and required folder structure and data format. 
 
 Network overlay with hazard data
-----------------------------
+--------------------------------
 
 It is possible to perform overlays with hazard data and the network. RA2CE can handle any hazard data in .tif format. It will return information on where the hazard touches the network and give the hazard attribute to the network (e.g. flood depth on a road segment). RA2CE can use this information to determine the impact of a hazard on the network and on the routes between origins-destinations. Check the examples to see how to use it. 
