@@ -1,6 +1,6 @@
 import pytest
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDirect,
     AnalysisSectionIndirect,
@@ -8,10 +8,10 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     IndirectAnalysisNameList,
     ProjectSection,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
     AnalysisDirectEnum,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_indirect_enum import (
+from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
 from tests import test_results

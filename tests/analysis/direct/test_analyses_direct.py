@@ -1,11 +1,11 @@
-from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDirect,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
     AnalysisDirectEnum,
 )
-from ra2ce.analyses.direct.analyses_direct import DirectAnalyses
+from ra2ce.analysis.direct.analyses_direct import DirectAnalyses
 from tests import test_data
 
 

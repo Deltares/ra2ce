@@ -19,13 +19,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 
-from ra2ce.analyses.analysis_config_wrapper import (
+from ra2ce.analysis.analysis_config_wrapper import (
     AnalysisConfigWrapper,
 )
-from ra2ce.analyses.direct import analyses_direct
+from ra2ce.analysis.direct import analyses_direct
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 

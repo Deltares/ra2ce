@@ -19,16 +19,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 from abc import ABC, abstractmethod
 
 import numpy as np
 import pandas as pd
 
-from ra2ce.analyses.direct.direct_lookup import LookUp as lookup
-from ra2ce.analyses.direct.direct_lookup import dataframe_lookup
-from ra2ce.analyses.direct.direct_utils import (
+from ra2ce.analysis.direct.direct_lookup import LookUp as lookup
+from ra2ce.analysis.direct.direct_lookup import dataframe_lookup
+from ra2ce.analysis.direct.direct_utils import (
     clean_lane_data,
     create_summary_statistics,
     scale_damage_using_lanes,
@@ -230,7 +229,11 @@ class DamageNetworkBase(ABC):
 
         df = self._gdf_mask
         df["lanes"] = df["lanes"].astype(int)
-        df["max_dam_hz"] = df.apply(dataframe_lookup, args=(df_max_damages_huizinga, ['lanes', 'road_type']), axis=1)
+        df["max_dam_hz"] = df.apply(
+            dataframe_lookup,
+            args=(df_max_damages_huizinga, ["lanes", "road_type"]),
+            axis=1,
+        )
 
         for event in events:
             df["dam_{}_{}".format(event, curve_name)] = round(

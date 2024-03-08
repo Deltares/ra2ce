@@ -19,13 +19,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 
 import numpy as np
 import pandas as pd
 
-from ra2ce.analyses.direct.damage_calculation.damage_network_base import (
+from ra2ce.analysis.direct.damage_calculation.damage_network_base import (
     DamageNetworkBase,
 )
 

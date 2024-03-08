@@ -4,16 +4,16 @@ import geopandas as gpd
 import pandas as pd
 import pytest
 
-from ra2ce.analyses.indirect.traffic_analysis.equity_analysis import EquityAnalysis
-from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis import TrafficAnalysis
-from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_base import (
+from ra2ce.analysis.indirect.traffic_analysis.equity_analysis import EquityAnalysis
+from ra2ce.analysis.indirect.traffic_analysis.traffic_analysis import TrafficAnalysis
+from ra2ce.analysis.indirect.traffic_analysis.traffic_analysis_base import (
     TrafficAnalysisBase,
 )
-from ra2ce.analyses.indirect.traffic_analysis.traffic_analysis_factory import (
+from ra2ce.analysis.indirect.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
 )
 from tests import test_results
-from tests.analyses.indirect.traffic_analysis import (
+from tests.analysis.indirect.traffic_analysis import (
     TrafficAnalysisInput,
     valid_traffic_analysis_input,
 )

@@ -19,13 +19,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 from configparser import ConfigParser
 from pathlib import Path
 from shutil import copyfile
 
-from ra2ce.analyses.analysis_config_data.analysis_config_data import (
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionBase,
     AnalysisSectionDirect,
@@ -34,13 +33,13 @@ from ra2ce.analyses.analysis_config_data.analysis_config_data import (
     IndirectAnalysisNameList,
     ProjectSection,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_direct_enum import (
+from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
     AnalysisDirectEnum,
 )
-from ra2ce.analyses.analysis_config_data.enums.analysis_indirect_enum import (
+from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
-from ra2ce.analyses.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
 )
