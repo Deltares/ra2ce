@@ -15,25 +15,29 @@ following steps.
 CLI only
 +++++++++++++++++++++++++++
 If only interested in using the tool via command-line interface follow these steps:
-::
-  pip install git+https://github.com/Deltares/ra2ce.git
+
 ::
 
+  pip install git+https://github.com/Deltares/ra2ce.git
+
+
 Alternatively you can install a specific tag or commit hash from our repo by using the symbol `@`:
+
 ::
+ 
   pip install git+https://github.com/Deltares/ra2ce.git@v0.3.1
-::
 
 
 Development mode
 +++++++++++++++++++++++++++
 When running a development environment with Anaconda, the user may follow these steps in command line:
+
 ::
+
   cd <to the main repository RA2CE folder>
   conda env create -f .config\environment.yml
   conda activate ra2ce_env
   poetry install
-::
 
 
 Docker
@@ -50,6 +54,9 @@ In this environment you will find all our available examples as well as the poss
 - More about `binder <https://mybinder.readthedocs.io/en/latest/>`_.
 
 
+..
+  The following table of contents is hidden as we don't need to display it.
+  However, it will bind those items to this one in the "section menu".
 
 .. toctree::
    :caption: Table of Contents

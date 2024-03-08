@@ -368,7 +368,9 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 This analysis finds the sections of the network that are fully isolated from the rest of the network (also named disconnected islands), because of network disruption due to a hazard.
 
 **network.ini**
+
 ::
+
     [project]
     name = example_indirect
 
@@ -403,9 +405,12 @@ This analysis finds the sections of the network that are fully isolated from the
     [isolation]
     locations = origins_worldpop_wgs84.shp
 
+
 **analyses.ini**
+
 ::
-    project]
+
+    [project]
     name = example_indirect
 
     [analysis1]
