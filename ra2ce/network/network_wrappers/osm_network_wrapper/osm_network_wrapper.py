@@ -26,6 +26,8 @@ import pandas as pd
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
 from shapely.geometry.base import BaseGeometry
+from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
+from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 import ra2ce.network.networks_utils as nut
 from ra2ce.network.exporters.json_exporter import JsonExporter
@@ -41,6 +43,8 @@ from ra2ce.network.network_wrappers.osm_network_wrapper.extremities_data import 
 class OsmNetworkWrapper(NetworkWrapperProtocol):
 
     polygon_graph: MultiDiGraph
+    network_type: NetworkTypeEnum
+    road_types: list[RoadTypeEnum]
 
     def __init__(self, config_data: NetworkConfigData) -> None:
         self.output_graph_dir = config_data.output_graph_dir
@@ -48,9 +52,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
         # Network
         self.network_type = config_data.network.network_type
-        self.road_types = list(
-            _enum.config_value for _enum in config_data.network.road_types
-        )
+        self.road_types = config_data.network.road_types
         self.polygon_graph = self._get_clean_graph_from_osm(config_data.network.polygon)
         self.is_directed = config_data.network.directed
 
@@ -168,31 +170,40 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         return _complex_graph
 
     def _download_clean_graph_from_osm(
-        self, polygon: BaseGeometry, road_types: list[str], network_type: str
+        self,
+        polygon: BaseGeometry,
+        road_types: list[RoadTypeEnum],
+        network_type: NetworkTypeEnum,
     ) -> MultiDiGraph:
-        _available_road_types = road_types and any(road_types)
+        _available_road_types = road_types and any(_road_types_as_str)
+        _road_types_as_str = (
+            list(map(lambda x: x.config_value, road_types))
+            if _available_road_types
+            else []
+        )
+
         if not _available_road_types and not network_type:
             raise ValueError("Either of the link_type or network_type should be known")
         elif not _available_road_types:
             # The user specified only the network type.
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon,
-                network_type=network_type,
+                network_type=network_type.config_value,
                 simplify=False,
                 retain_all=True,
             )
         elif not network_type:
             # The user specified only the road types.
-            cf = f'["highway"~"{"|".join(road_types)}"]'
+            cf = f'["highway"~"{"|".join(_road_types_as_str)}"]'
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon, custom_filter=cf, simplify=False, retain_all=True
             )
         else:
             # _available_road_types and network_type
-            cf = f'["highway"~"{"|".join(road_types)}"]'
+            cf = f'["highway"~"{"|".join(_road_types_as_str)}"]'
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon,
-                network_type=network_type,
+                network_type=network_type.config_value,
                 custom_filter=cf,
                 simplify=False,
                 retain_all=True,
