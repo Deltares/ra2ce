@@ -66,7 +66,6 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.githubpages",
     "sphinx.ext.napoleon",
-    "sphinx.ext.autosectionlabel",
     "sphinx.ext.autosummary",
     "sphinx_autosummary_accessors",
     "nbsphinx",
