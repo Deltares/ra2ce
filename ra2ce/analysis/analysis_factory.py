@@ -29,7 +29,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.direct.direct_damage import DirectDamage
-from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasure
+from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
 
 
 class AnalysisFactory:
@@ -61,7 +61,7 @@ class AnalysisFactory:
                 analysis_config.config_data.output_path,
             )
         elif self.analysis.analysis == AnalysisDirectEnum.EFFECTIVENESS_MEASURES:
-            return EffectivenessMeasure(
+            return EffectivenessMeasures(
                 analysis_config.graph_files.base_network_hazard,
                 self.analysis,
                 analysis_config.config_data.input_path,
