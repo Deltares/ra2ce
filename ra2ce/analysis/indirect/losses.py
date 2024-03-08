@@ -27,7 +27,6 @@ import numpy as np
 import pandas as pd
 import geopandas as gpd
 
-
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
@@ -68,17 +67,9 @@ class Losses:
         self.inundation_height_ranges: pd.DataFrame = self._get_link_types_heights_ranges()[1]
 
     @staticmethod
-    def values_of_time(file_path: Path) -> dict:
+    def values_of_time(file_path):
         """This function is to calculate vehicle loss hours based on an input table
         with value of time per type of transport, usage and value_of_reliability"""
-        self.partofday: str = analysis.partofday
-
-    @staticmethod
-    def vehicle_loss_hours(path):
-        """This function is to calculate vehicle loss hours based on an input table
-        with value of time per type of transport, usage and value_of_reliability"""
-
-        file_path = path / "vehicle_loss_hours.csv"
         df_lookup = pd.read_csv(file_path, index_col="transport_type")
         lookup_dict = df_lookup.transpose().to_dict()
         return lookup_dict
@@ -240,6 +231,7 @@ class Losses:
                     self.values_of_time.loc[self.values_of_time["trip_types"] == purpose, "value_of_time"].item()
                 # read and set the intensities
                 globals()[partofday_trip_purpose_intensity_name] = self.intensities[partofday_trip_purpose_name] / 24
+
         # shape vlh
         vlh = pd.DataFrame(
             index=self.intensities.index,  # "link_type"
