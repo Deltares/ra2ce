@@ -113,7 +113,9 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
             if _avg_speed_filepath.is_file():
                 return pd.read_csv(_avg_speed_filepath)
             logging.warning(
-                "No valid file found with average speeds in {}, calculating and saving them instead."
+                "No valid file found with average speeds in {}, calculating and saving them instead.".format(
+                    _avg_speed_filepath
+                )
             )
 
         return nut.calc_avg_speed(
