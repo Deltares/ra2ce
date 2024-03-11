@@ -1,3 +1,4 @@
+from collections import defaultdict
 import itertools
 from pathlib import Path
 
@@ -13,6 +14,7 @@ from ra2ce.analysis.indirect.losses import Losses
 
 
 class TestLosses:
+
     def test_initialize(self):
         # 1. Define test data
         _config = AnalysisConfigData(input_path=Path("sth"))
@@ -107,7 +109,9 @@ class TestLosses:
         )
 
         # 2. Run test.
-        _result = _losses.calc_vlh_with_shockwave(_traffic_data, _vehicle_loss_hours, _detour_data)
+        _result = _losses.calc_vlh_with_shockwave(
+            _traffic_data, _vehicle_loss_hours, _detour_data
+        )
 
         # 3. Verify final expectations.
         assert isinstance(_result, pd.DataFrame)
