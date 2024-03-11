@@ -21,7 +21,6 @@
 
 from ast import literal_eval
 from collections import defaultdict
-from enum import Enum
 
 from pathlib import Path
 
@@ -33,22 +32,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
 )
-
-trip_types = ["business" "commute" "freight" "other"]
-
-road_types = [
-    "motorway",
-    "primary",
-    "secondary",
-    "tertiary",
-    "residential",
-    "secondary_unpaved",
-    "tertiary_unpaved",
-    "residential_unpaved",
-    "tunnel",
-    "bridge",
-    "culvert",
-]
+from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 
 
 class Losses:
@@ -60,25 +44,25 @@ class Losses:
         self.traffic_throughput: float = analysis.fraction_drivethrough
         self.rest_capacity: float = analysis.rest_capacity
         self.maximum: float = analysis.maximum_jam
-        self.partofday: Enum = analysis.partofday
+        self.partofday: PartOfDayEnum = analysis.partofday
         self.performance_metric = analysis.performance
-        self.network: gpd.GeoDataFrame = self.load_gdf(
-            self.losses_input_path, "network.geojson"
+        self.network: gpd.GeoDataFrame = self._load_gdf(
+            self.losses_input_path.joinpath("network.geojson")
         )
-        self.intensities = self.load_df_from_csv(
-            self.losses_input_path, "traffic_intensities.csv"
+        self.intensities = self._load_df_from_csv(
+            self.losses_input_path.joinpath("traffic_intensities.csv"), []
         )  # per day
-        # ToDo: make sure the "link_id" is kept in the result of the criticality analysis
-        self.criticality_data = self.load_df_from_csv(
-            self.losses_input_path, "criticality_data.csv"
+
+        # TODO: make sure the "link_id" is kept in the result of the criticality analysis
+        self.criticality_data = self._load_df_from_csv(
+            self.losses_input_path.joinpath("criticality_data.csv"), []
         )
-        self.resilience_curve: pd.DataFrame = self.load_df_from_csv(
-            self.losses_input_path,
-            analysis.resilience_curve_file,
-            columns_to_interpret=["disruption_steps", "functionality_loss_ratio"],
+        self.resilience_curve: pd.DataFrame = self._load_df_from_csv(
+            self.losses_input_path.joinpath(analysis.resilience_curve_file),
+            ["disruption_steps", "functionality_loss_ratio"],
         )
-        self.values_of_time = self.load_df_from_csv(
-            self.losses_input_path, "values_of_time.csv", ""
+        self.values_of_time = self._load_df_from_csv(
+            self.losses_input_path.joinpath("values_of_time.csv"), []
         )
         self.link_types: list = self._get_link_types_heights_ranges()[0]
         self.inundation_height_ranges: pd.DataFrame = (
@@ -86,33 +70,29 @@ class Losses:
         )
 
     @staticmethod
-    def values_of_time(file_path):
+    def values_of_time(file_path: Path) -> pd.DataFrame:
         """This function is to calculate vehicle loss hours based on an input table
         with value of time per type of transport, usage and value_of_reliability"""
         df_lookup = pd.read_csv(file_path, index_col="transport_type")
         lookup_dict = df_lookup.transpose().to_dict()
         return lookup_dict
 
-    @staticmethod
-    def load_df_from_csv(
-        path: Path, file: str, index_col: str = "", columns_to_interpret=None
-    ):
-        if columns_to_interpret is None:
-            columns_to_interpret = []
-        file_path = path / file
-        if len(index_col) > 0:
-            df = pd.read_csv(file_path, index_col=index_col)
-        else:
-            df = pd.read_csv(file_path)
-        if len(columns_to_interpret) > 0:
-            df[columns_to_interpret] = df[columns_to_interpret].applymap(literal_eval)
-        return df
+    def _load_df_from_csv(
+        self,
+        csv_path: Path,
+        columns_to_interpret: list[str],
+        # path: Path, file: str, index_col: str = "", columns_to_interpret=None
+    ) -> pd.DataFrame:
+        _csv_dataframe = pd.read_csv(csv_path)
+        if any(columns_to_interpret):
+            _csv_dataframe[columns_to_interpret] = _csv_dataframe[
+                columns_to_interpret
+            ].applymap(literal_eval)
+        return _csv_dataframe
 
-    @staticmethod
-    def load_gdf(path: Path, file: str):
+    def _load_gdf(self, gdf_path: Path) -> gpd.GeoDataFrame:
         """This method reads the dataframe created from a .csv"""
-        file_path = path / file
-        gdf = gpd.read_file(file_path, index_col="link_id")
+        gdf = gpd.read_file(gdf_path, index_col="link_id")
         return gdf
 
     def traffic_shockwave(
@@ -146,10 +126,10 @@ class Losses:
         capacity = traffic_data["capacity"]
         diff_event_disr = self.duration - self.duration_disr
 
-        if self.partofday == "daily":
+        if self.partofday == PartOfDayEnum.DAY:
             intensity = traffic_data["day_total"] / 24
             detour_time = criticality_data["detour_time_day"]
-        if self.partofday == "evening":
+        if self.partofday == PartOfDayEnum.EVENING:
             intensity = traffic_data["evening_total"]
             detour_time = criticality_data["detour_time_evening"]
 
@@ -182,7 +162,7 @@ class Losses:
 
         vlh["vlh_total"] = vlh["vlh_traffic"] + vlh["vlh_detour"]
 
-        if self.partofday == "daily":
+        if self.partofday == PartOfDayEnum.DAY:
             vlh["euro_per_hour"] = (
                 (
                     traffic_data["day_freight"]
@@ -207,7 +187,7 @@ class Losses:
             )
             # to calculate costs per unit traffi per hour. This is weighted based on the traffic mix and value of each traffic type
 
-        if self.partofday == "evening":
+        if self.partofday == PartOfDayEnum.EVENING:
             vlh["euro_per_hour"] = (
                 (
                     traffic_data["evening_freight"]
@@ -234,6 +214,29 @@ class Losses:
         vlh["euro_vlh"] = vlh["euro_per_hour"] * vlh["vlh_total"]
         return vlh
 
+    def _get_vot_intensity_per_trip_purpose(
+        self, trip_types: list[str]
+    ) -> dict[str, pd.DataFrame]:
+        """
+        Generates a dictionary with all available `vot_purpose` with their intensity as a `pd.DataFrame`.
+        """
+        _vot_dict = defaultdict(pd.DataFrame)
+        for purpose in trip_types:
+            vot_var_name = f"vot_{purpose}"
+            partofday_trip_purpose_name = f"{self.partofday.config_value}_{purpose}"
+            partofday_trip_purpose_intensity_name = (
+                "intensity_" + partofday_trip_purpose_name
+            )
+            # read and set the vot's
+            _vot_dict[vot_var_name] = self.values_of_time.loc[
+                self.values_of_time["trip_types"] == purpose, "value_of_time"
+            ].item()
+            # read and set the intensities
+            _vot_dict[partofday_trip_purpose_intensity_name] = (
+                self.intensities[partofday_trip_purpose_name] / 24
+            )
+        return dict(_vot_dict)
+
     def calc_vlh(self) -> pd.DataFrame:
         def _get_range(height: float) -> str:
             for range_tuple in self.inundation_height_ranges:
@@ -241,30 +244,6 @@ class Losses:
                 if x <= height <= y:
                     return f"{x}_{y}"
             raise ValueError(f"No matching range found for height {height}")
-
-        def _set_vot_intensity_per_trip_purpose(
-            purposes: list,
-        ) -> dict[str, pd.DataFrame]:
-            """
-            Generates a dictionary with all available `vot_purpose` with their intensity as a `pd.DataFrame`.
-            """
-
-            _vot_dict = defaultdict(pd.DataFrame)
-            for purpose in purposes:
-                vot_var_name = f"vot_{purpose}"
-                partofday_trip_purpose_name = self.partofday + f"_{purpose}"
-                partofday_trip_purpose_intensity_name = (
-                    "intensity_" + partofday_trip_purpose_name
-                )
-                # read and set the vot's
-                _vot_dict[vot_var_name] = self.values_of_time.loc[
-                    self.values_of_time["trip_types"] == purpose, "value_of_time"
-                ].item()
-                # read and set the intensities
-                _vot_dict[partofday_trip_purpose_intensity_name] = (
-                    self.intensities[partofday_trip_purpose_name] / 24
-                )
-            return dict(_vot_dict)
 
         # shape vlh
         vlh = pd.DataFrame(
@@ -289,8 +268,9 @@ class Losses:
         )
 
         # set vot values for trip_types
-        _vot_intensity_per_trip_collection = _set_vot_intensity_per_trip_purpose(
-            trip_types
+        _trip_types = ["business" "commute" "freight" "other"]
+        _vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose(
+            _trip_types
         )
 
         # for each link and for each event calculate vlh
@@ -313,7 +293,7 @@ class Losses:
                 ].item()
 
                 # get vlh_trip_type_event
-                for trip_type in trip_types:
+                for trip_type in _trip_types:
                     intensity_trip_type = _vot_intensity_per_trip_collection[
                         f"intensity_{trip_type}"
                     ]

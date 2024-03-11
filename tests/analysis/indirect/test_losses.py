@@ -1,4 +1,3 @@
-from collections import defaultdict
 import itertools
 from pathlib import Path
 
