@@ -19,28 +19,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from ra2ce.analysis.analysis_config_wrapper import (
-    AnalysisConfigWrapper,
+from pathlib import Path
+from typing import Optional
+
+from geopandas import GeoDataFrame
+
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
+    AnalysisSectionDirect,
 )
-from ra2ce.analysis.indirect import analyses_indirect
-from ra2ce.configuration.config_wrapper import ConfigWrapper
-from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
+from ra2ce.analysis.analysis_protocol import AnalysisProtocol
+from ra2ce.network.graph_files.network_file import NetworkFile
 
 
-class IndirectAnalysisRunner(AnalysisRunner):
-    def __str__(self) -> str:
-        return "Indirect Analysis Runner"
-
-    @staticmethod
-    def can_run(ra2ce_input: ConfigWrapper) -> bool:
-        if (
-            not ra2ce_input.analysis_config
-            or not ra2ce_input.analysis_config.config_data.indirect
-        ):
-            return False
-        return True
-
-    def run(self, analysis_config: AnalysisConfigWrapper) -> None:
-        analyses_indirect.IndirectAnalyses(
-            analysis_config.config_data, analysis_config.graph_files
-        ).execute()
+class AnalysisDirectProtocol(AnalysisProtocol):
+    graph_file: NetworkFile
+    analysis: AnalysisSectionDirect
+    input_path: Path
+    output_path: Path
+    result: Optional[GeoDataFrame]
