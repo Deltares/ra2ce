@@ -79,7 +79,7 @@ class TestAnalysisCollection:
         assert isinstance(_collection, AnalysisCollection)
         assert _collection.direct_analyses[0].analysis.analysis == analysis
 
-    @pytest.mark.skip("Not implemented yet")
+    @pytest.mark.skip("Not implemented yet #317")
     @pytest.mark.parametrize(
         "analysis",
         [
