@@ -46,6 +46,9 @@ from ra2ce.analysis.indirect.origin_closest_destination import OriginClosestDest
 from ra2ce.analysis.indirect.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
 )
+from ra2ce.analysis.indirect.weighing_analysis.weighing_analysis_factory import (
+    WeighingAnalysisFactory,
+)
 from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.network.networks_utils import buffer_geometry, graph_to_gdf, graph_to_gpkg
 
@@ -106,50 +109,9 @@ class IndirectAnalyses:
         _diff_value_list = []
         _detour_exist_list = []
 
-        class LengthWeighingAnalysis:
-            weighing_data: dict
-
-            def calculate_distance(self) -> float:
-                return np.nan
-
-            def calculate_alternative_distance(self, alt_dist: float) -> float:
-                return alt_dist
-
-            def extend_graph(self, gdf_graph: gpd.GeoDataFrame) -> None:
-                return
-
-        class TimeWeighingAnalysis:
-            time_list: list
-            weighing_data: dict
-
-            def calculate_time(self) -> float:
-                _calculated_time = round(
-                    (self.weighing_data["length"] * 1e-3)
-                    / self.weighing_data["avgspeed"],
-                    2,
-                )  # in hours and avg speed in km/h
-                self.weighing_data[WeighingEnum.TIME.config_value] = _calculated_time
-                return round(_calculated_time, 2)
-
-            def calculate_alternative_distance(self, alt_dist: float) -> float:
-                alt_time = (alt_dist * 1e-3) / self.weighing_data[
-                    "avgspeed"
-                ]  # in hours
-                self.time_list.append(self.calculate_time())
-                return alt_time
-
-            def calculate_distance(self) -> float:
-                self.time_list.append(self.calculate_time())
-                return self.time_list[-1]
-
-            def extend_graph(self, gdf_graph: gpd.GeoDataFrame) -> None:
-                gdf_graph[WeighingEnum.TIME.config_value] = self.time_list
-
-        _calculator = LengthWeighingAnalysis()
-        if analysis.weighing == WeighingEnum.TIME:
-            _calculator = TimeWeighingAnalysis()
+        _weighing_analyser = WeighingAnalysisFactory.get_analysis(analysis.weighing)
         for e_remove in list(graph.edges.data(keys=True)):
-            u, v, k, _calculator.weighing_data = e_remove
+            u, v, k, _weighing_analyser.weighing_data = e_remove
 
             # if data['highway'] in attr_list:
             # remove the edge
@@ -160,7 +122,7 @@ class IndirectAnalyses:
                     graph, u, v, weight=WeighingEnum.LENGTH.config_value
                 )
                 alt_nodes = nx.dijkstra_path(graph, u, v)
-                alt_value = _calculator.calculate_alternative_distance(alt_dist)
+                alt_value = _weighing_analyser.calculate_alternative_distance(alt_dist)
 
                 # append alternative route information
                 _alt_value_list.append(alt_value)
@@ -168,22 +130,24 @@ class IndirectAnalyses:
                 _diff_value_list.append(
                     round(
                         alt_value
-                        - _calculator.weighing_data[analysis.weighing.config_value],
+                        - _weighing_analyser.weighing_data[
+                            analysis.weighing.config_value
+                        ],
                         2,
                     )
                 )
                 _detour_exist_list.append(1)
             else:
-                _alt_value_list.append(_calculator.calculate_distance())
+                _alt_value_list.append(_weighing_analyser.calculate_distance())
                 _alt_nodes_list.append(np.NaN)
                 _diff_value_list.append(np.NaN)
                 _detour_exist_list.append(0)
 
             # add edge again to the graph
-            graph.add_edge(u, v, k, **_calculator.weighing_data)
+            graph.add_edge(u, v, k, **_weighing_analyser.weighing_data)
 
         # Add the new columns to the geodataframe
-        _calculator.extend_graph(_gdf_graph)
+        _weighing_analyser.extend_graph(_gdf_graph)
         _gdf_graph[f"alt_{analysis.weighing.config_value}"] = _alt_value_list
         _gdf_graph["alt_nodes"] = _alt_nodes_list
         _gdf_graph[f"diff_{analysis.weighing.config_value}"] = _diff_value_list
@@ -399,33 +363,22 @@ class IndirectAnalyses:
                 columns.insert(2, "rfid")
 
             df_calculated = pd.DataFrame(columns=columns)
+            _weighing_analyser = WeighingAnalysisFactory.get_analysis(analysis.weighing)
 
             for edges in edges_remove:
-                u, v, k, edata = edges
-                time = round(
-                    (edata["length"] * 1e-3) / edata["avgspeed"], 2
-                )  # in hours and avg speed in km/h
+                u, v, k, _weighing_analyser.weighing_data = edges
+
                 if nx.has_path(graph, u, v):
                     alt_dist = nx.dijkstra_path_length(
                         graph, u, v, weight=WeighingEnum.LENGTH.config_value
                     )
                     alt_nodes = nx.dijkstra_path(graph, u, v)
                     connected = 1
-                    if analysis.weighing == WeighingEnum.TIME:
-                        alt_time = round(
-                            (alt_dist * 1e-3) / edata["avgspeed"], 2
-                        )  # in hours
-                        alt_value = alt_time
-                    else:
-                        alt_value = alt_dist
-
+                    alt_value = _weighing_analyser.calculate_alternative_distance(
+                        alt_dist
+                    )
                 else:
-                    if analysis.weighing == WeighingEnum.TIME:
-                        time = time
-                        alt_value = time
-                    else:
-                        alt_value = np.NaN
-
+                    alt_value = _weighing_analyser.calculate_distance()
                     alt_nodes, connected = np.NaN, 0
 
                 data = {
@@ -435,12 +388,10 @@ class IndirectAnalyses:
                     "alt_nodes": [alt_nodes],
                     "connected": [connected],
                 }
-
-                if analysis.weighing == WeighingEnum.TIME:
-                    data["time"] = [time]
+                _weighing_analyser.extend_graph(data)
 
                 if "rfid" in gdf:
-                    data["rfid"] = [str(edata["rfid"])]
+                    data["rfid"] = [str(_weighing_analyser.weighing_data["rfid"])]
 
                 df_calculated = pd.concat(
                     [df_calculated, pd.DataFrame(data)], ignore_index=True
