@@ -38,11 +38,6 @@ class AnalysisDirectProtocol(AnalysisProtocol):
     output_path: Path
     result: Optional[GeoDataFrame]
 
-    def __init__(
-        self, graph_file: NetworkFile, analysis: AnalysisSectionDirect
-    ) -> None:
-        pass
-
     def execute(self) -> GeoDataFrame:  # TODO make it a result object
         """
         Execute the analysis on the given graph/network with the given analysis parameters.
