@@ -11,7 +11,7 @@ from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
 from tests import test_data
 
 
-class MockEffectivenessMeasures(EffectivenessMeasures):
+class MockInvalidEffectivenessMeasures(EffectivenessMeasures):
     def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionDirect):
         """
         This class is only meant to inherit from `Effectiveness measures` and allow the partial testing of certain methods for pure code coverage reasons.
@@ -99,10 +99,12 @@ class TestEffectivenessMeasures:
     )
     def test_knmi_correction_with_invalid_duration_raises(self, duration: int):
         # 1. Define test data.
-        _measures = MockEffectivenessMeasures(None, None)
+        _measures = MockInvalidEffectivenessMeasures(None, None)
+
         # 2. Run test.
         with pytest.raises(ValueError) as exc_err:
             _measures._knmi_correction(None, duration)
+
         # 3. Verify final expectations.
         assert str(exc_err.value) == "Wrong duration configured, has to be 10 or 60"
 
@@ -115,7 +117,7 @@ class TestEffectivenessMeasures:
     )
     def test_knmi_correction_with_valid_duration(self, duration: int):
         # 1. Define test data.
-        _measures = MockEffectivenessMeasures(None, None)
+        _measures = MockInvalidEffectivenessMeasures(None, None)
         df_data = {"length": 42, "coefficient": {"length": 24, "max": 42}}
         _dataframe = pd.DataFrame(df_data)
 
@@ -127,7 +129,7 @@ class TestEffectivenessMeasures:
 
     def test_calculate_effectiveness(self):
         # 1. Define test data.
-        _measures = MockEffectivenessMeasures(None, None)
+        _measures = MockInvalidEffectivenessMeasures(None, None)
         _name = "standard"
         df_data = {
             "slope_0015_m": range(0, 4),
@@ -154,7 +156,7 @@ class TestEffectivenessMeasures:
 
     def test_calculate_strategy_costs_with_invalid_data_raises(self):
         # 1. Define test data
-        _measures = MockEffectivenessMeasures(None, None)
+        _measures = MockInvalidEffectivenessMeasures(None, None)
         _costs_dict = {
             "costs": [2.4, 4.2, 24, 42],
             "on_column": {
@@ -178,7 +180,7 @@ class TestEffectivenessMeasures:
 
     def test_calculate_stragey_costs_with_valid_data(self):
         # 1. Define test data
-        _measures = MockEffectivenessMeasures(None, None)
+        _measures = MockInvalidEffectivenessMeasures(None, None)
         _costs_dict = {
             "costs": {
                 "one_strategy": 1,
@@ -212,11 +214,11 @@ class TestEffectivenessMeasures:
         assert isinstance(_costs, pd.DataFrame)
 
     @pytest.mark.skip(
-        reason="TODO: Is this being used? NPV is deprecated and won't run calc_npv."
+        reason="TODO: Is this being used? NPV is deprecated and won't run calc_npv. #319"
     )
     def test_calculate_cost_benefit_analyses(self):
         # 1. Define test data.
-        _measures = MockEffectivenessMeasures(None, None)
+        _measures = MockInvalidEffectivenessMeasures(None, None)
         _measures.evaluation_period = 1
         _measures.climate_factor = 24
         _measures.interest_rate = 0.42
@@ -245,7 +247,7 @@ class TestEffectivenessMeasures:
 
     def test_calculate_cost_reduction(self):
         # 1. Define test data.
-        _measures = MockEffectivenessMeasures(None, None)
+        _measures = MockInvalidEffectivenessMeasures(None, None)
         _measures.return_period = 1
         _measures.repair_costs = 24
         _measures.interest_rate = 0.42
