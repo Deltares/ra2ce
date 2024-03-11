@@ -98,7 +98,7 @@ class TestLosses:
         )
         _mi = list(
             itertools.product(
-                ["freight", "commute", "business", "other"], ["vehicle_loss_hour"]
+                ["freight", "commute", "business", "other"], ["value_of_time"]
             )
         )
         _mi_idx = pd.MultiIndex.from_tuples(_mi, names=["A", "B"])
