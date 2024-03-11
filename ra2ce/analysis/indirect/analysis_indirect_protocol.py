@@ -28,11 +28,11 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol
-from ra2ce.network.graph_files.network_file import NetworkFile
+from ra2ce.network.graph_files.graph_file import GraphFile
 
 
 class AnalysisIndirectProtocol(AnalysisProtocol):
-    graph_file: NetworkFile
+    graph_file: GraphFile
     analysis: AnalysisSectionIndirect
     input_path: Path
     output_path: Path
