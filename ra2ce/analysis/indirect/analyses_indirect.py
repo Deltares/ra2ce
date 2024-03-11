@@ -112,10 +112,11 @@ class IndirectAnalyses:
             # if data['highway'] in attr_list:
             # remove the edge
             graph.remove_edge(u, v, k)
-            data["time"] = round(
-                (data["length"] * 1e-3) / data["avgspeed"], 2
-            )  # in hours and avg speed in km/h
-            _time = round(data["time"], 2)
+            if analysis.weighing == WeighingEnum.TIME:
+                data["time"] = round(
+                    (data["length"] * 1e-3) / data["avgspeed"], 2
+                )  # in hours and avg speed in km/h
+                _time = round(data["time"], 2)
             if nx.has_path(graph, u, v):
                 # calculate the alternative distance if that edge is unavailable
                 alt_dist = nx.dijkstra_path_length(
@@ -1274,10 +1275,10 @@ class IndirectAnalyses:
                             opt_routes_with_hazard,
                         ) = analyzer.multi_link_origin_closest_destination()
 
-                        (
-                            opt_routes_with_hazard
-                        ) = analyzer.difference_length_with_without_hazard(
-                            opt_routes_with_hazard, opt_routes_without_hazard
+                        (opt_routes_with_hazard) = (
+                            analyzer.difference_length_with_without_hazard(
+                                opt_routes_with_hazard, opt_routes_without_hazard
+                            )
                         )
 
                 else:
