@@ -97,7 +97,7 @@ class TestDirectDamage:
             df[error_rows]
         )
 
-    @pytest.mark.skip(reason="To do: Needs refining on what needs to be verified.")
+    @pytest.mark.skip(reason="To do: Needs refining on what needs to be verified. (#319)")
     def test_event_based_damage_calculation_huizinga(
         self, event_input_output: pytest.fixture
     ):
@@ -277,7 +277,7 @@ class TestDirectDamage:
         )
 
     @pytest.mark.skip(
-        reason="To do: Needs refining on what (and how) needs to be verified."
+        reason="To do: Needs refining on what (and how) needs to be verified. (#319)"
     )
     def test_old_event_based_damage_calculation_manualfunction(
         self, event_input_output: pytest.fixture

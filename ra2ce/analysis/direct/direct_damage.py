@@ -19,9 +19,9 @@ from ra2ce.network.graph_files.network_file import NetworkFile
 class DirectDamage(AnalysisDirectProtocol):
     graph_file: NetworkFile
     analysis: AnalysisSectionDirect
-    input_path: Path = None
-    output_path: Path = None
-    result: GeoDataFrame = None
+    input_path: Path
+    output_path: Path
+    result: GeoDataFrame
 
     def __init__(
         self,
@@ -34,10 +34,11 @@ class DirectDamage(AnalysisDirectProtocol):
         self.analysis = analysis
         self.input_path = input_path
         self.output_path = output_path
+        self.result = None
 
     def execute(self) -> GeoDataFrame:
 
-        def _rename_road_gdf_to_conventions(road_gdf_columns: Any) -> Any:
+        def _rename_road_gdf_to_conventions(road_gdf_columns: list[str]) -> list[str]:
             """
             Rename the columns in the road_gdf to the conventions of the ra2ce documentation
 

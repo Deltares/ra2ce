@@ -18,9 +18,9 @@ from ra2ce.network.graph_files.network_file import NetworkFile
 class EffectivenessMeasures(AnalysisDirectProtocol):
     graph_file: NetworkFile
     analysis: AnalysisSectionDirect
-    input_path: Path = None
-    output_path: Path = None
-    result: gpd.GeoDataFrame = None
+    input_path: Path
+    output_path: Path
+    result: gpd.GeoDataFrame
 
     def __init__(
         self,
@@ -33,6 +33,7 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
         self.analysis = analysis
         self.input_path = input_path
         self.output_path = output_path
+        self.result = None
 
         self.return_period = analysis.return_period  # years
         self.repair_costs = analysis.repair_costs  # euro
@@ -75,7 +76,7 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
         df_lookup = pd.read_csv(self._measures_csv, index_col="strategies")
         return df_lookup.transpose().to_dict()
 
-    def _create_feature_table(self, file_path: Path):
+    def _create_feature_table(self, file_path: Path) -> pd.DataFrame:
         """This function loads a table of features from the input folder"""
         logging.info("Loading feature dataframe...")
         gdf = gpd.read_file(file_path, engine="pyogrio")
@@ -114,7 +115,7 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
         df.to_csv(os.path.join(path, file.replace(".gpkg", ".csv")), index=False)
         return df
 
-    def _load_table(self, path, file):
+    def _load_table(self, path: Path, file: str) -> pd.DataFrame:
         """This method reads the dataframe created from"""
         file_path = path / file
         df = pd.read_csv(file_path)
@@ -211,7 +212,9 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
             ]
         ]
 
-    def _calculate_strategy_effectiveness(self, df, effectiveness_dict):
+    def _calculate_strategy_effectiveness(
+        self, df: pd.DataFrame, effectiveness_dict: dict
+    ) -> pd.DataFrame:
         """This function calculates the efficacy for each strategy"""
 
         columns = [
@@ -322,11 +325,11 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
     def _cost_benefit_analysis(self, effectiveness_dict) -> tuple[pd.DataFrame, dict]:
         """This method performs cost benefit analysis"""
 
-        def _calc_npv(x, cols):
+        def _calc_npv(x: pd.DataFrame, cols: list[str]) -> float:
             pv = np.npv(self.interest_rate, [0] + list(x[cols]))
             return pv
 
-        def _calc_npv_factor(factor):
+        def _calc_npv_factor(factor: float) -> float:
             cols = np.linspace(
                 1,
                 1 + (factor * self.evaluation_period),
@@ -391,7 +394,7 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
         costs = costs_dict["costs"]
         columns = costs_dict["on_column"]
 
-        def _columns_check(df, columns) -> bool:
+        def _columns_check(df: pd.DataFrame, columns: list[str]) -> bool:
             cols_check = []
             for col in columns:
                 cols_check.extend(columns[col].split(";"))
@@ -443,7 +446,7 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
 
         gdf_in = self.graph_file.get_graph()
 
-        if self.analysis.create_table is True:
+        if self.analysis.create_table:
             df = self._create_feature_table(
                 self.input_path.joinpath("direct", self.analysis.file_name)
             )
