@@ -79,7 +79,7 @@ class IndirectAnalyses:
             self.hazard_names_df = pd.DataFrame(data=None)
             self.config.hazard_names = list()
 
-    def _analyize_single_link_redundancy(
+    def _analyse_single_link_redundancy(
         self, graph: nx.Graph, analysis: AnalysisSectionIndirect
     ):
         """This is the function to analyse roads with a single link disruption and an alternative route.
@@ -101,58 +101,89 @@ class IndirectAnalyses:
         _gdf_graph = osmnx.graph_to_gdfs(graph, nodes=False)
 
         # list for the length of the alternative routes
-        _time_list = []
         _alt_value_list = []
         _alt_nodes_list = []
         _diff_value_list = []
         _detour_exist_list = []
+
+        class LengthWeighingAnalysis:
+            weighing_data: dict
+
+            def calculate_distance(self) -> float:
+                return np.nan
+
+            def calculate_alternative_distance(self, alt_dist: float) -> float:
+                return alt_dist
+
+            def extend_graph(self, gdf_graph: gpd.GeoDataFrame) -> None:
+                return
+
+        class TimeWeighingAnalysis:
+            time_list: list
+            weighing_data: dict
+
+            def calculate_time(self) -> float:
+                _calculated_time = round(
+                    (self.weighing_data["length"] * 1e-3)
+                    / self.weighing_data["avgspeed"],
+                    2,
+                )  # in hours and avg speed in km/h
+                self.weighing_data[WeighingEnum.TIME.config_value] = _calculated_time
+                return round(_calculated_time, 2)
+
+            def calculate_alternative_distance(self, alt_dist: float) -> float:
+                alt_time = (alt_dist * 1e-3) / self.weighing_data[
+                    "avgspeed"
+                ]  # in hours
+                self.time_list.append(self.calculate_time())
+                return alt_time
+
+            def calculate_distance(self) -> float:
+                self.time_list.append(self.calculate_time())
+                return self.time_list[-1]
+
+            def extend_graph(self, gdf_graph: gpd.GeoDataFrame) -> None:
+                gdf_graph[WeighingEnum.TIME.config_value] = self.time_list
+
+        _calculator = LengthWeighingAnalysis()
+        if analysis.weighing == WeighingEnum.TIME:
+            _calculator = TimeWeighingAnalysis()
         for e_remove in list(graph.edges.data(keys=True)):
-            u, v, k, data = e_remove
+            u, v, k, _calculator.weighing_data = e_remove
 
             # if data['highway'] in attr_list:
             # remove the edge
             graph.remove_edge(u, v, k)
-            if analysis.weighing == WeighingEnum.TIME:
-                data["time"] = round(
-                    (data["length"] * 1e-3) / data["avgspeed"], 2
-                )  # in hours and avg speed in km/h
-                _time = round(data["time"], 2)
             if nx.has_path(graph, u, v):
                 # calculate the alternative distance if that edge is unavailable
                 alt_dist = nx.dijkstra_path_length(
                     graph, u, v, weight=WeighingEnum.LENGTH.config_value
                 )
                 alt_nodes = nx.dijkstra_path(graph, u, v)
-                if analysis.weighing == WeighingEnum.TIME:
-                    alt_time = (alt_dist * 1e-3) / data["avgspeed"]  # in hours
-                    alt_value = alt_time
-                    _time_list.append(_time)
-                else:
-                    alt_value = alt_dist
+                alt_value = _calculator.calculate_alternative_distance(alt_dist)
 
                 # append alternative route information
                 _alt_value_list.append(alt_value)
                 _alt_nodes_list.append(alt_nodes)
                 _diff_value_list.append(
-                    round(alt_value - data[analysis.weighing.config_value], 2)
+                    round(
+                        alt_value
+                        - _calculator.weighing_data[analysis.weighing.config_value],
+                        2,
+                    )
                 )
                 _detour_exist_list.append(1)
             else:
-                if analysis.weighing == WeighingEnum.TIME:
-                    _time_list.append(_time)
-                    _alt_value_list.append(_time)
-                else:
-                    _alt_value_list.append(np.NaN)
+                _alt_value_list.append(_calculator.calculate_distance())
                 _alt_nodes_list.append(np.NaN)
                 _diff_value_list.append(np.NaN)
                 _detour_exist_list.append(0)
 
             # add edge again to the graph
-            graph.add_edge(u, v, k, **data)
+            graph.add_edge(u, v, k, **_calculator.weighing_data)
 
         # Add the new columns to the geodataframe
-        if analysis.weighing == WeighingEnum.TIME:
-            _gdf_graph["time"] = _time_list
+        _calculator.extend_graph(_gdf_graph)
         _gdf_graph[f"alt_{analysis.weighing.config_value}"] = _alt_value_list
         _gdf_graph["alt_nodes"] = _alt_nodes_list
         _gdf_graph[f"diff_{analysis.weighing.config_value}"] = _diff_value_list
@@ -1138,7 +1169,7 @@ class IndirectAnalyses:
 
             if analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY:
                 g = self.graph_files.base_graph.get_graph()
-                gdf = self._analyize_single_link_redundancy(g, analysis)
+                gdf = self._analyse_single_link_redundancy(g, analysis)
             elif analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_REDUNDANCY:
                 g = self.graph_files.base_graph_hazard.get_graph()
                 gdf = self.multi_link_redundancy(g, analysis)
@@ -1216,7 +1247,7 @@ class IndirectAnalyses:
                 AnalysisIndirectEnum.MULTI_LINK_LOSSES,
             ]:
                 g = self.graph_files.base_graph_hazard.get_graph()
-                gdf = self._analyize_single_link_redundancy(g, analysis)
+                gdf = self._analyse_single_link_redundancy(g, analysis)
                 gdf = self.single_link_losses(gdf, analysis)
             elif (
                 analysis.analysis
