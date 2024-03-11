@@ -21,6 +21,7 @@
 
 from ast import literal_eval
 from collections import defaultdict
+import logging
 
 from pathlib import Path
 
@@ -46,7 +47,9 @@ class Losses:
         self.maximum: float = analysis.maximum_jam
         self.partofday: PartOfDayEnum = analysis.partofday
         self.performance_metric = analysis.performance
-        self.network: gpd.GeoDataFrame = self._load_gdf(
+
+        # Load Dataframes
+        self.network = self._load_gdf(
             self.losses_input_path.joinpath("network.geojson")
         )
         self.intensities = self._load_df_from_csv(
@@ -57,32 +60,23 @@ class Losses:
         self.criticality_data = self._load_df_from_csv(
             self.losses_input_path.joinpath("criticality_data.csv"), []
         )
-        self.resilience_curve: pd.DataFrame = self._load_df_from_csv(
+        self.resilience_curve = self._load_df_from_csv(
             self.losses_input_path.joinpath(analysis.resilience_curve_file),
             ["disruption_steps", "functionality_loss_ratio"],
         )
         self.values_of_time = self._load_df_from_csv(
             self.losses_input_path.joinpath("values_of_time.csv"), []
         )
-        self.link_types: list = self._get_link_types_heights_ranges()[0]
-        self.inundation_height_ranges: pd.DataFrame = (
-            self._get_link_types_heights_ranges()[1]
-        )
-
-    @staticmethod
-    def values_of_time(file_path: Path) -> pd.DataFrame:
-        """This function is to calculate vehicle loss hours based on an input table
-        with value of time per type of transport, usage and value_of_reliability"""
-        df_lookup = pd.read_csv(file_path, index_col="transport_type")
-        lookup_dict = df_lookup.transpose().to_dict()
-        return lookup_dict
 
     def _load_df_from_csv(
         self,
         csv_path: Path,
         columns_to_interpret: list[str],
-        # path: Path, file: str, index_col: str = "", columns_to_interpret=None
     ) -> pd.DataFrame:
+        if not csv_path.exists():
+            logging.warning("No `csv` file found at {}.".format(csv_path))
+            return pd.DataFrame()
+
         _csv_dataframe = pd.read_csv(csv_path)
         if any(columns_to_interpret):
             _csv_dataframe[columns_to_interpret] = _csv_dataframe[
@@ -92,8 +86,10 @@ class Losses:
 
     def _load_gdf(self, gdf_path: Path) -> gpd.GeoDataFrame:
         """This method reads the dataframe created from a .csv"""
-        gdf = gpd.read_file(gdf_path, index_col="link_id")
-        return gdf
+        if gdf_path.exists():
+            return gpd.read_file(gdf_path, index_col="link_id")
+        logging.warning("No `gdf` file found at {}.".format(gdf_path))
+        return gpd.GeoDataFrame()
 
     def traffic_shockwave(
         self, vlh: pd.DataFrame, capacity: pd.Series, intensity: pd.Series
@@ -238,8 +234,11 @@ class Losses:
         return dict(_vot_dict)
 
     def calc_vlh(self) -> pd.DataFrame:
+        _link_types_heights_ranges = self._get_link_types_heights_ranges()
+        _inundation_height_ranges = _link_types_heights_ranges[1]
+
         def _get_range(height: float) -> str:
-            for range_tuple in self.inundation_height_ranges:
+            for range_tuple in _inundation_height_ranges:
                 x, y = range_tuple
                 if x <= height <= y:
                     return f"{x}_{y}"
@@ -318,7 +317,7 @@ class Losses:
         vlh = self.calc_vlh()
         return vlh
 
-    def _get_link_types_heights_ranges(self) -> tuple:
+    def _get_link_types_heights_ranges(self) -> tuple[list, pd.DataFrame]:
         _link_types = set()
         _inundation_height_ranges = set()
 
