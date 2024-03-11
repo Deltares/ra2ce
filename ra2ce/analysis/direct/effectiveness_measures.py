@@ -120,8 +120,7 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
         df = pd.read_csv(file_path)
         return df
 
-    @staticmethod
-    def _knmi_correction(df: pd.DataFrame, duration: int = 60) -> pd.DataFrame:
+    def _knmi_correction(self, df: pd.DataFrame, duration: int = 60) -> pd.DataFrame:
         """This function corrects the length of each segment depending on a KNMI factor.
         This factor is calculated using an exponential relation and was calculated using an analysis on all line elements
         a relation is establisched for a 10 minute or 60 minute rainfall period
@@ -150,9 +149,8 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
         )
         return df
 
-    @staticmethod
     def _calculate_effectiveness(
-        df: pd.DataFrame, name: str = "standard"
+        self, df: pd.DataFrame, name: str = "standard"
     ) -> pd.DataFrame:
         """This function calculates effectiveness, based on a number of columns:
         'dichtbij_m', 'ver_hoger_m', 'hwa_afw_ho_m', 'gw_hwa_m', slope_0015_m' and 'slope_001_m'
@@ -385,8 +383,9 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
 
         return df_cba, costs_dict
 
-    @staticmethod
-    def _calculate_strategy_costs(df: pd.DataFrame, costs_dict: dict) -> pd.DataFrame:
+    def _calculate_strategy_costs(
+        self, df: pd.DataFrame, costs_dict: dict
+    ) -> pd.DataFrame:
         """Method to calculate costs, benefits with net present value"""
 
         costs = costs_dict["costs"]

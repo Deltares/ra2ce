@@ -99,9 +99,10 @@ class TestEffectivenessMeasures:
     )
     def test_knmi_correction_with_invalid_duration_raises(self, duration: int):
         # 1. Define test data.
+        _measures = MockEffectivenessMeasures(None, None)
         # 2. Run test.
         with pytest.raises(ValueError) as exc_err:
-            EffectivenessMeasures._knmi_correction(None, duration)
+            _measures._knmi_correction(None, duration)
         # 3. Verify final expectations.
         assert str(exc_err.value) == "Wrong duration configured, has to be 10 or 60"
 
@@ -114,17 +115,19 @@ class TestEffectivenessMeasures:
     )
     def test_knmi_correction_with_valid_duration(self, duration: int):
         # 1. Define test data.
+        _measures = MockEffectivenessMeasures(None, None)
         df_data = {"length": 42, "coefficient": {"length": 24, "max": 42}}
         _dataframe = pd.DataFrame(df_data)
 
         # 2. Run test.
-        _correction = EffectivenessMeasures._knmi_correction(_dataframe, duration)
+        _correction = _measures._knmi_correction(_dataframe, duration)
 
         # 3. Verify final expectations.
         assert isinstance(_correction, pd.DataFrame)
 
     def test_calculate_effectiveness(self):
         # 1. Define test data.
+        _measures = MockEffectivenessMeasures(None, None)
         _name = "standard"
         df_data = {
             "slope_0015_m": range(0, 4),
@@ -144,15 +147,14 @@ class TestEffectivenessMeasures:
         _dataframe = pd.DataFrame(df_data)
 
         # 2. Run test.
-        _correction = EffectivenessMeasures._calculate_effectiveness(
-            _dataframe, "standard"
-        )
+        _correction = _measures._calculate_effectiveness(_dataframe, "standard")
 
         # 3. Verify final expectations.
         assert isinstance(_correction, pd.DataFrame)
 
     def test_calculate_strategy_costs_with_invalid_data_raises(self):
         # 1. Define test data
+        _measures = MockEffectivenessMeasures(None, None)
         _costs_dict = {
             "costs": [2.4, 4.2, 24, 42],
             "on_column": {
@@ -167,7 +169,7 @@ class TestEffectivenessMeasures:
 
         # 2. Run test.
         with pytest.raises(ValueError) as exc_err:
-            EffectivenessMeasures._calculate_strategy_costs(_dataframe, _costs_dict)
+            _measures._calculate_strategy_costs(_dataframe, _costs_dict)
 
         # 3. Verify expectations.
         assert "Wrong column configured in effectiveness_measures csv file." in str(
@@ -176,6 +178,7 @@ class TestEffectivenessMeasures:
 
     def test_calculate_stragey_costs_with_valid_data(self):
         # 1. Define test data
+        _measures = MockEffectivenessMeasures(None, None)
         _costs_dict = {
             "costs": {
                 "one_strategy": 1,
@@ -203,9 +206,7 @@ class TestEffectivenessMeasures:
         _dataframe = pd.DataFrame(df_data)
 
         # 2. Run test.
-        _costs = EffectivenessMeasures._calculate_strategy_costs(
-            _dataframe, _costs_dict
-        )
+        _costs = _measures._calculate_strategy_costs(_dataframe, _costs_dict)
 
         # 3. Verify expectations.
         assert isinstance(_costs, pd.DataFrame)
