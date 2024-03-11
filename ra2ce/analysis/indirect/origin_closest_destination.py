@@ -34,7 +34,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
 )
-from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.network.graph_files.graph_file import GraphFile
 
 
 class OriginClosestDestination:
@@ -49,7 +49,8 @@ class OriginClosestDestination:
         self,
         config: AnalysisConfigData,
         analysis: AnalysisSectionIndirect,
-        graph_files: GraphFilesCollection,
+        graph_file: GraphFile,
+        graph_file_hazard: GraphFile,
         hazard_names_df: pd.DataFrame,
     ):
         self.crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGEABLE
@@ -68,7 +69,8 @@ class OriginClosestDestination:
         )
         self.analysis = analysis
         self.config = config
-        self.graph_files = graph_files
+        self.graph_file = graph_file
+        self.graph_file_hazard = graph_file_hazard
 
         self.hazard_names = hazard_names_df
 
@@ -82,7 +84,7 @@ class OriginClosestDestination:
 
     def optimal_route_origin_closest_destination(self):
         """Calculates per origin the location of its closest destination"""
-        graph = self.graph_files.origins_destinations_graph.get_graph()
+        graph = self.graph_file.get_graph()
 
         # Load the origins and destinations
         origins = self.load_origins()
@@ -142,7 +144,7 @@ class OriginClosestDestination:
 
     def multi_link_origin_closest_destination(self):
         """Calculates per origin the location of its closest destination with hazard disruption"""
-        graph = self.graph_files.origins_destinations_graph_hazard.get_graph()
+        graph = self.graph_file_hazard.get_graph()
 
         # Load the origins and destinations
         origins = self.load_origins()

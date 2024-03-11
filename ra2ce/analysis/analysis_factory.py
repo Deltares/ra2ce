@@ -26,10 +26,24 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
     AnalysisDirectEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
+    AnalysisIndirectEnum,
+)
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol
-from ra2ce.analysis.direct.direct_damage import DirectDamage
-from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
+from ra2ce.analysis.direct import DirectDamage, EffectivenessMeasures
+from ra2ce.analysis.indirect import (
+    Losses,
+    MultiLinkIsolatedLocations,
+    MultiLinkLosses,
+    MultiLinkOriginClosestDestination,
+    MultiLinkOriginDestination,
+    MultiLinkRedundancy,
+    OptimalRouteOriginClosestDestination,
+    OptimalRouteOriginDestination,
+    SingleLinkLosses,
+    SingleLinkRedundancy,
+)
 
 
 class AnalysisFactory:
@@ -63,6 +77,90 @@ class AnalysisFactory:
         elif self.analysis.analysis == AnalysisDirectEnum.EFFECTIVENESS_MEASURES:
             return EffectivenessMeasures(
                 analysis_config.graph_files.base_network_hazard,
+                self.analysis,
+                analysis_config.config_data.input_path,
+                analysis_config.config_data.output_path,
+            )
+        elif self.analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY:
+            return SingleLinkRedundancy(
+                analysis_config.graph_files.base_graph,
+                self.analysis,
+                analysis_config.config_data.input_path,
+                analysis_config.config_data.output_path,
+            )
+        elif self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_REDUNDANCY:
+            return MultiLinkRedundancy(
+                analysis_config.graph_files.base_graph_hazard,
+                self.analysis,
+                analysis_config.config_data.input_path,
+                analysis_config.config_data.output_path,
+            )
+        elif (
+            self.analysis.analysis
+            == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION
+        ):
+            return OptimalRouteOriginDestination(
+                analysis_config.graph_files.origins_destinations_graph,
+                self.analysis,
+                analysis_config.config_data.input_path,
+                analysis_config.config_data.output_path,
+            )
+        elif (
+            self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_DESTINATION
+        ):
+            return MultiLinkOriginDestination(
+                analysis_config.graph_files.origins_destinations_graph_hazard,
+                self.analysis,
+                analysis_config.config_data.input_path,
+                analysis_config.config_data.output_path,
+            )
+        elif (
+            self.analysis.analysis
+            == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
+        ):
+            return OptimalRouteOriginClosestDestination(
+                analysis_config.graph_files.origins_destinations_graph,
+                self.analysis,
+                analysis_config.config_data.input_path,
+                analysis_config.config_data.output_path,
+            )
+        elif (
+            self.analysis.analysis
+            == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
+        ):
+            return MultiLinkOriginClosestDestination(
+                analysis_config.graph_files.origins_destinations_graph,
+                analysis_config.graph_files.origins_destinations_graph_hazard,
+                self.analysis,
+                analysis_config.config_data.input_path,
+                analysis_config.config_data.output_path,
+            )
+        elif self.analysis.analysis == AnalysisIndirectEnum.LOSSES:
+            return Losses(
+                analysis_config.graph_files.base_graph_hazard,
+                self.analysis,
+                analysis_config.config_data.input_path,
+                analysis_config.config_data.output_path,
+            )
+        elif self.analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
+            return SingleLinkLosses(
+                analysis_config.graph_files.base_graph_hazard,
+                self.analysis,
+                analysis_config.config_data.input_path,
+                analysis_config.config_data.output_path,
+            )
+        elif self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
+            return MultiLinkLosses(
+                analysis_config.graph_files.base_graph_hazard,
+                self.analysis,
+                analysis_config.config_data.input_path,
+                analysis_config.config_data.output_path,
+            )
+        elif (
+            self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS
+        ):
+            return MultiLinkIsolatedLocations(
+                analysis_config.graph_files.base_graph_hazard,
                 self.analysis,
                 analysis_config.config_data.input_path,
                 analysis_config.config_data.output_path,
