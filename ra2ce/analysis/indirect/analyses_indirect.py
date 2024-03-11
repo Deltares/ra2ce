@@ -40,7 +40,6 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.indirect.losses import Losses
 from ra2ce.analysis.indirect.origin_closest_destination import OriginClosestDestination
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
@@ -48,6 +47,7 @@ from ra2ce.analysis.indirect.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
 )
 from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.network.hazard.hazard_names import HazardNames
 from ra2ce.network.networks_utils import buffer_geometry, graph_to_gdf, graph_to_gpkg
 
 
@@ -61,24 +61,14 @@ class IndirectAnalyses:
 
     config: AnalysisConfigData
     graph_files: GraphFilesCollection
-    hazard_names_df: pd.DataFrame
-
-    _file_name_key = "File name"
-    _ra2ce_name_key = "RA2CE name"
+    hazard_names: HazardNames
 
     def __init__(self, config: AnalysisConfigData, graph_files: GraphFilesCollection):
         self.config = config
         self.graph_files = graph_files
-        if self.config.output_path.joinpath("hazard_names.xlsx").is_file():
-            self.hazard_names_df = pd.read_excel(
-                self.config.output_path.joinpath("hazard_names.xlsx")
-            )
-            self.config.hazard_names = list(
-                set(self.hazard_names_df[self._file_name_key])
-            )
-        else:
-            self.hazard_names_df = pd.DataFrame(data=None)
-            self.config.hazard_names = list()
+        self.hazard_names = HazardNames.from_file(
+            self.config.output_path.joinpath("hazard_names.xlsx")
+        )
 
     def single_link_redundancy(
         self, graph: nx.Graph, analysis: AnalysisSectionIndirect
@@ -262,10 +252,7 @@ class IndirectAnalyses:
         results = []
         master_graph = copy.deepcopy(graph)
         for hazard in self.config.hazard_names:
-            hazard_name = self.hazard_names_df.loc[
-                self.hazard_names_df[self._file_name_key] == hazard,
-                self._ra2ce_name_key,
-            ].values[0]
+            hazard_name = self.hazard_names.get_name(hazard)
 
             graph = copy.deepcopy(master_graph)
             # Create a geodataframe from the full graph
@@ -370,10 +357,7 @@ class IndirectAnalyses:
 
         results = []
         for hazard in self.config.hazard_names:
-            hazard_name = self.hazard_names_df.loc[
-                self.hazard_names_df[self._file_name_key] == hazard,
-                self._ra2ce_name_key,
-            ].values[0]
+            hazard_name = self.hazard_names.get_name(hazard)
 
             gdf_ = gdf.loc[gdf["hazard"] == hazard_name].copy()
             if (
@@ -568,10 +552,7 @@ class IndirectAnalyses:
 
         all_results = []
         for hazard in self.config.hazard_names:
-            hazard_name = self.hazard_names_df.loc[
-                self.hazard_names_df[self._file_name_key] == hazard,
-                self._ra2ce_name_key,
-            ].values[0]
+            hazard_name = self.hazard_names.get_name(hazard)
 
             graph_hz = copy.deepcopy(graph)
 
@@ -836,12 +817,9 @@ class IndirectAnalyses:
 
         # create an empty list to append the df_aggregation to
         aggregation = pd.DataFrame()
-        for i, hazard in enumerate(self.config.hazard_names):
+        for hazard in self.config.hazard_names:
             # for each hazard event
-            hazard_name = self.hazard_names_df.loc[
-                self.hazard_names_df[self._file_name_key] == hazard,
-                self._ra2ce_name_key,
-            ].values[0]
+            hazard_name = self.hazard_names.get_name(hazard)
 
             graph_hz_direct = copy.deepcopy(graph)
             graph_hz_indirect = copy.deepcopy(graph)
@@ -1124,7 +1102,11 @@ class IndirectAnalyses:
                 == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
             ):
                 analyzer = OriginClosestDestination(
-                    self.config, analysis, self.graph_files, self.hazard_names_df
+                    self.config,
+                    analysis,
+                    self.graph_files.origins_destinations_graph,
+                    None,
+                    self.hazard_names.names_df,
                 )
                 (
                     base_graph,
@@ -1154,7 +1136,11 @@ class IndirectAnalyses:
                 == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
             ):
                 analyzer = OriginClosestDestination(
-                    self.config, analysis, self.graph_files, self.hazard_names_df
+                    self.config,
+                    analysis,
+                    self.graph_files.origins_destinations_graph,
+                    self.graph_files.origins_destinations_graph_hazard,
+                    self.hazard_names.names_df,
                 )
 
                 if analysis.calculate_route_without_disruption:
