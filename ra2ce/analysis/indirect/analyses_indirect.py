@@ -43,6 +43,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.indirect.losses import Losses
 from ra2ce.analysis.indirect.origin_closest_destination import OriginClosestDestination
+from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.analysis.indirect.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
 )
@@ -88,64 +89,10 @@ class IndirectAnalyses:
             graph: The NetworkX graph to calculate the single link redundancy on.
             analysis: Dictionary of the configurations for the analysis.
         """
-        # TODO adjust to the right names of the RA2CE tool
-        # if 'road_usage_data_path' in InputDict:
-        #     road_usage_data = pd.read_excel(InputDict.road_usage_data_path)
-        #     road_usage_data.dropna(axis=0, how='all', subset=['vehicle_type'], inplace=True)
-        #     aadt_names = [aadt_name for aadt_name in road_usage_data['attribute_name'] if aadt_name == aadt_name]
-        # else:
-        #     aadt_names = None
-        #     road_usage_data = pd.DataFrame()
-
-        # create a geodataframe from the graph
-        gdf = osmnx.graph_to_gdfs(graph, nodes=False)
-
-        # list for the length of the alternative routes
-        alt_dist_list = []
-        alt_nodes_list = []
-        dif_dist_list = []
-        detour_exist_list = []
-        for e_remove in list(graph.edges.data(keys=True)):
-            u, v, k, data = e_remove
-
-            # if data['highway'] in attr_list:
-            # remove the edge
-            graph.remove_edge(u, v, k)
-
-            if nx.has_path(graph, u, v):
-                # calculate the alternative distance if that edge is unavailable
-                alt_dist = nx.dijkstra_path_length(
-                    graph, u, v, weight=analysis.weighing.config_value
-                )
-                alt_dist_list.append(alt_dist)
-
-                # append alternative route nodes
-                alt_nodes = nx.dijkstra_path(graph, u, v)
-                alt_nodes_list.append(alt_nodes)
-
-                # calculate the difference in distance
-                dif_dist_list.append(alt_dist - data[analysis.weighing.config_value])
-
-                detour_exist_list.append(1)
-            else:
-                alt_dist_list.append(np.NaN)
-                alt_nodes_list.append(np.NaN)
-                dif_dist_list.append(np.NaN)
-                detour_exist_list.append(0)
-
-            # add edge again to the graph
-            graph.add_edge(u, v, k, **data)
-
-        # Add the new columns to the geodataframe
-        gdf["alt_dist"] = alt_dist_list
-        gdf["alt_nodes"] = alt_nodes_list
-        gdf["diff_dist"] = dif_dist_list
-        gdf["detour"] = detour_exist_list
-
-        # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
-        # todo: input here this option
-
-        return gdf
+        _analysis = SingleLinkRedundancy(
+            graph, analysis, self.config.input_path, self.config.output_path
+        )
+        return _analysis.execute()
 
     def single_link_losses(
         self, gdf: gpd.GeoDataFrame, analysis: AnalysisSectionIndirect
