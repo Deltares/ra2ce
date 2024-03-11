@@ -23,16 +23,36 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
     AnalysisSectionIndirect,
 )
+from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
+from ra2ce.network.graph_files.graph_file import GraphFile
 
 
-class Losses:
-    def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionIndirect):
-        self.losses_input_path: Path = config.input_path.joinpath("losses")
+class Losses(AnalysisIndirectProtocol):
+    graph_file: GraphFile
+    analysis: AnalysisSectionIndirect
+    input_path: Path
+    output_path: Path
+    result: GeoDataFrame
+
+    def __init__(
+        self,
+        graph_file: GraphFile,
+        analysis: AnalysisSectionIndirect,
+        input_path: Path,
+        output_path: Path,
+    ):
+        self.graph_file = graph_file
+        self.analysis = analysis
+        self.input_path = input_path
+        self.output_path = output_path
+        self.result = None
+
+        self.losses_input_path: Path = input_path.joinpath("losses")
         self.duration: float = analysis.duration_event
         self.duration_disr: float = analysis.duration_disruption
         self.detour_traffic: float = analysis.fraction_detour
@@ -40,6 +60,9 @@ class Losses:
         self.rest_capacity: float = analysis.rest_capacity
         self.maximum: float = analysis.maximum_jam
         self.partofday: str = analysis.partofday
+
+    def execute(self) -> GeoDataFrame:
+        pass
 
     @staticmethod
     def vehicle_loss_hours(path):
