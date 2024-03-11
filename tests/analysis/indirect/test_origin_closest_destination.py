@@ -33,7 +33,8 @@ class TestOriginClosestDestination:
         _ocd = OriginClosestDestination(
             config=_config_dict,
             analysis=_analysis,
-            graph_files=_graph_files,
+            graph_file=_graph_files.origins_destinations_graph,
+            graph_file_hazard=_graph_files.origins_destinations_graph_hazard,
             hazard_names_df=_hazard_names,
         )
 
