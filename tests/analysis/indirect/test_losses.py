@@ -6,17 +6,18 @@ import pandas as pd
 import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
     AnalysisSectionIndirect,
 )
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.indirect.losses import Losses
 
 
 class TestLosses:
     def test_initialize(self):
         # 1. Define test data
-        _config = AnalysisConfigData(input_path=Path("sth"))
-        _analyses = AnalysisSectionIndirect(
+        _config = AnalysisConfigWrapper()
+        _config.config_data.input_path = Path("sth")
+        _analysis = AnalysisSectionIndirect(
             duration_event=None,
             duration_disruption=None,
             fraction_detour=None,
@@ -27,15 +28,21 @@ class TestLosses:
         )
 
         # 2. Run test.
-        _losses = Losses(_config, _analyses)
+        _losses = Losses(
+            _config.graph_files.base_graph_hazard,
+            _analysis,
+            _config.config_data.input_path,
+            _config.config_data.output_path,
+        )
 
         # 3. Verify final expectations.
         assert isinstance(_losses, Losses)
 
     def test_traffic_shockwave(self):
         # 1. Define test data
-        _config = AnalysisConfigData(input_path=Path("sth"))
-        _analyses = AnalysisSectionIndirect(
+        _config = AnalysisConfigWrapper()
+        _config.config_data.input_path = Path("sth")
+        _analysis = AnalysisSectionIndirect(
             duration_event=60,
             duration_disruption=None,
             fraction_detour=None,
@@ -44,7 +51,12 @@ class TestLosses:
             maximum_jam=None,
             partofday=None,
         )
-        _losses = Losses(_config, _analyses)
+        _losses = Losses(
+            _config.graph_files.base_graph_hazard,
+            _analysis,
+            _config.config_data.input_path,
+            _config.config_data.output_path,
+        )
         _capacity = pd.Series([42, 24, 12])
         _intensity = pd.Series([4.2, 2.4, 1.2])
         _vlh = pd.DataFrame()
@@ -65,7 +77,8 @@ class TestLosses:
     def test_calc_vlh(self, part_of_day: str):
         # 1. Define test data
         # TODO: Not sure of the input format values float of series?
-        _config = AnalysisConfigData(input_path=Path("sth"))
+        _config = AnalysisConfigWrapper()
+        _config.config_data.input_path = Path("sth")
         _analyses = AnalysisSectionIndirect(
             duration_event=60,
             duration_disruption=15,
@@ -76,7 +89,12 @@ class TestLosses:
             partofday=part_of_day,
         )
 
-        _losses = Losses(_config, _analyses)
+        _losses = Losses(
+            _config.graph_files.base_graph_hazard,
+            _analyses,
+            _config.config_data.input_path,
+            _config.config_data.output_path,
+        )
         _traffic_data = pd.DataFrame(
             {
                 "capacity": [10, 5, 2],
