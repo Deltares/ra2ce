@@ -79,11 +79,42 @@ class TestAnalysisCollection:
         assert isinstance(_collection, AnalysisCollection)
         assert _collection.direct_analyses[0].analysis.analysis == analysis
 
-    @pytest.mark.skip("Not implemented yet #317")
     @pytest.mark.parametrize(
         "analysis",
         [
+            pytest.param(
+                AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY, id="SINGLE_LINK_REDUNDANCY"
+            ),
+            pytest.param(
+                AnalysisIndirectEnum.MULTI_LINK_REDUNDANCY, id="MULTI_LINK_REDUNDANCY"
+            ),
+            pytest.param(
+                AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION,
+                id="OPTIMAL_ROUTE_ORIGIN_DESTINATION",
+            ),
+            pytest.param(
+                AnalysisIndirectEnum.MULTI_LINK_ORIGIN_DESTINATION,
+                id="MULTI_LINK_ORIGIN_DESTINATION",
+            ),
+            pytest.param(
+                AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION,
+                id="OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION",
+            ),
+            pytest.param(
+                AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION,
+                id="MULTI_LINK_ORIGIN_CLOSEST_DESTINATION",
+            ),
             pytest.param(AnalysisIndirectEnum.LOSSES, id="LOSSES"),
+            pytest.param(
+                AnalysisIndirectEnum.SINGLE_LINK_LOSSES, id="SINGLE_LINK_LOSSES"
+            ),
+            pytest.param(
+                AnalysisIndirectEnum.MULTI_LINK_LOSSES, id="MULTI_LINK_LOSSES"
+            ),
+            pytest.param(
+                AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS,
+                id="MULTI_LINK_ISOLATED_LOCATIONS",
+            ),
         ],
     )
     def test_create_collection_with_indirect_analyses(
@@ -92,6 +123,7 @@ class TestAnalysisCollection:
     ):
         # 1. Define test data.
         _config = AnalysisConfigWrapper()
+        _config.config_data.input_path = Path("Any path")
         _config.config_data.analyses.append(
             self.MockAnalysisSectionIndirect(analysis=analysis)
         )
@@ -101,4 +133,4 @@ class TestAnalysisCollection:
 
         # 3. Verify expectations.
         assert isinstance(_collection, AnalysisCollection)
-        assert _collection.direct_analyses == analysis
+        assert _collection.indirect_analyses[0].analysis.analysis == analysis
