@@ -374,7 +374,9 @@ class IndirectAnalyses:
                     (edata["length"] * 1e-3) / edata["avgspeed"], 2
                 )  # in hours and avg speed in km/h
                 if nx.has_path(graph, u, v):
-                    alt_dist = nx.dijkstra_path_length(graph, u, v, weight="length")
+                    alt_dist = nx.dijkstra_path_length(
+                        graph, u, v, weight=WeighingEnum.LENGTH.config_value
+                    )
                     alt_nodes = nx.dijkstra_path(graph, u, v)
                     connected = 1
                     if analysis.weighing == WeighingEnum.TIME:
@@ -402,7 +404,7 @@ class IndirectAnalyses:
                     "connected": [connected],
                 }
 
-                if analysis.weighing.config_value == "time":
+                if analysis.weighing == WeighingEnum.TIME:
                     data["time"] = [time]
 
                 if "rfid" in gdf:
