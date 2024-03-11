@@ -62,7 +62,9 @@ class Losses(AnalysisIndirectProtocol):
         self.partofday: str = analysis.partofday
 
     def execute(self) -> GeoDataFrame:
-        pass
+        _gdf_in = self.graph_file.get_graph()
+        df = self.calculate_losses_from_table()
+        return _gdf_in.merge(df, how="left", on="LinkNr")
 
     @staticmethod
     def vehicle_loss_hours(path):
@@ -198,7 +200,7 @@ class Losses(AnalysisIndirectProtocol):
         vlh["euro_vlh"] = vlh["euro_per_hour"] * vlh["vlh_total"]
         return vlh
 
-    def calculate_losses_from_table(self):
+    def calculate_losses_from_table(self) -> pd.DataFrame:
         """This function opens an existing table with traffic data and value of time to calculate losses based on detouring values. It also includes
         a traffic jam estimation.
         #TODO: check if gdf already exists from effectiveness measures.
@@ -224,7 +226,7 @@ class Losses(AnalysisIndirectProtocol):
         }
         traffic_data.rename(columns=dict1, inplace=True)
 
-        detour_data = self.load_df(_losses_input_path, "detour_data.csv")
+        detour_data = self.load_df(self.losses_input_path, "detour_data.csv")
         dict2 = {
             "VA_AV_HWN": "detour_time_evening",
             "VA_RD_HWN": "detour_time_remaining",
@@ -233,6 +235,6 @@ class Losses(AnalysisIndirectProtocol):
         }
         detour_data.rename(columns=dict2, inplace=True)
 
-        vehicle_loss_hours = self.vehicle_loss_hours(_losses_input_path)
+        vehicle_loss_hours = self.vehicle_loss_hours(self.losses_input_path)
         vlh = self.calc_vlh(traffic_data, vehicle_loss_hours, detour_data)
         return vlh
