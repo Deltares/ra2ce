@@ -1274,10 +1274,10 @@ class IndirectAnalyses:
                             opt_routes_with_hazard,
                         ) = analyzer.multi_link_origin_closest_destination()
 
-                        (opt_routes_with_hazard) = (
-                            analyzer.difference_length_with_without_hazard(
-                                opt_routes_with_hazard, opt_routes_without_hazard
-                            )
+                        (
+                            opt_routes_with_hazard
+                        ) = analyzer.difference_length_with_without_hazard(
+                            opt_routes_with_hazard, opt_routes_without_hazard
                         )
 
                 else:
