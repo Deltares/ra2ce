@@ -1,24 +1,3 @@
-"""
-                    GNU GENERAL PUBLIC LICENSE
-                      Version 3, 29 June 2007
-
-    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
-    Copyright (C) 2023 Stichting Deltares
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""
-
 import logging
 import os
 from pathlib import Path
@@ -28,32 +7,46 @@ import numpy as np
 import pandas as pd
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
     AnalysisSectionDirect,
 )
+from ra2ce.analysis.direct.analysis_direct_protocol import (
+    AnalysisDirectProtocol,
+)
+from ra2ce.network.graph_files.network_file import NetworkFile
 
 
-class EffectivenessMeasures:
-    """This is a namespace for methods to calculate effectiveness of measures"""
+class EffectivenessMeasures(AnalysisDirectProtocol):
+    graph_file: NetworkFile
+    analysis: AnalysisSectionDirect
+    input_path: Path
+    output_path: Path
+    result: gpd.GeoDataFrame
 
-    def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionDirect):
+    def __init__(
+        self,
+        graph_file: NetworkFile,
+        analysis: AnalysisSectionDirect,
+        input_path: Path,
+        output_path: Path,
+    ) -> None:
+        self.graph_file = graph_file
         self.analysis = analysis
-        self.config = config
+        self.input_path = input_path
+        self.output_path = output_path
+        self.result = None
+
         self.return_period = analysis.return_period  # years
         self.repair_costs = analysis.repair_costs  # euro
         self.evaluation_period = analysis.evaluation_period  # years
         self.interest_rate = analysis.interest_rate / 100  # interest rate
-        self.climate_factor = analysis.climate_factor / analysis.climate_period
         self.btw = 1.21  # VAT multiplication factor to include taxes
-        self._measures_csv = config.input_path.joinpath(
-            "direct", "effectiveness_measures.csv"
-        )
+        self._measures_csv = input_path.joinpath("direct", "effectiveness_measures.csv")
 
         # perform checks on input while initializing class
-        self._validate_input_params(self.config, self.analysis)
+        self._validate_input_params(self.input_path, self.analysis)
 
     def _validate_input_params(
-        self, config: AnalysisConfigData, analysis: AnalysisSectionDirect
+        self, input_path: Path, analysis: AnalysisSectionDirect
     ) -> None:
         if analysis.file_name is None:
             _error = "Effectiveness of measures calculation: No input file configured. Please define an input file in the analysis.ini file."
@@ -65,26 +58,25 @@ class EffectivenessMeasures:
             )
             logging.error(_error)
             raise ValueError(_error)
-        elif not (config.input_path / "direct" / analysis.file_name).exists():
+        elif not (input_path / "direct" / analysis.file_name).exists():
             _error = "Effectiveness of measures calculation: Input file doesn't exist please place file in the following folder: {}".format(
-                config.input_path / "direct"
+                input_path / "direct"
             )
             logging.error(_error)
-            raise FileNotFoundError(config.input_path / "direct" / analysis.file_name)
+            raise FileNotFoundError(input_path / "direct" / analysis.file_name)
         elif not self._measures_csv.exists():
             _error = "Effectiveness of measures calculation: lookup table with effectiveness of measures doesnt exist. Please place the effectiveness_measures.csv file in the following folder: {}".format(
-                config.input_path / "direct"
+                input_path / "direct"
             )
             logging.error(_error)
             raise FileNotFoundError(self._measures_csv)
 
-    def load_effectiveness_table(self):
+    def _load_effectiveness_table(self) -> dict:
         """This function loads a CSV table containing effectiveness of the different aspects for a number of strategies"""
         df_lookup = pd.read_csv(self._measures_csv, index_col="strategies")
         return df_lookup.transpose().to_dict()
 
-    @staticmethod
-    def create_feature_table(file_path: Path):
+    def _create_feature_table(self, file_path: Path) -> pd.DataFrame:
         """This function loads a table of features from the input folder"""
         logging.info("Loading feature dataframe...")
         gdf = gpd.read_file(file_path, engine="pyogrio")
@@ -123,15 +115,13 @@ class EffectivenessMeasures:
         df.to_csv(os.path.join(path, file.replace(".gpkg", ".csv")), index=False)
         return df
 
-    @staticmethod
-    def load_table(path, file):
+    def _load_table(self, path: Path, file: str) -> pd.DataFrame:
         """This method reads the dataframe created from"""
         file_path = path / file
         df = pd.read_csv(file_path)
         return df
 
-    @staticmethod
-    def knmi_correction(df: pd.DataFrame, duration: int = 60) -> pd.DataFrame:
+    def _knmi_correction(self, df: pd.DataFrame, duration: int = 60) -> pd.DataFrame:
         """This function corrects the length of each segment depending on a KNMI factor.
         This factor is calculated using an exponential relation and was calculated using an analysis on all line elements
         a relation is establisched for a 10 minute or 60 minute rainfall period
@@ -160,9 +150,8 @@ class EffectivenessMeasures:
         )
         return df
 
-    @staticmethod
-    def calculate_effectiveness(
-        df: pd.DataFrame, name: str = "standard"
+    def _calculate_effectiveness(
+        self, df: pd.DataFrame, name: str = "standard"
     ) -> pd.DataFrame:
         """This function calculates effectiveness, based on a number of columns:
         'dichtbij_m', 'ver_hoger_m', 'hwa_afw_ho_m', 'gw_hwa_m', slope_0015_m' and 'slope_001_m'
@@ -223,7 +212,9 @@ class EffectivenessMeasures:
             ]
         ]
 
-    def calculate_strategy_effectiveness(self, df, effectiveness_dict):
+    def _calculate_strategy_effectiveness(
+        self, df: pd.DataFrame, effectiveness_dict: dict
+    ) -> pd.DataFrame:
         """This function calculates the efficacy for each strategy"""
 
         columns = [
@@ -236,11 +227,9 @@ class EffectivenessMeasures:
         ]
 
         # calculate standard effectiveness without factors
-        df_total = self.calculate_effectiveness(df, name="standard")
+        df_total = self._calculate_effectiveness(df, name="standard")
 
-        df_blockage = pd.read_csv(
-            self.config.input_path / "direct" / "blockage_costs.csv"
-        )
+        df_blockage = pd.read_csv(self.input_path / "direct" / "blockage_costs.csv")
         df_total = df_total.merge(df_blockage, how="left", on="LinkNr")
         df_total["length"] = df_total[
             "afstand"
@@ -257,7 +246,7 @@ class EffectivenessMeasures:
                 df_temp[col + "_m"] = df_temp[col + "_m"] * (1 - lookup_dict[col])
 
             # calculate the effectiveness and add as a new column to total dataframe
-            df_new = self.calculate_effectiveness(df_temp, name=strategy)
+            df_new = self._calculate_effectiveness(df_temp, name=strategy)
             df_new = df_new.drop(
                 columns={
                     "length",
@@ -273,7 +262,7 @@ class EffectivenessMeasures:
 
         return df_total
 
-    def calculate_cost_reduction(
+    def _calculate_cost_reduction(
         self, df: pd.DataFrame, effectiveness_dict: dict
     ) -> pd.DataFrame:
         """This function calculates the yearly costs and possible reduction"""
@@ -333,14 +322,14 @@ class EffectivenessMeasures:
                 )
         return df
 
-    def cost_benefit_analysis(self, effectiveness_dict):
+    def _cost_benefit_analysis(self, effectiveness_dict) -> tuple[pd.DataFrame, dict]:
         """This method performs cost benefit analysis"""
 
-        def calc_npv(x, cols):
+        def _calc_npv(x: pd.DataFrame, cols: list[str]) -> float:
             pv = np.npv(self.interest_rate, [0] + list(x[cols]))
             return pv
 
-        def calc_npv_factor(factor):
+        def _calc_npv_factor(factor: float) -> float:
             cols = np.linspace(
                 1,
                 1 + (factor * self.evaluation_period),
@@ -349,7 +338,7 @@ class EffectivenessMeasures:
             )
             return np.npv(self.interest_rate, [0] + list(cols))
 
-        def calc_cash_flow(x, cols):
+        def _calc_cash_flow(x, cols):
             cash_flow = x[cols].sum() + x["investment"]
             return cash_flow
 
@@ -378,10 +367,10 @@ class EffectivenessMeasures:
             )
         year_cols = [str(year) for year in range(1, self.evaluation_period + 1)]
 
-        df_cba["om_pv"] = df_cba.apply(lambda x: calc_npv(x, year_cols), axis=1)
+        df_cba["om_pv"] = df_cba.apply(lambda x: _calc_npv(x, year_cols), axis=1)
         df_cba["pv"] = df_cba["om_pv"] + df_cba["investment"]
         df_cba["cash_flow"] = df_cba.apply(
-            lambda x: calc_cash_flow(x, year_cols), axis=1
+            lambda x: _calc_cash_flow(x, year_cols), axis=1
         )
         df_cba["costs"] = df_cba["pv"] * self.btw
         df_cba["costs_pmt"] = (
@@ -393,18 +382,19 @@ class EffectivenessMeasures:
         df_cba = df_cba.round(2)
 
         costs_dict = df_cba[["costs", "on_column"]].to_dict()
-        costs_dict["npv_factor"] = calc_npv_factor(self.climate_factor)
+        costs_dict["npv_factor"] = _calc_npv_factor(self.climate_factor)
 
         return df_cba, costs_dict
 
-    @staticmethod
-    def calculate_strategy_costs(df: pd.DataFrame, costs_dict: dict):
+    def _calculate_strategy_costs(
+        self, df: pd.DataFrame, costs_dict: dict
+    ) -> pd.DataFrame:
         """Method to calculate costs, benefits with net present value"""
 
         costs = costs_dict["costs"]
         columns = costs_dict["on_column"]
 
-        def columns_check(df, columns) -> bool:
+        def _columns_check(df: pd.DataFrame, columns: list[str]) -> bool:
             cols_check = []
             for col in columns:
                 cols_check.extend(columns[col].split(";"))
@@ -419,7 +409,7 @@ class EffectivenessMeasures:
                 raise ValueError(_error_mssg)
             return True
 
-        columns_check(df, columns)
+        _columns_check(df, columns)
         strategies = {col: columns[col].split(";") for col in columns}
 
         for strategy in strategies:
@@ -447,3 +437,49 @@ class EffectivenessMeasures:
             )
 
         return df
+
+    def execute(self) -> None:
+        """This function calculated the efficiency of measures. Input is a csv file with efficiency
+        and a list of different aspects you want to check.
+        """
+        effectiveness_dict = self._load_effectiveness_table()
+
+        gdf_in = self.graph_file.get_graph()
+
+        if self.analysis.create_table:
+            df = self._create_feature_table(
+                self.input_path.joinpath("direct", self.analysis.file_name)
+            )
+        else:
+            df = self._load_table(
+                self.input_path.joinpath("direct"),
+                self.analysis.file_name.replace(".gpkg", ".csv"),
+            )
+
+        df = self._calculate_strategy_effectiveness(df, effectiveness_dict)
+        df = self._knmi_correction(df)
+        df_cba, costs_dict = em.cost_benefit_analysis(effectiveness_dict)
+        df_cba.round(2).to_csv(
+            self.output_path.joinpath(
+                self.analysis.analysis.config_value,
+                "cost_benefit_analysis.csv",
+            ),
+            decimal=",",
+            sep=";",
+            index=False,
+            float_format="%.2f",
+        )
+        df = self._calculate_cost_reduction(df, effectiveness_dict)
+        df_costs = self._calculate_strategy_costs(df, costs_dict)
+        df_costs = df_costs.astype(float).round(2)
+        df_costs.to_csv(
+            self.output_path.joinpath(
+                self.analysis.analysis.config_value, "output_analysis.csv"
+            ),
+            decimal=",",
+            sep=";",
+            index=False,
+            float_format="%.2f",
+        )
+
+        return gdf_in.merge(df, how="left", on="LinkNr")

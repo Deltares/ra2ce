@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import pytest
 
@@ -8,11 +7,11 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDirect,
 )
-from ra2ce.analysis.direct.cost_benefit_analysis import EffectivenessMeasures
+from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
 from tests import test_data
 
 
-class MockEffectivenessMeasures(EffectivenessMeasures):
+class MockInvalidEffectivenessMeasures(EffectivenessMeasures):
     def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionDirect):
         """
         This class is only meant to inherit from `Effectiveness measures` and allow the partial testing of certain methods for pure code coverage reasons.
@@ -20,9 +19,8 @@ class MockEffectivenessMeasures(EffectivenessMeasures):
         pass
 
 
-class TestCostBenefitAnalysis:
+class TestEffectivenessMeasures:
     def test_init_raises_when_file_name_not_defined(self):
-        _config = AnalysisConfigData(input_path=test_data)
         _analysis = AnalysisSectionDirect(
             return_period=None,
             repair_costs=None,
@@ -33,14 +31,13 @@ class TestCostBenefitAnalysis:
             file_name=None,
         )
         with pytest.raises(ValueError) as exc_err:
-            EffectivenessMeasures(_config, _analysis)
+            EffectivenessMeasures(None, _analysis, test_data, None)
         assert (
             str(exc_err.value)
             == "Effectiveness of measures calculation: No input file configured. Please define an input file in the analysis.ini file."
         )
 
     def test_init_raises_when_file_name_not_shp(self):
-        _config = AnalysisConfigData(input_path=test_data)
         _analysis = AnalysisSectionDirect(
             return_period=None,
             repair_costs=None,
@@ -51,14 +48,14 @@ class TestCostBenefitAnalysis:
             file_name=Path("just_a_file.txt"),
         )
         with pytest.raises(ValueError) as exc_err:
-            EffectivenessMeasures(_config, _analysis)
+            EffectivenessMeasures(None, _analysis, test_data, None)
         assert (
             str(exc_err.value)
             == "Effectiveness of measures calculation: Wrong input file configured. Extension of input file is -.txt-, needs to be -.shp- (shapefile)"
         )
 
     def test_init_raises_when_direct_shp_file_does_not_exist(self):
-        _config = AnalysisConfigData(input_path=test_data)
+        _config_data = AnalysisConfigData(input_path=test_data)
         _analysis = AnalysisSectionDirect(
             return_period=None,
             repair_costs=None,
@@ -69,13 +66,13 @@ class TestCostBenefitAnalysis:
             file_name=Path("filedoesnotexist.shp"),
         )
         with pytest.raises(FileNotFoundError) as exc_err:
-            EffectivenessMeasures(_config, _analysis)
+            EffectivenessMeasures(None, _analysis, test_data, None)
         assert str(exc_err.value) == str(
-            _config.input_path.joinpath("direct", "filedoesnotexist.shp")
+            _config_data.input_path.joinpath("direct", "filedoesnotexist.shp")
         )
 
     def test_init_raises_when_effectiveness_measures_does_not_exist(self):
-        _config = AnalysisConfigData(input_path=test_data)
+        _config_data = AnalysisConfigData(input_path=test_data)
         _analysis = AnalysisSectionDirect(
             return_period=None,
             repair_costs=None,
@@ -85,11 +82,11 @@ class TestCostBenefitAnalysis:
             climate_period=2.4,
             file_name=Path("origins.shp"),
         )
-        assert (_config.input_path.joinpath("direct", "origins.shp")).exists()
+        assert (_config_data.input_path.joinpath("direct", "origins.shp")).exists()
         with pytest.raises(FileNotFoundError) as exc_err:
-            EffectivenessMeasures(_config, _analysis)
+            EffectivenessMeasures(None, _analysis, test_data, None)
         assert str(exc_err.value) == str(
-            _config.input_path.joinpath("direct", "effectiveness_measures.csv")
+            _config_data.input_path.joinpath("direct", "effectiveness_measures.csv")
         )
 
     @pytest.mark.parametrize(
@@ -102,9 +99,12 @@ class TestCostBenefitAnalysis:
     )
     def test_knmi_correction_with_invalid_duration_raises(self, duration: int):
         # 1. Define test data.
+        _measures = MockInvalidEffectivenessMeasures(None, None)
+
         # 2. Run test.
         with pytest.raises(ValueError) as exc_err:
-            EffectivenessMeasures.knmi_correction(None, duration)
+            _measures._knmi_correction(None, duration)
+
         # 3. Verify final expectations.
         assert str(exc_err.value) == "Wrong duration configured, has to be 10 or 60"
 
@@ -117,17 +117,19 @@ class TestCostBenefitAnalysis:
     )
     def test_knmi_correction_with_valid_duration(self, duration: int):
         # 1. Define test data.
+        _measures = MockInvalidEffectivenessMeasures(None, None)
         df_data = {"length": 42, "coefficient": {"length": 24, "max": 42}}
         _dataframe = pd.DataFrame(df_data)
 
         # 2. Run test.
-        _correction = EffectivenessMeasures.knmi_correction(_dataframe, duration)
+        _correction = _measures._knmi_correction(_dataframe, duration)
 
         # 3. Verify final expectations.
         assert isinstance(_correction, pd.DataFrame)
 
     def test_calculate_effectiveness(self):
         # 1. Define test data.
+        _measures = MockInvalidEffectivenessMeasures(None, None)
         _name = "standard"
         df_data = {
             "slope_0015_m": range(0, 4),
@@ -147,15 +149,14 @@ class TestCostBenefitAnalysis:
         _dataframe = pd.DataFrame(df_data)
 
         # 2. Run test.
-        _correction = EffectivenessMeasures.calculate_effectiveness(
-            _dataframe, "standard"
-        )
+        _correction = _measures._calculate_effectiveness(_dataframe, "standard")
 
         # 3. Verify final expectations.
         assert isinstance(_correction, pd.DataFrame)
 
     def test_calculate_strategy_costs_with_invalid_data_raises(self):
         # 1. Define test data
+        _measures = MockInvalidEffectivenessMeasures(None, None)
         _costs_dict = {
             "costs": [2.4, 4.2, 24, 42],
             "on_column": {
@@ -170,7 +171,7 @@ class TestCostBenefitAnalysis:
 
         # 2. Run test.
         with pytest.raises(ValueError) as exc_err:
-            EffectivenessMeasures.calculate_strategy_costs(_dataframe, _costs_dict)
+            _measures._calculate_strategy_costs(_dataframe, _costs_dict)
 
         # 3. Verify expectations.
         assert "Wrong column configured in effectiveness_measures csv file." in str(
@@ -179,6 +180,7 @@ class TestCostBenefitAnalysis:
 
     def test_calculate_stragey_costs_with_valid_data(self):
         # 1. Define test data
+        _measures = MockInvalidEffectivenessMeasures(None, None)
         _costs_dict = {
             "costs": {
                 "one_strategy": 1,
@@ -206,17 +208,17 @@ class TestCostBenefitAnalysis:
         _dataframe = pd.DataFrame(df_data)
 
         # 2. Run test.
-        _costs = EffectivenessMeasures.calculate_strategy_costs(_dataframe, _costs_dict)
+        _costs = _measures._calculate_strategy_costs(_dataframe, _costs_dict)
 
         # 3. Verify expectations.
         assert isinstance(_costs, pd.DataFrame)
 
     @pytest.mark.skip(
-        reason="TODO: Is this being used? NPV is deprecated and won't run calc_npv."
+        reason="TODO: Is this being used? NPV is deprecated and won't run calc_npv. #319"
     )
     def test_calculate_cost_benefit_analyses(self):
         # 1. Define test data.
-        _measures = MockEffectivenessMeasures(None, None)
+        _measures = MockInvalidEffectivenessMeasures(None, None)
         _measures.evaluation_period = 1
         _measures.climate_factor = 24
         _measures.interest_rate = 0.42
@@ -245,7 +247,7 @@ class TestCostBenefitAnalysis:
 
     def test_calculate_cost_reduction(self):
         # 1. Define test data.
-        _measures = MockEffectivenessMeasures(None, None)
+        _measures = MockInvalidEffectivenessMeasures(None, None)
         _measures.return_period = 1
         _measures.repair_costs = 24
         _measures.interest_rate = 0.42
@@ -266,7 +268,9 @@ class TestCostBenefitAnalysis:
         _dataframe = pd.DataFrame(df_data)
 
         # 2. Run test.
-        _return_df = _measures.calculate_cost_reduction(_dataframe, _effectiveness_dict)
+        _return_df = _measures._calculate_cost_reduction(
+            _dataframe, _effectiveness_dict
+        )
 
         # 3. Verify expectations
         assert isinstance(_return_df, pd.DataFrame)
