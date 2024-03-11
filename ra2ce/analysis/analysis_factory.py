@@ -67,6 +67,4 @@ class AnalysisFactory:
                 analysis_config.config_data.input_path,
                 analysis_config.config_data.output_path,
             )
-        elif True:
-            pass
         raise NotImplementedError
