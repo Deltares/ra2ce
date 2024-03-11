@@ -1221,10 +1221,13 @@ class IndirectAnalyses:
                         index=False,
                     )
             elif analysis.analysis == AnalysisIndirectEnum.LOSSES:
-                gdf_in = self.graph_files.base_graph_hazard.get_graph()
-                losses = Losses(self.config, analysis)
-                df = losses.calculate_losses_from_table()
-                gdf = gdf_in.merge(df, how="left", on="LinkNr")
+                losses = Losses(
+                    self.graph_files.base_graph_hazard,
+                    analysis,
+                    self.config.input_path,
+                    self.config.output_path,
+                )
+                gdf = losses.execute()
             elif (
                 analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS
             ):
