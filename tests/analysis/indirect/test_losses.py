@@ -10,6 +10,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
 from ra2ce.analysis.indirect.losses import Losses
+from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 
 
 class TestLosses:
@@ -28,6 +29,7 @@ class TestLosses:
         )
 
         # 2. Run test.
+
         _losses = Losses(_config, _analyses)
 
         # 3. Verify final expectations.
@@ -61,7 +63,8 @@ class TestLosses:
         )
 
     @pytest.mark.parametrize(
-        "part_of_day", [pytest.param("daily"), pytest.param("evening")]
+        "part_of_day",
+        [pytest.param(PartOfDayEnum.DAY), pytest.param(PartOfDayEnum.EVENING)],
     )
     def test_calc_vlh(self, part_of_day: str):
         # 1. Define test data
