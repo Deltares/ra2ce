@@ -37,10 +37,3 @@ class AnalysisDirectProtocol(AnalysisProtocol):
     input_path: Path
     output_path: Path
     result: Optional[GeoDataFrame]
-
-    def execute(self) -> GeoDataFrame:  # TODO make it a result object
-        """
-        Execute the analysis on the given graph/network with the given analysis parameters.
-        The resulting (Geo)DataFrame of the analysis is stored in the result attribute.
-        """
-        pass
