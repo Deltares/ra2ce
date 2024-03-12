@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Iterator
 
 import pandas as pd
 import pytest
@@ -35,7 +36,7 @@ class TestHazardNames:
         assert _hazard_names.names == []
 
     @pytest.fixture(autouse=True)
-    def hazard_names_file(self, request: pytest.FixtureRequest) -> Path:
+    def hazard_names_file(self, request: pytest.FixtureRequest) -> Iterator[Path]:
         _output_path = test_results.joinpath(request.node.name)
         _output_path.mkdir(parents=True, exist_ok=True)
         _file = _output_path.joinpath("hazard_names.xlsx")
