@@ -8,7 +8,11 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
+from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
+from ra2ce.analysis.indirect.weighing_analysis.weighing_analysis_factory import (
+    WeighingAnalysisFactory,
+)
 from ra2ce.network.graph_files.graph_file import GraphFile
 
 
@@ -42,15 +46,19 @@ class SingleLinkRedundancy(AnalysisIndirectProtocol):
         #     road_usage_data = pd.DataFrame()
 
         # create a geodataframe from the graph
-        gdf = osmnx.graph_to_gdfs(self.graph_file.graph, nodes=False)
+        _gdf_graph = osmnx.graph_to_gdfs(self.graph_file.graph, nodes=False)
 
         # list for the length of the alternative routes
-        alt_dist_list = []
-        alt_nodes_list = []
-        dif_dist_list = []
-        detour_exist_list = []
+        _alt_value_list = []
+        _alt_nodes_list = []
+        _diff_value_list = []
+        _detour_exist_list = []
+
+        _weighing_analyser = WeighingAnalysisFactory.get_analysis(
+            self.analysis.weighing
+        )
         for e_remove in list(self.graph_file.graph.edges.data(keys=True)):
-            u, v, k, data = e_remove
+            u, v, k, _weighing_analyser.weighing_data = e_remove
 
             # if data['highway'] in attr_list:
             # remove the edge
@@ -59,39 +67,44 @@ class SingleLinkRedundancy(AnalysisIndirectProtocol):
             if nx.has_path(self.graph_file.graph, u, v):
                 # calculate the alternative distance if that edge is unavailable
                 alt_dist = nx.dijkstra_path_length(
-                    self.graph_file.graph,
-                    u,
-                    v,
-                    weight=self.analysis.weighing.config_value,
+                    self.graph_file.graph, u, v, weight=WeighingEnum.LENGTH.config_value
                 )
-                alt_dist_list.append(alt_dist)
+                alt_nodes = nx.dijkstra_path(self.graph_file.graph, u, v)
+                alt_value = _weighing_analyser.calculate_alternative_distance(alt_dist)
 
                 # append alternative route nodes
-                alt_nodes = nx.dijkstra_path(self.graph_file.graph, u, v)
-                alt_nodes_list.append(alt_nodes)
+                _alt_value_list.append(alt_value)
+                _alt_nodes_list.append(alt_nodes)
 
                 # calculate the difference in distance
-                dif_dist_list.append(
-                    alt_dist - data[self.analysis.weighing.config_value]
+                _diff_value_list.append(
+                    round(
+                        alt_value
+                        - _weighing_analyser.weighing_data[
+                            self.analysis.weighing.config_value
+                        ],
+                        2,
+                    )
                 )
 
-                detour_exist_list.append(1)
+                _detour_exist_list.append(1)
             else:
-                alt_dist_list.append(np.NaN)
-                alt_nodes_list.append(np.NaN)
-                dif_dist_list.append(np.NaN)
-                detour_exist_list.append(0)
+                _alt_value_list.append(_weighing_analyser.calculate_distance())
+                _alt_nodes_list.append(np.NaN)
+                _diff_value_list.append(np.NaN)
+                _detour_exist_list.append(0)
 
             # add edge again to the graph
-            self.graph_file.graph.add_edge(u, v, k, **data)
+            self.graph_file.graph.add_edge(u, v, k, **_weighing_analyser.weighing_data)
 
         # Add the new columns to the geodataframe
-        gdf["alt_dist"] = alt_dist_list
-        gdf["alt_nodes"] = alt_nodes_list
-        gdf["diff_dist"] = dif_dist_list
-        gdf["detour"] = detour_exist_list
+        _weighing_analyser.extend_graph(_gdf_graph)
+        _gdf_graph["alt_{analysis.weighing.config_value}"] = _alt_value_list
+        _gdf_graph["alt_nodes"] = _alt_nodes_list
+        _gdf_graph["diff_{analysis.weighing.config_value}"] = _diff_value_list
+        _gdf_graph["detour"] = _detour_exist_list
 
         # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
         # todo: input here this option
 
-        return gdf
+        return _gdf_graph
