@@ -547,8 +547,8 @@ class OriginClosestDestination:
         self,
         node_checked_has_path: dict,
         list_no_path: list,
-        n_ndat: tuple,
-        disrupted_graph,
+        n_ndat: tuple[int, dict[str, float]],
+        disrupted_graph: nx.MultiGraph,
         hazard_name: str,
         list_disrupted_destinations: list,
         pref_routes: gpd.GeoDataFrame,
@@ -570,7 +570,8 @@ class OriginClosestDestination:
         n, ndat = n_ndat
         if self.od_key in ndat and self.o_name in ndat[self.od_key]:
             if nx.has_path(disrupted_graph, n, dest_name):
-                node_checked_has_path[ndat[self.od_key]].append(n)
+                # Add elements to the dictionary this way to prevent an exception when
+                # their key is not present.
                 node_checked_has_path.setdefault(ndat[self.od_key], []).append(n)
                 path = nx.shortest_path(
                     disrupted_graph,
