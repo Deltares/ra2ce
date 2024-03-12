@@ -42,10 +42,11 @@ class TestAnalysisFactory:
         # 1. Define test data.
         _analysis = self.MockAnalysisSectionDirect(analysis=AnalysisDirectEnum.INVALID)
         _factory = AnalysisFactory(_analysis)
+        _config = AnalysisConfigWrapper()
 
         # 2. Run test.
         with pytest.raises(NotImplementedError):
-            _factory.get_analysis(None)
+            _factory.get_direct_analysis(_config)
 
     def test_get_analysis_with_direct(self):
         # 1. Define test data.
@@ -54,7 +55,7 @@ class TestAnalysisFactory:
         _config = AnalysisConfigWrapper()
 
         # 2. Run test.
-        _result = _factory.get_analysis(_config)
+        _result = _factory.get_direct_analysis(_config)
 
         # 3. Verify expectations.
         assert isinstance(_result, AnalysisDirectProtocol)
