@@ -101,7 +101,7 @@ def read_origin_destination_files(
     for op, on in zip(origin_paths, origin_names):
         origin_new = gpd.read_file(op, crs=crs_, engine="pyogrio")
         try:
-            origin_new[od_id] * 2  # just for checking
+            origin_new[od_id]
         except Exception:
             origin_new[od_id] = origin_new.index
 
