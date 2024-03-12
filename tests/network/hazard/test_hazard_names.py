@@ -46,8 +46,6 @@ class TestHazardNames:
         _df.to_excel(_file, index=False)
         yield _file
 
-        _output_path.unlink()
-
     def test_create_from_existing_file(self, hazard_names_file: Path):
         # 1. Define test data
         _file = hazard_names_file
