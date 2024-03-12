@@ -46,6 +46,9 @@ from ra2ce.analysis.indirect.origin_closest_destination import OriginClosestDest
 from ra2ce.analysis.indirect.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
 )
+from ra2ce.analysis.indirect.weighing_analysis.weighing_analysis_factory import (
+    WeighingAnalysisFactory,
+)
 from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.network.networks_utils import buffer_geometry, graph_to_gdf, graph_to_gpkg
 
@@ -79,7 +82,7 @@ class IndirectAnalyses:
             self.hazard_names_df = pd.DataFrame(data=None)
             self.config.hazard_names = list()
 
-    def single_link_redundancy(
+    def _analyse_single_link_redundancy(
         self, graph: nx.Graph, analysis: AnalysisSectionIndirect
     ):
         """This is the function to analyse roads with a single link disruption and an alternative route.
@@ -98,54 +101,62 @@ class IndirectAnalyses:
         #     road_usage_data = pd.DataFrame()
 
         # create a geodataframe from the graph
-        gdf = osmnx.graph_to_gdfs(graph, nodes=False)
+        _gdf_graph = osmnx.graph_to_gdfs(graph, nodes=False)
 
         # list for the length of the alternative routes
-        alt_dist_list = []
-        alt_nodes_list = []
-        dif_dist_list = []
-        detour_exist_list = []
+        _alt_value_list = []
+        _alt_nodes_list = []
+        _diff_value_list = []
+        _detour_exist_list = []
+
+        _weighing_analyser = WeighingAnalysisFactory.get_analysis(analysis.weighing)
         for e_remove in list(graph.edges.data(keys=True)):
-            u, v, k, data = e_remove
+            u, v, k, _weighing_analyser.weighing_data = e_remove
 
             # if data['highway'] in attr_list:
             # remove the edge
             graph.remove_edge(u, v, k)
-
             if nx.has_path(graph, u, v):
                 # calculate the alternative distance if that edge is unavailable
                 alt_dist = nx.dijkstra_path_length(
-                    graph, u, v, weight=analysis.weighing.config_value
+                    graph, u, v, weight=WeighingEnum.LENGTH.config_value
                 )
-                alt_dist_list.append(alt_dist)
-
-                # append alternative route nodes
                 alt_nodes = nx.dijkstra_path(graph, u, v)
-                alt_nodes_list.append(alt_nodes)
+                alt_value = _weighing_analyser.calculate_alternative_distance(alt_dist)
 
-                # calculate the difference in distance
-                dif_dist_list.append(alt_dist - data[analysis.weighing.config_value])
-
-                detour_exist_list.append(1)
+                # append alternative route information
+                _alt_value_list.append(alt_value)
+                _alt_nodes_list.append(alt_nodes)
+                _diff_value_list.append(
+                    round(
+                        alt_value
+                        - _weighing_analyser.weighing_data[
+                            analysis.weighing.config_value
+                        ],
+                        2,
+                    )
+                )
+                _detour_exist_list.append(1)
             else:
-                alt_dist_list.append(np.NaN)
-                alt_nodes_list.append(np.NaN)
-                dif_dist_list.append(np.NaN)
-                detour_exist_list.append(0)
+                _alt_value_list.append(_weighing_analyser.calculate_distance())
+                _alt_nodes_list.append(np.NaN)
+                _diff_value_list.append(np.NaN)
+                _detour_exist_list.append(0)
 
             # add edge again to the graph
-            graph.add_edge(u, v, k, **data)
+            graph.add_edge(u, v, k, **_weighing_analyser.weighing_data)
 
         # Add the new columns to the geodataframe
-        gdf["alt_dist"] = alt_dist_list
-        gdf["alt_nodes"] = alt_nodes_list
-        gdf["diff_dist"] = dif_dist_list
-        gdf["detour"] = detour_exist_list
+        _weighing_analyser.extend_graph(_gdf_graph)
+        _gdf_graph[f"alt_{analysis.weighing.config_value}"] = _alt_value_list
+        _gdf_graph["alt_nodes"] = _alt_nodes_list
+        _gdf_graph[f"diff_{analysis.weighing.config_value}"] = _diff_value_list
+        _gdf_graph["detour"] = _detour_exist_list
 
         # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
         # todo: input here this option
 
-        return gdf
+        return _gdf_graph
 
     def single_link_losses(
         self, gdf: gpd.GeoDataFrame, analysis: AnalysisSectionIndirect
@@ -340,51 +351,68 @@ class IndirectAnalyses:
 
             graph.remove_edges_from(edges_remove)
 
-            columns = ["u", "v", "alt_dist", "alt_nodes", "connected"]
+            columns = [
+                "u",
+                "v",
+                f"alt_{analysis.weighing.config_value}",
+                "alt_nodes",
+                "connected",
+            ]
 
             if "rfid" in gdf:
                 columns.insert(2, "rfid")
 
             df_calculated = pd.DataFrame(columns=columns)
+            _weighing_analyser = WeighingAnalysisFactory.get_analysis(analysis.weighing)
 
             for edges in edges_remove:
-                u, v, k, edata = edges
+                u, v, k, _weighing_analyser.weighing_data = edges
 
                 if nx.has_path(graph, u, v):
                     alt_dist = nx.dijkstra_path_length(
-                        graph, u, v, weight=analysis.weighing.config_value
+                        graph, u, v, weight=WeighingEnum.LENGTH.config_value
                     )
                     alt_nodes = nx.dijkstra_path(graph, u, v)
                     connected = 1
+                    alt_value = _weighing_analyser.calculate_alternative_distance(
+                        alt_dist
+                    )
                 else:
-                    alt_dist, alt_nodes, connected = np.NaN, np.NaN, 0
+                    alt_value = _weighing_analyser.calculate_distance()
+                    alt_nodes, connected = np.NaN, 0
 
                 data = {
                     "u": [u],
                     "v": [v],
-                    "alt_dist": [alt_dist],
+                    f"alt_{analysis.weighing.config_value}": [alt_value],
                     "alt_nodes": [alt_nodes],
                     "connected": [connected],
                 }
+                _weighing_analyser.extend_graph(data)
 
                 if "rfid" in gdf:
-                    data["rfid"] = [str(edata["rfid"])]
+                    data["rfid"] = [str(_weighing_analyser.weighing_data["rfid"])]
 
                 df_calculated = pd.concat(
                     [df_calculated, pd.DataFrame(data)], ignore_index=True
                 )
+            df_calculated[f"alt_{analysis.weighing.config_value}"] = pd.to_numeric(
+                df_calculated[f"alt_{analysis.weighing.config_value}"], errors="coerce"
+            )
+
             # Merge the dataframes
             if "rfid" in gdf:
                 gdf = gdf.merge(df_calculated, how="left", on=["u", "v", "rfid"])
             else:
                 gdf = gdf.merge(df_calculated, how="left", on=["u", "v"])
 
-            # calculate the difference in distance
-            # previously here you would find if dist == dist which is a critical bug. Replaced by just verifying dist is a value.
-            gdf["diff_dist"] = [
-                dist - length if dist else np.NaN
-                for (dist, length) in zip(
-                    gdf["alt_dist"], gdf[analysis.weighing.config_value]
+            # calculate the differences in distance and time
+            # previously here you find if dist==dist which is a critical bug. Replaced by verifying dist is a value.
+            gdf[f"diff_{analysis.weighing.config_value}"] = [
+                round(alt - base, 2) if alt else np.NaN
+                for (alt, base) in zip(
+                    gdf[f"alt_{analysis.weighing.config_value}"],
+                    gdf[f"{analysis.weighing.config_value}"],
                 )
             ]
 
@@ -1092,7 +1120,7 @@ class IndirectAnalyses:
 
             if analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY:
                 g = self.graph_files.base_graph.get_graph()
-                gdf = self.single_link_redundancy(g, analysis)
+                gdf = self._analyse_single_link_redundancy(g, analysis)
             elif analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_REDUNDANCY:
                 g = self.graph_files.base_graph_hazard.get_graph()
                 gdf = self.multi_link_redundancy(g, analysis)
@@ -1170,7 +1198,7 @@ class IndirectAnalyses:
                 AnalysisIndirectEnum.MULTI_LINK_LOSSES,
             ]:
                 g = self.graph_files.base_graph_hazard.get_graph()
-                gdf = self.single_link_redundancy(g, analysis)
+                gdf = self._analyse_single_link_redundancy(g, analysis)
                 gdf = self.single_link_losses(gdf, analysis)
             elif (
                 analysis.analysis

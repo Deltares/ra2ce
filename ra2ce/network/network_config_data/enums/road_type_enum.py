@@ -15,5 +15,8 @@ class RoadTypeEnum(Ra2ceEnumBase):
     TERTIARY_LINK = 10
     RESIDENTIAL = 11
     ROAD = 12
+    TUNNEL = 13
+    BRIDGE = 14
+    CULVERT = 15
     UNCLASSIFIED = 98
     INVALID = 99

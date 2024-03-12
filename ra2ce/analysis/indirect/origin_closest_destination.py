@@ -22,7 +22,8 @@
 # -*- coding: utf-8 -*-
 import copy
 import logging
-from typing import Optional, Union
+from collections import defaultdict
+from typing import Optional, Any
 
 import geopandas as gpd
 import networkx as nx
@@ -453,8 +454,8 @@ class OriginClosestDestination:
 
     def find_closest_location(
         self,
-        disrupted_graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
-        base_graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
+        disrupted_graph: nx.classes.Graph | nx.classes.MultiGraph,
+        base_graph: nx.classes.Graph | nx.classes.MultiGraph,
         origins: gpd.GeoDataFrame,
         destinations: gpd.GeoDataFrame,
         column_name: str,
@@ -496,8 +497,10 @@ class OriginClosestDestination:
         optimal_routes = []
         list_disrupted_destinations = []
         list_no_path = []
+        node_checked_has_path = dict()
         for n_ndat in tqdm(disrupted_graph.nodes.data(), desc="Finding optimal routes"):
             _new_origins = self._find_optimal_routes(
+                node_checked_has_path,
                 list_no_path,
                 n_ndat,
                 disrupted_graph,
@@ -542,9 +545,10 @@ class OriginClosestDestination:
 
     def _find_optimal_routes(
         self,
+        node_checked_has_path: dict,
         list_no_path: list,
-        n_ndat: tuple,
-        disrupted_graph,
+        n_ndat: tuple[int, dict[str, float]],
+        disrupted_graph: nx.MultiGraph,
         hazard_name: str,
         list_disrupted_destinations: list,
         pref_routes: gpd.GeoDataFrame,
@@ -554,7 +558,7 @@ class OriginClosestDestination:
         origins,
         base_graph,
         destinations,
-    ) -> Optional[gpd.GeoDataFrame]:
+    ) -> tuple[Any, dict]:
         """
         Refactored method to avoid duplication of code between `find_closest_location` and `find_multiple_closest_locations` with subtile differences:
         - The first would not use a `dest_name` attribute.
@@ -566,6 +570,9 @@ class OriginClosestDestination:
         n, ndat = n_ndat
         if self.od_key in ndat and self.o_name in ndat[self.od_key]:
             if nx.has_path(disrupted_graph, n, dest_name):
+                # Add elements to the dictionary this way to prevent an exception when
+                # their key is not present.
+                node_checked_has_path.setdefault(ndat[self.od_key], []).append(n)
                 path = nx.shortest_path(
                     disrupted_graph,
                     source=n,
@@ -650,14 +657,15 @@ class OriginClosestDestination:
                         )
                     )
             else:
-                list_no_path.append((n, ndat[self.od_key]))
+                if ndat[self.od_key] not in node_checked_has_path:
+                    list_no_path.append((n, ndat[self.od_key]))
 
         return self.update_origins(origins, list_no_path, name_save.format("A"))
 
     def find_multiple_closest_locations(
         self,
-        disrupted_graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
-        base_graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
+        disrupted_graph: nx.classes.Graph | nx.classes.MultiGraph,
+        base_graph: nx.classes.Graph | nx.classes.MultiGraph,
         origins: gpd.GeoDataFrame,
         destinations: gpd.GeoDataFrame,
         column_name: str,
@@ -707,11 +715,13 @@ class OriginClosestDestination:
 
             list_disrupted_destinations = []
             list_no_path = []
+            node_checked_has_path = defaultdict(list)
             for n_ndat in tqdm(
                 disrupted_graph.nodes.data(),
                 desc=f"Finding optimal routes to {dest_name}",
             ):
                 _new_origins = self._find_optimal_routes(
+                    node_checked_has_path,
                     list_no_path,
                     n_ndat,
                     disrupted_graph,
@@ -757,8 +767,8 @@ class OriginClosestDestination:
 
     def calc_pref_routes_closest_dest(
         self,
-        graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
-        base_graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
+        graph: nx.classes.Graph | nx.classes.MultiGraph,
+        base_graph: nx.classes.Graph | nx.classes.MultiGraph,
         origin_closest_dest,
         origins,
     ):
@@ -860,8 +870,8 @@ class OriginClosestDestination:
 
     def calc_routes_closest_dest(
         self,
-        graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
-        base_graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
+        graph: nx.classes.Graph | nx.classes.MultiGraph,
+        base_graph: nx.classes.Graph | nx.classes.MultiGraph,
         list_closest: list,
         origin: gpd.GeoDataFrame,
         dest: gpd.GeoDataFrame,
