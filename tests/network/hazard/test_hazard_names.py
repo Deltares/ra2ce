@@ -35,15 +35,17 @@ class TestHazardNames:
         assert _hazard_names.names == []
 
     @pytest.fixture(autouse=True)
-    def hazard_names_file(self) -> Path:
-        _file = test_results.joinpath("hazard_names.xlsx")
+    def hazard_names_file(self, request: pytest.FixtureRequest) -> Path:
+        _output_path = test_results.joinpath(request.node.name)
+        _output_path.mkdir(parents=True, exist_ok=True)
+        _file = _output_path.joinpath("hazard_names.xlsx")
         _data = [["a", "A"], ["b", "B"], ["c", "C"]]
         _columns = ["File name", "RA2CE name"]
         _df = pd.DataFrame(_data, columns=_columns)
         _df.to_excel(_file, index=False)
         yield _file
 
-        _file.unlink()
+        _output_path.unlink()
 
     def test_create_from_existing_file(self, hazard_names_file: Path):
         # 1. Define test data
