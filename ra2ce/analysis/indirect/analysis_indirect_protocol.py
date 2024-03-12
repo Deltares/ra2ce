@@ -20,7 +20,6 @@
 """
 
 from pathlib import Path
-from typing import Optional
 
 from geopandas import GeoDataFrame
 
@@ -29,6 +28,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 )
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.network.graph_files.graph_file import GraphFile
+from ra2ce.network.hazard.hazard_names import HazardNames
 
 
 class AnalysisIndirectProtocol(AnalysisProtocol):
@@ -36,4 +36,5 @@ class AnalysisIndirectProtocol(AnalysisProtocol):
     analysis: AnalysisSectionIndirect
     input_path: Path
     output_path: Path
-    result: Optional[GeoDataFrame]
+    hazard_names: HazardNames
+    result: GeoDataFrame
