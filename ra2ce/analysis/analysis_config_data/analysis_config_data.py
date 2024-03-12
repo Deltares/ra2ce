@@ -92,7 +92,9 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     rest_capacity: float = math.nan
     maximum_jam: float = math.nan
     partofday: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
-    performance: str = "diff_time"  # "diff_time" or "diff_dist" relates to the used criticality metric
+    performance: str = (
+        "diff_time"  # "diff_time" or "diff_dist" relates to the used criticality metric
+    )
     resilience_curve_file: str = ""
     disruption_steps_file: str = ""
     # accessibility analyses
@@ -144,12 +146,12 @@ class AnalysisConfigData(ConfigDataProtocol):
     input_path: Optional[Path] = None
     output_path: Optional[Path] = None
     static_path: Optional[Path] = None
-    project: ProjectSection = field(default_factory=lambda: ProjectSection())
+    project: ProjectSection = field(default_factory=ProjectSection)
     analyses: list[AnalysisSectionBase] = field(default_factory=list)
     origins_destinations: Optional[OriginsDestinationsSection] = field(
-        default_factory=lambda: OriginsDestinationsSection()
+        default_factory=OriginsDestinationsSection
     )
-    network: NetworkSection = field(default_factory=lambda: NetworkSection())
+    network: NetworkSection = field(default_factory=NetworkSection)
     hazard_names: list[str] = field(default_factory=list)
 
     @property
