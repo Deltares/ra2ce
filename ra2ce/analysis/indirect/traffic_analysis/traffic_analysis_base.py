@@ -20,6 +20,7 @@
 """
 
 import ast
+from collections import defaultdict
 import itertools
 import logging
 import operator
@@ -49,36 +50,32 @@ class TrafficAnalysisBase(ABC):
         Returns:
             pd.DataFrame: Datafarme with the traffic indices for each of analysis.
         """
-        origin_nodes = np.unique(self.road_network["origin"])
-        destination_nodes = np.unique(self.road_network["destination"])
-
         unique_destination_nodes = np.unique(list(self.od_table["d_id"].fillna("0")))
         count_destination_nodes = len([x for x in unique_destination_nodes if x != "0"])
 
-        _traffic: dict[str, AccumulatedTraffic] = {}
-        for o_node in origin_nodes:
-            for d_node in destination_nodes:
-                opt_path = self._get_opt_path_values(o_node, d_node)
-                for u_node, v_node in itertools.pairwise(opt_path):
-                    _nodes_key_name = self._get_node_key(u_node, v_node)
-                    if "," in o_node:
-                        logging.error(
-                            "List of nodes as 'origin node' is not accepted and will be skipped."
-                        )
-                        continue
-                    _calculated_traffic = self._get_accumulated_traffic_from_node(
-                        o_node, count_destination_nodes
+        _traffic = defaultdict(AccumulatedTraffic)
+        for _, _road_network_row in self.road_network.iterrows():
+            # for d_node in destination_nodes:
+            o_node, d_node = (
+                _road_network_row["origin"],
+                _road_network_row["destination"],
+            )
+            opt_path = self._get_opt_path_values(o_node, d_node)
+            for u_node, v_node in itertools.pairwise(opt_path):
+                _nodes_key_name = self._get_node_key(u_node, v_node)
+                if "," in o_node:
+                    logging.error(
+                        "List of nodes as 'origin node' is not accepted and will be skipped."
                     )
+                    continue
+                _calculated_traffic = self._get_accumulated_traffic_from_node(
+                    o_node, count_destination_nodes
+                )
 
-                    if "," in d_node:
-                        _calculated_traffic *= len(d_node.split(","))
+                if "," in d_node:
+                    _calculated_traffic *= len(d_node.split(","))
 
-                    _accumulated_traffic = _traffic.get(
-                        _nodes_key_name, AccumulatedTraffic()
-                    )
-                    _traffic[_nodes_key_name] = (
-                        _accumulated_traffic + _calculated_traffic
-                    )
+                _traffic[_nodes_key_name] += _calculated_traffic
 
         return self._get_route_traffic(_traffic)
 
@@ -97,6 +94,10 @@ class TrafficAnalysisBase(ABC):
         if isinstance(_opt_path_value, list):
             return _opt_path_value
         return ast.literal_eval(_opt_path_value)
+
+    def _get_road_network_row(self, u_node: str, v_node: str) -> pd.DataFrame:
+        _with_u_node = self.road_network[self.road_network["o_node"] == int(u_node)]
+        return _with_u_node[_with_u_node["opt_path"].str.contains(v_node)]
 
     def _get_recorded_traffic_in_node(
         self, origin_node: str, column_name: str, count_destination_nodes: int
