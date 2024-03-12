@@ -19,15 +19,29 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import logging
+from pathlib import Path
+from typing import Optional, Protocol
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from geopandas import GeoDataFrame
+
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisSectionBase
+from ra2ce.network.graph_files.graph_files_protocol import GraphFileProtocol
 
 
-class DirectAnalyses:
-    def __init__(self, config: AnalysisConfigData):
-        self.config = config
+class AnalysisProtocol(Protocol):
+    graph_file: GraphFileProtocol
+    analysis: AnalysisSectionBase
+    input_path: Path
+    output_path: Path
+    result: Optional[GeoDataFrame]
 
-    def execute(self):
-        """Executes the direct analysis."""
-        logging.debug("Execution does not have any defined steps.")
+    def execute(self) -> GeoDataFrame:
+        """
+        Execute the analysis on the given graph/network with the given analysis parameters.
+        The resulting (Geo)DataFrame of the analysis is stored in the result attribute.
+        TODO: Make the return type a result object #318
+
+        Returns:
+            GeoDataFrame: The result of the analysis.
+        """
+        pass

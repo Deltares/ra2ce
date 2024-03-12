@@ -15,17 +15,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from __future__ import annotations
 import logging
 from pathlib import Path
-from typing import Any, Union
+from typing import Any
 
 import networkx as nx
 import osmnx
 import pandas as pd
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
-from shapely.geometry import LineString
 from shapely.geometry.base import BaseGeometry
+from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
+from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 import ra2ce.network.networks_utils as nut
 from ra2ce.network.exporters.json_exporter import JsonExporter
@@ -39,31 +41,51 @@ from ra2ce.network.network_wrappers.osm_network_wrapper.extremities_data import 
 
 
 class OsmNetworkWrapper(NetworkWrapperProtocol):
+
+    polygon_graph: MultiDiGraph
+    network_type: NetworkTypeEnum
+    road_types: list[RoadTypeEnum]
+
     def __init__(self, config_data: NetworkConfigData) -> None:
         self.output_graph_dir = config_data.output_graph_dir
         self.graph_crs = config_data.crs
 
         # Network
-        self.network_type = config_data.network.network_type.config_value
-        self.road_types = list(
-            _enum.config_value for _enum in config_data.network.road_types
-        )
-        self.polygon_path = config_data.network.polygon
+        self.network_type = config_data.network.network_type
+        self.road_types = config_data.network.road_types
+        self.polygon_graph = self._get_clean_graph_from_osm(config_data.network.polygon)
         self.is_directed = config_data.network.directed
 
-    def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
+    @classmethod
+    def with_polygon(
+        cls, config_data: NetworkConfigData, polygon: BaseGeometry
+    ) -> OsmNetworkWrapper:
         """
-        Gets an indirected graph
+        Gets an `OsmNetworkWrapper` with the given `polygon` transformed into a
+        clean graph as the `polygon_graph` property.
+
+        Args:
+            config_data (NetworkConfigData): Basic configuration data which contain information required the different methods of this wrapper.
+            polygon (BaseGeometry): Base polygon from which to generate the graph.
 
         Returns:
-            tuple[MultiGraph, GeoDataFrame]: _description_
+            OsmNetworkWrapper: Wrapper with valid `polygon_graph` property.
         """
+        _wrapper = cls(config_data)
+        _clean_graph = _wrapper._download_clean_graph_from_osm(
+            polygon=polygon,
+            network_type=_wrapper.network_type,
+            road_types=_wrapper.road_types,
+        )
+        _wrapper.polygon_graph = _clean_graph
+        return _wrapper
+
+    def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
         logging.info("Start downloading a network from OSM.")
-        graph_complex = self.get_clean_graph_from_osm()
 
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
-            graph_complex
+            self.polygon_graph
         )
 
         # Create 'edges_complex', convert complex graph to geodataframe
@@ -79,27 +101,48 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
         # Check if all geometries between nodes are there, if not, add them as a straight line.
         graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
-        graph_simple = self._get_avg_speed(graph_simple)
+        graph_simple = self._set_avg_speed_to_graph(graph_simple)
         return graph_simple, edges_complex
 
-    def _get_avg_speed(
+    def _get_avg_speeds(self, original_graph: nx.classes.graph.Graph) -> pd.DataFrame:
+        _save_csv = False
+        _avg_speed_filepath = None
+        if self.output_graph_dir is not None:
+            _save_csv = True
+            _avg_speed_filepath = self.output_graph_dir.joinpath("avg_speed.csv")
+            if _avg_speed_filepath.is_file():
+                return pd.read_csv(_avg_speed_filepath)
+            logging.warning(
+                "No valid file found with average speeds in {}, calculating and saving them instead.".format(
+                    _avg_speed_filepath
+                )
+            )
+
+        return nut.calc_avg_speed(
+            original_graph,
+            "highway",
+            save_csv=_save_csv,
+            save_path=_avg_speed_filepath,
+        )
+
+    def _set_avg_speed_to_graph(
         self, original_graph: nx.classes.graph.Graph
     ) -> nx.classes.graph.Graph:
-        if all(["length" in e for u, v, e in original_graph.edges.data()]) and any(
-            ["maxspeed" in e for u, v, e in original_graph.edges.data()]
-        ):
-            # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
-            path_avg_speed = self.output_graph_dir.joinpath("avg_speed.csv")
-            if path_avg_speed.is_file():
-                avg_speeds = pd.read_csv(path_avg_speed)
-            else:
-                avg_speeds = nut.calc_avg_speed(
-                    original_graph,
-                    "highway",
-                    save_csv=True,
-                    save_path=path_avg_speed,
+
+        _length_array, _maxspeed_array = list(
+            zip(
+                *(
+                    ("length" in e, "maxspeed" in e)
+                    for _, _, e in original_graph.edges.data()
                 )
-            original_graph = nut.assign_avg_speed(original_graph, avg_speeds, "highway")
+            )
+        )
+        if all(_length_array) and any(_maxspeed_array):
+            # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
+            _avg_speeds = self._get_avg_speeds(original_graph)
+            original_graph = nut.assign_avg_speed(
+                original_graph, _avg_speeds, "highway"
+            )
 
             # make a time value of seconds, length of road streches is in meters
             for u, v, k, edata in original_graph.edges.data(keys=True):
@@ -113,6 +156,11 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         return original_graph
 
     def _export_linking_tables(self, linking_tables: tuple[Any]) -> None:
+        if not self.output_graph_dir:
+            logging.warning(
+                "No `output_graph_dir` is set, therefore no intermediate results will be exported."
+            )
+            return
         _exporter = JsonExporter()
         _exporter.export(
             self.output_graph_dir.joinpath("simple_to_complex.json"), linking_tables[0]
@@ -121,25 +169,25 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
             self.output_graph_dir.joinpath("complex_to_simple.json"), linking_tables[1]
         )
 
-    def get_clean_graph_from_osm(self) -> MultiDiGraph:
+    def _get_clean_graph_from_osm(self, polygon_path: Path) -> MultiDiGraph | None:
         """
-        Creates a network from a polygon by by downloading via the OSM API in its extent.
+        Creates a network from a polygon by downloading via the OSM API in its extent.
 
-        Raises:
-            FileNotFoundError: When no valid polygon file is provided.
+        Args:
+            polygon_path (Path): Path where the polygon file can be found.
 
         Returns:
             MultiDiGraph: Complex (clean) graph after download from OSM, for use in the direct analyses and input to derive simplified network.
         """
         # It can only read in one geojson
-        if not isinstance(self.polygon_path, Path):
-            raise ValueError("No valid value provided for polygon file.")
-        if not self.polygon_path.is_file():
-            raise FileNotFoundError(
-                "No polygon_file file found at {}.".format(self.polygon_path)
-            )
+        if not isinstance(polygon_path, Path):
+            logging.warning("No valid value provided for polygon file.")
+            return None
+        elif not polygon_path.is_file():
+            logging.error("No polygon_file file found at {}.".format(polygon_path))
+            return None
 
-        _normalized_polygon = nut.get_normalized_geojson_polygon(self.polygon_path)
+        _normalized_polygon = nut.get_normalized_geojson_polygon(polygon_path)
         _complex_graph = self._download_clean_graph_from_osm(
             polygon=_normalized_polygon,
             network_type=self.network_type,
@@ -148,31 +196,40 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         return _complex_graph
 
     def _download_clean_graph_from_osm(
-        self, polygon: BaseGeometry, road_types: list[str], network_type: str
+        self,
+        polygon: BaseGeometry,
+        road_types: list[RoadTypeEnum],
+        network_type: NetworkTypeEnum,
     ) -> MultiDiGraph:
         _available_road_types = road_types and any(road_types)
+        _road_types_as_str = (
+            list(map(lambda x: x.config_value, road_types))
+            if _available_road_types
+            else []
+        )
+
         if not _available_road_types and not network_type:
             raise ValueError("Either of the link_type or network_type should be known")
         elif not _available_road_types:
             # The user specified only the network type.
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon,
-                network_type=network_type,
+                network_type=network_type.config_value,
                 simplify=False,
                 retain_all=True,
             )
         elif not network_type:
             # The user specified only the road types.
-            cf = f'["highway"~"{"|".join(road_types)}"]'
+            cf = f'["highway"~"{"|".join(_road_types_as_str)}"]'
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon, custom_filter=cf, simplify=False, retain_all=True
             )
         else:
             # _available_road_types and network_type
-            cf = f'["highway"~"{"|".join(road_types)}"]'
+            cf = f'["highway"~"{"|".join(_road_types_as_str)}"]'
             _complex_graph = osmnx.graph_from_polygon(
                 polygon=polygon,
-                network_type=network_type,
+                network_type=network_type.config_value,
                 custom_filter=cf,
                 simplify=False,
                 retain_all=True,

@@ -22,7 +22,6 @@
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 
 from ra2ce.analysis.analysis_config_wrapper import (
     AnalysisConfigWrapper,
