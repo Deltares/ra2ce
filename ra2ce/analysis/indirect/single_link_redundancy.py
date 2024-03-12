@@ -14,14 +14,16 @@ from ra2ce.analysis.indirect.weighing_analysis.weighing_analysis_factory import 
     WeighingAnalysisFactory,
 )
 from ra2ce.network.graph_files.graph_file import GraphFile
+from ra2ce.network.hazard.hazard_names import HazardNames
 
 
 class SingleLinkRedundancy(AnalysisIndirectProtocol):
     graph_file: GraphFile
     analysis: AnalysisSectionIndirect
-    input_path: Path = None
-    output_path: Path = None
-    result: GeoDataFrame = None
+    input_path: Path
+    output_path: Path
+    hazard_names: HazardNames
+    result: GeoDataFrame
 
     def __init__(
         self,
@@ -29,13 +31,17 @@ class SingleLinkRedundancy(AnalysisIndirectProtocol):
         analysis: AnalysisSectionIndirect,
         input_path: Path,
         output_path: Path,
+        hazard_names: HazardNames,
     ) -> None:
         self.graph_file = graph_file
         self.analysis = analysis
         self.input_path = input_path
         self.output_path = output_path
+        self.hazard_names = hazard_names
+        self.result = None
 
     def execute(self) -> GeoDataFrame:
+        """This is the function to analyse roads with a single link disruption and an alternative route."""
         # TODO adjust to the right names of the RA2CE tool
         # if 'road_usage_data_path' in InputDict:
         #     road_usage_data = pd.read_excel(InputDict.road_usage_data_path)

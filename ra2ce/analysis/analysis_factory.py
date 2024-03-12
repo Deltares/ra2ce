@@ -30,8 +30,8 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.direct import DirectDamage, EffectivenessMeasures
+from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
 from ra2ce.analysis.indirect import (
     Losses,
     MultiLinkIsolatedLocations,
@@ -44,6 +44,8 @@ from ra2ce.analysis.indirect import (
     SingleLinkLosses,
     SingleLinkRedundancy,
 )
+from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
+from ra2ce.network.hazard.hazard_names import HazardNames
 
 
 class AnalysisFactory:
@@ -54,7 +56,9 @@ class AnalysisFactory:
     ) -> None:
         self.analysis = analysis
 
-    def get_analysis(self, analysis_config: AnalysisConfigWrapper) -> AnalysisProtocol:
+    def get_direct_analysis(
+        self, analysis_config: AnalysisConfigWrapper
+    ) -> AnalysisDirectProtocol:
         """
         Create an analysis based on the given analysis configuration.
 
@@ -65,104 +69,96 @@ class AnalysisFactory:
             NotImplementedError: The analysis type is not implemented.
 
         Returns:
-            AnalysisProtocol: The analysis to be executed.
+            AnalysisIndirectProtocol: The direct analysis to be executed.
         """
+        _input_dict = dict(
+            analysis=self.analysis,
+            input_path=analysis_config.config_data.input_path,
+            output_path=analysis_config.config_data.output_path,
+        )
         if self.analysis.analysis == AnalysisDirectEnum.DIRECT:
             return DirectDamage(
-                analysis_config.graph_files.base_network_hazard,
-                self.analysis,
-                analysis_config.config_data.input_path,
-                analysis_config.config_data.output_path,
+                graph_file=analysis_config.graph_files.base_network_hazard,
+                **_input_dict,
             )
-        elif self.analysis.analysis == AnalysisDirectEnum.EFFECTIVENESS_MEASURES:
+        if self.analysis.analysis == AnalysisDirectEnum.EFFECTIVENESS_MEASURES:
             return EffectivenessMeasures(
-                analysis_config.graph_files.base_network_hazard,
-                self.analysis,
-                analysis_config.config_data.input_path,
-                analysis_config.config_data.output_path,
+                graph_file=analysis_config.graph_files.base_network_hazard,
+                **_input_dict,
             )
-        elif self.analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY:
+        raise NotImplementedError(f"Analysis {self.analysis.analysis} not implemented")
+
+    def get_indirect_analysis(
+        self, analysis_config: AnalysisConfigWrapper
+    ) -> AnalysisIndirectProtocol:
+        """
+        Create an analysis based on the given analysis configuration.
+
+        Args:
+            analysis_config (AnalysisConfigWrapper): Analysis configuration.
+
+        Raises:
+            NotImplementedError: The analysis type is not implemented.
+
+        Returns:
+            AnalysisIndirectProtocol: The indirect analysis to be executed.
+        """
+        _input_dict = dict(
+            analysis=self.analysis,
+            input_path=analysis_config.config_data.input_path,
+            output_path=analysis_config.config_data.output_path,
+            hazard_names=HazardNames.from_config(analysis_config),
+        )
+        if self.analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY:
             return SingleLinkRedundancy(
-                analysis_config.graph_files.base_graph,
-                self.analysis,
-                analysis_config.config_data.input_path,
-                analysis_config.config_data.output_path,
+                graph_file=analysis_config.graph_files.base_graph, **_input_dict
             )
-        elif self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_REDUNDANCY:
+        if self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_REDUNDANCY:
             return MultiLinkRedundancy(
-                analysis_config.graph_files.base_graph_hazard,
-                self.analysis,
-                analysis_config.config_data.input_path,
-                analysis_config.config_data.output_path,
+                graph_file=analysis_config.graph_files.base_graph_hazard, **_input_dict
             )
-        elif (
+        if (
             self.analysis.analysis
             == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION
         ):
             return OptimalRouteOriginDestination(
-                analysis_config.graph_files.origins_destinations_graph,
-                self.analysis,
-                analysis_config.config_data.input_path,
-                analysis_config.config_data.output_path,
+                graph_file=analysis_config.graph_files.origins_destinations_graph,
+                **_input_dict,
             )
-        elif (
-            self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_DESTINATION
-        ):
+        if self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_DESTINATION:
             return MultiLinkOriginDestination(
-                analysis_config.graph_files.origins_destinations_graph_hazard,
-                self.analysis,
-                analysis_config.config_data.input_path,
-                analysis_config.config_data.output_path,
+                graph_file=analysis_config.graph_files.origins_destinations_graph_hazard,
+                **_input_dict,
             )
-        elif (
+        if (
             self.analysis.analysis
             == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
         ):
             return OptimalRouteOriginClosestDestination(
-                analysis_config.graph_files.origins_destinations_graph,
-                self.analysis,
-                analysis_config.config_data.input_path,
-                analysis_config.config_data.output_path,
+                graph_file=analysis_config.graph_files.origins_destinations_graph,
+                **_input_dict,
             )
-        elif (
+        if (
             self.analysis.analysis
             == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
         ):
             return MultiLinkOriginClosestDestination(
-                analysis_config.graph_files.origins_destinations_graph,
-                analysis_config.graph_files.origins_destinations_graph_hazard,
-                self.analysis,
-                analysis_config.config_data.input_path,
-                analysis_config.config_data.output_path,
+                graph_file=analysis_config.graph_files.origins_destinations_graph,
+                graph_file_hazard=analysis_config.graph_files.origins_destinations_graph_hazard,
+                **_input_dict,
             )
-        elif self.analysis.analysis == AnalysisIndirectEnum.LOSSES:
-            return Losses(
-                analysis_config.graph_files.base_graph_hazard,
-                self.analysis,
-                analysis_config.config_data.input_path,
-                analysis_config.config_data.output_path,
-            )
-        elif self.analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
+        if self.analysis.analysis == AnalysisIndirectEnum.LOSSES:
+            return Losses(analysis_config.graph_files.base_graph_hazard, **_input_dict)
+        if self.analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
             return SingleLinkLosses(
-                analysis_config.graph_files.base_graph_hazard,
-                self.analysis,
-                analysis_config.config_data.input_path,
-                analysis_config.config_data.output_path,
+                graph_file=analysis_config.graph_files.base_graph_hazard, **_input_dict
             )
-        elif self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
+        if self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
             return MultiLinkLosses(
-                analysis_config.graph_files.base_graph_hazard,
-                self.analysis,
-                analysis_config.config_data.input_path,
-                analysis_config.config_data.output_path,
+                graph_file=analysis_config.graph_files.base_graph_hazard, **_input_dict
             )
-        elif (
-            self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS
-        ):
+        if self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS:
             return MultiLinkIsolatedLocations(
-                analysis_config.graph_files.base_graph_hazard,
-                self.analysis,
-                analysis_config.config_data.input_path,
-                analysis_config.config_data.output_path,
+                graph_file=analysis_config.graph_files.base_graph_hazard, **_input_dict
             )
-        raise NotImplementedError
+        raise NotImplementedError(f"Analysis {self.analysis.analysis} not implemented")

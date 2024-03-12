@@ -20,7 +20,6 @@
 """
 
 from pathlib import Path
-from typing import Optional
 
 from geopandas import GeoDataFrame
 
@@ -36,4 +35,4 @@ class AnalysisDirectProtocol(AnalysisProtocol):
     analysis: AnalysisSectionDirect
     input_path: Path
     output_path: Path
-    result: Optional[GeoDataFrame]
+    result: GeoDataFrame

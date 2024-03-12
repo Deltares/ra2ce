@@ -25,13 +25,14 @@ from dataclasses import dataclass, field
 
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_factory import AnalysisFactory
-from ra2ce.analysis.analysis_protocol import AnalysisProtocol
+from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
+from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 
 
 @dataclass
 class AnalysisCollection:
-    direct_analyses: list[AnalysisProtocol] = field(default_factory=list)
-    indirect_analyses: list[AnalysisProtocol] = field(default_factory=list)
+    direct_analyses: list[AnalysisDirectProtocol] = field(default_factory=list)
+    indirect_analyses: list[AnalysisIndirectProtocol] = field(default_factory=list)
 
     @classmethod
     def from_config(cls, analysis_config: AnalysisConfigWrapper) -> AnalysisCollection:
@@ -46,11 +47,11 @@ class AnalysisCollection:
         """
         return cls(
             direct_analyses=[
-                AnalysisFactory(analysis).get_analysis(analysis_config)
+                AnalysisFactory(analysis).get_direct_analysis(analysis_config)
                 for analysis in analysis_config.config_data.direct
             ],
             indirect_analyses=[
-                AnalysisFactory(analysis).get_analysis(analysis_config)
+                AnalysisFactory(analysis).get_indirect_analysis(analysis_config)
                 for analysis in analysis_config.config_data.indirect
             ],
         )

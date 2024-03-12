@@ -25,6 +25,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+
 FILE_NAME_KEY = "File name"
 RA2CE_NAME_KEY = "RA2CE name"
 
@@ -32,10 +34,17 @@ RA2CE_NAME_KEY = "RA2CE name"
 class HazardNames:
     names_df: pd.DataFrame
     names: list[str]
+    names_config: list[str]
 
-    def __init__(self, hazard_names_df: pd.DataFrame, hazard_names: list[str]) -> None:
+    def __init__(
+        self,
+        hazard_names_df: pd.DataFrame,
+        hazard_names: list[str],
+        names_config: list[str] = [],
+    ) -> None:
         self.names_df = hazard_names_df
         self.names = hazard_names
+        self.names_config = names_config
 
     @classmethod
     def from_file(cls, hazard_names_file: Path) -> HazardNames:
@@ -55,6 +64,24 @@ class HazardNames:
             _names_df = pd.DataFrame(data=None)
             _names = []
         return cls(_names_df, _names)
+
+    @classmethod
+    def from_config(cls, analysis_config: AnalysisConfigWrapper) -> HazardNames:
+        """
+        Create a HazardNames object from an analysis configuration.
+
+        Args:
+            analysis_config (AnalysisConfigWrapper): Analysis configuration.
+
+        Returns:
+            HazardNames: HazardNames object.
+        """
+        _hazard_file = analysis_config.config_data.output_path.joinpath(
+            "hazard_names.xlsx"
+        )
+        _hazard_names = cls.from_file(_hazard_file)
+        _hazard_names.names_config = analysis_config.config_data.hazard_names
+        return _hazard_names
 
     def get_name(self, hazard: str) -> str:
         """
