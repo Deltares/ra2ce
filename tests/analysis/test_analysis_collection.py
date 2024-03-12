@@ -123,7 +123,8 @@ class TestAnalysisCollection:
     ):
         # 1. Define test data.
         _config = AnalysisConfigWrapper()
-        _config.config_data.input_path = Path("Any path")
+        _config.config_data.input_path = Path("Any input path")
+        _config.config_data.output_path = Path("Any output path")
         _config.config_data.analyses.append(
             self.MockAnalysisSectionIndirect(analysis=analysis)
         )

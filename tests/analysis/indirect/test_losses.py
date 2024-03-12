@@ -35,6 +35,7 @@ class TestLosses:
             _analysis,
             _config.config_data.input_path,
             _config.config_data.output_path,
+            [],
         )
 
         # 3. Verify final expectations.
@@ -58,6 +59,7 @@ class TestLosses:
             _analysis,
             _config.config_data.input_path,
             _config.config_data.output_path,
+            [],
         )
         _capacity = pd.Series([42, 24, 12])
         _intensity = pd.Series([4.2, 2.4, 1.2])
@@ -97,6 +99,7 @@ class TestLosses:
             _analyses,
             _config.config_data.input_path,
             _config.config_data.output_path,
+            [],
         )
         _traffic_data = pd.DataFrame(
             {
