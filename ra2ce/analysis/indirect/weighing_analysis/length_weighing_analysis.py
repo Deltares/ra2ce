@@ -1,0 +1,19 @@
+import numpy as np
+import geopandas as gpd
+
+from ra2ce.analysis.indirect.weighing_analysis.weighing_analysis_protocol import (
+    WeighingAnalysisProtocol,
+)
+
+
+class LengthWeighingAnalysis(WeighingAnalysisProtocol):
+    weighing_data: dict
+
+    def calculate_distance(self) -> float:
+        return np.nan
+
+    def calculate_alternative_distance(self, alt_dist: float) -> float:
+        return alt_dist
+
+    def extend_graph(self, gdf_graph: gpd.GeoDataFrame | dict) -> None:
+        return

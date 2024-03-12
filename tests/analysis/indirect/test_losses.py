@@ -10,9 +10,11 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
 from ra2ce.analysis.indirect.losses import Losses
+from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 
 
 class TestLosses:
+
     def test_initialize(self):
         # 1. Define test data
         _config = AnalysisConfigData(input_path=Path("sth"))
@@ -27,6 +29,7 @@ class TestLosses:
         )
 
         # 2. Run test.
+
         _losses = Losses(_config, _analyses)
 
         # 3. Verify final expectations.
@@ -60,7 +63,8 @@ class TestLosses:
         )
 
     @pytest.mark.parametrize(
-        "part_of_day", [pytest.param("daily"), pytest.param("evening")]
+        "part_of_day",
+        [pytest.param(PartOfDayEnum.DAY), pytest.param(PartOfDayEnum.EVENING)],
     )
     def test_calc_vlh(self, part_of_day: str):
         # 1. Define test data
@@ -94,7 +98,7 @@ class TestLosses:
         )
         _mi = list(
             itertools.product(
-                ["freight", "commute", "business", "other"], ["vehicle_loss_hour"]
+                ["freight", "commute", "business", "other"], ["value_of_time"]
             )
         )
         _mi_idx = pd.MultiIndex.from_tuples(_mi, names=["A", "B"])
@@ -107,7 +111,9 @@ class TestLosses:
         )
 
         # 2. Run test.
-        _result = _losses.calc_vlh(_traffic_data, _vehicle_loss_hours, _detour_data)
+        _result = _losses.calc_vlh_with_shockwave(
+            _traffic_data, _vehicle_loss_hours, _detour_data
+        )
 
         # 3. Verify final expectations.
         assert isinstance(_result, pd.DataFrame)
