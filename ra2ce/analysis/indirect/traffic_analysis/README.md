@@ -1,6 +1,6 @@
 # Traffic analysis.
 
-In this module all dataclasses, classes and related can be found in order to generate a traffic analysis.
+In this package all dataclasses, classes and related can be found in order to generate a traffic analysis.
 We distinguish two types of analysis:
 - Traffic analysis (`TrafficAnalysis`). Provides utilitarian and egalitarian traffic data.
 - Equity analysis (`EquityAnalysis`), contains equity data relating regions and their road 'weights'. Provides utilitarian, egalitarian and prioritarian traffic data.
