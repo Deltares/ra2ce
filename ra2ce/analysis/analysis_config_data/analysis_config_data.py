@@ -35,6 +35,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
+from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.network.network_config_data.network_config_data import (
     NetworkSection,
     OriginsDestinationsSection,
@@ -87,11 +88,14 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     duration_event: float = math.nan
     duration_disruption: float = math.nan
     fraction_detour: float = math.nan
-    fraction_drivethrough: float = math.nan
+    fraction_drivethrough: float = 0.0
     rest_capacity: float = math.nan
     maximum_jam: float = math.nan
-    partofday: str = ""
-    # accessiblity analyses
+    partofday: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
+    performance: str = "diff_time"  # "diff_time" or "diff_dist" relates to the used criticality metric
+    resilience_curve_file: str = ""
+    disruption_steps_file: str = ""
+    # accessibility analyses
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     threshold: float = math.nan
     threshold_destinations: float = math.nan
