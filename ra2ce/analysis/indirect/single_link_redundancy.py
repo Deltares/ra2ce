@@ -56,7 +56,7 @@ class SingleLinkRedundancy(AnalysisIndirectProtocol):
             # remove the edge
             self.graph_file.graph.remove_edge(u, v, k)
 
-            if nx.has_path(self.graph_file, u, v):
+            if nx.has_path(self.graph_file.graph, u, v):
                 # calculate the alternative distance if that edge is unavailable
                 alt_dist = nx.dijkstra_path_length(
                     self.graph_file.graph,
