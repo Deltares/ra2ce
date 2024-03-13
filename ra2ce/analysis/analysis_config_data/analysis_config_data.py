@@ -94,7 +94,8 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     partofday: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
     performance: str = "diff_time"  # "diff_time" or "diff_dist" relates to the used criticality metric
     resilience_curve_file: str = ""
-    disruption_steps_file: str = ""
+    traffic_intensities_file: str = ""
+    values_of_time_file: str = ""
     # accessibility analyses
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     threshold: float = math.nan

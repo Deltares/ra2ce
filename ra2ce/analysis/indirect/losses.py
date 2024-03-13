@@ -53,7 +53,7 @@ class Losses:
             self.losses_input_path.joinpath("network.geojson")
         )
         self.intensities = self._load_df_from_csv(
-            self.losses_input_path.joinpath("traffic_intensities.csv"), []
+            self.losses_input_path.joinpath(analysis.traffic_intensities_file), []
         )  # per day
 
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
@@ -65,8 +65,10 @@ class Losses:
             ["disruption_steps", "functionality_loss_ratio"],
         )
         self.values_of_time = self._load_df_from_csv(
-            self.losses_input_path.joinpath("values_of_time.csv"), []
+            self.losses_input_path.joinpath(analysis.values_of_time_file), []
         )
+
+
 
     def _load_df_from_csv(
         self,
