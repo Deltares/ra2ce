@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
@@ -31,17 +32,9 @@ FILE_NAME_KEY = "File name"
 RA2CE_NAME_KEY = "RA2CE name"
 
 
+@dataclass
 class HazardNames:
     names_df: pd.DataFrame
-    names: list[str]
-
-    def __init__(
-        self,
-        hazard_names_df: pd.DataFrame,
-        hazard_names: list[str],
-    ) -> None:
-        self.names_df = hazard_names_df
-        self.names = hazard_names
 
     @classmethod
     def from_file(cls, hazard_names_file: Path) -> HazardNames:
@@ -56,11 +49,9 @@ class HazardNames:
         """
         if hazard_names_file.is_file():
             _names_df = pd.read_excel(hazard_names_file)
-            _names = _names_df[FILE_NAME_KEY].tolist()
         else:
             _names_df = pd.DataFrame(data=None)
-            _names = []
-        return cls(_names_df, _names)
+        return cls(names_df=_names_df)
 
     @classmethod
     def from_config(cls, analysis_config: AnalysisConfigWrapper) -> HazardNames:
@@ -77,6 +68,18 @@ class HazardNames:
             "hazard_names.xlsx"
         )
         return cls.from_file(_hazard_file)
+
+    @property
+    def names(self) -> list[str]:
+        """
+        Get the list of hazard names.
+
+        Returns:
+            list[str]: List of hazard names.
+        """
+        if self.names_df.empty:
+            return []
+        return self.names_df[FILE_NAME_KEY].tolist()
 
     def get_name(self, hazard: str) -> str:
         """
