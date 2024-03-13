@@ -55,7 +55,7 @@ class Losses:
         self.intensities = self._load_df_from_csv(analysis.traffic_intensities_file, [])  # per day
 
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
-        self.criticality_data = self._load_df_from_csv("criticality_data.csv", [])
+        self.criticality_data = self._load_df_from_csv(Path("criticality_data.csv"), [])
         self.resilience_curve = self._load_df_from_csv((analysis.resilience_curve_file),
                                                        ["disruption_steps", "functionality_loss_ratio",
                                                         "link_type_hazard_intensity"],
@@ -67,7 +67,7 @@ class Losses:
             csv_path: Path,
             columns_to_interpret: list[str],
     ) -> pd.DataFrame:
-        if not csv_path.exists():
+        if csv_path is None or not csv_path.exists():
             logging.warning("No `csv` file found at {}.".format(csv_path))
             return pd.DataFrame()
 
