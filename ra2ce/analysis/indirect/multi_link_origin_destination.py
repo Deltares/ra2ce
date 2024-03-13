@@ -110,7 +110,7 @@ class MultiLinkOriginDestination(AnalysisIndirectProtocol):
         od_nodes = self._get_origin_destination_pairs(graph)
 
         all_results = []
-        for hazard in self.hazard_names.names_config:
+        for hazard in self.hazard_names.names:
             hazard_name = self.hazard_names.get_name(hazard)
 
             graph_hz = copy.deepcopy(graph)

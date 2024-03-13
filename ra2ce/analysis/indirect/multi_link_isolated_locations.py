@@ -167,7 +167,7 @@ class MultiLinkIsolatedLocations(AnalysisIndirectProtocol):
 
         # create an empty list to append the df_aggregation to
         aggregation = pd.DataFrame()
-        for hazard in self.hazard_names.names_config:
+        for hazard in self.hazard_names.names:
             # for each hazard event
             hazard_name = self.hazard_names.get_name(hazard)
 

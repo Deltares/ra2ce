@@ -34,17 +34,14 @@ RA2CE_NAME_KEY = "RA2CE name"
 class HazardNames:
     names_df: pd.DataFrame
     names: list[str]
-    names_config: list[str]
 
     def __init__(
         self,
         hazard_names_df: pd.DataFrame,
         hazard_names: list[str],
-        names_config: list[str] = [],
     ) -> None:
         self.names_df = hazard_names_df
         self.names = hazard_names
-        self.names_config = names_config
 
     @classmethod
     def from_file(cls, hazard_names_file: Path) -> HazardNames:
@@ -79,9 +76,7 @@ class HazardNames:
         _hazard_file = analysis_config.config_data.output_path.joinpath(
             "hazard_names.xlsx"
         )
-        _hazard_names = cls.from_file(_hazard_file)
-        _hazard_names.names_config = analysis_config.config_data.hazard_names
-        return _hazard_names
+        return cls.from_file(_hazard_file)
 
     def get_name(self, hazard: str) -> str:
         """

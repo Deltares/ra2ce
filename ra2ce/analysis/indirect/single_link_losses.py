@@ -98,7 +98,7 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         disruption_df: pd.DataFrame,
     ):
         _road_classes = [x for x in disruption_df.columns if "class" in x]
-        for hz in self.hazard_names.names_config:
+        for hz in self.hazard_names.names:
             disruption_df["class_identifier"] = ""
             gdf["class_identifier"] = ""
             for i, road_class in enumerate(_road_classes):
