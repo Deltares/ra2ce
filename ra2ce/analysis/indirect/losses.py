@@ -40,7 +40,6 @@ class Losses:
     def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionIndirect):
         self.losses_input_path: Path = config.input_path.joinpath("losses")
         self.duration_event: float = analysis.duration_event
-        self.traffic_throughput: float = analysis.fraction_drivethrough
         self.rest_capacity: float = analysis.rest_capacity
         self.maximum: float = analysis.maximum_jam
         self.partofday: PartOfDayEnum = analysis.partofday
