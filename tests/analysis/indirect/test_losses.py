@@ -15,7 +15,27 @@ from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEn
 
 class TestLosses:
 
-    def test_initialize(self):
+    def test_initialize_no_data(self):
+        # 1. Define test data
+        _config = AnalysisConfigData(input_path=Path("sth"))
+        _analyses = AnalysisSectionIndirect(
+            duration_event=None,
+            duration_disruption=None,
+            fraction_detour=None,
+            fraction_drivethrough=None,
+            rest_capacity=None,
+            maximum_jam=None,
+            partofday=None,
+        )
+
+        # 2. Run test.
+
+        _losses = Losses(_config, _analyses)
+
+        # 3. Verify final expectations.
+        assert isinstance(_losses, Losses)
+
+    def test_initialize_with_data(self):
         # 1. Define test data
         _config = AnalysisConfigData(input_path=Path("sth"))
         _analyses = AnalysisSectionIndirect(
