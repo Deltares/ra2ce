@@ -155,7 +155,9 @@ class AnalysisFactory:
                 file_id=analysis_config.config_data.network.file_id,
             )
         if self.analysis.analysis == AnalysisIndirectEnum.LOSSES:
-            return Losses(analysis_config.graph_files.base_graph_hazard, **_input_dict)
+            return Losses(
+                graph_file=analysis_config.graph_files.base_graph_hazard, **_input_dict
+            )
         if self.analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
             return SingleLinkLosses(
                 graph_file=analysis_config.graph_files.base_graph_hazard, **_input_dict
