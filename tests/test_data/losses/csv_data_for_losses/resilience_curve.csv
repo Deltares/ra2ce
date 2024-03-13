@@ -1,0 +1,3 @@
+link_type_hazard_intensity;disruption_steps;functionality_loss_ratio
+motorway;(3, 5);(1, 0.4)
+primary;(1, 0.4);()
