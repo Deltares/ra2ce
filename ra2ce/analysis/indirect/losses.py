@@ -52,28 +52,20 @@ class Losses:
         self.network = self._load_gdf(
             self.losses_input_path.joinpath("network.geojson")
         )
-        self.intensities = self._load_df_from_csv(
-            self.losses_input_path.joinpath(analysis.traffic_intensities_file), []
-        )  # per day
+        self.intensities = self._load_df_from_csv(analysis.traffic_intensities_file, [])  # per day
 
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
-        self.criticality_data = self._load_df_from_csv(
-            self.losses_input_path.joinpath("criticality_data.csv"), []
-        )
-        self.resilience_curve = self._load_df_from_csv(
-            self.losses_input_path.joinpath(analysis.resilience_curve_file),
-            ["disruption_steps", "functionality_loss_ratio"],
-        )
-        self.values_of_time = self._load_df_from_csv(
-            self.losses_input_path.joinpath(analysis.values_of_time_file), []
-        )
-
-
+        self.criticality_data = self._load_df_from_csv("criticality_data.csv", [])
+        self.resilience_curve = self._load_df_from_csv((analysis.resilience_curve_file),
+                                                       ["disruption_steps", "functionality_loss_ratio",
+                                                        "link_type_hazard_intensity"],
+                                                       )
+        self.values_of_time = self._load_df_from_csv(analysis.values_of_time_file, [])
 
     def _load_df_from_csv(
-        self,
-        csv_path: Path,
-        columns_to_interpret: list[str],
+            self,
+            csv_path: Path,
+            columns_to_interpret: list[str],
     ) -> pd.DataFrame:
         if not csv_path.exists():
             logging.warning("No `csv` file found at {}.".format(csv_path))
@@ -94,21 +86,21 @@ class Losses:
         return gpd.GeoDataFrame()
 
     def traffic_shockwave(
-        self, vlh: pd.DataFrame, capacity: pd.Series, intensity: pd.Series
+            self, vlh: pd.DataFrame, capacity: pd.Series, intensity: pd.Series
     ) -> pd.DataFrame:
         vlh["vlh_traffic"] = (
-            (self.duration**2)
-            * (self.rest_capacity - 1)
-            * (self.rest_capacity * capacity - intensity / self.traffic_throughput)
-            / (2 * (1 - ((intensity / self.traffic_throughput) / capacity)))
+                (self.duration ** 2)
+                * (self.rest_capacity - 1)
+                * (self.rest_capacity * capacity - intensity / self.traffic_throughput)
+                / (2 * (1 - ((intensity / self.traffic_throughput) / capacity)))
         )
         return vlh
 
     def calc_vlh_with_shockwave(
-        self,
-        traffic_data: pd.DataFrame,
-        values_of_time: dict,
-        criticality_data: pd.DataFrame,
+            self,
+            traffic_data: pd.DataFrame,
+            values_of_time: dict,
+            criticality_data: pd.DataFrame,
     ) -> pd.DataFrame:
 
         vlh = pd.DataFrame(
@@ -141,17 +133,17 @@ class Losses:
         # all values above maximum, limit to maximum
         # TODO: integration here of time and traffic_throughput.
         vlh["vlh_detour"] = (
-            intensity * ((1 - self.traffic_throughput) * self.duration) * detour_time
-        ) / 60
+                                    intensity * ((1 - self.traffic_throughput) * self.duration) * detour_time
+                            ) / 60
         vlh["vlh_detour"] = vlh["vlh_detour"].apply(
             lambda x: np.where(x < 0, 0, x)
         )  # all values below 0 -> 0
 
         if (
-            diff_event_disr > 0
+                diff_event_disr > 0
         ):  # when the event is done, but the disruption continues after the event. Calculate extra detour times
             temp = (
-                diff_event_disr * (detour_time * self.detour_traffic * detour_time) / 60
+                    diff_event_disr * (detour_time * self.detour_traffic * detour_time) / 60
             )
             temp = temp.apply(
                 lambda x: np.where(x < 0, 0, x)
@@ -162,58 +154,58 @@ class Losses:
 
         if self.partofday == PartOfDayEnum.DAY:
             vlh["euro_per_hour"] = (
-                (
-                    traffic_data["day_freight"]
-                    / traffic_data["day_total"]
-                    * values_of_time["freight"]["value_of_time"]
-                )
-                + (
-                    traffic_data["day_commute"]
-                    / traffic_data["day_total"]
-                    * values_of_time["commute"]["value_of_time"]
-                )
-                + (
-                    traffic_data["day_business"]
-                    / traffic_data["day_total"]
-                    * values_of_time["business"]["value_of_time"]
-                )
-                + (
-                    traffic_data["day_other"]
-                    / traffic_data["day_total"]
-                    * values_of_time["other"]["value_of_time"]
-                )
+                    (
+                            traffic_data["day_freight"]
+                            / traffic_data["day_total"]
+                            * values_of_time["freight"]["value_of_time"]
+                    )
+                    + (
+                            traffic_data["day_commute"]
+                            / traffic_data["day_total"]
+                            * values_of_time["commute"]["value_of_time"]
+                    )
+                    + (
+                            traffic_data["day_business"]
+                            / traffic_data["day_total"]
+                            * values_of_time["business"]["value_of_time"]
+                    )
+                    + (
+                            traffic_data["day_other"]
+                            / traffic_data["day_total"]
+                            * values_of_time["other"]["value_of_time"]
+                    )
             )
             # to calculate costs per unit traffi per hour. This is weighted based on the traffic mix and value of each traffic type
 
         if self.partofday == PartOfDayEnum.EVENING:
             vlh["euro_per_hour"] = (
-                (
-                    traffic_data["evening_freight"]
-                    / traffic_data["evening_total"]
-                    * values_of_time["freight"]["value_of_time"]
-                )
-                + (
-                    traffic_data["evening_commute"]
-                    / traffic_data["evening_total"]
-                    * values_of_time["commute"]["value_of_time"]
-                )
-                + (
-                    traffic_data["evening_business"]
-                    / traffic_data["evening_total"]
-                    * values_of_time["business"]["value_of_time"]
-                )
-                + (
-                    traffic_data["evening_other"]
-                    / traffic_data["evening_total"]
-                    * values_of_time["other"]["value_of_time"]
-                )
+                    (
+                            traffic_data["evening_freight"]
+                            / traffic_data["evening_total"]
+                            * values_of_time["freight"]["value_of_time"]
+                    )
+                    + (
+                            traffic_data["evening_commute"]
+                            / traffic_data["evening_total"]
+                            * values_of_time["commute"]["value_of_time"]
+                    )
+                    + (
+                            traffic_data["evening_business"]
+                            / traffic_data["evening_total"]
+                            * values_of_time["business"]["value_of_time"]
+                    )
+                    + (
+                            traffic_data["evening_other"]
+                            / traffic_data["evening_total"]
+                            * values_of_time["other"]["value_of_time"]
+                    )
             )
             # to calculate costs per unit traffi per hour. This is weighted based on the traffic mix and value of each traffic type
         vlh["euro_vlh"] = vlh["euro_per_hour"] * vlh["vlh_total"]
         return vlh
 
     def _get_vot_intensity_per_trip_purpose(
-        self, trip_types: list[str]
+            self, trip_types: list[str]
     ) -> dict[str, pd.DataFrame]:
         """
         Generates a dictionary with all available `vot_purpose` with their intensity as a `pd.DataFrame`.
@@ -223,7 +215,7 @@ class Losses:
             vot_var_name = f"vot_{purpose}"
             partofday_trip_purpose_name = f"{self.partofday.config_value}_{purpose}"
             partofday_trip_purpose_intensity_name = (
-                "intensity_" + partofday_trip_purpose_name
+                    "intensity_" + partofday_trip_purpose_name
             )
             # read and set the vot's
             _vot_dict[vot_var_name] = self.values_of_time.loc[
@@ -231,16 +223,16 @@ class Losses:
             ].item()
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
-                self.intensities[partofday_trip_purpose_name] / 24
+                    self.intensities[partofday_trip_purpose_name] / 24
             )
         return dict(_vot_dict)
 
     def calc_vlh(self) -> pd.DataFrame:
         _link_types_heights_ranges = self._get_link_types_heights_ranges()
-        _inundation_height_ranges = _link_types_heights_ranges[1]
+        _hazard_intensity_ranges = _link_types_heights_ranges[1]
 
         def _get_range(height: float) -> str:
-            for range_tuple in _inundation_height_ranges:
+            for range_tuple in _hazard_intensity_ranges:
                 x, y = range_tuple
                 if x <= height <= y:
                     return f"{x}_{y}"
@@ -254,7 +246,7 @@ class Losses:
         # Read the performance_change stating the functionality drop
         performance_change = self.criticality_data[self.performance_metric]
 
-        # find the link_type and the inundation height
+        # find the link_type and the hazard intensity
         vlh = pd.merge(
             vlh,
             self.network[["link_id", "link_type"]],
@@ -278,16 +270,16 @@ class Losses:
         for link_id, vlh_row in vlh.iterrows():
             for event in events:
                 vlh_event_total = 0
-                row_inundation_range = _get_range(vlh_row[event])
-                link_type_inundation_range = (
-                    f"{vlh_row['link_type']}_{row_inundation_range}"
+                row_hazard_range = _get_range(vlh_row[event])
+                link_type_hazard_range = (
+                    f"{vlh_row['link_type']}_{row_hazard_range}"
                 )
 
                 # get stepwise recovery curve data
                 relevant_curve = self.resilience_curve[
-                    self.resilience_curve["link_type_inundation_height"]
-                    == link_type_inundation_range
-                ]
+                    self.resilience_curve["link_type_hazard_intensity"]
+                    == link_type_hazard_range
+                    ]
                 duration_steps: list = relevant_curve["duration_steps"].item()
                 functionality_loss_ratios: list = relevant_curve[
                     "functionality_loss_ratio"
@@ -321,9 +313,9 @@ class Losses:
 
     def _get_link_types_heights_ranges(self) -> tuple[list, pd.DataFrame]:
         _link_types = set()
-        _inundation_height_ranges = set()
+        _hazard_intensity_ranges = set()
 
-        for entry in self.resilience_curve["link_type_inundation_height"]:
+        for entry in self.resilience_curve["link_type_hazard_intensity"]:
             if pd.notna(entry):
                 _parts = entry.split("_")
 
@@ -342,8 +334,8 @@ class Losses:
                 if len(_range_parts) == 1:
                     _range_parts.append("")
 
-                _inundation_range = tuple(float(part) for part in _range_parts)
+                _hazard_range = tuple(float(part) for part in _range_parts)
 
                 _link_types.add(_link_type)
-                _inundation_height_ranges.add(_inundation_range)
-        return list(_link_types), list(_inundation_height_ranges)
+                _hazard_intensity_ranges.add(_hazard_range)
+        return list(_link_types), list(_hazard_intensity_ranges)
