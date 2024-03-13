@@ -39,9 +39,7 @@ from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEn
 class Losses:
     def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionIndirect):
         self.losses_input_path: Path = config.input_path.joinpath("losses")
-        self.duration: float = analysis.duration_event
-        self.duration_disr: float = analysis.duration_disruption
-        self.detour_traffic: float = analysis.fraction_detour
+        self.duration_event: float = analysis.duration_event
         self.traffic_throughput: float = analysis.fraction_drivethrough
         self.rest_capacity: float = analysis.rest_capacity
         self.maximum: float = analysis.maximum_jam
@@ -56,7 +54,7 @@ class Losses:
 
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
         self.criticality_data = self._load_df_from_csv(Path("criticality_data.csv"), [])
-        self.resilience_curve = self._load_df_from_csv((analysis.resilience_curve_file),
+        self.resilience_curve = self._load_df_from_csv(analysis.resilience_curve_file,
                                                        ["disruption_steps", "functionality_loss_ratio",
                                                         "link_type_hazard_intensity"],
                                                        )
@@ -84,125 +82,6 @@ class Losses:
             return gpd.read_file(gdf_path, index_col="link_id")
         logging.warning("No `gdf` file found at {}.".format(gdf_path))
         return gpd.GeoDataFrame()
-
-    def traffic_shockwave(
-            self, vlh: pd.DataFrame, capacity: pd.Series, intensity: pd.Series
-    ) -> pd.DataFrame:
-        vlh["vlh_traffic"] = (
-                (self.duration ** 2)
-                * (self.rest_capacity - 1)
-                * (self.rest_capacity * capacity - intensity / self.traffic_throughput)
-                / (2 * (1 - ((intensity / self.traffic_throughput) / capacity)))
-        )
-        return vlh
-
-    def calc_vlh_with_shockwave(
-            self,
-            traffic_data: pd.DataFrame,
-            values_of_time: dict,
-            criticality_data: pd.DataFrame,
-    ) -> pd.DataFrame:
-
-        vlh = pd.DataFrame(
-            index=traffic_data.index,
-            columns=[
-                "vlh_traffic",
-                "vlh_detour",
-                "vlh_total",
-                "euro_per_hour",
-                "euro_vlh",
-            ],
-        )
-        capacity = traffic_data["capacity"]
-        diff_event_disr = self.duration - self.duration_disr
-
-        if self.partofday == PartOfDayEnum.DAY:
-            intensity = traffic_data["day_total"] / 24
-            detour_time = criticality_data["detour_time_day"]
-        if self.partofday == PartOfDayEnum.EVENING:
-            intensity = traffic_data["evening_total"]
-            detour_time = criticality_data["detour_time_evening"]
-
-        vlh = self.traffic_shockwave(vlh, capacity, intensity)
-        vlh["vlh_traffic"] = vlh["vlh_traffic"].apply(
-            lambda x: np.where(x < 0, 0, x)
-        )  # all values below 0 -> 0
-        vlh["vlh_traffic"] = vlh["vlh_traffic"].apply(
-            lambda x: np.where(x > self.maximum, self.maximum, x)
-        )
-        # all values above maximum, limit to maximum
-        # TODO: integration here of time and traffic_throughput.
-        vlh["vlh_detour"] = (
-                                    intensity * ((1 - self.traffic_throughput) * self.duration) * detour_time
-                            ) / 60
-        vlh["vlh_detour"] = vlh["vlh_detour"].apply(
-            lambda x: np.where(x < 0, 0, x)
-        )  # all values below 0 -> 0
-
-        if (
-                diff_event_disr > 0
-        ):  # when the event is done, but the disruption continues after the event. Calculate extra detour times
-            temp = (
-                    diff_event_disr * (detour_time * self.detour_traffic * detour_time) / 60
-            )
-            temp = temp.apply(
-                lambda x: np.where(x < 0, 0, x)
-            )  # all values below 0 -> 0
-            vlh["vlh_detour"] = vlh["vlh_detour"] + temp
-
-        vlh["vlh_total"] = vlh["vlh_traffic"] + vlh["vlh_detour"]
-
-        if self.partofday == PartOfDayEnum.DAY:
-            vlh["euro_per_hour"] = (
-                    (
-                            traffic_data["day_freight"]
-                            / traffic_data["day_total"]
-                            * values_of_time["freight"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["day_commute"]
-                            / traffic_data["day_total"]
-                            * values_of_time["commute"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["day_business"]
-                            / traffic_data["day_total"]
-                            * values_of_time["business"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["day_other"]
-                            / traffic_data["day_total"]
-                            * values_of_time["other"]["value_of_time"]
-                    )
-            )
-            # to calculate costs per unit traffi per hour. This is weighted based on the traffic mix and value of each traffic type
-
-        if self.partofday == PartOfDayEnum.EVENING:
-            vlh["euro_per_hour"] = (
-                    (
-                            traffic_data["evening_freight"]
-                            / traffic_data["evening_total"]
-                            * values_of_time["freight"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["evening_commute"]
-                            / traffic_data["evening_total"]
-                            * values_of_time["commute"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["evening_business"]
-                            / traffic_data["evening_total"]
-                            * values_of_time["business"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["evening_other"]
-                            / traffic_data["evening_total"]
-                            * values_of_time["other"]["value_of_time"]
-                    )
-            )
-            # to calculate costs per unit traffi per hour. This is weighted based on the traffic mix and value of each traffic type
-        vlh["euro_vlh"] = vlh["euro_per_hour"] * vlh["vlh_total"]
-        return vlh
 
     def _get_vot_intensity_per_trip_purpose(
             self, trip_types: list[str]
