@@ -11,6 +11,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 )
 from ra2ce.analysis.indirect.losses import Losses
 from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
+from tests import test_data
 
 
 class TestLosses:
@@ -37,7 +38,7 @@ class TestLosses:
 
     def test_initialize_with_data(self):
         # 1. Define test data
-        _config = AnalysisConfigData(input_path=Path("sth"))
+        _config = AnalysisConfigData(input_path=test_data / "losses")
         _analyses = AnalysisSectionIndirect(
             duration_event=None,
             duration_disruption=None,
