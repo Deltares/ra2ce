@@ -104,7 +104,7 @@ class MultiLinkOriginClosestDestination(AnalysisIndirectProtocol):
             self.graph_file,
             self.graph_file_hazard,
             self.static_path,
-            self.hazard_names.names_df,
+            self.hazard_names,
         )
 
         if self.analysis.calculate_route_without_disruption:
