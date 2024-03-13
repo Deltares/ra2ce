@@ -100,6 +100,7 @@ class OptimalRouteOriginClosestDestination(AnalysisIndirectProtocol):
             self.analysis,
             self.graph_file,
             None,
+            self.static_path,
             self.hazard_names.names_df,
         )
         (

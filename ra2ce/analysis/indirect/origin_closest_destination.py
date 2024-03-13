@@ -23,6 +23,7 @@
 import copy
 import logging
 from collections import defaultdict
+from pathlib import Path
 from typing import Any
 
 import geopandas as gpd
@@ -60,6 +61,7 @@ class OriginClosestDestination:
         analysis: AnalysisSectionIndirect,
         graph_file: GraphFile,
         graph_file_hazard: GraphFile,
+        static_path: Path,
         hazard_names: HazardNames,
     ):
         self.crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGEABLE
@@ -78,7 +80,7 @@ class OriginClosestDestination:
         self.analysis = analysis
         self.graph_file = graph_file
         self.graph_file_hazard = graph_file_hazard
-
+        self.static_path = static_path
         self.hazard_names = hazard_names
 
         self.destination_names = None
@@ -1010,11 +1012,7 @@ class OriginClosestDestination:
         return origin
 
     def load_destinations(self):
-        od_path = (
-            self.static_path
-            / "output_graph"
-            / "origin_destination_table.feather"
-        )
+        od_path = self.static_path / "output_graph" / "origin_destination_table.feather"
         od = gpd.read_feather(od_path)
         destination = od.loc[od["d_id"].notna()]
         del destination["o_id"]
