@@ -138,8 +138,7 @@ class MultiLinkOriginDestination(AnalysisIndirectProtocol):
             od_routes["hazard"] = hazard_name
             all_results.append(od_routes)
 
-        all_results = pd.concat(all_results, ignore_index=True)
-        return all_results
+        return pd.concat(all_results, ignore_index=True)
 
     def multi_link_origin_destination_impact(self, gdf, gdf_ori):
         """Calculates some default indicators that quantify the impacts of disruptions to origin-destination flows

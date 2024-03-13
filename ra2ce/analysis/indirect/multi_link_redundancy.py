@@ -152,5 +152,4 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
 
             results.append(gdf)
 
-        aggregated_results = pd.concat(results, ignore_index=True)
-        return aggregated_results
+        return pd.concat(results, ignore_index=True)
