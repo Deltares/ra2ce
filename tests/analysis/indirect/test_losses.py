@@ -47,7 +47,13 @@ class TestLosses:
             rest_capacity=None,
             maximum_jam=None,
             partofday=None,
+            resilience_curve_file=test_data / "losses" / "csv_data_for_losses" / "resilience_curve.csv",
+            traffic_intensities_file=test_data / "losses" / "csv_data_for_losses" / "traffic_intensities.csv",
+            values_of_time_file=test_data / "losses" / "csv_data_for_losses" / "values_of_time.csv",
+            name="single_link_redundancy_losses_test"
         )
+        _config.input_path = test_data / "losses" / "csv_data_for_losses"
+
 
         # 2. Run test.
 

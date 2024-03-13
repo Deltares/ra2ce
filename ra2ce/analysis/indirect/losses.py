@@ -54,23 +54,24 @@ class Losses:
         self.intensities = self._load_df_from_csv(analysis.traffic_intensities_file, [])  # per day
 
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
-        self.criticality_data = self._load_df_from_csv(config.input_path.joinpath(f"{analysis.analysis.name}.csv"), [])
+        self.criticality_data = self._load_df_from_csv(config.input_path.joinpath(f"{analysis.name}.csv"), [])
         self.resilience_curve = self._load_df_from_csv((analysis.resilience_curve_file),
-                                                       ["disruption_steps", "functionality_loss_ratio",
-                                                        "link_type_hazard_intensity"],
+                                                       ["disruption_steps",
+                                                        "functionality_loss_ratio"], sep=";"
                                                        )
-        self.values_of_time = self._load_df_from_csv(analysis.values_of_time_file, [])
+        self.values_of_time = self._load_df_from_csv(analysis.values_of_time_file, [], sep=";")
 
     def _load_df_from_csv(
             self,
             csv_path: Path,
             columns_to_interpret: list[str],
+            sep: str = ",",
     ) -> pd.DataFrame:
         if csv_path is None or not csv_path.exists():
             logging.warning("No `csv` file found at {}.".format(csv_path))
             return pd.DataFrame()
 
-        _csv_dataframe = pd.read_csv(csv_path)
+        _csv_dataframe = pd.read_csv(csv_path, sep=sep, on_bad_lines='skip')
         if any(columns_to_interpret):
             _csv_dataframe[columns_to_interpret] = _csv_dataframe[
                 columns_to_interpret
