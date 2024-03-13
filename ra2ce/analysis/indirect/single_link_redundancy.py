@@ -105,9 +105,9 @@ class SingleLinkRedundancy(AnalysisIndirectProtocol):
 
         # Add the new columns to the geodataframe
         _weighing_analyser.extend_graph(_gdf_graph)
-        _gdf_graph["alt_{analysis.weighing.config_value}"] = _alt_value_list
+        _gdf_graph[f"alt_{self.analysis.weighing.config_value}"] = _alt_value_list
         _gdf_graph["alt_nodes"] = _alt_nodes_list
-        _gdf_graph["diff_{analysis.weighing.config_value}"] = _diff_value_list
+        _gdf_graph[f"diff_{self.analysis.weighing.config_value}"] = _diff_value_list
         _gdf_graph["detour"] = _detour_exist_list
 
         # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
