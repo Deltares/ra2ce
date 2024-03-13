@@ -179,7 +179,7 @@ class OriginClosestDestination:
             self.hazard_names.names_df.loc[
                 self.hazard_names.names_df["File name"] == hazard, "RA2CE name"
             ].values[0]
-            for hazard in self.hazard_names.names_df
+            for hazard in self.hazard_names.names
         ]
         hazards.sort()
         for hazard_name in hazards:
