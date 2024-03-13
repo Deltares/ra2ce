@@ -41,7 +41,7 @@ class Losses:
         self.losses_input_path: Path = config.input_path.joinpath("losses")
         self.duration_event: float = analysis.duration_event
         self.partofday: PartOfDayEnum = analysis.partofday
-        self.performance_metric = analysis.performance
+        self.performance_metric = analysis.performance_metric
 
         # Load Dataframes
         self.network = self._load_gdf(
