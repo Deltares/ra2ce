@@ -1,10 +1,10 @@
 {
 "type": "FeatureCollection",
 "features": [
-{ "type": "Feature", "properties": { "segment_id": 1, "name": "Amsterdam-Utrecht", "rfid_c": 1 }, "geometry": { "type": "LineString", "coordinates": [ [ 4.895168, 52.370216 ], [ 5.12142, 52.090737 ] ] } },
-{ "type": "Feature", "properties": { "segment_id": 2, "name": "Utrecht-Rotterdam", "rfid_c": 2 }, "geometry": { "type": "LineString", "coordinates": [ [ 5.12142, 52.090737 ], [ 4.477733, 51.92442 ] ] } },
-{ "type": "Feature", "properties": { "segment_id": 4, "name": "Rotterdam-Den Haag", "rfid_c": 4 }, "geometry": { "type": "LineString", "coordinates": [ [ 4.477733, 51.92442 ], [ 4.325633, 52.080167 ] ] } },
-{ "type": "Feature", "properties": { "segment_id": 5, "name": "Den Haag-Amsterdam", "rfid_c": 5 }, "geometry": { "type": "LineString", "coordinates": [ [ 4.325633, 52.080167 ], [ 4.895168, 52.370216 ] ] } },
-{ "type": "Feature", "properties": { "segment_id": 7, "name": "Rotterdam-Amsterdam", "rfid_c": 7 }, "geometry": { "type": "LineString", "coordinates": [ [ 4.477733, 51.92442 ], [ 4.895168, 52.370216 ] ] } }
+{ "type": "Feature", "properties": { "segment_id": 1, "name": "Amsterdam-Utrecht", "link_id": 1, "link_type": "motorway" }, "geometry": { "type": "LineString", "coordinates": [ [ 4.895168, 52.370216 ], [ 5.12142, 52.090737 ] ] } },
+{ "type": "Feature", "properties": { "segment_id": 2, "name": "Utrecht-Rotterdam", "link_id": 2, "link_type": "motorway" }, "geometry": { "type": "LineString", "coordinates": [ [ 5.12142, 52.090737 ], [ 4.477733, 51.92442 ] ] } },
+{ "type": "Feature", "properties": { "segment_id": 4, "name": "Rotterdam-Den Haag", "link_id": 3, "link_type": "motorway" }, "geometry": { "type": "LineString", "coordinates": [ [ 4.477733, 51.92442 ], [ 4.325633, 52.080167 ] ] } },
+{ "type": "Feature", "properties": { "segment_id": 5, "name": "Den Haag-Amsterdam", "link_id": 4, "link_type": "motorway" }, "geometry": { "type": "LineString", "coordinates": [ [ 4.325633, 52.080167 ], [ 4.895168, 52.370216 ] ] } },
+{ "type": "Feature", "properties": { "segment_id": 7, "name": "Rotterdam-Amsterdam", "link_id": 5, "link_type": "motorway" }, "geometry": { "type": "LineString", "coordinates": [ [ 4.477733, 51.92442 ], [ 4.895168, 52.370216 ] ] } }
 ]
 }
