@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 from geopandas import GeoDataFrame
@@ -13,12 +14,10 @@ from ra2ce.network.network_config_data.network_config_data import (
     OriginsDestinationsSection,
 )
 from ra2ce.network.networks_utils import graph_to_gpkg
-from ra2ce.ra2ce_logging import logging
 
 
-class MultiLinkOriginClosestDestination(AnalysisIndirectProtocol):
+class OptimalRouteOriginClosestDestination(AnalysisIndirectProtocol):
     graph_file: GraphFile
-    graph_file_hazard: GraphFile
     analysis: AnalysisSectionIndirect
     input_path: Path
     static_path: Path
@@ -31,7 +30,6 @@ class MultiLinkOriginClosestDestination(AnalysisIndirectProtocol):
     def __init__(
         self,
         graph_file: GraphFile,
-        graph_file_hazard: GraphFile,
         analysis: AnalysisSectionIndirect,
         input_path: Path,
         static_path: Path,
@@ -41,7 +39,6 @@ class MultiLinkOriginClosestDestination(AnalysisIndirectProtocol):
         file_id: str,
     ) -> None:
         self.graph_file = graph_file
-        self.graph_file_hazard = graph_file_hazard
         self.analysis = analysis
         self.input_path = input_path
         self.static_path = static_path
@@ -102,85 +99,31 @@ class MultiLinkOriginClosestDestination(AnalysisIndirectProtocol):
             self.origins_destinations,
             self.analysis,
             self.graph_file,
-            self.graph_file_hazard,
+            None,
             self.hazard_names.names_df,
         )
-
-        if self.analysis.calculate_route_without_disruption:
-            (
-                base_graph,
-                opt_routes_without_hazard,
-                destinations,
-            ) = analyzer.optimal_route_origin_closest_destination()
-
-            if self.graph_file_hazard.file is None:
-                origins = analyzer.load_origins()
-                opt_routes_with_hazard = GeoDataFrame(data=None)
-            else:
-                (
-                    base_graph,
-                    origins,
-                    destinations,
-                    agg_results,
-                    opt_routes_with_hazard,
-                ) = analyzer.multi_link_origin_closest_destination()
-
-                (opt_routes_with_hazard) = (
-                    analyzer.difference_length_with_without_hazard(
-                        opt_routes_with_hazard, opt_routes_without_hazard
-                    )
-                )
-        else:
-            (
-                base_graph,
-                origins,
-                destinations,
-                agg_results,
-                opt_routes_with_hazard,
-            ) = analyzer.multi_link_origin_closest_destination()
-            opt_routes_without_hazard = GeoDataFrame()
-
+        (
+            base_graph,
+            opt_routes,
+            destinations,
+        ) = analyzer.optimal_route_origin_closest_destination()
         if self.analysis.save_gpkg:
             # Save the GeoDataFrames
-            to_save_gdf = [
-                origins,
-                destinations,
-                opt_routes_without_hazard,
-                opt_routes_with_hazard,
-            ]
-            to_save_gdf_names = [
-                "origins",
-                "destinations",
-                "optimal_routes_without_hazard",
-                "optimal_routes_with_hazard",
-            ]
+            to_save_gdf = [destinations, opt_routes]
+            to_save_gdf_names = ["destinations", "optimal_routes"]
             _save_gpkg_analysis(base_graph, to_save_gdf, to_save_gdf_names)
+
         if self.analysis.save_csv:
             csv_path = _output_path.joinpath(
                 self.analysis.name.replace(" ", "_") + "_destinations.csv"
             )
-            if "geometry" in destinations.columns:
-                del destinations["geometry"]
-            if not csv_path.parent.exists():
-                csv_path.parent.mkdir(parents=True)
+            del destinations["geometry"]
             destinations.to_csv(csv_path, index=False)
 
             csv_path = _output_path.joinpath(
                 self.analysis.name.replace(" ", "_") + "_optimal_routes.csv"
             )
-            if not opt_routes_without_hazard.empty:
-                del opt_routes_without_hazard["geometry"]
-                opt_routes_without_hazard.to_csv(csv_path, index=False)
-            if not opt_routes_with_hazard.empty:
-                del opt_routes_with_hazard["geometry"]
-                opt_routes_with_hazard.to_csv(csv_path, index=False)
-
-        if self.graph_file_hazard.file is not None:
-            agg_results.to_excel(
-                _output_path.joinpath(
-                    self.analysis.name.replace(" ", "_") + "_results.xlsx"
-                ),
-                index=False,
-            )
+            del opt_routes["geometry"]
+            opt_routes.to_csv(csv_path, index=False)
 
         return None

@@ -42,6 +42,7 @@ class Losses(AnalysisIndirectProtocol):
     graph_file: GraphFile
     analysis: AnalysisSectionIndirect
     input_path: Path
+    static_path: Path
     output_path: Path
     hazard_names: HazardNames
     result: GeoDataFrame
@@ -51,12 +52,14 @@ class Losses(AnalysisIndirectProtocol):
         graph_file: GraphFile,
         analysis: AnalysisSectionIndirect,
         input_path: Path,
+        static_path: Path,
         output_path: Path,
         hazard_names: HazardNames,
     ) -> None:
         self.graph_file = graph_file
         self.analysis = analysis
         self.input_path = input_path
+        self.static_path = static_path
         self.output_path = output_path
         self.hazard_names = hazard_names
         self.result = None
@@ -90,11 +93,6 @@ class Losses(AnalysisIndirectProtocol):
         self.values_of_time = self._load_df_from_csv(
             self.losses_input_path.joinpath("values_of_time.csv"), []
         )
-
-    def execute(self) -> GeoDataFrame:
-        _gdf_in = self.graph_file.get_graph()
-        df = self.calculate_losses_from_table()
-        return _gdf_in.merge(df, how="left", on="LinkNr")
 
     def _load_df_from_csv(
         self,
@@ -372,4 +370,11 @@ class Losses(AnalysisIndirectProtocol):
 
                 _link_types.add(_link_type)
                 _inundation_height_ranges.add(_inundation_range)
+
         return list(_link_types), list(_inundation_height_ranges)
+
+    def execute(self) -> GeoDataFrame:
+        _gdf_in = self.graph_file.get_graph()
+        df = self.calculate_losses_from_table()
+
+        return _gdf_in.merge(df, how="left", on="LinkNr")

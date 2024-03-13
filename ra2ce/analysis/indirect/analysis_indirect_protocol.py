@@ -35,6 +35,7 @@ class AnalysisIndirectProtocol(AnalysisProtocol):
     graph_file: GraphFile
     analysis: AnalysisSectionIndirect
     input_path: Path
+    static_path: Path
     output_path: Path
     hazard_names: HazardNames
     result: GeoDataFrame

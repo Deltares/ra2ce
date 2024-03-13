@@ -106,6 +106,7 @@ class AnalysisFactory:
         _input_dict = dict(
             analysis=self.analysis,
             input_path=analysis_config.config_data.input_path,
+            static_path=analysis_config.config_data.static_path,
             output_path=analysis_config.config_data.output_path,
             hazard_names=HazardNames.from_config(analysis_config),
         )
@@ -124,11 +125,13 @@ class AnalysisFactory:
             return OptimalRouteOriginDestination(
                 graph_file=analysis_config.graph_files.origins_destinations_graph,
                 **_input_dict,
+                origins_destinations=analysis_config.config_data.origins_destinations,
             )
         if self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_DESTINATION:
             return MultiLinkOriginDestination(
                 graph_file=analysis_config.graph_files.origins_destinations_graph_hazard,
                 **_input_dict,
+                origins_destinations=analysis_config.config_data.origins_destinations,
             )
         if (
             self.analysis.analysis
@@ -137,6 +140,8 @@ class AnalysisFactory:
             return OptimalRouteOriginClosestDestination(
                 graph_file=analysis_config.graph_files.origins_destinations_graph,
                 **_input_dict,
+                origins_destinations=analysis_config.config_data.origins_destinations,
+                file_id=analysis_config.config_data.network.file_id,
             )
         if (
             self.analysis.analysis
@@ -146,6 +151,8 @@ class AnalysisFactory:
                 graph_file=analysis_config.graph_files.origins_destinations_graph,
                 graph_file_hazard=analysis_config.graph_files.origins_destinations_graph_hazard,
                 **_input_dict,
+                origins_destinations=analysis_config.config_data.origins_destinations,
+                file_id=analysis_config.config_data.network.file_id,
             )
         if self.analysis.analysis == AnalysisIndirectEnum.LOSSES:
             return Losses(analysis_config.graph_files.base_graph_hazard, **_input_dict)

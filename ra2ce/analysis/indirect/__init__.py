@@ -10,7 +10,7 @@ from ra2ce.analysis.indirect.multi_link_origin_destination import (
     MultiLinkOriginDestination,
 )
 from ra2ce.analysis.indirect.multi_link_redundancy import MultiLinkRedundancy
-from ra2ce.analysis.indirect.multi_route_origin_closest_destination import (
+from ra2ce.analysis.indirect.optimal_route_origin_closest_destination import (
     OptimalRouteOriginClosestDestination,
 )
 from ra2ce.analysis.indirect.optimal_route_origin_destination import (
