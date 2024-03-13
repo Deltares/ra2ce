@@ -2,6 +2,7 @@ import copy
 from pathlib import Path
 
 import networkx as nx
+import numpy as np
 import pandas as pd
 from geopandas import GeoDataFrame, overlay, read_feather
 from pyproj import CRS
