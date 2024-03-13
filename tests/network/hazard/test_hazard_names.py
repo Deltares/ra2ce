@@ -14,12 +14,12 @@ class TestHazardNames:
     def test_initialize(self):
         # 1. Define test data
         _data = [["a", 1], ["b", 2], ["c", 3]]
-        _columns = ["name", "value"]
+        _columns = ["File name", "RA2CE name"]
         _hazard_names_df = pd.DataFrame(_data, columns=_columns)
         _hazard_names = ["a", "b", "c"]
 
         # 2. Run test
-        _hazard_names = HazardNames(_hazard_names_df, _hazard_names)
+        _hazard_names = HazardNames(names_df=_hazard_names_df)
 
         # 3. Verify expectations
         assert _hazard_names.names_df.equals(_hazard_names_df)
