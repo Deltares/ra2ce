@@ -9,6 +9,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data_validator import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
     AnalysisDirectEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
 from tests import test_data, test_results
@@ -38,7 +39,9 @@ class TestAnalysisConfigDataValidator:
         # 2. Run test.
         _test_config_data = AnalysisConfigData(
             project=ProjectSection(),
-            analyses=AnalysisSectionDirect(analysis=AnalysisDirectEnum.DIRECT),
+            analyses=AnalysisSectionDirect(
+                analysis=AnalysisDirectEnum.DIRECT, event_type=EventTypeEnum.EVENT
+            ),
             output_path=_output_test_dir,
         )
         _report = self._validate_config(_test_config_data)
@@ -83,4 +86,4 @@ class TestAnalysisConfigDataValidator:
 
         # 3. Verify final expectations.
         assert not _report.is_valid()
-        assert len(_report._errors) == 2
+        assert len(_report._errors) == 3
