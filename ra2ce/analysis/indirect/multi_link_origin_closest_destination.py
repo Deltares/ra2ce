@@ -103,6 +103,7 @@ class MultiLinkOriginClosestDestination(AnalysisIndirectProtocol):
             self.analysis,
             self.graph_file,
             self.graph_file_hazard,
+            self.static_path,
             self.hazard_names.names_df,
         )
 

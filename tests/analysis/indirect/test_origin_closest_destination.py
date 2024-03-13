@@ -36,6 +36,7 @@ class TestOriginClosestDestination:
             analysis=_analysis,
             graph_file=_graph_files.origins_destinations_graph,
             graph_file_hazard=_graph_files.origins_destinations_graph_hazard,
+            static_path=_config_dict.static_path,
             hazard_names=_hazard_names,
         )
 
