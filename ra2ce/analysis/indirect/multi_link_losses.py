@@ -69,7 +69,7 @@ class MultiLinkLosses(AnalysisIndirectProtocol):
             road_classes = [x for x in disruption_df.columns if "class" in x]
 
         results = []
-        for hazard in self.hazard_names.names_config:
+        for hazard in self.hazard_names.names:
             hazard_name = self.hazard_names.get_name(hazard)
 
             _gdf = gdf.loc[gdf["hazard"] == hazard_name].copy()

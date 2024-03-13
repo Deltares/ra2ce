@@ -4,6 +4,7 @@ from typing import Iterator
 import pandas as pd
 import pytest
 
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.network.hazard.hazard_names import HazardNames
 from tests import test_results
 
@@ -52,6 +53,19 @@ class TestHazardNames:
 
         # 2. Run test
         _hazard_names = HazardNames.from_file(_file)
+
+        # 3. Verify expectations
+        assert _hazard_names.names_df.equals(pd.read_excel(_file))
+        assert _hazard_names.names == ["a", "b", "c"]
+
+    def test_create_from_config(self, hazard_names_file: Path):
+        # 1. Define test data
+        _file = hazard_names_file
+        _analysis_config = AnalysisConfigWrapper()
+        _analysis_config.config_data.output_path = _file.parent
+
+        # 2. Run test
+        _hazard_names = HazardNames.from_config(_analysis_config)
 
         # 3. Verify expectations
         assert _hazard_names.names_df.equals(pd.read_excel(_file))

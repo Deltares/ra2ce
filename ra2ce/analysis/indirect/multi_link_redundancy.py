@@ -57,7 +57,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         """
         results = []
         master_graph = copy.deepcopy(self.graph_file.graph)
-        for hazard in self.hazard_names.names_config:
+        for hazard in self.hazard_names.names:
             hazard_name = self.hazard_names.get_name(hazard)
 
             _graph = copy.deepcopy(master_graph)
