@@ -45,8 +45,12 @@ class OriginClosestDestination:
     """The origin closest destination analyses using NetworkX graphs.
 
     Attributes:
-        config: An object with the configuration details on how to create and adjust the network.
-        graph_files: An object with one or multiple NetworkX graphs.
+        file_id: The file id of the network.
+        origins_destinations: An object with the origins and destinations.
+        analysis: An object with the analysis details.
+        graph_file: An object with the NetworkX graph.
+        graph_file_hazard: An object with the NetworkX graph with hazard disruption.
+        hazard_names: An object with the hazard names.
     """
 
     def __init__(
@@ -999,11 +1003,7 @@ class OriginClosestDestination:
         )
 
     def load_origins(self):
-        od_path = (
-            self.config.static_path
-            / "output_graph"
-            / "origin_destination_table.feather"
-        )
+        od_path = self.static_path / "output_graph" / "origin_destination_table.feather"
         od = gpd.read_feather(od_path)
         origin = od.loc[od["o_id"].notna()]
         del origin["d_id"]
@@ -1011,7 +1011,7 @@ class OriginClosestDestination:
 
     def load_destinations(self):
         od_path = (
-            self.config.static_path
+            self.static_path
             / "output_graph"
             / "origin_destination_table.feather"
         )
