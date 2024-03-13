@@ -27,7 +27,6 @@ from pathlib import Path
 import geopandas as gpd
 import networkx as nx
 import numpy as np
-import osmnx
 import pandas as pd
 from pyproj import CRS
 from shapely.geometry import LineString, MultiLineString
@@ -42,12 +41,8 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
 )
 from ra2ce.analysis.indirect.losses import Losses
 from ra2ce.analysis.indirect.origin_closest_destination import OriginClosestDestination
-from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.analysis.indirect.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
-)
-from ra2ce.analysis.indirect.weighing_analysis.weighing_analysis_factory import (
-    WeighingAnalysisFactory,
 )
 from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.network.hazard.hazard_names import HazardNames
@@ -72,20 +67,6 @@ class IndirectAnalyses:
         self.hazard_names = HazardNames.from_file(
             self.config.output_path.joinpath("hazard_names.xlsx")
         )
-
-    def _analyse_single_link_redundancy(
-        self, graph: nx.Graph, analysis: AnalysisSectionIndirect
-    ):
-        """This is the function to analyse roads with a single link disruption and an alternative route.
-
-        Args:
-            graph: The NetworkX graph to calculate the single link redundancy on.
-            analysis: Dictionary of the configurations for the analysis.
-        """
-        _analysis = SingleLinkRedundancy(
-            graph, analysis, self.config.input_path, self.config.output_path
-        )
-        return _analysis.execute()
 
     def single_link_losses(
         self, gdf: gpd.GeoDataFrame, analysis: AnalysisSectionIndirect
@@ -235,119 +216,6 @@ class IndirectAnalyses:
                 gdf[[x for x in gdf.columns if ("losses" in x) and ("total" not in x)]],
                 axis=1,
             )
-
-    def multi_link_redundancy(
-        self, graph: nx.classes.MultiGraph, analysis: AnalysisSectionIndirect
-    ):
-        """Calculates the multi-link redundancy of a NetworkX graph.
-
-        The function removes all links of a variable that have a minimum value
-        of min_threshold. For each link it calculates the alternative path, if
-        any available. This function only removes one group at the time and saves the data from removing that group.
-
-        Args:
-            graph: The NetworkX graph to calculate the single link redundancy on.
-            analysis: Dictionary of the configurations for the analysis.
-
-        Returns:
-            aggregated_results (GeoDataFrame): The results of the analysis aggregated into a table.
-        """
-        results = []
-        master_graph = copy.deepcopy(graph)
-        for hazard in self.config.hazard_names:
-            hazard_name = self.hazard_names.get_name(hazard)
-
-            graph = copy.deepcopy(master_graph)
-            # Create a geodataframe from the full graph
-            gdf = osmnx.graph_to_gdfs(master_graph, nodes=False)
-            if "rfid" in gdf:
-                gdf["rfid"] = gdf["rfid"].astype(str)
-
-            # Create the edgelist that consist of edges that should be removed
-            edges_remove = [
-                e for e in graph.edges.data(keys=True) if hazard_name in e[-1]
-            ]
-            edges_remove = [e for e in edges_remove if (e[-1][hazard_name] is not None)]
-            edges_remove = [
-                e
-                for e in edges_remove
-                if (e[-1][hazard_name] > float(analysis.threshold))
-                & ("bridge" not in e[-1])
-            ]
-
-            graph.remove_edges_from(edges_remove)
-
-            columns = [
-                "u",
-                "v",
-                f"alt_{analysis.weighing.config_value}",
-                "alt_nodes",
-                "connected",
-            ]
-
-            if "rfid" in gdf:
-                columns.insert(2, "rfid")
-
-            df_calculated = pd.DataFrame(columns=columns)
-            _weighing_analyser = WeighingAnalysisFactory.get_analysis(analysis.weighing)
-
-            for edges in edges_remove:
-                u, v, k, _weighing_analyser.weighing_data = edges
-
-                if nx.has_path(graph, u, v):
-                    alt_dist = nx.dijkstra_path_length(
-                        graph, u, v, weight=WeighingEnum.LENGTH.config_value
-                    )
-                    alt_nodes = nx.dijkstra_path(graph, u, v)
-                    connected = 1
-                    alt_value = _weighing_analyser.calculate_alternative_distance(
-                        alt_dist
-                    )
-                else:
-                    alt_value = _weighing_analyser.calculate_distance()
-                    alt_nodes, connected = np.NaN, 0
-
-                data = {
-                    "u": [u],
-                    "v": [v],
-                    f"alt_{analysis.weighing.config_value}": [alt_value],
-                    "alt_nodes": [alt_nodes],
-                    "connected": [connected],
-                }
-                _weighing_analyser.extend_graph(data)
-
-                if "rfid" in gdf:
-                    data["rfid"] = [str(_weighing_analyser.weighing_data["rfid"])]
-
-                df_calculated = pd.concat(
-                    [df_calculated, pd.DataFrame(data)], ignore_index=True
-                )
-            df_calculated[f"alt_{analysis.weighing.config_value}"] = pd.to_numeric(
-                df_calculated[f"alt_{analysis.weighing.config_value}"], errors="coerce"
-            )
-
-            # Merge the dataframes
-            if "rfid" in gdf:
-                gdf = gdf.merge(df_calculated, how="left", on=["u", "v", "rfid"])
-            else:
-                gdf = gdf.merge(df_calculated, how="left", on=["u", "v"])
-
-            # calculate the differences in distance and time
-            # previously here you find if dist==dist which is a critical bug. Replaced by verifying dist is a value.
-            gdf[f"diff_{analysis.weighing.config_value}"] = [
-                round(alt - base, 2) if alt else np.NaN
-                for (alt, base) in zip(
-                    gdf[f"alt_{analysis.weighing.config_value}"],
-                    gdf[f"{analysis.weighing.config_value}"],
-                )
-            ]
-
-            gdf["hazard"] = hazard_name
-
-            results.append(gdf)
-
-        aggregated_results = pd.concat(results, ignore_index=True)
-        return aggregated_results
 
     def multi_link_losses(self, gdf, analysis: AnalysisSectionIndirect):
         """Calculates the multi-link redundancy losses of a NetworkX graph.
@@ -1036,11 +904,9 @@ class IndirectAnalyses:
                 graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
 
             if analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY:
-                g = self.graph_files.base_graph.get_graph()
-                gdf = self._analyse_single_link_redundancy(g, analysis)
+                pass
             elif analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_REDUNDANCY:
-                g = self.graph_files.base_graph_hazard.get_graph()
-                gdf = self.multi_link_redundancy(g, analysis)
+                pass
             elif (
                 analysis.analysis
                 == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION

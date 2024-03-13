@@ -53,11 +53,11 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
             aggregated_results (GeoDataFrame): The results of the analysis aggregated into a table.
         """
         results = []
-        master_graph = copy.deepcopy(graph)
+        master_graph = copy.deepcopy(self.graph_file.graph)
         for hazard in self.hazard_names.names_config:
             hazard_name = self.hazard_names.get_name(hazard)
 
-            graph = copy.deepcopy(master_graph)
+            _graph = copy.deepcopy(master_graph)
             # Create a geodataframe from the full graph
             gdf = osmnx.graph_to_gdfs(master_graph, nodes=False)
             if "rfid" in gdf:
@@ -65,7 +65,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
 
             # Create the edgelist that consist of edges that should be removed
             edges_remove = [
-                e for e in graph.edges.data(keys=True) if hazard_name in e[-1]
+                e for e in _graph.edges.data(keys=True) if hazard_name in e[-1]
             ]
             edges_remove = [e for e in edges_remove if (e[-1][hazard_name] is not None)]
             edges_remove = [
@@ -75,7 +75,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                 & ("bridge" not in e[-1])
             ]
 
-            graph.remove_edges_from(edges_remove)
+            _graph.remove_edges_from(edges_remove)
 
             columns = [
                 "u",
@@ -96,11 +96,11 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
             for edges in edges_remove:
                 u, v, k, _weighing_analyser.weighing_data = edges
 
-                if nx.has_path(graph, u, v):
+                if nx.has_path(_graph, u, v):
                     alt_dist = nx.dijkstra_path_length(
-                        graph, u, v, weight=WeighingEnum.LENGTH.config_value
+                        _graph, u, v, weight=WeighingEnum.LENGTH.config_value
                     )
-                    alt_nodes = nx.dijkstra_path(graph, u, v)
+                    alt_nodes = nx.dijkstra_path(_graph, u, v)
                     connected = 1
                     alt_value = _weighing_analyser.calculate_alternative_distance(
                         alt_dist
