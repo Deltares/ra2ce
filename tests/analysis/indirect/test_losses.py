@@ -34,6 +34,7 @@ class TestLosses:
             _config.graph_files.base_graph_hazard,
             _analysis,
             _config.config_data.input_path,
+            _config.config_data.static_path,
             _config.config_data.output_path,
             [],
         )
@@ -58,6 +59,7 @@ class TestLosses:
             _config.graph_files.base_graph_hazard,
             _analysis,
             _config.config_data.input_path,
+            _config.config_data.static_path,
             _config.config_data.output_path,
             [],
         )
@@ -98,6 +100,7 @@ class TestLosses:
             _config.graph_files.base_graph_hazard,
             _analyses,
             _config.config_data.input_path,
+            _config.config_data.static_path,
             _config.config_data.output_path,
             [],
         )

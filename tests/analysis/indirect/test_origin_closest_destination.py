@@ -31,17 +31,17 @@ class TestOriginClosestDestination:
 
         # 2. Run test.
         _ocd = OriginClosestDestination(
-            config=_config_dict,
+            file_id=_config_dict.network.file_id,
+            origins_destinations=_config_dict.origins_destinations,
             analysis=_analysis,
             graph_file=_graph_files.origins_destinations_graph,
             graph_file_hazard=_graph_files.origins_destinations_graph_hazard,
-            hazard_names_df=_hazard_names,
+            hazard_names=_hazard_names,
         )
 
         # 3. Verify expectations.
         assert isinstance(_ocd, OriginClosestDestination)
         assert _ocd.analysis == _analysis
-        assert _ocd.config == _config_dict
         assert _ocd.hazard_names == _hazard_names
         assert _ocd.results_dict == {}
         assert _ocd.destination_key_value == "dummy_value"

@@ -23,6 +23,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
     graph_file: GraphFile
     analysis: AnalysisSectionIndirect
     input_path: Path
+    static_path: Path
     output_path: Path
     hazard_names: HazardNames
     result: GeoDataFrame
@@ -32,12 +33,14 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         graph_file: GraphFile,
         analysis: AnalysisSectionIndirect,
         input_path: Path,
+        static_path: Path,
         output_path: Path,
         hazard_names: HazardNames,
     ) -> None:
         self.graph_file = graph_file
         self.analysis = analysis
         self.input_path = input_path
+        self.static_path = static_path
         self.output_path = output_path
         self.hazard_names = hazard_names
         self.result = None

@@ -23,7 +23,7 @@
 import copy
 import logging
 from collections import defaultdict
-from typing import Optional, Any
+from typing import Any
 
 import geopandas as gpd
 import networkx as nx
@@ -32,10 +32,13 @@ from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
     AnalysisSectionIndirect,
 )
 from ra2ce.network.graph_files.graph_file import GraphFile
+from ra2ce.network.hazard.hazard_names import HazardNames
+from ra2ce.network.network_config_data.network_config_data import (
+    OriginsDestinationsSection,
+)
 
 
 class OriginClosestDestination:
@@ -48,38 +51,37 @@ class OriginClosestDestination:
 
     def __init__(
         self,
-        config: AnalysisConfigData,
+        file_id: str,
+        origins_destinations: OriginsDestinationsSection,
         analysis: AnalysisSectionIndirect,
         graph_file: GraphFile,
         graph_file_hazard: GraphFile,
-        hazard_names_df: pd.DataFrame,
+        hazard_names: HazardNames,
     ):
         self.crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGEABLE
         self.unit = "km"
         self.network_threshold = analysis.threshold
         self.threshold_destinations = analysis.threshold_destinations
         self.weighing = analysis.weighing.config_value
-        self.o_name = config.origins_destinations.origins_names
-        self.d_name = config.origins_destinations.destinations_names
-        self.od_id = config.origins_destinations.id_name_origin_destination
-        self.origin_out_fraction = config.origins_destinations.origin_out_fraction
-        self.origin_count = config.origins_destinations.origin_count
+        self.origins_destinations = origins_destinations
+        self.o_name = origins_destinations.origins_names
+        self.d_name = origins_destinations.destinations_names
+        self.od_id = origins_destinations.id_name_origin_destination
+        self.origin_out_fraction = origins_destinations.origin_out_fraction
+        self.origin_count = origins_destinations.origin_count
         self.od_key = "od_id"
-        self.id_name = (
-            config.network.file_id if config.network.file_id is not None else "rfid"
-        )
+        self.id_name = file_id if file_id is not None else "rfid"
         self.analysis = analysis
-        self.config = config
         self.graph_file = graph_file
         self.graph_file_hazard = graph_file_hazard
 
-        self.hazard_names = hazard_names_df
+        self.hazard_names = hazard_names
 
         self.destination_names = None
         self.destination_key = None
-        if config.origins_destinations.category:
+        if origins_destinations.category:
             self.destination_key = "category"
-            self.destination_key_value = config.origins_destinations.category
+            self.destination_key_value = origins_destinations.category
 
         self.results_dict = {}
 
@@ -99,7 +101,7 @@ class OriginClosestDestination:
 
         if self.destination_key:
             self.destination_names = list(
-                destinations[self.config.origins_destinations.category].unique()
+                destinations[self.origins_destinations.category].unique()
             )
             self.destination_names_short = {
                 dn: f"D{i+1}" for i, dn in enumerate(self.destination_names)
@@ -156,7 +158,7 @@ class OriginClosestDestination:
 
         if self.destination_key:
             self.destination_names = list(
-                destinations[self.config.origins_destinations.category].unique()
+                destinations[self.origins_destinations.category].unique()
             )
             self.destination_names_short = {
                 dn: f"D{i+1}" for i, dn in enumerate(self.destination_names)
@@ -168,10 +170,10 @@ class OriginClosestDestination:
 
         # Calculate the criticality
         hazards = [
-            self.hazard_names.loc[
-                self.hazard_names["File name"] == hazard, "RA2CE name"
+            self.hazard_names.names_df.loc[
+                self.hazard_names.names_df["File name"] == hazard, "RA2CE name"
             ].values[0]
-            for hazard in self.config.hazard_names
+            for hazard in self.hazard_names.names_df
         ]
         hazards.sort()
         for hazard_name in hazards:
@@ -625,7 +627,7 @@ class OriginClosestDestination:
                     route_length = self.get_route_length(
                         disrupted_graph, n, closest_dest
                     )
-                    self.compare_route_with_without_distruption(
+                    self.compare_route_with_without_distruption(  # TODO where is this method defined?
                         pref_routes,
                         nr_per_route,
                         ndat[self.od_key],
