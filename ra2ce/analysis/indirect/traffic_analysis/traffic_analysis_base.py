@@ -23,9 +23,7 @@ import ast
 from collections import defaultdict
 import itertools
 import logging
-import operator
 from abc import ABC, abstractmethod
-from typing import Any
 
 import geopandas as gpd
 import numpy as np
@@ -89,10 +87,6 @@ class TrafficAnalysisBase(ABC):
         if isinstance(_opt_path_value, list):
             return _opt_path_value
         return ast.literal_eval(_opt_path_value)
-
-    def _get_road_network_row(self, u_node: str, v_node: str) -> pd.DataFrame:
-        _with_u_node = self.road_network[self.road_network["o_node"] == int(u_node)]
-        return _with_u_node[_with_u_node["opt_path"].str.contains(v_node)]
 
     def _get_recorded_traffic_in_node(
         self, origin_node: str, column_name: str, count_destination_nodes: int
