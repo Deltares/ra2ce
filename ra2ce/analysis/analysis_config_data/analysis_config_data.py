@@ -92,7 +92,9 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     rest_capacity: float = math.nan
     maximum_jam: float = math.nan
     partofday: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
-    performance: str = "diff_time"  # "diff_time" or "diff_dist" relates to the used criticality metric
+    performance: str = (
+        "diff_time"  # "diff_time" or "diff_dist" relates to the used criticality metric
+    )
     resilience_curve_file: str = ""
     disruption_steps_file: str = ""
     # accessibility analyses
@@ -107,6 +109,7 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     threshold_locations: float = math.nan
     category_field_name: str = ""
     save_traffic: bool = False
+    mathias_csv: Optional[Path] = None
 
 
 @dataclass
