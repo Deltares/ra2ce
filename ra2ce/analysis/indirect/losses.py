@@ -38,7 +38,6 @@ from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEn
 
 class Losses:
     def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionIndirect):
-        self.losses_input_path: Path = config.input_path.joinpath("losses")
         self.duration: float = analysis.duration_event
         self.duration_disr: float = analysis.duration_disruption
         self.detour_traffic: float = analysis.fraction_detour
@@ -50,12 +49,12 @@ class Losses:
 
         # Load Dataframes
         self.network = self._load_gdf(
-            self.losses_input_path.joinpath("network.geojson")
+            config.input_path.joinpath("network.geojson")
         )
         self.intensities = self._load_df_from_csv(analysis.traffic_intensities_file, [])  # per day
 
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
-        self.criticality_data = self._load_df_from_csv("criticality_data.csv", [])
+        self.criticality_data = self._load_df_from_csv(config.input_path.joinpath(f"{analysis.analysis.name}.csv"), [])
         self.resilience_curve = self._load_df_from_csv((analysis.resilience_curve_file),
                                                        ["disruption_steps", "functionality_loss_ratio",
                                                         "link_type_hazard_intensity"],
@@ -67,7 +66,7 @@ class Losses:
             csv_path: Path,
             columns_to_interpret: list[str],
     ) -> pd.DataFrame:
-        if not csv_path.exists():
+        if csv_path is None or not csv_path.exists():
             logging.warning("No `csv` file found at {}.".format(csv_path))
             return pd.DataFrame()
 
