@@ -79,27 +79,27 @@ class Losses(AnalysisIndirectProtocol):
             self.losses_input_path.joinpath("network.geojson")
         )
         self.intensities = self._load_df_from_csv(
-            self.losses_input_path.joinpath("traffic_intensities.csv"), []
+            analysis.traffic_intensities_file, []
         )  # per day
 
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
-        self.criticality_data = self._load_df_from_csv(
-            self.losses_input_path.joinpath("criticality_data.csv"), []
-        )
+        self.criticality_data = self._load_df_from_csv(Path("criticality_data.csv"), [])
         self.resilience_curve = self._load_df_from_csv(
-            self.losses_input_path.joinpath(analysis.resilience_curve_file),
-            ["disruption_steps", "functionality_loss_ratio"],
+            (analysis.resilience_curve_file),
+            [
+                "disruption_steps",
+                "functionality_loss_ratio",
+                "link_type_hazard_intensity",
+            ],
         )
-        self.values_of_time = self._load_df_from_csv(
-            self.losses_input_path.joinpath("values_of_time.csv"), []
-        )
+        self.values_of_time = self._load_df_from_csv(analysis.values_of_time_file, [])
 
     def _load_df_from_csv(
         self,
         csv_path: Path,
         columns_to_interpret: list[str],
     ) -> pd.DataFrame:
-        if not csv_path.exists():
+        if csv_path is None or not csv_path.exists():
             logging.warning("No `csv` file found at {}.".format(csv_path))
             return pd.DataFrame()
 
@@ -261,10 +261,10 @@ class Losses(AnalysisIndirectProtocol):
 
     def calc_vlh(self) -> pd.DataFrame:
         _link_types_heights_ranges = self._get_link_types_heights_ranges()
-        _inundation_height_ranges = _link_types_heights_ranges[1]
+        _hazard_intensity_ranges = _link_types_heights_ranges[1]
 
         def _get_range(height: float) -> str:
-            for range_tuple in _inundation_height_ranges:
+            for range_tuple in _hazard_intensity_ranges:
                 x, y = range_tuple
                 if x <= height <= y:
                     return f"{x}_{y}"
@@ -278,7 +278,7 @@ class Losses(AnalysisIndirectProtocol):
         # Read the performance_change stating the functionality drop
         performance_change = self.criticality_data[self.performance_metric]
 
-        # find the link_type and the inundation height
+        # find the link_type and the hazard intensity
         vlh = pd.merge(
             vlh,
             self.network[["link_id", "link_type"]],
@@ -302,15 +302,13 @@ class Losses(AnalysisIndirectProtocol):
         for link_id, vlh_row in vlh.iterrows():
             for event in events:
                 vlh_event_total = 0
-                row_inundation_range = _get_range(vlh_row[event])
-                link_type_inundation_range = (
-                    f"{vlh_row['link_type']}_{row_inundation_range}"
-                )
+                row_hazard_range = _get_range(vlh_row[event])
+                link_type_hazard_range = f"{vlh_row['link_type']}_{row_hazard_range}"
 
                 # get stepwise recovery curve data
                 relevant_curve = self.resilience_curve[
-                    self.resilience_curve["link_type_inundation_height"]
-                    == link_type_inundation_range
+                    self.resilience_curve["link_type_hazard_intensity"]
+                    == link_type_hazard_range
                 ]
                 duration_steps: list = relevant_curve["duration_steps"].item()
                 functionality_loss_ratios: list = relevant_curve[
@@ -345,9 +343,9 @@ class Losses(AnalysisIndirectProtocol):
 
     def _get_link_types_heights_ranges(self) -> tuple[list, pd.DataFrame]:
         _link_types = set()
-        _inundation_height_ranges = set()
+        _hazard_intensity_ranges = set()
 
-        for entry in self.resilience_curve["link_type_inundation_height"]:
+        for entry in self.resilience_curve["link_type_hazard_intensity"]:
             if pd.notna(entry):
                 _parts = entry.split("_")
 
@@ -366,12 +364,12 @@ class Losses(AnalysisIndirectProtocol):
                 if len(_range_parts) == 1:
                     _range_parts.append("")
 
-                _inundation_range = tuple(float(part) for part in _range_parts)
+                _hazard_range = tuple(float(part) for part in _range_parts)
 
                 _link_types.add(_link_type)
-                _inundation_height_ranges.add(_inundation_range)
+                _hazard_intensity_ranges.add(_hazard_range)
 
-        return list(_link_types), list(_inundation_height_ranges)
+        return list(_link_types), list(_hazard_intensity_ranges)
 
     def execute(self) -> GeoDataFrame:
         _gdf_in = self.graph_file.get_graph()
