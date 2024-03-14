@@ -78,6 +78,7 @@ class TestLosses:
         # 2. Run test.
         _result = _losses.calc_vlh(
         )
+        print(_result)
 
         # 3. Verify final expectations.
         assert isinstance(_result, pd.DataFrame)
