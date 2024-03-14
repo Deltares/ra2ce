@@ -7,6 +7,9 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionDirect,
 )
+from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
+    RiskCalculationModeEnum,
+)
 from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
 from ra2ce.analysis.direct.damage.manual_damage_functions import ManualDamageFunctions
 from ra2ce.analysis.direct.damage_calculation import (
@@ -96,12 +99,12 @@ class DirectDamage(AnalysisDirectProtocol):
                 manual_damage_functions=manual_damage_functions,
             )
 
-            if self.analysis.risk_calculation:  # Check if risk_calculation is demanded
-                if self.analysis.risk_calculation != "none":
-                    return_period_gdf.control_risk_calculation(
-                        mode=self.analysis.risk_calculation
-                    )
-
+            if (
+                self.analysis.risk_calculation_mode != RiskCalculationModeEnum.NONE
+            ):  # Check if risk_calculation is demanded
+                return_period_gdf.control_risk_calculation(
+                    mode=self.analysis.risk_calculation_mode
+                )
             else:
                 logging.info(
                     """No parameters for risk calculation are specified. 
