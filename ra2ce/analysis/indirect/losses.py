@@ -37,9 +37,11 @@ from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectP
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
 from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
+from ra2ce.network.network_config_data.network_config_data import NetworkSection
 
 
 class Losses(AnalysisIndirectProtocol):
+    network: NetworkSection
     graph_file: GraphFile
     analysis: AnalysisSectionIndirect
     input_path: Path
@@ -50,36 +52,39 @@ class Losses(AnalysisIndirectProtocol):
 
     def __init__(
             self,
-            config: AnalysisConfigData,
+            network: NetworkSection,
+            graph_file: GraphFile,
             analysis: AnalysisSectionIndirect,
+            input_path: Path,
+            static_path: Path,
+            output_path: Path,
+            hazard_names: HazardNames,
     ) -> None:
+        # TODO: Enable performing analysis for multiple input networks
+        if len(network.primary_file) > 1:
+            raise NotImplementedError('A list of networks is not supported yet')
+        self.network = network
         self.analysis = analysis
-        self.result = None
 
         self.part_of_day: PartOfDayEnum = analysis.part_of_day
         self.analysis_type = analysis.analysis
-        self.losses_input_path: Path = config.input_path.joinpath("losses")
         self.duration_event: float = analysis.duration_event
         self.performance_metric = analysis.performance_metric
 
-        if len(config.network.primary_file) > 1:
-            raise NotImplementedError('A list of networks is not supported yet')
 
-        # TODO: Enable performing analysis for multiple input networks
-        # Load Dataframes
-        self.network = self._load_gdf(
-            config.network.primary_file[0]
-        )
+
         self.intensities = self._load_df_from_csv(analysis.traffic_intensities_file, [])  # per day
 
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
-        self.criticality_data = self._load_df_from_csv(config.input_path.joinpath(f"{analysis.name}.csv"), [])
+        # self.criticality_data = self._load_df_from_csv(config.input_path.joinpath(f"{analysis.name}.csv"), [])
         self.resilience_curve = self._load_df_from_csv((analysis.resilience_curve_file),
                                                        ["duration_steps",
                                                         "functionality_loss_ratio"], sep=";"
                                                        )
         self.values_of_time = self._load_df_from_csv(analysis.values_of_time_file, [], sep=";")
         self._check_validity_df()
+
+        self.result = None
 
     def _check_validity_df(self):
         """
