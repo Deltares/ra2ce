@@ -31,7 +31,9 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import AnalysisIndirectEnum
+from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
+    AnalysisIndirectEnum,
+)
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
@@ -70,20 +72,23 @@ class Losses(AnalysisIndirectProtocol):
         self.analysis_type = analysis.analysis
 
         # Load Dataframes
-        self.network = self._load_gdf(
-            self.input_path.joinpath("network.geojson")
-        )
+        self.network = self._load_gdf(self.input_path.joinpath("network.geojson"))
         self.intensities = self._load_df_from_csv(
             analysis.traffic_intensities_file, []
         )  # per day
 
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
-        self.criticality_data = self._load_df_from_csv(self.input_path.joinpath(f"{analysis.name}.csv"), [])
-        self.resilience_curve = self._load_df_from_csv((analysis.resilience_curve_file),
-                                                       ["duration_steps",
-                                                        "functionality_loss_ratio"], sep=";"
-                                                       )
-        self.values_of_time = self._load_df_from_csv(analysis.values_of_time_file, [], sep=";")
+        self.criticality_data = self._load_df_from_csv(
+            self.input_path.joinpath(f"{analysis.name}.csv"), []
+        )
+        self.resilience_curve = self._load_df_from_csv(
+            (analysis.resilience_curve_file),
+            ["duration_steps", "functionality_loss_ratio"],
+            sep=";",
+        )
+        self.values_of_time = self._load_df_from_csv(
+            analysis.values_of_time_file, [], sep=";"
+        )
         self._check_validity_df()
 
     def _check_validity_df(self):
@@ -93,25 +98,36 @@ class Losses(AnalysisIndirectProtocol):
         """
         _required_values_of_time_keys = ["trip_types", "value_of_time", "occupants"]
         if len(self.values_of_time) > 0 and not all(
-                key in self.values_of_time.columns for key in _required_values_of_time_keys):
-            raise ValueError(f"Missing required columns in values_of_time: {_required_values_of_time_keys}")
+            key in self.values_of_time.columns for key in _required_values_of_time_keys
+        ):
+            raise ValueError(
+                f"Missing required columns in values_of_time: {_required_values_of_time_keys}"
+            )
 
-        _required_resilience_curve_keys = ["link_type_hazard_intensity", "duration_steps", "functionality_loss_ratio"]
+        _required_resilience_curve_keys = [
+            "link_type_hazard_intensity",
+            "duration_steps",
+            "functionality_loss_ratio",
+        ]
         if len(self.resilience_curve) > 0 and not all(
-                key in self.resilience_curve.columns for key in _required_resilience_curve_keys):
-            raise ValueError(f"Missing required columns in resilience_curve: {_required_resilience_curve_keys}")
+            key in self.resilience_curve.columns
+            for key in _required_resilience_curve_keys
+        ):
+            raise ValueError(
+                f"Missing required columns in resilience_curve: {_required_resilience_curve_keys}"
+            )
 
     def _load_df_from_csv(
-            self,
-            csv_path: Path,
-            columns_to_interpret: list[str],
-            sep: str = ",",
+        self,
+        csv_path: Path,
+        columns_to_interpret: list[str],
+        sep: str = ",",
     ) -> pd.DataFrame:
         if csv_path is None or not csv_path.exists():
             logging.warning("No `csv` file found at {}.".format(csv_path))
             return pd.DataFrame()
 
-        _csv_dataframe = pd.read_csv(csv_path, sep=sep, on_bad_lines='skip')
+        _csv_dataframe = pd.read_csv(csv_path, sep=sep, on_bad_lines="skip")
         if any(columns_to_interpret):
             _csv_dataframe[columns_to_interpret] = _csv_dataframe[
                 columns_to_interpret
@@ -144,8 +160,9 @@ class Losses(AnalysisIndirectProtocol):
             ].item()
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
-                    self.intensities[partofday_trip_purpose_name] / 10
-            # TODO: Make a new PR to support different time scales: here 10=10hours
+                self.intensities[partofday_trip_purpose_name]
+                / 10
+                # TODO: Make a new PR to support different time scales: here 10=10hours
             )
         return dict(_vot_dict)
 
@@ -176,7 +193,9 @@ class Losses(AnalysisIndirectProtocol):
             right_on="link_id",
         )
 
-        if self.analysis_type == AnalysisIndirectEnum.MULTI_LINK_LOSSES:  # only useful for MULTI_LINK_LOSSES
+        if (
+            self.analysis_type == AnalysisIndirectEnum.MULTI_LINK_LOSSES
+        ):  # only useful for MULTI_LINK_LOSSES
             vlh = pd.merge(
                 vlh,
                 self.criticality_data[["link_id"] + list(events.columns)],
@@ -190,43 +209,61 @@ class Losses(AnalysisIndirectProtocol):
         for _, vlh_row in vlh.iterrows():
             if self.analysis_type == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
 
-                row_hazard_range_list = self.resilience_curve['link_type_hazard_intensity'].str.extract(
-                    r'_(\d+\.\d+)_(\d+\.\d+)', expand=True).apply(lambda x: '_'.join(x), axis=1).tolist()
+                row_hazard_range_list = (
+                    self.resilience_curve["link_type_hazard_intensity"]
+                    .str.extract(r"_(\d+\.\d+)_(\d+\.\d+)", expand=True)
+                    .apply(lambda x: "_".join(x), axis=1)
+                    .tolist()
+                )
                 for row_hazard_range in row_hazard_range_list:
-                    self._populate_vlh_df(vlh, row_hazard_range, vlh_row, performance_change,
-                                          row_hazard_range)
-
+                    self._populate_vlh_df(
+                        vlh,
+                        row_hazard_range,
+                        vlh_row,
+                        performance_change,
+                        row_hazard_range,
+                    )
 
             elif self.analysis_type == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
                 for event in events:
                     row_hazard_range = _get_range(vlh_row[event])
-                    self._populate_vlh_df(vlh, row_hazard_range, vlh_row, performance_change, event)
+                    self._populate_vlh_df(
+                        vlh, row_hazard_range, vlh_row, performance_change, event
+                    )
 
             else:
                 raise ValueError(f"Invalid analysis type: {self.analysis_type}")
 
         return vlh
 
-    def _populate_vlh_df(self, vlh: pd.DataFrame, row_hazard_range: str, vlh_row: pd.Series,
-                         performance_change, hazard_col_name: str):
+    def _populate_vlh_df(
+        self,
+        vlh: pd.DataFrame,
+        row_hazard_range: str,
+        vlh_row: pd.Series,
+        performance_change,
+        hazard_col_name: str,
+    ):
 
         vlh_total = 0
-        _trip_types = ["business", "commute", "freight",
-                       "other"]  # TODO code smell: this should be either a Enum or read from csv (make a new PR)
+        _trip_types = [
+            "business",
+            "commute",
+            "freight",
+            "other",
+        ]  # TODO code smell: this should be either a Enum or read from csv (make a new PR)
 
         _vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose(
             _trip_types
         )
 
-        link_type_hazard_range = (
-            f"{vlh_row['link_type']}_{row_hazard_range}"
-        )
+        link_type_hazard_range = f"{vlh_row['link_type']}_{row_hazard_range}"
 
         # get stepwise recovery curve data
         relevant_curve = self.resilience_curve[
             self.resilience_curve["link_type_hazard_intensity"]
             == link_type_hazard_range
-            ]
+        ]
         duration_steps: list = relevant_curve["duration_steps"].item()
         functionality_loss_ratios: list = relevant_curve[
             "functionality_loss_ratio"
@@ -238,12 +275,14 @@ class Losses(AnalysisIndirectProtocol):
                 f"intensity_{self.part_of_day}_{trip_type}"
             ]
 
-            vot_trip_type = _vot_intensity_per_trip_collection[
-                f"vot_{trip_type}"
-            ]
+            vot_trip_type = _vot_intensity_per_trip_collection[f"vot_{trip_type}"]
 
             vlh_trip_type_event = sum(
-                intensity_trip_type * duration * loss_ratio * performance_change * vot_trip_type
+                intensity_trip_type
+                * duration
+                * loss_ratio
+                * performance_change
+                * vot_trip_type
                 for duration, loss_ratio in zip(
                     duration_steps, functionality_loss_ratios
                 )
