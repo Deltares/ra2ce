@@ -248,7 +248,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         _section.event_type = EventTypeEnum.get_enum(
             self._parser.get(section_name, "event_type", fallback=None)
         )
-        _section.event_type = RiskCalculationModeEnum.get_enum(
+        _section.risk_calculation_mode = RiskCalculationModeEnum.get_enum(
             self._parser.get(section_name, "risk_calculation_mode", fallback=None)
         )
         _section.risk_calculation_year = self._parser.getint(

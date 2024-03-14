@@ -101,15 +101,17 @@ class DirectDamage(AnalysisDirectProtocol):
             )
 
             if (
-                self.analysis.risk_calculation_mode != RiskCalculationModeEnum.NONE
+                self.analysis.risk_calculation_mode != RiskCalculationModeEnum.INVALID
             ):  # Check if risk_calculation is demanded
-                return_period_gdf.control_risk_calculation(
-                    mode=self.analysis.risk_calculation_mode
-                )
+                if self.analysis.risk_calculation_mode != RiskCalculationModeEnum.NONE:
+                    return_period_gdf.control_risk_calculation(
+                        mode=self.analysis.risk_calculation_mode
+                    )
+
             else:
                 logging.info(
                     """No parameters for risk calculation are specified. 
-                             Add key [risk_calculation] to analyses.ini."""
+                             Add key [risk_calculation_mode] to analyses.ini."""
                 )
 
             return return_period_gdf.gdf
