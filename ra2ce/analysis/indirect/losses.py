@@ -19,26 +19,52 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import logging
 from ast import literal_eval
 from collections import defaultdict
-import logging
-
 from pathlib import Path
 
+import geopandas as gpd
 import numpy as np
 import pandas as pd
-import geopandas as gpd
+from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
     AnalysisSectionIndirect,
 )
+from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
+from ra2ce.network.graph_files.graph_file import GraphFile
+from ra2ce.network.hazard.hazard_names import HazardNames
 from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 
 
-class Losses:
-    def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionIndirect):
-        self.losses_input_path: Path = config.input_path.joinpath("losses")
+class Losses(AnalysisIndirectProtocol):
+    graph_file: GraphFile
+    analysis: AnalysisSectionIndirect
+    input_path: Path
+    static_path: Path
+    output_path: Path
+    hazard_names: HazardNames
+    result: GeoDataFrame
+
+    def __init__(
+        self,
+        graph_file: GraphFile,
+        analysis: AnalysisSectionIndirect,
+        input_path: Path,
+        static_path: Path,
+        output_path: Path,
+        hazard_names: HazardNames,
+    ) -> None:
+        self.graph_file = graph_file
+        self.analysis = analysis
+        self.input_path = input_path
+        self.static_path = static_path
+        self.output_path = output_path
+        self.hazard_names = hazard_names
+        self.result = None
+
+        self.losses_input_path: Path = input_path.joinpath("losses")
         self.duration: float = analysis.duration_event
         self.duration_disr: float = analysis.duration_disruption
         self.detour_traffic: float = analysis.fraction_detour
@@ -52,20 +78,26 @@ class Losses:
         self.network = self._load_gdf(
             self.losses_input_path.joinpath("network.geojson")
         )
-        self.intensities = self._load_df_from_csv(analysis.traffic_intensities_file, [])  # per day
+        self.intensities = self._load_df_from_csv(
+            analysis.traffic_intensities_file, []
+        )  # per day
 
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
         self.criticality_data = self._load_df_from_csv(Path("criticality_data.csv"), [])
-        self.resilience_curve = self._load_df_from_csv((analysis.resilience_curve_file),
-                                                       ["disruption_steps", "functionality_loss_ratio",
-                                                        "link_type_hazard_intensity"],
-                                                       )
+        self.resilience_curve = self._load_df_from_csv(
+            (analysis.resilience_curve_file),
+            [
+                "disruption_steps",
+                "functionality_loss_ratio",
+                "link_type_hazard_intensity",
+            ],
+        )
         self.values_of_time = self._load_df_from_csv(analysis.values_of_time_file, [])
 
     def _load_df_from_csv(
-            self,
-            csv_path: Path,
-            columns_to_interpret: list[str],
+        self,
+        csv_path: Path,
+        columns_to_interpret: list[str],
     ) -> pd.DataFrame:
         if csv_path is None or not csv_path.exists():
             logging.warning("No `csv` file found at {}.".format(csv_path))
@@ -86,21 +118,21 @@ class Losses:
         return gpd.GeoDataFrame()
 
     def traffic_shockwave(
-            self, vlh: pd.DataFrame, capacity: pd.Series, intensity: pd.Series
+        self, vlh: pd.DataFrame, capacity: pd.Series, intensity: pd.Series
     ) -> pd.DataFrame:
         vlh["vlh_traffic"] = (
-                (self.duration ** 2)
-                * (self.rest_capacity - 1)
-                * (self.rest_capacity * capacity - intensity / self.traffic_throughput)
-                / (2 * (1 - ((intensity / self.traffic_throughput) / capacity)))
+            (self.duration**2)
+            * (self.rest_capacity - 1)
+            * (self.rest_capacity * capacity - intensity / self.traffic_throughput)
+            / (2 * (1 - ((intensity / self.traffic_throughput) / capacity)))
         )
         return vlh
 
     def calc_vlh_with_shockwave(
-            self,
-            traffic_data: pd.DataFrame,
-            values_of_time: dict,
-            criticality_data: pd.DataFrame,
+        self,
+        traffic_data: pd.DataFrame,
+        values_of_time: dict,
+        criticality_data: pd.DataFrame,
     ) -> pd.DataFrame:
 
         vlh = pd.DataFrame(
@@ -133,17 +165,17 @@ class Losses:
         # all values above maximum, limit to maximum
         # TODO: integration here of time and traffic_throughput.
         vlh["vlh_detour"] = (
-                                    intensity * ((1 - self.traffic_throughput) * self.duration) * detour_time
-                            ) / 60
+            intensity * ((1 - self.traffic_throughput) * self.duration) * detour_time
+        ) / 60
         vlh["vlh_detour"] = vlh["vlh_detour"].apply(
             lambda x: np.where(x < 0, 0, x)
         )  # all values below 0 -> 0
 
         if (
-                diff_event_disr > 0
+            diff_event_disr > 0
         ):  # when the event is done, but the disruption continues after the event. Calculate extra detour times
             temp = (
-                    diff_event_disr * (detour_time * self.detour_traffic * detour_time) / 60
+                diff_event_disr * (detour_time * self.detour_traffic * detour_time) / 60
             )
             temp = temp.apply(
                 lambda x: np.where(x < 0, 0, x)
@@ -154,58 +186,58 @@ class Losses:
 
         if self.partofday == PartOfDayEnum.DAY:
             vlh["euro_per_hour"] = (
-                    (
-                            traffic_data["day_freight"]
-                            / traffic_data["day_total"]
-                            * values_of_time["freight"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["day_commute"]
-                            / traffic_data["day_total"]
-                            * values_of_time["commute"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["day_business"]
-                            / traffic_data["day_total"]
-                            * values_of_time["business"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["day_other"]
-                            / traffic_data["day_total"]
-                            * values_of_time["other"]["value_of_time"]
-                    )
+                (
+                    traffic_data["day_freight"]
+                    / traffic_data["day_total"]
+                    * values_of_time["freight"]["value_of_time"]
+                )
+                + (
+                    traffic_data["day_commute"]
+                    / traffic_data["day_total"]
+                    * values_of_time["commute"]["value_of_time"]
+                )
+                + (
+                    traffic_data["day_business"]
+                    / traffic_data["day_total"]
+                    * values_of_time["business"]["value_of_time"]
+                )
+                + (
+                    traffic_data["day_other"]
+                    / traffic_data["day_total"]
+                    * values_of_time["other"]["value_of_time"]
+                )
             )
             # to calculate costs per unit traffi per hour. This is weighted based on the traffic mix and value of each traffic type
 
         if self.partofday == PartOfDayEnum.EVENING:
             vlh["euro_per_hour"] = (
-                    (
-                            traffic_data["evening_freight"]
-                            / traffic_data["evening_total"]
-                            * values_of_time["freight"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["evening_commute"]
-                            / traffic_data["evening_total"]
-                            * values_of_time["commute"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["evening_business"]
-                            / traffic_data["evening_total"]
-                            * values_of_time["business"]["value_of_time"]
-                    )
-                    + (
-                            traffic_data["evening_other"]
-                            / traffic_data["evening_total"]
-                            * values_of_time["other"]["value_of_time"]
-                    )
+                (
+                    traffic_data["evening_freight"]
+                    / traffic_data["evening_total"]
+                    * values_of_time["freight"]["value_of_time"]
+                )
+                + (
+                    traffic_data["evening_commute"]
+                    / traffic_data["evening_total"]
+                    * values_of_time["commute"]["value_of_time"]
+                )
+                + (
+                    traffic_data["evening_business"]
+                    / traffic_data["evening_total"]
+                    * values_of_time["business"]["value_of_time"]
+                )
+                + (
+                    traffic_data["evening_other"]
+                    / traffic_data["evening_total"]
+                    * values_of_time["other"]["value_of_time"]
+                )
             )
             # to calculate costs per unit traffi per hour. This is weighted based on the traffic mix and value of each traffic type
         vlh["euro_vlh"] = vlh["euro_per_hour"] * vlh["vlh_total"]
         return vlh
 
     def _get_vot_intensity_per_trip_purpose(
-            self, trip_types: list[str]
+        self, trip_types: list[str]
     ) -> dict[str, pd.DataFrame]:
         """
         Generates a dictionary with all available `vot_purpose` with their intensity as a `pd.DataFrame`.
@@ -215,7 +247,7 @@ class Losses:
             vot_var_name = f"vot_{purpose}"
             partofday_trip_purpose_name = f"{self.partofday.config_value}_{purpose}"
             partofday_trip_purpose_intensity_name = (
-                    "intensity_" + partofday_trip_purpose_name
+                "intensity_" + partofday_trip_purpose_name
             )
             # read and set the vot's
             _vot_dict[vot_var_name] = self.values_of_time.loc[
@@ -223,7 +255,7 @@ class Losses:
             ].item()
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
-                    self.intensities[partofday_trip_purpose_name] / 24
+                self.intensities[partofday_trip_purpose_name] / 24
             )
         return dict(_vot_dict)
 
@@ -271,15 +303,13 @@ class Losses:
             for event in events:
                 vlh_event_total = 0
                 row_hazard_range = _get_range(vlh_row[event])
-                link_type_hazard_range = (
-                    f"{vlh_row['link_type']}_{row_hazard_range}"
-                )
+                link_type_hazard_range = f"{vlh_row['link_type']}_{row_hazard_range}"
 
                 # get stepwise recovery curve data
                 relevant_curve = self.resilience_curve[
                     self.resilience_curve["link_type_hazard_intensity"]
                     == link_type_hazard_range
-                    ]
+                ]
                 duration_steps: list = relevant_curve["duration_steps"].item()
                 functionality_loss_ratios: list = relevant_curve[
                     "functionality_loss_ratio"
@@ -338,4 +368,11 @@ class Losses:
 
                 _link_types.add(_link_type)
                 _hazard_intensity_ranges.add(_hazard_range)
+
         return list(_link_types), list(_hazard_intensity_ranges)
+
+    def execute(self) -> GeoDataFrame:
+        _gdf_in = self.graph_file.get_graph()
+        df = self.calculate_losses_from_table()
+
+        return _gdf_in.merge(df, how="left", on="LinkNr")

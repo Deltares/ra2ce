@@ -20,7 +20,7 @@
 """
 
 from pathlib import Path
-from typing import Optional, Protocol
+from typing import Protocol
 
 from geopandas import GeoDataFrame
 
@@ -33,7 +33,7 @@ class AnalysisProtocol(Protocol):
     analysis: AnalysisSectionBase
     input_path: Path
     output_path: Path
-    result: Optional[GeoDataFrame]
+    result: GeoDataFrame
 
     def execute(self) -> GeoDataFrame:
         """
