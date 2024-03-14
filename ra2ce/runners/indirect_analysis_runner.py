@@ -19,10 +19,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import logging
+import time
+from pathlib import Path
+
+from geopandas import GeoDataFrame
+
+from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_wrapper import (
     AnalysisConfigWrapper,
 )
-from ra2ce.analysis.indirect import analyses_indirect
+from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 
@@ -40,7 +47,65 @@ class IndirectAnalysisRunner(AnalysisRunner):
             return False
         return True
 
+    def _save_gdf(self, gdf: GeoDataFrame, save_path: Path, driver: str):
+        """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp
+
+        Arguments:
+            gdf [geodataframe]: geodataframe object to be converted
+            save_path [Path]: path to save
+            driver [str]: defines the file format
+
+        Returns:
+            None
+        """
+        # save to shapefile
+        gdf.crs = "epsg:4326"  # TODO: decide if this should be variable with e.g. an output_crs configured
+
+        for col in gdf.columns:
+            if gdf[col].dtype == object and col != gdf.geometry.name:
+                gdf[col] = gdf[col].astype(str)
+
+        if save_path.exists():
+            save_path.unlink()
+        gdf.to_file(save_path, driver=driver)
+        logging.info("Results saved to: {}".format(save_path))
+
+    def _save_result(
+        self, analysis: AnalysisIndirectProtocol, analysis_config: AnalysisConfigWrapper
+    ):
+        if analysis.result is None or analysis.result.empty:
+            return
+
+        _output_path = analysis_config.config_data.output_path.joinpath(
+            analysis.analysis.analysis.config_value
+        )
+
+        if analysis.analysis.save_gpkg:
+            gpkg_path = _output_path.joinpath(
+                analysis.analysis.name.replace(" ", "_") + ".gpkg"
+            )
+            self._save_gdf(analysis.result, gpkg_path, "GPKG")
+        if analysis.analysis.save_csv:
+            csv_path = _output_path.joinpath(
+                analysis.analysis.name.replace(" ", "_") + ".csv"
+            )
+            del analysis.result["geometry"]
+            analysis.result.to_csv(csv_path, index=False)
+
     def run(self, analysis_config: AnalysisConfigWrapper) -> None:
-        analyses_indirect.IndirectAnalyses(
-            analysis_config.config_data, analysis_config.graph_files
-        ).execute()
+        _analysis_collection = AnalysisCollection.from_config(analysis_config)
+        for analysis in _analysis_collection.indirect_analyses:
+            logging.info(
+                f"----------------------------- Started analyzing '{analysis.analysis.name}'  -----------------------------"
+            )
+            starttime = time.time()
+
+            analysis.result = analysis.execute()
+
+            self._save_result(analysis, analysis_config)
+
+            endtime = time.time()
+            logging.info(
+                f"----------------------------- Analysis '{analysis.analysis.name}' finished. "
+                f"Time: {str(round(endtime - starttime, 2))}s  -----------------------------"
+            )

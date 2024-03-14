@@ -93,7 +93,7 @@ class HazardOverlay:
         self.graph_files = graph_files
 
         # files
-        self.hazard_files = self._get_hazard_files()
+        self.hazard_files = HazardFiles.from_hazard_map(self._hazard_map)
 
         # bookkeeping for the hazard map names
         self.hazard_name_table = self.get_hazard_name_table()
@@ -420,24 +420,6 @@ class HazardOverlay:
             ]
         df["Full path"] = [haz for haz in self._hazard_map for _ in chosen_agg_types]
         return df
-
-    def _get_hazard_files(self) -> HazardFiles:
-        """Sorts the hazard files into tif, shp, and csv/json
-
-        This function returns a HazardFiles object sorted per type.
-        {key = hazard file type (tif / shp / table (csv/json) : value = list of file paths}
-        """
-
-        def get_filtered_files(*suffix) -> list[Path]:
-            _filter = lambda x: x.suffix in list(suffix)
-            return list(filter(_filter, self._hazard_map))
-
-        _hazard_files = HazardFiles(
-            tif=get_filtered_files(".tif"),
-            gpkg=get_filtered_files(".gpkg"),
-            table=get_filtered_files(".csv", ".json"),
-        )
-        return _hazard_files
 
     def hazard_intersect(
         self, to_overlay: gpd.GeoDataFrame | nx.classes.graph.Graph

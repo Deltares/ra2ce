@@ -19,26 +19,43 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import logging
 from ast import literal_eval
 from collections import defaultdict
-import logging
-
 from pathlib import Path
 
+import geopandas as gpd
 import numpy as np
 import pandas as pd
-import geopandas as gpd
+from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
-    AnalysisSectionIndirect,
+    AnalysisSectionIndirect, AnalysisConfigData,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import AnalysisIndirectEnum
+from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
+from ra2ce.network.graph_files.graph_file import GraphFile
+from ra2ce.network.hazard.hazard_names import HazardNames
 from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 
 
-class Losses:
-    def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionIndirect):
+class Losses(AnalysisIndirectProtocol):
+    graph_file: GraphFile
+    analysis: AnalysisSectionIndirect
+    input_path: Path
+    static_path: Path
+    output_path: Path
+    hazard_names: HazardNames
+    result: GeoDataFrame
+
+    def __init__(
+            self,
+            config: AnalysisConfigData,
+            analysis: AnalysisSectionIndirect,
+    ) -> None:
+        self.analysis = analysis
+        self.result = None
+
         self.part_of_day: PartOfDayEnum = analysis.part_of_day
         self.analysis_type = analysis.analysis
         self.losses_input_path: Path = config.input_path.joinpath("losses")
@@ -104,7 +121,7 @@ class Losses:
         return gpd.GeoDataFrame()
 
     def _get_vot_intensity_per_trip_purpose(
-            self, trip_types: list[str]
+        self, trip_types: list[str]
     ) -> dict[str, pd.DataFrame]:
         """
         Generates a dictionary with all available `vot_purpose` with their intensity as a `pd.DataFrame`.
@@ -114,7 +131,7 @@ class Losses:
             vot_var_name = f"vot_{purpose}"
             partofday_trip_purpose_name = f"{self.part_of_day.config_value}_{purpose}"
             partofday_trip_purpose_intensity_name = (
-                    "intensity_" + partofday_trip_purpose_name
+                "intensity_" + partofday_trip_purpose_name
             )
             # read and set the vot's
             _vot_dict[vot_var_name] = self.values_of_time.loc[
@@ -122,7 +139,7 @@ class Losses:
             ].item()
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
-                    self.intensities[partofday_trip_purpose_name] / 24
+                self.intensities[partofday_trip_purpose_name] / 24
             )
         return dict(_vot_dict)
 
@@ -160,8 +177,6 @@ class Losses:
                 left_index=True,
                 right_on="link_id",
             )
-
-        # set vot values for trip_types
 
         # for each link and for each event calculate vlh
         for _, vlh_row in vlh.iterrows():
@@ -259,4 +274,11 @@ class Losses:
 
                 _link_types.add(_link_type)
                 _hazard_intensity_ranges.add(_hazard_range)
+
         return list(_link_types), list(_hazard_intensity_ranges)
+
+    def execute(self) -> GeoDataFrame:
+        _gdf_in = self.graph_file.get_graph()
+        df = self.calculate_losses_from_table()
+
+        return _gdf_in.merge(df, how="left", on="LinkNr")

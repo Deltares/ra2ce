@@ -6,8 +6,7 @@ import pandas as pd
 import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
-    AnalysisSectionIndirect,
+    AnalysisSectionIndirect, AnalysisConfigData,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import AnalysisIndirectEnum
 from ra2ce.analysis.indirect.losses import Losses
@@ -67,7 +66,7 @@ class TestLosses:
             traffic_intensities_file=test_data / "losses" / "csv_data_for_losses" / "traffic_intensities.csv",
             values_of_time_file=test_data / "losses" / "csv_data_for_losses" / "values_of_time.csv",
             name="single_link_redundancy_losses_test",
-            performance="diff_length"
+            performance_metric="diff_length"
 
         )
         _config.input_path = test_data / "losses" / "csv_data_for_losses"
