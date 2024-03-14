@@ -109,6 +109,7 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     threshold_locations: float = math.nan
     category_field_name: str = ""
     save_traffic: bool = False
+    mathias_csv: Optional[Path] = None
 
 
 @dataclass
