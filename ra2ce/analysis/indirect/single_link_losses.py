@@ -274,15 +274,20 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
                 _link_type_parts = [
                     part for part in _parts if not any(char.isdigit() for char in part)
                 ]
-                _link_type = "_".join(_link_type_parts)
+                _link_type = [
+                    part
+                    for part in _parts
+                    if all(isinstance(char, str) for char in part)
+                ][0]
 
-                _range_parts = [
+                _ranges = [
                     part
                     for part in _parts
                     if any(char.isdigit() or char == "." for char in part)
-                ]
+                ][0]
 
-                # Handle the case where the second part is empty, motorway_1.5_ => height > 1.5
+                _range_parts = _ranges.split("-")
+                # Handle the case where the second part is empty, motorway-1.5_ => height > 1.5
                 if len(_range_parts) == 1:
                     _range_parts.append("")
 
