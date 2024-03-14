@@ -26,7 +26,7 @@ class TestTrafficAnalysis:
         )
 
     @slow_test
-    def test_equity_analysis_with_valid_data(
+    def test_traffic_analysis_with_valid_data(
         self,
         valid_traffic_analysis: TrafficAnalysis,
         request: pytest.FixtureRequest,
@@ -57,8 +57,12 @@ class TestTrafficAnalysis:
         assert isinstance(_result, pd.DataFrame)
         _result.to_csv(_test_result)
 
-        assert not any(_result[["u", "v"]].duplicated())
-        pd.testing.assert_frame_equal(_expected_result, _result)
+        def _sort_dataframe(traffic_df: pd.DataFrame) -> pd.DataFrame:
+            return traffic_df.sort_values(by=["u", "v"]).reset_index(drop=True)
+
+        pd.testing.assert_frame_equal(
+            _sort_dataframe(_expected_result), _sort_dataframe(_result)
+        )
 
     def test_traffic_analysis_get_accumulated_traffic_from_node(
         self, valid_traffic_analysis: TrafficAnalysis

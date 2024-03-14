@@ -15,7 +15,15 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
+from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from tests import test_data
+
+_unsupported_direct_analysis = [
+    AnalysisDirectEnum.EFFECTIVENESS_MEASURES,
+    AnalysisDirectEnum.INVALID,
+]
+_unsupported_indirect_analysis = [AnalysisIndirectEnum.INVALID]
 
 
 class TestAnalysisCollection:
@@ -58,7 +66,9 @@ class TestAnalysisCollection:
     @pytest.mark.parametrize(
         "analysis",
         [
-            pytest.param(AnalysisDirectEnum.DIRECT, id="DIRECT"),
+            pytest.param(_analysis_type)
+            for _analysis_type in AnalysisDirectEnum
+            if _analysis_type not in _unsupported_direct_analysis
         ],
     )
     def test_create_collection_with_direct_analyses(
@@ -77,13 +87,18 @@ class TestAnalysisCollection:
 
         # 3. Verify expectations.
         assert isinstance(_collection, AnalysisCollection)
+        assert len(_collection.direct_analyses) == 1
+
+        _generated_analysis = _collection.direct_analyses[0]
+        assert isinstance(_generated_analysis, AnalysisDirectProtocol)
         assert _collection.direct_analyses[0].analysis.analysis == analysis
 
-    @pytest.mark.skip("Not implemented yet #317")
     @pytest.mark.parametrize(
         "analysis",
         [
-            pytest.param(AnalysisIndirectEnum.LOSSES, id="LOSSES"),
+            pytest.param(_analysis_type)
+            for _analysis_type in AnalysisIndirectEnum
+            if _analysis_type not in _unsupported_indirect_analysis
         ],
     )
     def test_create_collection_with_indirect_analyses(
@@ -92,6 +107,8 @@ class TestAnalysisCollection:
     ):
         # 1. Define test data.
         _config = AnalysisConfigWrapper()
+        _config.config_data.input_path = Path("Any input path")
+        _config.config_data.output_path = Path("Any output path")
         _config.config_data.analyses.append(
             self.MockAnalysisSectionIndirect(analysis=analysis)
         )
@@ -101,4 +118,8 @@ class TestAnalysisCollection:
 
         # 3. Verify expectations.
         assert isinstance(_collection, AnalysisCollection)
-        assert _collection.direct_analyses == analysis
+        assert len(_collection.indirect_analyses) == 1
+
+        _generated_analysis = _collection.indirect_analyses[0]
+        assert isinstance(_generated_analysis, AnalysisIndirectProtocol)
+        assert _generated_analysis.analysis.analysis == analysis
