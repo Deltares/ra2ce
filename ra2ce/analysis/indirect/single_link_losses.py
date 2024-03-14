@@ -81,8 +81,6 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         self.values_of_time = self._load_df_from_csv(analysis.values_of_time_file, [], sep=";")
         self._check_validity_df()
 
-        self.criticality_analysis = gpd.GeoDataFrame()
-
         self.input_path = input_path
         self.static_path = static_path
         self.output_path = output_path
@@ -153,7 +151,7 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
             )
         return dict(_vot_dict)
 
-    def calc_vlh(self) -> pd.DataFrame:
+    def calc_vlh(self, criticality_analysis) -> pd.DataFrame:
         _link_types_heights_ranges = self._get_link_types_heights_ranges()
         _hazard_intensity_ranges = _link_types_heights_ranges[1]
 
@@ -168,9 +166,9 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         vlh = pd.DataFrame(
             index=self.intensities.link_id,  # "link_type"
         )
-        events = self.criticality_analysis.filter(regex="^EV")
+        events = criticality_analysis.filter(regex="^EV")
         # Read the performance_change stating the functionality drop
-        performance_change = self.criticality_analysis[self.performance_metric]
+        performance_change = criticality_analysis[self.performance_metric]
 
         # find the link_type and the hazard intensity
         vlh = pd.merge(
@@ -183,7 +181,7 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         if self.analysis_type == AnalysisIndirectEnum.MULTI_LINK_LOSSES:  # only useful for MULTI_LINK_LOSSES
             vlh = pd.merge(
                 vlh,
-                self.criticality_analysis[["link_id"] + list(events.columns)],
+                criticality_analysis[["link_id"] + list(events.columns)],
                 left_index=True,
                 right_on="link_id",
             )
@@ -299,7 +297,7 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         return list(_link_types), list(_hazard_intensity_ranges)
 
     def execute(self) -> pd.DataFrame:
-        self.criticality_analysis = SingleLinkRedundancy(
+        criticality_analysis = SingleLinkRedundancy(
             self.graph_file,
             self.analysis,
             self.input_path,
@@ -310,7 +308,7 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
 
         _single_link_losses = SingleLinkLosses(
             network=self.network,
-            graph_file=GraphFile(),
+            graph_file=self.graph_file,
             analysis=self.analysis,
             input_path=Path(),
             static_path=Path(),
@@ -318,6 +316,6 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
             hazard_names=HazardNames(names_df=pd.DataFrame())
         )
 
-        self.result = _single_link_losses.calc_vlh()
+        self.result = _single_link_losses.calc_vlh(criticality_analysis=criticality_analysis,)
 
         return self.result
