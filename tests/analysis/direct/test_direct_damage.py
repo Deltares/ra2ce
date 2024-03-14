@@ -3,6 +3,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
@@ -73,7 +74,7 @@ class TestDirectDamage:
         """
 
         # SET PARAMETERS AND LOAD REFERENCE DATA
-        damage_function = "HZ"
+        damage_function = DamageCurveEnum.HZ
         test_data_path = direct_damage_test_data / "Direct_damage_tests_EV_HZ.xlsx"
         assert test_data_path.is_file()
 
@@ -106,7 +107,7 @@ class TestDirectDamage:
     def test_event_based_damage_calculation_huizinga(
         self, event_input_output: pytest.fixture
     ):
-        damage_function = "HZ"
+        damage_function = DamageCurveEnum.HZ
 
         # This test roughly follows the DirectDamage.road_damage() controller in analyses_direct.py
         test_input = event_input_output["input_path"]
@@ -170,7 +171,7 @@ class TestDirectDamage:
         """
 
         # SET PARAMETERS AND LOAD REFERENCE DATA
-        damage_function = "OSD"
+        damage_function = DamageCurveEnum.OSD
         test_data_path = direct_damage_test_data / "Direct_damage_tests_EV_OSD.xlsx"
         road_gdf = pd.read_excel(test_data_path)
 
@@ -241,7 +242,7 @@ class TestDirectDamage:
         """
 
         # SET PARAMETERS AND LOAD REFERENCE DATA
-        damage_function = "MAN"
+        damage_function = DamageCurveEnum.MAN
         test_data_path = direct_damage_test_data / "Direct_damage_tests_EV_HZ.xlsx"
         road_gdf = pd.read_excel(test_data_path)
 

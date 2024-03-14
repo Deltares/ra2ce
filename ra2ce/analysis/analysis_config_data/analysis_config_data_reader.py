@@ -39,6 +39,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
@@ -122,7 +123,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             _section.weighing = WeighingEnum.LENGTH
         else:
             _section.weighing = WeighingEnum.get_enum(_weighing)
-        _section.analysis = LossTypeEnum.get_enum(
+        _section.loss_type = LossTypeEnum.get_enum(
             self._parser.get(section_name, "loss_type", fallback=None)
         )
         # losses
@@ -254,6 +255,9 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             section_name,
             "risk_calculation_year",
             fallback=_section.risk_calculation_year,
+        )
+        _section.damage_curve = DamageCurveEnum.get_enum(
+            self._parser.get(section_name, "damage_curve", fallback=None)
         )
         _section.create_table = self._parser.getboolean(
             section_name,

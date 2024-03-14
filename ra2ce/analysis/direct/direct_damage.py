@@ -6,6 +6,7 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionDirect,
 )
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
@@ -75,7 +76,7 @@ class DirectDamage(AnalysisDirectProtocol):
 
         # If you want to use manual damage functions, these need to be loaded first
         manual_damage_functions = None
-        if self.analysis.damage_curve == "MAN":
+        if self.analysis.damage_curve == DamageCurveEnum.MAN:
             manual_damage_functions = ManualDamageFunctions()
             manual_damage_functions.find_damage_functions(
                 folder=(self.input_path.joinpath("damage_functions"))

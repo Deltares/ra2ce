@@ -25,6 +25,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 import pandas as pd
 
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.direct.direct_lookup import LookUp as lookup
 from ra2ce.analysis.direct.direct_lookup import dataframe_lookup
 from ra2ce.analysis.direct.direct_utils import (
@@ -47,12 +48,12 @@ class DamageNetworkBase(ABC):
         # TODO: also create constructors of the childs of this class
 
     @abstractmethod
-    def main(self, damage_function: str, manual_damage_functions):
+    def main(self, damage_function: DamageCurveEnum, manual_damage_functions):
         """
         Controler for doing the EAD calculation
 
         Args:
-            damage_function (str): damage function key name that is to be used, valid arguments are: 'HZ', 'OSD', 'MAN'
+            damage_function (DamageCurveEnum): damage function key name that is to be used
             manual_damage_functions (ManualDamageFunctions): `ManualDamageFunctions` object
         """
         raise ValueError("Needs to be implented in concrete child class.")
