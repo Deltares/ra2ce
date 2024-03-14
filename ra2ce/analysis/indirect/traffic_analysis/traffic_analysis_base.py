@@ -20,11 +20,10 @@
 """
 
 import ast
+from collections import defaultdict
 import itertools
 import logging
-import operator
 from abc import ABC, abstractmethod
-from typing import Any
 
 import geopandas as gpd
 import numpy as np
@@ -49,36 +48,31 @@ class TrafficAnalysisBase(ABC):
         Returns:
             pd.DataFrame: Datafarme with the traffic indices for each of analysis.
         """
-        origin_nodes = np.unique(self.road_network["origin"])
-        destination_nodes = np.unique(self.road_network["destination"])
-
         unique_destination_nodes = np.unique(list(self.od_table["d_id"].fillna("0")))
         count_destination_nodes = len([x for x in unique_destination_nodes if x != "0"])
 
-        _traffic: dict[str, AccumulatedTraffic] = {}
-        for o_node in origin_nodes:
-            for d_node in destination_nodes:
-                opt_path = self._get_opt_path_values(o_node, d_node)
-                for u_node, v_node in itertools.pairwise(opt_path):
-                    _nodes_key_name = self._get_node_key(u_node, v_node)
-                    if "," in o_node:
-                        logging.error(
-                            "List of nodes as 'origin node' is not accepted and will be skipped."
-                        )
-                        continue
-                    _calculated_traffic = self._get_accumulated_traffic_from_node(
-                        o_node, count_destination_nodes
-                    )
+        _traffic = defaultdict(AccumulatedTraffic)
+        for _, _road_network_row in self.road_network.iterrows():
+            o_node, d_node = (
+                _road_network_row["origin"],
+                _road_network_row["destination"],
+            )
+            if "," in o_node:
+                logging.error(
+                    "List of nodes as 'origin node' is not accepted and will be skipped."
+                )
+                continue
+            opt_path = self._get_opt_path_values(_road_network_row)
+            for u_node, v_node in itertools.pairwise(opt_path):
+                _nodes_key_name = self._get_node_key(u_node, v_node)
+                _calculated_traffic = self._get_accumulated_traffic_from_node(
+                    o_node, count_destination_nodes
+                )
 
-                    if "," in d_node:
-                        _calculated_traffic *= len(d_node.split(","))
+                if "," in d_node:
+                    _calculated_traffic *= len(d_node.split(","))
 
-                    _accumulated_traffic = _traffic.get(
-                        _nodes_key_name, AccumulatedTraffic()
-                    )
-                    _traffic[_nodes_key_name] = (
-                        _accumulated_traffic + _calculated_traffic
-                    )
+                _traffic[_nodes_key_name] += _calculated_traffic
 
         return self._get_route_traffic(_traffic)
 
@@ -88,12 +82,8 @@ class TrafficAnalysisBase(ABC):
     def _get_key_nodes(self, node_key: str) -> tuple[str, str]:
         return node_key.split("_")
 
-    def _get_opt_path_values(self, o_node: str, d_node: str) -> list[Any]:
-        _opt_path_value = self.road_network.loc[
-            (self.road_network["origin"] == o_node)
-            & (self.road_network["destination"] == d_node),
-            "opt_path",
-        ].values[0]
+    def _get_opt_path_values(self, _road_network_row: pd.Series) -> list[int]:
+        _opt_path_value = _road_network_row["opt_path"]
         if isinstance(_opt_path_value, list):
             return _opt_path_value
         return ast.literal_eval(_opt_path_value)
