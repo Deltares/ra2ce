@@ -147,8 +147,8 @@ class Losses:
             right_on="link_id",
         )
 
-        if self.analysis_type == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
-            vlh = pd.merge(  # only useful for MULTI_LINK_LOSSES with hazard map
+        if self.analysis_type == AnalysisIndirectEnum.MULTI_LINK_LOSSES:  # only useful for MULTI_LINK_LOSSES
+            vlh = pd.merge(
                 vlh,
                 self.criticality_data[["link_id"] + list(events.columns)],
                 left_index=True,
@@ -156,84 +156,67 @@ class Losses:
             )
 
         # set vot values for trip_types
-        _trip_types = ["business", "commute", "freight", "other"]
-        _vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose(
-            _trip_types
-        )
 
         # for each link and for each event calculate vlh
         for _, vlh_row in vlh.iterrows():
             if self.analysis_type == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
-                vlh_total = 0
-                # row_hazard_range = _get_range(vlh_row[event]) # this should be this: 0.2_0.5
-                row_hazard_range = '0.2_0.5'
-                link_type_hazard_range = (
-                    f"{vlh_row['link_type']}_{row_hazard_range}"
-                )
 
-                relevant_curve = self.resilience_curve[
-                    self.resilience_curve["link_type_hazard_intensity"]
-                    == link_type_hazard_range
-                    ]
-                duration_steps: list = relevant_curve["duration_steps"].item()
-                functionality_loss_ratios: list = relevant_curve[
-                    "functionality_loss_ratio"
-                ].item()
+                row_hazard_range_list = self.resilience_curve['link_type_hazard_intensity'].str.extract(
+                    r'_(\d+\.\d+)_(\d+\.\d+)', expand=True).apply(lambda x: '_'.join(x), axis=1).tolist()
+                for row_hazard_range in row_hazard_range_list:
+                    self._populate_vlh_df(vlh, row_hazard_range, vlh_row, performance_change,
+                                          row_hazard_range)
 
-                # get vlh_trip_type_event
-                for trip_type in _trip_types:
-                    intensity_trip_type = _vot_intensity_per_trip_collection[
-                        f"intensity_{self.part_of_day}_{trip_type}"
-                    ]
-                    vlh_trip_type_event = sum(
-                        intensity_trip_type * duration * loss_ratio * performance_change
-                        for duration, loss_ratio in zip(
-                            duration_steps, functionality_loss_ratios
-                        )
-                    )
 
-                    vlh[f"vlh_{trip_type}_{row_hazard_range}"] = vlh_trip_type_event
-                    vlh_total += vlh_trip_type_event
-                vlh[f"vlh_{row_hazard_range}_{self.part_of_day}_total"] = vlh_total
-
-                pass
             elif self.analysis_type == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
                 for event in events:
-                    vlh_event_total = 0
                     row_hazard_range = _get_range(vlh_row[event])
-                    link_type_hazard_range = (
-                        f"{vlh_row['link_type']}_{row_hazard_range}"
-                    )
+                    self._populate_vlh_df(vlh, row_hazard_range, vlh_row, performance_change, event)
 
-                    # get stepwise recovery curve data
-                    relevant_curve = self.resilience_curve[
-                        self.resilience_curve["link_type_hazard_intensity"]
-                        == link_type_hazard_range
-                        ]
-                    duration_steps: list = relevant_curve["duration_steps"].item()
-                    functionality_loss_ratios: list = relevant_curve[
-                        "functionality_loss_ratio"
-                    ].item()
-
-                    # get vlh_trip_type_event
-                    for trip_type in _trip_types:
-                        intensity_trip_type = _vot_intensity_per_trip_collection[
-                            f"intensity_{trip_type}"
-                        ]
-                        vlh_trip_type_event = sum(
-                            intensity_trip_type * duration * loss_ratio * performance_change
-                            for duration, loss_ratio in zip(
-                                duration_steps, functionality_loss_ratios
-                            )
-                        )
-
-                        vlh[f"vlh_{trip_type}_{event}"] = vlh_trip_type_event
-                        vlh_event_total += vlh_trip_type_event
-                    vlh[f"vlh_{event}_total"] = vlh_event_total
             else:
                 raise ValueError(f"Invalid analysis type: {self.analysis_type}")
 
         return vlh
+
+    def _populate_vlh_df(self, vlh: pd.DataFrame, row_hazard_range: str, vlh_row: pd.Series,
+                         performance_change, hazard_col_name: str):
+
+        vlh_total = 0
+        _trip_types = ["business", "commute", "freight", "other"] # TODO code smell: this should be either a Enum or read from csv
+
+        _vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose(
+            _trip_types
+        )
+
+        link_type_hazard_range = (
+            f"{vlh_row['link_type']}_{row_hazard_range}"
+        )
+
+        # get stepwise recovery curve data
+        relevant_curve = self.resilience_curve[
+            self.resilience_curve["link_type_hazard_intensity"]
+            == link_type_hazard_range
+            ]
+        duration_steps: list = relevant_curve["duration_steps"].item()
+        functionality_loss_ratios: list = relevant_curve[
+            "functionality_loss_ratio"
+        ].item()
+
+        # get vlh_trip_type_event
+        for trip_type in _trip_types:
+            intensity_trip_type = _vot_intensity_per_trip_collection[
+                f"intensity_{self.part_of_day}_{trip_type}"
+            ]
+            vlh_trip_type_event = sum(
+                intensity_trip_type * duration * loss_ratio * performance_change
+                for duration, loss_ratio in zip(
+                    duration_steps, functionality_loss_ratios
+                )
+            )
+
+            vlh[f"vlh_{trip_type}_{hazard_col_name}"] = vlh_trip_type_event
+            vlh_total += vlh_trip_type_event
+        vlh[f"vlh_{hazard_col_name}_total"] = vlh_total
 
     def calculate_losses_from_table(self) -> pd.DataFrame:
         """
