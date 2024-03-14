@@ -39,6 +39,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
@@ -243,6 +244,9 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         # road damage
         _section.event_type = EventTypeEnum.get_enum(
             self._parser.get(section_name, "event_type", fallback=None)
+        )
+        _section.damage_curve = DamageCurveEnum.get_enum(
+            self._parser.get(section_name, "damage_curve", fallback=None)
         )
         _section.create_table = self._parser.getboolean(
             section_name,
