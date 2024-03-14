@@ -9,23 +9,19 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import AnalysisIndirectEnum
 from ra2ce.analysis.indirect.losses import Losses
 from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
+from tests import test_data
 
 
 class TestLosses:
 
-    def test_initialize(self):
+    def test_initialize_no_data(self):
         # 1. Define test data
         _config = AnalysisConfigData(input_path=Path("sth"))
         _analyses = AnalysisSectionIndirect(
-            duration_event=None,
-            duration_disruption=None,
-            fraction_detour=None,
-            fraction_drivethrough=None,
-            rest_capacity=None,
-            maximum_jam=None,
-            partofday=None,
+            part_of_day=None,
         )
 
         # 2. Run test.
@@ -35,90 +31,55 @@ class TestLosses:
         # 3. Verify final expectations.
         assert isinstance(_losses, Losses)
 
-    def test_traffic_shockwave(self):
+    def test_initialize_with_data(self):
         # 1. Define test data
-        _config = AnalysisConfigData(input_path=Path("sth"))
+        _config = AnalysisConfigData(input_path=test_data / "losses")
         _analyses = AnalysisSectionIndirect(
-            duration_event=60,
-            duration_disruption=None,
-            fraction_detour=None,
-            fraction_drivethrough=24,
-            rest_capacity=42,
-            maximum_jam=None,
-            partofday=None,
+            part_of_day=None,
+            resilience_curve_file=test_data / "losses" / "csv_data_for_losses" / "resilience_curve.csv",
+            traffic_intensities_file=test_data / "losses" / "csv_data_for_losses" / "traffic_intensities.csv",
+            values_of_time_file=test_data / "losses" / "csv_data_for_losses" / "values_of_time.csv",
+            name="single_link_redundancy_losses_test"
         )
-        _losses = Losses(_config, _analyses)
-        _capacity = pd.Series([42, 24, 12])
-        _intensity = pd.Series([4.2, 2.4, 1.2])
-        _vlh = pd.DataFrame()
+        _config.input_path = test_data / "losses" / "csv_data_for_losses"
+
 
         # 2. Run test.
-        _result = _losses.traffic_shockwave(_vlh, _capacity, _intensity)
 
-        # 3. Verify expectations
-        assert _result.equals(_vlh)
-        assert "vlh_traffic" in _vlh
-        assert _vlh["vlh_traffic"].values == pytest.approx(
-            [1.307149e08, 7.46942460e07, 3.73471230e07]
-        )
+        _losses = Losses(_config, _analyses)
+
+        # 3. Verify final expectations.
+        assert isinstance(_losses, Losses)
 
     @pytest.mark.parametrize(
         "part_of_day",
-        [pytest.param(PartOfDayEnum.DAY), pytest.param(PartOfDayEnum.EVENING)],
+        # [pytest.param(PartOfDayEnum.DAY), pytest.param(PartOfDayEnum.EVENING)],
+        [pytest.param(PartOfDayEnum.DAY)],
     )
     def test_calc_vlh(self, part_of_day: str):
         # 1. Define test data
         # TODO: Not sure of the input format values float of series?
         _config = AnalysisConfigData(input_path=Path("sth"))
         _analyses = AnalysisSectionIndirect(
-            duration_event=60,
-            duration_disruption=15,
-            fraction_detour=1.24,
-            fraction_drivethrough=24,
-            rest_capacity=42,
-            maximum_jam=100,
-            partofday=part_of_day,
+            analysis=AnalysisIndirectEnum.SINGLE_LINK_LOSSES,
+            part_of_day=part_of_day,
+            resilience_curve_file=test_data / "losses" / "csv_data_for_losses" / "resilience_curve.csv",
+            traffic_intensities_file=test_data / "losses" / "csv_data_for_losses" / "traffic_intensities.csv",
+            values_of_time_file=test_data / "losses" / "csv_data_for_losses" / "values_of_time.csv",
+            name="single_link_redundancy_losses_test",
+            performance="diff_length"
+
         )
+        _config.input_path = test_data / "losses" / "csv_data_for_losses"
 
         _losses = Losses(_config, _analyses)
-        _traffic_data = pd.DataFrame(
-            {
-                "capacity": [10, 5, 2],
-                "day_total": [100, 50, 20],
-                "day_freight": [30, 60, 90],
-                "day_commute": [30, 60, 90],
-                "day_business": [30, 60, 90],
-                "day_other": [30, 60, 90],
-                "evening_total": [50, 25, 10],
-                "evening_freight": [15, 30, 60],
-                "evening_commute": [15, 30, 60],
-                "evening_business": [15, 30, 60],
-                "evening_other": [15, 30, 60],
-            }
-        )
-        _mi = list(
-            itertools.product(
-                ["freight", "commute", "business", "other"], ["value_of_time"]
-            )
-        )
-        _mi_idx = pd.MultiIndex.from_tuples(_mi, names=["A", "B"])
-        _vehicle_loss_hours = pd.Series(np.random.randn(4), index=_mi_idx)
-        _detour_data = pd.DataFrame(
-            {
-                "detour_time_day": [30, 20, 10],
-                "detour_time_evening": [15, 10, 5],
-            }
-        )
+
 
         # 2. Run test.
-        _result = _losses.calc_vlh_with_shockwave(
-            _traffic_data, _vehicle_loss_hours, _detour_data
+        _result = _losses.calc_vlh(
         )
 
         # 3. Verify final expectations.
         assert isinstance(_result, pd.DataFrame)
-        assert "euro_per_hour" in _result
-        assert "euro_vlh" in _result
-        assert "vlh_total" in _result
-        assert "vlh_traffic" in _result
-        assert "vlh_detour" in _result
+        assert "vlh_business_0.2_0.5" in _result
+

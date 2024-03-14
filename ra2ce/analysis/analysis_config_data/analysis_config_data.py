@@ -86,12 +86,9 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     traffic_cols: list[str] = field(default_factory=list)
     # losses
     duration_event: float = math.nan
-    duration_disruption: float = math.nan
-    fraction_detour: float = math.nan
-    fraction_drivethrough: float = 0.0
     rest_capacity: float = math.nan
     maximum_jam: float = math.nan
-    partofday: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
+    part_of_day: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
     performance_metric: str = "diff_time"  # "diff_time" or "diff_dist" relates to the used criticality metric
     resilience_curve_file: Optional[Path] = None
     traffic_intensities_file: Optional[Path] = None

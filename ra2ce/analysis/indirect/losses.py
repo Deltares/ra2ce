@@ -33,14 +33,16 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionIndirect,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import AnalysisIndirectEnum
 from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 
 
 class Losses:
     def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionIndirect):
+        self.part_of_day: PartOfDayEnum = analysis.part_of_day
+        self.analysis_type = analysis.analysis
         self.losses_input_path: Path = config.input_path.joinpath("losses")
         self.duration_event: float = analysis.duration_event
-        self.partofday: PartOfDayEnum = analysis.partofday
         self.performance_metric = analysis.performance_metric
 
         if len(config.network.primary_file) > 1:
@@ -53,23 +55,41 @@ class Losses:
         )
         self.intensities = self._load_df_from_csv(analysis.traffic_intensities_file, [])  # per day
 
-        self.criticality_data = self._load_df_from_csv(Path("criticality_data.csv"), [])
-        self.resilience_curve = self._load_df_from_csv(analysis.resilience_curve_file,
-                                                       ["disruption_steps", "functionality_loss_ratio",
-                                                        "link_type_hazard_intensity"],
+        # TODO: make sure the "link_id" is kept in the result of the criticality analysis
+        self.criticality_data = self._load_df_from_csv(config.input_path.joinpath(f"{analysis.name}.csv"), [])
+        self.resilience_curve = self._load_df_from_csv((analysis.resilience_curve_file),
+                                                       ["duration_steps",
+                                                        "functionality_loss_ratio"], sep=";"
                                                        )
-        self.values_of_time = self._load_df_from_csv(analysis.values_of_time_file, [])
+        self.values_of_time = self._load_df_from_csv(analysis.values_of_time_file, [], sep=";")
+        self._check_validity_df()
+
+    def _check_validity_df(self):
+        """
+        Check spelling of the required input csv files. If user writes wrong spelling, it will raise an error
+        when initializing the class.
+        """
+        _required_values_of_time_keys = ["trip_types", "value_of_time", "occupants"]
+        if len(self.values_of_time) > 0 and not all(
+                key in self.values_of_time.columns for key in _required_values_of_time_keys):
+            raise ValueError(f"Missing required columns in values_of_time: {_required_values_of_time_keys}")
+
+        _required_resilience_curve_keys = ["link_type_hazard_intensity", "duration_steps", "functionality_loss_ratio"]
+        if len(self.resilience_curve) > 0 and not all(
+                key in self.resilience_curve.columns for key in _required_resilience_curve_keys):
+            raise ValueError(f"Missing required columns in resilience_curve: {_required_resilience_curve_keys}")
 
     def _load_df_from_csv(
             self,
             csv_path: Path,
             columns_to_interpret: list[str],
+            sep: str = ",",
     ) -> pd.DataFrame:
         if csv_path is None or not csv_path.exists():
             logging.warning("No `csv` file found at {}.".format(csv_path))
             return pd.DataFrame()
 
-        _csv_dataframe = pd.read_csv(csv_path)
+        _csv_dataframe = pd.read_csv(csv_path, sep=sep, on_bad_lines='skip')
         if any(columns_to_interpret):
             _csv_dataframe[columns_to_interpret] = _csv_dataframe[
                 columns_to_interpret
@@ -92,7 +112,7 @@ class Losses:
         _vot_dict = defaultdict(pd.DataFrame)
         for purpose in trip_types:
             vot_var_name = f"vot_{purpose}"
-            partofday_trip_purpose_name = f"{self.partofday.config_value}_{purpose}"
+            partofday_trip_purpose_name = f"{self.part_of_day.config_value}_{purpose}"
             partofday_trip_purpose_intensity_name = (
                     "intensity_" + partofday_trip_purpose_name
             )
@@ -119,7 +139,7 @@ class Losses:
 
         # shape vlh
         vlh = pd.DataFrame(
-            index=self.intensities.index,  # "link_type"
+            index=self.intensities.link_id,  # "link_type"
         )
         events = self.criticality_data.filter(regex="^EV")
         # Read the performance_change stating the functionality drop
@@ -132,55 +152,77 @@ class Losses:
             left_index=True,
             right_on="link_id",
         )
-        vlh = pd.merge(
-            vlh,
-            self.criticality_data[["link_id"] + list(events.columns)],
-            left_index=True,
-            right_on="link_id",
-        )
+
+        if self.analysis_type == AnalysisIndirectEnum.MULTI_LINK_LOSSES:  # only useful for MULTI_LINK_LOSSES
+            vlh = pd.merge(
+                vlh,
+                self.criticality_data[["link_id"] + list(events.columns)],
+                left_index=True,
+                right_on="link_id",
+            )
 
         # set vot values for trip_types
-        _trip_types = ["business" "commute" "freight" "other"]
+
+        # for each link and for each event calculate vlh
+        for _, vlh_row in vlh.iterrows():
+            if self.analysis_type == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
+
+                row_hazard_range_list = self.resilience_curve['link_type_hazard_intensity'].str.extract(
+                    r'_(\d+\.\d+)_(\d+\.\d+)', expand=True).apply(lambda x: '_'.join(x), axis=1).tolist()
+                for row_hazard_range in row_hazard_range_list:
+                    self._populate_vlh_df(vlh, row_hazard_range, vlh_row, performance_change,
+                                          row_hazard_range)
+
+
+            elif self.analysis_type == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
+                for event in events:
+                    row_hazard_range = _get_range(vlh_row[event])
+                    self._populate_vlh_df(vlh, row_hazard_range, vlh_row, performance_change, event)
+
+            else:
+                raise ValueError(f"Invalid analysis type: {self.analysis_type}")
+
+        return vlh
+
+    def _populate_vlh_df(self, vlh: pd.DataFrame, row_hazard_range: str, vlh_row: pd.Series,
+                         performance_change, hazard_col_name: str):
+
+        vlh_total = 0
+        _trip_types = ["business", "commute", "freight", "other"] # TODO code smell: this should be either a Enum or read from csv
+
         _vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose(
             _trip_types
         )
 
-        # for each link and for each event calculate vlh
-        for link_id, vlh_row in vlh.iterrows():
-            for event in events:
-                vlh_event_total = 0
-                row_hazard_range = _get_range(vlh_row[event])
-                link_type_hazard_range = (
-                    f"{vlh_row['link_type']}_{row_hazard_range}"
+        link_type_hazard_range = (
+            f"{vlh_row['link_type']}_{row_hazard_range}"
+        )
+
+        # get stepwise recovery curve data
+        relevant_curve = self.resilience_curve[
+            self.resilience_curve["link_type_hazard_intensity"]
+            == link_type_hazard_range
+            ]
+        duration_steps: list = relevant_curve["duration_steps"].item()
+        functionality_loss_ratios: list = relevant_curve[
+            "functionality_loss_ratio"
+        ].item()
+
+        # get vlh_trip_type_event
+        for trip_type in _trip_types:
+            intensity_trip_type = _vot_intensity_per_trip_collection[
+                f"intensity_{self.part_of_day}_{trip_type}"
+            ]
+            vlh_trip_type_event = sum(
+                intensity_trip_type * duration * loss_ratio * performance_change
+                for duration, loss_ratio in zip(
+                    duration_steps, functionality_loss_ratios
                 )
+            )
 
-                # get stepwise recovery curve data
-                relevant_curve = self.resilience_curve[
-                    self.resilience_curve["link_type_hazard_intensity"]
-                    == link_type_hazard_range
-                    ]
-                duration_steps: list = relevant_curve["duration_steps"].item()
-                functionality_loss_ratios: list = relevant_curve[
-                    "functionality_loss_ratio"
-                ].item()
-
-                # get vlh_trip_type_event
-                for trip_type in _trip_types:
-                    intensity_trip_type = _vot_intensity_per_trip_collection[
-                        f"intensity_{trip_type}"
-                    ]
-                    vlh_trip_type_event = sum(
-                        intensity_trip_type * duration * loss_ratio * performance_change
-                        for duration, loss_ratio in zip(
-                            duration_steps, functionality_loss_ratios
-                        )
-                    )
-
-                    vlh[f"vlh_{trip_type}_{event}"] = vlh_trip_type_event
-                    vlh_event_total += vlh_trip_type_event
-                vlh[f"vlh_{event}_total"] = vlh_event_total
-
-        return vlh
+            vlh[f"vlh_{trip_type}_{hazard_col_name}"] = vlh_trip_type_event
+            vlh_total += vlh_trip_type_event
+        vlh[f"vlh_{hazard_col_name}_total"] = vlh_total
 
     def calculate_losses_from_table(self) -> pd.DataFrame:
         """
