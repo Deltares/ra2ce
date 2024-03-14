@@ -65,6 +65,7 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         if len(network.primary_file) > 1:
             raise NotImplementedError('A list of networks is not supported yet')
         self.network = network
+        self.graph_file = graph_file
         self.analysis = analysis
         self.performance_metric = f'diff_{self.analysis.weighing}'
 
@@ -73,13 +74,19 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         self.duration_event: float = analysis.duration_event
 
         self.intensities = self._load_df_from_csv(analysis.traffic_intensities_file, [])  # per day
-        self.criticality_analysis = gpd.GeoDataFrame()
         self.resilience_curve = self._load_df_from_csv(analysis.resilience_curve_file,
                                                        ["duration_steps",
                                                         "functionality_loss_ratio"], sep=";"
                                                        )
         self.values_of_time = self._load_df_from_csv(analysis.values_of_time_file, [], sep=";")
         self._check_validity_df()
+
+        self.criticality_analysis = gpd.GeoDataFrame()
+
+        self.input_path = input_path
+        self.static_path = static_path
+        self.output_path = output_path
+        self.hazard_names = hazard_names
 
         self.result = gpd.GeoDataFrame()
 
