@@ -1,15 +1,15 @@
 from dataclasses import dataclass
 import geopandas as gpd
 from ra2ce.analysis.analysis_result_protocol import AnalysisResultProtocol
-from ra2ce.network.graph_files.graph_files_protocol import GraphFileProtocol
-from ra2ce.network.graph_files.network_file import NetworkFile
+from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
+from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 
 
 @dataclass
 class DirectAnalysisResultWrapper(AnalysisResultProtocol):
 
     analysis_result: gpd.GeoDataFrame
-    network_file: NetworkFile
+    analysis: AnalysisDirectProtocol
 
     def is_valid_result(self) -> bool:
         return self.analysis_result and not self.analysis_result.empty
@@ -19,7 +19,7 @@ class DirectAnalysisResultWrapper(AnalysisResultProtocol):
 class IndirectAnalysisResultWrapper(AnalysisResultProtocol):
 
     analysis_result: gpd.GeoDataFrame
-    graph_file: GraphFileProtocol
+    analysis: AnalysisIndirectProtocol
 
     def is_valid_result(self) -> bool:
         return self.analysis_result and not self.analysis_result.empty
