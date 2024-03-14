@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.direct.damage_calculation.damage_network_base import (
     DamageNetworkBase,
 )
@@ -41,7 +42,11 @@ class TestDamageNetworkReturnPeriods:
     )
     @pytest.mark.parametrize(
         "damage_function",
-        [pytest.param("HZ"), pytest.param("OSD"), pytest.param("MAN")],
+        [
+            pytest.param(DamageCurveEnum.HZ),
+            pytest.param(DamageCurveEnum.OSD),
+            pytest.param(DamageCurveEnum.MAN),
+        ],
     )
     def test_main_with_valid_data(self, damage_function: str):
         # 1. Define test data.

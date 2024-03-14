@@ -26,6 +26,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+from ra2ce.analysis.analysis_config_data.enums import damage_curve_enum
 from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
     AnalysisDirectEnum,
 )
@@ -131,8 +132,10 @@ class AnalysisSectionDirect(AnalysisSectionBase):
     climate_factor: float = math.nan
     climate_period: float = math.nan
     # road damage
-    damage_curve: str = ""
     event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.INVALID)
+    damage_curve: damage_curve_enum.DamageCurveEnum = field(
+        default_factory=lambda: EventTypeEnum.INVALID
+    )
     risk_calculation: str = ""
     create_table: bool = False
     file_name: Optional[Path] = None
