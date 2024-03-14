@@ -27,6 +27,7 @@ from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_result_wrapper import DirectAnalysisResultWrapper
 from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
@@ -98,11 +99,15 @@ class DirectAnalysisRunner(AnalysisRunner):
             del analysis.result["geometry"]
             analysis.result.to_csv(csv_path, index=False)
 
-    def run(self, analysis_config: AnalysisConfigWrapper) -> None:
+    def run(
+        self, analysis_config: AnalysisConfigWrapper
+    ) -> list[DirectAnalysisResultWrapper]:
         _analysis_collection = AnalysisCollection.from_config(analysis_config)
+        _results = []
         for analysis in _analysis_collection.direct_analyses:
             logging.info(
-                f"----------------------------- Started analyzing '{analysis.analysis.name}'  -----------------------------"
+                "----------------------------- Started analyzing '%s'  -----------------------------",
+                analysis.analysis.name,
             )
             starttime = time.time()
 
@@ -112,6 +117,9 @@ class DirectAnalysisRunner(AnalysisRunner):
 
             endtime = time.time()
             logging.info(
-                f"----------------------------- Analysis '{analysis.analysis.name}' finished. "
-                f"Time: {str(round(endtime - starttime, 2))}s  -----------------------------"
+                "----------------------------- Analysis '%s' finished. "
+                "Time: %ss  -----------------------------",
+                analysis.analysis.name,
+                str(round(endtime - starttime, 2)),
             )
+        return _results
