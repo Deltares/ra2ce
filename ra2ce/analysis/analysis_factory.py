@@ -34,7 +34,6 @@ from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtoco
 from ra2ce.analysis.direct.direct_damage import DirectDamage
 from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
-from ra2ce.analysis.indirect.losses import Losses
 from ra2ce.analysis.indirect.multi_link_isolated_locations import (
     MultiLinkIsolatedLocations,
 )
