@@ -26,6 +26,7 @@ import numpy as np
 import pandas as pd
 from geopandas import GeoDataFrame
 
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
@@ -65,7 +66,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         return cls(road_gdf, val_cols)
 
     ### Controlers for return period based damage and risk calculations
-    def main(self, damage_function: str, manual_damage_functions):
+    def main(self, damage_function: DamageCurveEnum, manual_damage_functions):
         """
         Control the damage calculation per return period
 
@@ -77,13 +78,13 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
 
         self.do_cleanup_and_mask_creation()
 
-        if damage_function == "HZ":
+        if damage_function == DamageCurveEnum.HZ:
             self.calculate_damage_HZ(events=self.return_periods)
 
-        if damage_function == "OSD":
+        if damage_function == DamageCurveEnum.OSD:
             self.calculate_damage_OSdaMage(events=self.return_periods)
 
-        if damage_function == "MAN":
+        if damage_function == DamageCurveEnum.MAN:
             self.calculate_damage_manual_functions(
                 events=self.events, manual_damage_functions=manual_damage_functions
             )
