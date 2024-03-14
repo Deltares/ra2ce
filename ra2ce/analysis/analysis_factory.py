@@ -49,52 +49,52 @@ from ra2ce.network.hazard.hazard_names import HazardNames
 
 
 class AnalysisFactory:
-    analysis: AnalysisSectionIndirect | AnalysisSectionDirect
 
-    def __init__(
-        self, analysis: AnalysisSectionIndirect | AnalysisSectionDirect
-    ) -> None:
-        self.analysis = analysis
-
+    @staticmethod
     def get_direct_analysis(
-        self, analysis_config: AnalysisConfigWrapper
+        analysis: AnalysisSectionIndirect | AnalysisSectionDirect,
+        analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisDirectProtocol:
         """
         Create an analysis based on the given analysis configuration.
 
         Args:
+            analysis (AnalysisSectionIndirect | AnalysisSectionDirect): Analysis section.
             analysis_config (AnalysisConfigWrapper): Analysis configuration.
 
         Raises:
             NotImplementedError: The analysis type is not implemented.
 
         Returns:
-            AnalysisIndirectProtocol: The direct analysis to be executed.
+            AnalysisDirectProtocol: The direct analysis to be executed.
         """
         _input_dict = dict(
-            analysis=self.analysis,
+            analysis=analysis,
             input_path=analysis_config.config_data.input_path,
             output_path=analysis_config.config_data.output_path,
         )
-        if self.analysis.analysis == AnalysisDirectEnum.DIRECT:
+        if analysis.analysis == AnalysisDirectEnum.DIRECT:
             return DirectDamage(
                 graph_file=analysis_config.graph_files.base_network_hazard,
                 **_input_dict,
             )
-        if self.analysis.analysis == AnalysisDirectEnum.EFFECTIVENESS_MEASURES:
+        if analysis.analysis == AnalysisDirectEnum.EFFECTIVENESS_MEASURES:
             return EffectivenessMeasures(
                 graph_file=analysis_config.graph_files.base_network_hazard,
                 **_input_dict,
             )
-        raise NotImplementedError(f"Analysis {self.analysis.analysis} not implemented")
+        raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
 
+    @staticmethod
     def get_indirect_analysis(
-        self, analysis_config: AnalysisConfigWrapper
+        analysis: AnalysisSectionIndirect | AnalysisSectionDirect,
+        analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisIndirectProtocol:
         """
         Create an analysis based on the given analysis configuration.
 
         Args:
+            analysis (AnalysisSectionIndirect | AnalysisSectionDirect): Analysis section.
             analysis_config (AnalysisConfigWrapper): Analysis configuration.
 
         Raises:
@@ -104,37 +104,34 @@ class AnalysisFactory:
             AnalysisIndirectProtocol: The indirect analysis to be executed.
         """
         _input_dict = dict(
-            analysis=self.analysis,
+            analysis=analysis,
             input_path=analysis_config.config_data.input_path,
             static_path=analysis_config.config_data.static_path,
             output_path=analysis_config.config_data.output_path,
             hazard_names=HazardNames.from_config(analysis_config),
         )
-        if self.analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY:
+        if analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY:
             return SingleLinkRedundancy(
                 graph_file=analysis_config.graph_files.base_graph, **_input_dict
             )
-        if self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_REDUNDANCY:
+        if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_REDUNDANCY:
             return MultiLinkRedundancy(
                 graph_file=analysis_config.graph_files.base_graph_hazard, **_input_dict
             )
-        if (
-            self.analysis.analysis
-            == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION
-        ):
+        if analysis.analysis == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION:
             return OptimalRouteOriginDestination(
                 graph_file=analysis_config.graph_files.origins_destinations_graph,
                 **_input_dict,
                 origins_destinations=analysis_config.config_data.origins_destinations,
             )
-        if self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_DESTINATION:
+        if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_DESTINATION:
             return MultiLinkOriginDestination(
                 graph_file=analysis_config.graph_files.origins_destinations_graph_hazard,
                 **_input_dict,
                 origins_destinations=analysis_config.config_data.origins_destinations,
             )
         if (
-            self.analysis.analysis
+            analysis.analysis
             == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
         ):
             return OptimalRouteOriginClosestDestination(
@@ -144,7 +141,7 @@ class AnalysisFactory:
                 file_id=analysis_config.config_data.network.file_id,
             )
         if (
-            self.analysis.analysis
+            analysis.analysis
             == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
         ):
             return MultiLinkOriginClosestDestination(
@@ -154,20 +151,20 @@ class AnalysisFactory:
                 origins_destinations=analysis_config.config_data.origins_destinations,
                 file_id=analysis_config.config_data.network.file_id,
             )
-        if self.analysis.analysis == AnalysisIndirectEnum.LOSSES:
+        if analysis.analysis == AnalysisIndirectEnum.LOSSES:
             return Losses(
                 graph_file=analysis_config.graph_files.base_graph_hazard, **_input_dict
             )
-        if self.analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
+        if analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
             return SingleLinkLosses(
                 graph_file=analysis_config.graph_files.base_graph_hazard, **_input_dict
             )
-        if self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
+        if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
             return MultiLinkLosses(
                 graph_file=analysis_config.graph_files.base_graph_hazard, **_input_dict
             )
-        if self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS:
+        if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS:
             return MultiLinkIsolatedLocations(
                 graph_file=analysis_config.graph_files.base_graph_hazard, **_input_dict
             )
-        raise NotImplementedError(f"Analysis {self.analysis.analysis} not implemented")
+        raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")

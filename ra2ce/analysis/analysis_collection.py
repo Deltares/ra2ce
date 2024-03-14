@@ -47,11 +47,11 @@ class AnalysisCollection:
         """
         return cls(
             direct_analyses=[
-                AnalysisFactory(analysis).get_direct_analysis(analysis_config)
+                AnalysisFactory.get_direct_analysis(analysis, analysis_config)
                 for analysis in analysis_config.config_data.direct
             ],
             indirect_analyses=[
-                AnalysisFactory(analysis).get_indirect_analysis(analysis_config)
+                AnalysisFactory.get_indirect_analysis(analysis, analysis_config)
                 for analysis in analysis_config.config_data.indirect
             ],
         )

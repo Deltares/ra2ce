@@ -1005,14 +1005,16 @@ class OriginClosestDestination:
         )
 
     def load_origins(self):
-        od_path = self.static_path / "output_graph" / "origin_destination_table.feather"
+        od_path = self.static_path.joinpath("output_graph", "origin_destination_table.feather")
         od = gpd.read_feather(od_path)
         origin = od.loc[od["o_id"].notna()]
         del origin["d_id"]
         return origin
 
     def load_destinations(self):
-        od_path = self.static_path / "output_graph" / "origin_destination_table.feather"
+        od_path = self.static_path.joinpath(
+            "output_graph", "origin_destination_table.feather"
+        )
         od = gpd.read_feather(od_path)
         destination = od.loc[od["d_id"].notna()]
         del destination["o_id"]

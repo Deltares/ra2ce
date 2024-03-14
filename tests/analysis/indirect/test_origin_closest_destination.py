@@ -42,6 +42,7 @@ class TestOriginClosestDestination:
 
         # 3. Verify expectations.
         assert isinstance(_ocd, OriginClosestDestination)
+        assert isinstance(_ocd.analysis, AnalysisSectionIndirect)
         assert _ocd.analysis == _analysis
         assert _ocd.hazard_names == _hazard_names
         assert _ocd.results_dict == {}
