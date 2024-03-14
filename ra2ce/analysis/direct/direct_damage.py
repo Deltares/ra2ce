@@ -73,7 +73,7 @@ class DirectDamage(AnalysisDirectProtocol):
 
         # If you want to use manual damage functions, these need to be loaded first
         manual_damage_functions = None
-        if self.analysis.damage_curve == DamageCurveEnum.MANUAL:
+        if self.analysis.damage_curve == DamageCurveEnum.MAN:
             manual_damage_functions = ManualDamageFunctions()
             manual_damage_functions.find_damage_functions(
                 folder=(self.input_path.joinpath("damage_functions"))
