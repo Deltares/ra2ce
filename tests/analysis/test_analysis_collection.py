@@ -15,7 +15,15 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
+from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from tests import test_data
+
+_unsupported_direct_analysis = [
+    AnalysisDirectEnum.EFFECTIVENESS_MEASURES,
+    AnalysisDirectEnum.INVALID,
+]
+_unsupported_indirect_analysis = [AnalysisIndirectEnum.INVALID]
 
 
 class TestAnalysisCollection:
@@ -58,7 +66,9 @@ class TestAnalysisCollection:
     @pytest.mark.parametrize(
         "analysis",
         [
-            pytest.param(AnalysisDirectEnum.DIRECT, id="DIRECT"),
+            pytest.param(_analysis_type)
+            for _analysis_type in AnalysisDirectEnum
+            if _analysis_type not in _unsupported_direct_analysis
         ],
     )
     def test_create_collection_with_direct_analyses(
@@ -77,44 +87,18 @@ class TestAnalysisCollection:
 
         # 3. Verify expectations.
         assert isinstance(_collection, AnalysisCollection)
+        assert len(_collection.direct_analyses) == 1
+
+        _generated_analysis = _collection.direct_analyses[0]
+        assert isinstance(_generated_analysis, AnalysisDirectProtocol)
         assert _collection.direct_analyses[0].analysis.analysis == analysis
 
     @pytest.mark.parametrize(
         "analysis",
         [
-            pytest.param(
-                AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY, id="SINGLE_LINK_REDUNDANCY"
-            ),
-            pytest.param(
-                AnalysisIndirectEnum.MULTI_LINK_REDUNDANCY, id="MULTI_LINK_REDUNDANCY"
-            ),
-            pytest.param(
-                AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION,
-                id="OPTIMAL_ROUTE_ORIGIN_DESTINATION",
-            ),
-            pytest.param(
-                AnalysisIndirectEnum.MULTI_LINK_ORIGIN_DESTINATION,
-                id="MULTI_LINK_ORIGIN_DESTINATION",
-            ),
-            pytest.param(
-                AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION,
-                id="OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION",
-            ),
-            pytest.param(
-                AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION,
-                id="MULTI_LINK_ORIGIN_CLOSEST_DESTINATION",
-            ),
-            pytest.param(AnalysisIndirectEnum.LOSSES, id="LOSSES"),
-            pytest.param(
-                AnalysisIndirectEnum.SINGLE_LINK_LOSSES, id="SINGLE_LINK_LOSSES"
-            ),
-            pytest.param(
-                AnalysisIndirectEnum.MULTI_LINK_LOSSES, id="MULTI_LINK_LOSSES"
-            ),
-            pytest.param(
-                AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS,
-                id="MULTI_LINK_ISOLATED_LOCATIONS",
-            ),
+            pytest.param(_analysis_type)
+            for _analysis_type in AnalysisIndirectEnum
+            if _analysis_type not in _unsupported_indirect_analysis
         ],
     )
     def test_create_collection_with_indirect_analyses(
@@ -134,4 +118,8 @@ class TestAnalysisCollection:
 
         # 3. Verify expectations.
         assert isinstance(_collection, AnalysisCollection)
-        assert _collection.indirect_analyses[0].analysis.analysis == analysis
+        assert len(_collection.indirect_analyses) == 1
+
+        _generated_analysis = _collection.indirect_analyses[0]
+        assert isinstance(_generated_analysis, AnalysisIndirectProtocol)
+        assert _generated_analysis.analysis.analysis == analysis

@@ -41,6 +41,7 @@ class TestLosses:
 
         # 3. Verify final expectations.
         assert isinstance(_losses, Losses)
+        assert isinstance(_losses.analysis, AnalysisSectionIndirect)
 
     def test_traffic_shockwave(self):
         # 1. Define test data

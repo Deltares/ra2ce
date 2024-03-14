@@ -42,7 +42,7 @@ class MultiLinkIsolatedLocations(AnalysisIndirectProtocol):
         self.hazard_names = hazard_names
         self.result = None
 
-    def utm_crs(self, bbox):
+    def utm_crs(self, bbox: list[float]) -> CRS:
         """Returns wkt string of nearest UTM projects
         Parameters
         ----------
@@ -265,7 +265,9 @@ class MultiLinkIsolatedLocations(AnalysisIndirectProtocol):
             self.graph_file.get_graph(), self.analysis
         )
 
-        df_path = _output_path / (self.analysis.name.replace(" ", "_") + "_results.csv")
+        df_path = _output_path.joinpath(
+            self.analysis.name.replace(" ", "_") + "_results.csv"
+        )
         df.to_csv(df_path, index=False)
 
         return gdf
