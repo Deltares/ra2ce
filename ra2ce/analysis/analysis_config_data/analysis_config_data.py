@@ -88,9 +88,9 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     duration_event: float = math.nan # TODO remove the deprecated attribute that have been replaced by csv
     part_of_day: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
     performance_metric: str = "diff_time"  # "diff_time" or "diff_length" relates to the used criticality metric
-    resilience_curve_file: Optional[Path] = None
-    traffic_intensities_file: Optional[Path] = None
-    values_of_time_file: Optional[Path] = None
+    resilience_curve_file: Optional[Path] = Path()
+    traffic_intensities_file: Optional[Path] = Path()
+    values_of_time_file: Optional[Path] = Path()
     # accessibility analyses
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     threshold: float = math.nan
