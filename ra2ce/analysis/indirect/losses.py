@@ -25,7 +25,6 @@ from collections import defaultdict
 from pathlib import Path
 
 import geopandas as gpd
-import numpy as np
 import pandas as pd
 from geopandas import GeoDataFrame
 
@@ -66,26 +65,20 @@ class Losses(AnalysisIndirectProtocol):
         self.result = None
 
         self.losses_input_path: Path = input_path.joinpath("losses")
-        self.duration: float = analysis.duration_event
-        self.duration_disr: float = analysis.duration_disruption
-        self.detour_traffic: float = analysis.fraction_detour
-        self.traffic_throughput: float = analysis.fraction_drivethrough
-        self.rest_capacity: float = analysis.rest_capacity
-        self.maximum: float = analysis.maximum_jam
-        self.part_of_day: PartOfDayEnum = analysis.partofday
+        self.part_of_day: PartOfDayEnum = analysis.part_of_day
         self.performance_metric = analysis.performance
         self.analysis_type = analysis.analysis
 
         # Load Dataframes
         self.network = self._load_gdf(
-            config.input_path.joinpath("network.geojson")
+            self.input_path.joinpath("network.geojson")
         )
         self.intensities = self._load_df_from_csv(
             analysis.traffic_intensities_file, []
         )  # per day
 
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
-        self.criticality_data = self._load_df_from_csv(config.input_path.joinpath(f"{analysis.name}.csv"), [])
+        self.criticality_data = self._load_df_from_csv(self.input_path.joinpath(f"{analysis.name}.csv"), [])
         self.resilience_curve = self._load_df_from_csv((analysis.resilience_curve_file),
                                                        ["duration_steps",
                                                         "functionality_loss_ratio"], sep=";"
@@ -152,7 +145,7 @@ class Losses(AnalysisIndirectProtocol):
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
                     self.intensities[partofday_trip_purpose_name] / 10
-            # TODO: in other branch, support different time intervals: 10 is 10hours here
+            # TODO: Make a new PR to support different time scales: here 10=10hours
             )
         return dict(_vot_dict)
 
@@ -219,7 +212,7 @@ class Losses(AnalysisIndirectProtocol):
 
         vlh_total = 0
         _trip_types = ["business", "commute", "freight",
-                       "other"]  # TODO code smell: this should be either a Enum or read from csv
+                       "other"]  # TODO code smell: this should be either a Enum or read from csv (make a new PR)
 
         _vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose(
             _trip_types
