@@ -53,13 +53,14 @@ class DirectAnalysisRunner(AnalysisRunner):
             return False
         return True
 
-    def save_gdf(self, gdf: GeoDataFrame, save_path: Path, driver: str):
+    def _save_gdf(self, gdf: GeoDataFrame, save_path: Path, driver: str):
         """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp
 
         Arguments:
             gdf [geodataframe]: geodataframe object to be converted
             save_path [Path]: path to save
             driver [str]: defines the file format
+
         Returns:
             None
         """
@@ -75,7 +76,7 @@ class DirectAnalysisRunner(AnalysisRunner):
         gdf.to_file(save_path, driver=driver)
         logging.info("Results saved to: {}".format(save_path))
 
-    def save_result(
+    def _save_result(
         self, analysis: AnalysisDirectProtocol, analysis_config: AnalysisConfigWrapper
     ):
         if analysis.result is None or analysis.result.empty:
@@ -89,7 +90,7 @@ class DirectAnalysisRunner(AnalysisRunner):
             gpkg_path = _output_path.joinpath(
                 analysis.analysis.name.replace(" ", "_") + ".gpkg"
             )
-            self.save_gdf(analysis.result, gpkg_path, "GPKG")
+            self._save_gdf(analysis.result, gpkg_path, "GPKG")
         if analysis.analysis.save_csv:
             csv_path = _output_path.joinpath(
                 analysis.analysis.name.replace(" ", "_") + ".csv"
@@ -107,7 +108,7 @@ class DirectAnalysisRunner(AnalysisRunner):
 
             analysis.result = analysis.execute()
 
-            self.save_result(analysis, analysis_config)
+            self._save_result(analysis, analysis_config)
 
             endtime = time.time()
             logging.info(
