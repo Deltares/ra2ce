@@ -25,7 +25,6 @@ from collections import defaultdict
 from pathlib import Path
 
 import geopandas as gpd
-import numpy as np
 import pandas as pd
 from geopandas import GeoDataFrame
 
@@ -142,7 +141,8 @@ class Losses(AnalysisIndirectProtocol):
             ].item()
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
-                    self.intensities[partofday_trip_purpose_name] / 24
+                    self.intensities[partofday_trip_purpose_name] / 10
+            # TODO: Make a new PR to support different time scales: here 10=10hours
             )
         return dict(_vot_dict)
 
@@ -207,7 +207,7 @@ class Losses(AnalysisIndirectProtocol):
 
         vlh_total = 0
         _trip_types = ["business", "commute", "freight",
-                       "other"]  # TODO code smell: this should be either a Enum or read from csv
+                       "other"]  # TODO code smell: this should be either a Enum or read from csv (make a new PR)
 
         _vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose(
             _trip_types
@@ -232,8 +232,13 @@ class Losses(AnalysisIndirectProtocol):
             intensity_trip_type = _vot_intensity_per_trip_collection[
                 f"intensity_{self.part_of_day}_{trip_type}"
             ]
+
+            vot_trip_type = _vot_intensity_per_trip_collection[
+                f"vot_{trip_type}"
+            ]
+
             vlh_trip_type_event = sum(
-                intensity_trip_type * duration * loss_ratio * performance_change
+                intensity_trip_type * duration * loss_ratio * performance_change * vot_trip_type
                 for duration, loss_ratio in zip(
                     duration_steps, functionality_loss_ratios
                 )
