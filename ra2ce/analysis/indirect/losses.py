@@ -19,26 +19,52 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import logging
 from ast import literal_eval
 from collections import defaultdict
-import logging
-
 from pathlib import Path
 
+import geopandas as gpd
 import numpy as np
 import pandas as pd
-import geopandas as gpd
+from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
     AnalysisSectionIndirect,
 )
+from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
+from ra2ce.network.graph_files.graph_file import GraphFile
+from ra2ce.network.hazard.hazard_names import HazardNames
 from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 
 
-class Losses:
-    def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionIndirect):
-        self.losses_input_path: Path = config.input_path.joinpath("losses")
+class Losses(AnalysisIndirectProtocol):
+    graph_file: GraphFile
+    analysis: AnalysisSectionIndirect
+    input_path: Path
+    static_path: Path
+    output_path: Path
+    hazard_names: HazardNames
+    result: GeoDataFrame
+
+    def __init__(
+        self,
+        graph_file: GraphFile,
+        analysis: AnalysisSectionIndirect,
+        input_path: Path,
+        static_path: Path,
+        output_path: Path,
+        hazard_names: HazardNames,
+    ) -> None:
+        self.graph_file = graph_file
+        self.analysis = analysis
+        self.input_path = input_path
+        self.static_path = static_path
+        self.output_path = output_path
+        self.hazard_names = hazard_names
+        self.result = None
+
+        self.losses_input_path: Path = input_path.joinpath("losses")
         self.duration: float = analysis.duration_event
         self.duration_disr: float = analysis.duration_disruption
         self.detour_traffic: float = analysis.fraction_detour
@@ -344,4 +370,11 @@ class Losses:
 
                 _link_types.add(_link_type)
                 _inundation_height_ranges.add(_inundation_range)
+
         return list(_link_types), list(_inundation_height_ranges)
+
+    def execute(self) -> GeoDataFrame:
+        _gdf_in = self.graph_file.get_graph()
+        df = self.calculate_losses_from_table()
+
+        return _gdf_in.merge(df, how="left", on="LinkNr")

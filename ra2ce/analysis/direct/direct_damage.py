@@ -1,12 +1,12 @@
 import logging
 from pathlib import Path
-from typing import Any
 
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionDirect,
 )
+from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
@@ -83,7 +83,7 @@ class DirectDamage(AnalysisDirectProtocol):
             manual_damage_functions.load_damage_functions()
 
         # Choose between event or return period based analysis
-        if self.analysis.event_type == "event":
+        if self.analysis.event_type == EventTypeEnum.EVENT:
             event_gdf = DamageNetworkEvents(road_gdf, val_cols)
             event_gdf.main(
                 damage_function=damage_function,
@@ -92,7 +92,7 @@ class DirectDamage(AnalysisDirectProtocol):
 
             return event_gdf.gdf
 
-        elif self.analysis.event_type == "return_period":
+        elif self.analysis.event_type == EventTypeEnum.RETURN_PERIOD:
             return_period_gdf = DamageNetworkReturnPeriods(road_gdf, val_cols)
             return_period_gdf.main(
                 damage_function=damage_function,
