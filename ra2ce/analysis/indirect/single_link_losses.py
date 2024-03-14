@@ -7,6 +7,7 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
+from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.network.graph_files.graph_file import GraphFile
@@ -177,11 +178,11 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         losses_fn = self.static_path.joinpath("hazard", self.analysis.loss_per_distance)
         losses_df = pd.read_excel(losses_fn, sheet_name="Sheet1")
 
-        if self.analysis.loss_type == "uniform":
+        if self.analysis.loss_type == LossTypeEnum.UNIFORM:
             # assume uniform threshold for disruption
             self._single_link_losses_uniform(gdf, self.analysis, losses_df)
 
-        if self.analysis.loss_type == "categorized":
+        if self.analysis.loss_type == LossTypeEnum.CATEGORIZED:
             _disruption_file = self.static_path.joinpath(
                 "hazard", self.analysis.disruption_per_category
             )

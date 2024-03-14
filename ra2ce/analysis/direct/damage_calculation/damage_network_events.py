@@ -21,8 +21,7 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.direct.damage_calculation.damage_network_base import (
     DamageNetworkBase,
 )
@@ -47,20 +46,20 @@ class DamageNetworkEvents(DamageNetworkBase):
             raise ValueError("No event cols present in hazard data")
 
     ### Controler for Event-based damage calculation
-    def main(self, damage_function, manual_damage_functions=None):
+    def main(self, damage_function: DamageCurveEnum, manual_damage_functions=None):
         assert len(self.events) > 0, "no return periods identified"
         assert "me" in self.stats, "mean water depth (key: me) is missing"
         assert "fr" in self.stats, "inundated fraction (key: fr) is missing"
 
         self.do_cleanup_and_mask_creation()
 
-        if damage_function == "HZ":
+        if damage_function == DamageCurveEnum.HZ:
             self.calculate_damage_HZ(events=self.events)
 
-        if damage_function == "OSD":
+        if damage_function == DamageCurveEnum.OSD:
             self.calculate_damage_OSdaMage(events=self.events)
 
-        if damage_function == "MAN":
+        if damage_function == DamageCurveEnum.MAN:
             self.calculate_damage_manual_functions(
                 events=self.events, manual_damage_functions=manual_damage_functions
             )
