@@ -12,7 +12,9 @@ class DirectAnalysisResultWrapper(AnalysisResultProtocol):
     analysis: AnalysisDirectProtocol
 
     def is_valid_result(self) -> bool:
-        return self.analysis_result and not self.analysis_result.empty
+        if not isinstance(self.analysis_result, gpd.GeoDataFrame):
+            return False
+        return self.analysis_result.empty
 
 
 @dataclass
@@ -22,4 +24,6 @@ class IndirectAnalysisResultWrapper(AnalysisResultProtocol):
     analysis: AnalysisIndirectProtocol
 
     def is_valid_result(self) -> bool:
-        return self.analysis_result and not self.analysis_result.empty
+        if not isinstance(self.analysis_result, gpd.GeoDataFrame):
+            return False
+        return self.analysis_result.empty
