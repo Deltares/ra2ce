@@ -120,7 +120,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             _section.weighing = WeighingEnum.LENGTH
         else:
             _section.weighing = WeighingEnum.get_enum(_weighing)
-        _section.analysis = LossTypeEnum.get_enum(
+        _section.loss_type = LossTypeEnum.get_enum(
             self._parser.get(section_name, "loss_type", fallback=None)
         )
         # losses
