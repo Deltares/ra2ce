@@ -24,15 +24,18 @@ from pathlib import Path
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDirect,
+    AnalysisSectionIndirect,
 )
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol
-from ra2ce.network.graph_files.network_file import NetworkFile
+from ra2ce.network.graph_files.graph_file import GraphFile
+from ra2ce.network.hazard.hazard_names import HazardNames
 
 
-class AnalysisDirectProtocol(AnalysisProtocol):
-    graph_file: NetworkFile
-    analysis: AnalysisSectionDirect
+class AnalysisIndirectProtocol(AnalysisProtocol):
+    graph_file: GraphFile
+    analysis: AnalysisSectionIndirect
     input_path: Path
+    static_path: Path
     output_path: Path
+    hazard_names: HazardNames
     result: GeoDataFrame
