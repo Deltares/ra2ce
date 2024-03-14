@@ -125,7 +125,10 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             section_name,
             "duration_event",
             fallback=_section.duration_event,
-        )  # TODO remove the deprecated attribute that have been replaced by csv
+        )
+        _section.traffic_intensities_file = Path(_section.traffic_intensities_file)
+        _section.resilience_curve_file = Path(_section.resilience_curve_file)
+        _section.values_of_time_file = Path(_section.values_of_time_file)
         # accessibility analyses
         _section.threshold = self._parser.getfloat(
             section_name,
