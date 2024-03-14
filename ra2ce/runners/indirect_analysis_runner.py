@@ -29,6 +29,7 @@ from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_wrapper import (
     AnalysisConfigWrapper,
 )
+from ra2ce.analysis.analysis_result_wrapper import IndirectAnalysisResultWrapper
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
@@ -59,7 +60,8 @@ class IndirectAnalysisRunner(AnalysisRunner):
             None
         """
         # save to shapefile
-        gdf.crs = "epsg:4326"  # TODO: decide if this should be variable with e.g. an output_crs configured
+        # TODO: decide if this should be variable with e.g. an output_crs configured
+        gdf.crs = "epsg:4326"
 
         for col in gdf.columns:
             if gdf[col].dtype == object and col != gdf.geometry.name:
@@ -68,7 +70,7 @@ class IndirectAnalysisRunner(AnalysisRunner):
         if save_path.exists():
             save_path.unlink()
         gdf.to_file(save_path, driver=driver)
-        logging.info("Results saved to: {}".format(save_path))
+        logging.info("Results saved to: %s", save_path)
 
     def _save_result(
         self, analysis: AnalysisIndirectProtocol, analysis_config: AnalysisConfigWrapper
@@ -92,11 +94,15 @@ class IndirectAnalysisRunner(AnalysisRunner):
             del analysis.result["geometry"]
             analysis.result.to_csv(csv_path, index=False)
 
-    def run(self, analysis_config: AnalysisConfigWrapper) -> None:
+    def run(
+        self, analysis_config: AnalysisConfigWrapper
+    ) -> list[IndirectAnalysisResultWrapper]:
         _analysis_collection = AnalysisCollection.from_config(analysis_config)
+        _results = []
         for analysis in _analysis_collection.indirect_analyses:
             logging.info(
-                f"----------------------------- Started analyzing '{analysis.analysis.name}'  -----------------------------"
+                "----------------------------- Started analyzing '%s'  -----------------------------",
+                analysis.analysis.name,
             )
             starttime = time.time()
 
@@ -106,6 +112,9 @@ class IndirectAnalysisRunner(AnalysisRunner):
 
             endtime = time.time()
             logging.info(
-                f"----------------------------- Analysis '{analysis.analysis.name}' finished. "
-                f"Time: {str(round(endtime - starttime, 2))}s  -----------------------------"
+                "----------------------------- Analysis '%s' finished. "
+                "Time: %ss  -----------------------------",
+                analysis.analysis.name,
+                str(round(endtime - starttime, 2)),
             )
+        return _results
