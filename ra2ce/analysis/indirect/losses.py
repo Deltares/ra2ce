@@ -71,8 +71,6 @@ class Losses(AnalysisIndirectProtocol):
         self.duration_event: float = analysis.duration_event
         self.performance_metric = analysis.performance_metric
 
-
-
         self.intensities = self._load_df_from_csv(analysis.traffic_intensities_file, [])  # per day
 
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
@@ -126,7 +124,7 @@ class Losses(AnalysisIndirectProtocol):
         return gpd.GeoDataFrame()
 
     def _get_vot_intensity_per_trip_purpose(
-        self, trip_types: list[str]
+            self, trip_types: list[str]
     ) -> dict[str, pd.DataFrame]:
         """
         Generates a dictionary with all available `vot_purpose` with their intensity as a `pd.DataFrame`.
@@ -136,7 +134,7 @@ class Losses(AnalysisIndirectProtocol):
             vot_var_name = f"vot_{purpose}"
             partofday_trip_purpose_name = f"{self.part_of_day.config_value}_{purpose}"
             partofday_trip_purpose_intensity_name = (
-                "intensity_" + partofday_trip_purpose_name
+                    "intensity_" + partofday_trip_purpose_name
             )
             # read and set the vot's
             _vot_dict[vot_var_name] = self.values_of_time.loc[
@@ -144,7 +142,7 @@ class Losses(AnalysisIndirectProtocol):
             ].item()
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
-                self.intensities[partofday_trip_purpose_name] / 24
+                    self.intensities[partofday_trip_purpose_name] / 24
             )
         return dict(_vot_dict)
 
@@ -208,7 +206,8 @@ class Losses(AnalysisIndirectProtocol):
                          performance_change, hazard_col_name: str):
 
         vlh_total = 0
-        _trip_types = ["business", "commute", "freight", "other"] # TODO code smell: this should be either a Enum or read from csv
+        _trip_types = ["business", "commute", "freight",
+                       "other"]  # TODO code smell: this should be either a Enum or read from csv
 
         _vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose(
             _trip_types
