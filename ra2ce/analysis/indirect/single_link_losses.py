@@ -52,7 +52,6 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
 
     def __init__(
             self,
-            network: NetworkSection,
             graph_file: GraphFile,
             analysis: AnalysisSectionIndirect,
             input_path: Path,
@@ -61,10 +60,6 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
             hazard_names: HazardNames,
     ) -> None:
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
-        # TODO: Enable performing analysis for multiple input networks
-        if len(network.primary_file) > 1:
-            raise NotImplementedError('A list of networks is not supported yet')
-        self.network = network
         self.graph_file = graph_file
         self.analysis = analysis
         self.performance_metric = f'diff_{self.analysis.weighing}'
@@ -173,7 +168,7 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         # find the link_type and the hazard intensity
         vlh = pd.merge(
             vlh,
-            self.network[["link_id", "link_type"]],
+            criticality_analysis[["link_id", "link_type"]],
             left_index=True,
             right_on="link_id",
         )
@@ -258,7 +253,7 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         This function opens an existing table with traffic data and value of time to calculate losses based on
         detouring values. It also includes a traffic jam estimation.
         """
-        vlh = self.calc_vlh()
+        vlh = self.calc_vlh(criticality_analysis=gpd.GeoDataFrame())
         return vlh
 
     def _get_link_types_heights_ranges(self) -> tuple[list[str], list[tuple]]:
@@ -307,7 +302,6 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         ).execute()
 
         _single_link_losses = SingleLinkLosses(
-            network=self.network,
             graph_file=self.graph_file,
             analysis=self.analysis,
             input_path=Path(),
@@ -316,6 +310,6 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
             hazard_names=HazardNames(names_df=pd.DataFrame())
         )
 
-        self.result = _single_link_losses.calc_vlh(criticality_analysis=criticality_analysis,)
+        self.result = _single_link_losses.calc_vlh(criticality_analysis=criticality_analysis)
 
         return self.result
