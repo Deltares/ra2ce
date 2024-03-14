@@ -84,7 +84,7 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     # general
     weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
     loss_per_distance: str = ""
-    loss_type: LossTypeEnum = field(default_factory=lambda: LossTypeEnum.INVALID)
+    loss_type: LossTypeEnum = field(default_factory=lambda: LossTypeEnum.NONE)
     disruption_per_category: str = ""
     traffic_cols: list[str] = field(default_factory=list)
     # losses
