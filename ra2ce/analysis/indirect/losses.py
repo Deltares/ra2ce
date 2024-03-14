@@ -43,13 +43,16 @@ class Losses:
         self.partofday: PartOfDayEnum = analysis.partofday
         self.performance_metric = analysis.performance_metric
 
+        if len(config.network.primary_file) > 1:
+            raise NotImplementedError('A list of networks is not supported yet')
+
+        # TODO: Enable performing analysis for multiple input networks
         # Load Dataframes
         self.network = self._load_gdf(
-            self.losses_input_path.joinpath("network.geojson")
+            config.network.primary_file[0]
         )
         self.intensities = self._load_df_from_csv(analysis.traffic_intensities_file, [])  # per day
 
-        # TODO: make sure the "link_id" is kept in the result of the criticality analysis
         self.criticality_data = self._load_df_from_csv(Path("criticality_data.csv"), [])
         self.resilience_curve = self._load_df_from_csv(analysis.resilience_curve_file,
                                                        ["disruption_steps", "functionality_loss_ratio",

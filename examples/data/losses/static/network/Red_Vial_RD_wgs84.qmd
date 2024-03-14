@@ -1,5 +1,5 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis version="3.26.3-Buenos Aires">
+<qgis version="3.28.6-Firenze">
   <identifier></identifier>
   <parentidentifier></parentidentifier>
   <language></language>
@@ -12,7 +12,7 @@
   <crs>
     <spatialrefsys nativeFormat="Wkt">
       <wkt></wkt>
-      <proj4></proj4>
+      <proj4>+proj=longlat +datum=WGS84 +no_defs</proj4>
       <srsid>0</srsid>
       <srid>0</srid>
       <authid></authid>
