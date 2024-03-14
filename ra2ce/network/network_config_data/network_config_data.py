@@ -99,14 +99,14 @@ class NetworkConfigData(ConfigDataProtocol):
     static_path: Optional[Path] = None
     # CRS is not yet supported in the ini file, it might be relocated to a subsection.
     crs: CRS = field(default_factory=lambda: CRS.from_user_input(4326))
-    project: ProjectSection = field(default_factory=lambda: ProjectSection())
-    network: NetworkSection = field(default_factory=lambda: NetworkSection())
+    project: ProjectSection = field(default_factory=ProjectSection)
+    network: NetworkSection = field(default_factory=NetworkSection)
     origins_destinations: OriginsDestinationsSection = field(
-        default_factory=lambda: OriginsDestinationsSection()
+        default_factory=OriginsDestinationsSection
     )
-    isolation: IsolationSection = field(default_factory=lambda: IsolationSection())
-    hazard: HazardSection = field(default_factory=lambda: HazardSection())
-    cleanup: CleanupSection = field(default_factory=lambda: CleanupSection())
+    isolation: IsolationSection = field(default_factory=IsolationSection)
+    hazard: HazardSection = field(default_factory=HazardSection)
+    cleanup: CleanupSection = field(default_factory=CleanupSection)
 
     @property
     def output_graph_dir(self) -> Optional[Path]:

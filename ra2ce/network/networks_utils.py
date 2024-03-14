@@ -35,7 +35,6 @@ import pandas as pd
 import pyproj
 import rasterio
 import rtree
-from tqdm import tqdm
 from geopy import distance
 from networkx import Graph, set_edge_attributes
 from numpy.ma import MaskedArray
@@ -44,8 +43,9 @@ from osmnx import graph_to_gdfs, simplify_graph
 from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
+from shapely.geometry.base import BaseGeometry, BaseMultipartGeometry
 from shapely.ops import linemerge, unary_union
-from shapely.geometry.base import BaseMultipartGeometry, BaseGeometry
+from tqdm import tqdm
 
 
 def convert_unit(unit: str) -> Optional[float]:
@@ -1191,7 +1191,7 @@ def graph_to_gdf(
     return edges, nodes
 
 
-def graph_to_gpkg(origin_graph: nx.classes.graph.Graph, edge_gpkg, node_gpkg):
+def graph_to_gpkg(origin_graph: nx.classes.graph.Graph, edge_gpkg: str, node_gpkg: str) -> None:
     """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_gpkg and node_gpkg
 
     Arguments:
