@@ -30,21 +30,30 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.direct import DirectDamage, EffectivenessMeasures
 from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
-from ra2ce.analysis.indirect import (
-    Losses,
-    MultiLinkIsolatedLocations,
-    MultiLinkLosses,
-    MultiLinkOriginClosestDestination,
-    MultiLinkOriginDestination,
-    MultiLinkRedundancy,
-    OptimalRouteOriginClosestDestination,
-    OptimalRouteOriginDestination,
-    SingleLinkLosses,
-    SingleLinkRedundancy,
-)
+from ra2ce.analysis.direct.direct_damage import DirectDamage
+from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
+from ra2ce.analysis.indirect.losses import Losses
+from ra2ce.analysis.indirect.multi_link_isolated_locations import (
+    MultiLinkIsolatedLocations,
+)
+from ra2ce.analysis.indirect.multi_link_losses import MultiLinkLosses
+from ra2ce.analysis.indirect.multi_link_origin_closest_destination import (
+    MultiLinkOriginClosestDestination,
+)
+from ra2ce.analysis.indirect.multi_link_origin_destination import (
+    MultiLinkOriginDestination,
+)
+from ra2ce.analysis.indirect.multi_link_redundancy import MultiLinkRedundancy
+from ra2ce.analysis.indirect.optimal_route_origin_closest_destination import (
+    OptimalRouteOriginClosestDestination,
+)
+from ra2ce.analysis.indirect.optimal_route_origin_destination import (
+    OptimalRouteOriginDestination,
+)
+from ra2ce.analysis.indirect.single_link_losses import SingleLinkLosses
+from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.network.hazard.hazard_names import HazardNames
 
 
@@ -52,14 +61,14 @@ class AnalysisFactory:
 
     @staticmethod
     def get_direct_analysis(
-        analysis: AnalysisSectionIndirect | AnalysisSectionDirect,
+        analysis: AnalysisSectionDirect,
         analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisDirectProtocol:
         """
         Create an analysis based on the given analysis configuration.
 
         Args:
-            analysis (AnalysisSectionIndirect | AnalysisSectionDirect): Analysis section.
+            analysis (AnalysisSectionDirect): Analysis section.
             analysis_config (AnalysisConfigWrapper): Analysis configuration.
 
         Raises:
@@ -87,14 +96,14 @@ class AnalysisFactory:
 
     @staticmethod
     def get_indirect_analysis(
-        analysis: AnalysisSectionIndirect | AnalysisSectionDirect,
+        analysis: AnalysisSectionIndirect,
         analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisIndirectProtocol:
         """
         Create an analysis based on the given analysis configuration.
 
         Args:
-            analysis (AnalysisSectionIndirect | AnalysisSectionDirect): Analysis section.
+            analysis (AnalysisSectionIndirect): Analysis section.
             analysis_config (AnalysisConfigWrapper): Analysis configuration.
 
         Raises:

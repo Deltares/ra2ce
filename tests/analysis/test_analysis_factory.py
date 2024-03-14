@@ -29,14 +29,36 @@ class TestAnalysisFactory:
     class MockAnalysisSectionIndirect(AnalysisSectionIndirect):
         analysis: AnalysisIndirectEnum = None
 
-    def test_get_analysis_with_invalid_raises(self):
+    def test_get_direct_analysis_with_invalid_raises(self):
         # 1. Define test data.
         _analysis = self.MockAnalysisSectionDirect(analysis=AnalysisDirectEnum.INVALID)
         _config = AnalysisConfigWrapper()
 
         # 2. Run test.
-        with pytest.raises(NotImplementedError):
+        with pytest.raises(NotImplementedError) as exc_err:
             AnalysisFactory.get_direct_analysis(_analysis, _config)
+
+        # 3. Verify expectations.
+        assert str(exc_err.value) == "Analysis {} not implemented".format(
+            _analysis.analysis
+        )
+
+    def test_get_indirect_analysis_with_invalid_raises(self):
+        # 1. Define test data.
+        _analysis = self.MockAnalysisSectionIndirect(
+            analysis=AnalysisIndirectEnum.INVALID
+        )
+        _config = AnalysisConfigWrapper()
+        _config.config_data.output_path = Path("just a path")
+
+        # 2. Run test.
+        with pytest.raises(NotImplementedError) as exc_err:
+            AnalysisFactory.get_indirect_analysis(_analysis, _config)
+
+        # 3. Verify expectations.
+        assert str(exc_err.value) == "Analysis {} not implemented".format(
+            _analysis.analysis
+        )
 
     def test_get_analysis_with_direct(self):
         # 1. Define test data.
