@@ -33,7 +33,6 @@ class AnalysisProtocol(Protocol):
     analysis: AnalysisSectionBase
     input_path: Path
     output_path: Path
-    result: GeoDataFrame
 
     def execute(self) -> GeoDataFrame:
         """
