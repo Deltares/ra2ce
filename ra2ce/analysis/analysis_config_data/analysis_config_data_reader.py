@@ -126,32 +126,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             "duration_event",
             fallback=_section.duration_event,
         )  # TODO remove the deprecated attribute that have been replaced by csv
-        _section.duration_disruption = self._parser.getfloat(
-            section_name,
-            "duration_disruption",
-            fallback=_section.duration_disruption,
-        )
-        _section.fraction_detour = self._parser.getfloat(
-            section_name,
-            "fraction_detour",
-            fallback=_section.fraction_detour,
-        )
-        _section.fraction_drivethrough = self._parser.getfloat(
-            section_name,
-            "fraction_drivethrough",
-            fallback=_section.fraction_drivethrough,
-        )
-        _section.rest_capacity = self._parser.getfloat(
-            section_name,
-            "rest_capacity",
-            fallback=_section.rest_capacity,
-        )
-        _section.maximum_jam = self._parser.getfloat(
-            section_name,
-            "maximum_jam",
-            fallback=_section.maximum_jam,
-        )
-        # accessiblity analyses
+        # accessibility analyses
         _section.threshold = self._parser.getfloat(
             section_name,
             "threshold",
