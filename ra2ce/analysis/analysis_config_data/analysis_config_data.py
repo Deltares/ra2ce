@@ -92,7 +92,7 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     rest_capacity: float = math.nan
     maximum_jam: float = math.nan
     part_of_day: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
-    performance: str = "diff_time"  # "diff_time" or "diff_dist" relates to the used criticality metric
+    performance: str = "diff_time"  # "diff_time" or "diff_length" relates to the used criticality metric
     resilience_curve_file: Optional[Path] = None
     traffic_intensities_file: Optional[Path] = None
     values_of_time_file: Optional[Path] = None
