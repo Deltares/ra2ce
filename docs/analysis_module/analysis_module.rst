@@ -2,19 +2,7 @@
 
 Analysis module
 ================
-
-
-Data requirements
--------------------------------------
-The types of possible input file formats to create a network are:
-
-•	Shapefile of network;
-•	GeoJSON polygon of area of interest for downloading a network from OSM;
-•	OSM PBF file;
-•	Pickle – a python data format, also used to save graphs.
-
-Depending on the required analysis, more data might be needed. More information about the 
-data requirements to create a network can be found in the :ref:`network_module`.
+RA2CE's analysis module can perform several analyses on infrastructure networks. First, a network needs te be created. Visit the :ref:`network_module` for a better understanding of how this works. In the analysis module we distuingish a module focused on direct monetary road damages (physical damages) and an analysis module for network criticality and origin-destination analyses. The latter are developed from a 'societal losses due to hazards' point of view and provide insight into the hazard impact on the network and the disruption of network services to society. 
 
 Direct/physical damages
 -------------------------------------
