@@ -4,6 +4,8 @@ This module contains all the available runners that can be used in this tool.
 
 Each runner is specific for a given analysis type, to decide which one should be picked we make use of a _factory_ (`AnalysisRunnerFactory`). 
 
+The result of an analysis runner __execution__ will be an `AnalysisResultWrapper`, an object containing information of the type of analysis ran and its result.
+
 # How to add new analysis?
 * Create your own runner which should implement the `AnalysisRunnerProtocol`.
     * Define in the run method how the analysis should be run.

@@ -19,28 +19,24 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from pathlib import Path
-from typing import Protocol
-
-from geopandas import GeoDataFrame
-
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisSectionBase
-from ra2ce.network.graph_files.graph_files_protocol import GraphFileProtocol
+from dataclasses import dataclass
+import geopandas as gpd
+from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 
 
-class AnalysisProtocol(Protocol):
-    graph_file: GraphFileProtocol
-    analysis: AnalysisSectionBase
-    input_path: Path
-    output_path: Path
+@dataclass
+class AnalysisResultWrapper:
+    analysis_result: gpd.GeoDataFrame
+    analysis: AnalysisProtocol
 
-    def execute(self) -> GeoDataFrame:
+    def is_valid_result(self) -> bool:
         """
-        Execute the analysis on the given graph/network with the given analysis parameters.
-        The resulting (Geo)DataFrame of the analysis is stored in the result attribute.
-        TODO: Make the return type a result object #318
+        Validates whether the `analysis_result` in this wrapper is valid.
 
         Returns:
-            GeoDataFrame: The result of the analysis.
+            bool: validity of `analysis_result`.
         """
-        pass
+        return (
+            isinstance(self.analysis_result, gpd.GeoDataFrame)
+            and not self.analysis_result.empty
+        )
