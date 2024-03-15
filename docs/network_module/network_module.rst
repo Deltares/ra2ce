@@ -156,3 +156,37 @@ Specify the hazard file name in the network.ini and set some additional paramete
     hazard_id = None
     hazard_crs = EPSG:4326 #choose your CRS and specify the correct code
     aggregate_wl = max
+
+Possible parameters network.ini
+---------------------------------------------------------------------------------------
+
+Note: the origin-destination parameters are explained in the :ref:`analysis_module`. 
+
+::
+
+    [network]
+    directed = False                            # True / False 
+    source = OSM download                       # OSM PBF / OSM download / shapefile / pickle
+    primary_file = None                         # <name + file extension or full path of file> to be used for the shapefile option
+    diversion_file = None                       # <name + file extension or full path of file> can be used to delineate alternative routing options
+    file_id = None                              # <field name of the ID attribute in the shapefile for network creating with a shapefile>
+    polygon = map.geojson                       # <name + file extension of the geojson polygon file in the static/network folder> to be used in osm download
+    network_type = drive                        # drive / walk / bike / drive_service / all 
+    road_types = motorway,motorway_link,trunk,trunk_link,primary, primary_link,secondary,secondary_link,tertiary,tertiary_link #OSM road types to be downloaded
+    save_gpkg = True                            # True / False
+    
+    [origins_destinations]
+    origins = None                              # <file name of the origins file> / None
+    destinations = None                         # <file name of the destinations file> / None
+    origins_names = None                        # <origin name that will be saved in the output (e.g. A)> / None
+    destinations_names = None                   # <destination name that will be saved in the output (e.g. B)> / None
+    id_name_origin_destination = None           # <column name of origins/destinations data ID> / None
+    origin_count = None                         # <column name that holds the count in the origin (e.g. population count or freight count)> / None
+    origin_out_fraction = None                  # fraction of things/people going out of the origin to the destination
+    
+    [hazard]
+    hazard_map = None                           # <name(s) of hazard maps in the static/hazard folder> / None
+    hazard_id = None                            # <field name> / None
+    hazard_field_name = None                    # <field name(s)> / None
+    aggregate_wl = max                          # max / min / mean
+    hazard_crs = None                           # EPSG code / projection that can be read by pyproj / None
