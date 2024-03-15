@@ -7,8 +7,8 @@ The network module is a separate module created within `RA2CE` to help set up a 
 model. It helps to easily, reproducibly and consistently build models from global 
 to local datasets. The network module's goal is to create an infrastructure network to be used in further analyses. There are two possibilities to create a network: 1) downloading a network from OpenStreetMap with RA2CE and 2) creating a network from vector data. Within the network module, it is additionally possible to determine the network's exposure to a user-specified hazard using the 'hazard overlay' functionality. 
 
-Network from OpenStreetMap
-----------------------------
+Network from OpenStreetMap using scripting
+-----------------------------------------------------------------------------
 
 The :py:class:`~ra2ce.graph.network_wrappers.osm_network_wrapper.osm_network_wrapper.OsmNetworkWrapper` 
 class can download and process OpenStreetMap data for a given region of interest, using the `osmnx` 
@@ -25,6 +25,12 @@ class include:
 - Adding the missing nodes and edges to the network based on the snapped nodes and edges
 
 Examples of how to use this module can be found in the :ref:`examples`.
+
+Network from OpenStreetMap using initalization file network.ini
+-----------------------------------------------------------------------------
+
+
+
 
 Network from vector data
 ----------------------------
