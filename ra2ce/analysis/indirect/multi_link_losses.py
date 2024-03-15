@@ -7,6 +7,7 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
+from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.analysis.indirect.multi_link_redundancy import MultiLinkRedundancy
 from ra2ce.network.graph_files.graph_file import GraphFile
@@ -61,7 +62,7 @@ class MultiLinkLosses(AnalysisIndirectProtocol):
         losses_fn = self.static_path.joinpath("hazard", self.analysis.loss_per_distance)
         losses_df = pd.read_excel(losses_fn, sheet_name="Sheet1")
 
-        if self.analysis.loss_type == "categorized":
+        if self.analysis.loss_type == LossTypeEnum.CATEGORIZED:
             disruption_fn = self.static_path.joinpath(
                 "hazard", self.analysis.disruption_per_category
             )
@@ -74,7 +75,7 @@ class MultiLinkLosses(AnalysisIndirectProtocol):
 
             _gdf = gdf.loc[gdf["hazard"] == hazard_name].copy()
             if (
-                self.analysis.loss_type == "uniform"
+                self.analysis.loss_type == LossTypeEnum.UNIFORM
             ):  # assume uniform threshold for disruption
                 for col in self.analysis.traffic_cols:
                     # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle] * duration_disruption[hour] / 24[hour/day]
@@ -109,7 +110,7 @@ class MultiLinkLosses(AnalysisIndirectProtocol):
                 )
 
             if (
-                self.analysis.loss_type == "categorized"
+                self.analysis.loss_type == LossTypeEnum.CATEGORIZED
             ):  # assume different disruption type depending on flood depth and road types
                 disruption_df["class_identifier"] = ""
                 _gdf["class_identifier"] = ""

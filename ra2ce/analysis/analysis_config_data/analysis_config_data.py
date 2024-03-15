@@ -26,12 +26,15 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+from ra2ce.analysis.analysis_config_data.enums import damage_curve_enum
 from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
     AnalysisDirectEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
+from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
@@ -81,7 +84,7 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     # general
     weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
     loss_per_distance: str = ""
-    loss_type: str = ""  # should be enum
+    loss_type: LossTypeEnum = field(default_factory=lambda: LossTypeEnum.NONE)
     disruption_per_category: str = ""
     traffic_cols: list[str] = field(default_factory=list)
     # losses
@@ -127,9 +130,11 @@ class AnalysisSectionDirect(AnalysisSectionBase):
     climate_factor: float = math.nan
     climate_period: float = math.nan
     # road damage
-    damage_curve: str = ""
-    event_type: str = ""  # should be enum
-    risk_calculation: str = ""  # should be enum
+    event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.INVALID)
+    damage_curve: damage_curve_enum.DamageCurveEnum = field(
+        default_factory=lambda: EventTypeEnum.INVALID
+    )
+    risk_calculation: str = ""
     create_table: bool = False
     file_name: Optional[Path] = None
 
