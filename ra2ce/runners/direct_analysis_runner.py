@@ -27,7 +27,7 @@ from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.analysis_result_wrapper import DirectAnalysisResultWrapper
+from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 
@@ -78,7 +78,7 @@ class DirectAnalysisRunner(AnalysisRunner):
 
     def _save_result(
         self,
-        result_wrapper: DirectAnalysisResultWrapper,
+        result_wrapper: AnalysisResultWrapper,
     ):
         if not result_wrapper.is_valid_result():
             return
@@ -99,7 +99,7 @@ class DirectAnalysisRunner(AnalysisRunner):
 
     def run(
         self, analysis_config: AnalysisConfigWrapper
-    ) -> list[DirectAnalysisResultWrapper]:
+    ) -> list[AnalysisResultWrapper]:
         _analysis_collection = AnalysisCollection.from_config(analysis_config)
         _results = []
         for analysis in _analysis_collection.direct_analyses:
@@ -110,7 +110,7 @@ class DirectAnalysisRunner(AnalysisRunner):
             starttime = time.time()
 
             _result = analysis.execute()
-            _result_wrapper = DirectAnalysisResultWrapper(
+            _result_wrapper = AnalysisResultWrapper(
                 analysis_result=_result, analysis=analysis
             )
             _results.append(_result_wrapper)
