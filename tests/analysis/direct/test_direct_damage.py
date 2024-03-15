@@ -4,6 +4,9 @@ import pandas as pd
 import pytest
 
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
+from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
+    RiskCalculationModeEnum,
+)
 from ra2ce.analysis.direct.damage.manual_damage_functions import ManualDamageFunctions
 from ra2ce.analysis.direct.damage_calculation.damage_network_events import (
     DamageNetworkEvents,
@@ -365,7 +368,7 @@ class TestDirectDamage:
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
             risk_data_file, sep=";"
         )
-        damage_network.control_risk_calculation(mode="default")
+        damage_network.control_risk_calculation(mode=RiskCalculationModeEnum.DEFAULT)
         assert (
             damage_network.gdf["risk"][0] == damage_network.gdf["ref_risk_default"][0]
         )
@@ -375,7 +378,9 @@ class TestDirectDamage:
             damage_network = DamageNetworkReturnPeriods.construct_from_csv(
                 risk_data_file, sep=";"
             )
-            damage_network.control_risk_calculation(mode="cut_from_{}_year".format(rp))
+            damage_network.control_risk_calculation(
+                mode=RiskCalculationModeEnum.CUT_FROM_YEAR, year=rp
+            )
             test_result = round(damage_network.gdf["risk"][0], 0)
             reference_result = round(
                 damage_network.gdf["ref_risk_cut_from_{}_year".format(rp)][0], 0
@@ -388,7 +393,7 @@ class TestDirectDamage:
         )
         for triangle_rp in [8, 2]:
             damage_network.control_risk_calculation(
-                mode="triangle_to_null_{}_year".format(triangle_rp)
+                mode=RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR, year=triangle_rp
             )
             test_result = round(damage_network.gdf["risk"][0], 0)
             reference_result = round(
