@@ -35,6 +35,9 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
+from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
+    RiskCalculationModeEnum,
+)
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
@@ -88,14 +91,14 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     disruption_per_category: str = ""
     traffic_cols: list[str] = field(default_factory=list)
     # losses
-    duration_event: float = math.nan
+    duration_event: float = math.nan # TODO remove the deprecated attribute that have been replaced by csv
     duration_disruption: float = math.nan
     fraction_detour: float = math.nan
     fraction_drivethrough: float = 0.0
     rest_capacity: float = math.nan
     maximum_jam: float = math.nan
-    partofday: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
-    performance: str = "diff_time"  # "diff_time" or "diff_dist" relates to the used criticality metric
+    part_of_day: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
+    performance: str = "diff_time"  # "diff_time" or "diff_length" relates to the used criticality metric
     resilience_curve_file: Optional[Path] = None
     traffic_intensities_file: Optional[Path] = None
     values_of_time_file: Optional[Path] = None
@@ -134,7 +137,10 @@ class AnalysisSectionDirect(AnalysisSectionBase):
     damage_curve: damage_curve_enum.DamageCurveEnum = field(
         default_factory=lambda: EventTypeEnum.INVALID
     )
-    risk_calculation: str = ""
+    risk_calculation_mode: RiskCalculationModeEnum = field(
+        default_factory=lambda: RiskCalculationModeEnum.NONE
+    )
+    risk_calculation_year: int = 0
     create_table: bool = False
     file_name: Optional[Path] = None
 

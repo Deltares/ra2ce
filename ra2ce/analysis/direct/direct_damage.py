@@ -8,6 +8,9 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 )
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
+from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
+    RiskCalculationModeEnum,
+)
 from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
 from ra2ce.analysis.direct.damage.manual_damage_functions import ManualDamageFunctions
 from ra2ce.analysis.direct.damage_calculation import (
@@ -97,16 +100,18 @@ class DirectDamage(AnalysisDirectProtocol):
                 manual_damage_functions=manual_damage_functions,
             )
 
-            if self.analysis.risk_calculation:  # Check if risk_calculation is demanded
-                if self.analysis.risk_calculation != "none":
+            if (
+                self.analysis.risk_calculation_mode != RiskCalculationModeEnum.INVALID
+            ):  # Check if risk_calculation is demanded
+                if self.analysis.risk_calculation_mode != RiskCalculationModeEnum.NONE:
                     return_period_gdf.control_risk_calculation(
-                        mode=self.analysis.risk_calculation
+                        mode=self.analysis.risk_calculation_mode
                     )
 
             else:
                 logging.info(
                     """No parameters for risk calculation are specified. 
-                             Add key [risk_calculation] to analyses.ini."""
+                             Add key [risk_calculation_mode] to analyses.ini."""
                 )
 
             return return_period_gdf.gdf

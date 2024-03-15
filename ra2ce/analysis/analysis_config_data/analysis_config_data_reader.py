@@ -42,6 +42,9 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
+from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
+    RiskCalculationModeEnum,
+)
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
@@ -131,7 +134,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             section_name,
             "duration_event",
             fallback=_section.duration_event,
-        )
+        )  # TODO remove the deprecated attribute that have been replaced by csv
         _section.duration_disruption = self._parser.getfloat(
             section_name,
             "duration_disruption",
@@ -244,6 +247,14 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         # road damage
         _section.event_type = EventTypeEnum.get_enum(
             self._parser.get(section_name, "event_type", fallback=None)
+        )
+        _section.risk_calculation_mode = RiskCalculationModeEnum.get_enum(
+            self._parser.get(section_name, "risk_calculation_mode", fallback=None)
+        )
+        _section.risk_calculation_year = self._parser.getint(
+            section_name,
+            "risk_calculation_year",
+            fallback=_section.risk_calculation_year,
         )
         _section.damage_curve = DamageCurveEnum.get_enum(
             self._parser.get(section_name, "damage_curve", fallback=None)
