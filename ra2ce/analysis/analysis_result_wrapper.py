@@ -1,29 +1,21 @@
 from dataclasses import dataclass
 import geopandas as gpd
-from ra2ce.analysis.analysis_result_protocol import AnalysisResultProtocol
-from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
-from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
+from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 
 
 @dataclass
-class DirectAnalysisResultWrapper(AnalysisResultProtocol):
-
+class AnalysisResultWrapper:
     analysis_result: gpd.GeoDataFrame
-    analysis: AnalysisDirectProtocol
+    analysis: AnalysisProtocol
 
     def is_valid_result(self) -> bool:
-        if not isinstance(self.analysis_result, gpd.GeoDataFrame):
-            return False
-        return self.analysis_result.empty
+        """
+        Validates whether the `analysis_result` in this wrapper is valid.
 
-
-@dataclass
-class IndirectAnalysisResultWrapper(AnalysisResultProtocol):
-
-    analysis_result: gpd.GeoDataFrame
-    analysis: AnalysisIndirectProtocol
-
-    def is_valid_result(self) -> bool:
-        if not isinstance(self.analysis_result, gpd.GeoDataFrame):
-            return False
-        return self.analysis_result.empty
+        Returns:
+            bool: validity of `analysis_result`.
+        """
+        return (
+            isinstance(self.analysis_result, gpd.GeoDataFrame)
+            and not self.analysis_result.empty
+        )

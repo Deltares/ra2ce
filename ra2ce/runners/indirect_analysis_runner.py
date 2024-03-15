@@ -29,7 +29,7 @@ from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_wrapper import (
     AnalysisConfigWrapper,
 )
-from ra2ce.analysis.analysis_result_wrapper import IndirectAnalysisResultWrapper
+from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 
@@ -71,7 +71,7 @@ class IndirectAnalysisRunner(AnalysisRunner):
         gdf.to_file(save_path, driver=driver)
         logging.info("Results saved to: %s", save_path)
 
-    def _save_result(self, result_wrapper: IndirectAnalysisResultWrapper):
+    def _save_result(self, result_wrapper: AnalysisResultWrapper):
         if not result_wrapper.is_valid_result():
             return
 
@@ -92,7 +92,7 @@ class IndirectAnalysisRunner(AnalysisRunner):
 
     def run(
         self, analysis_config: AnalysisConfigWrapper
-    ) -> list[IndirectAnalysisResultWrapper]:
+    ) -> list[AnalysisResultWrapper]:
         _analysis_collection = AnalysisCollection.from_config(analysis_config)
         _results = []
         for analysis in _analysis_collection.indirect_analyses:
@@ -103,7 +103,7 @@ class IndirectAnalysisRunner(AnalysisRunner):
             starttime = time.time()
 
             _result = analysis.execute()
-            _result_wrapper = IndirectAnalysisResultWrapper(
+            _result_wrapper = AnalysisResultWrapper(
                 analysis_result=_result, analysis=analysis
             )
 
