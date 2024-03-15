@@ -7,6 +7,17 @@ The network module is a separate module created within `RA2CE` to help set up a 
 model. It helps to easily, reproducibly and consistently build models from global 
 to local datasets. The network module's goal is to create an infrastructure network to be used in further analyses. There are two possibilities to create a network: 1) downloading a network from OpenStreetMap with RA2CE and 2) creating a network from vector data. Within the network module, it is additionally possible to determine the network's exposure to a user-specified hazard using the 'hazard overlay' functionality. There are two options to set up a RA2CE model: using scripting and using initalization files (network.ini and analysis.ini). Examples of how to use this module can be found in the :ref:`examples` and can be tested in the Binder environment. 
 
+Data requirements
+-------------------------------------
+The types of possible input file formats to create a network are:
+
+•	Shapefile of network;
+•	GeoJSON polygon of area of interest for downloading a network from OSM;
+•	OSM PBF file;
+•	Pickle – a python data format, also used to save graphs.
+
+Depending on the required analysis, more data might be needed. Visit the :ref:`analysis_module` page to learn more or explore the :ref:`examples` in the Binder environment.
+
 Network from OpenStreetMap using scripting
 -----------------------------------------------------------------------------
 
