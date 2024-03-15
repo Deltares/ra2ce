@@ -74,12 +74,12 @@ class Losses(AnalysisIndirectProtocol):
         # Load Dataframes
         self.network = self._load_gdf(self.input_path.joinpath("network.geojson"))
         self.intensities = self._load_df_from_csv(
-            analysis.traffic_intensities_file, []
+            analysis.traffic_intensities_file, [], sep=","
         )  # per day
 
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
         self.criticality_data = self._load_df_from_csv(
-            self.input_path.joinpath(f"{analysis.name}.csv"), []
+            self.input_path.joinpath(f"{analysis.name}.csv"), [], sep=","
         )
         self.resilience_curve = self._load_df_from_csv(
             (analysis.resilience_curve_file),
@@ -101,7 +101,7 @@ class Losses(AnalysisIndirectProtocol):
             key in self.values_of_time.columns for key in _required_values_of_time_keys
         ):
             raise ValueError(
-                f"Missing required columns in values_of_time: {_required_values_of_time_keys}"
+                f"Missing required columns in values_of_time.csv: {_required_values_of_time_keys}"
             )
 
         _required_resilience_curve_keys = [
@@ -114,14 +114,14 @@ class Losses(AnalysisIndirectProtocol):
             for key in _required_resilience_curve_keys
         ):
             raise ValueError(
-                f"Missing required columns in resilience_curve: {_required_resilience_curve_keys}"
+                f"Missing required columns in resilience_curve.csv: {_required_resilience_curve_keys}"
             )
 
     def _load_df_from_csv(
         self,
         csv_path: Path,
         columns_to_interpret: list[str],
-        sep: str = ",",
+        sep: str,
     ) -> pd.DataFrame:
         if csv_path is None or not csv_path.exists():
             logging.warning("No `csv` file found at {}.".format(csv_path))

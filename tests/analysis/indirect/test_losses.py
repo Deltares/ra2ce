@@ -42,22 +42,17 @@ class TestLosses:
         # 1. Define test data
         _config = AnalysisConfigWrapper()
         _config.config_data.input_path = Path("sth")
+        _losses_csv_data = test_data.joinpath("losses", "csv_data_for_losses")
         _analyses = AnalysisSectionIndirect(
             part_of_day=None,
-            resilience_curve_file=test_data
-            / "losses"
-            / "csv_data_for_losses"
-            / "resilience_curve.csv",
-            traffic_intensities_file=test_data
-            / "losses"
-            / "csv_data_for_losses"
-            / "traffic_intensities.csv",
-            values_of_time_file=test_data
-            / "losses"
-            / "csv_data_for_losses"
-            / "values_of_time.csv",
+            resilience_curve_file=_losses_csv_data.joinpath("resilience_curve.csv"),
+            traffic_intensities_file=_losses_csv_data.joinpath(
+                "traffic_intensities.csv"
+            ),
+            values_of_time_file=_losses_csv_data.joinpath("values_of_time.csv"),
             name="single_link_redundancy_losses_test",
         )
+
         _config.input_path = test_data / "losses" / "csv_data_for_losses"
 
         # 2. Run test.
@@ -81,22 +76,17 @@ class TestLosses:
     def test_calc_vlh(self, part_of_day: str):
         # 1. Define test data
         _config = AnalysisConfigWrapper()
-        _config.config_data.input_path = test_data / "losses" / "csv_data_for_losses"
+        _losses_csv_data = test_data.joinpath("losses", "csv_data_for_losses")
+        _config.config_data.input_path = _losses_csv_data
+
         _analyses = AnalysisSectionIndirect(
             analysis=AnalysisIndirectEnum.SINGLE_LINK_LOSSES,
             part_of_day=part_of_day,
-            resilience_curve_file=test_data
-            / "losses"
-            / "csv_data_for_losses"
-            / "resilience_curve.csv",
-            traffic_intensities_file=test_data
-            / "losses"
-            / "csv_data_for_losses"
-            / "traffic_intensities.csv",
-            values_of_time_file=test_data
-            / "losses"
-            / "csv_data_for_losses"
-            / "values_of_time.csv",
+            resilience_curve_file=_losses_csv_data.joinpath("resilience_curve.csv"),
+            traffic_intensities_file=_losses_csv_data.joinpath(
+                "traffic_intensities.csv"
+            ),
+            values_of_time_file=_losses_csv_data.joinpath("values_of_time.csv"),
             name="single_link_redundancy_losses_test",
             performance="diff_length",
         )
