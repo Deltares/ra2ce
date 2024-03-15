@@ -134,7 +134,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             section_name,
             "duration_event",
             fallback=_section.duration_event,
-        )
+        )  # TODO remove the deprecated attribute that have been replaced by csv
         _section.duration_disruption = self._parser.getfloat(
             section_name,
             "duration_disruption",
