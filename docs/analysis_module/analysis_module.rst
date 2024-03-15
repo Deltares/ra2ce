@@ -94,8 +94,8 @@ Single link redundancy                                   single_link_redundancy
 Multi-link redundancy                                    multi_link_redundancy
 Origin-Destination, defined OD couples, no disruption    optimal_route_origin_destination
 Origin-Destination, defined OD couples, no disruption    multi_link_origin_destination
-Origin-Destination, O to closest D, disruption           optimal_route_origin_closest_destination with hazard file
-Origin-Destination,  O to closest D, disruption          multi_link_origin_closest_destination with hazard file
+Origin-Destination, O to closest D, disruption           optimal_route_origin_closest_destination
+Origin-Destination,  O to closest D, disruption          multi_link_origin_closest_destination
 Isolated locations                                       multi_link_isolated_locations 
 ======================================================   =====================
 
