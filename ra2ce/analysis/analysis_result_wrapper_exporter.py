@@ -58,12 +58,12 @@ class AnalysisResultWrapperExporter:
                 _output_path.joinpath(_analysis_name + ".csv"),
             )
 
-    def _export_gdf(self, gdf: GeoDataFrame, save_path: Path):
+    def _export_gdf(self, gdf: GeoDataFrame, export_path: Path):
         """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp
 
         Arguments:
             gdf [geodataframe]: geodataframe object to be converted
-            save_path [Path]: path to save
+            export_path [Path]: path to save
         """
         # save to shapefile
         gdf.crs = "epsg:4326"  # TODO: decide if this should be variable with e.g. an output_crs configured
@@ -72,12 +72,18 @@ class AnalysisResultWrapperExporter:
             if gdf[col].dtype == object and col != gdf.geometry.name:
                 gdf[col] = gdf[col].astype(str)
 
-        if save_path.exists():
-            save_path.unlink()
-        gdf.to_file(save_path, driver="GPKG")
-        logging.info("Results saved to: %s", save_path)
+        if export_path.exists():
+            export_path.unlink()
+        if not export_path.parent.exists():
+            export_path.parent.mkdir(parents=True)
+
+        gdf.to_file(export_path, driver="GPKG")
+        logging.info("Results saved to: %s", export_path)
 
     def _export_csv(self, result_gdf: GeoDataFrame, export_path: Path):
+        if not export_path.parent.exists():
+            export_path.parent.mkdir(parents=True)
+
         _result_copy = deepcopy(result_gdf)
         del _result_copy["geometry"]
         _result_copy.to_csv(export_path, index=False)
