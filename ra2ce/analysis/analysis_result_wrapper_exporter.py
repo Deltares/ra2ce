@@ -79,5 +79,5 @@ class AnalysisResultWrapperExporter:
 
     def _export_csv(self, result_gdf: GeoDataFrame, export_path: Path):
         _result_copy = deepcopy(result_gdf)
-        del _result_copy.analysis_result["geometry"]
-        _result_copy.analysis_result.to_csv(export_path, index=False)
+        del _result_copy["geometry"]
+        _result_copy.to_csv(export_path, index=False)
