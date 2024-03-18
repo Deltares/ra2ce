@@ -74,7 +74,7 @@ class TestAnalysisResultWrapperExporter:
         _result_files = list(wrapper.analysis.output_path.rglob(f"*.{extension}"))
         assert any(_result_files)
 
-    @pytest.skip(reason="Work in progress, seems to have FIONA issuse for export.")
+    @pytest.mark.skip(reason="Work in progress, seems to have FIONA issues for export.")
     def test_given_valid_result_export_gdf(
         self, valid_result_wrapper: AnalysisResultWrapper
     ):
