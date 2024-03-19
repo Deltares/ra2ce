@@ -33,7 +33,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         analysis_input: AnalysisInputWrapper,
     ) -> None:
         self.analysis = analysis_input.analysis
-        self.graph_file_hazard = analysis_input.graph_file
+        self.graph_file_hazard = analysis_input.graph_file_hazard
         self.input_path = analysis_input.input_path
         self.static_path = analysis_input.static_path
         self.output_path = analysis_input.output_path
