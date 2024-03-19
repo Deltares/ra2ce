@@ -23,20 +23,20 @@ from ra2ce.network.graph_files.network_file import NetworkFile
 
 class DirectDamage(AnalysisDirectProtocol):
     analysis: AnalysisSectionDirect
+    graph_file: NetworkFile
     graph_file_hazard: NetworkFile
     input_path: Path
     output_path: Path
-    result: GeoDataFrame
 
     def __init__(
         self,
         analysis_input: AnalysisInputWrapper,
     ) -> None:
-        self.graph_file_hazard = analysis_input.graph_file_hazard
         self.analysis = analysis_input.analysis
+        self.graph_file = None
+        self.graph_file_hazard = analysis_input.graph_file_hazard
         self.input_path = analysis_input.input_path
         self.output_path = analysis_input.output_path
-        self.result = None
 
     def execute(self) -> GeoDataFrame:
 

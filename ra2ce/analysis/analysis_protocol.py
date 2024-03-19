@@ -20,7 +20,7 @@
 """
 
 from pathlib import Path
-from typing import Protocol
+from typing import Optional, Protocol
 
 from geopandas import GeoDataFrame
 
@@ -29,18 +29,19 @@ from ra2ce.network.graph_files.graph_files_protocol import GraphFileProtocol
 
 
 class AnalysisProtocol(Protocol):
-    graph_file: GraphFileProtocol
+    graph_file: Optional[GraphFileProtocol]
+    graph_file_hazard: Optional[GraphFileProtocol]
     analysis: AnalysisSectionBase
     input_path: Path
     output_path: Path
 
-    def execute(self) -> GeoDataFrame:
+    def execute(self) -> GeoDataFrame | None:
         """
         Execute the analysis on the given graph/network with the given analysis parameters.
         The resulting (Geo)DataFrame of the analysis is stored in the result attribute.
         TODO: Make the return type a result object #318
 
         Returns:
-            GeoDataFrame: The result of the analysis.
+            GeoDataFrame (optional): The result of the analysis.
         """
         pass

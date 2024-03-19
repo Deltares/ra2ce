@@ -9,6 +9,7 @@ from geopandas import GeoDataFrame, read_feather, read_file
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.analysis.indirect.optimal_route_origin_destination import (
     OptimalRouteOriginDestination,
@@ -21,33 +22,25 @@ from ra2ce.network.network_config_data.network_config_data import (
 
 
 class MultiLinkOriginDestination(AnalysisIndirectProtocol):
-    graph_file: GraphFile
     analysis: AnalysisSectionIndirect
+    graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path
     output_path: Path
     hazard_names: HazardNames
     origins_destinations: OriginsDestinationsSection
-    result: GeoDataFrame
 
     def __init__(
         self,
-        graph_file: GraphFile,
-        analysis: AnalysisSectionIndirect,
-        input_path: Path,
-        static_path: Path,
-        output_path: Path,
-        hazard_names: HazardNames,
-        origins_destinations: OriginsDestinationsSection,
+        analysis_input: AnalysisInputWrapper,
     ) -> None:
-        self.graph_file = graph_file
-        self.analysis = analysis
-        self.input_path = input_path
-        self.static_path = static_path
-        self.output_path = output_path
-        self.hazard_names = hazard_names
-        self.origins_destinations = origins_destinations
-        self.result = None
+        self.analysis = analysis_input.analysis
+        self.graph_file_hazard = analysis_input.graph_file_hazard
+        self.input_path = analysis_input.input_path
+        self.static_path = analysis_input.static_path
+        self.output_path = analysis_input.output_path
+        self.hazard_names = analysis_input.hazard_names
+        self.origins_destinations = analysis_input.origins_destinations
 
     @staticmethod
     def extract_od_nodes_from_graph(
@@ -350,10 +343,10 @@ class MultiLinkOriginDestination(AnalysisIndirectProtocol):
     def execute(self) -> GeoDataFrame:
         _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
         gdf = self.multi_link_origin_destination(
-            self.graph_file.get_graph(), self.analysis
+            self.graph_file_hazard.get_graph(), self.analysis
         )
         gdf_not_disrupted = OptimalRouteOriginDestination(
-            self.graph_file,
+            self.graph_file_hazard,
             self.analysis,
             self.input_path,
             self.static_path,

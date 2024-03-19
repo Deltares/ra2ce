@@ -34,7 +34,9 @@ class TestEffectivenessMeasures:
         )
         _config = AnalysisConfigWrapper()
         _config.config_data.input_path = test_data
-        _analysis_input = AnalysisInputWrapper(_analysis, _config, None, None)
+        _analysis_input = AnalysisInputWrapper.from_input(
+            _analysis, _config, None, None
+        )
         with pytest.raises(ValueError) as exc_err:
             EffectivenessMeasures(_analysis_input)
         assert (
@@ -54,7 +56,9 @@ class TestEffectivenessMeasures:
         )
         _config = AnalysisConfigWrapper()
         _config.config_data.input_path = test_data
-        _analysis_input = AnalysisInputWrapper(_analysis, _config, None, None)
+        _analysis_input = AnalysisInputWrapper.from_input(
+            _analysis, _config, None, None
+        )
         with pytest.raises(ValueError) as exc_err:
             EffectivenessMeasures(_analysis_input)
         assert (
@@ -75,7 +79,7 @@ class TestEffectivenessMeasures:
         )
         _config = AnalysisConfigWrapper()
         _config.config_data.input_path = test_data
-        _input_wrapper = AnalysisInputWrapper(_analysis, _config, None, None)
+        _input_wrapper = AnalysisInputWrapper.from_input(_analysis, _config, None, None)
         with pytest.raises(FileNotFoundError) as exc_err:
             EffectivenessMeasures(_input_wrapper)
         assert str(exc_err.value) == str(
@@ -94,7 +98,7 @@ class TestEffectivenessMeasures:
         )
         _config = AnalysisConfigWrapper()
         _config.config_data.input_path = test_data
-        _input_wrapper = AnalysisInputWrapper(_analysis, _config, None, None)
+        _input_wrapper = AnalysisInputWrapper.from_input(_analysis, _config, None, None)
         assert (
             _config.config_data.input_path.joinpath("direct", "origins.shp")
         ).exists()
