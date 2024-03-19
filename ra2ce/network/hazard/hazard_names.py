@@ -47,7 +47,7 @@ class HazardNames:
         Returns:
             HazardNames: HazardNames object.
         """
-        if hazard_names_file.is_file():
+        if hazard_names_file and hazard_names_file.is_file():
             _names_df = pd.read_excel(hazard_names_file)
         else:
             _names_df = pd.DataFrame(data=None)
@@ -64,9 +64,12 @@ class HazardNames:
         Returns:
             HazardNames: HazardNames object.
         """
-        _hazard_file = analysis_config.config_data.output_path.joinpath(
-            "hazard_names.xlsx"
-        )
+        if analysis_config.config_data.output_path:
+            _hazard_file = analysis_config.config_data.output_path.joinpath(
+                "hazard_names.xlsx"
+            )
+        else:
+            _hazard_file = None
         return cls.from_file(_hazard_file)
 
     @property
