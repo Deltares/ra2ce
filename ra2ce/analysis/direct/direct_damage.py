@@ -11,6 +11,7 @@ from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeE
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
 from ra2ce.analysis.direct.damage.manual_damage_functions import ManualDamageFunctions
 from ra2ce.analysis.direct.damage_calculation import (
@@ -21,23 +22,20 @@ from ra2ce.network.graph_files.network_file import NetworkFile
 
 
 class DirectDamage(AnalysisDirectProtocol):
-    graph_file: NetworkFile
     analysis: AnalysisSectionDirect
+    graph_file_hazard: NetworkFile
     input_path: Path
     output_path: Path
     result: GeoDataFrame
 
     def __init__(
         self,
-        graph_file: NetworkFile,
-        analysis: AnalysisSectionDirect,
-        input_path: Path,
-        output_path: Path,
+        analysis_input: AnalysisInputWrapper,
     ) -> None:
-        self.graph_file = graph_file
-        self.analysis = analysis
-        self.input_path = input_path
-        self.output_path = output_path
+        self.graph_file_hazard = analysis_input.graph_file_hazard
+        self.analysis = analysis_input.analysis
+        self.input_path = analysis_input.input_path
+        self.output_path = analysis_input.output_path
         self.result = None
 
     def execute(self) -> GeoDataFrame:
@@ -63,7 +61,7 @@ class DirectDamage(AnalysisDirectProtocol):
             return new_cols
 
         # Open the network with hazard data
-        road_gdf = self.graph_file.get_graph()
+        road_gdf = self.graph_file_hazard.get_graph()
         road_gdf.columns = _rename_road_gdf_to_conventions(road_gdf.columns)
 
         # Find the hazard columns; these may be events or return periods
