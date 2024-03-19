@@ -30,6 +30,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
 from ra2ce.analysis.direct.direct_damage import DirectDamage
 from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
@@ -77,21 +78,15 @@ class AnalysisFactory:
         Returns:
             AnalysisDirectProtocol: The direct analysis to be executed.
         """
-        _input_dict = dict(
-            analysis=analysis,
-            input_path=analysis_config.config_data.input_path,
-            output_path=analysis_config.config_data.output_path,
+        _analysis_input = AnalysisInputWrapper(
+            analysis,
+            analysis_config,
+            graph_file_hazard=analysis_config.graph_files.base_network_hazard,
         )
         if analysis.analysis == AnalysisDirectEnum.DIRECT:
-            return DirectDamage(
-                graph_file=analysis_config.graph_files.base_network_hazard,
-                **_input_dict,
-            )
+            return DirectDamage(_analysis_input)
         if analysis.analysis == AnalysisDirectEnum.EFFECTIVENESS_MEASURES:
-            return EffectivenessMeasures(
-                graph_file=analysis_config.graph_files.base_network_hazard,
-                **_input_dict,
-            )
+            return EffectivenessMeasures(_analysis_input)
         raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
 
     @staticmethod
