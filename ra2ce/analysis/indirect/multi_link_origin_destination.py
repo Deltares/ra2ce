@@ -22,6 +22,7 @@ from ra2ce.network.network_config_data.network_config_data import (
 
 
 class MultiLinkOriginDestination(AnalysisIndirectProtocol):
+    analysis_input: AnalysisInputWrapper
     analysis: AnalysisSectionIndirect
     graph_file_hazard: GraphFile
     input_path: Path
@@ -34,6 +35,7 @@ class MultiLinkOriginDestination(AnalysisIndirectProtocol):
         self,
         analysis_input: AnalysisInputWrapper,
     ) -> None:
+        self.analysis_input = analysis_input
         self.analysis = analysis_input.analysis
         self.graph_file_hazard = analysis_input.graph_file_hazard
         self.input_path = analysis_input.input_path
@@ -345,15 +347,7 @@ class MultiLinkOriginDestination(AnalysisIndirectProtocol):
         gdf = self.multi_link_origin_destination(
             self.graph_file_hazard.get_graph(), self.analysis
         )
-        gdf_not_disrupted = OptimalRouteOriginDestination(
-            self.graph_file_hazard,
-            self.analysis,
-            self.input_path,
-            self.static_path,
-            self.output_path,
-            self.hazard_names,
-            self.origins_destinations,
-        ).execute()
+        gdf_not_disrupted = OptimalRouteOriginDestination(self.analysis_input).execute()
         (
             disruption_impact_df,
             gdf_ori,
