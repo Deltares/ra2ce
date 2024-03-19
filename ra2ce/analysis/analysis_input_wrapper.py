@@ -12,8 +12,8 @@ from ra2ce.network.network_config_data.network_config_data import (
 
 class AnalysisInputWrapper:
     analysis: AnalysisSectionBase
-    graph_file: GraphFileProtocol
-    graph_file_hazard: GraphFileProtocol
+    graph_file: Optional[GraphFileProtocol]
+    graph_file_hazard: Optional[GraphFileProtocol]
     input_path: Path
     static_path: Path
     output_path: Path
@@ -22,9 +22,15 @@ class AnalysisInputWrapper:
     file_id: str
 
     def __init__(
-        self, analysis: AnalysisSectionBase, analysis_config: AnalysisConfigWrapper
+        self,
+        analysis: AnalysisSectionBase,
+        analysis_config: AnalysisConfigWrapper,
+        graph_file: GraphFileProtocol = None,
+        graph_file_hazard: GraphFileProtocol = None,
     ):
         self.analysis = analysis
+        self.graph_file = graph_file
+        self.graph_file_hazard = graph_file_hazard
         self.input_path = analysis_config.config_data.input_path
         self.static_path = analysis_config.config_data.static_path
         self.output_path = analysis_config.config_data.output_path
