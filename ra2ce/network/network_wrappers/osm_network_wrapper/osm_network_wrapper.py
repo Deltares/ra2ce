@@ -98,6 +98,15 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         _network_wrapper = OsmNetworkWrapper.with_polygon(config_data, polygon)
         return _network_wrapper.get_network()
 
+    @staticmethod
+    def get_network_from_geojson(config_data: NetworkConfigData):
+        if not isinstance(config_data.network.polygon, Path):
+            raise ValueError(
+                "Network polygon (.geojson) file path needs to be provided."
+            )
+
+        return OsmNetworkWrapper(config_data).get_network()
+
     def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
         logging.info("Start downloading a network from OSM.")
 

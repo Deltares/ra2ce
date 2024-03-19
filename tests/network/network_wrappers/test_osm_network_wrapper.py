@@ -347,3 +347,40 @@ class TestOsmNetworkWrapper:
         _result_graph, _result_gdf = _network_tuple
         assert isinstance(_result_graph, MultiGraph)
         assert isinstance(_result_gdf, GeoDataFrame)
+
+    def test_get_network_from_geojson_without_path_raises(self):
+        # 1. Define test data
+        _config_data = NetworkConfigData()
+        _config_data.network.polygon = None
+
+        # 2. Run test.
+        with pytest.raises(ValueError) as exc_err:
+            OsmNetworkWrapper.get_network_from_geojson(_config_data)
+
+        # 3. Verify expectations.
+        assert (
+            str(exc_err.value)
+            == "Network polygon (.geojson) file path needs to be provided."
+        )
+
+    @slow_test
+    def test_get_network_from_geojson_with_valid_data(self):
+        # 1. Define test data
+        _test_input_directory = test_data.joinpath("graph", "test_osm_network_wrapper")
+        _polygon_file = _test_input_directory.joinpath("_test_polygon.geojson")
+        assert _polygon_file.exists()
+
+        _config_data = NetworkConfigData()
+        _config_data.network.polygon = _polygon_file
+        _config_data.network.network_type = NetworkTypeEnum.DRIVE
+        _config_data.network.road_types = []
+
+        # 2. Run test.
+        _network_tuple = OsmNetworkWrapper.get_network_from_geojson(_config_data)
+
+        # 3. Verify expectations
+        assert isinstance(_network_tuple, tuple)
+
+        _result_graph, _result_gdf = _network_tuple
+        assert isinstance(_result_graph, MultiGraph)
+        assert isinstance(_result_gdf, GeoDataFrame)
