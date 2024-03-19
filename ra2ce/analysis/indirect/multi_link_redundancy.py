@@ -50,7 +50,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
             aggregated_results (GeoDataFrame): The results of the analysis aggregated into a table.
         """
         results = []
-        master_graph = copy.deepcopy(self.graph_file_hazard.graph)
+        master_graph = copy.deepcopy(self.graph_file_hazard.get_graph())
         for hazard in self.hazard_names.names:
             hazard_name = self.hazard_names.get_name(hazard)
 
