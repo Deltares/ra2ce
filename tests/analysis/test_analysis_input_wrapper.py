@@ -20,7 +20,7 @@ class TestAnalysisInputWrapper:
         _graph_file_hazard = GraphFile(name="test_graph_file_hazard")
 
         # 2. Run test
-        _analysis_input = AnalysisInputWrapper(
+        _analysis_input = AnalysisInputWrapper.from_input(
             _analysis, _config, _graph_file, _graph_file_hazard
         )
 
