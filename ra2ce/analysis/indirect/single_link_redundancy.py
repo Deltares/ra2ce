@@ -47,7 +47,7 @@ class SingleLinkRedundancy(AnalysisIndirectProtocol):
         #     road_usage_data = pd.DataFrame()
 
         # create a geodataframe from the graph
-        _gdf_graph = osmnx.graph_to_gdfs(self.graph_file.graph, nodes=False)
+        _gdf_graph = osmnx.graph_to_gdfs(self.graph_file.get_graph(), nodes=False)
 
         # list for the length of the alternative routes
         _alt_value_list = []
