@@ -1,0 +1,3 @@
+numpy
+GDAL==3.5.1
+ra2ce
