@@ -5,6 +5,7 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.analysis.indirect.origin_closest_destination import OriginClosestDestination
 from ra2ce.network.graph_files.graph_file import GraphFile
@@ -17,39 +18,31 @@ from ra2ce.ra2ce_logging import logging
 
 
 class MultiLinkOriginClosestDestination(AnalysisIndirectProtocol):
+    analysis_input: AnalysisInputWrapper
+    analysis: AnalysisSectionIndirect
     graph_file: GraphFile
     graph_file_hazard: GraphFile
-    analysis: AnalysisSectionIndirect
     input_path: Path
     static_path: Path
     output_path: Path
     hazard_names: HazardNames
     origins_destinations: OriginsDestinationsSection
     file_id: str
-    result: GeoDataFrame
 
     def __init__(
         self,
-        graph_file: GraphFile,
-        graph_file_hazard: GraphFile,
-        analysis: AnalysisSectionIndirect,
-        input_path: Path,
-        static_path: Path,
-        output_path: Path,
-        hazard_names: HazardNames,
-        origins_destinations: OriginsDestinationsSection,
-        file_id: str,
+        analysis_input: AnalysisInputWrapper,
     ) -> None:
-        self.graph_file = graph_file
-        self.graph_file_hazard = graph_file_hazard
-        self.analysis = analysis
-        self.input_path = input_path
-        self.static_path = static_path
-        self.output_path = output_path
-        self.hazard_names = hazard_names
-        self.origins_destinations = origins_destinations
-        self.file_id = file_id
-        self.result = None
+        self.analysis_input = analysis_input
+        self.analysis = analysis_input.analysis
+        self.graph_file = analysis_input.graph_file
+        self.graph_file_hazard = analysis_input.graph_file_hazard
+        self.input_path = analysis_input.input_path
+        self.static_path = analysis_input.static_path
+        self.output_path = analysis_input.output_path
+        self.hazard_names = analysis_input.hazard_names
+        self.origins_destinations = analysis_input.origins_destinations
+        self.file_id = analysis_input.file_id
 
     def _save_gdf(self, gdf: GeoDataFrame, save_path: Path):
         """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp
@@ -97,15 +90,7 @@ class MultiLinkOriginClosestDestination(AnalysisIndirectProtocol):
 
         _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
 
-        analyzer = OriginClosestDestination(
-            self.file_id,
-            self.origins_destinations,
-            self.analysis,
-            self.graph_file,
-            self.graph_file_hazard,
-            self.static_path,
-            self.hazard_names,
-        )
+        analyzer = OriginClosestDestination(self.analysis_input)
 
         if self.analysis.calculate_route_without_disruption:
             (
