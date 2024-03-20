@@ -1,5 +1,51 @@
 # Changelog
 
+## v0.8.0 (2024-03-20)
+
+### Feat
+
+- Added functionality to directly retrieve the MultiGraph and GeoDataFrame for a given geojson network
+- Added static method to directly retrieve a network based on a polygon
+- Added result wrapper exporter logic
+- Added logic to wrap results of a ra2ce analysis
+- partofday Enum is added
+- Added logic so that exporting the intermediate results becomes dependent on the existance of the `output_graph_dir` property
+- Added endpoint to generate an OsmNetworkWrapper with a fix polygon
+- time calculated for the single link redundancy added to the link data
+- time calculated for the single link redundancy
+- if the link checked in the redundancy is not connected, then time and alt_time is added (for the weight=time) equal to the length/avgspeed.
+- add_missing_geometry improved to consider all ks of a multigraph edges
+- tracing the origins that are mapped on two graph nodes for instance and have path in one but not in the other
+- minor
+- calc_vhl completed. case should be ran. analysis properties are added for Losses
+- calc_vhl modified. see 2023-11-24_Sprint: Losses summary onenote
+- calc_vhl modified. see 2023-11-24_Sprint: Losses summary onenote
+- duration step attribute definition
+- calc_vhl chanege started
+- minor attribute hints
+- minor changes to the Losses
+- time and alt_time is added to multi-link redundancy
+- time and alt_time is added to multi-link redundancy
+
+### Fix
+
+- solve bug
+- Corrected wrong unknown key to dictionary
+- Added logic to callculate time only when strictly required
+- minor formatting
+- Enum typing added
+- Enum is used
+- Enum is used
+- formatting updated
+- Union removed
+- deafaultdict list is used
+- returning globals() fixed
+- float instead of int
+- alt_time and length are improved to correspond to the weight stated in the single and multi redundancy
+- updated the weight to get correct alt_dist. time is also rounded.
+- git ignore is updated to ignore all example outputs
+- LineString is impoted from shapely.geometry
+
 ## v0.7.0 (2023-12-05)
 
 ### Feat
