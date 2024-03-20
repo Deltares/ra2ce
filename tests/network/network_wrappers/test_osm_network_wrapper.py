@@ -348,10 +348,13 @@ class TestOsmNetworkWrapper:
         assert isinstance(_result_graph, MultiGraph)
         assert isinstance(_result_gdf, GeoDataFrame)
 
-    def test_get_network_from_geojson_without_path_raises(self):
+    @pytest.mark.parametrize(
+        "polygon_path", [pytest.param(None), pytest.param("not_a_valid_path")]
+    )
+    def test_get_network_from_geojson_without_path_raises(self, polygon_path: Path):
         # 1. Define test data
         _config_data = NetworkConfigData()
-        _config_data.network.polygon = None
+        _config_data.network.polygon = polygon_path
 
         # 2. Run test.
         with pytest.raises(ValueError) as exc_err:
@@ -360,7 +363,7 @@ class TestOsmNetworkWrapper:
         # 3. Verify expectations.
         assert (
             str(exc_err.value)
-            == "Network polygon (.geojson) file path needs to be provided."
+            == "A valid network polygon (.geojson) file path needs to be provided."
         )
 
     @slow_test
