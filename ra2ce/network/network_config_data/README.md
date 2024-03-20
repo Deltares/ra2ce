@@ -1,4 +1,4 @@
-# Network config data module.
+# Network config data
 
 In this package we contain the representation of a network configuration file, its readers and validators.
 
