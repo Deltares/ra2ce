@@ -26,7 +26,7 @@
 - Corrected wrong unknown key to dictionary
 - Added logic to calculate time only when strictly required
 - alt_time and length are improved to correspond to the weight stated in the single and multi redundancy
-- updated the weight to get correct alt_dist. time is also rounded.
+- Updated the weight to get correct alt_dist. time is also rounded.
 - LineString is imported from shapely.geometry
 
 ## v0.7.0 (2023-12-05)
