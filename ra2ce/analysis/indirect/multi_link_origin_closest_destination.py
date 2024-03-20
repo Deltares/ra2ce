@@ -18,7 +18,6 @@ from ra2ce.ra2ce_logging import logging
 
 
 class MultiLinkOriginClosestDestination(AnalysisIndirectProtocol):
-    analysis_input: AnalysisInputWrapper
     analysis: AnalysisSectionIndirect
     graph_file: GraphFile
     graph_file_hazard: GraphFile
@@ -28,12 +27,12 @@ class MultiLinkOriginClosestDestination(AnalysisIndirectProtocol):
     hazard_names: HazardNames
     origins_destinations: OriginsDestinationsSection
     file_id: str
+    _analysis_input: AnalysisInputWrapper
 
     def __init__(
         self,
         analysis_input: AnalysisInputWrapper,
     ) -> None:
-        self.analysis_input = analysis_input
         self.analysis = analysis_input.analysis
         self.graph_file = analysis_input.graph_file
         self.graph_file_hazard = analysis_input.graph_file_hazard
@@ -43,6 +42,7 @@ class MultiLinkOriginClosestDestination(AnalysisIndirectProtocol):
         self.hazard_names = analysis_input.hazard_names
         self.origins_destinations = analysis_input.origins_destinations
         self.file_id = analysis_input.file_id
+        self._analysis_input = analysis_input
 
     def _save_gdf(self, gdf: GeoDataFrame, save_path: Path):
         """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp
@@ -90,7 +90,7 @@ class MultiLinkOriginClosestDestination(AnalysisIndirectProtocol):
 
         _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
 
-        analyzer = OriginClosestDestination(self.analysis_input)
+        analyzer = OriginClosestDestination(self._analysis_input)
 
         if self.analysis.calculate_route_without_disruption:
             (

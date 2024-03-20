@@ -7,5 +7,5 @@ Analyses can be identified as:
 
 ## Input and output
 An analysis consumes an `AnalysisInputWrapper`, containing analysis parameters, the graph/network and some additional settings.
-The output of an analysis is an `AnalysisResultWrapper`, containing the analysis result (`GeoDataFrame`) and again the analysis parameters.
+The `AnalysisRunner` stores the output of an analysis in an `AnalysisResultWrapper`, containing the analysis result (`GeoDataFrame`) and again the analysis parameters.
 This output can be exported to different formats using the `AnalysisResultWrapperExporter`.
