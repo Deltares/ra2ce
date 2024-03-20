@@ -114,9 +114,12 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         Returns:
             tuple[MultiGraph, GeoDataFrame]: Resulting network representations.
         """
-        if not isinstance(config_data.network.polygon, Path):
+        if (
+            not isinstance(config_data.network.polygon, Path)
+            or not config_data.network.polygon.is_file()
+        ):
             raise ValueError(
-                "Network polygon (.geojson) file path needs to be provided."
+                "A valid network polygon (.geojson) file path needs to be provided."
             )
 
         return OsmNetworkWrapper(config_data).get_network()
