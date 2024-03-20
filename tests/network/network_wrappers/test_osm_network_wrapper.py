@@ -326,3 +326,24 @@ class TestOsmNetworkWrapper:
         assert isinstance(_wrapper.polygon_graph, MultiDiGraph)
         assert isinstance(_result_mg, MultiGraph)
         assert isinstance(_result_gdf, GeoDataFrame)
+
+    @slow_test
+    def test_get_network_from_polygon_with_valid_data(
+        self, _valid_network_polygon_fixture: BaseGeometry
+    ):
+        # 1. Define test data.
+        _network_config_data = self._get_dummy_network_config_data()
+        _network_config_data.network.network_type = NetworkTypeEnum.DRIVE
+        _network_config_data.network.road_types = []
+
+        # 2. Run test.
+        _network_tuple = OsmNetworkWrapper.get_network_from_polygon(
+            _network_config_data, _valid_network_polygon_fixture
+        )
+
+        # 3. Verify expectations.
+        assert isinstance(_network_tuple, tuple)
+
+        _result_graph, _result_gdf = _network_tuple
+        assert isinstance(_result_graph, MultiGraph)
+        assert isinstance(_result_gdf, GeoDataFrame)
