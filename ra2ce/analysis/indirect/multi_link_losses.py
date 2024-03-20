@@ -16,25 +16,25 @@ from ra2ce.network.hazard.hazard_names import HazardNames
 
 
 class MultiLinkLosses(AnalysisIndirectProtocol):
-    analysis_input: AnalysisInputWrapper
     analysis: AnalysisSectionIndirect
     graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path
     output_path: Path
     hazard_names: HazardNames
+    _analysis_input: AnalysisInputWrapper
 
     def __init__(
         self,
         analysis_input: AnalysisInputWrapper,
     ) -> None:
-        self.analysis_input = analysis_input
         self.analysis = analysis_input.analysis
         self.graph_file_hazard = analysis_input.graph_file_hazard
         self.input_path = analysis_input.input_path
         self.static_path = analysis_input.static_path
         self.output_path = analysis_input.output_path
         self.hazard_names = analysis_input.hazard_names
+        self._analysis_input = analysis_input
 
     def execute(self) -> GeoDataFrame:
         """Calculates the multi-link redundancy losses of a NetworkX graph.
@@ -46,7 +46,7 @@ class MultiLinkLosses(AnalysisIndirectProtocol):
         Returns:
             GeoDataFrame: The results of the analysis aggregated into a table.
         """
-        gdf = MultiLinkRedundancy(self.analysis_input).execute()
+        gdf = MultiLinkRedundancy(self._analysis_input).execute()
 
         losses_fn = self.static_path.joinpath("hazard", self.analysis.loss_per_distance)
         losses_df = pd.read_excel(losses_fn, sheet_name="Sheet1")
