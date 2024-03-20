@@ -347,6 +347,7 @@ class MultiLinkOriginDestination(AnalysisIndirectProtocol):
         gdf = self.multi_link_origin_destination(
             self.graph_file_hazard.get_graph(), self.analysis
         )
+        self.analysis_input.graph_file = self.analysis_input.graph_file_hazard
         gdf_not_disrupted = OptimalRouteOriginDestination(self.analysis_input).execute()
         (
             disruption_impact_df,
