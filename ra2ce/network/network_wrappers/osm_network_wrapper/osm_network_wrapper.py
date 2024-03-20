@@ -80,6 +80,24 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         _wrapper.polygon_graph = _clean_graph
         return _wrapper
 
+    @staticmethod
+    def get_network_from_polygon(
+        config_data: NetworkConfigData, polygon: BaseGeometry
+    ) -> tuple[MultiGraph, GeoDataFrame]:
+        """
+        Gets a valid network (`MultiGraph` and `GeoDataFrame`) for the given configuration and
+        boundary box (represented by a `shapely.BaseGeometry`).
+
+        Args:
+            config_data (NetworkConfigData): Network data configuration required for OSM download.
+            polygon (BaseGeometry): Polygon representing the boundary box.
+
+        Returns:
+            tuple[MultiGraph, GeoDataFrame]: Resulting network representations.
+        """
+        _network_wrapper = OsmNetworkWrapper.with_polygon(config_data, polygon)
+        return _network_wrapper.get_network()
+
     def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
         logging.info("Start downloading a network from OSM.")
 
