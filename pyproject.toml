@@ -2,11 +2,13 @@
 name = "ra2ce"
 version = "0.8.0"
 description = "Risk Assessment and Adaptation for Critical infrastructurE (RA2CE)."
-authors = ["Margreet van Marle <Margreet.vanMarle@deltares.nl>"]
-maintainers = [
-  "Frederique de Groen <frederique.degroen@deltares.nl>",
+authors = [
+  "Margreet van Marle <Margreet.vanMarle@deltares.nl>", 
   "Kees van Ginkel <kees.vanginkel@deltares.nl>",
+]
+maintainers = [
   "Carles Salvador Soriano Perez <carles.sorianoperez@deltares.nl>",
+  "Ardt Klapwijk<ardt.klapwijk@deltares.nl>",
 ]
 license = "GPL-3.0-or-later"
 readme = "README.md"
