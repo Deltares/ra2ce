@@ -29,8 +29,8 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
     hazard_names: HazardNames
 
     def __init__(
-        self,
-        analysis_input: AnalysisInputWrapper,
+            self,
+            analysis_input: AnalysisInputWrapper,
     ) -> None:
         self.analysis = analysis_input.analysis
         self.graph_file_hazard = analysis_input.graph_file_hazard
@@ -61,15 +61,16 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                 gdf["rfid"] = gdf["rfid"].astype(str)
 
             # Create the edgelist that consist of edges that should be removed
-            edges_remove = [
-                e for e in _graph.edges.data(keys=True) if hazard_name in e[-1]
-            ]
+            edges_remove = []
+            for e in _graph.edges.data(keys=True):
+                if (hazard_name in e[-1]) and (
+                        ('bridge' not in e[-1]) or ('bridge' in e[-1] and e[-1]['bridge'] != "yes")):
+                    edges_remove.append(e)
             edges_remove = [e for e in edges_remove if (e[-1][hazard_name] is not None)]
             edges_remove = [
                 e
                 for e in edges_remove
-                if (e[-1][hazard_name] > float(self.analysis.threshold))
-                & ("bridge" not in e[-1])
+                if (e[-1][hazard_name] > float(self.analysis["threshold"]))
             ]
 
             _graph.remove_edges_from(edges_remove)
