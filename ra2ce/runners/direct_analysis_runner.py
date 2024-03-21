@@ -19,14 +19,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
+import time
 
-from ra2ce.analyses.analysis_config_wrapper import (
-    AnalysisConfigWrapper,
-)
-from ra2ce.analyses.direct import analyses_direct
+from ra2ce.analysis.analysis_collection import AnalysisCollection
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.configuration.config_wrapper import ConfigWrapper
+from ra2ce.analysis.analysis_result_wrapper_exporter import (
+    AnalysisResultWrapperExporter,
+)
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 
 
@@ -51,7 +53,31 @@ class DirectAnalysisRunner(AnalysisRunner):
             return False
         return True
 
-    def run(self, analysis_config: AnalysisConfigWrapper) -> None:
-        analyses_direct.DirectAnalyses(
-            analysis_config.config_data, analysis_config.graph_files
-        ).execute()
+    def run(
+        self, analysis_config: AnalysisConfigWrapper
+    ) -> list[AnalysisResultWrapper]:
+        _analysis_collection = AnalysisCollection.from_config(analysis_config)
+        _results = []
+        for analysis in _analysis_collection.direct_analyses:
+            logging.info(
+                "----------------------------- Started analyzing '%s'  -----------------------------",
+                analysis.analysis.name,
+            )
+            starttime = time.time()
+
+            _result = analysis.execute()
+            _result_wrapper = AnalysisResultWrapper(
+                analysis_result=_result, analysis=analysis
+            )
+            _results.append(_result_wrapper)
+
+            AnalysisResultWrapperExporter().export_result(_result_wrapper)
+
+            endtime = time.time()
+            logging.info(
+                "----------------------------- Analysis '%s' finished. "
+                "Time: %ss  -----------------------------",
+                analysis.analysis.name,
+                str(round(endtime - starttime, 2)),
+            )
+        return _results

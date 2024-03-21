@@ -47,6 +47,7 @@ htmlcov/
 .coverage
 .coverage.*
 .cache
+cache
 nosetests.xml
 coverage.xml
 *.cover
@@ -82,6 +83,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/_examples/
 
 # PyBuilder
 target/
@@ -146,6 +148,6 @@ dmypy.json
 /tests/local_data
 
 # Examples data
-examples/data/isolated_locations/static/output_graph/
-examples/data/isolated_locations/static/output/
+examples/data/*/static/output_graph/
+examples/data/*/output/
 examples/cache/

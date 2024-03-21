@@ -1,0 +1,330 @@
+"""
+                    GNU GENERAL PUBLIC LICENSE
+                      Version 3, 29 June 2007
+
+    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+    Copyright (C) 2023 Stichting Deltares
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+import logging
+from configparser import ConfigParser
+from pathlib import Path
+from shutil import copyfile
+
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
+    AnalysisSectionBase,
+    AnalysisSectionDirect,
+    AnalysisSectionIndirect,
+    DirectAnalysisNameList,
+    IndirectAnalysisNameList,
+    ProjectSection,
+)
+from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
+    AnalysisDirectEnum,
+)
+from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
+    AnalysisIndirectEnum,
+)
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
+from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
+from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
+from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
+    RiskCalculationModeEnum,
+)
+from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.common.configuration.ini_configuration_reader_protocol import (
+    ConfigDataReaderProtocol,
+)
+
+
+class AnalysisConfigDataReader(ConfigDataReaderProtocol):
+    """
+    Reads the analysis configuration file analyses.ini.
+    Takes network_data as optional input. If not provided, it will read the network configuration
+    from the network.ini in the output folder.
+    """
+
+    _parser: ConfigParser
+
+    def __init__(self) -> None:
+        self._parser = ConfigParser(
+            inline_comment_prefixes="#",
+            converters={"list": lambda x: [x.strip() for x in x.split(",")]},
+        )
+
+    def read(self, ini_file: Path) -> AnalysisConfigData:
+        if not isinstance(ini_file, Path) or not ini_file.is_file():
+            raise ValueError("No analysis ini file 'Path' provided.")
+        self._parser.read(ini_file)
+        self._remove_none_values()
+
+        _parent_dir = ini_file.parent
+        _config_data = AnalysisConfigData(
+            root_path=_parent_dir.parent,
+            input_path=_parent_dir.joinpath("input"),
+            static_path=_parent_dir.joinpath("static"),
+            output_path=_parent_dir.joinpath("output"),
+            **self._get_sections(),
+        )
+        _config_data.project.name = _parent_dir.name
+
+        self._copy_output_files(ini_file, _config_data)
+
+        return _config_data
+
+    def _remove_none_values(self) -> None:
+        # Remove 'None' from values, replace them with empty strings
+        for _section in self._parser.sections():
+            _keys_with_none = [
+                k for k, v in self._parser[_section].items() if v == "None"
+            ]
+            for _key_with_none in _keys_with_none:
+                self._parser[_section].pop(_key_with_none)
+
+    def _get_sections(self) -> dict:
+        return {
+            "project": self.get_project_section(),
+            "analyses": self.get_analysis_sections(),
+        }
+
+    def get_project_section(self) -> ProjectSection:
+        return ProjectSection(**self._parser["project"])
+
+    def _get_analysis_section_indirect(
+        self, section_name: str
+    ) -> AnalysisSectionIndirect:
+        _section = AnalysisSectionIndirect(**self._parser[section_name])
+        _section.analysis = AnalysisIndirectEnum.get_enum(
+            self._parser.get(section_name, "analysis", fallback=None)
+        )
+        _section.save_gpkg = self._parser.getboolean(
+            section_name, "save_gpkg", fallback=_section.save_gpkg
+        )
+        _section.save_csv = self._parser.getboolean(
+            section_name, "save_csv", fallback=_section.save_csv
+        )
+        _weighing = self._parser.get(section_name, "weighing", fallback=None)
+        # Map distance -> length
+        if _weighing == "distance":
+            _section.weighing = WeighingEnum.LENGTH
+        else:
+            _section.weighing = WeighingEnum.get_enum(_weighing)
+        _section.loss_type = LossTypeEnum.get_enum(
+            self._parser.get(section_name, "loss_type", fallback=None)
+        )
+        # losses
+        _section.traffic_cols = self._parser.getlist(
+            section_name, "traffic_cols", fallback=_section.traffic_cols
+        )
+        _section.duration_event = self._parser.getfloat(
+            section_name,
+            "duration_event",
+            fallback=_section.duration_event,
+        )  # TODO remove the deprecated attribute that have been replaced by csv
+        _section.duration_disruption = self._parser.getfloat(
+            section_name,
+            "duration_disruption",
+            fallback=_section.duration_disruption,
+        )
+        _section.fraction_detour = self._parser.getfloat(
+            section_name,
+            "fraction_detour",
+            fallback=_section.fraction_detour,
+        )
+        _section.fraction_drivethrough = self._parser.getfloat(
+            section_name,
+            "fraction_drivethrough",
+            fallback=_section.fraction_drivethrough,
+        )
+        _section.rest_capacity = self._parser.getfloat(
+            section_name,
+            "rest_capacity",
+            fallback=_section.rest_capacity,
+        )
+        _section.maximum_jam = self._parser.getfloat(
+            section_name,
+            "maximum_jam",
+            fallback=_section.maximum_jam,
+        )
+        # accessiblity analyses
+        _section.threshold = self._parser.getfloat(
+            section_name,
+            "threshold",
+            fallback=_section.threshold,
+        )
+        _section.threshold_destinations = self._parser.getfloat(
+            section_name,
+            "threshold_destinations",
+            fallback=_section.threshold_destinations,
+        )
+        _section.uniform_duration = self._parser.getfloat(
+            section_name,
+            "uniform_duration",
+            fallback=_section.uniform_duration,
+        )
+        _section.gdp_percapita = self._parser.getfloat(
+            section_name,
+            "gdp_percapita",
+            fallback=_section.gdp_percapita,
+        )
+        _section.calculate_route_without_disruption = self._parser.getboolean(
+            section_name,
+            "calculate_route_without_disruption",
+            fallback=_section.calculate_route_without_disruption,
+        )
+        _section.buffer_meters = self._parser.getfloat(
+            section_name,
+            "buffer_meters",
+            fallback=_section.buffer_meters,
+        )
+        _section.threshold_locations = self._parser.getfloat(
+            section_name,
+            "threshold_locations",
+            fallback=_section.threshold_locations,
+        )
+        _section.save_traffic = self._parser.getboolean(
+            section_name, "save_traffic", fallback=_section.save_traffic
+        )
+
+        return _section
+
+    def _get_analysis_section_direct(self, section_name: str) -> AnalysisSectionDirect:
+        _section = AnalysisSectionDirect(**self._parser[section_name])
+        _section.analysis = AnalysisDirectEnum.get_enum(
+            self._parser.get(section_name, "analysis", fallback=None)
+        )
+        _section.save_gpkg = self._parser.getboolean(
+            section_name, "save_gpkg", fallback=_section.save_gpkg
+        )
+        _section.save_csv = self._parser.getboolean(
+            section_name, "save_csv", fallback=_section.save_csv
+        )
+        # adaptation/effectiveness measures
+        _section.return_period = self._parser.getfloat(
+            section_name,
+            "return_period",
+            fallback=_section.return_period,
+        )
+        _section.repair_costs = self._parser.getfloat(
+            section_name,
+            "repair_costs",
+            fallback=_section.repair_costs,
+        )
+        _section.evaluation_period = self._parser.getfloat(
+            section_name,
+            "evaluation_period",
+            fallback=_section.evaluation_period,
+        )
+        _section.interest_rate = self._parser.getfloat(
+            section_name,
+            "interest_rate",
+            fallback=_section.interest_rate,
+        )
+        _section.climate_factor = self._parser.getfloat(
+            section_name,
+            "climate_factor",
+            fallback=_section.climate_factor,
+        )
+        _section.climate_period = self._parser.getfloat(
+            section_name,
+            "climate_period",
+            fallback=_section.climate_period,
+        )
+        # road damage
+        _section.event_type = EventTypeEnum.get_enum(
+            self._parser.get(section_name, "event_type", fallback=None)
+        )
+        _section.risk_calculation_mode = RiskCalculationModeEnum.get_enum(
+            self._parser.get(section_name, "risk_calculation_mode", fallback=None)
+        )
+        _section.risk_calculation_year = self._parser.getint(
+            section_name,
+            "risk_calculation_year",
+            fallback=_section.risk_calculation_year,
+        )
+        _section.damage_curve = DamageCurveEnum.get_enum(
+            self._parser.get(section_name, "damage_curve", fallback=None)
+        )
+        _section.create_table = self._parser.getboolean(
+            section_name,
+            "create_table",
+            fallback=_section.create_table,
+        )
+        return _section
+
+    def get_analysis_sections(self) -> list[AnalysisSectionBase]:
+        """
+        Extracts info from [analysis<n>] sections
+
+        Returns:
+            list[AnalysisSection]: List of analyses (both direct and indirect)
+        """
+        _analysis_sections = []
+
+        _section_names = list(
+            section_name
+            for section_name in self._parser.sections()
+            if "analysis" in section_name
+        )
+        for _section_name in _section_names:
+            _analysis_type = self._parser.get(_section_name, "analysis")
+            if _analysis_type in DirectAnalysisNameList:
+                _analysis_section = self._get_analysis_section_direct(_section_name)
+            elif _analysis_type in IndirectAnalysisNameList:
+                _analysis_section = self._get_analysis_section_indirect(_section_name)
+            else:
+                raise ValueError(f"Analysis {_analysis_type} not supported.")
+            _analysis_sections.append(_analysis_section)
+
+        return _analysis_sections
+
+    def _copy_output_files(
+        self, from_path: Path, config_data: AnalysisConfigData
+    ) -> None:
+        _output_dir = config_data.root_path.joinpath(config_data.project.name, "output")
+        config_data.output_path = _output_dir
+        if not _output_dir.exists():
+            _output_dir.mkdir(parents=True)
+        try:
+            copyfile(
+                from_path,
+                config_data.output_path.joinpath("{}.ini".format(from_path.stem)),
+            )
+        except FileNotFoundError as e:
+            logging.warning(e)
+
+    def _parse_path_list(
+        self, property_name: str, path_list: str, config_data: AnalysisConfigData
+    ) -> list[Path]:
+        _list_paths = []
+        for path_value in path_list.split(","):
+            path_value = Path(path_value)
+            if path_value.is_file():
+                _list_paths.append(path_value)
+                continue
+
+            _project_name_dir = config_data.root_path.joinpath(config_data.project.name)
+            abs_path = _project_name_dir.joinpath("static", property_name, path_value)
+            try:
+                assert abs_path.is_file()
+            except AssertionError:
+                abs_path = _project_name_dir.joinpath(
+                    "input", property_name, path_value
+                )
+
+            _list_paths.append(abs_path)
+        return _list_paths
