@@ -28,13 +28,11 @@ import momepy
 import networkx as nx
 import pandas as pd
 import pyproj
-from geopandas import GeoDataFrame
 from tqdm import tqdm
 from shapely.geometry import Point
-from networkx import MultiDiGraph, Graph
 
 import ra2ce.network.networks_utils as nut
-from ra2ce.graph.exporters.json_exporter import JsonExporter
+from ra2ce.network.exporters.json_exporter import JsonExporter
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
@@ -86,7 +84,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
         graph_complex = (
             graph_complex.to_directed()
-        )  # simplification function requires MultiDiGraph
+        )  # simplification function requires nx.MultiDiGraph
         if self._config_data.cleanup.delete_duplicate_nodes:
             graph_complex = self._delete_duplicate_nodes(graph_complex)
             # edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
@@ -105,7 +103,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         # Save the link tables linking complex and simple IDs
         self._export_linking_tables(link_tables)
 
-        if not self.directed and isinstance(graph_simple, MultiDiGraph):
+        if not self.directed and isinstance(graph_simple, nx.MultiDiGraph):
             graph_simple = graph_simple.to_undirected()
 
         # Check if all geometries between nodes are there, if not, add them as a straight line.
