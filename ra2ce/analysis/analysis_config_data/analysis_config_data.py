@@ -91,6 +91,7 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     resilience_curve_file: Optional[Path] = Path()
     traffic_intensities_file: Optional[Path] = Path()
     values_of_time_file: Optional[Path] = Path()
+    link_id: str = "fid"  # this attribute should link edges (links) between the input network/graph and the intensities
     # accessibility analyses
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     threshold: float = math.nan
