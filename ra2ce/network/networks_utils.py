@@ -702,7 +702,6 @@ def split_line_with_points(line, points):
     return segments
 
 
-
 def cut(line: BaseMultipartGeometry, distance: float) -> tuple[LineString, LineString]:
     # Cuts a line in two at a distance from its starting point
     # This is taken from shapely manual
@@ -1107,7 +1106,9 @@ def add_missing_geoms_graph(graph: nx.Graph, geom_name: str = "geometry") -> nx.
         e for e in graph.edges.data(keys=True, data=True) if geom_name not in e[-1]
     ]
     for ed in edges_without_geom:
-        if graph.nodes[ed[0]].get(geom_name, None) and graph.nodes[ed[1]].get(geom_name, None):
+        if graph.nodes[ed[0]].get(geom_name, None) and graph.nodes[ed[1]].get(
+            geom_name, None
+        ):
             graph[ed[0]][ed[1]][ed[2]][geom_name] = LineString(
                 [graph.nodes[ed[0]][geom_name], graph.nodes[ed[1]][geom_name]]
             )
@@ -1203,7 +1204,9 @@ def simplify_graph(G, strict=True, remove_rings=True, track_merged=False):
             # street... we will keep only one of the edges (see below)
             edge_count = G.number_of_edges(u, v)
             if edge_count != 1:
-                utils.log(f"Found {edge_count} edges between {u} and {v} when simplifying")
+                utils.log(
+                    f"Found {edge_count} edges between {u} and {v} when simplifying"
+                )
 
             # get edge between these nodes: if multiple edges exist between
             # them (see above), we retain only one in the simplified graph
@@ -1226,11 +1229,11 @@ def simplify_graph(G, strict=True, remove_rings=True, track_merged=False):
             if attr in attrs_to_sum:
                 # if this attribute must be summed, sum it now
                 path_attributes[attr] = sum(path_attributes[attr])
-            elif attr != 'geometry' and len(set(path_attributes[attr])) == 1:
+            elif attr != "geometry" and len(set(path_attributes[attr])) == 1:
                 # if there's only 1 unique value in this attribute list,
                 # consolidate it to the single value (the zero-th):
                 path_attributes[attr] = path_attributes[attr][0]
-            elif attr != 'geometry':
+            elif attr != "geometry":
                 # otherwise, if there are multiple values, keep one of each
                 path_attributes[attr] = list(set(path_attributes[attr]))
 
@@ -1238,14 +1241,18 @@ def simplify_graph(G, strict=True, remove_rings=True, track_merged=False):
         if all("geometry" in G.nodes[node] for node in path):
             # Check if all nodes in the path have "geometry" attribute
             # Use existing geometries to create LineString
-            path_attributes["geometry"] = LineString([G.nodes[node]["geometry"] for node in path])
+            path_attributes["geometry"] = LineString(
+                [G.nodes[node]["geometry"] for node in path]
+            )
         elif all("x" in G.nodes[node] and "y" in G.nodes[node] for node in path):
             # Create LineString using x and y coordinates
             path_attributes["geometry"] = LineString(
                 [Point((G.nodes[node]["x"], G.nodes[node]["y"])) for node in path]
             )
         else:
-            raise ValueError("All nodes in the path must have 'geometry' or 'x' and 'y' attributes.")
+            raise ValueError(
+                "All nodes in the path must have 'geometry' or 'x' and 'y' attributes."
+            )
 
         if track_merged:
             # add the merged edges as a new attribute of the simplified edge
@@ -1339,7 +1346,9 @@ def graph_to_gdf(
     return edges, nodes
 
 
-def graph_to_gpkg(origin_graph: nx.classes.graph.Graph, edge_gpkg: str, node_gpkg: str) -> None:
+def graph_to_gpkg(
+    origin_graph: nx.classes.graph.Graph, edge_gpkg: str, node_gpkg: str
+) -> None:
     """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_gpkg and node_gpkg
 
     Arguments:
@@ -1372,9 +1381,9 @@ def graph_to_gpkg(origin_graph: nx.classes.graph.Graph, edge_gpkg: str, node_gpk
 
     # The encoding utf-8 might result in an empty shapefile if the wrong encoding is used.
     for entity in [nodes, edges]:
-        if 'osmid' in entity:
+        if "osmid" in entity:
             # Otherwise it gives this error: cannot insert osmid, already exist
-            entity['osmid_original'] = entity.pop('osmid')
+            entity["osmid_original"] = entity.pop("osmid")
     for _path in [node_gpkg, edge_gpkg]:
         if _path.exists():
             _path.unlink()

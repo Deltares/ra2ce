@@ -29,8 +29,8 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
     hazard_names: HazardNames
 
     def __init__(
-            self,
-            analysis_input: AnalysisInputWrapper,
+        self,
+        analysis_input: AnalysisInputWrapper,
     ) -> None:
         self.analysis = analysis_input.analysis
         self.graph_file_hazard = analysis_input.graph_file_hazard
@@ -64,7 +64,9 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
             edges_remove = []
             for e in _graph.edges.data(keys=True):
                 if (hazard_name in e[-1]) and (
-                        ('bridge' not in e[-1]) or ('bridge' in e[-1] and e[-1]['bridge'] != "yes")):
+                    ("bridge" not in e[-1])
+                    or ("bridge" in e[-1] and e[-1]["bridge"] != "yes")
+                ):
                     edges_remove.append(e)
             edges_remove = [e for e in edges_remove if (e[-1][hazard_name] is not None)]
             edges_remove = [

@@ -27,7 +27,6 @@ from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 
 
 class AnalysisResultWrapperExporter:
-
     def export_result(
         self,
         result_wrapper: AnalysisResultWrapper,

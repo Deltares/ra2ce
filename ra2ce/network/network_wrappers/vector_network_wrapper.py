@@ -64,7 +64,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         self.output_graph_dir = config_data.output_graph_dir
 
     def get_network(
-            self,
+        self,
     ) -> tuple[nx.Graph, gpd.GeoDataFrame]:
         """Gets a network built from vector files.
 
@@ -76,13 +76,17 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         gdf = self.clean_vector(gdf)
         if self.directed:
             graph = self.get_direct_graph_from_vector(
-                gdf, edge_attributes_to_include=["avgspeed", "bridge", "tunnel"])
+                gdf, edge_attributes_to_include=["avgspeed", "bridge", "tunnel"]
+            )
         else:
             graph = self.get_indirect_graph_from_vector(
-                gdf, edge_attributes_to_include=["avgspeed", "bridge", "tunnel"])
+                gdf, edge_attributes_to_include=["avgspeed", "bridge", "tunnel"]
+            )
         edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
         graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
-        graph_complex = graph_complex.to_directed()  # simplification function requires MultiDiGraph
+        graph_complex = (
+            graph_complex.to_directed()
+        )  # simplification function requires MultiDiGraph
         if self._config_data.cleanup.delete_duplicate_nodes:
             graph_complex = self._delete_duplicate_nodes(graph_complex)
             # edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
@@ -166,8 +170,11 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         location_to_representative = {}
 
         # Iterate through nodes and add representative nodes to the mapping
-        for node, data in tqdm(graph_complex.nodes(data=True), desc="Creating graph with removed node duplicates"):
-            location = (round(data['geometry'].x, 7), round(data['geometry'].y, 7))
+        for node, data in tqdm(
+            graph_complex.nodes(data=True),
+            desc="Creating graph with removed node duplicates",
+        ):
+            location = (round(data["geometry"].x, 7), round(data["geometry"].y, 7))
             if location not in location_to_representative:
                 location_to_representative[location] = node
 
@@ -175,38 +182,65 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         updated_graph = nx.MultiGraph()
 
         updated_graph.add_nodes_from(
-            (representative_node, {'geometry': Point(location)})
-            for location, representative_node in location_to_representative.items())
+            (representative_node, {"geometry": Point(location)})
+            for location, representative_node in location_to_representative.items()
+        )
 
         # Add edges to the updated_graph
-        for u, v, data in tqdm(graph_complex.edges(data=True), desc="Adding edges to the updated graph"):
-            u_representative = location_to_representative.get((round(graph_complex.nodes[u]['geometry'].x, 7),
-                                                               round(graph_complex.nodes[u]['geometry'].y, 7)))
-            v_representative = location_to_representative.get((round(graph_complex.nodes[v]['geometry'].x, 7),
-                                                               round(graph_complex.nodes[v]['geometry'].y, 7)))
+        for u, v, data in tqdm(
+            graph_complex.edges(data=True), desc="Adding edges to the updated graph"
+        ):
+            u_representative = location_to_representative.get(
+                (
+                    round(graph_complex.nodes[u]["geometry"].x, 7),
+                    round(graph_complex.nodes[u]["geometry"].y, 7),
+                )
+            )
+            v_representative = location_to_representative.get(
+                (
+                    round(graph_complex.nodes[v]["geometry"].x, 7),
+                    round(graph_complex.nodes[v]["geometry"].y, 7),
+                )
+            )
 
             if u_representative is not None and v_representative is not None:
                 # Add representative nodes if they don't exist in the updated graph
                 if not updated_graph.has_node(u_representative):
-                    updated_graph.add_node(u_representative,
-                                           geometry=Point((round(graph_complex.nodes[u]['geometry'].x, 7),
-                                                           round(graph_complex.nodes[u]['geometry'].y, 7))))
+                    updated_graph.add_node(
+                        u_representative,
+                        geometry=Point(
+                            (
+                                round(graph_complex.nodes[u]["geometry"].x, 7),
+                                round(graph_complex.nodes[u]["geometry"].y, 7),
+                            )
+                        ),
+                    )
 
                 if not updated_graph.has_node(v_representative):
-                    updated_graph.add_node(v_representative,
-                                           geometry=Point((round(graph_complex.nodes[v]['geometry'].x, 7),
-                                                           round(graph_complex.nodes[v]['geometry'].y, 7))))
+                    updated_graph.add_node(
+                        v_representative,
+                        geometry=Point(
+                            (
+                                round(graph_complex.nodes[v]["geometry"].x, 7),
+                                round(graph_complex.nodes[v]["geometry"].y, 7),
+                            )
+                        ),
+                    )
 
                 # Add edges to the updated graph
                 updated_graph.add_edge(u_representative, v_representative, **data)
 
         # Set the CRS for updated_graph equal to the CRS of graph_complex
-        updated_graph.graph['crs'] = graph_complex.graph.get('crs', pyproj.CRS('EPSG:4326'))
-        updated_graph.graph['name'] = graph_complex.graph.get('name', None)
+        updated_graph.graph["crs"] = graph_complex.graph.get(
+            "crs", pyproj.CRS("EPSG:4326")
+        )
+        updated_graph.graph["name"] = graph_complex.graph.get("name", None)
         return updated_graph
 
     @staticmethod
-    def get_direct_graph_from_vector(gdf: gpd.GeoDataFrame, edge_attributes_to_include=None) -> nx.DiGraph:
+    def get_direct_graph_from_vector(
+        gdf: gpd.GeoDataFrame, edge_attributes_to_include=None
+    ) -> nx.DiGraph:
         """Creates a simple directed graph with node and edge geometries based on a given GeoDataFrame.
 
         Args:
@@ -243,14 +277,20 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             )
             if len(edge_attributes_to_include) > 0:
                 for edge_attribute_to_include in edge_attributes_to_include:
-                    edge_attribute = row[edge_attribute_to_include] if edge_attribute_to_include in row else None
+                    edge_attribute = (
+                        row[edge_attribute_to_include]
+                        if edge_attribute_to_include in row
+                        else None
+                    )
                     if edge_attribute:
                         edge_data = digraph[from_node][to_node]
                         edge_data[edge_attribute_to_include] = edge_attribute
         return digraph
 
     @staticmethod
-    def get_indirect_graph_from_vector(gdf: gpd.GeoDataFrame, edge_attributes_to_include: list) -> nx.Graph:
+    def get_indirect_graph_from_vector(
+        gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
+    ) -> nx.Graph:
         """Creates a simple undirected graph with node and edge geometries based on a given GeoDataFrame.
 
         Args:
@@ -336,10 +376,10 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         )
 
     def _get_avg_speed(
-            self, original_graph: nx.classes.graph.Graph
+        self, original_graph: nx.classes.graph.Graph
     ) -> nx.classes.graph.Graph:
         if all(["length" in e for u, v, e in original_graph.edges.data()]) and any(
-                ["maxspeed" in e for u, v, e in original_graph.edges.data()]
+            ["maxspeed" in e for u, v, e in original_graph.edges.data()]
         ):
             # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
             path_avg_speed = self.output_graph_dir.joinpath("avg_speed.csv")

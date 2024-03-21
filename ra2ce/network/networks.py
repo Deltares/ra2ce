@@ -81,7 +81,7 @@ class Network:
         self.graph_files = graph_files
 
     def add_od_nodes(
-            self, graph: nx.classes.graph.Graph, crs: pyproj.CRS
+        self, graph: nx.classes.graph.Graph, crs: pyproj.CRS
     ) -> nx.classes.graph.Graph:
         """Adds origins and destinations nodes from shapefiles to the graph.
 
@@ -157,21 +157,23 @@ class Network:
         self.graph_files.set_graph(graph_type, network)
 
     def _get_new_network_and_graph(
-            self, export_types: list[str]
+        self, export_types: list[str]
     ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
         def _include_attributes(attributes: list, graph: nx.Graph) -> nx.Graph:
             def _add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
                 for node, data in graph.nodes(data=True):
-                    if 'x' not in data or 'y' not in data:
+                    if "x" not in data or "y" not in data:
                         # Use 'geometry' or provide default values if it's not present
-                        geometry = data.get('geometry', (0.0, 0.0))
-                        data.setdefault('x', round(geometry.x, 7))
-                        data.setdefault('y', round(geometry.y, 7))
+                        geometry = data.get("geometry", (0.0, 0.0))
+                        data.setdefault("x", round(geometry.x, 7))
+                        data.setdefault("y", round(geometry.y, 7))
                 return graph
 
             # If required_attributes are provided, check if all edges already have them
-            if attributes and all(all(attr in edge_data for attr in attributes) for _, _, edge_data in
-                                  graph.edges(data=True)):
+            if attributes and all(
+                all(attr in edge_data for attr in attributes)
+                for _, _, edge_data in graph.edges(data=True)
+            ):
                 # If all required attributes are present, return the original graph
                 return graph
             graph = _add_x_y_to_nodes(graph)
@@ -204,7 +206,9 @@ class Network:
             lambda x: nut.line_length(x, _network_gdf.crs)
         )
 
-        _base_graph = _include_attributes(attributes=["avgspeed", "bridge", "tunnel"], graph=_base_graph)
+        _base_graph = _include_attributes(
+            attributes=["avgspeed", "bridge", "tunnel"], graph=_base_graph
+        )
 
         # Save the graph and geodataframe
         self._export_network_files(_base_graph, "base_graph", export_types)
