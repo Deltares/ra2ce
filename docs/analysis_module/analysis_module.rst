@@ -96,7 +96,8 @@ Origin-Destination, defined OD couples, no disruption    optimal_route_origin_de
 Origin-Destination, defined OD couples, no disruption    multi_link_origin_destination
 Origin-Destination, O to closest D, disruption           optimal_route_origin_closest_destination
 Origin-Destination,  O to closest D, disruption          multi_link_origin_closest_destination
-Isolated locations                                       multi_link_isolated_locations 
+Isolated locations                                       multi_link_isolated_locations
+Equity and traffic analysis                              part of optimal_route_origin_destination    
 ======================================================   =====================
 
 **Single link redundancy**
@@ -173,7 +174,7 @@ This analysis provides insight into the impact of a hazard in terms of detour ti
     weighing = time
     aggregate_wl = max
     threshold = 0.5
-    save_shp = True
+    save_gpkg = True
     save_csv = True
 
 **Origin-Destination, defined OD couples**
@@ -194,7 +195,7 @@ RA2CE allows for origin-destination analyses. This analysis finds the shortest (
     polygon = Extent_Network_wgs84.geojson
     network_type = drive
     road_types = motorway,motorway_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,residential
-    save_shp = True
+    save_gpkg = True
 
     [origins_destinations]
     origins = origins_worldpop_wgs84.shp
@@ -216,7 +217,7 @@ RA2CE allows for origin-destination analyses. This analysis finds the shortest (
     name = example_od
     analysis = optimal_route_origin_destination
     weighing = distance
-    save_shp = True
+    save_gpkg = True
     save_csv = True
 
 **network.ini for the case with hazard**
@@ -256,7 +257,7 @@ RA2CE allows for origin-destination analyses. This analysis finds the shortest (
     name = example_od
     analysis = multi_link_origin_destination
     weighing = distance
-    save_shp = True
+    save_gpkg = True
     save_csv = True
 
 **Origin-Destination, defined origins to closest destinations**
@@ -277,7 +278,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
     polygon = Extent_Network_wgs84.geojson
     network_type = drive
     road_types = motorway,motorway_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,residential
-    save_shp = True
+    save_gpkg = True
 
     [origins_destinations]
     origins = origins_worldpop_wgs84.shp
@@ -299,7 +300,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
     name = example_od
     analysis = optimal_route_origin_closest_destination
     weighing = distance
-    save_shp = True
+    save_gpkg= True
     save_csv = True
 
 **network.ini for the case with hazard**
@@ -317,7 +318,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
     polygon = Extent_Network_wgs84.geojson
     network_type = drive
     road_types = motorway,motorway_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,residential
-    save_shp = True
+    save_gpkg = True
 
     [origins_destinations]
     origins = origins_worldpop_wgs84.shp
@@ -349,7 +350,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
     threshold = 1
     weighing = distance
     calculate_route_without_disruption = True
-    save_shp = True
+    save_gpkg = True
     save_csv = True
 
 **Isolated locations**
@@ -371,7 +372,7 @@ This analysis finds the sections of the network that are fully isolated from the
     polygon = Extent_Network_wgs84.geojson
     network_type = drive
     road_types = motorway,motorway_link,trunk,trunk_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,unclassified,residential
-    save_shp = True
+    save_gpkg = True
 
     [origins_destinations]
     origins = origins_worldpop_wgs84.shp
@@ -409,5 +410,64 @@ This analysis finds the sections of the network that are fully isolated from the
     weighing = length
     buffer_meters = 1000
     category_field_name = category
-    save_shp = True
+    save_gpkg = True
+    save_csv = True
+
+
+**Traffic and equity analysis**
+This analysis allows for network criticality analysis taking into account three distributive equity principles: utilitarian, egalitarian and prioritarian principles. For more background knowledge on these principles and the application on transport network criticality analysis, please read: https://www.sciencedirect.com/science/article/pii/S0965856420308077> The purpose of the equity analysis is providing insight into how different distributive principles can result in different prioritizations of the network. While we usually prioritize network interventions based on the number of people that use the road, equity principles allow us to also take into account the function of the network for for example underpriviliged communities. Depending on the equity principle applied, your network prioritization might change, which can change decision-making.
+This analysis is set up generically so that the user can determine the equity weights themselves. This can for example be GINI-coefficients or social vulnerability scores. The user-defined equity weights will feed into the prioritarian principle. The equity analysis example notebook will guide you through the use of this analysis.     
+
+**network.ini**
+
+::
+
+    [project]
+    name = example_indirect
+
+    [network]
+    directed = False
+    source = OSM download
+    primary_file = None
+    diversion_file = None
+    file_id = rfid_c
+    polygon = Extent_Network_wgs84.geojson
+    network_type = drive
+    road_types = motorway,motorway_link,trunk,trunk_link,primary,primary_link,secondary,secondary_link,tertiary,tertiary_link,unclassified,residential
+    save_gpkg = True
+
+    [origins_destinations]
+    origins = origins_points.shp # Must be in the static/network folder, belongs to this analysis. origins should hold counts (e.g. how many people live in the origin)
+    destinations = destination_points.shp # Must be in the static/network folder, belongs to this analysis
+    origins_names = A
+    destinations_names = B
+    id_name_origin_destination = OBJECTID 
+    origin_count = values #necessary if traffic on each edge should be recorded in optimal_route_origin_destination
+    origin_out_fraction = 1
+    category = category #column name in destinations specifying the different destination categories (e.g. hospital, school, etc.)
+    region = region.shp #a shapefile outlining the reigon's geometry, necessary for distributional / equity analysis
+    region_var = DESA #the region's name recorded in a column of the region shapefile
+
+    [hazard]
+    hazard_map = None
+    hazard_id = None
+    hazard_field_name = None
+    aggregate_wl = None
+    hazard_crs = None
+
+
+**analyses.ini**
+
+::
+
+    [project]
+    name = equity_analysis
+    
+    [analysis1]
+    name = optimal route origin destination
+    analysis = optimal_route_origin_destination
+    weighing = length
+    save_traffic = True #True if you want to record the traffic in each edge
+    equity_weight = region_weight.csv #equity-weighted factors for each region, should be stored in static/network. Note that 'region' and 'region_var' should present in network.ini
+    save_gpkg = True
     save_csv = True
