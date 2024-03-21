@@ -21,7 +21,7 @@
 
 import logging
 from pathlib import Path
-from typing import Any, Tuple
+from typing import Any
 
 import geopandas as gpd
 import momepy
