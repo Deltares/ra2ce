@@ -7,7 +7,6 @@ Introduction
 ---------------------------------
 This user guide introduces how to run Ra2ce in a public cloud environment.
 
-It 
 
 How to build the cloud docker image
 ---------------------------------

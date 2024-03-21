@@ -61,6 +61,16 @@ module "eks" {
       min_size     = 1
       max_size     = 3
       desired_size = 1
+    },
+
+    two = {
+      name = "argo-worker"
+
+      instance_types = ["m5.xlarge"]
+
+      min_size     = 0
+      max_size     = 3
+      desired_size = 0
     }
   }
 }
