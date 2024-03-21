@@ -9,6 +9,7 @@ from tqdm import tqdm
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.analysis.indirect.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
@@ -21,33 +22,25 @@ from ra2ce.network.network_config_data.network_config_data import (
 
 
 class OptimalRouteOriginDestination(AnalysisIndirectProtocol):
-    graph_file: GraphFile
     analysis: AnalysisSectionIndirect
+    graph_file: GraphFile
     input_path: Path
     static_path: Path
     output_path: Path
     hazard_names: HazardNames
     origins_destinations: OriginsDestinationsSection
-    result: GeoDataFrame
 
     def __init__(
         self,
-        graph_file: GraphFile,
-        analysis: AnalysisSectionIndirect,
-        input_path: Path,
-        static_path: Path,
-        output_path: Path,
-        hazard_names: HazardNames,
-        origins_destinations: OriginsDestinationsSection,
+        analysis_input: AnalysisInputWrapper,
     ) -> None:
-        self.graph_file = graph_file
-        self.analysis = analysis
-        self.input_path = input_path
-        self.static_path = static_path
-        self.output_path = output_path
-        self.hazard_names = hazard_names
-        self.origins_destinations = origins_destinations
-        self.result = None
+        self.analysis = analysis_input.analysis
+        self.graph_file = analysis_input.graph_file
+        self.input_path = analysis_input.input_path
+        self.static_path = analysis_input.static_path
+        self.output_path = analysis_input.output_path
+        self.hazard_names = analysis_input.hazard_names
+        self.origins_destinations = analysis_input.origins_destinations
 
     @staticmethod
     def extract_od_nodes_from_graph(
