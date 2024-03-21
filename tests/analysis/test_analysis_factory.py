@@ -70,7 +70,7 @@ class TestAnalysisFactory:
 
         # 3. Verify expectations.
         assert isinstance(_result, AnalysisDirectProtocol)
-        assert _result.graph_file == _config.graph_files.base_network_hazard
+        assert _result.graph_file_hazard == _config.graph_files.base_network_hazard
         assert _result.analysis == _analysis
 
     def test_get_analysis_with_indirect(self):

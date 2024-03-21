@@ -11,6 +11,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.analysis.indirect.weighing_analysis.weighing_analysis_factory import (
     WeighingAnalysisFactory,
@@ -20,30 +21,23 @@ from ra2ce.network.hazard.hazard_names import HazardNames
 
 
 class MultiLinkRedundancy(AnalysisIndirectProtocol):
-    graph_file: GraphFile
     analysis: AnalysisSectionIndirect
+    graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path
     output_path: Path
     hazard_names: HazardNames
-    result: GeoDataFrame
 
     def __init__(
         self,
-        graph_file: GraphFile,
-        analysis: AnalysisSectionIndirect,
-        input_path: Path,
-        static_path: Path,
-        output_path: Path,
-        hazard_names: HazardNames,
+        analysis_input: AnalysisInputWrapper,
     ) -> None:
-        self.graph_file = graph_file
-        self.analysis = analysis
-        self.input_path = input_path
-        self.static_path = static_path
-        self.output_path = output_path
-        self.hazard_names = hazard_names
-        self.result = None
+        self.analysis = analysis_input.analysis
+        self.graph_file_hazard = analysis_input.graph_file_hazard
+        self.input_path = analysis_input.input_path
+        self.static_path = analysis_input.static_path
+        self.output_path = analysis_input.output_path
+        self.hazard_names = analysis_input.hazard_names
 
     def execute(self) -> GeoDataFrame:
         """Calculates the multi-link redundancy of a NetworkX graph.
@@ -56,7 +50,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
             aggregated_results (GeoDataFrame): The results of the analysis aggregated into a table.
         """
         results = []
-        master_graph = copy.deepcopy(self.graph_file.graph)
+        master_graph = copy.deepcopy(self.graph_file_hazard.get_graph())
         for hazard in self.hazard_names.names:
             hazard_name = self.hazard_names.get_name(hazard)
 

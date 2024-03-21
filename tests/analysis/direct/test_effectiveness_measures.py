@@ -7,6 +7,8 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDirect,
 )
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
 from tests import test_data
 
@@ -30,8 +32,13 @@ class TestEffectivenessMeasures:
             climate_period=2.4,
             file_name=None,
         )
+        _config = AnalysisConfigWrapper()
+        _config.config_data.input_path = test_data
+        _analysis_input = AnalysisInputWrapper.from_input(
+            _analysis, _config, None, None
+        )
         with pytest.raises(ValueError) as exc_err:
-            EffectivenessMeasures(None, _analysis, test_data, None)
+            EffectivenessMeasures(_analysis_input)
         assert (
             str(exc_err.value)
             == "Effectiveness of measures calculation: No input file configured. Please define an input file in the analysis.ini file."
@@ -47,8 +54,13 @@ class TestEffectivenessMeasures:
             climate_period=2.4,
             file_name=Path("just_a_file.txt"),
         )
+        _config = AnalysisConfigWrapper()
+        _config.config_data.input_path = test_data
+        _analysis_input = AnalysisInputWrapper.from_input(
+            _analysis, _config, None, None
+        )
         with pytest.raises(ValueError) as exc_err:
-            EffectivenessMeasures(None, _analysis, test_data, None)
+            EffectivenessMeasures(_analysis_input)
         assert (
             str(exc_err.value)
             == "Effectiveness of measures calculation: Wrong input file configured. Extension of input file is -.txt-, needs to be -.shp- (shapefile)"
@@ -65,14 +77,16 @@ class TestEffectivenessMeasures:
             climate_period=2.4,
             file_name=Path("filedoesnotexist.shp"),
         )
+        _config = AnalysisConfigWrapper()
+        _config.config_data.input_path = test_data
+        _input_wrapper = AnalysisInputWrapper.from_input(_analysis, _config, None, None)
         with pytest.raises(FileNotFoundError) as exc_err:
-            EffectivenessMeasures(None, _analysis, test_data, None)
+            EffectivenessMeasures(_input_wrapper)
         assert str(exc_err.value) == str(
             _config_data.input_path.joinpath("direct", "filedoesnotexist.shp")
         )
 
     def test_init_raises_when_effectiveness_measures_does_not_exist(self):
-        _config_data = AnalysisConfigData(input_path=test_data)
         _analysis = AnalysisSectionDirect(
             return_period=None,
             repair_costs=None,
@@ -82,11 +96,18 @@ class TestEffectivenessMeasures:
             climate_period=2.4,
             file_name=Path("origins.shp"),
         )
-        assert (_config_data.input_path.joinpath("direct", "origins.shp")).exists()
+        _config = AnalysisConfigWrapper()
+        _config.config_data.input_path = test_data
+        _input_wrapper = AnalysisInputWrapper.from_input(_analysis, _config, None, None)
+        assert (
+            _config.config_data.input_path.joinpath("direct", "origins.shp")
+        ).exists()
         with pytest.raises(FileNotFoundError) as exc_err:
-            EffectivenessMeasures(None, _analysis, test_data, None)
+            EffectivenessMeasures(_input_wrapper)
         assert str(exc_err.value) == str(
-            _config_data.input_path.joinpath("direct", "effectiveness_measures.csv")
+            _config.config_data.input_path.joinpath(
+                "direct", "effectiveness_measures.csv"
+            )
         )
 
     @pytest.mark.parametrize(
