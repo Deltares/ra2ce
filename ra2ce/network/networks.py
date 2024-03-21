@@ -27,7 +27,6 @@ import pyproj
 
 import osmnx
 import copy
-from geopandas import GeoDataFrame
 
 from ra2ce.network import networks_utils as nut
 from ra2ce.network.exporters.network_exporter_factory import NetworkExporterFactory
@@ -142,7 +141,7 @@ class Network:
 
     def _export_network_files(
         self,
-        network: nx.MultiGraph | GeoDataFrame,
+        network: nx.MultiGraph | gpd.GeoDataFrame,
         graph_type: str,
         types_to_export: list[str],
     ):
@@ -225,7 +224,7 @@ class Network:
 
         def get_graph(
             file_type: str, file_path: Path | None
-        ) -> nx.MultiGraph | GeoDataFrame:
+        ) -> nx.MultiGraph | gpd.GeoDataFrame:
             graph = self.graph_files.get_graph(file_type)
             if graph is None:
                 raise FileNotFoundError(
