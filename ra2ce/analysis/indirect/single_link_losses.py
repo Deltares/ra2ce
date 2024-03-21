@@ -62,6 +62,8 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
         self.graph_file = graph_file
         self.analysis = analysis
+        self.link_id = self.analysis.link_id
+
         self.performance_metric = f'diff_{self.analysis.weighing}'
 
         self.part_of_day: PartOfDayEnum = analysis.part_of_day
