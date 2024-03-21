@@ -10,6 +10,7 @@ from pyproj import CRS
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
@@ -17,30 +18,23 @@ from ra2ce.network.networks_utils import buffer_geometry, graph_to_gdf
 
 
 class MultiLinkIsolatedLocations(AnalysisIndirectProtocol):
-    graph_file: GraphFile
     analysis: AnalysisSectionIndirect
+    graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path
     output_path: Path
     hazard_names: HazardNames
-    result: GeoDataFrame
 
     def __init__(
         self,
-        graph_file: GraphFile,
-        analysis: AnalysisSectionIndirect,
-        input_path: Path,
-        static_path: Path,
-        output_path: Path,
-        hazard_names: HazardNames,
+        analysis_input: AnalysisInputWrapper,
     ) -> None:
-        self.graph_file = graph_file
-        self.analysis = analysis
-        self.input_path = input_path
-        self.static_path = static_path
-        self.output_path = output_path
-        self.hazard_names = hazard_names
-        self.result = None
+        self.analysis = analysis_input.analysis
+        self.graph_file_hazard = analysis_input.graph_file_hazard
+        self.input_path = analysis_input.input_path
+        self.static_path = analysis_input.static_path
+        self.output_path = analysis_input.output_path
+        self.hazard_names = analysis_input.hazard_names
 
     def utm_crs(self, bbox: list[float]) -> CRS:
         """Returns wkt string of nearest UTM projects
@@ -262,7 +256,7 @@ class MultiLinkIsolatedLocations(AnalysisIndirectProtocol):
         _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
 
         (gdf, df) = self.multi_link_isolated_locations(
-            self.graph_file.get_graph(), self.analysis
+            self.graph_file_hazard.get_graph(), self.analysis
         )
 
         df_path = _output_path.joinpath(

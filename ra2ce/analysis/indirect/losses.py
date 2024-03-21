@@ -34,6 +34,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
@@ -41,53 +42,46 @@ from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEn
 
 
 class Losses(AnalysisIndirectProtocol):
-    graph_file: GraphFile
     analysis: AnalysisSectionIndirect
+    graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path
     output_path: Path
     hazard_names: HazardNames
-    result: GeoDataFrame
 
     def __init__(
         self,
-        graph_file: GraphFile,
-        analysis: AnalysisSectionIndirect,
-        input_path: Path,
-        static_path: Path,
-        output_path: Path,
-        hazard_names: HazardNames,
+        analysis_input: AnalysisInputWrapper,
     ) -> None:
-        self.graph_file = graph_file
-        self.analysis = analysis
-        self.input_path = input_path
-        self.static_path = static_path
-        self.output_path = output_path
-        self.hazard_names = hazard_names
-        self.result = None
+        self.analysis = analysis_input.analysis
+        self.graph_file_hazard = analysis_input.graph_file_hazard
+        self.input_path = analysis_input.input_path
+        self.static_path = analysis_input.static_path
+        self.output_path = analysis_input.output_path
+        self.hazard_names = analysis_input.hazard_names
 
-        self.losses_input_path: Path = input_path.joinpath("losses")
-        self.part_of_day: PartOfDayEnum = analysis.part_of_day
-        self.performance_metric = analysis.performance
-        self.analysis_type = analysis.analysis
+        self.losses_input_path: Path = self.input_path.joinpath("losses")
+        self.part_of_day: PartOfDayEnum = self.analysis.part_of_day
+        self.performance_metric = self.analysis.performance
+        self.analysis_type = self.analysis.analysis
 
         # Load Dataframes
         self.network = self._load_gdf(self.input_path.joinpath("network.geojson"))
         self.intensities = self._load_df_from_csv(
-            analysis.traffic_intensities_file, [], sep=","
+            self.analysis.traffic_intensities_file, [], sep=","
         )  # per day
 
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
         self.criticality_data = self._load_df_from_csv(
-            self.input_path.joinpath(f"{analysis.name}.csv"), [], sep=","
+            self.input_path.joinpath(f"{self.analysis.name}.csv"), [], sep=","
         )
         self.resilience_curve = self._load_df_from_csv(
-            (analysis.resilience_curve_file),
+            (self.analysis.resilience_curve_file),
             ["duration_steps", "functionality_loss_ratio"],
             sep=";",
         )
         self.values_of_time = self._load_df_from_csv(
-            analysis.values_of_time_file, [], sep=";"
+            self.analysis.values_of_time_file, [], sep=";"
         )
         self._check_validity_df()
 
@@ -331,7 +325,7 @@ class Losses(AnalysisIndirectProtocol):
         return list(_link_types), list(_hazard_intensity_ranges)
 
     def execute(self) -> GeoDataFrame:
-        _gdf_in = self.graph_file.get_graph()
+        _gdf_in = self.graph_file_hazard.get_graph()
         df = self.calculate_losses_from_table()
 
         return _gdf_in.merge(df, how="left", on="LinkNr")
