@@ -70,7 +70,7 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         self.analysis_type = analysis.analysis
         self.duration_event: float = analysis.duration_event
 
-        self.intensities = self._load_df_from_csv(analysis.traffic_intensities_file, [])  # per day
+        self._load_verified_intensities()
         self.resilience_curve = self._load_df_from_csv(analysis.resilience_curve_file,
                                                        ["duration_steps",
                                                         "functionality_loss_ratio"], sep=";"
@@ -84,6 +84,12 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         self.hazard_names = hazard_names
 
         self.result = gpd.GeoDataFrame()
+
+    def _load_verified_intensities(self):
+        self.intensities = self._load_df_from_csv(self.analysis.traffic_intensities_file, [])  # per day
+        if self.link_id not in self.intensities.columns:
+            raise Exception(f'''traffic_intensities_file and input graph do not have the same link_id.
+{self.link_id} is passed for feature ids of the graph''')
 
     def _check_validity_df(self):
         """
