@@ -34,8 +34,6 @@ import pyproj
 import rasterio
 import rasterio.mask
 import rasterio.transform
-from networkx import Graph
-from shapely.geometry import LineString
 from rasterio import Affine
 from rasterio.warp import Resampling, calculate_default_transform, reproject
 from shapely.geometry import LineString, Point
