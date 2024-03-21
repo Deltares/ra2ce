@@ -179,9 +179,10 @@ class Network:
             gdf_nodes, gdf_edges = osmnx.graph_to_gdfs(graph)
             updated_graph = copy.deepcopy(graph)
             for attribute in attributes:
-                attribute_values_gdf = gdf_edges[attribute]
-                for (u, v, key), attribute_values in attribute_values_gdf.items():
-                    updated_graph[u][v][key]["bridge"] = attribute_values
+                if attribute in gdf_edges.column:
+                    attribute_values_gdf = gdf_edges[attribute]
+                    for (u, v, key), attribute_values in attribute_values_gdf.items():
+                        updated_graph[u][v][key]["bridge"] = attribute_values
             return updated_graph
 
         _base_graph, _network_gdf = NetworkWrapperFactory(
