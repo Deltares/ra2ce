@@ -43,8 +43,8 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
     """
 
     def __init__(
-        self,
-        config_data: NetworkConfigData,
+            self,
+            config_data: NetworkConfigData,
     ) -> None:
         self.crs = config_data.crs
 
@@ -54,9 +54,10 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         # Origins Destinations
         self.region_path = config_data.origins_destinations.region
+        self.file_id = config_data.network.file_id
 
     def get_network(
-        self,
+            self,
     ) -> tuple[nx.MultiGraph, gpd.GeoDataFrame]:
         """Gets a network built from vector files.
 
@@ -122,8 +123,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         )
         return gdf
 
-    @staticmethod
-    def get_direct_graph_from_vector(gdf: gpd.GeoDataFrame) -> nx.DiGraph:
+    def get_direct_graph_from_vector(self, gdf: gpd.GeoDataFrame) -> nx.DiGraph:
         """Creates a simple directed graph with node and edge geometries based on a given GeoDataFrame.
 
         Args:
@@ -134,26 +134,27 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             nx.DiGraph: NetworkX graph object with "crs", "approach" as graph properties.
         """
 
-        # simple geometry handeling
+        # simple geometry handling
         gdf = VectorNetworkWrapper.explode_and_deduplicate_geometries(gdf)
 
         # to graph
         digraph = nx.DiGraph(crs=gdf.crs, approach="primal")
         for _, row in gdf.iterrows():
-            link_id = row.get("link_id", None)
+            link_id = row.get(self.file_id, None)
 
             from_node = row.geometry.coords[0]
             to_node = row.geometry.coords[-1]
+            edge_attributes = {
+                f"{self.file_id}": link_id,
+                "avgspeed": row.pop("avgspeed") if "avgspeed" in row else None,
+                "geometry": row.pop("geometry")
+            }
             digraph.add_node(from_node, geometry=Point(from_node))
             digraph.add_node(to_node, geometry=Point(to_node))
             digraph.add_edge(
                 from_node,
                 to_node,
-                link_id=link_id,
-                avgspeed=row.pop("avgspeed") if "avgspeed" in row else None,
-                geometry=row.pop(
-                    "geometry"
-                ),  # **row TODO: check if we do need all columns
+                **edge_attributes,  # **row TODO: check if we do need all columns
             )
 
         return digraph
@@ -174,7 +175,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
     @staticmethod
     def get_network_edges_and_nodes_from_graph(
-        graph: nx.Graph,
+            graph: nx.Graph,
     ) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
         """Sets up network nodes and edges from a given graph.
 
@@ -190,7 +191,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         # TODO ths function use conventions. Good to make consistant convention with osm
         nodes, edges = momepy.nx_to_gdf(graph, nodeID="node_fid")
         edges["edge_fid"] = (
-            edges["node_start"].astype(str) + "_" + edges["node_end"].astype(str)
+                edges["node_start"].astype(str) + "_" + edges["node_end"].astype(str)
         )
         edges.rename(
             {"node_start": "node_A", "node_end": "node_B"}, axis=1, inplace=True
