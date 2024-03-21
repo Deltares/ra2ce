@@ -19,7 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 
 from ra2ce.configuration.config_wrapper import ConfigWrapper
@@ -52,5 +51,5 @@ class AnalysisRunnerFactory:
         # Initialized selected supported runner (First one available).
         _selected_runner = _supported_runners[0]()
         if len(_supported_runners) > 1:
-            logging.warn(f"More than one runner available, using {_selected_runner}")
+            logging.warning(f"More than one runner available, using {_selected_runner}")
         return _selected_runner
