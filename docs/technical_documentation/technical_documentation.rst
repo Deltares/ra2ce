@@ -9,7 +9,5 @@ Technical Documentation
 
    network_package
 
-
-
 .. include:: ../../ra2ce/README.md
    :parser: myst_parser.sphinx_
