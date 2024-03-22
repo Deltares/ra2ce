@@ -55,6 +55,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         # Origins Destinations
         self.region_path = config_data.origins_destinations.region
         self.file_id = config_data.network.file_id
+        self.link_type_column = config_data.network.link_type_column
 
     def get_network(
             self,
@@ -141,11 +142,13 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         digraph = nx.DiGraph(crs=gdf.crs, approach="primal")
         for _, row in gdf.iterrows():
             link_id = row.get(self.file_id, None)
+            link_type = row.get(self.link_type_column, None)
 
             from_node = row.geometry.coords[0]
             to_node = row.geometry.coords[-1]
             edge_attributes = {
                 f"{self.file_id}": link_id,
+                f"{self.link_type_column}": link_type,
                 "avgspeed": row.pop("avgspeed") if "avgspeed" in row else None,
                 "geometry": row.pop("geometry")
             }
