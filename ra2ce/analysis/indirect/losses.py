@@ -82,6 +82,7 @@ class Losses(AnalysisIndirectProtocol):
         self.analysis = analysis
         self.network_config_data = network_config_data
         self.link_id = self.network_config_data.network.file_id
+        self.link_type_column = self.network_config_data.network.link_type_column
 
         self.performance_metric = f'diff_{self.analysis.weighing}'
 
@@ -89,11 +90,11 @@ class Losses(AnalysisIndirectProtocol):
         self.analysis_type = analysis.analysis
         self.duration_event: float = analysis.duration_event
 
-        self._load_verified_intensities()
+        self.intensities = _load_df_from_csv(self.analysis.traffic_intensities_file, [])  # per day
         self.resilience_curve = _load_df_from_csv(analysis.resilience_curve_file,
-                                                       ["duration_steps",
-                                                        "functionality_loss_ratio"], sep=";"
-                                                       )
+                                                  ["duration_steps",
+                                                   "functionality_loss_ratio"], sep=";"
+                                                  )
         self.values_of_time = _load_df_from_csv(analysis.values_of_time_file, [], sep=";")
         self._check_validity_df()
 
@@ -103,12 +104,6 @@ class Losses(AnalysisIndirectProtocol):
         self.hazard_names = hazard_names
 
         self.result = gpd.GeoDataFrame()
-
-    def _load_verified_intensities(self):
-        self.intensities = _load_df_from_csv(self.analysis.traffic_intensities_file, [])  # per day
-        if self.link_id not in self.intensities.columns:
-            raise Exception(f'''traffic_intensities_file and input graph do not have the same link_id.
-{self.link_id} is passed for feature ids of the graph''')
 
     def _check_validity_df(self):
         """
@@ -124,6 +119,10 @@ class Losses(AnalysisIndirectProtocol):
         if len(self.resilience_curve) > 0 and not all(
                 key in self.resilience_curve.columns for key in _required_resilience_curve_keys):
             raise ValueError(f"Missing required columns in resilience_curve: {_required_resilience_curve_keys}")
+
+        if self.link_id not in self.intensities.columns:
+            raise Exception(f'''traffic_intensities_file and input graph do not have the same link_id.
+        {self.link_id} is passed for feature ids of the graph''')
 
     def _load_gdf(self, gdf_path: Path) -> gpd.GeoDataFrame:
         """This method reads the dataframe created from a .csv"""
@@ -157,6 +156,12 @@ class Losses(AnalysisIndirectProtocol):
         return dict(_vot_dict)
 
     def calc_vlh(self, criticality_analysis) -> pd.DataFrame:
+        def _check_validity_criticality_analysis():
+            if self.link_type_column not in criticality_analysis.columns:
+                raise Exception(f'''criticality_analysis results does not have the passed link_type_column.
+            {self.link_type_column} is passed as link_type_column''')
+
+        _check_validity_criticality_analysis()
         _link_types_heights_ranges = self._get_link_types_heights_ranges()
         _hazard_intensity_ranges = _link_types_heights_ranges[1]
 
