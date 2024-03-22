@@ -1,17 +1,10 @@
-.. automodule:: ra2ce
-    :members:
-
 .. _technical_documentation:
 
 Technical Documentation
 =======================
 
-Running RA2CE
-------------------
+.. toctree::
+   :caption: Table of Contents
+   :maxdepth: 2
 
-.. autosummary::
-    :toctree: _generated
-
-    ra2ce.ra2ce_handler.Ra2ceHandler.configure
-    ra2ce.ra2ce_handler.Ra2ceHandler.run_analysis
-
+   network_package
