@@ -6,6 +6,13 @@ Analyses can be identified as:
 - `indirect`: calculating the economical **losses** that are a consequence of the damage to the infrastructure.
 Each analysis should comply to the `AnalysisProtocol`.
 
+## General class overview
+The following diagram describes the relations between the most relevant entities of the `ra2ce.analysis` (sub-)package.
+
+| ![ra2ce_analysis.jpg](../../docs/_diagrams/ra2ce_analysis.png)| 
+|:--:| 
+| *Ra2ce analysis overview* |
+
 ## Configuration
 The analyses can be configured in `analysis.ini` or directly in an `AnalysisConfigData` object.
 
