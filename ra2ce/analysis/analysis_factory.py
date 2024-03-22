@@ -55,7 +55,6 @@ from ra2ce.analysis.indirect.optimal_route_origin_destination import (
 )
 from ra2ce.analysis.indirect.single_link_losses import SingleLinkLosses
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
-from ra2ce.network.hazard.hazard_names import HazardNames
 
 
 class AnalysisFactory:
