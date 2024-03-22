@@ -29,7 +29,7 @@ import pandas as pd
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionIndirect,
+    AnalysisSectionIndirect, AnalysisConfigData,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import AnalysisIndirectEnum
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
@@ -40,7 +40,24 @@ from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEn
 from ra2ce.network.network_config_data.network_config_data import NetworkSection
 
 
-class SingleLinkLosses(AnalysisIndirectProtocol):
+def _load_df_from_csv(
+        csv_path: Path,
+        columns_to_interpret: list[str],
+        sep: str = ",",
+) -> pd.DataFrame:
+    if csv_path is None or not csv_path.exists():
+        logging.warning("No `csv` file found at {}.".format(csv_path))
+        return pd.DataFrame()
+
+    _csv_dataframe = pd.read_csv(csv_path, sep=sep, on_bad_lines='skip')
+    if any(columns_to_interpret):
+        _csv_dataframe[columns_to_interpret] = _csv_dataframe[
+            columns_to_interpret
+        ].applymap(literal_eval)
+    return _csv_dataframe
+
+
+class Losses(AnalysisIndirectProtocol):
     network: NetworkSection
     graph_file: GraphFile
     analysis: AnalysisSectionIndirect
@@ -52,6 +69,7 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
 
     def __init__(
             self,
+            network_config_data: AnalysisConfigData,
             graph_file: GraphFile,
             analysis: AnalysisSectionIndirect,
             input_path: Path,
@@ -62,7 +80,8 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
         self.graph_file = graph_file
         self.analysis = analysis
-        self.link_id = self.analysis.link_id
+        self.network_config_data = network_config_data
+        self.link_id = self.network_config_data.network.file_id
 
         self.performance_metric = f'diff_{self.analysis.weighing}'
 
@@ -71,11 +90,11 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         self.duration_event: float = analysis.duration_event
 
         self._load_verified_intensities()
-        self.resilience_curve = self._load_df_from_csv(analysis.resilience_curve_file,
+        self.resilience_curve = _load_df_from_csv(analysis.resilience_curve_file,
                                                        ["duration_steps",
                                                         "functionality_loss_ratio"], sep=";"
                                                        )
-        self.values_of_time = self._load_df_from_csv(analysis.values_of_time_file, [], sep=";")
+        self.values_of_time = _load_df_from_csv(analysis.values_of_time_file, [], sep=";")
         self._check_validity_df()
 
         self.input_path = input_path
@@ -86,7 +105,7 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         self.result = gpd.GeoDataFrame()
 
     def _load_verified_intensities(self):
-        self.intensities = self._load_df_from_csv(self.analysis.traffic_intensities_file, [])  # per day
+        self.intensities = _load_df_from_csv(self.analysis.traffic_intensities_file, [])  # per day
         if self.link_id not in self.intensities.columns:
             raise Exception(f'''traffic_intensities_file and input graph do not have the same link_id.
 {self.link_id} is passed for feature ids of the graph''')
@@ -105,23 +124,6 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         if len(self.resilience_curve) > 0 and not all(
                 key in self.resilience_curve.columns for key in _required_resilience_curve_keys):
             raise ValueError(f"Missing required columns in resilience_curve: {_required_resilience_curve_keys}")
-
-    def _load_df_from_csv(
-            self,
-            csv_path: Path,
-            columns_to_interpret: list[str],
-            sep: str = ",",
-    ) -> pd.DataFrame:
-        if csv_path is None or not csv_path.exists():
-            logging.warning("No `csv` file found at {}.".format(csv_path))
-            return pd.DataFrame()
-
-        _csv_dataframe = pd.read_csv(csv_path, sep=sep, on_bad_lines='skip')
-        if any(columns_to_interpret):
-            _csv_dataframe[columns_to_interpret] = _csv_dataframe[
-                columns_to_interpret
-            ].applymap(literal_eval)
-        return _csv_dataframe
 
     def _load_gdf(self, gdf_path: Path) -> gpd.GeoDataFrame:
         """This method reads the dataframe created from a .csv"""
@@ -309,7 +311,8 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
             self.hazard_names,
         ).execute()
 
-        _single_link_losses = SingleLinkLosses(
+        _single_link_losses = Losses(
+            network_config_data=self.network_config_data,
             graph_file=self.graph_file,
             analysis=self.analysis,
             input_path=Path(),
