@@ -4,9 +4,16 @@ In this package you will find all logic required to load network data from diver
 
 The configuration to be used to load a network is usually an `.ini` file. This file is later represented as a `NetworkConfigData` object that can as well be directly initialized via code (`network_config_data` (sub)package).
 
-The different sources are handled through our own network wrappers (`NetworkWrapperProtocol`) in the `network_wrappers` (sub)package.
+The different sources to generate a network are handled through our own network wrappers (`NetworkWrapperProtocol`) in the `network_wrappers` (sub)package.
 
 
-_TODO_
+## General class overview
+
+The following diagram describes the relations between the most relevant entities of the `ra2ce.network` (sub-)package.
+
+| ![ra2ce_network.jpg](../../docs/_diagrams/ra2ce_network.png)| 
+|:--:| 
+| *Ra2ce network overview* |
+
 Add class diagram
 Add flowchart diagram of loading a diagram
