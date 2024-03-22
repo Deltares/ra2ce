@@ -174,7 +174,7 @@ class Losses(AnalysisIndirectProtocol):
 
         # shape vlh
         vlh = pd.DataFrame(
-            index=self.intensities[f"{self.link_id}"],  # "link_type"
+            index=self.intensities[f"{self.link_id}"]
         )
         events = criticality_analysis.filter(regex="^EV")
         # Read the performance_change stating the functionality drop
@@ -183,7 +183,7 @@ class Losses(AnalysisIndirectProtocol):
         # find the link_type and the hazard intensity
         vlh = pd.merge(
             vlh,
-            criticality_analysis[[f"{self.link_id}", "link_type"]],
+            criticality_analysis[[f"{self.link_id}", f"{self.link_type_column}"]],
             left_index=True,
             right_on=f"{self.link_id}",
         )
