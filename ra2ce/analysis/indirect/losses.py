@@ -23,6 +23,7 @@ import logging
 from ast import literal_eval
 from collections import defaultdict
 from pathlib import Path
+from typing import Optional
 
 import geopandas as gpd
 import pandas as pd
@@ -42,6 +43,7 @@ from ra2ce.network.network_config_data.network_config_data import NetworkSection
 def _load_df_from_csv(
         csv_path: Path,
         columns_to_interpret: list[str],
+        index: Optional[str | None],
         sep: str = ",",
 ) -> pd.DataFrame:
     if csv_path is None or not csv_path.exists():
@@ -56,6 +58,8 @@ def _load_df_from_csv(
         _csv_dataframe[columns_to_interpret] = _csv_dataframe[
             columns_to_interpret
         ].applymap(literal_eval)
+    if index:
+        _csv_dataframe.set_index(index, inplace=True)
     return _csv_dataframe
 
 
@@ -85,6 +89,7 @@ class Losses(AnalysisIndirectProtocol):
         self.network_config_data = network_config_data
         self.link_id = self.network_config_data.network.file_id
         self.link_type_column = self.network_config_data.network.link_type_column
+        self.trip_purposes = self.analysis.trip_purposes
 
         self.performance_metric = f'diff_{self.analysis.weighing}'
 
@@ -92,12 +97,14 @@ class Losses(AnalysisIndirectProtocol):
         self.analysis_type = analysis.analysis
         self.duration_event: float = analysis.duration_event
 
-        self.intensities = _load_df_from_csv(self.analysis.traffic_intensities_file, [])  # per day
+        self.intensities = _load_df_from_csv(
+            self.analysis.traffic_intensities_file, [], self.link_id)  # per day
         self.resilience_curve = _load_df_from_csv(analysis.resilience_curve_file,
                                                   ["duration_steps",
-                                                   "functionality_loss_ratio"], sep=";"
+                                                   "functionality_loss_ratio"], None, sep=";"
                                                   )
-        self.values_of_time = _load_df_from_csv(analysis.values_of_time_file, [], sep=";")
+        self.values_of_time = _load_df_from_csv(analysis.values_of_time_file, [], None, sep=";")
+        self.vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose()
         self._check_validity_df()
 
         self.input_path = input_path
@@ -122,7 +129,7 @@ class Losses(AnalysisIndirectProtocol):
                 key in self.resilience_curve.columns for key in _required_resilience_curve_keys):
             raise ValueError(f"Missing required columns in resilience_curve: {_required_resilience_curve_keys}")
 
-        if self.link_id not in self.intensities.columns:
+        if self.link_id not in self.intensities.columns and self.link_id not in self.intensities.index.name:
             raise Exception(f'''traffic_intensities_file and input graph do not have the same link_id.
         {self.link_id} is passed for feature ids of the graph''')
 
@@ -134,13 +141,13 @@ class Losses(AnalysisIndirectProtocol):
         return gpd.GeoDataFrame()
 
     def _get_vot_intensity_per_trip_purpose(
-            self, trip_types: list[str]
+            self
     ) -> dict[str, pd.DataFrame]:
         """
         Generates a dictionary with all available `vot_purpose` with their intensity as a `pd.DataFrame`.
         """
         _vot_dict = defaultdict(pd.DataFrame)
-        for purpose in trip_types:
+        for purpose in self.trip_purposes:
             vot_var_name = f"vot_{purpose}"
             partofday_trip_purpose_name = f"{self.part_of_day}_{purpose}"
             partofday_trip_purpose_intensity_name = (
@@ -148,7 +155,7 @@ class Losses(AnalysisIndirectProtocol):
             )
             # read and set the vot's
             _vot_dict[vot_var_name] = self.values_of_time.loc[
-                self.values_of_time["trip_types"] == purpose, "value_of_time"
+                self.values_of_time["trip_types"] == purpose.config_value, "value_of_time"
             ].item()
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
@@ -157,7 +164,7 @@ class Losses(AnalysisIndirectProtocol):
             )
         return dict(_vot_dict)
 
-    def calc_vlh(self, criticality_analysis) -> pd.DataFrame:
+    def calc_vlh(self, criticality_analysis: GeoDataFrame) -> pd.DataFrame:
         def _check_validity_criticality_analysis():
             if self.link_type_column not in criticality_analysis.columns:
                 raise Exception(f'''criticality_analysis results does not have the passed link_type_column.
@@ -170,30 +177,33 @@ class Losses(AnalysisIndirectProtocol):
                     return f"{x}-{y}"
             raise ValueError(f"No matching range found for height {height}")
 
+        criticality_analysis.set_index(self.link_id, inplace=True)
         _check_validity_criticality_analysis()
         _hazard_intensity_ranges = self._get_link_types_heights_ranges()[1]
 
         # shape vlh
         vlh = pd.DataFrame(
-            index=self.intensities[f"{self.link_id}"]
+            index=self.intensities.index
         )
 
         criticality_analysis["EV1_ma"] = 1.2  # ToDO: replace with the HazardOverlay results in the graph_file
-        events = criticality_analysis.filter(regex="^EV")
+        criticality_analysis["EV1_fr"] = 0.1
+        events = criticality_analysis.filter(regex=r'^EV(?!1_fr)')
         # Read the performance_change stating the functionality drop
         performance_change = criticality_analysis[self.performance_metric]
 
         # find the link_type and the hazard intensity
         vlh = pd.merge(
             vlh,
-            criticality_analysis[[f"{self.link_id}", f"{self.link_type_column}"]+ list(events.columns)],
+            criticality_analysis[[f"{self.link_type_column}"] + list(events.columns)],
             left_index=True,
-            right_on=f"{self.link_id}",
+            right_index=True,
         )
-        for _, vlh_row in vlh.iterrows():
-            for event in events:
+        for event in events.columns:
+            for _, vlh_row in vlh.iterrows():
                 row_hazard_range = _get_range(vlh_row[event])
-                self._populate_vlh_df(vlh, row_hazard_range, vlh_row, performance_change, event)
+                row_performance_change = performance_change.loc[vlh_row.name]
+                self._populate_vlh_df(vlh, row_hazard_range, vlh_row, row_performance_change, event)
 
         return vlh
 
@@ -201,12 +211,6 @@ class Losses(AnalysisIndirectProtocol):
                          performance_change, hazard_col_name: str):
 
         vlh_total = 0
-        _trip_types = ["business", "commute", "freight",
-                       "other"]  # TODO code smell: this should be either a Enum or read from csv (make a new PR)
-
-        _vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose(
-            _trip_types
-        )
 
         link_type_hazard_range = (
             f"{vlh_row['link_type']}_{row_hazard_range}"
@@ -223,24 +227,31 @@ class Losses(AnalysisIndirectProtocol):
         ].item()
 
         # get vlh_trip_type_event
-        for trip_type in _trip_types:
-            intensity_trip_type = _vot_intensity_per_trip_collection[
+        for trip_type in self.trip_purposes:
+            intensity_trip_type = self.vot_intensity_per_trip_collection[
                 f"intensity_{self.part_of_day}_{trip_type}"
-            ]
+            ].loc[vlh_row.name]
 
-            vot_trip_type = float(_vot_intensity_per_trip_collection[
+            vot_trip_type = float(self.vot_intensity_per_trip_collection[
                                       f"vot_{trip_type}"
                                   ])
 
-            vlh_trip_type_event = sum(
-                intensity_trip_type * duration * loss_ratio * performance_change * vot_trip_type
-                for duration, loss_ratio in zip(
-                    duration_steps, functionality_loss_ratios
-                )
+            vlh_trip_type_event = pd.DataFrame(
+                data=sum(
+                    intensity_trip_type * duration * loss_ratio * performance_change * vot_trip_type
+                    for duration, loss_ratio in zip(
+                        duration_steps, functionality_loss_ratios
+                    )
+                ),
+                columns=[f"vlh_{trip_type}_{hazard_col_name}"]
             )
-
-            vlh[f"vlh_{trip_type}_{hazard_col_name}"] = vlh_trip_type_event
-            vlh_total += vlh_trip_type_event
+            vlh = pd.merge(
+                vlh,
+                vlh_trip_type_event,
+                left_index=True,
+                right_index=True,
+            )
+            vlh_total += vlh_trip_type_event[f"vlh_{trip_type}_{hazard_col_name}"].sum()
         vlh[f"vlh_{hazard_col_name}_total"] = vlh_total
 
     def calculate_losses_from_table(self) -> pd.DataFrame:
