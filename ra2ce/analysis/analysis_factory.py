@@ -51,7 +51,7 @@ from ra2ce.analysis.indirect.optimal_route_origin_closest_destination import (
 from ra2ce.analysis.indirect.optimal_route_origin_destination import (
     OptimalRouteOriginDestination,
 )
-from ra2ce.analysis.indirect.single_link_losses import SingleLinkLosses
+from ra2ce.analysis.indirect.losses import Losses
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.network.hazard.hazard_names import HazardNames
 
@@ -160,7 +160,8 @@ class AnalysisFactory:
                 file_id=analysis_config.config_data.network.file_id,
             )
         if analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
-            return SingleLinkLosses(
+            return Losses(
+                network_config_data=analysis_config.config_data,
                 graph_file=analysis_config.graph_files.base_graph,
                 **_input_dict
             )

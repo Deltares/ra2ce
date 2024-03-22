@@ -91,7 +91,6 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     resilience_curve_file: Optional[Path] = Path()
     traffic_intensities_file: Optional[Path] = Path()
     values_of_time_file: Optional[Path] = Path()
-    link_id: str = "fid"  # this attribute should link edges (links) between the input network/graph (generated in
     # the redundancy analysis) and the intensities
     # accessibility analyses
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
@@ -135,7 +134,7 @@ class AnalysisSectionDirect(AnalysisSectionBase):
 class AnalysisConfigData(ConfigDataProtocol):
     """
     Reflects all config data from analysis.ini with defaults set.
-    Additionally some attributes from the network config are added for completeness (files, origins_destinations, network, hazard_names)
+    Additionally, some attributes from the network config are added for completeness (files, origins_destinations, network, hazard_names)
     """
 
     root_path: Optional[Path] = None
