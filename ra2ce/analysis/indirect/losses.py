@@ -31,7 +31,6 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect, AnalysisConfigData,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import AnalysisIndirectEnum
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.network.graph_files.graph_file import GraphFile
@@ -50,6 +49,9 @@ def _load_df_from_csv(
         return pd.DataFrame()
 
     _csv_dataframe = pd.read_csv(csv_path, sep=sep, on_bad_lines='skip')
+    if "geometry" in _csv_dataframe.columns:
+        raise Exception(f"The csv file in {csv_path} should not have a geometry column")
+
     if any(columns_to_interpret):
         _csv_dataframe[columns_to_interpret] = _csv_dataframe[
             columns_to_interpret
@@ -140,7 +142,7 @@ class Losses(AnalysisIndirectProtocol):
         _vot_dict = defaultdict(pd.DataFrame)
         for purpose in trip_types:
             vot_var_name = f"vot_{purpose}"
-            partofday_trip_purpose_name = f"{self.part_of_day.config_value}_{purpose}"
+            partofday_trip_purpose_name = f"{self.part_of_day}_{purpose}"
             partofday_trip_purpose_intensity_name = (
                     "intensity_" + partofday_trip_purpose_name
             )
@@ -161,21 +163,22 @@ class Losses(AnalysisIndirectProtocol):
                 raise Exception(f'''criticality_analysis results does not have the passed link_type_column.
             {self.link_type_column} is passed as link_type_column''')
 
-        _check_validity_criticality_analysis()
-        _link_types_heights_ranges = self._get_link_types_heights_ranges()
-        _hazard_intensity_ranges = _link_types_heights_ranges[1]
-
         def _get_range(height: float) -> str:
             for range_tuple in _hazard_intensity_ranges:
                 x, y = range_tuple
                 if x <= height <= y:
-                    return f"{x}_{y}"
+                    return f"{x}-{y}"
             raise ValueError(f"No matching range found for height {height}")
+
+        _check_validity_criticality_analysis()
+        _hazard_intensity_ranges = self._get_link_types_heights_ranges()[1]
 
         # shape vlh
         vlh = pd.DataFrame(
             index=self.intensities[f"{self.link_id}"]
         )
+
+        criticality_analysis["EV1_ma"] = 1.2  # ToDO: replace with the HazardOverlay results in the graph_file
         events = criticality_analysis.filter(regex="^EV")
         # Read the performance_change stating the functionality drop
         performance_change = criticality_analysis[self.performance_metric]
@@ -183,37 +186,14 @@ class Losses(AnalysisIndirectProtocol):
         # find the link_type and the hazard intensity
         vlh = pd.merge(
             vlh,
-            criticality_analysis[[f"{self.link_id}", f"{self.link_type_column}"]],
+            criticality_analysis[[f"{self.link_id}", f"{self.link_type_column}"]+ list(events.columns)],
             left_index=True,
             right_on=f"{self.link_id}",
         )
-
-        if self.analysis_type == AnalysisIndirectEnum.MULTI_LINK_LOSSES:  # only useful for MULTI_LINK_LOSSES
-            vlh = pd.merge(
-                vlh,
-                criticality_analysis[[f"{self.link_id}"] + list(events.columns)],
-                left_index=True,
-                right_on=f"{self.link_id}",
-            )
-
-        # for each link and for each event calculate vlh
         for _, vlh_row in vlh.iterrows():
-            if self.analysis_type == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
-
-                row_hazard_range_list = self.resilience_curve['link_type_hazard_intensity'].str.extract(
-                    r'_(\d+\.\d+)_(\d+\.\d+)', expand=True).apply(lambda x: '_'.join(x), axis=1).tolist()
-                for row_hazard_range in row_hazard_range_list:
-                    self._populate_vlh_df(vlh, row_hazard_range, vlh_row, performance_change,
-                                          row_hazard_range)
-
-
-            elif self.analysis_type == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
-                for event in events:
-                    row_hazard_range = _get_range(vlh_row[event])
-                    self._populate_vlh_df(vlh, row_hazard_range, vlh_row, performance_change, event)
-
-            else:
-                raise ValueError(f"Invalid analysis type: {self.analysis_type}")
+            for event in events:
+                row_hazard_range = _get_range(vlh_row[event])
+                self._populate_vlh_df(vlh, row_hazard_range, vlh_row, performance_change, event)
 
         return vlh
 
@@ -248,9 +228,9 @@ class Losses(AnalysisIndirectProtocol):
                 f"intensity_{self.part_of_day}_{trip_type}"
             ]
 
-            vot_trip_type = _vot_intensity_per_trip_collection[
-                f"vot_{trip_type}"
-            ]
+            vot_trip_type = float(_vot_intensity_per_trip_collection[
+                                      f"vot_{trip_type}"
+                                  ])
 
             vlh_trip_type_event = sum(
                 intensity_trip_type * duration * loss_ratio * performance_change * vot_trip_type
@@ -278,10 +258,6 @@ class Losses(AnalysisIndirectProtocol):
         for entry in self.resilience_curve["link_type_hazard_intensity"]:
             if pd.notna(entry):
                 _parts = entry.split("_")
-
-                _link_type_parts = [
-                    part for part in _parts if not any(char.isdigit() for char in part)
-                ]
                 _link_type = [
                     part
                     for part in _parts
