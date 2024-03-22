@@ -22,6 +22,7 @@
 from __future__ import annotations
 
 import math
+from configparser import ConfigParser
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -32,6 +33,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
@@ -83,11 +85,12 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     loss_per_distance: str = ""
     loss_type: str = ""  # should be enum
     disruption_per_category: str = ""
-    traffic_cols: list[str] = field(default_factory=list)
     # losses
+    traffic_cols: list[str] = field(default_factory=list)
     duration_event: float = math.nan # TODO remove the deprecated attribute that have been replaced by csv
     part_of_day: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
     performance_metric: str = "diff_time"  # "diff_time" or "diff_length" relates to the used criticality metric
+    trip_purposes: TripPurposeEnum = field(default_factory=lambda: TripPurposeEnum.NONE)
     resilience_curve_file: Optional[Path] = Path()
     traffic_intensities_file: Optional[Path] = Path()
     values_of_time_file: Optional[Path] = Path()
