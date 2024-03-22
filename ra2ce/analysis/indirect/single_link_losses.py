@@ -126,7 +126,7 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
     def _load_gdf(self, gdf_path: Path) -> gpd.GeoDataFrame:
         """This method reads the dataframe created from a .csv"""
         if gdf_path.exists():
-            return gpd.read_file(gdf_path, index_col="link_id")
+            return gpd.read_file(gdf_path, index_col=f"{self.link_id}")
         logging.warning("No `gdf` file found at {}.".format(gdf_path))
         return gpd.GeoDataFrame()
 
@@ -167,7 +167,7 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
 
         # shape vlh
         vlh = pd.DataFrame(
-            index=self.intensities.link_id,  # "link_type"
+            index=self.intensities[f"{self.link_id}"],  # "link_type"
         )
         events = criticality_analysis.filter(regex="^EV")
         # Read the performance_change stating the functionality drop
@@ -176,17 +176,17 @@ class SingleLinkLosses(AnalysisIndirectProtocol):
         # find the link_type and the hazard intensity
         vlh = pd.merge(
             vlh,
-            criticality_analysis[["link_id", "link_type"]],
+            criticality_analysis[[f"{self.link_id}", "link_type"]],
             left_index=True,
-            right_on="link_id",
+            right_on=f"{self.link_id}",
         )
 
         if self.analysis_type == AnalysisIndirectEnum.MULTI_LINK_LOSSES:  # only useful for MULTI_LINK_LOSSES
             vlh = pd.merge(
                 vlh,
-                criticality_analysis[["link_id"] + list(events.columns)],
+                criticality_analysis[[f"{self.link_id}"] + list(events.columns)],
                 left_index=True,
-                right_on="link_id",
+                right_on=f"{self.link_id}",
             )
 
         # for each link and for each event calculate vlh
