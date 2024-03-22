@@ -316,16 +316,6 @@ class Losses(AnalysisIndirectProtocol):
             self.hazard_names,
         ).execute()
 
-        _single_link_losses = Losses(
-            network_config_data=self.network_config_data,
-            graph_file=self.graph_file,
-            analysis=self.analysis,
-            input_path=Path(),
-            static_path=Path(),
-            output_path=Path(),
-            hazard_names=HazardNames(names_df=pd.DataFrame())
-        )
-
-        self.result = _single_link_losses.calc_vlh(criticality_analysis=criticality_analysis)
+        self.result = self.calc_vlh(criticality_analysis=criticality_analysis)
 
         return self.result
