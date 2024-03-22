@@ -11,6 +11,6 @@ This package is divided into different (sub-)packages, the most relevants being 
 
 A general overview of the package relationships can be seen in the following diagram.
 
-| ![ra2ce_package_overview_.png](../docs/_diagrams/ra2ce_package_overview.png)| 
+| ![ra2ce_package_overview.png](../docs/_diagrams/ra2ce_package_overview.png)| 
 |:--:| 
 | *Ra2ce package overview* |
