@@ -36,8 +36,11 @@ from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectP
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
+from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.network.network_config_data.network_config_data import NetworkSection
+import momepy
+import osmnx
 
 
 def _load_df_from_csv(
@@ -77,7 +80,6 @@ class Losses(AnalysisIndirectProtocol):
             output_path: Path,
             hazard_names: HazardNames,
     ) -> None:
-        # TODO: make sure the "link_id" is kept in the result of the criticality analysis
         self.graph_file = graph_file
         self.analysis = analysis
         self.network_config_data = network_config_data
@@ -91,9 +93,9 @@ class Losses(AnalysisIndirectProtocol):
 
         self._load_verified_intensities()
         self.resilience_curve = _load_df_from_csv(analysis.resilience_curve_file,
-                                                       ["duration_steps",
-                                                        "functionality_loss_ratio"], sep=";"
-                                                       )
+                                                  ["duration_steps",
+                                                   "functionality_loss_ratio"], sep=";"
+                                                  )
         self.values_of_time = _load_df_from_csv(analysis.values_of_time_file, [], sep=";")
         self._check_validity_df()
 
@@ -311,16 +313,16 @@ class Losses(AnalysisIndirectProtocol):
             self.hazard_names,
         ).execute()
 
-        _single_link_losses = Losses(
-            network_config_data=self.network_config_data,
-            graph_file=self.graph_file,
-            analysis=self.analysis,
-            input_path=Path(),
-            static_path=Path(),
-            output_path=Path(),
-            hazard_names=HazardNames(names_df=pd.DataFrame())
-        )
+        # filter out all links not affected by the hazard
+        if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
+            criticality_analysis = criticality_analysis[criticality_analysis['EV1_ma'] != 0]
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
+            criticality_analysis = criticality_analysis[criticality_analysis['EV1_max'] != 0]
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
+            criticality_analysis = criticality_analysis[criticality_analysis['EV1_mean'] != 0]
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
+            criticality_analysis = criticality_analysis[criticality_analysis['EV1_min'] != 0]
 
-        self.result = _single_link_losses.calc_vlh(criticality_analysis=criticality_analysis)
+        self.result = self.calc_vlh(criticality_analysis=criticality_analysis)
 
         return self.result

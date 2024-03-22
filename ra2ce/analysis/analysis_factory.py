@@ -37,7 +37,6 @@ from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectP
 from ra2ce.analysis.indirect.multi_link_isolated_locations import (
     MultiLinkIsolatedLocations,
 )
-from ra2ce.analysis.indirect.multi_link_losses import MultiLinkLosses
 from ra2ce.analysis.indirect.multi_link_origin_closest_destination import (
     MultiLinkOriginClosestDestination,
 )
@@ -162,11 +161,11 @@ class AnalysisFactory:
         if analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
             return Losses(
                 network_config_data=analysis_config.config_data,
-                graph_file=analysis_config.graph_files.base_graph,
+                graph_file=analysis_config.graph_files.base_graph_hazard,
                 **_input_dict
             )
         if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
-            return MultiLinkLosses(
+            return Losses(
                 graph_file=analysis_config.graph_files.base_graph_hazard, **_input_dict
             )
         if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS:
