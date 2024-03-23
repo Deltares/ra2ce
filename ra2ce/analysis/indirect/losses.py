@@ -160,7 +160,7 @@ class Losses(AnalysisIndirectProtocol):
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
                     self.intensities[partofday_trip_purpose_name] / 10
-                # TODO: Make a new PR to support different time scales: here 10=10hours
+                    # TODO: Make a new PR to support different time scales: here 10=10hours
             )
         return dict(_vot_dict)
 
@@ -239,11 +239,11 @@ class Losses(AnalysisIndirectProtocol):
                                   ])
 
             vlh_trip_type_event = sum(
-                    intensity_trip_type * duration * loss_ratio * performance_change * vot_trip_type
-                    for duration, loss_ratio in zip(
-                        duration_steps, functionality_loss_ratios
-                    )
+                intensity_trip_type * duration * loss_ratio * performance_change * vot_trip_type
+                for duration, loss_ratio in zip(
+                    duration_steps, functionality_loss_ratios
                 )
+            )
             vlh.loc[vlh_row.name, f"vlh_{trip_type}_{hazard_col_name}"] = vlh_trip_type_event
             vlh_total += vlh_trip_type_event
         vlh.loc[vlh_row.name, f"vlh_{hazard_col_name}_total"] = vlh_total
