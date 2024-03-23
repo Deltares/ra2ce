@@ -199,7 +199,7 @@ class Losses(AnalysisIndirectProtocol):
             left_index=True,
             right_index=True,
         )
-        for event in events.columns:
+        for event in events.columns.tolist():
             for _, vlh_row in vlh.iterrows():
                 row_hazard_range = _get_range(vlh_row[event])
                 row_performance_change = performance_change.loc[vlh_row.name]
@@ -221,6 +221,8 @@ class Losses(AnalysisIndirectProtocol):
             self.resilience_curve["link_type_hazard_intensity"]
             == link_type_hazard_range
             ]
+        if relevant_curve.size == 0:
+            raise Exception(f"""{link_type_hazard_range} was not found in the introduced resilience_curve""")
         duration_steps: list = relevant_curve["duration_steps"].item()
         functionality_loss_ratios: list = relevant_curve[
             "functionality_loss_ratio"
@@ -236,23 +238,15 @@ class Losses(AnalysisIndirectProtocol):
                                       f"vot_{trip_type}"
                                   ])
 
-            vlh_trip_type_event = pd.DataFrame(
-                data=sum(
+            vlh_trip_type_event = sum(
                     intensity_trip_type * duration * loss_ratio * performance_change * vot_trip_type
                     for duration, loss_ratio in zip(
                         duration_steps, functionality_loss_ratios
                     )
-                ),
-                columns=[f"vlh_{trip_type}_{hazard_col_name}"]
-            )
-            vlh = pd.merge(
-                vlh,
-                vlh_trip_type_event,
-                left_index=True,
-                right_index=True,
-            )
-            vlh_total += vlh_trip_type_event[f"vlh_{trip_type}_{hazard_col_name}"].sum()
-        vlh[f"vlh_{hazard_col_name}_total"] = vlh_total
+                )
+            vlh.loc[vlh_row.name, f"vlh_{trip_type}_{hazard_col_name}"] = vlh_trip_type_event
+            vlh_total += vlh_trip_type_event
+        vlh.loc[vlh_row.name, f"vlh_{hazard_col_name}_total"] = vlh_total
 
     def calculate_losses_from_table(self) -> pd.DataFrame:
         """
