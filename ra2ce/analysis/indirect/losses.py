@@ -164,7 +164,13 @@ class Losses(AnalysisIndirectProtocol):
             )
         return dict(_vot_dict)
 
-    def calc_vlh(self, criticality_analysis: GeoDataFrame) -> pd.DataFrame:
+    def calculate_vehicle_loss_hours(self, criticality_analysis: GeoDataFrame) -> gpd.GeoDataFrame:
+        """
+        This function opens an existing table with traffic data and value of time to calculate losses based on
+        detouring values. It also includes a traffic jam estimation.
+
+        criticality_analysis: GeoDataFrame results of a criticality analysis with extra detour times
+        """
         def _check_validity_criticality_analysis():
             if self.link_type_column not in criticality_analysis.columns:
                 raise Exception(f'''criticality_analysis results does not have the passed link_type_column.
@@ -180,34 +186,33 @@ class Losses(AnalysisIndirectProtocol):
         criticality_analysis.set_index(self.link_id, inplace=True)
         _check_validity_criticality_analysis()
         _hazard_intensity_ranges = self._get_link_types_heights_ranges()[1]
-
-        # shape vlh
-        vlh = pd.DataFrame(
-            index=self.intensities.index
-        )
-
         criticality_analysis["EV1_ma"] = 1.2  # ToDO: replace with the HazardOverlay results in the graph_file
         criticality_analysis["EV1_fr"] = 0.1
         events = criticality_analysis.filter(regex=r'^EV(?!1_fr)')
         # Read the performance_change stating the functionality drop
         performance_change = criticality_analysis[self.performance_metric]
 
+        # shape vehicle_loss_hours
+        vehicle_loss_hours_df = pd.DataFrame(
+            index=self.intensities.index
+        )
         # find the link_type and the hazard intensity
-        vlh = pd.merge(
-            vlh,
-            criticality_analysis[[f"{self.link_type_column}"] + list(events.columns)],
+        vehicle_loss_hours_df = pd.merge(
+            vehicle_loss_hours_df,
+            criticality_analysis[[f"{self.link_type_column}", "geometry"] + list(events.columns)],
             left_index=True,
             right_index=True,
         )
+        vehicle_loss_hours = gpd.GeoDataFrame(vehicle_loss_hours_df, geometry="geometry", crs=criticality_analysis.crs)
         for event in events.columns.tolist():
-            for _, vlh_row in vlh.iterrows():
+            for _, vlh_row in vehicle_loss_hours.iterrows():
                 row_hazard_range = _get_range(vlh_row[event])
                 row_performance_change = performance_change.loc[vlh_row.name]
-                self._populate_vlh_df(vlh, row_hazard_range, vlh_row, row_performance_change, event)
+                self._populate_vlh_df(vehicle_loss_hours, row_hazard_range, vlh_row, row_performance_change, event)
 
-        return vlh
+        return vehicle_loss_hours
 
-    def _populate_vlh_df(self, vlh: pd.DataFrame, row_hazard_range: str, vlh_row: pd.Series,
+    def _populate_vlh_df(self, vehicle_loss_hours: gpd.GeoDataFrame, row_hazard_range: str, vlh_row: pd.Series,
                          performance_change, hazard_col_name: str):
 
         vlh_total = 0
@@ -244,17 +249,9 @@ class Losses(AnalysisIndirectProtocol):
                     duration_steps, functionality_loss_ratios
                 )
             )
-            vlh.loc[vlh_row.name, f"vlh_{trip_type}_{hazard_col_name}"] = vlh_trip_type_event
+            vehicle_loss_hours.loc[vlh_row.name, f"vlh_{trip_type}_{hazard_col_name}"] = vlh_trip_type_event
             vlh_total += vlh_trip_type_event
-        vlh.loc[vlh_row.name, f"vlh_{hazard_col_name}_total"] = vlh_total
-
-    def calculate_losses_from_table(self) -> pd.DataFrame:
-        """
-        This function opens an existing table with traffic data and value of time to calculate losses based on
-        detouring values. It also includes a traffic jam estimation.
-        """
-        vlh = self.calc_vlh(criticality_analysis=gpd.GeoDataFrame())
-        return vlh
+        vehicle_loss_hours.loc[vlh_row.name, f"vlh_{hazard_col_name}_total"] = vlh_total
 
     def _get_link_types_heights_ranges(self) -> tuple[list[str], list[tuple]]:
         _link_types = set()
@@ -297,6 +294,6 @@ class Losses(AnalysisIndirectProtocol):
             self.hazard_names,
         ).execute()
 
-        self.result = self.calc_vlh(criticality_analysis=criticality_analysis)
+        self.result = self.calculate_vehicle_loss_hours(criticality_analysis=criticality_analysis)
 
         return self.result
