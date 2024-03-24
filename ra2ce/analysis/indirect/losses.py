@@ -186,8 +186,6 @@ class Losses(AnalysisIndirectProtocol):
         criticality_analysis.set_index(self.link_id, inplace=True)
         _check_validity_criticality_analysis()
         _hazard_intensity_ranges = self._get_link_types_heights_ranges()[1]
-        criticality_analysis["EV1_ma"] = 1.2  # ToDO: replace with the HazardOverlay results in the graph_file
-        criticality_analysis["EV1_fr"] = 0.1
         events = criticality_analysis.filter(regex=r'^EV(?!1_fr)')
         # Read the performance_change stating the functionality drop
         performance_change = criticality_analysis[self.performance_metric]

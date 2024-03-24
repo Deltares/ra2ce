@@ -162,7 +162,7 @@ class AnalysisFactory:
         if analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
             return Losses(
                 network_config_data=analysis_config.config_data,
-                graph_file=analysis_config.graph_files.base_graph,
+                graph_file=analysis_config.graph_files.base_graph_hazard,
                 **_input_dict
             )
         if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
