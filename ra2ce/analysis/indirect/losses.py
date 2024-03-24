@@ -284,7 +284,7 @@ class Losses(AnalysisIndirectProtocol):
 
         return list(_link_types), list(_hazard_intensity_ranges)
 
-    def execute(self) -> pd.DataFrame:
+    def execute(self) -> gpd.GeoDataFrame:
         criticality_analysis = SingleLinkRedundancy(
             self.graph_file,
             self.analysis,
