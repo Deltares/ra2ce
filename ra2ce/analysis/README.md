@@ -9,7 +9,7 @@ Each analysis should comply to the `AnalysisProtocol`.
 ## General class overview
 The following diagram describes the relations between the most relevant entities of the `ra2ce.analysis` (sub-)package.
 
-| ![ra2ce_analysis.jpg](../../docs/_diagrams/ra2ce_analysis.png)| 
+| ![ra2ce_analysis_class_diagram.drawio.png](/docs/_diagrams/ra2ce_analysis_class_diagram.drawio.png)| 
 |:--:| 
 | *Ra2ce analysis overview* |
 
