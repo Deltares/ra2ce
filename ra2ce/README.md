@@ -24,6 +24,6 @@ Other (sub-)packages carry a more 'supporting' role, such as:
 
 A general overview of the package relationships can be seen in the following diagram.
 
-| ![ra2ce_package_overview.png](/docs/_diagrams/ra2ce_package_overview.png)| 
+| ![ra2ce_package_overview.drawio.png](/docs/_diagrams/ra2ce_package_overview.drawio.png)| 
 |:--:| 
 | *Ra2ce package overview* |
