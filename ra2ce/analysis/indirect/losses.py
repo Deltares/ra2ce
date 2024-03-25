@@ -39,6 +39,7 @@ from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectP
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
+from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 
 
@@ -326,7 +327,18 @@ class Losses(AnalysisIndirectProtocol):
 
     def execute(self) -> gpd.GeoDataFrame:
         criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
+
         criticality_analysis.drop_duplicates(subset='ID', inplace=True)
+
+        # filter out all links not affected by the hazard
+        if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
+            criticality_analysis = criticality_analysis[criticality_analysis['EV1_ma'] != 0]
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
+            criticality_analysis = criticality_analysis[criticality_analysis['EV1_max'] != 0]
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
+            criticality_analysis = criticality_analysis[criticality_analysis['EV1_mean'] != 0]
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
+            criticality_analysis = criticality_analysis[criticality_analysis['EV1_min'] != 0]
 
         self.result = self.calculate_vehicle_loss_hours(criticality_analysis=criticality_analysis)
 

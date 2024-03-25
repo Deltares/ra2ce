@@ -38,7 +38,6 @@ from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectP
 from ra2ce.analysis.indirect.multi_link_isolated_locations import (
     MultiLinkIsolatedLocations,
 )
-from ra2ce.analysis.indirect.multi_link_losses import MultiLinkLosses
 from ra2ce.analysis.indirect.multi_link_origin_closest_destination import (
     MultiLinkOriginClosestDestination,
 )
@@ -60,8 +59,8 @@ class AnalysisFactory:
 
     @staticmethod
     def get_direct_analysis(
-            analysis: AnalysisSectionDirect,
-            analysis_config: AnalysisConfigWrapper,
+        analysis: AnalysisSectionDirect,
+        analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisDirectProtocol:
         """
         Create an analysis based on the given analysis configuration.
@@ -170,7 +169,7 @@ class AnalysisFactory:
                 graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
 
-            return MultiLinkLosses(_analysis_input)
+            return Losses(_analysis_input)
         if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
