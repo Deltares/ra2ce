@@ -31,14 +31,15 @@ from geopandas import GeoDataFrame
 import math
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionIndirect, AnalysisConfigData,
+    AnalysisSectionIndirect,
 )
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
 from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
-from ra2ce.network.network_config_data.network_config_data import NetworkSection
 
 
 def _load_df_from_csv(
@@ -65,55 +66,46 @@ def _load_df_from_csv(
 
 
 class Losses(AnalysisIndirectProtocol):
-    network: NetworkSection
-    graph_file: GraphFile
     analysis: AnalysisSectionIndirect
+    graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path
     output_path: Path
     hazard_names: HazardNames
-    result: GeoDataFrame
 
-    def __init__(
-            self,
-            network_config_data: AnalysisConfigData,
-            graph_file: GraphFile,
-            analysis: AnalysisSectionIndirect,
-            input_path: Path,
-            static_path: Path,
-            output_path: Path,
-            hazard_names: HazardNames,
-    ) -> None:
+    def __init__(self, analysis_input: AnalysisInputWrapper, analysis_config: AnalysisConfigWrapper) -> None:
         # TODO: make sure the "link_id" is kept in the result of the criticality analysis
-        self.graph_file = graph_file
-        self.analysis = analysis
-        self.network_config_data = network_config_data
-        self.link_id = self.network_config_data.network.file_id
-        self.link_type_column = self.network_config_data.network.link_type_column
+        self.analysis_input = analysis_input
+        self.analysis = self.analysis_input.analysis
+        self.graph_file_hazard = self.analysis_input.graph_file_hazard
+
+        self.link_id = analysis_config.config_data.network.file_id
+        self.link_type_column = analysis_config.config_data.network.link_type_column
         self.trip_purposes = self.analysis.trip_purposes
 
         self.performance_metric = f'diff_{self.analysis.weighing}'
 
-        self.part_of_day: PartOfDayEnum = analysis.part_of_day
-        self.analysis_type = analysis.analysis
-        self.duration_event: float = analysis.duration_event
-        self.hours_per_day: float = analysis.hours_per_day
-        self.production_loss_per_capita_per_hour = analysis.production_loss_per_capita_per_day / self.hours_per_day
+        self.part_of_day: PartOfDayEnum = self.analysis.part_of_day
+        self.analysis_type = self.analysis.analysis
+        self.duration_event: float = self.analysis.duration_event
+        self.hours_per_day: float = self.analysis.hours_per_day
+        self.production_loss_per_capita_per_hour = (
+                self.analysis.production_loss_per_capita_per_day / self.hours_per_day)
 
         self.intensities = _load_df_from_csv(
             self.analysis.traffic_intensities_file, [], self.link_id)  # per day
-        self.resilience_curve = _load_df_from_csv(analysis.resilience_curve_file,
+        self.resilience_curve = _load_df_from_csv(self.analysis.resilience_curve_file,
                                                   ["duration_steps",
                                                    "functionality_loss_ratio"], None, sep=";"
                                                   )
-        self.values_of_time = _load_df_from_csv(analysis.values_of_time_file, [], None, sep=";")
+        self.values_of_time = _load_df_from_csv(self.analysis.values_of_time_file, [], None, sep=";")
         self.vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose()
         self._check_validity_df()
 
-        self.input_path = input_path
-        self.static_path = static_path
-        self.output_path = output_path
-        self.hazard_names = hazard_names
+        self.input_path = self.analysis_input.input_path
+        self.static_path = self.analysis_input.static_path
+        self.output_path = self.analysis_input.output_path
+        self.hazard_names = self.analysis_input.hazard_names
 
         self.result = gpd.GeoDataFrame()
 
@@ -167,7 +159,7 @@ class Losses(AnalysisIndirectProtocol):
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
                     self.intensities[partofday_trip_purpose_name] / self.hours_per_day
-                # TODO: Make a new PR to support different time scales: here 10=10hours
+                    # TODO: Make a new PR to support different time scales: here 10=10hours
             )
         return dict(_vot_dict)
 
@@ -250,7 +242,12 @@ class Losses(AnalysisIndirectProtocol):
             occupancy_trip_type = float(self.vot_intensity_per_trip_collection[
                                             f"occupants_{trip_type}"
                                         ])
-            vlh_trip_type_event = self.duration_event * intensity_trip_type * occupancy_trip_type * self.production_loss_per_capita_per_hour
+            vlh_trip_type_event = (
+                    self.duration_event *
+                    intensity_trip_type *
+                    occupancy_trip_type *
+                    self.production_loss_per_capita_per_hour
+            )
             vehicle_loss_hours.loc[vlh_row.name, f"vlh_{trip_type}_{hazard_col_name}"] = vlh_trip_type_event
             vlh_total += vlh_trip_type_event
         vehicle_loss_hours.loc[vlh_row.name, f"vlh_{hazard_col_name}_total"] = vlh_total
@@ -328,14 +325,7 @@ class Losses(AnalysisIndirectProtocol):
         return list(_link_types), list(_hazard_intensity_ranges)
 
     def execute(self) -> gpd.GeoDataFrame:
-        criticality_analysis = SingleLinkRedundancy(
-            self.graph_file,
-            self.analysis,
-            self.input_path,
-            self.static_path,
-            self.output_path,
-            self.hazard_names,
-        ).execute()
+        criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
         criticality_analysis.drop_duplicates(subset='ID', inplace=True)
 
         self.result = self.calculate_vehicle_loss_hours(criticality_analysis=criticality_analysis)

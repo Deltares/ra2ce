@@ -34,6 +34,12 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeEnum
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
+from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
+from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
+from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
+    RiskCalculationModeEnum,
+)
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
@@ -83,12 +89,12 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     # general
     weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
     loss_per_distance: str = ""
-    loss_type: str = ""  # should be enum
+    loss_type: LossTypeEnum = field(default_factory=lambda: LossTypeEnum.NONE)
     disruption_per_category: str = ""
     # losses
     traffic_cols: list[str] = field(default_factory=list)
     duration_event: float = math.nan # TODO remove the deprecated attribute that have been replaced by csv
-    production_loss_per_capita_per_day: float = math.nan 
+    production_loss_per_capita_per_day: float = math.nan
     part_of_day: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
     hours_per_day: float = 24
     performance_metric: str = "diff_time"  # "diff_time" or "diff_length" relates to the used criticality metric
@@ -128,9 +134,14 @@ class AnalysisSectionDirect(AnalysisSectionBase):
     climate_factor: float = math.nan
     climate_period: float = math.nan
     # road damage
-    damage_curve: str = ""
-    event_type: str = ""  # should be enum
-    risk_calculation: str = ""  # should be enum
+    event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.INVALID)
+    damage_curve: DamageCurveEnum = field(
+        default_factory=lambda: DamageCurveEnum.INVALID
+    )
+    risk_calculation_mode: RiskCalculationModeEnum = field(
+        default_factory=lambda: RiskCalculationModeEnum.NONE
+    )
+    risk_calculation_year: int = 0
     create_table: bool = False
     file_name: Optional[Path] = None
 

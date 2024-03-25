@@ -7,6 +7,8 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
+from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.analysis.indirect.multi_link_redundancy import MultiLinkRedundancy
 from ra2ce.network.graph_files.graph_file import GraphFile
@@ -14,30 +16,25 @@ from ra2ce.network.hazard.hazard_names import HazardNames
 
 
 class MultiLinkLosses(AnalysisIndirectProtocol):
-    graph_file: GraphFile
     analysis: AnalysisSectionIndirect
+    graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path
     output_path: Path
     hazard_names: HazardNames
-    result: GeoDataFrame
+    _analysis_input: AnalysisInputWrapper
 
     def __init__(
         self,
-        graph_file: GraphFile,
-        analysis: AnalysisSectionIndirect,
-        input_path: Path,
-        static_path: Path,
-        output_path: Path,
-        hazard_names: HazardNames,
+        analysis_input: AnalysisInputWrapper,
     ) -> None:
-        self.graph_file = graph_file
-        self.analysis = analysis
-        self.input_path = input_path
-        self.static_path = static_path
-        self.output_path = output_path
-        self.hazard_names = hazard_names
-        self.result = None
+        self.analysis = analysis_input.analysis
+        self.graph_file_hazard = analysis_input.graph_file_hazard
+        self.input_path = analysis_input.input_path
+        self.static_path = analysis_input.static_path
+        self.output_path = analysis_input.output_path
+        self.hazard_names = analysis_input.hazard_names
+        self._analysis_input = analysis_input
 
     def execute(self) -> GeoDataFrame:
         """Calculates the multi-link redundancy losses of a NetworkX graph.
@@ -49,19 +46,12 @@ class MultiLinkLosses(AnalysisIndirectProtocol):
         Returns:
             GeoDataFrame: The results of the analysis aggregated into a table.
         """
-        gdf = MultiLinkRedundancy(
-            self.graph_file,
-            self.analysis,
-            self.input_path,
-            self.static_path,
-            self.output_path,
-            self.hazard_names,
-        ).execute()
+        gdf = MultiLinkRedundancy(self._analysis_input).execute()
 
         losses_fn = self.static_path.joinpath("hazard", self.analysis.loss_per_distance)
         losses_df = pd.read_excel(losses_fn, sheet_name="Sheet1")
 
-        if self.analysis.loss_type == "categorized":
+        if self.analysis.loss_type == LossTypeEnum.CATEGORIZED:
             disruption_fn = self.static_path.joinpath(
                 "hazard", self.analysis.disruption_per_category
             )
@@ -74,7 +64,7 @@ class MultiLinkLosses(AnalysisIndirectProtocol):
 
             _gdf = gdf.loc[gdf["hazard"] == hazard_name].copy()
             if (
-                self.analysis.loss_type == "uniform"
+                self.analysis.loss_type == LossTypeEnum.UNIFORM
             ):  # assume uniform threshold for disruption
                 for col in self.analysis.traffic_cols:
                     # detour_losses = traffic_per_day[veh/day] * detour_distance[meter] * cost_per_meter[USD/meter/vehicle] * duration_disruption[hour] / 24[hour/day]
@@ -109,7 +99,7 @@ class MultiLinkLosses(AnalysisIndirectProtocol):
                 )
 
             if (
-                self.analysis.loss_type == "categorized"
+                self.analysis.loss_type == LossTypeEnum.CATEGORIZED
             ):  # assume different disruption type depending on flood depth and road types
                 disruption_df["class_identifier"] = ""
                 _gdf["class_identifier"] = ""

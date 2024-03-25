@@ -1,5 +1,36 @@
 # Changelog
 
+## v0.8.1 (2024-03-20)
+
+## v0.8.0 (2024-03-20)
+
+### Feat
+
+- Added functionality to directly retrieve the MultiGraph and GeoDataFrame for a given geojson network
+- Added static method to directly retrieve a network based on a polygon
+- Added result wrapper exporter logic
+- Added logic to wrap results of a ra2ce analysis
+- Partofday Enum is added
+- Added logic so that exporting the intermediate results becomes dependent on the existance of the `output_graph_dir` property
+- Added endpoint to generate an OsmNetworkWrapper with a fix polygon
+- Time calculated for the single link redundancy added to the link data
+- Time calculated for the single link redundancy
+- If the link checked in the redundancy is not connected, then time and alt_time is added (for the weight=time) equal to the length/avgspeed.
+- add_missing_geometry improved to consider all ks of a multigraph edges
+- Tracing the origins that are mapped on two graph nodes for instance and have path in one but not in the other
+- calc_vhl modified. see 2023-11-24_Sprint: Losses summary onenote
+- Duration step attribute definition
+- Minor changes to the Losses
+- Time and alt_time is added to multi-link redundancy
+
+### Fix
+
+- Corrected wrong unknown key to dictionary
+- Added logic to calculate time only when strictly required
+- alt_time and length are improved to correspond to the weight stated in the single and multi redundancy
+- Updated the weight to get correct alt_dist. time is also rounded.
+- LineString is imported from shapely.geometry
+
 ## v0.7.0 (2023-12-05)
 
 ### Feat
