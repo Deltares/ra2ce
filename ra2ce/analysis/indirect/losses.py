@@ -164,16 +164,31 @@ class Losses(AnalysisIndirectProtocol):
             )
         return dict(_vot_dict)
 
-    def calculate_vehicle_loss_hours(self, criticality_analysis: GeoDataFrame) -> gpd.GeoDataFrame:
+    def _get_disrupted_criticality_analysis_results(self, criticality_analysis: gpd.GeoDataFrame):
+        # filter out all links not affected by the hazard
+        if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
+            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_ma'] != 0]
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
+            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_max'] != 0]
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
+            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_mean'] != 0]
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
+            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_min'] != 0]
+
+        self.criticality_analysis_non_disrupted = criticality_analysis[
+            ~criticality_analysis.index.isin(self.criticality_analysis.index)
+        ]
+        self.criticality_analysis.set_index(self.link_id, inplace=True)
+        self.criticality_analysis_non_disrupted.set_index(self.link_id, inplace=True)
+
+    def calculate_vehicle_loss_hours(self) -> gpd.GeoDataFrame:
         """
         This function opens an existing table with traffic data and value of time to calculate losses based on
         detouring values. It also includes a traffic jam estimation.
-
-        criticality_analysis: GeoDataFrame results of a criticality analysis with extra detour times
         """
 
         def _check_validity_criticality_analysis():
-            if self.link_type_column not in criticality_analysis.columns:
+            if self.link_type_column not in self.criticality_analysis.columns:
                 raise Exception(f'''criticality_analysis results does not have the passed link_type_column.
             {self.link_type_column} is passed as link_type_column''')
 
@@ -184,12 +199,29 @@ class Losses(AnalysisIndirectProtocol):
                     return f"{x}-{y}"
             raise ValueError(f"No matching range found for height {height}")
 
-        criticality_analysis.set_index(self.link_id, inplace=True)
+        def _create_result(vlh: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+            result = pd.concat(
+                [
+                    vlh,
+                    self.criticality_analysis_non_disrupted[
+                        [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] +
+                        list(events.columns)
+                    ]
+                ]
+            )
+            # Get the columns from vehicle_loss_hours that are not in common
+            additional_columns = list(set(vlh.columns) - set(self.criticality_analysis_non_disrupted.columns))
+
+            # Fill 0 for the additional columns of self.criticality_analysis_non_disrupted
+            result.loc[result.index.difference(vlh.index), additional_columns] = result.loc[
+                result.index.difference(vlh.index), additional_columns].fillna(0)
+            return result
+
         _check_validity_criticality_analysis()
         _hazard_intensity_ranges = self._get_link_types_heights_ranges()[1]
-        events = criticality_analysis.filter(regex=r'^EV(?!1_fr)')
+        events = self.criticality_analysis.filter(regex=r'^EV(?!1_fr)')
         # Read the performance_change stating the functionality drop
-        performance_change = criticality_analysis[self.performance_metric]
+        performance_change = self.criticality_analysis[self.performance_metric]
 
         # shape vehicle_loss_hours
         vehicle_loss_hours_df = pd.DataFrame(
@@ -198,13 +230,14 @@ class Losses(AnalysisIndirectProtocol):
         # find the link_type and the hazard intensity
         vehicle_loss_hours_df = pd.merge(
             vehicle_loss_hours_df,
-            criticality_analysis[
+            self.criticality_analysis[
                 [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] + list(events.columns)
                 ],
             left_index=True,
             right_index=True,
         )
-        vehicle_loss_hours = gpd.GeoDataFrame(vehicle_loss_hours_df, geometry="geometry", crs=criticality_analysis.crs)
+        vehicle_loss_hours = gpd.GeoDataFrame(
+            vehicle_loss_hours_df, geometry="geometry", crs=self.criticality_analysis.crs)
         for event in events.columns.tolist():
             for _, vlh_row in vehicle_loss_hours.iterrows():
                 row_hazard_range = _get_range(vlh_row[event])
@@ -215,7 +248,8 @@ class Losses(AnalysisIndirectProtocol):
                     self._populate_vehicle_loss_hour_df(vehicle_loss_hours, row_hazard_range, vlh_row,
                                                         row_performance_change, event)
 
-        return vehicle_loss_hours
+        vehicle_loss_hours_result = _create_result(vehicle_loss_hours)
+        return vehicle_loss_hours_result
 
     def _calculate_production_loss_per_capita(self, vehicle_loss_hours: gpd.GeoDataFrame, vlh_row: pd.Series,
                                               hazard_col_name: str):
@@ -330,16 +364,8 @@ class Losses(AnalysisIndirectProtocol):
 
         criticality_analysis.drop_duplicates(subset='ID', inplace=True)
 
-        # filter out all links not affected by the hazard
-        if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
-            criticality_analysis = criticality_analysis[criticality_analysis['EV1_ma'] != 0]
-        elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
-            criticality_analysis = criticality_analysis[criticality_analysis['EV1_max'] != 0]
-        elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
-            criticality_analysis = criticality_analysis[criticality_analysis['EV1_mean'] != 0]
-        elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
-            criticality_analysis = criticality_analysis[criticality_analysis['EV1_min'] != 0]
+        self._get_disrupted_criticality_analysis_results(criticality_analysis=criticality_analysis)
 
-        self.result = self.calculate_vehicle_loss_hours(criticality_analysis=criticality_analysis)
+        self.result = self.calculate_vehicle_loss_hours()
 
         return self.result
