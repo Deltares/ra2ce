@@ -1627,12 +1627,15 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
                         not any(c.isalpha() for c in ss)
                         and (";" not in ss)
                         and ("|" not in ss)
+                        and ("-" not in ss)
                     ):
                         ns.append(int(ss))
                     elif not any(c.isalpha() for c in ss) and ";" in ss:
                         ns.extend([int(x) for x in ss.split(";") if x.isnumeric()])
                     elif not any(c.isalpha() for c in ss) and "|" in ss:
                         ns.extend([int(x) for x in ss.split("|") if x.isnumeric()])
+                    elif not any(c.isalpha() for c in ss) and "-" in ss:
+                        ns.extend([int(x) for x in ss.split("-") if x.isnumeric()])
                     elif " mph" in ss:
                         ns.append(int(ss.split(" mph")[0]) * 1.609344)
                 if len(ns) > 0:
@@ -1644,12 +1647,15 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
                     not any(c.isalpha() for c in s)
                     and (";" not in s)
                     and ("|" not in s)
+                    and ("-" not in s)
                 ):
                     ss = int(s)
                 elif not any(c.isalpha() for c in s) and ";" in s:
                     ss = mean([int(x) for x in s.split(";") if x.isnumeric()])
                 elif not any(c.isalpha() for c in s) and "|" in s:
                     ss = mean([int(x) for x in s.split("|") if x.isnumeric()])
+                elif not any(c.isalpha() for c in s) and "-" in s:
+                    ss = mean([int(x) for x in s.split("-") if x.isnumeric()])
                 elif " mph" in s:
                     ss = int(s.split(" mph")[0]) * 1.609344
                 else:
@@ -1730,12 +1736,15 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
                         not any(c.isalpha() for c in ms)
                         and (";" not in ms)
                         and ("|" not in ms)
+                        and ("-" not in ms)
                     ):
                         ns.append(int(ms))
                     elif not any(c.isalpha() for c in ms) and ";" in ms:
                         ns.extend([int(x) for x in ms.split(";") if x.isnumeric()])
                     elif not any(c.isalpha() for c in ms) and "|" in ms:
                         ns.extend([int(x) for x in ms.split("|") if x.isnumeric()])
+                    elif not any(c.isalpha() for c in ms) and "-" in ms:
+                        ns.extend([int(x) for x in ms.split("-") if x.isnumeric()])
                     elif " mph" in ms:
                         ns.append(int(ms.split(" mph")[0]) * 1.609344)
                 if len(ns) > 0:
@@ -1752,6 +1761,7 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
                     not any(c.isalpha() for c in max_speed)
                     and (";" not in max_speed)
                     and ("|" not in max_speed)
+                    and ("-" not in max_speed)
                 ):
                     graph[u][v][k]["avgspeed"] = round(int(max_speed), 0)
                 elif not any(c.isalpha() for c in max_speed) and ";" in max_speed:
@@ -1761,6 +1771,10 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
                 elif not any(c.isalpha() for c in max_speed) and "|" in max_speed:
                     graph[u][v][k]["avgspeed"] = round(
                         mean([int(x) for x in max_speed.split("|") if x.isnumeric()]), 0
+                    )
+                elif not any(c.isalpha() for c in max_speed) and "-" in max_speed:
+                    graph[u][v][k]["avgspeed"] = round(
+                        mean([int(x) for x in max_speed.split("-") if x.isnumeric()]), 0
                     )
                 elif " mph" in max_speed:
                     graph[u][v][k]["avgspeed"] = round(

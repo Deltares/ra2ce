@@ -21,14 +21,14 @@
 
 import logging
 import time
-from pathlib import Path
-
-from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
+from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.configuration.config_wrapper import ConfigWrapper
+from ra2ce.analysis.analysis_result_wrapper_exporter import (
+    AnalysisResultWrapperExporter,
+)
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 
 
@@ -53,65 +53,31 @@ class DirectAnalysisRunner(AnalysisRunner):
             return False
         return True
 
-    def _save_gdf(self, gdf: GeoDataFrame, save_path: Path, driver: str):
-        """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp
-
-        Arguments:
-            gdf [geodataframe]: geodataframe object to be converted
-            save_path [Path]: path to save
-            driver [str]: defines the file format
-
-        Returns:
-            None
-        """
-        # save to shapefile
-        gdf.crs = "epsg:4326"  # TODO: decide if this should be variable with e.g. an output_crs configured
-
-        for col in gdf.columns:
-            if gdf[col].dtype == object and col != gdf.geometry.name:
-                gdf[col] = gdf[col].astype(str)
-
-        if save_path.exists():
-            save_path.unlink()
-        gdf.to_file(save_path, driver=driver)
-        logging.info("Results saved to: {}".format(save_path))
-
-    def _save_result(
-        self, analysis: AnalysisDirectProtocol, analysis_config: AnalysisConfigWrapper
-    ):
-        if analysis.result is None or analysis.result.empty:
-            return
-
-        _output_path = analysis_config.config_data.output_path.joinpath(
-            analysis.analysis.analysis.config_value
-        )
-
-        if analysis.analysis.save_gpkg:
-            gpkg_path = _output_path.joinpath(
-                analysis.analysis.name.replace(" ", "_") + ".gpkg"
-            )
-            self._save_gdf(analysis.result, gpkg_path, "GPKG")
-        if analysis.analysis.save_csv:
-            csv_path = _output_path.joinpath(
-                analysis.analysis.name.replace(" ", "_") + ".csv"
-            )
-            del analysis.result["geometry"]
-            analysis.result.to_csv(csv_path, index=False)
-
-    def run(self, analysis_config: AnalysisConfigWrapper) -> None:
+    def run(
+        self, analysis_config: AnalysisConfigWrapper
+    ) -> list[AnalysisResultWrapper]:
         _analysis_collection = AnalysisCollection.from_config(analysis_config)
+        _results = []
         for analysis in _analysis_collection.direct_analyses:
             logging.info(
-                f"----------------------------- Started analyzing '{analysis.analysis.name}'  -----------------------------"
+                "----------------------------- Started analyzing '%s'  -----------------------------",
+                analysis.analysis.name,
             )
             starttime = time.time()
 
-            analysis.result = analysis.execute()
+            _result = analysis.execute()
+            _result_wrapper = AnalysisResultWrapper(
+                analysis_result=_result, analysis=analysis
+            )
+            _results.append(_result_wrapper)
 
-            self._save_result(analysis, analysis_config)
+            AnalysisResultWrapperExporter().export_result(_result_wrapper)
 
             endtime = time.time()
             logging.info(
-                f"----------------------------- Analysis '{analysis.analysis.name}' finished. "
-                f"Time: {str(round(endtime - starttime, 2))}s  -----------------------------"
+                "----------------------------- Analysis '%s' finished. "
+                "Time: %ss  -----------------------------",
+                analysis.analysis.name,
+                str(round(endtime - starttime, 2)),
             )
+        return _results

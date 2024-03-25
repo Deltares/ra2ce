@@ -3,6 +3,10 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
+from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
+    RiskCalculationModeEnum,
+)
 from ra2ce.analysis.direct.damage.manual_damage_functions import ManualDamageFunctions
 from ra2ce.analysis.direct.damage_calculation.damage_network_events import (
     DamageNetworkEvents,
@@ -70,7 +74,7 @@ class TestDirectDamage:
         """
 
         # SET PARAMETERS AND LOAD REFERENCE DATA
-        damage_function = "HZ"
+        damage_function = DamageCurveEnum.HZ
         test_data_path = direct_damage_test_data / "Direct_damage_tests_EV_HZ.xlsx"
         assert test_data_path.is_file()
 
@@ -97,11 +101,13 @@ class TestDirectDamage:
             df[error_rows]
         )
 
-    @pytest.mark.skip(reason="To do: Needs refining on what needs to be verified. (#319)")
+    @pytest.mark.skip(
+        reason="To do: Needs refining on what needs to be verified. (#319)"
+    )
     def test_event_based_damage_calculation_huizinga(
         self, event_input_output: pytest.fixture
     ):
-        damage_function = "HZ"
+        damage_function = DamageCurveEnum.HZ
 
         # This test roughly follows the DirectDamage.road_damage() controller in analyses_direct.py
         test_input = event_input_output["input_path"]
@@ -165,7 +171,7 @@ class TestDirectDamage:
         """
 
         # SET PARAMETERS AND LOAD REFERENCE DATA
-        damage_function = "OSD"
+        damage_function = DamageCurveEnum.OSD
         test_data_path = direct_damage_test_data / "Direct_damage_tests_EV_OSD.xlsx"
         road_gdf = pd.read_excel(test_data_path)
 
@@ -236,7 +242,7 @@ class TestDirectDamage:
         """
 
         # SET PARAMETERS AND LOAD REFERENCE DATA
-        damage_function = "MAN"
+        damage_function = DamageCurveEnum.MAN
         test_data_path = direct_damage_test_data / "Direct_damage_tests_EV_HZ.xlsx"
         road_gdf = pd.read_excel(test_data_path)
 
@@ -362,7 +368,7 @@ class TestDirectDamage:
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
             risk_data_file, sep=";"
         )
-        damage_network.control_risk_calculation(mode="default")
+        damage_network.control_risk_calculation(mode=RiskCalculationModeEnum.DEFAULT)
         assert (
             damage_network.gdf["risk"][0] == damage_network.gdf["ref_risk_default"][0]
         )
@@ -372,7 +378,9 @@ class TestDirectDamage:
             damage_network = DamageNetworkReturnPeriods.construct_from_csv(
                 risk_data_file, sep=";"
             )
-            damage_network.control_risk_calculation(mode="cut_from_{}_year".format(rp))
+            damage_network.control_risk_calculation(
+                mode=RiskCalculationModeEnum.CUT_FROM_YEAR, year=rp
+            )
             test_result = round(damage_network.gdf["risk"][0], 0)
             reference_result = round(
                 damage_network.gdf["ref_risk_cut_from_{}_year".format(rp)][0], 0
@@ -385,7 +393,7 @@ class TestDirectDamage:
         )
         for triangle_rp in [8, 2]:
             damage_network.control_risk_calculation(
-                mode="triangle_to_null_{}_year".format(triangle_rp)
+                mode=RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR, year=triangle_rp
             )
             test_result = round(damage_network.gdf["risk"][0], 0)
             reference_result = round(
