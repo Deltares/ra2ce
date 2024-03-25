@@ -27,7 +27,6 @@ from typing import Optional
 
 import geopandas as gpd
 import pandas as pd
-from geopandas import GeoDataFrame
 import math
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
