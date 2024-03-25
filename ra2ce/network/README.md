@@ -11,6 +11,6 @@ The different sources to generate a network are handled through our own network 
 
 The following diagram describes the relations between the most relevant entities of the `ra2ce.network` (sub-)package.
 
-| ![ra2ce_network_package.drawio.png](/docs/_diagrams/ra2ce_network_package.drawio.png)| 
+| ![ra2ce_network_class_diagram.drawio.png](/docs/_diagrams/ra2ce_network_class_diagram.drawio.png)| 
 |:--:| 
 | *Ra2ce network overview* |
