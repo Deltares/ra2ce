@@ -35,6 +35,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
+from ra2ce.analysis.indirect.multi_link_redundancy import MultiLinkRedundancy
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
@@ -199,6 +200,18 @@ class Losses(AnalysisIndirectProtocol):
             raise ValueError(f"No matching range found for height {height}")
 
         def _create_result(vlh: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+            """
+
+            Args: vlh: calculated vehicle_loss_hours GeoDataFrame. For single_link_losses it only includes the
+            disrupted links. For Multi_link_losses it includes all links. This is because of the difference between
+            the underlying single_link_redundancy and multi_link_redundancy analysis results.
+
+            Returns: results of the Losses analysis. For the single_link_losses it adds non_disrupted links to vlh. For
+            Multi_link_losses this is not necessary because of the underlying multi_link_redundancy analysis.
+
+            """
+            if self.analysis.analysis.name == 'MULTI_LINK_LOSSES':
+                return vlh
             result = pd.concat(
                 [
                     vlh,
@@ -359,12 +372,14 @@ class Losses(AnalysisIndirectProtocol):
         return list(_link_types), list(_hazard_intensity_ranges)
 
     def execute(self) -> gpd.GeoDataFrame:
-        criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
-
-        criticality_analysis.drop_duplicates(subset='ID', inplace=True)
-
-        self._get_disrupted_criticality_analysis_results(criticality_analysis=criticality_analysis)
+        if self.analysis.analysis.name == 'SINGLE_LINK_LOSSES':
+            criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
+            criticality_analysis.drop_duplicates(subset='ID', inplace=True)
+            self._get_disrupted_criticality_analysis_results(criticality_analysis=criticality_analysis)
+        elif self.analysis.analysis.name == 'MULTI_LINK_LOSSES':
+            criticality_analysis = MultiLinkRedundancy(self.analysis_input).execute()
+            criticality_analysis.drop_duplicates(subset='ID', inplace=True)
+            raise NotImplementedError("Under construction!")
 
         self.result = self.calculate_vehicle_loss_hours()
-
         return self.result
