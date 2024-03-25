@@ -50,7 +50,6 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         self,
         config_data: NetworkConfigData,
     ) -> None:
-        self._config_data = config_data
         self.crs = config_data.crs
 
         # Network options
@@ -60,6 +59,9 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         # Origins Destinations
         self.region_path = config_data.origins_destinations.region
         self.output_graph_dir = config_data.output_graph_dir
+
+        # Cleanup
+        self.delete_duplicate_nodes = config_data.cleanup.delete_duplicate_nodes
 
     def get_network(
         self,
@@ -85,7 +87,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         graph_complex = (
             graph_complex.to_directed()
         )  # simplification function requires nx.MultiDiGraph
-        if self._config_data.cleanup.delete_duplicate_nodes:
+        if self.delete_duplicate_nodes:
             graph_complex = self._delete_duplicate_nodes(graph_complex)
             # edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
 

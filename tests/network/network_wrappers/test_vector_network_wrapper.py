@@ -11,7 +11,7 @@ from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
 from ra2ce.network.network_wrappers.vector_network_wrapper import VectorNetworkWrapper
-from tests import test_data
+from tests import test_data, test_results
 
 _test_dir = test_data / "vector_network_wrapper"
 
@@ -61,7 +61,7 @@ class TestVectorNetworkWrapper:
         assert _wrapper.crs.to_epsg() == 4326
 
     @pytest.fixture
-    def _valid_wrapper(self) -> VectorNetworkWrapper:
+    def _valid_wrapper(self, request: pytest.FixtureRequest) -> VectorNetworkWrapper:
         _network_dir = _test_dir.joinpath("static", "network")
         _config_data = NetworkConfigData()
         _config_data.network.primary_file = [
@@ -70,6 +70,7 @@ class TestVectorNetworkWrapper:
         _config_data.network.directed = False
         _config_data.origins_destinations.region = None
         _config_data.crs = CRS.from_user_input(4326)
+        _config_data.static_path = test_results.joinpath(request.node.originalname)
         yield VectorNetworkWrapper(
             config_data=_config_data,
         )
