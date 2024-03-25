@@ -1,5 +1,14 @@
 # RA2CE
 
+## Ra2ce semantics
+
+- `ra2ce` is a [package](https://packaging.python.org/en/latest/tutorials/packaging-projects/),
+- everything else with an `__init__.py` is a subpackage (often written as (sub-)package).
+- single `.py` files are [modules](https://docs.python.org/3/tutorial/modules.html),
+- from a business perspective an `analysis` might be a module, but technically it can be implemented either as a (sub-package) or a module.
+
+## Structure description
+
 This package is divided into different (sub-)packages, the most relevants being the following:
 
 - `network`, this (sub-)package contains the logic to retrieve a normalized data structure capable of representing all the required properties of a network for its later analysis.
