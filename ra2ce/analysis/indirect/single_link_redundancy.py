@@ -40,7 +40,7 @@ class SingleLinkRedundancy(AnalysisIndirectProtocol):
         self.input_path = input_path
         self.static_path = static_path
         self.output_path = output_path
-        self.hazard_names = hazard_names
+        self.hazard_names = hazard_names  # TODO this isnt used anywhere?
         self.result = None
 
     def execute(self) -> GeoDataFrame:

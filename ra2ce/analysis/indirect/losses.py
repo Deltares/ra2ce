@@ -33,6 +33,7 @@ import math
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect, AnalysisConfigData,
 )
+from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeEnum
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.network.graph_files.graph_file import GraphFile
@@ -84,7 +85,6 @@ class Losses(AnalysisIndirectProtocol):
             output_path: Path,
             hazard_names: HazardNames,
     ) -> None:
-        # TODO: make sure the "link_id" is kept in the result of the criticality analysis
         self.graph_file = graph_file
         self.analysis = analysis
         self.network_config_data = network_config_data
@@ -150,6 +150,7 @@ class Losses(AnalysisIndirectProtocol):
         Generates a dictionary with all available `vot_purpose` with their intensity as a `pd.DataFrame`.
         """
         _vot_dict = defaultdict(pd.DataFrame)
+
         for trip_purpose in self.trip_purposes:
             vot_var_name = f"vot_{trip_purpose}"
             occupancy_var_name = f"occupants_{trip_purpose}"
@@ -191,7 +192,7 @@ class Losses(AnalysisIndirectProtocol):
                     return f"{x}-{y}"
             raise ValueError(f"No matching range found for height {height}")
 
-        criticality_analysis.set_index(self.link_id, inplace=True)
+        # criticality_analysis.set_index(self.link_id, inplace=True)
         _check_validity_criticality_analysis()
         _hazard_intensity_ranges = self._get_link_types_heights_ranges()[1]
         events = criticality_analysis.filter(regex=r'^EV(?!1_fr)')
@@ -199,23 +200,23 @@ class Losses(AnalysisIndirectProtocol):
         performance_change = criticality_analysis[self.performance_metric]
 
         # shape vehicle_loss_hours
-        vehicle_loss_hours_df = pd.DataFrame(
-            index=self.intensities.index
-        )
+        vehicle_loss_hours_df = pd.DataFrame(columns=['link_id'], data=criticality_analysis.index.values)
+
         # find the link_type and the hazard intensity
         vehicle_loss_hours_df = pd.merge(
             vehicle_loss_hours_df,
             criticality_analysis[
-                [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] + list(events.columns)
+                ["link_id", f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] + list(
+                    events.columns)
                 ],
-            left_index=True,
+            left_on="link_id",
             right_index=True,
         )
         vehicle_loss_hours = gpd.GeoDataFrame(vehicle_loss_hours_df, geometry="geometry", crs=criticality_analysis.crs)
         for event in events.columns.tolist():
             for _, vlh_row in vehicle_loss_hours.iterrows():
-                row_hazard_range = _get_range(vlh_row[event])
-                row_performance_change = performance_change.loc[vlh_row.name]
+                row_hazard_range = _get_range(eval(vlh_row[event]))
+                row_performance_change = eval(performance_change.loc[vlh_row.name])
                 if math.isnan(row_performance_change):
                     self._calculate_production_loss_per_capita(vehicle_loss_hours, vlh_row, event)
                 else:
@@ -280,7 +281,7 @@ class Losses(AnalysisIndirectProtocol):
         for trip_type in self.trip_purposes:
             intensity_trip_type = self.vot_intensity_per_trip_collection[
                 f"intensity_{self.part_of_day}_{trip_type}"
-            ].loc[vlh_row.name]
+            ].iloc[vlh_row.name]
 
             vot_trip_type = float(self.vot_intensity_per_trip_collection[
                                       f"vot_{trip_type}"
