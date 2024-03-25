@@ -165,11 +165,10 @@ class AnalysisFactory:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
-                graph_file=analysis_config.graph_files.base_graph_hazard,
                 graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
 
-            return Losses(_analysis_input)
+            return Losses(_analysis_input, analysis_config)
         if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
