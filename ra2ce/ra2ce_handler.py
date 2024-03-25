@@ -28,6 +28,7 @@ from typing import Optional
 from shapely.errors import ShapelyDeprecationWarning
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.configuration.config_factory import ConfigFactory
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
@@ -67,7 +68,7 @@ class Ra2ceHandler:
     def configure(self) -> None:
         self.input_config.configure()
 
-    def run_analysis(self) -> None:
+    def run_analysis(self) -> list[AnalysisResultWrapper]:
         """
         Runs a Ra2ce analysis based on the provided network and analysis files.
         """
@@ -79,4 +80,4 @@ class Ra2ceHandler:
             raise ValueError(_error)
 
         _runner = AnalysisRunnerFactory.get_runner(self.input_config)
-        _runner.run(self.input_config.analysis_config)
+        return _runner.run(self.input_config.analysis_config)

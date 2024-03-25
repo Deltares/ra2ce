@@ -6,6 +6,12 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionDirect,
 )
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
+from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
+from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
+    RiskCalculationModeEnum,
+)
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
 from ra2ce.analysis.direct.damage.manual_damage_functions import ManualDamageFunctions
 from ra2ce.analysis.direct.damage_calculation import (
@@ -16,24 +22,21 @@ from ra2ce.network.graph_files.network_file import NetworkFile
 
 
 class DirectDamage(AnalysisDirectProtocol):
-    graph_file: NetworkFile
     analysis: AnalysisSectionDirect
+    graph_file: NetworkFile
+    graph_file_hazard: NetworkFile
     input_path: Path
     output_path: Path
-    result: GeoDataFrame
 
     def __init__(
         self,
-        graph_file: NetworkFile,
-        analysis: AnalysisSectionDirect,
-        input_path: Path,
-        output_path: Path,
+        analysis_input: AnalysisInputWrapper,
     ) -> None:
-        self.graph_file = graph_file
-        self.analysis = analysis
-        self.input_path = input_path
-        self.output_path = output_path
-        self.result = None
+        self.analysis = analysis_input.analysis
+        self.graph_file = None
+        self.graph_file_hazard = analysis_input.graph_file_hazard
+        self.input_path = analysis_input.input_path
+        self.output_path = analysis_input.output_path
 
     def execute(self) -> GeoDataFrame:
 
@@ -58,7 +61,7 @@ class DirectDamage(AnalysisDirectProtocol):
             return new_cols
 
         # Open the network with hazard data
-        road_gdf = self.graph_file.get_graph()
+        road_gdf = self.graph_file_hazard.get_graph()
         road_gdf.columns = _rename_road_gdf_to_conventions(road_gdf.columns)
 
         # Find the hazard columns; these may be events or return periods
@@ -71,7 +74,7 @@ class DirectDamage(AnalysisDirectProtocol):
 
         # If you want to use manual damage functions, these need to be loaded first
         manual_damage_functions = None
-        if self.analysis.damage_curve == "MAN":
+        if self.analysis.damage_curve == DamageCurveEnum.MAN:
             manual_damage_functions = ManualDamageFunctions()
             manual_damage_functions.find_damage_functions(
                 folder=(self.input_path.joinpath("damage_functions"))
@@ -79,7 +82,7 @@ class DirectDamage(AnalysisDirectProtocol):
             manual_damage_functions.load_damage_functions()
 
         # Choose between event or return period based analysis
-        if self.analysis.event_type == "event":
+        if self.analysis.event_type == EventTypeEnum.EVENT:
             event_gdf = DamageNetworkEvents(road_gdf, val_cols)
             event_gdf.main(
                 damage_function=damage_function,
@@ -88,23 +91,25 @@ class DirectDamage(AnalysisDirectProtocol):
 
             return event_gdf.gdf
 
-        elif self.analysis.event_type == "return_period":
+        elif self.analysis.event_type == EventTypeEnum.RETURN_PERIOD:
             return_period_gdf = DamageNetworkReturnPeriods(road_gdf, val_cols)
             return_period_gdf.main(
                 damage_function=damage_function,
                 manual_damage_functions=manual_damage_functions,
             )
 
-            if self.analysis.risk_calculation:  # Check if risk_calculation is demanded
-                if self.analysis.risk_calculation != "none":
+            if (
+                self.analysis.risk_calculation_mode != RiskCalculationModeEnum.INVALID
+            ):  # Check if risk_calculation is demanded
+                if self.analysis.risk_calculation_mode != RiskCalculationModeEnum.NONE:
                     return_period_gdf.control_risk_calculation(
-                        mode=self.analysis.risk_calculation
+                        mode=self.analysis.risk_calculation_mode
                     )
 
             else:
                 logging.info(
                     """No parameters for risk calculation are specified. 
-                             Add key [risk_calculation] to analyses.ini."""
+                             Add key [risk_calculation_mode] to analyses.ini."""
                 )
 
             return return_period_gdf.gdf

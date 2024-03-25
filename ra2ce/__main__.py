@@ -19,7 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 # -*- coding: utf-8 -*-
 import logging
 from pathlib import Path
@@ -27,6 +26,7 @@ from typing import Optional
 
 import click
 
+from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.ra2ce_handler import Ra2ceHandler
 
 
@@ -36,7 +36,7 @@ from ra2ce.ra2ce_handler import Ra2ceHandler
 @click.option(
     "--analyses_ini", default=None, help="Full path to the analyses.ini file."
 )
-def run_analysis(network_ini: str, analyses_ini: str):
+def run_analysis(network_ini: str, analyses_ini: str) -> list[AnalysisResultWrapper]:
     def _as_path(ini_file: str) -> Optional[Path]:
         if not ini_file:
             return None
@@ -50,7 +50,7 @@ def run_analysis(network_ini: str, analyses_ini: str):
     _analysis_ini = _as_path(analyses_ini)
     _handler = Ra2ceHandler(_network_ini, _analysis_ini)
     _handler.configure()
-    _handler.run_analysis()
+    return _handler.run_analysis()
 
 
 if __name__ == "__main__":

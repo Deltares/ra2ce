@@ -30,6 +30,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
 from ra2ce.analysis.direct.direct_damage import DirectDamage
 from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
@@ -37,7 +38,6 @@ from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectP
 from ra2ce.analysis.indirect.multi_link_isolated_locations import (
     MultiLinkIsolatedLocations,
 )
-from ra2ce.analysis.indirect.multi_link_losses import MultiLinkLosses
 from ra2ce.analysis.indirect.multi_link_origin_closest_destination import (
     MultiLinkOriginClosestDestination,
 )
@@ -53,7 +53,6 @@ from ra2ce.analysis.indirect.optimal_route_origin_destination import (
 )
 from ra2ce.analysis.indirect.losses import Losses
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
-from ra2ce.network.hazard.hazard_names import HazardNames
 
 
 class AnalysisFactory:
@@ -76,27 +75,21 @@ class AnalysisFactory:
         Returns:
             AnalysisDirectProtocol: The direct analysis to be executed.
         """
-        _input_dict = dict(
+        _analysis_input = AnalysisInputWrapper.from_input(
             analysis=analysis,
-            input_path=analysis_config.config_data.input_path,
-            output_path=analysis_config.config_data.output_path,
+            analysis_config=analysis_config,
+            graph_file_hazard=analysis_config.graph_files.base_network_hazard,
         )
         if analysis.analysis == AnalysisDirectEnum.DIRECT:
-            return DirectDamage(
-                graph_file=analysis_config.graph_files.base_network_hazard,
-                **_input_dict,
-            )
+            return DirectDamage(_analysis_input)
         if analysis.analysis == AnalysisDirectEnum.EFFECTIVENESS_MEASURES:
-            return EffectivenessMeasures(
-                graph_file=analysis_config.graph_files.base_network_hazard,
-                **_input_dict,
-            )
+            return EffectivenessMeasures(_analysis_input)
         raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
 
     @staticmethod
     def get_indirect_analysis(
-        analysis: AnalysisSectionIndirect,
-        analysis_config: AnalysisConfigWrapper,
+            analysis: AnalysisSectionIndirect,
+            analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisIndirectProtocol:
         """
         Create an analysis based on the given analysis configuration.
@@ -111,66 +104,76 @@ class AnalysisFactory:
         Returns:
             AnalysisIndirectProtocol: The indirect analysis to be executed.
         """
-        _input_dict = dict(
-            analysis=analysis,
-            input_path=analysis_config.config_data.input_path,
-            static_path=analysis_config.config_data.static_path,
-            output_path=analysis_config.config_data.output_path,
-            hazard_names=HazardNames.from_config(analysis_config),
-        )
         if analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY:
-            return SingleLinkRedundancy(
-                graph_file=analysis_config.graph_files.base_graph, **_input_dict
+            _analysis_input = AnalysisInputWrapper.from_input(
+                analysis=analysis,
+                analysis_config=analysis_config,
+                graph_file=analysis_config.graph_files.base_graph,
             )
+            return SingleLinkRedundancy(_analysis_input)
         if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_REDUNDANCY:
-            return MultiLinkRedundancy(
-                graph_file=analysis_config.graph_files.base_graph_hazard, **_input_dict
+            _analysis_input = AnalysisInputWrapper.from_input(
+                analysis=analysis,
+                analysis_config=analysis_config,
+                graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
+            return MultiLinkRedundancy(_analysis_input)
         if analysis.analysis == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION:
-            return OptimalRouteOriginDestination(
+            _analysis_input = AnalysisInputWrapper.from_input(
+                analysis=analysis,
+                analysis_config=analysis_config,
                 graph_file=analysis_config.graph_files.origins_destinations_graph,
-                **_input_dict,
-                origins_destinations=analysis_config.config_data.origins_destinations,
             )
+            return OptimalRouteOriginDestination(_analysis_input)
         if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_DESTINATION:
-            return MultiLinkOriginDestination(
-                graph_file=analysis_config.graph_files.origins_destinations_graph_hazard,
-                **_input_dict,
-                origins_destinations=analysis_config.config_data.origins_destinations,
+            _analysis_input = AnalysisInputWrapper.from_input(
+                analysis=analysis,
+                analysis_config=analysis_config,
+                graph_file_hazard=analysis_config.graph_files.origins_destinations_graph_hazard,
             )
+            return MultiLinkOriginDestination(_analysis_input)
         if (
-            analysis.analysis
-            == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
+                analysis.analysis
+                == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
         ):
-            return OptimalRouteOriginClosestDestination(
-                graph_file=analysis_config.graph_files.origins_destinations_graph,
-                **_input_dict,
-                origins_destinations=analysis_config.config_data.origins_destinations,
-                file_id=analysis_config.config_data.network.file_id,
+            _analysis_input = AnalysisInputWrapper.from_input(
+                analysis=analysis,
+                analysis_config=analysis_config,
+                graph_file_hazard=analysis_config.graph_files.origins_destinations_graph_hazard,
             )
+            return OptimalRouteOriginClosestDestination(analysis_input=_analysis_input)
         if (
-            analysis.analysis
-            == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
+                analysis.analysis
+                == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
         ):
-            return MultiLinkOriginClosestDestination(
+            _analysis_input = AnalysisInputWrapper.from_input(
+                analysis=analysis,
+                analysis_config=analysis_config,
                 graph_file=analysis_config.graph_files.origins_destinations_graph,
                 graph_file_hazard=analysis_config.graph_files.origins_destinations_graph_hazard,
-                **_input_dict,
-                origins_destinations=analysis_config.config_data.origins_destinations,
-                file_id=analysis_config.config_data.network.file_id,
             )
+            return MultiLinkOriginClosestDestination(_analysis_input)
         if analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
-            return Losses(
-                network_config_data=analysis_config.config_data,
+            _analysis_input = AnalysisInputWrapper.from_input(
+                analysis=analysis,
+                analysis_config=analysis_config,
                 graph_file=analysis_config.graph_files.base_graph_hazard,
-                **_input_dict
+                graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
+            return Losses(_analysis_input, analysis_config)
         if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
-            return MultiLinkLosses(
-                graph_file=analysis_config.graph_files.base_graph_hazard, **_input_dict
+            _analysis_input = AnalysisInputWrapper.from_input(
+                analysis=analysis,
+                analysis_config=analysis_config,
+                graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
+
+            return Losses(_analysis_input, analysis_config)
         if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS:
-            return MultiLinkIsolatedLocations(
-                graph_file=analysis_config.graph_files.base_graph_hazard, **_input_dict
+            _analysis_input = AnalysisInputWrapper.from_input(
+                analysis=analysis,
+                analysis_config=analysis_config,
+                graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
+            return MultiLinkIsolatedLocations(_analysis_input)
         raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")

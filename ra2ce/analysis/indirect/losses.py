@@ -27,19 +27,20 @@ from typing import Optional
 
 import geopandas as gpd
 import pandas as pd
-from geopandas import GeoDataFrame
 import math
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionIndirect, AnalysisConfigData,
+    AnalysisSectionIndirect,
 )
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeEnum
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
+from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
-from ra2ce.network.network_config_data.network_config_data import NetworkSection
 
 
 def _load_df_from_csv(
@@ -66,54 +67,46 @@ def _load_df_from_csv(
 
 
 class Losses(AnalysisIndirectProtocol):
-    network: NetworkSection
-    graph_file: GraphFile
     analysis: AnalysisSectionIndirect
+    graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path
     output_path: Path
     hazard_names: HazardNames
-    result: GeoDataFrame
 
-    def __init__(
-            self,
-            network_config_data: AnalysisConfigData,
-            graph_file: GraphFile,
-            analysis: AnalysisSectionIndirect,
-            input_path: Path,
-            static_path: Path,
-            output_path: Path,
-            hazard_names: HazardNames,
-    ) -> None:
-        self.graph_file = graph_file
-        self.analysis = analysis
-        self.network_config_data = network_config_data
-        self.link_id = self.network_config_data.network.file_id
-        self.link_type_column = self.network_config_data.network.link_type_column
+    def __init__(self, analysis_input: AnalysisInputWrapper, analysis_config: AnalysisConfigWrapper) -> None:
+        # TODO: make sure the "link_id" is kept in the result of the criticality analysis
+        self.analysis_input = analysis_input
+        self.analysis = self.analysis_input.analysis
+        self.graph_file_hazard = self.analysis_input.graph_file_hazard
+
+        self.link_id = analysis_config.config_data.network.file_id
+        self.link_type_column = analysis_config.config_data.network.link_type_column
         self.trip_purposes = self.analysis.trip_purposes
 
         self.performance_metric = f'diff_{self.analysis.weighing}'
 
-        self.part_of_day: PartOfDayEnum = analysis.part_of_day
-        self.analysis_type = analysis.analysis
-        self.duration_event: float = analysis.duration_event
-        self.hours_per_day: float = analysis.hours_per_day
-        self.production_loss_per_capita_per_hour = analysis.production_loss_per_capita_per_day / self.hours_per_day
+        self.part_of_day: PartOfDayEnum = self.analysis.part_of_day
+        self.analysis_type = self.analysis.analysis
+        self.duration_event: float = self.analysis.duration_event
+        self.hours_per_day: float = self.analysis.hours_per_day
+        self.production_loss_per_capita_per_hour = (
+                self.analysis.production_loss_per_capita_per_day / self.hours_per_day)
 
         self.intensities = _load_df_from_csv(
             self.analysis.traffic_intensities_file, [], self.link_id)  # per day
-        self.resilience_curve = _load_df_from_csv(analysis.resilience_curve_file,
+        self.resilience_curve = _load_df_from_csv(self.analysis.resilience_curve_file,
                                                   ["duration_steps",
                                                    "functionality_loss_ratio"], None, sep=";"
                                                   )
-        self.values_of_time = _load_df_from_csv(analysis.values_of_time_file, [], None, sep=";")
+        self.values_of_time = _load_df_from_csv(self.analysis.values_of_time_file, [], None, sep=";")
         self.vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose()
         self._check_validity_df()
 
-        self.input_path = input_path
-        self.static_path = static_path
-        self.output_path = output_path
-        self.hazard_names = hazard_names
+        self.input_path = self.analysis_input.input_path
+        self.static_path = self.analysis_input.static_path
+        self.output_path = self.analysis_input.output_path
+        self.hazard_names = self.analysis_input.hazard_names
 
         self.result = gpd.GeoDataFrame()
 
@@ -168,20 +161,35 @@ class Losses(AnalysisIndirectProtocol):
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
                     self.intensities[partofday_trip_purpose_name] / self.hours_per_day
-                # TODO: Make a new PR to support different time scales: here 10=10hours
+                    # TODO: Make a new PR to support different time scales: here 10=10hours
             )
         return dict(_vot_dict)
 
-    def calculate_vehicle_loss_hours(self, criticality_analysis: GeoDataFrame) -> gpd.GeoDataFrame:
+    def _get_disrupted_criticality_analysis_results(self, criticality_analysis: gpd.GeoDataFrame):
+        # filter out all links not affected by the hazard
+        if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
+            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_ma'] != 0]
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
+            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_max'] != 0]
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
+            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_mean'] != 0]
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
+            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_min'] != 0]
+
+        self.criticality_analysis_non_disrupted = criticality_analysis[
+            ~criticality_analysis.index.isin(self.criticality_analysis.index)
+        ]
+        self.criticality_analysis.set_index(self.link_id, inplace=True)
+        self.criticality_analysis_non_disrupted.set_index(self.link_id, inplace=True)
+
+    def calculate_vehicle_loss_hours(self) -> gpd.GeoDataFrame:
         """
         This function opens an existing table with traffic data and value of time to calculate losses based on
         detouring values. It also includes a traffic jam estimation.
-
-        criticality_analysis: GeoDataFrame results of a criticality analysis with extra detour times
         """
 
         def _check_validity_criticality_analysis():
-            if self.link_type_column not in criticality_analysis.columns:
+            if self.link_type_column not in self.criticality_analysis.columns:
                 raise Exception(f'''criticality_analysis results does not have the passed link_type_column.
             {self.link_type_column} is passed as link_type_column''')
 
@@ -192,12 +200,29 @@ class Losses(AnalysisIndirectProtocol):
                     return f"{x}-{y}"
             raise ValueError(f"No matching range found for height {height}")
 
-        # criticality_analysis.set_index(self.link_id, inplace=True)
+        def _create_result(vlh: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+            result = pd.concat(
+                [
+                    vlh,
+                    self.criticality_analysis_non_disrupted[
+                        [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] +
+                        list(events.columns)
+                    ]
+                ]
+            )
+            # Get the columns from vehicle_loss_hours that are not in common
+            additional_columns = list(set(vlh.columns) - set(self.criticality_analysis_non_disrupted.columns))
+
+            # Fill 0 for the additional columns of self.criticality_analysis_non_disrupted
+            result.loc[result.index.difference(vlh.index), additional_columns] = result.loc[
+                result.index.difference(vlh.index), additional_columns].fillna(0)
+            return result
+
         _check_validity_criticality_analysis()
         _hazard_intensity_ranges = self._get_link_types_heights_ranges()[1]
-        events = criticality_analysis.filter(regex=r'^EV(?!1_fr)')
+        events = self.criticality_analysis.filter(regex=r'^EV(?!1_fr)')
         # Read the performance_change stating the functionality drop
-        performance_change = criticality_analysis[self.performance_metric]
+        performance_change = self.criticality_analysis[self.performance_metric]
 
         # shape vehicle_loss_hours
         vehicle_loss_hours_df = pd.DataFrame(columns=['link_id'], data=criticality_analysis.index.values)
@@ -205,14 +230,14 @@ class Losses(AnalysisIndirectProtocol):
         # find the link_type and the hazard intensity
         vehicle_loss_hours_df = pd.merge(
             vehicle_loss_hours_df,
-            criticality_analysis[
-                ["link_id", f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] + list(
-                    events.columns)
+            self.criticality_analysis[
+                [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] + list(events.columns)
                 ],
             left_on="link_id",
             right_index=True,
         )
-        vehicle_loss_hours = gpd.GeoDataFrame(vehicle_loss_hours_df, geometry="geometry", crs=criticality_analysis.crs)
+        vehicle_loss_hours = gpd.GeoDataFrame(
+            vehicle_loss_hours_df, geometry="geometry", crs=self.criticality_analysis.crs)
         for event in events.columns.tolist():
             for _, vlh_row in vehicle_loss_hours.iterrows():
                 row_hazard_range = _get_range(eval(vlh_row[event]))
@@ -223,7 +248,8 @@ class Losses(AnalysisIndirectProtocol):
                     self._populate_vehicle_loss_hour_df(vehicle_loss_hours, row_hazard_range, vlh_row,
                                                         row_performance_change, event)
 
-        return vehicle_loss_hours
+        vehicle_loss_hours_result = _create_result(vehicle_loss_hours)
+        return vehicle_loss_hours_result
 
     def _calculate_production_loss_per_capita(self, vehicle_loss_hours: gpd.GeoDataFrame, vlh_row: pd.Series,
                                               hazard_col_name: str):
@@ -251,7 +277,12 @@ class Losses(AnalysisIndirectProtocol):
             occupancy_trip_type = float(self.vot_intensity_per_trip_collection[
                                             f"occupants_{trip_type}"
                                         ])
-            vlh_trip_type_event = self.duration_event * intensity_trip_type * occupancy_trip_type * self.production_loss_per_capita_per_hour
+            vlh_trip_type_event = (
+                    self.duration_event *
+                    intensity_trip_type *
+                    occupancy_trip_type *
+                    self.production_loss_per_capita_per_hour
+            )
             vehicle_loss_hours.loc[vlh_row.name, f"vlh_{trip_type}_{hazard_col_name}"] = vlh_trip_type_event
             vlh_total += vlh_trip_type_event
         vehicle_loss_hours.loc[vlh_row.name, f"vlh_{hazard_col_name}_total"] = vlh_total
@@ -329,16 +360,12 @@ class Losses(AnalysisIndirectProtocol):
         return list(_link_types), list(_hazard_intensity_ranges)
 
     def execute(self) -> gpd.GeoDataFrame:
-        criticality_analysis = SingleLinkRedundancy(
-            self.graph_file,
-            self.analysis,
-            self.input_path,
-            self.static_path,
-            self.output_path,
-            self.hazard_names,
-        ).execute()
+        criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
+
         criticality_analysis.drop_duplicates(subset='ID', inplace=True)
 
-        self.result = self.calculate_vehicle_loss_hours(criticality_analysis=criticality_analysis)
+        self._get_disrupted_criticality_analysis_results(criticality_analysis=criticality_analysis)
+
+        self.result = self.calculate_vehicle_loss_hours()
 
         return self.result

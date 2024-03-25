@@ -21,8 +21,6 @@
 
 from pathlib import Path
 
-from geopandas import GeoDataFrame
-
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionDirect,
 )
@@ -32,7 +30,7 @@ from ra2ce.network.graph_files.network_file import NetworkFile
 
 class AnalysisDirectProtocol(AnalysisProtocol):
     graph_file: NetworkFile
+    graph_file_hazard: NetworkFile
     analysis: AnalysisSectionDirect
     input_path: Path
     output_path: Path
-    result: GeoDataFrame
