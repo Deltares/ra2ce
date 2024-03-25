@@ -96,6 +96,7 @@ class Losses(AnalysisIndirectProtocol):
         self.part_of_day: PartOfDayEnum = analysis.part_of_day
         self.analysis_type = analysis.analysis
         self.duration_event: float = analysis.duration_event
+        self.hours_per_day: float = analysis.hours_per_day
 
         self.intensities = _load_df_from_csv(
             self.analysis.traffic_intensities_file, [], self.link_id)  # per day
@@ -159,7 +160,7 @@ class Losses(AnalysisIndirectProtocol):
             ].item()
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
-                    self.intensities[partofday_trip_purpose_name] / 10
+                    self.intensities[partofday_trip_purpose_name] / self.hours_per_day
                     # TODO: Make a new PR to support different time scales: here 10=10hours
             )
         return dict(_vot_dict)
@@ -197,7 +198,9 @@ class Losses(AnalysisIndirectProtocol):
         # find the link_type and the hazard intensity
         vehicle_loss_hours_df = pd.merge(
             vehicle_loss_hours_df,
-            criticality_analysis[[f"{self.link_type_column}", "geometry"] + list(events.columns)],
+            criticality_analysis[
+                [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] + list(events.columns)
+            ],
             left_index=True,
             right_index=True,
         )

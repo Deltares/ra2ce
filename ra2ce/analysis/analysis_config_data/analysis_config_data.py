@@ -89,6 +89,7 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     traffic_cols: list[str] = field(default_factory=list)
     duration_event: float = math.nan # TODO remove the deprecated attribute that have been replaced by csv
     part_of_day: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
+    hours_per_day: float = 24
     performance_metric: str = "diff_time"  # "diff_time" or "diff_length" relates to the used criticality metric
     trip_purposes: TripPurposeEnum = field(default_factory=lambda: TripPurposeEnum.NONE)
     resilience_curve_file: Optional[Path] = Path()
