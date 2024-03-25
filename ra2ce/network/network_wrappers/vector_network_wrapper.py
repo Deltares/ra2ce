@@ -297,7 +297,9 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         Returns:
             nx.Graph: NetworkX graph object with "crs", "approach" as graph properties.
         """
-        digraph = VectorNetworkWrapper.get_direct_graph_from_vector(gdf=gdf, edge_attributes_to_include = [])
+        digraph = VectorNetworkWrapper.get_direct_graph_from_vector(
+            gdf=gdf, edge_attributes_to_include=edge_attributes_to_include
+        )
         return digraph.to_undirected()
 
     @staticmethod

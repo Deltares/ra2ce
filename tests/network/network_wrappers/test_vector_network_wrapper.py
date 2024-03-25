@@ -135,7 +135,7 @@ class TestVectorNetworkWrapper:
 
     def test_get_indirect_graph_from_vector(self, lines_gdf: gpd.GeoDataFrame):
         # When
-        graph = VectorNetworkWrapper.get_indirect_graph_from_vector(lines_gdf)
+        graph = VectorNetworkWrapper.get_indirect_graph_from_vector(lines_gdf, [])
 
         # Then
         assert graph.nodes(data="geometry") is not None
@@ -145,7 +145,9 @@ class TestVectorNetworkWrapper:
 
     def test_get_direct_graph_from_vector(self, lines_gdf: gpd.GeoDataFrame):
         # When
-        graph = VectorNetworkWrapper.get_direct_graph_from_vector(gdf=lines_gdf, edge_attributes_to_include=[])
+        graph = VectorNetworkWrapper.get_direct_graph_from_vector(
+            gdf=lines_gdf, edge_attributes_to_include=[]
+        )
 
         # Then
         assert isinstance(graph, nx.DiGraph)
