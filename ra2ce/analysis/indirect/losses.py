@@ -28,6 +28,7 @@ from typing import Optional
 import geopandas as gpd
 import pandas as pd
 from geopandas import GeoDataFrame
+import math
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect, AnalysisConfigData,
@@ -97,6 +98,7 @@ class Losses(AnalysisIndirectProtocol):
         self.analysis_type = analysis.analysis
         self.duration_event: float = analysis.duration_event
         self.hours_per_day: float = analysis.hours_per_day
+        self.production_loss_per_capita_per_hour = analysis.production_loss_per_capita_per_day / self.hours_per_day
 
         self.intensities = _load_df_from_csv(
             self.analysis.traffic_intensities_file, [], self.link_id)  # per day
@@ -148,20 +150,24 @@ class Losses(AnalysisIndirectProtocol):
         Generates a dictionary with all available `vot_purpose` with their intensity as a `pd.DataFrame`.
         """
         _vot_dict = defaultdict(pd.DataFrame)
-        for purpose in self.trip_purposes:
-            vot_var_name = f"vot_{purpose}"
-            partofday_trip_purpose_name = f"{self.part_of_day}_{purpose}"
+        for trip_purpose in self.trip_purposes:
+            vot_var_name = f"vot_{trip_purpose}"
+            occupancy_var_name = f"occupants_{trip_purpose}"
+            partofday_trip_purpose_name = f"{self.part_of_day}_{trip_purpose}"
             partofday_trip_purpose_intensity_name = (
                     "intensity_" + partofday_trip_purpose_name
             )
             # read and set the vot's
             _vot_dict[vot_var_name] = self.values_of_time.loc[
-                self.values_of_time["trip_types"] == purpose.config_value, "value_of_time"
+                self.values_of_time["trip_types"] == trip_purpose.config_value, "value_of_time"
+            ].item()
+            _vot_dict[occupancy_var_name] = self.values_of_time.loc[
+                self.values_of_time["trip_types"] == trip_purpose.config_value, "occupants"
             ].item()
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
                     self.intensities[partofday_trip_purpose_name] / self.hours_per_day
-                    # TODO: Make a new PR to support different time scales: here 10=10hours
+                # TODO: Make a new PR to support different time scales: here 10=10hours
             )
         return dict(_vot_dict)
 
@@ -172,6 +178,7 @@ class Losses(AnalysisIndirectProtocol):
 
         criticality_analysis: GeoDataFrame results of a criticality analysis with extra detour times
         """
+
         def _check_validity_criticality_analysis():
             if self.link_type_column not in criticality_analysis.columns:
                 raise Exception(f'''criticality_analysis results does not have the passed link_type_column.
@@ -200,7 +207,7 @@ class Losses(AnalysisIndirectProtocol):
             vehicle_loss_hours_df,
             criticality_analysis[
                 [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] + list(events.columns)
-            ],
+                ],
             left_index=True,
             right_index=True,
         )
@@ -209,15 +216,50 @@ class Losses(AnalysisIndirectProtocol):
             for _, vlh_row in vehicle_loss_hours.iterrows():
                 row_hazard_range = _get_range(vlh_row[event])
                 row_performance_change = performance_change.loc[vlh_row.name]
-                self._populate_vlh_df(vehicle_loss_hours, row_hazard_range, vlh_row, row_performance_change, event)
+                if math.isnan(row_performance_change):
+                    self._calculate_production_loss_per_capita(vehicle_loss_hours, vlh_row, event)
+                else:
+                    self._populate_vehicle_loss_hour_df(vehicle_loss_hours, row_hazard_range, vlh_row,
+                                                        row_performance_change, event)
 
         return vehicle_loss_hours
 
-    def _populate_vlh_df(self, vehicle_loss_hours: gpd.GeoDataFrame, row_hazard_range: str, vlh_row: pd.Series,
-                         performance_change, hazard_col_name: str):
+    def _calculate_production_loss_per_capita(self, vehicle_loss_hours: gpd.GeoDataFrame, vlh_row: pd.Series,
+                                              hazard_col_name: str):
+        """
+        In cases where there is no alternative route in the event of disruption of the road, we propose to use a
+        proxy for the assessment of losses from the interruption of services from the road in these cases where no
+        alternative routes exist.
+        The assumption for the proxy is that a loss of production will occur from the
+        interruption of the road, equal to the size of the added value from the persons that cannot make use of the
+        road, measured in the regional GDP per capita. This assumption constitutes both the loss of production within
+        the area that cannot be reached, as well the loss of production outside the area due to the inability of the
+        workers from within the cut-off area to arrive at their place of production outside this area.
+
+        The daily loss of productivity for each link section without detour routes, when they are
+        disrupted is then obtained multiplying the traffic intensity by the total occupancy per vehicle type,
+        including drivers, by the daily loss of productivity per capita per hour.
+
+        the unit of time is hour.
+        """
+        vlh_total = 0
+        for trip_type in self.trip_purposes:
+            intensity_trip_type = self.vot_intensity_per_trip_collection[
+                f"intensity_{self.part_of_day}_{trip_type}"
+            ].loc[vlh_row.name]
+            occupancy_trip_type = float(self.vot_intensity_per_trip_collection[
+                                            f"occupants_{trip_type}"
+                                        ])
+            vlh_trip_type_event = self.duration_event * intensity_trip_type * occupancy_trip_type * self.production_loss_per_capita_per_hour
+            vehicle_loss_hours.loc[vlh_row.name, f"vlh_{trip_type}_{hazard_col_name}"] = vlh_trip_type_event
+            vlh_total += vlh_trip_type_event
+        vehicle_loss_hours.loc[vlh_row.name, f"vlh_{hazard_col_name}_total"] = vlh_total
+
+    def _populate_vehicle_loss_hour_df(self, vehicle_loss_hours: gpd.GeoDataFrame, row_hazard_range: str,
+                                       vlh_row: pd.Series,
+                                       performance_change: float, hazard_col_name: str):
 
         vlh_total = 0
-
         link_type_hazard_range = (
             f"{vlh_row['link_type']}_{row_hazard_range}"
         )
@@ -294,6 +336,7 @@ class Losses(AnalysisIndirectProtocol):
             self.output_path,
             self.hazard_names,
         ).execute()
+        criticality_analysis.drop_duplicates(subset='ID', inplace=True)
 
         self.result = self.calculate_vehicle_loss_hours(criticality_analysis=criticality_analysis)
 

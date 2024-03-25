@@ -126,6 +126,11 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             TripPurposeEnum.get_enum,
             self._parser.getlist(section_name, "trip_purposes", fallback=[])
         ))
+        _section.production_loss_per_capita_per_day = self._parser.getfloat(
+            section_name,
+            "production_loss_per_capita_per_day",
+            fallback=_section.production_loss_per_capita_per_day,
+        )
         _section.duration_event = self._parser.getfloat(
             section_name,
             "duration_event",
