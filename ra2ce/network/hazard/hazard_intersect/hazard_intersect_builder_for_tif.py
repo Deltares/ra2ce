@@ -163,7 +163,9 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
             )
 
         # Run in parallel to boost performance.
-        self._overlay_in_parallel(overlay_network_x)
+        # self._overlay_in_parallel(overlay_network_x)
+        for i, (hn, rn) in enumerate(self._combined_names):
+            overlay_network_x(self.hazard_tif_files[i], hn, rn)
         return hazard_overlay
 
     def _from_geodataframe(self, hazard_overlay: GeoDataFrame):
