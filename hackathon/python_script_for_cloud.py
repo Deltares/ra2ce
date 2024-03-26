@@ -13,7 +13,9 @@ from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.ra2ce_logging import Ra2ceLogger
 
 # Create one network configuration per provided hazard.
-_root_dir = Path(__file__).parent
+_root_dir = Path("/data")
+assert _root_dir.exists()
+
 _network_file = _root_dir.joinpath("network.ini")
 assert _network_file.exists()
 _network_data = NetworkConfigDataReader().read(_network_file)
@@ -32,7 +34,8 @@ _analysis_config_data = AnalysisConfigDataReader().read(_analysis_ini)
 _config_wrapper = ConfigWrapper()
 
 # Initialize logger.
-Ra2ceLogger(logging_dir=_network_data.output_path, logger_name="RA2CE")
+# NOTE! Logging seems to flood the bucket files, so better to disable it for now.
+# Ra2ceLogger(logging_dir=_network_data.output_path, logger_name="RA2CE")
 
 # Configure analysis and network
 _network_config_wrapper = NetworkConfigWrapper.from_data(_network_file, _network_data)
