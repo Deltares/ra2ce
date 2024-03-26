@@ -200,18 +200,6 @@ class Losses(AnalysisIndirectProtocol):
             raise ValueError(f"No matching range found for height {height}")
 
         def _create_result(vlh: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-            """
-
-            Args: vlh: calculated vehicle_loss_hours GeoDataFrame. For single_link_losses it only includes the
-            disrupted links. For Multi_link_losses it includes all links. This is because of the difference between
-            the underlying single_link_redundancy and multi_link_redundancy analysis results.
-
-            Returns: results of the Losses analysis. For the single_link_losses it adds non_disrupted links to vlh. For
-            Multi_link_losses this is not necessary because of the underlying multi_link_redundancy analysis.
-
-            """
-            if self.analysis.analysis.name == 'MULTI_LINK_LOSSES':
-                return vlh
             result = pd.concat(
                 [
                     vlh,
@@ -372,14 +360,12 @@ class Losses(AnalysisIndirectProtocol):
         return list(_link_types), list(_hazard_intensity_ranges)
 
     def execute(self) -> gpd.GeoDataFrame:
-        if self.analysis.analysis.name == 'SINGLE_LINK_LOSSES':
-            criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
-            criticality_analysis.drop_duplicates(subset='ID', inplace=True)
-            self._get_disrupted_criticality_analysis_results(criticality_analysis=criticality_analysis)
-        elif self.analysis.analysis.name == 'MULTI_LINK_LOSSES':
-            criticality_analysis = MultiLinkRedundancy(self.analysis_input).execute()
-            criticality_analysis.drop_duplicates(subset='ID', inplace=True)
-            raise NotImplementedError("Under construction!")
+        criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
+
+        criticality_analysis.drop_duplicates(subset='ID', inplace=True)
+
+        self._get_disrupted_criticality_analysis_results(criticality_analysis=criticality_analysis)
 
         self.result = self.calculate_vehicle_loss_hours()
+
         return self.result
