@@ -1,11 +1,6 @@
 from pathlib import Path
 
-from ra2ce.network.network_config_data.network_config_data_reader import (
-    NetworkConfigDataReader,
-)
-from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
-from ra2ce.runners import AnalysisRunnerFactory
-from ra2ce.configuration.config_wrapper import ConfigWrapper
+from ra2ce.ra2ce_handler import Ra2ceHandler
 
 """
     This script runs a network WITHOUT an analysis,
@@ -19,20 +14,15 @@ assert _root_dir.exists()
 
 _network_file = _root_dir.joinpath("network.ini")
 assert _network_file.exists()
-_network_data = NetworkConfigDataReader().read(_network_file)
 
 _tif_data_directory = _root_dir.joinpath("static", "hazard")
 assert _tif_data_directory.exists()
-_network_data.hazard.hazard_map = list(_tif_data_directory.glob("*.tif"))
-
-# Run one analysis per network hazard.
-_config_wrapper = ConfigWrapper()
-
-# Configure analysis and network
-_network_config_wrapper = NetworkConfigWrapper.from_data(_network_file, _network_data)
-_config_wrapper.network_config = _network_config_wrapper
-_config_wrapper.configure()
 
 # Run analysis
-_runner = AnalysisRunnerFactory.get_runner(_config_wrapper)
-_runner.run(_config_wrapper.analysis_config)
+_handler = Ra2ceHandler(_network_file, analysis=None)
+_handler.input_config.network_config.config_data.hazard.hazard_map = list(
+    _tif_data_directory.glob("*.tif")
+)
+
+_handler.configure()
+_handler.run_analysis()
