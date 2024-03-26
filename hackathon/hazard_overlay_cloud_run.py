@@ -7,8 +7,10 @@ from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from ra2ce.runners import AnalysisRunnerFactory
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 
-# This script runs a network WITHOUT an analysis,
-# as we are only interested to retrieve the direct analysis.
+"""
+    This script runs a network WITHOUT an analysis,
+    as we are only interested to retrieve the HAZARD overlay.
+"""
 
 # Create one network configuration per provided hazard.
 _root_dir = Path("/data")
