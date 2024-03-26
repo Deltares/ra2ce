@@ -21,7 +21,7 @@ _network_file = _root_dir.joinpath("network.ini")
 assert _network_file.exists()
 _network_data = NetworkConfigDataReader().read(_network_file)
 
-_tif_data_directory = _root_dir.joinpath("data")
+_tif_data_directory = _root_dir.joinpath("static", "hazard")
 assert _tif_data_directory.exists()
 _network_data.hazard.hazard_map = list(_tif_data_directory.glob("*.tif"))
 
