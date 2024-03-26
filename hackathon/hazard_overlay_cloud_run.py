@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 
 from ra2ce.ra2ce_handler import Ra2ceHandler
@@ -19,10 +20,15 @@ _tif_data_directory = _root_dir.joinpath("static", "hazard")
 assert _tif_data_directory.exists()
 
 # Run analysis
+logging.getLogger().setLevel(logging.INFO)
+
 _handler = Ra2ceHandler(_network_file, analysis=None)
-_handler.input_config.network_config.config_data.hazard.hazard_map = list(
-    _tif_data_directory.glob("*.tif")
-)
+_handler.input_config.network_config.config_data.hazard.hazard_map = [
+    list(_tif_data_directory.glob("*.tif"))[0]
+]
+
+# Try to get only RELEVANT info messages.
+logging.getLogger("RA2CE").setLevel(logging.INFO)
 
 _handler.configure()
 _handler.run_analysis()
