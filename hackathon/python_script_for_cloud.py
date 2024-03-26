@@ -13,6 +13,7 @@ from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.ra2ce_logging import Ra2ceLogger
 
 # Create one network configuration per provided hazard.
+# We assume the whole input directory will be mounted in `/data`
 _root_dir = Path("/data")
 assert _root_dir.exists()
 
