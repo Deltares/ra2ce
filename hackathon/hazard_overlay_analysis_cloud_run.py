@@ -22,14 +22,15 @@ assert _analysis_ini.exists()
 # Ra2ceLogger(logging_dir=_network_data.output_path, logger_name="RA2CE")
 
 # Run analysis
-logging.getLogger().setLevel(logging.INFO)
 _handler = Ra2ceHandler(_network_file, _analysis_ini)
 _handler.input_config.network_config.config_data.hazard.hazard_map = list(
     _tif_data_directory.glob("*.tif")
 )
 
 # Try to get only RELEVANT info messages.
-logging.getLogger("RA2CE").setLevel(logging.INFO)
+import warnings
+
+warnings.filterwarnings("ignore")
 
 _handler.configure()
 _handler.run_analysis()
