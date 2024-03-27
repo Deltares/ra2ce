@@ -13,7 +13,7 @@ spec:
   - name: run-scenario
     container:
       image: containers.deltares.nl/ra2ce/ra2ce:latest
-      command: ["python", "/scripts/run_race.py"]
+      command: ["python", "/scripts/run_hazard_overlay.py"]
     inputs:
       artifacts:
         - name: data
