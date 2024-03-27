@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  generateName: ra2ce-
+spec:
+  containers:
+  - name: ra2ce
+    image: containers.deltares.nl/ra2ce/ra2ce:latest
+  imagePullSecrets:
+  - name: regcred

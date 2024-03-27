@@ -729,13 +729,13 @@ class HazardOverlay:
                 gdf_reprojected["geometry"] = original_geometries
                 self.graph_files.base_network_hazard.graph = gdf_reprojected.copy()
                 del gdf_reprojected
-            else:
+            #else:
                 # read previously created file
-                logging.info("Setting 'base_network_hazard' graph.")
-                if not self.graph_files.base_network_hazard.file:
-                    self.graph_files.base_network_hazard.graph = self.hazard_intersect(
-                        self.graph_files.base_network.get_graph()
-                    )
+                #logging.info("Setting 'base_network_hazard' graph.")
+                #if not self.graph_files.base_network_hazard.file:
+                    #self.graph_files.base_network_hazard.graph = self.hazard_intersect(
+                        #self.graph_files.base_network.get_graph()
+                    #)
 
         #### Step 4: hazard overlay of the locations that are checked for isolation ###
         if self._isolation_locations:
