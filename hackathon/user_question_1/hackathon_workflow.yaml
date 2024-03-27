@@ -29,7 +29,7 @@ spec:
   - name: pre-processing
     container:
       image: containers.deltares.nl/ra2ce/ra2ce:latest
-      command: ["python", "/scripts/convert_floodmaps_to_wgs84.py", "/input", "/output"]
+      command: ["python", "/scripts/user_question_1/convert_floodmaps_to_wgs84.py", "/input", "/output"]
     nodeSelector:
       beta.kubernetes.io/instance-type: "m5.xlarge"
     inputs:
@@ -109,7 +109,7 @@ spec:
   - name: run-scenario
     container:
       image: containers.deltares.nl/ra2ce/ra2ce:latest
-      command: ["python", "/scripts/hazard_overlay_cloud_run.py"]
+      command: ["python", "/scripts/user_question_1/hazard_overlay_cloud_run.py"]
     nodeSelector:
       beta.kubernetes.io/instance-type: "m5.xlarge"
     inputs:
@@ -182,7 +182,7 @@ spec:
   - name: post-processing
     container:
       image: containers.deltares.nl/ra2ce/ra2ce:latest
-      command: ["python", "/scripts/post_processing.py"]
+      command: ["python", "/scripts/user_question_1/post_processing.py"]
       #command: [sh, "-c", "for I in $(seq 1 1000) ; do echo $I ; sleep 1s; done"]
     nodeSelector:
       beta.kubernetes.io/instance-type: "m5.xlarge"
