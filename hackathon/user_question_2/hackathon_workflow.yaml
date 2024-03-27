@@ -33,7 +33,7 @@ spec:
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
-            key: beira_qualimane_sfincs_fm/output
+            key: beira_qualimane_sfincs_fm/output_q2
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials
@@ -65,7 +65,7 @@ spec:
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
-            key: beira_qualimane_sfincs_fm/postprocessing_output
+            key: beira_qualimane_sfincs_fm/postprocessing_output_q2
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials
@@ -161,7 +161,7 @@ spec:
           bucket: ra2ce-data
           endpoint: s3.amazonaws.com
           region: eu-west-1
-          key: beira_qualimane_sfincs_fm/output/{{inputs.parameters.member}}/
+          key: beira_qualimane_sfincs_fm/output_q2/{{inputs.parameters.member}}/
           accessKeySecret:
             name: my-s3-credentials
             key: accessKey
