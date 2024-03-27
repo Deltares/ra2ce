@@ -2,8 +2,6 @@ from pathlib import Path
 import pandas as pd
 import geopandas as gpd
 
-
-
 # set the required parameters
 cloud_output_folder = Path('/data')
 
@@ -43,5 +41,6 @@ for i, event_name in enumerate(event_names):
         )
 
 gdf = result_gdf
-gdf.to_json('/output/result_gdf.json')
+
+gdf.to_file('/output/result_gdf.geojson', driver="GeoJSON")
 gdf.to_feather('/output/result_gdf.feather')
