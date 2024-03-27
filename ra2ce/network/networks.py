@@ -23,8 +23,10 @@ import logging
 from pathlib import Path
 
 import networkx as nx
+import pandas as pd
 import pyproj
 from geopandas import GeoDataFrame
+import warnings
 
 from ra2ce.network import networks_utils as nut
 from ra2ce.network.exporters.network_exporter_factory import NetworkExporterFactory
@@ -44,7 +46,7 @@ class Network:
     """
 
     def __init__(
-        self, network_config: NetworkConfigData, graph_files: GraphFilesCollection
+            self, network_config: NetworkConfigData, graph_files: GraphFilesCollection
     ):
         # General
         self._config_data = network_config
@@ -78,7 +80,7 @@ class Network:
         self.graph_files = graph_files
 
     def add_od_nodes(
-        self, graph: nx.classes.graph.Graph, crs: pyproj.CRS
+            self, graph: nx.classes.graph.Graph, crs: pyproj.CRS
     ) -> nx.classes.graph.Graph:
         """Adds origins and destinations nodes from shapefiles to the graph.
 
@@ -138,10 +140,10 @@ class Network:
         return out_fn
 
     def _export_network_files(
-        self,
-        network: nx.MultiGraph | GeoDataFrame,
-        graph_type: str,
-        types_to_export: list[str],
+            self,
+            network: nx.MultiGraph | GeoDataFrame,
+            graph_type: str,
+            types_to_export: list[str],
     ):
         _exporter = NetworkExporterFactory()
         _exporter.export(
@@ -154,6 +156,26 @@ class Network:
         self.graph_files.set_graph(graph_type, network)
 
     def _get_new_network_and_graph(self, export_types: list[str]) -> None:
+        def _get_edges_time_hours(_graph: nx.MultiGraph) -> dict:
+            result = {}
+
+            for e in _graph.edges.data(keys=True):
+                if e[2].get("avgspeed") is None:
+                    warnings.warn("Some edges have missing 'avgspeed' attribute. Time values set to None.", UserWarning)
+                    time_value = None
+                else:
+                    time_value = (e[2]["length"] / 1000) / e[2]["avgspeed"]
+                result[(e[0], e[1], e[2])] = {"time": time_value}
+
+            return result
+
+        def _get_edges_time_hours_row_wise(_row):
+            if pd.notnull(_row["avgspeed"]):
+                return _row["length"] / 1000 / _row["avgspeed"]
+            else:
+                warnings.warn("Some edges have missing 'avgspeed' attribute. Time values set to None.", UserWarning)
+                return None
+
         (_base_graph, _network_gdf) = NetworkWrapperFactory(
             self._config_data
         ).get_network()
@@ -171,9 +193,13 @@ class Network:
         }
         nx.set_edge_attributes(_base_graph, edges_lengths_meters)
 
+        edges_time_hours = _get_edges_time_hours(_base_graph)
+        nx.set_edge_attributes(_base_graph, edges_time_hours)
+
         _network_gdf["length"] = _network_gdf["geometry"].apply(
             lambda x: nut.line_length(x, _network_gdf.crs)
         )
+        _network_gdf["time"] = _network_gdf.apply(_get_edges_time_hours_row_wise, axis=1)
 
         # Save the graph and geodataframe
         self._export_network_files(_base_graph, "base_graph", export_types)
@@ -189,7 +215,7 @@ class Network:
         )
 
         def get_graph(
-            file_type: str, file_path: Path | None
+                file_type: str, file_path: Path | None
         ) -> nx.MultiGraph | GeoDataFrame:
             graph = self.graph_files.get_graph(file_type)
             if graph is None:
@@ -224,9 +250,9 @@ class Network:
 
         # create origins destinations graph
         if (
-            (self.origins)
-            and (self.destinations)
-            and not self.graph_files.origins_destinations_graph.file
+                (self.origins)
+                and (self.destinations)
+                and not self.graph_files.origins_destinations_graph.file
         ):
             # fetch the base graph
             base_graph = self.graph_files.base_graph.get_graph()
