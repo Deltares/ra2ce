@@ -11,7 +11,7 @@ assert _root_dir.exists()
 _network_file = _root_dir.joinpath("network.ini")
 assert _network_file.exists()
 
-_tif_data_directory = _root_dir.joinpath("data")
+_tif_data_directory = Path("/input")
 assert _tif_data_directory.exists()
 
 _analysis_ini = _root_dir.joinpath("analysis.ini")
