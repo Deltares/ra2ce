@@ -160,11 +160,11 @@ class Network:
             result = {}
 
             for e in _graph.edges.data(keys=True):
-                if e[2].get("avgspeed") is None:
+                if e[-1].get("avgspeed") is None:
                     warnings.warn("Some edges have missing 'avgspeed' attribute. Time values set to None.", UserWarning)
                     time_value = None
                 else:
-                    time_value = (e[2]["length"] / 1000) / e[2]["avgspeed"]
+                    time_value = (e[-1]["length"] / 1000) / e[-1]["avgspeed"]
                 result[(e[0], e[1], e[2])] = {"time": time_value}
 
             return result
