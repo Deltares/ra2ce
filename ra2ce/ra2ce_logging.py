@@ -19,8 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
+import warnings
 from pathlib import Path
 from typing import Optional
 
@@ -34,6 +34,9 @@ class Ra2ceLogger:
         self.log_file = logging_dir.joinpath(f"{logger_name}.log")
         if not self.log_file.is_file():
             self.log_file.touch()
+
+        # Ignore the deprecated warnings that can flood the logger.
+        warnings.filterwarnings("ignore")
 
         self._set_file_handler()
         self._set_console_handler()

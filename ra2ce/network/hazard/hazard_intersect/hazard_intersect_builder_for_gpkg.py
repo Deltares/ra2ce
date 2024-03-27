@@ -91,9 +91,9 @@ class HazardIntersectBuilderForGpkg(HazardIntersectBuilderBase):
                     ] = 0
 
         # Run in parallel to boost performance.
-        self._overlay_in_parallel(networkx_overlay)
-        # for i, _ra2ce_name in self.ra2ce_names:
-        #     networkx_overlay(self.hazard_shp_files[i], _ra2ce_name)
+        # self._overlay_in_parallel(networkx_overlay)
+        for i, _ra2ce_name in self.ra2ce_names:
+            networkx_overlay(self.hazard_gpkg_files[i], _ra2ce_name)
         return hazard_overlay
 
     def _from_geodataframe(self, hazard_overlay: GeoDataFrame) -> GeoDataFrame:
@@ -128,9 +128,9 @@ class HazardIntersectBuilderForGpkg(HazardIntersectBuilderBase):
             )
 
         # Run in parallel to boost performance.
-        self._overlay_in_parallel(geodataframe_overlay)
-        # for i, _ra2ce_name in self.ra2ce_names:
-        #     geodataframe_overlay(self.hazard_shp_files[i], _ra2ce_name)
+        # self._overlay_in_parallel(geodataframe_overlay)
+        for i, _ra2ce_name in self.ra2ce_names:
+            geodataframe_overlay(self.hazard_gpkg_files[i], _ra2ce_name)
 
         if hazard_overlay.crs != gdf_crs_original:
             hazard_overlay = hazard_overlay.to_crs(gdf_crs_original)
