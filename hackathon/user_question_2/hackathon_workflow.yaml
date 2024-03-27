@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
-  generateName: ra2ce-hackathon-uq1-
+  generateName: ra2ce-hackathon-uq2-
 spec:
   entrypoint: scenario-workflow
   templates:
@@ -9,13 +9,6 @@ spec:
     steps:
     - - name: define-subdirs
         template: read-members
-    # - - name: pre-processing
-    #     template: pre-processing
-    #     arguments:
-    #       parameters:
-    #       - name: member
-    #         value: "{{item}}"
-    #     withParam: "{{steps.define-subdirs.outputs.result}}"
     - - name: run-scenario
         template: run-scenario
         arguments:
@@ -25,64 +18,6 @@ spec:
         withParam: "{{steps.define-subdirs.outputs.result}}"
     - - name: post-processing
         template: post-processing
-
-  - name: pre-processing
-    container:
-      image: containers.deltares.nl/ra2ce/ra2ce:latest
-      command: ["python", "/scripts/convert_floodmaps_to_wgs84.py", "/input", "/output"]
-    nodeSelector:
-      beta.kubernetes.io/instance-type: "m5.xlarge"
-    inputs:
-      parameters:
-        - name: member
-      artifacts:
-        - name: input
-          path: /input/{{inputs.parameters.member}}.tif
-          s3:
-            endpoint: s3.amazonaws.com
-            bucket: ra2ce-data
-            key: sfincs_floodmaps_sub/{{inputs.parameters.member}}.tif
-            region: eu-west-1
-            accessKeySecret:
-              name: my-s3-credentials
-              key: accessKey
-            secretKeySecret:
-              name: my-s3-credentials
-              key: secretKey
-          archive:
-            none: {}
-        - name: scripts
-          path: /scripts
-          s3:
-            endpoint: s3.amazonaws.com
-            bucket: ra2ce-data
-            key: beira_qualimane_sfincs_fm/scripts
-            region: eu-west-1
-            accessKeySecret:
-              name: my-s3-credentials
-              key: accessKey
-            secretKeySecret:
-              name: my-s3-credentials
-              key: secretKey
-          archive:
-            none: {}
-    outputs:
-      artifacts:
-        - name: output
-          path: /output/
-          s3:
-            endpoint: s3.amazonaws.com
-            bucket: ra2ce-data
-            key: sfincs_floodmaps_sub_converted
-            region: eu-west-1
-            accessKeySecret:
-              name: my-s3-credentials
-              key: accessKey
-            secretKeySecret:
-              name: my-s3-credentials
-              key: secretKey
-          archive:
-            none: {}
 
   - name: post-processing
     container:
@@ -166,7 +101,7 @@ spec:
   - name: run-scenario
     container:
       image: containers.deltares.nl/ra2ce/ra2ce:latest
-      command: ["python", "/scripts/hazard_overlay_cloud_run.py"]
+      command: ["python", "/scripts/hazard_overlay_cloud_run_analysis.py"]
     nodeSelector:
       beta.kubernetes.io/instance-type: "m5.xlarge"
     inputs:
