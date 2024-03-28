@@ -174,6 +174,9 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
 
     def get_origins_destinations_section(self) -> OriginsDestinationsSection:
         _section = "origins_destinations"
+        if _section not in self._parser:
+            return OriginsDestinationsSection()
+
         _od_section = OriginsDestinationsSection(**self._parser[_section])
         _od_section.origin_out_fraction = self._parser.getint(
             _section, "origin_out_fraction", fallback=_od_section.origin_out_fraction
@@ -187,12 +190,14 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
         _section = "isolation"
         if _section not in self._parser:
             return IsolationSection()
+
         return IsolationSection(**self._parser[_section])
 
     def get_hazard_section(self) -> HazardSection:
         _section = "hazard"
         if _section not in self._parser:
             return HazardSection()
+
         _hazard_section = HazardSection(**self._parser[_section])
         _hazard_section.hazard_map = list(
             map(
@@ -212,6 +217,8 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
 
     def get_cleanup_section(self) -> CleanupSection:
         _section = "cleanup"
+        if _section not in self._parser:
+            return CleanupSection()
 
         _cleanup_section = CleanupSection()
         _cleanup_section.snapping_threshold = self._parser.getboolean(
