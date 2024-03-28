@@ -1,8 +1,8 @@
 from pathlib import Path
 
 import networkx as nx
-from geopandas import GeoDataFrame
 import pytest
+from geopandas import GeoDataFrame
 from networkx import Graph, MultiDiGraph, MultiGraph
 from networkx.utils import graphs_equal
 from shapely.geometry import LineString, Polygon

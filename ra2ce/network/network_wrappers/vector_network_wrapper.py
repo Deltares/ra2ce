@@ -28,8 +28,8 @@ import momepy
 import networkx as nx
 import pandas as pd
 import pyproj
-from tqdm import tqdm
 from shapely.geometry import Point
+from tqdm import tqdm
 
 import ra2ce.network.networks_utils as nut
 from ra2ce.network.exporters.json_exporter import JsonExporter

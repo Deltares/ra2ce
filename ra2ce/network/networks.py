@@ -19,16 +19,16 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import copy
 import logging
+import warnings
 from pathlib import Path
+
 import geopandas as gpd
 import networkx as nx
+import osmnx
 import pandas as pd
 import pyproj
-
-import osmnx
-import copy
-import warnings
 
 from ra2ce.network import networks_utils as nut
 from ra2ce.network.exporters.network_exporter_factory import NetworkExporterFactory

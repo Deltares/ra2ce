@@ -20,6 +20,7 @@
 """
 
 from typing import Protocol
+
 from geopandas import GeoDataFrame
 from networkx import Graph
 

@@ -457,9 +457,9 @@ def add_od_nodes(
             closest_node_on_extremities_id = get_node_id_from_position(
                 graph, *closest_node_on_extremities
             )
-            inverse_nodes_dict[(closest_node_on_road[0], closest_node_on_road[1])] = (
-                closest_node_on_extremities_id
-            )
+            inverse_nodes_dict[
+                (closest_node_on_road[0], closest_node_on_road[1])
+            ] = closest_node_on_extremities_id
 
         return inverse_nodes_dict
 
