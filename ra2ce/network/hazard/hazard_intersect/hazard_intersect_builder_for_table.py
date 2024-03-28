@@ -28,10 +28,7 @@ from pandas import read_csv
 from ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base import (
     HazardIntersectBuilderBase,
 )
-from ra2ce.network.networks_utils import (
-    graph_from_gdf,
-    graph_to_gdf,
-)
+from ra2ce.network.networks_utils import graph_from_gdf, graph_to_gdf
 
 
 @dataclass

@@ -19,10 +19,12 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from copy import deepcopy
 import logging
+from copy import deepcopy
 from pathlib import Path
+
 from geopandas import GeoDataFrame
+
 from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 
 

@@ -20,7 +20,9 @@
 """
 
 from dataclasses import dataclass
+
 import geopandas as gpd
+
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 
 

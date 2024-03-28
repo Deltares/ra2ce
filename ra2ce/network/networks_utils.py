@@ -39,8 +39,8 @@ from geopy import distance
 from numpy.ma import MaskedArray
 from osgeo import gdal
 from osmnx import graph_to_gdfs
-from osmnx.simplification import _remove_rings, utils, _get_paths_to_simplify
 from osmnx._errors import GraphSimplificationError
+from osmnx.simplification import _get_paths_to_simplify, _remove_rings, utils
 from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
@@ -1119,7 +1119,9 @@ def simplify_graph_count(complex_graph: nx.Graph) -> nx.Graph:
     old_len_nodes = complex_graph.number_of_nodes()
     old_len_edges = complex_graph.number_of_edges()
 
-    simple_graph = simplify_graph(graph=complex_graph, strict=True, remove_rings=True, track_merged=False)
+    simple_graph = simplify_graph(
+        graph=complex_graph, strict=True, remove_rings=True, track_merged=False
+    )
 
     new_len_nodes = simple_graph.number_of_nodes()
     new_len_edges = simple_graph.number_of_edges()
@@ -1133,7 +1135,9 @@ def simplify_graph_count(complex_graph: nx.Graph) -> nx.Graph:
     return simple_graph
 
 
-def simplify_graph(graph: nx.Graph, strict: bool, remove_rings: bool, track_merged: bool):
+def simplify_graph(
+    graph: nx.Graph, strict: bool, remove_rings: bool, track_merged: bool
+):
     """
     this is an OSMNX function with the same name, modified to check if geometry attribute exists in the nodes of each
     path to simplify.
@@ -1243,10 +1247,15 @@ def simplify_graph(graph: nx.Graph, strict: bool, remove_rings: bool, track_merg
             path_attributes["geometry"] = LineString(
                 [graph.nodes[node]["geometry"] for node in path]
             )
-        elif all("x" in graph.nodes[node] and "y" in graph.nodes[node] for node in path):
+        elif all(
+            "x" in graph.nodes[node] and "y" in graph.nodes[node] for node in path
+        ):
             # Create LineString using x and y coordinates
             path_attributes["geometry"] = LineString(
-                [Point((graph.nodes[node]["x"], graph.nodes[node]["y"])) for node in path]
+                [
+                    Point((graph.nodes[node]["x"], graph.nodes[node]["y"]))
+                    for node in path
+                ]
             )
         else:
             raise ValueError(

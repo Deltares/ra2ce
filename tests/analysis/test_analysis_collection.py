@@ -27,7 +27,6 @@ _unsupported_indirect_analysis = [AnalysisIndirectEnum.INVALID]
 
 
 class TestAnalysisCollection:
-
     @dataclass
     class MockAnalysisSectionDirect(AnalysisSectionDirect):
         analysis: AnalysisDirectEnum = None
