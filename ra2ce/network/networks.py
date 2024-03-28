@@ -21,10 +21,12 @@
 
 import logging
 from pathlib import Path
-
+import geopandas as gpd
 import networkx as nx
 import pyproj
-from geopandas import GeoDataFrame
+
+import osmnx
+import copy
 
 from ra2ce.network import networks_utils as nut
 from ra2ce.network.exporters.network_exporter_factory import NetworkExporterFactory
@@ -139,7 +141,7 @@ class Network:
 
     def _export_network_files(
         self,
-        network: nx.MultiGraph | GeoDataFrame,
+        network: nx.MultiGraph | gpd.GeoDataFrame,
         graph_type: str,
         types_to_export: list[str],
     ):
@@ -153,8 +155,37 @@ class Network:
         self.graph_files.set_file(_exporter.get_pickle_path())
         self.graph_files.set_graph(graph_type, network)
 
-    def _get_new_network_and_graph(self, export_types: list[str]) -> None:
-        (_base_graph, _network_gdf) = NetworkWrapperFactory(
+    def _get_new_network_and_graph(
+        self, export_types: list[str]
+    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+        def _include_attributes(attributes: list, graph: nx.Graph) -> nx.Graph:
+            def _add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
+                for node, data in graph.nodes(data=True):
+                    if "x" not in data or "y" not in data:
+                        # Use 'geometry' or provide default values if it's not present
+                        geometry = data.get("geometry", (0.0, 0.0))
+                        data.setdefault("x", round(geometry.x, 7))
+                        data.setdefault("y", round(geometry.y, 7))
+                return graph
+
+            # If required_attributes are provided, check if all edges already have them
+            if attributes and all(
+                all(attr in edge_data for attr in attributes)
+                for _, _, edge_data in graph.edges(data=True)
+            ):
+                # If all required attributes are present, return the original graph
+                return graph
+            graph = _add_x_y_to_nodes(graph)
+            gdf_nodes, gdf_edges = osmnx.graph_to_gdfs(graph)
+            updated_graph = copy.deepcopy(graph)
+            for attribute in attributes:
+                if attribute in gdf_edges.columns:
+                    attribute_values_gdf = gdf_edges[attribute]
+                    for (u, v, key), attribute_values in attribute_values_gdf.items():
+                        updated_graph[u][v][key]["bridge"] = attribute_values
+            return updated_graph
+
+        _base_graph, _network_gdf = NetworkWrapperFactory(
             self._config_data
         ).get_network()
 
@@ -175,6 +206,10 @@ class Network:
             lambda x: nut.line_length(x, _network_gdf.crs)
         )
 
+        _base_graph = _include_attributes(
+            attributes=["avgspeed", "bridge", "tunnel"], graph=_base_graph
+        )
+
         # Save the graph and geodataframe
         self._export_network_files(_base_graph, "base_graph", export_types)
         self._export_network_files(_network_gdf, "base_network", export_types)
@@ -190,7 +225,7 @@ class Network:
 
         def get_graph(
             file_type: str, file_path: Path | None
-        ) -> nx.MultiGraph | GeoDataFrame:
+        ) -> nx.MultiGraph | gpd.GeoDataFrame:
             graph = self.graph_files.get_graph(file_type)
             if graph is None:
                 raise FileNotFoundError(
