@@ -150,6 +150,8 @@ class MultiLinkIsolatedLocations(AnalysisIndirectProtocol):
             tuple (gpd.GeoDataFrame, pd.DataFrame): A tuple containing the location GeoDataFrame updated with hazard impacts,
                 and a DataFrame summarizing the impacts per location category.
         """
+        def _is_not_none(value):
+            return value is not None and value is not pd.NA and not pd.isna(value) and not np.isnan(value)
 
         # Load the point shapefile with the locations of which the isolated locations should be identified.
         locations = read_feather(
@@ -174,8 +176,9 @@ class MultiLinkIsolatedLocations(AnalysisIndirectProtocol):
                 e
                 for e in edges
                 if (hazard_name in e[-1]) and (
-                    (e[-1][hazard_name] > float(analysis.threshold))
-                    & (("bridge" not in e[-1]) or ("bridge" in e[-1] and e[-1]["bridge"] != "yes"))
+                    _is_not_none(e[-1][hazard_name]) and
+                    (e[-1][hazard_name] > float(analysis.threshold)) & 
+                    (("bridge" not in e[-1]) or ("bridge" in e[-1] and e[-1]["bridge"] != "yes"))
                 )
             ]
             edges_hz_indirect = [e for e in edges if e not in edges_hz_direct]
