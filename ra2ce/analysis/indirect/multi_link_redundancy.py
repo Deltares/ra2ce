@@ -72,7 +72,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
             edges_remove = [
                 e
                 for e in edges_remove
-                if (e[-1][hazard_name] > float(self.analysis["threshold"]))
+                if (e[-1][hazard_name] > float(self.analysis.threshold))
             ]
 
             _graph.remove_edges_from(edges_remove)
