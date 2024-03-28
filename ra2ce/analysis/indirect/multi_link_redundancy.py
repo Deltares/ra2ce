@@ -49,8 +49,10 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         """
         gdf_graph[self.analysis.weighing.config_value] = gdf_calculated[self.analysis.weighing.config_value]
         for i, row in gdf_graph.iterrows():
-            if pd.isna(row[WeighingEnum.TIME.config_value]) and not pd.isna(row["avgspeed"]):
-                gdf_graph.at[i, WeighingEnum.TIME.config_value] = row["length"] * 1e-3 / row["avgspeed"]
+            row_avgspeed = row.get("avgspeed", None)
+            row_length = row.get("length", None)
+            if pd.isna(row[WeighingEnum.TIME.config_value]) and row_avgspeed and row_length:
+                gdf_graph.at[i, WeighingEnum.TIME.config_value] = row_length * 1e-3 / row_avgspeed
             else:
                 gdf_graph.at[i, WeighingEnum.TIME.config_value] = row.get(WeighingEnum.TIME.config_value, None)
         return gdf_graph
