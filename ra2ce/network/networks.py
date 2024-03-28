@@ -157,62 +157,63 @@ class Network:
         self.graph_files.set_file(_exporter.get_pickle_path())
         self.graph_files.set_graph(graph_type, network)
 
-    def _get_new_network_and_graph(
-        self, export_types: list[str]
-    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
-        def _include_attributes(attributes: list, graph: nx.Graph) -> nx.Graph:
-            def _add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
-                for node, data in graph.nodes(data=True):
-                    if "x" not in data or "y" not in data:
-                        # Use 'geometry' or provide default values if it's not present
-                        geometry = data.get("geometry", (0.0, 0.0))
-                        data.setdefault("x", round(geometry.x, 7))
-                        data.setdefault("y", round(geometry.y, 7))
-                return graph
+    def _include_attributes(self, attributes: list, graph: nx.Graph) -> nx.Graph:
+        def _add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
+            for node, data in graph.nodes(data=True):
+                if "x" not in data or "y" not in data:
+                    # Use 'geometry' or provide default values if it's not present
+                    geometry = data.get("geometry", (0.0, 0.0))
+                    data.setdefault("x", round(geometry.x, 7))
+                    data.setdefault("y", round(geometry.y, 7))
+            return graph
 
-            # If required_attributes are provided, check if all edges already have them
-            if attributes and all(
-                all(attr in edge_data for attr in attributes)
-                for _, _, edge_data in graph.edges(data=True)
-            ):
-                # If all required attributes are present, return the original graph
-                return graph
-            graph = _add_x_y_to_nodes(graph)
-            gdf_nodes, gdf_edges = osmnx.graph_to_gdfs(graph)
-            updated_graph = copy.deepcopy(graph)
-            for attribute in attributes:
-                if attribute in gdf_edges.columns:
-                    attribute_values_gdf = gdf_edges[attribute]
-                    for (u, v, key), attribute_values in attribute_values_gdf.items():
-                        updated_graph[u][v][key]["bridge"] = attribute_values
-            return updated_graph
+        # If required_attributes are provided, check if all edges already have them
+        if attributes and all(
+            all(attr in edge_data for attr in attributes)
+            for _, _, edge_data in graph.edges(data=True)
+        ):
+            # If all required attributes are present, return the original graph
+            return graph
+        graph = _add_x_y_to_nodes(graph)
+        gdf_nodes, gdf_edges = osmnx.graph_to_gdfs(graph)
+        updated_graph = copy.deepcopy(graph)
+        for attribute in attributes:
+            if attribute in gdf_edges.columns:
+                attribute_values_gdf = gdf_edges[attribute]
+                for (u, v, key), attribute_values in attribute_values_gdf.items():
+                    updated_graph[u][v][key]["bridge"] = attribute_values
+        return updated_graph
 
-        def _get_edges_time_hours(_graph: nx.MultiGraph) -> dict:
-            result = {}
+    def _get_edges_time_hours(self, _graph: nx.MultiGraph) -> dict:
+        result = {}
 
-            for e in _graph.edges.data(keys=True):
-                if not e[-1].get("avgspeed"):
-                    warnings.warn(
-                        "Some edges have missing 'avgspeed' attribute. Time values set to None.",
-                        UserWarning,
-                    )
-                    time_value = None
-                else:
-                    time_value = (e[-1]["length"] / 1000) / e[-1]["avgspeed"]
-                result[(e[0], e[1], e[2])] = {"time": time_value}
-
-            return result
-
-        def _get_edges_time_hours_row_wise(_row: pd.Series) -> pd.Series | None:
-            row_avgspeed = _row.get("avgspeed", None)
-            if row_avgspeed:
-                return _row["length"] * 1e-3 / _row["avgspeed"]
-            else:
+        for e in _graph.edges.data(keys=True):
+            if not e[-1].get("avgspeed"):
                 warnings.warn(
                     "Some edges have missing 'avgspeed' attribute. Time values set to None.",
                     UserWarning,
                 )
-                return None
+                time_value = None
+            else:
+                time_value = (e[-1]["length"] / 1000) / e[-1]["avgspeed"]
+            result[(e[0], e[1], e[2])] = {"time": time_value}
+
+        return result
+
+    def _get_edges_time_hours_row_wise(self, _row: pd.Series) -> pd.Series | None:
+        row_avgspeed = _row.get("avgspeed", None)
+        if row_avgspeed:
+            return _row["length"] * 1e-3 / _row["avgspeed"]
+        else:
+            warnings.warn(
+                "Some edges have missing 'avgspeed' attribute. Time values set to None.",
+                UserWarning,
+            )
+            return None
+
+    def _get_new_network_and_graph(
+        self, export_types: list[str]
+    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
 
         _base_graph, _network_gdf = NetworkWrapperFactory(
             self._config_data
@@ -231,17 +232,17 @@ class Network:
         }
         nx.set_edge_attributes(_base_graph, edges_lengths_meters)
 
-        edges_time_hours = _get_edges_time_hours(_base_graph)
+        edges_time_hours = self._get_edges_time_hours(_base_graph)
         nx.set_edge_attributes(_base_graph, edges_time_hours)
 
         _network_gdf["length"] = _network_gdf["geometry"].apply(
             lambda x: nut.line_length(x, _network_gdf.crs)
         )
         _network_gdf["time"] = _network_gdf.apply(
-            _get_edges_time_hours_row_wise, axis=1
+            self._get_edges_time_hours_row_wise, axis=1
         )
 
-        _base_graph = _include_attributes(
+        _base_graph = self._include_attributes(
             attributes=["avgspeed", "bridge", "tunnel"], graph=_base_graph
         )
 
