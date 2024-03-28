@@ -173,10 +173,9 @@ class MultiLinkIsolatedLocations(AnalysisIndirectProtocol):
             edges_hz_direct = [
                 e
                 for e in edges
-                if e[-1][hazard_name]
-                and (
+                if (hazard_name in e[-1]) and (
                     (e[-1][hazard_name] > float(analysis.threshold))
-                    & ("bridge" not in e[-1])
+                    & (("bridge" not in e[-1]) or ("bridge" in e[-1] and e[-1]["bridge"] != "yes"))
                 )
             ]
             edges_hz_indirect = [e for e in edges if e not in edges_hz_direct]
