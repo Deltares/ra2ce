@@ -143,7 +143,11 @@ def closest_node(node: np.ndarray, nodes: np.ndarray) -> np.ndarray:
     dist_2 = np.einsum("ij,ij->i", deltas, deltas)
     # Find indices of all minimum distances
     min_dist_indices = np.where(dist_2 == dist_2.min())[0]
-    return np.round(nodes[min_dist_indices], decimals=7)  # nodes[np.argmin(dist_2)]
+
+    # CROSSCADE: The previous return value `nodes[np.argmin(dist_2)]`
+    # returned a np.ndarray of 1 dimension (`[result]`), whilst the new value
+    # will return a 2 dimensional np.ndarray ( `[[result]]`)
+    return np.round(nodes[min_dist_indices], decimals=7)[0]
 
 
 def get_od(o_id: str, d_id: str) -> str:
@@ -453,9 +457,9 @@ def add_od_nodes(
             closest_node_on_extremities_id = get_node_id_from_position(
                 graph, *closest_node_on_extremities
             )
-            inverse_nodes_dict[
-                (closest_node_on_road[0], closest_node_on_road[1])
-            ] = closest_node_on_extremities_id
+            inverse_nodes_dict[(closest_node_on_road[0], closest_node_on_road[1])] = (
+                closest_node_on_extremities_id
+            )
 
         return inverse_nodes_dict
 
