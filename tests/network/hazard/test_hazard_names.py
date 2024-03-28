@@ -10,7 +10,6 @@ from tests import test_results
 
 
 class TestHazardNames:
-
     def test_initialize(self):
         # 1. Define test data
         _data = [["a", 1], ["b", 2], ["c", 3]]

@@ -23,9 +23,7 @@ from __future__ import annotations
 
 import logging
 
-from ra2ce.analysis.analysis_config_wrapper import (
-    AnalysisConfigWrapper,
-)
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 
 

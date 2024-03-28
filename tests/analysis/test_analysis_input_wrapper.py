@@ -7,7 +7,6 @@ from ra2ce.network.graph_files.graph_file import GraphFile
 
 
 class TestAnalysisInputWrapper:
-
     @dataclass
     class MockAnalysisSection(AnalysisSectionBase):
         pass

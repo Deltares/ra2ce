@@ -1,6 +1,4 @@
-from ra2ce.network.network_config_data.network_config_data import (
-    NetworkConfigData,
-)
+from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )

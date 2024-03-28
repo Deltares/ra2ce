@@ -23,14 +23,12 @@ import logging
 import time
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
-from ra2ce.analysis.analysis_config_wrapper import (
-    AnalysisConfigWrapper,
-)
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
-from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.analysis.analysis_result_wrapper_exporter import (
     AnalysisResultWrapperExporter,
 )
+from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 
 

@@ -1,12 +1,12 @@
 import copy
 from pathlib import Path
 
+import geopandas as gpd
 import networkx as nx
 import numpy as np
 import osmnx
 import pandas as pd
 from geopandas import GeoDataFrame
-import geopandas as gpd
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
