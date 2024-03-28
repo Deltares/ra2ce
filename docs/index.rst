@@ -22,6 +22,7 @@ Or navigate directly to another section:
    installation/installation
    examples/examples
    contributing/index
+   technical_documentation/technical_documentation
    changelog_wrapper
 
 Lost..? Try the :ref:`search`.
