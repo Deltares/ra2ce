@@ -741,12 +741,12 @@ def cut(line: BaseMultipartGeometry, distance: float) -> tuple[LineString, LineS
 def join_nodes_edges(
     gdf_nodes: gpd.GeoDataFrame, gdf_edges: gpd.GeoDataFrame, id_name: str
 ) -> gpd.GeoDataFrame:
-    """Creates tuples from the adjecent nodes and add as column in geodataframe.
+    """Creates tuples from the adjacent nodes and add as column in geodataframe.
     Args:
         gdf_nodes [geodataframe]: geodataframe of the nodes of a graph
         gdf_edges [geodataframe]: geodataframe of the edges of a graph
     Returns:
-        result [geodataframe]: geodataframe of adjecent nodes from edges
+        result [geodataframe]: geodataframe of adjacent nodes from edges
     """
     logging.info("Started joining edges and nodes...")
     # list of the edges that are not topographically correct

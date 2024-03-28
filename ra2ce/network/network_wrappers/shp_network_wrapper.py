@@ -126,7 +126,7 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
         if not edges.crs:
             edges.crs = self.crs
 
-        # create tuples from the adjecent nodes and add as column in geodataframe
+        # create tuples from the adjacent nodes and add as column in geodataframe
         edges_complex = nut.join_nodes_edges(nodes, edges, id_name)
         edges_complex.crs = self.crs  # set the right CRS
         edges_complex.dropna(subset=["node_A", "node_B"], inplace=True)

@@ -22,6 +22,7 @@
 from __future__ import annotations
 
 import math
+from configparser import ConfigParser
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -32,6 +33,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
@@ -89,23 +91,17 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     loss_per_distance: str = ""
     loss_type: LossTypeEnum = field(default_factory=lambda: LossTypeEnum.NONE)
     disruption_per_category: str = ""
-    traffic_cols: list[str] = field(default_factory=list)
     # losses
-    duration_event: float = (
-        math.nan
-    )  # TODO remove the deprecated attribute that have been replaced by csv
-    duration_disruption: float = math.nan
-    fraction_detour: float = math.nan
-    fraction_drivethrough: float = 0.0
-    rest_capacity: float = math.nan
-    maximum_jam: float = math.nan
+    traffic_cols: list[str] = field(default_factory=list)
+    duration_event: float = math.nan # TODO remove the deprecated attribute that have been replaced by csv
+    production_loss_per_capita_per_day: float = math.nan
     part_of_day: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
-    performance: str = (
-        "diff_time"  # "diff_time" or "diff_length" relates to the used criticality metric
-    )
-    resilience_curve_file: Optional[Path] = None
-    traffic_intensities_file: Optional[Path] = None
-    values_of_time_file: Optional[Path] = None
+    hours_per_day: float = 24
+    trip_purposes: list[TripPurposeEnum] = field(default_factory=lambda: [TripPurposeEnum.NONE])
+    resilience_curve_file: Optional[Path] = Path()
+    traffic_intensities_file: Optional[Path] = Path()
+    values_of_time_file: Optional[Path] = Path()
+    # the redundancy analysis) and the intensities
     # accessibility analyses
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     threshold: float = math.nan
@@ -153,7 +149,7 @@ class AnalysisSectionDirect(AnalysisSectionBase):
 class AnalysisConfigData(ConfigDataProtocol):
     """
     Reflects all config data from analysis.ini with defaults set.
-    Additionally some attributes from the network config are added for completeness (files, origins_destinations, network, hazard_names)
+    Additionally, some attributes from the network config are added for completeness (files, origins_destinations, network, hazard_names)
     """
 
     root_path: Optional[Path] = None
