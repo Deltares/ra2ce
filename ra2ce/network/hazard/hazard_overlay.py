@@ -441,7 +441,7 @@ class HazardOverlay:
                 ra2ce_names=self.ra2ce_names,
                 hazard_gpkg_files=self.hazard_files.gpkg,
             ).get_intersection(to_overlay)
-        elif self.hazard["table"]:
+        elif self.hazard_files["table"]:
             return HazardIntersectBuilderForTable(
                 hazard_field_name=self._hazard_field_name,
                 network_file_id=self._network_file_id,

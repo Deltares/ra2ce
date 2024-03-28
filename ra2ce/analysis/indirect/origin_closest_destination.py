@@ -184,16 +184,18 @@ class OriginClosestDestination:
 
             # Check if the o/d pairs are still connected while some links are disrupted by the hazard(s)
             h = copy.deepcopy(graph)
-
-            edges_remove = [
-                e for e in graph.edges.data(keys=True) if hazard_name in e[-1]
-            ]
+            edges_remove = []
+            for e in graph.edges.data(keys=True):
+                if (hazard_name in e[-1]) and (
+                    ("bridge" not in e[-1])
+                    or ("bridge" in e[-1] and e[-1]["bridge"] != "yes")
+                ):
+                    edges_remove.append(e)
             edges_remove = [e for e in edges_remove if (e[-1][hazard_name] is not None)]
             edges_remove = [
                 e
                 for e in edges_remove
                 if (e[-1][hazard_name] > float(self.network_threshold))
-                & ("bridge" not in e[-1])
             ]
             h.remove_edges_from(edges_remove)
 
@@ -407,10 +409,12 @@ class OriginClosestDestination:
         # Attribute to the origins that don't have access that they do not have any access
         if len(other) > 0:
             for oth in other:
-                origins.loc[
-                    origins[self.od_id] == int(oth[-1].split("_")[-1]),
-                    col_name,
-                ] = "no access"
+                od_id_list = oth[-1].split(",")
+                for od_id in od_id_list:
+                    origins.loc[
+                        origins[self.od_id] == int(od_id.split("_")[-1]),
+                        col_name,
+                    ] = "no access"
         return origins
 
     def get_nr_without_access(
