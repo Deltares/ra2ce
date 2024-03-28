@@ -21,9 +21,6 @@ from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
 
 
-
-
-
 class MultiLinkRedundancy(AnalysisIndirectProtocol):
     analysis: AnalysisSectionIndirect
     graph_file_hazard: GraphFile
@@ -33,8 +30,8 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
     hazard_names: HazardNames
 
     def __init__(
-        self,
-        analysis_input: AnalysisInputWrapper,
+            self,
+            analysis_input: AnalysisInputWrapper,
     ) -> None:
         self.analysis = analysis_input.analysis
         self.graph_file_hazard = analysis_input.graph_file_hazard
@@ -56,7 +53,6 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
             else:
                 gdf_graph.at[i, WeighingEnum.TIME.config_value] = row.get(WeighingEnum.TIME.config_value, None)
         return gdf_graph
-
 
     def execute(self) -> GeoDataFrame:
         """Calculates the multi-link redundancy of a NetworkX graph.
@@ -88,7 +84,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                 e
                 for e in edges_remove
                 if (e[-1][hazard_name] > float(self.analysis.threshold))
-                & ("bridge" not in e[-1])
+                   & ("bridge" not in e[-1])
             ]
 
             _graph.remove_edges_from(edges_remove)
