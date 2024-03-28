@@ -1,0 +1,772 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Docker User Guide &#8212; Risk Assessment and Adaptation for Critical infrastructurE 0.8.1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6" />
+  <script src="../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=365ca57ee442770a23c6"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'installation/docker_user_guide';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Examples" href="../examples/examples.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/examples.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../contributing/index.html">
+                        Contributing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../technical_documentation/technical_documentation.html">
+                        Technical Documentation
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../changelog_wrapper.html">
+                        Changelog
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../examples/examples.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../contributing/index.html">
+                        Contributing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../technical_documentation/technical_documentation.html">
+                        Technical Documentation
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../changelog_wrapper.html">
+                        Changelog
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/about.html">RA2CE</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="installation.html">Installation</a><input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Docker User Guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples/examples.html">Examples</a><input checked class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../_examples/example_ra2ce_basics.html">RA2CE basics: set up RA2CE and configure a road network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_examples/example_single_link_redundancy.html">RA2CE feature: single link redundancy without the example data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_examples/example_origin_destination_analysis.html">RA2CE feature: Origin-destination analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_examples/example_direct_damage.html">RA2CE feature: Direct analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_examples/example_hazard_overlay.html">RA2CE feature: Hazard overlay</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_examples/example_isolated_locations.html">RA2CE feature: Isolated locations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_examples/example_optimal_route_origin_destination.html">RA2CE feature: Optimal routes between origins and destinations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../_examples/example_ra2ce_basics_fromgpkg.html">RA2CE basics: set up RA2CE and configure a road network from a pre-defined shapefile</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../network_module/network_module.html">Network Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analysis_module/analysis_module.html">Analysis module</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../contributing/index.html">Contributing</a><input checked class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contributing/design_principles.html">Design principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing/implementation_decisions.html">Implementation decisions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../technical_documentation/technical_documentation.html">Technical Documentation</a><input checked class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../technical_documentation/network_package.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../technical_documentation/analysis_package.html">Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications/publications.html">Publications</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../overview.html" class="nav-link">Overview</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="installation.html" class="nav-link">Installation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Docker User Guide</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="docker-user-guide">
+<span id="id1"></span><h1>Docker User Guide<a class="headerlink" href="#docker-user-guide" title="Permalink to this heading">#</a></h1>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading">#</a></h2>
+<p>This user guide shows a couple of thing:</p>
+<ol class="loweralpha simple">
+<li><p>How to build a docker image from the ra2ce source tree and push it to a Dockerhub.</p></li>
+<li><p>How to run a simple model inside a created container and save the generated data for later display.</p></li>
+<li><p>(Future). How to get ra2ce plus displayer up and running in a standard Kubernetes environment.</p></li>
+</ol>
+<p>In the addendum I will explain how to install Docker desktop on Windows and Docker on Ubuntu or Redhat like servers,
+but since this can be changed outside this repository, it is probably best to use:</p>
+<ol class="lowerroman simple">
+<li><p>For Windows-like systems: <a class="reference external" href="https://www.docker.com/products/docker-desktop/">https://www.docker.com/products/docker-desktop/</a>
+There is a good alternative (<a class="reference external" href="https://podman-desktop.io/">https://podman-desktop.io/</a>) which works a little differen, but with the same
+outcome (at least for ra2ce).</p></li>
+<li><p>For Ubuntu-like systems: <a class="reference external" href="https://docs.docker.com/engine/install/ubuntu/">https://docs.docker.com/engine/install/ubuntu/</a></p></li>
+<li><p>For Redhat-like systems: <a class="reference external" href="https://docs.docker.com/desktop/install/linux-install/">https://docs.docker.com/desktop/install/linux-install/</a></p></li>
+<li><p>For MacOS there is: <a class="reference external" href="https://docs.docker.com/desktop/install/mac-install/">https://docs.docker.com/desktop/install/mac-install/</a> (the writer of this document doesn’t have
+much experience with a Mac.</p></li>
+</ol>
+<p>Shown is the bash prompt, but when using Docker Desktop with Linux Containers enables, a Powershell also will do.</p>
+</section>
+<section id="how-to-build-a-docker-image-from-the-ra2ce-source-tree">
+<h2>How to build a docker image from the ra2ce source tree<a class="headerlink" href="#how-to-build-a-docker-image-from-the-ra2ce-source-tree" title="Permalink to this heading">#</a></h2>
+<p>Assuming access to a Linux box with Docker installed, or a Docker Desktop with “Switch to Linux Containers”. You can do the
+following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone git@github.com:Deltares/ra2ce.git
+$ cd ra2ce
+$ docker build -t ra2ce:latest .
+</pre></div>
+</div>
+<p>These instructions will build a docker image. After a good while, you should end up with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ docker images
+REPOSITORY                   TAG       IMAGE ID       CREATED             SIZE
+ra2ce                        latest    dd5dc5fe79ba   45 minutes ago      1.01GB
+</pre></div>
+</div>
+<p>Remark that this is a local image only (it only exists on the server or laptop you build it). To share it with other team members, you should push this to a docker hub. This operation entails the following.</p>
+<ol class="loweralpha simple">
+<li><p>Login to your dockerhub account (go to <a class="reference external" href="https://hub.docker.com/">https://hub.docker.com/</a> if you don’t have that yet):</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ docker login
+Login with your Docker ID to push and pull images from Docker Hub. If you don&#39;t have a Docker ID, head over to https://hub.docker.com to create one.
+Username: willemdeltares
+Password:
+WARNING! Your password will be stored unencrypted in /u/noorduin/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+</pre></div>
+</div>
+<ol class="loweralpha simple" start="2">
+<li><p>Retag the image:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ docker tag ra2ce:latest willemdeltares/ra2ce:latest
+</pre></div>
+</div>
+<ol class="loweralpha simple" start="3">
+<li><p>Pushing the image to the dockerhub:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo docker push willemdeltares/ra2ce:latest
+</pre></div>
+</div>
+<p>If all is well, you can login to the dockerhub account and see the image yourself.</p>
+</section>
+<section id="simple-run">
+<h2>Simple run<a class="headerlink" href="#simple-run" title="Permalink to this heading">#</a></h2>
+<p>On probably another laptop you can do the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker pull willemdeltares/ra2ce:latest
+latest: Pulling from willemdeltares/race
+4db1b89c0bd1: Pull complete
+d78e3c519d33: Pull complete
+8219ddbde264: Pull complete
+....
+d86857fa3e39: Pull complete
+3a05d3e367e1: Pull complete
+Digest: sha256:1c1cee508e498e7e58e01661b3c4047e458e936720ce11b8a242fae8375b1c7f
+Status: Downloaded newer image for willemdeltares/race:latest
+docker.io/willemdeltares/race:latest
+
+noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker run -d -p 8080:8080 ra2ce:latest
+
+    noorduin@c-teamcity08065 ~/development/ra2ce/docs/docker (noorduin_docker_k8s)$ docker ps
+CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS          PORTS                    NAMES
+43ca6b0aef08   ra2ce:latest   &quot;/usr/local/bin/_ent…&quot;   23 minutes ago   Up 23 minutes   0.0.0.0:8080-&gt;8080/tcp   keen_bose
+</pre></div>
+</div>
+<p>Now go to <a class="reference external" href="http://localhost:8080">http://localhost:8080</a> and give in the default password (if you don’t know it, try the name of this project, lowercase with the 2 in it).</p>
+</section>
+<section id="mounting-in-projects">
+<h2>Mounting in projects<a class="headerlink" href="#mounting-in-projects" title="Permalink to this heading">#</a></h2>
+<p>When run as in “Simple run”, you only get what is bundled within the Docker image of ra2ce itself. Above that, when the container is
+stopped in some matter, the data is gone. to remedy this, we can mount in a custom based directory in the Docker Container. Like in the following:</p>
+<ol class="loweralpha simple">
+<li><p>Make a standard ra2ce project like this:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">+---</span> <span class="n">example01</span>
+    <span class="o">|</span>   <span class="o">+---</span> <span class="o">.</span><span class="n">ipynb_checkpoints</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">+---</span> <span class="n">test</span><span class="o">-</span><span class="n">checkpoint</span><span class="o">.</span><span class="n">ipynb</span>
+<span class="o">|</span>   <span class="o">+---</span> <span class="n">analysis</span><span class="o">.</span><span class="n">ini</span>
+<span class="o">|</span>   <span class="o">+---</span> <span class="n">cache</span>
+<span class="o">|</span>   <span class="o">+---</span> <span class="nb">input</span>
+<span class="o">|</span>   <span class="o">+---</span> <span class="n">network</span><span class="o">.</span><span class="n">ini</span>
+<span class="o">|</span>   <span class="o">+---</span> <span class="n">output</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">+---</span> <span class="n">network</span><span class="o">.</span><span class="n">ini</span>
+<span class="o">|</span>   <span class="o">+---</span> <span class="n">static</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">+---</span> <span class="n">hazard</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">+---</span> <span class="n">network</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">|</span>   <span class="o">+---</span> <span class="n">Delft</span><span class="o">.</span><span class="n">geojson</span>
+<span class="o">|</span>   <span class="o">|</span>   <span class="o">+---</span> <span class="n">output_graph</span>
+<span class="o">|</span>   <span class="o">+---</span> <span class="n">test</span><span class="o">.</span><span class="n">ipynb</span>
+</pre></div>
+</div>
+<ol class="loweralpha simple" start="2">
+<li><p>Start the container as follows:</p></li>
+</ol>
+<pre class="literal-block">C:Usersnoorduindevelopmentra2ce_inputs&gt; docker run -d -v C:Usersnoorduindevelopmentra2ce_inputsproject:/home/mambauser/sample -p 8081:8080 ra2ce:latest
+9d95083de344c27a7009a65b57700e3db32eb72f33ebf605376a41587d19bd81
+
+C:Usersnoorduindevelopmentra2ce_inputs&gt; docker ps
+CONTAINER ID   IMAGE          COMMAND                  CREATED          STATUS          PORTS                    NAMES
+7c000d7ae8ae   ra2ce:latest   &quot;/usr/local/bin/_ent…&quot;   23 seconds ago   Up 22 seconds   0.0.0.0:8081-&gt;8080/tcp   adoring_roentgen
+        43ca6b0aef08   ra2ce:latest   &quot;/usr/local/bin/_ent…&quot;   2 hours ago      Up 2 hours      0.0.0.0:8080-&gt;8080/tcp   keen_bose</pre>
+<p>Notice that we have two ra2ce-applications now, one available on <a class="reference external" href="http://localhost:8080">http://localhost:8080</a> and one new on <a class="reference external" href="http://localhost:8081">http://localhost:8081</a>. The first interface
+knows nothing of the second here. When you go to <a class="reference external" href="http://localhost:8081">http://localhost:8081</a> you can see the data folder mounted in /home/mambauser as a directory sample.
+From there, you can start test.ipynb.</p>
+</section>
+<section id="trouble-shooting">
+<h2>Trouble shooting<a class="headerlink" href="#trouble-shooting" title="Permalink to this heading">#</a></h2>
+<p>In the Docker world, there are a lot of things that go wrong (from forgetting the BIOS setting mentioned in the Addendum) to
+not enough user rights on Linux). It is best to refer to www.docker.com or one of there foras for those. Here, we focuss on the
+errors and warning you could see in the combination Ra2ce and docker.</p>
+<ol class="arabic">
+<li><p>When I browse to <a class="reference external" href="http://localhost:8080">http://localhost:8080</a> I can’t see the interface. Or when I log in, I can’t see the project.</p>
+<p>Jupyter seems to be very cookie-aware. Try to delete the cookies or use a private browser-session.</p>
+</li>
+</ol>
+</section>
+<section id="addendum">
+<h2>Addendum<a class="headerlink" href="#addendum" title="Permalink to this heading">#</a></h2>
+<ol class="arabic">
+<li><p>Simple Docker Desktop setup on Windows:</p>
+<p><strong>Step 1: BIOS Prerequisites</strong></p>
+<p>There is a setting in the BIOS (or a modern equivalent of that) that makes it possible to virtualize the CPU.
+Unfortunately every Hardware Manufacturer has its own name for it and position in the BIOS.</p>
+<p><strong>Step 2: Containers and Hyper-V</strong></p>
+<p>Run the following in an Administrator’s Powershell:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>PS C:&gt; Enable-WindowsOptionalFeature -Online -FeatureName $(&quot;Microsoft-Hyper-V&quot;, &quot;Containers&quot;) -All
+</pre></div>
+</div>
+<p>Then reboot your PC.</p>
+<p><strong>Step 3: Install wsl-1 and wsl-2</strong></p>
+<p>See also: <a class="reference external" href="https://learn.microsoft.com/en-us/windows/wsl/install">https://learn.microsoft.com/en-us/windows/wsl/install</a>. Make sure that you reboot afterwards</p>
+<p><strong>Step 4: Install Docker desktop</strong></p>
+<p>After step 1 and 2 it should be posssible to download and install Docker Desktop for Windows (see also
+<a class="reference external" href="https://docs.docker.com/desktop/install/windows-install/">https://docs.docker.com/desktop/install/windows-install/</a>).</p>
+<p><strong>Step 5: Switch to Linux Containers</strong></p>
+<p>Ra2ce is based on a Linux image and it is hard too tell the default at forehand. If Docker Desktop is
+started up correctly, there should be a Whale-like icon amongst your “Hidden Icons”. When you right-click
+it you can swich to either Linux or Windows Containers. For Ra2ce it’s important to choose “Linux containers”.</p>
+</li>
+</ol>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="installation.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Installation</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../examples/examples.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Examples</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#introduction">Introduction</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#how-to-build-a-docker-image-from-the-ra2ce-source-tree">How to build a docker image from the ra2ce source tree</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simple-run">Simple run</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mounting-in-projects">Mounting in projects</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trouble-shooting">Trouble shooting</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#addendum">Addendum</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/installation/docker_user_guide.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div class="tocsection sourcelink">
+    <a href="../_sources/installation/docker_user_guide.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2020, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
