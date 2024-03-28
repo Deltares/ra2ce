@@ -6,6 +6,7 @@ import numpy as np
 import osmnx
 import pandas as pd
 from geopandas import GeoDataFrame
+import geopandas as gpd
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
@@ -18,6 +19,9 @@ from ra2ce.analysis.indirect.weighing_analysis.weighing_analysis_factory import 
 )
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
+
+
+
 
 
 class MultiLinkRedundancy(AnalysisIndirectProtocol):
@@ -38,6 +42,19 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         self.static_path = analysis_input.static_path
         self.output_path = analysis_input.output_path
         self.hazard_names = analysis_input.hazard_names
+
+    def _update_time(self, gdf_calculated: pd.DataFrame, gdf_graph: gpd.GeoDataFrame):
+        """
+        updates the time column with the calculated dataframe and updates the rest of the gdf_graph if time is None.
+        """
+        gdf_graph[self.analysis.weighing.config_value] = gdf_calculated[self.analysis.weighing.config_value]
+        for i, row in gdf_graph.iterrows():
+            if pd.isna(row[WeighingEnum.TIME.config_value]) and not pd.isna(row["avgspeed"]):
+                gdf_graph.at[i, WeighingEnum.TIME.config_value] = row["length"] * 1e-3 / row["avgspeed"]
+            else:
+                gdf_graph.at[i, WeighingEnum.TIME.config_value] = row.get(WeighingEnum.TIME.config_value, None)
+        return gdf_graph
+
 
     def execute(self) -> GeoDataFrame:
         """Calculates the multi-link redundancy of a NetworkX graph.
@@ -79,6 +96,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                 "v",
                 f"alt_{self.analysis.weighing.config_value}",
                 "alt_nodes",
+                f"diff_{self.analysis.weighing.config_value}",
                 "connected",
             ]
 
@@ -106,11 +124,16 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                     alt_value = _weighing_analyser.calculate_distance()
                     alt_nodes, connected = np.NaN, 0
 
+                diff = round(
+                    alt_value - _weighing_analyser.weighing_data[self.analysis.weighing.config_value], 3
+                )
+
                 data = {
                     "u": [u],
                     "v": [v],
                     f"alt_{self.analysis.weighing.config_value}": [alt_value],
                     "alt_nodes": [alt_nodes],
+                    f"diff_{self.analysis.weighing.config_value}": diff,
                     "connected": [connected],
                 }
                 _weighing_analyser.extend_graph(data)
@@ -132,15 +155,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
             else:
                 gdf = gdf.merge(df_calculated, how="left", on=["u", "v"])
 
-            # calculate the differences in distance and time
-            # previously here you find if dist==dist which is a critical bug. Replaced by verifying dist is a value.
-            gdf[f"diff_{self.analysis.weighing.config_value}"] = [
-                round(alt - base, 2) if alt else np.NaN
-                for (alt, base) in zip(
-                    gdf[f"alt_{self.analysis.weighing.config_value}"],
-                    gdf[f"{self.analysis.weighing.config_value}"],
-                )
-            ]
+            gdf = self._update_time(df_calculated, gdf)
 
             gdf["hazard"] = hazard_name
 

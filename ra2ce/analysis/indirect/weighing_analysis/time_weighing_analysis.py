@@ -1,4 +1,5 @@
 import geopandas as gpd
+
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.indirect.weighing_analysis.weighing_analysis_protocol import (
     WeighingAnalysisProtocol,
@@ -15,10 +16,10 @@ class TimeWeighingAnalysis(WeighingAnalysisProtocol):
     def _calculate_time(self) -> float:
         _calculated_time = round(
             (self.weighing_data["length"] * 1e-3) / self.weighing_data["avgspeed"],
-            2,
+            3,
         )  # in hours and avg speed in km/h
         self.weighing_data[WeighingEnum.TIME.config_value] = _calculated_time
-        return round(_calculated_time, 2)
+        return round(_calculated_time, 3)
 
     def calculate_distance(self) -> float:
         self.time_list.append(self._calculate_time())
@@ -30,4 +31,9 @@ class TimeWeighingAnalysis(WeighingAnalysisProtocol):
         return alt_time
 
     def extend_graph(self, gdf_graph: gpd.GeoDataFrame | dict) -> None:
-        gdf_graph[WeighingEnum.TIME.config_value] = self.time_list
+        if isinstance(gdf_graph, gpd.GeoDataFrame):
+            gdf_graph[WeighingEnum.TIME.config_value] = self.time_list
+        elif isinstance(gdf_graph, dict):
+            gdf_graph[WeighingEnum.TIME.config_value] = [self.time_list[-1]]
+
+
