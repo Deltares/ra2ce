@@ -6,6 +6,7 @@ import numpy as np
 import osmnx
 import pandas as pd
 from geopandas import GeoDataFrame
+import geopandas as gpd
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
@@ -39,6 +40,35 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         self.output_path = analysis_input.output_path
         self.hazard_names = analysis_input.hazard_names
 
+    def _update_time(self, gdf_calculated: pd.DataFrame, gdf_graph: gpd.GeoDataFrame):
+        """
+        updates the time column with the calculated dataframe and updates the rest of the gdf_graph if time is None.
+        """
+        if (
+            WeighingEnum.TIME.config_value not in gdf_graph.columns
+            or WeighingEnum.TIME.config_value not in gdf_calculated.columns
+        ):
+            return gdf_graph
+        gdf_graph[WeighingEnum.TIME.config_value] = gdf_calculated[
+            WeighingEnum.TIME.config_value
+        ]
+        for i, row in gdf_graph.iterrows():
+            row_avgspeed = row.get("avgspeed", None)
+            row_length = row.get("length", None)
+            if (
+                pd.isna(row[WeighingEnum.TIME.config_value])
+                and row_avgspeed
+                and row_length
+            ):
+                gdf_graph.at[i, WeighingEnum.TIME.config_value] = (
+                    row_length * 1e-3 / row_avgspeed
+                )
+            else:
+                gdf_graph.at[i, WeighingEnum.TIME.config_value] = row.get(
+                    WeighingEnum.TIME.config_value, None
+                )
+        return gdf_graph
+
     def execute(self) -> GeoDataFrame:
         """Calculates the multi-link redundancy of a NetworkX graph.
 
@@ -49,6 +79,15 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         Returns:
             aggregated_results (GeoDataFrame): The results of the analysis aggregated into a table.
         """
+
+        def _is_not_none(value):
+            return (
+                value is not None
+                and value is not pd.NA
+                and not pd.isna(value)
+                and not np.isnan(value)
+            )
+
         results = []
         master_graph = copy.deepcopy(self.graph_file_hazard.get_graph())
         for hazard in self.hazard_names.names:
@@ -72,7 +111,15 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
             edges_remove = [
                 e
                 for e in edges_remove
-                if (e[-1][hazard_name] > float(self.analysis.threshold))
+                if (hazard_name in e[-1])
+                and (
+                    _is_not_none(e[-1][hazard_name])
+                    and (e[-1][hazard_name] > float(self.analysis.threshold))
+                    and (
+                        ("bridge" not in e[-1])
+                        or ("bridge" in e[-1] and e[-1]["bridge"] != "yes")
+                    )
+                )
             ]
 
             _graph.remove_edges_from(edges_remove)
@@ -82,6 +129,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                 "v",
                 f"alt_{self.analysis.weighing.config_value}",
                 "alt_nodes",
+                f"diff_{self.analysis.weighing.config_value}",
                 "connected",
             ]
 
@@ -109,11 +157,20 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                     alt_value = _weighing_analyser.calculate_distance()
                     alt_nodes, connected = np.NaN, 0
 
+                diff = round(
+                    alt_value
+                    - _weighing_analyser.weighing_data[
+                        self.analysis.weighing.config_value
+                    ],
+                    3,
+                )
+
                 data = {
                     "u": [u],
                     "v": [v],
                     f"alt_{self.analysis.weighing.config_value}": [alt_value],
                     "alt_nodes": [alt_nodes],
+                    f"diff_{self.analysis.weighing.config_value}": diff,
                     "connected": [connected],
                 }
                 _weighing_analyser.extend_graph(data)
@@ -135,15 +192,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
             else:
                 gdf = gdf.merge(df_calculated, how="left", on=["u", "v"])
 
-            # calculate the differences in distance and time
-            # previously here you find if dist==dist which is a critical bug. Replaced by verifying dist is a value.
-            gdf[f"diff_{self.analysis.weighing.config_value}"] = [
-                round(alt - base, 2) if alt else np.NaN
-                for (alt, base) in zip(
-                    gdf[f"alt_{self.analysis.weighing.config_value}"],
-                    gdf[f"{self.analysis.weighing.config_value}"],
-                )
-            ]
+            gdf = self._update_time(df_calculated, gdf)
 
             gdf["hazard"] = hazard_name
 
