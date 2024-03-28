@@ -26,7 +26,7 @@ class TestLosses:
     def test_initialize_no_data(self):
         # 1. Define test data
 
-        _config_data = AnalysisConfigData(part_of_day=None)
+        _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
         _valid_analysis_ini = test_data / "losses" / "analyses.ini"
         _config = AnalysisConfigWrapper.from_data_with_network(
@@ -37,35 +37,31 @@ class TestLosses:
         _analysis = AnalysisSectionIndirect(
             part_of_day=None)
 
+        _analysis_input = AnalysisInputWrapper.from_input(
+            analysis=_analysis,
+            analysis_config=_config,
+            graph_file=_config.graph_files.base_graph_hazard,
+            graph_file_hazard=_config.graph_files.base_graph_hazard,
+        )
+
         with pytest.raises(PermissionError):
-            _losses = Losses(
-                _config_data,
-                _network_config.graph_files.base_network_hazard,
-                _analysis,
-                _config.config_data.input_path,
-                _config.config_data.static_path,
-                _config.config_data.output_path,
-                [],
-            )
-            # # 2. Run test.
-            #         _analysis = AnalysisSectionIndirect(part_of_day=None)
-            #         _config = AnalysisConfigWrapper()
-            #         _config.config_data.input_path = Path("sth")
-            #         _analysis_input = AnalysisInputWrapper.from_input(_analysis, _config)
-            # _losses = Losses(_analysis_input)
+            _losses = Losses(_analysis_input, _config)
 
     def test_initialize_with_data(self):
         # 1. Define test data
-        _config_data = AnalysisConfigWrapper()
+        _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
         _valid_analysis_ini = test_data / "losses" / "analyses.ini"
         _config = AnalysisConfigWrapper.from_data_with_network(
             _valid_analysis_ini, _config_data, _network_config
         )
-        _config_data.network.file_id = "link_id"
-        _config.config_data.input_path = test_data / "losses" / "csv_data_for_losses"
 
-        _analyses = AnalysisSectionIndirect(
+        # Add extra arguments to config_data
+        _config.config_data.input_path = test_data / "losses" / "csv_data_for_losses"
+        _config_data.network.file_id = "link_id"
+        _config_data.network.link_type_column = "link_type"
+
+        _analysis = AnalysisSectionIndirect(
             part_of_day=PartOfDayEnum.DAY,
             resilience_curve_file=test_data / "losses" / "csv_data_for_losses" / "resilience_curve.csv",
             traffic_intensities_file=test_data / "losses" / "csv_data_for_losses" / "traffic_intensities.csv",
@@ -75,43 +71,42 @@ class TestLosses:
 
         )
 
-        # 2. Run test.
-
-        _losses = Losses(
-            _config_data,
-            _network_config.graph_files.base_network_hazard,
-            _analyses,
-            _config.config_data.input_path,
-            None,
-            None,
-            [],
+        _analysis_input = AnalysisInputWrapper.from_input(
+            analysis=_analysis,
+            analysis_config=_config,
+            graph_file=_config.graph_files.base_graph_hazard,
+            graph_file_hazard=_config.graph_files.base_graph_hazard,
         )
+
+        # 2. Run test.
+        _losses = Losses(_analysis_input, _config)
 
         # 3. Verify final expectations.
         assert isinstance(_losses, Losses)
 
     @pytest.mark.parametrize(
         "part_of_day",
-        [pytest.param(PartOfDayEnum.DAY),
-         # pytest.param(PartOfDayEnum.EVENING)
-         ],
+        [
+            pytest.param(PartOfDayEnum.DAY),
+            # pytest.param(PartOfDayEnum.EVENING)
+        ],
     )
     def test_calc_vlh(self, part_of_day: PartOfDayEnum):
         # 1. Define test data
         _losses_csv_data = test_data.joinpath("losses", "csv_data_for_losses")
 
-        _config_data = AnalysisConfigWrapper()
+        _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
         _valid_analysis_ini = test_data / "losses" / "analyses.ini"
         _config = AnalysisConfigWrapper.from_data_with_network(
             _valid_analysis_ini, _config_data, _network_config
         )
+
         _config_data.network.file_id = "link_id"
         _config_data.network.link_type_column = "link_type"
-
         _config.config_data.input_path = test_data / "losses" / "csv_data_for_losses"
 
-        _analyses = AnalysisSectionIndirect(
+        _analysis = AnalysisSectionIndirect(
             part_of_day=part_of_day,
             resilience_curve_file=_losses_csv_data.joinpath("resilience_curve.csv"),
             traffic_intensities_file=_losses_csv_data.joinpath(
@@ -125,20 +120,21 @@ class TestLosses:
 
         )
 
-        _losses = Losses(
-            _config_data,
-            _network_config.graph_files.base_network_hazard,
-            _analyses,
-            _config.config_data.input_path,
-            None,
-            None,
-            [],
+        _analysis_input = AnalysisInputWrapper.from_input(
+            analysis=_analysis,
+            analysis_config=_config,
+            graph_file=_config.graph_files.base_graph_hazard,
+            graph_file_hazard=_config.graph_files.base_graph_hazard,
         )
 
+        _losses = Losses(_analysis_input, _config)
+        _losses._get_disrupted_criticality_analysis_results(gpd.read_file(test_data / 'losses' / 'csv_data_for_losses' / 'single_link_redundancy_losses_test.csv'))
+
+
         # 2. Run test.
-        _result = _losses.calculate_vehicle_loss_hours(
-            gpd.read_file(test_data / 'losses' / 'csv_data_for_losses' / 'single_link_redundancy_losses_test.csv'),
-        )
+
+        _result = _losses.calculate_vehicle_loss_hours()
+
         _expected_result = pd.read_csv(
             test_data / "losses" / "csv_data_for_losses" / "results_test_calc_vlh.csv"
         )

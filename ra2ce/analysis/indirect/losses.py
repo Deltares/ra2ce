@@ -225,7 +225,7 @@ class Losses(AnalysisIndirectProtocol):
         performance_change = self.criticality_analysis[self.performance_metric]
 
         # shape vehicle_loss_hours
-        vehicle_loss_hours_df = pd.DataFrame(columns=['link_id'], data=criticality_analysis.index.values)
+        vehicle_loss_hours_df = pd.DataFrame(columns=['link_id'], data=self.criticality_analysis.index.values)
 
         # find the link_type and the hazard intensity
         vehicle_loss_hours_df = pd.merge(
