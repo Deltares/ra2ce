@@ -160,7 +160,7 @@ class Network:
             result = {}
 
             for e in _graph.edges.data(keys=True):
-                if e[-1].get("avgspeed") is None:
+                if not e[-1].get("avgspeed"):
                     warnings.warn("Some edges have missing 'avgspeed' attribute. Time values set to None.", UserWarning)
                     time_value = None
                 else:
@@ -169,9 +169,9 @@ class Network:
 
             return result
 
-        def _get_edges_time_hours_row_wise(_row):
+        def _get_edges_time_hours_row_wise(_row: pd.Series) -> pd.Series | None:
             if pd.notnull(_row["avgspeed"]):
-                return _row["length"] / 1000 / _row["avgspeed"]
+                return _row["length"] * 1e-3 / _row["avgspeed"]
             else:
                 warnings.warn("Some edges have missing 'avgspeed' attribute. Time values set to None.", UserWarning)
                 return None
