@@ -44,7 +44,10 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         """
         updates the time column with the calculated dataframe and updates the rest of the gdf_graph if time is None.
         """
-        gdf_graph[self.analysis.weighing.config_value] = gdf_calculated[self.analysis.weighing.config_value]
+        if (WeighingEnum.TIME.config_value not in gdf_graph.columns or
+                WeighingEnum.TIME.config_value not in gdf_calculated.columns):
+            return gdf_graph
+        gdf_graph[WeighingEnum.TIME.config_value] = gdf_calculated[WeighingEnum.TIME.config_value]
         for i, row in gdf_graph.iterrows():
             row_avgspeed = row.get("avgspeed", None)
             row_length = row.get("length", None)
@@ -64,6 +67,10 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         Returns:
             aggregated_results (GeoDataFrame): The results of the analysis aggregated into a table.
         """
+
+        def _is_not_none(value):
+            return value is not None and value is not pd.NA and not pd.isna(value) and not np.isnan(value)
+
         results = []
         master_graph = copy.deepcopy(self.graph_file_hazard.get_graph())
         for hazard in self.hazard_names.names:
@@ -83,8 +90,10 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
             edges_remove = [
                 e
                 for e in edges_remove
-                if (e[-1][hazard_name] > float(self.analysis.threshold))
-                   & ("bridge" not in e[-1])
+                if (hazard_name in e[-1]) and
+                   (_is_not_none(e[-1][hazard_name]) and (e[-1][hazard_name] > float(self.analysis.threshold)) and
+                    (("bridge" not in e[-1]) or ("bridge" in e[-1] and e[-1]["bridge"] != "yes"))
+                    )
             ]
 
             _graph.remove_edges_from(edges_remove)
