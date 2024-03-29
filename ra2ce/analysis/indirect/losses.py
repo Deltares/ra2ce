@@ -92,7 +92,7 @@ class Losses(AnalysisIndirectProtocol):
         self.hours_per_day: float = self.analysis.hours_per_day
         self.production_loss_per_capita_per_hour = (
                 self.analysis.production_loss_per_capita_per_day / self.hours_per_day)
-
+        self._check_validity_analysis_files()
         self.intensities = _load_df_from_csv(
             Path(self.analysis.traffic_intensities_file), [], self.link_id)  # per day
         self.resilience_curve = _load_df_from_csv(Path(self.analysis.resilience_curve_file),
@@ -110,6 +110,13 @@ class Losses(AnalysisIndirectProtocol):
         self.hazard_names = self.analysis_input.hazard_names
 
         self.result = gpd.GeoDataFrame()
+
+    def _check_validity_analysis_files(self):
+        if (self.analysis.traffic_intensities_file is None or
+                self.analysis.resilience_curve_file is None or
+                self.analysis.values_of_time_file is None):
+            raise ValueError(
+                f"traffic_intensities_file, resilience_curve_file, and values_of_time_file should be given")
 
     def _check_validity_df(self):
         """
