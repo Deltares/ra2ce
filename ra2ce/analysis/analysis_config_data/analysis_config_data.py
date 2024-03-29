@@ -93,14 +93,21 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     disruption_per_category: str = ""
     # losses
     traffic_cols: list[str] = field(default_factory=list)
-    duration_event: float = math.nan # TODO remove the deprecated attribute that have been replaced by csv
+    duration_event: float = (
+        math.nan
+    )  # TODO remove the deprecated attribute that have been replaced by csv
     production_loss_per_capita_per_day: float = math.nan
     part_of_day: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
+    performance: str = (
+        "diff_time"  # "diff_time" or "diff_length" relates to the used criticality metric
+    )
     hours_per_day: float = 24
-    trip_purposes: list[TripPurposeEnum] = field(default_factory=lambda: [TripPurposeEnum.NONE])
-    resilience_curve_file: Optional[Path] = Path()
-    traffic_intensities_file: Optional[Path] = Path()
-    values_of_time_file: Optional[Path] = Path()
+    trip_purposes: list[TripPurposeEnum] = field(
+        default_factory=lambda: [TripPurposeEnum.NONE]
+    )
+    resilience_curve_file: Optional[Path] = None
+    traffic_intensities_file: Optional[Path] = None
+    values_of_time_file: Optional[Path] = None
     # the redundancy analysis) and the intensities
     # accessibility analyses
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)

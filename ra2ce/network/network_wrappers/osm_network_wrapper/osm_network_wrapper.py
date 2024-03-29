@@ -16,6 +16,7 @@
 """
 
 from __future__ import annotations
+
 import logging
 from pathlib import Path
 from typing import Any
@@ -26,11 +27,11 @@ import pandas as pd
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
 from shapely.geometry.base import BaseGeometry
-from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
-from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 import ra2ce.network.networks_utils as nut
 from ra2ce.network.exporters.json_exporter import JsonExporter
+from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
+from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,

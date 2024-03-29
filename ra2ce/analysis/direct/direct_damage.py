@@ -39,7 +39,6 @@ class DirectDamage(AnalysisDirectProtocol):
         self.output_path = analysis_input.output_path
 
     def execute(self) -> GeoDataFrame:
-
         def _rename_road_gdf_to_conventions(road_gdf_columns: list[str]) -> list[str]:
             """
             Rename the columns in the road_gdf to the conventions of the ra2ce documentation

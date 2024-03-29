@@ -1,7 +1,9 @@
 import shutil
-import pytest
+
 import geopandas as gpd
+import pytest
 from shapely import Point
+
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisSectionBase
 from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
@@ -15,7 +17,6 @@ from tests import test_results
 
 
 class TestAnalysisResultWrapperExporter:
-
     def test_initialize(self):
         _exporter = AnalysisResultWrapperExporter()
         assert isinstance(_exporter, AnalysisResultWrapperExporter)
