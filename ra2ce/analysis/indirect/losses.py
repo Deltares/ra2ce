@@ -76,6 +76,7 @@ class Losses(AnalysisIndirectProtocol):
 
     def __init__(self, analysis_input: AnalysisInputWrapper, analysis_config: AnalysisConfigWrapper) -> None:
         self.analysis_input = analysis_input
+        self.analysis_config = analysis_config
         self.analysis = self.analysis_input.analysis
         self.graph_file_hazard = self.analysis_input.graph_file_hazard
 
@@ -360,7 +361,7 @@ class Losses(AnalysisIndirectProtocol):
     def execute(self) -> gpd.GeoDataFrame:
         criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
 
-        criticality_analysis.drop_duplicates(subset='ID', inplace=True)
+        criticality_analysis.drop_duplicates(subset=self.analysis_config.config_data.network.file_id, inplace=True)
 
         self._get_disrupted_criticality_analysis_results(criticality_analysis=criticality_analysis)
 

@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import pytest
 import geopandas as gpd
-
+from shapely.geometry import LineString, Point
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect, AnalysisConfigData,
 )
@@ -16,7 +16,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
-from ra2ce.analysis.indirect.losses import Losses
+from ra2ce.analysis.indirect.losses import Losses, _load_df_from_csv
 from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data
@@ -92,7 +92,22 @@ class TestLosses:
         ],
     )
     def test_calc_vlh(self, part_of_day: PartOfDayEnum):
+        def create_linestring(row):
+            node_a_coords = (node_coordinates_df.loc[node_coordinates_df['node_id'] == row['node_A'], 'longitude'].values[0],
+                            node_coordinates_df.loc[node_coordinates_df['node_id'] == row['node_A'], 'latitude'].values[0])
+            node_b_coords = (node_coordinates_df.loc[node_coordinates_df['node_id'] == row['node_B'], 'longitude'].values[0],
+                            node_coordinates_df.loc[node_coordinates_df['node_id'] == row['node_B'], 'latitude'].values[0])
+            return LineString([node_a_coords, node_b_coords])
+        
         # 1. Define test data
+        # Define latitude and longitude values for each node
+        node_coordinates_data = {
+            'node_id': [0, 1, 2, 3],
+            'latitude': [40.7128, 34.0522, 51.5074, 48.8566],
+            'longitude': [-74.0060, -118.2437, -0.1278, 2.3522]
+        }
+        node_coordinates_df = pd.DataFrame(node_coordinates_data)
+        
         _losses_csv_data = test_data.joinpath("losses", "csv_data_for_losses")
 
         _config_data = AnalysisConfigData()
@@ -128,7 +143,18 @@ class TestLosses:
         )
 
         _losses = Losses(_analysis_input, _config)
-        _losses._get_disrupted_criticality_analysis_results(gpd.read_file(test_data / 'losses' / 'csv_data_for_losses' / 'single_link_redundancy_losses_test.csv'))
+        
+        _losses.criticality_analysis = pd.read_csv(
+            test_data / 'losses' / 'csv_data_for_losses' / 'single_link_redundancy_losses_test.csv', 
+            sep=",", on_bad_lines='skip')
+        _losses.criticality_analysis[["EV1_ma", "diff_length", "detour"]].astype(float)
+
+        # Create a GeoDataFrame
+        _losses.criticality_analysis['alt_nodes'] = _losses.criticality_analysis['alt_nodes'].apply(eval)
+        _losses.criticality_analysis['geometry'] = _losses.criticality_analysis.apply(create_linestring, axis=1)
+        _losses.criticality_analysis = gpd.GeoDataFrame(_losses.criticality_analysis)
+        
+        _losses._get_disrupted_criticality_analysis_results(_losses.criticality_analysis)
 
 
         # 2. Run test.
