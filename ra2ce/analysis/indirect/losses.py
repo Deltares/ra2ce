@@ -173,15 +173,18 @@ class Losses(AnalysisIndirectProtocol):
         return dict(_vot_dict)
 
     def _get_disrupted_criticality_analysis_results(self, criticality_analysis: gpd.GeoDataFrame):
-        # filter out all links not affected by the hazard
-        if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
-            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_ma'] != 0]
-        elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
-            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_max'] != 0]
-        elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
-            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_mean'] != 0]
-        elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
-            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_min'] != 0]
+        if self.analysis.analysis.name == 'SINGLE_LINK_LOSSES':
+            # filter out all links not affected by the hazard
+            if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
+                self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_ma'] != 0]
+            elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
+                self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_max'] != 0]
+            elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
+                self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_mean'] != 0]
+            elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
+                self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_min'] != 0]
+        else:
+            self.criticality_analysis = criticality_analysis
 
         self.criticality_analysis_non_disrupted = criticality_analysis[
             ~criticality_analysis.index.isin(self.criticality_analysis.index)
@@ -384,12 +387,10 @@ class Losses(AnalysisIndirectProtocol):
 
     def execute(self) -> gpd.GeoDataFrame:
         if self.analysis.analysis.name == 'SINGLE_LINK_LOSSES':
-            criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
-            
+            criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()    
         elif self.analysis.analysis.name == 'MULTI_LINK_LOSSES':
             criticality_analysis = MultiLinkRedundancy(self.analysis_input).execute()
 
-        criticality_analysis.drop_duplicates(subset=self.link_id, inplace=True)
         self._get_disrupted_criticality_analysis_results(criticality_analysis=criticality_analysis)
         self.result = self.calculate_vehicle_loss_hours()
         return self.result
