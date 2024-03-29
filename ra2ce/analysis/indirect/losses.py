@@ -75,7 +75,6 @@ class Losses(AnalysisIndirectProtocol):
     hazard_names: HazardNames
 
     def __init__(self, analysis_input: AnalysisInputWrapper, analysis_config: AnalysisConfigWrapper) -> None:
-        # TODO: make sure the "link_id" is kept in the result of the criticality analysis
         self.analysis_input = analysis_input
         self.analysis = self.analysis_input.analysis
         self.graph_file_hazard = self.analysis_input.graph_file_hazard
@@ -161,7 +160,6 @@ class Losses(AnalysisIndirectProtocol):
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
                     self.intensities[partofday_trip_purpose_name] / self.hours_per_day
-                    # TODO: Make a new PR to support different time scales: here 10=10hours
             )
         return dict(_vot_dict)
 
@@ -225,7 +223,7 @@ class Losses(AnalysisIndirectProtocol):
         performance_change = self.criticality_analysis[self.performance_metric]
 
         # shape vehicle_loss_hours
-        vehicle_loss_hours_df = pd.DataFrame(columns=['link_id'], data=self.criticality_analysis.index.values)
+        vehicle_loss_hours_df = pd.DataFrame(columns=[self.link_id], data=self.criticality_analysis.index.values)
 
         # find the link_type and the hazard intensity
         vehicle_loss_hours_df = pd.merge(
@@ -233,15 +231,15 @@ class Losses(AnalysisIndirectProtocol):
             self.criticality_analysis[
                 [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] + list(events.columns)
                 ],
-            left_on="link_id",
+            left_on=self.link_id,
             right_index=True,
         )
         vehicle_loss_hours = gpd.GeoDataFrame(
             vehicle_loss_hours_df, geometry="geometry", crs=self.criticality_analysis.crs)
         for event in events.columns.tolist():
             for _, vlh_row in vehicle_loss_hours.iterrows():
-                row_hazard_range = _get_range(eval(vlh_row[event]))
-                row_performance_change = eval(performance_change.loc[vlh_row.link_id])
+                row_hazard_range = _get_range(vlh_row[event])
+                row_performance_change = performance_change.loc[vlh_row[self.link_id]]
                 if math.isnan(row_performance_change):
                     self._calculate_production_loss_per_capita(vehicle_loss_hours, vlh_row, event)
                 else:
@@ -273,7 +271,7 @@ class Losses(AnalysisIndirectProtocol):
         for trip_type in self.trip_purposes:
             intensity_trip_type = self.vot_intensity_per_trip_collection[
                 f"intensity_{self.part_of_day}_{trip_type}"
-            ].loc[vlh_row.name]
+            ].loc[vlh_row[self.link_id]]
             occupancy_trip_type = float(self.vot_intensity_per_trip_collection[
                                             f"occupants_{trip_type}"
                                         ])
