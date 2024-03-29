@@ -94,12 +94,12 @@ class Losses(AnalysisIndirectProtocol):
                 self.analysis.production_loss_per_capita_per_day / self.hours_per_day)
 
         self.intensities = _load_df_from_csv(
-            self.analysis.traffic_intensities_file, [], self.link_id)  # per day
-        self.resilience_curve = _load_df_from_csv(self.analysis.resilience_curve_file,
+            Path(self.analysis.traffic_intensities_file), [], self.link_id)  # per day
+        self.resilience_curve = _load_df_from_csv(Path(self.analysis.resilience_curve_file),
                                                   ["duration_steps",
                                                    "functionality_loss_ratio"], None, sep=";"
                                                   )
-        self.values_of_time = _load_df_from_csv(self.analysis.values_of_time_file, [], None, sep=";")
+        self.values_of_time = _load_df_from_csv(Path(self.analysis.values_of_time_file), [], None, sep=";")
         self._check_validity_df()
         self.vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose()
         
