@@ -1,9 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from ra2ce.analysis.analysis_config_wrapper import (
-    AnalysisConfigWrapper,
-)
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper

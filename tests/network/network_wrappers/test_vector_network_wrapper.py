@@ -11,7 +11,7 @@ from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
 from ra2ce.network.network_wrappers.vector_network_wrapper import VectorNetworkWrapper
-from tests import test_data
+from tests import test_data, test_results
 
 _test_dir = test_data / "vector_network_wrapper"
 
@@ -61,7 +61,7 @@ class TestVectorNetworkWrapper:
         assert _wrapper.crs.to_epsg() == 4326
 
     @pytest.fixture
-    def _valid_wrapper(self) -> VectorNetworkWrapper:
+    def _valid_wrapper(self, request: pytest.FixtureRequest) -> VectorNetworkWrapper:
         _network_dir = _test_dir.joinpath("static", "network")
         _config_data = NetworkConfigData()
         _config_data.network.primary_file = [
@@ -70,6 +70,7 @@ class TestVectorNetworkWrapper:
         _config_data.network.directed = False
         _config_data.origins_destinations.region = None
         _config_data.crs = CRS.from_user_input(4326)
+        _config_data.static_path = test_results.joinpath(request.node.originalname)
         yield VectorNetworkWrapper(
             config_data=_config_data,
         )
@@ -134,8 +135,15 @@ class TestVectorNetworkWrapper:
         assert gdf1.equals(gdf2)
 
     def test_get_indirect_graph_from_vector(self, lines_gdf: gpd.GeoDataFrame):
+        # Given
+        _config_data = NetworkConfigData()
+        _config_data.network.file_id = "dummy_file_id"
+        _config_data.network.link_type_column = "dummy_type_column"
+
+        _vector_network_wrapper = VectorNetworkWrapper(_config_data)
+
         # When
-        graph = VectorNetworkWrapper.get_indirect_graph_from_vector(lines_gdf)
+        graph = _vector_network_wrapper._get_indirect_graph_from_vector(lines_gdf, [])
 
         # Then
         assert graph.nodes(data="geometry") is not None
@@ -144,8 +152,17 @@ class TestVectorNetworkWrapper:
         assert isinstance(graph, nx.Graph) and not isinstance(graph, nx.DiGraph)
 
     def test_get_direct_graph_from_vector(self, lines_gdf: gpd.GeoDataFrame):
+        # Given
+        _config_data = NetworkConfigData()
+        _config_data.network.file_id = "dummy_file_id"
+        _config_data.network.link_type_column = "dummy_type_column"
+
+        _vector_network_wrapper = VectorNetworkWrapper(_config_data)
+
         # When
-        graph = VectorNetworkWrapper.get_direct_graph_from_vector(lines_gdf)
+        graph = _vector_network_wrapper._get_direct_graph_from_vector(
+            gdf=lines_gdf, edge_attributes_to_include=[]
+        )
 
         # Then
         assert isinstance(graph, nx.DiGraph)

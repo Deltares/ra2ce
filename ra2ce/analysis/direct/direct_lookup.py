@@ -35,6 +35,7 @@ def dataframe_lookup(row: pd.Series, lookup_df: DataFrame, columns: list) -> Any
     row_values = [row[column] for column in columns]
     return lookup_df.loc[tuple(row_values)]
 
+
 class LookUp:
     """ " This namespace contains several lookup tables, used e.g. for road damage calculation."""
 

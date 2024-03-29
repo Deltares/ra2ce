@@ -27,7 +27,6 @@ _unsupported_indirect_analysis = [AnalysisIndirectEnum.INVALID]
 
 
 class TestAnalysisCollection:
-
     @dataclass
     class MockAnalysisSectionDirect(AnalysisSectionDirect):
         analysis: AnalysisDirectEnum = None
@@ -105,6 +104,13 @@ class TestAnalysisCollection:
         self,
         analysis: AnalysisIndirectEnum,
     ):
+        def verify_expectations(_collection, analysis):
+            assert isinstance(_collection, AnalysisCollection)
+            assert len(_collection.indirect_analyses) == 1
+
+            _generated_analysis = _collection.indirect_analyses[0]
+            assert isinstance(_generated_analysis, AnalysisIndirectProtocol)
+            assert _generated_analysis.analysis.analysis == analysis
         # 1. Define test data.
         _config = AnalysisConfigWrapper()
         _config.config_data.input_path = Path("Any input path")
@@ -113,13 +119,16 @@ class TestAnalysisCollection:
             self.MockAnalysisSectionIndirect(analysis=analysis)
         )
 
-        # 2. Run test.
-        _collection = AnalysisCollection.from_config(_config)
+        if (analysis.config_value == 'single_link_losses' or 
+            analysis.config_value == 'multi_link_losses'):
+            with pytest.raises(ValueError):
+                # 2. Run test.
+                _collection = AnalysisCollection.from_config(_config)
+                # 3. Verify expectations.
+                verify_expectations(_collection, analysis)
 
-        # 3. Verify expectations.
-        assert isinstance(_collection, AnalysisCollection)
-        assert len(_collection.indirect_analyses) == 1
-
-        _generated_analysis = _collection.indirect_analyses[0]
-        assert isinstance(_generated_analysis, AnalysisIndirectProtocol)
-        assert _generated_analysis.analysis.analysis == analysis
+        else:
+            # 2. Run test.
+            _collection = AnalysisCollection.from_config(_config)
+            # 3. Verify expectations.
+            verify_expectations(_collection, analysis)

@@ -19,9 +19,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from typing import Callable
+
 # This file contains the common utils to run a method in parallel
 from joblib import Parallel, delayed
-from typing import Callable
 
 
 def get_hazard_parallel_process(

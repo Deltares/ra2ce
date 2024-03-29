@@ -64,7 +64,6 @@ class OptimalRouteOriginClosestDestination(AnalysisIndirectProtocol):
         logging.info("Results saved to: {}".format(save_path))
 
     def execute(self) -> GeoDataFrame:
-
         def _save_gpkg_analysis(
             base_graph,
             to_save_gdf: list[GeoDataFrame],

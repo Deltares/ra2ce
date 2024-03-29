@@ -34,6 +34,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeEnum
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
 from ra2ce.analysis.indirect.multi_link_redundancy import MultiLinkRedundancy
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
@@ -75,8 +76,8 @@ class Losses(AnalysisIndirectProtocol):
     hazard_names: HazardNames
 
     def __init__(self, analysis_input: AnalysisInputWrapper, analysis_config: AnalysisConfigWrapper) -> None:
-        # TODO: make sure the "link_id" is kept in the result of the criticality analysis
         self.analysis_input = analysis_input
+        self.analysis_config = analysis_config
         self.analysis = self.analysis_input.analysis
         self.graph_file_hazard = self.analysis_input.graph_file_hazard
 
@@ -92,16 +93,17 @@ class Losses(AnalysisIndirectProtocol):
         self.hours_per_day: float = self.analysis.hours_per_day
         self.production_loss_per_capita_per_hour = (
                 self.analysis.production_loss_per_capita_per_day / self.hours_per_day)
-
+        self._check_validity_analysis_files()
         self.intensities = _load_df_from_csv(
-            self.analysis.traffic_intensities_file, [], self.link_id)  # per day
-        self.resilience_curve = _load_df_from_csv(self.analysis.resilience_curve_file,
+            Path(self.analysis.traffic_intensities_file), [], self.link_id)  # per day
+        self.resilience_curve = _load_df_from_csv(Path(self.analysis.resilience_curve_file),
                                                   ["duration_steps",
                                                    "functionality_loss_ratio"], None, sep=";"
                                                   )
-        self.values_of_time = _load_df_from_csv(self.analysis.values_of_time_file, [], None, sep=";")
-        self.vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose()
+        self.values_of_time = _load_df_from_csv(Path(self.analysis.values_of_time_file), [], None, sep=";")
         self._check_validity_df()
+        self.vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose()
+
 
         self.input_path = self.analysis_input.input_path
         self.static_path = self.analysis_input.static_path
@@ -110,14 +112,20 @@ class Losses(AnalysisIndirectProtocol):
 
         self.result = gpd.GeoDataFrame()
 
+    def _check_validity_analysis_files(self):
+        if (self.analysis.traffic_intensities_file is None or
+                self.analysis.resilience_curve_file is None or
+                self.analysis.values_of_time_file is None):
+            raise ValueError(
+                f"traffic_intensities_file, resilience_curve_file, and values_of_time_file should be given")
+
     def _check_validity_df(self):
         """
         Check spelling of the required input csv files. If user writes wrong spelling, it will raise an error
         when initializing the class.
         """
         _required_values_of_time_keys = ["trip_types", "value_of_time", "occupants"]
-        if len(self.values_of_time) > 0 and not all(
-                key in self.values_of_time.columns for key in _required_values_of_time_keys):
+        if not all(key in self.values_of_time.columns for key in _required_values_of_time_keys):
             raise ValueError(f"Missing required columns in values_of_time: {_required_values_of_time_keys}")
 
         _required_resilience_curve_keys = ["link_type_hazard_intensity", "duration_steps", "functionality_loss_ratio"]
@@ -143,6 +151,7 @@ class Losses(AnalysisIndirectProtocol):
         Generates a dictionary with all available `vot_purpose` with their intensity as a `pd.DataFrame`.
         """
         _vot_dict = defaultdict(pd.DataFrame)
+
         for trip_purpose in self.trip_purposes:
             vot_var_name = f"vot_{trip_purpose}"
             occupancy_var_name = f"occupants_{trip_purpose}"
@@ -160,7 +169,6 @@ class Losses(AnalysisIndirectProtocol):
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
                     self.intensities[partofday_trip_purpose_name] / self.hours_per_day
-                    # TODO: Make a new PR to support different time scales: here 10=10hours
             )
         return dict(_vot_dict)
 
@@ -236,16 +244,15 @@ class Losses(AnalysisIndirectProtocol):
         performance_change = self.criticality_analysis[self.performance_metric]
 
         # shape vehicle_loss_hours
-        vehicle_loss_hours_df = pd.DataFrame(
-            index=self.intensities.index
-        )
+        vehicle_loss_hours_df = pd.DataFrame(columns=[self.link_id], data=self.criticality_analysis.index.values)
+
         # find the link_type and the hazard intensity
         vehicle_loss_hours_df = pd.merge(
             vehicle_loss_hours_df,
             self.criticality_analysis[
                 [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] + list(events.columns)
                 ],
-            left_index=True,
+            left_on=self.link_id,
             right_index=True,
         )
         vehicle_loss_hours = gpd.GeoDataFrame(
@@ -253,7 +260,7 @@ class Losses(AnalysisIndirectProtocol):
         for event in events.columns.tolist():
             for _, vlh_row in vehicle_loss_hours.iterrows():
                 row_hazard_range = _get_range(vlh_row[event])
-                row_performance_change = performance_change.loc[vlh_row.name]
+                row_performance_change = performance_change.loc[vlh_row[self.link_id]]
                 if math.isnan(row_performance_change):
                     self._calculate_production_loss_per_capita(vehicle_loss_hours, vlh_row, event)
                 else:
@@ -285,7 +292,7 @@ class Losses(AnalysisIndirectProtocol):
         for trip_type in self.trip_purposes:
             intensity_trip_type = self.vot_intensity_per_trip_collection[
                 f"intensity_{self.part_of_day}_{trip_type}"
-            ].loc[vlh_row.name]
+            ].loc[vlh_row[self.link_id]]
             occupancy_trip_type = float(self.vot_intensity_per_trip_collection[
                                             f"occupants_{trip_type}"
                                         ])
@@ -324,7 +331,7 @@ class Losses(AnalysisIndirectProtocol):
         for trip_type in self.trip_purposes:
             intensity_trip_type = self.vot_intensity_per_trip_collection[
                 f"intensity_{self.part_of_day}_{trip_type}"
-            ].loc[vlh_row.name]
+            ].iloc[vlh_row.name]
 
             vot_trip_type = float(self.vot_intensity_per_trip_collection[
                                       f"vot_{trip_type}"

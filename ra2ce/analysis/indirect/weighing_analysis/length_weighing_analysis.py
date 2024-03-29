@@ -1,5 +1,5 @@
-import numpy as np
 import geopandas as gpd
+import numpy as np
 
 from ra2ce.analysis.indirect.weighing_analysis.weighing_analysis_protocol import (
     WeighingAnalysisProtocol,

@@ -20,7 +20,6 @@ from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectP
 
 
 class TestAnalysisFactory:
-
     @dataclass
     class MockAnalysisSectionDirect(AnalysisSectionDirect):
         analysis: AnalysisDirectEnum = None
