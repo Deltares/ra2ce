@@ -131,10 +131,12 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         _section.traffic_cols = self._parser.getlist(
             section_name, "traffic_cols", fallback=_section.traffic_cols
         )
-        _section.trip_purposes = list(map(
-            TripPurposeEnum.get_enum,
-            self._parser.getlist(section_name, "trip_purposes", fallback=[])
-        ))
+        _section.trip_purposes = list(
+            map(
+                TripPurposeEnum.get_enum,
+                self._parser.getlist(section_name, "trip_purposes", fallback=[]),
+            )
+        )
         _section.production_loss_per_capita_per_day = self._parser.getfloat(
             section_name,
             "production_loss_per_capita_per_day",
@@ -150,9 +152,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             "hours_per_day",
             fallback=_section.hours_per_day,
         )
-        _section.traffic_intensities_file = Path(_section.traffic_intensities_file)
-        _section.resilience_curve_file = Path(_section.resilience_curve_file)
-        _section.values_of_time_file = Path(_section.values_of_time_file)
+
         # accessibility analyses
         _section.threshold = self._parser.getfloat(
             section_name,
