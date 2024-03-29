@@ -381,12 +381,11 @@ class Losses(AnalysisIndirectProtocol):
     def execute(self) -> gpd.GeoDataFrame:
         if self.analysis.analysis.name == 'SINGLE_LINK_LOSSES':
             criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
-            criticality_analysis.drop_duplicates(subset='ID', inplace=True)
-            self._get_disrupted_criticality_analysis_results(criticality_analysis=criticality_analysis)
+            
         elif self.analysis.analysis.name == 'MULTI_LINK_LOSSES':
             criticality_analysis = MultiLinkRedundancy(self.analysis_input).execute()
-            criticality_analysis.drop_duplicates(subset='ID', inplace=True)
-            raise NotImplementedError("Under construction!")
 
+        criticality_analysis.drop_duplicates(subset=self.link_id, inplace=True)
+        self._get_disrupted_criticality_analysis_results(criticality_analysis=criticality_analysis)
         self.result = self.calculate_vehicle_loss_hours()
         return self.result
