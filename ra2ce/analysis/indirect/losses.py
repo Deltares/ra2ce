@@ -247,10 +247,14 @@ class Losses(AnalysisIndirectProtocol):
         vehicle_loss_hours_df = pd.DataFrame(columns=[self.link_id], data=self.criticality_analysis.index.values)
 
         # find the link_type and the hazard intensity
+        connectivity_attribute = None
+        if any(col in self.criticality_analysis.columns for col in ["detour", "connected"]):
+            connectivity_attribute = "detour" if "detour" in self.criticality_analysis.columns else "connected"
+
         vehicle_loss_hours_df = pd.merge(
             vehicle_loss_hours_df,
             self.criticality_analysis[
-                [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] + list(events.columns)
+                [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", connectivity_attribute] + list(events.columns)
                 ],
             left_on=self.link_id,
             right_index=True,
