@@ -100,8 +100,9 @@ class Losses(AnalysisIndirectProtocol):
                                                    "functionality_loss_ratio"], None, sep=";"
                                                   )
         self.values_of_time = _load_df_from_csv(self.analysis.values_of_time_file, [], None, sep=";")
-        self.vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose()
         self._check_validity_df()
+        self.vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose()
+        
 
         self.input_path = self.analysis_input.input_path
         self.static_path = self.analysis_input.static_path
@@ -116,8 +117,7 @@ class Losses(AnalysisIndirectProtocol):
         when initializing the class.
         """
         _required_values_of_time_keys = ["trip_types", "value_of_time", "occupants"]
-        if len(self.values_of_time) > 0 and not all(
-                key in self.values_of_time.columns for key in _required_values_of_time_keys):
+        if not all(key in self.values_of_time.columns for key in _required_values_of_time_keys):
             raise ValueError(f"Missing required columns in values_of_time: {_required_values_of_time_keys}")
 
         _required_resilience_curve_keys = ["link_type_hazard_intensity", "duration_steps", "functionality_loss_ratio"]

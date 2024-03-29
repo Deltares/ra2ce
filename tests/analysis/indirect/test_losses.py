@@ -44,7 +44,7 @@ class TestLosses:
             graph_file_hazard=_config.graph_files.base_graph_hazard,
         )
 
-        with pytest.raises(PermissionError):
+        with pytest.raises(ValueError):
             _losses = Losses(_analysis_input, _config)
 
     def test_initialize_with_data(self):
