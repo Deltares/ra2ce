@@ -16,6 +16,7 @@
 """
 
 from __future__ import annotations
+
 import logging
 from pathlib import Path
 from typing import Any
@@ -26,11 +27,11 @@ import pandas as pd
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
 from shapely.geometry.base import BaseGeometry
-from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
-from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 import ra2ce.network.networks_utils as nut
 from ra2ce.network.exporters.json_exporter import JsonExporter
+from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
+from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
@@ -79,6 +80,50 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         )
         _wrapper.polygon_graph = _clean_graph
         return _wrapper
+
+    @staticmethod
+    def get_network_from_polygon(
+        config_data: NetworkConfigData, polygon: BaseGeometry
+    ) -> tuple[MultiGraph, GeoDataFrame]:
+        """
+        Gets a valid network (`MultiGraph` and `GeoDataFrame`) for the given network configuration and
+        boundary box (represented by a `shapely.BaseGeometry`).
+
+        Args:
+            config_data (NetworkConfigData): Network data configuration required for OSM download.
+            polygon (BaseGeometry): Polygon representing the boundary box.
+
+        Returns:
+            tuple[MultiGraph, GeoDataFrame]: Resulting network representations.
+        """
+        _network_wrapper = OsmNetworkWrapper.with_polygon(config_data, polygon)
+        return _network_wrapper.get_network()
+
+    @staticmethod
+    def get_network_from_geojson(config_data: NetworkConfigData):
+        """
+        Gets a valid network (`MultiGraph` and `GeoDataFrame`) for the given network configuration,
+        given that its network section contains a valid path for the polygon property.
+
+        Args:
+            config_data (NetworkConfigData): Network data configuration required for OSM download.
+
+        Raises:
+            ValueError: When the `NetworkConfigData` does not contain a valid polygon path
+            for its network section.
+
+        Returns:
+            tuple[MultiGraph, GeoDataFrame]: Resulting network representations.
+        """
+        if (
+            not isinstance(config_data.network.polygon, Path)
+            or not config_data.network.polygon.is_file()
+        ):
+            raise ValueError(
+                "A valid network polygon (.geojson) file path needs to be provided."
+            )
+
+        return OsmNetworkWrapper(config_data).get_network()
 
     def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
         logging.info("Start downloading a network from OSM.")

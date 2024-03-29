@@ -20,10 +20,10 @@
 """
 
 import ast
-from collections import defaultdict
 import itertools
 import logging
 from abc import ABC, abstractmethod
+from collections import defaultdict
 
 import geopandas as gpd
 import numpy as np

@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.indirect.weighing_analysis.time_weighing_analysis import (
     TimeWeighingAnalysis,

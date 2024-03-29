@@ -22,6 +22,7 @@ import shutil
 import sys
 from distutils.dir_util import copy_tree
 import sphinx_autosummary_accessors
+from pathlib import Path
 
 # This is not needed
 sys.path.insert(0, os.path.abspath(".."))
@@ -48,8 +49,20 @@ if os.path.isdir("build"):
     remove_dir_content("build")
 if os.path.isdir("_examples"):
     remove_dir_content("_examples")
+
 os.makedirs("_examples")
 copy_tree("../examples", "_examples")
+
+if os.path.isdir("docs"):
+    remove_dir_content("docs")
+
+_src_diagrams = "../docs/_diagrams/"
+_dst_diagrams = "docs/_diagrams/"
+os.makedirs(_dst_diagrams)
+for _img_file in os.listdir(_src_diagrams):
+    if not _img_file.endswith(".png"):
+        continue
+    shutil.copy((_src_diagrams + _img_file), (_dst_diagrams + _img_file))
 
 # -- General configuration ---------------------------------------------
 

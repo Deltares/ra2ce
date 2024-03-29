@@ -89,6 +89,7 @@ class CleanupSection:
     segmentation_length: float = float("nan")
     merge_lines: bool = False
     cut_at_intersections: bool = False
+    delete_duplicate_nodes: bool = False
 
 
 @dataclass

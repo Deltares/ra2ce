@@ -26,13 +26,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.analysis.analysis_config_data.enums import damage_curve_enum
 from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
     AnalysisDirectEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
@@ -91,7 +91,9 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     disruption_per_category: str = ""
     traffic_cols: list[str] = field(default_factory=list)
     # losses
-    duration_event: float = math.nan # TODO remove the deprecated attribute that have been replaced by csv
+    duration_event: float = (
+        math.nan
+    )  # TODO remove the deprecated attribute that have been replaced by csv
     duration_disruption: float = math.nan
     fraction_detour: float = math.nan
     fraction_drivethrough: float = 0.0
@@ -134,8 +136,8 @@ class AnalysisSectionDirect(AnalysisSectionBase):
     climate_period: float = math.nan
     # road damage
     event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.INVALID)
-    damage_curve: damage_curve_enum.DamageCurveEnum = field(
-        default_factory=lambda: EventTypeEnum.INVALID
+    damage_curve: DamageCurveEnum = field(
+        default_factory=lambda: DamageCurveEnum.INVALID
     )
     risk_calculation_mode: RiskCalculationModeEnum = field(
         default_factory=lambda: RiskCalculationModeEnum.NONE

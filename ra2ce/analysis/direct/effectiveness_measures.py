@@ -9,38 +9,37 @@ import pandas as pd
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionDirect,
 )
-from ra2ce.analysis.direct.analysis_direct_protocol import (
-    AnalysisDirectProtocol,
-)
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
 from ra2ce.network.graph_files.network_file import NetworkFile
 
 
 class EffectivenessMeasures(AnalysisDirectProtocol):
-    graph_file: NetworkFile
     analysis: AnalysisSectionDirect
+    graph_file: NetworkFile
+    graph_file_hazard: NetworkFile
     input_path: Path
     output_path: Path
-    result: gpd.GeoDataFrame
 
     def __init__(
         self,
-        graph_file: NetworkFile,
-        analysis: AnalysisSectionDirect,
-        input_path: Path,
-        output_path: Path,
+        analysis_input: AnalysisInputWrapper,
     ) -> None:
-        self.graph_file = graph_file
-        self.analysis = analysis
-        self.input_path = input_path
-        self.output_path = output_path
+        self.analysis = analysis_input.analysis
+        self.graph_file = None
+        self.graph_file_hazard = analysis_input.graph_file_hazard
+        self.input_path = analysis_input.input_path
+        self.output_path = analysis_input.output_path
         self.result = None
 
-        self.return_period = analysis.return_period  # years
-        self.repair_costs = analysis.repair_costs  # euro
-        self.evaluation_period = analysis.evaluation_period  # years
-        self.interest_rate = analysis.interest_rate / 100  # interest rate
+        self.return_period = self.analysis.return_period  # years
+        self.repair_costs = self.analysis.repair_costs  # euro
+        self.evaluation_period = self.analysis.evaluation_period  # years
+        self.interest_rate = self.analysis.interest_rate / 100  # interest rate
         self.btw = 1.21  # VAT multiplication factor to include taxes
-        self._measures_csv = input_path.joinpath("direct", "effectiveness_measures.csv")
+        self._measures_csv = self.input_path.joinpath(
+            "direct", "effectiveness_measures.csv"
+        )
 
         # perform checks on input while initializing class
         self._validate_input_params(self.input_path, self.analysis)
@@ -444,7 +443,7 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
         """
         effectiveness_dict = self._load_effectiveness_table()
 
-        gdf_in = self.graph_file.get_graph()
+        gdf_in = self.graph_file_hazard.get_graph()
 
         if self.analysis.create_table:
             df = self._create_feature_table(

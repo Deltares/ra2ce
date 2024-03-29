@@ -23,7 +23,6 @@
 import copy
 import logging
 from collections import defaultdict
-from pathlib import Path
 from typing import Any
 
 import geopandas as gpd
@@ -32,14 +31,7 @@ import pandas as pd
 from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionIndirect,
-)
-from ra2ce.network.graph_files.graph_file import GraphFile
-from ra2ce.network.hazard.hazard_names import HazardNames
-from ra2ce.network.network_config_data.network_config_data import (
-    OriginsDestinationsSection,
-)
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 
 
 class OriginClosestDestination:
@@ -56,38 +48,35 @@ class OriginClosestDestination:
 
     def __init__(
         self,
-        file_id: str,
-        origins_destinations: OriginsDestinationsSection,
-        analysis: AnalysisSectionIndirect,
-        graph_file: GraphFile,
-        graph_file_hazard: GraphFile,
-        static_path: Path,
-        hazard_names: HazardNames,
+        analysis_input: AnalysisInputWrapper,  # noqa: F821
     ):
+        self.analysis = analysis_input.analysis
+        self.graph_file = analysis_input.graph_file
+        self.graph_file_hazard = analysis_input.graph_file_hazard
+        self.static_path = analysis_input.static_path
+        self.hazard_names = analysis_input.hazard_names
+
         self.crs = 4326  # TODO PUT IN DOCUMENTATION OR MAKE CHANGEABLE
         self.unit = "km"
-        self.network_threshold = analysis.threshold
-        self.threshold_destinations = analysis.threshold_destinations
-        self.weighing = analysis.weighing.config_value
-        self.origins_destinations = origins_destinations
-        self.o_name = origins_destinations.origins_names
-        self.d_name = origins_destinations.destinations_names
-        self.od_id = origins_destinations.id_name_origin_destination
-        self.origin_out_fraction = origins_destinations.origin_out_fraction
-        self.origin_count = origins_destinations.origin_count
+        self.network_threshold = self.analysis.threshold
+        self.threshold_destinations = self.analysis.threshold_destinations
+        self.weighing = self.analysis.weighing.config_value
+        self.origins_destinations = analysis_input.origins_destinations
+        self.o_name = self.origins_destinations.origins_names
+        self.d_name = self.origins_destinations.destinations_names
+        self.od_id = self.origins_destinations.id_name_origin_destination
+        self.origin_out_fraction = self.origins_destinations.origin_out_fraction
+        self.origin_count = self.origins_destinations.origin_count
         self.od_key = "od_id"
-        self.id_name = file_id if file_id is not None else "rfid"
-        self.analysis = analysis
-        self.graph_file = graph_file
-        self.graph_file_hazard = graph_file_hazard
-        self.static_path = static_path
-        self.hazard_names = hazard_names
+        self.id_name = (
+            analysis_input.file_id if analysis_input.file_id is not None else "rfid"
+        )
 
         self.destination_names = None
         self.destination_key = None
-        if origins_destinations.category:
+        if self.origins_destinations.category:
             self.destination_key = "category"
-            self.destination_key_value = origins_destinations.category
+            self.destination_key_value = self.origins_destinations.category
 
         self.results_dict = {}
 
@@ -195,16 +184,18 @@ class OriginClosestDestination:
 
             # Check if the o/d pairs are still connected while some links are disrupted by the hazard(s)
             h = copy.deepcopy(graph)
-
-            edges_remove = [
-                e for e in graph.edges.data(keys=True) if hazard_name in e[-1]
-            ]
+            edges_remove = []
+            for e in graph.edges.data(keys=True):
+                if (hazard_name in e[-1]) and (
+                    ("bridge" not in e[-1])
+                    or ("bridge" in e[-1] and e[-1]["bridge"] != "yes")
+                ):
+                    edges_remove.append(e)
             edges_remove = [e for e in edges_remove if (e[-1][hazard_name] is not None)]
             edges_remove = [
                 e
                 for e in edges_remove
                 if (e[-1][hazard_name] > float(self.network_threshold))
-                & ("bridge" not in e[-1])
             ]
             h.remove_edges_from(edges_remove)
 
@@ -418,10 +409,12 @@ class OriginClosestDestination:
         # Attribute to the origins that don't have access that they do not have any access
         if len(other) > 0:
             for oth in other:
-                origins.loc[
-                    origins[self.od_id] == int(oth[-1].split("_")[-1]),
-                    col_name,
-                ] = "no access"
+                od_id_list = oth[-1].split(",")
+                for od_id in od_id_list:
+                    origins.loc[
+                        origins[self.od_id] == int(od_id.split("_")[-1]),
+                        col_name,
+                    ] = "no access"
         return origins
 
     def get_nr_without_access(
@@ -1005,7 +998,9 @@ class OriginClosestDestination:
         )
 
     def load_origins(self):
-        od_path = self.static_path.joinpath("output_graph", "origin_destination_table.feather")
+        od_path = self.static_path.joinpath(
+            "output_graph", "origin_destination_table.feather"
+        )
         od = gpd.read_feather(od_path)
         origin = od.loc[od["o_id"].notna()]
         del origin["d_id"]

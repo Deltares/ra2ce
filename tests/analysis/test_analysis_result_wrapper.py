@@ -1,10 +1,10 @@
-import pytest
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 import geopandas as gpd
+import pytest
+
+from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 
 
 class TestAnalysisResultWrapper:
-
     def test_initialize(self):
         # 1. Define test data.
         _analysis_result = None

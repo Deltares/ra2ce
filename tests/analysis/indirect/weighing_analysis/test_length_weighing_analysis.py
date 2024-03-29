@@ -1,5 +1,6 @@
 import numpy as np
 import pytest
+
 from ra2ce.analysis.indirect.weighing_analysis.length_weighing_analysis import (
     LengthWeighingAnalysis,
 )
@@ -9,7 +10,6 @@ from ra2ce.analysis.indirect.weighing_analysis.weighing_analysis_protocol import
 
 
 class TestLengthWeighingAnalysis:
-
     def test_init(self):
         # 1. Define test data.
         _analysis = LengthWeighingAnalysis()
