@@ -56,7 +56,6 @@ from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 
 
 class AnalysisFactory:
-
     @staticmethod
     def get_direct_analysis(
         analysis: AnalysisSectionDirect,

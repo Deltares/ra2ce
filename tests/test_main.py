@@ -1,9 +1,10 @@
 import shutil
-import pytest
-from click.testing import CliRunner, Result
 from itertools import chain
 from pathlib import Path
 from typing import Iterator, Optional
+
+import pytest
+from click.testing import CliRunner, Result
 
 from ra2ce import __main__
 from tests import external_test, slow_test, test_data, test_external_data

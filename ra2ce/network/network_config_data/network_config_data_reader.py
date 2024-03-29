@@ -237,4 +237,9 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
             "cut_at_intersections",
             fallback=_cleanup_section.cut_at_intersections,
         )
+        _cleanup_section.delete_duplicate_nodes = self._parser.getboolean(
+            _section,
+            "delete_duplicate_nodes",
+            fallback=_cleanup_section.delete_duplicate_nodes,
+        )
         return _cleanup_section
