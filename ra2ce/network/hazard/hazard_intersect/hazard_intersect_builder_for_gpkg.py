@@ -30,9 +30,6 @@ from numpy import nanmean
 from ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base import (
     HazardIntersectBuilderBase,
 )
-from ra2ce.network.hazard.hazard_intersect.hazard_intersect_parallel_run import (
-    get_hazard_parallel_process,
-)
 
 
 @dataclass
@@ -90,10 +87,8 @@ class HazardIntersectBuilderForGpkg(HazardIntersectBuilderBase):
                         race_name + "_" + self.hazard_aggregate_wl[:2]
                     ] = 0
 
-        # Run in parallel to boost performance.
-        self._overlay_in_parallel(networkx_overlay)
-        # for i, _ra2ce_name in self.ra2ce_names:
-        #     networkx_overlay(self.hazard_shp_files[i], _ra2ce_name)
+        self._overlay_hazard_files(networkx_overlay)
+
         return hazard_overlay
 
     def _from_geodataframe(self, hazard_overlay: GeoDataFrame) -> GeoDataFrame:
@@ -127,22 +122,13 @@ class HazardIntersectBuilderForGpkg(HazardIntersectBuilderBase):
                 inplace=True,
             )
 
-        # Run in parallel to boost performance.
-        self._overlay_in_parallel(geodataframe_overlay)
-        # for i, _ra2ce_name in self.ra2ce_names:
-        #     geodataframe_overlay(self.hazard_shp_files[i], _ra2ce_name)
+        self._overlay_hazard_files(geodataframe_overlay)
 
         if hazard_overlay.crs != gdf_crs_original:
             hazard_overlay = hazard_overlay.to_crs(gdf_crs_original)
 
         return hazard_overlay
 
-    def _overlay_in_parallel(self, overlay_func: Callable):
-        # Run in parallel to boost performance.
-        get_hazard_parallel_process(
-            overlay_func,
-            lambda delayed_func: (
-                delayed_func(self.hazard_gpkg_files[i], _ra2ce_name)
-                for i, _ra2ce_name in enumerate(self.ra2ce_names)
-            ),
-        )
+    def _overlay_hazard_files(self, overlay_func: Callable[[str, str], None]):
+        for i, _ra2ce_name in enumerate(self.ra2ce_names):
+            overlay_func(self.hazard_gpkg_files[i], _ra2ce_name)
