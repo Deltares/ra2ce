@@ -11,7 +11,6 @@ from ra2ce.analysis.indirect.weighing_analysis.weighing_analysis_protocol import
 
 
 class WeighingAnalysisFactory:
-
     @staticmethod
     def get_analysis(weighing_type: WeighingEnum) -> WeighingAnalysisProtocol:
         if weighing_type == WeighingEnum.TIME:
