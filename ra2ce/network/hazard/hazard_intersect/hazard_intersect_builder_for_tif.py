@@ -37,9 +37,7 @@ from ra2ce.network.hazard.hazard_common_functions import (
 from ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base import (
     HazardIntersectBuilderBase,
 )
-from ra2ce.network.hazard.hazard_intersect.hazard_intersect_parallel_run import (
-    get_hazard_parallel_process,
-)
+
 from ra2ce.network.networks_utils import (
     fraction_flooded,
     get_graph_edges_extent,
@@ -162,8 +160,7 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                 },
             )
 
-        # Run in parallel to boost performance.
-        self._overlay_in_parallel(overlay_network_x)
+        self._overlay_hazard_files(overlay_network_x)
         return hazard_overlay
 
     def _from_geodataframe(self, hazard_overlay: GeoDataFrame):
@@ -231,16 +228,9 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                 lambda x, _hz_str=_hazard_files_str: fraction_flooded(x, _hz_str)
             )
 
-        # Run in parallel to boost performance.
-        self._overlay_in_parallel(overlay_geodataframe)
+        self._overlay_hazard_files(overlay_geodataframe)
         return hazard_overlay
 
-    def _overlay_in_parallel(self, overlay_func: Callable):
-        # Run in parallel to boost performance.
-        get_hazard_parallel_process(
-            overlay_func,
-            lambda delayed_func: (
-                delayed_func(self.hazard_tif_files[i], hn, rn)
-                for i, (hn, rn) in enumerate(self._combined_names)
-            ),
-        )
+    def _overlay_hazard_files(self, overlay_func: Callable[[str, str, str], None]):
+        for i, (hn, rn) in enumerate(self._combined_names):
+            overlay_func(self.hazard_tif_files[i], hn, rn)
