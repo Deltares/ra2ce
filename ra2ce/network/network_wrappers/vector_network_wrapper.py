@@ -338,7 +338,8 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         if not edges.crs:
             edges.crs = graph.graph["crs"]
 
-        edges = edges.drop(columns=["fid"])
+        if "fid" in edges.columns:
+            edges = edges.drop(columns=["fid"])
         return edges, nodes
 
     @staticmethod
