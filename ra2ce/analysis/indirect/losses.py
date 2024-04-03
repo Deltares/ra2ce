@@ -185,7 +185,8 @@ class Losses(AnalysisIndirectProtocol):
             ~criticality_analysis.index.isin(self.criticality_analysis.index)
         ]
         # link_id from list to tuple
-        self.criticality_analysis_non_disrupted[self.link_id] = self.criticality_analysis_non_disrupted[
+        if len(self.criticality_analysis_non_disrupted) > 0:
+            self.criticality_analysis_non_disrupted[self.link_id] = self.criticality_analysis_non_disrupted[
             self.link_id].apply(lambda x: tuple(x) if isinstance(x, list) else x)
         self.criticality_analysis[self.link_id] = self.criticality_analysis[self.link_id].apply(
             lambda x: tuple(x) if isinstance(x, list) else x)
