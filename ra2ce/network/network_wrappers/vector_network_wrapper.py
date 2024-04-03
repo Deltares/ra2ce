@@ -114,6 +114,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
         graph_simple = self._get_avg_speed(graph_simple)
         logging.info("Finished converting the complex graph to a simple graph")
+
         return graph_simple, edges_complex
 
         # return graph_complex, edges
@@ -336,6 +337,9 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             nodes.crs = graph.graph["crs"]
         if not edges.crs:
             edges.crs = graph.graph["crs"]
+
+        if "fid" in edges.columns:
+            edges = edges.drop(columns=["fid"])
         return edges, nodes
 
     @staticmethod

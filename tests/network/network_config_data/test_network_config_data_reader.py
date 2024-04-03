@@ -30,6 +30,7 @@ class TestNetworkConfigDataReader:
         "network_ini_filepath",
         [
             pytest.param("1_network_shape"),
+            pytest.param("1_network_shape_minimal_config"),
             pytest.param("2_network_shape"),
             pytest.param("3_network_osm_download"),
         ],

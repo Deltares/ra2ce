@@ -24,6 +24,7 @@ from ast import literal_eval
 from collections import defaultdict
 from pathlib import Path
 from typing import Optional
+import ast
 
 import geopandas as gpd
 import pandas as pd
@@ -102,8 +103,6 @@ class Losses(AnalysisIndirectProtocol):
                                                   )
         self.values_of_time = _load_df_from_csv(Path(self.analysis.values_of_time_file), [], None, sep=";")
         self._check_validity_df()
-        self.vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose()
-
 
         self.input_path = self.analysis_input.input_path
         self.static_path = self.analysis_input.static_path
@@ -168,7 +167,7 @@ class Losses(AnalysisIndirectProtocol):
             ].item()
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
-                    self.intensities[partofday_trip_purpose_name] / self.hours_per_day
+                    self.intensities_simplified_graph[partofday_trip_purpose_name] / self.hours_per_day
             )
         return dict(_vot_dict)
 
@@ -189,8 +188,35 @@ class Losses(AnalysisIndirectProtocol):
         self.criticality_analysis_non_disrupted = criticality_analysis[
             ~criticality_analysis.index.isin(self.criticality_analysis.index)
         ]
+        # link_id from list to tuple
+        if len(self.criticality_analysis_non_disrupted) > 0:
+            self.criticality_analysis_non_disrupted[self.link_id] = self.criticality_analysis_non_disrupted[
+            self.link_id].apply(lambda x: tuple(x) if isinstance(x, list) else x)
+        self.criticality_analysis[self.link_id] = self.criticality_analysis[self.link_id].apply(
+            lambda x: tuple(x) if isinstance(x, list) else x)
+
         self.criticality_analysis.set_index(self.link_id, inplace=True)
-        self.criticality_analysis_non_disrupted.set_index(self.link_id, inplace=True)
+        self.criticality_analysis_non_disrupted = self.criticality_analysis_non_disrupted.reset_index()
+
+    def _get_intensities_simplified_graph(self) -> pd.DataFrame:
+        _intensities_simplified_graph_list = []
+
+        for index in self.criticality_analysis.index.values:
+            if isinstance(index, tuple):
+                filtered_intensities = self.intensities[self.intensities.index.isin(index)]
+
+                # Create a new DataFrame with the index set to tuple_of_indices and the maximum values as the values
+                max_intensities = filtered_intensities.max().to_frame().T
+                max_intensities.index = [index]
+
+                row_data = max_intensities.squeeze()
+            else:
+                row_data = self.intensities.loc[index]
+
+            _intensities_simplified_graph_list.append(row_data)
+        _intensities_simplified_graph = pd.DataFrame(_intensities_simplified_graph_list,
+                                                     index=self.criticality_analysis.index.values)
+        return _intensities_simplified_graph
 
     def calculate_vehicle_loss_hours(self) -> gpd.GeoDataFrame:
         """
@@ -227,11 +253,13 @@ class Losses(AnalysisIndirectProtocol):
                 [
                     vlh,
                     self.criticality_analysis_non_disrupted[
-                        [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] +
+                        [f"{self.link_id}", f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] +
                         list(events.columns)
-                    ]
+                        ]
                 ]
             )
+            result = result.reset_index()
+
             # Get the columns from vehicle_loss_hours that are not in common
             additional_columns = list(set(vlh.columns) - set(self.criticality_analysis_non_disrupted.columns))
 
@@ -267,12 +295,12 @@ class Losses(AnalysisIndirectProtocol):
         for event in events.columns.tolist():
             for _, vlh_row in vehicle_loss_hours.iterrows():
                 row_hazard_range = _get_range(vlh_row[event])
-                row_performance_change = performance_change.loc[vlh_row[self.link_id]]
+                row_performance_change = performance_change.loc[[vlh_row[self.link_id]]]
                 if math.isnan(row_performance_change):
                     self._calculate_production_loss_per_capita(vehicle_loss_hours, vlh_row, event)
                 else:
-                    self._populate_vehicle_loss_hour_df(vehicle_loss_hours, row_hazard_range, vlh_row,
-                                                        row_performance_change, event)
+                    self._populate_vehicle_loss_hour(vehicle_loss_hours, row_hazard_range, vlh_row,
+                                                     row_performance_change, event)
 
         vehicle_loss_hours_result = _create_result(vehicle_loss_hours)
         return vehicle_loss_hours_result
@@ -299,34 +327,49 @@ class Losses(AnalysisIndirectProtocol):
         for trip_type in self.trip_purposes:
             intensity_trip_type = self.vot_intensity_per_trip_collection[
                 f"intensity_{self.part_of_day}_{trip_type}"
-            ].loc[vlh_row[self.link_id]]
+            ].loc[[vlh_row[self.link_id]]]
             occupancy_trip_type = float(self.vot_intensity_per_trip_collection[
                                             f"occupants_{trip_type}"
                                         ])
-            vlh_trip_type_event = (
+            vlh_trip_type_event_series = (
                     self.duration_event *
                     intensity_trip_type *
                     occupancy_trip_type *
                     self.production_loss_per_capita_per_hour
             )
-            vehicle_loss_hours.loc[vlh_row.name, f"vlh_{trip_type}_{hazard_col_name}"] = vlh_trip_type_event
+            vlh_trip_type_event = vlh_trip_type_event_series.squeeze()
+            vehicle_loss_hours.loc[[vlh_row.name], f"vlh_{trip_type}_{hazard_col_name}"] = vlh_trip_type_event
             vlh_total += vlh_trip_type_event
-        vehicle_loss_hours.loc[vlh_row.name, f"vlh_{hazard_col_name}_total"] = vlh_total
+        vehicle_loss_hours.loc[[vlh_row.name], f"vlh_{hazard_col_name}_total"] = vlh_total
 
-    def _populate_vehicle_loss_hour_df(self, vehicle_loss_hours: gpd.GeoDataFrame, row_hazard_range: str,
-                                       vlh_row: pd.Series,
-                                       performance_change: float, hazard_col_name: str):
+    def _populate_vehicle_loss_hour(self, vehicle_loss_hours: gpd.GeoDataFrame, row_hazard_range: str,
+                                    vlh_row: pd.Series,
+                                    performance_change: float, hazard_col_name: str):
 
         vlh_total = 0
-        link_type_hazard_range = (
-            f"{vlh_row['link_type']}_{row_hazard_range}"
-        )
+        if isinstance(vlh_row['link_type'], list):
+            max_disruption = 0
+            for row_link_type in vlh_row['link_type']:
+                link_type_hazard_range = (f"{row_link_type}_{row_hazard_range}")
+                row_relevant_curve = self.resilience_curve[
+                    self.resilience_curve["link_type_hazard_intensity"] == link_type_hazard_range
+                    ]
+                disruption = ((row_relevant_curve['duration_steps'].apply(pd.Series) *
+                               (row_relevant_curve['functionality_loss_ratio']).apply(pd.Series) / 100).sum(
+                    axis=1)).squeeze()
+                if disruption > max_disruption:
+                    relevant_curve = row_relevant_curve
+        else:
+            row_link_type = vlh_row['link_type']
+            link_type_hazard_range = (
+                f"{row_link_type}_{row_hazard_range}"
+            )
 
-        # get stepwise recovery curve data
-        relevant_curve = self.resilience_curve[
-            self.resilience_curve["link_type_hazard_intensity"]
-            == link_type_hazard_range
-            ]
+            # get stepwise recovery curve data
+            relevant_curve = self.resilience_curve[
+                self.resilience_curve["link_type_hazard_intensity"]
+                == link_type_hazard_range
+                ]
         if relevant_curve.size == 0:
             raise Exception(f"""{link_type_hazard_range} was not found in the introduced resilience_curve""")
         duration_steps: list = relevant_curve["duration_steps"].item()
@@ -338,21 +381,22 @@ class Losses(AnalysisIndirectProtocol):
         for trip_type in self.trip_purposes:
             intensity_trip_type = self.vot_intensity_per_trip_collection[
                 f"intensity_{self.part_of_day}_{trip_type}"
-            ].iloc[vlh_row.name]
+            ].loc[[vlh_row[self.link_id]]]
 
             vot_trip_type = float(self.vot_intensity_per_trip_collection[
                                       f"vot_{trip_type}"
                                   ])
 
-            vlh_trip_type_event = sum(
+            vlh_trip_type_event_series = sum(
                 intensity_trip_type * duration * loss_ratio * performance_change * vot_trip_type
                 for duration, loss_ratio in zip(
                     duration_steps, functionality_loss_ratios
                 )
             )
-            vehicle_loss_hours.loc[vlh_row.name, f"vlh_{trip_type}_{hazard_col_name}"] = vlh_trip_type_event
+            vlh_trip_type_event = vlh_trip_type_event_series.squeeze()
+            vehicle_loss_hours.loc[[vlh_row.name], f"vlh_{trip_type}_{hazard_col_name}"] = vlh_trip_type_event
             vlh_total += vlh_trip_type_event
-        vehicle_loss_hours.loc[vlh_row.name, f"vlh_{hazard_col_name}_total"] = vlh_total
+        vehicle_loss_hours.loc[[vlh_row.name], f"vlh_{hazard_col_name}_total"] = vlh_total
 
     def _get_link_types_heights_ranges(self) -> tuple[list[str], list[tuple]]:
         _link_types = set()
@@ -387,10 +431,15 @@ class Losses(AnalysisIndirectProtocol):
 
     def execute(self) -> gpd.GeoDataFrame:
         if self.analysis.analysis.name == 'SINGLE_LINK_LOSSES':
-            criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()    
+            criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
         elif self.analysis.analysis.name == 'MULTI_LINK_LOSSES':
             criticality_analysis = MultiLinkRedundancy(self.analysis_input).execute()
 
         self._get_disrupted_criticality_analysis_results(criticality_analysis=criticality_analysis)
+
+        self.intensities_simplified_graph = self._get_intensities_simplified_graph()
+
+        self.vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose()
+
         self.result = self.calculate_vehicle_loss_hours()
         return self.result
