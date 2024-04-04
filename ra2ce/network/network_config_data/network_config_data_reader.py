@@ -213,6 +213,11 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
         _hazard_section.aggregate_wl = AggregateWlEnum.get_enum(
             self._parser.get(_section, "aggregate_wl", fallback=None)
         )
+        _hazard_section.scenario_cost = list(
+            self._parser.getlist(
+                _section, "scenario_cost", fallback=_hazard_section.scenario_cost
+            )
+        )
         return _hazard_section
 
     def get_cleanup_section(self) -> CleanupSection:

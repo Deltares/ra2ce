@@ -81,6 +81,7 @@ class HazardSection:
     hazard_field_name: list[str] = field(default_factory=list)
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     hazard_crs: str = ""
+    scenario_cost: list[float] = field(default_factory=list)
 
 
 @dataclass
