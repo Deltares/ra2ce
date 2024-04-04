@@ -71,9 +71,14 @@ class TestMainCli:
         purge_output_dirs()
 
     def _run_with_click(
-        self, network_ini: Optional[Path], analysis_ini: Optional[Path]
+        self,
+        working_dir: Optional[Path],
+        network_ini: Optional[Path],
+        analysis_ini: Optional[Path],
     ) -> Result:
         args = []
+        if working_dir:
+            args.extend(["--working_dir", str(working_dir)])
         if network_ini:
             args.extend(["--network_ini", str(network_ini)])
         if analysis_ini:
@@ -85,27 +90,40 @@ class TestMainCli:
         )
 
     @pytest.mark.parametrize(
-        "network_ini, analyses_ini, expected_error",
+        "working_dir, network_ini, analyses_ini, expected_error",
         [
             pytest.param(
+                test_dir.joinpath("no_valid_workdir"),
+                None,
+                None,
+                str(test_dir.joinpath("no_valid_workdir")),
+                id="Workdir is invalid",
+            ),
+            pytest.param(
+                None,
                 test_dir.joinpath("not_a_network.ini"),
                 test_dir.joinpath("analyses.ini"),
                 str(test_dir.joinpath("not_a_network.ini")),
-                id="Network is None",
+                id="Network is invalid",
             ),
             pytest.param(
+                None,
                 test_dir.joinpath("network.ini"),
                 test_dir.joinpath("not_an_analyses.ini"),
                 str(test_dir.joinpath("not_an_analyses.ini")),
-                id="Analyses is None",
+                id="Analyses is invalid",
             ),
         ],
     )
-    def test_given_invalid_paths_raises_value_error(
-        self, network_ini: Path, analyses_ini: Path, expected_error: str
+    def test_given_invalid_ini_paths_raises_value_error(
+        self,
+        working_dir: Optional[Path],
+        network_ini: Optional[Path],
+        analyses_ini: Optional[Path],
+        expected_error: str,
     ):
         # 1 - 2. Define and run test data.
-        _run_result = self._run_with_click(network_ini, analyses_ini)
+        _run_result = self._run_with_click(working_dir, network_ini, analyses_ini)
 
         # 3. Verify expectations.
         assert _run_result.exit_code == 1
@@ -133,7 +151,7 @@ class TestMainCli:
         assert _analysis.is_file()
 
         # 2. Run test.
-        _run_result = self._run_with_click(_network, _analysis)
+        _run_result = self._run_with_click(None, _network, _analysis)
 
         # 3. Verify expectations.
         assert _run_result.exit_code == 0
@@ -207,7 +225,7 @@ class TestMainCli:
         _analysis_dir = case_data_dir.joinpath("output")
 
         # 2. When test:
-        _click_arguments = self._run_with_click(network_ini, analysis_ini)
+        _click_arguments = self._run_with_click(None, network_ini, analysis_ini)
 
         # 3. Then, validate expectations
         assert _click_arguments.exit_code == 0
