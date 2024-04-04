@@ -3,7 +3,7 @@
 Network Module
 ==============
 
-The network module is a separate module created within `RA2CE` to help set up a RA2CE 
+The network module is a separate module created within ``RA2CE`` to help set up a RA2CE 
 model. It helps to easily, reproducibly and consistently build models from global 
 to local datasets. The network module's goal is to create an infrastructure network to be used in further analyses. There are two possibilities to create a network: 1) downloading a network from OpenStreetMap with RA2CE and 2) creating a network from vector data. Within the network module, it is additionally possible to determine the network's exposure to a user-specified hazard using the 'hazard overlay' functionality. There are two options to set up a RA2CE model: using scripting and using initalization files (network.ini and analysis.ini). Examples of how to use this module can be found in the :ref:`examples` and can be tested in the Binder environment. 
 
@@ -40,7 +40,7 @@ Examples of how to use this module can be found in the :ref:`examples`.
 Network from OpenStreetMap using the network.ini initalization file
 -----------------------------------------------------------------------------
 The network.ini file contains several parts: 1[project], 2[network], 3[origins_destinations], 4[hazard]. These subsections are used to set the parameters necessary for the creation of different networks. Here, we will focus on the [network] part, as this can be used to create a basic network. 
-To download a network from OpenStreetMap, the user needs to create a geojson of the extent for which they want to create a network. This .geojson polygon should be stored in the static>network folder of the RA2CE project folder. If you are not yet familiar with the folder setup of a RA2CE project, first visit :ref:`RA2CE`.
+To download a network from OpenStreetMap, the user needs to create a geojson of the extent for which they want to create a network. This .geojson polygon should be stored in the static>network folder of the RA2CE project folder. If you are not yet familiar with the folder setup of a RA2CE project, first visit :ref:`about`.
 
 To create a network from OSM, specify the following parameters in your network.ini file:
 
