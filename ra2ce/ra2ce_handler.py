@@ -49,26 +49,26 @@ class Ra2ceHandler:
 
     def __init__(
         self,
-        working_dir: Optional[Path],
-        network_ini: Optional[Path],
-        analysis_ini: Optional[Path],
+        working_dir: Optional[Path] = None,
+        network: Optional[Path] = None,
+        analysis: Optional[Path] = None,
     ) -> None:
-        self._initialize_logger(working_dir, network_ini, analysis_ini)
-        self.input_config = ConfigFactory.get_config_wrapper(network_ini, analysis_ini)
+        self._initialize_logger(working_dir, network, analysis)
+        self.input_config = ConfigFactory.get_config_wrapper(network, analysis)
 
     def _initialize_logger(
         self,
         working_dir: Optional[Path],
-        network_ini: Optional[Path],
-        analysis_ini: Optional[Path],
+        network: Optional[Path],
+        analysis: Optional[Path],
     ) -> None:
         _output_config = None
         if working_dir:
             _output_config = working_dir.joinpath("output")
-        elif network_ini:
-            _output_config = NetworkConfigData.get_data_output(network_ini)
-        elif analysis_ini:
-            _output_config = AnalysisConfigData.get_data_output(analysis_ini)
+        elif network:
+            _output_config = NetworkConfigData.get_data_output(network)
+        elif analysis:
+            _output_config = AnalysisConfigData.get_data_output(analysis)
         else:
             raise ValueError(
                 "No valid location provided to start logging. Either network or analysis are required."

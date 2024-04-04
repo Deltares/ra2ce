@@ -10,7 +10,7 @@ class TestRa2ceHandler:
     def test_initialize_with_no_network_nor_analysis_raises(self):
         # 1. Run test.
         with pytest.raises(ValueError) as exc_err:
-            Ra2ceHandler(None, None)
+            Ra2ceHandler(None, None, None)
 
         # 2. Verify final expectations.
         assert (
@@ -33,7 +33,7 @@ class TestRa2ceHandler:
             # It will raise an exception because the analysis folder does not
             # contain any analysis.ini file, but we only care to see if the
             # directory was correctly initialized.
-            Ra2ceHandler(None, _analysis_dir)
+            Ra2ceHandler(None, None, _analysis_dir)
 
         # 3. Verify expectations.
         assert _test_dir.exists()

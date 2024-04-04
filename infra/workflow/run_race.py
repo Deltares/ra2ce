@@ -16,7 +16,7 @@ network_ini = (
 )  # we set the _network_ini_name before, so we can use this now for the project
 assert network_ini.is_file()  # check whether the network.ini file exists
 
-handler = Ra2ceHandler(network_ini=network_ini, analysis_ini=None)
+handler = Ra2ceHandler(network=network_ini, analysis=None)
 handler.configure()
 
 # Set the path to your output_graph folder to find the network/graph creation:
