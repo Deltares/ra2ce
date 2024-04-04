@@ -48,24 +48,47 @@ from ra2ce.ra2ce_handler import Ra2ceHandler
 def run_analysis(
     working_dir: Optional[str], network_ini: Optional[str], analyses_ini: Optional[str]
 ) -> list[AnalysisResultWrapper]:
-    def _as_path(
-        working_dir: Optional[str], ini_file: Optional[str] = None
-    ) -> Path | None:
+    _handler = get_handler(working_dir, network_ini, analyses_ini)
+    _handler.configure()
+    return _handler.run_analysis()
+
+
+def get_handler(
+    working_dir: Optional[str], network_ini: Optional[str], analyses_ini: Optional[str]
+) -> Ra2ceHandler:
+    def _as_path(working_dir: Optional[str], ini_file: Optional[str]) -> Path | None:
+        """
+        Constructs a Path object from the given working directory and ini file.
+
+        Args:
+            working_dir (Optional[str]): Working directory where the ini files could be located.
+            ini_file (Optional[str]): Name of or path to the ini file.
+
+        Raises:
+            FileNotFoundError: The working directory or ini file could not be found.
+
+        Returns:
+            Path | None: Path to the ini file (if provided and existing).
+        """
         if working_dir:
             _working_dir = Path(working_dir)
             if not _working_dir.is_dir():
                 raise FileNotFoundError(working_dir)
             if ini_file:
-                return _working_dir.joinpath(Path(ini_file).name)
+                _ini_file = _working_dir.joinpath(Path(ini_file).name)
+                if not _ini_file.is_file():
+                    return None
+                return _ini_file
             return Path(_working_dir)
         if ini_file:
-            return Path(ini_file)
+            _ini_file = Path(ini_file)
+            if not _ini_file.is_file():
+                raise FileNotFoundError(_ini_file)
+            return _ini_file
         return None
 
     if network_ini:
         _network_ini = _as_path(working_dir, network_ini)
-        if not _network_ini.is_file():
-            raise FileNotFoundError(_network_ini)
     elif working_dir:
         _network_ini = _as_path(working_dir, "network.ini")
     else:
@@ -73,16 +96,12 @@ def run_analysis(
 
     if analyses_ini:
         _analysis_ini = _as_path(working_dir, analyses_ini)
-        if not _analysis_ini.is_file():
-            raise FileNotFoundError(_analysis_ini)
     elif working_dir:
         _analysis_ini = _as_path(working_dir, "analyses.ini")
     else:
         _analysis_ini = None
 
-    _handler = Ra2ceHandler(_network_ini, _analysis_ini)
-    _handler.configure()
-    return _handler.run_analysis()
+    return Ra2ceHandler(_network_ini, _analysis_ini)
 
 
 if __name__ == "__main__":

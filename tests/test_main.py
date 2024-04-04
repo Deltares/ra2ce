@@ -130,6 +130,61 @@ class TestMainCli:
         assert FileNotFoundError == type(_run_result.exc_info[1])
         assert expected_error == str(_run_result.exc_info[1])
 
+    @pytest.mark.parametrize(
+        "working_dir, network_ini, analyses_ini",
+        [
+            pytest.param(
+                test_dir,
+                "",
+                "",
+                id="Workdir provided",
+            ),
+            pytest.param(
+                test_dir,
+                "network.ini",
+                "",
+                id="Workdir and network ini name provided",
+            ),
+            pytest.param(
+                test_dir,
+                "",
+                "analyses.ini",
+                id="Workdir and analyses ini name provided",
+            ),
+            pytest.param(
+                "",
+                test_dir.joinpath("network.ini"),
+                "",
+                id="Path to network ini provided",
+            ),
+            pytest.param(
+                "",
+                "",
+                test_dir.joinpath("analyses.ini"),
+                id="Path to analyses ini provided",
+            ),
+            pytest.param(
+                test_dir,
+                test_dir.joinpath("network.ini"),
+                test_dir.joinpath("analyses.ini"),
+                id="Workdir and path to network and analyses ini provided",
+            ),
+        ],
+    )
+    def test_valid_config_does_not_throw(
+        self,
+        working_dir: Optional[Path],
+        network_ini: Optional[Path],
+        analyses_ini: Optional[Path],
+    ):
+        # 1 - 2. Define and run test data.
+        _handler = __main__.get_handler(
+            str(working_dir), str(network_ini), str(analyses_ini)
+        )
+
+        # 3. Verify expectations.
+        assert _handler is not None
+
     @slow_test
     @pytest.mark.parametrize(
         "case_data_dir",
