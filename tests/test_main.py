@@ -171,7 +171,7 @@ class TestMainCli:
             ),
         ],
     )
-    def test_valid_config_does_not_throw(
+    def test_valid_input_returns_handler(
         self,
         working_dir: Optional[Path],
         network_ini: Optional[Path],
@@ -184,6 +184,7 @@ class TestMainCli:
 
         # 3. Verify expectations.
         assert _handler is not None
+        assert _handler.input_config is not None
 
     @slow_test
     @pytest.mark.parametrize(

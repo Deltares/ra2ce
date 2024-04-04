@@ -56,7 +56,9 @@ def run_analysis(
 def get_handler(
     working_dir: Optional[str], network_ini: Optional[str], analyses_ini: Optional[str]
 ) -> Ra2ceHandler:
-    def _as_path(working_dir: Optional[str], ini_file: Optional[str]) -> Path | None:
+    def _as_path(
+        working_dir: Optional[str], ini_file: Optional[str] = None
+    ) -> Path | None:
         """
         Constructs a Path object from the given working directory and ini file.
 
@@ -101,7 +103,7 @@ def get_handler(
     else:
         _analysis_ini = None
 
-    return Ra2ceHandler(_network_ini, _analysis_ini)
+    return Ra2ceHandler(_as_path(working_dir), _network_ini, _analysis_ini)
 
 
 if __name__ == "__main__":

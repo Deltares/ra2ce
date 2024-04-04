@@ -48,16 +48,24 @@ class Ra2ceHandler:
     input_config: ConfigWrapper
 
     def __init__(
-        self, network_ini: Optional[Path], analysis_ini: Optional[Path]
+        self,
+        working_dir: Optional[Path],
+        network_ini: Optional[Path],
+        analysis_ini: Optional[Path],
     ) -> None:
-        self._initialize_logger(network_ini, analysis_ini)
+        self._initialize_logger(working_dir, network_ini, analysis_ini)
         self.input_config = ConfigFactory.get_config_wrapper(network_ini, analysis_ini)
 
     def _initialize_logger(
-        self, network_ini: Optional[Path], analysis_ini: Optional[Path]
+        self,
+        working_dir: Optional[Path],
+        network_ini: Optional[Path],
+        analysis_ini: Optional[Path],
     ) -> None:
         _output_config = None
-        if network_ini:
+        if working_dir:
+            _output_config = working_dir.joinpath("output")
+        elif network_ini:
             _output_config = NetworkConfigData.get_data_output(network_ini)
         elif analysis_ini:
             _output_config = AnalysisConfigData.get_data_output(analysis_ini)
