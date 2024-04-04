@@ -40,7 +40,7 @@ Examples of how to use this module can be found in the :ref:`examples`.
 Network from OpenStreetMap using the network.ini initalization file
 -----------------------------------------------------------------------------
 The network.ini file contains several parts: 1[project], 2[network], 3[origins_destinations], 4[hazard]. These subsections are used to set the parameters necessary for the creation of different networks. Here, we will focus on the [network] part, as this can be used to create a basic network. 
-To download a network from OpenStreetMap, the user needs to create a geojson of the extent for which they want to create a network. This .geojson polygon should be stored in the static>network folder of the RA2CE project folder. If you are not yet familiar with the folder setup of a RA2CE project, first visit :ref:`RA2CE`.
+To download a network from OpenStreetMap, the user needs to create a geojson of the extent for which they want to create a network. This .geojson polygon should be stored in the static>network folder of the RA2CE project folder. If you are not yet familiar with the folder setup of a RA2CE project, first visit :ref:`about`.
 
 To create a network from OSM, specify the following parameters in your network.ini file:
 
