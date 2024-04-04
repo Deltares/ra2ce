@@ -9,30 +9,30 @@ This user guide introduces how to run Ra2ce in a public cloud environment.
 
 
 How to build the cloud docker image
----------------------------------
+-----------------------------------
 
 Assuming access to a Linux box with Docker installed, or in Windows a Docker Desktop installation. You can do the 
 following:
 
     $ git clone git@github.com:Deltares/ra2ce.git
     $ cd ra2ce
-    $ docker build -t race:latest -f Dockerfile.package .
+    $ docker build -t ra2ce:latest -f Dockerfile .
 
 These instructions will build a docker image. After a good while, you should end up with::
 
     $ docker images
     REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
-    race         latest    616f672677f2   19 hours ago   1.01GB
+    ra2ce         latest    616f672677f2   19 hours ago   1.01GB
 
 Remark that this is a local image only.
 
 
 Running Ra2ce Docker container locally
----------------------------------
+--------------------------------------
 
 To run the Docker container locally you can execute the following command:
 
-$ docker run -it race bash
+$ docker run -it ra2ce bash
 
 This will create a Docker container from the specified image and start an interactive shell in which you can enter commands
 
@@ -46,7 +46,7 @@ $ docker run -it -v $PWD/workflow:/scripts -v $PWD/tests/test_data/acceptance_te
 After that you can call run_race.py. Output files will be available in the acceptance_test_data folder
 
 Running Ra2ce container in a cloud environment
----------------------------------
+----------------------------------------------
 
 In the local example you are running a Docker container entirely locally and thus can mount your own hard drive with input data.
 
@@ -63,7 +63,7 @@ Currently we have tested Ra2ce using the following tech stack:
 - Argo Workflow as workflow orchestrator. If there is no Argo deployment currently available see /infra/workflow/README.md on how to deploy Argo.
 
 Running a singular Ra2ce container in Kubernetes
----------------------------------
+-------------------------------------------------
 
 In Kubernetes, you can deploy Docker containers stored in container registries such as Docker Hub or any other container registry provider. This guide illustrates how to run a Docker container from an existing container registry using `kubectl`.
 
