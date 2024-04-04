@@ -1,5 +1,6 @@
 .. _technical_meetings:
 
+=====================
 Technical meetings
 =====================
 
@@ -14,12 +15,13 @@ We try to reflect the knowledge shared (and gained) in jupyter notebooks that ar
 .. toctree::
    :maxdepth: 1
    :caption: Tech meetings topics
+
    ../_examples/tech_meetings/20240403_run_without_ini_files_DIY.ipynb
    ../_examples/tech_meetings/20240403_using_enums_DIY.ipynb
 
 
 .. tip::
-    
+
     Ra2ce is a tool developed by both software engineers and scientists. As such, we understand that it needs to be maintained and understood by both.
     This principle applies to both parties, therefore we defer from writing functionality only understood by one of said parties.
 
