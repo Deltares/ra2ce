@@ -46,6 +46,7 @@ from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import
     RiskCalculationModeEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeEnum
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
 )
@@ -130,37 +131,29 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         _section.traffic_cols = self._parser.getlist(
             section_name, "traffic_cols", fallback=_section.traffic_cols
         )
+        _section.trip_purposes = list(
+            map(
+                TripPurposeEnum.get_enum,
+                self._parser.getlist(section_name, "trip_purposes", fallback=[]),
+            )
+        )
+        _section.production_loss_per_capita_per_day = self._parser.getfloat(
+            section_name,
+            "production_loss_per_capita_per_day",
+            fallback=_section.production_loss_per_capita_per_day,
+        )
         _section.duration_event = self._parser.getfloat(
             section_name,
             "duration_event",
             fallback=_section.duration_event,
-        )  # TODO remove the deprecated attribute that have been replaced by csv
-        _section.duration_disruption = self._parser.getfloat(
-            section_name,
-            "duration_disruption",
-            fallback=_section.duration_disruption,
         )
-        _section.fraction_detour = self._parser.getfloat(
+        _section.hours_per_day = self._parser.getfloat(
             section_name,
-            "fraction_detour",
-            fallback=_section.fraction_detour,
+            "hours_per_day",
+            fallback=_section.hours_per_day,
         )
-        _section.fraction_drivethrough = self._parser.getfloat(
-            section_name,
-            "fraction_drivethrough",
-            fallback=_section.fraction_drivethrough,
-        )
-        _section.rest_capacity = self._parser.getfloat(
-            section_name,
-            "rest_capacity",
-            fallback=_section.rest_capacity,
-        )
-        _section.maximum_jam = self._parser.getfloat(
-            section_name,
-            "maximum_jam",
-            fallback=_section.maximum_jam,
-        )
-        # accessiblity analyses
+
+        # accessibility analyses
         _section.threshold = self._parser.getfloat(
             section_name,
             "threshold",
