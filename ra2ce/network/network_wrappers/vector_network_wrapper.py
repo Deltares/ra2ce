@@ -58,6 +58,8 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         # Origins Destinations
         self.region_path = config_data.origins_destinations.region
+        self.file_id = config_data.network.file_id
+        self.link_type_column = config_data.network.link_type_column
         self.output_graph_dir = config_data.output_graph_dir
 
         # Cleanup
@@ -75,11 +77,11 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         gdf = self._read_vector_to_project_region_and_crs()
         gdf = self.clean_vector(gdf)
         if self.directed:
-            graph = self.get_direct_graph_from_vector(
+            graph = self._get_direct_graph_from_vector(
                 gdf=gdf, edge_attributes_to_include=["avgspeed", "bridge", "tunnel"]
             )
         else:
-            graph = self.get_indirect_graph_from_vector(
+            graph = self._get_indirect_graph_from_vector(
                 gdf, edge_attributes_to_include=["avgspeed", "bridge", "tunnel"]
             )
         edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
@@ -112,6 +114,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
         graph_simple = self._get_avg_speed(graph_simple)
         logging.info("Finished converting the complex graph to a simple graph")
+
         return graph_simple, edges_complex
 
         # return graph_complex, edges
@@ -237,9 +240,8 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         updated_graph.graph["name"] = graph_complex.graph.get("name", None)
         return updated_graph
 
-    @staticmethod
-    def get_direct_graph_from_vector(
-        gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
+    def _get_direct_graph_from_vector(
+        self, gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
     ) -> nx.DiGraph:
         """Creates a simple directed graph with node and edge geometries based on a given GeoDataFrame.
 
@@ -252,26 +254,31 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         Returns:
             nx.DiGraph: NetworkX graph object with "crs", "approach" as graph properties.
         """
+
         # simple geometry handling
         gdf = VectorNetworkWrapper.explode_and_deduplicate_geometries(gdf)
 
         # to graph
         digraph = nx.DiGraph(crs=gdf.crs, approach="primal")
         for _, row in gdf.iterrows():
-            link_id = row.get("link_id", None)
+            link_id = row.get(self.file_id, None)
+            link_type = row.get(self.link_type_column, None)
 
             from_node = row.geometry.coords[0]
             to_node = row.geometry.coords[-1]
+            _edge_attributes = {
+                f"{self.file_id}": link_id,
+                f"{self.link_type_column}": link_type,
+                "avgspeed": row.pop("avgspeed") if "avgspeed" in row else None,
+                "geometry": row.pop("geometry"),
+            }
             digraph.add_node(from_node, geometry=Point(from_node))
             digraph.add_node(to_node, geometry=Point(to_node))
             digraph.add_edge(
                 from_node,
                 to_node,
                 link_id=link_id,
-                avgspeed=row.pop("avgspeed") if "avgspeed" in row else None,
-                geometry=row.pop(
-                    "geometry"
-                ),  # **row TODO: check if we do need all columns
+                **_edge_attributes,
             )
             if len(edge_attributes_to_include) > 0:
                 for edge_attribute_to_include in edge_attributes_to_include:
@@ -285,9 +292,8 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
                         edge_data[edge_attribute_to_include] = edge_attribute
         return digraph
 
-    @staticmethod
-    def get_indirect_graph_from_vector(
-        gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
+    def _get_indirect_graph_from_vector(
+        self, gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
     ) -> nx.Graph:
         """Creates a simple undirected graph with node and edge geometries based on a given GeoDataFrame.
 
@@ -299,7 +305,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         Returns:
             nx.Graph: NetworkX graph object with "crs", "approach" as graph properties.
         """
-        digraph = VectorNetworkWrapper.get_direct_graph_from_vector(
+        digraph = self._get_direct_graph_from_vector(
             gdf=gdf, edge_attributes_to_include=edge_attributes_to_include
         )
         return digraph.to_undirected()
@@ -331,6 +337,9 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             nodes.crs = graph.graph["crs"]
         if not edges.crs:
             edges.crs = graph.graph["crs"]
+
+        if "fid" in edges.columns:
+            edges = edges.drop(columns=["fid"])
         return edges, nodes
 
     @staticmethod

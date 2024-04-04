@@ -35,11 +35,9 @@ from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtoco
 from ra2ce.analysis.direct.direct_damage import DirectDamage
 from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
-from ra2ce.analysis.indirect.losses import Losses
 from ra2ce.analysis.indirect.multi_link_isolated_locations import (
     MultiLinkIsolatedLocations,
 )
-from ra2ce.analysis.indirect.multi_link_losses import MultiLinkLosses
 from ra2ce.analysis.indirect.multi_link_origin_closest_destination import (
     MultiLinkOriginClosestDestination,
 )
@@ -53,7 +51,7 @@ from ra2ce.analysis.indirect.optimal_route_origin_closest_destination import (
 from ra2ce.analysis.indirect.optimal_route_origin_destination import (
     OptimalRouteOriginDestination,
 )
-from ra2ce.analysis.indirect.single_link_losses import SingleLinkLosses
+from ra2ce.analysis.indirect.losses import Losses
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 
 
@@ -89,8 +87,8 @@ class AnalysisFactory:
 
     @staticmethod
     def get_indirect_analysis(
-        analysis: AnalysisSectionIndirect,
-        analysis_config: AnalysisConfigWrapper,
+            analysis: AnalysisSectionIndirect,
+            analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisIndirectProtocol:
         """
         Create an analysis based on the given analysis configuration.
@@ -134,8 +132,8 @@ class AnalysisFactory:
             )
             return MultiLinkOriginDestination(_analysis_input)
         if (
-            analysis.analysis
-            == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
+                analysis.analysis
+                == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
         ):
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
@@ -144,8 +142,8 @@ class AnalysisFactory:
             )
             return OptimalRouteOriginClosestDestination(analysis_input=_analysis_input)
         if (
-            analysis.analysis
-            == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
+                analysis.analysis
+                == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
         ):
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
@@ -154,27 +152,22 @@ class AnalysisFactory:
                 graph_file_hazard=analysis_config.graph_files.origins_destinations_graph_hazard,
             )
             return MultiLinkOriginClosestDestination(_analysis_input)
-        if analysis.analysis == AnalysisIndirectEnum.LOSSES:
-            _analysis_input = AnalysisInputWrapper.from_input(
-                analysis=analysis,
-                analysis_config=analysis_config,
-                graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
-            )
-            return Losses(_analysis_input)
         if analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
+                graph_file=analysis_config.graph_files.base_graph_hazard,
                 graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
-            return SingleLinkLosses(_analysis_input)
+            return Losses(_analysis_input, analysis_config)
         if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
                 graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
-            return MultiLinkLosses(_analysis_input)
+
+            return Losses(_analysis_input, analysis_config)
         if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
