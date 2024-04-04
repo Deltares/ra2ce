@@ -78,7 +78,7 @@ class IsolationSection:
 class HazardSection:
     hazard_map: list[Path] = field(default_factory=list)
     hazard_id: str = ""
-    hazard_field_name: list[str] = field(default_factory=list)
+    hazard_field_name: str = ""
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     hazard_crs: str = ""
     scenario_cost: list[float] = field(default_factory=list)
