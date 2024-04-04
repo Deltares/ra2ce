@@ -10,7 +10,7 @@ The HPC environment will need to support Docker containers. Not every
 HPC environment will but the Deltares H7 HPC does.
 
 Running Ra2ce Docker container on H7
----------------------------------
+-------------------------------------
 
 Access the head node of the H7. Detailed instructions can be found on our public Wiki: https://publicwiki.deltares.nl/display/Deltareken/Access
 
@@ -45,12 +45,12 @@ docker run --mount src=${PWD},target=/data,type=bind containers.deltares.nl/ra2c
 +------------------------------------------------+---------------------------------------------------------------+
 | Command                                        | Description                                                   |
 +------------------------------------------------+---------------------------------------------------------------+
-| docker run                                     | The command to run a docker container                        |
-| --mount src=,target=,type=bind                 | This mounts the current folder to a target location in the   |
+| docker run                                     | The command to run a docker container                         |
+| --mount src=,target=,type=bind                 | This mounts the current folder to a target location in the    |
 |                                                | Docker container                                              |
-| containers.deltares.nl/ra2ce/ra2ce:latest      | The container image and version to run. If you want older    |
+| containers.deltares.nl/ra2ce/ra2ce:latest      | The container image and version to run. If you want older     |
 |                                                | versions you can change the latest tag                        |
-| python /data/run_race.py                       | The command to run in the container                          |
+| python /data/run_race.py                       | The command to run in the container                           |
 +------------------------------------------------+---------------------------------------------------------------+
 
 Make sure your run_race.py writes to the mounted drive or you will lose your output once the job is finished.

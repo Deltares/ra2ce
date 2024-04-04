@@ -1,5 +1,7 @@
+.. _kubernetes_deployement:
+
 Deploying Amazon EKS Cluster with Terraform
-===========================================
+============================================
 
 This guide outlines the steps to deploy an Amazon EKS cluster using Terraform. The Terraform configuration provided here automates the setup process, making it easier to create and manage an EKS cluster on AWS.
 
