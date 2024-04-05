@@ -15,36 +15,51 @@ following steps.
 CLI only
 +++++++++++++++++++++++++++
 If only interested in using the tool via command-line interface follow these steps:
-::
-  pip install git+https://github.com/Deltares/ra2ce.git
+
 ::
 
-Alternatively you can install a specific tag or commit hash from our repo by using the symbol `@`:
+  pip install ra2ce
+  
+Alternatively you can install the latest version available on GitHub or a specific tag / commit hash by using the symbol `@`:
+
 ::
+
+  pip install git+https://github.com/Deltares/ra2ce.git
   pip install git+https://github.com/Deltares/ra2ce.git@v0.3.1
-::
 
 
 Development mode
 +++++++++++++++++++++++++++
 When running a development environment with Anaconda, the user may follow these steps in command line:
+
 ::
+
   cd <to the main repository RA2CE folder>
   conda env create -f .config\environment.yml
   conda activate ra2ce_env
   poetry install
-::
 
 
-Docker
+Docker and cloud
 +++++++++++++++++++++++++++
-You may install ra2ce using `Docker`. Please refer to our :ref:`docker_user_guide` for it.
+You may install ra2ce using `Docker` and running with different cloud services.
+Please refer to our :ref:`docker_and_cloud`.
 
 
 Binder environment
 +++++++++++++++++++++++++++
-Binder provides us an online web-tool capable of hosting a `conda` environment with the latest-greatest version of `RA2CE` already installed and ready to be used.
+Binder provides us an online web-tool capable of hosting a ``conda`` environment with the latest-greatest version of `RA2CE` already installed and ready to be used.
 In this environment you will find all our available examples as well as the possibility to create your own `Jupyter` notebooks or experiment with the `CLI` options.
 
 - Our `ra2ce jupyter-binder <https://mybinder.org/v2/gh/Deltares/ra2ce/jupyter-binder>`_ environment.
 - More about `binder <https://mybinder.readthedocs.io/en/latest/>`_.
+
+
+..
+  The following table of contents is hidden as we don't need to display it.
+  However, it will bind those items to this one in the "section menu".
+
+.. toctree::
+   :caption: Table of Contents
+   :maxdepth: 2
+   :hidden:

@@ -19,12 +19,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 from typing import Protocol, runtime_checkable
 
-from ra2ce.analyses.analysis_config_wrapper import (
-    AnalysisConfigWrapper,
-)
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 
 
@@ -41,13 +39,16 @@ class AnalysisRunner(Protocol):
         Returns:
             bool: Whether the `ConfigWrapper` can be run or not.
         """
-        pass
 
-    def run(self, analysis_config: AnalysisConfigWrapper) -> None:
+    def run(
+        self, analysis_config: AnalysisConfigWrapper
+    ) -> list[AnalysisResultWrapper]:
         """
         Runs this `AnalysisRunner` with the given analysis configuration.
 
         Args:
             analysis_config (AnalysisConfigWrapper): Analysis configuration representation to be run on this `AnalysisRunner`.
+
+        Returns:
+            list[AnalysisResultWrapper]: List of all results for all ran analysis.
         """
-        pass

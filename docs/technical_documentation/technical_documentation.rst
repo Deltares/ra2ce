@@ -1,17 +1,15 @@
-.. automodule:: ra2ce
-    :members:
-
 .. _technical_documentation:
 
 Technical Documentation
 =======================
 
-Running RA2CE
-------------------
+.. toctree::
+   :caption: Technical topics
+   :maxdepth: 1
 
-.. autosummary::
-    :toctree: _generated
+   technical_meetings
+   network_package
+   analysis_package
 
-    ra2ce.ra2ce_handler.Ra2ceHandler.configure
-    ra2ce.ra2ce_handler.Ra2ceHandler.run_analysis
-
+.. include:: ../../ra2ce/README.md
+   :parser: myst_parser.sphinx_

@@ -20,12 +20,9 @@ Or navigate directly to another section:
 
    overview
    installation/installation
-   installation/docker_user_guide
-   user_guide/user_guide
    examples/examples
-   network_module/network_module
-   analysis_module/analysis_module
-   collaboration/collaboration
+   contributing/index
+   technical_documentation/technical_documentation
    changelog_wrapper
 
 Lost..? Try the :ref:`search`.

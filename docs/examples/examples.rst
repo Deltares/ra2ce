@@ -17,9 +17,11 @@ Bellow you can access some of the main examples and go through them in an off-li
 .. toctree::
    :maxdepth: 1
    :caption: Examples
-
+   
    ../_examples/example_ra2ce_basics
    ../_examples/example_single_link_redundancy
+   ../_examples/example_equity_analysis
+   ../_examples/example_losses
    ../_examples/example_origin_destination_analysis
    ../_examples/example_direct_damage
    ../_examples/example_hazard_overlay
