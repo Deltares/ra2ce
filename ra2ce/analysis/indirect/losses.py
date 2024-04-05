@@ -172,6 +172,13 @@ class Losses(AnalysisIndirectProtocol):
         return dict(_vot_dict)
 
     def _get_disrupted_criticality_analysis_results(self, criticality_analysis: gpd.GeoDataFrame):
+        criticality_analysis.reset_index(inplace=True)
+        if "key" in criticality_analysis.columns:
+            criticality_analysis = criticality_analysis.drop_duplicates(["u", "v", "key"])
+        else:
+            criticality_analysis = criticality_analysis.drop_duplicates(["u", "v"])
+
+
         if self.analysis.analysis.name == 'SINGLE_LINK_LOSSES':
             # filter out all links not affected by the hazard
             if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
@@ -191,7 +198,7 @@ class Losses(AnalysisIndirectProtocol):
         # link_id from list to tuple
         if len(self.criticality_analysis_non_disrupted) > 0:
             self.criticality_analysis_non_disrupted[self.link_id] = self.criticality_analysis_non_disrupted[
-            self.link_id].apply(lambda x: tuple(x) if isinstance(x, list) else x)
+                self.link_id].apply(lambda x: tuple(x) if isinstance(x, list) else x)
         self.criticality_analysis[self.link_id] = self.criticality_analysis[self.link_id].apply(
             lambda x: tuple(x) if isinstance(x, list) else x)
 
@@ -216,6 +223,9 @@ class Losses(AnalysisIndirectProtocol):
             _intensities_simplified_graph_list.append(row_data)
         _intensities_simplified_graph = pd.DataFrame(_intensities_simplified_graph_list,
                                                      index=self.criticality_analysis.index.values)
+        # no duplicate exists in the intensities and _intensities_simplified_graph. each link has its own intensity and ID in these files
+        _intensities_simplified_graph = _intensities_simplified_graph[
+            ~_intensities_simplified_graph.index.duplicated(keep='first')]
         return _intensities_simplified_graph
 
     def calculate_vehicle_loss_hours(self) -> gpd.GeoDataFrame:
@@ -253,7 +263,8 @@ class Losses(AnalysisIndirectProtocol):
                 [
                     vlh,
                     self.criticality_analysis_non_disrupted[
-                        [f"{self.link_id}", f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] +
+                        [f"{self.link_id}", f"{self.link_type_column}", "geometry", f"{self.performance_metric}",
+                         "detour"] +
                         list(events.columns)
                         ]
                 ]
@@ -272,10 +283,28 @@ class Losses(AnalysisIndirectProtocol):
         _hazard_intensity_ranges = self._get_link_types_heights_ranges()[1]
         events = self.criticality_analysis.filter(regex=r'^EV(?!1_fr)')
         # Read the performance_change stating the functionality drop
-        performance_change = self.criticality_analysis[self.performance_metric]
+        if "key" in self.criticality_analysis.columns:
+            performance_change = self.criticality_analysis[[f"{self.performance_metric}", "u", "v", "key"]]
+            vehicle_loss_hours_df = pd.DataFrame({
+            f"{self.link_id}": self.criticality_analysis.index.values,
+            "u": self.criticality_analysis["u"],
+            "v": self.criticality_analysis["v"],
+            "key": self.criticality_analysis["key"]
+        })
+        else:
+            performance_change = self.criticality_analysis[[f"{self.performance_metric}", "u", "v"]]
+            vehicle_loss_hours_df = pd.DataFrame({
+            f"{self.link_id}": self.criticality_analysis.index.values,
+            "u": self.criticality_analysis["u"],
+            "v": self.criticality_analysis["v"]
+        })
 
         # shape vehicle_loss_hours
-        vehicle_loss_hours_df = pd.DataFrame(columns=[self.link_id], data=self.criticality_analysis.index.values)
+        
+        # Check if the index name exists in the columns
+        if vehicle_loss_hours_df.index.name in vehicle_loss_hours_df.columns:
+            vehicle_loss_hours_df.reset_index(drop=True, inplace=True)
+        vehicle_loss_hours_df.reset_index(inplace=True)
 
         # find the link_type and the hazard intensity
         connectivity_attribute = None
@@ -285,7 +314,8 @@ class Losses(AnalysisIndirectProtocol):
         vehicle_loss_hours_df = pd.merge(
             vehicle_loss_hours_df,
             self.criticality_analysis[
-                [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", connectivity_attribute] + list(events.columns)
+                [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", connectivity_attribute] + list(
+                    events.columns)
                 ],
             left_on=self.link_id,
             right_index=True,
@@ -295,12 +325,26 @@ class Losses(AnalysisIndirectProtocol):
         for event in events.columns.tolist():
             for _, vlh_row in vehicle_loss_hours.iterrows():
                 row_hazard_range = _get_range(vlh_row[event])
-                row_performance_change = performance_change.loc[[vlh_row[self.link_id]]]
-                if math.isnan(row_performance_change):
-                    self._calculate_production_loss_per_capita(vehicle_loss_hours, vlh_row, event)
+                row_performance_changes = performance_change.loc[[vlh_row[self.link_id]]]
+                if "key" in vlh_row.index:
+                    key = vlh_row["key"]
                 else:
-                    self._populate_vehicle_loss_hour(vehicle_loss_hours, row_hazard_range, vlh_row,
-                                                     row_performance_change, event)
+                    key = 0
+                (u, v, k) = (vlh_row["u"], vlh_row["v"], key,)
+                # allow link_id not to be repeating in the graph uniquely (results reliability is up to the user)
+                # this can happen for instance when a directed graph shuld be made from an input network
+                for performance_row in row_performance_changes.iterrows():
+                    row_performance_change = performance_row[-1][f"{self.performance_metric}"]
+                    if "key" in performance_row[-1].index:
+                        performance_key = performance_row[-1]["key"]
+                    else:
+                        performance_key = 0
+                    row_u_v_k =( performance_row[-1]["u"], performance_row[-1]["v"], performance_key)
+                    if math.isnan(row_performance_change):
+                        self._calculate_production_loss_per_capita(vehicle_loss_hours, vlh_row, event)
+                    elif (u, v, k) == row_u_v_k:
+                        self._populate_vehicle_loss_hour(vehicle_loss_hours, row_hazard_range, vlh_row,
+                                                         row_performance_change, event)
 
         vehicle_loss_hours_result = _create_result(vehicle_loss_hours)
         return vehicle_loss_hours_result
