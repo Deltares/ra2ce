@@ -56,52 +56,37 @@ def run_analysis(
 def get_handler(
     working_dir: Optional[str], network_ini: Optional[str], analyses_ini: Optional[str]
 ) -> Ra2ceHandler:
-    def _as_path(
-        working_dir: Optional[str], ini_file: Optional[str] = None
-    ) -> Path | None:
-        """
-        Constructs a Path object from the given working directory and ini file.
-
-        Args:
-            working_dir (Optional[str]): Working directory where the ini files could be located.
-            ini_file (Optional[str]): Name of or path to the ini file.
-
-        Raises:
-            FileNotFoundError: The working directory or ini file could not be found.
-
-        Returns:
-            Path | None: Path to the ini file (if provided and existing).
-        """
-        if working_dir:
-            _working_dir = Path(working_dir)
-            if not _working_dir.is_dir():
-                raise FileNotFoundError(working_dir)
-            if ini_file:
-                _ini_file = _working_dir.joinpath(Path(ini_file).name)
-                if not _ini_file.is_file():
+    def _as_path(dirc: Optional[str], file: Optional[str] = None) -> Path | None:
+        """Converts a directory and/or file to a Path to an existing directory or file."""
+        if dirc:
+            _dir = Path(dirc)
+            if not _dir.is_dir():
+                raise FileNotFoundError(dirc)
+            if file:
+                _file = _dir.joinpath(Path(file).name)
+                if not _file.is_file():
                     return None
-                return _ini_file
-            return Path(_working_dir)
-        if ini_file:
-            _ini_file = Path(ini_file)
-            if not _ini_file.is_file():
-                raise FileNotFoundError(_ini_file)
-            return _ini_file
+                return _file
+            return Path(_dir)
+        if file:
+            _file = Path(file)
+            if not _file.is_file():
+                raise FileNotFoundError(_file)
+            return _file
         return None
 
-    if network_ini:
-        _network_ini = _as_path(working_dir, network_ini)
-    elif working_dir:
-        _network_ini = _as_path(working_dir, "network.ini")
-    else:
-        _network_ini = None
+    def _construct_ini_path(
+        working_dir: Optional[str], ini_file: Optional[str], default_name: str
+    ) -> Path | None:
+        """Constructs the Path to an ini file, based on the working directory and/or the ini file name."""
+        if ini_file:
+            return _as_path(working_dir, ini_file)
+        if working_dir:
+            return _as_path(working_dir, default_name)
+        return None
 
-    if analyses_ini:
-        _analysis_ini = _as_path(working_dir, analyses_ini)
-    elif working_dir:
-        _analysis_ini = _as_path(working_dir, "analyses.ini")
-    else:
-        _analysis_ini = None
+    _network_ini = _construct_ini_path(working_dir, network_ini, "network.ini")
+    _analysis_ini = _construct_ini_path(working_dir, analyses_ini, "analyses.ini")
 
     return Ra2ceHandler(_as_path(working_dir), _network_ini, _analysis_ini)
 
