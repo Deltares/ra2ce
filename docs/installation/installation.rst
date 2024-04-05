@@ -23,6 +23,7 @@ If only interested in using the tool via command-line interface follow these ste
 Alternatively you can install the latest version available on GitHub or a specific tag / commit hash by using the symbol `@`:
 
 ::
+
   pip install git+https://github.com/Deltares/ra2ce.git
   pip install git+https://github.com/Deltares/ra2ce.git@v0.3.1
 

@@ -1116,6 +1116,7 @@ def add_missing_geoms_graph(graph: nx.Graph, geom_name: str = "geometry") -> nx.
 
 def simplify_graph_count(complex_graph: nx.Graph) -> nx.Graph:
     # Simplify the graph topology and log the change in nr of nodes and edges.
+    logging.info("Simplifying graph count")
     old_len_nodes = complex_graph.number_of_nodes()
     old_len_edges = complex_graph.number_of_edges()
 
