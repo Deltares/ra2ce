@@ -34,7 +34,7 @@ class TestRa2ceHandler:
         _handler = Ra2ceHandler.from_config(_config, _data_dir)
 
         # 3. Verify expectations.
-        assert True
+        assert isinstance(_handler, Ra2ceHandler)
 
     def test_initialize_with_analysis_does_not_raise(
         self, request: pytest.FixtureRequest
