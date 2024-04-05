@@ -26,7 +26,7 @@ import sys
 import warnings
 from pathlib import Path
 from statistics import mean
-from typing import Optional, Union
+from typing import Optional
 
 import geopandas as gpd
 import networkx as nx
@@ -1180,7 +1180,7 @@ def simplify_graph(
         msg = "This graph has already been simplified, cannot simplify it again."
         raise GraphSimplificationError(msg)
 
-    utils.log("Begin topologically simplifying the graph...")
+    logging.info("Begin topologically simplifying the graph...")
 
     # define edge segment attributes to sum upon edge simplification
     attrs_to_sum = {"length", "travel_time"}
@@ -1291,7 +1291,7 @@ def simplify_graph(
         f"Simplified graph: {initial_node_count:,} to {len(graph):,} nodes, "
         f"{initial_edge_count:,} to {len(graph.edges):,} edges"
     )
-    utils.log(msg)
+    logging.info(msg)
     return graph
 
 
