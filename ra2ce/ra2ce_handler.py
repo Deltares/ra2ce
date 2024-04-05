@@ -20,6 +20,9 @@
 """
 
 # -*- coding: utf-8 -*-
+
+from __future__ import annotations
+
 import logging
 import warnings
 from pathlib import Path
@@ -28,10 +31,12 @@ from typing import Optional
 from shapely.errors import ShapelyDeprecationWarning
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.configuration.config_factory import ConfigFactory
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from ra2ce.ra2ce_logging import Ra2ceLogger
 from ra2ce.runners import AnalysisRunnerFactory
 
@@ -51,6 +56,57 @@ class Ra2ceHandler:
         self._initialize_logger(network, analysis)
         self.input_config = ConfigFactory.get_config_wrapper(network, analysis)
 
+    @classmethod
+    def from_config(cls, config: ConfigWrapper, data_dir: Path) -> Ra2ceHandler:
+
+        def _set_config_paths(
+            config_data: NetworkConfigData | AnalysisConfigData,
+        ) -> None:
+            config_data.root_path = data_dir.parent
+            config_data.input_path = data_dir.joinpath("input")
+            config_data.static_path = data_dir.joinpath("static")
+            config_data.output_path = data_dir.joinpath("output")
+
+        def _get_network_config() -> NetworkConfigWrapper | None:
+            _network_config = config.network_config
+            _set_config_paths(_network_config.config_data)
+            if not isinstance(_network_config, NetworkConfigWrapper):
+                return None
+            if _network_config.config_data.output_graph_dir:
+                if _network_config.config_data.output_graph_dir.is_dir():
+                    _network_config.graph_files = (
+                        _network_config.read_graphs_from_config(
+                            _network_config.config_data.output_graph_dir
+                        )
+                    )
+                else:
+                    _network_config.config_data.output_graph_dir.mkdir(parents=True)
+            return _network_config
+
+        def _get_analysis_config() -> AnalysisConfigWrapper:
+            _analysis_config = config.analysis_config
+            _set_config_paths(_analysis_config.config_data)
+            if isinstance(_handler.input_config.network_config, NetworkConfigWrapper):
+                _analysis_config.config_data.network = (
+                    _handler.input_config.network_config.config_data.network
+                )
+                _analysis_config.config_data.origins_destinations = (
+                    _handler.input_config.network_config.config_data.origins_destinations
+                )
+                _analysis_config.graph_files = (
+                    _handler.input_config.network_config.graph_files
+                )
+            return _analysis_config
+
+        _handler = cls(None, None)
+        _handler._initialize_logger(data_dir.joinpath("dummy.ini"), None)
+        _handler.input_config = config
+
+        _handler.input_config.network_config = _get_network_config()
+        _handler.input_config.analysis_config = _get_analysis_config()
+
+        return _handler
+
     def _initialize_logger(
         self, network: Optional[Path], analysis: Optional[Path]
     ) -> None:
@@ -60,9 +116,10 @@ class Ra2ceHandler:
         elif analysis:
             _output_config = AnalysisConfigData.get_data_output(analysis)
         else:
-            raise ValueError(
+            logging.error(
                 "No valid location provided to start logging. Either network or analysis are required."
             )
+            return
         Ra2ceLogger(logging_dir=_output_config, logger_name="RA2CE")
 
     def configure(self) -> None:

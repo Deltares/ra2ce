@@ -2,6 +2,9 @@ import shutil
 
 import pytest
 
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.configuration.config_wrapper import ConfigWrapper
+from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from ra2ce.ra2ce_handler import Ra2ceHandler
 from tests import test_results
 
@@ -17,6 +20,21 @@ class TestRa2ceHandler:
             str(exc_err.value)
             == "No valid location provided to start logging. Either network or analysis are required."
         )
+
+    def test_initialize_from_config_does_not_raise(
+        self, request: pytest.FixtureRequest
+    ):
+        # 1. Define test data.
+        _config = ConfigWrapper()
+        _config.network_config = NetworkConfigWrapper()
+        _config.analysis_config = AnalysisConfigWrapper()
+        _data_dir = test_results.joinpath(request.node.name)
+
+        # 2. Run test.
+        _handler = Ra2ceHandler.from_config(_config, _data_dir)
+
+        # 3. Verify expectations.
+        assert True
 
     def test_initialize_with_analysis_does_not_raise(
         self, request: pytest.FixtureRequest
