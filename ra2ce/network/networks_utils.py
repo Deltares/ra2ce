@@ -1115,8 +1115,16 @@ def add_missing_geoms_graph(graph: nx.Graph, geom_name: str = "geometry") -> nx.
 
 
 def simplify_graph_count(complex_graph: nx.Graph) -> nx.Graph:
+    """
+    _summary_
+
+    Args:
+        complex_graph (nx.Graph): _description_
+
+    Returns:
+        nx.Graph: _description_
+    """
     # Simplify the graph topology and log the change in nr of nodes and edges.
-    logging.info("Simplifying graph count")
     old_len_nodes = complex_graph.number_of_nodes()
     old_len_edges = complex_graph.number_of_edges()
 
@@ -1140,40 +1148,25 @@ def simplify_graph(
     graph: nx.Graph, strict: bool, remove_rings: bool, track_merged: bool
 ):
     """
-    this is an OSMNX function with the same name, modified to check if geometry attribute exists in the nodes of each
+    This is an OSMNX function with the same name, modified to check if geometry attribute exists in the nodes of each
     path to simplify.
 
-        Simplify a graph's topology by removing interstitial nodes.
+    !IMPORTANT! This whole method makes us bound to `OSMNX==1.7.1`.
 
-        Simplifies graph topology by removing all nodes that are not intersections
-        or dead-ends. Create an edge directly between the end points that
-        encapsulate them, but retain the geometry of the original edges, saved as
-        a new `geometry` attribute on the new edge. Note that only simplified
-        edges receive a `geometry` attribute. Some of the resulting consolidated
-        edges may comprise multiple OSM ways, and if so, their multiple attribute
-        values are stored as a list. Optionally, the simplified edges can receive
-        a `merged_edges` attribute that contains a list of all the (u, v) node
-        pairs that were merged together.
+    Check the official OSMNX documentation for more details.
 
-        Parameters
-        ----------
-        graph : networkx.MultiDiGraph
-            input graph
-        strict : bool
-            if False, allow nodes to be end points even if they fail all other
+    Args:
+        graph (networkx.MultiDiGraph): input graph
+        strict (bool): if False, allow nodes to be end points even if they fail all other
             rules but have incident edges with different OSM IDs. Lets you keep
             nodes at elbow two-way intersections, but sometimes individual blocks
             have multiple OSM IDs within them too.
-        remove_rings : bool
-            if True, remove isolated self-contained rings that have no endpoints
-        track_merged : bool
-            if True, add `merged_edges` attribute on simplified edges, containing
+        remove_rings(bool): if True, remove isolated self-contained rings that have no endpoints
+        track_merged (bool): if True, add `merged_edges` attribute on simplified edges, containing
             a list of all the (u, v) node pairs that were merged together
 
-        Returns
-        -------
-        graph : networkx.MultiDiGraph
-            topologically simplified graph, with a new `geometry` attribute on
+    Returns
+         networkx.MultiDiGraph: topologically simplified graph, with a new `geometry` attribute on
             each simplified edge
     """
     if "simplified" in graph.graph and graph.graph["simplified"]:  # pragma: no cover
@@ -1193,10 +1186,7 @@ def simplify_graph(
     all_edges_to_add = []
 
     # generate each path that needs to be simplified
-    logging.info("Getting paths to simplify")
-    _paths_to_simplify = list(_get_paths_to_simplify(graph, strict))
-    logging.info("Got {} paths to simplified.".format(len(_paths_to_simplify)))
-    for path in _paths_to_simplify:
+    for path in _get_paths_to_simplify(graph, strict):
         # add the interstitial edges we're removing to a list so we can retain
         # their spatial geometry
         merged_edges = []
