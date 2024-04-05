@@ -1193,7 +1193,10 @@ def simplify_graph(
     all_edges_to_add = []
 
     # generate each path that needs to be simplified
-    for path in _get_paths_to_simplify(graph, strict):
+    logging.info("Getting paths to simplify")
+    _paths_to_simplify = list(_get_paths_to_simplify(graph, strict))
+    logging.info("Got {} paths to simplified.".format(len(_paths_to_simplify)))
+    for path in _paths_to_simplify:
         # add the interstitial edges we're removing to a list so we can retain
         # their spatial geometry
         merged_edges = []
