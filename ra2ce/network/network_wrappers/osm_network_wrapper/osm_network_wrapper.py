@@ -27,7 +27,7 @@ import pandas as pd
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
 from shapely.geometry.base import BaseGeometry
-from ra2ce.graph.network_wrappers.osm_network_wrapper.osm_utils import (
+from ra2ce.network.network_wrappers.osm_network_wrapper.osm_utils import (
     get_node_nearest_edge, _is_endnode_simplified, modify_edges, remove_key
 )
 
