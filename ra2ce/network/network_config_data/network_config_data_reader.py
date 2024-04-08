@@ -1,3 +1,4 @@
+import re
 from configparser import ConfigParser
 from pathlib import Path
 from typing import Any, Union
@@ -26,7 +27,7 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
     def __init__(self) -> None:
         self._parser = ConfigParser(
             inline_comment_prefixes="#",
-            converters={"list": lambda x: [x.strip() for x in x.split(",")]},
+            converters={"list": lambda x: [x.strip() for x in re.split("[,|;]", x)]},
         )
 
     def read(self, ini_file: Path) -> NetworkConfigData:
@@ -212,6 +213,11 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
         )
         _hazard_section.aggregate_wl = AggregateWlEnum.get_enum(
             self._parser.get(_section, "aggregate_wl", fallback=None)
+        )
+        _hazard_section.scenario_cost = list(
+            self._parser.getlist(
+                _section, "scenario_cost", fallback=_hazard_section.scenario_cost
+            )
         )
         return _hazard_section
 

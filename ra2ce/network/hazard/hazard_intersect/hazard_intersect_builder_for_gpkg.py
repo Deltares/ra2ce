@@ -36,9 +36,8 @@ from ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base import 
 class HazardIntersectBuilderForGpkg(HazardIntersectBuilderBase):
     hazard_field_name: str = ""
     hazard_aggregate_wl: str = ""
-    hazard_names: list[str] = field(default_factory=list)
     ra2ce_names: list[str] = field(default_factory=list)
-    hazard_gpkg_files: list[str] = field(default_factory=list)
+    hazard_gpkg_files: list[Path] = field(default_factory=list)
 
     def _from_networkx(self, hazard_overlay: Graph) -> Graph:
         """Overlays the hazard `gpkg` file over the road segments NetworkX graph.
