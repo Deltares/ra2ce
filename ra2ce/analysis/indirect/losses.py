@@ -37,6 +37,7 @@ from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeEnum
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
+from ra2ce.analysis.indirect.multi_link_redundancy import MultiLinkRedundancy
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
@@ -171,15 +172,18 @@ class Losses(AnalysisIndirectProtocol):
         return dict(_vot_dict)
 
     def _get_disrupted_criticality_analysis_results(self, criticality_analysis: gpd.GeoDataFrame):
-        # filter out all links not affected by the hazard
-        if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
-            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_ma'] != 0]
-        elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
-            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_max'] != 0]
-        elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
-            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_mean'] != 0]
-        elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
-            self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_min'] != 0]
+        if self.analysis.analysis.name == 'SINGLE_LINK_LOSSES':
+            # filter out all links not affected by the hazard
+            if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
+                self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_ma'] != 0]
+            elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
+                self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_max'] != 0]
+            elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
+                self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_mean'] != 0]
+            elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
+                self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_min'] != 0]
+        else:
+            self.criticality_analysis = criticality_analysis
 
         self.criticality_analysis_non_disrupted = criticality_analysis[
             ~criticality_analysis.index.isin(self.criticality_analysis.index)
@@ -233,6 +237,18 @@ class Losses(AnalysisIndirectProtocol):
             raise ValueError(f"No matching range found for height {height}")
 
         def _create_result(vlh: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+            """
+
+            Args: vlh: calculated vehicle_loss_hours GeoDataFrame. For single_link_losses it only includes the
+            disrupted links. For Multi_link_losses it includes all links. This is because of the difference between
+            the underlying single_link_redundancy and multi_link_redundancy analysis results.
+
+            Returns: results of the Losses analysis. For the single_link_losses it adds non_disrupted links to vlh. For
+            Multi_link_losses this is not necessary because of the underlying multi_link_redundancy analysis.
+
+            """
+            if self.analysis.analysis.name == 'MULTI_LINK_LOSSES':
+                return vlh
             result = pd.concat(
                 [
                     vlh,
@@ -262,10 +278,14 @@ class Losses(AnalysisIndirectProtocol):
         vehicle_loss_hours_df = pd.DataFrame(columns=[self.link_id], data=self.criticality_analysis.index.values)
 
         # find the link_type and the hazard intensity
+        connectivity_attribute = None
+        if any(col in self.criticality_analysis.columns for col in ["detour", "connected"]):
+            connectivity_attribute = "detour" if "detour" in self.criticality_analysis.columns else "connected"
+
         vehicle_loss_hours_df = pd.merge(
             vehicle_loss_hours_df,
             self.criticality_analysis[
-                [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", "detour"] + list(events.columns)
+                [f"{self.link_type_column}", "geometry", f"{self.performance_metric}", connectivity_attribute] + list(events.columns)
                 ],
             left_on=self.link_id,
             right_index=True,
@@ -410,9 +430,10 @@ class Losses(AnalysisIndirectProtocol):
         return list(_link_types), list(_hazard_intensity_ranges)
 
     def execute(self) -> gpd.GeoDataFrame:
-        criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
-
-        criticality_analysis.drop_duplicates(subset=self.analysis_config.config_data.network.file_id, inplace=True)
+        if self.analysis.analysis.name == 'SINGLE_LINK_LOSSES':
+            criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
+        elif self.analysis.analysis.name == 'MULTI_LINK_LOSSES':
+            criticality_analysis = MultiLinkRedundancy(self.analysis_input).execute()
 
         self._get_disrupted_criticality_analysis_results(criticality_analysis=criticality_analysis)
 
@@ -421,5 +442,4 @@ class Losses(AnalysisIndirectProtocol):
         self.vot_intensity_per_trip_collection = self._get_vot_intensity_per_trip_purpose()
 
         self.result = self.calculate_vehicle_loss_hours()
-
         return self.result
