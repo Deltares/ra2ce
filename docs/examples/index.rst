@@ -18,5 +18,5 @@ These notebooks can be used as tutorials and are divided in three types:
    :caption: Examples
 
    basic_examples
-   hackathon_sessions/index
+   hackathon_sessions
    technical_meetings
