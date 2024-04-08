@@ -437,7 +437,6 @@ class HazardOverlay:
             return HazardIntersectBuilderForGpkg(
                 hazard_field_name=self._hazard_field_name,
                 hazard_aggregate_wl=self._hazard_aggregate_wl,
-                hazard_names=self.hazard_names,
                 ra2ce_names=self.ra2ce_names,
                 hazard_gpkg_files=self.hazard_files.gpkg,
             ).get_intersection(to_overlay)
