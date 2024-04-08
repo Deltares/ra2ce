@@ -53,39 +53,41 @@ class Ra2ceHandler:
     input_config: ConfigWrapper
 
     def __init__(self, network: Optional[Path], analysis: Optional[Path]) -> None:
-        self._initialize_logger(network, analysis)
-        self.input_config = ConfigFactory.get_config_wrapper(network, analysis)
+        if network or analysis:
+            self._initialize_logger(network, analysis)
+            self.input_config = ConfigFactory.get_config_wrapper(network, analysis)
 
     @classmethod
-    def from_config(cls, config: ConfigWrapper, data_dir: Path) -> Ra2ceHandler:
+    def from_config(
+        cls, network: NetworkConfigData, analysis: AnalysisConfigData
+    ) -> Ra2ceHandler:
 
-        def _set_config_paths(
-            config_data: NetworkConfigData | AnalysisConfigData,
-        ) -> None:
-            config_data.root_path = data_dir.parent
-            config_data.input_path = data_dir.joinpath("input")
-            config_data.static_path = data_dir.joinpath("static")
-            config_data.output_path = data_dir.joinpath("output")
+        def _set_config_paths(_analysis_config: AnalysisConfigWrapper) -> None:
+            if not network:
+                return
+            _analysis_config.config_data.root_path = network.root_path
+            _analysis_config.config_data.input_path = network.input_path
+            _analysis_config.config_data.static_path = network.static_path
+            _analysis_config.config_data.output_path = network.output_path
 
-        def _get_network_config() -> NetworkConfigWrapper | None:
-            _network_config = config.network_config
-            _set_config_paths(_network_config.config_data)
-            if not isinstance(_network_config, NetworkConfigWrapper):
-                return None
-            if _network_config.config_data.output_graph_dir:
-                if _network_config.config_data.output_graph_dir.is_dir():
+        def _get_network_config() -> NetworkConfigWrapper:
+            _network_config = NetworkConfigWrapper()
+            _network_config.config_data = network
+            if network.output_graph_dir:
+                if network.output_graph_dir.is_dir():
                     _network_config.graph_files = (
                         _network_config.read_graphs_from_config(
-                            _network_config.config_data.output_graph_dir
+                            network.output_graph_dir
                         )
                     )
                 else:
-                    _network_config.config_data.output_graph_dir.mkdir(parents=True)
+                    network.output_graph_dir.mkdir(parents=True)
             return _network_config
 
         def _get_analysis_config() -> AnalysisConfigWrapper:
-            _analysis_config = config.analysis_config
-            _set_config_paths(_analysis_config.config_data)
+            _analysis_config = AnalysisConfigWrapper()
+            _analysis_config.config_data = analysis
+            _set_config_paths(_analysis_config)
             if isinstance(_handler.input_config.network_config, NetworkConfigWrapper):
                 _analysis_config.config_data.network = (
                     _handler.input_config.network_config.config_data.network
@@ -99,9 +101,8 @@ class Ra2ceHandler:
             return _analysis_config
 
         _handler = cls(None, None)
-        _handler._initialize_logger(data_dir.joinpath("dummy.ini"), None)
-        _handler.input_config = config
-
+        _handler._initialize_logger(None, None)
+        _handler.input_config = ConfigWrapper()
         _handler.input_config.network_config = _get_network_config()
         _handler.input_config.analysis_config = _get_analysis_config()
 
@@ -116,8 +117,8 @@ class Ra2ceHandler:
         elif analysis:
             _output_config = AnalysisConfigData.get_data_output(analysis)
         else:
-            logging.error(
-                "No valid location provided to start logging. Either network or analysis are required."
+            logging.warning(
+                "No valid location provided to start logging: no logfile will be created."
             )
             return
         Ra2ceLogger(logging_dir=_output_config, logger_name="RA2CE")

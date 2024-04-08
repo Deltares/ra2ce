@@ -2,36 +2,27 @@ import shutil
 
 import pytest
 
-from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.configuration.config_wrapper import ConfigWrapper
-from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.ra2ce_handler import Ra2ceHandler
 from tests import test_results
 
 
 class TestRa2ceHandler:
-    def test_initialize_with_no_network_nor_analysis_raises(self):
+    def test_initialize_with_no_network_nor_analysis_does_not_raise(self):
         # 1. Run test.
-        with pytest.raises(ValueError) as exc_err:
-            Ra2ceHandler(None, None)
+        _handler = Ra2ceHandler(None, None)
 
         # 2. Verify final expectations.
-        assert (
-            str(exc_err.value)
-            == "No valid location provided to start logging. Either network or analysis are required."
-        )
+        assert isinstance(_handler, Ra2ceHandler)
 
-    def test_initialize_from_config_does_not_raise(
-        self, request: pytest.FixtureRequest
-    ):
+    def test_initialize_from_config_does_not_raise(self):
         # 1. Define test data.
-        _config = ConfigWrapper()
-        _config.network_config = NetworkConfigWrapper()
-        _config.analysis_config = AnalysisConfigWrapper()
-        _data_dir = test_results.joinpath(request.node.name)
+        _network_config = NetworkConfigData()
+        _analysis_config = AnalysisConfigData()
 
         # 2. Run test.
-        _handler = Ra2ceHandler.from_config(_config, _data_dir)
+        _handler = Ra2ceHandler.from_config(_network_config, _analysis_config)
 
         # 3. Verify expectations.
         assert isinstance(_handler, Ra2ceHandler)
