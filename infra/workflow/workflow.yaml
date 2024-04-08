@@ -1,0 +1,65 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: ra2ce-example-workflow-
+spec:
+  entrypoint: scenario-workflow
+  templates:
+  - name: scenario-workflow
+    steps:
+    - - name: run-scenario
+        template: run-scenario
+
+  - name: run-scenario
+    container:
+      image: containers.deltares.nl/ra2ce/ra2ce:latest
+      command: ["python", "/scripts/run_race.py"]
+    inputs:
+      artifacts:
+        - name: data
+          path: /data
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: input/data
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+        - name: scripts
+          path: /scripts
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: input/scripts
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+    outputs:
+      artifacts:
+      - name: ra2ce-output
+        path: /data
+        s3:
+          bucket: ra2ce-data
+          endpoint: s3.amazonaws.com
+          region: eu-west-1
+          key: output
+          accessKeySecret:
+            name: my-s3-credentials
+            key: accessKey
+          secretKeySecret:
+            name: my-s3-credentials
+            key: secretKey
+        archive:
+          none: {}

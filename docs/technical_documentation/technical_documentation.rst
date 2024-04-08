@@ -4,9 +4,10 @@ Technical Documentation
 =======================
 
 .. toctree::
-   :caption: Table of Contents
-   :maxdepth: 2
+   :caption: Technical topics
+   :maxdepth: 1
 
+   technical_meetings
    network_package
    analysis_package
 
