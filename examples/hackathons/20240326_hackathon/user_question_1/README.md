@@ -2,11 +2,11 @@
 
 UQ.1: Which roads are most likely to get hit by flooding from this hurricane given its projected flood maps?
 
-- __Input__: road extent (OSM), 100+ flood maps from SFINCS in Beira/Qualimane area and a RA2CE folder setup with .ini files 
-- __Proposed workflow__: multiple flood maps – for every flood map a seperate RA2CE run - for every scenario seperate results – save the results in an efficient way – postprocess into meaningful results
-- __Expected output__: flood depths on edges for every scenario
+- __Input__: road extent (OSM), 100+ flood maps from SFINCS in Beira/Qualimane area and a RA2CE folder setup with .ini files.
+- __Proposed workflow__: multiple flood maps – for every flood map a seperate RA2CE run - for every scenario seperate results – save the results in an efficient way – postprocess into meaningful results.
+- __Expected output__: flood depths on edges for every scenario.
 - __Expected post-processed results__: per edge an indication of ‘likelihood’ of flooding (e.g. in 90 / 100 scenario’s this edge gets hit (% hits)). 
-- __Acceptance level__: Tackle user question 1 on Tuesday
+- __Acceptance level__: Tackle user question 1 on Tuesday.
 - Which questions for user questions 2,3,4 are also relevant for question 1?
 
 

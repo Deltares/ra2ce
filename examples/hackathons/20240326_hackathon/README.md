@@ -10,8 +10,8 @@ Setting up a workflow to enable running RA2CE with multiple flood scenarios in a
 
 ## User questions
 
-- [UQ.1] Which roads are most likely to get hit by flooding from this hurricane given its projected flood maps?
-- [UQ.2] Where are the flood impacts most disruptive in terms of accessibility? (detour length) = multi-link redundancy 
+- [UQ.1](user_question_1\README.md) Which roads are most likely to get hit by flooding from this hurricane given its projected flood maps?
+- [UQ.2](user_question_2\README.md) Where are the flood impacts most disruptive in terms of accessibility? (detour length) = multi-link redundancy 
 - [UQ.3] Which areas/locations are most likely to be unreachable because of this hurricane given its possible tracks? (OD analysis) (to be refined)
 - [UQ.4] Optional if damages module works: What is the range of minimum and maximum damages that might occur because of this hurricane given its possible tracks?
 
