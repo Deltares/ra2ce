@@ -27,8 +27,9 @@ import pandas as pd
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
 from shapely.geometry.base import BaseGeometry
+import pyproj
 from ra2ce.network.network_wrappers.osm_network_wrapper.osm_utils import (
-    get_node_nearest_edge, _is_endnode_simplified, modify_edges, remove_key
+    get_node_nearest_edge, is_endnode_check, modify_graph, remove_key
 )
 
 import ra2ce.network.networks_utils as nut
@@ -416,30 +417,19 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         )
 
     @staticmethod
-    def snap_nodes_to_edges(graph: MultiDiGraph, threshold: float):
-        end_nodes = [node for node in graph.nodes(data=True) if _is_endnode_simplified(graph, node[0])]
-
-        if not graph.graph or not graph.graph['crs']:
-            graph.graph['crs'] = "epsg:4326"
-
-        nut.add_missing_geoms_graph(graph=graph, geom_name='geometry').to_directed()
-
+    def snap_nodes_to_edges(graph: MultiDiGraph, threshold: float) -> MultiDiGraph:
         def threshold_check(node_nearest_ed: dict):
             distance = node_nearest_ed['nearest_edge'][-1]
-            return distance < threshold
+            return distance <= threshold
+        
+        end_nodes = [node for node in graph.nodes(data=True) if is_endnode_check(graph, node[0])]
+
+        if not graph.graph or not graph.graph['crs'] or isinstance(graph.graph['crs'], str):
+            graph.graph['crs'] = pyproj.CRS("epsg:4326")
+        nut.add_missing_geoms_graph(graph=graph, geom_name='geometry').to_directed()
 
         for node_nearest_edge_data in filter(threshold_check,
                                              map(lambda end_node:
-                                                 get_node_nearest_edge(graph, end_node), end_nodes)):
-            node_geom, nearest_edge_geom = node_nearest_edge_data['node'][1]['geometry'], \
-                node_nearest_edge_data['nearest_edge'][3]
-            node_data = node_nearest_edge_data['node'][1]
-            projected_node_on_nearest_edge = nearest_edge_geom.interpolate(nearest_edge_geom.project(node_geom))
-            new_node_data = node_data.copy()
-            new_node_data = remove_key(new_node_data, ['geometry', 'x', 'y'])
-            modify_edges(graph=graph, u=node_nearest_edge_data['nearest_edge'][0],
-                         v=node_nearest_edge_data['nearest_edge'][1], new_node=projected_node_on_nearest_edge,
-                         new_node_data=new_node_data)
-        # ToDo: Make sure the directions make sense after clustering; both for snap_edges
-        # ToDo: Create tests for modify_edges and snap_nodes_to_edges functions
-        raise NotImplementedError("Next thing to do!")
+                                                 get_node_nearest_edge(graph, end_node), end_nodes)):    
+            modify_graph(graph=graph, node_nearest_edge_data=node_nearest_edge_data)
+        return graph
