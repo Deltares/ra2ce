@@ -2,6 +2,8 @@
 
 Directory containing all jupyter notebooks and related work from the hackathon taken place 26 March 2024.
 
+For a more in-detail summary of all the work done, please check the [jupyter notebook summary](./summary_2024q1.ipynb).
+
 
 ## Overall goal
 

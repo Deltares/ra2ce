@@ -13,4 +13,4 @@ We try to summarize a hackathon session in a jupyter notebook. This is not exclu
    :maxdepth: 1
    :caption: Hackathon sessions
 
-   ../_examples/hackathons/20240326_hackathon/summary
+   ../_examples/hackathons/20240326_hackathon/summary_2024q1
