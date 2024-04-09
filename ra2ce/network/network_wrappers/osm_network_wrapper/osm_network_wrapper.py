@@ -28,7 +28,7 @@ from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
 from shapely.geometry.base import BaseGeometry
 from ra2ce.network.network_wrappers.osm_network_wrapper.osm_utils import (
-    get_node_nearest_edge, _is_endnode_simplified, modify_edges, remove_key
+    get_node_nearest_edge, is_endnode_check, modify_edges, remove_key
 )
 
 import ra2ce.network.networks_utils as nut
@@ -417,7 +417,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
     @staticmethod
     def snap_nodes_to_edges(graph: MultiDiGraph, threshold: float):
-        end_nodes = [node for node in graph.nodes(data=True) if _is_endnode_simplified(graph, node[0])]
+        end_nodes = [node for node in graph.nodes(data=True) if is_endnode_check(graph, node[0])]
 
         if not graph.graph or not graph.graph['crs']:
             graph.graph['crs'] = "epsg:4326"
@@ -442,4 +442,3 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
                          new_node_data=new_node_data)
         # ToDo: Make sure the directions make sense after clustering; both for snap_edges
         # ToDo: Create tests for modify_edges and snap_nodes_to_edges functions
-        raise NotImplementedError("Next thing to do!")
