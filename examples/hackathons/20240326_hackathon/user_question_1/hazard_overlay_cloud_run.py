@@ -1,4 +1,3 @@
-import logging
 from pathlib import Path
 
 from ra2ce.ra2ce_handler import Ra2ceHandler
