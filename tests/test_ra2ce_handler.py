@@ -16,13 +16,24 @@ class TestRa2ceHandler:
         # 2. Verify final expectations.
         assert isinstance(_handler, Ra2ceHandler)
 
-    def test_initialize_from_config_does_not_raise(self):
-        # 1. Define test data.
-        _network_config = NetworkConfigData()
-        _analysis_config = AnalysisConfigData()
-
-        # 2. Run test.
-        _handler = Ra2ceHandler.from_config(_network_config, _analysis_config)
+    @pytest.mark.parametrize(
+        "network_config, analysis_config",
+        [
+            pytest.param(None, None, id="No network and no analysis"),
+            pytest.param(NetworkConfigData(), None, id="No analysis"),
+            pytest.param(None, AnalysisConfigData(), id="No network"),
+            pytest.param(
+                NetworkConfigData(),
+                AnalysisConfigData(),
+                id="Both network and analysis",
+            ),
+        ],
+    )
+    def test_initialize_from_valid_config_does_not_raise(
+        self, network_config, analysis_config
+    ):
+        # 1./2. Define test data/Run test.
+        _handler = Ra2ceHandler.from_config(network_config, analysis_config)
 
         # 3. Verify expectations.
         assert isinstance(_handler, Ra2ceHandler)
