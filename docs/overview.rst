@@ -26,7 +26,7 @@ Overview
 
     .. grid-item-card::
         :text-align: center
-        :link: examples
+        :link: examples_index
         :link-type: ref
 
         :octicon:`eye;10em`
@@ -94,7 +94,7 @@ Overview
 
    about/about.rst
    installation/installation.rst
-   examples/examples.rst
+   examples/index.rst
    network_module/network_module.rst
    analysis_module/analysis_module.rst 
    docker_and_cloud/index
