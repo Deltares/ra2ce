@@ -421,7 +421,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         def threshold_check(node_nearest_ed: dict):
             distance = node_nearest_ed['nearest_edge'][-1]
             return distance <= threshold
-        
+
         end_nodes = [node for node in graph.nodes(data=True) if is_endnode_check(graph, node[0])]
 
         if not graph.graph or not graph.graph['crs'] or isinstance(graph.graph['crs'], str):
@@ -430,6 +430,6 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
         for node_nearest_edge_data in filter(threshold_check,
                                              map(lambda end_node:
-                                                 get_node_nearest_edge(graph, end_node), end_nodes)):    
+                                                 get_node_nearest_edge(graph, end_node), end_nodes)):
             modify_graph(graph=graph, node_nearest_edge_data=node_nearest_edge_data)
         return graph
