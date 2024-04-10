@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from ra2ce.ra2ce_logging import Ra2ceLogger
+from ra2ce.ra2ce_logger import Ra2ceLogger
 from tests import test_results
 
 
