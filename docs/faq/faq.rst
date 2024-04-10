@@ -53,7 +53,7 @@ Initialization parameters
  | **Q**: How do I know which parameters to specify for the action I want to perform with RA2CE?
 
 The :ref:`network_module` and :ref:`analysis_module` show all the possible parameters you can use in the .ini files. The combination 
-of paramaters depends on the purpose for which the user wants to use RA2CE. Using the :ref:`examples` the user can get familiair with 
+of paramaters depends on the purpose for which the user wants to use RA2CE. Using the :ref:`examples_index` the user can get acquainted with 
 possible input parameter combinations. 
 
 Network creation
@@ -97,7 +97,7 @@ With these settings, you can initialize a hazard map in raster format.
  | **Q**: Where do I find the results of the hazard overlay?
 
 These results are stored in the static/output_graph folder. The results have 'hazard' in their file name. In these files there are columns which hold the hazard's attribute for each edge. 
-See :ref:`examples` on how to use this in practice. 
+See :ref:`examples_index` on how to use this in practice. 
 
 
 
@@ -109,7 +109,7 @@ Specifying analysis
 You can specify the preferred analysis in the analyses.ini file. 
 You can choose any analysis and you can initialize multiple at the same time. 
 More information can be found in the :ref:`analysis_module` under 'Initialization file templates'. 
-There are also examples in the :ref:`examples` notebooks.
+There are also examples in the :ref:`examples_index` notebooks.
 
 Direct damage assessment
 ----------------------------
