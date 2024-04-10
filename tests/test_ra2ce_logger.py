@@ -14,7 +14,7 @@ def get_logged_text_lines(log_file: Path) -> list[str]:
     return _logged_text.splitlines(keepends=False)
 
 
-class TestRa2ceLogging:
+class TestRa2ceLogger:
     def test_initialize_logger(self, request: pytest.FixtureRequest):
         # 1. Define test data.
         _test_dir = test_results.joinpath(request.node.name)
