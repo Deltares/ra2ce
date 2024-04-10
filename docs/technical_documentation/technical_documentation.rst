@@ -7,7 +7,6 @@ Technical Documentation
    :caption: Technical topics
    :maxdepth: 1
 
-   technical_meetings
    network_package
    analysis_package
 

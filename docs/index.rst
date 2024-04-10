@@ -20,7 +20,7 @@ Or navigate directly to another section:
 
    overview
    installation/installation
-   examples/examples
+   examples/index
    contributing/index
    technical_documentation/technical_documentation
    changelog_wrapper
