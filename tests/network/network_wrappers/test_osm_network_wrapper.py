@@ -190,6 +190,28 @@ class TestOsmNetworkWrapper:
         return _valid_graph
 
     @pytest.fixture
+    def _valid_graph_fixture(self) -> MultiDiGraph:
+        _valid_graph = nx.MultiDiGraph()
+        _valid_graph.add_node(1, x=1, y=10)
+        _valid_graph.add_node(2, x=2, y=20)
+        _valid_graph.add_node(3, x=1, y=10)
+        _valid_graph.add_node(4, x=2, y=40)
+        _valid_graph.add_node(5, x=3, y=50)
+
+        _valid_graph.add_edge(1, 2, x=[1, 2], y=[10, 20])
+        _valid_graph.add_edge(1, 3, x=[1, 1], y=[10, 10])
+        _valid_graph.add_edge(2, 4, x=[2, 2], y=[20, 40])
+        _valid_graph.add_edge(3, 4, x=[1, 2], y=[10, 40])
+        _valid_graph.add_edge(1, 4, x=[1, 2], y=[10, 40])
+        _valid_graph.add_edge(5, 3, x=[3, 1], y=[50, 10])
+        _valid_graph.add_edge(5, 5, x=[3, 3], y=[50, 50])
+
+        # Add a valid CRS value.
+        _valid_graph.graph["crs"] = "EPSG:4326"
+
+        return _valid_graph
+    
+    @pytest.fixture
     def _expected_unique_graph_fixture(self) -> MultiDiGraph:
         _valid_unique_graph = nx.MultiDiGraph()
         _valid_unique_graph.add_node(1, x=1, y=10)

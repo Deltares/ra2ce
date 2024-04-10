@@ -218,6 +218,7 @@ def is_endnode_check(graph: nx.MultiDiGraph, node_id: int) -> bool:
     else:
         return False
 
+
 def create_edges(graph: nx.MultiDiGraph, u: int, v: int, key_data: dict) -> nx.MultiDiGraph:
     """
     Create or update edges between nodes `u` and `v` in the graph with the given data.
@@ -235,20 +236,20 @@ def create_edges(graph: nx.MultiDiGraph, u: int, v: int, key_data: dict) -> nx.M
     for key, data in key_data.items():
         if not graph.has_edge(u, v, key):
             geom_data = {
-                "geometry": LineString([graph.nodes(data=True)[u]['geometry'], 
+                "geometry": LineString([graph.nodes(data=True)[u]['geometry'],
                                         graph.nodes(data=True)[v]['geometry']])
-                }
+            }
             graph.add_edge(u, v, **data)
             graph[u][v][key].update(geom_data)
     return graph
 
-def update_edges_by_node(graph: nx.MultiDiGraph, node_edges: list, 
-                         u_nearest_edge: Optional[int], v_nearest_edge: Optional[int], 
-                         node_id: int,new_node_geom: dict) -> None:
+
+def update_edges_by_node(graph: nx.MultiDiGraph, node_edges: list, node_id: int, new_node_geom: dict) -> None:
     """
     Update connected edges of a node by replacing node_id and node_geom with new_node_id and new_node_geom.
 
     Args:
+        node_edges: edges connected to the node in teh original graph to modify
         graph (nx.MultiDiGraph): The graph to modify.
         node_id (int): The ID of the node to update.
         new_node_geom (dict): Dictionary containing geometry information for the new node.
@@ -278,6 +279,7 @@ def update_edges_by_node(graph: nx.MultiDiGraph, node_edges: list,
         # Step 3: Create a new edge by replacing node_id with new_node_id
         graph.add_edge(*new_edge_id, **new_edge_data)
 
+
 def modify_graph(graph: nx.MultiDiGraph, node_nearest_edge_data: dict):
     def set_edge_length(graph: nx.MultiDiGraph, u_nearest_edge: int, v_nearest_edge, new_node_id):
         for _, nodes in enumerate([(u_nearest_edge, new_node_id), (new_node_id, v_nearest_edge)], start=1):
@@ -285,26 +287,26 @@ def modify_graph(graph: nx.MultiDiGraph, node_nearest_edge_data: dict):
             for key in graph[u][v]:
                 length_data = {"length": nut.line_length(graph[u][v][key]["geometry"], graph.graph["crs"])}
                 graph[u][v][key].update(length_data)
+
     def get_edges_by_node(graph, node):
         return list(graph.edges(node, data=True, keys=True))
-   
+
     # step 1: set variables
-    u_nearest_edge=node_nearest_edge_data['nearest_edge'][0]
-    v_nearest_edge=node_nearest_edge_data['nearest_edge'][1]
+    u_nearest_edge = node_nearest_edge_data['nearest_edge'][0]
+    v_nearest_edge = node_nearest_edge_data['nearest_edge'][1]
     nearest_edge_geom = node_nearest_edge_data['nearest_edge'][3]
     nearest_edge_key_data = graph.get_edge_data(u_nearest_edge, v_nearest_edge).copy()
     if nearest_edge_key_data is None:
         raise ValueError("Edge not found in the graph")
-    
+
     node_id = node_nearest_edge_data['node'][0]
     node_geom = node_nearest_edge_data['node'][1]['geometry']
     node_edges = get_edges_by_node(graph, node_id).copy()
-                
+
     new_node_geom = nearest_edge_geom.interpolate(nearest_edge_geom.project(node_geom))
     new_node_data = node_nearest_edge_data['node'][1].copy()
     new_node_data = remove_key(new_node_data, ['geometry', 'x', 'y'])
 
-    
     # step 2: add the new_node
     # Check if the new_node already exists in the nodes of the graph
     if find_existing_node(graph, new_node_geom)[0] is None:
@@ -312,7 +314,7 @@ def modify_graph(graph: nx.MultiDiGraph, node_nearest_edge_data: dict):
         graph.add_node(node_id, x=new_node_geom.x, y=new_node_geom.y, geometry=new_node_geom, **new_node_data)
     else:
         node_id = find_existing_node(graph, new_node_geom)[0]
-    
+
     # step 3: update edges of the graph being affected by adding a new node
     graph.remove_edge(u_nearest_edge, v_nearest_edge)
     # Add new node to the nearest edge and create two edges
@@ -322,7 +324,7 @@ def modify_graph(graph: nx.MultiDiGraph, node_nearest_edge_data: dict):
     set_edge_length(graph, u_nearest_edge, v_nearest_edge, node_id)
 
     # update edges connected to the node close enough (passed the threshold) to the nearest edge
-    update_edges_by_node(graph, node_edges, u_nearest_edge, v_nearest_edge, node_id, new_node_geom)
+    update_edges_by_node(graph, node_edges, node_id, new_node_geom)
 
 
 def remove_key(element_data: dict, keys_to_exclude: list) -> dict:
