@@ -27,6 +27,10 @@ from typing import Optional
 
 
 class Ra2ceLogger:
+    """
+    Class to handle the logging configuration for the RA2CE application.
+    """
+
     log_file: Optional[Path] = None
     _file_handler: Optional[logging.FileHandler] = None
 
@@ -39,6 +43,16 @@ class Ra2ceLogger:
 
     @classmethod
     def initialize_file_logger(cls, logging_dir: Path, logger_name: str) -> Ra2ceLogger:
+        """
+        Initializes a logger that writes to a file and to console.
+
+        Args:
+            logging_dir (Path): Path to the logging directory
+            logger_name (str): Name of the logger
+
+        Returns:
+            Ra2ceLogger: The logger object
+        """
         if not logging_dir.is_dir():
             logging_dir.mkdir(parents=True)
         _log_file = logging_dir.joinpath(f"{logger_name}.log")
@@ -48,6 +62,15 @@ class Ra2ceLogger:
 
     @classmethod
     def initialize_console_logger(cls, logger_name: str) -> Ra2ceLogger:
+        """
+        Initializes a logger that writes to console only.
+
+        Args:
+            logger_name (str): Name of the logger
+
+        Returns:
+            Ra2ceLogger: The logger object
+        """
         return cls(None, logger_name)
 
     def _get_logger(self) -> logging.Logger:

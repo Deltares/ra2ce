@@ -50,6 +50,12 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 
 class Ra2ceHandler:
+    """
+    Top level class to handle the RA2CE analysis process.
+    This class is used to orchestrate the analysis process based on the provided network and analysis configuration,
+    including the logging configuration
+    """
+
     input_config: ConfigWrapper
 
     def __init__(self, network: Optional[Path], analysis: Optional[Path]) -> None:
@@ -63,6 +69,16 @@ class Ra2ceHandler:
     def from_config(
         cls, network: NetworkConfigData, analysis: AnalysisConfigData
     ) -> Ra2ceHandler:
+        """
+        Create a handler from the provided network and analysis configuration.
+
+        Args:
+            network (NetworkConfigData): Network configuration
+            analysis (AnalysisConfigData): Analysis configuration
+
+        Returns:
+            Ra2ceHandler: The handler object
+        """
 
         def set_config_paths(_analysis_config: AnalysisConfigWrapper) -> None:
             if not network:
@@ -139,6 +155,14 @@ class Ra2ceHandler:
     def run_analysis(self) -> list[AnalysisResultWrapper]:
         """
         Runs a Ra2ce analysis based on the provided network and analysis files.
+
+        Args: None
+
+        Raises:
+            ValueError: If the input files are not valid
+
+        Returns:
+            list[AnalysisResultWrapper]: A list of analysis results
         """
         if not self.input_config.analysis_config:
             return
