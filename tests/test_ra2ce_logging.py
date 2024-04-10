@@ -15,7 +15,42 @@ def get_logged_text_lines(log_file: Path) -> list[str]:
 
 
 class TestRa2ceLogging:
+    def test_initialize_logger(self, request: pytest.FixtureRequest):
+        # 1. Define test data.
+        _test_dir = test_results.joinpath(request.node.name)
+        _test_dir.mkdir(parents=True, exist_ok=True)
+        _logger_name = "testlog"
+        _log_file = _test_dir.joinpath(_logger_name).with_suffix(".log")
+        _log_file.touch()
+
+        # 2. Run test.
+        _logger = Ra2ceLogger(_log_file, _logger_name)
+
+        # 3. Verify final expectations.
+        assert isinstance(_logger, Ra2ceLogger)
+        assert _logger.log_file == _log_file
+
+    def test_initialize_file_logger(self, request: pytest.FixtureRequest):
+        # 1. Define test data.
+        _test_dir = test_results.joinpath(request.node.name)
+        _logger_name = "testlog"
+
+        # 2. Run test.
+        _logger = Ra2ceLogger.initialize_file_logger(_test_dir, _logger_name)
+
+        # 3. Verify final expectations.
+        assert isinstance(_logger, Ra2ceLogger)
+        assert _logger.log_file.is_file()
+
+    def test_initialize_console_logger(self):
+        # 1./2. Define test data. / Run test.
+        _logger = Ra2ceLogger.initialize_console_logger("testlog")
+
+        # 3. Verify final expectations.
+        assert isinstance(_logger, Ra2ceLogger)
+
     def test_given_non_existent_dir_creates_log(self, request: pytest.FixtureRequest):
+        # 1. Define test data.
         _test_dir = test_results / request.node.name
         _logger_name = "testlog"
         shutil.rmtree(_test_dir, ignore_errors=True)
@@ -23,8 +58,10 @@ class TestRa2ceLogging:
 
         assert not _test_dir.is_dir()
 
-        _logger = Ra2ceLogger(_test_dir, _logger_name)
+        # 2. Run test
+        _logger = Ra2ceLogger.initialize_file_logger(_test_dir, _logger_name)
 
+        # 3. Verify final expectations.
         assert logging.getLogger("") == _logger._get_logger()
         assert _test_dir.is_dir()
         assert _logger.log_file.is_file()
@@ -47,7 +84,7 @@ class TestRa2ceLogging:
         assert not _test_dir.is_dir()
 
         # 2. Run test
-        _logger = Ra2ceLogger(_test_dir, _logger_name)
+        _logger = Ra2ceLogger.initialize_file_logger(_test_dir, _logger_name)
         logging.error(_err_mssg)
         logging.warning(_warn_mssg)
         logging.info(_info_mssg)

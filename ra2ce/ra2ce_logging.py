@@ -19,6 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from __future__ import annotations
 
 import logging
 from pathlib import Path
@@ -27,18 +28,27 @@ from typing import Optional
 
 class Ra2ceLogger:
     log_file: Optional[Path] = None
+    _file_handler: Optional[logging.FileHandler] = None
 
-    def __init__(self, logging_dir: Path, logger_name: str) -> None:
-        if not logging_dir.is_dir():
-            logging_dir.mkdir(parents=True)
-        self.log_file = logging_dir.joinpath(f"{logger_name}.log")
-        if not self.log_file.is_file():
-            self.log_file.touch()
-
+    def __init__(self, log_file: Optional[Path], logger_name: str) -> None:
+        self.log_file = log_file
         self._set_file_handler()
         self._set_console_handler()
         self._set_formatter()
         logging.info(f"{logger_name} logger initialized.")
+
+    @classmethod
+    def initialize_file_logger(cls, logging_dir: Path, logger_name: str) -> Ra2ceLogger:
+        if not logging_dir.is_dir():
+            logging_dir.mkdir(parents=True)
+        _log_file = logging_dir.joinpath(f"{logger_name}.log")
+        if not _log_file.is_file():
+            _log_file.touch()
+        return cls(_log_file, logger_name)
+
+    @classmethod
+    def initialize_console_logger(cls, logger_name: str) -> Ra2ceLogger:
+        return cls(None, logger_name)
 
     def _get_logger(self) -> logging.Logger:
         """
@@ -51,6 +61,8 @@ class Ra2ceLogger:
 
     def _set_file_handler(self) -> None:
         # Create a root logger and set the minimum logging level.
+        if not self.log_file:
+            return
         self._get_logger().setLevel(logging.INFO)
         self._file_handler = logging.FileHandler(filename=self.log_file, mode="a")
         self._file_handler.setLevel(logging.INFO)
@@ -68,5 +80,6 @@ class Ra2ceLogger:
             fmt="%(asctime)s - [%(filename)s:%(lineno)d] - %(name)s - %(levelname)s - %(message)s",
             datefmt="%Y-%m-%d %I:%M:%S %p",
         )
-        self._file_handler.setFormatter(_formatter)
+        if self.log_file:
+            self._file_handler.setFormatter(_formatter)
         self._console_handler.setFormatter(_formatter)

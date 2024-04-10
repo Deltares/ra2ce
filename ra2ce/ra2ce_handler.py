@@ -54,8 +54,10 @@ class Ra2ceHandler:
 
     def __init__(self, network: Optional[Path], analysis: Optional[Path]) -> None:
         if network or analysis:
-            self._initialize_logger(network, analysis)
+            self._initialize_logger_from_files(network, analysis)
             self.input_config = ConfigFactory.get_config_wrapper(network, analysis)
+        else:
+            self._initialize_logger_from_config()
 
     @classmethod
     def from_config(
@@ -70,10 +72,10 @@ class Ra2ceHandler:
             _analysis_config.config_data.static_path = network.static_path
             _analysis_config.config_data.output_path = network.output_path
 
-        def get_network_config() -> NetworkConfigWrapper:
+        def get_network_config() -> NetworkConfigWrapper | None:
+            if not isinstance(network, NetworkConfigData):
+                return None
             _network_config = NetworkConfigWrapper()
-            if not network:
-                return _network_config
             _network_config.config_data = network
             if network.output_graph_dir:
                 if network.output_graph_dir.is_dir():
@@ -86,10 +88,10 @@ class Ra2ceHandler:
                     network.output_graph_dir.mkdir(parents=True)
             return _network_config
 
-        def get_analysis_config() -> AnalysisConfigWrapper:
+        def get_analysis_config() -> AnalysisConfigWrapper | None:
+            if not isinstance(analysis, AnalysisConfigData):
+                return None
             _analysis_config = AnalysisConfigWrapper()
-            if not analysis:
-                return _analysis_config
             _analysis_config.config_data = analysis
             set_config_paths(_analysis_config)
             if isinstance(_handler.input_config.network_config, NetworkConfigWrapper):
@@ -105,14 +107,13 @@ class Ra2ceHandler:
             return _analysis_config
 
         _handler = cls(None, None)
-        _handler._initialize_logger(None, None)
         _handler.input_config = ConfigWrapper()
         _handler.input_config.network_config = get_network_config()
         _handler.input_config.analysis_config = get_analysis_config()
 
         return _handler
 
-    def _initialize_logger(
+    def _initialize_logger_from_files(
         self, network: Optional[Path], analysis: Optional[Path]
     ) -> None:
         _output_config = None
@@ -125,7 +126,12 @@ class Ra2ceHandler:
                 "No valid location provided to start logging: no logger and logfile is created."
             )
             return
-        Ra2ceLogger(logging_dir=_output_config, logger_name="RA2CE")
+        Ra2ceLogger.initialize_file_logger(
+            logging_dir=_output_config, logger_name="RA2CE"
+        )
+
+    def _initialize_logger_from_config(self) -> None:
+        Ra2ceLogger.initialize_console_logger(logger_name="RA2CE")
 
     def configure(self) -> None:
         self.input_config.configure()
