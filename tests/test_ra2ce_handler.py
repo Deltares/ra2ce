@@ -1,3 +1,4 @@
+from pathlib import Path
 import shutil
 
 import pytest
@@ -45,15 +46,30 @@ class TestRa2ceHandler:
         # 3. Verify expectations.
         assert isinstance(_handler, Ra2ceHandler)
 
+    def _get_acceptance_test_data_copy_dir(
+        self, request: pytest.FixtureRequest
+    ) -> Path:
+        _copy_root_dir = test_results.joinpath(request.node.originalname)
+        if not _copy_root_dir.is_dir():
+            _copy_root_dir.mkdir(parents=True)
+        _test_case_name = (
+            request.node.name.split("[")[-1].split("]")[0].lower().replace(" ", "_")
+        )
+        _test_case_dir = _copy_root_dir.joinpath(_test_case_name)
+        if not _test_case_dir.is_dir():
+            shutil.copytree(acceptance_test_data, _test_case_dir)
+        return _test_case_dir
+
     @pytest.fixture
     def network_config(
         self, request: pytest.FixtureRequest
     ) -> NetworkConfigData | None:
         if not request.param:
             return None
-        _test_dir = acceptance_test_data
-        _network_ini = acceptance_test_data.joinpath("network.ini")
-        _network_config = NetworkConfigDataReader().read(_network_ini)
+        _test_dir = self._get_acceptance_test_data_copy_dir(request)
+        _network_config = NetworkConfigDataReader().read(
+            _test_dir.joinpath("network.ini")
+        )
         _network_config.root_path = _test_dir.parent
         _network_config.input_path = _test_dir.joinpath("input")
         _network_config.static_path = _test_dir.joinpath("static")
@@ -66,9 +82,10 @@ class TestRa2ceHandler:
     ) -> AnalysisConfigData | None:
         if not request.param:
             return None
-        _test_dir = acceptance_test_data
-        _analysis_ini = acceptance_test_data.joinpath("analyses.ini")
-        _analysis_config = AnalysisConfigDataReader().read(_analysis_ini)
+        _test_dir = self._get_acceptance_test_data_copy_dir(request)
+        _analysis_config = AnalysisConfigDataReader().read(
+            _test_dir.joinpath("analyses.ini")
+        )
         _analysis_config.static_path = _test_dir.joinpath("static")
         return _analysis_config
 
