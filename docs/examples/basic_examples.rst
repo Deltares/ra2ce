@@ -21,6 +21,7 @@ Below you can access some of the main examples and go through them in an off-lin
    ../_examples/example_isolated_locations
    ../_examples/example_optimal_route_origin_destination
    ../_examples/example_ra2ce_basics_fromgpkg
+   ../_examples/example_download_network_using_a_polygon
 
 .. toctree::
    :maxdepth: 1
