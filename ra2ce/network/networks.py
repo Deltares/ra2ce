@@ -181,7 +181,7 @@ class Network:
             if attribute in gdf_edges.columns:
                 attribute_values_gdf = gdf_edges[attribute]
                 for (u, v, key), attribute_values in attribute_values_gdf.items():
-                    updated_graph[u][v][key]["bridge"] = attribute_values
+                    updated_graph[u][v][key][attribute] = attribute_values
         return updated_graph
 
     def _get_edges_time_hours(self, _graph: nx.MultiGraph) -> dict:

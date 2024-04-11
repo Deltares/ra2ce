@@ -94,6 +94,4 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
         self.initialize_output_dirs()
 
     def is_valid(self) -> bool:
-        _file_is_valid = self.ini_file.is_file() and self.ini_file.suffix == ".ini"
-        _validation_report = AnalysisConfigDataValidator(self.config_data).validate()
-        return _file_is_valid and _validation_report.is_valid()
+        return AnalysisConfigDataValidator(self.config_data).validate().is_valid()
