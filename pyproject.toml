@@ -98,7 +98,7 @@ pytest-notebook = "^0.9.0"
 
 [tool.black]
 line-length = 88
-target-version = ['py38', 'py39']
+target-version = ['py310', 'py311']
 exclude = '''
 (
   /(
@@ -120,7 +120,6 @@ exclude = '''
 [tool.isort]
 profile = "black"
 multi_line_output = 3
-line_length = 88
 
 [tool.commitizen]
 name = "cz_conventional_commits"
