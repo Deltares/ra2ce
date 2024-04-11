@@ -3,6 +3,8 @@ import shutil
 import pytest
 
 from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
+from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
+from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from tests import test_results
 
@@ -43,3 +45,16 @@ class TestNetworkConfigWrapper:
         assert _result.base_network.graph is None
         assert _result.base_network_hazard.graph is None
         shutil.rmtree(_test_dir)
+
+    def test_analysis_config_wrapper_valid_without_ini_file(self):
+        # 1. Define test data
+        _network_wrapper = NetworkConfigWrapper()
+        _network_wrapper.config_data = NetworkConfigData()
+        _network_wrapper.config_data.network.source = SourceEnum.OSB_BPF
+        _network_wrapper.ini_file = None
+
+        # 2. Run test.
+        _result = _network_wrapper.is_valid()
+
+        # 3. Verify expectations.
+        assert _result is True

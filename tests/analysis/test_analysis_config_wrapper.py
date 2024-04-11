@@ -14,6 +14,8 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
+from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data, test_results
@@ -41,7 +43,7 @@ class TestAnalysisConfigWrapper:
 
         # 2. Run test.
         with pytest.raises(ValueError):
-            _config = AnalysisConfigWrapper.from_data_with_network(
+            AnalysisConfigWrapper.from_data_with_network(
                 valid_analysis_ini, _config_data, None
             )
 
@@ -94,3 +96,22 @@ class TestAnalysisConfigWrapper:
         assert _output_dir.exists()
         assert _output_dir.joinpath("effectiveness_measures").exists()
         assert _output_dir.joinpath("single_link_redundancy").exists()
+
+    def test_analysis_config_wrapper_valid_without_ini_file(self):
+        # 1. Define test data
+        _analysis_wrapper = AnalysisConfigWrapper()
+        _analysis_wrapper.config_data = AnalysisConfigData()
+        _analysis_wrapper.config_data.analyses.append(
+            AnalysisSectionDirect(
+                analysis=AnalysisDirectEnum.DIRECT,
+                event_type=EventTypeEnum.EVENT,
+                damage_curve=DamageCurveEnum.HZ,
+            )
+        )
+        _analysis_wrapper.ini_file = None
+
+        # 2. Run test.
+        _result = _analysis_wrapper.is_valid()
+
+        # 3. Verify expectations.
+        assert _result is True
