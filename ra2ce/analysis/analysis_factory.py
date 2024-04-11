@@ -35,6 +35,7 @@ from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtoco
 from ra2ce.analysis.direct.direct_damage import DirectDamage
 from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
+from ra2ce.analysis.indirect.losses import Losses
 from ra2ce.analysis.indirect.multi_link_isolated_locations import (
     MultiLinkIsolatedLocations,
 )
@@ -51,7 +52,6 @@ from ra2ce.analysis.indirect.optimal_route_origin_closest_destination import (
 from ra2ce.analysis.indirect.optimal_route_origin_destination import (
     OptimalRouteOriginDestination,
 )
-from ra2ce.analysis.indirect.losses import Losses
 from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 
 
@@ -87,8 +87,8 @@ class AnalysisFactory:
 
     @staticmethod
     def get_indirect_analysis(
-            analysis: AnalysisSectionIndirect,
-            analysis_config: AnalysisConfigWrapper,
+        analysis: AnalysisSectionIndirect,
+        analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisIndirectProtocol:
         """
         Create an analysis based on the given analysis configuration.
@@ -132,8 +132,8 @@ class AnalysisFactory:
             )
             return MultiLinkOriginDestination(_analysis_input)
         if (
-                analysis.analysis
-                == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
+            analysis.analysis
+            == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
         ):
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
@@ -142,8 +142,8 @@ class AnalysisFactory:
             )
             return OptimalRouteOriginClosestDestination(analysis_input=_analysis_input)
         if (
-                analysis.analysis
-                == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
+            analysis.analysis
+            == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
         ):
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
