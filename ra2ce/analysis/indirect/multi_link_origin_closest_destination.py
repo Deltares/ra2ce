@@ -14,7 +14,7 @@ from ra2ce.network.network_config_data.network_config_data import (
     OriginsDestinationsSection,
 )
 from ra2ce.network.networks_utils import graph_to_gpkg
-from ra2ce.ra2ce_logging import logging
+from ra2ce.ra2ce_logger import logging
 
 
 class MultiLinkOriginClosestDestination(AnalysisIndirectProtocol):
@@ -110,10 +110,10 @@ class MultiLinkOriginClosestDestination(AnalysisIndirectProtocol):
                     opt_routes_with_hazard,
                 ) = analyzer.multi_link_origin_closest_destination()
 
-                (
-                    opt_routes_with_hazard
-                ) = analyzer.difference_length_with_without_hazard(
-                    opt_routes_with_hazard, opt_routes_without_hazard
+                (opt_routes_with_hazard) = (
+                    analyzer.difference_length_with_without_hazard(
+                        opt_routes_with_hazard, opt_routes_without_hazard
+                    )
                 )
         else:
             (
