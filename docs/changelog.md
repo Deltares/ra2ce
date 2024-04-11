@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.9.0 (2024-04-11)
+
+### Feat
+
+- 389 allow an analysis run without files 2nd attempt
+- network cleaning simplifying functions PR(#322) - Issue 144
+- add hazard cost to the configuration (#406)
+- added infrastructure and documentation to allow a cloud run (#398)
+- Adapted losses class for `single_link_losses` and `single_link_redundancy`. Included jupyter notebook example. (#383)
+- 390 make sections optional (#391)
+- Multi link redundancy - adjust calculating diff_time o -diff_length (#393)
+- Add time to graph and network (#387)
+- Integrated crosscade (#294)
+
+### Fix
+
+- multi link losses document missing test data. (#415)
+- running the binder environment examples results in a crash (#409)
+- Removed parallel logic that could lead to memory issues (#397)
+- Removed parallel logic that could lead to memory issues when running on the cloud or locally
+- correct damage_curve field initialization
+
 ## v0.8.1 (2024-03-20)
 
 ## v0.8.0 (2024-03-20)
