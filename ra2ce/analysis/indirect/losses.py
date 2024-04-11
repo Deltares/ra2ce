@@ -33,6 +33,7 @@ import math
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import AnalysisIndirectEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeEnum
@@ -179,7 +180,7 @@ class Losses(AnalysisIndirectProtocol):
         else:
             criticality_analysis = criticality_analysis.drop_duplicates(["u", "v"])
 
-        if self.analysis.analysis.name == 'SINGLE_LINK_LOSSES':
+        if self.analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
             # filter out all links not affected by the hazard
             if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
                 self.criticality_analysis = criticality_analysis[criticality_analysis['EV1_ma'] != 0]
@@ -258,7 +259,7 @@ class Losses(AnalysisIndirectProtocol):
             Multi_link_losses this is not necessary because of the underlying multi_link_redundancy analysis.
 
             """
-            if self.analysis.analysis.name == 'MULTI_LINK_LOSSES':
+            if self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
                 return vlh
             result = pd.concat(
                 [
@@ -473,9 +474,9 @@ class Losses(AnalysisIndirectProtocol):
         return list(_link_types), list(_hazard_intensity_ranges)
 
     def execute(self) -> gpd.GeoDataFrame:
-        if self.analysis.analysis.name == 'SINGLE_LINK_LOSSES':
+        if self.analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
             criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
-        elif self.analysis.analysis.name == 'MULTI_LINK_LOSSES':
+        elif self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
             criticality_analysis = MultiLinkRedundancy(self.analysis_input).execute()
 
         self._get_disrupted_criticality_analysis_results(criticality_analysis=criticality_analysis)
