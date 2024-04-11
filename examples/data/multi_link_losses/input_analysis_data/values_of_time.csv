@@ -1,0 +1,5 @@
+trip_types;value_of_time;occupants
+business;40;2
+commute;15.856;2.68
+freight;341.248;1
+other;89.494;22.58
