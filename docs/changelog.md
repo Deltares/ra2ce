@@ -2,6 +2,9 @@
 
 ## v0.9.1 (2024-04-12)
 
+- Removal of sensitive data throughout repository's history.
+- Overall code normalization using `isort` and `black`.
+
 ## v0.9.0 (2024-04-11)
 
 ### Feat
