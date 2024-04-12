@@ -24,13 +24,10 @@ from typing import Any
 import networkx as nx
 import osmnx
 import pandas as pd
+import pyproj
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
 from shapely.geometry.base import BaseGeometry
-import pyproj
-from ra2ce.network.network_wrappers.osm_network_wrapper.osm_utils import (
-    get_node_nearest_edge, is_endnode_check, modify_graph, remove_key
-)
 
 import ra2ce.network.networks_utils as nut
 from ra2ce.network.exporters.json_exporter import JsonExporter
@@ -42,6 +39,12 @@ from ra2ce.network.network_wrappers.network_wrapper_protocol import (
 )
 from ra2ce.network.network_wrappers.osm_network_wrapper.extremities_data import (
     ExtremitiesData,
+)
+from ra2ce.network.network_wrappers.osm_network_wrapper.osm_utils import (
+    get_node_nearest_edge,
+    is_endnode_check,
+    modify_graph,
+    remove_key,
 )
 
 
@@ -419,17 +422,24 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
     @staticmethod
     def snap_nodes_to_edges(graph: MultiDiGraph, threshold: float) -> MultiDiGraph:
         def threshold_check(node_nearest_ed: dict):
-            distance = node_nearest_ed['nearest_edge'][-1]
+            distance = node_nearest_ed["nearest_edge"][-1]
             return distance <= threshold
 
-        end_nodes = [node for node in graph.nodes(data=True) if is_endnode_check(graph, node[0])]
+        end_nodes = [
+            node for node in graph.nodes(data=True) if is_endnode_check(graph, node[0])
+        ]
 
-        if not graph.graph or not graph.graph['crs'] or isinstance(graph.graph['crs'], str):
-            graph.graph['crs'] = pyproj.CRS("epsg:4326")
-        nut.add_missing_geoms_graph(graph=graph, geom_name='geometry').to_directed()
+        if (
+            not graph.graph
+            or not graph.graph["crs"]
+            or isinstance(graph.graph["crs"], str)
+        ):
+            graph.graph["crs"] = pyproj.CRS("epsg:4326")
+        nut.add_missing_geoms_graph(graph=graph, geom_name="geometry").to_directed()
 
-        for node_nearest_edge_data in filter(threshold_check,
-                                             map(lambda end_node:
-                                                 get_node_nearest_edge(graph, end_node), end_nodes)):
+        for node_nearest_edge_data in filter(
+            threshold_check,
+            map(lambda end_node: get_node_nearest_edge(graph, end_node), end_nodes),
+        ):
             modify_graph(graph=graph, node_nearest_edge_data=node_nearest_edge_data)
         return graph

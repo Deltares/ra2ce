@@ -37,7 +37,6 @@ from ra2ce.network.hazard.hazard_common_functions import (
 from ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base import (
     HazardIntersectBuilderBase,
 )
-
 from ra2ce.network.networks_utils import (
     fraction_flooded,
     get_graph_edges_extent,
