@@ -1,3 +1,6 @@
+# Examples DIY sensitive data
+examples/data/DIY-*/
+
 # External test data
 tests/test_external_data/*
 
