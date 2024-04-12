@@ -243,10 +243,10 @@ class Losses(AnalysisIndirectProtocol):
         ]
         # link_id from list to tuple
         if len(self.criticality_analysis_non_disrupted) > 0:
-            self.criticality_analysis_non_disrupted[self.link_id] = (
-                self.criticality_analysis_non_disrupted[self.link_id].apply(
-                    lambda x: tuple(x) if isinstance(x, list) else x
-                )
+            self.criticality_analysis_non_disrupted[
+                self.link_id
+            ] = self.criticality_analysis_non_disrupted[self.link_id].apply(
+                lambda x: tuple(x) if isinstance(x, list) else x
             )
         self.criticality_analysis[self.link_id] = self.criticality_analysis[
             self.link_id
@@ -342,10 +342,12 @@ class Losses(AnalysisIndirectProtocol):
             )
 
             # Fill 0 for the additional columns of self.criticality_analysis_non_disrupted
-            result.loc[result.index.difference(vlh.index), additional_columns] = (
-                result.loc[
-                    result.index.difference(vlh.index), additional_columns
-                ].fillna(0)
+            result.loc[
+                result.index.difference(vlh.index), additional_columns
+            ] = result.loc[
+                result.index.difference(vlh.index), additional_columns
+            ].fillna(
+                0
             )
             return result
 
@@ -500,9 +502,9 @@ class Losses(AnalysisIndirectProtocol):
                 [vlh_row.name], f"vlh_{trip_type}_{hazard_col_name}"
             ] = vlh_trip_type_event
             vlh_total += vlh_trip_type_event
-        vehicle_loss_hours.loc[[vlh_row.name], f"vlh_{hazard_col_name}_total"] = (
-            vlh_total
-        )
+        vehicle_loss_hours.loc[
+            [vlh_row.name], f"vlh_{hazard_col_name}_total"
+        ] = vlh_total
 
     def _populate_vehicle_loss_hour(
         self,
@@ -576,9 +578,9 @@ class Losses(AnalysisIndirectProtocol):
                 [vlh_row.name], f"vlh_{trip_type}_{hazard_col_name}"
             ] = vlh_trip_type_event
             vlh_total += vlh_trip_type_event
-        vehicle_loss_hours.loc[[vlh_row.name], f"vlh_{hazard_col_name}_total"] = (
-            vlh_total
-        )
+        vehicle_loss_hours.loc[
+            [vlh_row.name], f"vlh_{hazard_col_name}_total"
+        ] = vlh_total
 
     def _get_link_types_heights_ranges(self) -> tuple[list[str], list[tuple]]:
         _link_types = set()

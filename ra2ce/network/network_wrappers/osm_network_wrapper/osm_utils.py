@@ -19,15 +19,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from pathlib import Path
 import logging
-import geopandas as gpd
-import numpy as np
+from pathlib import Path
 from typing import Optional
-from osmnx import graph_to_gdfs
-from geopandas import GeoDataFrame
+
+import geopandas as gpd
 import networkx as nx
-from shapely.geometry import Point, LineString
+import numpy as np
+from geopandas import GeoDataFrame
+from osmnx import graph_to_gdfs
+from shapely.geometry import LineString, Point
+
 from ra2ce.network import networks_utils as nut
 
 
@@ -100,7 +102,11 @@ def from_shapefile_to_poly(shapefile: Path, out_path: Path, outname: str = ""):
 
 
 def graph_to_gdf(
-        graph: nx.classes.graph.Graph, nodes: bool, edges: bool, node_geometry: bool, fill_edge_geometry: bool
+    graph: nx.classes.graph.Graph,
+    nodes: bool,
+    edges: bool,
+    node_geometry: bool,
+    fill_edge_geometry: bool,
 ) -> GeoDataFrame:
     u, v, k, data = zip(*graph.edges(keys=True, data=True))
     graph_gdf = graph_to_gdfs(graph, nodes, edges, node_geometry, fill_edge_geometry)
@@ -108,13 +114,17 @@ def graph_to_gdf(
     return graph_gdf
 
 
-def get_node_nearest_edge(graph: nx.MultiDiGraph, node: tuple, return_geom=True, return_dist=True) -> dict:
+def get_node_nearest_edge(
+    graph: nx.MultiDiGraph, node: tuple, return_geom=True, return_dist=True
+) -> dict:
     """
-        Based on osmnx.
+    Based on osmnx.
     """
-    node_coor = (node[1]['x'], node[1]['y'])
+    node_coor = (node[1]["x"], node[1]["y"])
     # get u, v, key, geom from all the graph edges
-    gdf_edges = graph_to_gdf(graph, nodes=False, edges=True, node_geometry=True, fill_edge_geometry=True)
+    gdf_edges = graph_to_gdf(
+        graph, nodes=False, edges=True, node_geometry=True, fill_edge_geometry=True
+    )
     if {"u", "v", "key"}.issubset(gdf_edges.index.names):
         gdf_edges.reset_index(inplace=True)
     edges = gdf_edges[["u", "v", "data", "key", "geometry"]].values
@@ -126,64 +136,51 @@ def get_node_nearest_edge(graph: nx.MultiDiGraph, node: tuple, return_geom=True,
     edge_distances = [(edge, xy_point.distance(edge[4])) for edge in edges]
 
     # the nearest edge minimizes the non-zero distance to the node
-    (u, v, data, key, geom), dist = min(edge_distances, key=lambda x: x[1] if x[1] > 0 else float('inf'))
+    (u, v, data, key, geom), dist = min(
+        edge_distances, key=lambda x: x[1] if x[1] > 0 else float("inf")
+    )
     logging.info(f"Found nearest edge ({u, v, data, key}) to node {node}")
 
     # return results requested by caller
     if data == 0 and key == 0:
         if return_dist and return_geom:
-            return {
-                "node": node,
-                "nearest_edge": (u, v, geom, round(dist, 7))}
+            return {"node": node, "nearest_edge": (u, v, geom, round(dist, 7))}
         elif return_dist:
-            return {
-                "node": node,
-                "nearest_edge": (u, v, round(dist, 7))}
+            return {"node": node, "nearest_edge": (u, v, round(dist, 7))}
         elif return_geom:
-            return {"node": node,
-                    "nearest_edge": (u, v, geom)}
+            return {"node": node, "nearest_edge": (u, v, geom)}
         else:
-            return {"node": node,
-                    "nearest_edge": (u, v)}
+            return {"node": node, "nearest_edge": (u, v)}
     elif data == 0:
         if return_dist and return_geom:
-            return {"node": node,
-                    "nearest_edge": (u, v, key, geom, round(dist, 7))}
+            return {"node": node, "nearest_edge": (u, v, key, geom, round(dist, 7))}
         elif return_dist:
-            return {"node": node,
-                    "nearest_edge": (u, v, key, round(dist, 7))}
+            return {"node": node, "nearest_edge": (u, v, key, round(dist, 7))}
         elif return_geom:
-            return {"node": node,
-                    "nearest_edge": (u, v, key, geom)}
+            return {"node": node, "nearest_edge": (u, v, key, geom)}
         else:
-            return {"node": node,
-                    "nearest_edge": (u, v, key)}
+            return {"node": node, "nearest_edge": (u, v, key)}
     elif key == 0:
         if return_dist and return_geom:
-            return {"node": node,
-                    "nearest_edge": (u, v, data, geom, round(dist, 7))}
+            return {"node": node, "nearest_edge": (u, v, data, geom, round(dist, 7))}
         elif return_dist:
-            return {"node": node,
-                    "nearest_edge": (u, v, data, round(dist, 7))}
+            return {"node": node, "nearest_edge": (u, v, data, round(dist, 7))}
         elif return_geom:
-            return {"node": node,
-                    "nearest_edge": (u, v, data, geom)}
+            return {"node": node, "nearest_edge": (u, v, data, geom)}
         else:
-            return {"node": node,
-                    "nearest_edge": (u, v, data)}
+            return {"node": node, "nearest_edge": (u, v, data)}
     else:
         if return_dist and return_geom:
-            return {"node": node,
-                    "nearest_edge": (u, v, data, key, geom, round(dist, 7))}
+            return {
+                "node": node,
+                "nearest_edge": (u, v, data, key, geom, round(dist, 7)),
+            }
         elif return_dist:
-            return {"node": node,
-                    "nearest_edge": (u, v, data, key, round(dist, 7))}
+            return {"node": node, "nearest_edge": (u, v, data, key, round(dist, 7))}
         elif return_geom:
-            return {"node": node,
-                    "nearest_edge": (u, v, data, key, geom)}
+            return {"node": node, "nearest_edge": (u, v, data, key, geom)}
         else:
-            return {"node": node,
-                    "nearest_edge": (u, v, data, key)}
+            return {"node": node, "nearest_edge": (u, v, data, key)}
 
 
 def is_endnode_check(graph: nx.MultiDiGraph, node_id: int) -> bool:
@@ -219,7 +216,9 @@ def is_endnode_check(graph: nx.MultiDiGraph, node_id: int) -> bool:
         return False
 
 
-def create_edges(graph: nx.MultiDiGraph, u: int, v: int, key_data: dict) -> nx.MultiDiGraph:
+def create_edges(
+    graph: nx.MultiDiGraph, u: int, v: int, key_data: dict
+) -> nx.MultiDiGraph:
     """
     Create or update edges between nodes `u` and `v` in the graph with the given data.
 
@@ -236,15 +235,21 @@ def create_edges(graph: nx.MultiDiGraph, u: int, v: int, key_data: dict) -> nx.M
     for key, data in key_data.items():
         if not graph.has_edge(u, v, key):
             geom_data = {
-                "geometry": LineString([graph.nodes(data=True)[u]['geometry'],
-                                        graph.nodes(data=True)[v]['geometry']])
+                "geometry": LineString(
+                    [
+                        graph.nodes(data=True)[u]["geometry"],
+                        graph.nodes(data=True)[v]["geometry"],
+                    ]
+                )
             }
             graph.add_edge(u, v, **data)
             graph[u][v][key].update(geom_data)
     return graph
 
 
-def update_edges_by_node(graph: nx.MultiDiGraph, node_edges: list, node_id: int, new_node_geom: dict) -> None:
+def update_edges_by_node(
+    graph: nx.MultiDiGraph, node_edges: list, node_id: int, new_node_geom: dict
+) -> None:
     """
     Update connected edges of a node by replacing node_id and node_geom with new_node_id and new_node_geom.
 
@@ -264,54 +269,76 @@ def update_edges_by_node(graph: nx.MultiDiGraph, node_edges: list, node_id: int,
         # Step 1: Determine if node_id is a u or v in the edge
         if u == node_id:
             new_edge_id = (node_id, v, key)
-            new_line_points = LineString([new_node_geom, graph.nodes(data=True)[v]['geometry']])
+            new_line_points = LineString(
+                [new_node_geom, graph.nodes(data=True)[v]["geometry"]]
+            )
         elif v == node_id:
             new_edge_id = (u, node_id, key)
-            new_line_points = LineString([graph.nodes(data=True)[u]['geometry']], new_node_geom)
+            new_line_points = LineString(
+                [graph.nodes(data=True)[u]["geometry"]], new_node_geom
+            )
 
         # Step 2: Set attributes of the new edge using existing edge data and
         # Set geometry and length of the new edge
-        new_edge_data.update({
-            "geometry": LineString(new_line_points),
-            "length": nut.line_length(LineString(new_line_points), graph.graph["crs"])
-        })
+        new_edge_data.update(
+            {
+                "geometry": LineString(new_line_points),
+                "length": nut.line_length(
+                    LineString(new_line_points), graph.graph["crs"]
+                ),
+            }
+        )
 
         # Step 3: Create a new edge by replacing node_id with new_node_id
         graph.add_edge(*new_edge_id, **new_edge_data)
 
 
 def modify_graph(graph: nx.MultiDiGraph, node_nearest_edge_data: dict):
-    def set_edge_length(graph: nx.MultiDiGraph, u_nearest_edge: int, v_nearest_edge, new_node_id):
-        for _, nodes in enumerate([(u_nearest_edge, new_node_id), (new_node_id, v_nearest_edge)], start=1):
+    def set_edge_length(
+        graph: nx.MultiDiGraph, u_nearest_edge: int, v_nearest_edge, new_node_id
+    ):
+        for _, nodes in enumerate(
+            [(u_nearest_edge, new_node_id), (new_node_id, v_nearest_edge)], start=1
+        ):
             u, v = nodes
             for key in graph[u][v]:
-                length_data = {"length": nut.line_length(graph[u][v][key]["geometry"], graph.graph["crs"])}
+                length_data = {
+                    "length": nut.line_length(
+                        graph[u][v][key]["geometry"], graph.graph["crs"]
+                    )
+                }
                 graph[u][v][key].update(length_data)
 
     def get_edges_by_node(graph, node):
         return list(graph.edges(node, data=True, keys=True))
 
     # step 1: set variables
-    u_nearest_edge = node_nearest_edge_data['nearest_edge'][0]
-    v_nearest_edge = node_nearest_edge_data['nearest_edge'][1]
-    nearest_edge_geom = node_nearest_edge_data['nearest_edge'][3]
+    u_nearest_edge = node_nearest_edge_data["nearest_edge"][0]
+    v_nearest_edge = node_nearest_edge_data["nearest_edge"][1]
+    nearest_edge_geom = node_nearest_edge_data["nearest_edge"][3]
     nearest_edge_key_data = graph.get_edge_data(u_nearest_edge, v_nearest_edge).copy()
     if nearest_edge_key_data is None:
         raise ValueError("Edge not found in the graph")
 
-    node_id = node_nearest_edge_data['node'][0]
-    node_geom = node_nearest_edge_data['node'][1]['geometry']
+    node_id = node_nearest_edge_data["node"][0]
+    node_geom = node_nearest_edge_data["node"][1]["geometry"]
     node_edges = get_edges_by_node(graph, node_id).copy()
 
     new_node_geom = nearest_edge_geom.interpolate(nearest_edge_geom.project(node_geom))
-    new_node_data = node_nearest_edge_data['node'][1].copy()
-    new_node_data = remove_key(new_node_data, ['geometry', 'x', 'y'])
+    new_node_data = node_nearest_edge_data["node"][1].copy()
+    new_node_data = remove_key(new_node_data, ["geometry", "x", "y"])
 
     # step 2: add the new_node
     # Check if the new_node already exists in the nodes of the graph
     if find_existing_node(graph, new_node_geom)[0] is None:
         graph.remove_node(node_id)
-        graph.add_node(node_id, x=new_node_geom.x, y=new_node_geom.y, geometry=new_node_geom, **new_node_data)
+        graph.add_node(
+            node_id,
+            x=new_node_geom.x,
+            y=new_node_geom.y,
+            geometry=new_node_geom,
+            **new_node_data,
+        )
     else:
         node_id = find_existing_node(graph, new_node_geom)[0]
 
@@ -343,7 +370,9 @@ def remove_key(element_data: dict, keys_to_exclude: list) -> dict:
     return element_data
 
 
-def find_existing_node(graph: nx.MultiDiGraph, new_node: Point) -> tuple[int, dict] | tuple[None, None]:
+def find_existing_node(
+    graph: nx.MultiDiGraph, new_node: Point
+) -> tuple[int, dict] | tuple[None, None]:
     """
     finds whether a newly created node exists in a graph
     Args:
@@ -354,10 +383,10 @@ def find_existing_node(graph: nx.MultiDiGraph, new_node: Point) -> tuple[int, di
 
     """
     for node, data in graph.nodes(data=True):
-        if not data.get('geometry', ''):
+        if not data.get("geometry", ""):
             raise ValueError("Nodes should have geometry")
 
-        if data['geometry'] == new_node:
+        if data["geometry"] == new_node:
             return node, data
     return None, None
 

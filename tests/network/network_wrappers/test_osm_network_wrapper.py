@@ -6,7 +6,7 @@ from geopandas import GeoDataFrame
 from networkx import Graph, MultiDiGraph, MultiGraph
 from networkx.utils import graphs_equal
 from shapely import wkt
-from shapely.geometry import LineString, Polygon, Point
+from shapely.geometry import LineString, Point, Polygon
 from shapely.geometry.base import BaseGeometry
 
 import ra2ce.network.networks_utils as nut
@@ -158,35 +158,35 @@ class TestOsmNetworkWrapper:
         )
 
         assert _result is None
-    
+
     @pytest.fixture
     def _graph_fixture_node_to_edge(self) -> MultiDiGraph:
         _graph = nx.MultiDiGraph()
-        _graph.add_node(1, x=2, y=10, pos=(2,10))
-        _graph.add_node(2, x=2, y=20, pos=(2,20))
-        _graph.add_node(3, x=2.1, y=15, pos=(2.1,15))
-        _graph.add_node(4, x=4, y=15, pos=(4,15))
-        
+        _graph.add_node(1, x=2, y=10, pos=(2, 10))
+        _graph.add_node(2, x=2, y=20, pos=(2, 20))
+        _graph.add_node(3, x=2.1, y=15, pos=(2.1, 15))
+        _graph.add_node(4, x=4, y=15, pos=(4, 15))
+
         _graph.add_edge(1, 2, length=10)
         _graph.add_edge(3, 4, length=1.9)
 
         _graph.graph["crs"] = "EPSG:4326"
-        
+
         return _graph
-    
+
     @pytest.fixture
     def _valid_graph_fixture_node_to_edge(self) -> MultiDiGraph:
         _valid_graph = nx.MultiDiGraph()
-        _valid_graph.add_node(1, x=2, y=10, pos=(2,10))
-        _valid_graph.add_node(2, x=2, y=20, pos=(2,20))
-        _valid_graph.add_node(3, x=2.1, y=15, pos=(2.1,15))
-        _valid_graph.add_node(4, x=4, y=15, pos=(4,15))
-        
+        _valid_graph.add_node(1, x=2, y=10, pos=(2, 10))
+        _valid_graph.add_node(2, x=2, y=20, pos=(2, 20))
+        _valid_graph.add_node(3, x=2.1, y=15, pos=(2.1, 15))
+        _valid_graph.add_node(4, x=4, y=15, pos=(4, 15))
+
         _valid_graph.add_edge(1, 2, length=10)
         _valid_graph.add_edge(3, 4, length=1.9)
 
         _valid_graph.graph["crs"] = "EPSG:4326"
-        
+
         return _valid_graph
 
     @pytest.fixture
@@ -210,7 +210,7 @@ class TestOsmNetworkWrapper:
         _valid_graph.graph["crs"] = "EPSG:4326"
 
         return _valid_graph
-    
+
     @pytest.fixture
     def _expected_unique_graph_fixture(self) -> MultiDiGraph:
         _valid_unique_graph = nx.MultiDiGraph()
@@ -317,7 +317,7 @@ class TestOsmNetworkWrapper:
         assert isinstance(_result_graph, MultiDiGraph)
 
     def test_snap_nodes_to_edges(self, _graph_fixture_node_to_edge: MultiDiGraph):
-        
+
         # 1. Define test data.
         _threshold = 0.1
 
@@ -326,34 +326,44 @@ class TestOsmNetworkWrapper:
             _graph_fixture_node_to_edge, _threshold
         )
         for node, data in _result_graph.nodes(data=True):
-            pos = (data['x'], data['y'])  # Get the (x, y) position tuple
-            _result_graph.nodes[node]['pos'] = pos
-            _result_graph.nodes[node]['geometry'] = Point(data['x'], data['y'])
+            pos = (data["x"], data["y"])  # Get the (x, y) position tuple
+            _result_graph.nodes[node]["pos"] = pos
+            _result_graph.nodes[node]["geometry"] = Point(data["x"], data["y"])
 
-        # 3. Verify expectations.       
+        # 3. Verify expectations.
         _valid_graph = nx.MultiDiGraph()
-        _valid_graph.add_node(1, x=2, y=10, pos=(2,10))
-        _valid_graph.add_node(2, x=2, y=20, pos=(2,20))
-        _valid_graph.add_node(4, x=4, y=15, pos=(4,15))
-        _valid_graph.add_node(3, x=2, y=15, pos=(2,15))
-        
+        _valid_graph.add_node(1, x=2, y=10, pos=(2, 10))
+        _valid_graph.add_node(2, x=2, y=20, pos=(2, 20))
+        _valid_graph.add_node(4, x=4, y=15, pos=(4, 15))
+        _valid_graph.add_node(3, x=2, y=15, pos=(2, 15))
+
         _valid_graph.add_edge(1, 3, length=553135.0)
         _valid_graph.add_edge(3, 2, length=553377.0)
         _valid_graph.add_edge(3, 4, length=215100.0)
 
         _valid_graph.graph["crs"] = "EPSG:4326"
-        
-        for node, data in _valid_graph.nodes(data=True):
-            _valid_graph.nodes[node]['geometry'] = Point(data['x'], data['y'])
-        
-        for u, v, key, data in _valid_graph.edges(keys=True, data=True):
-            u_geom = _valid_graph.nodes[u]['geometry']
-            v_geom = _valid_graph.nodes[v]['geometry']
-            edge_geometry = LineString([u_geom, v_geom])
-            data['geometry'] = edge_geometry
 
-        result_edges_wkt = sorted([(u, v, k, wkt.dumps(data['geometry'])) for u, v, k, data in _result_graph.edges(keys=True, data=True)])
-        valid_edges_wkt = sorted([(u, v, k, wkt.dumps(data['geometry'])) for u, v, k, data in _valid_graph.edges(keys=True, data=True)])
+        for node, data in _valid_graph.nodes(data=True):
+            _valid_graph.nodes[node]["geometry"] = Point(data["x"], data["y"])
+
+        for u, v, key, data in _valid_graph.edges(keys=True, data=True):
+            u_geom = _valid_graph.nodes[u]["geometry"]
+            v_geom = _valid_graph.nodes[v]["geometry"]
+            edge_geometry = LineString([u_geom, v_geom])
+            data["geometry"] = edge_geometry
+
+        result_edges_wkt = sorted(
+            [
+                (u, v, k, wkt.dumps(data["geometry"]))
+                for u, v, k, data in _result_graph.edges(keys=True, data=True)
+            ]
+        )
+        valid_edges_wkt = sorted(
+            [
+                (u, v, k, wkt.dumps(data["geometry"]))
+                for u, v, k, data in _valid_graph.edges(keys=True, data=True)
+            ]
+        )
 
         assert isinstance(_result_graph, MultiDiGraph)
         assert _result_graph.nodes(data=True) == _valid_graph.nodes(data=True)
