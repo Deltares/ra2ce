@@ -21,8 +21,9 @@ import os
 import shutil
 import sys
 from distutils.dir_util import copy_tree
-import sphinx_autosummary_accessors
 from pathlib import Path
+
+import sphinx_autosummary_accessors
 
 # This is not needed
 sys.path.insert(0, os.path.abspath(".."))

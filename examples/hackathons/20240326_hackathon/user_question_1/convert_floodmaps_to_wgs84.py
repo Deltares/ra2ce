@@ -1,8 +1,8 @@
-import sys
 import gc
-import xarray as xr
+import sys
 from pathlib import Path
 
+import xarray as xr
 
 # Input and output folder paths
 _input_folder = Path(sys.argv[0])
