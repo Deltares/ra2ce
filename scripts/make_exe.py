@@ -1,10 +1,12 @@
+from datetime import datetime
+from os import environ
 from pathlib import Path
+
 import PyInstaller.__main__
+from pyinstaller_versionfile import create_versionfile
+
 from ra2ce import __main__ as cli_module
 from ra2ce import __version__
-from os import environ
-from pyinstaller_versionfile import create_versionfile
-from datetime import datetime
 
 _conda_env = Path(environ["CONDA_PREFIX"])
 _root_dir = Path(__file__).parent.parent
