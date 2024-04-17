@@ -1,18 +1,16 @@
-from pytest_notebook.execution import execute_notebook
-from pytest_notebook.notebook import load_notebook
 from pathlib import Path
 
-from tests import test_examples
 import pytest
+from pytest_notebook.execution import execute_notebook
+from pytest_notebook.notebook import load_notebook
 
+from tests import test_examples
 
 _supported_examples = lambda x: "DIY" not in x.stem
 _jupyter_examples = [
     pytest.param(_jupyter_file, id=_jupyter_file.stem.replace("_", " ").capitalize())
     for _jupyter_file in filter(_supported_examples, test_examples.glob("*.ipynb"))
 ]
-
-
 
 
 class TestExamples:
