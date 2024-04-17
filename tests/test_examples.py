@@ -1,6 +1,8 @@
 from pathlib import Path
 
-
+import pytest
+from pytest_notebook.execution import execute_notebook
+from pytest_notebook.notebook import load_notebook
 
 from tests import test_examples
 
@@ -10,9 +12,6 @@ _jupyter_examples = [
     for _jupyter_file in filter(_supported_examples, test_examples.glob("*.ipynb"))
 ]
 
-import pytest
-from pytest_notebook.execution import execute_notebook
-from pytest_notebook.notebook import load_notebook
 
 class TestExamples:
     @pytest.mark.parametrize("jupyter_example", _jupyter_examples)
