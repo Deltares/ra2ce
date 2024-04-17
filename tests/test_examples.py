@@ -1,9 +1,10 @@
-from pathlib import Path
-
 from pytest_notebook.execution import execute_notebook
 from pytest_notebook.notebook import load_notebook
+from pathlib import Path
 
 from tests import test_examples
+import pytest
+
 
 _supported_examples = lambda x: "DIY" not in x.stem
 _jupyter_examples = [
@@ -11,7 +12,7 @@ _jupyter_examples = [
     for _jupyter_file in filter(_supported_examples, test_examples.glob("*.ipynb"))
 ]
 
-import pytest
+
 
 
 class TestExamples:
