@@ -1,6 +1,7 @@
 """Unit test package for ra2ce."""
-import pytest
 from pathlib import Path
+
+import pytest
 
 slow_test = pytest.mark.slow_test
 external_test = pytest.mark.external_test_data
