@@ -1,10 +1,11 @@
-from pathlib import Path
-
-import pytest
-from pytest_notebook.execution import execute_notebook
-from pytest_notebook.notebook import load_notebook
 
 from tests import test_examples
+from pathlib import Path
+
+from pytest_notebook.execution import execute_notebook
+from pytest_notebook.notebook import load_notebook
+import pytest
+
 
 _supported_examples = lambda x: "DIY" not in x.stem
 _jupyter_examples = [

@@ -9,7 +9,7 @@ env:
 
 jobs:
   normalize-code:
-    if: (github.event.head_commit.message != $AUTOFORMAT_COMMIT_MESSAGE) && ${{ (!startsWith(github.event.head_commit.message, 'bump:')) }}
+    if: "${{ (!startsWith(github.event.head_commit.message, 'chore: autoformat isort & black')) && (!startsWith(github.event.head_commit.message, 'bump:')) }}"
     name: "Normalize code with internal standards"
     permissions: write-all
     strategy:
