@@ -1,9 +1,8 @@
 from pathlib import Path
 
-from pytest_notebook.notebook import load_notebook
 import pytest
 from pytest_notebook.execution import execute_notebook
-
+from pytest_notebook.notebook import load_notebook
 
 from tests import test_examples
 
