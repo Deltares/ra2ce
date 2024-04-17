@@ -61,5 +61,5 @@ jobs:
       - name: Push changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with: 
-          commit_message: $AUTOFORMAT_COMMIT_MESSAGE
+          commit_message: ${{ env.AUTOFORMAT_COMMIT_MESSAGE }}
           push_options: --force
