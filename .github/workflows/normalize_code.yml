@@ -5,12 +5,12 @@ on:
     branches:
       - master
 
-env:
-  AUTOFORMAT_COMMIT_MESSAGE: 'chore: autoformat isort & black'
-
 jobs:
+
   normalize-code:
-    if: ${{ (!startsWith(github.event.head_commit.message, 'bump:')) && (github.event.head_commit.message != $AUTOFORMAT_COMMIT_MESSAGE)}}
+    env:
+      AUTOFORMAT_COMMIT_MESSAGE: 'chore: autoformat isort & black'
+    if: (github.event.head_commit.message != $AUTOFORMAT_COMMIT_MESSAGE) && ${{ (!startsWith(github.event.head_commit.message, 'bump:')) }}
     name: "Normalize code with internal standards"
     permissions: write-all
     strategy:
