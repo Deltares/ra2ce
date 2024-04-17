@@ -5,9 +5,12 @@ on:
     branches:
       - master
 
+env:
+  AUTOFORMAT_COMMIT_MESSAGE: "chore: autoformat isort & black"
+
 jobs:
   normalize-code:
-    if: "!startsWith(github.event.head_commit.message, 'bump:')"
+    if: ${{ (!startsWith(github.event.head_commit.message, 'bump:')) && (github.event.head_commit.message != env.AUTOFORMAT_COMMIT_MESSAGE)}}
     name: "Normalize code with internal standards"
     permissions: write-all
     strategy:
@@ -59,5 +62,5 @@ jobs:
       - name: Push changes
         uses: stefanzweifel/git-auto-commit-action@v5
         with: 
-          commit_message: "chore: autoformat isort & black"
+          commit_message: $AUTOFORMAT_COMMIT_MESSAGE
           push_options: --force
