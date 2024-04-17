@@ -516,9 +516,9 @@ class Losses(AnalysisIndirectProtocol):
     ):
 
         vlh_total = 0
-        if isinstance(vlh_row["link_type"], list):
+        if isinstance(vlh_row[self.link_type_column], list):
             max_disruption = 0
-            for row_link_type in vlh_row["link_type"]:
+            for row_link_type in vlh_row[self.link_type_column]:
                 link_type_hazard_range = f"{row_link_type}_{row_hazard_range}"
                 row_relevant_curve = self.resilience_curve[
                     self.resilience_curve["link_type_hazard_intensity"]
@@ -536,7 +536,7 @@ class Losses(AnalysisIndirectProtocol):
                 if disruption > max_disruption:
                     relevant_curve = row_relevant_curve
         else:
-            row_link_type = vlh_row["link_type"]
+            row_link_type = vlh_row[self.link_type_column]
             link_type_hazard_range = f"{row_link_type}_{row_hazard_range}"
 
             # get stepwise recovery curve data
