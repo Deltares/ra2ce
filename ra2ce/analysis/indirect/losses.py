@@ -446,7 +446,8 @@ class Losses(AnalysisIndirectProtocol):
                         self._calculate_production_loss_per_capita(
                             vehicle_loss_hours, vlh_row, event
                         )
-                    elif (math.isnan(row_performance_change) and row_connectivity == 0) and ((u, v, k) == row_u_v_k):
+                    elif (not(math.isnan(row_performance_change) and math.isnan(row_connectivity)) and
+                          ((u, v, k) == row_u_v_k)):
                         self._populate_vehicle_loss_hour(
                             vehicle_loss_hours,
                             row_hazard_range,
