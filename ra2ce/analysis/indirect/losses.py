@@ -217,26 +217,23 @@ class Losses(AnalysisIndirectProtocol):
         else:
             criticality_analysis = criticality_analysis.drop_duplicates(["u", "v"])
 
-        if self.analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
-            # filter out all links not affected by the hazard
-            if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
-                self.criticality_analysis = criticality_analysis[
-                    criticality_analysis["EV1_ma"] != 0
-                ]
-            elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
-                self.criticality_analysis = criticality_analysis[
-                    criticality_analysis["EV1_max"] != 0
-                ]
-            elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
-                self.criticality_analysis = criticality_analysis[
-                    criticality_analysis["EV1_mean"] != 0
-                ]
-            elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
-                self.criticality_analysis = criticality_analysis[
-                    criticality_analysis["EV1_min"] != 0
-                ]
-        else:
-            self.criticality_analysis = criticality_analysis
+        # filter out all links not affected by the hazard
+        if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
+            self.criticality_analysis = criticality_analysis[
+                criticality_analysis["EV1_ma"] > float(self.analysis.threshold)
+            ]
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
+            self.criticality_analysis = criticality_analysis[
+                criticality_analysis["EV1_max"] > float(self.analysis.threshold)
+            ]
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
+            self.criticality_analysis = criticality_analysis[
+                criticality_analysis["EV1_mean"] > float(self.analysis.threshold)
+            ]
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
+            self.criticality_analysis = criticality_analysis[
+                criticality_analysis["EV1_min"] > float(self.analysis.threshold)
+            ]
 
         self.criticality_analysis_non_disrupted = criticality_analysis[
             ~criticality_analysis.index.isin(self.criticality_analysis.index)
@@ -306,7 +303,7 @@ class Losses(AnalysisIndirectProtocol):
                     return f"{x}-{y}"
             raise ValueError(f"No matching range found for height {height}")
 
-        def _create_result(vlh: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+        def _create_result(vlh: gpd.GeoDataFrame, connectivity_attribute: str) -> gpd.GeoDataFrame:
             """
 
             Args: vlh: calculated vehicle_loss_hours GeoDataFrame. For single_link_losses it only includes the
@@ -317,8 +314,6 @@ class Losses(AnalysisIndirectProtocol):
             Multi_link_losses this is not necessary because of the underlying multi_link_redundancy analysis.
 
             """
-            if self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
-                return vlh
             result = pd.concat(
                 [
                     vlh,
@@ -328,7 +323,7 @@ class Losses(AnalysisIndirectProtocol):
                             f"{self.link_type_column}",
                             "geometry",
                             f"{self.performance_metric}",
-                            "detour",
+                            connectivity_attribute,
                         ]
                         + list(events.columns)
                     ],
@@ -383,7 +378,8 @@ class Losses(AnalysisIndirectProtocol):
         # Check if the index name exists in the columns
         if vehicle_loss_hours_df.index.name in vehicle_loss_hours_df.columns:
             vehicle_loss_hours_df.reset_index(drop=True, inplace=True)
-        vehicle_loss_hours_df.reset_index(inplace=True)
+        else:
+            vehicle_loss_hours_df.reset_index(inplace=True)
 
         # find the link_type and the hazard intensity
         connectivity_attribute = None
@@ -445,7 +441,7 @@ class Losses(AnalysisIndirectProtocol):
                         performance_row[-1]["v"],
                         performance_key,
                     )
-                    if math.isnan(row_performance_change):
+                    if math.isnan(row_performance_change) or row_performance_change == 0:
                         self._calculate_production_loss_per_capita(
                             vehicle_loss_hours, vlh_row, event
                         )
@@ -458,7 +454,7 @@ class Losses(AnalysisIndirectProtocol):
                             event,
                         )
 
-        vehicle_loss_hours_result = _create_result(vehicle_loss_hours)
+        vehicle_loss_hours_result = _create_result(vehicle_loss_hours, connectivity_attribute)
         return vehicle_loss_hours_result
 
     def _calculate_production_loss_per_capita(
