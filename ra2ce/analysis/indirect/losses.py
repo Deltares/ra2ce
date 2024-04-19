@@ -414,6 +414,7 @@ class Losses(AnalysisIndirectProtocol):
         for event in events.columns.tolist():
             for _, vlh_row in vehicle_loss_hours.iterrows():
                 row_hazard_range = _get_range(vlh_row[event])
+                row_connectivity = vlh_row[connectivity_attribute]
                 row_performance_changes = performance_change.loc[
                     [vlh_row[self.link_id]]
                 ]
@@ -441,11 +442,11 @@ class Losses(AnalysisIndirectProtocol):
                         performance_row[-1]["v"],
                         performance_key,
                     )
-                    if math.isnan(row_performance_change) or row_performance_change == 0:
+                    if (math.isnan(row_performance_change) and row_connectivity == 0) or row_performance_change == 0:
                         self._calculate_production_loss_per_capita(
                             vehicle_loss_hours, vlh_row, event
                         )
-                    elif (u, v, k) == row_u_v_k:
+                    elif (math.isnan(row_performance_change) and row_connectivity == 0) and ((u, v, k) == row_u_v_k):
                         self._populate_vehicle_loss_hour(
                             vehicle_loss_hours,
                             row_hazard_range,
