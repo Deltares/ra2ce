@@ -220,19 +220,19 @@ class Losses(AnalysisIndirectProtocol):
         # filter out all links not affected by the hazard
         if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
             self.criticality_analysis = criticality_analysis[
-                criticality_analysis["EV1_ma"] > float(self.analysis.threshold)
+                criticality_analysis["EV1_ma"] > self.analysis.threshold
             ]
         elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
             self.criticality_analysis = criticality_analysis[
-                criticality_analysis["EV1_max"] > float(self.analysis.threshold)
+                criticality_analysis["EV1_max"] > self.analysis.threshold
             ]
         elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
             self.criticality_analysis = criticality_analysis[
-                criticality_analysis["EV1_mean"] > float(self.analysis.threshold)
+                criticality_analysis["EV1_mean"] > self.analysis.threshold
             ]
         elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
             self.criticality_analysis = criticality_analysis[
-                criticality_analysis["EV1_min"] > float(self.analysis.threshold)
+                criticality_analysis["EV1_min"] > self.analysis.threshold
             ]
 
         self.criticality_analysis_non_disrupted = criticality_analysis[
