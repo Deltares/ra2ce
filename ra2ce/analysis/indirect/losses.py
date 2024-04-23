@@ -522,11 +522,6 @@ class Losses(AnalysisIndirectProtocol):
                     self.resilience_curve["link_type_hazard_intensity"]
                     == link_type_hazard_range
                 ]
-                
-                if all(ratio < 1 for ratio in row_relevant_curve["functionality_loss_ratio"]):
-                    divisor = 1
-                else:
-                    divisor = 100
 
                 disruption = (
                     (
@@ -534,7 +529,6 @@ class Losses(AnalysisIndirectProtocol):
                         * (row_relevant_curve["functionality_loss_ratio"]).apply(
                             pd.Series
                         )
-                        / divisor
                     ).sum(axis=1)
                 ).squeeze()
                 if disruption > max_disruption:
@@ -553,7 +547,7 @@ class Losses(AnalysisIndirectProtocol):
                 f"""{link_type_hazard_range} was not found in the introduced resilience_curve"""
             )
         
-        if all(ratio < 1 for ratio in row_relevant_curve["functionality_loss_ratio"]):
+        if all(ratio <= 1 for ratio_tuple in relevant_curve["functionality_loss_ratio"] for ratio in ratio_tuple):
                     divisor = 1
         else:
             divisor = 100
