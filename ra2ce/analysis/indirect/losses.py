@@ -522,13 +522,19 @@ class Losses(AnalysisIndirectProtocol):
                     self.resilience_curve["link_type_hazard_intensity"]
                     == link_type_hazard_range
                 ]
+                
+                if all(ratio < 1 for ratio in row_relevant_curve["functionality_loss_ratio"]):
+                    divisor = 1
+                else:
+                    divisor = 100
+
                 disruption = (
                     (
                         row_relevant_curve["duration_steps"].apply(pd.Series)
                         * (row_relevant_curve["functionality_loss_ratio"]).apply(
                             pd.Series
                         )
-                        / 100
+                        / divisor
                     ).sum(axis=1)
                 ).squeeze()
                 if disruption > max_disruption:
@@ -546,6 +552,12 @@ class Losses(AnalysisIndirectProtocol):
             raise Exception(
                 f"""{link_type_hazard_range} was not found in the introduced resilience_curve"""
             )
+        
+        if all(ratio < 1 for ratio in row_relevant_curve["functionality_loss_ratio"]):
+                    divisor = 1
+        else:
+            divisor = 100
+            
         duration_steps: list = relevant_curve["duration_steps"].item()
         functionality_loss_ratios: list = relevant_curve[
             "functionality_loss_ratio"
@@ -562,11 +574,11 @@ class Losses(AnalysisIndirectProtocol):
             )
 
             vlh_trip_type_event_series = sum(
-                intensity_trip_type
+                (intensity_trip_type
                 * duration
                 * loss_ratio
                 * performance_change
-                * vot_trip_type
+                * vot_trip_type) / divisor
                 for duration, loss_ratio in zip(
                     duration_steps, functionality_loss_ratios
                 )
