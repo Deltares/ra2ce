@@ -46,27 +46,29 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         """
         if (
             WeighingEnum.TIME.config_value not in gdf_graph.columns
-            or WeighingEnum.TIME.config_value not in gdf_calculated.columns
+            and WeighingEnum.TIME.config_value not in gdf_calculated.columns
         ):
             return gdf_graph
-        gdf_graph[WeighingEnum.TIME.config_value] = gdf_calculated[
-            WeighingEnum.TIME.config_value
-        ]
-        for i, row in gdf_graph.iterrows():
-            row_avgspeed = row.get("avgspeed", None)
-            row_length = row.get("length", None)
-            if (
-                pd.isna(row[WeighingEnum.TIME.config_value])
-                and row_avgspeed
-                and row_length
-            ):
-                gdf_graph.at[i, WeighingEnum.TIME.config_value] = (
-                    row_length * 1e-3 / row_avgspeed
-                )
-            else:
-                gdf_graph.at[i, WeighingEnum.TIME.config_value] = row.get(
-                    WeighingEnum.TIME.config_value, None
-                )
+        
+        elif WeighingEnum.TIME.config_value in gdf_calculated.columns:
+            gdf_graph[WeighingEnum.TIME.config_value] = gdf_calculated[
+                WeighingEnum.TIME.config_value
+            ]
+            for i, row in gdf_graph.iterrows():
+                row_avgspeed = row.get("avgspeed", None)
+                row_length = row.get("length", None)
+                if (
+                    pd.isna(row[WeighingEnum.TIME.config_value])
+                    and row_avgspeed
+                    and row_length
+                ):
+                    gdf_graph.at[i, WeighingEnum.TIME.config_value] = (
+                        row_length * 1e-3 / row_avgspeed
+                    )
+                else:
+                    gdf_graph.at[i, WeighingEnum.TIME.config_value] = row.get(
+                        WeighingEnum.TIME.config_value, None
+                    )
         return gdf_graph
 
     def execute(self) -> GeoDataFrame:
@@ -185,14 +187,19 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                 df_calculated[f"alt_{self.analysis.weighing.config_value}"],
                 errors="coerce",
             )
+            
+            gdf = self._update_time(df_calculated, gdf)
 
+            if WeighingEnum.TIME.config_value in df_calculated.columns:
+                df_calculated_time_excluded = df_calculated.drop(columns=[WeighingEnum.TIME.config_value])
+            
             # Merge the dataframes
             if "rfid" in gdf:
-                gdf = gdf.merge(df_calculated, how="left", on=["u", "v", "rfid"])
+                gdf = gdf.merge(df_calculated_time_excluded, how="left", on=["u", "v", "rfid"])
             else:
-                gdf = gdf.merge(df_calculated, how="left", on=["u", "v"])
+                gdf = gdf.merge(df_calculated_time_excluded, how="left", on=["u", "v"])
 
-            gdf = self._update_time(df_calculated, gdf)
+            
 
             gdf["hazard"] = hazard_name
 
