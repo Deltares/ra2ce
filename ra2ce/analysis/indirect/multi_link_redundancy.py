@@ -45,10 +45,16 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         updates the time column with the calculated dataframe and updates the rest of the gdf_graph if time is None.
         """
         if (
+            WeighingEnum.TIME.config_value in gdf_graph.columns
+            and WeighingEnum.TIME.config_value in gdf_calculated.columns
+        ):
+            gdf_calculated = gdf_calculated.drop(columns=[WeighingEnum.TIME.config_value])
+            return gdf_graph, gdf_calculated
+        
+        if (
             WeighingEnum.TIME.config_value not in gdf_graph.columns
             and WeighingEnum.TIME.config_value not in gdf_calculated.columns
         ):
-            gdf_calculated = gdf_calculated.drop(columns=[WeighingEnum.TIME.config_value])
             return gdf_graph, gdf_calculated
         
         elif WeighingEnum.TIME.config_value in gdf_calculated.columns:
