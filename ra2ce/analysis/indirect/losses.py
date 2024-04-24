@@ -314,36 +314,33 @@ class Losses(AnalysisIndirectProtocol):
             Multi_link_losses this is not necessary because of the underlying multi_link_redundancy analysis.
 
             """
+            columns_without_index = [col for col in self.criticality_analysis_non_disrupted.columns if col not in ["level_0"]]
+            # Get the vlh_columns from vehicle_loss_hours that vlh calculations are filled in.
+            vlh_columns = list(
+                set(vlh.columns) - set(self.criticality_analysis_non_disrupted[columns_without_index].columns)
+            )
+            vlh[vlh_columns] = vlh[vlh_columns].fillna(0)
+
             result = pd.concat(
                 [
                     vlh,
-                    self.criticality_analysis_non_disrupted[
-                        [
-                            f"{self.link_id}",
-                            f"{self.link_type_column}",
-                            "geometry",
-                            f"{self.performance_metric}",
-                            connectivity_attribute,
-                        ]
-                        + list(events.columns)
-                    ],
+                    self.criticality_analysis_non_disrupted[columns_without_index],
                 ]
             )
             result = result.reset_index()
 
-            # Get the columns from vehicle_loss_hours that are not in common
-            additional_columns = list(
-                set(vlh.columns) - set(self.criticality_analysis_non_disrupted.columns)
-            )
-
-            # Fill 0 for the additional columns of self.criticality_analysis_non_disrupted
+            # Fill 0 for the vlh_columns of vlh and self.criticality_analysis_non_disrupted
             result.loc[
-                result.index.difference(vlh.index), additional_columns
+                result.index.difference(vlh.index), vlh_columns
             ] = result.loc[
-                result.index.difference(vlh.index), additional_columns
+                result.index.difference(vlh.index), vlh_columns
             ].fillna(
                 0
             )
+            for col in ['index', 'level_0']:
+                if col in result.columns:
+                    result = result.drop(col, axis=1)
+                    
             return result
 
         _check_validity_criticality_analysis()
@@ -391,18 +388,9 @@ class Losses(AnalysisIndirectProtocol):
                 if "detour" in self.criticality_analysis.columns
                 else "connected"
             )
-
+        vlh_additional_columns = self.criticality_analysis.columns.difference(vehicle_loss_hours_df.columns).tolist()
         vehicle_loss_hours_df = pd.merge(
-            vehicle_loss_hours_df,
-            self.criticality_analysis[
-                [
-                    f"{self.link_type_column}",
-                    "geometry",
-                    f"{self.performance_metric}",
-                    connectivity_attribute,
-                ]
-                + list(events.columns)
-            ],
+            vehicle_loss_hours_df, self.criticality_analysis[vlh_additional_columns],
             left_on=self.link_id,
             right_index=True,
         )
