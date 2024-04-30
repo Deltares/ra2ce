@@ -269,7 +269,7 @@ class Losses(AnalysisIndirectProtocol):
 
                 row_data = max_intensities.squeeze()
             else:
-                row_data = self.intensities.loc[index]
+                row_data = self.intensities.loc[int(index)]
 
             _intensities_simplified_graph_list.append(row_data)
         _intensities_simplified_graph = pd.DataFrame(
