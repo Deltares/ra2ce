@@ -166,13 +166,12 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                     alt_value = _weighing_analyser.calculate_distance()
                     alt_nodes, connected = np.NaN, 0
 
-                diff = round(
-                    alt_value
-                    - _weighing_analyser.weighing_data[
+                current_value = _weighing_analyser.weighing_data[
                         self.analysis.weighing.config_value
-                    ],
-                    3,
-                )
+                    ]
+                if not current_value:  # if None
+                    current_value = np.nan
+                diff = round(alt_value - current_value, 3)
 
                 data = {
                     "u": [u],
