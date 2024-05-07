@@ -65,7 +65,7 @@ class DirectDamage(AnalysisDirectProtocol):
 
         # Find the hazard columns; these may be events or return periods
         val_cols = [
-            col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
+            col for col in road_gdf.columns if "F" in col.split("_")
         ]
 
         # Read the desired damage function
