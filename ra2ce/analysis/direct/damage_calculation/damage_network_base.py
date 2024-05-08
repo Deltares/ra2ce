@@ -341,7 +341,7 @@ class DamageNetworkBase(ABC):
                     df["dam_{}_{}_{}".format(percentage, curve_name, event)] = round(
                         df["damage_{}".format(percentage)].astype(
                             float
-                        )  # max damage (in euro/km)
+                        )  # max damage (in euro/m)
                         * interpolator(
                             df["{}_{}_{}".format(hazard_prefix, event, end)]
                         ).astype(
@@ -350,7 +350,7 @@ class DamageNetworkBase(ABC):
                         * df["{}_{}_{}".format(hazard_prefix, event, "fr")].astype(
                             float
                         )  # inundated fraction of the segment should be in km. because max damage (in euro/km) 
-                        * (df["length"].astype(float))/1000,
+                        * df["length"].astype(float),
                         3,
                     )
 
