@@ -339,7 +339,7 @@ class DamageNetworkBase(ABC):
                     )
 
                 # This wraps it all in tuple again
-                df["dam_{}_{}".format(curve_name, event)] = tuple(
+                df["dam_{}_{}_quantiles".format(curve_name, event)] = tuple(
                     zip(
                         df["dam_0_{}_{}".format(curve_name, event)],
                         df["dam_25_{}_{}".format(curve_name, event)],
