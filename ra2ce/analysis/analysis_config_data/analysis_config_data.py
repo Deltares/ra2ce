@@ -137,7 +137,7 @@ class AnalysisSectionDirect(AnalysisSectionBase):
     climate_factor: float = math.nan
     climate_period: float = math.nan
     # road damage
-    representative_damage_percentile: float = 50
+    representative_damage_percentile: float = 100
     event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.INVALID)
     damage_curve: DamageCurveEnum = field(
         default_factory=lambda: DamageCurveEnum.INVALID

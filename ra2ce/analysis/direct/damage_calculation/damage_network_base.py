@@ -365,7 +365,8 @@ class DamageNetworkBase(ABC):
                     )
                 )
                 df[f"dam_{curve_name}_{event}_representative"] = (
-                    df.apply(lambda row: interpolate_damage(row, self.representative_damage_percentile), axis=1))
+                    df.apply(lambda row: interpolate_damage(row, self.representative_damage_percentile),
+                             axis=1)).astype(float)
 
                 # And throw way all intermediate results (that are not in the tuple)
                 df = df.drop(
