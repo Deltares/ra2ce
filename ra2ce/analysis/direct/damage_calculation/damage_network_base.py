@@ -333,8 +333,8 @@ class DamageNetworkBase(ABC):
                         )  # damage curve: fraction f(depth-cm) #Todo check units
                         * df["{}_{}_{}".format(hazard_prefix, event, "fr")].astype(
                             float
-                        )  # inundated fraction of the segment
-                        * df["length"].astype(float),
+                        )  # inundated fraction of the segment should be in km. because max damage (in euro/km) 
+                        * (df["length"].astype(float))/1000,
                         2,
                     )
 
