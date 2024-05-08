@@ -46,9 +46,9 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         *self.stats* (set)   : the available statistics
     """
 
-    def __init__(self, road_gdf: GeoDataFrame, val_cols: list[str]):
+    def __init__(self, road_gdf: GeoDataFrame, val_cols: list[str], representative_damage_percentile: float):
         # Construct using the parent class __init__
-        super().__init__(road_gdf, val_cols)
+        super().__init__(road_gdf, val_cols, representative_damage_percentile)
 
         self.return_periods = set(
             [x.split("_")[1] for x in val_cols]

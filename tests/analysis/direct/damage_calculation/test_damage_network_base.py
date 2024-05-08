@@ -19,22 +19,22 @@ class MockedDNB(DamageNetworkBase):
 class TestDamageNetworkBase:
     def test_init_network_base_raises(self):
         with pytest.raises(TypeError):
-            DamageNetworkBase(None, [])
+            DamageNetworkBase(None, [], 50)
 
     def test_main_raises_error(self):
         # 1. Define test data.
-        _dnb = MockedDNB(None, [])
+        _dnb = MockedDNB(None, [], 50)
 
         # 2. Run test
         with pytest.raises(ValueError) as exc_err:
             _dnb.main("", None)
 
         # 3. Verify final expectations.
-        assert str(exc_err.value) == "Needs to be implented in concrete child class."
+        assert str(exc_err.value) == "Needs to be implemented in concrete child class."
 
     def test_create_mask(self):
         # 1. Define test data.
-        _dnb = MockedDNB(None, [])
+        _dnb = MockedDNB(None, [], 50)
         _dnb.gdf = gpd.GeoDataFrame.from_dict({"geometry": [None, None]})
         _dnb.val_cols = ["_fr"]
         assert "geometry" in _dnb.gdf.columns
@@ -47,7 +47,7 @@ class TestDamageNetworkBase:
 
     def test_replace_none_with_nan(self):
         # 1. Define test data.
-        _dnb = MockedDNB(None, [])
+        _dnb = MockedDNB(None, [], 50)
         _dnb.gdf = gpd.GeoDataFrame.from_dict(
             {"dam_abc": [None, None], "dam_cde": [None, None]}
         )
