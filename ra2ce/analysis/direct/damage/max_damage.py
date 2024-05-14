@@ -45,10 +45,11 @@ class MaxDamageByRoadTypeByLane:
         self.name = name
         self.damage_unit = damage_unit
 
-    def from_csv(self, path: Path, sep=",") -> None:
+    def from_csv(self, path: Path, sep=",", output_unit='euro/m') -> None:
         """Construct object from csv file. Damage curve name is inferred from filename
 
-        The first row describe the lane numbers per column; and should have 'Road_type \ lanes' as index/first value
+        The first row describe the lane numbers per column; and should have 'Road_type \ lanes' as index/first value.
+        Assume road types are in the rows; lane numbers in the columns.
         The second row has the units per column, and should have 'unit' as index/first value
         the rest of the rows contains the different road types as index/first value; and the costs as values
 
@@ -80,7 +81,7 @@ class MaxDamageByRoadTypeByLane:
         # assumes that the columns containst the lanes
         self.data.columns = self.data.columns.astype("int")
 
-        if self.damage_unit != "output_unit":
+        if self.damage_unit != output_unit:
             self.convert_length_unit()  # convert the unit
 
     def convert_length_unit(self, desired_unit="euro/m"):
