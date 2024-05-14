@@ -6,7 +6,6 @@ import networkx as nx
 import numpy as np
 import osmnx
 import pandas as pd
-from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
@@ -41,7 +40,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         self.hazard_names = analysis_input.hazard_names
 
     def _update_time(self, gdf_calculated: pd.DataFrame, gdf_graph: gpd.GeoDataFrame) \
-            -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+            -> tuple[gpd.GeoDataFrame, pd.DataFrame]:
         """
         updates the time column with the calculated dataframe and updates the rest of the gdf_graph if time is None.
         """
@@ -79,7 +78,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                     )
         return gdf_graph, gdf_calculated
 
-    def execute(self) -> GeoDataFrame:
+    def execute(self) -> gpd.GeoDataFrame:
         """Calculates the multi-link redundancy of a NetworkX graph.
 
         The function removes all links of a variable that have a minimum value
