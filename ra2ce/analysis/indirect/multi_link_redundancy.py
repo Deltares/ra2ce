@@ -40,7 +40,8 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         self.output_path = analysis_input.output_path
         self.hazard_names = analysis_input.hazard_names
 
-    def _update_time(self, gdf_calculated: pd.DataFrame, gdf_graph: gpd.GeoDataFrame) -> tuple:
+    def _update_time(self, gdf_calculated: pd.DataFrame, gdf_graph: gpd.GeoDataFrame) \
+            -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
         """
         updates the time column with the calculated dataframe and updates the rest of the gdf_graph if time is None.
         """
@@ -50,13 +51,13 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         ):
             gdf_calculated = gdf_calculated.drop(columns=[WeighingEnum.TIME.config_value])
             return gdf_graph, gdf_calculated
-        
+
         if (
             WeighingEnum.TIME.config_value not in gdf_graph.columns
             and WeighingEnum.TIME.config_value not in gdf_calculated.columns
         ):
             return gdf_graph, gdf_calculated
-        
+
         elif WeighingEnum.TIME.config_value in gdf_calculated.columns:
             gdf_graph[WeighingEnum.TIME.config_value] = gdf_calculated[
                 WeighingEnum.TIME.config_value
