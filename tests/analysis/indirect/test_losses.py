@@ -144,6 +144,7 @@ class TestLosses:
 
         _analysis = AnalysisSectionIndirect(
             part_of_day=part_of_day,
+            threshold=0,
             resilience_curve_file=_losses_csv_data.joinpath("resilience_curve.csv"),
             traffic_intensities_file=_losses_csv_data.joinpath(
                 "traffic_intensities.csv"

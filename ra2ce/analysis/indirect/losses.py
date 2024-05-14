@@ -49,10 +49,10 @@ from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEn
 
 
 def _load_df_from_csv(
-    csv_path: Path,
-    columns_to_interpret: list[str],
-    index: Optional[str | None],
-    sep: str = ",",
+        csv_path: Path,
+        columns_to_interpret: list[str],
+        index: Optional[str | None],
+        sep: str = ",",
 ) -> pd.DataFrame:
     if csv_path is None or not csv_path.exists():
         logging.warning("No `csv` file found at {}.".format(csv_path))
@@ -80,9 +80,9 @@ class Losses(AnalysisIndirectProtocol):
     hazard_names: HazardNames
 
     def __init__(
-        self,
-        analysis_input: AnalysisInputWrapper,
-        analysis_config: AnalysisConfigWrapper,
+            self,
+            analysis_input: AnalysisInputWrapper,
+            analysis_config: AnalysisConfigWrapper,
     ) -> None:
         self.analysis_input = analysis_input
         self.analysis_config = analysis_config
@@ -100,7 +100,7 @@ class Losses(AnalysisIndirectProtocol):
         self.duration_event: float = self.analysis.duration_event
         self.hours_per_day: float = self.analysis.hours_per_day
         self.production_loss_per_capita_per_hour = (
-            self.analysis.production_loss_per_capita_per_day / self.hours_per_day
+                self.analysis.production_loss_per_capita_per_day / self.hours_per_day
         )
         self._check_validity_analysis_files()
         self.intensities = _load_df_from_csv(
@@ -126,9 +126,9 @@ class Losses(AnalysisIndirectProtocol):
 
     def _check_validity_analysis_files(self):
         if (
-            self.analysis.traffic_intensities_file is None
-            or self.analysis.resilience_curve_file is None
-            or self.analysis.values_of_time_file is None
+                self.analysis.traffic_intensities_file is None
+                or self.analysis.resilience_curve_file is None
+                or self.analysis.values_of_time_file is None
         ):
             raise ValueError(
                 f"traffic_intensities_file, resilience_curve_file, and values_of_time_file should be given"
@@ -141,7 +141,7 @@ class Losses(AnalysisIndirectProtocol):
         """
         _required_values_of_time_keys = ["trip_types", "value_of_time", "occupants"]
         if not all(
-            key in self.values_of_time.columns for key in _required_values_of_time_keys
+                key in self.values_of_time.columns for key in _required_values_of_time_keys
         ):
             raise ValueError(
                 f"Missing required columns in values_of_time: {_required_values_of_time_keys}"
@@ -153,16 +153,16 @@ class Losses(AnalysisIndirectProtocol):
             "functionality_loss_ratio",
         ]
         if len(self.resilience_curve) > 0 and not all(
-            key in self.resilience_curve.columns
-            for key in _required_resilience_curve_keys
+                key in self.resilience_curve.columns
+                for key in _required_resilience_curve_keys
         ):
             raise ValueError(
                 f"Missing required columns in resilience_curve: {_required_resilience_curve_keys}"
             )
 
         if (
-            self.link_id not in self.intensities.columns
-            and self.link_id not in self.intensities.index.name
+                self.link_id not in self.intensities.columns
+                and self.link_id not in self.intensities.index.name
         ):
             raise Exception(
                 f"""traffic_intensities_file and input graph do not have the same link_id.
@@ -187,7 +187,7 @@ class Losses(AnalysisIndirectProtocol):
             occupancy_var_name = f"occupants_{trip_purpose}"
             partofday_trip_purpose_name = f"{self.part_of_day}_{trip_purpose}"
             partofday_trip_purpose_intensity_name = (
-                "intensity_" + partofday_trip_purpose_name
+                    "intensity_" + partofday_trip_purpose_name
             )
             # read and set the vot's
             _vot_dict[vot_var_name] = self.values_of_time.loc[
@@ -200,13 +200,13 @@ class Losses(AnalysisIndirectProtocol):
             ].item()
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
-                self.intensities_simplified_graph[partofday_trip_purpose_name]
-                / self.hours_per_day
+                    self.intensities_simplified_graph[partofday_trip_purpose_name]
+                    / self.hours_per_day
             )
         return dict(_vot_dict)
 
     def _get_disrupted_criticality_analysis_results(
-        self, criticality_analysis: gpd.GeoDataFrame
+            self, criticality_analysis: gpd.GeoDataFrame
     ):
         criticality_analysis.reset_index(inplace=True)
 
@@ -217,26 +217,23 @@ class Losses(AnalysisIndirectProtocol):
         else:
             criticality_analysis = criticality_analysis.drop_duplicates(["u", "v"])
 
-        if self.analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
-            # filter out all links not affected by the hazard
-            if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
-                self.criticality_analysis = criticality_analysis[
-                    criticality_analysis["EV1_ma"] != 0
+        # filter out all links not affected by the hazard
+        if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
+            self.criticality_analysis = criticality_analysis[
+                criticality_analysis["EV1_ma"] > self.analysis.threshold
                 ]
-            elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
-                self.criticality_analysis = criticality_analysis[
-                    criticality_analysis["EV1_max"] != 0
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
+            self.criticality_analysis = criticality_analysis[
+                criticality_analysis["EV1_max"] > self.analysis.threshold
                 ]
-            elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
-                self.criticality_analysis = criticality_analysis[
-                    criticality_analysis["EV1_mean"] != 0
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
+            self.criticality_analysis = criticality_analysis[
+                criticality_analysis["EV1_mean"] > self.analysis.threshold
                 ]
-            elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
-                self.criticality_analysis = criticality_analysis[
-                    criticality_analysis["EV1_min"] != 0
+        elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
+            self.criticality_analysis = criticality_analysis[
+                criticality_analysis["EV1_min"] > self.analysis.threshold
                 ]
-        else:
-            self.criticality_analysis = criticality_analysis
 
         self.criticality_analysis_non_disrupted = criticality_analysis[
             ~criticality_analysis.index.isin(self.criticality_analysis.index)
@@ -272,7 +269,7 @@ class Losses(AnalysisIndirectProtocol):
 
                 row_data = max_intensities.squeeze()
             else:
-                row_data = self.intensities.loc[index]
+                row_data = self.intensities.loc[int(index)]
 
             _intensities_simplified_graph_list.append(row_data)
         _intensities_simplified_graph = pd.DataFrame(
@@ -306,7 +303,7 @@ class Losses(AnalysisIndirectProtocol):
                     return f"{x}-{y}"
             raise ValueError(f"No matching range found for height {height}")
 
-        def _create_result(vlh: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+        def _create_result(vlh: gpd.GeoDataFrame, connectivity_attribute: str) -> gpd.GeoDataFrame:
             """
 
             Args: vlh: calculated vehicle_loss_hours GeoDataFrame. For single_link_losses it only includes the
@@ -317,38 +314,34 @@ class Losses(AnalysisIndirectProtocol):
             Multi_link_losses this is not necessary because of the underlying multi_link_redundancy analysis.
 
             """
-            if self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
-                return vlh
+            columns_without_index = [col for col in self.criticality_analysis_non_disrupted.columns if
+                                     col not in ["level_0"]]
+            # Get the vlh_columns from vehicle_loss_hours that vlh calculations are filled in.
+            vlh_columns = list(
+                set(vlh.columns) - set(self.criticality_analysis_non_disrupted[columns_without_index].columns)
+            )
+            vlh[vlh_columns] = vlh[vlh_columns].fillna(0)
+
             result = pd.concat(
                 [
                     vlh,
-                    self.criticality_analysis_non_disrupted[
-                        [
-                            f"{self.link_id}",
-                            f"{self.link_type_column}",
-                            "geometry",
-                            f"{self.performance_metric}",
-                            "detour",
-                        ]
-                        + list(events.columns)
-                    ],
+                    self.criticality_analysis_non_disrupted[columns_without_index],
                 ]
             )
             result = result.reset_index()
 
-            # Get the columns from vehicle_loss_hours that are not in common
-            additional_columns = list(
-                set(vlh.columns) - set(self.criticality_analysis_non_disrupted.columns)
-            )
-
-            # Fill 0 for the additional columns of self.criticality_analysis_non_disrupted
+            # Fill 0 for the vlh_columns of vlh and self.criticality_analysis_non_disrupted
             result.loc[
-                result.index.difference(vlh.index), additional_columns
+                result.index.difference(vlh.index), vlh_columns
             ] = result.loc[
-                result.index.difference(vlh.index), additional_columns
+                result.index.difference(vlh.index), vlh_columns
             ].fillna(
                 0
             )
+            for col in ['index', 'level_0']:
+                if col in result.columns:
+                    result = result.drop(col, axis=1)
+
             return result
 
         _check_validity_criticality_analysis()
@@ -383,30 +376,22 @@ class Losses(AnalysisIndirectProtocol):
         # Check if the index name exists in the columns
         if vehicle_loss_hours_df.index.name in vehicle_loss_hours_df.columns:
             vehicle_loss_hours_df.reset_index(drop=True, inplace=True)
-        vehicle_loss_hours_df.reset_index(inplace=True)
+        else:
+            vehicle_loss_hours_df.reset_index(inplace=True)
 
         # find the link_type and the hazard intensity
         connectivity_attribute = None
         if any(
-            col in self.criticality_analysis.columns for col in ["detour", "connected"]
+                col in self.criticality_analysis.columns for col in ["detour", "connected"]
         ):
             connectivity_attribute = (
                 "detour"
                 if "detour" in self.criticality_analysis.columns
                 else "connected"
             )
-
+        vlh_additional_columns = self.criticality_analysis.columns.difference(vehicle_loss_hours_df.columns).tolist()
         vehicle_loss_hours_df = pd.merge(
-            vehicle_loss_hours_df,
-            self.criticality_analysis[
-                [
-                    f"{self.link_type_column}",
-                    "geometry",
-                    f"{self.performance_metric}",
-                    connectivity_attribute,
-                ]
-                + list(events.columns)
-            ],
+            vehicle_loss_hours_df, self.criticality_analysis[vlh_additional_columns],
             left_on=self.link_id,
             right_index=True,
         )
@@ -418,6 +403,7 @@ class Losses(AnalysisIndirectProtocol):
         for event in events.columns.tolist():
             for _, vlh_row in vehicle_loss_hours.iterrows():
                 row_hazard_range = _get_range(vlh_row[event])
+                row_connectivity = vlh_row[connectivity_attribute]
                 row_performance_changes = performance_change.loc[
                     [vlh_row[self.link_id]]
                 ]
@@ -445,11 +431,12 @@ class Losses(AnalysisIndirectProtocol):
                         performance_row[-1]["v"],
                         performance_key,
                     )
-                    if math.isnan(row_performance_change):
+                    if (math.isnan(row_performance_change) and row_connectivity == 0) or row_performance_change == 0:
                         self._calculate_production_loss_per_capita(
                             vehicle_loss_hours, vlh_row, event
                         )
-                    elif (u, v, k) == row_u_v_k:
+                    elif (not(math.isnan(row_performance_change) and math.isnan(row_connectivity)) and
+                          ((u, v, k) == row_u_v_k)):
                         self._populate_vehicle_loss_hour(
                             vehicle_loss_hours,
                             row_hazard_range,
@@ -458,14 +445,14 @@ class Losses(AnalysisIndirectProtocol):
                             event,
                         )
 
-        vehicle_loss_hours_result = _create_result(vehicle_loss_hours)
+        vehicle_loss_hours_result = _create_result(vehicle_loss_hours, connectivity_attribute)
         return vehicle_loss_hours_result
 
     def _calculate_production_loss_per_capita(
-        self,
-        vehicle_loss_hours: gpd.GeoDataFrame,
-        vlh_row: pd.Series,
-        hazard_col_name: str,
+            self,
+            vehicle_loss_hours: gpd.GeoDataFrame,
+            vlh_row: pd.Series,
+            hazard_col_name: str,
     ):
         """
         In cases where there is no alternative route in the event of disruption of the road, we propose to use a
@@ -492,10 +479,10 @@ class Losses(AnalysisIndirectProtocol):
                 self.vot_intensity_per_trip_collection[f"occupants_{trip_type}"]
             )
             vlh_trip_type_event_series = (
-                self.duration_event
-                * intensity_trip_type
-                * occupancy_trip_type
-                * self.production_loss_per_capita_per_hour
+                    self.duration_event
+                    * intensity_trip_type
+                    * occupancy_trip_type
+                    * self.production_loss_per_capita_per_hour
             )
             vlh_trip_type_event = vlh_trip_type_event_series.squeeze()
             vehicle_loss_hours.loc[
@@ -507,12 +494,12 @@ class Losses(AnalysisIndirectProtocol):
         ] = vlh_total
 
     def _populate_vehicle_loss_hour(
-        self,
-        vehicle_loss_hours: gpd.GeoDataFrame,
-        row_hazard_range: str,
-        vlh_row: pd.Series,
-        performance_change: float,
-        hazard_col_name: str,
+            self,
+            vehicle_loss_hours: gpd.GeoDataFrame,
+            row_hazard_range: str,
+            vlh_row: pd.Series,
+            performance_change: float,
+            hazard_col_name: str,
     ):
 
         vlh_total = 0
@@ -523,14 +510,14 @@ class Losses(AnalysisIndirectProtocol):
                 row_relevant_curve = self.resilience_curve[
                     self.resilience_curve["link_type_hazard_intensity"]
                     == link_type_hazard_range
-                ]
+                    ]
+
                 disruption = (
                     (
-                        row_relevant_curve["duration_steps"].apply(pd.Series)
-                        * (row_relevant_curve["functionality_loss_ratio"]).apply(
-                            pd.Series
-                        )
-                        / 100
+                            row_relevant_curve["duration_steps"].apply(pd.Series)
+                            * (row_relevant_curve["functionality_loss_ratio"]).apply(
+                        pd.Series
+                    )
                     ).sum(axis=1)
                 ).squeeze()
                 if disruption > max_disruption:
@@ -543,11 +530,16 @@ class Losses(AnalysisIndirectProtocol):
             relevant_curve = self.resilience_curve[
                 self.resilience_curve["link_type_hazard_intensity"]
                 == link_type_hazard_range
-            ]
+                ]
         if relevant_curve.size == 0:
             raise Exception(
                 f"""{link_type_hazard_range} was not found in the introduced resilience_curve"""
             )
+
+        divisor = 100
+        if all(ratio <= 1 for ratio_tuple in relevant_curve["functionality_loss_ratio"] for ratio in ratio_tuple):
+            divisor = 1
+
         duration_steps: list = relevant_curve["duration_steps"].item()
         functionality_loss_ratios: list = relevant_curve[
             "functionality_loss_ratio"
@@ -564,11 +556,11 @@ class Losses(AnalysisIndirectProtocol):
             )
 
             vlh_trip_type_event_series = sum(
-                intensity_trip_type
-                * duration
-                * loss_ratio
-                * performance_change
-                * vot_trip_type
+                (intensity_trip_type
+                 * duration
+                 * loss_ratio
+                 * performance_change
+                 * vot_trip_type) / divisor
                 for duration, loss_ratio in zip(
                     duration_steps, functionality_loss_ratios
                 )
