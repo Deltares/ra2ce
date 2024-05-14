@@ -39,26 +39,26 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         self.output_path = analysis_input.output_path
         self.hazard_names = analysis_input.hazard_names
 
-    def _update_time(self, gdf_calculated: pd.DataFrame, gdf_graph: gpd.GeoDataFrame) \
-            -> tuple[gpd.GeoDataFrame, pd.DataFrame]:
+    def _update_time(self, df_calculated: pd.DataFrame, gdf_graph: gpd.GeoDataFrame) \
+            -> tuple[pd.DataFrame, gpd.GeoDataFrame]:
         """
         updates the time column with the calculated dataframe and updates the rest of the gdf_graph if time is None.
         """
         if (
             WeighingEnum.TIME.config_value in gdf_graph.columns
-            and WeighingEnum.TIME.config_value in gdf_calculated.columns
+            and WeighingEnum.TIME.config_value in df_calculated.columns
         ):
-            gdf_calculated = gdf_calculated.drop(columns=[WeighingEnum.TIME.config_value])
-            return gdf_graph, gdf_calculated
+            df_calculated = df_calculated.drop(columns=[WeighingEnum.TIME.config_value])
+            return df_calculated, gdf_graph
 
         if (
             WeighingEnum.TIME.config_value not in gdf_graph.columns
-            and WeighingEnum.TIME.config_value not in gdf_calculated.columns
+            and WeighingEnum.TIME.config_value not in df_calculated.columns
         ):
-            return gdf_graph, gdf_calculated
+            return df_calculated, gdf_graph
 
-        elif WeighingEnum.TIME.config_value in gdf_calculated.columns:
-            gdf_graph[WeighingEnum.TIME.config_value] = gdf_calculated[
+        elif WeighingEnum.TIME.config_value in df_calculated.columns:
+            gdf_graph[WeighingEnum.TIME.config_value] = df_calculated[
                 WeighingEnum.TIME.config_value
             ]
             for i, row in gdf_graph.iterrows():
@@ -76,7 +76,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                     gdf_graph.at[i, WeighingEnum.TIME.config_value] = row.get(
                         WeighingEnum.TIME.config_value, None
                     )
-        return gdf_graph, gdf_calculated
+        return df_calculated, gdf_graph
 
     def execute(self) -> gpd.GeoDataFrame:
         """Calculates the multi-link redundancy of a NetworkX graph.
@@ -194,7 +194,7 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                 errors="coerce",
             )
             
-            gdf, df_calculated = self._update_time(df_calculated, gdf)
+            df_calculated, gdf = self._update_time(df_calculated, gdf)
             
             # Merge the dataframes
             if "rfid" in gdf:
