@@ -29,8 +29,8 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
     hazard_names: HazardNames
 
     def __init__(
-        self,
-        analysis_input: AnalysisInputWrapper,
+            self,
+            analysis_input: AnalysisInputWrapper,
     ) -> None:
         self.analysis = analysis_input.analysis
         self.graph_file_hazard = analysis_input.graph_file_hazard
@@ -45,15 +45,15 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         updates the time column with the calculated dataframe and updates the rest of the gdf_graph if time is None.
         """
         if (
-            WeighingEnum.TIME.config_value in gdf_graph.columns
-            and WeighingEnum.TIME.config_value in df_calculated.columns
+                WeighingEnum.TIME.config_value in gdf_graph.columns
+                and WeighingEnum.TIME.config_value in df_calculated.columns
         ):
             df_calculated = df_calculated.drop(columns=[WeighingEnum.TIME.config_value])
             return df_calculated, gdf_graph
 
         if (
-            WeighingEnum.TIME.config_value not in gdf_graph.columns
-            and WeighingEnum.TIME.config_value not in df_calculated.columns
+                WeighingEnum.TIME.config_value not in gdf_graph.columns
+                and WeighingEnum.TIME.config_value not in df_calculated.columns
         ):
             return df_calculated, gdf_graph
 
@@ -65,12 +65,12 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                 row_avgspeed = row.get("avgspeed", None)
                 row_length = row.get("length", None)
                 if (
-                    pd.isna(row[WeighingEnum.TIME.config_value])
-                    and row_avgspeed
-                    and row_length
+                        pd.isna(row[WeighingEnum.TIME.config_value])
+                        and row_avgspeed
+                        and row_length
                 ):
                     gdf_graph.at[i, WeighingEnum.TIME.config_value] = (
-                        row_length * 1e-3 / row_avgspeed
+                            row_length * 1e-3 / row_avgspeed
                     )
                 else:
                     gdf_graph.at[i, WeighingEnum.TIME.config_value] = row.get(
@@ -91,10 +91,10 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
 
         def _is_not_none(value):
             return (
-                value is not None
-                and value is not pd.NA
-                and not pd.isna(value)
-                and not np.isnan(value)
+                    value is not None
+                    and value is not pd.NA
+                    and not pd.isna(value)
+                    and not np.isnan(value)
             )
 
         results = []
@@ -112,8 +112,8 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
             edges_remove = []
             for e in _graph.edges.data(keys=True):
                 if (hazard_name in e[-1]) and (
-                    ("bridge" not in e[-1])
-                    or ("bridge" in e[-1] and e[-1]["bridge"] != "yes")
+                        ("bridge" not in e[-1])
+                        or ("bridge" in e[-1] and e[-1]["bridge"] != "yes")
                 ):
                     edges_remove.append(e)
             edges_remove = [e for e in edges_remove if (e[-1][hazard_name] is not None)]
@@ -121,14 +121,14 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                 e
                 for e in edges_remove
                 if (hazard_name in e[-1])
-                and (
-                    _is_not_none(e[-1][hazard_name])
-                    and (e[-1][hazard_name] > float(self.analysis.threshold))
-                    and (
-                        ("bridge" not in e[-1])
-                        or ("bridge" in e[-1] and e[-1]["bridge"] != "yes")
-                    )
-                )
+                   and (
+                           _is_not_none(e[-1][hazard_name])
+                           and (e[-1][hazard_name] > float(self.analysis.threshold))
+                           and (
+                                   ("bridge" not in e[-1])
+                                   or ("bridge" in e[-1] and e[-1]["bridge"] != "yes")
+                           )
+                   )
             ]
 
             _graph.remove_edges_from(edges_remove)
@@ -167,8 +167,8 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                     alt_nodes, connected = np.NaN, 0
 
                 current_value = _weighing_analyser.weighing_data[
-                        self.analysis.weighing.config_value
-                    ]
+                    self.analysis.weighing.config_value
+                ]
                 if not current_value:  # if None
                     current_value = np.nan
                 diff = round(alt_value - current_value, 3)
@@ -193,16 +193,14 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                 df_calculated[f"alt_{self.analysis.weighing.config_value}"],
                 errors="coerce",
             )
-            
+
             df_calculated, gdf = self._update_time(df_calculated, gdf)
-            
+
             # Merge the dataframes
             if "rfid" in gdf:
                 gdf = gdf.merge(df_calculated, how="left", on=["u", "v", "rfid"])
             else:
                 gdf = gdf.merge(df_calculated, how="left", on=["u", "v"])
-
-            
 
             gdf["hazard"] = hazard_name
 
