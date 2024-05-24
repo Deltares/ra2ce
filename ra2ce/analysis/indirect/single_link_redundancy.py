@@ -84,7 +84,7 @@ class SingleLinkRedundancy(AnalysisIndirectProtocol):
                         - _weighing_analyser.weighing_data[
                             self.analysis.weighing.config_value
                         ],
-                        2,
+                        7,
                     )
                 )
 

@@ -108,7 +108,7 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     # the redundancy analysis) and the intensities
     # accessibility analyses
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
-    threshold: float = math.nan
+    threshold: float = 0.0
     threshold_destinations: float = math.nan
     uniform_duration: float = math.nan
     gdp_percapita: float = math.nan
