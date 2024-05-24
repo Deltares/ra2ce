@@ -92,7 +92,9 @@ class DirectDamage(AnalysisDirectProtocol):
             return event_gdf.gdf
 
         elif self.analysis.event_type == EventTypeEnum.RETURN_PERIOD:
-            return_period_gdf = DamageNetworkReturnPeriods(road_gdf, val_cols)
+            return_period_gdf = DamageNetworkReturnPeriods(
+                road_gdf, val_cols, self.analysis.representative_damage_percentile
+            )
             return_period_gdf.main(
                 damage_function=damage_function,
                 manual_damage_functions=manual_damage_functions,
