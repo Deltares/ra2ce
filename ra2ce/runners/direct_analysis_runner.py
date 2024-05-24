@@ -115,13 +115,15 @@ class DirectAnalysisRunner(AnalysisRunner):
             )
             starttime = time.time()
 
-            _result_segment_based = analysis.execute()
+            _result_segmented = analysis.execute()
             _result_link_based = self._get_result_link_based(analysis=analysis, analysis_config=analysis_config,
-                                                             result_segment_based=_result_segment_based)
-            for _result in [_result_segment_based, _result_link_based]:
+                                                             result_segment_based=_result_segmented)
+            analysis_name = analysis.analysis.name
+            for _result, suffix in zip([_result_segmented, _result_link_based], ['segmented', 'link_based']):
                 _result_wrapper = AnalysisResultWrapper(
                     analysis_result=_result, analysis=analysis
                 )
+                _result_wrapper.analysis.analysis.name = analysis_name + '_' + suffix
                 _results.append(_result_wrapper)
 
                 AnalysisResultWrapperExporter().export_result(_result_wrapper)
