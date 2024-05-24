@@ -6,7 +6,6 @@ import networkx as nx
 import numpy as np
 import osmnx
 import pandas as pd
-from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionIndirect,
@@ -40,36 +39,47 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
         self.output_path = analysis_input.output_path
         self.hazard_names = analysis_input.hazard_names
 
-    def _update_time(self, gdf_calculated: pd.DataFrame, gdf_graph: gpd.GeoDataFrame):
+    def _update_time(
+        self, df_calculated: pd.DataFrame, gdf_graph: gpd.GeoDataFrame
+    ) -> tuple[pd.DataFrame, gpd.GeoDataFrame]:
         """
         updates the time column with the calculated dataframe and updates the rest of the gdf_graph if time is None.
         """
         if (
-            WeighingEnum.TIME.config_value not in gdf_graph.columns
-            or WeighingEnum.TIME.config_value not in gdf_calculated.columns
+            WeighingEnum.TIME.config_value in gdf_graph.columns
+            and WeighingEnum.TIME.config_value in df_calculated.columns
         ):
-            return gdf_graph
-        gdf_graph[WeighingEnum.TIME.config_value] = gdf_calculated[
-            WeighingEnum.TIME.config_value
-        ]
-        for i, row in gdf_graph.iterrows():
-            row_avgspeed = row.get("avgspeed", None)
-            row_length = row.get("length", None)
-            if (
-                pd.isna(row[WeighingEnum.TIME.config_value])
-                and row_avgspeed
-                and row_length
-            ):
-                gdf_graph.at[i, WeighingEnum.TIME.config_value] = (
-                    row_length * 1e-3 / row_avgspeed
-                )
-            else:
-                gdf_graph.at[i, WeighingEnum.TIME.config_value] = row.get(
-                    WeighingEnum.TIME.config_value, None
-                )
-        return gdf_graph
+            df_calculated = df_calculated.drop(columns=[WeighingEnum.TIME.config_value])
+            return df_calculated, gdf_graph
 
-    def execute(self) -> GeoDataFrame:
+        if (
+            WeighingEnum.TIME.config_value not in gdf_graph.columns
+            and WeighingEnum.TIME.config_value not in df_calculated.columns
+        ):
+            return df_calculated, gdf_graph
+
+        elif WeighingEnum.TIME.config_value in df_calculated.columns:
+            gdf_graph[WeighingEnum.TIME.config_value] = df_calculated[
+                WeighingEnum.TIME.config_value
+            ]
+            for i, row in gdf_graph.iterrows():
+                row_avgspeed = row.get("avgspeed", None)
+                row_length = row.get("length", None)
+                if (
+                    pd.isna(row[WeighingEnum.TIME.config_value])
+                    and row_avgspeed
+                    and row_length
+                ):
+                    gdf_graph.at[i, WeighingEnum.TIME.config_value] = (
+                        row_length * 1e-3 / row_avgspeed
+                    )
+                else:
+                    gdf_graph.at[i, WeighingEnum.TIME.config_value] = row.get(
+                        WeighingEnum.TIME.config_value, None
+                    )
+        return df_calculated, gdf_graph
+
+    def execute(self) -> gpd.GeoDataFrame:
         """Calculates the multi-link redundancy of a NetworkX graph.
 
         The function removes all links of a variable that have a minimum value
@@ -157,13 +167,12 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                     alt_value = _weighing_analyser.calculate_distance()
                     alt_nodes, connected = np.NaN, 0
 
-                diff = round(
-                    alt_value
-                    - _weighing_analyser.weighing_data[
-                        self.analysis.weighing.config_value
-                    ],
-                    3,
-                )
+                current_value = _weighing_analyser.weighing_data[
+                    self.analysis.weighing.config_value
+                ]
+                if not current_value:  # if None
+                    current_value = np.nan
+                diff = round(alt_value - current_value, 3)
 
                 data = {
                     "u": [u],
@@ -186,13 +195,13 @@ class MultiLinkRedundancy(AnalysisIndirectProtocol):
                 errors="coerce",
             )
 
+            df_calculated, gdf = self._update_time(df_calculated, gdf)
+
             # Merge the dataframes
             if "rfid" in gdf:
                 gdf = gdf.merge(df_calculated, how="left", on=["u", "v", "rfid"])
             else:
                 gdf = gdf.merge(df_calculated, how="left", on=["u", "v"])
-
-            gdf = self._update_time(df_calculated, gdf)
 
             gdf["hazard"] = hazard_name
 
