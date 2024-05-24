@@ -358,7 +358,7 @@ class TestDirectDamage:
 
     def test_construct_damage_network_return_periods(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-            risk_data_file, sep=";"
+            risk_data_file, sep=";", representative_damage_percentile=100
         )
         assert (
             type(damage_network) == DamageNetworkReturnPeriods
@@ -366,7 +366,7 @@ class TestDirectDamage:
 
     def test_risk_calculation_default(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-            risk_data_file, sep=";"
+            risk_data_file, sep=";", representative_damage_percentile=100
         )
         damage_network.control_risk_calculation(mode=RiskCalculationModeEnum.DEFAULT)
         assert (
@@ -376,7 +376,7 @@ class TestDirectDamage:
     def test_risk_calculation_cutoff(self, risk_data_file: Path):
         for rp in [15, 200, 25]:
             damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-                risk_data_file, sep=";"
+                risk_data_file, sep=";", representative_damage_percentile=100
             )
             damage_network.control_risk_calculation(
                 mode=RiskCalculationModeEnum.CUT_FROM_YEAR, year=rp
@@ -389,7 +389,7 @@ class TestDirectDamage:
 
     def test_risk_calculation_triangle_to_null(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-            risk_data_file, sep=";"
+            risk_data_file, sep=";", representative_damage_percentile=100
         )
         for triangle_rp in [8, 2]:
             damage_network.control_risk_calculation(

@@ -58,12 +58,12 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
             raise ValueError("No return_period cols present in hazard data")
 
     @classmethod
-    def construct_from_csv(cls, path: Path, sep: str = ";"):
+    def construct_from_csv(cls, path: Path, representative_damage_percentile: float, sep: str = ";"):
         road_gdf = pd.read_csv(path, sep=sep)
         val_cols = [
             c for c in road_gdf.columns if c.startswith("F_")
         ]  # Find everything starting with 'F'
-        return cls(road_gdf, val_cols)
+        return cls(road_gdf, val_cols, representative_damage_percentile)
 
     ### Controlers for return period based damage and risk calculations
     def main(self, damage_function: DamageCurveEnum, manual_damage_functions):
