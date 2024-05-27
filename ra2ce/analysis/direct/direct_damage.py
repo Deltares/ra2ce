@@ -83,7 +83,9 @@ class DirectDamage(AnalysisDirectProtocol):
 
         # Choose between event or return period based analysis
         if self.analysis.event_type == EventTypeEnum.EVENT:
-            event_gdf = DamageNetworkEvents(road_gdf, val_cols, self.analysis.representative_damage_percentile)
+            event_gdf = DamageNetworkEvents(
+                road_gdf, val_cols, self.analysis.representative_damage_percentile
+            )
             event_gdf.main(
                 damage_function=damage_function,
                 manual_damage_functions=manual_damage_functions,

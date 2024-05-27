@@ -85,7 +85,9 @@ class TestDirectDamage:
         ]
         _representative_damage_percentile = 100
         # DO ACTUAL DAMAGE CALCULATION
-        event_gdf = DamageNetworkEvents(road_gdf, val_cols, _representative_damage_percentile)
+        event_gdf = DamageNetworkEvents(
+            road_gdf, val_cols, _representative_damage_percentile
+        )
         event_gdf.main(damage_function=damage_function)
 
         # CHECK OUTCOMES OF DAMAGE CALCULATIONS
@@ -119,7 +121,9 @@ class TestDirectDamage:
             col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
         ]
         _representative_damage_percentile = 100
-        event_gdf = DamageNetworkEvents(road_gdf, val_cols, _representative_damage_percentile)
+        event_gdf = DamageNetworkEvents(
+            road_gdf, val_cols, _representative_damage_percentile
+        )
         event_gdf.main(damage_function=damage_function)
 
         ### Some manual corrections, because the RA2CE implementation also calculates damage for bridges, but the
@@ -182,7 +186,9 @@ class TestDirectDamage:
         _representative_damage_percentile = 100
 
         # DO ACTUAL DAMAGE CALCULATION
-        event_gdf = DamageNetworkEvents(road_gdf, val_cols, _representative_damage_percentile)
+        event_gdf = DamageNetworkEvents(
+            road_gdf, val_cols, _representative_damage_percentile
+        )
         event_gdf.main(damage_function=damage_function)
 
         # CHECK OUTCOMES OF DAMAGE CALCULATIONS
@@ -261,11 +267,13 @@ class TestDirectDamage:
 
         fun0 = manual_damage_functions.loaded[0]
         assert fun0.prefix == "te"
-        
+
         _representative_damage_percentile = 100
 
         # DO ACTUAL DAMAGE CALCULATION
-        event_gdf = DamageNetworkEvents(road_gdf, val_cols, _representative_damage_percentile)
+        event_gdf = DamageNetworkEvents(
+            road_gdf, val_cols, _representative_damage_percentile
+        )
         event_gdf.main(
             damage_function=damage_function,
             manual_damage_functions=manual_damage_functions,

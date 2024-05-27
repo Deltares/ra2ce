@@ -46,7 +46,12 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         *self.stats* (set)   : the available statistics
     """
 
-    def __init__(self, road_gdf: GeoDataFrame, val_cols: list[str], representative_damage_percentile: float):
+    def __init__(
+        self,
+        road_gdf: GeoDataFrame,
+        val_cols: list[str],
+        representative_damage_percentile: float,
+    ):
         # Construct using the parent class __init__
         super().__init__(road_gdf, val_cols, representative_damage_percentile)
 
@@ -58,7 +63,9 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
             raise ValueError("No return_period cols present in hazard data")
 
     @classmethod
-    def construct_from_csv(cls, path: Path, representative_damage_percentile: float, sep: str = ";"):
+    def construct_from_csv(
+        cls, path: Path, representative_damage_percentile: float, sep: str = ";"
+    ):
         road_gdf = pd.read_csv(path, sep=sep)
         val_cols = [
             c for c in road_gdf.columns if c.startswith("F_")

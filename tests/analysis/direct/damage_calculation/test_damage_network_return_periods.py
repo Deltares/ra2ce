@@ -19,7 +19,9 @@ class TestDamageNetworkReturnPeriods:
         _representative_damage_percentile = 100
 
         # 2. Run test.
-        _damage = DamageNetworkReturnPeriods(_road_gf, _val_cols, _representative_damage_percentile)
+        _damage = DamageNetworkReturnPeriods(
+            _road_gf, _val_cols, _representative_damage_percentile
+        )
 
         # 2. Verify expectations.
         assert isinstance(_damage, DamageNetworkReturnPeriods)
@@ -34,7 +36,9 @@ class TestDamageNetworkReturnPeriods:
 
         # 2. Run test.
         with pytest.raises(ValueError) as exc_err:
-            DamageNetworkReturnPeriods(_road_gf, _val_cols, _representative_damage_percentile)
+            DamageNetworkReturnPeriods(
+                _road_gf, _val_cols, _representative_damage_percentile
+            )
 
         # 3. Verify expectations
         assert str(exc_err.value) == "No return_period cols present in hazard data"
