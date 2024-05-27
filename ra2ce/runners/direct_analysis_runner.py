@@ -77,7 +77,7 @@ class DirectAnalysisRunner(AnalysisRunner):
         # Step 1: Create a new attribute damage_segments_list for each edge
         for event in events:
             if damage_curve == analysis.analysis.damage_curve.HZ.name:
-                damage_result_columns = f'dam_{event}_{damage_curve}'  # there is one damage column
+                damage_result_columns = [f'dam_{event}_{damage_curve}']  # there is one damage column
             elif damage_curve == analysis.analysis.damage_curve.OSD.name:
                 pattern = rf'dam_.*_{event}_representative'
                 damage_result_columns = [col for col in result_segment_based.columns if re.match(pattern, col)]
