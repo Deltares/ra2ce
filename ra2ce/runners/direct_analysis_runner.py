@@ -23,6 +23,7 @@ import logging
 import time
 import numpy as np
 import geopandas as gpd
+import re
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
@@ -75,27 +76,36 @@ class DirectAnalysisRunner(AnalysisRunner):
 
         # Step 1: Create a new attribute damage_segments_list for each edge
         for event in events:
-            for u, v, key, data in damages_link_based_graph.edges(keys=True, data=True):
-                damages_link_based_graph[u][v][key]['damage_segments_list'] = []
-                damages_link_based_graph[u][v][key][f'dam_{event}_{damage_curve}'] = 0
+            if (damage_curve == analysis.analysis.damage_curve.HZ.name or damage_curve == analysis.analysis.damage_curve.MAN.name):
+                damage_result_columns = f'dam_{event}_{damage_curve}'  # there is one damage column
+            elif damage_curve == analysis.analysis.damage_curve.OSD.name:
+                pattern = rf'dam_.*_{event}_representative'
+                damage_result_columns = [col for col in result_segment_based.columns if re.match(pattern, col)]  # there are multiple damage columns
+            else:
+                raise ValueError(f"damage curve {damage_curve} is invalid")
+            
+            for damage_result_column in damage_result_columns:
+                for u, v, key, data in damages_link_based_graph.edges(keys=True, data=True):
+                    damages_link_based_graph[u][v][key]['damage_segments_list'] = []
+                    damages_link_based_graph[u][v][key][damage_result_column] = 0
 
-            # Step 2: Lookup segment_id_list for each edge
-            for u, v, key, data in damages_link_based_graph.edges(keys=True, data=True):
-                link_damage = data[f'dam_{event}_{damage_curve}']
-                segment_id_list = data[segment_id_column] if isinstance(data[segment_id_column], list) else [
-                    data[segment_id_column]]
+                # Step 2: Lookup segment_id_list for each edge
+                for u, v, key, data in damages_link_based_graph.edges(keys=True, data=True):
+                    link_damage = data[damage_result_column]
+                    segment_id_list = data[segment_id_column] if isinstance(data[segment_id_column], list) else [
+                        data[segment_id_column]]
 
-                # Step 3: Read damage for each segment_id and append to damage_segments_list and calculate link_damage
-                for segment_id in segment_id_list:
-                    segment_damage = result_segment_based.loc[
-                        result_segment_based[segment_id_column] == segment_id, f'dam_{event}_{damage_curve}'
-                    ].squeeze()
-                    if np.isnan(segment_damage):
-                        segment_damage = 0
-                    data['damage_segments_list'].append(round(segment_damage, 2))
-                    link_damage += round(segment_damage, 2)
+                    # Step 3: Read damage for each segment_id and append to damage_segments_list and calculate link_damage
+                    for segment_id in segment_id_list:
+                        segment_damage = result_segment_based.loc[
+                            result_segment_based[segment_id_column] == segment_id, damage_result_column
+                        ].squeeze()
+                        if np.isnan(segment_damage):
+                            segment_damage = 0
+                        data['damage_segments_list'].append(round(segment_damage, 2))
+                        link_damage += round(segment_damage, 2)
 
-                data[f'dam_{event}_{damage_curve}'] = round(link_damage, 2)
+                    data[damage_result_column] = round(link_damage, 2)
         # Step 4: Convert the edge attributes to a GeoDataFrame
         edge_attributes = []
         for u, v, key, data in damages_link_based_graph.edges(keys=True, data=True):
