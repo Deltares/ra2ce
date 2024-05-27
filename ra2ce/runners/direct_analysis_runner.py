@@ -76,11 +76,16 @@ class DirectAnalysisRunner(AnalysisRunner):
 
         # Step 1: Create a new attribute damage_segments_list for each edge
         for event in events:
-            if (damage_curve == analysis.analysis.damage_curve.HZ.name or damage_curve == analysis.analysis.damage_curve.MAN.name):
+            if damage_curve == analysis.analysis.damage_curve.HZ.name:
                 damage_result_columns = f'dam_{event}_{damage_curve}'  # there is one damage column
             elif damage_curve == analysis.analysis.damage_curve.OSD.name:
                 pattern = rf'dam_.*_{event}_representative'
-                damage_result_columns = [col for col in result_segment_based.columns if re.match(pattern, col)]  # there are multiple damage columns
+                damage_result_columns = [col for col in result_segment_based.columns if re.match(pattern, col)]
+                # there are multiple damage columns
+            elif damage_curve == analysis.analysis.damage_curve.MAN.name:
+                pattern = rf'dam_{event}_.*'
+                damage_result_columns = [col for col in result_segment_based.columns if
+                                         re.match(pattern, col)]  # there are multiple damage columns
             else:
                 raise ValueError(f"damage curve {damage_curve} is invalid")
             
@@ -95,7 +100,7 @@ class DirectAnalysisRunner(AnalysisRunner):
                     segment_id_list = data[segment_id_column] if isinstance(data[segment_id_column], list) else [
                         data[segment_id_column]]
 
-                    # Step 3: Read damage for each segment_id and append to damage_segments_list and calculate link_damage
+                    # Step 3: Read damage for each segment_id & append to damage_segments_list and calculate link_damage
                     for segment_id in segment_id_list:
                         segment_damage = result_segment_based.loc[
                             result_segment_based[segment_id_column] == segment_id, damage_result_column
