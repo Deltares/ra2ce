@@ -48,7 +48,6 @@ class ManualDamageFunctions:
         )
         for subfolder in folder.iterdir():  # Subfolders contain the damage curves
             if subfolder.is_dir():
-                # print(subfolder.stem,subfolder)
                 self.available[subfolder.stem] = subfolder
         logging.info(
             "Found {} manual damage curves: \n {}".format(
