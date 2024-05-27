@@ -14,9 +14,11 @@ class TestDamageNetworkEvents:
         # 1. Define test data.
         _road_gf = None
         _val_cols = ["an_event_01", "an_event_02"]
-
+        _representative_damage_percentile = 100
         # 2. Run test
-        _dne = DamageNetworkEvents(_road_gf, _val_cols)
+        _dne = DamageNetworkEvents(
+            _road_gf, _val_cols, _representative_damage_percentile
+        )
 
         # 3. Verify final expectations
         assert isinstance(_dne, DamageNetworkEvents)
@@ -27,10 +29,13 @@ class TestDamageNetworkEvents:
         # 1. Define test data.
         _road_gf = None
         _val_cols = []
+        _representative_damage_percentile = 100
 
         # 2. Run test.
         with pytest.raises(ValueError) as exc_err:
-            DamageNetworkEvents(_road_gf, _val_cols)
+            _dne = DamageNetworkEvents(
+                _road_gf, _val_cols, _representative_damage_percentile
+            )
 
         # 3. Verify final expectations.
         assert str(exc_err.value) == "No event cols present in hazard data"

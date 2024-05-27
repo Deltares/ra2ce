@@ -18,8 +18,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
 from __future__ import annotations
+
+from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.direct.damage_calculation.damage_network_base import (
@@ -37,9 +38,14 @@ class DamageNetworkEvents(DamageNetworkBase):
         *self.stats* (set)   : the available statistics
     """
 
-    def __init__(self, road_gdf, val_cols):
+    def __init__(
+        self,
+        road_gdf: GeoDataFrame,
+        val_cols: list[str],
+        representative_damage_percentile: float,
+    ):
         # Construct using the parent class __init__
-        super().__init__(road_gdf, val_cols)
+        super().__init__(road_gdf, val_cols, representative_damage_percentile)
         self.events = set([x.split("_")[1] for x in val_cols])  # set of unique events
 
         if not any(self.events):
