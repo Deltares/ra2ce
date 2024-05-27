@@ -21,10 +21,10 @@
 
 import logging
 from abc import ABC, abstractmethod
-
+from geopandas import GeoDataFrame
 import numpy as np
 import pandas as pd
-
+from scipy.interpolate import interp1d
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.direct.direct_lookup import LookUp as lookup
 from ra2ce.analysis.direct.direct_lookup import dataframe_lookup
@@ -38,25 +38,26 @@ from ra2ce.analysis.direct.direct_utils import (
 class DamageNetworkBase(ABC):
     """A road network gdf with hazard data stored in it, and for which damages can be calculated"""
 
-    def __init__(self, road_gdf, val_cols):
+    def __init__(self, road_gdf: GeoDataFrame, val_cols: list[str], representative_damage_percentile: float):
         """Construct the Data"""
         self.val_cols = val_cols
         self.gdf = road_gdf
         # set of hazard info per event
         self.stats = set([x.split("_")[-1] for x in val_cols])
+        self.representative_damage_percentile = representative_damage_percentile
         # TODO: also track the damage cols after the dam calculation, that is useful for the risk calc. module
-        # TODO: also create constructors of the childs of this class
+        # TODO: also create constructors of the children of this class
 
     @abstractmethod
     def main(self, damage_function: DamageCurveEnum, manual_damage_functions):
         """
-        Controler for doing the EAD calculation
+        Controller for doing the EAD calculation
 
         Args:
             damage_function (DamageCurveEnum): damage function key name that is to be used
             manual_damage_functions (ManualDamageFunctions): `ManualDamageFunctions` object
         """
-        raise ValueError("Needs to be implented in concrete child class.")
+        raise ValueError("Needs to be implemented in concrete child class.")
 
     # events is missing
     def do_cleanup_and_mask_creation(self):
@@ -260,6 +261,21 @@ class DamageNetworkBase(ABC):
     def calculate_damage_OSdaMage(self, events):
         """Damage calculation with the OSdaMage functions"""
 
+        def interpolate_damage(row, representative_damage_percentile):
+            # Extract the tuple of damage values from the row
+            damage_values = row["dam_{}_{}_quartiles".format(curve_name, event)]
+
+            # Quantile values corresponding to the damage values
+            percentiles = [0, 25, 50, 75, 100]
+
+            # Perform linear interpolation using interp1d from scipy
+            _interpolator = interp1d(percentiles, damage_values, kind='linear', fill_value='extrapolate')
+
+            # Interpolate the damage value for the given representative_damage_percentile
+            interpolated_damage = _interpolator(representative_damage_percentile)
+
+            return interpolated_damage
+
         # These factors are derived from: Van Ginkel et al. 2021: https://nhess.copernicus.org/articles/21/1011/2021/
         logging.warning(
             """Damage calculations with OSdaMage functions are based on 
@@ -325,7 +341,7 @@ class DamageNetworkBase(ABC):
                     df["dam_{}_{}_{}".format(percentage, curve_name, event)] = round(
                         df["damage_{}".format(percentage)].astype(
                             float
-                        )  # max damage (in euro/km)
+                        )  # max damage (in euro/m)
                         * interpolator(
                             df["{}_{}_{}".format(hazard_prefix, event, end)]
                         ).astype(
@@ -333,13 +349,13 @@ class DamageNetworkBase(ABC):
                         )  # damage curve: fraction f(depth-cm) #Todo check units
                         * df["{}_{}_{}".format(hazard_prefix, event, "fr")].astype(
                             float
-                        )  # inundated fraction of the segment
+                        )  # inundated fraction of the segment should be in km. because max damage (in euro/km) 
                         * df["length"].astype(float),
-                        2,
+                        3,
                     )
 
                 # This wraps it all in tuple again
-                df["dam_{}_{}".format(curve_name, event)] = tuple(
+                df["dam_{}_{}_quartiles".format(curve_name, event)] = tuple(
                     zip(
                         df["dam_0_{}_{}".format(curve_name, event)],
                         df["dam_25_{}_{}".format(curve_name, event)],
@@ -348,6 +364,9 @@ class DamageNetworkBase(ABC):
                         df["dam_100_{}_{}".format(curve_name, event)],
                     )
                 )
+                df[f"dam_{curve_name}_{event}_representative"] = (
+                    df.apply(lambda row: interpolate_damage(row, self.representative_damage_percentile),
+                             axis=1)).astype(float)
 
                 # And throw way all intermediate results (that are not in the tuple)
                 df = df.drop(

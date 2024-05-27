@@ -83,9 +83,9 @@ class TestDirectDamage:
         val_cols = [
             col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
         ]
-
+        _representative_damage_percentile = 100
         # DO ACTUAL DAMAGE CALCULATION
-        event_gdf = DamageNetworkEvents(road_gdf, val_cols)
+        event_gdf = DamageNetworkEvents(road_gdf, val_cols, _representative_damage_percentile)
         event_gdf.main(damage_function=damage_function)
 
         # CHECK OUTCOMES OF DAMAGE CALCULATIONS
@@ -118,8 +118,8 @@ class TestDirectDamage:
         val_cols = [
             col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
         ]
-
-        event_gdf = DamageNetworkEvents(road_gdf, val_cols)
+        _representative_damage_percentile = 100
+        event_gdf = DamageNetworkEvents(road_gdf, val_cols, _representative_damage_percentile)
         event_gdf.main(damage_function=damage_function)
 
         ### Some manual corrections, because the RA2CE implementation also calculates damage for bridges, but the
@@ -179,8 +179,10 @@ class TestDirectDamage:
             col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
         ]
 
+        _representative_damage_percentile = 100
+
         # DO ACTUAL DAMAGE CALCULATION
-        event_gdf = DamageNetworkEvents(road_gdf, val_cols)
+        event_gdf = DamageNetworkEvents(road_gdf, val_cols, _representative_damage_percentile)
         event_gdf.main(damage_function=damage_function)
 
         # CHECK OUTCOMES OF DAMAGE CALCULATIONS
@@ -189,7 +191,7 @@ class TestDirectDamage:
         # LOOP OVER THE OSdaMage functions
         for curve in ["C1", "C2", "C3", "C4", "C5", "C6"]:
             # Check lower boundary of the reconstruction/max damage costs
-            ra2ce_results_lower = df["dam_{}_EV1".format(curve)].apply(
+            ra2ce_results_lower = df["dam_{}_EV1_quartiles".format(curve)].apply(
                 lambda x: x[0] if isinstance(x, tuple) else x
             )
             ra2ce_results_lower = ra2ce_results_lower.fillna(0)
@@ -259,9 +261,11 @@ class TestDirectDamage:
 
         fun0 = manual_damage_functions.loaded[0]
         assert fun0.prefix == "te"
+        
+        _representative_damage_percentile = 100
 
         # DO ACTUAL DAMAGE CALCULATION
-        event_gdf = DamageNetworkEvents(road_gdf, val_cols)
+        event_gdf = DamageNetworkEvents(road_gdf, val_cols, _representative_damage_percentile)
         event_gdf.main(
             damage_function=damage_function,
             manual_damage_functions=manual_damage_functions,
@@ -358,7 +362,7 @@ class TestDirectDamage:
 
     def test_construct_damage_network_return_periods(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-            risk_data_file, sep=";"
+            risk_data_file, sep=";", representative_damage_percentile=100
         )
         assert (
             type(damage_network) == DamageNetworkReturnPeriods
@@ -366,7 +370,7 @@ class TestDirectDamage:
 
     def test_risk_calculation_default(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-            risk_data_file, sep=";"
+            risk_data_file, sep=";", representative_damage_percentile=100
         )
         damage_network.control_risk_calculation(mode=RiskCalculationModeEnum.DEFAULT)
         assert (
@@ -376,7 +380,7 @@ class TestDirectDamage:
     def test_risk_calculation_cutoff(self, risk_data_file: Path):
         for rp in [15, 200, 25]:
             damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-                risk_data_file, sep=";"
+                risk_data_file, sep=";", representative_damage_percentile=100
             )
             damage_network.control_risk_calculation(
                 mode=RiskCalculationModeEnum.CUT_FROM_YEAR, year=rp
@@ -389,7 +393,7 @@ class TestDirectDamage:
 
     def test_risk_calculation_triangle_to_null(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-            risk_data_file, sep=";"
+            risk_data_file, sep=";", representative_damage_percentile=100
         )
         for triangle_rp in [8, 2]:
             damage_network.control_risk_calculation(

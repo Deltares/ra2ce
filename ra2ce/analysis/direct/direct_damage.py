@@ -52,20 +52,21 @@ class DirectDamage(AnalysisDirectProtocol):
             new_cols = []
             for c in cs:
                 if c.startswith("RP") or c.startswith("EV"):
-                    new_cols.append("F_" + c)
+                    new_cols.append(f"{hazard_prefix}_" + c)
                 else:
                     new_cols.append(c)
 
             ### Todo add handling of events if this gives a problem
             return new_cols
 
+        hazard_prefix = "F"
         # Open the network with hazard data
         road_gdf = self.graph_file_hazard.get_graph()
         road_gdf.columns = _rename_road_gdf_to_conventions(road_gdf.columns)
 
         # Find the hazard columns; these may be events or return periods
         val_cols = [
-            col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
+            col for col in road_gdf.columns if f"{hazard_prefix}" in col.split("_")
         ]
 
         # Read the desired damage function
@@ -82,7 +83,7 @@ class DirectDamage(AnalysisDirectProtocol):
 
         # Choose between event or return period based analysis
         if self.analysis.event_type == EventTypeEnum.EVENT:
-            event_gdf = DamageNetworkEvents(road_gdf, val_cols)
+            event_gdf = DamageNetworkEvents(road_gdf, val_cols, self.analysis.representative_damage_percentile)
             event_gdf.main(
                 damage_function=damage_function,
                 manual_damage_functions=manual_damage_functions,
@@ -91,7 +92,9 @@ class DirectDamage(AnalysisDirectProtocol):
             return event_gdf.gdf
 
         elif self.analysis.event_type == EventTypeEnum.RETURN_PERIOD:
-            return_period_gdf = DamageNetworkReturnPeriods(road_gdf, val_cols)
+            return_period_gdf = DamageNetworkReturnPeriods(
+                road_gdf, val_cols, self.analysis.representative_damage_percentile
+            )
             return_period_gdf.main(
                 damage_function=damage_function,
                 manual_damage_functions=manual_damage_functions,
