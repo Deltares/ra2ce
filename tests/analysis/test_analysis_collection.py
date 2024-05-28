@@ -15,7 +15,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.damages.analysis_direct_protocol import AnalysisDirectProtocol
+from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from tests import test_data
 
@@ -89,7 +89,7 @@ class TestAnalysisCollection:
         assert len(_collection.damages_analyses) == 1
 
         _generated_analysis = _collection.damages_analyses[0]
-        assert isinstance(_generated_analysis, AnalysisDirectProtocol)
+        assert isinstance(_generated_analysis, AnalysisDamagesProtocol)
         assert _collection.damages_analyses[0].analysis.analysis == analysis
 
     @pytest.mark.parametrize(

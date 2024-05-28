@@ -10,11 +10,11 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionDamages,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
-from ra2ce.analysis.damages.analysis_direct_protocol import AnalysisDirectProtocol
+from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.network.graph_files.network_file import NetworkFile
 
 
-class EffectivenessMeasures(AnalysisDirectProtocol):
+class EffectivenessMeasures(AnalysisDamagesProtocol):
     analysis: AnalysisSectionDamages
     graph_file: NetworkFile
     graph_file_hazard: NetworkFile
