@@ -123,7 +123,7 @@ class TestMainCli:
     )
     def test_given_test_data_main_does_not_throw(self, case_data_dir: Path):
         """
-        ToDo: is this test necessary? Would it not be better to frame it in direct / indirect ?
+        ToDo: is this test necessary? Would it not be better to frame it in damages / losses ?
         """
         # 1. Define test data.
         _network = case_data_dir.joinpath(_network_ini_name)
@@ -185,12 +185,12 @@ class TestMainCli:
                         "multilink_origin_closest_dest_test_results_nodes.gpkg",
                     ],
                 ),
-                id="Case 2. All indirect analyses",
+                id="Case 2. All losses analyses",
             ),
         ],
         indirect=["case_data_dir"],
     )
-    def test_indirect_analysis(
+    def test_losses_analysis(
         self,
         case_data_dir: Path,
         expected_graph_files: list[str],

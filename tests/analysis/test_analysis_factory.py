@@ -21,16 +21,18 @@ from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtoco
 
 class TestAnalysisFactory:
     @dataclass
-    class MockAnalysisSectionDirect(AnalysisSectionDamages):
+    class MockAnalysisSectionDamages(AnalysisSectionDamages):
         analysis: AnalysisDamagesEnum = None
 
     @dataclass
-    class MockAnalysisSectionIndirect(AnalysisSectionLosses):
+    class MockAnalysisSectionLosses(AnalysisSectionLosses):
         analysis: AnalysisLossesEnum = None
 
     def test_get_direct_analysis_with_invalid_raises(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionDirect(analysis=AnalysisDamagesEnum.INVALID)
+        _analysis = self.MockAnalysisSectionDamages(
+            analysis=AnalysisDamagesEnum.INVALID
+        )
         _config = AnalysisConfigWrapper()
 
         # 2. Run test.
@@ -42,11 +44,9 @@ class TestAnalysisFactory:
             _analysis.analysis
         )
 
-    def test_get_indirect_analysis_with_invalid_raises(self):
+    def test_get_losses_analysis_with_invalid_raises(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionIndirect(
-            analysis=AnalysisLossesEnum.INVALID
-        )
+        _analysis = self.MockAnalysisSectionLosses(analysis=AnalysisLossesEnum.INVALID)
         _config = AnalysisConfigWrapper()
         _config.config_data.output_path = Path("just a path")
 
@@ -59,9 +59,9 @@ class TestAnalysisFactory:
             _analysis.analysis
         )
 
-    def test_get_analysis_with_direct(self):
+    def test_get_analysis_with_damages(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionDirect(
+        _analysis = self.MockAnalysisSectionDamages(
             analysis=AnalysisDamagesEnum.DIRECT_DAMAGE
         )
         _config = AnalysisConfigWrapper()
@@ -74,9 +74,9 @@ class TestAnalysisFactory:
         assert _result.graph_file_hazard == _config.graph_files.base_network_hazard
         assert _result.analysis == _analysis
 
-    def test_get_analysis_with_indirect(self):
+    def test_get_analysis_with_losses(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionIndirect(
+        _analysis = self.MockAnalysisSectionLosses(
             analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY
         )
         _config = AnalysisConfigWrapper()
