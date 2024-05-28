@@ -6,8 +6,8 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_data.analysis_config_data_validator import (
     AnalysisConfigDataValidator,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
-    AnalysisDirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
@@ -41,7 +41,7 @@ class TestAnalysisConfigDataValidator:
         _test_config_data = AnalysisConfigData(
             project=ProjectSection(),
             analyses=AnalysisSectionDirect(
-                analysis=AnalysisDirectEnum.DIRECT,
+                analysis=AnalysisDamagesEnum.DIRECT_DAMAGE,
                 event_type=EventTypeEnum.EVENT,
                 damage_curve=DamageCurveEnum.HZ,
             ),

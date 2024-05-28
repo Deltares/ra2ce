@@ -7,11 +7,11 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionDirect,
     AnalysisSectionIndirect,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
-    AnalysisDirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
-    AnalysisIndirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_factory import AnalysisFactory
@@ -22,15 +22,15 @@ from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectP
 class TestAnalysisFactory:
     @dataclass
     class MockAnalysisSectionDirect(AnalysisSectionDirect):
-        analysis: AnalysisDirectEnum = None
+        analysis: AnalysisDamagesEnum = None
 
     @dataclass
     class MockAnalysisSectionIndirect(AnalysisSectionIndirect):
-        analysis: AnalysisIndirectEnum = None
+        analysis: AnalysisLossesEnum = None
 
     def test_get_direct_analysis_with_invalid_raises(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionDirect(analysis=AnalysisDirectEnum.INVALID)
+        _analysis = self.MockAnalysisSectionDirect(analysis=AnalysisDamagesEnum.INVALID)
         _config = AnalysisConfigWrapper()
 
         # 2. Run test.
@@ -45,7 +45,7 @@ class TestAnalysisFactory:
     def test_get_indirect_analysis_with_invalid_raises(self):
         # 1. Define test data.
         _analysis = self.MockAnalysisSectionIndirect(
-            analysis=AnalysisIndirectEnum.INVALID
+            analysis=AnalysisLossesEnum.INVALID
         )
         _config = AnalysisConfigWrapper()
         _config.config_data.output_path = Path("just a path")
@@ -61,7 +61,9 @@ class TestAnalysisFactory:
 
     def test_get_analysis_with_direct(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionDirect(analysis=AnalysisDirectEnum.DIRECT)
+        _analysis = self.MockAnalysisSectionDirect(
+            analysis=AnalysisDamagesEnum.DIRECT_DAMAGE
+        )
         _config = AnalysisConfigWrapper()
 
         # 2. Run test.
@@ -75,7 +77,7 @@ class TestAnalysisFactory:
     def test_get_analysis_with_indirect(self):
         # 1. Define test data.
         _analysis = self.MockAnalysisSectionIndirect(
-            analysis=AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY
+            analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY
         )
         _config = AnalysisConfigWrapper()
         _config.config_data.output_path = Path("just a path")

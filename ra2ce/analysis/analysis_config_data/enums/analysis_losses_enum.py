@@ -1,7 +1,7 @@
 from ra2ce.configuration.ra2ce_enum_base import Ra2ceEnumBase
 
 
-class AnalysisIndirectEnum(Ra2ceEnumBase):
+class AnalysisLossesEnum(Ra2ceEnumBase):
     SINGLE_LINK_REDUNDANCY = 1
     MULTI_LINK_REDUNDANCY = 2
     OPTIMAL_ROUTE_ORIGIN_DESTINATION = 3

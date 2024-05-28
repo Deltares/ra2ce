@@ -26,11 +26,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
-    AnalysisDirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
-    AnalysisIndirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
@@ -49,10 +49,10 @@ from ra2ce.network.network_config_data.network_config_data import (
 )
 
 IndirectAnalysisNameList: list[str] = list(
-    map(str, AnalysisIndirectEnum.list_valid_options())
+    map(str, AnalysisLossesEnum.list_valid_options())
 )
 DirectAnalysisNameList: list[str] = list(
-    map(str, AnalysisDirectEnum.list_valid_options())
+    map(str, AnalysisDamagesEnum.list_valid_options())
 )
 
 
@@ -82,8 +82,8 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
     Reflects all possible settings that an indirect analysis section might contain.
     """
 
-    analysis: AnalysisIndirectEnum = field(
-        default_factory=lambda: AnalysisIndirectEnum.INVALID
+    analysis: AnalysisLossesEnum = field(
+        default_factory=lambda: AnalysisLossesEnum.INVALID
     )
     # general
     weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
@@ -126,8 +126,8 @@ class AnalysisSectionDirect(AnalysisSectionBase):
     Reflects all possible settings that a direct analysis section might contain.
     """
 
-    analysis: AnalysisDirectEnum = field(
-        default_factory=lambda: AnalysisDirectEnum.INVALID
+    analysis: AnalysisDamagesEnum = field(
+        default_factory=lambda: AnalysisDamagesEnum.INVALID
     )
     # adaptation/effectiveness measures
     return_period: float = math.nan

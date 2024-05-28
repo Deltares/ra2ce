@@ -8,11 +8,11 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionDirect,
     AnalysisSectionIndirect,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
-    AnalysisDirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
-    AnalysisIndirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
@@ -81,10 +81,8 @@ class TestAnalysisConfigWrapper:
         _output_dir = test_results / request.node.name
         _analysis.config_data = AnalysisConfigData(output_path=_output_dir)
         _analysis.config_data.analyses = [
-            AnalysisSectionDirect(analysis=AnalysisDirectEnum.EFFECTIVENESS_MEASURES),
-            AnalysisSectionIndirect(
-                analysis=AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY
-            ),
+            AnalysisSectionDirect(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES),
+            AnalysisSectionIndirect(analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY),
         ]
         if _output_dir.exists():
             shutil.rmtree(_output_dir)
@@ -103,7 +101,7 @@ class TestAnalysisConfigWrapper:
         _analysis_wrapper.config_data = AnalysisConfigData()
         _analysis_wrapper.config_data.analyses.append(
             AnalysisSectionDirect(
-                analysis=AnalysisDirectEnum.DIRECT,
+                analysis=AnalysisDamagesEnum.DIRECT_DAMAGE,
                 event_type=EventTypeEnum.EVENT,
                 damage_curve=DamageCurveEnum.HZ,
             )

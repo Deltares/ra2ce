@@ -33,11 +33,11 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     IndirectAnalysisNameList,
     ProjectSection,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
-    AnalysisDirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
-    AnalysisIndirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
@@ -109,7 +109,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         self, section_name: str
     ) -> AnalysisSectionIndirect:
         _section = AnalysisSectionIndirect(**self._parser[section_name])
-        _section.analysis = AnalysisIndirectEnum.get_enum(
+        _section.analysis = AnalysisLossesEnum.get_enum(
             self._parser.get(section_name, "analysis", fallback=None)
         )
         _section.save_gpkg = self._parser.getboolean(
@@ -197,7 +197,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
 
     def _get_analysis_section_direct(self, section_name: str) -> AnalysisSectionDirect:
         _section = AnalysisSectionDirect(**self._parser[section_name])
-        _section.analysis = AnalysisDirectEnum.get_enum(
+        _section.analysis = AnalysisDamagesEnum.get_enum(
             self._parser.get(section_name, "analysis", fallback=None)
         )
         _section.save_gpkg = self._parser.getboolean(
