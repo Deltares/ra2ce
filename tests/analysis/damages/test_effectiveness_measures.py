@@ -9,7 +9,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
-from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
+from ra2ce.analysis.damages.effectiveness_measures import EffectivenessMeasures
 from tests import test_data
 
 

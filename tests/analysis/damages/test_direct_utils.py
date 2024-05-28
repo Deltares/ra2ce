@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 from shapely.geometry import LineString
 
-from ra2ce.analysis.direct.direct_utils import (
+from ra2ce.analysis.damages.direct_utils import (
     clean_lane_data,
     create_summary_statistics,
     lane_cleaner,

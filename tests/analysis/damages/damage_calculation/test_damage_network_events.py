@@ -1,10 +1,10 @@
 import pandas as pd
 import pytest
 
-from ra2ce.analysis.direct.damage_calculation.damage_network_base import (
+from ra2ce.analysis.damages.damage_calculation.damage_network_base import (
     DamageNetworkBase,
 )
-from ra2ce.analysis.direct.damage_calculation.damage_network_events import (
+from ra2ce.analysis.damages.damage_calculation.damage_network_events import (
     DamageNetworkEvents,
 )
 

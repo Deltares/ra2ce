@@ -15,7 +15,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_factory import AnalysisFactory
-from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
+from ra2ce.analysis.damages.analysis_direct_protocol import AnalysisDirectProtocol
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 
 

@@ -31,9 +31,9 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
-from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
-from ra2ce.analysis.direct.direct_damage import DirectDamage
-from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
+from ra2ce.analysis.damages.analysis_direct_protocol import AnalysisDirectProtocol
+from ra2ce.analysis.damages.direct_damage import DirectDamage
+from ra2ce.analysis.damages.effectiveness_measures import EffectivenessMeasures
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.losses import Losses
 from ra2ce.analysis.losses.multi_link_isolated_locations import (

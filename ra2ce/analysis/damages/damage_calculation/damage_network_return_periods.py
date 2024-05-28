@@ -30,7 +30,7 @@ from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCu
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
-from ra2ce.analysis.direct.damage_calculation.damage_network_base import (
+from ra2ce.analysis.damages.damage_calculation.damage_network_base import (
     DamageNetworkBase,
 )
 
