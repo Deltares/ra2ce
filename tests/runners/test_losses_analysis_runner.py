@@ -7,14 +7,14 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
     AnalysisIndirectEnum,
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper
-from ra2ce.runners.indirect_analysis_runner import IndirectAnalysisRunner
+from ra2ce.runners.losses_analysis_runner import LossesAnalysisRunner
 from tests.runners.dummy_classes import DummyRa2ceInput
 
 
-class TestIndirectAnalysisRunner:
+class TestLossesAnalysisRunner:
     def test_init_direct_analysis_runner(self):
-        _runner = IndirectAnalysisRunner()
-        assert str(_runner) == "Indirect Analysis Runner"
+        _runner = LossesAnalysisRunner()
+        assert str(_runner) == "Losses Analysis Runner"
 
     @pytest.fixture
     def dummy_ra2ce_input(self):
@@ -22,9 +22,7 @@ class TestIndirectAnalysisRunner:
         assert isinstance(_ra2ce_input, ConfigWrapper)
         yield _ra2ce_input
 
-    def test_given_indirect_configuration_can_run(
-        self, dummy_ra2ce_input: ConfigWrapper
-    ):
+    def test_given_losses_configuration_can_run(self, dummy_ra2ce_input: ConfigWrapper):
         # 1. Define test data.
         dummy_ra2ce_input.analysis_config.config_data.analyses = [
             AnalysisSectionIndirect(
@@ -33,7 +31,7 @@ class TestIndirectAnalysisRunner:
         ]
 
         # 2. Run test.
-        _result = IndirectAnalysisRunner.can_run(dummy_ra2ce_input)
+        _result = LossesAnalysisRunner.can_run(dummy_ra2ce_input)
 
         # 3. Verify expectations.
         assert _result
@@ -44,7 +42,7 @@ class TestIndirectAnalysisRunner:
         # 1. Define test data.
 
         # 2. Run test.
-        _result = IndirectAnalysisRunner.can_run(dummy_ra2ce_input)
+        _result = LossesAnalysisRunner.can_run(dummy_ra2ce_input)
 
         # 3. Verify expectations.
         assert not _result
