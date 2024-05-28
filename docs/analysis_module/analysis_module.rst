@@ -2,7 +2,7 @@
 
 Analysis module
 ================
-RA2CE's analysis module can perform several analyses on infrastructure networks. First, a network needs te be created. Visit the :ref:`network_module` for a better understanding of how this works. In the analysis module we distuingish a module focused on direct monetary road damages (physical damages) and an analysis module for network criticality and origin-destination analyses. The latter are developed from a 'societal losses due to hazards' point of view and provide insight into the hazard impact on the network and the disruption of network services to society. 
+RA2CE's analysis module can perform several analyses on infrastructure networks. First, a network needs te be created. Visit the :ref:`network_module` for a better understanding of how this works. In the analysis module we distuingish a module focused on direct monetary road damages (damages) and an analysis module for network criticality and origin-destination analyses (losses). The latter are developed from a 'societal losses due to hazards' point of view and provide insight into the hazard impact on the network and the disruption of network services to society. 
 
 Direct/physical damages
 -------------------------------------
@@ -18,7 +18,7 @@ Possible (built-in) options for vulnerability curves include:
 ::
 
     [project]
-    name = example_direct
+    name = example_damages
 
     [network]
     directed = False
@@ -95,7 +95,7 @@ Multi-link redundancy                                    multi_link_redundancy
 Origin-Destination, defined OD couples, no disruption    optimal_route_origin_destination
 Origin-Destination, defined OD couples, no disruption    multi_link_origin_destination
 Origin-Destination, O to closest D, disruption           optimal_route_origin_closest_destination
-Origin-Destination,  O to closest D, disruption          multi_link_origin_closest_destination
+Origin-Destination, O to closest D, disruption           multi_link_origin_closest_destination
 Isolated locations                                       multi_link_isolated_locations
 Equity and traffic analysis                              part of optimal_route_origin_destination    
 ======================================================   =====================
@@ -107,7 +107,7 @@ With this analysis, you gain insight into the criticality of each link in the ne
 ::
 
     [project]
-    name = example_indirect
+    name = example_losses
 
     [network]
     directed = False
@@ -124,7 +124,7 @@ With this analysis, you gain insight into the criticality of each link in the ne
 ::
 
   [project]
-  name = example_indirect
+  name = example_losses
 
   [analysis1]
   name = example_redundancy
@@ -142,7 +142,7 @@ This analysis provides insight into the impact of a hazard in terms of detour ti
 ::
 
     [project]
-    name = example_indirect
+    name = example_losses
 
     [network]
     directed = False
@@ -166,7 +166,7 @@ This analysis provides insight into the impact of a hazard in terms of detour ti
 ::
 
     [project]
-    name = example_indirect
+    name = example_losses
 
     [analysis1]
     name = example_redundancy_multi
@@ -184,7 +184,7 @@ RA2CE allows for origin-destination analyses. This analysis finds the shortest (
 ::
 
     [project]
-    name = example_indirect
+    name = example_losses
 
     [network]
     directed = False
@@ -211,7 +211,7 @@ RA2CE allows for origin-destination analyses. This analysis finds the shortest (
 ::
 
     [project]
-    name = example_indirect
+    name = example_losses
 
     [analysis1]
     name = example_od
@@ -224,7 +224,7 @@ RA2CE allows for origin-destination analyses. This analysis finds the shortest (
 ::
 
     [project]
-    name = example_indirect
+    name = example_losses
 
     [network]
     directed = False
@@ -251,7 +251,7 @@ RA2CE allows for origin-destination analyses. This analysis finds the shortest (
 ::
 
     [project]
-    name = example_indirect
+    name = example_losses
 
     [analysis1]
     name = example_od
@@ -267,7 +267,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 ::
 
     [project]
-    name = example_indirect
+    name = example_losses
 
     [network]
     directed = False
@@ -294,7 +294,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 ::
 
     [project]
-    name = example_indirect
+    name = example_losses
 
     [analysis1]
     name = example_od
@@ -307,7 +307,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 ::
 
     [project]
-    name = example_indirect
+    name = example_losses
 
     [network]
     directed = False
@@ -341,7 +341,7 @@ This analysis finds the shortest (distance-weighed) or quickest (time-weighed) r
 ::
 
     [project]
-    name = example_indirect
+    name = example_losses
 
     [analysis1]
     name = example_od
@@ -361,7 +361,7 @@ This analysis finds the sections of the network that are fully isolated from the
 ::
 
     [project]
-    name = example_indirect
+    name = example_losses
 
     [network]
     directed = False
@@ -400,7 +400,7 @@ This analysis finds the sections of the network that are fully isolated from the
 ::
 
     [project]
-    name = example_indirect
+    name = example_losses
 
     [analysis1]
     name = example_locations
@@ -423,7 +423,7 @@ This analysis is set up generically so that the user can determine the equity we
 ::
 
     [project]
-    name = example_indirect
+    name = example_losses
 
     [network]
     directed = False
