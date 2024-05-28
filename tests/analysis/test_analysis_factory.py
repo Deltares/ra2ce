@@ -35,7 +35,7 @@ class TestAnalysisFactory:
 
         # 2. Run test.
         with pytest.raises(NotImplementedError) as exc_err:
-            AnalysisFactory.get_direct_analysis(_analysis, _config)
+            AnalysisFactory.get_damages_analysis(_analysis, _config)
 
         # 3. Verify expectations.
         assert str(exc_err.value) == "Analysis {} not implemented".format(
@@ -52,7 +52,7 @@ class TestAnalysisFactory:
 
         # 2. Run test.
         with pytest.raises(NotImplementedError) as exc_err:
-            AnalysisFactory.get_indirect_analysis(_analysis, _config)
+            AnalysisFactory.get_losses_analysis(_analysis, _config)
 
         # 3. Verify expectations.
         assert str(exc_err.value) == "Analysis {} not implemented".format(
@@ -67,7 +67,7 @@ class TestAnalysisFactory:
         _config = AnalysisConfigWrapper()
 
         # 2. Run test.
-        _result = AnalysisFactory.get_direct_analysis(_analysis, _config)
+        _result = AnalysisFactory.get_damages_analysis(_analysis, _config)
 
         # 3. Verify expectations.
         assert isinstance(_result, AnalysisDirectProtocol)
@@ -83,7 +83,7 @@ class TestAnalysisFactory:
         _config.config_data.output_path = Path("just a path")
 
         # 2. Run test.
-        _result = AnalysisFactory.get_indirect_analysis(_analysis, _config)
+        _result = AnalysisFactory.get_losses_analysis(_analysis, _config)
 
         # 3. Verify expectations.
         assert isinstance(_result, AnalysisIndirectProtocol)

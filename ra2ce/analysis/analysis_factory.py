@@ -57,7 +57,7 @@ from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 
 class AnalysisFactory:
     @staticmethod
-    def get_direct_analysis(
+    def get_damages_analysis(
         analysis: AnalysisSectionDamages,
         analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisDirectProtocol:
@@ -65,7 +65,7 @@ class AnalysisFactory:
         Create an analysis based on the given analysis configuration.
 
         Args:
-            analysis (AnalysisSectionDirect): Analysis section.
+            analysis (AnalysisSectionDamages): Analysis section.
             analysis_config (AnalysisConfigWrapper): Analysis configuration.
 
         Raises:
@@ -86,7 +86,7 @@ class AnalysisFactory:
         raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
 
     @staticmethod
-    def get_indirect_analysis(
+    def get_losses_analysis(
         analysis: AnalysisSectionLosses,
         analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisIndirectProtocol:
@@ -94,7 +94,7 @@ class AnalysisFactory:
         Create an analysis based on the given analysis configuration.
 
         Args:
-            analysis (AnalysisSectionIndirect): Analysis section.
+            analysis (AnalysisSectionLosses): Analysis section.
             analysis_config (AnalysisConfigWrapper): Analysis configuration.
 
         Raises:

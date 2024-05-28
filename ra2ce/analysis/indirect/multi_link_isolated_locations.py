@@ -143,7 +143,7 @@ class MultiLinkIsolatedLocations(AnalysisIndirectProtocol):
 
         Args:
             graph (nx.Graph): The original graph representing the network, with additional hazard information.
-            analysis (AnalysisSectionIndirect): The configuration of the analysis, which contains the threshold for considering a hazard impact significant.
+            analysis (AnalysisSectionLosses): The configuration of the analysis, which contains the threshold for considering a hazard impact significant.
             crs (int, optional): The coordinate reference system used for geographical data. Defaults to 4326 (WGS84).
 
         Returns:
