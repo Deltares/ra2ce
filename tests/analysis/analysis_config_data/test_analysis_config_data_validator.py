@@ -1,6 +1,6 @@
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisSectionDirect,
+    AnalysisSectionDamages,
     ProjectSection,
 )
 from ra2ce.analysis.analysis_config_data.analysis_config_data_validator import (
@@ -40,7 +40,7 @@ class TestAnalysisConfigDataValidator:
         # 2. Run test.
         _test_config_data = AnalysisConfigData(
             project=ProjectSection(),
-            analyses=AnalysisSectionDirect(
+            analyses=AnalysisSectionDamages(
                 analysis=AnalysisDamagesEnum.DIRECT_DAMAGE,
                 event_type=EventTypeEnum.EVENT,
                 damage_curve=DamageCurveEnum.HZ,
@@ -79,7 +79,7 @@ class TestAnalysisConfigDataValidator:
             root_path=test_results,
             output_path=test_results.joinpath("output"),
             project=ProjectSection(),
-            analyses=[AnalysisSectionDirect(analysis="invalid_analysis_type")],
+            analyses=[AnalysisSectionDamages(analysis="invalid_analysis_type")],
         )
 
         # 2. Run test.

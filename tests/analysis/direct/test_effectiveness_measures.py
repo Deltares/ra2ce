@@ -5,7 +5,7 @@ import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisSectionDirect,
+    AnalysisSectionDamages,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
@@ -14,7 +14,7 @@ from tests import test_data
 
 
 class MockInvalidEffectivenessMeasures(EffectivenessMeasures):
-    def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionDirect):
+    def __init__(self, config: AnalysisConfigData, analysis: AnalysisSectionDamages):
         """
         This class is only meant to inherit from `Effectiveness measures` and allow the partial testing of certain methods for pure code coverage reasons.
         """
@@ -23,7 +23,7 @@ class MockInvalidEffectivenessMeasures(EffectivenessMeasures):
 
 class TestEffectivenessMeasures:
     def test_init_raises_when_file_name_not_defined(self):
-        _analysis = AnalysisSectionDirect(
+        _analysis = AnalysisSectionDamages(
             return_period=None,
             repair_costs=None,
             evaluation_period=None,
@@ -45,7 +45,7 @@ class TestEffectivenessMeasures:
         )
 
     def test_init_raises_when_file_name_not_shp(self):
-        _analysis = AnalysisSectionDirect(
+        _analysis = AnalysisSectionDamages(
             return_period=None,
             repair_costs=None,
             evaluation_period=None,
@@ -68,7 +68,7 @@ class TestEffectivenessMeasures:
 
     def test_init_raises_when_direct_shp_file_does_not_exist(self):
         _config_data = AnalysisConfigData(input_path=test_data)
-        _analysis = AnalysisSectionDirect(
+        _analysis = AnalysisSectionDamages(
             return_period=None,
             repair_costs=None,
             evaluation_period=None,
@@ -87,7 +87,7 @@ class TestEffectivenessMeasures:
         )
 
     def test_init_raises_when_effectiveness_measures_does_not_exist(self):
-        _analysis = AnalysisSectionDirect(
+        _analysis = AnalysisSectionDamages(
             return_period=None,
             repair_costs=None,
             evaluation_period=None,

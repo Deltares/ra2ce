@@ -5,8 +5,8 @@ import pytest
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDirect,
-    AnalysisSectionIndirect,
+    AnalysisSectionDamages,
+    AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -28,11 +28,11 @@ _unsupported_indirect_analysis = [AnalysisLossesEnum.INVALID]
 
 class TestAnalysisCollection:
     @dataclass
-    class MockAnalysisSectionDirect(AnalysisSectionDirect):
+    class MockAnalysisSectionDirect(AnalysisSectionDamages):
         analysis: AnalysisDamagesEnum = None
 
     @dataclass
-    class MockAnalysisSectionIndirect(AnalysisSectionIndirect):
+    class MockAnalysisSectionIndirect(AnalysisSectionLosses):
         analysis: AnalysisLossesEnum = None
 
     @pytest.fixture(autouse=False)

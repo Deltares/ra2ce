@@ -23,8 +23,8 @@ from typing import Any
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    DirectAnalysisNameList,
-    IndirectAnalysisNameList,
+    DamagesAnalysisNameList,
+    LossesAnalysisNameList,
 )
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
@@ -34,7 +34,7 @@ from ra2ce.network.network_config_data.network_config_data_validator import (
 )
 
 AnalysisNetworkDictValues = NetworkDictValues | {
-    "analysis": IndirectAnalysisNameList + DirectAnalysisNameList
+    "analysis": LossesAnalysisNameList + DamagesAnalysisNameList
 }
 
 

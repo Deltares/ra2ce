@@ -5,8 +5,8 @@ import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisSectionDirect,
-    AnalysisSectionIndirect,
+    AnalysisSectionDamages,
+    AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -81,8 +81,8 @@ class TestAnalysisConfigWrapper:
         _output_dir = test_results / request.node.name
         _analysis.config_data = AnalysisConfigData(output_path=_output_dir)
         _analysis.config_data.analyses = [
-            AnalysisSectionDirect(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES),
-            AnalysisSectionIndirect(analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY),
+            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES),
+            AnalysisSectionLosses(analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY),
         ]
         if _output_dir.exists():
             shutil.rmtree(_output_dir)
@@ -100,7 +100,7 @@ class TestAnalysisConfigWrapper:
         _analysis_wrapper = AnalysisConfigWrapper()
         _analysis_wrapper.config_data = AnalysisConfigData()
         _analysis_wrapper.config_data.analyses.append(
-            AnalysisSectionDirect(
+            AnalysisSectionDamages(
                 analysis=AnalysisDamagesEnum.DIRECT_DAMAGE,
                 event_type=EventTypeEnum.EVENT,
                 damage_curve=DamageCurveEnum.HZ,

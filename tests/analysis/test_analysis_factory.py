@@ -4,8 +4,8 @@ from pathlib import Path
 import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDirect,
-    AnalysisSectionIndirect,
+    AnalysisSectionDamages,
+    AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -21,11 +21,11 @@ from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectP
 
 class TestAnalysisFactory:
     @dataclass
-    class MockAnalysisSectionDirect(AnalysisSectionDirect):
+    class MockAnalysisSectionDirect(AnalysisSectionDamages):
         analysis: AnalysisDamagesEnum = None
 
     @dataclass
-    class MockAnalysisSectionIndirect(AnalysisSectionIndirect):
+    class MockAnalysisSectionIndirect(AnalysisSectionLosses):
         analysis: AnalysisLossesEnum = None
 
     def test_get_direct_analysis_with_invalid_raises(self):

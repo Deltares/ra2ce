@@ -2,8 +2,8 @@ import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisSectionDirect,
-    AnalysisSectionIndirect,
+    AnalysisSectionDamages,
+    AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -34,10 +34,10 @@ class TestAnalysisRunnerFactory:
         _config_wrapper = DummyRa2ceInput()
         _config_wrapper.analysis_config.config_data = AnalysisConfigData(
             analyses=[
-                AnalysisSectionDirect(
+                AnalysisSectionDamages(
                     analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES
                 ),
-                AnalysisSectionIndirect(
+                AnalysisSectionLosses(
                     analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY
                 ),
             ]

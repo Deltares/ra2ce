@@ -20,8 +20,8 @@
 """
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDirect,
-    AnalysisSectionIndirect,
+    AnalysisSectionDamages,
+    AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -58,7 +58,7 @@ from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 class AnalysisFactory:
     @staticmethod
     def get_direct_analysis(
-        analysis: AnalysisSectionDirect,
+        analysis: AnalysisSectionDamages,
         analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisDirectProtocol:
         """
@@ -87,7 +87,7 @@ class AnalysisFactory:
 
     @staticmethod
     def get_indirect_analysis(
-        analysis: AnalysisSectionIndirect,
+        analysis: AnalysisSectionLosses,
         analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisIndirectProtocol:
         """

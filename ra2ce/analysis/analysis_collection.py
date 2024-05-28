@@ -48,10 +48,10 @@ class AnalysisCollection:
         return cls(
             direct_analyses=[
                 AnalysisFactory.get_direct_analysis(analysis, analysis_config)
-                for analysis in analysis_config.config_data.direct
+                for analysis in analysis_config.config_data.damages
             ],
             indirect_analyses=[
                 AnalysisFactory.get_indirect_analysis(analysis, analysis_config)
-                for analysis in analysis_config.config_data.indirect
+                for analysis in analysis_config.config_data.losses
             ],
         )

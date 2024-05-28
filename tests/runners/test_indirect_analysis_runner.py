@@ -1,7 +1,7 @@
 import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionIndirect,
+    AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
@@ -27,7 +27,7 @@ class TestIndirectAnalysisRunner:
     ):
         # 1. Define test data.
         dummy_ra2ce_input.analysis_config.config_data.analyses = [
-            AnalysisSectionIndirect(analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY)
+            AnalysisSectionLosses(analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY)
         ]
 
         # 2. Run test.

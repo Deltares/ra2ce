@@ -9,7 +9,7 @@ from shapely.geometry import LineString, Point
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisSectionIndirect,
+    AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
@@ -36,7 +36,7 @@ class TestLosses:
         )
 
         _config.config_data.input_path = Path("sth")
-        _analysis = AnalysisSectionIndirect(part_of_day=None)
+        _analysis = AnalysisSectionLosses(part_of_day=None)
 
         _analysis_input = AnalysisInputWrapper.from_input(
             analysis=_analysis,
@@ -62,7 +62,7 @@ class TestLosses:
         _config_data.network.file_id = "link_id"
         _config_data.network.link_type_column = "link_type"
 
-        _analysis = AnalysisSectionIndirect(
+        _analysis = AnalysisSectionLosses(
             part_of_day=PartOfDayEnum.DAY,
             resilience_curve_file=test_data
             / "losses"
@@ -142,7 +142,7 @@ class TestLosses:
         _config_data.network.link_type_column = "link_type"
         _config.config_data.input_path = test_data / "losses" / "csv_data_for_losses"
 
-        _analysis = AnalysisSectionIndirect(
+        _analysis = AnalysisSectionLosses(
             part_of_day=part_of_day,
             threshold=0,
             resilience_curve_file=_losses_csv_data.joinpath("resilience_curve.csv"),

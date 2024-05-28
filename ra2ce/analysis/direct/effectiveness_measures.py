@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDirect,
+    AnalysisSectionDamages,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
@@ -15,7 +15,7 @@ from ra2ce.network.graph_files.network_file import NetworkFile
 
 
 class EffectivenessMeasures(AnalysisDirectProtocol):
-    analysis: AnalysisSectionDirect
+    analysis: AnalysisSectionDamages
     graph_file: NetworkFile
     graph_file_hazard: NetworkFile
     input_path: Path
@@ -45,7 +45,7 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
         self._validate_input_params(self.input_path, self.analysis)
 
     def _validate_input_params(
-        self, input_path: Path, analysis: AnalysisSectionDirect
+        self, input_path: Path, analysis: AnalysisSectionDamages
     ) -> None:
         if analysis.file_name is None:
             _error = "Effectiveness of measures calculation: No input file configured. Please define an input file in the analysis.ini file."

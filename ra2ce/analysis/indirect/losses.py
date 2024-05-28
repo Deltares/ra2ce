@@ -31,7 +31,7 @@ import geopandas as gpd
 import pandas as pd
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionIndirect,
+    AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
@@ -72,7 +72,7 @@ def _load_df_from_csv(
 
 
 class Losses(AnalysisIndirectProtocol):
-    analysis: AnalysisSectionIndirect
+    analysis: AnalysisSectionLosses
     graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path

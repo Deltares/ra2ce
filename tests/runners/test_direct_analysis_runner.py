@@ -1,7 +1,7 @@
 import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDirect,
+    AnalysisSectionDamages,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -25,7 +25,7 @@ class TestDirectAnalysisRunner:
     def test_given_direct_configuration_can_run(self, dummy_ra2ce_input: ConfigWrapper):
         # 1. Define test data.
         dummy_ra2ce_input.analysis_config.config_data.analyses = [
-            AnalysisSectionDirect(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES)
+            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES)
         ]
         dummy_ra2ce_input.network_config.config_data.hazard.hazard_map = "A value"
 
@@ -52,7 +52,7 @@ class TestDirectAnalysisRunner:
     ):
         # 1. Define test data.
         dummy_ra2ce_input.analysis_config.config_data.analyses = [
-            AnalysisSectionDirect(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES)
+            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES)
         ]
 
         # 2. Run test.
@@ -66,7 +66,7 @@ class TestDirectAnalysisRunner:
     ):
         # 1. Define test data.
         dummy_ra2ce_input.analysis_config.config_data.analyses = [
-            AnalysisSectionDirect(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES)
+            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES)
         ]
         dummy_ra2ce_input.network_config = None
 

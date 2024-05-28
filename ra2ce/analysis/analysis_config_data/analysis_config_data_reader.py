@@ -27,10 +27,10 @@ from shutil import copyfile
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionBase,
-    AnalysisSectionDirect,
-    AnalysisSectionIndirect,
-    DirectAnalysisNameList,
-    IndirectAnalysisNameList,
+    AnalysisSectionDamages,
+    AnalysisSectionLosses,
+    DamagesAnalysisNameList,
+    LossesAnalysisNameList,
     ProjectSection,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
@@ -105,10 +105,8 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
     def get_project_section(self) -> ProjectSection:
         return ProjectSection(**self._parser["project"])
 
-    def _get_analysis_section_indirect(
-        self, section_name: str
-    ) -> AnalysisSectionIndirect:
-        _section = AnalysisSectionIndirect(**self._parser[section_name])
+    def _get_analysis_section_losses(self, section_name: str) -> AnalysisSectionLosses:
+        _section = AnalysisSectionLosses(**self._parser[section_name])
         _section.analysis = AnalysisLossesEnum.get_enum(
             self._parser.get(section_name, "analysis", fallback=None)
         )
@@ -195,8 +193,10 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
 
         return _section
 
-    def _get_analysis_section_direct(self, section_name: str) -> AnalysisSectionDirect:
-        _section = AnalysisSectionDirect(**self._parser[section_name])
+    def _get_analysis_section_damages(
+        self, section_name: str
+    ) -> AnalysisSectionDamages:
+        _section = AnalysisSectionDamages(**self._parser[section_name])
         _section.analysis = AnalysisDamagesEnum.get_enum(
             self._parser.get(section_name, "analysis", fallback=None)
         )
@@ -264,7 +264,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         Extracts info from [analysis<n>] sections
 
         Returns:
-            list[AnalysisSection]: List of analyses (both direct and indirect)
+            list[AnalysisSection]: List of analyses (both damages and losses)
         """
         _analysis_sections = []
 
@@ -275,10 +275,10 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         for _section_name in _section_names:
             _analysis_type = self._parser.get(_section_name, "analysis")
-            if _analysis_type in DirectAnalysisNameList:
-                _analysis_section = self._get_analysis_section_direct(_section_name)
-            elif _analysis_type in IndirectAnalysisNameList:
-                _analysis_section = self._get_analysis_section_indirect(_section_name)
+            if _analysis_type in DamagesAnalysisNameList:
+                _analysis_section = self._get_analysis_section_damages(_section_name)
+            elif _analysis_type in LossesAnalysisNameList:
+                _analysis_section = self._get_analysis_section_losses(_section_name)
             else:
                 raise ValueError(f"Analysis {_analysis_type} not supported.")
             _analysis_sections.append(_analysis_section)
