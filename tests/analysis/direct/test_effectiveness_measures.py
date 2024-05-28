@@ -83,7 +83,7 @@ class TestEffectivenessMeasures:
         with pytest.raises(FileNotFoundError) as exc_err:
             EffectivenessMeasures(_input_wrapper)
         assert str(exc_err.value) == str(
-            _config_data.input_path.joinpath("direct", "filedoesnotexist.shp")
+            _config_data.input_path.joinpath("direct_damage", "filedoesnotexist.shp")
         )
 
     def test_init_raises_when_effectiveness_measures_does_not_exist(self):
@@ -100,13 +100,13 @@ class TestEffectivenessMeasures:
         _config.config_data.input_path = test_data
         _input_wrapper = AnalysisInputWrapper.from_input(_analysis, _config, None, None)
         assert (
-            _config.config_data.input_path.joinpath("direct", "origins.shp")
+            _config.config_data.input_path.joinpath("direct_damage", "origins.shp")
         ).exists()
         with pytest.raises(FileNotFoundError) as exc_err:
             EffectivenessMeasures(_input_wrapper)
         assert str(exc_err.value) == str(
             _config.config_data.input_path.joinpath(
-                "direct", "effectiveness_measures.csv"
+                "direct_damage", "effectiveness_measures.csv"
             )
         )
 
