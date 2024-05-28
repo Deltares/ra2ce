@@ -16,7 +16,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_factory import AnalysisFactory
 from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
-from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
+from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 
 
 class TestAnalysisFactory:
@@ -86,6 +86,6 @@ class TestAnalysisFactory:
         _result = AnalysisFactory.get_losses_analysis(_analysis, _config)
 
         # 3. Verify expectations.
-        assert isinstance(_result, AnalysisIndirectProtocol)
+        assert isinstance(_result, AnalysisLossesProtocol)
         assert _result.graph_file == _config.graph_files.base_graph
         assert _result.analysis == _analysis

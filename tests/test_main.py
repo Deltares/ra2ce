@@ -152,7 +152,7 @@ class TestMainCli:
                 id="Case 1. Given only network shape redundancy.",
             ),
             pytest.param(
-                "4_analyses_indirect",
+                "4_analyses_losses",
                 [],
                 dict(
                     single_link_redundancy=[
