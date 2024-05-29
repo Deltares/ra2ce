@@ -61,58 +61,11 @@ class DirectAnalysisRunner(AnalysisRunner):
         return True
 
     @staticmethod
-    def _calculate_link_damage(
-        graph: nx.MultiDiGraph,
-        segment_id_column: str,
-        result_segment_based: gpd.GeoDataFrame,
-        damage_result_column: str,
-    ) -> nx.MultiDiGraph:
-        """
-        Calculate the link damage for each edge in the graph by reading the damage for each segment ID and appending
-        it to the damage_segments_list. Also calculate the total link damage.
-
-        Args:
-            graph (nx.MultiDiGraph): Input graph with edges containing segment IDs.
-            segment_id_column (str): Name of the column containing segment IDs.
-            result_segment_based (gpd.GeoDataFrame): GeoDataFrame containing segment-based damage results.
-            damage_result_column (str): Name of the damage result column.
-
-        Returns:
-            nx.MultiDiGraph: Updated graph with damage_segments_list and link damage.
-        """
-        for u, v, key, data in graph.edges(keys=True, data=True):
-            damage_segments_list = []
-            segment_id_list = (
-                data[segment_id_column]
-                if isinstance(data[segment_id_column], list)
-                else [data[segment_id_column]]
-            )
-
-            for segment_id in segment_id_list:
-                segment_damage = result_segment_based.loc[
-                    result_segment_based[segment_id_column] == segment_id,
-                    damage_result_column,
-                ].squeeze()
-                if np.isnan(segment_damage):
-                    segment_damage = 0
-                damage_segments_list.append(round(segment_damage, 2))
-
-            data[f"{damage_result_column}_segments"] = damage_segments_list
-            data[damage_result_column] = round(sum(damage_segments_list), 2)
-
-        return graph
-
-    @staticmethod
     def _get_result_link_based(
         analysis: AnalysisDirectProtocol,
         analysis_config: AnalysisConfigWrapper,
         result_segment_based: gpd.GeoDataFrame,
     ) -> gpd.GeoDataFrame:
-        # Step 0: define parameters
-        base_graph_hazard_graph = analysis_config.graph_files.base_graph_hazard.graph
-        damage_curve = analysis.analysis.damage_curve
-        segment_id_column = "rfid_c"
-
         def get_damage_result_columns(
             damage_curve: DamageCurveEnum,
             event: str,
@@ -148,13 +101,44 @@ class DirectAnalysisRunner(AnalysisRunner):
 
             return damage_result_columns
 
+        def calculate_link_damage(
+            graph: nx.MultiDiGraph,
+            segment_id_column: str,
+            result_segment_based: gpd.GeoDataFrame,
+            damage_result_column: str,
+        ) -> nx.MultiDiGraph:
+            for u, v, key, data in graph.edges(keys=True, data=True):
+                damage_segments_list = []
+                segment_id_list = (
+                    data[segment_id_column]
+                    if isinstance(data[segment_id_column], list)
+                    else [data[segment_id_column]]
+                )
+
+                for segment_id in segment_id_list:
+                    segment_damage = result_segment_based.loc[
+                        result_segment_based[segment_id_column] == segment_id,
+                        damage_result_column,
+                    ].squeeze()
+                    if np.isnan(segment_damage):
+                        segment_damage = 0.0
+                    damage_segments_list.append(round(segment_damage, 2))
+
+                data[f"{damage_result_column}_segments"] = damage_segments_list
+                data[damage_result_column] = sum(damage_segments_list)
+
+            return graph
+
         # Step 0: Find the hazard columns; these may be events or return periods
+        base_graph_hazard_graph = analysis_config.graph_files.base_graph_hazard.graph
+        damage_curve = analysis.analysis.damage_curve
+        segment_id_column = "rfid_c"
         event_cols = [
             col
             for col in result_segment_based.columns
             if (col[0].isupper() and col[1] == "_")
         ]
-        events = set([x.split("_")[1] for x in event_cols])  # set of unique events
+        events = set(x.split("_")[1] for x in event_cols)  # set of unique events
 
         # Step 1: create a deep copy of the base_graph_hazard to compose further as the final outcome of this process
         damages_link_based_graph = base_graph_hazard_graph.copy()
@@ -167,7 +151,7 @@ class DirectAnalysisRunner(AnalysisRunner):
 
             # Step 3: Lookup segment ID list and calculate damage
             for damage_result_column in damage_result_columns:
-                damages_link_based_graph = DirectAnalysisRunner._calculate_link_damage(
+                damages_link_based_graph = calculate_link_damage(
                     damages_link_based_graph,
                     segment_id_column,
                     result_segment_based,
