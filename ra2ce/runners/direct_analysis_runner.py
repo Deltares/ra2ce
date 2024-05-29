@@ -20,12 +20,12 @@
 """
 
 import logging
-import time
-import numpy as np
-import geopandas as gpd
 import re
-import networkx as nx
+import time
 
+import geopandas as gpd
+import networkx as nx
+import numpy as np
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
