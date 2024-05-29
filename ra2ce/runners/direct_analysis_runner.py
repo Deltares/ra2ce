@@ -82,7 +82,6 @@ class DirectAnalysisRunner(AnalysisRunner):
         """
         for u, v, key, data in graph.edges(keys=True, data=True):
             damage_segments_list = []
-            link_damage = 0
             segment_id_list = (
                 data[segment_id_column]
                 if isinstance(data[segment_id_column], list)
@@ -97,10 +96,9 @@ class DirectAnalysisRunner(AnalysisRunner):
                 if np.isnan(segment_damage):
                     segment_damage = 0
                 damage_segments_list.append(round(segment_damage, 2))
-                link_damage += round(segment_damage, 2)
 
             data[f"{damage_result_column}_segments"] = damage_segments_list
-            data[damage_result_column] = round(link_damage, 2)
+            data[damage_result_column] = round(sum(damage_segments_list), 2)
 
         return graph
 
