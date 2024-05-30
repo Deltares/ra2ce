@@ -119,7 +119,7 @@ class DamageFunctionByRoadTypeByLane:
 
         max_damage_data = self.max_damage.data
         df["{}_temp_max_dam".format(prefix)] = max_damage_data.lookup(
-            df["road_type"], df["lanes"]
+            df["infra_type"], df["lanes"]
         )
         return df
 
