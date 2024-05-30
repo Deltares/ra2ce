@@ -4,7 +4,7 @@ from pathlib import Path
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionIndirect,
+    AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
@@ -18,7 +18,7 @@ from ra2ce.network.networks_utils import graph_to_gpkg
 
 
 class OptimalRouteOriginClosestDestination(AnalysisIndirectProtocol):
-    analysis: AnalysisSectionIndirect
+    analysis: AnalysisSectionLosses
     graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path

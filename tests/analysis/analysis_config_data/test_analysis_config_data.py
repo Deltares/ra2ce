@@ -2,17 +2,17 @@ import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisSectionDirect,
-    AnalysisSectionIndirect,
-    DirectAnalysisNameList,
-    IndirectAnalysisNameList,
+    AnalysisSectionDamages,
+    AnalysisSectionLosses,
+    DamagesAnalysisNameList,
+    LossesAnalysisNameList,
     ProjectSection,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
-    AnalysisDirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
-    AnalysisIndirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
 )
 from tests import test_results
 
@@ -27,15 +27,13 @@ class TestAnalysisConfigData:
     @pytest.fixture
     def valid_config(self) -> AnalysisConfigData:
         _config = AnalysisConfigData(project=ProjectSection())
-        for _indirect in IndirectAnalysisNameList:
+        for _indirect in LossesAnalysisNameList:
             _config.analyses.append(
-                AnalysisSectionIndirect(
-                    analysis=AnalysisIndirectEnum.get_enum(_indirect)
-                )
+                AnalysisSectionLosses(analysis=AnalysisLossesEnum.get_enum(_indirect))
             )
-        for _direct in DirectAnalysisNameList:
+        for _direct in DamagesAnalysisNameList:
             _config.analyses.append(
-                AnalysisSectionDirect(analysis=AnalysisDirectEnum.get_enum(_direct))
+                AnalysisSectionDamages(analysis=AnalysisDamagesEnum.get_enum(_direct))
             )
         yield _config
 
@@ -43,19 +41,23 @@ class TestAnalysisConfigData:
         # 1. Define test data
 
         # 2. Run test
-        _indirect = [_config.analysis.config_value for _config in valid_config.indirect]
+        _indirect = [
+            _config.analysis.config_value for _config in valid_config.losses_list
+        ]
 
         # 3. Verify expectations
-        assert all(item in _indirect for item in IndirectAnalysisNameList)
+        assert all(item in _indirect for item in LossesAnalysisNameList)
 
     def test_direct(self, valid_config: AnalysisConfigData):
         # 1. Define test data
 
         # 2. Run test
-        _direct = [_config.analysis.config_value for _config in valid_config.direct]
+        _direct = [
+            _config.analysis.config_value for _config in valid_config.damages_list
+        ]
 
         # 3. Verify expectations
-        assert all(item in _direct for item in DirectAnalysisNameList)
+        assert all(item in _direct for item in DamagesAnalysisNameList)
 
     def test_get_data_output(self):
         # 1. Define test data

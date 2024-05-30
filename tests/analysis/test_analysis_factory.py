@@ -4,14 +4,14 @@ from pathlib import Path
 import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDirect,
-    AnalysisSectionIndirect,
+    AnalysisSectionDamages,
+    AnalysisSectionLosses,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
-    AnalysisDirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
-    AnalysisIndirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_factory import AnalysisFactory
@@ -21,21 +21,21 @@ from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectP
 
 class TestAnalysisFactory:
     @dataclass
-    class MockAnalysisSectionDirect(AnalysisSectionDirect):
-        analysis: AnalysisDirectEnum = None
+    class MockAnalysisSectionDirect(AnalysisSectionDamages):
+        analysis: AnalysisDamagesEnum = None
 
     @dataclass
-    class MockAnalysisSectionIndirect(AnalysisSectionIndirect):
-        analysis: AnalysisIndirectEnum = None
+    class MockAnalysisSectionIndirect(AnalysisSectionLosses):
+        analysis: AnalysisLossesEnum = None
 
     def test_get_direct_analysis_with_invalid_raises(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionDirect(analysis=AnalysisDirectEnum.INVALID)
+        _analysis = self.MockAnalysisSectionDirect(analysis=AnalysisDamagesEnum.INVALID)
         _config = AnalysisConfigWrapper()
 
         # 2. Run test.
         with pytest.raises(NotImplementedError) as exc_err:
-            AnalysisFactory.get_direct_analysis(_analysis, _config)
+            AnalysisFactory.get_damages_analysis(_analysis, _config)
 
         # 3. Verify expectations.
         assert str(exc_err.value) == "Analysis {} not implemented".format(
@@ -45,14 +45,14 @@ class TestAnalysisFactory:
     def test_get_indirect_analysis_with_invalid_raises(self):
         # 1. Define test data.
         _analysis = self.MockAnalysisSectionIndirect(
-            analysis=AnalysisIndirectEnum.INVALID
+            analysis=AnalysisLossesEnum.INVALID
         )
         _config = AnalysisConfigWrapper()
         _config.config_data.output_path = Path("just a path")
 
         # 2. Run test.
         with pytest.raises(NotImplementedError) as exc_err:
-            AnalysisFactory.get_indirect_analysis(_analysis, _config)
+            AnalysisFactory.get_losses_analysis(_analysis, _config)
 
         # 3. Verify expectations.
         assert str(exc_err.value) == "Analysis {} not implemented".format(
@@ -61,11 +61,11 @@ class TestAnalysisFactory:
 
     def test_get_analysis_with_direct(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionDirect(analysis=AnalysisDirectEnum.DIRECT)
+        _analysis = self.MockAnalysisSectionDirect(analysis=AnalysisDamagesEnum.DAMAGES)
         _config = AnalysisConfigWrapper()
 
         # 2. Run test.
-        _result = AnalysisFactory.get_direct_analysis(_analysis, _config)
+        _result = AnalysisFactory.get_damages_analysis(_analysis, _config)
 
         # 3. Verify expectations.
         assert isinstance(_result, AnalysisDirectProtocol)
@@ -75,13 +75,13 @@ class TestAnalysisFactory:
     def test_get_analysis_with_indirect(self):
         # 1. Define test data.
         _analysis = self.MockAnalysisSectionIndirect(
-            analysis=AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY
+            analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY
         )
         _config = AnalysisConfigWrapper()
         _config.config_data.output_path = Path("just a path")
 
         # 2. Run test.
-        _result = AnalysisFactory.get_indirect_analysis(_analysis, _config)
+        _result = AnalysisFactory.get_losses_analysis(_analysis, _config)
 
         # 3. Verify expectations.
         assert isinstance(_result, AnalysisIndirectProtocol)

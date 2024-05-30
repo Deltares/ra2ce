@@ -23,7 +23,7 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionIndirect,
+    AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.network.graph_files.graph_file import GraphFile
@@ -33,7 +33,7 @@ from ra2ce.network.hazard.hazard_names import HazardNames
 class AnalysisIndirectProtocol(AnalysisProtocol):
     graph_file: Optional[GraphFile]
     graph_file_hazard: Optional[GraphFile]
-    analysis: AnalysisSectionIndirect
+    analysis: AnalysisSectionLosses
     input_path: Path
     static_path: Path
     output_path: Path

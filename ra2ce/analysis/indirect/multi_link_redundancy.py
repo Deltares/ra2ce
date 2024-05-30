@@ -8,7 +8,7 @@ import osmnx
 import pandas as pd
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionIndirect,
+    AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
@@ -21,7 +21,7 @@ from ra2ce.network.hazard.hazard_names import HazardNames
 
 
 class MultiLinkRedundancy(AnalysisIndirectProtocol):
-    analysis: AnalysisSectionIndirect
+    analysis: AnalysisSectionLosses
     graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path

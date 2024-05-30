@@ -20,14 +20,14 @@
 """
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDirect,
-    AnalysisSectionIndirect,
+    AnalysisSectionDamages,
+    AnalysisSectionLosses,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
-    AnalysisDirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
-    AnalysisIndirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
@@ -57,15 +57,15 @@ from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 
 class AnalysisFactory:
     @staticmethod
-    def get_direct_analysis(
-        analysis: AnalysisSectionDirect,
+    def get_damages_analysis(
+        analysis: AnalysisSectionDamages,
         analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisDirectProtocol:
         """
         Create an analysis based on the given analysis configuration.
 
         Args:
-            analysis (AnalysisSectionDirect): Analysis section.
+            analysis (AnalysisSectionDamages): Analysis section.
             analysis_config (AnalysisConfigWrapper): Analysis configuration.
 
         Raises:
@@ -79,22 +79,22 @@ class AnalysisFactory:
             analysis_config=analysis_config,
             graph_file_hazard=analysis_config.graph_files.base_network_hazard,
         )
-        if analysis.analysis == AnalysisDirectEnum.DIRECT:
+        if analysis.analysis == AnalysisDamagesEnum.DAMAGES:
             return DirectDamage(_analysis_input)
-        if analysis.analysis == AnalysisDirectEnum.EFFECTIVENESS_MEASURES:
+        if analysis.analysis == AnalysisDamagesEnum.EFFECTIVENESS_MEASURES:
             return EffectivenessMeasures(_analysis_input)
         raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
 
     @staticmethod
-    def get_indirect_analysis(
-        analysis: AnalysisSectionIndirect,
+    def get_losses_analysis(
+        analysis: AnalysisSectionLosses,
         analysis_config: AnalysisConfigWrapper,
     ) -> AnalysisIndirectProtocol:
         """
         Create an analysis based on the given analysis configuration.
 
         Args:
-            analysis (AnalysisSectionIndirect): Analysis section.
+            analysis (AnalysisSectionLosses): Analysis section.
             analysis_config (AnalysisConfigWrapper): Analysis configuration.
 
         Raises:
@@ -103,28 +103,28 @@ class AnalysisFactory:
         Returns:
             AnalysisIndirectProtocol: The indirect analysis to be executed.
         """
-        if analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_REDUNDANCY:
+        if analysis.analysis == AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
                 graph_file=analysis_config.graph_files.base_graph,
             )
             return SingleLinkRedundancy(_analysis_input)
-        if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_REDUNDANCY:
+        if analysis.analysis == AnalysisLossesEnum.MULTI_LINK_REDUNDANCY:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
                 graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
             return MultiLinkRedundancy(_analysis_input)
-        if analysis.analysis == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION:
+        if analysis.analysis == AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
                 graph_file=analysis_config.graph_files.origins_destinations_graph,
             )
             return OptimalRouteOriginDestination(_analysis_input)
-        if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_DESTINATION:
+        if analysis.analysis == AnalysisLossesEnum.MULTI_LINK_ORIGIN_DESTINATION:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
@@ -133,7 +133,7 @@ class AnalysisFactory:
             return MultiLinkOriginDestination(_analysis_input)
         if (
             analysis.analysis
-            == AnalysisIndirectEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
+            == AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
         ):
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
@@ -143,7 +143,7 @@ class AnalysisFactory:
             return OptimalRouteOriginClosestDestination(analysis_input=_analysis_input)
         if (
             analysis.analysis
-            == AnalysisIndirectEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
+            == AnalysisLossesEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
         ):
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
@@ -152,7 +152,7 @@ class AnalysisFactory:
                 graph_file_hazard=analysis_config.graph_files.origins_destinations_graph_hazard,
             )
             return MultiLinkOriginClosestDestination(_analysis_input)
-        if analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
+        if analysis.analysis == AnalysisLossesEnum.SINGLE_LINK_LOSSES:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
@@ -160,7 +160,7 @@ class AnalysisFactory:
                 graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
             return Losses(_analysis_input, analysis_config)
-        if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
+        if analysis.analysis == AnalysisLossesEnum.MULTI_LINK_LOSSES:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
@@ -168,7 +168,7 @@ class AnalysisFactory:
             )
 
             return Losses(_analysis_input, analysis_config)
-        if analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_ISOLATED_LOCATIONS:
+        if analysis.analysis == AnalysisLossesEnum.MULTI_LINK_ISOLATED_LOCATIONS:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
