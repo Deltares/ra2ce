@@ -1,3 +1,7 @@
+import shutil
+
+import pytest
+
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionDamages,
@@ -13,7 +17,7 @@ from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCu
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
-from tests import test_data, test_results
+from tests import test_results
 
 
 class TestAnalysisConfigDataValidator:
@@ -32,10 +36,12 @@ class TestAnalysisConfigDataValidator:
         _validator = AnalysisConfigDataValidator(config_data)
         return _validator.validate()
 
-    def test_validate_with_required_headers(self):
+    def test_validate_with_required_headers(self, request: pytest.FixtureRequest):
         # 1. Define test data.
-        _output_test_dir = test_data.joinpath("acceptance_test_data")
-        assert _output_test_dir.is_dir()
+        _output_dir = test_results.joinpath(request.node.name)
+        if _output_dir.exists():
+            shutil.rmtree(_output_dir)
+        _output_dir.mkdir(parents=True)
 
         # 2. Run test.
         _test_config_data = AnalysisConfigData(
@@ -45,7 +51,7 @@ class TestAnalysisConfigDataValidator:
                 event_type=EventTypeEnum.EVENT,
                 damage_curve=DamageCurveEnum.HZ,
             ),
-            output_path=_output_test_dir,
+            output_path=_output_dir,
         )
         _report = self._validate_config(_test_config_data)
 

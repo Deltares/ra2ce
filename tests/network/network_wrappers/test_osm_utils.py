@@ -5,7 +5,7 @@ import pytest
 from ra2ce.network.network_wrappers.osm_network_wrapper.osm_utils import (
     from_shapefile_to_poly,
 )
-from tests import test_data, test_results
+from tests import acceptance_test_data, test_data, test_results
 
 
 class TestOsmUtils:
@@ -48,11 +48,9 @@ class TestOsmUtils:
 
     def test_from_shapefile_to_poly(self, request: pytest.FixtureRequest):
         # 1. Define test data.
-        _shp_file = (
-            test_data / "acceptance_test_data" / "static" / "network" / "origins.shp"
-        )
+        _shp_file = acceptance_test_data.joinpath("static", "network", "origins.shp")
         assert _shp_file.exists()
-        _output = test_results / request.node.name
+        _output = test_results.joinpath(request.node.name)
         if _output.exists():
             shutil.rmtree(_output)
         _output.mkdir(parents=True)

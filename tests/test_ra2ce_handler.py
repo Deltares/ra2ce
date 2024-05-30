@@ -13,7 +13,7 @@ from ra2ce.network.network_config_data.network_config_data_reader import (
     NetworkConfigDataReader,
 )
 from ra2ce.ra2ce_handler import Ra2ceHandler
-from tests import acceptance_test_data, test_results
+from tests import test_data, test_results
 
 
 class TestRa2ceHandler:
@@ -60,7 +60,7 @@ class TestRa2ceHandler:
         )
         _test_case_dir = _copy_root_dir.joinpath(_test_case_name)
         if not _test_case_dir.is_dir():
-            shutil.copytree(acceptance_test_data, _test_case_dir)
+            shutil.copytree(test_data.joinpath("single_link_losses"), _test_case_dir)
         return _test_case_dir
 
     @pytest.fixture(name="network_config")

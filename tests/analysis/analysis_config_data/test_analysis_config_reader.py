@@ -6,7 +6,7 @@ import pytest
 from ra2ce.analysis.analysis_config_data.analysis_config_data_reader import (
     AnalysisConfigDataReader,
 )
-from tests import test_data
+from tests import acceptance_test_data
 
 
 class TestAnalysisConfigReader:
@@ -36,10 +36,8 @@ class TestAnalysisConfigReader:
 
     def test_read_succeeds(self):
         # 1. Define test data
-        _ini_file = test_data.joinpath("acceptance_test_data", "analyses.ini")
-        _ini_file_output = test_data.joinpath(
-            "acceptance_test_data", "output", "analyses.ini"
-        )
+        _ini_file = acceptance_test_data.joinpath("analyses.ini")
+        _ini_file_output = acceptance_test_data.joinpath("output", "analyses.ini")
         if _ini_file_output.exists():
             _ini_file_output.unlink()
 

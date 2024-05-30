@@ -9,7 +9,7 @@ from shapely.geometry import LineString, MultiLineString, Point
 from shapely.geometry.base import BaseGeometry
 
 from ra2ce.network import networks_utils as nu
-from tests import test_data
+from tests import acceptance_test_data
 
 
 class TestNetworkUtils:
@@ -369,9 +369,7 @@ class TestGraphCreateUniqueIds:
 class TestNetworksUtils:
     def test_get_normalized_geojson_polygon_from_geojson(self):
         # 1. Define test data.
-        _test_file = (
-            test_data / "acceptance_test_data" / "static" / "network" / "map.geojson"
-        )
+        _test_file = acceptance_test_data.joinpath("static", "network", "map.geojson")
         assert _test_file.exists()
 
         # 2. Run test
