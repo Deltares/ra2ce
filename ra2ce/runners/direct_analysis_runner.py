@@ -169,7 +169,7 @@ class DirectAnalysisRunner(AnalysisRunner):
     ) -> list[AnalysisResultWrapper]:
         _analysis_collection = AnalysisCollection.from_config(analysis_config)
         _results = []
-        for analysis in _analysis_collection.direct_analyses:
+        for analysis in _analysis_collection.damages_analyses:
             logging.info(
                 "----------------------------- Started analyzing '%s'  -----------------------------",
                 analysis.analysis.name,

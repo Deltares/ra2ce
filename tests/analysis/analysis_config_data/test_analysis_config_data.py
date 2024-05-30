@@ -37,7 +37,7 @@ class TestAnalysisConfigData:
             )
         yield _config
 
-    def test_indirect(self, valid_config: AnalysisConfigData):
+    def test_losses(self, valid_config: AnalysisConfigData):
         # 1. Define test data
 
         # 2. Run test
@@ -48,7 +48,7 @@ class TestAnalysisConfigData:
         # 3. Verify expectations
         assert all(item in _indirect for item in LossesAnalysisNameList)
 
-    def test_direct(self, valid_config: AnalysisConfigData):
+    def test_damages(self, valid_config: AnalysisConfigData):
         # 1. Define test data
 
         # 2. Run test

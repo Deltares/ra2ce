@@ -2,8 +2,8 @@
 
 This module contains all protocols and classes related to performing an analysis on a graph or network.
 Analyses can be identified as:
-- `direct`: calculating the **damages** to the infrastructure (roads) due to a hazard (e.g. flood),
-- `indirect`: calculating the economical **losses** that are a consequence of the damage to the infrastructure.
+- `damages`: calculating the direct damages to the infrastructure (roads) due to a hazard (e.g. flood),
+- `losses`: calculating the economical losses that are a consequence of the damage to the infrastructure.
 Each analysis should comply to the `AnalysisProtocol`.
 
 ## General class overview

@@ -50,7 +50,7 @@ class IndirectAnalysisRunner(AnalysisRunner):
     ) -> list[AnalysisResultWrapper]:
         _analysis_collection = AnalysisCollection.from_config(analysis_config)
         _results = []
-        for analysis in _analysis_collection.indirect_analyses:
+        for analysis in _analysis_collection.losses_analyses:
             logging.info(
                 "----------------------------- Started analyzing '%s'  -----------------------------",
                 analysis.analysis.name,
