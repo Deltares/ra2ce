@@ -3,10 +3,10 @@ import pandas as pd
 import pytest
 
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
-from ra2ce.analysis.direct.damage_calculation.damage_network_base import (
+from ra2ce.analysis.damages.damage_calculation.damage_network_base import (
     DamageNetworkBase,
 )
-from ra2ce.analysis.direct.damage_calculation.damage_network_return_periods import (
+from ra2ce.analysis.damages.damage_calculation.damage_network_return_periods import (
     DamageNetworkReturnPeriods,
 )
 

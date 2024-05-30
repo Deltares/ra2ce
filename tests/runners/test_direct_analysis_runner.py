@@ -22,7 +22,9 @@ class TestDirectAnalysisRunner:
         assert isinstance(_ra2ce_input, ConfigWrapper)
         yield _ra2ce_input
 
-    def test_given_direct_configuration_can_run(self, dummy_ra2ce_input: ConfigWrapper):
+    def test_given_damages_configuration_can_run(
+        self, dummy_ra2ce_input: ConfigWrapper
+    ):
         # 1. Define test data.
         dummy_ra2ce_input.analysis_config.config_data.analyses = [
             AnalysisSectionDamages(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES)

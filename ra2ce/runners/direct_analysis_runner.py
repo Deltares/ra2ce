@@ -34,7 +34,7 @@ from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.analysis_result_wrapper_exporter import (
     AnalysisResultWrapperExporter,
 )
-from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
+from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 
@@ -62,7 +62,7 @@ class DirectAnalysisRunner(AnalysisRunner):
 
     @staticmethod
     def _get_result_link_based(
-        analysis: AnalysisDirectProtocol,
+        analysis: AnalysisDamagesProtocol,
         analysis_config: AnalysisConfigWrapper,
         result_segment_based: gpd.GeoDataFrame,
     ) -> gpd.GeoDataFrame:

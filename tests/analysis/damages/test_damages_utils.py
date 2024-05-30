@@ -6,14 +6,14 @@ import pandas as pd
 import pytest
 from shapely.geometry import LineString
 
-from ra2ce.analysis.direct.direct_utils import (
+from ra2ce.analysis.damages.damages_utils import (
     clean_lane_data,
     create_summary_statistics,
     lane_cleaner,
 )
 
 
-class TestDirectUtils:
+class TestDamagesUtils:
     @pytest.mark.parametrize(
         "value_type",
         [(None), ("")],

@@ -22,7 +22,7 @@
 import logging
 from pathlib import Path
 
-from ra2ce.analysis.direct.damage.damage_function_road_type_lane import (
+from ra2ce.analysis.damages.damage.damage_function_road_type_lane import (
     DamageFunctionByRoadTypeByLane,
 )
 

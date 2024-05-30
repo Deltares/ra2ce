@@ -15,15 +15,15 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
+from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from tests import test_data
 
-_unsupported_direct_analysis = [
+_unsupported_damages_analyses = [
     AnalysisDamagesEnum.EFFECTIVENESS_MEASURES,
     AnalysisDamagesEnum.INVALID,
 ]
-_unsupported_indirect_analysis = [AnalysisLossesEnum.INVALID]
+_unsupported_losses_analyses = [AnalysisLossesEnum.INVALID]
 
 
 class TestAnalysisCollection:
@@ -67,7 +67,7 @@ class TestAnalysisCollection:
         [
             pytest.param(_analysis_type)
             for _analysis_type in AnalysisDamagesEnum
-            if _analysis_type not in _unsupported_direct_analysis
+            if _analysis_type not in _unsupported_damages_analyses
         ],
     )
     def test_create_collection_with_damages_analyses(
@@ -89,7 +89,7 @@ class TestAnalysisCollection:
         assert len(_collection.damages_analyses) == 1
 
         _generated_analysis = _collection.damages_analyses[0]
-        assert isinstance(_generated_analysis, AnalysisDirectProtocol)
+        assert isinstance(_generated_analysis, AnalysisDamagesProtocol)
         assert _collection.damages_analyses[0].analysis.analysis == analysis
 
     @pytest.mark.parametrize(
@@ -97,7 +97,7 @@ class TestAnalysisCollection:
         [
             pytest.param(_analysis_type)
             for _analysis_type in AnalysisLossesEnum
-            if _analysis_type not in _unsupported_indirect_analysis
+            if _analysis_type not in _unsupported_losses_analyses
         ],
     )
     def test_create_collection_with_losses_analyses(
