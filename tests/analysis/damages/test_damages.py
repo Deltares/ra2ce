@@ -19,7 +19,7 @@ from tests import test_data
 damages_test_data = test_data / "damages"
 
 
-class TestDirectDamage:
+class TestDamages:
     @pytest.fixture(autouse=False)
     def risk_data_file(self) -> Path:
         _risk_file = damages_test_data / "risk_test_data.csv"

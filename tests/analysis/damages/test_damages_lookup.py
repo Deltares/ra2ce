@@ -15,7 +15,7 @@ _lookup_keys = [
 ]
 
 
-class TestDirectLookUp:
+class TestDamagesLookUp:
     def test_road_lanes(self):
         _road_lanes = LookUp.road_lanes()
         assert isinstance(_road_lanes, OrderedDict)

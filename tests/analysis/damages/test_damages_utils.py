@@ -13,7 +13,7 @@ from ra2ce.analysis.damages.damages_utils import (
 )
 
 
-class TestDirectUtils:
+class TestDamagesUtils:
     @pytest.mark.parametrize(
         "value_type",
         [(None), ("")],
