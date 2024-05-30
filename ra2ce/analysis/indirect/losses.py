@@ -31,10 +31,10 @@ import geopandas as gpd
 import pandas as pd
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionIndirect,
+    AnalysisSectionLosses,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
-    AnalysisIndirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
@@ -72,7 +72,7 @@ def _load_df_from_csv(
 
 
 class Losses(AnalysisIndirectProtocol):
-    analysis: AnalysisSectionIndirect
+    analysis: AnalysisSectionLosses
     graph_file_hazard: GraphFile
     input_path: Path
     static_path: Path
@@ -628,9 +628,9 @@ class Losses(AnalysisIndirectProtocol):
         return list(_link_types), list(_hazard_intensity_ranges)
 
     def execute(self) -> gpd.GeoDataFrame:
-        if self.analysis.analysis == AnalysisIndirectEnum.SINGLE_LINK_LOSSES:
+        if self.analysis.analysis == AnalysisLossesEnum.SINGLE_LINK_LOSSES:
             criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
-        elif self.analysis.analysis == AnalysisIndirectEnum.MULTI_LINK_LOSSES:
+        elif self.analysis.analysis == AnalysisLossesEnum.MULTI_LINK_LOSSES:
             criticality_analysis = MultiLinkRedundancy(self.analysis_input).execute()
 
         self._get_disrupted_criticality_analysis_results(

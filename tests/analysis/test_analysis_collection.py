@@ -5,14 +5,14 @@ import pytest
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDirect,
-    AnalysisSectionIndirect,
+    AnalysisSectionDamages,
+    AnalysisSectionLosses,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
-    AnalysisDirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
-    AnalysisIndirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
@@ -20,20 +20,20 @@ from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectP
 from tests import test_data
 
 _unsupported_direct_analysis = [
-    AnalysisDirectEnum.EFFECTIVENESS_MEASURES,
-    AnalysisDirectEnum.INVALID,
+    AnalysisDamagesEnum.EFFECTIVENESS_MEASURES,
+    AnalysisDamagesEnum.INVALID,
 ]
-_unsupported_indirect_analysis = [AnalysisIndirectEnum.INVALID]
+_unsupported_indirect_analysis = [AnalysisLossesEnum.INVALID]
 
 
 class TestAnalysisCollection:
     @dataclass
-    class MockAnalysisSectionDirect(AnalysisSectionDirect):
-        analysis: AnalysisDirectEnum = None
+    class MockAnalysisSectionDirect(AnalysisSectionDamages):
+        analysis: AnalysisDamagesEnum = None
 
     @dataclass
-    class MockAnalysisSectionIndirect(AnalysisSectionIndirect):
-        analysis: AnalysisIndirectEnum = None
+    class MockAnalysisSectionIndirect(AnalysisSectionLosses):
+        analysis: AnalysisLossesEnum = None
 
     @pytest.fixture(autouse=False)
     def valid_analysis_ini(self) -> Path:
@@ -66,13 +66,13 @@ class TestAnalysisCollection:
         "analysis",
         [
             pytest.param(_analysis_type)
-            for _analysis_type in AnalysisDirectEnum
+            for _analysis_type in AnalysisDamagesEnum
             if _analysis_type not in _unsupported_direct_analysis
         ],
     )
     def test_create_collection_with_direct_analyses(
         self,
-        analysis: AnalysisDirectEnum,
+        analysis: AnalysisDamagesEnum,
     ):
         # 1. Define test data.
         _config = AnalysisConfigWrapper()
@@ -96,13 +96,13 @@ class TestAnalysisCollection:
         "analysis",
         [
             pytest.param(_analysis_type)
-            for _analysis_type in AnalysisIndirectEnum
+            for _analysis_type in AnalysisLossesEnum
             if _analysis_type not in _unsupported_indirect_analysis
         ],
     )
     def test_create_collection_with_indirect_analyses(
         self,
-        analysis: AnalysisIndirectEnum,
+        analysis: AnalysisLossesEnum,
     ):
         def verify_expectations(_collection, analysis):
             assert isinstance(_collection, AnalysisCollection)

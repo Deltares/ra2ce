@@ -7,7 +7,7 @@ from shapely.geometry import LineString, MultiLineString
 from tqdm import tqdm
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionIndirect,
+    AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
@@ -22,7 +22,7 @@ from ra2ce.network.network_config_data.network_config_data import (
 
 
 class OptimalRouteOriginDestination(AnalysisIndirectProtocol):
-    analysis: AnalysisSectionIndirect
+    analysis: AnalysisSectionLosses
     graph_file: GraphFile
     input_path: Path
     static_path: Path
@@ -187,7 +187,7 @@ class OptimalRouteOriginDestination(AnalysisIndirectProtocol):
         return od_nodes
 
     def optimal_route_origin_destination(
-        self, graph: nx.classes.MultiGraph, analysis: AnalysisSectionIndirect
+        self, graph: nx.classes.MultiGraph, analysis: AnalysisSectionLosses
     ) -> GeoDataFrame:
         # create list of origin-destination pairs
         od_nodes = self._get_origin_destination_pairs(graph)

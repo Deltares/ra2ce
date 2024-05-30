@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDirect,
+    AnalysisSectionDamages,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
@@ -15,7 +15,7 @@ from ra2ce.network.graph_files.network_file import NetworkFile
 
 
 class EffectivenessMeasures(AnalysisDirectProtocol):
-    analysis: AnalysisSectionDirect
+    analysis: AnalysisSectionDamages
     graph_file: NetworkFile
     graph_file_hazard: NetworkFile
     input_path: Path
@@ -38,14 +38,14 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
         self.interest_rate = self.analysis.interest_rate / 100  # interest rate
         self.btw = 1.21  # VAT multiplication factor to include taxes
         self._measures_csv = self.input_path.joinpath(
-            "direct", "effectiveness_measures.csv"
+            "direct_damage", "effectiveness_measures.csv"
         )
 
         # perform checks on input while initializing class
         self._validate_input_params(self.input_path, self.analysis)
 
     def _validate_input_params(
-        self, input_path: Path, analysis: AnalysisSectionDirect
+        self, input_path: Path, analysis: AnalysisSectionDamages
     ) -> None:
         if analysis.file_name is None:
             _error = "Effectiveness of measures calculation: No input file configured. Please define an input file in the analysis.ini file."
@@ -57,15 +57,15 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
             )
             logging.error(_error)
             raise ValueError(_error)
-        elif not (input_path / "direct" / analysis.file_name).exists():
+        elif not (input_path / "direct_damage" / analysis.file_name).exists():
             _error = "Effectiveness of measures calculation: Input file doesn't exist please place file in the following folder: {}".format(
-                input_path / "direct"
+                input_path / "direct_damage"
             )
             logging.error(_error)
-            raise FileNotFoundError(input_path / "direct" / analysis.file_name)
+            raise FileNotFoundError(input_path / "direct_damage" / analysis.file_name)
         elif not self._measures_csv.exists():
             _error = "Effectiveness of measures calculation: lookup table with effectiveness of measures doesnt exist. Please place the effectiveness_measures.csv file in the following folder: {}".format(
-                input_path / "direct"
+                input_path / "direct_damage"
             )
             logging.error(_error)
             raise FileNotFoundError(self._measures_csv)
@@ -228,7 +228,9 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
         # calculate standard effectiveness without factors
         df_total = self._calculate_effectiveness(df, name="standard")
 
-        df_blockage = pd.read_csv(self.input_path / "direct" / "blockage_costs.csv")
+        df_blockage = pd.read_csv(
+            self.input_path / "direct_damage" / "blockage_costs.csv"
+        )
         df_total = df_total.merge(df_blockage, how="left", on="LinkNr")
         df_total["length"] = df_total[
             "afstand"
@@ -447,11 +449,11 @@ class EffectivenessMeasures(AnalysisDirectProtocol):
 
         if self.analysis.create_table:
             df = self._create_feature_table(
-                self.input_path.joinpath("direct", self.analysis.file_name)
+                self.input_path.joinpath("direct_damage", self.analysis.file_name)
             )
         else:
             df = self._load_table(
-                self.input_path.joinpath("direct"),
+                self.input_path.joinpath("direct_damage"),
                 self.analysis.file_name.replace(".gpkg", ".csv"),
             )
 

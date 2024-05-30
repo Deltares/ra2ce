@@ -26,11 +26,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
-from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
-    AnalysisDirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
-    AnalysisIndirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
@@ -48,11 +48,11 @@ from ra2ce.network.network_config_data.network_config_data import (
     OriginsDestinationsSection,
 )
 
-IndirectAnalysisNameList: list[str] = list(
-    map(str, AnalysisIndirectEnum.list_valid_options())
+LossesAnalysisNameList: list[str] = list(
+    map(str, AnalysisLossesEnum.list_valid_options())
 )
-DirectAnalysisNameList: list[str] = list(
-    map(str, AnalysisDirectEnum.list_valid_options())
+DamagesAnalysisNameList: list[str] = list(
+    map(str, AnalysisDamagesEnum.list_valid_options())
 )
 
 
@@ -68,7 +68,7 @@ class ProjectSection:
 @dataclass
 class AnalysisSectionBase:
     """
-    Reflects all common settings that direct and indirect analysis sections might contain.
+    Reflects all common settings that damages and losses analysis sections might contain.
     """
 
     name: str = ""
@@ -77,13 +77,13 @@ class AnalysisSectionBase:
 
 
 @dataclass
-class AnalysisSectionIndirect(AnalysisSectionBase):
+class AnalysisSectionLosses(AnalysisSectionBase):
     """
-    Reflects all possible settings that an indirect analysis section might contain.
+    Reflects all possible settings that a losses analysis section might contain.
     """
 
-    analysis: AnalysisIndirectEnum = field(
-        default_factory=lambda: AnalysisIndirectEnum.INVALID
+    analysis: AnalysisLossesEnum = field(
+        default_factory=lambda: AnalysisLossesEnum.INVALID
     )
     # general
     weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
@@ -121,13 +121,13 @@ class AnalysisSectionIndirect(AnalysisSectionBase):
 
 
 @dataclass
-class AnalysisSectionDirect(AnalysisSectionBase):
+class AnalysisSectionDamages(AnalysisSectionBase):
     """
-    Reflects all possible settings that a direct analysis section might contain.
+    Reflects all possible settings that a damages analysis section might contain.
     """
 
-    analysis: AnalysisDirectEnum = field(
-        default_factory=lambda: AnalysisDirectEnum.INVALID
+    analysis: AnalysisDamagesEnum = field(
+        default_factory=lambda: AnalysisDamagesEnum.INVALID
     )
     # adaptation/effectiveness measures
     return_period: float = math.nan
@@ -170,27 +170,27 @@ class AnalysisConfigData(ConfigDataProtocol):
     hazard_names: list[str] = field(default_factory=list)
 
     @property
-    def direct(self) -> list[AnalysisSectionDirect]:
+    def damages_list(self) -> list[AnalysisSectionDamages]:
         """
-        Get all direct analyses from config.
+        Get all damages analyses from config.
 
         Returns:
-            list[AnalysisSectionDirect]: List of all direct analyses.
+            list[AnalysisSectionDamages]: List of all damages analyses.
         """
         return list(
-            filter(lambda x: isinstance(x, AnalysisSectionDirect), self.analyses)
+            filter(lambda x: isinstance(x, AnalysisSectionDamages), self.analyses)
         )
 
     @property
-    def indirect(self) -> list[AnalysisSectionIndirect]:
+    def losses_list(self) -> list[AnalysisSectionLosses]:
         """
-        Get all indirect analyses from config.
+        Get all losses analyses from config.
 
         Returns:
-            list[AnalysisSectionIndirect]: List of all indirect analyses.
+            list[AnalysisSectionLosses]: List of all losses analyses.
         """
         return list(
-            filter(lambda x: isinstance(x, AnalysisSectionIndirect), self.analyses)
+            filter(lambda x: isinstance(x, AnalysisSectionLosses), self.analyses)
         )
 
     @staticmethod

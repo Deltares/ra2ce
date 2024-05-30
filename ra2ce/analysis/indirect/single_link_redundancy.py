@@ -6,7 +6,7 @@ import osmnx
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionIndirect,
+    AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
@@ -19,7 +19,7 @@ from ra2ce.network.hazard.hazard_names import HazardNames
 
 
 class SingleLinkRedundancy(AnalysisIndirectProtocol):
-    analysis: AnalysisSectionIndirect
+    analysis: AnalysisSectionLosses
     graph_file: GraphFile
     input_path: Path
     static_path: Path
