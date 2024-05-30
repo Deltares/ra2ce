@@ -111,7 +111,7 @@ class TestDirectDamage:
     ):
         damage_function = DamageCurveEnum.HZ
 
-        # This test roughly follows the DirectDamage.road_damage() controller in analyses_direct.py
+        # This test roughly follows the DirectDamage.road_damage() controller in analyses_damages.py
         test_input = event_input_output["input_path"]
         test_ref_output = event_input_output["output_path"]
 
@@ -303,7 +303,7 @@ class TestDirectDamage:
         # Todo: have a look at this test again, to see if the existing issues have been solved
         damage_function = "MAN"
 
-        # This test roughly follows the DirectDamage.road_damage() controller in analyses_direct.py
+        # This test roughly follows the DirectDamage.road_damage() controller in analyses_damages.py
         test_input = event_input_output["input_path"]
         test_ref_output = event_input_output["output_path"]
 

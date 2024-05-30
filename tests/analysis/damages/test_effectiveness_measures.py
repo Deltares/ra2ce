@@ -66,7 +66,7 @@ class TestEffectivenessMeasures:
             == "Effectiveness of measures calculation: Wrong input file configured. Extension of input file is -.txt-, needs to be -.shp- (shapefile)"
         )
 
-    def test_init_raises_when_direct_shp_file_does_not_exist(self):
+    def test_init_raises_when_damages_shp_file_does_not_exist(self):
         _config_data = AnalysisConfigData(input_path=test_data)
         _analysis = AnalysisSectionDamages(
             return_period=None,

@@ -28,7 +28,7 @@ class TestAnalysisFactory:
     class MockAnalysisSectionIndirect(AnalysisSectionLosses):
         analysis: AnalysisLossesEnum = None
 
-    def test_get_direct_analysis_with_invalid_raises(self):
+    def test_get_damages_analysis_with_invalid_raises(self):
         # 1. Define test data.
         _analysis = self.MockAnalysisSectionDirect(analysis=AnalysisDamagesEnum.INVALID)
         _config = AnalysisConfigWrapper()

@@ -41,7 +41,7 @@ class TestDamageNetworkEvents:
         assert str(exc_err.value) == "No event cols present in hazard data"
 
     @pytest.mark.skip(reason="Results are not yet comparable (#319)")
-    def test_direct_analysis_event_huizinga(
+    def test_damages_analysis_event_huizinga(
         self, road_gdf: pd.DataFrame, gdf_correct: pd.DataFrame
     ):
         assert isinstance(road_gdf, pd.DataFrame)
