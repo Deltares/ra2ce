@@ -10,7 +10,7 @@ class TestDamageFunctionByRoadTypeByLane:
     def test_from_input_folder_without_damage_files_raises(self):
         # 1. Define test data.
         _damage_function = DamageFunctionByRoadTypeByLane()
-        _damage_test_data = test_data / "direct_damage" / "no_files"
+        _damage_test_data = test_data / "damages" / "no_files"
         if not _damage_test_data.exists():
             _damage_test_data.mkdir(parents=True)
 
@@ -26,7 +26,7 @@ class TestDamageFunctionByRoadTypeByLane:
     def test_from_input_folder_with_too_many_files_raises(self):
         # 1. Define test data.
         _damage_function = DamageFunctionByRoadTypeByLane()
-        _damage_test_data = test_data / "direct_damage" / "repeated_files"
+        _damage_test_data = test_data / "damages" / "repeated_files"
         # 2. Run test.
         with pytest.raises(ValueError) as exc_err:
             _damage_function.from_input_folder(_damage_test_data)

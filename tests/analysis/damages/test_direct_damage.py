@@ -16,7 +16,7 @@ from ra2ce.analysis.damages.damage_calculation.damage_network_return_periods imp
 )
 from tests import test_data
 
-direct_damage_test_data = test_data / "direct_damage"
+direct_damage_test_data = test_data / "damages"
 
 
 class TestDirectDamage:

@@ -142,7 +142,7 @@ def scale_damage_using_lanes(lane_scale_factors, df, cols_to_scale) -> pd.DataFr
     Scale (max) damage or construction cost data using the lane data
 
     Arguments:
-        *lane_scale_factors* (dict)  : output of direct_lookup.get_max_damages_OSD()
+        *lane_scale_factors* (dict)  : output of damages_lookup.get_max_damages_OSD()
         *df* (pd.DataFrame)          : the data to scale, should have a col road_types, and a col lanes
         *cols_to_scale* (list)       : names of the columns to scale
 

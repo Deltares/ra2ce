@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-from ra2ce.analysis.damages.direct_lookup import CreateLookupTables, LookUp
+from ra2ce.analysis.damages.damages_lookup import CreateLookupTables, LookUp
 from tests import test_data
 
 _lookup_keys = [
