@@ -2,7 +2,7 @@ import geopandas as gpd
 import numpy as np
 import pytest
 
-from ra2ce.analysis.direct.damage_calculation.damage_network_base import (
+from ra2ce.analysis.damages.damage_calculation.damage_network_base import (
     DamageNetworkBase,
 )
 

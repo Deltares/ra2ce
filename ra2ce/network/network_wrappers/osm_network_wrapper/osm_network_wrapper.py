@@ -229,7 +229,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
             polygon_path (Path): Path where the polygon file can be found.
 
         Returns:
-            MultiDiGraph: Complex (clean) graph after download from OSM, for use in the direct analyses and input to derive simplified network.
+            MultiDiGraph: Complex (clean) graph after download from OSM, for use in the damages analyses and input to derive simplified network.
         """
         # It can only read in one geojson
         if not isinstance(polygon_path, Path):

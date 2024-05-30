@@ -25,13 +25,13 @@ from dataclasses import dataclass, field
 
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_factory import AnalysisFactory
-from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
+from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 
 
 @dataclass
 class AnalysisCollection:
-    damages_analyses: list[AnalysisDirectProtocol] = field(default_factory=list)
+    damages_analyses: list[AnalysisDamagesProtocol] = field(default_factory=list)
     losses_analyses: list[AnalysisLossesProtocol] = field(default_factory=list)
 
     @classmethod

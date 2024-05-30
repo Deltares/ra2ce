@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-from ra2ce.analysis.direct.direct_lookup import CreateLookupTables, LookUp
+from ra2ce.analysis.damages.damages_lookup import CreateLookupTables, LookUp
 from tests import test_data
 
 _lookup_keys = [
@@ -15,7 +15,7 @@ _lookup_keys = [
 ]
 
 
-class TestDirectLookUp:
+class TestDamagesLookUp:
     def test_road_lanes(self):
         _road_lanes = LookUp.road_lanes()
         assert isinstance(_road_lanes, OrderedDict)

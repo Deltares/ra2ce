@@ -9,7 +9,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
-from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
+from ra2ce.analysis.damages.effectiveness_measures import EffectivenessMeasures
 from tests import test_data
 
 
@@ -66,7 +66,7 @@ class TestEffectivenessMeasures:
             == "Effectiveness of measures calculation: Wrong input file configured. Extension of input file is -.txt-, needs to be -.shp- (shapefile)"
         )
 
-    def test_init_raises_when_direct_shp_file_does_not_exist(self):
+    def test_init_raises_when_damages_shp_file_does_not_exist(self):
         _config_data = AnalysisConfigData(input_path=test_data)
         _analysis = AnalysisSectionDamages(
             return_period=None,
@@ -83,7 +83,7 @@ class TestEffectivenessMeasures:
         with pytest.raises(FileNotFoundError) as exc_err:
             EffectivenessMeasures(_input_wrapper)
         assert str(exc_err.value) == str(
-            _config_data.input_path.joinpath("direct_damage", "filedoesnotexist.shp")
+            _config_data.input_path.joinpath("damages", "filedoesnotexist.shp")
         )
 
     def test_init_raises_when_effectiveness_measures_does_not_exist(self):
@@ -100,13 +100,13 @@ class TestEffectivenessMeasures:
         _config.config_data.input_path = test_data
         _input_wrapper = AnalysisInputWrapper.from_input(_analysis, _config, None, None)
         assert (
-            _config.config_data.input_path.joinpath("direct_damage", "origins.shp")
+            _config.config_data.input_path.joinpath("damages", "origins.shp")
         ).exists()
         with pytest.raises(FileNotFoundError) as exc_err:
             EffectivenessMeasures(_input_wrapper)
         assert str(exc_err.value) == str(
             _config.config_data.input_path.joinpath(
-                "direct_damage", "effectiveness_measures.csv"
+                "damages", "effectiveness_measures.csv"
             )
         )
 

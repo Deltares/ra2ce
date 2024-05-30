@@ -28,9 +28,9 @@ from geopandas import GeoDataFrame
 from scipy.interpolate import interp1d
 
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
-from ra2ce.analysis.direct.direct_lookup import LookUp as lookup
-from ra2ce.analysis.direct.direct_lookup import dataframe_lookup
-from ra2ce.analysis.direct.direct_utils import (
+from ra2ce.analysis.damages.damages_lookup import LookUp as lookup
+from ra2ce.analysis.damages.damages_lookup import dataframe_lookup
+from ra2ce.analysis.damages.damages_utils import (
     clean_lane_data,
     create_summary_statistics,
     scale_damage_using_lanes,

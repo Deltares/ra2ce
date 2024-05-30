@@ -12,16 +12,16 @@ from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import
     RiskCalculationModeEnum,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
-from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
-from ra2ce.analysis.direct.damage.manual_damage_functions import ManualDamageFunctions
-from ra2ce.analysis.direct.damage_calculation import (
+from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
+from ra2ce.analysis.damages.damage.manual_damage_functions import ManualDamageFunctions
+from ra2ce.analysis.damages.damage_calculation import (
     DamageNetworkEvents,
     DamageNetworkReturnPeriods,
 )
 from ra2ce.network.graph_files.network_file import NetworkFile
 
 
-class DirectDamage(AnalysisDirectProtocol):
+class Damages(AnalysisDamagesProtocol):
     analysis: AnalysisSectionDamages
     graph_file: NetworkFile
     graph_file_hazard: NetworkFile

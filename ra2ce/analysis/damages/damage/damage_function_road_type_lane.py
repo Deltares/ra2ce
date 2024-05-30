@@ -24,8 +24,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from ra2ce.analysis.direct.damage.damage_fraction_uniform import DamageFractionUniform
-from ra2ce.analysis.direct.damage.max_damage import MaxDamageByRoadTypeByLane
+from ra2ce.analysis.damages.damage.damage_fraction_uniform import DamageFractionUniform
+from ra2ce.analysis.damages.damage.max_damage import MaxDamageByRoadTypeByLane
 
 
 class DamageFunctionByRoadTypeByLane:
