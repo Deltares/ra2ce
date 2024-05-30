@@ -16,7 +16,9 @@ Below you can access some of the main examples and go through them in an off-lin
    ../_examples/example_single_link_losses
    ../_examples/example_multi_link_losses
    ../_examples/example_origin_destination_analysis
-   ../_examples/example_direct_damage
+   ../_examples/example_damages_huizinga
+   ../_examples/example_damages_manual
+   ../_examples/example_damages_OSdamage
    ../_examples/example_hazard_overlay
    ../_examples/example_isolated_locations
    ../_examples/example_optimal_route_origin_destination
