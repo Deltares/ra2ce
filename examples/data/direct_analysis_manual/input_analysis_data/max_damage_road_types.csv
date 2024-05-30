@@ -1,8 +1,0 @@
-Road_type \ lanes	lanes
-unit	euro/m
-tertiary_link	100
-tertiary	100
-secondary_link	10
-secondary	10
-residential	1000
-['tertiary', 'residential']	500

@@ -53,7 +53,7 @@ Possible (built-in) options for vulnerability curves include:
     
     [analysis1]
     name = example's damages analysis
-    analysis = direct_damage
+    analysis = damages
     event_type = event
     damage_curve = HZ/OSD/MAN
     aggregate_wl = max
@@ -72,7 +72,7 @@ Possible (built-in) options for vulnerability curves include:
 
     [analysis1]
     name = example's damages analysis
-    analysis = direct_damage
+    analysis = damages
     event_type = return_period
     risk_calculation = None/default/cut_from_YYYY_year/triangle_to_null_YYYY_year
     damage_curve = HZ/OSD/MAN

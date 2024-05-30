@@ -101,7 +101,7 @@ class TestAnalysisConfigWrapper:
         _analysis_wrapper.config_data = AnalysisConfigData()
         _analysis_wrapper.config_data.analyses.append(
             AnalysisSectionDamages(
-                analysis=AnalysisDamagesEnum.DIRECT_DAMAGE,
+                analysis=AnalysisDamagesEnum.DAMAGES,
                 event_type=EventTypeEnum.EVENT,
                 damage_curve=DamageCurveEnum.HZ,
             )
