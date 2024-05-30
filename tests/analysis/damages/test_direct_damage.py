@@ -16,13 +16,13 @@ from ra2ce.analysis.damages.damage_calculation.damage_network_return_periods imp
 )
 from tests import test_data
 
-direct_damage_test_data = test_data / "damages"
+damages_test_data = test_data / "damages"
 
 
 class TestDirectDamage:
     @pytest.fixture(autouse=False)
     def risk_data_file(self) -> Path:
-        _risk_file = direct_damage_test_data / "risk_test_data.csv"
+        _risk_file = damages_test_data / "risk_test_data.csv"
         assert _risk_file.is_file()
         assert _risk_file.exists()
         return _risk_file
@@ -31,7 +31,7 @@ class TestDirectDamage:
     def event_input_output(self) -> dict:
         import numpy as np
 
-        file_path = direct_damage_test_data / "NL332.csv"
+        file_path = damages_test_data / "NL332.csv"
         raw_data = pd.read_csv(file_path, index_col=0)
         input_cols = [
             "osm_id",
@@ -75,7 +75,7 @@ class TestDirectDamage:
 
         # SET PARAMETERS AND LOAD REFERENCE DATA
         damage_function = DamageCurveEnum.HZ
-        test_data_path = direct_damage_test_data / "Direct_damage_tests_EV_HZ.xlsx"
+        test_data_path = damages_test_data / "Damages_tests_EV_HZ.xlsx"
         assert test_data_path.is_file()
 
         road_gdf = pd.read_excel(test_data_path)
@@ -176,7 +176,7 @@ class TestDirectDamage:
 
         # SET PARAMETERS AND LOAD REFERENCE DATA
         damage_function = DamageCurveEnum.OSD
-        test_data_path = direct_damage_test_data / "Direct_damage_tests_EV_OSD.xlsx"
+        test_data_path = damages_test_data / "Damages_tests_EV_OSD.xlsx"
         road_gdf = pd.read_excel(test_data_path)
 
         val_cols = [
@@ -214,7 +214,7 @@ class TestDirectDamage:
     def _load_manual_damage_function(self):
         manual_damage_functions = ManualDamageFunctions()
         manual_damage_functions.find_damage_functions(
-            folder=direct_damage_test_data / "test_damage_functions"
+            folder=damages_test_data / "test_damage_functions"
         )
         manual_damage_functions.load_damage_functions()
 
@@ -251,7 +251,7 @@ class TestDirectDamage:
 
         # SET PARAMETERS AND LOAD REFERENCE DATA
         damage_function = DamageCurveEnum.MAN
-        test_data_path = direct_damage_test_data / "Direct_damage_tests_EV_HZ.xlsx"
+        test_data_path = damages_test_data / "Damages_tests_EV_HZ.xlsx"
         road_gdf = pd.read_excel(test_data_path)
 
         val_cols = [
@@ -261,7 +261,7 @@ class TestDirectDamage:
         # LOAD DAMAGE FUNCTIONS
         manual_damage_functions = ManualDamageFunctions()
         manual_damage_functions.find_damage_functions(
-            folder=direct_damage_test_data / "test_damage_functions"
+            folder=damages_test_data / "test_damage_functions"
         )
         manual_damage_functions.load_damage_functions()
 
