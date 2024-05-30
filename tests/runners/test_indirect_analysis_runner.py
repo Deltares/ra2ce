@@ -22,9 +22,7 @@ class TestIndirectAnalysisRunner:
         assert isinstance(_ra2ce_input, ConfigWrapper)
         yield _ra2ce_input
 
-    def test_given_indirect_configuration_can_run(
-        self, dummy_ra2ce_input: ConfigWrapper
-    ):
+    def test_given_losses_configuration_can_run(self, dummy_ra2ce_input: ConfigWrapper):
         # 1. Define test data.
         dummy_ra2ce_input.analysis_config.config_data.analyses = [
             AnalysisSectionLosses(analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY)
