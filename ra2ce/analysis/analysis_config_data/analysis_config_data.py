@@ -170,7 +170,7 @@ class AnalysisConfigData(ConfigDataProtocol):
     hazard_names: list[str] = field(default_factory=list)
 
     @property
-    def damages(self) -> list[AnalysisSectionDamages]:
+    def damages_list(self) -> list[AnalysisSectionDamages]:
         """
         Get all damages analyses from config.
 
@@ -182,7 +182,7 @@ class AnalysisConfigData(ConfigDataProtocol):
         )
 
     @property
-    def losses(self) -> list[AnalysisSectionLosses]:
+    def losses_list(self) -> list[AnalysisSectionLosses]:
         """
         Get all losses analyses from config.
 
