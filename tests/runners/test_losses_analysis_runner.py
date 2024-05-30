@@ -12,7 +12,7 @@ from tests.runners.dummy_classes import DummyRa2ceInput
 
 
 class TestLossesAnalysisRunner:
-    def test_init_direct_analysis_runner(self):
+    def test_init_losses_analysis_runner(self):
         _runner = LossesAnalysisRunner()
         assert str(_runner) == "Losses Analysis Runner"
 
