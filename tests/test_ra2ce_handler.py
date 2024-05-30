@@ -1,5 +1,6 @@
 import shutil
 from pathlib import Path
+from typing import Iterator
 
 import pytest
 
@@ -49,87 +50,90 @@ class TestRa2ceHandler:
         # 3. Verify expectations.
         assert isinstance(_handler, Ra2ceHandler)
 
+    @pytest.fixture(name="minimal_acceptance_test_case")
     def _get_acceptance_test_data_copy_dir(
         self, request: pytest.FixtureRequest
-    ) -> Path:
-        _copy_root_dir = test_results.joinpath(request.node.originalname)
-        if not _copy_root_dir.is_dir():
-            _copy_root_dir.mkdir(parents=True)
-        _test_case_name = (
-            request.node.name.split("[")[-1].split("]")[0].lower().replace(" ", "_")
-        )
-        _test_case_dir = _copy_root_dir.joinpath(_test_case_name)
-        if not _test_case_dir.is_dir():
-            shutil.copytree(test_data.joinpath("single_link_losses"), _test_case_dir)
-        return _test_case_dir
+    ) -> Iterator[Path]:
+        _reference_dir = test_data.joinpath("simple_inputs")
+        assert _reference_dir.exists()
 
-    @pytest.fixture(name="network_config")
-    def _get_network_config_fixture(
-        self, request: pytest.FixtureRequest
-    ) -> NetworkConfigData | None:
-        if not request.param:
-            return None
-        _test_dir = self._get_acceptance_test_data_copy_dir(request)
-        _network_config = NetworkConfigDataReader().read(
-            _test_dir.joinpath("network.ini")
-        )
-        _network_config.root_path = _test_dir.parent
-        _network_config.input_path = _test_dir.joinpath("input")
-        _network_config.static_path = _test_dir.joinpath("static")
-        _network_config.output_path = _test_dir.joinpath("output")
-        return _network_config
+        # Define the results directory for this test case.
 
-    @pytest.fixture(name="analysis_config")
-    def _get_analysis_config_fixture(
-        self, request: pytest.FixtureRequest
-    ) -> AnalysisConfigData | None:
-        if not request.param:
-            return None
-        _test_dir = self._get_acceptance_test_data_copy_dir(request)
-        _analysis_config = AnalysisConfigDataReader().read(
-            _test_dir.joinpath("analyses.ini")
-        )
-        _analysis_config.static_path = _test_dir.joinpath("static")
-        return _analysis_config
+        _test_case_dir = test_results.joinpath(request.node.originalname)
+        if request.node.originalname != request.node.name:
+            _test_case_dir = _test_case_dir.joinpath(
+                request.node.name.split("[")[-1].split("]")[0].lower().replace(" ", "_")
+            )
+
+        # This ensures we handle both unparametrized and parametrized tests.
+        if _test_case_dir.exists():
+            shutil.rmtree(_test_case_dir)
+        if not _test_case_dir.parent.exists():
+            _test_case_dir.parent.mkdir()
+
+        shutil.copytree(_reference_dir, _test_case_dir)
+        yield _test_case_dir
+
+    @pytest.fixture(name="fast_test_case_files")
+    def _get_fast_acceptance_test_case_files(
+        self, minimal_acceptance_test_case: Path
+    ) -> Iterator[tuple[Path, Path]]:
+        _network_file = minimal_acceptance_test_case.joinpath("network.ini")
+        assert _network_file.exists()
+
+        _analyses_file = minimal_acceptance_test_case.joinpath("analysis.ini")
+        assert _analyses_file.exists()
+
+        yield (_network_file, _analyses_file)
+
+    @pytest.fixture(name="fast_test_case_configs")
+    def _get_fast_acceptance_test_case_configs(
+        self, fast_test_case_files: tuple[Path, Path], request: pytest.FixtureRequest
+    ) -> Iterator[tuple[NetworkConfigData, AnalysisConfigData]]:
+        # Network config data.
+        _network_config_data = NetworkConfigDataReader().read(fast_test_case_files[0])
+        _network_config_data.input_path = fast_test_case_files
+        assert isinstance(_network_config_data, NetworkConfigData)
+
+        # Analysis config data
+        _analysis_config_data = AnalysisConfigDataReader().read(fast_test_case_files[1])
+        assert isinstance(_analysis_config_data, AnalysisConfigData)
+
+        if request.param_index == 0:
+            yield (_network_config_data, _analysis_config_data)
+
+        _return_network, _return_analysis = request.param
+        if _return_network is False:
+            _network_config_data = None
+        if _return_analysis is False:
+            _analysis_config_data = None
+
+        yield (_network_config_data, _analysis_config_data)
 
     @pytest.mark.slow_test
     @pytest.mark.parametrize(
-        "analysis_config",
+        "fast_test_case_configs",
         [
-            pytest.param(None, id="No analysis config"),
-            pytest.param(
-                True,
-                id="Valid analysis config",
-            ),
-        ],
-        indirect=True,
-    )
-    @pytest.mark.parametrize(
-        "network_config",
-        [
-            pytest.param(None, id="No network config"),
-            pytest.param(
-                True,
-                id="Valid network config",
-            ),
+            pytest.param((False, False), id="No config data provided"),
+            pytest.param((False, True), id="Only network config data provided"),
+            pytest.param((True, False), id="Only analysis config data provided"),
+            pytest.param((True, True), id="All config data provided"),
         ],
         indirect=True,
     )
     def test_configure_handler_created_from_config_does_not_raise(
-        self,
-        network_config: NetworkConfigData,
-        analysis_config: AnalysisConfigData,
+        self, fast_test_case_configs: tuple[NetworkConfigData, AnalysisConfigData]
     ):
         # 1./2. Define test data./Run test.
-        _handler = Ra2ceHandler.from_config(network_config, analysis_config)
+        _handler = Ra2ceHandler.from_config(
+            fast_test_case_configs[0], fast_test_case_configs[1]
+        )
         _handler.configure()
 
         # 3. Verify expectations.
         assert isinstance(_handler, Ra2ceHandler)
 
-    def test_initialize_with_analysis_does_not_raise(
-        self, request: pytest.FixtureRequest
-    ):
+    def test_initialize_without_analysis_raises(self, request: pytest.FixtureRequest):
         # 1. Define test data.
         _test_dir = test_results.joinpath(request.node.name)
         _analysis_dir = _test_dir.joinpath("analysis_folder")
@@ -139,53 +143,34 @@ class TestRa2ceHandler:
 
         # 2. Run test.
         with pytest.raises(Exception):
-            # It will raise an exception because the analysis folder does not
-            # contain any analysis.ini file, but we only care to see if the
-            # directory was correctly initialized.
             Ra2ceHandler(None, _analysis_dir)
 
         # 3. Verify expectations.
         assert _test_dir.exists()
-        assert (_test_dir / "output").exists()
+        assert _test_dir.joinpath("output").exists()
 
     @pytest.mark.slow_test
-    def test_run_with_ini_files_given_valid_files(self, request: pytest.FixtureRequest):
-        # 1. Define test data.
-        _test_dir = self._get_acceptance_test_data_copy_dir(request)
-        _network_file = _test_dir.joinpath("network.ini")
-        _analyses_file = _test_dir.joinpath("analyses.ini")
+    def test_run_with_ini_files_given_valid_files(
+        self, fast_test_case_files: tuple[Path, Path]
+    ):
+        # 1. Run test.
+        _results = Ra2ceHandler.run_with_ini_files(
+            fast_test_case_files[0], fast_test_case_files[1]
+        )
 
-        # 2. Run test.
-        _results = Ra2ceHandler.run_with_ini_files(_network_file, _analyses_file)
-
-        # 3. Verify expectations.
+        # 2. Verify expectations.
         assert any(_results)
         assert all(isinstance(_result, AnalysisResultWrapper) for _result in _results)
 
     @pytest.mark.slow_test
     def test_run_with_config_data_given_valid_files(
-        self, request: pytest.FixtureRequest
+        self, fast_test_case_configs: tuple[NetworkConfigData, AnalysisConfigData]
     ):
-        # 1. Define test data.
-        _test_dir = self._get_acceptance_test_data_copy_dir(request)
-
-        # Network configuration
-        _network_file = _test_dir.joinpath("network.ini")
-        assert _network_file.exists()
-        _network_config_data = NetworkConfigDataReader().read(_network_file)
-        assert isinstance(_network_config_data, NetworkConfigData)
-
-        # Analysis configuration
-        _analyses_file = _test_dir.joinpath("analyses.ini")
-        assert _analyses_file.exists()
-        _analysis_config_data = AnalysisConfigDataReader().read(_analyses_file)
-        assert isinstance(_analysis_config_data, AnalysisConfigData)
-
-        # 2. Run test.
+        # 1. Run test.
         _results = Ra2ceHandler.run_with_config_data(
-            _network_config_data, _analysis_config_data
+            fast_test_case_configs[0], fast_test_case_configs[1]
         )
 
-        # 3. Verify expectations.
+        # 2. Verify expectations.
         assert any(_results)
         assert all(isinstance(_result, AnalysisResultWrapper) for _result in _results)
