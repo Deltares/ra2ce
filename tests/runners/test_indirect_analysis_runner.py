@@ -11,10 +11,10 @@ from ra2ce.runners.indirect_analysis_runner import IndirectAnalysisRunner
 from tests.runners.dummy_classes import DummyRa2ceInput
 
 
-class TestIndirectAnalysisRunner:
-    def test_init_direct_analysis_runner(self):
-        _runner = IndirectAnalysisRunner()
-        assert str(_runner) == "Indirect Analysis Runner"
+class TestLossesAnalysisRunner:
+    def test_init_losses_analysis_runner(self):
+        _runner = LossesAnalysisRunner()
+        assert str(_runner) == "Losses Analysis Runner"
 
     @pytest.fixture
     def dummy_ra2ce_input(self):

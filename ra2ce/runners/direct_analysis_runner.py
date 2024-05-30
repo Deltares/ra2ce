@@ -55,7 +55,7 @@ class DirectAnalysisRunner(AnalysisRunner):
         _network_config = ra2ce_input.network_config.config_data
         if not _network_config.hazard or not _network_config.hazard.hazard_map:
             logging.error(
-                "Please define a hazard map in your network.ini file. Unable to calculate direct damages."
+                "Please define a hazard map in your network.ini file. Unable to calculate damages."
             )
             return False
         return True
