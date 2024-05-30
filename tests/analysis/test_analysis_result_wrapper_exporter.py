@@ -5,8 +5,8 @@ import pytest
 from shapely import Point
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisSectionBase
-from ra2ce.analysis.analysis_config_data.enums.analysis_indirect_enum import (
-    AnalysisIndirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
@@ -39,7 +39,7 @@ class TestAnalysisResultWrapperExporter:
                 _analysis = AnalysisSectionBase(
                     name="Mocked Analysis", save_csv=False, save_gpkg=False
                 )
-                _analysis.analysis = AnalysisIndirectEnum.SINGLE_LINK_LOSSES
+                _analysis.analysis = AnalysisLossesEnum.SINGLE_LINK_LOSSES
                 self.analysis = _analysis
                 self.output_path = test_results.joinpath(request.node.name)
 

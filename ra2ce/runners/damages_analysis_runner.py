@@ -45,7 +45,7 @@ class DamagesAnalysisRunner(AnalysisRunner):
     def can_run(ra2ce_input: ConfigWrapper) -> bool:
         if (
             not ra2ce_input.analysis_config
-            or not ra2ce_input.analysis_config.config_data.direct
+            or not ra2ce_input.analysis_config.config_data.damages_list
         ):
             return False
         if not ra2ce_input.network_config:

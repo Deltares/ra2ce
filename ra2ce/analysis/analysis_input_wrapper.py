@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDirect,
-    AnalysisSectionIndirect,
+    AnalysisSectionDamages,
+    AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.network.graph_files.graph_files_protocol import GraphFileProtocol
@@ -18,7 +18,7 @@ from ra2ce.network.network_config_data.network_config_data import (
 
 @dataclass
 class AnalysisInputWrapper:
-    analysis: AnalysisSectionDirect | AnalysisSectionIndirect
+    analysis: AnalysisSectionDamages | AnalysisSectionLosses
     graph_file: Optional[GraphFileProtocol]
     graph_file_hazard: Optional[GraphFileProtocol]
     input_path: Path
@@ -31,7 +31,7 @@ class AnalysisInputWrapper:
     @classmethod
     def from_input(
         cls,
-        analysis: AnalysisSectionDirect | AnalysisSectionIndirect,
+        analysis: AnalysisSectionDamages | AnalysisSectionLosses,
         analysis_config: AnalysisConfigWrapper,
         graph_file: Optional[GraphFileProtocol] = None,
         graph_file_hazard: Optional[GraphFileProtocol] = None,

@@ -1,6 +1,6 @@
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
-    AnalysisSectionIndirect,
+    AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
@@ -28,7 +28,7 @@ class TestOriginClosestDestination:
             ),
             network=NetworkSection(file_id=""),
         )
-        _analysis = AnalysisSectionIndirect(threshold="", weighing=WeighingEnum.INVALID)
+        _analysis = AnalysisSectionLosses(threshold="", weighing=WeighingEnum.INVALID)
         _analysis_input = AnalysisInputWrapper.from_input(
             analysis=_analysis,
             analysis_config=_config,
@@ -40,7 +40,7 @@ class TestOriginClosestDestination:
 
         # 3. Verify expectations.
         assert isinstance(_ocd, OriginClosestDestination)
-        assert isinstance(_ocd.analysis, AnalysisSectionIndirect)
+        assert isinstance(_ocd.analysis, AnalysisSectionLosses)
         assert _ocd.analysis == _analysis
         assert _ocd.hazard_names.names == _config.config_data.hazard_names
         assert _ocd.results_dict == {}

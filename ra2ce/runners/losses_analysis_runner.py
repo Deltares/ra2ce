@@ -40,7 +40,7 @@ class LossesAnalysisRunner(AnalysisRunner):
     def can_run(ra2ce_input: ConfigWrapper) -> bool:
         if (
             not ra2ce_input.analysis_config
-            or not ra2ce_input.analysis_config.config_data.indirect
+            or not ra2ce_input.analysis_config.config_data.losses_list
         ):
             return False
         return True

@@ -4,7 +4,7 @@ from pathlib import Path
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDirect,
+    AnalysisSectionDamages,
 )
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
@@ -22,7 +22,7 @@ from ra2ce.network.graph_files.network_file import NetworkFile
 
 
 class DirectDamage(AnalysisDirectProtocol):
-    analysis: AnalysisSectionDirect
+    analysis: AnalysisSectionDamages
     graph_file: NetworkFile
     graph_file_hazard: NetworkFile
     input_path: Path

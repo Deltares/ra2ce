@@ -1,10 +1,10 @@
 import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDirect,
+    AnalysisSectionDamages,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_direct_enum import (
-    AnalysisDirectEnum,
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.damages_analysis_runner import DamagesAnalysisRunner
@@ -27,7 +27,7 @@ class TestDamagesAnalysisRunner:
     ):
         # 1. Define test data.
         dummy_ra2ce_input.analysis_config.config_data.analyses = [
-            AnalysisSectionDirect(analysis=AnalysisDirectEnum.EFFECTIVENESS_MEASURES)
+            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES)
         ]
         dummy_ra2ce_input.network_config.config_data.hazard.hazard_map = "A value"
 
@@ -54,7 +54,7 @@ class TestDamagesAnalysisRunner:
     ):
         # 1. Define test data.
         dummy_ra2ce_input.analysis_config.config_data.analyses = [
-            AnalysisSectionDirect(analysis=AnalysisDirectEnum.EFFECTIVENESS_MEASURES)
+            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES)
         ]
 
         # 2. Run test.
@@ -68,7 +68,7 @@ class TestDamagesAnalysisRunner:
     ):
         # 1. Define test data.
         dummy_ra2ce_input.analysis_config.config_data.analyses = [
-            AnalysisSectionDirect(analysis=AnalysisDirectEnum.EFFECTIVENESS_MEASURES)
+            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES)
         ]
         dummy_ra2ce_input.network_config = None
 
