@@ -16,7 +16,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
-from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
+from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from tests import test_data
 
 _unsupported_direct_analysis = [
@@ -28,11 +28,11 @@ _unsupported_indirect_analysis = [AnalysisLossesEnum.INVALID]
 
 class TestAnalysisCollection:
     @dataclass
-    class MockAnalysisSectionDirect(AnalysisSectionDamages):
+    class MockAnalysisSectionDamages(AnalysisSectionDamages):
         analysis: AnalysisDamagesEnum = None
 
     @dataclass
-    class MockAnalysisSectionIndirect(AnalysisSectionLosses):
+    class MockAnalysisSectionLosses(AnalysisSectionLosses):
         analysis: AnalysisLossesEnum = None
 
     @pytest.fixture(autouse=False)
@@ -47,8 +47,8 @@ class TestAnalysisCollection:
 
         # 3. Verify expectations.
         assert isinstance(_collection, AnalysisCollection)
-        assert _collection.direct_analyses is None
-        assert _collection.indirect_analyses is None
+        assert _collection.damages_analyses is None
+        assert _collection.losses_analyses is None
 
     def test_create_collection_with_no_analysis_returns_empty(self):
         # 1. Define test data.
@@ -59,8 +59,8 @@ class TestAnalysisCollection:
         _collection = AnalysisCollection.from_config(_config)
 
         # 3. Verify expectations.
-        assert not any(_collection.direct_analyses)
-        assert not any(_collection.indirect_analyses)
+        assert not any(_collection.damages_analyses)
+        assert not any(_collection.losses_analyses)
 
     @pytest.mark.parametrize(
         "analysis",
@@ -70,7 +70,7 @@ class TestAnalysisCollection:
             if _analysis_type not in _unsupported_direct_analysis
         ],
     )
-    def test_create_collection_with_direct_analyses(
+    def test_create_collection_with_damages_analyses(
         self,
         analysis: AnalysisDamagesEnum,
     ):
@@ -78,7 +78,7 @@ class TestAnalysisCollection:
         _config = AnalysisConfigWrapper()
         _config.config_data.input_path = Path("Any path")
         _config.config_data.analyses.append(
-            self.MockAnalysisSectionDirect(analysis=analysis)
+            self.MockAnalysisSectionDamages(analysis=analysis)
         )
 
         # 2. Run test.
@@ -86,11 +86,11 @@ class TestAnalysisCollection:
 
         # 3. Verify expectations.
         assert isinstance(_collection, AnalysisCollection)
-        assert len(_collection.direct_analyses) == 1
+        assert len(_collection.damages_analyses) == 1
 
-        _generated_analysis = _collection.direct_analyses[0]
+        _generated_analysis = _collection.damages_analyses[0]
         assert isinstance(_generated_analysis, AnalysisDirectProtocol)
-        assert _collection.direct_analyses[0].analysis.analysis == analysis
+        assert _collection.damages_analyses[0].analysis.analysis == analysis
 
     @pytest.mark.parametrize(
         "analysis",
@@ -100,16 +100,16 @@ class TestAnalysisCollection:
             if _analysis_type not in _unsupported_indirect_analysis
         ],
     )
-    def test_create_collection_with_indirect_analyses(
+    def test_create_collection_with_losses_analyses(
         self,
         analysis: AnalysisLossesEnum,
     ):
         def verify_expectations(_collection, analysis):
             assert isinstance(_collection, AnalysisCollection)
-            assert len(_collection.indirect_analyses) == 1
+            assert len(_collection.losses_analyses) == 1
 
-            _generated_analysis = _collection.indirect_analyses[0]
-            assert isinstance(_generated_analysis, AnalysisIndirectProtocol)
+            _generated_analysis = _collection.losses_analyses[0]
+            assert isinstance(_generated_analysis, AnalysisLossesProtocol)
             assert _generated_analysis.analysis.analysis == analysis
 
         # 1. Define test data.
@@ -117,7 +117,7 @@ class TestAnalysisCollection:
         _config.config_data.input_path = Path("Any input path")
         _config.config_data.output_path = Path("Any output path")
         _config.config_data.analyses.append(
-            self.MockAnalysisSectionIndirect(analysis=analysis)
+            self.MockAnalysisSectionLosses(analysis=analysis)
         )
 
         if (

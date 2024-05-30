@@ -52,8 +52,8 @@ class TrailsNetworkWrapper(NetworkWrapperProtocol):
         # released
 
         Returns:
-            graph_simple (NetworkX graph): Simplified graph (for use in the indirect analyses).
-            complex_edges (GeoDataFrame): Complex graph (for use in the direct analyses).
+            graph_simple (NetworkX graph): Simplified graph (for use in the losses analyses).
+            complex_edges (GeoDataFrame): Complex graph (for use in the damages analyses).
         """
         logging.info(
             "TRAILS importer: Reads the provided primary edge file: {}, assumes there also is a_nodes file".format(

@@ -34,25 +34,25 @@ from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
 from ra2ce.analysis.direct.direct_damage import DirectDamage
 from ra2ce.analysis.direct.effectiveness_measures import EffectivenessMeasures
-from ra2ce.analysis.indirect.analysis_indirect_protocol import AnalysisIndirectProtocol
-from ra2ce.analysis.indirect.losses import Losses
-from ra2ce.analysis.indirect.multi_link_isolated_locations import (
+from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
+from ra2ce.analysis.losses.losses import Losses
+from ra2ce.analysis.losses.multi_link_isolated_locations import (
     MultiLinkIsolatedLocations,
 )
-from ra2ce.analysis.indirect.multi_link_origin_closest_destination import (
+from ra2ce.analysis.losses.multi_link_origin_closest_destination import (
     MultiLinkOriginClosestDestination,
 )
-from ra2ce.analysis.indirect.multi_link_origin_destination import (
+from ra2ce.analysis.losses.multi_link_origin_destination import (
     MultiLinkOriginDestination,
 )
-from ra2ce.analysis.indirect.multi_link_redundancy import MultiLinkRedundancy
-from ra2ce.analysis.indirect.optimal_route_origin_closest_destination import (
+from ra2ce.analysis.losses.multi_link_redundancy import MultiLinkRedundancy
+from ra2ce.analysis.losses.optimal_route_origin_closest_destination import (
     OptimalRouteOriginClosestDestination,
 )
-from ra2ce.analysis.indirect.optimal_route_origin_destination import (
+from ra2ce.analysis.losses.optimal_route_origin_destination import (
     OptimalRouteOriginDestination,
 )
-from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
+from ra2ce.analysis.losses.single_link_redundancy import SingleLinkRedundancy
 
 
 class AnalysisFactory:
@@ -89,7 +89,7 @@ class AnalysisFactory:
     def get_losses_analysis(
         analysis: AnalysisSectionLosses,
         analysis_config: AnalysisConfigWrapper,
-    ) -> AnalysisIndirectProtocol:
+    ) -> AnalysisLossesProtocol:
         """
         Create an analysis based on the given analysis configuration.
 
@@ -101,7 +101,7 @@ class AnalysisFactory:
             NotImplementedError: The analysis type is not implemented.
 
         Returns:
-            AnalysisIndirectProtocol: The indirect analysis to be executed.
+            AnalysisLossesProtocol: The losses analysis to be executed.
         """
         if analysis.analysis == AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY:
             _analysis_input = AnalysisInputWrapper.from_input(
