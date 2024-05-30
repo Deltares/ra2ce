@@ -21,18 +21,16 @@ from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtoco
 
 class TestAnalysisFactory:
     @dataclass
-    class MockAnalysisSectionDamages(AnalysisSectionDamages):
+    class MockAnalysisSectionDirect(AnalysisSectionDamages):
         analysis: AnalysisDamagesEnum = None
 
     @dataclass
-    class MockAnalysisSectionLosses(AnalysisSectionLosses):
+    class MockAnalysisSectionIndirect(AnalysisSectionLosses):
         analysis: AnalysisLossesEnum = None
 
     def test_get_direct_analysis_with_invalid_raises(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionDamages(
-            analysis=AnalysisDamagesEnum.INVALID
-        )
+        _analysis = self.MockAnalysisSectionDirect(analysis=AnalysisDamagesEnum.INVALID)
         _config = AnalysisConfigWrapper()
 
         # 2. Run test.
@@ -46,7 +44,9 @@ class TestAnalysisFactory:
 
     def test_get_losses_analysis_with_invalid_raises(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionLosses(analysis=AnalysisLossesEnum.INVALID)
+        _analysis = self.MockAnalysisSectionIndirect(
+            analysis=AnalysisLossesEnum.INVALID
+        )
         _config = AnalysisConfigWrapper()
         _config.config_data.output_path = Path("just a path")
 
@@ -61,9 +61,7 @@ class TestAnalysisFactory:
 
     def test_get_analysis_with_damages(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionDamages(
-            analysis=AnalysisDamagesEnum.DIRECT_DAMAGE
-        )
+        _analysis = self.MockAnalysisSectionDirect(analysis=AnalysisDamagesEnum.DAMAGES)
         _config = AnalysisConfigWrapper()
 
         # 2. Run test.
@@ -76,7 +74,7 @@ class TestAnalysisFactory:
 
     def test_get_analysis_with_losses(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionLosses(
+        _analysis = self.MockAnalysisSectionIndirect(
             analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY
         )
         _config = AnalysisConfigWrapper()

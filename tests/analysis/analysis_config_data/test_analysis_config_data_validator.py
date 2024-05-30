@@ -41,7 +41,7 @@ class TestAnalysisConfigDataValidator:
         _test_config_data = AnalysisConfigData(
             project=ProjectSection(),
             analyses=AnalysisSectionDamages(
-                analysis=AnalysisDamagesEnum.DIRECT_DAMAGE,
+                analysis=AnalysisDamagesEnum.DAMAGES,
                 event_type=EventTypeEnum.EVENT,
                 damage_curve=DamageCurveEnum.HZ,
             ),

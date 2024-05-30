@@ -48,10 +48,10 @@ class AnalysisCollection:
         return cls(
             damages_analyses=[
                 AnalysisFactory.get_damages_analysis(analysis, analysis_config)
-                for analysis in analysis_config.config_data.damages
+                for analysis in analysis_config.config_data.damages_list
             ],
             losses_analyses=[
                 AnalysisFactory.get_losses_analysis(analysis, analysis_config)
-                for analysis in analysis_config.config_data.losses
+                for analysis in analysis_config.config_data.losses_list
             ],
         )

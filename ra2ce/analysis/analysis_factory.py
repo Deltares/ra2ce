@@ -79,7 +79,7 @@ class AnalysisFactory:
             analysis_config=analysis_config,
             graph_file_hazard=analysis_config.graph_files.base_network_hazard,
         )
-        if analysis.analysis == AnalysisDamagesEnum.DIRECT_DAMAGE:
+        if analysis.analysis == AnalysisDamagesEnum.DAMAGES:
             return DirectDamage(_analysis_input)
         if analysis.analysis == AnalysisDamagesEnum.EFFECTIVENESS_MEASURES:
             return EffectivenessMeasures(_analysis_input)

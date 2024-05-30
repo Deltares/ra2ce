@@ -27,13 +27,13 @@ class TestAnalysisConfigData:
     @pytest.fixture
     def valid_config(self) -> AnalysisConfigData:
         _config = AnalysisConfigData(project=ProjectSection())
-        for _losses in LossesAnalysisNameList:
+        for _indirect in LossesAnalysisNameList:
             _config.analyses.append(
-                AnalysisSectionLosses(analysis=AnalysisLossesEnum.get_enum(_losses))
+                AnalysisSectionLosses(analysis=AnalysisLossesEnum.get_enum(_indirect))
             )
-        for _damages in DamagesAnalysisNameList:
+        for _direct in DamagesAnalysisNameList:
             _config.analyses.append(
-                AnalysisSectionDamages(analysis=AnalysisDamagesEnum.get_enum(_damages))
+                AnalysisSectionDamages(analysis=AnalysisDamagesEnum.get_enum(_direct))
             )
         yield _config
 
@@ -41,19 +41,23 @@ class TestAnalysisConfigData:
         # 1. Define test data
 
         # 2. Run test
-        _losses = [_config.analysis.config_value for _config in valid_config.losses]
+        _indirect = [
+            _config.analysis.config_value for _config in valid_config.losses_list
+        ]
 
         # 3. Verify expectations
-        assert all(item in _losses for item in LossesAnalysisNameList)
+        assert all(item in _indirect for item in LossesAnalysisNameList)
 
     def test_damages(self, valid_config: AnalysisConfigData):
         # 1. Define test data
 
         # 2. Run test
-        _damages = [_config.analysis.config_value for _config in valid_config.damages]
+        _direct = [
+            _config.analysis.config_value for _config in valid_config.damages_list
+        ]
 
         # 3. Verify expectations
-        assert all(item in _damages for item in DamagesAnalysisNameList)
+        assert all(item in _direct for item in DamagesAnalysisNameList)
 
     def test_get_data_output(self):
         # 1. Define test data
