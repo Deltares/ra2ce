@@ -61,9 +61,7 @@ class TestAnalysisFactory:
 
     def test_get_analysis_with_direct(self):
         # 1. Define test data.
-        _analysis = self.MockAnalysisSectionDirect(
-            analysis=AnalysisDamagesEnum.DIRECT_DAMAGE
-        )
+        _analysis = self.MockAnalysisSectionDirect(analysis=AnalysisDamagesEnum.DAMAGES)
         _config = AnalysisConfigWrapper()
 
         # 2. Run test.
