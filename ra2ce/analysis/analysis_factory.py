@@ -32,7 +32,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
-from ra2ce.analysis.damages.direct_damage import DirectDamage
+from ra2ce.analysis.damages.damages import Damages
 from ra2ce.analysis.damages.effectiveness_measures import EffectivenessMeasures
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.losses import Losses
@@ -80,7 +80,7 @@ class AnalysisFactory:
             graph_file_hazard=analysis_config.graph_files.base_network_hazard,
         )
         if analysis.analysis == AnalysisDamagesEnum.DAMAGES:
-            return DirectDamage(_analysis_input)
+            return Damages(_analysis_input)
         if analysis.analysis == AnalysisDamagesEnum.EFFECTIVENESS_MEASURES:
             return EffectivenessMeasures(_analysis_input)
         raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")

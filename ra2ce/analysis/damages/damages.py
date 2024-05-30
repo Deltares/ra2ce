@@ -21,7 +21,7 @@ from ra2ce.analysis.damages.damage_calculation import (
 from ra2ce.network.graph_files.network_file import NetworkFile
 
 
-class DirectDamage(AnalysisDamagesProtocol):
+class Damages(AnalysisDamagesProtocol):
     analysis: AnalysisSectionDamages
     graph_file: NetworkFile
     graph_file_hazard: NetworkFile
