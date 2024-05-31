@@ -60,7 +60,6 @@ class TestRa2ceHandler:
         assert _reference_dir.exists()
 
         # Define the results directory for this test case.
-
         _test_case_dir = test_results.joinpath(request.node.originalname)
         if request.node.originalname != request.node.name:
             _test_case_dir = _test_case_dir.joinpath(
@@ -76,8 +75,8 @@ class TestRa2ceHandler:
         shutil.copytree(_reference_dir, _test_case_dir)
         yield _test_case_dir
 
-    @pytest.fixture(name="fast_test_case_files")
-    def _get_fast_acceptance_test_case_files(
+    @pytest.fixture(name="simple_test_case_files")
+    def _get_simple_test_case_files(
         self, minimal_acceptance_test_case: Path
     ) -> Iterator[tuple[Path, Path]]:
         _network_file = minimal_acceptance_test_case.joinpath("network.ini")
@@ -88,17 +87,19 @@ class TestRa2ceHandler:
 
         yield (_network_file, _analyses_file)
 
-    @pytest.fixture(name="fast_test_case_configs")
-    def _get_fast_acceptance_test_case_configs(
-        self, fast_test_case_files: tuple[Path, Path], request: pytest.FixtureRequest
+    @pytest.fixture(name="simple_test_case_configs")
+    def _get_simple_test_case_configs(
+        self, simple_test_case_files: tuple[Path, Path], request: pytest.FixtureRequest
     ) -> Iterator[tuple[NetworkConfigData, AnalysisConfigData]]:
         # Network config data.
-        _network_config_data = NetworkConfigDataReader().read(fast_test_case_files[0])
-        _network_config_data.input_path = fast_test_case_files
+        _network_config_data = NetworkConfigDataReader().read(simple_test_case_files[0])
+        _network_config_data.input_path = simple_test_case_files
         assert isinstance(_network_config_data, NetworkConfigData)
 
         # Analysis config data
-        _analysis_config_data = AnalysisConfigDataReader().read(fast_test_case_files[1])
+        _analysis_config_data = AnalysisConfigDataReader().read(
+            simple_test_case_files[1]
+        )
         assert isinstance(_analysis_config_data, AnalysisConfigData)
 
         if request.param_index != 0:
@@ -112,7 +113,7 @@ class TestRa2ceHandler:
 
     @pytest.mark.slow_test
     @pytest.mark.parametrize(
-        "fast_test_case_configs",
+        "simple_test_case_configs",
         [
             pytest.param((False, False), id="No config data provided"),
             pytest.param((False, True), id="Only network config data provided"),
@@ -122,11 +123,11 @@ class TestRa2ceHandler:
         indirect=True,
     )
     def test_configure_handler_created_from_config_does_not_raise(
-        self, fast_test_case_configs: tuple[NetworkConfigData, AnalysisConfigData]
+        self, simple_test_case_configs: tuple[NetworkConfigData, AnalysisConfigData]
     ):
         # 1./2. Define test data./Run test.
         _handler = Ra2ceHandler.from_config(
-            fast_test_case_configs[0], fast_test_case_configs[1]
+            simple_test_case_configs[0], simple_test_case_configs[1]
         )
         _handler.configure()
 
@@ -149,7 +150,7 @@ class TestRa2ceHandler:
         assert _test_dir.exists()
         assert _test_dir.joinpath("output").exists()
 
-    def _validate_run_results_with_fast_test_case(
+    def _validate_run_results_with_simple_test_case(
         self, results: list[AnalysisResultWrapper]
     ):
         assert len(results) == 1
@@ -161,24 +162,24 @@ class TestRa2ceHandler:
 
     @pytest.mark.slow_test
     def test_run_with_ini_files_given_valid_files(
-        self, fast_test_case_files: tuple[Path, Path]
+        self, simple_test_case_files: tuple[Path, Path]
     ):
         # 1. Run test.
         _results = Ra2ceHandler.run_with_ini_files(
-            fast_test_case_files[0], fast_test_case_files[1]
+            simple_test_case_files[0], simple_test_case_files[1]
         )
 
         # 2. Verify expectations.
-        self._validate_run_results_with_fast_test_case(_results)
+        self._validate_run_results_with_simple_test_case(_results)
 
     @pytest.mark.slow_test
     def test_run_with_config_data_given_valid_files(
-        self, fast_test_case_configs: tuple[NetworkConfigData, AnalysisConfigData]
+        self, simple_test_case_configs: tuple[NetworkConfigData, AnalysisConfigData]
     ):
         # 1. Run test.
         _results = Ra2ceHandler.run_with_config_data(
-            fast_test_case_configs[0], fast_test_case_configs[1]
+            simple_test_case_configs[0], simple_test_case_configs[1]
         )
 
         # 2. Verify expectations.
-        self._validate_run_results_with_fast_test_case(_results)
+        self._validate_run_results_with_simple_test_case(_results)
