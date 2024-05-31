@@ -15,7 +15,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_factory import AnalysisFactory
-from ra2ce.analysis.direct.analysis_direct_protocol import AnalysisDirectProtocol
+from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 
 
@@ -28,7 +28,7 @@ class TestAnalysisFactory:
     class MockAnalysisSectionLosses(AnalysisSectionLosses):
         analysis: AnalysisLossesEnum = None
 
-    def test_get_direct_analysis_with_invalid_raises(self):
+    def test_get_damages_analysis_with_invalid_raises(self):
         # 1. Define test data.
         _analysis = self.MockAnalysisSectionDamages(
             analysis=AnalysisDamagesEnum.INVALID
@@ -70,7 +70,7 @@ class TestAnalysisFactory:
         _result = AnalysisFactory.get_damages_analysis(_analysis, _config)
 
         # 3. Verify expectations.
-        assert isinstance(_result, AnalysisDirectProtocol)
+        assert isinstance(_result, AnalysisDamagesProtocol)
         assert _result.graph_file_hazard == _config.graph_files.base_network_hazard
         assert _result.analysis == _analysis
 
