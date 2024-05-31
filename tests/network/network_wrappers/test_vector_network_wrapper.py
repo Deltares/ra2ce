@@ -134,7 +134,7 @@ class TestVectorNetworkWrapper:
         # Then
         assert gdf1.equals(gdf2)
 
-    def test_get_indirect_graph_from_vector(self, lines_gdf: gpd.GeoDataFrame):
+    def test_get_undirected_graph_from_vector(self, lines_gdf: gpd.GeoDataFrame):
         # Given
         _config_data = NetworkConfigData()
         _config_data.network.file_id = "dummy_file_id"
@@ -143,7 +143,7 @@ class TestVectorNetworkWrapper:
         _vector_network_wrapper = VectorNetworkWrapper(_config_data)
 
         # When
-        graph = _vector_network_wrapper._get_indirect_graph_from_vector(lines_gdf, [])
+        graph = _vector_network_wrapper._get_undirected_graph_from_vector(lines_gdf, [])
 
         # Then
         assert graph.nodes(data="geometry") is not None

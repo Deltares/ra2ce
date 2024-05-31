@@ -81,7 +81,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
                 gdf=gdf, edge_attributes_to_include=["avgspeed", "bridge", "tunnel"]
             )
         else:
-            graph = self._get_indirect_graph_from_vector(
+            graph = self._get_undirected_graph_from_vector(
                 gdf, edge_attributes_to_include=["avgspeed", "bridge", "tunnel"]
             )
         edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
@@ -292,7 +292,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
                         edge_data[edge_attribute_to_include] = edge_attribute
         return digraph
 
-    def _get_indirect_graph_from_vector(
+    def _get_undirected_graph_from_vector(
         self, gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
     ) -> nx.Graph:
         """Creates a simple undirected graph with node and edge geometries based on a given GeoDataFrame.
