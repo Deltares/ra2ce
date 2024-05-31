@@ -8,18 +8,14 @@ from ra2ce.network.graph_files.network_file import NetworkFile
 
 class TestNetworkFile:
     def test_initialize(self):
-        # 1. Define test data
-
-        # 2. Execute test
+        # 1-2. Execute test
         _nf = NetworkFile()
 
         # 3. Verify results
         assert isinstance(_nf, GraphFileProtocol)
 
     def test_get_file_without_graph_is_none(self):
-        # 1. Define test data
-
-        # 2. Execute test
+        # 1-2. Execute test
         _nf = NetworkFile(name="base_network.feather")
 
         # 3. Verify results
