@@ -66,7 +66,7 @@ class DamagesAnalysisRunner(AnalysisRunner):
     ) -> gpd.GeoDataFrame:
         # Step 00: define parameters
         base_graph_hazard_graph = analysis_config.graph_files.base_graph_hazard.graph
-        damage_curve = analysis.analysis.damage_curve.name
+        damage_curve = analysis.analysis.damage_curve
         segment_id_column = "rfid_c"
 
         # Find the hazard columns; these may be events or return periods
@@ -82,11 +82,11 @@ class DamagesAnalysisRunner(AnalysisRunner):
 
         # Step 1: Create a new attribute damage_segments_list for each edge
         for event in events:
-            if damage_curve == analysis.analysis.damage_curve.HZ.name:
+            if damage_curve == analysis.analysis.damage_curve.HZ:
                 damage_result_columns = [
                     f"dam_{event}_{damage_curve}"
                 ]  # there is one damage column
-            elif damage_curve == analysis.analysis.damage_curve.OSD.name:
+            elif damage_curve == analysis.analysis.damage_curve.OSD:
                 pattern = rf"dam_.*_{event}_representative"
                 damage_result_columns = [
                     col
@@ -94,7 +94,7 @@ class DamagesAnalysisRunner(AnalysisRunner):
                     if re.match(pattern, col)
                 ]
                 # there are multiple damage columns
-            elif damage_curve == analysis.analysis.damage_curve.MAN.name:
+            elif damage_curve == analysis.analysis.damage_curve.MAN:
                 pattern = rf"dam_{event}_.*"
                 damage_result_columns = [
                     col
