@@ -17,7 +17,6 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
-from tests import test_data
 
 _unsupported_damages_analyses = [
     AnalysisDamagesEnum.EFFECTIVENESS_MEASURES,
