@@ -41,12 +41,12 @@ class TestAnalysisConfigData:
         # 1. Define test data
 
         # 2. Run test
-        _indirect = [
+        _losses = [
             _config.analysis.config_value for _config in valid_config.losses_list
         ]
 
         # 3. Verify expectations
-        assert all(item in _indirect for item in LossesAnalysisNameList)
+        assert all(item in _losses for item in LossesAnalysisNameList)
 
     def test_damages(self, valid_config: AnalysisConfigData):
         # 1. Define test data
