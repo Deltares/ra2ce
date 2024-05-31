@@ -48,7 +48,7 @@ To create a network from OSM, specify the following parameters in your network.i
 ::
 
     [project]
-    name = example_direct
+    name = example_damages
 
     [network]
     directed = False
@@ -92,7 +92,7 @@ The user can also read in a pre-defined shapefile using the ra2ce_basics_from_gp
 ::
 
     [project]
-    name = example_direct
+    name = example_damages
 
     [network]
     directed = False
@@ -130,7 +130,7 @@ Specify the hazard file name in the network.ini and set some additional paramete
 ::
 
     [project]
-    name = example_direct
+    name = example_damages
 
     [network]
     directed = False
