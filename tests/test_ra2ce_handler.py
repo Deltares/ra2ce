@@ -99,14 +99,12 @@ class TestRa2ceHandler:
         _analysis_config_data = AnalysisConfigDataReader().read(fast_test_case_files[1])
         assert isinstance(_analysis_config_data, AnalysisConfigData)
 
-        if request.param_index == 0:
-            yield (_network_config_data, _analysis_config_data)
-
-        _return_network, _return_analysis = request.param
-        if _return_network is False:
-            _network_config_data = None
-        if _return_analysis is False:
-            _analysis_config_data = None
+        if request.param_index != 0:
+            _return_network, _return_analysis = request.param
+            if _return_network is False:
+                _network_config_data = None
+            if _return_analysis is False:
+                _analysis_config_data = None
 
         yield (_network_config_data, _analysis_config_data)
 
