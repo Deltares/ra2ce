@@ -7,9 +7,13 @@ import pytest
 from click.testing import CliRunner, Result
 
 from ra2ce import __main__
-from tests import external_test, slow_test, test_data, test_external_data
-
-test_dir = test_data.joinpath("acceptance_test_data")
+from tests import (
+    acceptance_test_data,
+    external_test,
+    slow_test,
+    test_data,
+    test_external_data,
+)
 
 # Just to make sonar-cloud stop complaining.
 _network_ini_name = "network.ini"
@@ -88,15 +92,15 @@ class TestMainCli:
         "network_ini, analyses_ini, expected_error",
         [
             pytest.param(
-                test_dir.joinpath("not_a_network.ini"),
-                test_dir.joinpath("analyses.ini"),
-                str(test_dir.joinpath("not_a_network.ini")),
+                acceptance_test_data.joinpath("not_a_network.ini"),
+                acceptance_test_data.joinpath("analyses.ini"),
+                str(acceptance_test_data.joinpath("not_a_network.ini")),
                 id="Network is None",
             ),
             pytest.param(
-                test_dir.joinpath("network.ini"),
-                test_dir.joinpath("not_an_analyses.ini"),
-                str(test_dir.joinpath("not_an_analyses.ini")),
+                acceptance_test_data.joinpath("network.ini"),
+                acceptance_test_data.joinpath("not_an_analyses.ini"),
+                str(acceptance_test_data.joinpath("not_an_analyses.ini")),
                 id="Analyses is None",
             ),
         ],
