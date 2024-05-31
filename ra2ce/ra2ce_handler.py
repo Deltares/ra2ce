@@ -150,6 +150,10 @@ class Ra2ceHandler:
         Ra2ceLogger.initialize_console_logger(logger_name="RA2CE")
 
     def configure(self) -> None:
+        """
+        Configures the `ConfigWrapper` with the current `AnalysisConfigData` and
+        `NetworkConfigData` so that the analyses can be succesfully run.
+        """
         self.input_config.configure()
 
     def run_analysis(self) -> list[AnalysisResultWrapper]:
@@ -173,3 +177,50 @@ class Ra2ceHandler:
 
         _runner = AnalysisRunnerFactory.get_runner(self.input_config)
         return _runner.run(self.input_config.analysis_config)
+
+    @staticmethod
+    def run_with_ini_files(
+        network_ini_file: Path | None, analysis_ini_file: Path | None
+    ) -> list[AnalysisResultWrapper]:
+        """
+        Streamlined method to directly run a `Ra2ce` analysis based
+        on the provided `network` and `analysis` `.ini` files.
+
+        This streamlined method allows for automatic initialization of the
+        logger.
+
+        Args:
+            network_ini_file (Path | None): Location of the network file (`*.ini`).
+            analysis_ini_file (Path | None): Location of the analysis file (`*.ini`).
+
+        Returns:
+            list[AnalysisResultWrapper]: A list of analyses results.
+        """
+        _handler = Ra2ceHandler(network_ini_file, analysis_ini_file)
+        _handler.configure()
+        return _handler.run_analysis()
+
+    @staticmethod
+    def run_with_config_data(
+        network: NetworkConfigData | None, analysis: AnalysisConfigData | None
+    ) -> list[AnalysisResultWrapper]:
+        """
+        Streamlined method to directly run a `Ra2ce` analysis based
+        on the dataclasses for `Network` and `Analysis` instead of
+        using `.ini` files.
+
+        This streamlined method allows for automatic initialization of the
+        logger.
+
+        Args:
+            network (NetworkConfigData | None):
+                Dataclass containing all the information for the network.
+            analysis (AnalysisConfigData | None):
+                Dataclass containing all the information related to analyses.
+
+        Returns:
+            list[AnalysisResultWrapper]: A list of analyses results.
+        """
+        _handler = Ra2ceHandler.from_config(network, analysis)
+        _handler.configure()
+        return _handler.run_analysis()

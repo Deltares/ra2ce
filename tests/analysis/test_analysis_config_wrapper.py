@@ -18,7 +18,7 @@ from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCu
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
-from tests import test_data, test_results
+from tests import test_results
 
 
 class TestAnalysisConfigWrapper:
@@ -30,12 +30,6 @@ class TestAnalysisConfigWrapper:
         _config = AnalysisConfigWrapper()
         assert isinstance(_config, AnalysisConfigWrapper)
         assert isinstance(_config.config_data, AnalysisConfigData)
-
-    @pytest.fixture(autouse=False)
-    def valid_analysis_ini(self) -> Path:
-        _ini_file = test_data / "acceptance_test_data" / "analyses.ini"
-        assert _ini_file.exists()
-        return _ini_file
 
     def test_from_data_network_not_provided(self, valid_analysis_ini: Path):
         # 1. Define test data.

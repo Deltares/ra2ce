@@ -17,7 +17,6 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
-from tests import test_data
 
 _unsupported_damages_analyses = [
     AnalysisDamagesEnum.EFFECTIVENESS_MEASURES,
@@ -34,12 +33,6 @@ class TestAnalysisCollection:
     @dataclass
     class MockAnalysisSectionLosses(AnalysisSectionLosses):
         analysis: AnalysisLossesEnum = None
-
-    @pytest.fixture(autouse=False)
-    def valid_analysis_ini(self) -> Path:
-        _ini_file = test_data / "acceptance_test_data" / "analyses.ini"
-        assert _ini_file.exists()
-        return _ini_file
 
     def test_initialize(self):
         # 1./2. Define test data / Run test.
