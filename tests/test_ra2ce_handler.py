@@ -10,7 +10,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data_reader import (
     AnalysisConfigDataReader,
 )
 from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
-from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
+from ra2ce.analysis.losses.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.network.network_config_data.network_config_data_reader import (
     NetworkConfigDataReader,
