@@ -3,12 +3,14 @@ from pathlib import Path
 from typing import Iterator
 
 import pytest
+from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_data.analysis_config_data_reader import (
     AnalysisConfigDataReader,
 )
 from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.indirect.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.network.network_config_data.network_config_data_reader import (
     NetworkConfigDataReader,
@@ -147,6 +149,16 @@ class TestRa2ceHandler:
         assert _test_dir.exists()
         assert _test_dir.joinpath("output").exists()
 
+    def _validate_run_results_with_fast_test_case(
+        self, results: list[AnalysisResultWrapper]
+    ):
+        assert len(results) == 1
+        _found_result = results[0]
+        assert isinstance(_found_result, AnalysisResultWrapper)
+        assert isinstance(_found_result.analysis, SingleLinkRedundancy)
+        assert isinstance(_found_result.analysis_result, GeoDataFrame)
+        assert _found_result.analysis_result.empty is False
+
     @pytest.mark.slow_test
     def test_run_with_ini_files_given_valid_files(
         self, fast_test_case_files: tuple[Path, Path]
@@ -157,8 +169,7 @@ class TestRa2ceHandler:
         )
 
         # 2. Verify expectations.
-        assert any(_results)
-        assert all(isinstance(_result, AnalysisResultWrapper) for _result in _results)
+        self._validate_run_results_with_fast_test_case(_results)
 
     @pytest.mark.slow_test
     def test_run_with_config_data_given_valid_files(
@@ -170,5 +181,4 @@ class TestRa2ceHandler:
         )
 
         # 2. Verify expectations.
-        assert any(_results)
-        assert all(isinstance(_result, AnalysisResultWrapper) for _result in _results)
+        self._validate_run_results_with_fast_test_case(_results)
