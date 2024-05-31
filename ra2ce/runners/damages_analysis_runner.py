@@ -24,11 +24,9 @@ import re
 import time
 
 import geopandas as gpd
-import networkx as nx
 import numpy as np
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
-from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.analysis_result_wrapper_exporter import (
@@ -39,9 +37,9 @@ from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 
 
-class DirectAnalysisRunner(AnalysisRunner):
+class DamagesAnalysisRunner(AnalysisRunner):
     def __str__(self) -> str:
-        return "Direct Analysis Runner"
+        return "Damages Analysis Runner"
 
     @staticmethod
     def can_run(ra2ce_input: ConfigWrapper) -> bool:
@@ -66,20 +64,29 @@ class DirectAnalysisRunner(AnalysisRunner):
         analysis_config: AnalysisConfigWrapper,
         result_segment_based: gpd.GeoDataFrame,
     ) -> gpd.GeoDataFrame:
-        def get_damage_result_columns(
-            damage_curve: DamageCurveEnum,
-            event: str,
-            result_segment_based: gpd.GeoDataFrame,
-        ) -> list[str]:
-            if (
-                damage_curve == DamageCurveEnum.HZ
-            ):  # Replace with the actual enum or constant if needed
+        # Step 00: define parameters
+        base_graph_hazard_graph = analysis_config.graph_files.base_graph_hazard.graph
+        damage_curve = analysis.analysis.damage_curve
+        segment_id_column = "rfid_c"
+
+        # Find the hazard columns; these may be events or return periods
+        event_cols = [
+            col
+            for col in result_segment_based.columns
+            if (col[0].isupper() and col[1] == "_")
+        ]
+        events = set([x.split("_")[1] for x in event_cols])  # set of unique events
+
+        # Step 0: create a deep copy of the base_graph_hazard to compose further as the final outcome of this process
+        damages_link_based_graph = base_graph_hazard_graph.copy()
+
+        # Step 1: Create a new attribute damage_segments_list for each edge
+        for event in events:
+            if damage_curve == analysis.analysis.damage_curve.HZ:
                 damage_result_columns = [
                     f"dam_{event}_{damage_curve}"
                 ]  # there is one damage column
-            elif (
-                damage_curve == DamageCurveEnum.OSD
-            ):  # Replace with the actual enum or constant if needed
+            elif damage_curve == analysis.analysis.damage_curve.OSD:
                 pattern = rf"dam_.*_{event}_representative"
                 damage_result_columns = [
                     col
@@ -87,9 +94,7 @@ class DirectAnalysisRunner(AnalysisRunner):
                     if re.match(pattern, col)
                 ]
                 # there are multiple damage columns
-            elif (
-                damage_curve == DamageCurveEnum.MAN
-            ):  # Replace with the actual enum or constant if needed
+            elif damage_curve == analysis.analysis.damage_curve.MAN:
                 pattern = rf"dam_{event}_.*"
                 damage_result_columns = [
                     col
@@ -97,72 +102,44 @@ class DirectAnalysisRunner(AnalysisRunner):
                     if re.match(pattern, col)
                 ]  # there are multiple damage columns
             else:
-                raise ValueError(f"damage curve {damage_curve.name} is invalid")
+                raise ValueError(f"damage curve {damage_curve} is invalid")
 
-            return damage_result_columns
-
-        def calculate_link_damage(
-            graph: nx.MultiDiGraph,
-            segment_id_column: str,
-            result_segment_based: gpd.GeoDataFrame,
-            damage_result_column: str,
-        ) -> nx.MultiDiGraph:
-            for u, v, key, data in graph.edges(keys=True, data=True):
-                damage_segments_list = []
-                segment_id_list = (
-                    data[segment_id_column]
-                    if isinstance(data[segment_id_column], list)
-                    else [data[segment_id_column]]
-                )
-
-                for segment_id in segment_id_list:
-                    segment_damage = result_segment_based.loc[
-                        result_segment_based[segment_id_column] == segment_id,
-                        damage_result_column,
-                    ].squeeze()
-                    if np.isnan(segment_damage):
-                        segment_damage = 0.0
-                    damage_segments_list.append(round(segment_damage, 2))
-
-                data[f"{damage_result_column}_segments"] = damage_segments_list
-                data[damage_result_column] = sum(damage_segments_list)
-
-            return graph
-
-        # Step 0: Find the hazard columns; these may be events or return periods
-        base_graph_hazard_graph = analysis_config.graph_files.base_graph_hazard.graph
-        damage_curve = analysis.analysis.damage_curve
-        segment_id_column = "rfid_c"
-        event_cols = [
-            col
-            for col in result_segment_based.columns
-            if (col[0].isupper() and col[1] == "_")
-        ]
-        events = set(x.split("_")[1] for x in event_cols)  # set of unique events
-
-        # Step 1: create a deep copy of the base_graph_hazard to compose further as the final outcome of this process
-        damages_link_based_graph = base_graph_hazard_graph.copy()
-
-        for event in events:
-            # Step 2: Get the damage_result_columns representing the estimated damages for network segments
-            damage_result_columns = get_damage_result_columns(
-                damage_curve, event, result_segment_based
-            )
-
-            # Step 3: Lookup segment ID list and calculate damage
             for damage_result_column in damage_result_columns:
-                damages_link_based_graph = calculate_link_damage(
-                    damages_link_based_graph,
-                    segment_id_column,
-                    result_segment_based,
-                    damage_result_column,
-                )
+                for u, v, key, data in damages_link_based_graph.edges(
+                    keys=True, data=True
+                ):
+                    damages_link_based_graph[u][v][key]["damage_segments_list"] = []
+                    damages_link_based_graph[u][v][key][damage_result_column] = 0
 
+                # Step 2: Lookup segment_id_list for each edge
+                for u, v, key, data in damages_link_based_graph.edges(
+                    keys=True, data=True
+                ):
+                    link_damage = data[damage_result_column]
+                    segment_id_list = (
+                        data[segment_id_column]
+                        if isinstance(data[segment_id_column], list)
+                        else [data[segment_id_column]]
+                    )
+
+                    # Step 3: Read damage for each segment_id & append to damage_segments_list and calculate link_damage
+                    for segment_id in segment_id_list:
+                        segment_damage = result_segment_based.loc[
+                            result_segment_based[segment_id_column] == segment_id,
+                            damage_result_column,
+                        ].squeeze()
+                        if np.isnan(segment_damage):
+                            segment_damage = 0
+                        data["damage_segments_list"].append(round(segment_damage, 2))
+                        link_damage += round(segment_damage, 2)
+
+                    data[damage_result_column] = round(link_damage, 2)
         # Step 4: Convert the edge attributes to a GeoDataFrame
         edge_attributes = []
         for u, v, key, data in damages_link_based_graph.edges(keys=True, data=True):
             edge_attributes.append({**{"u": u, "v": v, "key": key}, **data})
-        return gpd.GeoDataFrame(edge_attributes)
+        damages_link_based_gdf = gpd.GeoDataFrame(edge_attributes)
+        return damages_link_based_gdf
 
     def run(
         self, analysis_config: AnalysisConfigWrapper

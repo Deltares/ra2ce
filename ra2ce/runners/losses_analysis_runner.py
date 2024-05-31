@@ -32,9 +32,9 @@ from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 
 
-class IndirectAnalysisRunner(AnalysisRunner):
+class LossesAnalysisRunner(AnalysisRunner):
     def __str__(self) -> str:
-        return "Indirect Analysis Runner"
+        return "Losses Analysis Runner"
 
     @staticmethod
     def can_run(ra2ce_input: ConfigWrapper) -> bool:
