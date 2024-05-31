@@ -180,7 +180,7 @@ class Ra2ceHandler:
 
     @staticmethod
     def run_with_ini_files(
-        network_ini_file: Path, analysis_ini_file: Path
+        network_ini_file: Path | None, analysis_ini_file: Path | None
     ) -> list[AnalysisResultWrapper]:
         """
         Streamlined method to directly run a `Ra2ce` analysis based
@@ -190,8 +190,8 @@ class Ra2ceHandler:
         logger.
 
         Args:
-            network_ini_file (Path): Location of the network file (`*.ini`).
-            analysis_ini_file (Path): Location of the analysis file (`*.ini`).
+            network_ini_file (Path | None): Location of the network file (`*.ini`).
+            analysis_ini_file (Path | None): Location of the analysis file (`*.ini`).
 
         Returns:
             list[AnalysisResultWrapper]: A list of analyses results.
@@ -202,7 +202,7 @@ class Ra2ceHandler:
 
     @staticmethod
     def run_with_config_data(
-        network: NetworkConfigData, analysis: AnalysisConfigData
+        network: NetworkConfigData | None, analysis: AnalysisConfigData | None
     ) -> list[AnalysisResultWrapper]:
         """
         Streamlined method to directly run a `Ra2ce` analysis based
@@ -213,9 +213,9 @@ class Ra2ceHandler:
         logger.
 
         Args:
-            network (NetworkConfigData):
+            network (NetworkConfigData | None):
                 Dataclass containing all the information for the network.
-            analysis (AnalysisConfigData):
+            analysis (AnalysisConfigData | None):
                 Dataclass containing all the information related to analyses.
 
         Returns:
