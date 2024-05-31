@@ -1,3 +1,8 @@
+from pathlib import Path
+from typing import Iterator
+
+import pytest
+
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.configuration.config_factory import ConfigFactory
 from ra2ce.configuration.config_wrapper import ConfigWrapper
@@ -7,14 +12,22 @@ from tests import test_data
 
 
 class TestConfigFactory:
-    def test_get_config_wrapper_with_valid_input(self):
-        # 1. Define test data.
-        _test_dir = test_data / "simple_inputs"
+    @pytest.fixture(name="simple_inputs")
+    def _get_simple_inputs_acceptance_case(self) -> Iterator[tuple[Path, Path]]:
+        _test_dir = test_data.joinpath("simple_inputs")
         assert _test_dir.is_dir()
         _analysis_ini = _test_dir / "analysis.ini"
         _network_ini = _test_dir / "network.ini"
 
         assert _analysis_ini.is_file() and _network_ini.is_file()
+
+        yield (_network_ini, _analysis_ini)
+
+    def test_get_config_wrapper_with_valid_input(
+        self, simple_inputs: tuple[Path, Path]
+    ):
+        # 1. Define test data.
+        _network_ini, _analysis_ini = simple_inputs
 
         # 2. Run test.
         _input_config = ConfigFactory.get_config_wrapper(_network_ini, _analysis_ini)
@@ -26,13 +39,11 @@ class TestConfigFactory:
         assert isinstance(_input_config.network_config, NetworkConfigWrapper)
         assert isinstance(_input_config.network_config.config_data, NetworkConfigData)
 
-    def test_from_input_paths_given_only_analysis(self):
+    def test_from_input_paths_given_only_analysis(
+        self, simple_inputs: tuple[Path, Path]
+    ):
         # 1. Define test data.
-        _test_dir = test_data / "simple_inputs"
-        assert _test_dir.is_dir()
-        _analysis_ini = _test_dir / "analysis.ini"
-
-        assert _analysis_ini.is_file()
+        _, _analysis_ini = simple_inputs
 
         # 2. Run test.
         _input_config = ConfigFactory.get_config_wrapper(None, _analysis_ini)
@@ -43,13 +54,11 @@ class TestConfigFactory:
         assert isinstance(_input_config.analysis_config, AnalysisConfigWrapper)
         assert not _input_config.network_config
 
-    def test_from_input_paths_given_only_network(self):
+    def test_from_input_paths_given_only_network(
+        self, simple_inputs: tuple[Path, Path]
+    ):
         # 1. Define test data.
-        _test_dir = test_data / "simple_inputs"
-        assert _test_dir.is_dir()
-        _network_ini = _test_dir / "network.ini"
-
-        assert _network_ini.is_file()
+        _network_ini, _ = simple_inputs
 
         # 2. Run test.
         _input_config = ConfigFactory.get_config_wrapper(_network_ini, None)
