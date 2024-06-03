@@ -88,6 +88,7 @@ class HazardOverlay:
         self._hazard_crs = config.hazard.hazard_crs
         self._hazard_aggregate_wl = config.hazard.aggregate_wl.config_value
         self._hazard_directory = config.static_path.joinpath("hazard")
+        self._skip_base_network = config.hazard.skip_base_network
 
         # graph files
         self.graph_files = graph_files
@@ -686,6 +687,7 @@ class HazardOverlay:
         if (
             self.graph_files.base_network.file
             and not self.graph_files.base_network_hazard.file
+            and not self._skip_base_network
         ):
             logging.info("Iterating overlay of GeoPandas Dataframe.")
             # Check if the graph needs to be reprojected
