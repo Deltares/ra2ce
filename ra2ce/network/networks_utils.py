@@ -1113,31 +1113,41 @@ def add_missing_geoms_graph(graph: nx.Graph, geom_name: str = "geometry") -> nx.
     return graph
 
 
-def simplify_graph_count(complex_graph: nx.Graph) -> nx.Graph:
+def add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
     """
-    _summary_
+    Add missing x and y attributes to nodes
 
     Args:
-        complex_graph (nx.Graph): _description_
+        graph (nx.Graph): Graph to add x and y attributes to
 
     Returns:
-        nx.Graph: _description_
+        nx.Graph: Graph with x and y attributes added
     """
+    for _, data in graph.nodes(data=True):
+        if "x" not in data or "y" not in data:
+            # Use 'geometry' or provide default values if it's not present
+            geometry = data.get("geometry", (0.0, 0.0))
+            data.setdefault("x", round(geometry.x, 7))
+            data.setdefault("y", round(geometry.y, 7))
+    return graph
 
-    def _add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
-        for _, data in graph.nodes(data=True):
-            if "x" not in data or "y" not in data:
-                # Use 'geometry' or provide default values if it's not present
-                geometry = data.get("geometry", (0.0, 0.0))
-                data.setdefault("x", round(geometry.x, 7))
-                data.setdefault("y", round(geometry.y, 7))
-        return graph
+
+def simplify_graph_count(complex_graph: nx.Graph) -> nx.Graph:
+    """
+    Simplify the graph after adding missing x and y attributes to nodes
+
+    Args:
+        complex_graph (nx.Graph): Graph to simplify
+
+    Returns:
+        nx.Graph: Simplified graph
+    """
 
     # Simplify the graph topology and log the change in nr of nodes and edges.
     old_len_nodes = complex_graph.number_of_nodes()
     old_len_edges = complex_graph.number_of_edges()
 
-    complex_graph = _add_x_y_to_nodes(complex_graph)
+    complex_graph = add_x_y_to_nodes(complex_graph)
     simple_graph = simplify_graph(
         complex_graph, strict=True, remove_rings=True, track_merged=False
     )
@@ -1161,12 +1171,12 @@ def graph_from_gdf(
     _created_graph = nx.MultiGraph(crs=gdf.crs)
 
     # create nodes on the Graph
-    for index, row in gdf_nodes.iterrows():
+    for _, row in gdf_nodes.iterrows():
         c = {node_id: row[node_id], "geometry": row.geometry}
         _created_graph.add_node(row[node_id], **c)
 
     # create edges on top of the nodes
-    for index, row in gdf.iterrows():
+    for _, row in gdf.iterrows():
         dict_row = row.to_dict()
         _created_graph.add_edge(
             u_for_edge=dict_row["node_A"], v_for_edge=dict_row["node_B"], **dict_row

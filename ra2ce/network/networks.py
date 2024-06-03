@@ -158,15 +158,6 @@ class Network:
         self.graph_files.set_graph(graph_type, network)
 
     def _include_attributes(self, attributes: list, graph: nx.Graph) -> nx.Graph:
-        def _add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
-            for node, data in graph.nodes(data=True):
-                if "x" not in data or "y" not in data:
-                    # Use 'geometry' or provide default values if it's not present
-                    geometry = data.get("geometry", (0.0, 0.0))
-                    data.setdefault("x", round(geometry.x, 7))
-                    data.setdefault("y", round(geometry.y, 7))
-            return graph
-
         # If required_attributes are provided, check if all edges already have them
         if attributes and all(
             all(attr in edge_data for attr in attributes)
@@ -174,8 +165,8 @@ class Network:
         ):
             # If all required attributes are present, return the original graph
             return graph
-        graph = _add_x_y_to_nodes(graph)
-        gdf_nodes, gdf_edges = osmnx.graph_to_gdfs(graph)
+        graph = nut.add_x_y_to_nodes(graph)
+        _, gdf_edges = osmnx.graph_to_gdfs(graph)
         updated_graph = copy.deepcopy(graph)
         for attribute in attributes:
             if attribute in gdf_edges.columns:
