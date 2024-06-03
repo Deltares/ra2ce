@@ -687,7 +687,7 @@ class HazardOverlay:
         if (
             self.graph_files.base_network.file
             and not self.graph_files.base_network_hazard.file
-            and not self._skip_base_network
+            and (not self._skip_base_network or self._isolation_locations)
         ):
             logging.info("Iterating overlay of GeoPandas Dataframe.")
             # Check if the graph needs to be reprojected
