@@ -219,6 +219,9 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
                 _section, "scenario_cost", fallback=_hazard_section.scenario_cost
             )
         )
+        _hazard_section.skip_base_network = self._parser.getboolean(
+            _section, "skip_base_network", fallback=_hazard_section.skip_base_network
+        )
         return _hazard_section
 
     def get_cleanup_section(self) -> CleanupSection:
