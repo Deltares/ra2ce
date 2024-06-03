@@ -552,56 +552,51 @@ class HazardOverlay:
             )
 
         #### Step 1: hazard overlay of the base graph (NetworkX) ###
-        if self.graph_files.base_graph.file:
-            if self.graph_files.base_graph_hazard.file is None:
-                graph = self.graph_files.base_graph.get_graph()
+        if (
+            self.graph_files.base_graph.file
+            and not self.graph_files.base_graph_hazard.file
+        ):
+            graph = self.graph_files.base_graph.get_graph()
 
-                # Check if the graph needs to be reprojected
-                hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
-                graph_crs = pyproj.CRS.from_user_input(
-                    "EPSG:4326"
-                )  # this is WGS84, TODO: Make flexible by including in the network ini
+            # Check if the graph needs to be reprojected
+            hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
+            graph_crs = pyproj.CRS.from_user_input(
+                "EPSG:4326"
+            )  # this is WGS84, TODO: Make flexible by including in the network ini
 
-                if hazard_crs != graph_crs:
-                    # Temporarily reproject the graph to the CRS of the hazard
-                    logging.warning(
-                        """Hazard crs {} and graph crs {} are inconsistent,
-                                                  we try to reproject the graph crs""".format(
-                            hazard_crs, graph_crs
-                        )
-                    )
-                    graph_reprojected = self.get_reproject_graph(
-                        graph, graph_crs, hazard_crs
-                    )
+            if hazard_crs != graph_crs:
+                # Temporarily reproject the graph to the CRS of the hazard
+                logging.warning(
+                    """Hazard crs %s and graph crs %s are inconsistent, we try to reproject the graph crs""",
+                    hazard_crs,
+                    graph_crs,
+                )
+                graph_reprojected = self.get_reproject_graph(
+                    graph, graph_crs, hazard_crs
+                )
 
-                    # Do the actual hazard intersect
-                    base_graph_hazard_reprojected = self.hazard_intersect(
-                        graph_reprojected
-                    )
+                # Do the actual hazard intersect
+                base_graph_hazard_reprojected = self.hazard_intersect(graph_reprojected)
 
-                    # Assign the original geometries to the reprojected raster
-                    self.graph_files.base_graph_hazard.graph = (
-                        self.get_original_geoms_graph(
-                            graph, base_graph_hazard_reprojected
-                        )
-                    )
+                # Assign the original geometries to the reprojected raster
+                self.graph_files.base_graph_hazard.graph = (
+                    self.get_original_geoms_graph(graph, base_graph_hazard_reprojected)
+                )
 
-                    # Clean up memory
-                    ntu.clean_memory([graph_reprojected, base_graph_hazard_reprojected])
-                else:
-                    self.graph_files.base_graph_hazard.graph = self.hazard_intersect(
-                        graph
-                    )
+                # Clean up memory
+                ntu.clean_memory([graph_reprojected, base_graph_hazard_reprojected])
+            else:
+                self.graph_files.base_graph_hazard.graph = self.hazard_intersect(graph)
 
-                # Save graphs/network with hazard
-                self._export_network_files("base_graph_hazard", types_to_export)
+            # Save graphs/network with hazard
+            self._export_network_files("base_graph_hazard", types_to_export)
 
         #### Step 2: hazard overlay of the origins_destinations (NetworkX) ###
         if (
             self.graph_files.origins_destinations_graph.file
             and self._origins
             and self._destinations
-            and (not self.graph_files.origins_destinations_graph_hazard.file)
+            and not self.graph_files.origins_destinations_graph_hazard.file
         ):
             graph = self.graph_files.origins_destinations_graph.get_graph()
             ods = self.load_origins_destinations()
@@ -616,17 +611,15 @@ class HazardOverlay:
                 hazard_crs != graph_crs
             ):  # Temporarily reproject the graph to the CRS of the hazard
                 logging.warning(
-                    """Hazard crs {} and graph crs {} are inconsistent,
-                                                  we try to reproject the graph crs""".format(
-                        hazard_crs, graph_crs
-                    )
+                    """Hazard crs %s and graph crs %s are inconsistent, we try to reproject the graph crs""",
+                    hazard_crs,
+                    graph_crs,
                 )
                 if hazard_crs != ods.crs:
                     logging.warning(
-                        """Hazard crs {} and OD crs {} are inconsistent,
-                                                      we try to reproject the graph crs""".format(
-                            hazard_crs, ods.crs
-                        )
+                        """Hazard crs %s and OD crs %s are inconsistent, we try to reproject the graph crs""",
+                        hazard_crs,
+                        ods.crs,
                     )
                     ods_reprojected = ods.to_crs(hazard_crs)
 
@@ -676,7 +669,7 @@ class HazardOverlay:
                 index=False,
             )
             logging.info(
-                f"Saved {_od_table_feather.name} in {_od_table_feather.parent}."
+                "Saved %s in %s.", _od_table_feather.name, _od_table_feather.parent
             )
 
             # Save the OD pairs (GeoDataFrame) as shapefile
@@ -685,7 +678,9 @@ class HazardOverlay:
                     "origin_destination_table.gpkg"
                 )
                 ods.to_file(ods_path, index=False)
-                logging.info(f"Saved {ods_path.stem} in {ods_path.resolve().parent}.")
+                logging.info(
+                    "Saved %s in %s.", ods_path.stem, ods_path.resolve().parent
+                )
 
         #### Step 3: iterate overlay of the GeoPandas Dataframe (if any) ###
         if (
@@ -703,19 +698,18 @@ class HazardOverlay:
                 hazard_crs != gdf_crs
             ):  # Temporarily reproject the graph to the CRS of the hazard
                 logging.warning(
-                    """Hazard crs {} and gdf crs {} are inconsistent,
-                                                we try to reproject the gdf crs""".format(
-                        hazard_crs, gdf_crs
-                    )
+                    "Hazard crs % and gdf crs %s are inconsistent, we try to reproject the gdf crs",
+                    hazard_crs,
+                    gdf_crs,
                 )
                 extent_gdf = self.graph_files.base_network.get_graph().total_bounds
-                logging.info("Gdf extent before reprojecting: {}".format(extent_gdf))
+                logging.info("Gdf extent before reprojecting: %s", extent_gdf)
                 gdf_reprojected = self.graph_files.base_network.graph.copy().to_crs(
                     hazard_crs
                 )
                 extent_gdf_reprojected = gdf_reprojected.total_bounds
                 logging.info(
-                    "Gdf extent after reprojecting: {}".format(extent_gdf_reprojected)
+                    "Gdf extent after reprojecting: %s", extent_gdf_reprojected
                 )
 
                 # Do the actual hazard intersect
@@ -728,13 +722,16 @@ class HazardOverlay:
                 gdf_reprojected["geometry"] = original_geometries
                 self.graph_files.base_network_hazard.graph = gdf_reprojected.copy()
                 del gdf_reprojected
+
             else:
                 # read previously created file
                 logging.info("Setting 'base_network_hazard' graph.")
-                if not self.graph_files.base_network_hazard.file:
-                    self.graph_files.base_network_hazard.graph = self.hazard_intersect(
-                        self.graph_files.base_network.get_graph()
-                    )
+                self.graph_files.base_network_hazard.graph = self.hazard_intersect(
+                    self.graph_files.base_network.get_graph()
+                )
+
+            # Save segmented network with hazard
+            self._export_network_files("base_network_hazard", types_to_export)
 
         #### Step 4: hazard overlay of the locations that are checked for isolation ###
         if self._isolation_locations:
