@@ -202,9 +202,7 @@ class Network:
             )
             return None
 
-    def _get_new_network_and_graph(
-        self, export_types: list[str]
-    ) -> tuple[nx.classes.graph.Graph, gpd.GeoDataFrame]:
+    def _get_new_network_and_graph(self, export_types: list[str]) -> None:
 
         _base_graph, _network_gdf = NetworkWrapperFactory(
             self._config_data
@@ -247,7 +245,8 @@ class Network:
 
         logging.info(
             "Apparently, you already did create a network with ra2ce earlier. "
-            + "Ra2ce will use this: {}".format(base_graph_filepath)
+            + "Ra2ce will use this: %s",
+            base_graph_filepath,
         )
 
         def get_graph(
