@@ -1142,23 +1142,17 @@ def simplify_graph_count(complex_graph: nx.Graph) -> nx.Graph:
     Returns:
         nx.Graph: Simplified graph
     """
-
-    # Simplify the graph topology and log the change in nr of nodes and edges.
-    old_len_nodes = complex_graph.number_of_nodes()
-    old_len_edges = complex_graph.number_of_edges()
-
     complex_graph = add_x_y_to_nodes(complex_graph)
     simple_graph = simplify_graph(
         complex_graph, strict=True, remove_rings=True, track_merged=False
     )
 
-    new_len_nodes = simple_graph.number_of_nodes()
-    new_len_edges = simple_graph.number_of_edges()
-
     logging.info(
-        "Graph simplified from {:,} to {:,} nodes and {:,} to {:,} edges.".format(
-            old_len_nodes, new_len_nodes, old_len_edges, new_len_edges
-        )
+        "Graph simplified from %s to %s nodes and %s to %s edges.",
+        complex_graph.number_of_nodes(),
+        simple_graph.number_of_nodes(),
+        complex_graph.number_of_edges(),
+        simple_graph.number_of_edges(),
     )
 
     return simple_graph
