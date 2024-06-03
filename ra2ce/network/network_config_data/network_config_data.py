@@ -82,7 +82,7 @@ class HazardSection:
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     hazard_crs: str = ""
     scenario_cost: list[float] = field(default_factory=list)
-    skip_base_network: bool = True
+    skip_base_network: bool = False
 
 
 @dataclass
