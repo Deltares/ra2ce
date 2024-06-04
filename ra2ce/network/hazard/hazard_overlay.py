@@ -107,102 +107,6 @@ class HazardOverlay:
         )
         logging.info("Initialized hazard object.")
 
-    def overlay_hazard_raster_graph(self, graph: nx.Graph) -> nx.Graph:
-        """Overlays the hazard raster over the road segments graph.
-
-        Args:
-            *hf* (list of Pathlib paths) : #not sure if this is needed as argument if we also read if from the config
-            *graph* (NetworkX Graph) : NetworkX graph with geometries that will be intersected with the hazard map raster.
-
-        Returns:
-            *graph* (NetworkX Graph) : NetworkX graph with hazard values
-        """
-
-        # Verify the graph type (networkx)
-        assert isinstance(graph, nx.Graph)
-        extent_graph = ntu.get_graph_edges_extent(graph)
-
-        # Get all edge geometries
-        edges_geoms = get_edges_geoms(graph)
-
-        for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
-            # Check if the hazard and graph extents overlap
-            validate_extent_graph(extent_graph, self.hazard_files.tif[i])
-            # Add a no-data value for the edges that do not have a geometry
-            nx.set_edge_attributes(
-                graph,
-                {
-                    (u, v, k): {rn + "_" + self._hazard_aggregate_wl[:2]: np.nan}
-                    for u, v, k, edata in graph.edges.data(keys=True)
-                    if "geometry" not in edata
-                },
-            )
-
-            # Add the hazard values to the edges that do have a geometry
-            gdf = gpd.GeoDataFrame(
-                {"geometry": [edata["geometry"] for u, v, k, edata in edges_geoms]}
-            )
-            tqdm.pandas(desc="Graph hazard overlay with " + hn)
-            _tif_hazard_files = str(self.hazard_files.tif[i])
-            if self._hazard_aggregate_wl == "mean":
-                flood_stats = gdf.geometry.progress_apply(
-                    lambda x, _files_value=_tif_hazard_files: zonal_stats(
-                        x,
-                        _files_value,
-                        all_touched=True,
-                        add_stats={"mean": ntu.get_valid_mean},
-                    )
-                )
-            else:
-                flood_stats = gdf.geometry.progress_apply(
-                    lambda x, _files_value=_tif_hazard_files: zonal_stats(
-                        x,
-                        _files_value,
-                        all_touched=True,
-                        stats=f"{self._hazard_aggregate_wl}",
-                    )
-                )
-
-            try:
-                flood_stats = flood_stats.apply(
-                    lambda x: (
-                        x[0][self._hazard_aggregate_wl]
-                        if x[0][self._hazard_aggregate_wl]
-                        else 0
-                    )
-                )
-                nx.set_edge_attributes(
-                    graph,
-                    {
-                        (edges[0], edges[1], edges[2]): {
-                            rn + "_" + self._hazard_aggregate_wl[:2]: x
-                        }
-                        for x, edges in zip(flood_stats, edges_geoms)
-                    },
-                )
-            except KeyError:
-                logging.warning(
-                    "No aggregation method ('aggregate_wl') is chosen - choose from 'max', 'min' or 'mean'."
-                )
-
-            # Get the fraction of the road that is intersecting with the hazard
-            tqdm.pandas(desc="Graph fraction with hazard overlay with " + hn)
-            graph_fraction_flooded = gdf.geometry.progress_apply(
-                lambda x, _files_values=_tif_hazard_files: ntu.fraction_flooded(
-                    x, _files_values
-                )
-            )
-            graph_fraction_flooded = graph_fraction_flooded.fillna(0)
-            nx.set_edge_attributes(
-                graph,
-                {
-                    (edges[0], edges[1], edges[2]): {rn + "_fr": x}
-                    for x, edges in zip(graph_fraction_flooded, edges_geoms)
-                },
-            )
-
-        return graph
-
     def od_hazard_intersect(
         self, graph: nx.Graph, ods: gpd.GeoDataFrame
     ) -> tuple[nx.Graph, gpd.GeoDataFrame]:
@@ -313,29 +217,6 @@ class HazardOverlay:
 
         return graph, ods
 
-    def point_hazard_intersect(self, gdf: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
-        """Overlays the point locations with hazard maps
-
-        Args:
-            gdf (GeoDataFrame): the point geodataframe that should be overlayed with the hazard raster(s)
-        Returns:
-            gdf (GeoDataFrame): the point geodataframe with hazard raster(s) data joined
-        """
-
-        ## Intersect the origin and destination nodes with the hazard map (now only geotiff possible)
-        for i, (hn, rn) in enumerate(zip(self.hazard_names, self.ra2ce_names)):
-            # Read the hazard values at the nodes and write to the nodes.
-            tqdm.pandas(desc="Potentially isolated locations hazard overlay with " + hn)
-            _tif_hazard_files = str(self.hazard_files.tif[i])
-            flood_stats = gdf.geometry.progress_apply(
-                lambda x, _file_values=_tif_hazard_files: point_query(x, _file_values)
-            )
-            gdf[rn + "_" + self._hazard_aggregate_wl[:2]] = flood_stats.apply(
-                lambda x: x[0] if x[0] else 0
-            )
-
-        return gdf
-
     def get_point_hazard_from_network(
         self, points: gpd.GeoDataFrame, network: gpd.GeoDataFrame
     ) -> gpd.GeoDataFrame:
@@ -421,7 +302,7 @@ class HazardOverlay:
 
     def hazard_intersect(
         self, to_overlay: gpd.GeoDataFrame | nx.Graph
-    ) -> gpd.GeoDataFrame | nx.classes.graph.Graph:
+    ) -> gpd.GeoDataFrame | nx.Graph:
         """Handler function that chooses the right function for overlaying the network with the hazard data."""
         # To improve performance we need to initialize the variables
         if self.hazard_files.tif:
@@ -453,23 +334,21 @@ class HazardOverlay:
 
     def get_reproject_graph(
         self,
-        original_graph: nx.classes.graph.Graph,
+        original_graph: nx.Graph,
         in_crs: pyproj.CRS,
         out_crs: pyproj.CRS,
-    ) -> nx.classes.graph.Graph:
+    ) -> nx.Graph:
         """Reproject networkX graph"""
         extent_graph = ntu.get_graph_edges_extent(original_graph)
-        logging.info("Graph extent before reprojecting: {}".format(extent_graph))
+        logging.info("Graph extent before reprojecting: %s", extent_graph)
 
         graph_reprojected = ntu.reproject_graph(original_graph, in_crs, out_crs)
         extent_graph_reprojected = ntu.get_graph_edges_extent(graph_reprojected)
-        logging.info(
-            "Graph extent after reprojecting: {}".format(extent_graph_reprojected)
-        )
+        logging.info("Graph extent after reprojecting: %s", extent_graph_reprojected)
 
         return graph_reprojected
 
-    def get_original_geoms_graph(self, graph_original, graph_new):
+    def get_original_geoms_graph(self, graph_original: nx.MultiGraph, graph_new):
         original_geometries = nx.get_edge_attributes(graph_original, "geometry")
         _graph_new = graph_new.copy()
         nx.set_edge_attributes(_graph_new, original_geometries, "geometry")
@@ -490,43 +369,7 @@ class HazardOverlay:
         od = gpd.read_feather(od_path)
         return od
 
-    def hazard_intersect_with_reprojection(
-        self, gdf: gpd.GeoDataFrame
-    ) -> gpd.GeoDataFrame:
-        """Intersect geodataframe and hazard with reprojection"""
-        # Check if the graph needs to be reprojected
-        hazard_crs = pyproj.CRS.from_user_input(self.config.hazard["hazard_crs"])
-        gdf_crs = pyproj.CRS.from_user_input(gdf.crs)
-
-        if (
-            hazard_crs != gdf_crs
-        ):  # Temporarily reproject the graph to the CRS of the hazard
-            logging.warning(
-                """Hazard crs {} and gdf crs {} are inconsistent,
-                                            we try to reproject the gdf crs""".format(
-                    hazard_crs, gdf_crs
-                )
-            )
-            extent_gdf = gdf.total_bounds
-            logging.info("Gdf extent before reprojecting: {}".format(extent_gdf))
-            gdf_reprojected = gdf.to_crs(hazard_crs)
-            extent_gdf_reprojected = gdf_reprojected.total_bounds
-            logging.info(
-                "Gdf extent after reprojecting: {}".format(extent_gdf_reprojected)
-            )
-
-            # Do the actual hazard intersect
-            gdf_reprojected = self.hazard_intersect(gdf_reprojected)
-
-            # reassign crs
-            gdf_output = gdf_reprojected.to_crs(gdf_crs)
-
-        else:
-            gdf_output = self.hazard_intersect(gdf)
-
-        return gdf_output
-
-    def _create_base_overlay(self, base_graph) -> nx.MultiGraph:
+    def _create_base_overlay(self, base_graph: nx.MultiGraph) -> nx.MultiGraph:
 
         # Check if the graph needs to be reprojected
         _hazard_crs = pyproj.CRS.from_user_input(self._hazard_crs)
@@ -558,7 +401,7 @@ class HazardOverlay:
         return _graph_hazard
 
     def _create_origin_destinations_overlay(
-        self, origin_destinations_graph
+        self, origin_destinations_graph: nx.MultiGraph
     ) -> tuple[nx.MultiGraph, gpd.GeoDataFrame]:
         _ods = self.load_origins_destinations()
 
