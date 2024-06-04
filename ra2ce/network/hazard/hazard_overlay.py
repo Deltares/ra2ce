@@ -395,7 +395,7 @@ class HazardOverlay:
                 base_graph, _base_graph_hazard_reprojected
             )
 
-        _graph_hazard = self.hazard_intersect(base_graph)
+        return self.hazard_intersect(base_graph)
 
     def _create_origin_destinations_overlay(
         self, origin_destinations_graph: nx.MultiGraph
