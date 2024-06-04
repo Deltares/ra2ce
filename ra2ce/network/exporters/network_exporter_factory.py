@@ -63,4 +63,4 @@ class NetworkExporterFactory:
             nx.MultiDiGraph,
         ]:
             return MultiGraphNetworkExporter
-        raise ValueError(f"Unknown network type: {_network_type}")
+        raise ValueError(f"Unsupported network type: {_network_type}")
