@@ -36,6 +36,9 @@ class GraphFilesCollection:
     base_network_hazard: NetworkFile = field(
         default_factory=lambda: NetworkFile(name="base_network_hazard.feather")
     )
+    locations_hazard: NetworkFile = field(
+        default_factory=lambda: NetworkFile(name="locations_hazard.feather")
+    )
 
     @property
     def _graph_collection(self) -> list[GraphFile | NetworkFile]:
@@ -46,6 +49,7 @@ class GraphFilesCollection:
             self.origins_destinations_graph_hazard,
             self.base_network,
             self.base_network_hazard,
+            self.locations_hazard,
         ]
 
     def has_graphs(self) -> bool:
@@ -131,6 +135,7 @@ class GraphFilesCollection:
         _collection.origins_destinations_graph_hazard.read_graph(parent_dir)
         _collection.base_network.read_graph(parent_dir)
         _collection.base_network_hazard.read_graph(parent_dir)
+        _collection.locations_hazard.read_graph(parent_dir)
 
         return _collection
 
