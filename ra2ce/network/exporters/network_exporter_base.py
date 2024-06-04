@@ -21,21 +21,20 @@
 
 
 from pathlib import Path
-from typing import Any, Union
 
 import geopandas as gpd
 import networkx as nx
 
 from ra2ce.common.io.writers.ra2ce_exporter_protocol import Ra2ceExporterProtocol
 
-MULTIGRAPH_TYPE = Union[
-    nx.classes.multigraph.MultiGraph, nx.classes.multidigraph.MultiDiGraph
-]
-NETWORK_TYPE = Union[gpd.GeoDataFrame, MULTIGRAPH_TYPE]
+MULTIGRAPH_TYPE = nx.MultiGraph | nx.MultiDiGraph
+NETWORK_TYPE = gpd.GeoDataFrame | MULTIGRAPH_TYPE
 
 
 class NetworkExporterBase(Ra2ceExporterProtocol):
+    _basename: str
     _export_types: list[str] = ["pickle"]
+    pickle_path: Path
 
     def __init__(self, basename: str, export_types: list[str]) -> None:
         self._basename = basename
@@ -62,14 +61,14 @@ class NetworkExporterBase(Ra2ceExporterProtocol):
         """
         pass
 
-    def export(self, export_path: Path, export_data: Any) -> None:
+    def export(self, export_path: Path, export_data: NETWORK_TYPE) -> None:
         """
         Exports the given data to the specified types.
         TODO: I do not particularly like this approach, but at least gives better clarity on what the export options at the moment are.
 
         Args:
             export_path (Path): Path to the output directory where to export the data.
-            export_data (Any): Data that needs to be exported.
+            export_data (NETWORK_TYPE): Data that needs to be exported.
         """
         if "pickle" in self._export_types:
             self.export_to_pickle(export_path, export_data)

@@ -29,6 +29,6 @@ class TestNetworkExporterFactory:
         ],
     )
     def test_get_exporter(self, network_type: NETWORK_TYPE, expected_exporter):
-        _result = NetworkExporterFactory.get_exporter(network_type())
+        _result = NetworkExporterFactory.get_exporter_type(network_type())
         assert _result is expected_exporter
         assert issubclass(_result, NetworkExporterBase)
