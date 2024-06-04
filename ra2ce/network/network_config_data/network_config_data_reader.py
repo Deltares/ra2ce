@@ -219,8 +219,10 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
                 _section, "scenario_cost", fallback=_hazard_section.scenario_cost
             )
         )
-        _hazard_section.skip_base_network = self._parser.getboolean(
-            _section, "skip_base_network", fallback=_hazard_section.skip_base_network
+        _hazard_section.overlay_segmented_network = self._parser.getboolean(
+            _section,
+            "overlay_segmented_network",
+            fallback=_hazard_section.overlay_segmented_network,
         )
         return _hazard_section
 

@@ -20,7 +20,6 @@
 """
 
 import logging
-from pathlib import Path
 
 import geopandas as gpd
 import networkx as nx
@@ -88,7 +87,7 @@ class HazardOverlay:
         self._hazard_crs = config.hazard.hazard_crs
         self._hazard_aggregate_wl = config.hazard.aggregate_wl.config_value
         self._hazard_directory = config.static_path.joinpath("hazard")
-        self._skip_base_network = config.hazard.skip_base_network
+        self._overlay_segmented_network = config.hazard.overlay_segmented_network
 
         # graph files
         self.graph_files = graph_files
@@ -687,7 +686,7 @@ class HazardOverlay:
         if (
             self.graph_files.base_network.file
             and not self.graph_files.base_network_hazard.file
-            and (not self._skip_base_network or self._isolation_locations)
+            and (self._overlay_segmented_network or self._isolation_locations)
         ):
             logging.info("Iterating overlay of GeoPandas Dataframe.")
             # Check if the graph needs to be reprojected
