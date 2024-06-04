@@ -366,8 +366,7 @@ class HazardOverlay:
 
     def load_origins_destinations(self):
         od_path = self._output_graph_dir.joinpath("origin_destination_table.feather")
-        od = gpd.read_feather(od_path)
-        return od
+        return gpd.read_feather(od_path)
 
     def _create_base_overlay(self, base_graph: nx.MultiGraph) -> nx.MultiGraph:
 
@@ -392,13 +391,11 @@ class HazardOverlay:
             _base_graph_hazard_reprojected = self.hazard_intersect(_graph_reprojected)
 
             # Assign the original geometries to the reprojected raster
-            _graph_hazard = self.get_original_geoms_graph(
+            return self.get_original_geoms_graph(
                 base_graph, _base_graph_hazard_reprojected
             )
-        else:
-            _graph_hazard = self.hazard_intersect(base_graph)
 
-        return _graph_hazard
+        _graph_hazard = self.hazard_intersect(base_graph)
 
     def _create_origin_destinations_overlay(
         self, origin_destinations_graph: nx.MultiGraph
@@ -481,13 +478,11 @@ class HazardOverlay:
             # Assign the original geometries to the reprojected raster
             _original_geometries = base_network["geometry"]
             _gdf_reprojected["geometry"] = _original_geometries
-            _base_network_hazard = _gdf_reprojected.copy()
-        else:
-            # read previously created file
-            logging.info("Setting 'base_network_hazard' graph.")
-            _base_network_hazard = self.hazard_intersect(base_network)
+            return _gdf_reprojected.copy()
 
-        return _base_network_hazard
+        # read previously created file
+        logging.info("Setting 'base_network_hazard' graph.")
+        return self.hazard_intersect(base_network)
 
     def _create_isolated_locations_overlay(
         self, base_network_hazard: gpd.GeoDataFrame

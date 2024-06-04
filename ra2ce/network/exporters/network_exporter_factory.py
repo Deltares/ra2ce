@@ -20,7 +20,6 @@
 """
 
 from pathlib import Path
-from typing import Type
 
 import geopandas as gpd
 import networkx as nx
@@ -55,7 +54,7 @@ class NetworkExporterFactory:
         return self._exporter.pickle_path
 
     @staticmethod
-    def get_exporter_type(network: NETWORK_TYPE) -> Type[NetworkExporterBase]:
+    def get_exporter_type(network: NETWORK_TYPE) -> type[NetworkExporterBase]:
         _network_type = type(network)
         if _network_type == gpd.GeoDataFrame:
             return GeoDataFrameNetworkExporter
