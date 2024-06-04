@@ -82,6 +82,8 @@ class HazardSection:
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     hazard_crs: str = ""
     scenario_cost: list[float] = field(default_factory=list)
+    # If False no overlay of the segmented network will be created.
+    overlay_segmented_network: bool = True
 
 
 @dataclass

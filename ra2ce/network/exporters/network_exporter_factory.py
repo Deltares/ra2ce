@@ -20,7 +20,6 @@
 """
 
 from pathlib import Path
-from typing import Type
 
 import geopandas as gpd
 import networkx as nx
@@ -38,6 +37,8 @@ from ra2ce.network.exporters.network_exporter_base import (
 
 
 class NetworkExporterFactory:
+    _exporter: NetworkExporterBase
+
     def export(
         self,
         network: NETWORK_TYPE,
@@ -45,7 +46,7 @@ class NetworkExporterFactory:
         output_dir: Path,
         export_types: list[str],
     ) -> None:
-        _exporter_type = self.get_exporter(network)
+        _exporter_type = self.get_exporter_type(network)
         self._exporter = _exporter_type(basename, export_types)
         self._exporter.export(output_dir, network)
 
@@ -53,12 +54,13 @@ class NetworkExporterFactory:
         return self._exporter.pickle_path
 
     @staticmethod
-    def get_exporter(network: NETWORK_TYPE) -> Type[NetworkExporterBase]:
+    def get_exporter_type(network: NETWORK_TYPE) -> type[NetworkExporterBase]:
         _network_type = type(network)
         if _network_type == gpd.GeoDataFrame:
             return GeoDataFrameNetworkExporter
-        elif _network_type in [
-            nx.classes.multigraph.MultiGraph,
-            nx.classes.multidigraph.MultiDiGraph,
+        if _network_type in [
+            nx.MultiGraph,
+            nx.MultiDiGraph,
         ]:
             return MultiGraphNetworkExporter
+        raise ValueError(f"Unsupported network type: {_network_type}")
