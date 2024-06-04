@@ -39,8 +39,7 @@ from geopy import distance
 from numpy.ma import MaskedArray
 from osgeo import gdal
 from osmnx import graph_to_gdfs
-from osmnx._errors import GraphSimplificationError
-from osmnx.simplification import _get_paths_to_simplify, _remove_rings, utils
+from osmnx.simplification import simplify_graph
 from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
@@ -1114,178 +1113,49 @@ def add_missing_geoms_graph(graph: nx.Graph, geom_name: str = "geometry") -> nx.
     return graph
 
 
-def simplify_graph_count(complex_graph: nx.Graph) -> nx.Graph:
+def add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
     """
-    _summary_
+    Add missing x and y attributes to nodes
 
     Args:
-        complex_graph (nx.Graph): _description_
+        graph (nx.Graph): Graph to add x and y attributes to
 
     Returns:
-        nx.Graph: _description_
+        nx.Graph: Graph with x and y attributes added
     """
-    # Simplify the graph topology and log the change in nr of nodes and edges.
-    old_len_nodes = complex_graph.number_of_nodes()
-    old_len_edges = complex_graph.number_of_edges()
+    for _, data in graph.nodes(data=True):
+        if "x" not in data or "y" not in data:
+            # Use 'geometry' or provide default values if it's not present
+            geometry = data.get("geometry", (0.0, 0.0))
+            data.setdefault("x", round(geometry.x, 7))
+            data.setdefault("y", round(geometry.y, 7))
+    return graph
 
+
+def simplify_graph_count(complex_graph: nx.Graph) -> nx.Graph:
+    """
+    Simplify the graph after adding missing x and y attributes to nodes
+
+    Args:
+        complex_graph (nx.Graph): Graph to simplify
+
+    Returns:
+        nx.Graph: Simplified graph
+    """
+    complex_graph = add_x_y_to_nodes(complex_graph)
     simple_graph = simplify_graph(
-        graph=complex_graph, strict=True, remove_rings=True, track_merged=False
+        complex_graph, strict=True, remove_rings=True, track_merged=False
     )
 
-    new_len_nodes = simple_graph.number_of_nodes()
-    new_len_edges = simple_graph.number_of_edges()
-
     logging.info(
-        "Graph simplified from {:,} to {:,} nodes and {:,} to {:,} edges.".format(
-            old_len_nodes, new_len_nodes, old_len_edges, new_len_edges
-        )
+        "Graph simplified from %s to %s nodes and %s to %s edges.",
+        complex_graph.number_of_nodes(),
+        simple_graph.number_of_nodes(),
+        complex_graph.number_of_edges(),
+        simple_graph.number_of_edges(),
     )
 
     return simple_graph
-
-
-def simplify_graph(
-    graph: nx.Graph, strict: bool, remove_rings: bool, track_merged: bool
-):
-    """
-    This is an OSMNX function with the same name, modified to check if geometry attribute exists in the nodes of each
-    path to simplify.
-
-    !IMPORTANT! This whole method makes us bound to `OSMNX==1.7.1`.
-
-    Check the official OSMNX documentation for more details.
-
-    Args:
-        graph (networkx.MultiDiGraph): input graph
-        strict (bool): if False, allow nodes to be end points even if they fail all other
-            rules but have incident edges with different OSM IDs. Lets you keep
-            nodes at elbow two-way intersections, but sometimes individual blocks
-            have multiple OSM IDs within them too.
-        remove_rings(bool): if True, remove isolated self-contained rings that have no endpoints
-        track_merged (bool): if True, add `merged_edges` attribute on simplified edges, containing
-            a list of all the (u, v) node pairs that were merged together
-
-    Returns
-         networkx.MultiDiGraph: topologically simplified graph, with a new `geometry` attribute on
-            each simplified edge
-    """
-    if "simplified" in graph.graph and graph.graph["simplified"]:  # pragma: no cover
-        msg = "This graph has already been simplified, cannot simplify it again."
-        raise GraphSimplificationError(msg)
-
-    logging.info("Begin topologically simplifying the graph...")
-
-    # define edge segment attributes to sum upon edge simplification
-    attrs_to_sum = {"length", "travel_time"}
-
-    # make a copy to not mutate original graph object caller passed in
-    graph = graph.copy()
-    initial_node_count = len(graph)
-    initial_edge_count = len(graph.edges)
-    all_nodes_to_remove = []
-    all_edges_to_add = []
-
-    # generate each path that needs to be simplified
-    for path in _get_paths_to_simplify(graph, strict):
-        # add the interstitial edges we're removing to a list so we can retain
-        # their spatial geometry
-        merged_edges = []
-        path_attributes = {}
-        for u, v in zip(path[:-1], path[1:]):
-            if track_merged:
-                # keep track of the edges that were merged
-                merged_edges.append((u, v))
-
-            # there should rarely be multiple edges between interstitial nodes
-            # usually happens if OSM has duplicate ways digitized for just one
-            # street... we will keep only one of the edges (see below)
-            edge_count = graph.number_of_edges(u, v)
-            if edge_count != 1:
-                utils.log(
-                    f"Found {edge_count} edges between {u} and {v} when simplifying"
-                )
-
-            # get edge between these nodes: if multiple edges exist between
-            # them (see above), we retain only one in the simplified graph
-            # We can't assume that there exists an edge from u to v
-            # with key=0, so we get a list of all edges from u to v
-            # and just take the first one.
-            edge_data = list(graph.get_edge_data(u, v).values())[0]
-            for attr in edge_data:
-                if attr in path_attributes:
-                    # if this key already exists in the dict, append it to the
-                    # value list
-                    path_attributes[attr].append(edge_data[attr])
-                else:
-                    # if this key doesn't already exist, set the value to a list
-                    # containing the one value
-                    path_attributes[attr] = [edge_data[attr]]
-
-        # consolidate the path's edge segments' attribute values
-        for attr in path_attributes:
-            if attr in attrs_to_sum:
-                # if this attribute must be summed, sum it now
-                path_attributes[attr] = sum(path_attributes[attr])
-            elif attr != "geometry" and len(set(path_attributes[attr])) == 1:
-                # if there's only 1 unique value in this attribute list,
-                # consolidate it to the single value (the zero-th):
-                path_attributes[attr] = path_attributes[attr][0]
-            elif attr != "geometry":
-                # otherwise, if there are multiple values, keep one of each
-                path_attributes[attr] = list(set(path_attributes[attr]))
-
-        # construct the new consolidated edge's geometry for this path
-        if all("geometry" in graph.nodes[node] for node in path):
-            # Check if all nodes in the path have "geometry" attribute
-            # Use existing geometries to create LineString
-            path_attributes["geometry"] = LineString(
-                [graph.nodes[node]["geometry"] for node in path]
-            )
-        elif all(
-            "x" in graph.nodes[node] and "y" in graph.nodes[node] for node in path
-        ):
-            # Create LineString using x and y coordinates
-            path_attributes["geometry"] = LineString(
-                [
-                    Point((graph.nodes[node]["x"], graph.nodes[node]["y"]))
-                    for node in path
-                ]
-            )
-        else:
-            raise ValueError(
-                "All nodes in the path must have 'geometry' or 'x' and 'y' attributes."
-            )
-
-        if track_merged:
-            # add the merged edges as a new attribute of the simplified edge
-            path_attributes["merged_edges"] = merged_edges
-
-        # add the nodes and edge to their lists for processing at the end
-        all_nodes_to_remove.extend(path[1:-1])
-        all_edges_to_add.append(
-            {"origin": path[0], "destination": path[-1], "attr_dict": path_attributes}
-        )
-
-    # for each edge to add in the list we assembled, create a new edge between
-    # the origin and destination
-    for edge in all_edges_to_add:
-        graph.add_edge(edge["origin"], edge["destination"], **edge["attr_dict"])
-
-    # finally remove all the interstitial nodes between the new edges
-    graph.remove_nodes_from(set(all_nodes_to_remove))
-
-    if remove_rings:
-        graph = _remove_rings(graph)
-
-    # mark the graph as having been simplified
-    graph.graph["simplified"] = True
-
-    msg = (
-        f"Simplified graph: {initial_node_count:,} to {len(graph):,} nodes, "
-        f"{initial_edge_count:,} to {len(graph.edges):,} edges"
-    )
-    logging.info(msg)
-    return graph
 
 
 def graph_from_gdf(
@@ -1295,12 +1165,12 @@ def graph_from_gdf(
     _created_graph = nx.MultiGraph(crs=gdf.crs)
 
     # create nodes on the Graph
-    for index, row in gdf_nodes.iterrows():
+    for _, row in gdf_nodes.iterrows():
         c = {node_id: row[node_id], "geometry": row.geometry}
         _created_graph.add_node(row[node_id], **c)
 
     # create edges on top of the nodes
-    for index, row in gdf.iterrows():
+    for _, row in gdf.iterrows():
         dict_row = row.to_dict()
         _created_graph.add_edge(
             u_for_edge=dict_row["node_A"], v_for_edge=dict_row["node_B"], **dict_row
