@@ -1,4 +1,5 @@
 import math
+from typing import Any
 
 import geopandas as gpd
 
@@ -8,7 +9,11 @@ from ra2ce.analysis.losses.weighing_analysis.weighing_analysis_protocol import (
 
 
 class LengthWeighingAnalysis(WeighingAnalysisProtocol):
-    weighing_data: dict
+    weighing_data: dict[str, Any]
+    avgspeed_dict: dict[str, float]
+
+    def __init__(self) -> None:
+        pass
 
     def calculate_value(self) -> float:
         return math.nan

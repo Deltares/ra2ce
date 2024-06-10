@@ -148,7 +148,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
 
             df_calculated = pd.DataFrame(columns=columns)
             _weighing_analyser = WeighingAnalysisFactory.get_analysis(
-                self.analysis.weighing
+                self.analysis.weighing, gdf
             )
 
             for edges in edges_remove:
@@ -170,7 +170,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
                 ]
                 if not current_value:  # if None
                     current_value = np.nan
-                diff = round(alt_value - current_value, 3)
+                diff = round(alt_value - current_value, 7)
 
                 data = {
                     "u": [u],

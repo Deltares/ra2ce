@@ -56,7 +56,7 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
         _detour_exist_list = []
 
         _weighing_analyser = WeighingAnalysisFactory.get_analysis(
-            self.analysis.weighing
+            self.analysis.weighing, _gdf_graph
         )
         for e_remove in list(self.graph_file.graph.edges.data(keys=True)):
             u, v, k, _weighing_analyser.weighing_data = e_remove
@@ -78,15 +78,8 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
                 _alt_nodes_list.append(_alt_nodes)
 
                 # calculate the difference in distance
-                _diff_value_list.append(
-                    round(
-                        _alt_value
-                        - _weighing_analyser.weighing_data[
-                            self.analysis.weighing.config_value
-                        ],
-                        7,
-                    )
-                )
+                _orig_value = _weighing_analyser.calculate_value()
+                _diff_value_list.append(round(_alt_value - _orig_value, 7))
 
                 _detour_exist_list.append(1)
             else:

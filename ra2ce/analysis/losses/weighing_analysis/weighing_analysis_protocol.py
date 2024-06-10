@@ -1,11 +1,12 @@
-from typing import Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 import geopandas as gpd
 
 
 @runtime_checkable
 class WeighingAnalysisProtocol(Protocol):
-    weighing_data: dict
+    weighing_data: dict[str, Any]
+    avgspeed_dict: dict[str, float]
 
     def calculate_value(self) -> float:
         """
