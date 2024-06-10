@@ -1,7 +1,7 @@
+import math
 from pathlib import Path
 
 import networkx as nx
-import numpy as np
 import osmnx
 from geopandas import GeoDataFrame
 
@@ -67,20 +67,20 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
 
             if nx.has_path(self.graph_file.graph, u, v):
                 # calculate the alternative distance if that edge is unavailable
-                alt_dist = nx.dijkstra_path_length(
+                _alt_dist = nx.dijkstra_path_length(
                     self.graph_file.graph, u, v, weight=WeighingEnum.LENGTH.config_value
                 )
-                alt_nodes = nx.dijkstra_path(self.graph_file.graph, u, v)
-                alt_value = _weighing_analyser.calculate_alternative_distance(alt_dist)
+                _alt_nodes = nx.dijkstra_path(self.graph_file.graph, u, v)
+                _alt_value = _weighing_analyser.calculate_alternative_value(_alt_dist)
 
                 # append alternative route nodes
-                _alt_value_list.append(alt_value)
-                _alt_nodes_list.append(alt_nodes)
+                _alt_value_list.append(_alt_value)
+                _alt_nodes_list.append(_alt_nodes)
 
                 # calculate the difference in distance
                 _diff_value_list.append(
                     round(
-                        alt_value
+                        _alt_value
                         - _weighing_analyser.weighing_data[
                             self.analysis.weighing.config_value
                         ],
@@ -90,9 +90,9 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
 
                 _detour_exist_list.append(1)
             else:
-                _alt_value_list.append(_weighing_analyser.calculate_distance())
-                _alt_nodes_list.append(np.NaN)
-                _diff_value_list.append(np.NaN)
+                _alt_value_list.append(_weighing_analyser.calculate_value())
+                _alt_nodes_list.append(math.nan)
+                _diff_value_list.append(math.nan)
                 _detour_exist_list.append(0)
 
             # add edge again to the graph

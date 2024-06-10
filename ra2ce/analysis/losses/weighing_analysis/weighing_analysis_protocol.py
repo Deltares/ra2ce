@@ -7,23 +7,23 @@ import geopandas as gpd
 class WeighingAnalysisProtocol(Protocol):
     weighing_data: dict
 
-    def calculate_distance(self) -> float:
+    def calculate_value(self) -> float:
         """
-        Calculates the distance of the current `weighing_data` collection.
+        Calculates the distance/time of the current `weighing_data` collection.
 
         Returns:
-            float: Single distance value.
+            float: Single distance/time value.
         """
 
-    def calculate_alternative_distance(self, alt_dist: float) -> float:
+    def calculate_alternative_value(self, alt_dist: float) -> float:
         """
-        Calculates alternative distances relative the current `weighing_data` collection.
+        Calculates alternative distances/times relative the current `weighing_data` collection.
 
         Args:
-            alt_dist (float): Provided alternative distance.
+            alt_dist (float): Provided alternative distance/time.
 
         Returns:
-            float: Corrected alternative distance.
+            float: Corrected alternative distance/time value.
         """
 
     def extend_graph(self, gdf_graph: gpd.GeoDataFrame | dict) -> None:

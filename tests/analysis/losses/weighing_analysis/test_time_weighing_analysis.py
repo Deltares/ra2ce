@@ -1,4 +1,3 @@
-import numpy as np
 import pytest
 
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
@@ -42,7 +41,7 @@ class TestTimeWeighingAnalysis:
         _expected_value = 1.0
 
         # 2. Run test
-        _calculated_distance = valid_analysis.calculate_distance()
+        _calculated_distance = valid_analysis.calculate_value()
 
         # 3. Verify expectations.
         assert _calculated_distance == pytest.approx(_expected_value)
@@ -55,9 +54,7 @@ class TestTimeWeighingAnalysis:
         _expected_time = 1.0
 
         # 2. Run test
-        _calculated_distance = valid_analysis.calculate_alternative_distance(
-            _alt_distance
-        )
+        _calculated_distance = valid_analysis.calculate_alternative_value(_alt_distance)
 
         # 3. Verify expectations.
         assert _calculated_distance == pytest.approx(_expected_value, rel=1e-2)

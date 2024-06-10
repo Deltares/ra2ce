@@ -160,11 +160,9 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
                     )
                     alt_nodes = nx.dijkstra_path(_graph, u, v)
                     connected = 1
-                    alt_value = _weighing_analyser.calculate_alternative_distance(
-                        alt_dist
-                    )
+                    alt_value = _weighing_analyser.calculate_alternative_value(alt_dist)
                 else:
-                    alt_value = _weighing_analyser.calculate_distance()
+                    alt_value = _weighing_analyser.calculate_value()
                     alt_nodes, connected = np.NaN, 0
 
                 current_value = _weighing_analyser.weighing_data[
