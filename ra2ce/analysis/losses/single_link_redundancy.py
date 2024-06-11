@@ -89,7 +89,7 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
                 _alt_nodes_list.append(_alt_nodes)
 
                 # calculate the difference in distance
-                _diff_value_list.append(round(_alt_value - _current_value_list[e], 7))
+                _diff_value_list.append(round(_alt_value - _current_value_list[e], 3))
 
                 _detour_exist_list.append(1)
             else:
