@@ -14,7 +14,7 @@ class TimeWeighingAnalysis(WeighingAnalysisProtocol):
     edge_data: dict[str, Any]
     avgspeed_dict: dict[str, float]
 
-    def __init__(self, gdf_graph: gpd.GeoDataFrame) -> None:
+    def __init__(self, gdf_graph: gpd.GeoDataFrame | None) -> None:
         self.avgspeed_dict = {
             _road_type.config_value: get_avgspeed_per_road_type(gdf_graph, _road_type)
             for _road_type in RoadTypeEnum

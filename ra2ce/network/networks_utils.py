@@ -1858,6 +1858,10 @@ def get_avgspeed_per_road_type(
     Returns:
         float: The average speed for that road type
     """
+    _default_speed = 50
+    if not gdf_graph:
+        return _default_speed
+
     _avgspeed = gdf_graph[gdf_graph["highway"] == road_type.config_value]["avgspeed"]
     _avg = _avgspeed[_avgspeed > 0].mean()
     if _avg > 0:
@@ -1870,7 +1874,6 @@ def get_avgspeed_per_road_type(
         return _avg
 
     # If the graph has no average speed, return the default average speed
-    _default_speed = 50
     logging.warning(
         "No average speed found for road type %s. Using default speed of %s.",
         road_type,

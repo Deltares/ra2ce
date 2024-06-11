@@ -14,7 +14,7 @@ class LengthWeighingAnalysis(WeighingAnalysisProtocol):
     edge_data: dict[str, Any]
     avgspeed_dict: dict[str, float]
 
-    def __init__(self, gdf_graph: gpd.GeoDataFrame) -> None:
+    def __init__(self, gdf_graph: gpd.GeoDataFrame | None) -> None:
         self.avgspeed_dict = {
             _road_type.config_value: get_avgspeed_per_road_type(gdf_graph, _road_type)
             for _road_type in RoadTypeEnum
@@ -24,7 +24,7 @@ class LengthWeighingAnalysis(WeighingAnalysisProtocol):
         _avgspeed = self.edge_data.get("avgspeed", None)  # km/h
         if not _avgspeed:
             _avgspeed = self.avgspeed_dict[self.edge_data["highway"]]
-        return round(time * 3600 * _avgspeed, 1)  # m
+        return round(time * _avgspeed * 1e3, 1)  # m
 
     def get_current_value(self) -> float:
         _dist = self.edge_data.get(WeighingEnum.LENGTH.config_value, None)  # h
