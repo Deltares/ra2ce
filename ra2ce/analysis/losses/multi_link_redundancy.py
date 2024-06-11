@@ -45,6 +45,8 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
         """
         updates the time column with the calculated dataframe and updates the rest of the gdf_graph if time is None.
         """
+        # TODO: can this first branch be deleted since it is done (better) in the 3rd branch?
+        # In that case a drop of the time column should be done in the 3rd branch.
         if (
             WeighingEnum.TIME.config_value in gdf_graph.columns
             and WeighingEnum.TIME.config_value in df_calculated.columns
@@ -58,7 +60,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
         ):
             return df_calculated, gdf_graph
 
-        elif WeighingEnum.TIME.config_value in df_calculated.columns:
+        if WeighingEnum.TIME.config_value in df_calculated.columns:
             gdf_graph[WeighingEnum.TIME.config_value] = df_calculated[
                 WeighingEnum.TIME.config_value
             ]
@@ -77,6 +79,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
                     gdf_graph.at[i, WeighingEnum.TIME.config_value] = row.get(
                         WeighingEnum.TIME.config_value, None
                     )
+
         return df_calculated, gdf_graph
 
     def execute(self) -> gpd.GeoDataFrame:
@@ -152,25 +155,23 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
             )
 
             for edges in edges_remove:
-                u, v, k, _weighing_analyser.weighing_data = edges
+                u, v, k, _weighing_analyser.edge_data = edges
 
                 if nx.has_path(_graph, u, v):
+                    current_value = _weighing_analyser.calculate_current_value()
+
                     alt_dist = nx.dijkstra_path_length(
                         _graph, u, v, weight=WeighingEnum.LENGTH.config_value
                     )
                     alt_nodes = nx.dijkstra_path(_graph, u, v)
                     connected = 1
                     alt_value = _weighing_analyser.calculate_alternative_value(alt_dist)
-                else:
-                    alt_value = _weighing_analyser.calculate_value()
-                    alt_nodes, connected = np.NaN, 0
 
-                current_value = _weighing_analyser.weighing_data[
-                    self.analysis.weighing.config_value
-                ]
-                if not current_value:  # if None
-                    current_value = np.nan
-                diff = round(alt_value - current_value, 7)
+                    diff = round(alt_value - current_value, 7)
+                else:
+                    alt_value = _weighing_analyser.calculate_current_value()
+                    alt_nodes, connected = np.NaN, 0
+                    diff = np.NaN
 
                 data = {
                     "u": [u],
@@ -180,10 +181,9 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
                     f"diff_{self.analysis.weighing.config_value}": diff,
                     "connected": [connected],
                 }
-                _weighing_analyser.extend_graph(data)
 
                 if "rfid" in gdf:
-                    data["rfid"] = [str(_weighing_analyser.weighing_data["rfid"])]
+                    data["rfid"] = [str(_weighing_analyser.edge_data["rfid"])]
 
                 df_calculated = pd.concat(
                     [df_calculated, pd.DataFrame(data)], ignore_index=True

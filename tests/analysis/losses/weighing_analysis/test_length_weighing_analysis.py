@@ -24,7 +24,7 @@ class TestLengthWeighingAnalysis:
 
     def test_calculate_distance(self, valid_analysis: LengthWeighingAnalysis):
         # 1. Run test
-        _calculated_distance = valid_analysis.calculate_value()
+        _calculated_distance = valid_analysis.calculate_current_value()
 
         # 2. Verify expectations.
         assert np.isnan(_calculated_distance)
@@ -36,9 +36,7 @@ class TestLengthWeighingAnalysis:
         _alt_distance = 42
 
         # 1. Run test
-        _calculated_distance = valid_analysis.calculate_alternative_value(
-            _alt_distance
-        )
+        _calculated_distance = valid_analysis.calculate_alternative_value(_alt_distance)
 
         # 2. Verify expectations.
         assert _calculated_distance == _alt_distance

@@ -59,13 +59,15 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
             self.analysis.weighing, _gdf_graph
         )
         for e_remove in list(self.graph_file.graph.edges.data(keys=True)):
-            u, v, k, _weighing_analyser.weighing_data = e_remove
+            u, v, k, _weighing_analyser.edge_data = e_remove
 
             # if data['highway'] in attr_list:
             # remove the edge
             self.graph_file.graph.remove_edge(u, v, k)
 
             if nx.has_path(self.graph_file.graph, u, v):
+                _current_value = _weighing_analyser.calculate_current_value()
+
                 # calculate the alternative distance if that edge is unavailable
                 _alt_dist = nx.dijkstra_path_length(
                     self.graph_file.graph, u, v, weight=WeighingEnum.LENGTH.config_value
@@ -78,21 +80,19 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
                 _alt_nodes_list.append(_alt_nodes)
 
                 # calculate the difference in distance
-                _orig_value = _weighing_analyser.calculate_value()
-                _diff_value_list.append(round(_alt_value - _orig_value, 7))
+                _diff_value_list.append(round(_alt_value - _current_value, 7))
 
                 _detour_exist_list.append(1)
             else:
-                _alt_value_list.append(_weighing_analyser.calculate_value())
+                _alt_value_list.append(_weighing_analyser.calculate_current_value())
                 _alt_nodes_list.append(math.nan)
                 _diff_value_list.append(math.nan)
                 _detour_exist_list.append(0)
 
             # add edge again to the graph
-            self.graph_file.graph.add_edge(u, v, k, **_weighing_analyser.weighing_data)
+            self.graph_file.graph.add_edge(u, v, k, **_weighing_analyser.edge_data)
 
         # Add the new columns to the geodataframe
-        _weighing_analyser.extend_graph(_gdf_graph)
         _gdf_graph[f"alt_{self.analysis.weighing.config_value}"] = _alt_value_list
         _gdf_graph["alt_nodes"] = _alt_nodes_list
         _gdf_graph[f"diff_{self.analysis.weighing.config_value}"] = _diff_value_list

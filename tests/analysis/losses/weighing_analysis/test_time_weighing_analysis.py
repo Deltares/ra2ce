@@ -41,7 +41,7 @@ class TestTimeWeighingAnalysis:
         _expected_value = 1.0
 
         # 2. Run test
-        _calculated_distance = valid_analysis.calculate_value()
+        _calculated_distance = valid_analysis.calculate_current_value()
 
         # 3. Verify expectations.
         assert _calculated_distance == pytest.approx(_expected_value)

@@ -1,33 +1,25 @@
 from typing import Any, Protocol, runtime_checkable
 
-import geopandas as gpd
-
 
 @runtime_checkable
 class WeighingAnalysisProtocol(Protocol):
-    weighing_data: dict[str, Any]
-    avgspeed_dict: dict[str, float]
+    edge_data: dict[str, Any]
 
-    def calculate_value(self) -> float:
+    def calculate_current_value(self) -> float:
         """
-        Calculates the distance/time of the current `weighing_data` collection.
+        Calculates the current distance/time of the edge.
 
         Returns:
-            float: Single distance/time value.
+            float: Current distance/time value.
         """
 
     def calculate_alternative_value(self, alt_dist: float) -> float:
         """
-        Calculates alternative distances/times relative the current `weighing_data` collection.
+        Calculates the alternative distances/times of the edge.
 
         Args:
             alt_dist (float): Provided alternative distance/time.
 
         Returns:
             float: Corrected alternative distance/time value.
-        """
-
-    def extend_graph(self, gdf_graph: gpd.GeoDataFrame | dict) -> None:
-        """
-        Extends the provided graph with custom attributes.
         """
