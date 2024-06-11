@@ -15,7 +15,7 @@ from ra2ce.analysis.losses.weighing_analysis.weighing_analysis_protocol import (
 class WeighingAnalysisFactory:
     @staticmethod
     def get_analysis(
-        weighing_type: WeighingEnum, gdf_graph: gpd.GeoDataFrame
+        weighing_type: WeighingEnum, gdf_graph: gpd.GeoDataFrame | None
     ) -> WeighingAnalysisProtocol:
         if weighing_type == WeighingEnum.TIME:
             _analysis = TimeWeighingAnalysis(gdf_graph)
