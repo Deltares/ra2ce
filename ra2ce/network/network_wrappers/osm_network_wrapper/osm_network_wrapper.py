@@ -44,7 +44,6 @@ from ra2ce.network.network_wrappers.osm_network_wrapper.osm_utils import (
     get_node_nearest_edge,
     is_endnode_check,
     modify_graph,
-    remove_key,
 )
 
 
