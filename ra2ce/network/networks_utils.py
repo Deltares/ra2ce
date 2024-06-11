@@ -1843,7 +1843,7 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
 
 
 def get_avgspeed_per_road_type(
-    gdf_graph: gpd.GeoDataFrame, road_type: RoadTypeEnum
+    gdf_graph: gpd.GeoDataFrame | None, road_type: RoadTypeEnum
 ) -> float:
     """
     Calculate the average speed of a graph per road type.
@@ -1859,7 +1859,7 @@ def get_avgspeed_per_road_type(
         float: The average speed for that road type
     """
     _default_speed = 50
-    if not gdf_graph:
+    if not isinstance(gdf_graph, gpd.GeoDataFrame):
         return _default_speed
 
     _avgspeed = gdf_graph[gdf_graph["highway"] == road_type.config_value]["avgspeed"]
