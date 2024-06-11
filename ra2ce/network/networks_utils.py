@@ -1849,6 +1849,7 @@ def get_avgspeed_per_road_type(
     Calculate the average speed of a graph per road type.
     If all edges of a certain road type have no average speed,
     the average speed of the whole graph is returned.
+    If the graph has no average speed on any edge, the default average speed is returned (== 50).
 
     Args:
         gdf_graph (gpd.GeoDataFrame): The graph
@@ -1861,13 +1862,21 @@ def get_avgspeed_per_road_type(
     _avg = _avgspeed[_avgspeed > 0].mean()
     if _avg > 0:
         return _avg
-    # If the average speed is not available,
-    # get the average speed of the whole graph
+
+    # If the average speed is not available, get the average speed of the whole graph
     _avgspeed = gdf_graph["avgspeed"]
     _avg = _avgspeed[_avgspeed > 0].mean()
     if _avg > 0:
         return _avg
-    return 50  # Default average speed
+
+    # If the graph has no average speed, return the default average speed
+    _default_speed = 50
+    logging.warning(
+        "No average speed found for road type %s. Using default speed of %s.",
+        road_type,
+        _default_speed,
+    )
+    return _default_speed  # Default average speed
 
 
 def fraction_flooded(line: LineString, hazard_map: str):

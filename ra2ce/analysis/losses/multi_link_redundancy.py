@@ -158,7 +158,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
                 u, v, k, _weighing_analyser.edge_data = edges
 
                 if nx.has_path(_graph, u, v):
-                    current_value = _weighing_analyser.calculate_current_value()
+                    current_value = _weighing_analyser.get_current_value()
 
                     alt_dist = nx.dijkstra_path_length(
                         _graph, u, v, weight=WeighingEnum.LENGTH.config_value
@@ -169,7 +169,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
 
                     diff = round(alt_value - current_value, 7)
                 else:
-                    alt_value = _weighing_analyser.calculate_current_value()
+                    alt_value = _weighing_analyser.get_current_value()
                     alt_nodes, connected = np.NaN, 0
                     diff = np.NaN
 

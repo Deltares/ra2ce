@@ -20,7 +20,7 @@ class WeighingAnalysisFactory:
         if weighing_type == WeighingEnum.TIME:
             _analysis = TimeWeighingAnalysis(gdf_graph)
         elif weighing_type == WeighingEnum.LENGTH:
-            _analysis = LengthWeighingAnalysis()
+            _analysis = LengthWeighingAnalysis(gdf_graph)
         else:
             raise NotImplementedError(
                 "Weighing type {} not yet supported.".format(weighing_type)

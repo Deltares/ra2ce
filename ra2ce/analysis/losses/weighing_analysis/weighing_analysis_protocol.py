@@ -5,9 +5,10 @@ from typing import Any, Protocol, runtime_checkable
 class WeighingAnalysisProtocol(Protocol):
     edge_data: dict[str, Any]
 
-    def calculate_current_value(self) -> float:
+    def get_current_value(self) -> float:
         """
-        Calculates the current distance/time of the edge.
+        Gets the current distance/time of the edge.
+        If the edge has not time attribute, it is calculated and added to the edge.
 
         Returns:
             float: Current distance/time value.

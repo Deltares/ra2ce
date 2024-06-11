@@ -11,7 +11,7 @@ from ra2ce.network.networks_utils import get_avgspeed_per_road_type
 
 
 class TimeWeighingAnalysis(WeighingAnalysisProtocol):
-    weighing_data: dict[str, Any]
+    edge_data: dict[str, Any]
     avgspeed_dict: dict[str, float]
 
     def __init__(self, gdf_graph: gpd.GeoDataFrame) -> None:
@@ -21,18 +21,18 @@ class TimeWeighingAnalysis(WeighingAnalysisProtocol):
         }
 
     def _calculate_time(self, dist: float) -> float:
-        _avgspeed = self.weighing_data.get("avgspeed", None)  # km/h
+        _avgspeed = self.edge_data.get("avgspeed", None)  # km/h
         if not _avgspeed:
-            _avgspeed = self.avgspeed_dict[self.weighing_data["highway"]]
-        return round(
-            (dist * 1e-3) / _avgspeed,
-            7,
-        )  # h
+            _avgspeed = self.avgspeed_dict[self.edge_data["highway"]]
+        return round(dist * 1e-3 / _avgspeed, 3)  # h
 
-    def calculate_current_value(self) -> float:
-        _dist = self.weighing_data.get("length", 0)  # m
+    def get_current_value(self) -> float:
+        _time = self.edge_data.get(WeighingEnum.TIME.config_value, None)  # h
+        if _time:
+            return round(_time, 3)
+        _dist = self.edge_data.get(WeighingEnum.LENGTH.config_value, 0)  # m
         _time = self._calculate_time(_dist)
-        self.weighing_data[WeighingEnum.TIME.config_value] = _time
+        self.edge_data[WeighingEnum.TIME.config_value] = _time
         return _time
 
     def calculate_alternative_value(self, alt_dist: float) -> float:

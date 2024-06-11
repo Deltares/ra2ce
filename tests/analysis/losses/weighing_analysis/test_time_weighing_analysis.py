@@ -23,7 +23,7 @@ class TestTimeWeighingAnalysis:
     def valid_analysis(self) -> TimeWeighingAnalysis:
         _analysis = TimeWeighingAnalysis()
         _weighing_data_dict = {"length": 420, "avgspeed": 0.42}
-        _analysis.weighing_data = _weighing_data_dict
+        _analysis.edge_data = _weighing_data_dict
         return _analysis
 
     def test_calculate_time(self, valid_analysis: TimeWeighingAnalysis):
@@ -41,7 +41,7 @@ class TestTimeWeighingAnalysis:
         _expected_value = 1.0
 
         # 2. Run test
-        _calculated_distance = valid_analysis.calculate_current_value()
+        _calculated_distance = valid_analysis.get_current_value()
 
         # 3. Verify expectations.
         assert _calculated_distance == pytest.approx(_expected_value)
