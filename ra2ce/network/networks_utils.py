@@ -1859,7 +1859,7 @@ def get_avgspeed_per_road_type(
         float: The average speed for that road type
     """
     _default_speed = 50
-    if not isinstance(gdf_graph, gpd.GeoDataFrame):
+    if not isinstance(gdf_graph, gpd.GeoDataFrame) or "higway" not in gdf_graph.columns:
         return _default_speed
 
     _avgspeed = gdf_graph[gdf_graph["highway"] == road_type.config_value]["avgspeed"]
