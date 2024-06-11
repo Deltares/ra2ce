@@ -18,11 +18,10 @@ class WeighingAnalysisFactory:
         weighing_type: WeighingEnum, gdf_graph: gpd.GeoDataFrame | None
     ) -> WeighingAnalysisProtocol:
         if weighing_type == WeighingEnum.TIME:
-            _analysis = TimeWeighingAnalysis(gdf_graph)
-        elif weighing_type == WeighingEnum.LENGTH:
-            _analysis = LengthWeighingAnalysis(gdf_graph)
-        else:
-            raise NotImplementedError(
-                "Weighing type {} not yet supported.".format(weighing_type)
-            )
-        return _analysis
+            return TimeWeighingAnalysis(gdf_graph)
+        if weighing_type == WeighingEnum.LENGTH:
+            return LengthWeighingAnalysis(gdf_graph)
+
+        raise NotImplementedError(
+            "Weighing type {} not yet supported.".format(weighing_type)
+        )
