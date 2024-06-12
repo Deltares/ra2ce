@@ -332,8 +332,14 @@ class OriginClosestDestination:
             ]
 
     def get_route_path(
-        self, graph, base_graph, origin_node, destination_node, nr_from_origin, col_name
-    ):
+        self,
+        graph: nx.MultiGraph,
+        base_graph: nx.MultiGraph,
+        origin_node,
+        destination_node,
+        nr_from_origin,
+        col_name,
+    ) -> tuple[nx.MultiGraph, float, MultiLineString]:
         # Get the nodes of the optimal route
         route_nodes = nx.dijkstra_path(
             graph, origin_node, destination_node, weight=self.weighing
@@ -405,7 +411,9 @@ class OriginClosestDestination:
         )
         return destinations
 
-    def update_origins(self, origins, other, col_name):
+    def update_origins(
+        self, origins: gpd.GeoDataFrame, other: list, col_name: str
+    ) -> gpd.GeoDataFrame:
         # Attribute to the origins that don't have access that they do not have any access
         if len(other) > 0:
             for oth in other:
@@ -422,7 +430,7 @@ class OriginClosestDestination:
         origins: gpd.GeoDataFrame,
         origins_without_access: list,
         add_key_name: str = None,
-    ):
+    ) -> None:
         # Calculate the number of people that cannot access any destination
         origins_no_access = [
             o
@@ -457,14 +465,20 @@ class OriginClosestDestination:
 
     def find_closest_location(
         self,
-        disrupted_graph: nx.classes.Graph | nx.classes.MultiGraph,
-        base_graph: nx.classes.Graph | nx.classes.MultiGraph,
+        disrupted_graph: nx.MultiGraph,
+        base_graph: nx.MultiGraph,
         origins: gpd.GeoDataFrame,
         destinations: gpd.GeoDataFrame,
         column_name: str,
         hazard_name: str = None,
         pref_routes: gpd.GeoDataFrame = None,
-    ):
+    ) -> tuple[
+        nx.MultiGraph,
+        gpd.GeoDataFrame,
+        gpd.GeoDataFrame,
+        list,
+        gpd.GeoDataFrame,
+    ]:
         """Find the closest destination nodes with a certain attribute from all origin nodes for a single destination
         Args:
             disrupted_graph: NetworkX graph with origin and destination nodes and disrupted edges removed
@@ -559,9 +573,9 @@ class OriginClosestDestination:
         name_save: str,
         optimal_routes: list,
         origins,
-        base_graph,
+        base_graph: nx.MultiGraph,
         destinations,
-    ) -> tuple[Any, dict]:
+    ) -> gpd.GeoDataFrame:
         """
         Refactored method to avoid duplication of code between `find_closest_location` and `find_multiple_closest_locations` with subtile differences:
         - The first would not use a `dest_name` attribute.
@@ -626,7 +640,7 @@ class OriginClosestDestination:
                     route_length = self.get_route_length(
                         disrupted_graph, n, closest_dest
                     )
-                    self.compare_route_with_without_distruption(  # TODO where is this method defined?
+                    self.compare_route_with_without_disruption(
                         pref_routes,
                         nr_per_route,
                         ndat[self.od_key],
@@ -667,14 +681,20 @@ class OriginClosestDestination:
 
     def find_multiple_closest_locations(
         self,
-        disrupted_graph: nx.classes.Graph | nx.classes.MultiGraph,
-        base_graph: nx.classes.Graph | nx.classes.MultiGraph,
+        disrupted_graph: nx.MultiGraph,
+        base_graph: nx.MultiGraph,
         origins: gpd.GeoDataFrame,
         destinations: gpd.GeoDataFrame,
         column_name: str,
         hazard_name: str = None,
         pref_routes: gpd.GeoDataFrame = None,
-    ):
+    ) -> tuple[
+        nx.MultiGraph,
+        gpd.GeoDataFrame,
+        gpd.GeoDataFrame,
+        list,
+        gpd.GeoDataFrame,
+    ]:
         """Find the closest destination nodes with a certain attribute from all origin nodes for multiple destinations
         Args:
             disrupted_graph: NetworkX graph with origin and destination nodes and disrupted edges removed
@@ -766,235 +786,6 @@ class OriginClosestDestination:
             destinations,
             list_disrupted_destinations,
             optimal_routes_gdf,
-        )
-
-    def calc_pref_routes_closest_dest(
-        self,
-        graph: nx.classes.Graph | nx.classes.MultiGraph,
-        base_graph: nx.classes.Graph | nx.classes.MultiGraph,
-        origin_closest_dest,
-        origins,
-    ):
-        # dataframe to save the optimal routes
-        pref_routes = gpd.GeoDataFrame(
-            columns=[
-                "o_node",
-                "d_node",
-                "origin",
-                "destination",
-                "opt_path",
-                self.weighing,
-                "match_ids",
-                "origin_cnt",
-                "cnt_weight",
-                "tot_km",
-                "geometry",
-            ],
-            geometry="geometry",
-            crs="epsg:{}".format(self.crs),
-        )
-
-        # find the optimal route without (hazard) disruption
-        for o, d in tqdm(origin_closest_dest, desc="Finding optimal routes"):
-            # calculate the length of the preferred route
-            pref_route = nx.dijkstra_path_length(
-                graph, o[0], d[0], weight=self.weighing
-            )
-
-            # save preferred route nodes
-            pref_nodes = nx.dijkstra_path(graph, o[0], d[0], weight=self.weighing)
-
-            # found out which edges belong to the preferred path
-            edgesinpath = list(zip(pref_nodes[0:], pref_nodes[1:]))
-
-            # Find the number of people per neighborhood
-            try:
-                nr_people_per_route_total = origins.loc[
-                    origins[self.od_id] == int(o[1].split("_")[-1]), self.origin_count
-                ].iloc[0]
-            except IndexError:
-                origin_node = [a for a in o[1].split(",") if self.o_name in a][0]
-                nr_people_per_route_total = origins.loc[
-                    origins[self.od_id] == int(origin_node.split("_")[-1]),
-                    self.origin_count,
-                ].iloc[0]
-            nr_per_route = nr_people_per_route_total * self.origin_out_fraction
-
-            pref_edges = []
-            match_list = []
-            length_list = []
-            for u, v in edgesinpath:
-                # get edge with the lowest weighing if there are multiple edges that connect u and v
-                _uv_graph = graph[u][v]
-                edge_key = sorted(
-                    _uv_graph,
-                    key=lambda x, _fgraph=_uv_graph: _fgraph[x][self.weighing],
-                )[0]
-                _uv_graph_edge = _uv_graph[edge_key]
-                if "geometry" in _uv_graph_edge:
-                    pref_edges.append(_uv_graph_edge["geometry"])
-                else:
-                    pref_edges.append(
-                        LineString(
-                            [graph.nodes[u]["geometry"], graph.nodes[v]["geometry"]]
-                        )
-                    )
-                if self.id_name in _uv_graph_edge:
-                    match_list.append(_uv_graph_edge[self.id_name])
-                if "length" in _uv_graph_edge:
-                    length_list.append(_uv_graph_edge["length"])
-
-                # Add the number of people that go from the origin to a destination to the road segments.
-                # For now, each road segment in a route gets attributed all the people that are taking that route.
-                base_graph[u][v][edge_key]["opt_cnt"] = (
-                    base_graph[u][v][edge_key]["opt_cnt"] + nr_per_route
-                )
-
-            # compile the road segments into one geometry
-            pref_edges = MultiLineString(pref_edges)
-            pref_routes = pref_routes.append(
-                {
-                    "o_node": o[0],
-                    "d_node": d[0],
-                    "origin": o[1],
-                    "destination": d[1],
-                    "opt_path": pref_nodes,
-                    self.weighing: pref_route,
-                    "match_ids": match_list,
-                    "origin_cnt": nr_people_per_route_total,
-                    "cnt_weight": nr_per_route,
-                    "tot_km": sum(length_list) / 1000,
-                    "geometry": pref_edges,
-                },
-                ignore_index=True,
-            )
-
-        return pref_routes, base_graph
-
-    def calc_routes_closest_dest(
-        self,
-        graph: nx.classes.Graph | nx.classes.MultiGraph,
-        base_graph: nx.classes.Graph | nx.classes.MultiGraph,
-        list_closest: list,
-        origin: gpd.GeoDataFrame,
-        dest: gpd.GeoDataFrame,
-        hazname: str,
-        pref_routes: gpd.GeoDataFrame = None,
-    ):
-        pp_no_delay = [0]
-        pp_delayed = [0]
-        extra_weights = [0]
-        extra_kms_total = [0]
-        list_disrupted_destinations = []
-
-        # find the optimal route with hazard disruption
-        for o, d in tqdm(
-            list_closest,
-            desc=f"Finding optimal routes with hazard disruption '{hazname}'.",
-        ):
-            # Check if the destination that is accessed, is flooded
-            try:
-                if graph.nodes[d[0]][hazname] > self.threshold_destinations:
-                    list_disrupted_destinations.append((o, d))
-                    continue
-            except KeyError as e:
-                logging.warning(
-                    f"The destination nodes do not contain the required attribute '{hazname}',"
-                    " please make sure that the hazard overlay is done correctly by rerunning the 'network.ini'"
-                    " and checking the output files."
-                    f"Further error details {e}"
-                )
-                quit()
-
-            # calculate the length of the preferred route
-            alt_route = nx.dijkstra_path_length(graph, o[0], d[0], weight=self.weighing)
-
-            # save preferred route nodes
-            alt_nodes = nx.dijkstra_path(graph, o[0], d[0], weight=self.weighing)
-
-            # Find the number of people per neighborhood
-            try:
-                nr_people_per_route_total = origin.loc[
-                    origin[self.od_id] == int(o[1].split("_")[-1]), self.origin_count
-                ].iloc[0]
-            except IndexError:
-                origin_node = [a for a in o[1].split(",") if self.o_name in a][0]
-                nr_people_per_route_total = origin.loc[
-                    origin[self.od_id] == int(origin_node.split("_")[-1]),
-                    self.origin_count,
-                ].iloc[0]
-            nr_per_route = nr_people_per_route_total * self.origin_out_fraction
-
-            # find out which edges belong to the preferred path
-            edgesinpath = list(zip(alt_nodes[0:], alt_nodes[1:]))
-
-            # calculate the total length of the alternative route (in miles)
-            # Find the road segments that are used for the detour to the same or another hospital
-            length_list = []
-            for u, v in edgesinpath:
-                # get edge with the lowest weighing if there are multiple edges that connect u and v
-                _uv_graph = graph[u][v]
-                edge_key = sorted(
-                    _uv_graph,
-                    key=lambda x, _fgraph=_uv_graph: _fgraph[x][self.weighing],
-                )[0]
-                _uv_graph_edge = _uv_graph[edge_key]
-
-                # Add the number of people that need to go to a destination to the road segments. For now, each road segment in a route
-                # gets attributed all the people that are taking that route.
-                base_graph[u][v][edge_key][hazname + "_P"] = (
-                    base_graph[u][v][edge_key][hazname + "_P"] + nr_per_route
-                )
-
-                if "length" in _uv_graph_edge:
-                    length_list.append(_uv_graph_edge["length"])
-
-            alt_dist = sum(length_list)
-
-            if pref_routes:
-                # If the destination is different from the origin, the destination is further than without hazard disruption
-                if pref_routes.loc[
-                    (pref_routes["origin"] == o[1])
-                    & (pref_routes["destination"] == d[1])
-                ].empty:
-                    # subtract the length/time of the optimal route from the alternative route
-                    extra_dist = (
-                        alt_route
-                        - pref_routes.loc[
-                            pref_routes["origin"] == o[1], self.weighing
-                        ].iloc[0]
-                    )
-                    extra_km = (
-                        alt_dist
-                        - pref_routes.loc[pref_routes["origin"] == o[1], "tot_km"].iloc[
-                            0
-                        ]
-                    )
-                    pp_delayed.append(nr_per_route)
-                    extra_weights.append(extra_dist)
-                    extra_kms_total.append(extra_km)
-                else:
-                    pp_no_delay.append(nr_per_route)
-
-            # compile the road segments into one geometry
-            # alt_edges = MultiLineString(alt_edges)
-
-            # Add the number of people to the total number of people that go to that destination
-            dest.loc[dest[self.od_id] == int(d[1].split("_")[-1]), hazname + "_P"] = (
-                dest.loc[
-                    dest[self.od_id] == int(d[1].split("_")[-1]), hazname + "_P"
-                ].iloc[0]
-                + nr_per_route
-            )
-
-        return (
-            base_graph,
-            dest,
-            list_disrupted_destinations,
-            pp_no_delay,
-            pp_delayed,
-            extra_weights,
-            extra_kms_total,
         )
 
     def load_origins(self):

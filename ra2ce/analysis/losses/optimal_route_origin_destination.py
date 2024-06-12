@@ -9,6 +9,7 @@ from tqdm import tqdm
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
+from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.traffic_analysis.traffic_analysis_factory import (
@@ -44,14 +45,14 @@ class OptimalRouteOriginDestination(AnalysisLossesProtocol):
 
     @staticmethod
     def extract_od_nodes_from_graph(
-        graph: nx.classes.MultiGraph,
+        graph: nx.MultiGraph,
     ) -> list[tuple[str, str]]:
         """
         Extracts all Origin - Destination nodes from the graph, prevents from entries
         with list of nodes for a node.
 
         Args:
-            graph (nx.classes.MultiGraph): Graph containing origin-destination nodes.
+            graph (nx.MultiGraph): Graph containing origin-destination nodes.
 
         Returns:
             list[tuple[str, str]]]: List containing tuples of origin - destination node combinations.
@@ -66,9 +67,9 @@ class OptimalRouteOriginDestination(AnalysisLossesProtocol):
 
     @staticmethod
     def find_route_ods(
-        graph: nx.classes.MultiGraph,
-        od_nodes: list[tuple[tuple[int, str], tuple[int, str]]],
-        weighing: str,
+        graph: nx.MultiGraph,
+        od_nodes: list[tuple[tuple[str, str], tuple[str, str]]],
+        weighing: WeighingEnum,
     ) -> GeoDataFrame:
         # create the routes between all OD pairs
         (
@@ -84,7 +85,9 @@ class OptimalRouteOriginDestination(AnalysisLossesProtocol):
         for o, d in tqdm(od_nodes, desc="Finding optimal routes."):
             if nx.has_path(graph, o[0], d[0]):
                 # calculate the length of the preferred route
-                pref_route = nx.dijkstra_path_length(graph, o[0], d[0], weight=weighing)
+                pref_route = nx.dijkstra_path_length(
+                    graph, o[0], d[0], weight=weighing.config_value
+                )
 
                 # save preferred route nodes
                 pref_nodes = nx.dijkstra_path(graph, o[0], d[0], weight=weighing)
@@ -155,8 +158,8 @@ class OptimalRouteOriginDestination(AnalysisLossesProtocol):
         return pref_routes
 
     def _get_origin_destination_pairs(
-        self, graph: nx.classes.MultiGraph
-    ) -> list[tuple[int, str], tuple[int, str]]:
+        self, graph: nx.MultiGraph
+    ) -> list[tuple[tuple[str, str], tuple[str, str]]]:
         od_path = self.static_path.joinpath(
             "output_graph", "origin_destination_table.feather"
         )
@@ -187,13 +190,11 @@ class OptimalRouteOriginDestination(AnalysisLossesProtocol):
         return od_nodes
 
     def optimal_route_origin_destination(
-        self, graph: nx.classes.MultiGraph, analysis: AnalysisSectionLosses
+        self, graph: nx.MultiGraph, analysis: AnalysisSectionLosses
     ) -> GeoDataFrame:
         # create list of origin-destination pairs
         od_nodes = self._get_origin_destination_pairs(graph)
-        pref_routes = self.find_route_ods(
-            graph, od_nodes, analysis.weighing.config_value
-        )
+        pref_routes = self.find_route_ods(graph, od_nodes, analysis.weighing)
         return pref_routes
 
     def optimal_route_od_link(
