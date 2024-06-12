@@ -55,9 +55,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
             WeighingEnum.TIME.config_value in gdf_graph.columns
             and WeighingEnum.TIME.config_value in df_calculated.columns
         ):
-            df_calculated = df_calculated.drop(
-                columns=[WeighingEnum.TIME.config_value], errors="ignore"
-            )
+            df_calculated = df_calculated.drop(columns=[WeighingEnum.TIME.config_value])
             return df_calculated, gdf_graph
 
         gdf_graph[WeighingEnum.TIME.config_value] = df_calculated[
