@@ -994,22 +994,26 @@ def create_simplified_graph(
                 config_data.network.attributes_to_exclude_in_simplification
             )
             print(f"{attributes_to_exclude_in_simplification}")
+            graph_simple = simplify_graph_count_with_attribute_exclusion(graph_complex)
         else:
             # Create simplified graph and add unique ids
-            graph_simple = simplify_graph_count(graph_complex)
-            graph_simple = graph_create_unique_ids(graph_simple, new_id)
-
-            # Create look_up_tables between graphs with unique ids
-            simple_to_complex, complex_to_simple = graph_link_simple_id_to_complex(
-                graph_simple, new_id=new_id
+            graph_simple = simplify_graph_count_without_attribute_exclusion(
+                graph_complex
             )
 
-            # Store id table and add simple ids to complex graph
-            id_tables = (simple_to_complex, complex_to_simple)
-            graph_complex = add_simple_id_to_graph_complex(
-                graph_complex, complex_to_simple, new_id
-            )
-            logging.info("Simplified graph succesfully created")
+        graph_simple = graph_create_unique_ids(graph_simple, new_id)
+
+        # Create look_up_tables between graphs with unique ids
+        simple_to_complex, complex_to_simple = graph_link_simple_id_to_complex(
+            graph_simple, new_id=new_id
+        )
+
+        # Store id table and add simple ids to complex graph
+        id_tables = (simple_to_complex, complex_to_simple)
+        graph_complex = add_simple_id_to_graph_complex(
+            graph_complex, complex_to_simple, new_id
+        )
+        logging.info("Simplified graph successfully created")
     except Exception as exc:
         graph_simple = None
         id_tables = None
@@ -1140,7 +1144,9 @@ def add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
     return graph
 
 
-def simplify_graph_count(complex_graph: nx.Graph) -> nx.Graph:
+def simplify_graph_count_without_attribute_exclusion(
+    complex_graph: nx.Graph,
+) -> nx.Graph:
     """
     Simplify the graph after adding missing x and y attributes to nodes
 
