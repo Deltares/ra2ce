@@ -35,10 +35,10 @@ from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProt
 from ra2ce.analysis.damages.damages import Damages
 from ra2ce.analysis.damages.effectiveness_measures import EffectivenessMeasures
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
-from ra2ce.analysis.losses.losses import Losses
 from ra2ce.analysis.losses.multi_link_isolated_locations import (
     MultiLinkIsolatedLocations,
 )
+from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
 from ra2ce.analysis.losses.multi_link_origin_closest_destination import (
     MultiLinkOriginClosestDestination,
 )
@@ -52,6 +52,7 @@ from ra2ce.analysis.losses.optimal_route_origin_closest_destination import (
 from ra2ce.analysis.losses.optimal_route_origin_destination import (
     OptimalRouteOriginDestination,
 )
+from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
 from ra2ce.analysis.losses.single_link_redundancy import SingleLinkRedundancy
 
 
@@ -79,10 +80,13 @@ class AnalysisFactory:
             analysis_config=analysis_config,
             graph_file_hazard=analysis_config.graph_files.base_network_hazard,
         )
+
         if analysis.analysis == AnalysisDamagesEnum.DAMAGES:
             return Damages(_analysis_input)
+
         if analysis.analysis == AnalysisDamagesEnum.EFFECTIVENESS_MEASURES:
             return EffectivenessMeasures(_analysis_input)
+
         raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
 
     @staticmethod
@@ -110,6 +114,7 @@ class AnalysisFactory:
                 graph_file=analysis_config.graph_files.base_graph,
             )
             return SingleLinkRedundancy(_analysis_input)
+
         if analysis.analysis == AnalysisLossesEnum.MULTI_LINK_REDUNDANCY:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
@@ -117,6 +122,7 @@ class AnalysisFactory:
                 graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
             return MultiLinkRedundancy(_analysis_input)
+
         if analysis.analysis == AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
@@ -124,6 +130,7 @@ class AnalysisFactory:
                 graph_file=analysis_config.graph_files.origins_destinations_graph,
             )
             return OptimalRouteOriginDestination(_analysis_input)
+
         if analysis.analysis == AnalysisLossesEnum.MULTI_LINK_ORIGIN_DESTINATION:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
@@ -131,6 +138,7 @@ class AnalysisFactory:
                 graph_file_hazard=analysis_config.graph_files.origins_destinations_graph_hazard,
             )
             return MultiLinkOriginDestination(_analysis_input)
+
         if (
             analysis.analysis
             == AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION
@@ -141,6 +149,7 @@ class AnalysisFactory:
                 graph_file_hazard=analysis_config.graph_files.origins_destinations_graph_hazard,
             )
             return OptimalRouteOriginClosestDestination(analysis_input=_analysis_input)
+
         if (
             analysis.analysis
             == AnalysisLossesEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION
@@ -152,22 +161,23 @@ class AnalysisFactory:
                 graph_file_hazard=analysis_config.graph_files.origins_destinations_graph_hazard,
             )
             return MultiLinkOriginClosestDestination(_analysis_input)
+
         if analysis.analysis == AnalysisLossesEnum.SINGLE_LINK_LOSSES:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
-                graph_file=analysis_config.graph_files.base_graph_hazard,
                 graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
-            return Losses(_analysis_input, analysis_config)
+            return SingleLinkLosses(_analysis_input, analysis_config)
+
         if analysis.analysis == AnalysisLossesEnum.MULTI_LINK_LOSSES:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
                 graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
+            return MultiLinkLosses(_analysis_input, analysis_config)
 
-            return Losses(_analysis_input, analysis_config)
         if analysis.analysis == AnalysisLossesEnum.MULTI_LINK_ISOLATED_LOCATIONS:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
@@ -175,4 +185,5 @@ class AnalysisFactory:
                 graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
             return MultiLinkIsolatedLocations(_analysis_input)
+
         raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
