@@ -171,6 +171,9 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
             )
         )
         _network_section.polygon = self._get_str_as_path(_network_section.polygon)
+        _network_section.attributes_to_exclude_in_simplification = self._parser.getlist(
+            _section, "attributes_to_exclude_in_simplification", fallback=[]
+        )
         return _network_section
 
     def get_origins_destinations_section(self) -> OriginsDestinationsSection:
