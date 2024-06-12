@@ -27,7 +27,7 @@ class TestLosses:
             _losses = LossesBase(None, None)
 
         # 2. Verify final expectations
-        assert str(exc.value).startswith("Can't instantiate abstract class LossesBase")
+        assert str(exc.value).startswith(f"Can't instantiate abstract class {LossesBase.__name__}")
 
     def test_initialize_no_data(self):
         # 1. Define test data
