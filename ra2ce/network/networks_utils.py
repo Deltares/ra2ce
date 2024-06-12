@@ -27,7 +27,7 @@ import sys
 import warnings
 from pathlib import Path
 from statistics import mean
-from typing import Union, Optional
+from typing import Callable, Union, Optional
 
 import geopandas as gpd
 import networkx as nx
@@ -996,7 +996,10 @@ def create_simplified_graph(
                 config_data.network.attributes_to_exclude_in_simplification
             )
             print(f"{attributes_to_exclude_in_simplification}")
-            graph_simple = simplify_graph_count_with_attribute_exclusion(graph_complex)
+            graph_simple = simplify_graph_count_with_attribute_exclusion(
+                graph=graph_complex,
+                attributes_to_exclude=config_data.network.attributes_to_exclude_in_simplification,
+            )
         else:
             # Create simplified graph and add unique ids
             graph_simple = simplify_graph_count_without_attribute_exclusion(
@@ -1147,27 +1150,44 @@ def add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
 
 
 def simplify_graph_count_with_attribute_exclusion(
-    excluded_edge_types: list[str],
-    network: snkit.network.Network = None,
-    graph: nx.Graph = None,
-) -> snkit.network.Network:
-    # merge_edges starts here. add the degree column to nodes and put it high for the excluded_edge_types objects
-    if (not network) and (not graph):
-        raise ValueError("a network or graph should be introduced")
-    if graph and (not network):
-        network = nx_to_network(graph)
+    graph: nx.Graph,
+    attributes_to_exclude: list[str],
+) -> nx.Graph:
+    def process_network(
+        network: snkit.network.Network,
+        crs: str,
+    ) -> snkit.network.Network:
+        network.edges["length"] = network.edges["geometry"].apply(
+            lambda x: line_length(x, crs)
+        )  # length in m
+        network.edges = network.edges[
+            network.edges["length"] != 0
+        ]  # Remove zero-length edges
 
+        convert_to_line_string = lambda geom: (
+            linemerge([line for line in geom.geoms])
+            if isinstance(geom, MultiLineString)
+            else geom
+        )
+        network.edges["geometry"] = network.edges["geometry"].apply(
+            convert_to_line_string
+        )
+        return network
+
+    # merge_edges starts here. add the degree column to nodes and put it high for the excluded_edge_types objects
+    network = nx_to_network(graph)
+    crs = network.edges.crs
     network = _check_edge_ids(network)
     network = _get_nodes_degree(network)
     # _merge_edges
     cols = [col for col in network.edges.columns if col != "geometry"]
 
-    if "demand_edge" not in excluded_edge_types:
+    if "demand_edge" not in attributes_to_exclude:
         aggfunc = {
             col: (
                 lambda col_data: (
                     col_data.iloc[0]
-                    if col_data.name in excluded_edge_types
+                    if col_data.name in attributes_to_exclude
                     else (
                         "; ".join(
                             str(item) for item in col_data if isinstance(item, str)
@@ -1186,7 +1206,7 @@ def simplify_graph_count_with_attribute_exclusion(
             col: (
                 lambda col_data: (
                     col_data.iloc[0]
-                    if col_data.name in excluded_edge_types
+                    if col_data.name in attributes_to_exclude
                     else (
                         "; ".join(
                             str(item) for item in col_data if isinstance(item, str)
@@ -1199,19 +1219,10 @@ def simplify_graph_count_with_attribute_exclusion(
             for col in cols
         }
 
-    network = _merge_edges(network, aggfunc=aggfunc, by=excluded_edge_types)
-    network.edges["length"] = network.edges["geometry"].length * 111.32  # length in km
-    network.edges = network.edges[
-        network.edges["length"] != 0
-    ]  # sometimes such links emerge during merging.
-
-    convert_to_line_string = lambda geom: (
-        linemerge([line for line in geom.geoms])
-        if isinstance(geom, MultiLineString)
-        else geom
-    )
-    network.edges["geometry"] = network.edges["geometry"].apply(convert_to_line_string)
-    return network
+    network = _merge_edges(network, aggfunc=aggfunc, by=attributes_to_exclude)
+    network = process_network(network, crs)
+    simple_graph = network_to_nx(network, crs)
+    return simple_graph
 
 
 def nx_to_network(
@@ -1240,6 +1251,35 @@ def nx_to_network(
     network.set_crs(default_crs)
 
     return network
+
+
+def network_to_nx(
+    net: snkit.network.Network,
+    crs: pyproj.CRS,
+    node_id_column_name="id",
+    edge_from_id_column="from_id",
+    edge_to_id_column="to_id",
+) -> nx.MultiGraph:
+    g = nx.MultiGraph()
+
+    # Add nodes to the graph
+    for index, row in net.nodes.iterrows():
+        node_id = row[node_id_column_name]
+        attributes = {k: v for k, v in row.items()}
+        g.add_node(node_id, **attributes)
+
+    # Add edges to the graph
+    for index, row in net.edges.iterrows():
+        u = row[edge_from_id_column]
+        v = row[edge_to_id_column]
+        attributes = {k: v for k, v in row.items()}
+        g.add_edge(u, v, **attributes)
+
+    # Add CRS information to the graph
+    if "crs" not in g.graph:
+        g.graph["crs"] = crs
+
+    return g
 
 
 def _check_edge_ids(network: snkit.network.Network) -> snkit.network.Network:
@@ -1530,7 +1570,7 @@ def _get_merge_edge_paths(
         # _merge function starts from here:
         gdf["intersections"] = gdf.apply(lambda x: _get_intersections(x, gdf), axis=1)
         # _merged = gdf.dissolve(by=by, aggfunc=_aggfunc, sort=False)
-        _merged = merge_connected_lines(gdf, by, _aggfunc)
+        _merged = _merge_connected_lines(gdf, by, _aggfunc)
         merged_id = _merged["id"]  # the edge id of the merged edge
         if len(gdf) == 1:
             # 1. no merging is occurring
@@ -1680,7 +1720,7 @@ def _get_merge_edge_paths(
     return merged_edges
 
 
-def merge_connected_lines(
+def _merge_connected_lines(
     gdf: gpd.GeoDataFrame, by: str, aggfunc: dict
 ) -> gpd.GeoDataFrame:
     """
