@@ -994,7 +994,7 @@ def create_simplified_graph(
                 config_data.network.attributes_to_exclude_in_simplification
             )
             print(f"{attributes_to_exclude_in_simplification}")
-            graph_simple = simplify_graph_count_with_attribute_exclusion(graph_complex)
+            # graph_simple = simplify_graph_count_with_attribute_exclusion(graph_complex)
         else:
             # Create simplified graph and add unique ids
             graph_simple = simplify_graph_count_without_attribute_exclusion(
