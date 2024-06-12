@@ -19,6 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from collections import defaultdict
 import itertools
 import logging
 import os
@@ -26,7 +27,7 @@ import sys
 import warnings
 from pathlib import Path
 from statistics import mean
-from typing import Optional
+from typing import Union, Optional
 
 import geopandas as gpd
 import networkx as nx
@@ -994,7 +995,7 @@ def create_simplified_graph(
                 config_data.network.attributes_to_exclude_in_simplification
             )
             print(f"{attributes_to_exclude_in_simplification}")
-            # graph_simple = simplify_graph_count_with_attribute_exclusion(graph_complex)
+            graph_simple = simplify_graph_count_with_attribute_exclusion(graph_complex)
         else:
             # Create simplified graph and add unique ids
             graph_simple = simplify_graph_count_without_attribute_exclusion(
@@ -1142,6 +1143,681 @@ def add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
             data.setdefault("x", round(geometry.x, 7))
             data.setdefault("y", round(geometry.y, 7))
     return graph
+
+
+def simplify_graph_count_with_attribute_exclusion(
+    excluded_edge_types: list[str],
+    network: snkit.network.Network = None,
+    graph: nx.Graph = None,
+) -> snkit.network.Network:
+    # merge_edges starts here. add the degree column to nodes and put it high for the excluded_edge_types objects
+    if (not network) and (not graph):
+        raise ValueError("a network or graph should be introduced")
+    if graph and (not network):
+        network = nx_to_network(graph)
+
+    network = _check_edge_ids(network)
+    network = _get_nodes_degree(network)
+    # _merge_edges
+    cols = [col for col in network.edges.columns if col != "geometry"]
+
+    if "demand_edge" not in excluded_edge_types:
+        aggfunc = {
+            col: (
+                lambda col_data: (
+                    col_data.iloc[0]
+                    if col_data.name in excluded_edge_types
+                    else (
+                        "; ".join(
+                            str(item) for item in col_data if isinstance(item, str)
+                        )
+                        if col_data.dtype == "O"
+                        else col_data.iloc[0]
+                        if col != "demand_edge"
+                        else max(col_data)
+                    )
+                )
+            )
+            for col in cols
+        }
+    else:
+        aggfunc = {
+            col: (
+                lambda col_data: (
+                    col_data.iloc[0]
+                    if col_data.name in excluded_edge_types
+                    else (
+                        "; ".join(
+                            str(item) for item in col_data if isinstance(item, str)
+                        )
+                        if col_data.dtype == "O"
+                        else col_data.iloc[0]
+                    )
+                )
+            )
+            for col in cols
+        }
+
+    network = _merge_edges(network, aggfunc=aggfunc, by=excluded_edge_types)
+    network.edges["length"] = network.edges["geometry"].length * 111.32  # length in km
+    network.edges = network.edges[
+        network.edges["length"] != 0
+    ]  # sometimes such links emerge during merging.
+
+    convert_to_line_string = lambda geom: (
+        linemerge([line for line in geom.geoms])
+        if isinstance(geom, MultiLineString)
+        else geom
+    )
+    network.edges["geometry"] = network.edges["geometry"].apply(convert_to_line_string)
+    return network
+
+
+def nx_to_network(
+    g: Union[nx.Graph, nx.MultiGraph, nx.MultiDiGraph],
+    node_id_column_name="id",
+    edge_from_id_column="from_id",
+    edge_to_id_column="to_id",
+    default_crs: pyproj.CRS = pyproj.CRS.from_epsg(4326),
+) -> snkit.network.Network:
+    network = snkit.network.Network()
+
+    node_attributes = [
+        {node_id_column_name: node, **data} for node, data in g.nodes(data=True)
+    ]
+    network.nodes = gpd.GeoDataFrame(node_attributes)
+    network.nodes.set_geometry("geometry", inplace=True)
+
+    edge_attributes = [
+        {edge_from_id_column: u, edge_to_id_column: v, **data}
+        for u, v, data in g.edges(data=True)
+    ]
+    network.edges = gpd.GeoDataFrame(edge_attributes)
+    network.edges.set_geometry("geometry", inplace=True)
+
+    # Set network CRS to default_crs
+    network.set_crs(default_crs)
+
+    return network
+
+
+def _check_edge_ids(network: snkit.network.Network) -> snkit.network.Network:
+    if not id in network.edges.columns:
+        network.edges["id"] = network.edges.index
+    return network
+
+
+def _get_nodes_degree(network: snkit.network.Network) -> snkit.network.Network:
+    degrees = _calculate_degree(network)
+    node_degrees_dict = {
+        node_id: degree for node_id, degree in enumerate(degrees) if degree > 0
+    }
+    network.nodes["degree"] = network.nodes.apply(
+        lambda node: node_degrees_dict[node.id], axis=1
+    )
+    return network
+
+
+def _calculate_degree(net: snkit.network.Network) -> np.ndarray:
+    # Get the maximum node ID from both 'from_id' and 'to_id' arrays
+    max_node_id = int(max(max(net.edges["from_id"]), max(net.edges["to_id"])))
+    # Initialize a weights array to count the degrees for each node
+    degrees = np.zeros(max_node_id + 1)
+    # Calculate the degree for the 'from_id' array and add it to degrees
+    from_ids = net.edges["from_id"].to_numpy(dtype=np.int64)
+    np.add.at(degrees, from_ids, 1)
+    # Calculate the degree for the 'to_id' array and add it to degrees
+    to_id = net.edges["to_id"].to_numpy(dtype=np.int64)
+    np.add.at(degrees, to_id, 1)
+    return degrees
+
+
+def _get_merged_edges(
+    paths_to_group: list,
+    by: list,
+    aggfunc: Union[str, dict],
+    net: snkit.network.Network,
+) -> gpd.GeoDataFrame:
+    updated_edges = gpd.GeoDataFrame(
+        columns=net.edges.columns, crs=net.edges.crs
+    )  # merged edges
+
+    for edge_path in tqdm(paths_to_group, desc="merge_edge_paths"):
+        # Convert None values to a placeholder value
+        placeholder = "None"
+        for col in by:
+            edge_path[col] = edge_path[col].fillna(placeholder)
+        merged_edges = _get_merge_edge_paths(edge_path, by, aggfunc, net)
+        updated_edges = pd.concat([updated_edges, merged_edges], ignore_index=True)
+
+    return updated_edges
+
+
+def _get_merge_edge_paths(
+    edges: gpd.GeoDataFrame,
+    excluded_edge_types: list,
+    aggfunc: Union[str, dict],
+    net: snkit.network.Network,
+) -> gpd.GeoDataFrame:
+    def get_connected_lines(ids: pd.Index):
+        """
+        Find groups of connected lines in a GeoDataFrame.
+
+        Parameters:
+        gdf (GeoDataFrame): A GeoDataFrame containing LINESTRING geometries.
+
+        Returns:
+        list of lists: Each sublist contains indices of lines in gdf that are connected.
+        """
+
+        # Initialize an empty graph
+        G = nx.Graph()
+        gdf = edges.loc[ids.tolist()]
+        # Add edges to the graph for each line in the GeoDataFrame
+        for idx, row in gdf.iterrows():
+            # Get the start and end points of the line
+            line = row["geometry"]
+            start_point = line.coords[0]
+            end_point = line.coords[-1]
+
+            # Add the line as an edge between its start and end points with the id as attribute
+            G.add_edge(start_point, end_point, index=idx, id=row["id"])
+
+        # Find connected components in the graph
+        connected_components = list(nx.connected_components(G))
+
+        # Map each component to the corresponding line ids
+        connected_line_groups = []
+        for component in connected_components:
+            line_ids = []
+            for u, v, data in G.edges(component, data=True):
+                line_ids.append(data["id"])
+            connected_line_groups.append(line_ids)
+
+        return connected_line_groups
+
+    def _get_paths_to_merge(groups: dict) -> list:
+        _paths_to_merge = []  # list of gpds to merge
+        for _, edge_group_ids in groups.items():
+            sub_path_parts = get_connected_lines(edge_group_ids)
+            _paths_to_merge.extend(sub_path_parts)
+        return _paths_to_merge
+
+    def _merge(
+        gdf: gpd.GeoDataFrame, by: list, _aggfunc: dict, ntw: snkit.network.Network
+    ) -> gpd.GeoDataFrame:
+        def _get_merged_in_a_loop(_merged: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+            # 2.1.2. pick one with one intersection point
+            start_path_extrms = [
+                gdf_node_slice[gdf_node_slice["degree"] > 2].iloc[0].id
+            ]
+            end_path_extrms = [gdf_node_slice[gdf_node_slice["degree"] > 2].iloc[1].id]
+            _merged.from_id = [
+                start_path_extremity for start_path_extremity in start_path_extrms
+            ]
+            _merged.to_id = [
+                end_path_extremity for end_path_extremity in end_path_extrms
+            ]
+            return _merged
+
+        def _get_merged_multiple_demand_edges(
+            _merged: gpd.GeoDataFrame, path_extrms_nod_ids: set
+        ) -> gpd.GeoDataFrame:
+            _mrgd = _get_split_edges_info(_merged)
+            _mrgd.from_id = _mrgd.apply(
+                lambda row: _get_node_id(row, "from_id", path_extrms_nod_ids), axis=1
+            )
+            _mrgd.to_id = _mrgd.apply(
+                lambda row: _get_node_id(row, "to_id", path_extrms_nod_ids), axis=1
+            )
+            return _mrgd
+
+        def _get_split_edges_info(_merged: gpd.GeoDataFrame) -> tuple:
+            # used for the cases where demand nodes exist in the to-be-merged paths
+            # make the demand node from_id of the merged edge
+            dem_nod_ids = [
+                i
+                for i in set(gdf.from_id.tolist() + gdf.to_id.tolist())
+                if (
+                    gdf[gdf.demand_edge == 1].from_id.tolist()
+                    + gdf[gdf.demand_edge == 1].to_id.tolist()
+                ).count(i)
+                == 2
+            ]
+            split_parts = [_merged["geometry"].iloc[0]]
+            split_edges_gdf = gpd.GeoDataFrame(columns=_merged.columns)
+            for dem_nod_id in dem_nod_ids:
+                for part in split_parts:
+                    part_splits, split_edges_gdf = _split(
+                        part, dem_nod_id, split_edges_gdf
+                    )
+                    if part_splits is not None:
+                        split_parts.extend(part_splits)
+                        split_parts.remove(part)
+            return split_edges_gdf
+
+        def _split(
+            _line_geom: Union[MultiLineString, LineString],
+            dem_nod_id: int,
+            splits_gdf: gpd.GeoDataFrame,
+        ) -> tuple:
+            # used for the cases where demand nodes exist in the to-be-merged paths
+            dem_nod_geom = ntw.nodes[ntw.nodes.id == dem_nod_id].geometry.iloc[0]
+            if _line_geom.contains(dem_nod_geom):
+                if isinstance(_line_geom, MultiLineString):
+                    coords = [
+                        linemerge(_line_geom).coords[0],
+                        linemerge(_line_geom).coords[-1],
+                    ]
+                else:
+                    coords = [_line_geom.coords[0], _line_geom.coords[-1]]
+                # Add the coords from the points
+                coords += dem_nod_geom.coords
+                # Calculate the distance along the line for each point
+                dists = [linemerge(_line_geom).project(Point(p)) for p in coords]
+                # sort the coordinates
+                coords = [p for (d, p) in sorted(zip(dists, coords))]
+                splits = [
+                    LineString([coords[i], coords[i + 1]])
+                    for i in range(len(coords) - 1)
+                ]
+                splits_gdf = _update_split_edges_gdf(
+                    splits, dem_nod_id, splits_gdf, _line_geom
+                )
+                return splits, splits_gdf
+            else:
+                return None, splits_gdf
+
+        def _update_split_edges_gdf(
+            parts: list,
+            dem_nod_id: int,
+            splt_edgs: gpd.GeoDataFrame,
+            _split_line_geom: LineString,
+        ) -> gpd.GeoDataFrame:
+            # used for the cases where demand nodes exist in the to-be-merged paths
+            for part in parts:
+                # _split_line_geom is the line divided and produced parts
+                if _split_line_geom not in splt_edgs.geometry.tolist():
+                    part_gdf = gpd.GeoDataFrame(
+                        {
+                            "geometry": part,
+                            "id": len(splt_edgs),
+                            "from_id": dem_nod_id,
+                            "to_id": -1,
+                            **_merged.drop(
+                                columns=["geometry", "id", "from_id", "to_id"]
+                            ),
+                        }
+                    )
+                else:
+                    # if _split_line_geom is divided and n stored in splt_edgs, we need to retrieve from/to_id info
+                    # and update splt_edgs
+                    part_gdf = gpd.GeoDataFrame(
+                        {
+                            "geometry": part,
+                            "id": -1,
+                            "from_id": splt_edgs[
+                                splt_edgs.geometry == _split_line_geom
+                            ].apply(
+                                lambda row: (
+                                    row.from_id if row.from_id != -1 else dem_nod_id
+                                ),
+                                axis=1,
+                            ),
+                            "to_id": splt_edgs[
+                                splt_edgs.geometry == _split_line_geom
+                            ].apply(
+                                lambda row: (
+                                    row.to_id if row.to_id != -1 else dem_nod_id
+                                ),
+                                axis=1,
+                            ),
+                            **_merged.drop(
+                                columns=["geometry", "id", "from_id", "to_id"]
+                            ),
+                        }
+                    )
+                    _split_line_index = splt_edgs.loc[
+                        splt_edgs.geometry == _split_line_geom
+                    ].index[0]
+                    splt_edgs = splt_edgs.drop(_split_line_index)
+                splt_edgs = pd.concat([splt_edgs, part_gdf], ignore_index=True)
+            return splt_edgs
+
+        def _get_node_id(r: gpd.GeoSeries, attr: str, path_extrms_nod_ids: set) -> int:
+            # to fill from_id and to_id of the to-be-merged paths
+            if r[attr] == -1:
+                for path_extremities_node_id in path_extrms_nod_ids:
+                    path_extremities_node_geom = ntw.nodes[
+                        ntw.nodes.id == path_extremities_node_id
+                    ].geometry.iloc[0]
+                    if r.geometry.intersects(path_extremities_node_geom):
+                        return path_extremities_node_id
+            else:
+                return r[attr]
+
+        def _get_merged_one_or_none_demand_edges(
+            _merged, path_extrms_nod_ids: set
+        ) -> gpd.GeoDataFrame:
+            _start_edges = gdf[gdf["intersections"].apply(lambda x: len(x) == 1)]
+            if ("demand_edge" in gdf.columns) and (
+                len(gdf[gdf["demand_edge"] == 1])
+            ) == 1:
+                _start_edge = _start_edges[_start_edges.demand_edge == 1].iloc[0]
+            elif ("demand_edge" not in gdf.columns) or (
+                len(gdf[gdf["demand_edge"] == 1])
+            ) != 1:
+                _start_edge = _start_edges.iloc[0]
+            start_path_extrms = [
+                (
+                    _start_edge["from_id"]
+                    if _start_edge["from_id"] in list(path_extrms_nod_ids)
+                    else _start_edge["to_id"]
+                )
+            ]
+            end_path_extrms = [(path_extrms_nod_ids - set(start_path_extrms)).pop()]
+            _merged.from_id = [
+                start_path_extremity for start_path_extremity in start_path_extrms
+            ]
+            _merged.to_id = [
+                end_path_extremity for end_path_extremity in end_path_extrms
+            ]
+            return _merged
+
+        # _merge function starts from here:
+        gdf["intersections"] = gdf.apply(lambda x: _get_intersections(x, gdf), axis=1)
+        # _merged = gdf.dissolve(by=by, aggfunc=_aggfunc, sort=False)
+        _merged = merge_connected_lines(gdf, by, _aggfunc)
+        merged_id = _merged["id"]  # the edge id of the merged edge
+        if len(gdf) == 1:
+            # 1. no merging is occurring
+            start_path_extremities = [gdf.iloc[0]["from_id"]]
+            end_path_extremities = [gdf.iloc[0]["to_id"]]
+            _merged.from_id = start_path_extremities[0]
+            _merged.to_id = end_path_extremities[0]
+        else:
+            # 2. merging is occurring
+            if len(gdf[gdf["intersections"].apply(lambda x: len(x) == 1)]) == 0:
+                # 2.1. a loop with two nodes degree > 2
+                gdf_node_ids = list(set(gdf.from_id.tolist() + gdf.to_id.tolist()))
+                gdf_node_slice = ntw.nodes[ntw.nodes["id"].isin(gdf_node_ids)]
+                if len(gdf_node_slice[gdf_node_slice["degree"] > 2]) == 0:
+                    # 2.1.1. a loop with only degree 2 edges => isolated from the rest of the graph
+                    warnings.warn(
+                        f"""
+                    A sub-graph loop isolated from the main graph is detected and removed.
+                    This isolated part had {len(gdf_node_slice)} nodes with node_fids {gdf_node_slice.id.tolist()} in
+                    the input node graph.
+                    """
+                    )
+                    if "demand_edge" in gdf.columns:
+                        warnings.warn(
+                            f"""'This sub-graph had these demand nodes {(
+                                    gdf[gdf.demand_edge == 1].from_id.tolist() +
+                                    gdf[gdf.demand_edge == 1].to_id.tolist()
+                            )}"""
+                        )
+                    return gpd.GeoDataFrame(
+                        data=None, columns=ntw.edges.columns, crs=ntw.edges.crs
+                    )
+
+                elif len(gdf_node_slice[gdf_node_slice["degree"] > 2]) == 1:
+                    # 2.1.2. If there is only one node with the degree bigger than 2
+                    if (
+                        "demand_edge" not in gdf.columns
+                        or len(gdf[gdf["demand_edge"] == 1]) == 0
+                    ):
+                        # No demand node is in this loop. Then omit this loop and return empty gdf
+                        return gpd.GeoDataFrame(
+                            data=None, columns=ntw.edges.columns, crs=ntw.edges.crs
+                        )
+                    elif (
+                        "demand_edge" in gdf.columns
+                        and len(gdf[gdf["demand_edge"] == 1]) > 0
+                    ):
+                        demand_node_ids = [
+                            i
+                            for i in set(gdf.from_id.tolist() + gdf.to_id.tolist())
+                            if (
+                                gdf[gdf.demand_edge == 1].from_id.tolist()
+                                + gdf[gdf.demand_edge == 1].to_id.tolist()
+                            ).count(i)
+                            == 2
+                        ]
+                        if len(demand_node_ids) > 1:
+                            return gdf  # merging this situation is skipped: not probable + complicated
+                        else:
+                            # Only one demand node exists in the loop
+                            if isinstance(
+                                linemerge(_merged.geometry.iloc[0]), MultiLineString
+                            ):
+                                # to exclude the merged geoms for which linemerge does not work
+                                return gdf
+                            path_extremities_node_ids = {
+                                x
+                                for x in gdf_node_slice[
+                                    gdf_node_slice["degree"] > 2
+                                ].id.tolist()
+                                + demand_node_ids
+                            }
+                            _merged = _get_merged_multiple_demand_edges(
+                                _merged, path_extremities_node_ids
+                            )
+                else:
+                    # 2.1.3. the only remaining option is two nodes with degrees bigger than 2
+                    if (
+                        "demand_edge" not in gdf.columns
+                        or len(gdf[gdf["demand_edge"] == 1]) == 0
+                    ):
+                        # No demand node is in this loop. Then merge
+                        _merged = _get_merged_in_a_loop(_merged)
+                    else:
+                        return gdf
+            else:
+                # 2.2. merging non-loop paths
+                path_extremities_node_ids = {
+                    i
+                    for i in set(gdf.from_id.tolist() + gdf.to_id.tolist())
+                    if (gdf.from_id.tolist() + gdf.to_id.tolist()).count(i) == 1
+                }
+                # if len(path_extremities_node_ids) > 0:
+                if ("demand_edge" in gdf.columns) and (
+                    len(gdf[gdf["demand_edge"] == 1]) > 1
+                ):
+                    _merged = _get_merged_multiple_demand_edges(
+                        _merged, path_extremities_node_ids
+                    )
+                elif (
+                    "demand_edge" in gdf.columns
+                    and len(gdf[gdf["demand_edge"] == 1]) <= 1
+                ) or ("demand_edge" not in gdf.columns):
+                    # 2.2.2.no dem node is in the to_be_merged path or only one dem node. In the later case dem node
+                    # will not be dissolved because it is in the path_extremities_node_ids
+                    _merged = _get_merged_one_or_none_demand_edges(
+                        _merged, path_extremities_node_ids
+                    )
+                else:
+                    raise Warning(
+                        f"""Check the lines with the following ids {gdf.id.tolist()} """
+                    )
+
+            merged_id = (
+                "to_be_updated"  # the edge id of the merged edge will be updated later
+            )
+        _merged.node_A = _merged.from_id
+        _merged.node_B = _merged.to_id
+        _merged.id = merged_id
+        _merged.crs = gdf.crs
+        return _merged
+
+    # _get_merged_paths starts here
+    grouped_edges = edges.groupby(excluded_edge_types)
+    if len(grouped_edges.groups) == 1:
+        merged_edges = _merge(
+            gdf=edges, by=excluded_edge_types, _aggfunc=aggfunc, ntw=net
+        )
+    else:
+        merged_edges = gpd.GeoDataFrame(
+            columns=edges.columns, crs=edges.crs
+        )  # merged edges
+        edge_groups = edges.groupby(excluded_edge_types).groups
+        paths_to_merge = _get_paths_to_merge(edge_groups)
+
+        for path_ids in paths_to_merge:
+            path_to_merge = edges[
+                edges["id"].isin(path_ids)
+            ].copy()  # indices of the edges in edges gdf
+            merged = _merge(
+                gdf=path_to_merge, by=excluded_edge_types, _aggfunc=aggfunc, ntw=net
+            )
+            merged_edges = pd.concat([merged_edges, merged], ignore_index=True)
+
+        merged_edges.crs = edges.crs
+
+    return merged_edges
+
+
+def merge_connected_lines(
+    gdf: gpd.GeoDataFrame, by: str, aggfunc: dict
+) -> gpd.GeoDataFrame:
+    """
+    Merge connected lines in a GeoDataFrame into a single LineString.
+
+    Parameters:
+    gdf (gpd.GeoDataFrame): GeoDataFrame containing the lines to merge.
+    by (str): Column name to group by.
+    aggfunc (dict): Dictionary of aggregation functions for other columns.
+
+    Returns:
+    gpd.GeoDataFrame: GeoDataFrame with merged lines.
+    """
+
+    # Merge all geometries into a single MultiLineString
+    merged_geometry = linemerge(gdf.geometry.tolist())
+    indices = gdf[by].iloc[0]
+    # Create a new GeoDataFrame with the merged geometry
+    merged_gdf = gpd.GeoDataFrame(
+        [{**indices, "geometry": merged_geometry}], crs=gdf.crs
+    )
+    merged_gdf.set_index(by, inplace=True)
+
+    # Combine the attributes using the aggregation function
+    for col, func in aggfunc.items():
+        if col != "geometry":
+            merged_gdf[col] = func(gdf[col])
+
+    return merged_gdf
+
+
+def _get_intersections(_edge, _edges):
+    intersections = []
+    edge_geometry = _edge.geometry.simplify(tolerance=1e-8)
+
+    for other_edge_index, other_edge in _edges.iterrows():
+        other_edge_geometry = other_edge.geometry.simplify(tolerance=1e-8)
+
+        if not edge_geometry.equals(other_edge_geometry):  # avoid self-intersection
+            intersection = edge_geometry.intersection(other_edge_geometry)
+
+            if not intersection.is_empty and any(
+                intersection.intersects(boundary)
+                for boundary in edge_geometry.boundary.geoms
+            ):
+                if isinstance(intersection, nx.MultiPoint):
+                    intersections.extend(
+                        [
+                            point.coords[0]
+                            for point in intersection.geoms
+                            if point in other_edge_geometry.boundary.geoms
+                        ]
+                    )
+                else:
+                    intersections.append(intersection.coords[0])
+
+    return sorted(intersections, key=lambda x: x[0])
+
+
+def _merge_edges(
+    net: snkit.network.Network,
+    aggfunc: Union[str, dict],
+    by: Union[str, list],
+    id_col="id",
+) -> snkit.network.Network:
+    def _get_edge_ids_to_update(edges_list: list) -> list:
+        ids_to_update = []
+        for edges in edges_list:
+            ids_to_update.extend(edges.id.tolist())
+        return ids_to_update
+
+    if "degree" not in net.nodes.columns:
+        net.nodes["degree"] = net.nodes[id_col].apply(
+            lambda x: node_connectivity_degree(x, net)
+        )
+
+    degree_2 = list(net.nodes[id_col].loc[net.nodes.degree == 2])
+    degree_2_set = set(degree_2)
+    edge_paths = _get_edge_paths(degree_2_set, net)
+
+    edge_ids_to_update = _get_edge_ids_to_update(edge_paths)
+    edges_to_keep = net.edges[~net.edges["id"].isin(edge_ids_to_update)]
+
+    updated_edges = _get_merged_edges(
+        paths_to_group=edge_paths, by=by, aggfunc=aggfunc, net=net
+    )
+    updated_edges = updated_edges.reset_index(drop=True)
+
+    new_edges = pd.concat([edges_to_keep, updated_edges], ignore_index=True)
+    new_edges.id = range(len(new_edges))
+    new_edges = new_edges.reset_index(drop=True)
+
+    nodes_to_keep = list(set(new_edges.from_id.tolist() + new_edges.to_id.tolist()))
+    new_nodes = net.nodes[net.nodes[id_col].isin(nodes_to_keep)]
+    new_nodes = new_nodes.reset_index(drop=True)
+
+    return Network(nodes=new_nodes, edges=new_edges)
+
+
+def node_connectivity_degree(node, network):
+    return len(
+        network.edges[(network.edges.from_id == node) | (network.edges.to_id == node)]
+    )
+
+
+def _get_edge_paths(node_set: set, net: snkit.network.Network) -> list:
+    # Convert edges to an adjacency list using vectorized operations
+    edge_dict = defaultdict(set)
+    from_ids = net.edges["from_id"].values
+    to_ids = net.edges["to_id"].values
+
+    for from_id, to_id in zip(from_ids, to_ids):
+        edge_dict[from_id].add(to_id)
+        edge_dict[to_id].add(from_id)
+
+    edge_paths = []
+
+    while node_set:
+        popped_node = node_set.pop()
+        node_path = {popped_node}
+        candidates = {popped_node}
+        while candidates:
+            popped_cand = candidates.pop()
+            matches = edge_dict[popped_cand]
+            matches = matches - node_path
+            for match in matches:
+                if match in node_set:
+                    candidates.add(match)
+                    node_path.add(match)
+                    node_set.remove(match)
+                else:
+                    node_path.add(match)
+        if len(node_path) >= 2:
+            edge_paths.append(
+                net.edges.loc[
+                    (net.edges.from_id.isin(node_path))
+                    & (net.edges.to_id.isin(node_path))
+                ]
+            )
+    return edge_paths
 
 
 def simplify_graph_count_without_attribute_exclusion(
