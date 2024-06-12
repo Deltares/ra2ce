@@ -9,6 +9,9 @@ class MultiLinkLosses(LossesBase):
     The function removes all links of a variable that have a minimum value
     of min_threshold. For each link it calculates the alternative path, if any available.
     This function only removes one group at the time and saves the data from removing that group.
+
+    This class is based on the LossesBase abstract base class.
+    Don't override other methods than _get_criticality_analysis.
     """
 
     def _get_criticality_analysis(self) -> MultiLinkRedundancy:

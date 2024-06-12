@@ -66,6 +66,11 @@ def _load_df_from_csv(
 
 
 class LossesBase(AnalysisLossesProtocol, ABC):
+    """
+    This class is the base class for the Losses analyses, containing the common methods and attributes.
+    Based on the analysis type a different criticality analysis is executed.
+    """
+
     analysis: AnalysisSectionLosses
     graph_file_hazard: GraphFile
     input_path: Path
