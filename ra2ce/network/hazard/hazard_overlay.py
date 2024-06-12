@@ -460,7 +460,7 @@ class HazardOverlay:
             _hazard_crs != _gdf_crs
         ):  # Temporarily reproject the graph to the CRS of the hazard
             logging.warning(
-                "Hazard crs % and gdf crs %s are inconsistent, we try to reproject the gdf crs",
+                "Hazard crs %s and gdf crs %s are inconsistent, we try to reproject the gdf crs",
                 _hazard_crs,
                 _gdf_crs,
             )

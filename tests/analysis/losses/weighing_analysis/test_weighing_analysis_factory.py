@@ -17,7 +17,7 @@ class TestWeighingAnalysisFactory:
         [pytest.param(we) for we in WeighingEnum if we not in _unsupported_enums],
     )
     def test_get_analysis_with_valid_enum(self, valid_enum: WeighingEnum):
-        _analysis = WeighingAnalysisFactory.get_analysis(valid_enum)
+        _analysis = WeighingAnalysisFactory.get_analysis(valid_enum, None)
 
         assert isinstance(_analysis, WeighingAnalysisProtocol)
 
@@ -28,7 +28,7 @@ class TestWeighingAnalysisFactory:
     def test_get_analysis_with_unsupported_enum(self, valid_enum: WeighingEnum):
         # 2. Run test.
         with pytest.raises(NotImplementedError) as exc_err:
-            WeighingAnalysisFactory.get_analysis(valid_enum)
+            WeighingAnalysisFactory.get_analysis(valid_enum, None)
 
         # 3. Verify expectations.
         assert str(exc_err.value) == "Weighing type {} not yet supported.".format(
@@ -41,7 +41,7 @@ class TestWeighingAnalysisFactory:
 
         # 2. Run test.
         with pytest.raises(NotImplementedError) as exc_err:
-            WeighingAnalysisFactory.get_analysis(_invalid_enum)
+            WeighingAnalysisFactory.get_analysis(_invalid_enum, None)
 
         # 3. Verify expectations.
         assert str(exc_err.value) == "Weighing type {} not yet supported.".format(
