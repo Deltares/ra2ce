@@ -45,10 +45,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
         """
         updates the time column with the calculated dataframe and updates the rest of the gdf_graph if time is None.
         """
-        if (
-            WeighingEnum.TIME.config_value not in gdf_graph.columns
-            and WeighingEnum.TIME.config_value not in df_calculated.columns
-        ):
+        if WeighingEnum.TIME.config_value not in df_calculated.columns:
             return df_calculated, gdf_graph
 
         if (
