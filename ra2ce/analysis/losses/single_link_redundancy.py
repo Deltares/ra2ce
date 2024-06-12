@@ -62,7 +62,7 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
 
         # Ensure each edge has a valid weighing attribute
         for edge in list(self.graph_file.graph.edges.data(keys=True)):
-            u, v, k, _weighing_analyser.edge_data = edge
+            _weighing_analyser.edge_data = edge[3]
             _current_value_list.append(_weighing_analyser.get_current_value())
 
         # Loop over all edges to temporarily remove them and calculate the alternative route
