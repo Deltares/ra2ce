@@ -78,6 +78,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         analysis_input: AnalysisInputWrapper,
         analysis_config: AnalysisConfigWrapper,
     ) -> None:
+        self.analysis_input = analysis_input
         self.analysis_config = analysis_config
         self.analysis = analysis_input.analysis
         self.graph_file_hazard = analysis_input.graph_file_hazard
