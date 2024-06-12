@@ -44,6 +44,7 @@ from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
 from shapely.geometry.base import BaseGeometry, BaseMultipartGeometry
+from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from shapely.ops import linemerge, unary_union
 from tqdm import tqdm
 
@@ -980,28 +981,35 @@ def delete_duplicates(all_points: list[Point]) -> list[Point]:
 
 
 def create_simplified_graph(
-    graph_complex: nx.classes.graph.Graph, new_id: str = "rfid"
+    graph_complex: nx.classes.graph.Graph,
+    config_data: NetworkConfigData,
+    new_id: str = "rfid",
 ):
     """Create a simplified graph with unique ids from a complex graph"""
     logging.info("Simplifying graph")
     try:
         graph_complex = graph_create_unique_ids(graph_complex, "{}_c".format(new_id))
+        if len(config_data.network.attributes_to_exclude_in_simplification) > 0:
+            attributes_to_exclude_in_simplification = (
+                config_data.network.attributes_to_exclude_in_simplification
+            )
+            print(f"{attributes_to_exclude_in_simplification}")
+        else:
+            # Create simplified graph and add unique ids
+            graph_simple = simplify_graph_count(graph_complex)
+            graph_simple = graph_create_unique_ids(graph_simple, new_id)
 
-        # Create simplified graph and add unique ids
-        graph_simple = simplify_graph_count(graph_complex)
-        graph_simple = graph_create_unique_ids(graph_simple, new_id)
+            # Create look_up_tables between graphs with unique ids
+            simple_to_complex, complex_to_simple = graph_link_simple_id_to_complex(
+                graph_simple, new_id=new_id
+            )
 
-        # Create look_up_tables between graphs with unique ids
-        simple_to_complex, complex_to_simple = graph_link_simple_id_to_complex(
-            graph_simple, new_id=new_id
-        )
-
-        # Store id table and add simple ids to complex graph
-        id_tables = (simple_to_complex, complex_to_simple)
-        graph_complex = add_simple_id_to_graph_complex(
-            graph_complex, complex_to_simple, new_id
-        )
-        logging.info("Simplified graph succesfully created")
+            # Store id table and add simple ids to complex graph
+            id_tables = (simple_to_complex, complex_to_simple)
+            graph_complex = add_simple_id_to_graph_complex(
+                graph_complex, complex_to_simple, new_id
+            )
+            logging.info("Simplified graph succesfully created")
     except Exception as exc:
         graph_simple = None
         id_tables = None

@@ -55,6 +55,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
     road_types: list[RoadTypeEnum]
 
     def __init__(self, config_data: NetworkConfigData) -> None:
+        self.config_data = config_data
         self.output_graph_dir = config_data.output_graph_dir
         self.graph_crs = config_data.crs
 
@@ -73,7 +74,6 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         clean graph as the `polygon_graph` property.
 
         Args:
-            config_data (NetworkConfigData): Basic configuration data which contain information required the different methods of this wrapper.
             polygon (BaseGeometry): Base polygon from which to generate the graph.
 
         Returns:
@@ -137,7 +137,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
-            self.polygon_graph
+            self.polygon_graph, self.config_data
         )
 
         # Create 'edges_complex', convert complex graph to geodataframe
