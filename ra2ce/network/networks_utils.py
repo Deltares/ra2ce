@@ -45,6 +45,7 @@ from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
 from shapely.geometry.base import BaseGeometry, BaseMultipartGeometry
+import snkit
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from shapely.ops import linemerge, unary_union
 from tqdm import tqdm
@@ -1290,7 +1291,9 @@ def _get_merged_edges(
         merged_edges = _get_merge_edge_paths(edge_path, by, aggfunc, net)
         updated_edges = pd.concat([updated_edges, merged_edges], ignore_index=True)
 
-    return updated_edges
+    updated_edges_gdf = gpd.GeoDataFrame(updated_edges, geometry="geometry")
+    updated_edges_gdf.set_crs(net.edges.crs, inplace=True)
+    return updated_edges_gdf
 
 
 def _get_merge_edge_paths(
@@ -1767,14 +1770,16 @@ def _merge_edges(
     updated_edges = updated_edges.reset_index(drop=True)
 
     new_edges = pd.concat([edges_to_keep, updated_edges], ignore_index=True)
-    new_edges.id = range(len(new_edges))
-    new_edges = new_edges.reset_index(drop=True)
+    new_edges_gdf = gpd.GeoDataFrame(new_edges, geometry="geometry")
+    new_edges_gdf.set_crs(edges_to_keep.crs, inplace=True)
+    new_edges_gdf = new_edges_gdf.reset_index(drop=True)
+    new_edges_gdf["id"] = range(len(new_edges_gdf))
 
     nodes_to_keep = list(set(new_edges.from_id.tolist() + new_edges.to_id.tolist()))
-    new_nodes = net.nodes[net.nodes[id_col].isin(nodes_to_keep)]
-    new_nodes = new_nodes.reset_index(drop=True)
+    new_nodes_gdf = net.nodes[net.nodes[id_col].isin(nodes_to_keep)]
+    new_nodes_gdf = new_nodes_gdf.reset_index(drop=True)
 
-    return Network(nodes=new_nodes, edges=new_edges)
+    return snkit.network.Network(nodes=new_nodes_gdf, edges=new_edges_gdf)
 
 
 def node_connectivity_degree(node, network):
