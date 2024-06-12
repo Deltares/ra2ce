@@ -50,6 +50,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         self,
         config_data: NetworkConfigData,
     ) -> None:
+        self.config_data = config_data
         self.crs = config_data.crs
 
         # Network options
@@ -96,7 +97,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         logging.info("Start converting the complex graph to a simple graph")
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
-            graph_complex
+            graph_complex, self.config_data
         )
 
         # Create 'edges_complex', convert complex graph to geodataframe
