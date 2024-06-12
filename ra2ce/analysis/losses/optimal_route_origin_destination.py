@@ -90,7 +90,9 @@ class OptimalRouteOriginDestination(AnalysisLossesProtocol):
                 )
 
                 # save preferred route nodes
-                pref_nodes = nx.dijkstra_path(graph, o[0], d[0], weight=weighing)
+                pref_nodes = nx.dijkstra_path(
+                    graph, o[0], d[0], weight=weighing.config_value
+                )
 
                 # found out which edges belong to the preferred path
                 edgesinpath = list(zip(pref_nodes[0:], pref_nodes[1:]))
@@ -102,7 +104,9 @@ class OptimalRouteOriginDestination(AnalysisLossesProtocol):
                     _uv_graph = graph[u][v]
                     edge_key = sorted(
                         _uv_graph,
-                        key=lambda x, _fgraph=_uv_graph: _fgraph[x][weighing],
+                        key=lambda x, _fgraph=_uv_graph: _fgraph[x][
+                            weighing.config_value
+                        ],
                     )[0]
                     _uv_graph_edge = _uv_graph[edge_key]
                     if "geometry" in _uv_graph_edge:

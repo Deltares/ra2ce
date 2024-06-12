@@ -68,7 +68,7 @@ class MultiLinkOriginDestination(AnalysisLossesProtocol):
 
     def _get_origin_destination_pairs(
         self, graph: nx.MultiGraph
-    ) -> list[tuple[int, str], tuple[int, str]]:
+    ) -> list[tuple[str, str], tuple[str, str]]:
         od_path = self.static_path.joinpath(
             "output_graph", "origin_destination_table.feather"
         )
@@ -135,7 +135,9 @@ class MultiLinkOriginDestination(AnalysisLossesProtocol):
 
         return pd.concat(all_results, ignore_index=True)
 
-    def multi_link_origin_destination_impact(self, gdf, gdf_ori):
+    def multi_link_origin_destination_impact(
+        self, gdf: GeoDataFrame, gdf_ori: GeoDataFrame
+    ) -> tuple[pd.DataFrame, GeoDataFrame]:
         """Calculates some default indicators that quantify the impacts of disruptions to origin-destination flows
         The function outputs the following file:
 
@@ -264,7 +266,9 @@ class MultiLinkOriginDestination(AnalysisLossesProtocol):
 
         return diff_df, gdf_ori
 
-    def multi_link_origin_destination_regional_impact(self, gdf_ori):
+    def multi_link_origin_destination_regional_impact(
+        self, gdf_ori: GeoDataFrame
+    ) -> tuple[GeoDataFrame, GeoDataFrame]:
         """
         Aggregation of the impacts of disruptions at region level
         Users need to specify 'region' and 'region_var' attributes in the network.ini file
