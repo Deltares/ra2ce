@@ -168,13 +168,6 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         {self.link_id} is passed for feature ids of the graph"""
             )
 
-    def _load_gdf(self, gdf_path: Path) -> gpd.GeoDataFrame:
-        """This method reads the dataframe created from a .csv"""
-        if gdf_path.exists():
-            return gpd.read_file(gdf_path, index_col=f"{self.link_id}")
-        logging.warning("No `gdf` file found at {}.".format(gdf_path))
-        return gpd.GeoDataFrame()
-
     def _get_vot_intensity_per_trip_purpose(self) -> dict[str, pd.DataFrame]:
         """
         Generates a dictionary with all available `vot_purpose` with their intensity as a `pd.DataFrame`.

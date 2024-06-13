@@ -1,14 +1,13 @@
+import math
 from pathlib import Path
 
 import networkx as nx
-import numpy as np
 import osmnx
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
-from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.weighing_analysis.weighing_analysis_factory import (
@@ -50,56 +49,59 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
         _gdf_graph = osmnx.graph_to_gdfs(self.graph_file.get_graph(), nodes=False)
 
         # list for the length of the alternative routes
+        _current_value_list = []
         _alt_value_list = []
         _alt_nodes_list = []
         _diff_value_list = []
         _detour_exist_list = []
 
         _weighing_analyser = WeighingAnalysisFactory.get_analysis(
-            self.analysis.weighing
+            self.analysis.weighing, _gdf_graph
         )
-        for e_remove in list(self.graph_file.graph.edges.data(keys=True)):
-            u, v, k, _weighing_analyser.weighing_data = e_remove
 
-            # if data['highway'] in attr_list:
+        # Ensure each edge has a valid weighing attribute
+        for edge in list(self.graph_file.graph.edges.data(keys=True)):
+            _weighing_analyser.edge_data = edge[3]
+            _current_value_list.append(_weighing_analyser.get_current_value())
+
+        # Loop over all edges to temporarily remove them and calculate the alternative route
+        for e, e_remove in enumerate(list(self.graph_file.graph.edges.data(keys=True))):
+            u, v, k, _weighing_analyser.edge_data = e_remove
+
             # remove the edge
             self.graph_file.graph.remove_edge(u, v, k)
 
             if nx.has_path(self.graph_file.graph, u, v):
+
                 # calculate the alternative distance if that edge is unavailable
-                alt_dist = nx.dijkstra_path_length(
-                    self.graph_file.graph, u, v, weight=WeighingEnum.LENGTH.config_value
+                _alt_dist = nx.dijkstra_path_length(
+                    self.graph_file.graph,
+                    u,
+                    v,
+                    weight=self.analysis.weighing.config_value,
                 )
-                alt_nodes = nx.dijkstra_path(self.graph_file.graph, u, v)
-                alt_value = _weighing_analyser.calculate_alternative_distance(alt_dist)
+                _alt_nodes = nx.dijkstra_path(self.graph_file.graph, u, v)
+                _alt_value = _weighing_analyser.calculate_alternative_value(_alt_dist)
 
                 # append alternative route nodes
-                _alt_value_list.append(alt_value)
-                _alt_nodes_list.append(alt_nodes)
+                _alt_value_list.append(_alt_value)
+                _alt_nodes_list.append(_alt_nodes)
 
                 # calculate the difference in distance
-                _diff_value_list.append(
-                    round(
-                        alt_value
-                        - _weighing_analyser.weighing_data[
-                            self.analysis.weighing.config_value
-                        ],
-                        7,
-                    )
-                )
+                _diff_value_list.append(round(_alt_value - _current_value_list[e], 3))
 
                 _detour_exist_list.append(1)
             else:
-                _alt_value_list.append(_weighing_analyser.calculate_distance())
-                _alt_nodes_list.append(np.NaN)
-                _diff_value_list.append(np.NaN)
+                _alt_value_list.append(_current_value_list[e])
+                _alt_nodes_list.append(math.nan)
+                _diff_value_list.append(math.nan)
                 _detour_exist_list.append(0)
 
             # add edge again to the graph
-            self.graph_file.graph.add_edge(u, v, k, **_weighing_analyser.weighing_data)
+            self.graph_file.graph.add_edge(u, v, k, **_weighing_analyser.edge_data)
 
         # Add the new columns to the geodataframe
-        _weighing_analyser.extend_graph(_gdf_graph)
+        _gdf_graph[self.analysis.weighing.config_value] = _current_value_list
         _gdf_graph[f"alt_{self.analysis.weighing.config_value}"] = _alt_value_list
         _gdf_graph["alt_nodes"] = _alt_nodes_list
         _gdf_graph[f"diff_{self.analysis.weighing.config_value}"] = _diff_value_list
