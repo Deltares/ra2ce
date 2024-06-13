@@ -1194,9 +1194,7 @@ def simplify_graph_count_with_attribute_exclusion(
                             str(item) for item in col_data if isinstance(item, str)
                         )
                         if col_data.dtype == "O"
-                        else col_data.iloc[0]
-                        if col != "demand_edge"
-                        else max(col_data)
+                        else col_data.iloc[0] if col != "demand_edge" else max(col_data)
                     )
                 )
             )
@@ -1355,26 +1353,23 @@ def _check_edge_ids(network: snkit.network.Network) -> snkit.network.Network:
 
 def _get_nodes_degree(network: snkit.network.Network) -> snkit.network.Network:
     degrees = _calculate_degree(network)
-    node_degrees_dict = {
-        node_id: degree for node_id, degree in enumerate(degrees) if degree > 0
-    }
-    network.nodes["degree"] = network.nodes.apply(
-        lambda node: node_degrees_dict[node.id], axis=1
+    network.nodes["degree"] = network.nodes["id"].apply(
+        lambda node_id: degrees.get(node_id, 0)
     )
     return network
 
 
-def _calculate_degree(net: snkit.network.Network) -> np.ndarray:
-    # Get the maximum node ID from both 'from_id' and 'to_id' arrays
-    max_node_id = int(max(max(net.edges["from_id"]), max(net.edges["to_id"])))
-    # Initialize a weights array to count the degrees for each node
-    degrees = np.zeros(max_node_id + 1)
-    # Calculate the degree for the 'from_id' array and add it to degrees
+def _calculate_degree(net: snkit.network.Network) -> dict:
+    degrees = defaultdict(int)
+
     from_ids = net.edges["from_id"].to_numpy(dtype=np.int64)
-    np.add.at(degrees, from_ids, 1)
-    # Calculate the degree for the 'to_id' array and add it to degrees
-    to_id = net.edges["to_id"].to_numpy(dtype=np.int64)
-    np.add.at(degrees, to_id, 1)
+    for from_id in from_ids:
+        degrees[from_id] += 1
+
+    to_ids = net.edges["to_id"].to_numpy(dtype=np.int64)
+    for to_id in to_ids:
+        degrees[to_id] += 1
+
     return degrees
 
 
