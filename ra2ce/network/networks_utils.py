@@ -36,6 +36,7 @@ import pandas as pd
 import pyproj
 import rasterio
 import rtree
+from geopandas import GeoDataFrame
 from geopy import distance
 from numpy.ma import MaskedArray
 from osgeo import gdal
@@ -1175,7 +1176,7 @@ def simplify_graph_count_with_attribute_exclusion(
         return network
 
     # merge_edges starts here. add the degree column to nodes and put it high for the excluded_edge_types objects
-    network = nx_to_network(graph)
+    network = nx_to_network(graph, graph.graph.get("crs", None))
     crs = network.edges.crs
     network = _check_edge_ids(network)
     network = _get_nodes_degree(network)
@@ -1227,10 +1228,10 @@ def simplify_graph_count_with_attribute_exclusion(
 
 def nx_to_network(
     g: Union[nx.Graph, nx.MultiGraph, nx.MultiDiGraph],
+    crs: pyproj.CRS,
     node_id_column_name="id",
     edge_from_id_column="from_id",
     edge_to_id_column="to_id",
-    default_crs: pyproj.CRS = pyproj.CRS.from_epsg(4326),
 ) -> snkit.network.Network:
     network = snkit.network.Network()
 
@@ -1238,17 +1239,19 @@ def nx_to_network(
         {node_id_column_name: node, **data} for node, data in g.nodes(data=True)
     ]
     network.nodes = gpd.GeoDataFrame(node_attributes)
-    network.nodes.set_geometry("geometry", inplace=True)
+    network.nodes = check_and_create_node_geometries(network.nodes)
+    network.nodes.set_geometry("geometry", inplace=True, crs=crs)
 
     edge_attributes = [
         {edge_from_id_column: u, edge_to_id_column: v, **data}
         for u, v, data in g.edges(data=True)
     ]
     network.edges = gpd.GeoDataFrame(edge_attributes)
-    network.edges.set_geometry("geometry", inplace=True)
+    network = check_and_create_edge_geometries(network)
+    network.edges.set_geometry("geometry", inplace=True, crs=crs)
 
     # Set network CRS to default_crs
-    network.set_crs(default_crs)
+    network.set_crs(crs)
 
     return network
 
@@ -1280,6 +1283,68 @@ def network_to_nx(
         g.graph["crs"] = crs
 
     return g
+
+
+def check_and_create_node_geometries(gdf: gpd.GeoDataFrame) -> GeoDataFrame:
+    """
+    Check if there is a geometry column in network.nodes.
+    If not, check if both 'x' and 'y' columns are present.
+    If both are present, create Point geometries for each row.
+    If either 'x' or 'y' is missing, raise a ValueError.
+
+    Parameters:
+    gdf (snkit.network.Network): The gdf object containing nodes as a GeoDataFrame.
+
+    Raises:
+    ValueError: If neither geometry column nor both 'x' and 'y' columns are present in network.nodes.
+    """
+    if "geometry" in gdf.columns:
+        return gdf
+
+    if "x" in gdf.columns and "y" in gdf.columns:
+        gdf["geometry"] = gdf.apply(lambda row: Point(row["x"], row["y"]), axis=1)
+        return gdf
+    else:
+        raise ValueError(
+            "The network nodes must contain either a 'geometry' column or both 'x' and 'y' columns."
+        )
+
+
+def check_and_create_edge_geometries(
+    network: snkit.network.Network,
+) -> snkit.network.Network:
+    """
+    Creates a GEOMETRY attribute for each edge in the graph using the geometries of the nodes.
+
+    Parameters:
+    G (nx.Graph): The NetworkX graph with nodes having geometries.
+
+    Returns:
+    nx.Graph: The NetworkX graph with edges having GEOMETRY attributes.
+    """
+
+    def create_linestring(row):
+        from_geom = node_geometries.get(row["from_id"])
+        to_geom = node_geometries.get(row["to_id"])
+        if from_geom is None or to_geom is None:
+            raise ValueError(
+                f"Geometry missing for from_id {row['from_id']} or to_id {row['to_id']}."
+            )
+        return LineString([from_geom, to_geom])
+
+    if "geometry" in network.edges.columns:
+        return network
+    # Check if nodes have geometries
+    if not ("geometry" in network.nodes.columns):
+        network.nodes = check_and_create_node_geometries(network.nodes)
+
+    # Convert nodes to a dictionary for fast lookup
+    node_geometries = network.nodes.set_index("id")["geometry"].to_dict()
+
+    # Apply the function to create the geometry column
+    network.edges["geometry"] = network.edges.apply(create_linestring, axis=1)
+
+    return network
 
 
 def _check_edge_ids(network: snkit.network.Network) -> snkit.network.Network:
