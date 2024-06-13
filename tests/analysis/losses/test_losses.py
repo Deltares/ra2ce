@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Iterator
 
 import geopandas as gpd
 import pandas as pd
@@ -23,10 +24,22 @@ from tests import test_data
 
 
 class TestLosses:
-    @pytest.mark.parametrize(
-        "analysis", [pytest.param(SingleLinkLosses), pytest.param(MultiLinkLosses)]
+    @pytest.fixture(
+        params=[
+            pytest.param(SingleLinkLosses, id="Single link losses analysis"),
+            pytest.param(MultiLinkLosses, id="Multi link losses analysis"),
+        ],
+        name="losses_analysis",
     )
-    def test_initialize_no_data(self, analysis: type[AnalysisLossesProtocol]):
+    def _get_losses_analysis(
+        self, request: pytest.FixtureRequest
+    ) -> Iterator[AnalysisLossesProtocol]:
+        _analysis_losses_type = request.param
+        assert issubclass(_analysis_losses_type, LossesBase)
+        assert issubclass(_analysis_losses_type, AnalysisLossesProtocol)
+        yield _analysis_losses_type
+
+    def test_initialize_no_data(self, losses_analysis: type[AnalysisLossesProtocol]):
         # 1. Define test data
 
         _config_data = AnalysisConfigData()
@@ -48,7 +61,7 @@ class TestLosses:
 
         # 2. Run test.
         with pytest.raises(ValueError) as exc:
-            _losses = analysis(_analysis_input, _config)
+            _losses = losses_analysis(_analysis_input, _config)
 
         # 3. Verify final expectations.
         assert (
@@ -56,10 +69,7 @@ class TestLosses:
             == "traffic_intensities_file, resilience_curve_file, and values_of_time_file should be given"
         )
 
-    @pytest.mark.parametrize(
-        "analysis", [pytest.param(SingleLinkLosses), pytest.param(MultiLinkLosses)]
-    )
-    def test_initialize_with_data(self, analysis: type[AnalysisLossesProtocol]):
+    def test_initialize_with_data(self, losses_analysis: type[AnalysisLossesProtocol]):
         # 1. Define test data
         _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
@@ -98,11 +108,11 @@ class TestLosses:
         )
 
         # 2. Run test.
-        _losses = analysis(_analysis_input, _config)
+        _losses = losses_analysis(_analysis_input, _config)
 
         # 3. Verify final expectations.
         assert isinstance(_losses, LossesBase)
-        assert isinstance(_losses, analysis)
+        assert isinstance(_losses, losses_analysis)
 
     @pytest.mark.parametrize(
         "part_of_day",
