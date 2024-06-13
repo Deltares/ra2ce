@@ -632,6 +632,8 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
     def execute(self) -> gpd.GeoDataFrame:
         criticality_analysis = self._get_criticality_analysis().execute()
+        if criticality_analysis.empty:
+            return criticality_analysis
 
         self._get_disrupted_criticality_analysis_results(
             criticality_analysis=criticality_analysis

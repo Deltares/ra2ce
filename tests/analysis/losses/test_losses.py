@@ -13,7 +13,9 @@ from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeE
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.losses_base import LossesBase
+from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
 from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
 from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
@@ -21,15 +23,10 @@ from tests import test_data
 
 
 class TestLosses:
-    def test_initialize_base_class_raises(self):
-        # 1. Run test.
-        with pytest.raises(TypeError) as exc:
-            _losses = LossesBase(None, None)
-
-        # 2. Verify final expectations
-        assert str(exc.value).startswith("Can't instantiate abstract class LossesBase")
-
-    def test_initialize_no_data(self):
+    @pytest.mark.parametrize(
+        "analysis", [pytest.param(SingleLinkLosses), pytest.param(MultiLinkLosses)]
+    )
+    def test_initialize_no_data(self, analysis: type[AnalysisLossesProtocol]):
         # 1. Define test data
 
         _config_data = AnalysisConfigData()
@@ -51,7 +48,7 @@ class TestLosses:
 
         # 2. Run test.
         with pytest.raises(ValueError) as exc:
-            _losses = SingleLinkLosses(_analysis_input, _config)
+            _losses = analysis(_analysis_input, _config)
 
         # 3. Verify final expectations.
         assert (
@@ -59,7 +56,10 @@ class TestLosses:
             == "traffic_intensities_file, resilience_curve_file, and values_of_time_file should be given"
         )
 
-    def test_initialize_with_data(self):
+    @pytest.mark.parametrize(
+        "analysis", [pytest.param(SingleLinkLosses), pytest.param(MultiLinkLosses)]
+    )
+    def test_initialize_with_data(self, analysis: type[AnalysisLossesProtocol]):
         # 1. Define test data
         _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
@@ -98,11 +98,11 @@ class TestLosses:
         )
 
         # 2. Run test.
-        _losses = SingleLinkLosses(_analysis_input, _config)
+        _losses = analysis(_analysis_input, _config)
 
         # 3. Verify final expectations.
         assert isinstance(_losses, LossesBase)
-        assert isinstance(_losses, SingleLinkLosses)
+        assert isinstance(_losses, analysis)
 
     @pytest.mark.parametrize(
         "part_of_day",
