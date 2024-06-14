@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Iterator
 
 import geopandas as gpd
 import pandas as pd
@@ -9,26 +10,41 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionLosses,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
-)
 from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
-from ra2ce.analysis.losses.losses import Losses
+from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
+from ra2ce.analysis.losses.losses_base import LossesBase
+from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
+from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
 from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data
 
 
 class TestLosses:
-    def test_initialize_no_data(self):
+    @pytest.fixture(
+        params=[
+            pytest.param(SingleLinkLosses, id="Single link losses analysis"),
+            pytest.param(MultiLinkLosses, id="Multi link losses analysis"),
+        ],
+        name="losses_analysis",
+    )
+    def _get_losses_analysis(
+        self, request: pytest.FixtureRequest
+    ) -> Iterator[AnalysisLossesProtocol]:
+        _analysis_losses_type = request.param
+        assert issubclass(_analysis_losses_type, LossesBase)
+        assert issubclass(_analysis_losses_type, AnalysisLossesProtocol)
+        yield _analysis_losses_type
+
+    def test_initialize_no_data(self, losses_analysis: type[AnalysisLossesProtocol]):
         # 1. Define test data
 
         _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
-        _valid_analysis_ini = test_data / "losses" / "analyses.ini"
+        _valid_analysis_ini = test_data.joinpath("losses", "analyses.ini")
         _config = AnalysisConfigWrapper.from_data_with_network(
             _valid_analysis_ini, _config_data, _network_config
         )
@@ -43,37 +59,43 @@ class TestLosses:
             graph_file_hazard=_config.graph_files.base_graph_hazard,
         )
 
-        with pytest.raises(ValueError):
-            _losses = Losses(_analysis_input, _config)
+        # 2. Run test.
+        with pytest.raises(ValueError) as exc:
+            _losses = losses_analysis(_analysis_input, _config)
 
-    def test_initialize_with_data(self):
+        # 3. Verify final expectations.
+        assert (
+            str(exc.value)
+            == "traffic_intensities_file, resilience_curve_file, and values_of_time_file should be given"
+        )
+
+    def test_initialize_with_data(self, losses_analysis: type[AnalysisLossesProtocol]):
         # 1. Define test data
         _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
-        _valid_analysis_ini = test_data / "losses" / "analyses.ini"
+        _valid_analysis_ini = test_data.joinpath("losses", "analyses.ini")
         _config = AnalysisConfigWrapper.from_data_with_network(
             _valid_analysis_ini, _config_data, _network_config
         )
 
         # Add extra arguments to config_data
-        _config.config_data.input_path = test_data / "losses" / "csv_data_for_losses"
+        _config.config_data.input_path = test_data.joinpath(
+            "losses", "csv_data_for_losses"
+        )
         _config_data.network.file_id = "link_id"
         _config_data.network.link_type_column = "link_type"
 
         _analysis = AnalysisSectionLosses(
             part_of_day=PartOfDayEnum.DAY,
-            resilience_curve_file=test_data
-            / "losses"
-            / "csv_data_for_losses"
-            / "resilience_curve.csv",
-            traffic_intensities_file=test_data
-            / "losses"
-            / "csv_data_for_losses"
-            / "traffic_intensities.csv",
-            values_of_time_file=test_data
-            / "losses"
-            / "csv_data_for_losses"
-            / "values_of_time.csv",
+            resilience_curve_file=test_data.joinpath(
+                "losses", "csv_data_for_losses", "resilience_curve.csv"
+            ),
+            traffic_intensities_file=test_data.joinpath(
+                "losses", "csv_data_for_losses", "traffic_intensities.csv"
+            ),
+            values_of_time_file=test_data.joinpath(
+                "losses", "csv_data_for_losses", "values_of_time.csv"
+            ),
             name="single_link_redundancy_losses_test",
             trip_purposes=[TripPurposeEnum.BUSINESS, TripPurposeEnum.COMMUTE],
         )
@@ -86,10 +108,11 @@ class TestLosses:
         )
 
         # 2. Run test.
-        _losses = Losses(_analysis_input, _config)
+        _losses = losses_analysis(_analysis_input, _config)
 
         # 3. Verify final expectations.
-        assert isinstance(_losses, Losses)
+        assert isinstance(_losses, LossesBase)
+        assert isinstance(_losses, losses_analysis)
 
     @pytest.mark.parametrize(
         "part_of_day",
@@ -131,14 +154,16 @@ class TestLosses:
 
         _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
-        _valid_analysis_ini = test_data / "losses" / "analyses.ini"
+        _valid_analysis_ini = test_data.joinpath("losses", "analyses.ini")
         _config = AnalysisConfigWrapper.from_data_with_network(
             _valid_analysis_ini, _config_data, _network_config
         )
 
         _config_data.network.file_id = "link_id"
         _config_data.network.link_type_column = "link_type"
-        _config.config_data.input_path = test_data / "losses" / "csv_data_for_losses"
+        _config.config_data.input_path = test_data.joinpath(
+            "losses" "csv_data_for_losses"
+        )
 
         _analysis = AnalysisSectionLosses(
             part_of_day=part_of_day,
@@ -161,13 +186,14 @@ class TestLosses:
             graph_file_hazard=_config.graph_files.base_graph_hazard,
         )
 
-        _losses = Losses(_analysis_input, _config)
+        _losses = SingleLinkLosses(_analysis_input, _config)
 
         _losses.criticality_analysis = pd.read_csv(
-            test_data
-            / "losses"
-            / "csv_data_for_losses"
-            / "single_link_redundancy_losses_test.csv",
+            test_data.joinpath(
+                "losses",
+                "csv_data_for_losses",
+                "single_link_redundancy_losses_test.csv",
+            ),
             sep=",",
             on_bad_lines="skip",
         )
@@ -197,7 +223,9 @@ class TestLosses:
         _result = _losses.calculate_vehicle_loss_hours()
 
         _expected_result = pd.read_csv(
-            test_data / "losses" / "csv_data_for_losses" / "results_test_calc_vlh.csv"
+            test_data.joinpath(
+                "losses", "csv_data_for_losses", "results_test_calc_vlh.csv"
+            )
         )
 
         # 3. Verify final expectations.
