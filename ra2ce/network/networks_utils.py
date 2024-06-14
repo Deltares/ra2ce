@@ -20,6 +20,7 @@
 """
 
 from collections import defaultdict
+import ast
 import itertools
 import logging
 import os
@@ -31,11 +32,13 @@ from typing import Callable, Union, Optional
 
 import geopandas as gpd
 import networkx as nx
+import math
 import numpy as np
 import pandas as pd
 import pyproj
 import rasterio
 import rtree
+import shapely
 from geopandas import GeoDataFrame
 from geopy import distance
 from numpy.ma import MaskedArray
@@ -996,16 +999,13 @@ def create_simplified_graph(
             attributes_to_exclude_in_simplification = (
                 config_data.network.attributes_to_exclude_in_simplification
             )
-            print(f"{attributes_to_exclude_in_simplification}")
             graph_simple = simplify_graph_count_with_attribute_exclusion(
                 graph=graph_complex,
                 attributes_to_exclude=config_data.network.attributes_to_exclude_in_simplification,
             )
         else:
             # Create simplified graph and add unique ids
-            graph_simple = simplify_graph_count_without_attribute_exclusion(
-                graph_complex
-            )
+            graph_simple = simplify_graph_count_without_attribute_exclusion(graph_complex)
 
         graph_simple = graph_create_unique_ids(graph_simple, new_id)
 
@@ -1154,6 +1154,48 @@ def simplify_graph_count_with_attribute_exclusion(
     graph: nx.Graph,
     attributes_to_exclude: list[str],
 ) -> nx.Graph:
+    def aggfunc_with_demand_edge(cols, attributes_to_exclude):
+        def aggregate_column(col_data, col_name):
+            if col_name in attributes_to_exclude:
+                return col_data.iloc[0]
+            elif col_name == "rfid_c":
+                return list(col_data)
+            elif col_name in ["maxspeed", "avgspeed"]:
+                return col_data.mean()
+            elif col_name == "demand_edge":
+                return max(col_data)
+            elif col_data.dtype == "O":
+                return "; ".join(
+                    str(item) for item in col_data if isinstance(item, str)
+                )
+            else:
+                return col_data.iloc[0]
+
+        return {
+            col: (lambda col_data, col_name=col: aggregate_column(col_data, col_name))
+            for col in cols
+        }
+
+    def aggfunc_no_demand_edge(cols, attributes_to_exclude):
+        def aggregate_column(col_data, col_name):
+            if col_name in attributes_to_exclude:
+                return col_data.iloc[0]
+            elif col_name == "rfid_c":
+                return list(col_data)
+            elif col_name in ["maxspeed", "avgspeed"]:
+                return col_data.mean()
+            elif col_data.dtype == "O":
+                return "; ".join(
+                    str(item) for item in col_data if isinstance(item, str)
+                )
+            else:
+                return col_data.iloc[0]
+
+        return {
+            col: (lambda col_data, col_name=col: aggregate_column(col_data, col_name))
+            for col in cols
+        }
+
     def process_network(
         network: snkit.network.Network,
         crs: str,
@@ -1175,48 +1217,27 @@ def simplify_graph_count_with_attribute_exclusion(
         )
         return network
 
+    def filter_excluded_attributes(
+        network_edges: pd.DataFrame, attributes_to_exclude: list[str]
+    ) -> list[str]:
+        columns_set = set(network_edges.columns)
+        return [attr for attr in attributes_to_exclude if attr in columns_set]
+
     # merge_edges starts here. add the degree column to nodes and put it high for the excluded_edge_types objects
     network = nx_to_network(graph, graph.graph.get("crs", None))
     crs = network.edges.crs
     network = _check_edge_ids(network)
     network = _get_nodes_degree(network)
+    attributes_to_exclude = filter_excluded_attributes(
+        network.edges, attributes_to_exclude
+    )
     # _merge_edges
     cols = [col for col in network.edges.columns if col != "geometry"]
 
     if "demand_edge" not in attributes_to_exclude:
-        aggfunc = {
-            col: (
-                lambda col_data: (
-                    col_data.iloc[0]
-                    if col_data.name in attributes_to_exclude
-                    else (
-                        "; ".join(
-                            str(item) for item in col_data if isinstance(item, str)
-                        )
-                        if col_data.dtype == "O"
-                        else col_data.iloc[0] if col != "demand_edge" else max(col_data)
-                    )
-                )
-            )
-            for col in cols
-        }
+        aggfunc = aggfunc_with_demand_edge(cols, attributes_to_exclude)
     else:
-        aggfunc = {
-            col: (
-                lambda col_data: (
-                    col_data.iloc[0]
-                    if col_data.name in attributes_to_exclude
-                    else (
-                        "; ".join(
-                            str(item) for item in col_data if isinstance(item, str)
-                        )
-                        if col_data.dtype == "O"
-                        else col_data.iloc[0]
-                    )
-                )
-            )
-            for col in cols
-        }
+        aggfunc = aggfunc_no_demand_edge(cols, attributes_to_exclude)
 
     network = _merge_edges(network, aggfunc=aggfunc, by=attributes_to_exclude)
     network = process_network(network, crs)
@@ -1807,7 +1828,13 @@ def _merge_connected_lines(
     # Combine the attributes using the aggregation function
     for col, func in aggfunc.items():
         if col != "geometry":
-            merged_gdf[col] = func(gdf[col])
+            # Try to convert the column to float if needed
+            if gdf[col].dtype != float:
+                try:
+                    gdf[col] = gdf[col].astype(float)
+                except ValueError:
+                    pass  # Skip conversion if it fails
+            merged_gdf[col] = [func(gdf[col])]
 
     return merged_gdf
 
@@ -1826,7 +1853,7 @@ def _get_intersections(_edge, _edges):
                 intersection.intersects(boundary)
                 for boundary in edge_geometry.boundary.geoms
             ):
-                if isinstance(intersection, nx.MultiPoint):
+                if isinstance(intersection, shapely.MultiPoint):
                     intersections.extend(
                         [
                             point.coords[0]
@@ -2472,6 +2499,7 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
                     and (";" not in s)
                     and ("|" not in s)
                     and ("-" not in s)
+                    and not len(s) == 0
                 ):
                     ss = int(s)
                 elif not any(c.isalpha() for c in s) and ";" in s:
@@ -2480,6 +2508,8 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
                     ss = mean([int(x) for x in s.split("|") if x.isnumeric()])
                 elif not any(c.isalpha() for c in s) and "-" in s:
                     ss = mean([int(x) for x in s.split("-") if x.isnumeric()])
+                elif len(s) == 0:
+                    ss = np.nan
                 elif " mph" in s:
                     ss = int(s.split(" mph")[0]) * 1.609344
                 else:
@@ -2611,6 +2641,11 @@ def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
                         ].iloc[0],
                         0,
                     )
+
+            elif math.isnan(max_speed):
+                graph[u][v][k]["avgspeed"] = np.nan
+            else:
+                graph[u][v][k]["avgspeed"] = int(max_speed)
         else:
             if "]" in road_type:
                 avg_speed = int(
