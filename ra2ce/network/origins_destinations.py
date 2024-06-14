@@ -21,12 +21,10 @@
 
 import logging
 import os
-from collections import defaultdict
 from pathlib import Path
 from typing import Optional, Union
 
 import geopandas as gpd
-import networkx
 import networkx as nx
 import numpy as np
 import pandas as pd
@@ -182,7 +180,7 @@ def add_data_to_existing_node(graph, node, match_name):
 
 
 def update_edges_with_new_node(
-    graph: networkx.MultiGraph,
+    graph: nx.MultiGraph,
     edge_data: dict,
     node_a: int,
     node_b: int,
@@ -429,7 +427,7 @@ def update_edges_with_new_node(
 
 def add_od_nodes(
     od: gpd.GeoDataFrame,
-    graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
+    graph: nx.Graph,
     crs,
     category: Optional[str] = None,
 ):
@@ -437,7 +435,7 @@ def add_od_nodes(
         closest_node_on_road: np.ndarray,
         inverse_vertices_dict: dict,
         inverse_nodes_dict: dict,
-        graph: Union[nx.classes.Graph, nx.classes.MultiGraph],
+        graph: nx.Graph,
     ) -> dict[tuple[float, float], int]:
         closest_u_v_k = inverse_vertices_dict.get(
             (closest_node_on_road[0], closest_node_on_road[1]), None
@@ -464,7 +462,7 @@ def add_od_nodes(
         return inverse_nodes_dict
 
     def get_node_id_from_position(
-        g: Union[nx.classes.Graph], x: float, y: float
+        g: nx.Graph, x: float, y: float
     ) -> Union[float, None]:
         nodes = [
             (node, data)

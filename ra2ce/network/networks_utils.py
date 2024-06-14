@@ -981,9 +981,7 @@ def delete_duplicates(all_points: list[Point]) -> list[Point]:
     return uniquepoints
 
 
-def create_simplified_graph(
-    graph_complex: nx.classes.graph.Graph, new_id: str = "rfid"
-):
+def create_simplified_graph(graph_complex: nx.Graph, new_id: str = "rfid"):
     """Create a simplified graph with unique ids from a complex graph"""
     logging.info("Simplifying graph")
     try:
@@ -1185,7 +1183,7 @@ def graph_from_gdf(
 
 
 def graph_to_gdf(
-    graph_to_convert: nx.classes.graph.Graph,
+    graph_to_convert: nx.Graph,
     save_nodes: bool = False,
     save_edges: bool = True,
     to_save: bool = False,
@@ -1193,10 +1191,13 @@ def graph_to_gdf(
     """Takes in a networkx graph object and returns edges and nodes as geodataframes
     Arguments:
         graph_to_convert (Graph): networkx graph object to be converted
+        save_nodes (bool): get the nodes as a geodataframe (False)
+        save_edges (bool): get the edges as a geodataframe (True)
+        to_save (bool): convert all columns to string (False)
 
     Returns:
-        edges (GeoDataFrame) : containes the edges
-        nodes (GeoDataFrame) :
+        edges (GeoDataFrame): contains the edges
+        nodes (GeoDataFrame): contains the nodes
     """
 
     nodes, edges = None, None
@@ -1204,14 +1205,11 @@ def graph_to_gdf(
         nodes, edges = graph_to_gdfs(
             graph_to_convert, nodes=save_nodes, edges=save_edges, node_geometry=False
         )
-
         if to_save:
-            dfs = [edges, nodes]
-            for df in dfs:
+            for df in [edges, nodes]:
                 for col in df.columns:
                     if df[col].dtype == object and col != df.geometry.name:
                         df[col] = df[col].astype(str)
-
     elif not save_nodes and save_edges:
         edges = graph_to_gdfs(graph_to_convert, nodes=save_nodes, edges=save_edges)
     elif save_nodes and not save_edges:
@@ -1220,13 +1218,11 @@ def graph_to_gdf(
     return edges, nodes
 
 
-def graph_to_gpkg(
-    origin_graph: nx.classes.graph.Graph, edge_gpkg: str, node_gpkg: str
-) -> None:
+def graph_to_gpkg(origin_graph: nx.Graph, edge_gpkg: str, node_gpkg: str) -> None:
     """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_gpkg and node_gpkg
 
     Arguments:
-        origin_graph [nx.classes.graph.Graph]: networkx graph object to be converted
+        origin_graph [nx.Graph]: networkx graph object to be converted
         edge_gpkg [str]: output path including extension for edges geopackage
         node_gpkg [str]: output path including extension for nodes geopackage
 
@@ -1234,7 +1230,7 @@ def graph_to_gpkg(
         None
     """
     # now only multidigraphs and graphs are used
-    if type(origin_graph) == nx.classes.graph.Graph:
+    if type(origin_graph) == nx.Graph:
         origin_graph = nx.MultiGraph(origin_graph)
 
     # The nodes should have a geometry attribute (perhaps on top of the x and y attributes)
@@ -1408,7 +1404,7 @@ def get_extent(dataset):
 
 
 def get_graph_edges_extent(
-    network_graph: nx.classes.Graph,
+    network_graph: nx.Graph,
 ) -> tuple[float, float, float, float]:
     """Inspects all geometries of the edges of a graph and returns the most extreme coordinates
 
@@ -1444,9 +1440,7 @@ def get_graph_edges_extent(
     return (min_x, max_x, min_y, max_y)
 
 
-def reproject_graph(
-    original_graph: nx.classes.Graph, crs_in: str, crs_out: str
-) -> nx.classes.Graph:
+def reproject_graph(original_graph: nx.Graph, crs_in: str, crs_out: str) -> nx.Graph:
     """
     Reprojects the shapely geometry data (of a NetworkX graph) to a different projection
 
@@ -1525,7 +1519,7 @@ def filter_osm(osm_filter_path, o5m, filtered_o5m, tags=None):
     os.system(command)
 
 
-def graph_link_simple_id_to_complex(graph_simple: nx.classes.graph.Graph, new_id: str):
+def graph_link_simple_id_to_complex(graph_simple: nx.Graph, new_id: str):
     """
     Create lookup tables (dicts) to match edges_ids of the complex and simple graph
     Optionally, saves these lookup tables as json files.
@@ -1568,8 +1562,8 @@ def graph_link_simple_id_to_complex(graph_simple: nx.classes.graph.Graph, new_id
 
 
 def add_simple_id_to_graph_complex(
-    complex_graph: nx.classes.Graph, complex_to_simple, new_id
-) -> nx.classes.Graph:
+    complex_graph: nx.Graph, complex_to_simple, new_id
+) -> nx.Graph:
     """Adds the appropriate ID of the simple graph to each edge of the complex graph as a new attribute 'rfid'
 
     Arguments:
@@ -1606,7 +1600,12 @@ def add_simple_id_to_graph_complex(
     return complex_graph
 
 
-def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
+def calc_avg_speed(
+    graph: nx.Graph,
+    road_type_col_name: str,
+    save_csv: bool = False,
+    save_path: str = None,
+) -> pd.DataFrame:
     """Calculates the average speed from OSM roads, per road type
 
     Args:
@@ -1741,7 +1740,9 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
     return df
 
 
-def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
+def assign_avg_speed(
+    graph: nx.Graph, avg_road_speed: pd.DataFrame, road_type_col_name: str
+) -> nx.Graph:
     """Assigns the average speed to roads in an existing (OSM) graph
 
     Args:

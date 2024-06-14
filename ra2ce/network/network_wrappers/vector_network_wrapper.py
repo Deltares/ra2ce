@@ -101,7 +101,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         # Create 'edges_complex', convert complex graph to geodataframe
         logging.info("Start converting the graph to a geodataframe")
-        edges_complex, node_complex = nut.graph_to_gdf(graph_complex)
+        edges_complex, _ = nut.graph_to_gdf(graph_complex)
         logging.info("Finished converting the graph to a geodataframe")
 
         # Save the link tables linking complex and simple IDs
@@ -384,9 +384,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             self.output_graph_dir.joinpath("complex_to_simple.json"), linking_tables[1]
         )
 
-    def _get_avg_speed(
-        self, original_graph: nx.classes.graph.Graph
-    ) -> nx.classes.graph.Graph:
+    def _get_avg_speed(self, original_graph: nx.Graph) -> nx.Graph:
         if all(["length" in e for u, v, e in original_graph.edges.data()]) and any(
             ["maxspeed" in e for u, v, e in original_graph.edges.data()]
         ):

@@ -141,7 +141,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
         # Create 'edges_complex', convert complex graph to geodataframe
         logging.info("Start converting the graph to a geodataframe")
-        edges_complex, node_complex = nut.graph_to_gdf(graph_complex)
+        edges_complex, _ = nut.graph_to_gdf(graph_complex)
         logging.info("Finished converting the graph to a geodataframe")
 
         # Save the link tables linking complex and simple IDs
@@ -155,7 +155,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         graph_simple = self._set_avg_speed_to_graph(graph_simple)
         return graph_simple, edges_complex
 
-    def _get_avg_speeds(self, original_graph: nx.classes.graph.Graph) -> pd.DataFrame:
+    def _get_avg_speeds(self, original_graph: nx.Graph) -> pd.DataFrame:
         _save_csv = False
         _avg_speed_filepath = None
         if self.output_graph_dir is not None:
@@ -176,9 +176,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
             save_path=_avg_speed_filepath,
         )
 
-    def _set_avg_speed_to_graph(
-        self, original_graph: nx.classes.graph.Graph
-    ) -> nx.classes.graph.Graph:
+    def _set_avg_speed_to_graph(self, original_graph: nx.Graph) -> nx.Graph:
 
         _length_array, _maxspeed_array = list(
             zip(

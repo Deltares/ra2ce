@@ -81,9 +81,7 @@ class Network:
         # graph files
         self.graph_files = graph_files
 
-    def add_od_nodes(
-        self, graph: nx.classes.graph.Graph, crs: pyproj.CRS
-    ) -> nx.classes.graph.Graph:
+    def add_od_nodes(self, graph: nx.Graph, crs: pyproj.CRS) -> nx.Graph:
         """Adds origins and destinations nodes from shapefiles to the graph.
 
         Args:
