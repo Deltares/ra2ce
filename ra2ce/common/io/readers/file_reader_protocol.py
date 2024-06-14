@@ -21,9 +21,10 @@
 
 
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any, Protocol, runtime_checkable
 
 
+@runtime_checkable
 class FileReaderProtocol(Protocol):
     def read(self, file_path: Path) -> Any:
         """
