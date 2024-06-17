@@ -981,7 +981,9 @@ def delete_duplicates(all_points: list[Point]) -> list[Point]:
     return uniquepoints
 
 
-def create_simplified_graph(graph_complex: nx.Graph, new_id: str = "rfid"):
+def create_simplified_graph(
+    graph_complex: nx.Graph, new_id: str = "rfid"
+) -> tuple[nx.Graph, nx.Graph, tuple[dict, dict]]:
     """Create a simplified graph with unique ids from a complex graph"""
     logging.info("Simplifying graph")
     try:
@@ -1519,7 +1521,9 @@ def filter_osm(osm_filter_path, o5m, filtered_o5m, tags=None):
     os.system(command)
 
 
-def graph_link_simple_id_to_complex(graph_simple: nx.Graph, new_id: str):
+def graph_link_simple_id_to_complex(
+    graph_simple: nx.Graph, new_id: str
+) -> tuple[dict, dict]:
     """
     Create lookup tables (dicts) to match edges_ids of the complex and simple graph
     Optionally, saves these lookup tables as json files.
@@ -1604,7 +1608,7 @@ def calc_avg_speed(
     graph: nx.Graph,
     road_type_col_name: str,
     save_csv: bool = False,
-    save_path: str = None,
+    save_path: Path = None,
 ) -> pd.DataFrame:
     """Calculates the average speed from OSM roads, per road type
 
@@ -1612,7 +1616,7 @@ def calc_avg_speed(
         graph (NetworkX graph): NetworkX graph with road types
         road_type_col_name (string): name of the column which holds the road types ('highway' in OSM)
         save_csv (boolean): To save a csv or not
-        save_path (string): Path to save the csv to
+        save_path (Path): Path to save the csv to
 
     Returns:
         df (Pandas DataFrame): Dataframe with the average road speeds per road type
