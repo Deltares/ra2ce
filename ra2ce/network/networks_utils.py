@@ -1002,7 +1002,9 @@ def create_simplified_graph(
             )
         else:
             # Create simplified graph and add unique ids
-            graph_simple = simplify_graph_count_without_attribute_exclusion(graph_complex)
+            graph_simple = simplify_graph_count_without_attribute_exclusion(
+                graph_complex
+            )
 
         graph_simple = graph_create_unique_ids(graph_simple, new_id)
 
@@ -2511,6 +2513,10 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
                     ss = int(s.split(" mph")[0]) * 1.609344
                 else:
                     continue
+            elif isinstance(s, float) or isinstance(s, int):
+                ss = int(s)
+            else:
+                raise ValueError(f"Edge {u, v} has invalid avgspeed {s}")
             all_avg.append(ss * l)
             all_l.append(l)
             df.iloc[i, 1] = sum(all_avg) / sum(all_l)

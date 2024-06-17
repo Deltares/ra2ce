@@ -733,7 +733,7 @@ class LookUp:
 
         Output: dict:
          - road types are keys
-         - max damages in euro / m road length
+         - max damages in euro / km road length
         """
 
         # Note, these values are in euro/km; while RA2CE standard unit is euro/m length
