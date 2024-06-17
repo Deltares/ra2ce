@@ -19,9 +19,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import ast
 import logging
 import math
+from abc import ABC, abstractmethod
 from ast import literal_eval
 from collections import defaultdict
 from pathlib import Path
@@ -33,15 +33,9 @@ import pandas as pd
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
-)
-from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
-from ra2ce.analysis.losses.multi_link_redundancy import MultiLinkRedundancy
-from ra2ce.analysis.losses.single_link_redundancy import SingleLinkRedundancy
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
@@ -71,7 +65,12 @@ def _load_df_from_csv(
     return _csv_dataframe
 
 
-class Losses(AnalysisLossesProtocol):
+class LossesBase(AnalysisLossesProtocol, ABC):
+    """
+    This class is the base class for the Losses analyses, containing the common methods and attributes.
+    Based on the analysis type a different criticality analysis is executed.
+    """
+
     analysis: AnalysisSectionLosses
     graph_file_hazard: GraphFile
     input_path: Path
@@ -117,10 +116,10 @@ class Losses(AnalysisLossesProtocol):
         )
         self._check_validity_df()
 
-        self.input_path = self.analysis_input.input_path
-        self.static_path = self.analysis_input.static_path
-        self.output_path = self.analysis_input.output_path
-        self.hazard_names = self.analysis_input.hazard_names
+        self.input_path = analysis_input.input_path
+        self.static_path = analysis_input.static_path
+        self.output_path = analysis_input.output_path
+        self.hazard_names = analysis_input.hazard_names
 
         self.result = gpd.GeoDataFrame()
 
@@ -168,13 +167,6 @@ class Losses(AnalysisLossesProtocol):
                 f"""traffic_intensities_file and input graph do not have the same link_id.
         {self.link_id} is passed for feature ids of the graph"""
             )
-
-    def _load_gdf(self, gdf_path: Path) -> gpd.GeoDataFrame:
-        """This method reads the dataframe created from a .csv"""
-        if gdf_path.exists():
-            return gpd.read_file(gdf_path, index_col=f"{self.link_id}")
-        logging.warning("No `gdf` file found at {}.".format(gdf_path))
-        return gpd.GeoDataFrame()
 
     def _get_vot_intensity_per_trip_purpose(self) -> dict[str, pd.DataFrame]:
         """
@@ -627,11 +619,12 @@ class Losses(AnalysisLossesProtocol):
 
         return list(_link_types), list(_hazard_intensity_ranges)
 
+    @abstractmethod
+    def _get_criticality_analysis(self) -> AnalysisLossesProtocol:
+        pass
+
     def execute(self) -> gpd.GeoDataFrame:
-        if self.analysis.analysis == AnalysisLossesEnum.SINGLE_LINK_LOSSES:
-            criticality_analysis = SingleLinkRedundancy(self.analysis_input).execute()
-        elif self.analysis.analysis == AnalysisLossesEnum.MULTI_LINK_LOSSES:
-            criticality_analysis = MultiLinkRedundancy(self.analysis_input).execute()
+        criticality_analysis = self._get_criticality_analysis().execute()
 
         self._get_disrupted_criticality_analysis_results(
             criticality_analysis=criticality_analysis

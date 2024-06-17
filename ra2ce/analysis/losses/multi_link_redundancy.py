@@ -45,6 +45,9 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
         """
         updates the time column with the calculated dataframe and updates the rest of the gdf_graph if time is None.
         """
+        if WeighingEnum.TIME.config_value not in df_calculated.columns:
+            return df_calculated, gdf_graph
+
         if (
             WeighingEnum.TIME.config_value in gdf_graph.columns
             and WeighingEnum.TIME.config_value in df_calculated.columns
@@ -52,31 +55,24 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
             df_calculated = df_calculated.drop(columns=[WeighingEnum.TIME.config_value])
             return df_calculated, gdf_graph
 
-        if (
-            WeighingEnum.TIME.config_value not in gdf_graph.columns
-            and WeighingEnum.TIME.config_value not in df_calculated.columns
-        ):
-            return df_calculated, gdf_graph
-
-        elif WeighingEnum.TIME.config_value in df_calculated.columns:
-            gdf_graph[WeighingEnum.TIME.config_value] = df_calculated[
-                WeighingEnum.TIME.config_value
-            ]
-            for i, row in gdf_graph.iterrows():
-                row_avgspeed = row.get("avgspeed", None)
-                row_length = row.get("length", None)
-                if (
-                    pd.isna(row[WeighingEnum.TIME.config_value])
-                    and row_avgspeed
-                    and row_length
-                ):
-                    gdf_graph.at[i, WeighingEnum.TIME.config_value] = (
-                        row_length * 1e-3 / row_avgspeed
-                    )
-                else:
-                    gdf_graph.at[i, WeighingEnum.TIME.config_value] = row.get(
-                        WeighingEnum.TIME.config_value, None
-                    )
+        gdf_graph[WeighingEnum.TIME.config_value] = df_calculated[
+            WeighingEnum.TIME.config_value
+        ]
+        for i, row in gdf_graph.iterrows():
+            row_avgspeed = row.get("avgspeed", None)
+            row_length = row.get("length", None)
+            if (
+                pd.isna(row[WeighingEnum.TIME.config_value])
+                and row_avgspeed
+                and row_length
+            ):
+                gdf_graph.at[i, WeighingEnum.TIME.config_value] = (
+                    row_length * 1e-3 / row_avgspeed
+                )
+            else:
+                gdf_graph.at[i, WeighingEnum.TIME.config_value] = row.get(
+                    WeighingEnum.TIME.config_value, None
+                )
         return df_calculated, gdf_graph
 
     def execute(self) -> gpd.GeoDataFrame:
@@ -148,48 +144,49 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
 
             df_calculated = pd.DataFrame(columns=columns)
             _weighing_analyser = WeighingAnalysisFactory.get_analysis(
-                self.analysis.weighing
+                self.analysis.weighing, gdf
             )
 
-            for edges in edges_remove:
-                u, v, k, _weighing_analyser.weighing_data = edges
+            # Ensure each edge has a valid weighing attribute
+            _current_value_list = []
+            for edge in list(edges_remove):
+                _weighing_analyser.edge_data = edge[3]
+                _current_value_list.append(_weighing_analyser.get_current_value())
+
+            for e, edges in enumerate(edges_remove):
+                u, v, _, _weighing_analyser.edge_data = edges
 
                 if nx.has_path(_graph, u, v):
                     alt_dist = nx.dijkstra_path_length(
-                        _graph, u, v, weight=WeighingEnum.LENGTH.config_value
+                        _graph, u, v, weight=self.analysis.weighing.config_value
                     )
                     alt_nodes = nx.dijkstra_path(_graph, u, v)
                     connected = 1
-                    alt_value = _weighing_analyser.calculate_alternative_distance(
-                        alt_dist
-                    )
-                else:
-                    alt_value = _weighing_analyser.calculate_distance()
-                    alt_nodes, connected = np.NaN, 0
+                    alt_value = _weighing_analyser.calculate_alternative_value(alt_dist)
 
-                current_value = _weighing_analyser.weighing_data[
-                    self.analysis.weighing.config_value
-                ]
-                if not current_value:  # if None
-                    current_value = np.nan
-                diff = round(alt_value - current_value, 3)
+                    diff = round(alt_value - _current_value_list[e], 3)
+                else:
+                    alt_value = _current_value_list[e]
+                    alt_nodes, connected = np.NaN, 0
+                    diff = np.NaN
 
                 data = {
                     "u": [u],
                     "v": [v],
+                    self.analysis.weighing.config_value: [_current_value_list[e]],
                     f"alt_{self.analysis.weighing.config_value}": [alt_value],
                     "alt_nodes": [alt_nodes],
                     f"diff_{self.analysis.weighing.config_value}": diff,
                     "connected": [connected],
                 }
-                _weighing_analyser.extend_graph(data)
 
                 if "rfid" in gdf:
-                    data["rfid"] = [str(_weighing_analyser.weighing_data["rfid"])]
+                    data["rfid"] = [str(_weighing_analyser.edge_data["rfid"])]
 
                 df_calculated = pd.concat(
                     [df_calculated, pd.DataFrame(data)], ignore_index=True
                 )
+
             df_calculated[f"alt_{self.analysis.weighing.config_value}"] = pd.to_numeric(
                 df_calculated[f"alt_{self.analysis.weighing.config_value}"],
                 errors="coerce",
