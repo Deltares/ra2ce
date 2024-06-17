@@ -379,7 +379,9 @@ class TestOsmNetworkWrapper:
         _network_config_data.network.road_types = []
 
         # 2. Run test.
-        _wrapper = OsmNetworkWrapper.with_polygon(_valid_network_polygon_fixture)
+        _wrapper = OsmNetworkWrapper.with_polygon(
+            _network_config_data, _valid_network_polygon_fixture
+        )
 
         # 3. Verify expectations.
         assert isinstance(_wrapper, OsmNetworkWrapper)
@@ -420,7 +422,7 @@ class TestOsmNetworkWrapper:
 
         # 2. Run test.
         _network_tuple = OsmNetworkWrapper.get_network_from_polygon(
-            _valid_network_polygon_fixture
+            _network_config_data, _valid_network_polygon_fixture
         )
 
         # 3. Verify expectations.
