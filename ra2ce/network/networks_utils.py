@@ -996,9 +996,6 @@ def create_simplified_graph(
     try:
         graph_complex = graph_create_unique_ids(graph_complex, "{}_c".format(new_id))
         if len(config_data.network.attributes_to_exclude_in_simplification) > 0:
-            attributes_to_exclude_in_simplification = (
-                config_data.network.attributes_to_exclude_in_simplification
-            )
             graph_simple = simplify_graph_count_with_attribute_exclusion(
                 graph=graph_complex,
                 attributes_to_exclude=config_data.network.attributes_to_exclude_in_simplification,
