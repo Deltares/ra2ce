@@ -19,7 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import os
 from collections import OrderedDict
 from pathlib import Path
@@ -733,7 +732,7 @@ class LookUp:
 
         Output: dict:
          - road types are keys
-         - max damages in euro / km road length
+         - max damages in euro / m road length
         """
 
         # Note, these values are in euro/km; while RA2CE standard unit is euro/m length
