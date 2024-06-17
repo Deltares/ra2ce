@@ -2513,8 +2513,10 @@ def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
                     ss = int(s.split(" mph")[0]) * 1.609344
                 else:
                     continue
-            elif isinstance(s, float) or isinstance(s, int):
+            elif isinstance(s, float) and (not (math.isnan(s) or np.isnan(s))):
                 ss = int(s)
+            elif isinstance(s, int) or (math.isnan(s) or np.isnan(s)):
+                ss = s
             else:
                 raise ValueError(f"Edge {u, v} has invalid avgspeed {s}")
             all_avg.append(ss * l)
