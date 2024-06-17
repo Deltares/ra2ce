@@ -186,7 +186,7 @@ class Network:
                 )
                 time_value = None
             else:
-                time_value = (e[-1]["length"] / 1000) / e[-1]["avgspeed"]
+                time_value = (e[-1]["length"] * 1e-3) / e[-1]["avgspeed"]
             result[(e[0], e[1], e[2])] = {"time": time_value}
 
         return result

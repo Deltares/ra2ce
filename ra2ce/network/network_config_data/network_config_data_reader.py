@@ -211,9 +211,6 @@ class NetworkConfigDataReader(ConfigDataReaderProtocol):
                 ),
             )
         )
-        _hazard_section.hazard_field_name = self._parser.getlist(
-            _section, "hazard_field_name", fallback=_hazard_section.hazard_field_name
-        )
         _hazard_section.aggregate_wl = AggregateWlEnum.get_enum(
             self._parser.get(_section, "aggregate_wl", fallback=None)
         )
