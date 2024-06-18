@@ -139,7 +139,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
-            self.polygon_graph, self.attributes_to_exclude_in_simplification
+            self.polygon_graph, self.attributes_to_exclude_in_simplification, "rfid"
         )
 
         # Create 'edges_complex', convert complex graph to geodataframe

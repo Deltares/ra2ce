@@ -99,7 +99,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         logging.info("Start converting the complex graph to a simple graph")
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
-            graph_complex, self.attributes_to_exclude_in_simplification
+            graph_complex, self.attributes_to_exclude_in_simplification, "rfid"
         )
 
         # Create 'edges_complex', convert complex graph to geodataframe

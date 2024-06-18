@@ -20,7 +20,6 @@
 """
 
 from collections import defaultdict
-import ast
 import itertools
 import logging
 import os
@@ -28,7 +27,7 @@ import sys
 import warnings
 from pathlib import Path
 from statistics import mean
-from typing import Callable, Union, Optional
+from typing import Union, Optional
 
 import geopandas as gpd
 import networkx as nx
@@ -50,7 +49,6 @@ from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
 from shapely.geometry.base import BaseGeometry, BaseMultipartGeometry
 import snkit
-from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from shapely.ops import linemerge, unary_union
 from tqdm import tqdm
 
@@ -1225,7 +1223,9 @@ def simplify_graph_count_with_attribute_exclusion(
         return [attr for attr in attributes_to_exclude if attr in columns_set]
 
     # merge_edges starts here. add the degree column to nodes and put it high for the excluded_edge_types objects
-    network = nx_to_network(graph, graph.graph.get("crs", None))
+    network = nx_network_to_snkit_network(
+        graph, graph.graph.get("crs", None), "id", "from_id", "to_id"
+    )
     crs = network.edges.crs
     network = _check_edge_ids(network)
     network = _get_nodes_degree(network)
@@ -1242,11 +1242,11 @@ def simplify_graph_count_with_attribute_exclusion(
 
     network = _merge_edges(network, aggfunc=aggfunc, by=attributes_to_exclude)
     network = process_network(network, crs)
-    simple_graph = network_to_nx(network, crs)
+    simple_graph = snkit_network_to_nx_network(network, crs, "id", "from_id", "to_id")
     return simple_graph
 
 
-def nx_to_network(
+def nx_network_to_snkit_network(
     g: Union[nx.Graph, nx.MultiGraph, nx.MultiDiGraph],
     crs: pyproj.CRS,
     node_id_column_name: str,
@@ -1276,12 +1276,12 @@ def nx_to_network(
     return network
 
 
-def network_to_nx(
+def snkit_network_to_nx_network(
     net: snkit.network.Network,
     crs: pyproj.CRS,
-    node_id_column_name="id",
-    edge_from_id_column="from_id",
-    edge_to_id_column="to_id",
+    node_id_column_name: str,
+    edge_from_id_column: str,
+    edge_to_id_column: str,
 ) -> nx.MultiGraph:
     g = nx.MultiGraph()
 
@@ -2262,7 +2262,7 @@ def get_graph_edges_extent(
         if maxy > max_y:
             max_y = maxy
 
-    return (min_x, max_x, min_y, max_y)
+    return min_x, max_x, min_y, max_y
 
 
 def reproject_graph(
