@@ -55,7 +55,9 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
     road_types: list[RoadTypeEnum]
 
     def __init__(self, config_data: NetworkConfigData) -> None:
-        self.config_data = config_data
+        self.attributes_to_exclude_in_simplification = (
+            config_data.network.attributes_to_exclude_in_simplification
+        )
         self.output_graph_dir = config_data.output_graph_dir
         self.graph_crs = config_data.crs
 
@@ -137,7 +139,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
-            self.polygon_graph, self.config_data
+            self.polygon_graph, self.attributes_to_exclude_in_simplification
         )
 
         # Create 'edges_complex', convert complex graph to geodataframe

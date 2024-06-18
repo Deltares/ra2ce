@@ -990,17 +990,17 @@ def delete_duplicates(all_points: list[Point]) -> list[Point]:
 
 def create_simplified_graph(
     graph_complex: nx.classes.graph.Graph,
-    config_data: NetworkConfigData,
-    new_id: str = "rfid",
+    attributes_to_exclude_in_simplification: list,
+    new_id: str,
 ):
     """Create a simplified graph with unique ids from a complex graph"""
     logging.info("Simplifying graph")
     try:
         graph_complex = graph_create_unique_ids(graph_complex, "{}_c".format(new_id))
-        if len(config_data.network.attributes_to_exclude_in_simplification) > 0:
+        if len(attributes_to_exclude_in_simplification) > 0:
             graph_simple = simplify_graph_count_with_attribute_exclusion(
                 graph=graph_complex,
-                attributes_to_exclude=config_data.network.attributes_to_exclude_in_simplification,
+                attributes_to_exclude=attributes_to_exclude_in_simplification,
             )
         else:
             # Create simplified graph and add unique ids

@@ -50,7 +50,9 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         self,
         config_data: NetworkConfigData,
     ) -> None:
-        self.config_data = config_data
+        self.attributes_to_exclude_in_simplification = (
+            config_data.network.attributes_to_exclude_in_simplification
+        )
         self.crs = config_data.crs
 
         # Network options
@@ -97,7 +99,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         logging.info("Start converting the complex graph to a simple graph")
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
-            graph_complex, self.config_data
+            graph_complex, self.attributes_to_exclude_in_simplification
         )
 
         # Create 'edges_complex', convert complex graph to geodataframe
