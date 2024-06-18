@@ -42,10 +42,10 @@ class DamageNetworkEvents(DamageNetworkBase):
         self,
         road_gdf: GeoDataFrame,
         val_cols: list[str],
-        representative_damage_percentile: float,
+        representative_damage_percentage: float,
     ):
         # Construct using the parent class __init__
-        super().__init__(road_gdf, val_cols, representative_damage_percentile)
+        super().__init__(road_gdf, val_cols, representative_damage_percentage)
         self.events = set([x.split("_")[1] for x in val_cols])  # set of unique events
 
         if not any(self.events):
