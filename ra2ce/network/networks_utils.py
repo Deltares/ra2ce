@@ -997,7 +997,7 @@ def create_simplified_graph(
     logging.info("Simplifying graph")
     try:
         graph_complex = graph_create_unique_ids(graph_complex, "{}_c".format(new_id))
-        if len(attributes_to_exclude_in_simplification) > 0:
+        if any(attributes_to_exclude_in_simplification):
             graph_simple = simplify_graph_count_with_attribute_exclusion(
                 graph=graph_complex,
                 attributes_to_exclude=attributes_to_exclude_in_simplification,
@@ -1249,9 +1249,9 @@ def simplify_graph_count_with_attribute_exclusion(
 def nx_to_network(
     g: Union[nx.Graph, nx.MultiGraph, nx.MultiDiGraph],
     crs: pyproj.CRS,
-    node_id_column_name="id",
-    edge_from_id_column="from_id",
-    edge_to_id_column="to_id",
+    node_id_column_name: str,
+    edge_from_id_column: str,
+    edge_to_id_column: str,
 ) -> snkit.network.Network:
     network = snkit.network.Network()
 
