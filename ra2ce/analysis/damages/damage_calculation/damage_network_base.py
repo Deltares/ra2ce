@@ -44,14 +44,14 @@ class DamageNetworkBase(ABC):
         self,
         road_gdf: GeoDataFrame,
         val_cols: list[str],
-        representative_damage_percentile: float,
+        representative_damage_percentage: float,
     ):
         """Construct the Data"""
         self.val_cols = val_cols
         self.gdf = road_gdf
         # set of hazard info per event
         self.stats = set([x.split("_")[-1] for x in val_cols])
-        self.representative_damage_percentile = representative_damage_percentile
+        self.representative_damage_percentage = representative_damage_percentage
         # TODO: also track the damage cols after the dam calculation, that is useful for the risk calc. module
         # TODO: also create constructors of the children of this class
 
@@ -268,7 +268,7 @@ class DamageNetworkBase(ABC):
     def calculate_damage_OSdaMage(self, events):
         """Damage calculation with the OSdaMage functions"""
 
-        def interpolate_damage(row, representative_damage_percentile):
+        def interpolate_damage(row, representative_damage_percentage):
             # Extract the tuple of damage values from the row
             damage_values = row["dam_{}_{}_quartiles".format(curve_name, event)]
 
@@ -280,8 +280,8 @@ class DamageNetworkBase(ABC):
                 percentiles, damage_values, kind="linear", fill_value="extrapolate"
             )
 
-            # Interpolate the damage value for the given representative_damage_percentile
-            interpolated_damage = _interpolator(representative_damage_percentile)
+            # Interpolate the damage value for the given representative_damage_percentage
+            interpolated_damage = _interpolator(representative_damage_percentage)
 
             return interpolated_damage
 
@@ -376,7 +376,7 @@ class DamageNetworkBase(ABC):
                 df[f"dam_{curve_name}_{event}_representative"] = (
                     df.apply(
                         lambda row: interpolate_damage(
-                            row, self.representative_damage_percentile
+                            row, self.representative_damage_percentage
                         ),
                         axis=1,
                     )
