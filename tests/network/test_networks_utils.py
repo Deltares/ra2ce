@@ -267,7 +267,7 @@ class TestDeleteDuplicates:
 
 class TestCreateSimplifiedGraph:
     def test_with_none_graph_complex_doesnot_raise(self):
-        _return_result = nu.create_simplified_graph(None, "")
+        _return_result = nu.create_simplified_graph(None, "", "rfid")
         assert _return_result == (None, None, None)
 
 
