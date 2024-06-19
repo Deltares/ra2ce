@@ -29,6 +29,15 @@ from tqdm import tqdm
 NxGraph = nx.Graph | nx.MultiGraph | nx.MultiDiGraph
 
 
+"""
+Disclaimer!
+
+This file contains several complex logic introduced in feature #277.
+At the moment it was not possible to streamline / improve it further than
+its current state.
+"""
+
+
 def merge_edges(
     snkit_network: SnkitNetwork,
     aggregate_func: str | dict,

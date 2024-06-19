@@ -22,57 +22,16 @@ import logging
 from dataclasses import dataclass
 
 import networkx as nx
-from osmnx.simplification import simplify_graph
 from tqdm import tqdm
 
 from ra2ce.network.network_simplification.network_simplification_with_attribute_exclusion import (
     NetworkSimplificationWithAttributeExclusion,
 )
-from ra2ce.network.networks_utils import add_x_y_to_nodes
+from ra2ce.network.network_simplification.network_simplification_without_attribute_exclusion import (
+    NetworkSimplificationWithoutAttributeExclusion,
+)
 
 NxGraph = nx.Graph | nx.MultiGraph | nx.MultiDiGraph
-
-
-def graph_link_simple_id_to_complex(graph_simple: nx.classes.graph.Graph, new_id: str):
-    """
-    Create lookup tables (dicts) to match edges_ids of the complex and simple graph
-    Optionally, saves these lookup tables as json files.
-
-    Arguments:
-        graph_simple (Graph) : Graph, containing attribute 'new_id'
-        new_id (string) : Name of the ID attribute in graph_simple
-
-    Returns:
-        simple_to_complex (dict): Keys are ids of the simple graph, values are lists with all matching complex ids
-        complex_to_simple (dict): Keys are the ids of the complex graph, value is the matching simple_ID
-
-    We need this because the simple graph is derived from the complex graph, and therefore initially only the
-    simple graph knows from which complex edges it was created. To assign this information also to the complex
-    graph we invert the look-up dictionary
-    @author: Kees van Ginkel en Margreet van Marle
-    """
-    # Iterate over the simple, because this already has the corresponding complex information
-    lookup_dict = {}
-    # keys are the ids of the simple graph, values are lists with all matching complex id's
-    for u, v, k in tqdm(graph_simple.edges(keys=True)):
-        key_1 = graph_simple[u][v][k]["{}".format(new_id)]
-        value_1 = graph_simple[u][v][k]["{}_c".format(new_id)]
-        lookup_dict[key_1] = value_1
-
-    inverted_lookup_dict = {}
-    # keys are the ids of the complex graph, value is the matching simple_ID
-    for key, value in lookup_dict.items():
-        if isinstance(value, list):
-            for subvalue in value:
-                inverted_lookup_dict[subvalue] = key
-        elif isinstance(value, int):
-            inverted_lookup_dict[value] = key
-
-    simple_to_complex = lookup_dict
-    complex_to_simple = inverted_lookup_dict
-
-    logging.info("Lookup tables from complex to simple and vice versa were created")
-    return simple_to_complex, complex_to_simple
 
 
 @dataclass(kw_only=True)
@@ -94,23 +53,13 @@ class NetworkSimplificationFactory:
             _graph_complex = self._graph_create_unique_ids(
                 self.graph_complex, "{}_c".format(self.new_id)
             )
-            if any(self.attributes_to_exclude):
-                _graph_simple = NetworkSimplificationWithAttributeExclusion(
-                    nx_graph=self.graph_complex,
-                    attributes_to_exclude=self.attributes_to_exclude,
-                ).simplify_graph()
-            else:
-                # Create simplified graph and add unique ids
-                _graph_simple = self._simplify_graph_count_without_attribute_exclusion(
-                    _graph_complex
-                )
-
-            _graph_simple = self._graph_create_unique_ids(_graph_simple, self.new_id)
+            _graph_simple = self._get_graph_simple()
 
             # Create look_up_tables between graphs with unique ids
-            _simple_to_complex, _complex_to_simple = graph_link_simple_id_to_complex(
-                _graph_simple, new_id=self.new_id
-            )
+            (
+                _simple_to_complex,
+                _complex_to_simple,
+            ) = self._graph_link_simple_id_to_complex(_graph_simple)
 
             # Store id table and add simple ids to complex graph
             _id_tables = (_simple_to_complex, _complex_to_simple)
@@ -123,6 +72,20 @@ class NetworkSimplificationFactory:
             _id_tables = None
             logging.error("Did not create a simplified version of the graph (%s)", exc)
         return _graph_simple, _graph_complex, _id_tables
+
+    def _get_graph_simple(self) -> NxGraph:
+        if any(self.attributes_to_exclude):
+            _graph_simple = NetworkSimplificationWithAttributeExclusion(
+                nx_graph=self.graph_complex,
+                attributes_to_exclude=self.attributes_to_exclude,
+            ).simplify_graph()
+        else:
+            # Create simplified graph and add unique ids
+            _graph_simple = NetworkSimplificationWithoutAttributeExclusion(
+                nx_graph=self.graph_complex
+            ).simplify_graph()
+
+        return self._graph_create_unique_ids(_graph_simple, self.new_id)
 
     def _graph_create_unique_ids(
         self, graph: nx.Graph, new_id_name: str = "rfid"
@@ -176,30 +139,42 @@ class NetworkSimplificationFactory:
 
         return complex_graph
 
-    def _simplify_graph_count_without_attribute_exclusion(
-        self,
-        complex_graph: nx.Graph,
-    ) -> nx.Graph:
+    def _graph_link_simple_id_to_complex(self, graph_simple: nx.classes.graph.Graph):
         """
-        Simplify the graph after adding missing x and y attributes to nodes
+        Create lookup tables (dicts) to match edges_ids of the complex and simple graph
+        Optionally, saves these lookup tables as json files.
 
-        Args:
-            complex_graph (nx.Graph): Graph to simplify
+        Arguments:
+            graph_simple (Graph) : Graph, containing attribute 'new_id'
 
         Returns:
-            nx.Graph: Simplified graph
+            simple_to_complex (dict): Keys are ids of the simple graph, values are lists with all matching complex ids
+            complex_to_simple (dict): Keys are the ids of the complex graph, value is the matching simple_ID
+
+        We need this because the simple graph is derived from the complex graph, and therefore initially only the
+        simple graph knows from which complex edges it was created. To assign this information also to the complex
+        graph we invert the look-up dictionary
+        @author: Kees van Ginkel en Margreet van Marle
         """
-        complex_graph = add_x_y_to_nodes(complex_graph)
-        simple_graph = simplify_graph(
-            complex_graph, strict=True, remove_rings=True, track_merged=False
-        )
+        # Iterate over the simple, because this already has the corresponding complex information
+        lookup_dict = {}
+        # keys are the ids of the simple graph, values are lists with all matching complex id's
+        for u, v, k in tqdm(graph_simple.edges(keys=True)):
+            key_1 = graph_simple[u][v][k]["{}".format(self.new_id)]
+            value_1 = graph_simple[u][v][k]["{}_c".format(self.new_id)]
+            lookup_dict[key_1] = value_1
 
-        logging.info(
-            "Graph simplified from %s to %s nodes and %s to %s edges.",
-            complex_graph.number_of_nodes(),
-            simple_graph.number_of_nodes(),
-            complex_graph.number_of_edges(),
-            simple_graph.number_of_edges(),
-        )
+        inverted_lookup_dict = {}
+        # keys are the ids of the complex graph, value is the matching simple_ID
+        for key, value in lookup_dict.items():
+            if isinstance(value, list):
+                for subvalue in value:
+                    inverted_lookup_dict[subvalue] = key
+            elif isinstance(value, int):
+                inverted_lookup_dict[value] = key
 
-        return simple_graph
+        simple_to_complex = lookup_dict
+        complex_to_simple = inverted_lookup_dict
+
+        logging.info("Lookup tables from complex to simple and vice versa were created")
+        return simple_to_complex, complex_to_simple

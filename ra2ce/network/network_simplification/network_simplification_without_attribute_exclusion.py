@@ -15,41 +15,45 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import logging
 from dataclasses import dataclass
 
 import networkx as nx
+from osmnx.simplification import simplify_graph
 
-from ra2ce.network.network_simplification.snkit_network_wrapper import (
-    SnkitNetworkWrapper,
-)
+from ra2ce.network.networks_utils import add_x_y_to_nodes
 
 NxGraph = nx.Graph | nx.MultiGraph | nx.MultiDiGraph
 
 
 @dataclass(kw_only=True)
-class NetworkSimplificationWithAttributeExclusion:
+class NetworkSimplificationWithoutAttributeExclusion:
     """
-    Simplifies a network by excluding a given set of attributes (columns).
+    Simplifies a network with the `osmnx.simplification` functionality.
     """
 
     nx_graph: NxGraph
-    attributes_to_exclude: list[str]
 
-    def simplify_graph(self) -> nx.Graph:
+    def simplify_graph(
+        self,
+    ) -> nx.Graph:
         """
-        Simplifies the inner graph by using the `snkit` package.
+        Simplify the graph after adding missing x and y attributes to nodes
 
         Returns:
-            nx.Graph: Resulting simplified graph.
+            nx.Graph: Simplified graph
         """
-        _snkit_network_wrapper = SnkitNetworkWrapper.from_networkx(
-            self.nx_graph,
-            column_names_dict=dict(
-                node_id_column_name="id",
-                edge_from_id_column_name="from_id",
-                edge_to_id_column_name="to_id",
-            ),
+        _complex_graph = add_x_y_to_nodes(self.nx_graph)
+        _simple_graph = simplify_graph(
+            _complex_graph, strict=True, remove_rings=True, track_merged=False
         )
-        _snkit_network_wrapper.merge_edges(self.attributes_to_exclude)
-        _snkit_network_wrapper.process_network()
-        return _snkit_network_wrapper.to_networkx()
+
+        logging.info(
+            "Graph simplified from %s to %s nodes and %s to %s edges.",
+            _complex_graph.number_of_nodes(),
+            _simple_graph.number_of_nodes(),
+            _complex_graph.number_of_edges(),
+            _simple_graph.number_of_edges(),
+        )
+
+        return _simple_graph

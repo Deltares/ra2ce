@@ -34,9 +34,7 @@ from ra2ce.network.exporters.json_exporter import JsonExporter
 from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.network.network_simplification.network_simplification_factory import (
-    NetworkSimplificationFactory,
-)
+from ra2ce.network.network_simplification import NetworkSimplificationFactory
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
