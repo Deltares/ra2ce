@@ -34,6 +34,9 @@ from tqdm import tqdm
 import ra2ce.network.networks_utils as nut
 from ra2ce.network.exporters.json_exporter import JsonExporter
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_simplification.network_simplification_factory import (
+    NetworkSimplificationFactory,
+)
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
@@ -98,9 +101,10 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         logging.info("Start converting the complex graph to a simple graph")
         # Create 'graph_simple'
-        graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
-            graph_complex, self.attributes_to_exclude_in_simplification, "rfid"
-        )
+        graph_simple, graph_complex, link_tables = NetworkSimplificationFactory(
+            graph_complex=graph_complex, 
+            attributes_to_exclude=self.attributes_to_exclude_in_simplification, 
+        ).simplify_graph()
 
         # Create 'edges_complex', convert complex graph to geodataframe
         logging.info("Start converting the graph to a geodataframe")
