@@ -18,13 +18,13 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
 import itertools
 import logging
 import os
 import sys
 import warnings
 from pathlib import Path
+from re import split
 from statistics import mean
 from typing import Optional
 
@@ -47,6 +47,7 @@ from shapely.geometry.base import BaseGeometry, BaseMultipartGeometry
 from shapely.ops import linemerge, unary_union
 from tqdm import tqdm
 
+from ra2ce.network.avg_speed.avg_speed import AvgSpeed
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 
@@ -1607,145 +1608,94 @@ def add_simple_id_to_graph_complex(
 def calc_avg_speed(
     graph: nx.Graph,
     road_type_col_name: str,
-    save_csv: bool = False,
-    save_path: Path = None,
-) -> pd.DataFrame:
+) -> AvgSpeed:
     """Calculates the average speed from OSM roads, per road type
 
     Args:
         graph (NetworkX graph): NetworkX graph with road types
         road_type_col_name (string): name of the column which holds the road types ('highway' in OSM)
-        save_csv (boolean): To save a csv or not
-        save_path (Path): Path to save the csv to
 
     Returns:
         df (Pandas DataFrame): Dataframe with the average road speeds per road type
     """
-    # Create a dataframe of all road types
-    exceptions = list(
-        set(
-            [
-                str(edata[road_type_col_name])
-                for u, v, edata in graph.edges.data()
-                if isinstance(edata[road_type_col_name], list)
-            ]
-        )
-    )
-    types = list(
-        set(
-            [
-                str(edata[road_type_col_name])
-                for u, v, edata in graph.edges.data()
-                if isinstance(edata[road_type_col_name], str)
-            ]
-        )
-    )
-    all_road_types = exceptions + types
-    df = pd.DataFrame({"road_types": all_road_types, "avg_speed": 0})
 
-    # calculate average speed
-    for i in range(len(df)):
-        roadtype = df.road_types[i]
-        all_edges = [
-            (u, v, edata["maxspeed"], edata["length"])
-            for u, v, edata in graph.edges.data()
-            if (str(edata[road_type_col_name]) == roadtype) & ("maxspeed" in edata)
+    def parse_avg_speed(speed_input: str | list[str]) -> float:
+        if isinstance(speed_input, list):
+            return mean(map(parse_avg_speed, speed_input))
+        if " mph" in speed_input:
+            return float(speed_input.split(" mph")[0]) * 1.609344
+        if any(c.isalpha() for c in speed_input):
+            return 0
+        # Split on the different separators (";" or "-" or "|")
+        # and take the mean of the numbers (if any)
+        return mean([float(x) for x in split(r";|-|\|", speed_input) if x.isnumeric()])
+
+    def get_main_speed(link_type: RoadTypeEnum) -> float:
+        _base_rt = RoadTypeEnum.get_enum(str(link_type).split("_link")[0])
+        if _base_rt in _avg_speed.road_types:
+            return _avg_speed.get_avg_speed(_base_rt)
+        return 0.0
+
+    def get_uncombined_speed(combined_types: list[RoadTypeEnum]) -> float:
+        for _rt in combined_types:
+            if _rt in _avg_speed.road_types:
+                return _avg_speed.get_avg_speed(_rt)
+        return 0.0
+
+    # Calculate average speed
+    _avg_speed = AvgSpeed()
+
+    for roadtype in list(
+        set(str(edata[road_type_col_name]) for _, _, edata in graph.edges.data())
+    ):
+        edge_data = [
+            (parse_avg_speed(edata["maxspeed"]), edata["length"])
+            for _, _, edata in graph.edges.data()
+            if (edata[road_type_col_name] == roadtype) & ("maxspeed" in edata)
         ]
-        all_avg = []
-        all_l = []
-        for u, v, s, l in all_edges:
-            if isinstance(s, list):
-                ns = []
-                for ss in s:
-                    if (
-                        not any(c.isalpha() for c in ss)
-                        and (";" not in ss)
-                        and ("|" not in ss)
-                        and ("-" not in ss)
-                    ):
-                        ns.append(int(ss))
-                    elif not any(c.isalpha() for c in ss) and ";" in ss:
-                        ns.extend([int(x) for x in ss.split(";") if x.isnumeric()])
-                    elif not any(c.isalpha() for c in ss) and "|" in ss:
-                        ns.extend([int(x) for x in ss.split("|") if x.isnumeric()])
-                    elif not any(c.isalpha() for c in ss) and "-" in ss:
-                        ns.extend([int(x) for x in ss.split("-") if x.isnumeric()])
-                    elif " mph" in ss:
-                        ns.append(int(ss.split(" mph")[0]) * 1.609344)
-                if len(ns) > 0:
-                    ss = sum(ns) / len(ns)
-                else:
-                    continue
-            elif isinstance(s, str):
-                if (
-                    not any(c.isalpha() for c in s)
-                    and (";" not in s)
-                    and ("|" not in s)
-                    and ("-" not in s)
-                ):
-                    ss = int(s)
-                elif not any(c.isalpha() for c in s) and ";" in s:
-                    ss = mean([int(x) for x in s.split(";") if x.isnumeric()])
-                elif not any(c.isalpha() for c in s) and "|" in s:
-                    ss = mean([int(x) for x in s.split("|") if x.isnumeric()])
-                elif not any(c.isalpha() for c in s) and "-" in s:
-                    ss = mean([int(x) for x in s.split("-") if x.isnumeric()])
-                elif " mph" in s:
-                    ss = int(s.split(" mph")[0]) * 1.609344
-                else:
-                    continue
-            all_avg.append(ss * l)
-            all_l.append(l)
-            df.iloc[i, 1] = sum(all_avg) / sum(all_l)
+        if not edge_data:
+            _avg_speed.set_avg_speed(roadtype, 0.0)
+        else:
+            # Calculate weighted average speed
+            edge_speed, edge_length = zip(*edge_data)
+            _avg_speed.set_avg_speed(
+                roadtype,
+                sum([s * l for s, l in zip(edge_speed, edge_length)])
+                / sum(edge_length),
+            )
 
-    # For all types without an average speed, take one that is closest. E.g. for the links take the one of the same type
-    # of the main roads
-    if not df.loc[df["avg_speed"] == 0].empty:
+    # For all types without an average speed, take one that is closest.
+    _zero_road_types = [
+        _rt for _rt in _avg_speed.road_types if _avg_speed.get_avg_speed(_rt) == 0
+    ]
+    if _zero_road_types:
         logging.info(
-            f"Not all of the edges contain a 'maxspeed' attribute. RA2CE will guess the right average maximum "
-            f"speed per road type that does not contain a 'maxspeed' attribute. Please check the average speed CSV to ensure correct speeds here: {save_path}"
+            "Not all of the edges contain a 'maxspeed' attribute. RA2CE will guess the right average maximum "
+            "speed per road type that does not contain a 'maxspeed' attribute. Please check the average speed CSV to ensure correct speeds."
         )
-        for i in df.loc[df["avg_speed"] == 0].index:
-            if df["road_types"].iloc[i] in exceptions:
-                if any(rt in df["road_types"].iloc[i] for rt in df["road_types"]):
-                    try:
-                        road_type, avg_speed = [
-                            (rt, avg_s)
-                            for rt, avg_s in zip(df["road_types"], df["avg_speed"])
-                            if rt in df["road_types"].iloc[i] and avg_s != 0
-                        ][0]
-                        df["avg_speed"].iloc[i] = avg_speed
-                    except IndexError as e:
-                        logging.warning(
-                            f"Road type '{df['road_types'].iloc[i]}' cannot be assigned any average speed. Please check the average speed CSV ({save_path}), enter the right average speed for this road type, and run RA2CE again."
-                        )
-                        logging.error("Index error: {}".format(e))
-                        df["avg_speed"].iloc[i] = 0
-            else:
-                # if any(rt in df['road_types'].iloc[i] for rt in df['road_types']):
-                if "link" in df["road_types"].iloc[i]:
-                    try:
-                        df["avg_speed"].iloc[i] = df.loc[
-                            df["road_types"]
-                            == df["road_types"].iloc[i].split("_link")[0],
-                            "avg_speed",
-                        ].values[0]
-                    except IndexError as e:
-                        logging.warning(
-                            f"Road type '{df['road_types'].iloc[i]}' cannot be assigned any average speed. Please check the average speed CSV ({save_path}), enter the right average speed for this road type, and run RA2CE again."
-                        )
-                        logging.error("Index error: {}".format(e))
-                        df["avg_speed"].iloc[i] = 0
+        for _rt in _zero_road_types:
+            if isinstance(_rt, list):
+                # Try to get the speed from the uncombined road types in the list
+                _uncombined_speed = get_uncombined_speed(_rt)
+                if _uncombined_speed:
+                    _avg_speed.set_avg_speed(_rt, _uncombined_speed)
+                    continue
+            # For the links take the one of the same type of the main roads
+            if "_link" in str(_rt):
+                _main_speed = get_main_speed(_rt)
+                if _main_speed:
+                    _avg_speed.set_avg_speed(_rt, _main_speed)
+                    continue
+            logging.warning(
+                "Road type %s cannot be assigned any average speed. Please check the average speed CSV, enter the right average speed for this road type, and run RA2CE again.",
+                _rt,
+            )
 
-    if save_csv:
-        df.to_csv(save_path)
-        logging.info("Saved the average speeds per road type to: {}".format(save_path))
-
-    return df
+    return _avg_speed
 
 
 def assign_avg_speed(
-    graph: nx.Graph, avg_road_speed: pd.DataFrame, road_type_col_name: str
+    graph: nx.Graph, avg_road_speed: AvgSpeed, road_type_col_name: str
 ) -> nx.Graph:
     """Assigns the average speed to roads in an existing (OSM) graph
 
@@ -1757,12 +1707,10 @@ def assign_avg_speed(
     Returns:
         graph (NetworkX graph): NetworkX graph with an additional attribute 'avgspeed'
     """
-    # make a list of strings instead of just a string of the road types column
-    avg_road_speed["road_types"] = avg_road_speed["road_types"].astype(str)
 
     # calculate the average maximum speed per edge and assign the ones that don't have a value
     for u, v, k, edata in graph.edges.data(keys=True):
-        road_type = str(edata[road_type_col_name])
+        road_type = RoadTypeEnum.get_enum(edata[road_type_col_name])
         if "maxspeed" in edata:
             max_speed = edata["maxspeed"]
             if isinstance(max_speed, list):
@@ -1787,11 +1735,9 @@ def assign_avg_speed(
                     graph[u][v][k]["avgspeed"] = round(sum(ns) / len(ns), 0)
                 else:
                     graph[u][v][k]["avgspeed"] = round(
-                        avg_road_speed.loc[
-                            avg_road_speed["road_types"] == road_type, "avg_speed"
-                        ].iloc[0],
-                        0,
+                        avg_road_speed.get_avg_speed(road_type), 0
                     )
+
             elif isinstance(max_speed, str):
                 if (
                     not any(c.isalpha() for c in max_speed)
@@ -1818,19 +1764,14 @@ def assign_avg_speed(
                     )
                 else:
                     graph[u][v][k]["avgspeed"] = round(
-                        avg_road_speed.loc[
-                            avg_road_speed["road_types"] == road_type, "avg_speed"
-                        ].iloc[0],
-                        0,
+                        avg_road_speed.get_avg_speed(road_type), 0
                     )
         else:
             if "]" in road_type:
                 avg_speed = int(
                     [
                         s
-                        for r, s in zip(
-                            avg_road_speed["road_types"], avg_road_speed["avg_speed"]
-                        )
+                        for r, s in avg_road_speed.items()
                         if set(road_type[2:-2].split("', '"))
                         == set(r[2:-2].split("', '"))
                     ][0]
@@ -1838,10 +1779,7 @@ def assign_avg_speed(
                 graph[u][v][k]["avgspeed"] = round(avg_speed, 0)
             else:
                 graph[u][v][k]["avgspeed"] = round(
-                    avg_road_speed.loc[
-                        avg_road_speed["road_types"] == road_type, "avg_speed"
-                    ].iloc[0],
-                    0,
+                    avg_road_speed.get_avg_speed(road_type), 0
                 )
 
     return graph

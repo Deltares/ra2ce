@@ -43,7 +43,9 @@ class AvgSpeedCalculator:
                 "highway",
             )
             if self.output_graph_dir:
-                AvgSpeedWriter().export(self.output_graph_dir, _avg_speed)
+                AvgSpeedWriter().export(
+                    self.output_graph_dir.joinpath("avg_speed.csv"), _avg_speed
+                )
         else:
             logging.info(
                 "No attributes found in the graph to estimate average speed per network segment."
