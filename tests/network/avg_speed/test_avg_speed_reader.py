@@ -32,5 +32,4 @@ class TestAvgSpeedReader:
 
         # 3. Verify expectations
         assert isinstance(_avg_speed, AvgSpeed)
-        assert isinstance(_avg_speed.speed_dict, dict)
-        assert all(_type in _avg_speed.speed_dict.keys() for _type in _expected_types)
+        assert all(_type in _avg_speed.road_types for _type in _expected_types)

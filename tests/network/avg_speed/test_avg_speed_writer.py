@@ -24,16 +24,19 @@ class TestAvgSpeedWriter:
         _avg_speed_csv.unlink(missing_ok=True)
         assert not _avg_speed_csv.is_file()
 
-        _avg_speed = AvgSpeed(
-            speed_dict={
-                RoadTypeEnum.TERTIARY: 1.0,
-                RoadTypeEnum.TERTIARY_LINK: 2.1,
-                RoadTypeEnum.SECONDARY: 3.2,
-                RoadTypeEnum.SECONDARY_LINK: 4.3,
-                RoadTypeEnum.TRUNK: 5.4,
-                RoadTypeEnum.TRUNK_LINK: 6.5,
-            }
-        )
+        _road_types = [
+            RoadTypeEnum.TERTIARY,
+            RoadTypeEnum.TERTIARY_LINK,
+            RoadTypeEnum.SECONDARY,
+            RoadTypeEnum.SECONDARY_LINK,
+            RoadTypeEnum.TRUNK,
+            RoadTypeEnum.TRUNK_LINK,
+            [RoadTypeEnum.TERTIARY, RoadTypeEnum.SECONDARY],
+        ]
+
+        _avg_speed = AvgSpeed()
+        for i, _rt in enumerate(_road_types):
+            _avg_speed.set_avg_speed(_rt, i * 1.1)
 
         # 2. Execute test
         AvgSpeedWriter().export(_avg_speed_csv, _avg_speed)
