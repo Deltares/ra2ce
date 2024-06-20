@@ -133,15 +133,16 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
     def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
 
-        # Assign the average speed and time to the graph
-        self.polygon_graph = AvgSpeedCalculator(
-            self.polygon_graph, self.output_graph_dir
-        ).assign()
-
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
             self.polygon_graph
         )
+
+        # Assign the average speed and time to the graphs
+        graph_simple = AvgSpeedCalculator(graph_simple, self.output_graph_dir).assign()
+        graph_complex = AvgSpeedCalculator(
+            graph_complex, self.output_graph_dir
+        ).assign()
 
         # Create 'edges_complex', convert complex graph to geodataframe
         logging.info("Start converting the graph to a geodataframe")

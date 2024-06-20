@@ -93,15 +93,16 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         if self.delete_duplicate_nodes:
             graph_complex = self._delete_duplicate_nodes(graph_complex)
 
-        # Assign the average speed and time to the graph
-        graph_complex = AvgSpeedCalculator(
-            graph_complex, self.output_graph_dir
-        ).assign()
-
         logging.info("Start converting the complex graph to a simple graph")
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
             graph_complex
         )
+
+        # Assign the average speed and time to the graphs
+        graph_simple = AvgSpeedCalculator(graph_simple, self.output_graph_dir).assign()
+        graph_complex = AvgSpeedCalculator(
+            graph_complex, self.output_graph_dir
+        ).assign()
 
         logging.info("Start converting the graph to a geodataframe")
         edges_complex, _ = nut.graph_to_gdf(graph_complex)
