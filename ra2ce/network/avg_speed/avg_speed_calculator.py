@@ -5,6 +5,7 @@ from statistics import mean
 
 import networkx as nx
 
+import ra2ce.network.networks_utils as nut
 from ra2ce.network.avg_speed.avg_speed import AvgSpeed
 from ra2ce.network.avg_speed.avg_speed_reader import AvgSpeedReader
 from ra2ce.network.avg_speed.avg_speed_writer import AvgSpeedWriter
@@ -182,14 +183,17 @@ class AvgSpeedCalculator:
 
         # calculate the average maximum speed per edge and assign the ones that don't have a value
         for u, v, k, edata in self.graph.edges.data(keys=True):
-            _rt = edata["highway"]
+            _rt = edata.get("highway", None)
+            _length = edata.get("length", None)  # m
             _speed = self.parse_speed(edata.get("maxspeed", None))
-            _length = edata["length"]  # m
+            if not _length:
+                _length = nut.line_length(edata["geometry"], self.graph.graph["crs"])
+                self.graph.edges[u, v, k]["length"] = _length
             if not _speed:
                 _speed = self.avg_speed.get_avg_speed(_rt)
-            self.graph[u][v][k]["avgspeed"] = max(
+            self.graph.edges[u, v, k]["avgspeed"] = max(
                 round(_speed, 0), 1
             )  # km/h (at least 1)
-            self.graph[u][v][k]["time"] = round(_length * 1e-3 / _speed, 3)  # h
+            self.graph.edges[u, v, k]["time"] = round(_length * 1e-3 / _speed, 3)  # h
 
         return self.graph
