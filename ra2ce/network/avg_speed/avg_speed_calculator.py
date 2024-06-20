@@ -158,6 +158,7 @@ class AvgSpeedCalculator:
                     self.output_graph_dir.joinpath("avg_speed.csv"), _avg_speed
                 )
         else:
+            _avg_speed = AvgSpeed()
             logging.info(
                 "No attributes found in the graph to estimate average speed per network segment."
             )
