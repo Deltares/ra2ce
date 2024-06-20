@@ -1090,12 +1090,6 @@ def graph_create_unique_ids(graph: nx.Graph, new_id_name: str = "rfid") -> nx.Gr
 
 def add_missing_geoms_graph(graph: nx.Graph, geom_name: str = "geometry") -> nx.Graph:
     # Not all nodes have geometry attributed (some only x and y coordinates) so add a geometry columns
-    def get_node_by_attribute(graph: nx.Graph, node_number: int) -> dict:
-        for node, data in graph.nodes(data=True):
-            if node == node_number:
-                return data
-        return dict()
-
     nodes_without_geom = [
         n[0] for n in graph.nodes(data=True) if geom_name not in n[-1]
     ]
@@ -1604,19 +1598,6 @@ def add_simple_id_to_graph_complex(
     return complex_graph
 
 
-def calc_avg_speed(
-    graph: nx.Graph,
-    road_type_col_name: str,
-) -> AvgSpeed:
-    return AvgSpeed()
-
-
-def assign_avg_speed(
-    graph: nx.Graph, avg_road_speed: AvgSpeed, road_type_col_name: str
-) -> nx.Graph:
-    return graph
-
-
 def get_avgspeed_per_road_type(
     gdf_graph: gpd.GeoDataFrame, road_type: RoadTypeEnum
 ) -> float:
@@ -1634,7 +1615,7 @@ def get_avgspeed_per_road_type(
         float: The average speed for that road type
     """
     _default_speed = 50
-    if not gdf_graph:
+    if not isinstance(gdf_graph, gpd.GeoDataFrame):
         return _default_speed
 
     _avgspeed = gdf_graph[gdf_graph["highway"] == road_type.config_value]["avgspeed"]
