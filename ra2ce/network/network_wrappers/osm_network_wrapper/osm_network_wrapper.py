@@ -30,6 +30,7 @@ from networkx import MultiDiGraph, MultiGraph
 from shapely.geometry.base import BaseGeometry
 
 import ra2ce.network.networks_utils as nut
+from ra2ce.network.avg_speed.avg_speed_calculator import AvgSpeedCalculator
 from ra2ce.network.exporters.json_exporter import JsonExporter
 from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
@@ -152,57 +153,8 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
         # Check if all geometries between nodes are there, if not, add them as a straight line.
         graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
-        graph_simple = self._set_avg_speed_to_graph(graph_simple)
+        graph_simple = AvgSpeedCalculator(graph_simple, self.output_graph_dir).assign()
         return graph_simple, edges_complex
-
-    def _get_avg_speeds(self, original_graph: nx.Graph) -> pd.DataFrame:
-        _save_csv = False
-        _avg_speed_filepath = None
-        if self.output_graph_dir is not None:
-            _save_csv = True
-            _avg_speed_filepath = self.output_graph_dir.joinpath("avg_speed.csv")
-            if _avg_speed_filepath.is_file():
-                return pd.read_csv(_avg_speed_filepath)
-            logging.warning(
-                "No valid file found with average speeds in {}, calculating and saving them instead.".format(
-                    _avg_speed_filepath
-                )
-            )
-
-        return nut.calc_avg_speed(
-            original_graph,
-            "highway",
-            save_csv=_save_csv,
-            save_path=_avg_speed_filepath,
-        )
-
-    def _set_avg_speed_to_graph(self, original_graph: nx.Graph) -> nx.Graph:
-
-        _length_array, _maxspeed_array = list(
-            zip(
-                *(
-                    ("length" in e, "maxspeed" in e)
-                    for _, _, e in original_graph.edges.data()
-                )
-            )
-        )
-        if all(_length_array) and any(_maxspeed_array):
-            # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
-            _avg_speeds = self._get_avg_speeds(original_graph)
-            original_graph = nut.assign_avg_speed(
-                original_graph, _avg_speeds, "highway"
-            )
-
-            # make a time value of seconds, length of road streches is in meters
-            for u, v, k, edata in original_graph.edges.data(keys=True):
-                hours = (edata["length"] / 1000) / edata["avgspeed"]
-                original_graph[u][v][k]["time"] = round(hours * 3600, 0)
-
-            return original_graph
-        logging.info(
-            "No attributes found in the graph to estimate average speed per network segment."
-        )
-        return original_graph
 
     def _export_linking_tables(self, linking_tables: tuple[Any]) -> None:
         if not self.output_graph_dir:

@@ -32,6 +32,7 @@ from shapely.geometry import Point
 from tqdm import tqdm
 
 import ra2ce.network.networks_utils as nut
+from ra2ce.network.avg_speed.avg_speed_calculator import AvgSpeedCalculator
 from ra2ce.network.exporters.json_exporter import JsonExporter
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
@@ -112,7 +113,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         # Check if all geometries between nodes are there, if not, add them as a straight line.
         graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
-        graph_simple = self._get_avg_speed(graph_simple)
+        graph_simple = AvgSpeedCalculator(graph_simple, self.output_graph_dir).assign()
         logging.info("Finished converting the complex graph to a simple graph")
 
         return graph_simple, edges_complex

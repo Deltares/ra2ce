@@ -27,7 +27,7 @@ class RoadTypeEntry:
 class AvgSpeed:
     default_speed: float = 50.0
     speed_per_road_type: defaultdict[RoadTypeEntry, float] = field(
-        default_factory=lambda: defaultdict(lambda: 0.0)
+        default_factory=lambda: defaultdict(lambda: AvgSpeed.default_speed)
     )
 
     @property
