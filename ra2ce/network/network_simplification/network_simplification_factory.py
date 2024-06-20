@@ -80,6 +80,10 @@ class NetworkSimplificationFactory:
                 attributes_to_exclude=self.attributes_to_exclude,
             ).simplify_graph()
         else:
+            self.graph_complex = (
+                self.graph_complex.to_directed()
+            )  # simplification function requires nx.MultiDiGraph
+
             # Create simplified graph and add unique ids
             _graph_simple = NetworkSimplificationWithoutAttributeExclusion(
                 nx_graph=self.graph_complex

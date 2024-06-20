@@ -90,12 +90,8 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             )
         edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
         graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
-        graph_complex = (
-            graph_complex.to_directed()
-        )  # simplification function requires nx.MultiDiGraph
         if self.delete_duplicate_nodes:
             graph_complex = self._delete_duplicate_nodes(graph_complex)
-            # edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
 
         logging.info("Start converting the complex graph to a simple graph")
         # Create 'graph_simple'
