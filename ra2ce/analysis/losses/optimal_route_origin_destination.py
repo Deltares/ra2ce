@@ -147,7 +147,7 @@ class OptimalRouteOriginDestination(AnalysisLossesProtocol):
                 "origin": origin_list,
                 "destination": destination_list,
                 "opt_path": opt_path_list,
-                weighing: weighing_list,
+                weighing.config_value: weighing_list,
                 "match_ids": match_ids_list,
                 "geometry": geometries_list,
             },
