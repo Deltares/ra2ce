@@ -5,3 +5,4 @@
 3,secondary_link,0.0
 4,trunk,0.0
 5,trunk_link,0.0
+6,"['tertiary', 'secondary']",60.0
