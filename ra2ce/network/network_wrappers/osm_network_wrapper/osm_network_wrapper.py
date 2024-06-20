@@ -23,7 +23,6 @@ from typing import Any
 
 import networkx as nx
 import osmnx
-import pandas as pd
 import pyproj
 from geopandas import GeoDataFrame
 from networkx import MultiDiGraph, MultiGraph
@@ -133,7 +132,11 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         return OsmNetworkWrapper(config_data).get_network()
 
     def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
-        logging.info("Start downloading a network from OSM.")
+
+        # Assign the average speed and time to the graph
+        self.polygon_graph = AvgSpeedCalculator(
+            self.polygon_graph, self.output_graph_dir
+        ).assign()
 
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
@@ -153,7 +156,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
 
         # Check if all geometries between nodes are there, if not, add them as a straight line.
         graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
-        graph_simple = AvgSpeedCalculator(graph_simple, self.output_graph_dir).assign()
+
         return graph_simple, edges_complex
 
     def _export_linking_tables(self, linking_tables: tuple[Any]) -> None:

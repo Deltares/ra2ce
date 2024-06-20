@@ -4,9 +4,6 @@ from ast import literal_eval
 from collections import defaultdict
 from dataclasses import dataclass, field
 
-import networkx as nx
-
-import ra2ce.network.networks_utils as nut
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 
@@ -14,13 +11,19 @@ from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 class RoadTypeEntry:
     road_type: RoadTypeEnum | list[RoadTypeEnum]
 
-    def __hash__(self) -> int:
-        return hash(str(self.road_type))
-
     def __str__(self) -> str:
+        """
+        Override the str function to make it writeable as key in the CSV.
+        """
         if isinstance(self.road_type, list):
             return str([x.config_value for x in self.road_type])
         return self.road_type.config_value
+
+    def __hash__(self) -> int:
+        """
+        Override the hash function to make the RoadTypeEntry hashable.
+        """
+        return hash(str(self.road_type))
 
 
 @dataclass
@@ -56,14 +59,16 @@ class AvgSpeed:
     def set_avg_speed(
         self, road_type: str | RoadTypeEnum | list[RoadTypeEnum], avg_speed: float
     ) -> None:
-        self.speed_per_road_type[self._get_road_type_entry(road_type)] = avg_speed
+        self.speed_per_road_type[self._get_road_type_entry(road_type)] = round(
+            avg_speed, 1
+        )
 
-    def set_avg_speed_time(self, original_graph: nx.Graph) -> nx.Graph:
-        original_graph = nut.assign_avg_speed(original_graph, self, "highway")
+    # def set_avg_speed_time(self, original_graph: nx.Graph) -> nx.Graph:
+    #     original_graph = nut.assign_avg_speed(original_graph, self, "highway")
 
-        # make a time value of seconds, length of road streches is in meters
-        for u, v, k, edata in original_graph.edges.data(keys=True):
-            hours = (edata["length"] / 1000) / edata["avgspeed"]
-            original_graph[u][v][k]["time"] = round(hours * 3600, 0)
+    #     # make a time value of seconds, length of road streches is in meters
+    #     for u, v, k, edata in original_graph.edges.data(keys=True):
+    #         hours = (edata["length"] / 1000) / edata["avgspeed"]
+    #         original_graph[u][v][k]["time"] = round(hours * 3600, 0)
 
-        return original_graph
+    #     return original_graph

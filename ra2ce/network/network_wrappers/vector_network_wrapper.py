@@ -92,15 +92,17 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         )  # simplification function requires nx.MultiDiGraph
         if self.delete_duplicate_nodes:
             graph_complex = self._delete_duplicate_nodes(graph_complex)
-            # edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
+
+        # Assign the average speed and time to the graph
+        graph_complex = AvgSpeedCalculator(
+            graph_complex, self.output_graph_dir
+        ).assign()
 
         logging.info("Start converting the complex graph to a simple graph")
-        # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
             graph_complex
         )
 
-        # Create 'edges_complex', convert complex graph to geodataframe
         logging.info("Start converting the graph to a geodataframe")
         edges_complex, _ = nut.graph_to_gdf(graph_complex)
         logging.info("Finished converting the graph to a geodataframe")
@@ -113,7 +115,6 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         # Check if all geometries between nodes are there, if not, add them as a straight line.
         graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
-        graph_simple = AvgSpeedCalculator(graph_simple, self.output_graph_dir).assign()
         logging.info("Finished converting the complex graph to a simple graph")
 
         return graph_simple, edges_complex

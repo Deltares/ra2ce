@@ -270,9 +270,11 @@ def get_distance(a_b_tuple: tuple[tuple[float, float], tuple[float, float]]) -> 
 
 def line_length(line: LineString, crs: pyproj.CRS) -> float:
     """Calculate length of a line in meters, given in geographic coordinates.
+
     Args:
         line: a shapely LineString object with coordinate reference system 'crs'
         crs: the coordinate reference system of the 'line' LineString
+
     Returns:
         Length of line in m
     """
@@ -301,14 +303,12 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
             )
             return np.nan
     elif crs.is_projected:
-        ## line length of projected linestrings
-        if isinstance(line, LineString):
-            total_length = line.length
-        elif isinstance(line, MultiLineString):
+        # line length of projected linestrings
+        if isinstance(line, LineString | MultiLineString):
             total_length = line.length
         else:
             logging.error(
-                "The road strech is not a Shapely LineString or MultiLineString so the length cannot be computed."
+                "The road stretch is not a Shapely LineString or MultiLineString so the length cannot be computed."
                 "Please check your data network data."
             )
             return np.nan

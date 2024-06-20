@@ -213,7 +213,7 @@ class Network:
         # TODO: rename "length" column to "length [m]" to be explicit
         edges_lengths_meters = {
             (e[0], e[1], e[2]): {
-                "length": nut.line_length(e[-1]["geometry"], _network_gdf.crs)
+                "length": nut.line_length(e[3]["geometry"], _network_gdf.crs)
             }
             for e in _base_graph.edges.data(keys=True)
         }
