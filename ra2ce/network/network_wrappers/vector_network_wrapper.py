@@ -331,9 +331,10 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         Returns:
             nx.Graph: NetworkX graph object with "crs", "approach" as graph properties.
         """
-        # to graph
-        graph = nx.Graph(crs=gdf.crs, approach="primal")
-        return self._create_graph_from_gdf(graph, gdf, edge_attributes_to_include)
+        digraph = self._get_direct_graph_from_vector(
+            gdf=gdf, edge_attributes_to_include=edge_attributes_to_include
+        )
+        return digraph.to_undirected()
 
     @staticmethod
     def get_network_edges_and_nodes_from_graph(
