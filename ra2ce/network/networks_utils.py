@@ -1615,7 +1615,10 @@ def get_avgspeed_per_road_type(
         float: The average speed for that road type
     """
     _default_speed = 50
-    if not isinstance(gdf_graph, gpd.GeoDataFrame):
+    if (
+        not isinstance(gdf_graph, gpd.GeoDataFrame)
+        or "highway" not in gdf_graph.columns
+    ):
         return _default_speed
 
     _avgspeed = gdf_graph[gdf_graph["highway"] == road_type.config_value]["avgspeed"]
@@ -1636,6 +1639,7 @@ def get_avgspeed_per_road_type(
         _default_speed,
     )
     return _default_speed  # Default average speed
+
 
 def fraction_flooded(line: LineString, hazard_map: str):
     """Calculates the fraction of a linestring that overlaps with a hazard raster with value > 0
