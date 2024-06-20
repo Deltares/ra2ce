@@ -45,8 +45,9 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
         """
         updates the time column with the calculated dataframe and updates the rest of the gdf_graph if time is None.
         """
-        # TODO: can this first branch be deleted since it is done (better) in the 3rd branch?
-        # In that case a drop of the time column should be done in the 3rd branch.
+        if WeighingEnum.TIME.config_value not in df_calculated.columns:
+            return df_calculated, gdf_graph
+
         if (
             WeighingEnum.TIME.config_value in gdf_graph.columns
             and WeighingEnum.TIME.config_value in df_calculated.columns
@@ -54,32 +55,24 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
             df_calculated = df_calculated.drop(columns=[WeighingEnum.TIME.config_value])
             return df_calculated, gdf_graph
 
-        if (
-            WeighingEnum.TIME.config_value not in gdf_graph.columns
-            and WeighingEnum.TIME.config_value not in df_calculated.columns
-        ):
-            return df_calculated, gdf_graph
-
-        if WeighingEnum.TIME.config_value in df_calculated.columns:
-            gdf_graph[WeighingEnum.TIME.config_value] = df_calculated[
-                WeighingEnum.TIME.config_value
-            ]
-            for i, row in gdf_graph.iterrows():
-                row_avgspeed = row.get("avgspeed", None)
-                row_length = row.get("length", None)
-                if (
-                    pd.isna(row[WeighingEnum.TIME.config_value])
-                    and row_avgspeed
-                    and row_length
-                ):
-                    gdf_graph.at[i, WeighingEnum.TIME.config_value] = (
-                        row_length * 1e-3 / row_avgspeed
-                    )
-                else:
-                    gdf_graph.at[i, WeighingEnum.TIME.config_value] = row.get(
-                        WeighingEnum.TIME.config_value, None
-                    )
-
+        gdf_graph[WeighingEnum.TIME.config_value] = df_calculated[
+            WeighingEnum.TIME.config_value
+        ]
+        for i, row in gdf_graph.iterrows():
+            row_avgspeed = row.get("avgspeed", None)
+            row_length = row.get("length", None)
+            if (
+                pd.isna(row[WeighingEnum.TIME.config_value])
+                and row_avgspeed
+                and row_length
+            ):
+                gdf_graph.at[i, WeighingEnum.TIME.config_value] = (
+                    row_length * 1e-3 / row_avgspeed
+                )
+            else:
+                gdf_graph.at[i, WeighingEnum.TIME.config_value] = row.get(
+                    WeighingEnum.TIME.config_value, None
+                )
         return df_calculated, gdf_graph
 
     def execute(self) -> gpd.GeoDataFrame:
@@ -157,11 +150,11 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
             # Ensure each edge has a valid weighing attribute
             _current_value_list = []
             for edge in list(edges_remove):
-                u, v, k, _weighing_analyser.edge_data = edge
+                _weighing_analyser.edge_data = edge[3]
                 _current_value_list.append(_weighing_analyser.get_current_value())
 
             for e, edges in enumerate(edges_remove):
-                u, v, k, _weighing_analyser.edge_data = edges
+                u, v, _, _weighing_analyser.edge_data = edges
 
                 if nx.has_path(_graph, u, v):
                     alt_dist = nx.dijkstra_path_length(

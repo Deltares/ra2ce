@@ -1637,7 +1637,6 @@ def get_avgspeed_per_road_type(
     )
     return _default_speed  # Default average speed
 
-
 def fraction_flooded(line: LineString, hazard_map: str):
     """Calculates the fraction of a linestring that overlaps with a hazard raster with value > 0
 

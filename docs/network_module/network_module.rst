@@ -187,6 +187,7 @@ Note: the origin-destination parameters are explained in the :ref:`analysis_modu
     [hazard]
     hazard_map = None                           # <name(s) of hazard maps in the static/hazard folder> / None
     hazard_id = None                            # <field name> / None
-    hazard_field_name = None                    # <field name(s)> / None
+    hazard_field_name = None                    # <field name> / None
     aggregate_wl = max                          # max / min / mean
     hazard_crs = None                           # EPSG code / projection that can be read by pyproj / None
+    overlay_segmented_graph = True              # True / False
