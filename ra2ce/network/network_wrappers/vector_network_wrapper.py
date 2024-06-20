@@ -119,8 +119,6 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         return graph_simple, edges_complex
 
-        # return graph_complex, edges
-
     def _read_vector_to_project_region_and_crs(self) -> gpd.GeoDataFrame:
         gdf = self._read_files(self.primary_files)
         if gdf is None:
