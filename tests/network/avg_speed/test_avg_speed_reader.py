@@ -1,7 +1,5 @@
 from pathlib import Path
 
-import numpy
-
 from ra2ce.common.io.readers.file_reader_protocol import FileReaderProtocol
 from ra2ce.network.avg_speed.avg_speed import AvgSpeed
 from ra2ce.network.avg_speed.avg_speed_reader import AvgSpeedReader

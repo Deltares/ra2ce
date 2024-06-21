@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Iterator
 
 import networkx as nx
@@ -5,6 +6,7 @@ import pytest
 
 from ra2ce.network.avg_speed.avg_speed_calculator import AvgSpeedCalculator
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
+from tests import test_data, test_results
 
 _SPEED_SECONDARY = 80.0
 _SPEED_TERTIARY = 30.0
@@ -65,13 +67,10 @@ class TestAvgSpeedCalculator:
         assert _result == pytest.approx(expected)
 
     def test_calculate_without_output_dir(self, valid_network: nx.MultiGraph):
-        # 1. Define test data
+        # 1. Run test
         _calculator = AvgSpeedCalculator(valid_network, None)
 
-        # 2. Run test
-        _calculator._calculate(None)
-
-        # 3. Verify expectations
+        # 2. Verify expectations
         assert _calculator.avg_speed is not None
         assert (
             _calculator.avg_speed.get_avg_speed([RoadTypeEnum.SECONDARY])
@@ -95,6 +94,32 @@ class TestAvgSpeedCalculator:
             _calculator.avg_speed.get_avg_speed([RoadTypeEnum.INVALID])
             == _SPEED_DEFAULT
         )
+
+    def test_calculate_with_empty_output_dir_creates_csv(
+        self, valid_network: nx.MultiGraph, request: pytest.FixtureRequest
+    ):
+        # 1. Define test data
+        _csv_dir = test_results.joinpath(request.node.name)
+        _csv_path = _csv_dir.joinpath("avg_speed.csv")
+        _csv_path.unlink(missing_ok=True)
+
+        # 2. Run test
+        _calculator = AvgSpeedCalculator(valid_network, _csv_dir)
+
+        # 3. Verify expectations
+        assert _csv_path.is_file()
+
+    def test_calculate_with_csv_in_output_dir_reads_csv(
+        self, valid_network: nx.MultiGraph, avg_speed_csv: Path
+    ):
+        # 1. Define test data
+        assert avg_speed_csv.is_file()
+
+        # 2. Run test
+        _calculator = AvgSpeedCalculator(valid_network, avg_speed_csv.parent)
+
+        # 3. Verify expectations
+        assert len(_calculator.avg_speed.road_types) > 0
 
     def test_assign(self, valid_network: nx.MultiGraph):
         # 1. Define test data
