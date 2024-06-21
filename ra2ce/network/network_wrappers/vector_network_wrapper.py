@@ -243,8 +243,8 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
     def _create_graph_from_gdf(
         self,
-        g: nx.Graph | nx.DiGraph,
-        gdf: gpd.GeoDataFrame,
+        networkx_graph: nx.Graph | nx.DiGraph,
+        geo_dataframe: gpd.GeoDataFrame,
         edge_attributes_to_include: list,
     ) -> nx.Graph | nx.DiGraph:
         """
@@ -259,7 +259,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             nx.Graph: NetworkX graph object with node and edge geometries and specified attributes.
         """
 
-        for _, row in gdf.iterrows():
+        for _, row in geo_dataframe.iterrows():
             link_id = row.get(self.file_id, None)
             link_type = row.get(self.link_type_column, None)
 
@@ -271,9 +271,9 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
                 "avgspeed": row.pop("avgspeed") if "avgspeed" in row else None,
                 "geometry": row.pop("geometry"),
             }
-            g.add_node(from_node, geometry=Point(from_node))
-            g.add_node(to_node, geometry=Point(to_node))
-            g.add_edge(
+            networkx_graph.add_node(from_node, geometry=Point(from_node))
+            networkx_graph.add_node(to_node, geometry=Point(to_node))
+            networkx_graph.add_edge(
                 from_node,
                 to_node,
                 link_id=link_id,
@@ -287,10 +287,10 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
                         else None
                     )
                     if edge_attribute:
-                        edge_data = g[from_node][to_node]
+                        edge_data = networkx_graph[from_node][to_node]
                         edge_data[edge_attribute_to_include] = edge_attribute
 
-        return g
+        return networkx_graph
 
     def _get_direct_graph_from_vector(
         self, gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
