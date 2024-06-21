@@ -832,7 +832,7 @@ class OriginClosestDestination:
 
     def difference_length_with_without_hazard(
         self, with_hazard: gpd.GeoDataFrame, without_hazard: gpd.GeoDataFrame
-    ) -> float:
+    ) -> gpd.GeoDataFrame:
         with_hazard.rename(columns={"length": "lengthDisr"}, inplace=True)
         without_hazard.rename(columns={"length": "lengthNorm"}, inplace=True)
         diff_length_bc_hazard = pd.merge(
@@ -845,4 +845,4 @@ class OriginClosestDestination:
             diff_length_bc_hazard["lengthDisr"].values
             - diff_length_bc_hazard["lengthNorm"].values
         )
-        return gpd.GeoDataFrame
+        return diff_length_bc_hazard
