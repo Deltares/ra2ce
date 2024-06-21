@@ -144,17 +144,12 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
 
             df_calculated = pd.DataFrame(columns=columns)
             _weighing_analyser = WeighingAnalysisFactory.get_analysis(
-                self.analysis.weighing, gdf
+                self.analysis.weighing
             )
 
-            # Ensure each edge has a valid weighing attribute
-            _current_value_list = []
-            for edge in list(edges_remove):
-                _weighing_analyser.edge_data = edge[3]
-                _current_value_list.append(_weighing_analyser.get_current_value())
-
-            for e, edges in enumerate(edges_remove):
+            for edges in edges_remove:
                 u, v, _, _weighing_analyser.edge_data = edges
+                _current_value = _weighing_analyser.get_current_value()
 
                 if nx.has_path(_graph, u, v):
                     alt_dist = nx.dijkstra_path_length(
@@ -164,16 +159,16 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
                     connected = 1
                     alt_value = _weighing_analyser.calculate_alternative_value(alt_dist)
 
-                    diff = round(alt_value - _current_value_list[e], 3)
+                    diff = round(alt_value - _current_value, 3)
                 else:
-                    alt_value = _current_value_list[e]
+                    alt_value = _current_value
                     alt_nodes, connected = np.NaN, 0
                     diff = np.NaN
 
                 data = {
                     "u": [u],
                     "v": [v],
-                    self.analysis.weighing.config_value: [_current_value_list[e]],
+                    self.analysis.weighing.config_value: [_current_value],
                     f"alt_{self.analysis.weighing.config_value}": [alt_value],
                     "alt_nodes": [alt_nodes],
                     f"diff_{self.analysis.weighing.config_value}": diff,

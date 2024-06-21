@@ -1,4 +1,3 @@
-import numpy as np
 import pytest
 
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
@@ -13,7 +12,7 @@ from ra2ce.analysis.losses.weighing_analysis.weighing_analysis_protocol import (
 class TestLengthWeighingAnalysis:
     def test_init(self):
         # 1. Define test data.
-        _analysis = LengthWeighingAnalysis(None)
+        _analysis = LengthWeighingAnalysis()
 
         # 2. Verify expectations.
         assert isinstance(_analysis, LengthWeighingAnalysis)
@@ -21,7 +20,7 @@ class TestLengthWeighingAnalysis:
 
     @pytest.fixture
     def valid_analysis(self) -> LengthWeighingAnalysis:
-        _analysis = LengthWeighingAnalysis(None)
+        _analysis = LengthWeighingAnalysis()
         _analysis.edge_data = {WeighingEnum.TIME.config_value: 1, "avgspeed": 0.42}
         return _analysis
 
@@ -60,3 +59,14 @@ class TestLengthWeighingAnalysis:
 
         # 2. Verify expectations.
         assert _calculated_distance == _alt_distance
+
+    def test_extend_graph(self, valid_analysis: LengthWeighingAnalysis):
+        # 1. Define test data.
+        _graph_dict = dict(my_value=42)
+
+        # 2. Run test.
+        valid_analysis.extend_graph(_graph_dict)
+
+        # 3. Verify expectations
+        assert len(_graph_dict) == 1
+        assert _graph_dict["my_value"] == 42

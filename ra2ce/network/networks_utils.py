@@ -46,7 +46,6 @@ from shapely.geometry.base import BaseGeometry, BaseMultipartGeometry
 from shapely.ops import linemerge, unary_union
 from tqdm import tqdm
 
-from ra2ce.network.avg_speed.avg_speed import AvgSpeed
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 
@@ -1596,49 +1595,6 @@ def add_simple_id_to_graph_complex(
     nx.set_edge_attributes(complex_graph, simple_ids_per_complex_id, new_id)
 
     return complex_graph
-
-
-def get_avgspeed_per_road_type(
-    gdf_graph: gpd.GeoDataFrame, road_type: RoadTypeEnum
-) -> float:
-    """
-    Calculate the average speed of a graph per road type.
-    If all edges of a certain road type have no average speed,
-    the average speed of the whole graph is returned.
-    If the graph has no average speed on any edge, the default average speed is returned (== 50).
-
-    Args:
-        gdf_graph (gpd.GeoDataFrame): The graph
-        road_type (RoadTypeEnum): The road type
-
-    Returns:
-        float: The average speed for that road type
-    """
-    _default_speed = 50
-    if (
-        not isinstance(gdf_graph, gpd.GeoDataFrame)
-        or "highway" not in gdf_graph.columns
-    ):
-        return _default_speed
-
-    _avgspeed = gdf_graph[gdf_graph["highway"] == road_type.config_value]["avgspeed"]
-    _avg = _avgspeed[_avgspeed > 0].mean()
-    if _avg > 0:
-        return _avg
-
-    # If the average speed is not available, get the average speed of the whole graph
-    _avgspeed = gdf_graph["avgspeed"]
-    _avg = _avgspeed[_avgspeed > 0].mean()
-    if _avg > 0:
-        return _avg
-
-    # If the graph has no average speed, return the default average speed
-    logging.warning(
-        "No average speed found for road type %s. Using default speed of %s.",
-        road_type,
-        _default_speed,
-    )
-    return _default_speed  # Default average speed
 
 
 def fraction_flooded(line: LineString, hazard_map: str):

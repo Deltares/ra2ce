@@ -12,7 +12,7 @@ from ra2ce.analysis.losses.weighing_analysis.weighing_analysis_protocol import (
 class TestTimeWeighingAnalysis:
     def test_init(self):
         # 1. Define test data.
-        _analysis = TimeWeighingAnalysis(None)
+        _analysis = TimeWeighingAnalysis()
 
         # 2. Verify expectations.
         assert isinstance(_analysis, TimeWeighingAnalysis)
@@ -20,7 +20,7 @@ class TestTimeWeighingAnalysis:
 
     @pytest.fixture
     def valid_analysis(self) -> TimeWeighingAnalysis:
-        _analysis = TimeWeighingAnalysis(None)
+        _analysis = TimeWeighingAnalysis()
         _analysis.edge_data = {WeighingEnum.LENGTH.config_value: 420, "avgspeed": 0.42}
         return _analysis
 
@@ -60,3 +60,17 @@ class TestTimeWeighingAnalysis:
 
         # 3. Verify expectations.
         assert _calculated_time == pytest.approx(_expected_time, rel=1e-2)
+
+    def test_extend_graph(self, valid_analysis: TimeWeighingAnalysis):
+        # 1. Define test data.
+        _graph_dict = dict(my_value=42)
+        _time_list = [4.2]
+        valid_analysis.time_list = _time_list
+
+        # 2. Run test.
+        valid_analysis.extend_graph(_graph_dict)
+
+        # 3. Verify expectations
+        assert len(_graph_dict) == 2
+        assert _graph_dict["my_value"] == 42
+        assert _graph_dict[WeighingEnum.TIME.config_value] == _time_list

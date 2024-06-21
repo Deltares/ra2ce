@@ -1,5 +1,7 @@
 from typing import Any, Protocol, runtime_checkable
 
+import geopandas as gpd
+
 
 @runtime_checkable
 class WeighingAnalysisProtocol(Protocol):
@@ -23,4 +25,9 @@ class WeighingAnalysisProtocol(Protocol):
 
         Returns:
             float: Corrected alternative distance/time value.
+        """
+
+    def extend_graph(self, gdf_graph: gpd.GeoDataFrame | dict) -> None:
+        """
+        Extends the provided graph with custom attributes.
         """
