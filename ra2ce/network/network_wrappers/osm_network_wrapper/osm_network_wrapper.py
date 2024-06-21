@@ -34,7 +34,7 @@ from ra2ce.network.exporters.json_exporter import JsonExporter
 from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
-from ra2ce.network.network_simplification import NetworkSimplificationFactory
+from ra2ce.network.network_simplification import NetworkGraphSimplificator
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
@@ -138,10 +138,10 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         logging.info("Start downloading a network from OSM.")
 
         # Create 'graph_simple'
-        graph_simple, graph_complex, link_tables = NetworkSimplificationFactory(
+        graph_simple, graph_complex, link_tables = NetworkGraphSimplificator(
             graph_complex=self.polygon_graph,
             attributes_to_exclude=self.attributes_to_exclude_in_simplification,
-        ).simplify_graph()
+        ).simplify()
 
         # Create 'edges_complex', convert complex graph to geodataframe
         logging.info("Start converting the graph to a geodataframe")

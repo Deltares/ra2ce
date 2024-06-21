@@ -35,7 +35,7 @@ NxGraph = nx.Graph | nx.MultiGraph | nx.MultiDiGraph
 
 
 @dataclass(kw_only=True)
-class NetworkSimplificationFactory:
+class NetworkGraphSimplificator:
     """
     Factory dataclass to simplify the containing graph.
     """
@@ -44,10 +44,15 @@ class NetworkSimplificationFactory:
     attributes_to_exclude: list[str]
     new_id: str = "rfid"
 
-    def simplify_graph(
+    def simplify(
         self,
     ) -> tuple[nx.Graph, nx.Graph, tuple[dict, dict]]:
-        """Create a simplified graph with unique ids from a complex graph"""
+        """
+        Create a simplified graph with unique ids from a complex graph
+
+        Returns:
+            tuple[nx.Graph, nx.Graph, tuple[dict, dict]]: The simple and complex graph and the "id" tables.
+        """
         logging.info("Simplifying graph")
         try:
             _graph_complex = self._graph_create_unique_ids(
