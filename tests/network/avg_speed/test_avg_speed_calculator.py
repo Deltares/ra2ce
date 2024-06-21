@@ -4,6 +4,7 @@ import networkx as nx
 import pytest
 
 from ra2ce.network.avg_speed.avg_speed_calculator import AvgSpeedCalculator
+from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 _SPEED_SECONDARY = 80.0
 _SPEED_TERTIARY = 30.0
@@ -68,18 +69,32 @@ class TestAvgSpeedCalculator:
         _calculator = AvgSpeedCalculator(valid_network, None)
 
         # 2. Run test
-        _calculator.calculate()
+        _calculator._calculate(None)
 
         # 3. Verify expectations
         assert _calculator.avg_speed is not None
-        assert _calculator.avg_speed.get_avg_speed("secondary") == _SPEED_SECONDARY
-        assert _calculator.avg_speed.get_avg_speed("tertiary") == _SPEED_TERTIARY
-        assert _calculator.avg_speed.get_avg_speed("tertiary_link") == _SPEED_TERTIARY
         assert (
-            _calculator.avg_speed.get_avg_speed("['primary', 'tertiary']")
+            _calculator.avg_speed.get_avg_speed([RoadTypeEnum.SECONDARY])
+            == _SPEED_SECONDARY
+        )
+        assert (
+            _calculator.avg_speed.get_avg_speed([RoadTypeEnum.TERTIARY])
             == _SPEED_TERTIARY
         )
-        assert _calculator.avg_speed.get_avg_speed("NOTVALID") == _SPEED_DEFAULT
+        assert (
+            _calculator.avg_speed.get_avg_speed([RoadTypeEnum.TERTIARY_LINK])
+            == _SPEED_TERTIARY
+        )
+        assert (
+            _calculator.avg_speed.get_avg_speed(
+                [RoadTypeEnum.PRIMARY, RoadTypeEnum.TERTIARY]
+            )
+            == _SPEED_TERTIARY
+        )
+        assert (
+            _calculator.avg_speed.get_avg_speed([RoadTypeEnum.INVALID])
+            == _SPEED_DEFAULT
+        )
 
     def test_assign(self, valid_network: nx.MultiGraph):
         # 1. Define test data
@@ -89,13 +104,15 @@ class TestAvgSpeedCalculator:
         _calculator.assign()
 
         # 3. Verify expectations
-        assert _calculator.graph.edges[1, 2, 1]["avgspeed"] == _SPEED_TERTIARY
-        assert _calculator.graph.edges[1, 2, 1]["time"] == pytest.approx(0.033)
-        assert _calculator.graph.edges[2, 3, 2]["avgspeed"] == _SPEED_TERTIARY
-        assert _calculator.graph.edges[2, 3, 2]["time"] == pytest.approx(0.067)
-        assert _calculator.graph.edges[3, 4, 3]["avgspeed"] == _SPEED_TERTIARY
-        assert _calculator.graph.edges[3, 4, 3]["time"] == pytest.approx(0.117)
-        assert _calculator.graph.edges[1, 3, 4]["avgspeed"] == _SPEED_SECONDARY
-        assert _calculator.graph.edges[1, 3, 4]["time"] == pytest.approx(0.028)
-        assert _calculator.graph.edges[1, 4, 5]["avgspeed"] == _SPEED_TERTIARY
-        assert _calculator.graph.edges[1, 4, 5]["time"] == pytest.approx(0.167)
+        _avg_speed_key = "avgspeed"
+        _time_key = "time"
+        assert _calculator.graph.edges[1, 2, 1][_avg_speed_key] == _SPEED_TERTIARY
+        assert _calculator.graph.edges[1, 2, 1][_time_key] == pytest.approx(0.033)
+        assert _calculator.graph.edges[2, 3, 2][_avg_speed_key] == _SPEED_TERTIARY
+        assert _calculator.graph.edges[2, 3, 2][_time_key] == pytest.approx(0.067)
+        assert _calculator.graph.edges[3, 4, 3][_avg_speed_key] == _SPEED_TERTIARY
+        assert _calculator.graph.edges[3, 4, 3][_time_key] == pytest.approx(0.117)
+        assert _calculator.graph.edges[1, 3, 4][_avg_speed_key] == _SPEED_SECONDARY
+        assert _calculator.graph.edges[1, 3, 4][_time_key] == pytest.approx(0.028)
+        assert _calculator.graph.edges[1, 4, 5][_avg_speed_key] == _SPEED_TERTIARY
+        assert _calculator.graph.edges[1, 4, 5][_time_key] == pytest.approx(0.167)

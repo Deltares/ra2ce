@@ -80,7 +80,9 @@ class OriginClosestDestination:
 
         self.results_dict = {}
 
-    def optimal_route_origin_closest_destination(self):
+    def optimal_route_origin_closest_destination(
+        self,
+    ) -> tuple[nx.MultiGraph, gpd.GeoDataFrame, gpd.GeoDataFrame]:
         """Calculates per origin the location of its closest destination"""
         graph = self.graph_file.get_graph()
 
@@ -140,7 +142,15 @@ class OriginClosestDestination:
 
         return base_graph, optimal_routes_gdf, destinations
 
-    def multi_link_origin_closest_destination(self):
+    def multi_link_origin_closest_destination(
+        self,
+    ) -> tuple[
+        nx.MultiGraph,
+        gpd.GeoDataFrame,
+        gpd.GeoDataFrame,
+        pd.DataFrame,
+        gpd.GeoDataFrame,
+    ]:
         """Calculates per origin the location of its closest destination with hazard disruption"""
         graph = self.graph_file_hazard.get_graph()
 
@@ -283,15 +293,23 @@ class OriginClosestDestination:
 
         return base_graph, origins, destinations, aggregated, opt_routes_aggregated
 
-    def get_route_length(self, graph, origin_node, destination_node):
+    def get_route_length(
+        self, graph: nx.MultiGraph, origin_node: int, destination_node: int
+    ) -> float:
         # calculate the length of the preferred route
         return nx.dijkstra_path_length(
             graph, origin_node, destination_node, weight=self.weighing
         )
 
     def compare_route_with_without_disruption(
-        self, pref_routes, nr_per_route, o_name, d_name, alt_route, alt_dist
-    ):
+        self,
+        pref_routes: gpd.GeoDataFrame,
+        nr_per_route: float,
+        o_name: str,
+        d_name: str,
+        alt_route: float,
+        alt_dist: float,
+    ) -> None:
         pp_no_delay = [0]
         pp_delayed = [0]
         extra_weights = [0]
@@ -335,10 +353,10 @@ class OriginClosestDestination:
         self,
         graph: nx.MultiGraph,
         base_graph: nx.MultiGraph,
-        origin_node,
-        destination_node,
-        nr_from_origin,
-        col_name,
+        origin_node: int,
+        destination_node: int,
+        nr_from_origin: float,
+        col_name: str,
     ) -> tuple[nx.MultiGraph, float, MultiLineString]:
         # Get the nodes of the optimal route
         route_nodes = nx.dijkstra_path(
@@ -379,7 +397,9 @@ class OriginClosestDestination:
 
         return base_graph, sum(length_list), pref_edges
 
-    def get_nr_people_on_route(self, origins, origin_node):
+    def get_nr_people_on_route(
+        self, origins: gpd.GeoDataFrame, origin_node: str
+    ) -> float:
         # Find the number of people per neighborhood
         try:
             nr_people_per_route_total = origins.loc[
@@ -396,8 +416,12 @@ class OriginClosestDestination:
         return nr_per_route
 
     def update_destinations(
-        self, destinations, destination_name, nr_per_route, col_name
-    ):
+        self,
+        destinations: gpd.GeoDataFrame,
+        destination_name: str,
+        nr_per_route: float,
+        col_name: str,
+    ) -> gpd.GeoDataFrame:
         dest_ids = [
             int(d.split("_")[-1])
             for d in [dest for dest in destination_name.split(",")]
@@ -564,7 +588,7 @@ class OriginClosestDestination:
         self,
         node_checked_has_path: dict,
         list_no_path: list,
-        n_ndat: tuple[int, dict[str, float]],
+        n_ndat: tuple[int, dict[str, Any]],
         disrupted_graph: nx.MultiGraph,
         hazard_name: str,
         list_disrupted_destinations: list,
@@ -572,9 +596,9 @@ class OriginClosestDestination:
         dest_name: str,
         name_save: str,
         optimal_routes: list,
-        origins,
+        origins: gpd.GeoDataFrame,
         base_graph: nx.MultiGraph,
-        destinations,
+        destinations: gpd.GeoDataFrame,
     ) -> gpd.GeoDataFrame:
         """
         Refactored method to avoid duplication of code between `find_closest_location` and `find_multiple_closest_locations` with subtile differences:
@@ -788,7 +812,7 @@ class OriginClosestDestination:
             optimal_routes_gdf,
         )
 
-    def load_origins(self):
+    def load_origins(self) -> gpd.GeoDataFrame:
         od_path = self.static_path.joinpath(
             "output_graph", "origin_destination_table.feather"
         )
@@ -797,7 +821,7 @@ class OriginClosestDestination:
         del origin["d_id"]
         return origin
 
-    def load_destinations(self):
+    def load_destinations(self) -> gpd.GeoDataFrame:
         od_path = self.static_path.joinpath(
             "output_graph", "origin_destination_table.feather"
         )
@@ -806,7 +830,9 @@ class OriginClosestDestination:
         del destination["o_id"]
         return destination
 
-    def difference_length_with_without_hazard(self, with_hazard, without_hazard):
+    def difference_length_with_without_hazard(
+        self, with_hazard: gpd.GeoDataFrame, without_hazard: gpd.GeoDataFrame
+    ) -> float:
         with_hazard.rename(columns={"length": "lengthDisr"}, inplace=True)
         without_hazard.rename(columns={"length": "lengthNorm"}, inplace=True)
         diff_length_bc_hazard = pd.merge(
@@ -819,4 +845,4 @@ class OriginClosestDestination:
             diff_length_bc_hazard["lengthDisr"].values
             - diff_length_bc_hazard["lengthNorm"].values
         )
-        return diff_length_bc_hazard
+        return gpd.GeoDataFrame

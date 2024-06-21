@@ -27,7 +27,7 @@ class AvgSpeedWriter(Ra2ceExporterProtocol):
         export_path.parent.mkdir(parents=True, exist_ok=True)
         pd.DataFrame(
             {
-                "road_types": [str(x) for x in export_data.speed_per_road_type.keys()],
+                "road_types": list(map(str, export_data.speed_per_road_type.keys())),
                 "avg_speed": export_data.speed_per_road_type.values(),
             }
         ).to_csv(export_path)

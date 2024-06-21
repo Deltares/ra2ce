@@ -27,5 +27,7 @@ class AvgSpeedReader(FileReaderProtocol):
         _avg_speed_data = pd.read_csv(file_path)
         _avg_speed = AvgSpeed()
         for _, row in _avg_speed_data.iterrows():
-            _avg_speed.set_avg_speed(row["road_types"], row["avg_speed"])
+            _avg_speed.set_avg_speed(
+                AvgSpeed.get_road_type_list(row["road_types"]), row["avg_speed"]
+            )
         return _avg_speed

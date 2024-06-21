@@ -9,9 +9,7 @@ from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 class TestAvgSpeed:
     @pytest.fixture(
         params=[
-            pytest.param("tertiary", id="from str"),
-            pytest.param("['tertiary', 'secondary']", id="from str(list)"),
-            pytest.param(RoadTypeEnum.TERTIARY, id="from Enum"),
+            pytest.param([RoadTypeEnum.TERTIARY], id="from Enum"),
             pytest.param(
                 [RoadTypeEnum.TERTIARY, RoadTypeEnum.SECONDARY], id="from list[Enum]"
             ),
@@ -20,10 +18,10 @@ class TestAvgSpeed:
     )
     def _get_road_type(
         self, request: pytest.FixtureRequest
-    ) -> Iterator[str | RoadTypeEnum | list[RoadTypeEnum]]:
+    ) -> Iterator[list[RoadTypeEnum]]:
         yield request.param
 
-    def test_set_avg_speed(self, road_type: str | RoadTypeEnum | list[RoadTypeEnum]):
+    def test_set_avg_speed(self, road_type: list[RoadTypeEnum]):
         # 1. Define test data
         _avg_speed = AvgSpeed()
         _speed = 60.0
@@ -36,7 +34,7 @@ class TestAvgSpeed:
         _speeds = list(_avg_speed.speed_per_road_type.values())
         assert _speeds[0] == _speed
 
-    def test_get_avg_speed(self, road_type: str | RoadTypeEnum | list[RoadTypeEnum]):
+    def test_get_avg_speed(self, road_type: list[RoadTypeEnum]):
         # 1. Define test data
         _avg_speed = AvgSpeed()
         _expected_speed = 60.0
@@ -48,11 +46,22 @@ class TestAvgSpeed:
         # 3. Verify expectations
         assert _speed == _expected_speed
 
+    def test_get_avg_speed_default(self):
+        # 1. Define test data
+        _avg_speed = AvgSpeed()
+        _road_type = [RoadTypeEnum.TERTIARY]
+
+        # 2. Execute test
+        _speed = _avg_speed.get_avg_speed(_road_type)
+
+        # 3. Verify expectations
+        assert _speed == 50.0
+
     @pytest.mark.parametrize(
         "road_type, expected",
         [
             pytest.param(
-                RoadTypeEnum.TERTIARY,
+                [RoadTypeEnum.TERTIARY],
                 RoadTypeEnum.TERTIARY.config_value,
                 id="from Enum",
             ),
@@ -63,9 +72,7 @@ class TestAvgSpeed:
             ),
         ],
     )
-    def test_get_key_str(
-        self, road_type: str | RoadTypeEnum | list[RoadTypeEnum], expected: str
-    ):
+    def test_get_key_str(self, road_type: list[RoadTypeEnum], expected: str):
         # 1. Define test data
         _avg_speed = AvgSpeed()
         _avg_speed.set_avg_speed(road_type, 60.0)
