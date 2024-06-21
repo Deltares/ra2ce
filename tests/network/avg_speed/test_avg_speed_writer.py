@@ -25,12 +25,12 @@ class TestAvgSpeedWriter:
         assert not _avg_speed_csv.is_file()
 
         _road_types = [
-            RoadTypeEnum.TERTIARY,
-            RoadTypeEnum.TERTIARY_LINK,
-            RoadTypeEnum.SECONDARY,
-            RoadTypeEnum.SECONDARY_LINK,
-            RoadTypeEnum.TRUNK,
-            RoadTypeEnum.TRUNK_LINK,
+            [RoadTypeEnum.TERTIARY],
+            [RoadTypeEnum.TERTIARY_LINK],
+            [RoadTypeEnum.SECONDARY],
+            [RoadTypeEnum.SECONDARY_LINK],
+            [RoadTypeEnum.TRUNK],
+            [RoadTypeEnum.TRUNK_LINK],
             [RoadTypeEnum.TERTIARY, RoadTypeEnum.SECONDARY],
         ]
 

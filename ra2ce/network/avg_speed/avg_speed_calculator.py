@@ -1,3 +1,19 @@
+"""
+                    GNU GENERAL PUBLIC LICENSE
+                      Version 3, 29 June 2007
+    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+    Copyright (C) 2023 Stichting Deltares
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
 import logging
 from pathlib import Path
 from re import split
@@ -18,13 +34,11 @@ class AvgSpeedCalculator:
     """
 
     graph: nx.Graph
-    output_graph_dir: Path | None
     avg_speed: AvgSpeed
 
     def __init__(self, graph: nx.Graph, output_graph_dir: Path | None) -> None:
         self.graph = graph
-        self.output_graph_dir = output_graph_dir
-        self.avg_speed = None
+        self.avg_speed = self._calculate(output_graph_dir)
 
     @staticmethod
     def parse_speed(speed_input: str | list[str]) -> float:
@@ -45,35 +59,50 @@ class AvgSpeedCalculator:
             return mean(map(AvgSpeedCalculator.parse_speed, speed_input))
         if " mph" in speed_input:
             return float(speed_input.split(" mph")[0]) * 1.609344
+        # If it contains other letters, it can't be parsed as speed.
         if any(c.isalpha() for c in speed_input):
             return 0.0
         # Split on the different separators (";" or "-" or "|")
         # and take the mean of the results (if any).
-        return mean(float(x) for x in split(r";|-|\|", speed_input) if x.isnumeric())
+        return mean(int(x) for x in split(r";|-|\|", speed_input) if x.isnumeric())
+
+    def _get_avg_speed_from_graph(
+        self, road_type: list[RoadTypeEnum], avg_speed: AvgSpeed
+    ) -> float:
+        def get_main_speed(link_type: RoadTypeEnum) -> float:
+            _base_rt = RoadTypeEnum.get_enum(str(link_type).split("_link")[0])
+            if [_base_rt] in avg_speed.road_types:
+                return avg_speed.get_avg_speed([_base_rt])
+            return 0.0
+
+        def get_uncombined_speed(combined_types: list[RoadTypeEnum]) -> float:
+            for _rt in combined_types:
+                if [_rt] in avg_speed.road_types:
+                    return avg_speed.get_avg_speed([_rt])
+            return 0.0
+
+        # Try to get the speed from the uncombined road types in the list.
+        if len(road_type) > 1:
+            _uncombined_speed = get_uncombined_speed(road_type)
+            if _uncombined_speed:
+                return _uncombined_speed
+
+        # For the links take the one of the same type of the main roads.
+        if "_link" in str(road_type[0]):
+            _main_speed = get_main_speed(road_type[0])
+            if _main_speed:
+                return _main_speed
+
+        return 0.0
 
     def _get_avg_speed(
         self,
         road_type_col_name: str,
     ) -> AvgSpeed:
-        def get_main_speed(link_type: RoadTypeEnum) -> float:
-            _base_rt = RoadTypeEnum.get_enum(str(link_type).split("_link")[0])
-            if _base_rt in _avg_speed.road_types:
-                return _avg_speed.get_avg_speed(_base_rt)
-            return 0.0
-
-        def get_uncombined_speed(combined_types: list[RoadTypeEnum]) -> float:
-            for _rt in combined_types:
-                if _rt in _avg_speed.road_types:
-                    return _avg_speed.get_avg_speed(_rt)
-            return 0.0
-
         _avg_speed = AvgSpeed()
 
-        for _rt in list(
-            set(
-                str(edata[road_type_col_name])
-                for _, _, edata in self.graph.edges.data()
-            )
+        for _rt in set(
+            str(edata[road_type_col_name]) for _, _, edata in self.graph.edges.data()
         ):
             edge_data = [
                 (self.parse_speed(edata["maxspeed"]), edata["length"])
@@ -81,12 +110,12 @@ class AvgSpeedCalculator:
                 if (edata[road_type_col_name] == _rt) & ("maxspeed" in edata)
             ]
             if not edge_data:
-                _avg_speed.set_avg_speed(_rt, 0.0)
+                _avg_speed.set_avg_speed(AvgSpeed.get_road_type_list(_rt), 0.0)
             else:
                 # Calculate weighted average speed
                 edge_speed, edge_length = zip(*edge_data)
                 _avg_speed.set_avg_speed(
-                    _rt,
+                    AvgSpeed.get_road_type_list(_rt),
                     sum(s * l for s, l in zip(edge_speed, edge_length))
                     / sum(edge_length),
                 )
@@ -100,41 +129,35 @@ class AvgSpeedCalculator:
                 "Not all of the edges contain a 'maxspeed' attribute. RA2CE will guess the right average maximum "
                 "speed per road type that does not contain a 'maxspeed' attribute. Please check the average speed CSV to ensure correct speeds."
             )
-            for _rt in _zero_rts:
-                if isinstance(_rt, list):
-                    # Try to get the speed from the uncombined road types in the list.
-                    _uncombined_speed = get_uncombined_speed(_rt)
-                    if _uncombined_speed:
-                        _avg_speed.set_avg_speed(_rt, _uncombined_speed)
-                        continue
-                # For the links take the one of the same type of the main roads.
-                if "_link" in str(_rt):
-                    _main_speed = get_main_speed(_rt)
-                    if _main_speed:
-                        _avg_speed.set_avg_speed(_rt, _main_speed)
-                        continue
-                _avg_speed.set_avg_speed(_rt, _avg_speed.default_speed)
+            for _zrt in _zero_rts:
+                _speed = self._get_avg_speed_from_graph(_zrt, _avg_speed)
+                if _speed:
+                    _avg_speed.set_avg_speed(_zrt, _speed)
+                    continue
+
+                _avg_speed.set_avg_speed(_zrt, _avg_speed.default_speed)
                 logging.warning(
                     "Default speed have been assigned to road type %s. Please check the average speed CSV, "
                     "enter the right average speed for this road type and run RA2CE again.",
-                    _rt,
+                    _zrt,
                 )
 
         return _avg_speed
 
-    def calculate(self) -> AvgSpeed:
+    def _calculate(self, output_graph_dir: Path | None) -> AvgSpeed:
         """
         Calculates the average speed from OSM roads, per road type.
         If the average speed is already calculated and saved in a CSV, it will be read from there.
         After calculation it will be saved in a CSV file in the output_graph_dir.
 
-        Args: None
+        Args:
+            output_graph_dir (Path | None): Directory to read/save the average speed CSV file.
 
         Returns:
             AvgSpeed: Object with the average speeds per road type
         """
-        if self.output_graph_dir:
-            _avg_speed_path = self.output_graph_dir.joinpath("avg_speed.csv")
+        if output_graph_dir:
+            _avg_speed_path = output_graph_dir.joinpath("avg_speed.csv")
             if _avg_speed_path.is_file():
                 return AvgSpeedReader().read(_avg_speed_path)
 
@@ -154,9 +177,9 @@ class AvgSpeedCalculator:
         if all(_length_array) and any(_maxspeed_array):
             # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
             _avg_speed = self._get_avg_speed("highway")
-            if self.output_graph_dir:
+            if output_graph_dir:
                 AvgSpeedWriter().export(
-                    self.output_graph_dir.joinpath("avg_speed.csv"), _avg_speed
+                    output_graph_dir.joinpath("avg_speed.csv"), _avg_speed
                 )
         else:
             _avg_speed = AvgSpeed()
@@ -164,13 +187,12 @@ class AvgSpeedCalculator:
                 "No attributes found in the graph to estimate average speed per network segment."
             )
 
-        self.avg_speed = _avg_speed
         return _avg_speed
 
     def assign(self) -> nx.Graph:
         """
         Assigns the average speed and time to roads in an existing (OSM) graph.
-        If not already calculated, the average speed will be calculated first.
+        If a road does not have a 'maxspeed' attribute, the average speed will be assigned based on the road type.
 
         Args: None
 
@@ -178,19 +200,19 @@ class AvgSpeedCalculator:
             graph (NetworkX graph): NetworkX graph with an additional attribute 'avgspeed' and 'time'
         """
 
-        if not self.avg_speed:
-            self.avg_speed = self.calculate()
-
-        # calculate the average maximum speed per edge and assign the ones that don't have a value
-        for u, v, k, edata in self.graph.edges.data(keys=True):
+        def get_speed(edata: dict) -> float:
             _rt = edata.get("highway", None)
-            _length = edata.get("length", None)  # m
             _speed = self.parse_speed(edata.get("maxspeed", None))
+            if not _speed:
+                _speed = self.avg_speed.get_avg_speed(AvgSpeed.get_road_type_list(_rt))
+            return max(round(_speed, 0), 1)
+
+        for u, v, k, edata in self.graph.edges.data(keys=True):
+            _speed = get_speed(edata)  # km/h
+            _length = edata.get("length", None)  # m
             if not _length:
                 _length = nut.line_length(edata["geometry"], self.graph.graph["crs"])
                 self.graph.edges[u, v, k]["length"] = _length
-            if not _speed:
-                _speed = self.avg_speed.get_avg_speed(_rt)
             self.graph.edges[u, v, k]["avgspeed"] = max(
                 round(_speed, 0), 1
             )  # km/h (at least 1)
