@@ -68,9 +68,7 @@ class AvgSpeed:
         return road_type
 
     def get_avg_speed(self, road_type: list[RoadTypeEnum]) -> float:
-        return self.speed_per_road_type.get(
-            RoadTypeEntry(road_type), self.default_speed
-        )
+        return self.speed_per_road_type[RoadTypeEntry(road_type)]
 
     def set_avg_speed(self, road_type: list[RoadTypeEnum], avg_speed: float) -> None:
         self.speed_per_road_type[RoadTypeEntry(road_type)] = round(avg_speed, 1)
