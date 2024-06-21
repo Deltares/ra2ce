@@ -3,26 +3,26 @@ from typing import Iterator
 import networkx as nx
 import pytest
 
-from ra2ce.network.network_simplification.network_simplification_factory import (
+from ra2ce.network.network_simplification.network_graph_simplificator import (
     NetworkGraphSimplificator,
 )
 
 
-class TestNetworkSimplificationFactory:
-    @pytest.fixture(name="network_simplification_factory")
-    def _get_network_simplification_factory(
+class TestNetworkGraphSimplificator:
+    @pytest.fixture(name="network_graph_simplificator")
+    def _get_network_graph_simplificator(
         self,
     ) -> Iterator[NetworkGraphSimplificator]:
         yield NetworkGraphSimplificator(graph_complex=None, attributes_to_exclude=[])
 
     def test_validate_fixture_init(
         self,
-        network_simplification_factory: NetworkGraphSimplificator,
+        network_graph_simplificator: NetworkGraphSimplificator,
     ):
-        assert isinstance(network_simplification_factory, NetworkGraphSimplificator)
+        assert isinstance(network_graph_simplificator, NetworkGraphSimplificator)
 
     def test__graph_create_unique_ids_with_missing_id_data(
-        self, network_simplification_factory: NetworkGraphSimplificator
+        self, network_graph_simplificator: NetworkGraphSimplificator
     ):
         # 1. Define test data
         _graph = nx.MultiGraph()
@@ -31,7 +31,7 @@ class TestNetworkSimplificationFactory:
         _new_id_name = "dummy_id"
 
         # 2. Run test
-        _return_graph = network_simplification_factory._graph_create_unique_ids(
+        _return_graph = network_graph_simplificator._graph_create_unique_ids(
             _graph, _new_id_name
         )
 
@@ -41,7 +41,7 @@ class TestNetworkSimplificationFactory:
         assert all(_new_id_name in _keys for _keys in _dicts_keys)
 
     def test__graph_create_unique_ids_with_existing_id(
-        self, network_simplification_factory: NetworkGraphSimplificator
+        self, network_graph_simplificator: NetworkGraphSimplificator
     ):
         # 1. Define test data
         _graph = nx.MultiGraph()
@@ -50,7 +50,7 @@ class TestNetworkSimplificationFactory:
         _new_id_name = "weight"
 
         # 2. Run test
-        _return_graph = network_simplification_factory._graph_create_unique_ids(
+        _return_graph = network_graph_simplificator._graph_create_unique_ids(
             _graph, _new_id_name
         )
 
