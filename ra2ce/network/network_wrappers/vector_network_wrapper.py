@@ -243,7 +243,6 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
     def _create_graph_from_gdf(
         self,
-        networkx_graph: nx.Graph | nx.DiGraph,
         geo_dataframe: gpd.GeoDataFrame,
         edge_attributes_to_include: list,
     ) -> nx.Graph | nx.DiGraph:
@@ -258,7 +257,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         Returns:
             nx.Graph: NetworkX graph object with node and edge geometries and specified attributes.
         """
-
+        _networkx_graph = nx.DiGraph(crs=geo_dataframe.crs, approach="primal")
         for _, row in geo_dataframe.iterrows():
             link_id = row.get(self.file_id, None)
             link_type = row.get(self.link_type_column, None)
@@ -271,9 +270,9 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
                 "avgspeed": row.pop("avgspeed") if "avgspeed" in row else None,
                 "geometry": row.pop("geometry"),
             }
-            networkx_graph.add_node(from_node, geometry=Point(from_node))
-            networkx_graph.add_node(to_node, geometry=Point(to_node))
-            networkx_graph.add_edge(
+            _networkx_graph.add_node(from_node, geometry=Point(from_node))
+            _networkx_graph.add_node(to_node, geometry=Point(to_node))
+            _networkx_graph.add_edge(
                 from_node,
                 to_node,
                 link_id=link_id,
@@ -287,10 +286,10 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
                         else None
                     )
                     if edge_attribute:
-                        edge_data = networkx_graph[from_node][to_node]
+                        edge_data = _networkx_graph[from_node][to_node]
                         edge_data[edge_attribute_to_include] = edge_attribute
 
-        return networkx_graph
+        return _networkx_graph
 
     def _get_direct_graph_from_vector(
         self, gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
@@ -311,8 +310,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         gdf = VectorNetworkWrapper.explode_and_deduplicate_geometries(gdf)
 
         # to graph
-        digraph = nx.DiGraph(crs=gdf.crs, approach="primal")
-        return self._create_graph_from_gdf(digraph, gdf, edge_attributes_to_include)
+        return self._create_graph_from_gdf(gdf, edge_attributes_to_include)
 
     def _get_undirected_graph_from_vector(
         self, gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
