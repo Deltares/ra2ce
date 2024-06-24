@@ -15,18 +15,14 @@ class TestAvgSpeedReader:
         assert isinstance(_reader, AvgSpeedReader)
         assert isinstance(_reader, FileReaderProtocol)
 
-    def test_read_avg_speed(self, avg_speed_csv: Path):
+    def test_read_avg_speed(
+        self,
+        avg_speed_csv: Path,
+        avg_speed_data: list[tuple[list[RoadTypeEnum], float]],
+    ):
         # 1. Define test data
         assert avg_speed_csv.is_file()
-        _expected_values = [
-            [[RoadTypeEnum.TERTIARY], 58.4],
-            [[RoadTypeEnum.TERTIARY_LINK], 58.4],
-            [[RoadTypeEnum.SECONDARY], 0.0],
-            [[RoadTypeEnum.SECONDARY_LINK], 0.0],
-            [[RoadTypeEnum.TRUNK], 0.0],
-            [[RoadTypeEnum.TRUNK_LINK], 0.0],
-            [[RoadTypeEnum.TERTIARY, RoadTypeEnum.SECONDARY], 60.0],
-        ]
+        _expected_values = avg_speed_data
 
         # 2. Execute test
         _avg_speed = AvgSpeedReader().read(avg_speed_csv)

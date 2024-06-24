@@ -18,28 +18,26 @@ class TestAvgSpeedWriter:
         assert isinstance(_writer, AvgSpeedWriter)
         assert isinstance(_writer, Ra2ceExporterProtocol)
 
-    def test_write_avg_speed(self, request: pytest.FixtureRequest):
+    def test_write_avg_speed(
+        self,
+        avg_speed_csv: Path,
+        avg_speed_data: list[tuple[list[RoadTypeEnum], float]],
+        request: pytest.FixtureRequest,
+    ):
         # 1. Define test data
         _avg_speed_csv = test_results.joinpath(request.node.name, "avg_speed.csv")
         _avg_speed_csv.unlink(missing_ok=True)
         assert not _avg_speed_csv.is_file()
-
-        _road_types = [
-            [RoadTypeEnum.TERTIARY],
-            [RoadTypeEnum.TERTIARY_LINK],
-            [RoadTypeEnum.SECONDARY],
-            [RoadTypeEnum.SECONDARY_LINK],
-            [RoadTypeEnum.TRUNK],
-            [RoadTypeEnum.TRUNK_LINK],
-            [RoadTypeEnum.TERTIARY, RoadTypeEnum.SECONDARY],
-        ]
+        _reference_csv = avg_speed_csv
+        assert _reference_csv.is_file()
 
         _avg_speed = AvgSpeed()
-        for i, _rt in enumerate(_road_types):
-            _avg_speed.set_avg_speed(_rt, i * 1.1)
+        for _rt in avg_speed_data:
+            _avg_speed.set_avg_speed(*_rt)
 
         # 2. Execute test
         AvgSpeedWriter().export(_avg_speed_csv, _avg_speed)
 
         # 3. Verify expectations
         assert _avg_speed_csv.is_file()
+        assert _avg_speed_csv.read_text() == _reference_csv.read_text()

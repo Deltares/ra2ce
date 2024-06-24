@@ -1,8 +1,8 @@
 ,road_types,avg_speed
-0,tertiary,58.41160268864214
-1,tertiary_link,58.41160268864214
-2,secondary,0.0
-3,secondary_link,0.0
-4,trunk,0.0
-5,trunk_link,0.0
-6,"['tertiary', 'secondary']",60.0
+0,tertiary,1.2
+1,tertiary_link,2.3
+2,secondary,3.4
+3,secondary_link,4.5
+4,trunk,5.6
+5,trunk_link,6.7
+6,"['tertiary', 'secondary']",7.8
