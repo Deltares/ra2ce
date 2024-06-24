@@ -8,6 +8,7 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
+from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.weighing_analysis.weighing_analysis_factory import (
@@ -78,7 +79,7 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
                     self.graph_file.graph,
                     u,
                     v,
-                    weight=self.analysis.weighing.config_value,
+                    weight=WeighingEnum.LENGTH.config_value,
                 )
                 _alt_nodes = nx.dijkstra_path(self.graph_file.graph, u, v)
                 _alt_value = _weighing_analyser.calculate_alternative_value(_alt_dist)
