@@ -158,7 +158,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
 
                 if nx.has_path(_graph, u, v):
                     alt_dist = nx.dijkstra_path_length(
-                        _graph, u, v, weight=self.analysis.weighing.config_value
+                        _graph, u, v, weight=WeighingEnum.LENGTH.config_value
                     )
                     alt_nodes = nx.dijkstra_path(_graph, u, v)
                     connected = 1
