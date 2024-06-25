@@ -174,6 +174,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
                     f"diff_{self.analysis.weighing.config_value}": diff,
                     "connected": [connected],
                 }
+                _weighing_analyser.extend_graph(data)
 
                 if "rfid" in gdf:
                     data["rfid"] = [str(_weighing_analyser.edge_data["rfid"])]
