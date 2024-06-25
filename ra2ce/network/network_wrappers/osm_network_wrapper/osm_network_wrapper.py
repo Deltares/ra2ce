@@ -34,6 +34,7 @@ from ra2ce.network.exporters.json_exporter import JsonExporter
 from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_simplification import NetworkGraphSimplificator
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
@@ -44,7 +45,6 @@ from ra2ce.network.network_wrappers.osm_network_wrapper.osm_utils import (
     get_node_nearest_edge,
     is_endnode_check,
     modify_graph,
-    remove_key,
 )
 
 
@@ -138,9 +138,10 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         logging.info("Start downloading a network from OSM.")
 
         # Create 'graph_simple'
-        graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
-            self.polygon_graph, self.attributes_to_exclude_in_simplification, "rfid"
-        )
+        graph_simple, graph_complex, link_tables = NetworkGraphSimplificator(
+            graph_complex=self.polygon_graph,
+            attributes_to_exclude=self.attributes_to_exclude_in_simplification,
+        ).simplify()
 
         # Create 'edges_complex', convert complex graph to geodataframe
         logging.info("Start converting the graph to a geodataframe")

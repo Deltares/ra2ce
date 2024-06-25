@@ -34,6 +34,7 @@ from tqdm import tqdm
 import ra2ce.network.networks_utils as nut
 from ra2ce.network.exporters.json_exporter import JsonExporter
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_simplification import NetworkGraphSimplificator
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
@@ -89,18 +90,15 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             )
         edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
         graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
-        graph_complex = (
-            graph_complex.to_directed()
-        )  # simplification function requires nx.MultiDiGraph
         if self.delete_duplicate_nodes:
             graph_complex = self._delete_duplicate_nodes(graph_complex)
-            # edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
 
         logging.info("Start converting the complex graph to a simple graph")
         # Create 'graph_simple'
-        graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
-            graph_complex, self.attributes_to_exclude_in_simplification, "rfid"
-        )
+        graph_simple, graph_complex, link_tables = NetworkGraphSimplificator(
+            graph_complex=graph_complex,
+            attributes_to_exclude=self.attributes_to_exclude_in_simplification,
+        ).simplify()
 
         # Create 'edges_complex', convert complex graph to geodataframe
         logging.info("Start converting the graph to a geodataframe")
@@ -243,6 +241,56 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         updated_graph.graph["name"] = graph_complex.graph.get("name", None)
         return updated_graph
 
+    def _create_graph_from_gdf(
+        self,
+        geo_dataframe: gpd.GeoDataFrame,
+        edge_attributes_to_include: list,
+    ) -> nx.Graph | nx.DiGraph:
+        """
+        Creates a simple undirected graph with node and edge geometries based on a given GeoDataFrame.
+
+        Args:
+            gdf (gpd.GeoDataFrame): Input GeoDataFrame containing line geometries.
+                Allow both LineString and MultiLineString.
+            edge_attributes_to_include (List[str], optional): Additional attributes to include from the GeoDataFrame in the graph.
+
+        Returns:
+            nx.Graph: NetworkX graph object with node and edge geometries and specified attributes.
+        """
+        _networkx_graph = nx.DiGraph(crs=geo_dataframe.crs, approach="primal")
+        for _, row in geo_dataframe.iterrows():
+            link_id = row.get(self.file_id, None)
+            link_type = row.get(self.link_type_column, None)
+
+            from_node = row.geometry.coords[0]
+            to_node = row.geometry.coords[-1]
+            _edge_attributes = {
+                f"{self.file_id}": link_id,
+                f"{self.link_type_column}": link_type,
+                "avgspeed": row.pop("avgspeed") if "avgspeed" in row else None,
+                "geometry": row.pop("geometry"),
+            }
+            _networkx_graph.add_node(from_node, geometry=Point(from_node))
+            _networkx_graph.add_node(to_node, geometry=Point(to_node))
+            _networkx_graph.add_edge(
+                from_node,
+                to_node,
+                link_id=link_id,
+                **_edge_attributes,
+            )
+            if edge_attributes_to_include:
+                for edge_attribute_to_include in edge_attributes_to_include:
+                    edge_attribute = (
+                        row[edge_attribute_to_include]
+                        if edge_attribute_to_include in row
+                        else None
+                    )
+                    if edge_attribute:
+                        edge_data = _networkx_graph[from_node][to_node]
+                        edge_data[edge_attribute_to_include] = edge_attribute
+
+        return _networkx_graph
+
     def _get_direct_graph_from_vector(
         self, gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
     ) -> nx.DiGraph:
@@ -262,38 +310,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         gdf = VectorNetworkWrapper.explode_and_deduplicate_geometries(gdf)
 
         # to graph
-        digraph = nx.DiGraph(crs=gdf.crs, approach="primal")
-        for _, row in gdf.iterrows():
-            link_id = row.get(self.file_id, None)
-            link_type = row.get(self.link_type_column, None)
-
-            from_node = row.geometry.coords[0]
-            to_node = row.geometry.coords[-1]
-            _edge_attributes = {
-                f"{self.file_id}": link_id,
-                f"{self.link_type_column}": link_type,
-                "avgspeed": row.pop("avgspeed") if "avgspeed" in row else None,
-                "geometry": row.pop("geometry"),
-            }
-            digraph.add_node(from_node, geometry=Point(from_node))
-            digraph.add_node(to_node, geometry=Point(to_node))
-            digraph.add_edge(
-                from_node,
-                to_node,
-                link_id=link_id,
-                **_edge_attributes,
-            )
-            if len(edge_attributes_to_include) > 0:
-                for edge_attribute_to_include in edge_attributes_to_include:
-                    edge_attribute = (
-                        row[edge_attribute_to_include]
-                        if edge_attribute_to_include in row
-                        else None
-                    )
-                    if edge_attribute:
-                        edge_data = digraph[from_node][to_node]
-                        edge_data[edge_attribute_to_include] = edge_attribute
-        return digraph
+        return self._create_graph_from_gdf(gdf, edge_attributes_to_include)
 
     def _get_undirected_graph_from_vector(
         self, gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
