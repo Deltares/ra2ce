@@ -64,14 +64,21 @@ class TestDamagesUtils:
         assert _result_data[0] == 42
         assert _result_data[1] == 24
 
-    def test_create_summary_statistics(self):
+    @pytest.mark.parametrize(
+        "lanes",
+        [
+            pytest.param([0, 1], id="Valid lanes"),
+            pytest.param([np.nan, np.nan], id="Invalid lanes"),
+        ],
+    )
+    def test_create_summary_statistics(self, lanes):
         # 1. Define test data.
         _left_line = LineString([[0, 0], [1, 0], [2, 0]])
         _right_line = LineString([[3, 0], [2, 1], [2, 2]])
         _data = {
             "road_type": ["name1", "name2"],
             "geometry": [_left_line, _right_line],
-            "lanes": [0, 1],
+            "lanes": lanes,
         }
         _test_gdf = gpd.GeoDataFrame(_data, crs="EPSG:4326")
 
@@ -80,3 +87,9 @@ class TestDamagesUtils:
 
         # 3. Verify final expectations
         assert isinstance(result_dict, dict)
+        if all(np.isnan(lanes)):
+            assert np.isnan(result_dict["name1"])
+            assert np.isnan(result_dict["name2"])
+        else:
+            assert result_dict["name1"] == lanes[0]
+            assert result_dict["name2"] == lanes[1]
