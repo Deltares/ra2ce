@@ -166,13 +166,13 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
                     diff = np.NaN
 
                 data = {
-                    "u": [u],
-                    "v": [v],
-                    self.analysis.weighing.config_value: [_current_value],
-                    f"alt_{self.analysis.weighing.config_value}": [alt_value],
+                    "u": u,
+                    "v": v,
+                    self.analysis.weighing.config_value: _current_value,
+                    f"alt_{self.analysis.weighing.config_value}": alt_value,
                     "alt_nodes": [alt_nodes],
                     f"diff_{self.analysis.weighing.config_value}": diff,
-                    "connected": [connected],
+                    "connected": connected,
                 }
                 _weighing_analyser.extend_graph(data)
 
