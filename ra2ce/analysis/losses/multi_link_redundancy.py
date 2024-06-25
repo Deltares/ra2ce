@@ -153,7 +153,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
 
                 if nx.has_path(_graph, u, v):
                     [_alt_value, _alt_nodes] = nx.single_source_dijkstra(
-                        self.graph_file.graph,
+                        _graph,
                         u,
                         v,
                         weight=self.analysis.weighing.config_value,
