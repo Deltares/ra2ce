@@ -16,17 +16,6 @@ class WeighingAnalysisProtocol(Protocol):
             float: Current distance/time value.
         """
 
-    def calculate_alternative_value(self, alt_dist: float) -> float:
-        """
-        Calculates the alternative distances/times of the edge.
-
-        Args:
-            alt_dist (float): Provided alternative distance/time.
-
-        Returns:
-            float: Corrected alternative distance/time value.
-        """
-
     def extend_graph(self, gdf_graph: gpd.GeoDataFrame | dict) -> None:
         """
         Extends the provided graph with custom attributes.

@@ -68,15 +68,13 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
 
             if nx.has_path(self.graph_file.graph, u, v):
 
-                # calculate the alternative distance if that edge is unavailable
-                _alt_dist = nx.dijkstra_path_length(
+                # calculate the alternative distance/time and path if that edge is unavailable
+                [_alt_value, _alt_nodes] = nx.single_source_dijkstra(
                     self.graph_file.graph,
                     u,
                     v,
                     weight=self.analysis.weighing.config_value,
                 )
-                _alt_nodes = nx.dijkstra_path(self.graph_file.graph, u, v)
-                _alt_value = _weighing_analyser.calculate_alternative_value(_alt_dist)
 
                 # append alternative route nodes
                 _alt_value_list.append(_alt_value)

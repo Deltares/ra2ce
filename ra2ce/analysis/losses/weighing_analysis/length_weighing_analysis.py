@@ -27,8 +27,5 @@ class LengthWeighingAnalysis(WeighingAnalysisProtocol):
         self.edge_data[WeighingEnum.LENGTH.config_value] = _dist
         return _dist
 
-    def calculate_alternative_value(self, alt_dist: float) -> float:
-        return alt_dist
-
     def extend_graph(self, gdf_graph: gpd.GeoDataFrame | dict) -> None:
         return

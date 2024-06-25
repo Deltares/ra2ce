@@ -24,7 +24,7 @@ class TestLengthWeighingAnalysis:
         _analysis.edge_data = {WeighingEnum.TIME.config_value: 1, "avgspeed": 0.42}
         return _analysis
 
-    def test_calculate_distance(self, valid_analysis: LengthWeighingAnalysis):
+    def test__calculate_distance(self, valid_analysis: LengthWeighingAnalysis):
         # 1. Define test data.
         _expected_distance = 420.0
         _time = valid_analysis.edge_data[WeighingEnum.TIME.config_value]
@@ -49,16 +49,6 @@ class TestLengthWeighingAnalysis:
         assert valid_analysis.edge_data[
             WeighingEnum.LENGTH.config_value
         ] == pytest.approx(_expected_distance)
-
-    def test_calculate_alternative_value(self, valid_analysis: LengthWeighingAnalysis):
-        # 1. Define test data.
-        _alt_distance = 42
-
-        # 1. Run test
-        _calculated_distance = valid_analysis.calculate_alternative_value(_alt_distance)
-
-        # 2. Verify expectations.
-        assert _calculated_distance == _alt_distance
 
     def test_extend_graph(self, valid_analysis: LengthWeighingAnalysis):
         # 1. Define test data.

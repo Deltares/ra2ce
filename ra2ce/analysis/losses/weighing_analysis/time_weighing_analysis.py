@@ -29,9 +29,6 @@ class TimeWeighingAnalysis(WeighingAnalysisProtocol):
         self.time_list.append(_time)
         return _time
 
-    def calculate_alternative_value(self, alt_dist: float) -> float:
-        return self._calculate_time(alt_dist)
-
     def extend_graph(self, gdf_graph: gpd.GeoDataFrame | dict) -> None:
         if isinstance(gdf_graph, gpd.GeoDataFrame):
             gdf_graph[WeighingEnum.TIME.config_value] = self.time_list
