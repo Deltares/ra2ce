@@ -7,6 +7,27 @@ from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 
 class TestAvgSpeed:
+    @pytest.mark.parametrize(
+        "road_type, expected",
+        [
+            pytest.param("tertiary", [RoadTypeEnum.TERTIARY], id="from str"),
+            pytest.param(
+                "['secondary', 'tertiary']",
+                [RoadTypeEnum.SECONDARY, RoadTypeEnum.TERTIARY],
+                id="from list[str]",
+            ),
+        ],
+    )
+    def test_get_road_type_list(self, road_type: str, expected: list[RoadTypeEnum]):
+        # 1. Define test data
+
+        # 2. Execute test
+        _road_type_list = AvgSpeed.get_road_type_list(road_type)
+
+        # 3. Verify expectations
+        assert isinstance(_road_type_list, list)
+        assert _road_type_list == expected
+
     @pytest.fixture(
         params=[
             pytest.param([RoadTypeEnum.TERTIARY], id="from Enum"),
