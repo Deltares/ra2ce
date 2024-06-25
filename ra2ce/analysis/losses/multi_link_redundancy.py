@@ -162,15 +162,15 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
 
                     diff = round(_alt_value - _current_value, 3)
                 else:
-                    _alt_value = _current_value
-                    _alt_nodes, _connected = np.NaN, 0
-                    diff = np.NaN
+                    _alt_value = np.nan
+                    _alt_nodes, _connected = np.nan, 0
+                    diff = np.nan
 
                 data = {
                     "u": u,
                     "v": v,
                     self.analysis.weighing.config_value: _current_value,
-                    f"alt_{self.analysis.weighing.config_value}": alt_value,
+                    f"alt_{self.analysis.weighing.config_value}": _alt_value,
                     "alt_nodes": [_alt_nodes],
                     f"diff_{self.analysis.weighing.config_value}": diff,
                     "connected": _connected,
