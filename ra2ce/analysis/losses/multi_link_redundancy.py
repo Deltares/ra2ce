@@ -167,14 +167,15 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
                     diff = np.NaN
 
                 data = {
-                    "u": [u],
-                    "v": [v],
-                    self.analysis.weighing.config_value: [_current_value],
-                    f"alt_{self.analysis.weighing.config_value}": [_alt_value],
+                    "u": u,
+                    "v": v,
+                    self.analysis.weighing.config_value: _current_value,
+                    f"alt_{self.analysis.weighing.config_value}": alt_value,
                     "alt_nodes": [_alt_nodes],
                     f"diff_{self.analysis.weighing.config_value}": diff,
-                    "connected": [_connected],
+                    "connected": _connected,
                 }
+                _weighing_analyser.extend_graph(data)
 
                 if "rfid" in gdf:
                     data["rfid"] = [str(_weighing_analyser.edge_data["rfid"])]

@@ -84,13 +84,8 @@ class OptimalRouteOriginDestination(AnalysisLossesProtocol):
         ) = ([], [], [], [], [], [], [], [])
         for o, d in tqdm(od_nodes, desc="Finding optimal routes."):
             if nx.has_path(graph, o[0], d[0]):
-                # calculate the length of the preferred route
-                pref_route = nx.dijkstra_path_length(
-                    graph, o[0], d[0], weight=weighing.config_value
-                )
-
-                # save preferred route nodes
-                pref_nodes = nx.dijkstra_path(
+                # calculate the length of the preferred route and preferred route nodes
+                [pref_route, pref_nodes] = nx.single_source_dijkstra(
                     graph, o[0], d[0], weight=weighing.config_value
                 )
 
