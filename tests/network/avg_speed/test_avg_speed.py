@@ -10,15 +10,26 @@ class TestAvgSpeed:
     @pytest.mark.parametrize(
         "road_type, expected",
         [
+            pytest.param(None, [RoadTypeEnum.INVALID], id="None"),
             pytest.param("tertiary", [RoadTypeEnum.TERTIARY], id="from str"),
             pytest.param(
                 "['secondary', 'tertiary']",
                 [RoadTypeEnum.SECONDARY, RoadTypeEnum.TERTIARY],
+                id="from str(list)",
+            ),
+            pytest.param(
+                ["secondary", "tertiary"],
+                [RoadTypeEnum.SECONDARY, RoadTypeEnum.TERTIARY],
                 id="from list[str]",
             ),
+            pytest.param(dict(), [RoadTypeEnum.INVALID], id="Other type"),
         ],
     )
-    def test_get_road_type_list(self, road_type: str, expected: list[RoadTypeEnum]):
+    def test_get_road_type_list(
+        self,
+        road_type: None | str | list[str],
+        expected: list[RoadTypeEnum],
+    ):
         # 1. Define test data
 
         # 2. Execute test
