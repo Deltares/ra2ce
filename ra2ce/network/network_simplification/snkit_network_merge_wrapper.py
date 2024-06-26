@@ -155,7 +155,6 @@ def merge_edges(
     new_edges_gdf = gpd.GeoDataFrame(new_edges, geometry="geometry")
     new_edges_gdf.set_crs(edges_to_keep.crs, inplace=True)
     new_edges_gdf = new_edges_gdf.reset_index(drop=True)
-    new_edges_gdf["id"] = range(len(new_edges_gdf))
 
     nodes_to_keep = list(set(new_edges.from_id.tolist() + new_edges.to_id.tolist()))
     new_nodes_gdf = snkit_network.nodes[snkit_network.nodes[id_col].isin(nodes_to_keep)]
