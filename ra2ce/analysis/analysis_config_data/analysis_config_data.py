@@ -98,7 +98,6 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     production_loss_per_capita_per_day: float = math.nan
     part_of_day: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
     performance: str = "diff_time"  # "diff_time" or "diff_length" relates to the used criticality metric
-    hours_per_day: float = 24
     trip_purposes: list[TripPurposeEnum] = field(
         default_factory=lambda: [TripPurposeEnum.NONE]
     )
