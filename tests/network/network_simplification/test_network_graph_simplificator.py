@@ -125,8 +125,8 @@ class TestNetworkSimplificationWithAttributeExclusion:
         _nx_digraph = add_missing_geoms_graph(_nx_digraph, "geometry")
         return _nx_digraph
 
-    @pytest.fixture(name="_result_digraph")
-    def _result_digraph_fixture(self, _nx_digraph: nx.MultiDiGraph) -> nx.MultiGraph:
+    @pytest.fixture(name="_result_graph")
+    def _result_graph_fixture(self, _nx_digraph: nx.MultiDiGraph) -> nx.MultiGraph:
         _result_digraph = nx.MultiDiGraph()
         node_ids_degrees = {2: 1, 4: 2, 7: 2, 8: 4, 11: 3, 12: 2}
         for node_id, degree in node_ids_degrees.items():
@@ -253,7 +253,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
     def test_simplify_graph(
         self,
         _nx_digraph: nx.MultiDiGraph,
-        _result_digraph: nx.MultiDiGraph,
+        _result_graph: nx.MultiDiGraph,
         network_simplification_with_attribute_exclusion: NetworkSimplificationWithAttributeExclusion,
     ):
         network_simplification_with_attribute_exclusion.nx_graph = _nx_digraph
@@ -262,8 +262,8 @@ class TestNetworkSimplificationWithAttributeExclusion:
         _graph_simple = network_simplification_with_attribute_exclusion.simplify_graph()
 
         # Compare nodes with attributes
-        assert _graph_simple.nodes(data=True) == _result_digraph.nodes(data=True)
-
+        assert _graph_simple.nodes(data=True) == _result_graph.nodes(data=True)
         # Compare edges topology
-        assert set(_graph_simple.edges()) == set(_result_digraph.edges())
-        assert _detailed_edge_comparison(_graph_simple, _result_digraph)
+        assert set(_graph_simple.edges()) == set(_result_graph.edges())
+        # Compare edges with attributes
+        assert _detailed_edge_comparison(_graph_simple, _result_graph)
