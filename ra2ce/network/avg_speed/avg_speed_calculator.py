@@ -14,7 +14,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+
 import logging
+import math
 from pathlib import Path
 from re import split
 from statistics import mean
@@ -41,7 +43,7 @@ class AvgSpeedCalculator:
         self.avg_speed = self._calculate(output_graph_dir)
 
     @staticmethod
-    def parse_speed(speed_input: str | list[str]) -> float:
+    def parse_speed(speed_input: float | str | list[str]) -> float:
         """
         Parse the average speed from the input string(s).
 
@@ -53,6 +55,10 @@ class AvgSpeedCalculator:
             float: Average speed of the input string(s).
                 0.0 is returned if the input is empty or can't be parsed correctly.
         """
+        if (isinstance(speed_input, float) and math.isnan(speed_input)) or isinstance(
+            speed_input, float
+        ):
+            return speed_input
         if not speed_input:
             return 0.0
         if isinstance(speed_input, list):
