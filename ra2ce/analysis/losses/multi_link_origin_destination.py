@@ -46,14 +46,14 @@ class MultiLinkOriginDestination(AnalysisLossesProtocol):
 
     @staticmethod
     def extract_od_nodes_from_graph(
-        graph: nx.classes.MultiGraph,
+        graph: nx.MultiGraph,
     ) -> list[tuple[str, str]]:
         """
         Extracts all Origin - Destination nodes from the graph, prevents from entries
         with list of nodes for a node.
 
         Args:
-            graph (nx.classes.MultiGraph): Graph containing origin-destination nodes.
+            graph (nx.MultiGraph): Graph containing origin-destination nodes.
 
         Returns:
             list[tuple[str, str]]]: List containing tuples of origin - destination node combinations.
@@ -67,8 +67,8 @@ class MultiLinkOriginDestination(AnalysisLossesProtocol):
         return _od_nodes
 
     def _get_origin_destination_pairs(
-        self, graph: nx.classes.MultiGraph
-    ) -> list[tuple[int, str], tuple[int, str]]:
+        self, graph: nx.MultiGraph
+    ) -> list[tuple[str, str], tuple[str, str]]:
         od_path = self.static_path.joinpath(
             "output_graph", "origin_destination_table.feather"
         )
@@ -99,7 +99,7 @@ class MultiLinkOriginDestination(AnalysisLossesProtocol):
         return od_nodes
 
     def multi_link_origin_destination(
-        self, graph: nx.classes.MultiGraph, analysis: AnalysisSectionLosses
+        self, graph: nx.MultiGraph, analysis: AnalysisSectionLosses
     ) -> GeoDataFrame:
         """Calculates the connectivity between origins and destinations"""
         od_nodes = self._get_origin_destination_pairs(graph)
@@ -128,14 +128,16 @@ class MultiLinkOriginDestination(AnalysisLossesProtocol):
 
             # Find the routes
             od_routes = OptimalRouteOriginDestination.find_route_ods(
-                graph_hz, od_nodes, analysis.weighing.config_value
+                graph_hz, od_nodes, analysis.weighing
             )
             od_routes["hazard"] = hazard_name
             all_results.append(od_routes)
 
         return pd.concat(all_results, ignore_index=True)
 
-    def multi_link_origin_destination_impact(self, gdf, gdf_ori):
+    def multi_link_origin_destination_impact(
+        self, gdf: GeoDataFrame, gdf_ori: GeoDataFrame
+    ) -> tuple[pd.DataFrame, GeoDataFrame]:
         """Calculates some default indicators that quantify the impacts of disruptions to origin-destination flows
         The function outputs the following file:
 
@@ -264,7 +266,9 @@ class MultiLinkOriginDestination(AnalysisLossesProtocol):
 
         return diff_df, gdf_ori
 
-    def multi_link_origin_destination_regional_impact(self, gdf_ori):
+    def multi_link_origin_destination_regional_impact(
+        self, gdf_ori: GeoDataFrame
+    ) -> tuple[GeoDataFrame, GeoDataFrame]:
         """
         Aggregation of the impacts of disruptions at region level
         Users need to specify 'region' and 'region_var' attributes in the network.ini file

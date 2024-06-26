@@ -81,9 +81,7 @@ class Network:
         # graph files
         self.graph_files = graph_files
 
-    def add_od_nodes(
-        self, graph: nx.classes.graph.Graph, crs: pyproj.CRS
-    ) -> nx.classes.graph.Graph:
+    def add_od_nodes(self, graph: nx.Graph, crs: pyproj.CRS) -> nx.Graph:
         """Adds origins and destinations nodes from shapefiles to the graph.
 
         Args:
@@ -175,33 +173,6 @@ class Network:
                     updated_graph[u][v][key][attribute] = attribute_values
         return updated_graph
 
-    def _get_edges_time_hours(self, _graph: nx.MultiGraph) -> dict:
-        result = {}
-
-        for e in _graph.edges.data(keys=True):
-            if not e[-1].get("avgspeed"):
-                warnings.warn(
-                    "Some edges have missing 'avgspeed' attribute. Time values set to None.",
-                    UserWarning,
-                )
-                time_value = None
-            else:
-                time_value = (e[-1]["length"] * 1e-3) / e[-1]["avgspeed"]
-            result[(e[0], e[1], e[2])] = {"time": time_value}
-
-        return result
-
-    def _get_edges_time_hours_row_wise(self, _row: pd.Series) -> pd.Series | None:
-        row_avgspeed = _row.get("avgspeed", None)
-        if row_avgspeed:
-            return _row["length"] * 1e-3 / _row["avgspeed"]
-        else:
-            warnings.warn(
-                "Some edges have missing 'avgspeed' attribute. Time values set to None.",
-                UserWarning,
-            )
-            return None
-
     def _get_new_network_and_graph(self, export_types: list[str]) -> None:
         """
         TODO: This method should be relying on a generic definition of a network result
@@ -216,26 +187,6 @@ class Network:
 
         self.base_graph_crs = _network_gdf.crs
         self.base_network_crs = _network_gdf.crs
-
-        # Set the road lengths to meters for both the base_graph and network_gdf
-        # TODO: rename "length" column to "length [m]" to be explicit
-        edges_lengths_meters = {
-            (e[0], e[1], e[2]): {
-                "length": nut.line_length(e[-1]["geometry"], _network_gdf.crs)
-            }
-            for e in _base_graph.edges.data(keys=True)
-        }
-        nx.set_edge_attributes(_base_graph, edges_lengths_meters)
-
-        edges_time_hours = self._get_edges_time_hours(_base_graph)
-        nx.set_edge_attributes(_base_graph, edges_time_hours)
-
-        _network_gdf["length"] = _network_gdf["geometry"].apply(
-            lambda x: nut.line_length(x, _network_gdf.crs)
-        )
-        _network_gdf["time"] = _network_gdf.apply(
-            self._get_edges_time_hours_row_wise, axis=1
-        )
 
         _base_graph = self._include_attributes(
             attributes=["avgspeed", "bridge", "tunnel"], graph=_base_graph
