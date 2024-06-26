@@ -1,7 +1,7 @@
-import math
 from pathlib import Path
 
 import networkx as nx
+import numpy as np
 import osmnx
 from geopandas import GeoDataFrame
 
@@ -63,11 +63,11 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
         for e_remove in list(self.graph_file.graph.edges.data(keys=True)):
             u, v, k, _weighing_analyser.edge_data = e_remove
             _current_value = _weighing_analyser.get_current_value()
-            _current_value_list.append(_current_value)
 
             # remove the edge
             self.graph_file.graph.remove_edge(u, v, k)
 
+            _alt_value, _alt_nodes, _connected, _diff = np.nan, np.nan, 0, np.nan
             if nx.has_path(self.graph_file.graph, u, v):
 
                 # calculate the alternative distance/time and path if that edge is unavailable
@@ -78,19 +78,16 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
                     weight=self.analysis.weighing.config_value,
                 )
 
-                # append alternative route nodes
-                _alt_value_list.append(_alt_value)
-                _alt_nodes_list.append(_alt_nodes)
-
                 # calculate the difference in distance
-                _diff_value_list.append(round(_alt_value - _current_value, 3))
+                _diff = round(_alt_value - _current_value, 3)
 
-                _detour_exist_list.append(1)
-            else:
-                _alt_value_list.append(_current_value)
-                _alt_nodes_list.append(math.nan)
-                _diff_value_list.append(math.nan)
-                _detour_exist_list.append(0)
+                _connected = 1
+
+            _current_value_list.append(_current_value)
+            _alt_value_list.append(_alt_value)
+            _alt_nodes_list.append(_alt_nodes)
+            _diff_value_list.append(_diff)
+            _detour_exist_list.append(_connected)
 
             # add edge again to the graph
             self.graph_file.graph.add_edge(u, v, k, **_weighing_analyser.edge_data)

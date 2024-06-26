@@ -151,6 +151,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
                 u, v, _, _weighing_analyser.edge_data = edges
                 _current_value = _weighing_analyser.get_current_value()
 
+                _alt_value, _alt_nodes, _connected, _diff = np.nan, np.nan, 0, np.nan
                 if nx.has_path(_graph, u, v):
                     [_alt_value, _alt_nodes] = nx.single_source_dijkstra(
                         _graph,
@@ -160,11 +161,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
                     )
                     _connected = 1
 
-                    diff = round(_alt_value - _current_value, 3)
-                else:
-                    _alt_value = np.nan
-                    _alt_nodes, _connected = np.nan, 0
-                    diff = np.nan
+                    _diff = round(_alt_value - _current_value, 3)
 
                 data = {
                     "u": u,
@@ -172,7 +169,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
                     self.analysis.weighing.config_value: _current_value,
                     f"alt_{self.analysis.weighing.config_value}": _alt_value,
                     "alt_nodes": [_alt_nodes],
-                    f"diff_{self.analysis.weighing.config_value}": diff,
+                    f"diff_{self.analysis.weighing.config_value}": _diff,
                     "connected": _connected,
                 }
 
