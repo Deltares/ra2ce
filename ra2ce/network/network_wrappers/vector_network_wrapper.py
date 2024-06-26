@@ -95,9 +95,6 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             graph_complex = self._delete_duplicate_nodes(graph_complex)
 
         logging.info("Start converting the complex graph to a simple graph")
-        graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
-            graph_complex
-        )
         # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = NetworkGraphSimplificator(
             graph_complex=graph_complex,
