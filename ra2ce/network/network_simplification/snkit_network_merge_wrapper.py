@@ -467,6 +467,7 @@ class GdfSnkitNetworkMerger:
         _merged.node_A = _merged.from_id
         _merged.node_B = _merged.to_id
         _merged.crs = _geo_dataframe.crs
+        _merged = _merged.drop(columns=["id"])
         return _merged
 
     def _get_merged_in_a_loop(
