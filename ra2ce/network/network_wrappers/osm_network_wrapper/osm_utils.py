@@ -102,7 +102,7 @@ def from_shapefile_to_poly(shapefile: Path, out_path: Path, outname: str = ""):
 
 
 def graph_to_gdf(
-    graph: nx.classes.graph.Graph,
+    graph: nx.Graph,
     nodes: bool,
     edges: bool,
     node_geometry: bool,
