@@ -22,7 +22,9 @@ from ra2ce.network.network_simplification.snkit_to_nx_network_converter import (
 from ra2ce.network.networks_utils import line_length
 
 
-def _detailed_edge_comparison(graph1: nx.MultiDiGraph, graph2: nx.MultiDiGraph) -> bool:
+def _detailed_edge_comparison(
+    graph1: nx.MultiDiGraph | nx.MultiGraph, graph2: nx.MultiDiGraph | nx.MultiGraph
+) -> bool:
     for u, v, k, data in graph1.edges(keys=True, data=True):
         if data != graph2.get_edge_data(u, v, k):
             return False
