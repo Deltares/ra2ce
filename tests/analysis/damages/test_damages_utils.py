@@ -65,19 +65,32 @@ class TestDamagesUtils:
         assert _result_data[1] == 24
 
     @pytest.mark.parametrize(
-        "lanes",
+        "lanes, expected",
         [
-            pytest.param([0, 1], id="Valid lanes"),
-            pytest.param([np.nan, np.nan], id="Invalid lanes"),
+            pytest.param([0, 1, 3], [0, 1, 3], id="Valid lanes"),
+            pytest.param([np.nan, 1, 3], [2, 1, 3], id="First lane invalid"),
+            pytest.param([0, np.nan, 3], [0, 1.5, 3], id="Middle lane invalid"),
+            pytest.param([0, 1, np.nan], [0, 1, 0.5], id="Last lane invalid"),
+            pytest.param(
+                [np.nan, np.nan, np.nan],
+                [np.nan, np.nan, np.nan],
+                id="All lanes invalid",
+            ),
         ],
     )
-    def test_create_summary_statistics(self, lanes):
+    def test_create_summary_statistics(self, lanes, expected):
+        def valid_lanes(lane: float, expected: float) -> bool:
+            if np.isnan(lane):
+                return np.isnan(expected)
+            return lane == pytest.approx(expected)
+
         # 1. Define test data.
         _left_line = LineString([[0, 0], [1, 0], [2, 0]])
+        _middle_line = LineString([[1, 0], [1, 1], [2, 2]])
         _right_line = LineString([[3, 0], [2, 1], [2, 2]])
         _data = {
-            "road_type": ["name1", "name2"],
-            "geometry": [_left_line, _right_line],
+            "road_type": ["name1", "name2", "name3"],
+            "geometry": [_left_line, _middle_line, _right_line],
             "lanes": lanes,
         }
         _test_gdf = gpd.GeoDataFrame(_data, crs="EPSG:4326")
@@ -87,9 +100,4 @@ class TestDamagesUtils:
 
         # 3. Verify final expectations
         assert isinstance(result_dict, dict)
-        if all(np.isnan(lanes)):
-            assert np.isnan(result_dict["name1"])
-            assert np.isnan(result_dict["name2"])
-        else:
-            assert result_dict["name1"] == lanes[0]
-            assert result_dict["name2"] == lanes[1]
+        assert all(map(valid_lanes, result_dict.values(), expected))
