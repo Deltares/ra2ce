@@ -318,7 +318,6 @@ class GdfSnkitNetworkMerger:
         )
         # _merged = gdf.dissolve(by=by, aggfunc=_aggfunc, sort=False)
         _merged = _merge_connected_lines(_geo_dataframe, by, aggregate_func)
-        merged_id = _merged["id"]  # the edge id of the merged edge
         if len(_geo_dataframe) == 1:
             # 1. no merging is occurring
             start_path_extremities = [_geo_dataframe.iloc[0]["from_id"]]
@@ -465,12 +464,8 @@ class GdfSnkitNetworkMerger:
                         f"""Check the lines with the following ids {_geo_dataframe.id.tolist()} """
                     )
 
-            merged_id = (
-                "to_be_updated"  # the edge id of the merged edge will be updated later
-            )
         _merged.node_A = _merged.from_id
         _merged.node_B = _merged.to_id
-        _merged.id = merged_id
         _merged.crs = _geo_dataframe.crs
         return _merged
 
