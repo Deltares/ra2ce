@@ -22,12 +22,11 @@ class TestAvgSpeedReader:
     ):
         # 1. Define test data
         assert avg_speed_csv.is_file()
-        _expected_values = avg_speed_data
 
         # 2. Execute test
         _avg_speed = AvgSpeedReader().read(avg_speed_csv)
 
         # 3. Verify expectations
         assert isinstance(_avg_speed, AvgSpeed)
-        for _expected_value in _expected_values:
+        for _expected_value in avg_speed_data:
             assert _avg_speed.get_avg_speed(_expected_value[0]) == _expected_value[1]

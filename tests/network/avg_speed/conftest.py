@@ -15,6 +15,12 @@ def get_avg_speed_csv_filepath() -> Iterator[Path]:
 
 @pytest.fixture(name="avg_speed_data")
 def get_avg_speed_data() -> Iterator[list[tuple[list[RoadTypeEnum], float]]]:
+    """
+    Get average speed data for testing.
+
+    Yields:
+        Iterator[list[tuple[list[RoadTypeEnum], float]]]: list of road types and average speeds.
+    """
     yield [
         ([RoadTypeEnum.TERTIARY], 1.2),
         ([RoadTypeEnum.TERTIARY_LINK], 2.3),
