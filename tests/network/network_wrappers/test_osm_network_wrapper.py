@@ -109,7 +109,9 @@ class TestOsmNetworkWrapper:
 
     @pytest.fixture
     def _valid_network_polygon_fixture(self) -> BaseGeometry:
-        _test_input_directory = test_data.joinpath("graph", "test_osm_network_wrapper")
+        _test_input_directory = test_data.joinpath(
+            "network", "test_osm_network_wrapper"
+        )
         _polygon_file = _test_input_directory.joinpath("_test_polygon.geojson")
         assert _polygon_file.exists()
         yield nut.get_normalized_geojson_polygon(_polygon_file)
@@ -390,7 +392,9 @@ class TestOsmNetworkWrapper:
     @slow_test
     def test_given_no_output_graph_dir_when_get_network(self):
         # 1. Define test data.
-        _test_input_directory = test_data.joinpath("graph", "test_osm_network_wrapper")
+        _test_input_directory = test_data.joinpath(
+            "network", "test_osm_network_wrapper"
+        )
         _polygon_file = _test_input_directory.joinpath("_test_polygon.geojson")
         assert _polygon_file.exists()
 
@@ -453,7 +457,9 @@ class TestOsmNetworkWrapper:
     @slow_test
     def test_get_network_from_geojson_with_valid_data(self):
         # 1. Define test data
-        _test_input_directory = test_data.joinpath("graph", "test_osm_network_wrapper")
+        _test_input_directory = test_data.joinpath(
+            "network", "test_osm_network_wrapper"
+        )
         _polygon_file = _test_input_directory.joinpath("_test_polygon.geojson")
         assert _polygon_file.exists()
 
