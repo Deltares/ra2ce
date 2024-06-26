@@ -98,9 +98,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         self.analysis_type = self.analysis.analysis
         self.duration_event: float = self.analysis.duration_event
         self.hours_per_day: float = self.analysis.hours_per_day
-        self.production_loss_per_capita_per_hour = (
-            self.analysis.production_loss_per_capita_per_day / self.hours_per_day
-        )
+        self.production_loss_per_capita_per_hour = self.analysis.production_loss_per_capita_per_hour
         self._check_validity_analysis_files()
         self.intensities = _load_df_from_csv(
             Path(self.analysis.traffic_intensities_file), [], self.link_id
