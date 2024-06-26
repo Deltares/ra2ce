@@ -161,7 +161,12 @@ def merge_edges(
     new_nodes_gdf = snkit_network.nodes[snkit_network.nodes[id_col].isin(nodes_to_keep)]
     new_nodes_gdf = new_nodes_gdf.reset_index(drop=True)
 
-    return SnkitNetwork(nodes=new_nodes_gdf, edges=new_edges_gdf)
+    merged_snkit_network = SnkitNetwork(nodes=new_nodes_gdf, edges=new_edges_gdf)
+    merged_snkit_network.nodes["degree"] = merged_snkit_network.nodes[id_col].apply(
+        lambda x: _node_connectivity_degree(x, merged_snkit_network)
+    )
+
+    return merged_snkit_network
 
 
 def _merge_connected_lines(
