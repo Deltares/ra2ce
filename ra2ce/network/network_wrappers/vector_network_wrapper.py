@@ -32,6 +32,7 @@ from shapely.geometry import Point
 from tqdm import tqdm
 
 import ra2ce.network.networks_utils as nut
+from ra2ce.network.avg_speed.avg_speed_calculator import AvgSpeedCalculator
 from ra2ce.network.exporters.json_exporter import JsonExporter
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
@@ -91,17 +92,20 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         )  # simplification function requires nx.MultiDiGraph
         if self.delete_duplicate_nodes:
             graph_complex = self._delete_duplicate_nodes(graph_complex)
-            # edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
 
         logging.info("Start converting the complex graph to a simple graph")
-        # Create 'graph_simple'
         graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
             graph_complex
         )
 
-        # Create 'edges_complex', convert complex graph to geodataframe
+        # Assign the average speed and time to the graphs
+        graph_simple = AvgSpeedCalculator(graph_simple, self.output_graph_dir).assign()
+        graph_complex = AvgSpeedCalculator(
+            graph_complex, self.output_graph_dir
+        ).assign()
+
         logging.info("Start converting the graph to a geodataframe")
-        edges_complex, node_complex = nut.graph_to_gdf(graph_complex)
+        edges_complex, _ = nut.graph_to_gdf(graph_complex)
         logging.info("Finished converting the graph to a geodataframe")
 
         # Save the link tables linking complex and simple IDs
@@ -112,12 +116,9 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         # Check if all geometries between nodes are there, if not, add them as a straight line.
         graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
-        graph_simple = self._get_avg_speed(graph_simple)
         logging.info("Finished converting the complex graph to a simple graph")
 
         return graph_simple, edges_complex
-
-        # return graph_complex, edges
 
     def _read_vector_to_project_region_and_crs(self) -> gpd.GeoDataFrame:
         gdf = self._read_files(self.primary_files)
@@ -383,33 +384,3 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         _exporter.export(
             self.output_graph_dir.joinpath("complex_to_simple.json"), linking_tables[1]
         )
-
-    def _get_avg_speed(
-        self, original_graph: nx.classes.graph.Graph
-    ) -> nx.classes.graph.Graph:
-        if all(["length" in e for u, v, e in original_graph.edges.data()]) and any(
-            ["maxspeed" in e for u, v, e in original_graph.edges.data()]
-        ):
-            # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
-            path_avg_speed = self.output_graph_dir.joinpath("avg_speed.csv")
-            if path_avg_speed.is_file():
-                avg_speeds = pd.read_csv(path_avg_speed)
-            else:
-                avg_speeds = nut.calc_avg_speed(
-                    original_graph,
-                    "highway",
-                    save_csv=True,
-                    save_path=path_avg_speed,
-                )
-            original_graph = nut.assign_avg_speed(original_graph, avg_speeds, "highway")
-
-            # make a time value of seconds, length of road streches is in meters
-            for u, v, k, edata in original_graph.edges.data(keys=True):
-                hours = (edata["length"] / 1000) / edata["avgspeed"]
-                original_graph[u][v][k]["time"] = round(hours * 3600, 0)
-
-            return original_graph
-        logging.info(
-            "No attributes found in the graph to estimate average speed per network segment."
-        )
-        return original_graph

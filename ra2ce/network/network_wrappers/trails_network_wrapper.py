@@ -93,9 +93,9 @@ class TrailsNetworkWrapper(NetworkWrapperProtocol):
         edges_complex = edges
         if self.segmentation_length:
             logging.info("TRAILS importer: start segmentating graph")
-            to_segment = Segmentation(edges, self._cleanup.segmentation_length)
+            to_segment = Segmentation(edges, self.segmentation_length)
             edges_simple_segmented = to_segment.apply_segmentation()
-            if edges_simple_segmented.crs is None:  # The CRS might have dissapeared.
+            if edges_simple_segmented.crs is None:  # The CRS might have disappeared.
                 edges_simple_segmented.crs = edges.crs  # set the right CRS
                 edges_complex = edges_simple_segmented
 

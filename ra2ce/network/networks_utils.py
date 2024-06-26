@@ -18,7 +18,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
 import itertools
 import logging
 import os
@@ -270,9 +269,11 @@ def get_distance(a_b_tuple: tuple[tuple[float, float], tuple[float, float]]) -> 
 
 def line_length(line: LineString, crs: pyproj.CRS) -> float:
     """Calculate length of a line in meters, given in geographic coordinates.
+
     Args:
         line: a shapely LineString object with coordinate reference system 'crs'
         crs: the coordinate reference system of the 'line' LineString
+
     Returns:
         Length of line in m
     """
@@ -301,14 +302,12 @@ def line_length(line: LineString, crs: pyproj.CRS) -> float:
             )
             return np.nan
     elif crs.is_projected:
-        ## line length of projected linestrings
-        if isinstance(line, LineString):
-            total_length = line.length
-        elif isinstance(line, MultiLineString):
+        # line length of projected linestrings
+        if isinstance(line, LineString | MultiLineString):
             total_length = line.length
         else:
             logging.error(
-                "The road strech is not a Shapely LineString or MultiLineString so the length cannot be computed."
+                "The road stretch is not a Shapely LineString or MultiLineString so the length cannot be computed."
                 "Please check your data network data."
             )
             return np.nan
@@ -982,8 +981,8 @@ def delete_duplicates(all_points: list[Point]) -> list[Point]:
 
 
 def create_simplified_graph(
-    graph_complex: nx.classes.graph.Graph, new_id: str = "rfid"
-):
+    graph_complex: nx.Graph, new_id: str = "rfid"
+) -> tuple[nx.Graph, nx.Graph, tuple[dict, dict]]:
     """Create a simplified graph with unique ids from a complex graph"""
     logging.info("Simplifying graph")
     try:
@@ -1090,12 +1089,6 @@ def graph_create_unique_ids(graph: nx.Graph, new_id_name: str = "rfid") -> nx.Gr
 
 def add_missing_geoms_graph(graph: nx.Graph, geom_name: str = "geometry") -> nx.Graph:
     # Not all nodes have geometry attributed (some only x and y coordinates) so add a geometry columns
-    def get_node_by_attribute(graph: nx.Graph, node_number: int) -> dict:
-        for node, data in graph.nodes(data=True):
-            if node == node_number:
-                return data
-        return dict()
-
     nodes_without_geom = [
         n[0] for n in graph.nodes(data=True) if geom_name not in n[-1]
     ]
@@ -1185,7 +1178,7 @@ def graph_from_gdf(
 
 
 def graph_to_gdf(
-    graph_to_convert: nx.classes.graph.Graph,
+    graph_to_convert: nx.Graph,
     save_nodes: bool = False,
     save_edges: bool = True,
     to_save: bool = False,
@@ -1193,10 +1186,13 @@ def graph_to_gdf(
     """Takes in a networkx graph object and returns edges and nodes as geodataframes
     Arguments:
         graph_to_convert (Graph): networkx graph object to be converted
+        save_nodes (bool): get the nodes as a geodataframe (False)
+        save_edges (bool): get the edges as a geodataframe (True)
+        to_save (bool): convert all columns to string (False)
 
     Returns:
-        edges (GeoDataFrame) : containes the edges
-        nodes (GeoDataFrame) :
+        edges (GeoDataFrame): contains the edges
+        nodes (GeoDataFrame): contains the nodes
     """
 
     nodes, edges = None, None
@@ -1204,14 +1200,11 @@ def graph_to_gdf(
         nodes, edges = graph_to_gdfs(
             graph_to_convert, nodes=save_nodes, edges=save_edges, node_geometry=False
         )
-
         if to_save:
-            dfs = [edges, nodes]
-            for df in dfs:
+            for df in [edges, nodes]:
                 for col in df.columns:
                     if df[col].dtype == object and col != df.geometry.name:
                         df[col] = df[col].astype(str)
-
     elif not save_nodes and save_edges:
         edges = graph_to_gdfs(graph_to_convert, nodes=save_nodes, edges=save_edges)
     elif save_nodes and not save_edges:
@@ -1220,13 +1213,11 @@ def graph_to_gdf(
     return edges, nodes
 
 
-def graph_to_gpkg(
-    origin_graph: nx.classes.graph.Graph, edge_gpkg: str, node_gpkg: str
-) -> None:
+def graph_to_gpkg(origin_graph: nx.Graph, edge_gpkg: str, node_gpkg: str) -> None:
     """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_gpkg and node_gpkg
 
     Arguments:
-        origin_graph [nx.classes.graph.Graph]: networkx graph object to be converted
+        origin_graph [nx.Graph]: networkx graph object to be converted
         edge_gpkg [str]: output path including extension for edges geopackage
         node_gpkg [str]: output path including extension for nodes geopackage
 
@@ -1234,7 +1225,7 @@ def graph_to_gpkg(
         None
     """
     # now only multidigraphs and graphs are used
-    if type(origin_graph) == nx.classes.graph.Graph:
+    if type(origin_graph) == nx.Graph:
         origin_graph = nx.MultiGraph(origin_graph)
 
     # The nodes should have a geometry attribute (perhaps on top of the x and y attributes)
@@ -1408,7 +1399,7 @@ def get_extent(dataset):
 
 
 def get_graph_edges_extent(
-    network_graph: nx.classes.Graph,
+    network_graph: nx.Graph,
 ) -> tuple[float, float, float, float]:
     """Inspects all geometries of the edges of a graph and returns the most extreme coordinates
 
@@ -1444,9 +1435,7 @@ def get_graph_edges_extent(
     return (min_x, max_x, min_y, max_y)
 
 
-def reproject_graph(
-    original_graph: nx.classes.Graph, crs_in: str, crs_out: str
-) -> nx.classes.Graph:
+def reproject_graph(original_graph: nx.Graph, crs_in: str, crs_out: str) -> nx.Graph:
     """
     Reprojects the shapely geometry data (of a NetworkX graph) to a different projection
 
@@ -1525,7 +1514,9 @@ def filter_osm(osm_filter_path, o5m, filtered_o5m, tags=None):
     os.system(command)
 
 
-def graph_link_simple_id_to_complex(graph_simple: nx.classes.graph.Graph, new_id: str):
+def graph_link_simple_id_to_complex(
+    graph_simple: nx.Graph, new_id: str
+) -> tuple[dict, dict]:
     """
     Create lookup tables (dicts) to match edges_ids of the complex and simple graph
     Optionally, saves these lookup tables as json files.
@@ -1568,8 +1559,8 @@ def graph_link_simple_id_to_complex(graph_simple: nx.classes.graph.Graph, new_id
 
 
 def add_simple_id_to_graph_complex(
-    complex_graph: nx.classes.Graph, complex_to_simple, new_id
-) -> nx.classes.Graph:
+    complex_graph: nx.Graph, complex_to_simple, new_id
+) -> nx.Graph:
     """Adds the appropriate ID of the simple graph to each edge of the complex graph as a new attribute 'rfid'
 
     Arguments:
@@ -1604,285 +1595,6 @@ def add_simple_id_to_graph_complex(
     nx.set_edge_attributes(complex_graph, simple_ids_per_complex_id, new_id)
 
     return complex_graph
-
-
-def calc_avg_speed(graph, road_type_col_name, save_csv=False, save_path=None):
-    """Calculates the average speed from OSM roads, per road type
-
-    Args:
-        graph (NetworkX graph): NetworkX graph with road types
-        road_type_col_name (string): name of the column which holds the road types ('highway' in OSM)
-        save_csv (boolean): To save a csv or not
-        save_path (string): Path to save the csv to
-
-    Returns:
-        df (Pandas DataFrame): Dataframe with the average road speeds per road type
-    """
-    # Create a dataframe of all road types
-    exceptions = list(
-        set(
-            [
-                str(edata[road_type_col_name])
-                for u, v, edata in graph.edges.data()
-                if isinstance(edata[road_type_col_name], list)
-            ]
-        )
-    )
-    types = list(
-        set(
-            [
-                str(edata[road_type_col_name])
-                for u, v, edata in graph.edges.data()
-                if isinstance(edata[road_type_col_name], str)
-            ]
-        )
-    )
-    all_road_types = exceptions + types
-    df = pd.DataFrame({"road_types": all_road_types, "avg_speed": 0})
-
-    # calculate average speed
-    for i in range(len(df)):
-        roadtype = df.road_types[i]
-        all_edges = [
-            (u, v, edata["maxspeed"], edata["length"])
-            for u, v, edata in graph.edges.data()
-            if (str(edata[road_type_col_name]) == roadtype) & ("maxspeed" in edata)
-        ]
-        all_avg = []
-        all_l = []
-        for u, v, s, l in all_edges:
-            if isinstance(s, list):
-                ns = []
-                for ss in s:
-                    if (
-                        not any(c.isalpha() for c in ss)
-                        and (";" not in ss)
-                        and ("|" not in ss)
-                        and ("-" not in ss)
-                    ):
-                        ns.append(int(ss))
-                    elif not any(c.isalpha() for c in ss) and ";" in ss:
-                        ns.extend([int(x) for x in ss.split(";") if x.isnumeric()])
-                    elif not any(c.isalpha() for c in ss) and "|" in ss:
-                        ns.extend([int(x) for x in ss.split("|") if x.isnumeric()])
-                    elif not any(c.isalpha() for c in ss) and "-" in ss:
-                        ns.extend([int(x) for x in ss.split("-") if x.isnumeric()])
-                    elif " mph" in ss:
-                        ns.append(int(ss.split(" mph")[0]) * 1.609344)
-                if len(ns) > 0:
-                    ss = sum(ns) / len(ns)
-                else:
-                    continue
-            elif isinstance(s, str):
-                if (
-                    not any(c.isalpha() for c in s)
-                    and (";" not in s)
-                    and ("|" not in s)
-                    and ("-" not in s)
-                ):
-                    ss = int(s)
-                elif not any(c.isalpha() for c in s) and ";" in s:
-                    ss = mean([int(x) for x in s.split(";") if x.isnumeric()])
-                elif not any(c.isalpha() for c in s) and "|" in s:
-                    ss = mean([int(x) for x in s.split("|") if x.isnumeric()])
-                elif not any(c.isalpha() for c in s) and "-" in s:
-                    ss = mean([int(x) for x in s.split("-") if x.isnumeric()])
-                elif " mph" in s:
-                    ss = int(s.split(" mph")[0]) * 1.609344
-                else:
-                    continue
-            all_avg.append(ss * l)
-            all_l.append(l)
-            df.iloc[i, 1] = sum(all_avg) / sum(all_l)
-
-    # For all types without an average speed, take one that is closest. E.g. for the links take the one of the same type
-    # of the main roads
-    if not df.loc[df["avg_speed"] == 0].empty:
-        logging.info(
-            f"Not all of the edges contain a 'maxspeed' attribute. RA2CE will guess the right average maximum "
-            f"speed per road type that does not contain a 'maxspeed' attribute. Please check the average speed CSV to ensure correct speeds here: {save_path}"
-        )
-        for i in df.loc[df["avg_speed"] == 0].index:
-            if df["road_types"].iloc[i] in exceptions:
-                if any(rt in df["road_types"].iloc[i] for rt in df["road_types"]):
-                    try:
-                        road_type, avg_speed = [
-                            (rt, avg_s)
-                            for rt, avg_s in zip(df["road_types"], df["avg_speed"])
-                            if rt in df["road_types"].iloc[i] and avg_s != 0
-                        ][0]
-                        df["avg_speed"].iloc[i] = avg_speed
-                    except IndexError as e:
-                        logging.warning(
-                            f"Road type '{df['road_types'].iloc[i]}' cannot be assigned any average speed. Please check the average speed CSV ({save_path}), enter the right average speed for this road type, and run RA2CE again."
-                        )
-                        logging.error("Index error: {}".format(e))
-                        df["avg_speed"].iloc[i] = 0
-            else:
-                # if any(rt in df['road_types'].iloc[i] for rt in df['road_types']):
-                if "link" in df["road_types"].iloc[i]:
-                    try:
-                        df["avg_speed"].iloc[i] = df.loc[
-                            df["road_types"]
-                            == df["road_types"].iloc[i].split("_link")[0],
-                            "avg_speed",
-                        ].values[0]
-                    except IndexError as e:
-                        logging.warning(
-                            f"Road type '{df['road_types'].iloc[i]}' cannot be assigned any average speed. Please check the average speed CSV ({save_path}), enter the right average speed for this road type, and run RA2CE again."
-                        )
-                        logging.error("Index error: {}".format(e))
-                        df["avg_speed"].iloc[i] = 0
-
-    if save_csv:
-        df.to_csv(save_path)
-        logging.info("Saved the average speeds per road type to: {}".format(save_path))
-
-    return df
-
-
-def assign_avg_speed(graph, avg_road_speed, road_type_col_name):
-    """Assigns the average speed to roads in an existing (OSM) graph
-
-    Args:
-        graph (NetworkX graph): NetworkX graph with road types
-        avg_road_speed (Pandas DataFrame): a Dataframe with columns "road_types" and "maxspeed"
-        road_type_col_name (string): Attribute name of the road type in the NetworkX graph
-
-    Returns:
-        graph (NetworkX graph): NetworkX graph with an additional attribute 'avgspeed'
-    """
-    # make a list of strings instead of just a string of the road types column
-    avg_road_speed["road_types"] = avg_road_speed["road_types"].astype(str)
-
-    # calculate the average maximum speed per edge and assign the ones that don't have a value
-    for u, v, k, edata in graph.edges.data(keys=True):
-        road_type = str(edata[road_type_col_name])
-        if "maxspeed" in edata:
-            max_speed = edata["maxspeed"]
-            if isinstance(max_speed, list):
-                ns = []
-                for ms in max_speed:
-                    if (
-                        not any(c.isalpha() for c in ms)
-                        and (";" not in ms)
-                        and ("|" not in ms)
-                        and ("-" not in ms)
-                    ):
-                        ns.append(int(ms))
-                    elif not any(c.isalpha() for c in ms) and ";" in ms:
-                        ns.extend([int(x) for x in ms.split(";") if x.isnumeric()])
-                    elif not any(c.isalpha() for c in ms) and "|" in ms:
-                        ns.extend([int(x) for x in ms.split("|") if x.isnumeric()])
-                    elif not any(c.isalpha() for c in ms) and "-" in ms:
-                        ns.extend([int(x) for x in ms.split("-") if x.isnumeric()])
-                    elif " mph" in ms:
-                        ns.append(int(ms.split(" mph")[0]) * 1.609344)
-                if len(ns) > 0:
-                    graph[u][v][k]["avgspeed"] = round(sum(ns) / len(ns), 0)
-                else:
-                    graph[u][v][k]["avgspeed"] = round(
-                        avg_road_speed.loc[
-                            avg_road_speed["road_types"] == road_type, "avg_speed"
-                        ].iloc[0],
-                        0,
-                    )
-            elif isinstance(max_speed, str):
-                if (
-                    not any(c.isalpha() for c in max_speed)
-                    and (";" not in max_speed)
-                    and ("|" not in max_speed)
-                    and ("-" not in max_speed)
-                ):
-                    graph[u][v][k]["avgspeed"] = round(int(max_speed), 0)
-                elif not any(c.isalpha() for c in max_speed) and ";" in max_speed:
-                    graph[u][v][k]["avgspeed"] = round(
-                        mean([int(x) for x in max_speed.split(";") if x.isnumeric()]), 0
-                    )
-                elif not any(c.isalpha() for c in max_speed) and "|" in max_speed:
-                    graph[u][v][k]["avgspeed"] = round(
-                        mean([int(x) for x in max_speed.split("|") if x.isnumeric()]), 0
-                    )
-                elif not any(c.isalpha() for c in max_speed) and "-" in max_speed:
-                    graph[u][v][k]["avgspeed"] = round(
-                        mean([int(x) for x in max_speed.split("-") if x.isnumeric()]), 0
-                    )
-                elif " mph" in max_speed:
-                    graph[u][v][k]["avgspeed"] = round(
-                        int(max_speed.split(" mph")[0]) * 1.609344, 0
-                    )
-                else:
-                    graph[u][v][k]["avgspeed"] = round(
-                        avg_road_speed.loc[
-                            avg_road_speed["road_types"] == road_type, "avg_speed"
-                        ].iloc[0],
-                        0,
-                    )
-        else:
-            if "]" in road_type:
-                avg_speed = int(
-                    [
-                        s
-                        for r, s in zip(
-                            avg_road_speed["road_types"], avg_road_speed["avg_speed"]
-                        )
-                        if set(road_type[2:-2].split("', '"))
-                        == set(r[2:-2].split("', '"))
-                    ][0]
-                )
-                graph[u][v][k]["avgspeed"] = round(avg_speed, 0)
-            else:
-                graph[u][v][k]["avgspeed"] = round(
-                    avg_road_speed.loc[
-                        avg_road_speed["road_types"] == road_type, "avg_speed"
-                    ].iloc[0],
-                    0,
-                )
-
-    return graph
-
-
-def get_avgspeed_per_road_type(
-    gdf_graph: gpd.GeoDataFrame | None, road_type: RoadTypeEnum
-) -> float:
-    """
-    Calculate the average speed of a graph per road type.
-    If all edges of a certain road type have no average speed,
-    the average speed of the whole graph is returned.
-    If the graph has no average speed on any edge, the default average speed is returned (== 50).
-
-    Args:
-        gdf_graph (gpd.GeoDataFrame): The graph
-        road_type (RoadTypeEnum): The road type
-
-    Returns:
-        float: The average speed for that road type
-    """
-    _default_speed = 50
-    if (
-        not isinstance(gdf_graph, gpd.GeoDataFrame)
-        or "highway" not in gdf_graph.columns
-    ):
-        return _default_speed
-
-    _avgspeed = gdf_graph[gdf_graph["highway"] == road_type.config_value]["avgspeed"]
-    _avg = _avgspeed[_avgspeed > 0].mean()
-    if _avg > 0:
-        return _avg
-
-    # If the average speed is not available, get the average speed of the whole graph
-    _avgspeed = gdf_graph["avgspeed"]
-    _avg = _avgspeed[_avgspeed > 0].mean()
-    if _avg > 0:
-        return _avg
-
-    # If the graph has no average speed, return the default average speed
-    logging.warning(
-        "No average speed found for road type %s. Using default speed of %s.",
-        road_type,
-        _default_speed,
-    )
-    return _default_speed  # Default average speed
 
 
 def fraction_flooded(line: LineString, hazard_map: str):

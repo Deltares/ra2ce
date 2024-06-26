@@ -44,7 +44,7 @@ class MultiLinkOriginClosestDestination(AnalysisLossesProtocol):
         self.file_id = analysis_input.file_id
         self._analysis_input = analysis_input
 
-    def _save_gdf(self, gdf: GeoDataFrame, save_path: Path):
+    def _save_gdf(self, gdf: GeoDataFrame, save_path: Path) -> None:
         """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp
 
         Arguments:
