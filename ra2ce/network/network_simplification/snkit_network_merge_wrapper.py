@@ -91,7 +91,8 @@ def merge_edges(
 
         updated_edges_gdf = gpd.GeoDataFrame(updated_edges, geometry="geometry")
         updated_edges_gdf.set_crs(net.edges.crs, inplace=True)
-        return updated_edges_gdf.drop(columns=["id"])
+        updated_edges_gdf = updated_edges_gdf.drop(columns=["id"])
+        return updated_edges_gdf
 
     def _get_edge_paths(node_set: set, snkit_network: SnkitNetwork) -> list:
         # Convert edges to an adjacency list using vectorized operations
@@ -149,6 +150,7 @@ def merge_edges(
         aggfunc=aggregate_func,
         net=snkit_network,
     )
+    edges_to_keep = edges_to_keep.drop(columns=["id"])
     updated_edges = updated_edges.reset_index(drop=True)
 
     new_edges = pd.concat([edges_to_keep, updated_edges], ignore_index=True)
