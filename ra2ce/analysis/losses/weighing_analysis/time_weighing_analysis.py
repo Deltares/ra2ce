@@ -1,7 +1,5 @@
 from typing import Any
 
-import geopandas as gpd
-
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.losses.weighing_analysis.weighing_analysis_protocol import (
     WeighingAnalysisProtocol,
@@ -28,12 +26,3 @@ class TimeWeighingAnalysis(WeighingAnalysisProtocol):
             self.edge_data[WeighingEnum.TIME.config_value] = _time
         self.time_list.append(_time)
         return _time
-
-    def calculate_alternative_value(self, alt_dist: float) -> float:
-        return self._calculate_time(alt_dist)
-
-    def extend_graph(self, gdf_graph: gpd.GeoDataFrame | dict) -> None:
-        if isinstance(gdf_graph, gpd.GeoDataFrame):
-            gdf_graph[WeighingEnum.TIME.config_value] = self.time_list
-        elif isinstance(gdf_graph, dict):
-            gdf_graph[WeighingEnum.TIME.config_value] = [self.time_list[-1]]

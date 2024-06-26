@@ -151,30 +151,27 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
                 u, v, _, _weighing_analyser.edge_data = edges
                 _current_value = _weighing_analyser.get_current_value()
 
+                _alt_value, _alt_nodes, _connected, _diff = np.nan, np.nan, 0, np.nan
                 if nx.has_path(_graph, u, v):
-                    alt_dist = nx.dijkstra_path_length(
-                        _graph, u, v, weight=self.analysis.weighing.config_value
+                    [_alt_value, _alt_nodes] = nx.single_source_dijkstra(
+                        _graph,
+                        u,
+                        v,
+                        weight=self.analysis.weighing.config_value,
                     )
-                    alt_nodes = nx.dijkstra_path(_graph, u, v)
-                    connected = 1
-                    alt_value = _weighing_analyser.calculate_alternative_value(alt_dist)
+                    _connected = 1
 
-                    diff = round(alt_value - _current_value, 3)
-                else:
-                    alt_value = _current_value
-                    alt_nodes, connected = np.NaN, 0
-                    diff = np.NaN
+                    _diff = round(_alt_value - _current_value, 3)
 
                 data = {
                     "u": u,
                     "v": v,
                     self.analysis.weighing.config_value: _current_value,
-                    f"alt_{self.analysis.weighing.config_value}": alt_value,
-                    "alt_nodes": [alt_nodes],
-                    f"diff_{self.analysis.weighing.config_value}": diff,
-                    "connected": connected,
+                    f"alt_{self.analysis.weighing.config_value}": _alt_value,
+                    "alt_nodes": [_alt_nodes],
+                    f"diff_{self.analysis.weighing.config_value}": _diff,
+                    "connected": _connected,
                 }
-                _weighing_analyser.extend_graph(data)
 
                 if "rfid" in gdf:
                     data["rfid"] = [str(_weighing_analyser.edge_data["rfid"])]
