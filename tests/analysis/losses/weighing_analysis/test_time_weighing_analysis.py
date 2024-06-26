@@ -49,17 +49,3 @@ class TestTimeWeighingAnalysis:
         assert valid_analysis.edge_data[
             WeighingEnum.TIME.config_value
         ] == pytest.approx(_expected_time)
-
-    def test_extend_graph(self, valid_analysis: TimeWeighingAnalysis):
-        # 1. Define test data.
-        _graph_dict = dict(my_value=42)
-        _time_list = [4.2]
-        valid_analysis.time_list = _time_list
-
-        # 2. Run test.
-        valid_analysis.extend_graph(_graph_dict)
-
-        # 3. Verify expectations
-        assert len(_graph_dict) == 2
-        assert _graph_dict["my_value"] == 42
-        assert _graph_dict[WeighingEnum.TIME.config_value] == _time_list

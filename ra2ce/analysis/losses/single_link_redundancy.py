@@ -49,6 +49,7 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
         _gdf_graph = osmnx.graph_to_gdfs(self.graph_file.get_graph(), nodes=False)
 
         # list for the length of the alternative routes
+        _current_value_list = []
         _alt_value_list = []
         _alt_nodes_list = []
         _diff_value_list = []
@@ -62,6 +63,7 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
         for e_remove in list(self.graph_file.graph.edges.data(keys=True)):
             u, v, k, _weighing_analyser.edge_data = e_remove
             _current_value = _weighing_analyser.get_current_value()
+            _current_value_list.append(_current_value)
 
             # remove the edge
             self.graph_file.graph.remove_edge(u, v, k)
@@ -93,8 +95,8 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
             # add edge again to the graph
             self.graph_file.graph.add_edge(u, v, k, **_weighing_analyser.edge_data)
 
-        # Add the new columns to the geodataframe
-        _weighing_analyser.extend_graph(_gdf_graph)
+        # Add the updated/new columns to the geodataframe
+        _gdf_graph[self.analysis.weighing.config_value] = _current_value_list
         _gdf_graph[f"alt_{self.analysis.weighing.config_value}"] = _alt_value_list
         _gdf_graph["alt_nodes"] = _alt_nodes_list
         _gdf_graph[f"diff_{self.analysis.weighing.config_value}"] = _diff_value_list

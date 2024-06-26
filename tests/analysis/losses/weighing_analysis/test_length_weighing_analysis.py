@@ -49,14 +49,3 @@ class TestLengthWeighingAnalysis:
         assert valid_analysis.edge_data[
             WeighingEnum.LENGTH.config_value
         ] == pytest.approx(_expected_distance)
-
-    def test_extend_graph(self, valid_analysis: LengthWeighingAnalysis):
-        # 1. Define test data.
-        _graph_dict = dict(my_value=42)
-
-        # 2. Run test.
-        valid_analysis.extend_graph(_graph_dict)
-
-        # 3. Verify expectations
-        assert len(_graph_dict) == 1
-        assert _graph_dict["my_value"] == 42
