@@ -54,13 +54,20 @@ class AvgSpeed:
         return [_rte.road_type for _rte in self.speed_per_road_type.keys()]
 
     @staticmethod
-    def get_road_type_list(road_type: str | None) -> list[RoadTypeEnum] | None:
+    def get_road_type_list(
+        road_type: str | list[str] | None,
+    ) -> list[RoadTypeEnum] | None:
         if not road_type:
-            return None
-        if road_type.startswith("["):
-            # If the roadtype is a str(list), convert it back to a list
-            return list(map(RoadTypeEnum.get_enum, literal_eval(road_type)))
-        return [RoadTypeEnum.get_enum(road_type)]
+            return [RoadTypeEnum.INVALID]
+        if isinstance(road_type, str):
+            if road_type.startswith("["):
+                # If the roadtype is a str(list), convert it back to a list
+                return list(map(RoadTypeEnum.get_enum, literal_eval(road_type)))
+            return [RoadTypeEnum.get_enum(road_type)]
+        if isinstance(road_type, list):
+            return list(map(RoadTypeEnum.get_enum, road_type))
+        else:
+            return [RoadTypeEnum.INVALID]
 
     def get_avg_speed(self, road_type: list[RoadTypeEnum]) -> float:
         return self.speed_per_road_type[RoadTypeEntry(road_type)]
