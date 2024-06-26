@@ -111,17 +111,19 @@ class TestNetworkSimplificationWithAttributeExclusion:
     @pytest.fixture(name="_result_digraph")
     def _result_digraph_fixture(self, _nx_digraph: nx.MultiDiGraph) -> nx.MultiDiGraph:
         _result_digraph = nx.MultiDiGraph()
-        for node_id in [2, 4, 7, 8, 11, 12]:
+        node_ids_degrees = {2: 1, 4: 2, 7: 2, 8: 4, 11: 3, 12: 2}
+        for node_id, degree in node_ids_degrees.items():
             node_data = _nx_digraph.nodes[node_id]
             node_data["id"] = node_id
+            node_data["degree"] = degree
             _result_digraph.add_node(node_id, **node_data)
-        _result_digraph.add_edge(2, 4, a=np.nan)
-        _result_digraph.add_edge(4, 7, a="yes")
-        _result_digraph.add_edge(7, 8, a=np.nan)
-        _result_digraph.add_edge(8, 11, a=np.nan)
-        _result_digraph.add_edge(8, 11, a="yes")
-        _result_digraph.add_edge(8, 12, a=np.nan)
-        _result_digraph.add_edge(11, 12, a="yes")
+        _result_digraph.add_edge(2, 4.0, a="None")
+        _result_digraph.add_edge(4, 7.0, a="yes")
+        _result_digraph.add_edge(7, 8.0, a="None")
+        _result_digraph.add_edge(8, 11.0, a="None")
+        _result_digraph.add_edge(8, 11.0, a="yes")
+        _result_digraph.add_edge(8, 12.0, a="None")
+        _result_digraph.add_edge(11, 12.0, a="yes")
 
         _result_digraph = add_missing_geoms_graph(_result_digraph, "geometry")
         _result_digraph.graph["crs"] = "EPSG:4326"
@@ -135,5 +137,9 @@ class TestNetworkSimplificationWithAttributeExclusion:
     ):
         network_simplification_with_attribute_exclusion.nx_graph = _nx_digraph
         network_simplification_with_attribute_exclusion.attributes_to_exclude = ["a"]
+
         _graph_simple = network_simplification_with_attribute_exclusion.simplify_graph()
+
+        assert _graph_simple.nodes(data=True) == _result_digraph.nodes(data=True)
+        assert _graph_simple.edges(data=True) == _result_digraph.edges(data=True)
         pass
