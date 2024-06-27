@@ -92,7 +92,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         self.link_type_column = analysis_config.config_data.network.link_type_column
         self.trip_purposes = self.analysis.trip_purposes
 
-        self.performance_metric = f"diff_{self.analysis.weighing}"
+        self.performance_metric = f"diff_{self.analysis.weighing}"  # either diff_time or diff_distance
 
         self.part_of_day: PartOfDayEnum = self.analysis.part_of_day
         self.analysis_type = self.analysis.analysis
@@ -343,32 +343,28 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             return result
 
         _check_validity_criticality_analysis()
-        _hazard_intensity_ranges = self._get_link_types_heights_ranges()[1]
+        _hazard_intensity_ranges = self._get_link_types_hazard_intensity_ranges()[1]
         events = self.criticality_analysis.filter(regex=r"^EV(?!1_fr)")
+
         # Read the performance_change stating the functionality drop
         if "key" in self.criticality_analysis.columns:
             performance_change = self.criticality_analysis[
                 [f"{self.performance_metric}", "u", "v", "key"]
             ]
-            vehicle_loss_hours_df = pd.DataFrame(
-                {
-                    f"{self.link_id}": self.criticality_analysis.index.values,
-                    "u": self.criticality_analysis["u"],
-                    "v": self.criticality_analysis["v"],
-                    "key": self.criticality_analysis["key"],
-                }
-            )
+
         else:
             performance_change = self.criticality_analysis[
                 [f"{self.performance_metric}", "u", "v"]
             ]
-            vehicle_loss_hours_df = pd.DataFrame(
-                {
-                    f"{self.link_id}": self.criticality_analysis.index.values,
-                    "u": self.criticality_analysis["u"],
-                    "v": self.criticality_analysis["v"],
-                }
-            )
+
+        # Create a DataFrame to store the results of the vlh calculations later
+        vehicle_loss_hours_df = pd.DataFrame(
+            {
+                f"{self.link_id}": self.criticality_analysis.index.values,
+                "u": self.criticality_analysis["u"],
+                "v": self.criticality_analysis["v"],
+            }
+        )
 
         # shape vehicle_loss_hours
         # Check if the index name exists in the columns
@@ -401,6 +397,8 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             geometry="geometry",
             crs=self.criticality_analysis.crs,
         )
+
+        # Loop for all events and calculate the vehicle loss hours
         for event in events.columns.tolist():
             for _, vlh_row in vehicle_loss_hours.iterrows():
                 row_hazard_range = _get_range(vlh_row[event])
@@ -432,12 +430,16 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                         performance_row[-1]["v"],
                         performance_key,
                     )
+
+                    # If the disrupted link has no alternative route, use the production loss per capita
                     if (
                         math.isnan(row_performance_change) and row_connectivity == 0
                     ) or row_performance_change == 0:
                         self._calculate_production_loss_per_capita(
                             vehicle_loss_hours, vlh_row, event
                         )
+
+                    # If the disrupted link has an alternative route, use the Value of Time
                     elif not (
                         math.isnan(row_performance_change)
                         and math.isnan(row_connectivity)
@@ -543,6 +545,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                 f"""{link_type_hazard_range} was not found in the introduced resilience_curve"""
             )
 
+        # If loss ratio in the resilience curve is given in percentage, divide by 100.
         divisor = 100
         if all(
             ratio <= 1
@@ -588,7 +591,12 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             [vlh_row.name], f"vlh_{hazard_col_name}_total"
         ] = vlh_total
 
-    def _get_link_types_heights_ranges(self) -> tuple[list[str], list[tuple]]:
+    def _get_link_types_hazard_intensity_ranges(self) -> tuple[list[str], list[tuple]]:
+        """
+
+        Returns:
+
+        """
         _link_types = set()
         _hazard_intensity_ranges = set()
 
