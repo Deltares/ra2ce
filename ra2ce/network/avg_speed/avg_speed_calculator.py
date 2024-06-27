@@ -49,7 +49,7 @@ class AvgSpeedCalculator:
 
         Args:
             speed_input (float | str | list[str]): (List of) string(s) with the speed(s).
-                Can have different formats, e.g. "50 mph", "50", "50;60", "50-60", "50|60".
+                Can have different formats, e.g. nan(float), "50 mph", "50", "50;60", "50-60", "50|60".
 
         Returns:
             float: Average speed of the input string(s).
