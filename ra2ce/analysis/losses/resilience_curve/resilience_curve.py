@@ -13,10 +13,17 @@ class ResilienceCurve:
     duration_steps: list[list[float]] = field(default_factory=list)
     functionality_loss_ratio: list[list[float]] = field(default_factory=list)
 
+    @property
+    def ranges(self) -> list[tuple[float, float]]:
+        return list(set(zip(self.hazard_min, self.hazard_max)))
+
     def _get_index(self, link_type: RoadTypeEnum, hazard_min: float) -> int:
         _link_type_indices = np.where(np.array(self.link_type) == link_type)[0]
         _hazard_min_indices = np.where(np.array(self.hazard_min) == hazard_min)[0]
         return int(np.intersect1d(_link_type_indices, _hazard_min_indices)[0])
+
+    def has_resilience_curve(self, link_type: RoadTypeEnum, hazard_min: float) -> bool:
+        return self._get_index(link_type, hazard_min) != None
 
     def get_duration_steps(
         self, link_type: RoadTypeEnum, hazard_min: float
