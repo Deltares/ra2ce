@@ -509,7 +509,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             for _row_link_type in vlh_row[self.link_type_column]:
                 _link_type = RoadTypeEnum.get_enum(_row_link_type)
                 disruption = self.resilience_curve.get_disruption(
-                    _link_type, row_hazard_range[0]
+                    _link_type, row_hazard_range
                 )
                 if disruption > _max_disruption:
                     _relevant_link_type = _link_type
@@ -517,7 +517,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             _link_type = RoadTypeEnum.get_enum(vlh_row[self.link_type_column])
             if self.resilience_curve.has_resilience_curve(
                 _link_type,
-                row_hazard_range[0],
+                row_hazard_range,
             ):
                 _relevant_link_type = _link_type
 
@@ -530,16 +530,16 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         if all(
             ratio <= 1
             for ratio in self.resilience_curve.get_functionality_loss_ratio(
-                _relevant_link_type, row_hazard_range[0]
+                _relevant_link_type, row_hazard_range
             )
         ):
             divisor = 1
 
         duration_steps = self.resilience_curve.get_duration_steps(
-            _relevant_link_type, row_hazard_range[0]
+            _relevant_link_type, row_hazard_range
         )
         functionality_loss_ratios = self.resilience_curve.get_functionality_loss_ratio(
-            _relevant_link_type, row_hazard_range[0]
+            _relevant_link_type, row_hazard_range
         )
 
         # get vlh_trip_type_event
