@@ -129,7 +129,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
 
     @pytest.fixture(name="_result_graph")
     def _result_graph_fixture(self, _nx_digraph: nx.MultiDiGraph) -> nx.MultiGraph:
-        _result_digraph = nx.MultiDiGraph()
+        _result_digraph = nx.MultiGraph()
         node_ids_degrees = {2: 1, 4: 2, 7: 2, 8: 4, 11: 3, 12: 2}
         for node_id, degree in node_ids_degrees.items():
             node_data = _nx_digraph.nodes[node_id]
