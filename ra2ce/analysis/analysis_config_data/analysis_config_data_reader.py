@@ -45,7 +45,7 @@ from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnu
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeEnum
+from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
