@@ -34,8 +34,7 @@ class ResilienceCurveReader(FileReaderProtocol):
             return findall(r"^(\w+)_([\d.]+)-([\d.]+)$", link_type_hazard_intensity)[0]
 
         _link_type = []
-        _hazard_min = []
-        _hazard_max = []
+        _hazard_range = []
         _duration_steps = []
         _functionality_loss_ratio = []
 
@@ -45,8 +44,7 @@ class ResilienceCurveReader(FileReaderProtocol):
                 _link_type_hazard_intensity
             )
             _link_type.append(RoadTypeEnum.get_enum(_lt))
-            _hazard_min.append(float(_h_min))
-            _hazard_max.append(float(_h_max))
+            _hazard_range.append((float(_h_min), float(_h_max)))
             _duration_steps.append(literal_eval(row["duration_steps"]))
             _functionality_loss_ratio.append(
                 literal_eval(row["functionality_loss_ratio"])
@@ -59,8 +57,7 @@ class ResilienceCurveReader(FileReaderProtocol):
 
         return ResilienceCurve(
             link_type=_link_type,
-            hazard_min=_hazard_min,
-            hazard_max=_hazard_max,
+            hazard_range=_hazard_range,
             duration_steps=_duration_steps,
             functionality_loss_ratio=_functionality_loss_ratio,
         )

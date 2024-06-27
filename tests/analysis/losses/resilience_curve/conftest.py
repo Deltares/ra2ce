@@ -17,15 +17,15 @@ def get_resilience_curve_csv_filepath() -> Iterator[Path]:
 
 @pytest.fixture(name="resilience_curve_data")
 def get_resilience_curve_data() -> Iterator[
-    list[tuple[RoadTypeEnum, float, float, list[float], list[float]]]
+    list[tuple[RoadTypeEnum, tuple[float, float], list[float], list[float]]]
 ]:
     """
     Get resilience curve data for testing.
 
     Yields:
-        Iterator[list[tuple[RoadTypeEnum, float, float, list[float], list[float]]]]: list of resilience curve data.
+        Iterator[list[tuple[RoadTypeEnum, tuple[float, float], list[float], list[float]]]]: list of resilience curve data.
     """
     yield [
-        (RoadTypeEnum.MOTORWAY, 0.2, 0.5, [3.0, 5.0], [1.0, 0.4]),
-        (RoadTypeEnum.MOTORWAY, 0.5, 1.2, [2.0, 4.0], [1.0, 0.3]),
+        (RoadTypeEnum.MOTORWAY, (0.2, 0.5), [3.0, 5.0], [1.0, 0.4]),
+        (RoadTypeEnum.MOTORWAY, (0.5, 1.2), [2.0, 4.0], [1.0, 0.3]),
     ]
