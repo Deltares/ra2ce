@@ -473,6 +473,18 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
         return _relevant_link_type
 
+    def _get_divisor(
+        self, relevant_link_type: RoadTypeEnum, row_hazard_range: tuple[float, float]
+    ):
+        if all(
+            ratio <= 1
+            for ratio in self.resilience_curve.get_functionality_loss_ratio(
+                relevant_link_type, row_hazard_range[0]
+            )
+        ):
+            return 1
+        return 100  # high value assuming the road is almost inaccessible
+
     def _calculate_production_loss_per_capita(
         self,
         vehicle_loss_hours: gpd.GeoDataFrame,
@@ -498,6 +510,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         """
         vlh_total = 0
         _relevant_link_type = self._get_relevant_link_type(vlh_row, row_hazard_range)
+        _divisor = self._get_divisor(_relevant_link_type, row_hazard_range)
 
         duration_steps = self.resilience_curve.get_duration_steps(
             _relevant_link_type, row_hazard_range[0]
@@ -521,6 +534,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                     * occupancy_trip_type
                     * self.production_loss_per_capita_per_hour
                 )
+                / _divisor
                 for duration, loss_ratio in zip(
                     duration_steps, functionality_loss_ratios
                 )
@@ -545,15 +559,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
         vlh_total = 0
         _relevant_link_type = self._get_relevant_link_type(vlh_row, row_hazard_range)
-
-        divisor = 100  # high value assuming the road is almost inaccessible
-        if all(
-            ratio <= 1
-            for ratio in self.resilience_curve.get_functionality_loss_ratio(
-                _relevant_link_type, row_hazard_range[0]
-            )
-        ):
-            divisor = 1
+        _divisor = self._get_divisor(_relevant_link_type, row_hazard_range)
 
         duration_steps = self.resilience_curve.get_duration_steps(
             _relevant_link_type, row_hazard_range[0]
@@ -580,7 +586,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                     * performance_change
                     * vot_trip_type
                 )
-                / divisor
+                / _divisor
                 for duration, loss_ratio in zip(
                     duration_steps, functionality_loss_ratios
                 )
