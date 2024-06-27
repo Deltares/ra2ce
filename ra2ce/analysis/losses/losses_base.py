@@ -36,8 +36,8 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
-from ra2ce.analysis.losses.resilience_curve.resilience_curve_reader import (
-    ResilienceCurveReader,
+from ra2ce.analysis.losses.resilience_curves.resilience_curves_reader import (
+    ResilienceCurvesReader,
 )
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
@@ -109,8 +109,8 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         self.intensities = _load_df_from_csv(
             Path(self.analysis.traffic_intensities_file), [], self.link_id
         )  # per day
-        self.resilience_curve = ResilienceCurveReader().read(
-            self.analysis.resilience_curve_file
+        self.resilience_curves = ResilienceCurvesReader().read(
+            self.analysis.resilience_curves_file
         )
         self.values_of_time = _load_df_from_csv(
             Path(self.analysis.values_of_time_file), [], None, sep=";"
@@ -127,11 +127,11 @@ class LossesBase(AnalysisLossesProtocol, ABC):
     def _check_validity_analysis_files(self):
         if (
             self.analysis.traffic_intensities_file is None
-            or self.analysis.resilience_curve_file is None
+            or self.analysis.resilience_curves_file is None
             or self.analysis.values_of_time_file is None
         ):
             raise ValueError(
-                f"traffic_intensities_file, resilience_curve_file, and values_of_time_file should be given"
+                f"traffic_intensities_file, resilience_curves_file, and values_of_time_file should be given"
             )
 
     def _check_validity_df(self):
@@ -332,7 +332,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
         _check_validity_criticality_analysis()
 
-        _hazard_intensity_ranges = self.resilience_curve.ranges
+        _hazard_intensity_ranges = self.resilience_curves.ranges
         events = self.criticality_analysis.filter(regex=r"^EV(?!1_fr)")
         # Read the performance_change stating the functionality drop
         if "key" in self.criticality_analysis.columns:
@@ -474,7 +474,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             occupancy_trip_type = float(
                 self.vot_intensity_per_trip_collection[f"occupants_{trip_type}"]
             )
-            # TODO: improve formula based on road_type, water_heigth resilience_curve.csv (duration*loss_ratio) instead of duration_event
+            # TODO: improve formula based on road_type, water_heigth resilience_curves.csv (duration*loss_ratio) instead of duration_event
             # Compare with other function
             vlh_trip_type_event_series = (
                 self.duration_event
@@ -508,14 +508,14 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             _max_disruption = 0
             for _row_link_type in vlh_row[self.link_type_column]:
                 _link_type = RoadTypeEnum.get_enum(_row_link_type)
-                disruption = self.resilience_curve.get_disruption(
+                disruption = self.resilience_curves.get_disruption(
                     _link_type, row_hazard_range
                 )
                 if disruption > _max_disruption:
                     _relevant_link_type = _link_type
         else:
             _link_type = RoadTypeEnum.get_enum(vlh_row[self.link_type_column])
-            if self.resilience_curve.has_resilience_curve(
+            if self.resilience_curves.has_resilience_curve(
                 _link_type,
                 row_hazard_range,
             ):
@@ -523,22 +523,22 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
         if not _relevant_link_type:
             raise ValueError(
-                f"'{_link_type}' with range {row_hazard_range} was not found in the introduced resilience_curve"
+                f"'{_link_type}' with range {row_hazard_range} was not found in the introduced resilience_curves"
             )
 
         divisor = 100  # high value assuming the road is almost inaccessible
         if all(
             ratio <= 1
-            for ratio in self.resilience_curve.get_functionality_loss_ratio(
+            for ratio in self.resilience_curves.get_functionality_loss_ratio(
                 _relevant_link_type, row_hazard_range
             )
         ):
             divisor = 1
 
-        duration_steps = self.resilience_curve.get_duration_steps(
+        duration_steps = self.resilience_curves.get_duration_steps(
             _relevant_link_type, row_hazard_range
         )
-        functionality_loss_ratios = self.resilience_curve.get_functionality_loss_ratio(
+        functionality_loss_ratios = self.resilience_curves.get_functionality_loss_ratio(
             _relevant_link_type, row_hazard_range
         )
 
