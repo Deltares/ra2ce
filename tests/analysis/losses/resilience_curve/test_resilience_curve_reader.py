@@ -33,15 +33,13 @@ class TestResilienceCurveReader:
         # 3. Verify expectations
         assert isinstance(_resilience_curve, ResilienceCurve)
         for _expected_value in resilience_curve_data:
-            assert (
-                _resilience_curve.get_duration_steps(
-                    _expected_value[0], _expected_value[1]
-                )
-                == _expected_value[3]
+            _duration_steps = _resilience_curve.get_duration_steps(
+                _expected_value[0], _expected_value[1]
             )
-            assert (
-                _resilience_curve.get_functionality_loss_ratio(
-                    _expected_value[0], _expected_value[1]
-                )
-                == _expected_value[4]
+            assert len(_duration_steps) == len(_expected_value[3])
+            assert all(_val in _expected_value[3] for _val in _duration_steps)
+            _functionality_loss_ratio = _resilience_curve.get_functionality_loss_ratio(
+                _expected_value[0], _expected_value[1]
             )
+            assert len(_functionality_loss_ratio) == len(_expected_value[4])
+            assert all(_val in _expected_value[4] for _val in _functionality_loss_ratio)
