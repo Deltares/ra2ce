@@ -100,7 +100,6 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
         self.part_of_day: PartOfDayEnum = self.analysis.part_of_day
         self.analysis_type = self.analysis.analysis
-        self.duration_event: float = self.analysis.duration_event
         self.hours_per_day: float = self.analysis.hours_per_day
         self.production_loss_per_capita_per_hour = (
             self.analysis.production_loss_per_capita_per_hour

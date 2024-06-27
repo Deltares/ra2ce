@@ -92,9 +92,6 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     disruption_per_category: str = ""
     # losses
     traffic_cols: list[str] = field(default_factory=list)
-    duration_event: float = (
-        math.nan
-    )  # TODO remove the deprecated attribute that have been replaced by csv
     production_loss_per_capita_per_hour: float = math.nan
     part_of_day: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
     performance: str = "diff_time"  # "diff_time" or "diff_length" relates to the used criticality metric
