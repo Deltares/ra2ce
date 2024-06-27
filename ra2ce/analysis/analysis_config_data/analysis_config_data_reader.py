@@ -135,10 +135,10 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
                 self._parser.getlist(section_name, "trip_purposes", fallback=[]),
             )
         )
-        _section.production_loss_per_capita_per_day = self._parser.getfloat(
+        _section.production_loss_per_capita_per_hour = self._parser.getfloat(
             section_name,
-            "production_loss_per_capita_per_day",
-            fallback=_section.production_loss_per_capita_per_day,
+            "production_loss_per_capita_per_hour",
+            fallback=_section.production_loss_per_capita_per_hour,
         )
         _section.duration_event = self._parser.getfloat(
             section_name,
