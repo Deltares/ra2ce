@@ -7,16 +7,16 @@ from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 from tests import test_data
 
 
-@pytest.fixture(name="resilience_curve_csv")
-def get_resilience_curve_csv_filepath() -> Iterator[Path]:
+@pytest.fixture(name="resilience_curves_csv")
+def get_resilience_curves_csv_filepath() -> Iterator[Path]:
     _csv_file = test_data.joinpath(
         "losses", "csv_data_for_losses", "resilience_curve.csv"
     )
     yield _csv_file
 
 
-@pytest.fixture(name="resilience_curve_data")
-def get_resilience_curve_data() -> Iterator[
+@pytest.fixture(name="resilience_curves_data")
+def get_resilience_curves_data() -> Iterator[
     list[tuple[RoadTypeEnum, tuple[float, float], list[float], list[float]]]
 ]:
     """

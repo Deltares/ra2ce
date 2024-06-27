@@ -1,24 +1,24 @@
 import pytest
 
-from ra2ce.analysis.losses.resilience_curve.resilience_curve import ResilienceCurve
+from ra2ce.analysis.losses.resilience_curves.resilience_curves import ResilienceCurves
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 
 class TestResilienceCurve:
-    @pytest.fixture(name="valid_resilience_curve")
-    def _get_valid_resilience_curve(
+    @pytest.fixture(name="valid_resilience_curves")
+    def _get_valid_resilience_curves(
         self,
-        resilience_curve_data: list[
+        resilience_curves_data: list[
             tuple[RoadTypeEnum, tuple[float, float], list[float], list[float]]
         ],
     ):
-        _resilience_curve = ResilienceCurve()
-        for _data in resilience_curve_data:
-            _resilience_curve.link_type.append(_data[0])
-            _resilience_curve.hazard_range.append(_data[1])
-            _resilience_curve.duration_steps.append(_data[2])
-            _resilience_curve.functionality_loss_ratio.append(_data[3])
-        return _resilience_curve
+        _resilience_curves = ResilienceCurves()
+        for _data in resilience_curves_data:
+            _resilience_curves.link_type.append(_data[0])
+            _resilience_curves.hazard_range.append(_data[1])
+            _resilience_curves.duration_steps.append(_data[2])
+            _resilience_curves.functionality_loss_ratio.append(_data[3])
+        return _resilience_curves
 
     @pytest.mark.parametrize(
         "link_type, hazard_range, expected",
@@ -33,13 +33,13 @@ class TestResilienceCurve:
     )
     def test_get_duration_steps(
         self,
-        valid_resilience_curve: ResilienceCurve,
+        valid_resilience_curves: ResilienceCurves,
         link_type: RoadTypeEnum,
         hazard_range: tuple[float, float],
         expected: list[float],
     ):
         # 1. Execute test
-        _result = valid_resilience_curve.get_duration_steps(link_type, hazard_range)
+        _result = valid_resilience_curves.get_duration_steps(link_type, hazard_range)
 
         # 2. Verify expectations
         assert _result == expected
@@ -57,13 +57,13 @@ class TestResilienceCurve:
     )
     def test_get_functionality_loss_ratio(
         self,
-        valid_resilience_curve: ResilienceCurve,
+        valid_resilience_curves: ResilienceCurves,
         link_type: RoadTypeEnum,
         hazard_range: tuple[float, float],
         expected: list[float],
     ):
         # 1. Execute test
-        _result = valid_resilience_curve.get_functionality_loss_ratio(
+        _result = valid_resilience_curves.get_functionality_loss_ratio(
             link_type, hazard_range
         )
 
@@ -79,13 +79,13 @@ class TestResilienceCurve:
     )
     def test_get_disruption(
         self,
-        valid_resilience_curve: ResilienceCurve,
+        valid_resilience_curves: ResilienceCurves,
         link_type: RoadTypeEnum,
         hazard_range: tuple[float, float],
         expected: float,
     ):
         # 2. Execute test
-        _result = valid_resilience_curve.get_disruption(link_type, hazard_range)
+        _result = valid_resilience_curves.get_disruption(link_type, hazard_range)
 
         # 3. Verify expectations
         assert _result == pytest.approx(expected)

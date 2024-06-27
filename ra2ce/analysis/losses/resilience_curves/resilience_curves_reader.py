@@ -21,13 +21,13 @@ from re import findall
 
 import pandas as pd
 
-from ra2ce.analysis.losses.resilience_curve.resilience_curve import ResilienceCurve
+from ra2ce.analysis.losses.resilience_curves.resilience_curves import ResilienceCurves
 from ra2ce.common.io.readers.file_reader_protocol import FileReaderProtocol
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 
-class ResilienceCurveReader(FileReaderProtocol):
-    def _parse_df(self, df: pd.DataFrame) -> ResilienceCurve:
+class ResilienceCurvesReader(FileReaderProtocol):
+    def _parse_df(self, df: pd.DataFrame) -> ResilienceCurves:
         def parse_link_type_hazard_intensity(
             link_type_hazard_intensity: str,
         ) -> tuple[str, str, str]:
@@ -55,17 +55,17 @@ class ResilienceCurveReader(FileReaderProtocol):
                 "Duration steps and functionality loss ratio should have the same length"
             )
 
-        return ResilienceCurve(
+        return ResilienceCurves(
             link_type=_link_type,
             hazard_range=_hazard_range,
             duration_steps=_duration_steps,
             functionality_loss_ratio=_functionality_loss_ratio,
         )
 
-    def read(self, file_path: Path | None) -> ResilienceCurve:
+    def read(self, file_path: Path | None) -> ResilienceCurves:
         if not file_path or not file_path.exists():
             logging.warning("No `csv` file found at %s.", file_path)
-            return ResilienceCurve()
+            return ResilienceCurves()
 
         _df = pd.read_csv(file_path, sep=";", on_bad_lines="skip")
         if "geometry" in _df.columns:
