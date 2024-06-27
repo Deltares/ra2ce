@@ -79,11 +79,6 @@ class TestDamagesUtils:
         ],
     )
     def test_create_summary_statistics(self, lanes, expected):
-        def valid_lanes(lane: float, expected: float) -> bool:
-            if np.isnan(lane):
-                return np.isnan(expected)
-            return lane == pytest.approx(expected)
-
         # 1. Define test data.
         _left_line = LineString([[0, 0], [1, 0], [2, 0]])
         _middle_line = LineString([[1, 0], [1, 1], [2, 2]])
@@ -99,5 +94,10 @@ class TestDamagesUtils:
         result_dict = create_summary_statistics(_test_gdf)
 
         # 3. Verify final expectations
+        def valid_lanes(lane: float, expected: float) -> bool:
+            if np.isnan(lane):
+                return np.isnan(expected)
+            return lane == pytest.approx(expected)
+
         assert isinstance(result_dict, dict)
         assert all(map(valid_lanes, result_dict.values(), expected))
