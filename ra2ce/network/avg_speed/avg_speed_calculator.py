@@ -58,9 +58,9 @@ class AvgSpeedCalculator:
         if not speed_input:
             return 0.0
         if isinstance(speed_input, float):
+            if math.isnan(speed_input):
+                return 0.0
             return speed_input
-        if isinstance(speed_input, float) and math.isnan(speed_input):
-            return 0.0
         if isinstance(speed_input, list):
             return mean(map(AvgSpeedCalculator.parse_speed, speed_input))
         if " mph" in speed_input:
