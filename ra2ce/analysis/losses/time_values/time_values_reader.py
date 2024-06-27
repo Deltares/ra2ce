@@ -29,9 +29,9 @@ from ra2ce.analysis.losses.time_values.time_values import TimeValues
 @dataclass
 class TimeValuesReader(LossesInputDataReaderBase):
     csv_columns = ["trip_types", "value_of_time", "occupants"]
-    data_type = TimeValues
+    data_type = type[TimeValues]
 
-    def _parse_df(self, df: DataFrame) -> Any:
+    def _parse_df(self, df: DataFrame) -> type[TimeValues]:
         _time_values = TimeValues()
 
         for _, row in df.iterrows():
