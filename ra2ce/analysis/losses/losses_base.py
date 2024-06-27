@@ -444,7 +444,9 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         )
         return vehicle_loss_hours_result
 
-    def _get_relevant_link_type(self, vlh_row: pd.Series) -> RoadTypeEnum:
+    def _get_relevant_link_type(
+        self, vlh_row: pd.Series, row_hazard_range: tuple[float, float]
+    ) -> RoadTypeEnum:
         # Check if the resilience curve is present for the link type and hazard intensity
         _relevant_link_type = None
         if isinstance(vlh_row[self.link_type_column], list):
@@ -496,6 +498,15 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         The unit of time is hour.
         """
         vlh_total = 0
+        _relevant_link_type = self._get_relevant_link_type(vlh_row, row_hazard_range)
+
+        duration_steps = self.resilience_curve.get_duration_steps(
+            _relevant_link_type, row_hazard_range[0]
+        )
+        functionality_loss_ratios = self.resilience_curve.get_functionality_loss_ratio(
+            _relevant_link_type, row_hazard_range[0]
+        )
+
         for trip_type in self.trip_purposes:
             intensity_trip_type = self.vot_intensity_per_trip_collection[
                 f"intensity_{self.part_of_day}_{trip_type}"
@@ -503,13 +514,17 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             occupancy_trip_type = float(
                 self.vot_intensity_per_trip_collection[f"occupants_{trip_type}"]
             )
-            # TODO: improve formula based on road_type, water_heigth resilience_curve.csv (duration*loss_ratio) instead of duration_event
-            # Compare with other function
-            vlh_trip_type_event_series = (
-                self.duration_event
-                * intensity_trip_type
-                * occupancy_trip_type
-                * self.production_loss_per_capita_per_hour
+            vlh_trip_type_event_series = sum(
+                (
+                    intensity_trip_type
+                    * duration
+                    * loss_ratio
+                    * occupancy_trip_type
+                    * self.production_loss_per_capita_per_hour
+                )
+                for duration, loss_ratio in zip(
+                    duration_steps, functionality_loss_ratios
+                )
             )
             vlh_trip_type_event = vlh_trip_type_event_series.squeeze()
             vehicle_loss_hours.loc[
@@ -530,7 +545,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
     ):
 
         vlh_total = 0
-        _relevant_link_type = self._get_relevant_link_type(vlh_row)
+        _relevant_link_type = self._get_relevant_link_type(vlh_row, row_hazard_range)
 
         divisor = 100  # high value assuming the road is almost inaccessible
         if all(
