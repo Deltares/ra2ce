@@ -14,75 +14,47 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-import logging
 from ast import literal_eval
-from pathlib import Path
 from re import findall
+from typing import Any
 
 import pandas as pd
 
+from ra2ce.analysis.losses.losses_input_data_reader_base import (
+    LossesInputDataReaderBase,
+)
 from ra2ce.analysis.losses.resilience_curves.resilience_curves import ResilienceCurves
-from ra2ce.common.io.readers.file_reader_protocol import FileReaderProtocol
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 
-class ResilienceCurvesReader(FileReaderProtocol):
+class ResilienceCurvesReader(LossesInputDataReaderBase):
+    csv_columns = [
+        "link_type_hazard_intensity",
+        "duration_steps",
+        "functionality_loss_ratio",
+    ]
+    data_type: type[Any] = ResilienceCurves
+
     def _parse_df(self, df: pd.DataFrame) -> ResilienceCurves:
         def parse_link_type_hazard_intensity(
             link_type_hazard_intensity: str,
         ) -> tuple[str, str, str]:
             return findall(r"^(\w+)_([\d.]+)-([\d.]+)$", link_type_hazard_intensity)[0]
 
-        _link_type = []
-        _hazard_range = []
-        _duration_steps = []
-        _functionality_loss_ratio = []
+        _resilience_curves = ResilienceCurves()
 
         for _, row in df.iterrows():
             _link_type_hazard_intensity = row["link_type_hazard_intensity"]
             _lt, _h_min, _h_max = parse_link_type_hazard_intensity(
                 _link_type_hazard_intensity
             )
-            _link_type.append(RoadTypeEnum.get_enum(_lt))
-            _hazard_range.append((float(_h_min), float(_h_max)))
-            _duration_steps.append(literal_eval(row["duration_steps"]))
-            _functionality_loss_ratio.append(
+            _resilience_curves.link_type.append(RoadTypeEnum.get_enum(_lt))
+            _resilience_curves.hazard_range.append((float(_h_min), float(_h_max)))
+            _resilience_curves.duration_steps.append(
+                literal_eval(row["duration_steps"])
+            )
+            _resilience_curves.functionality_loss_ratio.append(
                 literal_eval(row["functionality_loss_ratio"])
             )
 
-        if len(_duration_steps) != len(_functionality_loss_ratio):
-            raise ValueError(
-                "Duration steps and functionality loss ratio should have the same length"
-            )
-
-        return ResilienceCurves(
-            link_type=_link_type,
-            hazard_range=_hazard_range,
-            duration_steps=_duration_steps,
-            functionality_loss_ratio=_functionality_loss_ratio,
-        )
-
-    def read(self, file_path: Path | None) -> ResilienceCurves:
-        if not file_path or not file_path.exists():
-            logging.warning("No `csv` file found at %s.", file_path)
-            return ResilienceCurves()
-
-        _df = pd.read_csv(file_path, sep=";", on_bad_lines="skip")
-        if "geometry" in _df.columns:
-            raise ValueError(
-                f"The csv file in {file_path} should not have a geometry column"
-            )
-
-        if not all(
-            col in _df.columns
-            for col in [
-                "link_type_hazard_intensity",
-                "duration_steps",
-                "functionality_loss_ratio",
-            ]
-        ):
-            raise ValueError(
-                f"The csv file in {file_path} should have columns link_type_hazard_intensity, duration_steps, functionality_loss_ratio",
-            )
-
-        return self._parse_df(_df)
+        return _resilience_curves
