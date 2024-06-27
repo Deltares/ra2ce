@@ -28,6 +28,7 @@ class TestTimeValuesReader:
         traffic_intensities_data: list[
             tuple[int, int, int, int, int, int, int, int, int, int, int]
         ],
+        traffic_intensities_names: list[str],
     ):
         # 1. Define test data
         assert traffic_intensities_csv.is_file()
@@ -36,23 +37,9 @@ class TestTimeValuesReader:
         _traffic_intensities = TrafficIntensitiesReader().read(traffic_intensities_csv)
 
         # 3. Verify expectations
-        _field_names = [
-            "link_id",
-            "evening_total",
-            "evening_freight",
-            "evening_commute",
-            "evening_business",
-            "evening_other",
-            "day_freight",
-            "day_commute",
-            "day_business",
-            "day_other",
-            "day_total",
-        ]
-
         assert isinstance(_traffic_intensities, TrafficIntensities)
         _data = list(zip(*traffic_intensities_data))
-        for i, _field_name in enumerate(_field_names):
+        for i, _field_name in enumerate(traffic_intensities_names):
             _values = _traffic_intensities.__getattribute__(_field_name)
             assert len(_values) == len(_data[i])
             assert all(_val in _data[i] for _val in _values)

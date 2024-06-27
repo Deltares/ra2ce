@@ -42,7 +42,7 @@ class TrafficIntensitiesReader(LossesInputDataReaderBase):
         "day_total",
     ]
     separator = ","
-    data_type = TrafficIntensities
+    data_type = type[TrafficIntensities]
 
     def _parse_df(self, df: pd.DataFrame) -> TrafficIntensities:
         _traffic_intensities = TrafficIntensities()

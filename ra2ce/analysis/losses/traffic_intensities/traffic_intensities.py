@@ -14,9 +14,13 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
-
 from dataclasses import dataclass, field
+from operator import itemgetter
+
+import numpy as np
+
+from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
+from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 
 
 @dataclass
@@ -32,3 +36,19 @@ class TrafficIntensities:
     day_business: list[int] = field(default_factory=list)
     day_other: list[int] = field(default_factory=list)
     day_total: list[int] = field(default_factory=list)
+
+    def get_intensity(
+        self,
+        link_ids: list[int],
+        part_of_day: PartOfDayEnum,
+        trip_purpose: TripPurposeEnum,
+    ) -> int:
+        _idx = list(
+            filter(lambda x: self.link_id[x] in link_ids, range(len(self.link_id)))
+        )
+        if not _idx:
+            return 0
+        _intensities = getattr(
+            self, f"{part_of_day.config_value}_{trip_purpose.config_value}"
+        )
+        return sum(itemgetter(*_idx)(_intensities))

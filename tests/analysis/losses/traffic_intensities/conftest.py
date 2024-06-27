@@ -31,3 +31,26 @@ def get_traffic_intensities_data() -> Iterator[
         (4, 0, 0, 20, 10, 0, 0, 20, 10, 0, 30),
         (5, 0, 0, 4, 8, 0, 0, 4, 8, 0, 12),
     ]
+
+
+@pytest.fixture(name="traffic_intensities_names")
+def get_traffic_intensities_names() -> Iterator[list[str]]:
+    """
+    Get traffic intensities field names.
+
+    Yields:
+        Iterator[list[str]]: Traffic intensities field names.
+    """
+    yield [
+        "link_id",
+        "evening_total",
+        "evening_freight",
+        "evening_commute",
+        "evening_business",
+        "evening_other",
+        "day_freight",
+        "day_commute",
+        "day_business",
+        "day_other",
+        "day_total",
+    ]
