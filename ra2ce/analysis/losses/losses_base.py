@@ -425,7 +425,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                         math.isnan(row_performance_change) and row_connectivity == 0
                     ) or row_performance_change == 0:
                         self._calculate_production_loss_per_capita(
-                            vehicle_loss_hours, vlh_row, event
+                            vehicle_loss_hours, row_hazard_range, vlh_row, event
                         )
                     elif not (
                         math.isnan(row_performance_change)
@@ -444,9 +444,38 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         )
         return vehicle_loss_hours_result
 
+    def _get_relevant_link_type(self, vlh_row: pd.Series) -> RoadTypeEnum:
+        # Check if the resilience curve is present for the link type and hazard intensity
+        _relevant_link_type = None
+        if isinstance(vlh_row[self.link_type_column], list):
+            # Find the link type with the highest disruption for the given hazard intensity
+            _max_disruption = 0
+            for _row_link_type in vlh_row[self.link_type_column]:
+                _link_type = RoadTypeEnum.get_enum(_row_link_type)
+                disruption = self.resilience_curve.get_disruption(
+                    _link_type, row_hazard_range[0]
+                )
+                if disruption > _max_disruption:
+                    _relevant_link_type = _link_type
+        else:
+            _link_type = RoadTypeEnum.get_enum(vlh_row[self.link_type_column])
+            if self.resilience_curve.has_resilience_curve(
+                _link_type,
+                row_hazard_range[0],
+            ):
+                _relevant_link_type = _link_type
+
+        if not _relevant_link_type:
+            raise ValueError(
+                f"'{_link_type}' with range {row_hazard_range} was not found in the introduced resilience_curve"
+            )
+
+        return _relevant_link_type
+
     def _calculate_production_loss_per_capita(
         self,
         vehicle_loss_hours: gpd.GeoDataFrame,
+        row_hazard_range: tuple[float, float],
         vlh_row: pd.Series,
         hazard_col_name: str,
     ):
@@ -464,7 +493,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         disrupted is then obtained multiplying the traffic intensity by the total occupancy per vehicle type,
         including drivers, by the daily loss of productivity per capita per hour.
 
-        the unit of time is hour.
+        The unit of time is hour.
         """
         vlh_total = 0
         for trip_type in self.trip_purposes:
@@ -500,31 +529,8 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         hazard_col_name: str,
     ):
 
-        # Check if the resilience curve is present for the link type and hazard intensity
         vlh_total = 0
-        _relevant_link_type = None
-        if isinstance(vlh_row[self.link_type_column], list):
-            # Find the link type with the highest disruption for the given hazard intensity
-            _max_disruption = 0
-            for _row_link_type in vlh_row[self.link_type_column]:
-                _link_type = RoadTypeEnum.get_enum(_row_link_type)
-                disruption = self.resilience_curve.get_disruption(
-                    _link_type, row_hazard_range[0]
-                )
-                if disruption > _max_disruption:
-                    _relevant_link_type = _link_type
-        else:
-            _link_type = RoadTypeEnum.get_enum(vlh_row[self.link_type_column])
-            if self.resilience_curve.has_resilience_curve(
-                _link_type,
-                row_hazard_range[0],
-            ):
-                _relevant_link_type = _link_type
-
-        if not _relevant_link_type:
-            raise ValueError(
-                f"'{_link_type}' with range {row_hazard_range} was not found in the introduced resilience_curve"
-            )
+        _relevant_link_type = self._get_relevant_link_type(vlh_row)
 
         divisor = 100  # high value assuming the road is almost inaccessible
         if all(
