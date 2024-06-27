@@ -48,18 +48,16 @@ class AvgSpeedCalculator:
         Parse the average speed from the input string(s).
 
         Args:
-            speed_input (str | list[str]): (List of) string(s) with the speed(s).
+            speed_input (float | str | list[str]): (List of) string(s) with the speed(s).
                 Can have different formats, e.g. "50 mph", "50", "50;60", "50-60", "50|60".
 
         Returns:
             float: Average speed of the input string(s).
                 0.0 is returned if the input is empty or can't be parsed correctly.
         """
-        if (isinstance(speed_input, float) and math.isnan(speed_input)) or isinstance(
-            speed_input, float
-        ):
-            return speed_input
         if not speed_input:
+            return 0.0
+        if isinstance(speed_input, float) and math.isnan(speed_input):
             return 0.0
         if isinstance(speed_input, list):
             return mean(map(AvgSpeedCalculator.parse_speed, speed_input))
