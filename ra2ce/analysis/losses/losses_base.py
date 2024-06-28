@@ -453,14 +453,14 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             _max_disruption = 0
             for _row_link_type in vlh_row[self.link_type_column]:
                 _link_type = RoadTypeEnum.get_enum(_row_link_type)
-                disruption = self.resilience_curve.get_disruption(
+                disruption = self.resilience_curves.get_disruption(
                     _link_type, row_hazard_range
                 )
                 if disruption > _max_disruption:
                     _relevant_link_type = _link_type
         else:
             _link_type = RoadTypeEnum.get_enum(vlh_row[self.link_type_column])
-            if self.resilience_curve.has_resilience_curve(
+            if self.resilience_curves.has_resilience_curve(
                 _link_type,
                 row_hazard_range,
             ):
@@ -468,7 +468,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
         if not _relevant_link_type:
             raise ValueError(
-                f"'{_link_type}' with range {row_hazard_range} was not found in the introduced resilience_curve"
+                f"'{_link_type}' with range {row_hazard_range} was not found in the introduced resilience_curves"
             )
 
         return _relevant_link_type
@@ -478,7 +478,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
     ):
         if all(
             ratio <= 1
-            for ratio in self.resilience_curve.get_functionality_loss_ratio(
+            for ratio in self.resilience_curves.get_functionality_loss_ratio(
                 relevant_link_type, row_hazard_range
             )
         ):
@@ -512,10 +512,10 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         _relevant_link_type = self._get_relevant_link_type(vlh_row, row_hazard_range)
         _divisor = self._get_divisor(_relevant_link_type, row_hazard_range)
 
-        duration_steps = self.resilience_curve.get_duration_steps(
+        duration_steps = self.resilience_curves.get_duration_steps(
             _relevant_link_type, row_hazard_range
         )
-        functionality_loss_ratios = self.resilience_curve.get_functionality_loss_ratio(
+        functionality_loss_ratios = self.resilience_curves.get_functionality_loss_ratio(
             _relevant_link_type, row_hazard_range
         )
 
