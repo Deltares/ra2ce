@@ -3,6 +3,8 @@ from typing import Iterator
 
 import pytest
 
+from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
+from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 from tests import test_data
 
 
@@ -16,41 +18,21 @@ def get_traffic_intensities_csv_filepath() -> Iterator[Path]:
 
 @pytest.fixture(name="traffic_intensities_data")
 def get_traffic_intensities_data() -> Iterator[
-    list[tuple[int, int, int, int, int, int, int, int, int, int, int]]
+    dict[tuple[PartOfDayEnum, TripPurposeEnum], list[int]]
 ]:
     """
     Get traffic intensities data for testing.
 
     Yields:
-        Iterator[list[tuple[int, int, int,int, int, int, int, int, int, int, int]]]: Traffic intensities data.
+        Iterator[dict[tuple[PartOfDayEnum, RoadTypeEnum], list[int]]]: Traffic intensities data.
     """
-    yield [
-        (1, 0, 0, 10, 20, 0, 0, 10, 20, 0, 30),
-        (2, 0, 0, 2, 5, 0, 0, 2, 5, 0, 7),
-        (3, 0, 0, 8, 7, 0, 0, 8, 7, 0, 15),
-        (4, 0, 0, 20, 10, 0, 0, 20, 10, 0, 30),
-        (5, 0, 0, 4, 8, 0, 0, 4, 8, 0, 12),
-    ]
-
-
-@pytest.fixture(name="traffic_intensities_names")
-def get_traffic_intensities_names() -> Iterator[list[str]]:
-    """
-    Get traffic intensities field names.
-
-    Yields:
-        Iterator[list[str]]: Traffic intensities field names.
-    """
-    yield [
-        "link_id",
-        "evening_total",
-        "evening_freight",
-        "evening_commute",
-        "evening_business",
-        "evening_other",
-        "day_freight",
-        "day_commute",
-        "day_business",
-        "day_other",
-        "day_total",
-    ]
+    yield {
+        (PartOfDayEnum.EVENING, TripPurposeEnum.FREIGHT): [0, 0, 0, 0, 0],
+        (PartOfDayEnum.EVENING, TripPurposeEnum.COMMUTE): [10, 2, 8, 20, 4],
+        (PartOfDayEnum.EVENING, TripPurposeEnum.BUSINESS): [20, 5, 7, 10, 8],
+        (PartOfDayEnum.EVENING, TripPurposeEnum.OTHER): [0, 0, 0, 0, 0],
+        (PartOfDayEnum.DAY, TripPurposeEnum.FREIGHT): [0, 0, 0, 0, 0],
+        (PartOfDayEnum.DAY, TripPurposeEnum.COMMUTE): [10, 2, 8, 20, 4],
+        (PartOfDayEnum.DAY, TripPurposeEnum.BUSINESS): [20, 5, 7, 10, 8],
+        (PartOfDayEnum.DAY, TripPurposeEnum.OTHER): [0, 0, 0, 0, 0],
+    }

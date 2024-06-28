@@ -17,25 +17,16 @@
 from dataclasses import dataclass, field
 from operator import itemgetter
 
-import numpy as np
-
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 
 
-@dataclass
+@dataclass(kw_only=True)
 class TrafficIntensities:
     link_id: list[int] = field(default_factory=list)
-    evening_total: list[int] = field(default_factory=list)
-    evening_freight: list[int] = field(default_factory=list)
-    evening_commute: list[int] = field(default_factory=list)
-    evening_business: list[int] = field(default_factory=list)
-    evening_other: list[int] = field(default_factory=list)
-    day_freight: list[int] = field(default_factory=list)
-    day_commute: list[int] = field(default_factory=list)
-    day_business: list[int] = field(default_factory=list)
-    day_other: list[int] = field(default_factory=list)
-    day_total: list[int] = field(default_factory=list)
+    intensities: dict[tuple[PartOfDayEnum, TripPurposeEnum], list[int]] = field(
+        default_factory=dict
+    )
 
     def get_intensity(
         self,
@@ -48,7 +39,4 @@ class TrafficIntensities:
         )
         if not _idx:
             return 0
-        _intensities = getattr(
-            self, f"{part_of_day.config_value}_{trip_purpose.config_value}"
-        )
-        return sum(itemgetter(*_idx)(_intensities))
+        return sum(itemgetter(*_idx)(self.intensities[(part_of_day, trip_purpose)]))

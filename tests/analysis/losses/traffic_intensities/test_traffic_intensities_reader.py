@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.losses.losses_input_data_reader_base import (
     LossesInputDataReaderBase,
 )
@@ -10,6 +11,7 @@ from ra2ce.analysis.losses.traffic_intensities.traffic_intensities_reader import
     TrafficIntensitiesReader,
 )
 from ra2ce.common.io.readers.file_reader_protocol import FileReaderProtocol
+from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 
 
 class TestTimeValuesReader:
@@ -25,10 +27,9 @@ class TestTimeValuesReader:
     def test_read_traffic_intensities(
         self,
         traffic_intensities_csv: Path,
-        traffic_intensities_data: list[
-            tuple[int, int, int, int, int, int, int, int, int, int, int]
+        traffic_intensities_data: dict[
+            tuple[PartOfDayEnum, TripPurposeEnum], list[int]
         ],
-        traffic_intensities_names: list[str],
     ):
         # 1. Define test data
         assert traffic_intensities_csv.is_file()
@@ -38,8 +39,8 @@ class TestTimeValuesReader:
 
         # 3. Verify expectations
         assert isinstance(_traffic_intensities, TrafficIntensities)
-        _data = list(zip(*traffic_intensities_data))
-        for i, _field_name in enumerate(traffic_intensities_names):
-            _values = _traffic_intensities.__getattribute__(_field_name)
-            assert len(_values) == len(_data[i])
-            assert all(_val in _data[i] for _val in _values)
+        for _key in traffic_intensities_data:
+            assert _key in _traffic_intensities.intensities
+            assert (
+                traffic_intensities_data[_key] == _traffic_intensities.intensities[_key]
+            )

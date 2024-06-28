@@ -8,20 +8,14 @@ from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEn
 class TestTrafficIntensities:
     def test_get_traffic_intensity(
         self,
-        traffic_intensities_data: list[
-            tuple[int, int, int, int, int, int, int, int, int, int, int]
+        traffic_intensities_data: dict[
+            tuple[PartOfDayEnum, TripPurposeEnum], list[int]
         ],
-        traffic_intensities_names: list[str],
     ):
         # 1. Define test data
-        _traffic_intensities = TrafficIntensities()
-        _data = list(zip(*traffic_intensities_data))
-        for i, _field_name in enumerate(traffic_intensities_names):
-            setattr(
-                _traffic_intensities,
-                _field_name,
-                _data[i],
-            )
+        _traffic_intensities = TrafficIntensities(link_id=list(range(1, 6)))
+        for _key in traffic_intensities_data:
+            _traffic_intensities.intensities[_key] = traffic_intensities_data[_key]
 
         _part_of_day = PartOfDayEnum.DAY
         _trip_purpose = TripPurposeEnum.BUSINESS

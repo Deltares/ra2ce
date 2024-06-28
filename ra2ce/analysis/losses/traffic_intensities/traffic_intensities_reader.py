@@ -19,12 +19,14 @@ from pathlib import Path
 
 import pandas as pd
 
+from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.losses.losses_input_data_reader_base import (
     LossesInputDataReaderBase,
 )
 from ra2ce.analysis.losses.traffic_intensities.traffic_intensities import (
     TrafficIntensities,
 )
+from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 
 
 @dataclass
@@ -35,18 +37,16 @@ class TrafficIntensitiesReader(LossesInputDataReaderBase):
 
     def _parse_df(self, df: pd.DataFrame) -> TrafficIntensities:
         _traffic_intensities = TrafficIntensities()
-        for _, row in df.iterrows():
-            _traffic_intensities.link_id.append(row["link_id"])
-            _traffic_intensities.evening_total.append(row["evening_total"])
-            _traffic_intensities.evening_freight.append(row["evening_freight"])
-            _traffic_intensities.evening_commute.append(row["evening_commute"])
-            _traffic_intensities.evening_business.append(row["evening_business"])
-            _traffic_intensities.evening_other.append(row["evening_other"])
-            _traffic_intensities.day_freight.append(row["day_freight"])
-            _traffic_intensities.day_commute.append(row["day_commute"])
-            _traffic_intensities.day_business.append(row["day_business"])
-            _traffic_intensities.day_other.append(row["day_other"])
-            _traffic_intensities.day_total.append(row["day_total"])
+        for col in df:
+            if col == "link_id":
+                _traffic_intensities.link_id = df[col].tolist()
+                continue
+            _col_parts = col.split("_")
+            _part_of_day = PartOfDayEnum.get_enum(_col_parts[0])
+            _trip_purpose = TripPurposeEnum.get_enum(_col_parts[1])
+            _traffic_intensities.intensities[(_part_of_day, _trip_purpose)] = df[
+                col
+            ].tolist()
         return _traffic_intensities
 
     def read(self, file_path: Path | None) -> TrafficIntensities:
