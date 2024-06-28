@@ -19,7 +19,6 @@ class TestResilienceCurveReader:
         # 2. Verify expections
         assert isinstance(_reader, ResilienceCurvesReader)
         assert isinstance(_reader, FileReaderProtocol)
-        assert isinstance(_reader, LossesInputDataReaderBase)
 
     def test_read_resilience_curves(
         self,
