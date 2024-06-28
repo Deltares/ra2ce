@@ -176,7 +176,6 @@ class TestLosses:
             name="single_link_redundancy_losses_test",
             trip_purposes=[TripPurposeEnum.BUSINESS, TripPurposeEnum.COMMUTE],
             weighing=WeighingEnum.LENGTH,
-            hours_per_day=10,
         )
 
         _analysis_input = AnalysisInputWrapper.from_input(

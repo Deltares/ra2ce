@@ -121,20 +121,24 @@ def create_summary_statistics(gdf: GeoDataFrame) -> dict:
     """
     # Todo: in the future we can make it more generic, so that we can easily get the mode/mean/whatever
 
-    dictionary = dict(gdf.groupby("road_type")["lanes"].agg(pd.Series.mode))
+    _grouped_lanes = gdf.groupby("road_type")["lanes"]
+    _road_types, _lanes = list(zip(*((x[0], x[1].mode()) for x in _grouped_lanes)))
+    _lanes_dict = {
+        _road_type: _lanes[0] if not _lanes.empty else np.nan
+        for _road_type, _lanes in zip(_road_types, _lanes)
+    }
 
-    # get a default value if any key of the dictionary became empty (because the mode operation on the 'lanes' column
-    # for a road type results in an empty array
-    non_empty_modes = [
-        value for value in dictionary.values() if isinstance(value, float) and value > 0
-    ]
-    default_value = np.mean(non_empty_modes)
+    # get a default value if any key of the dictionary is nan
+    # (because the mode operation on the 'lanes' column for a road type results in an empty array)
+    default_value = np.mean(
+        list(_val for _val in _lanes_dict.values() if not np.isnan(_val))
+    )
 
-    # Replace empty arrays with the calculated average
-    for key, value in dictionary.items():
-        if isinstance(value, np.ndarray) and len(value) == 0:
-            dictionary[key] = default_value
-    return dictionary
+    # Replace nan with the calculated average
+    return {
+        _road_type: _lanes if not np.isnan(_lanes) else default_value
+        for _road_type, _lanes in _lanes_dict.items()
+    }
 
 
 def scale_damage_using_lanes(lane_scale_factors, df, cols_to_scale) -> pd.DataFrame:
