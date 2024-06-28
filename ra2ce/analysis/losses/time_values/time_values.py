@@ -32,4 +32,4 @@ class TimeValues:
         return self.value_of_time[self._get_index(trip_type)]
 
     def get_occupants(self, trip_type: TripPurposeEnum) -> int:
-        return self.value_of_time[self._get_index(trip_type)]
+        return self.occupants[self._get_index(trip_type)]

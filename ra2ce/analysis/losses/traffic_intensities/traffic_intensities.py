@@ -15,7 +15,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from dataclasses import dataclass, field
-from operator import itemgetter
 
 from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
@@ -23,20 +22,32 @@ from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurp
 
 @dataclass(kw_only=True)
 class TrafficIntensities:
-    link_id: list[int] = field(default_factory=list)
+    link_id: list[int | tuple[int, int]] = field(default_factory=list)
     intensities: dict[tuple[PartOfDayEnum, TripPurposeEnum], list[int]] = field(
         default_factory=dict
     )
 
     def get_intensity(
         self,
-        link_ids: list[int],
+        link_id: int | tuple[int, int],
         part_of_day: PartOfDayEnum,
         trip_purpose: TripPurposeEnum,
     ) -> int:
-        _idx = list(
-            filter(lambda x: self.link_id[x] in link_ids, range(len(self.link_id)))
+        if isinstance(link_id, tuple):
+            return max(
+                self.get_intensity(_id, part_of_day, trip_purpose) for _id in link_id
+            )
+        return self.intensities[(part_of_day, trip_purpose)][
+            self.link_id.index(link_id)
+        ]
+
+    def get_intensities(
+        self,
+        link_ids: list[int | tuple[int, int]],
+        part_of_day: PartOfDayEnum,
+        trip_purpose: TripPurposeEnum,
+    ) -> list[int]:
+        return list(
+            self.get_intensity(_link_id, part_of_day, trip_purpose)
+            for _link_id in link_ids
         )
-        if not _idx:
-            return 0
-        return sum(itemgetter(*_idx)(self.intensities[(part_of_day, trip_purpose)]))

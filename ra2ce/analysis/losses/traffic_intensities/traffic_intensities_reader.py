@@ -29,11 +29,11 @@ from ra2ce.analysis.losses.traffic_intensities.traffic_intensities import (
 
 
 class TrafficIntensitiesReader(LossesInputDataReaderBase):
-    csv_columns = ["link_id"]
+    csv_columns = []
     separator = ","
     data_type = TrafficIntensities
 
-    def __init__(self, link_id: str) -> None:
+    def __init__(self, link_id: str = "link_id") -> None:
         self.csv_columns = [link_id]
 
     def _parse_df(self, df: pd.DataFrame) -> TrafficIntensities:
