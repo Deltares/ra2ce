@@ -1,8 +1,5 @@
 from pathlib import Path
 
-from ra2ce.analysis.losses.losses_input_data_reader_base import (
-    LossesInputDataReaderBase,
-)
 from ra2ce.analysis.losses.resilience_curves.resilience_curves import ResilienceCurves
 from ra2ce.analysis.losses.resilience_curves.resilience_curves_reader import (
     ResilienceCurvesReader,
