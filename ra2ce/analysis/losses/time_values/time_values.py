@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 
 
-@dataclass
+@dataclass(kw_only=True)
 class TimeValues:
     trip_types: list[TripPurposeEnum] = field(default_factory=list)
     value_of_time: list[int] = field(default_factory=list)
