@@ -92,7 +92,9 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         self.link_type_column = analysis_config.config_data.network.link_type_column
         self.trip_purposes = self.analysis.trip_purposes
 
-        self.performance_metric = f"diff_{self.analysis.weighing}"  # either diff_time or diff_distance
+        self.performance_metric = (
+            f"diff_{self.analysis.weighing}"  # either diff_time or diff_distance
+        )
 
         self.part_of_day: PartOfDayEnum = self.analysis.part_of_day
         self.analysis_type = self.analysis.analysis
