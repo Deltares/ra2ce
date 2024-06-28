@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from ast import literal_eval
+from pathlib import Path
 from re import findall
 from typing import Any
 
@@ -33,7 +34,7 @@ class ResilienceCurvesReader(LossesInputDataReaderBase):
         "duration_steps",
         "functionality_loss_ratio",
     ]
-    data_type: type[Any] = ResilienceCurves
+    data_type = ResilienceCurves
 
     def _parse_df(self, df: pd.DataFrame) -> ResilienceCurves:
         def parse_link_type_hazard_intensity(
@@ -58,3 +59,6 @@ class ResilienceCurvesReader(LossesInputDataReaderBase):
             )
 
         return _resilience_curves
+
+    def read(self, file_path: Path | None) -> ResilienceCurves:
+        return super().read(file_path)

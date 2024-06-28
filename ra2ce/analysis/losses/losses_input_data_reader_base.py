@@ -19,6 +19,7 @@ from __future__ import annotations
 import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 
@@ -32,10 +33,10 @@ class LossesInputDataReaderBase(ABC, FileReaderProtocol):
 
     csv_columns: list[str] = []
     separator: str = ";"
-    data_type: type[LossesInputDataReaderBase] = None
+    object_type: type[Any] = None
 
     @abstractmethod
-    def _parse_df(self, df: pd.DataFrame) -> type[LossesInputDataReaderBase]:
+    def _parse_df(self, df: pd.DataFrame) -> Any:
         """
         Abstract method to parse the data from a DataFrame.
 
@@ -47,10 +48,10 @@ class LossesInputDataReaderBase(ABC, FileReaderProtocol):
         """
         pass
 
-    def read(self, file_path: Path | None) -> type[LossesInputDataReaderBase]:
+    def read(self, file_path: Path | None) -> Any:
         if not file_path or not file_path.exists():
             logging.warning("No `csv` file found at %s.", file_path)
-            return self.data_type()
+            return self.object_type()
 
         _df = pd.read_csv(file_path, sep=self.separator, on_bad_lines="skip")
         if "geometry" in _df.columns:

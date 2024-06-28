@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from dataclasses import dataclass
+from pathlib import Path
 
 import pandas as pd
 
@@ -28,21 +29,9 @@ from ra2ce.analysis.losses.traffic_intensities.traffic_intensities import (
 
 @dataclass
 class TrafficIntensitiesReader(LossesInputDataReaderBase):
-    csv_columns = [
-        "link_id",
-        "evening_total",
-        "evening_freight",
-        "evening_commute",
-        "evening_business",
-        "evening_other",
-        "day_freight",
-        "day_commute",
-        "day_business",
-        "day_other",
-        "day_total",
-    ]
+    csv_columns = ["link_id"]
     separator = ","
-    data_type = type[TrafficIntensities]
+    data_type = TrafficIntensities
 
     def _parse_df(self, df: pd.DataFrame) -> TrafficIntensities:
         _traffic_intensities = TrafficIntensities()
@@ -59,3 +48,6 @@ class TrafficIntensitiesReader(LossesInputDataReaderBase):
             _traffic_intensities.day_other.append(row["day_other"])
             _traffic_intensities.day_total.append(row["day_total"])
         return _traffic_intensities
+
+    def read(self, file_path: Path | None) -> TrafficIntensities:
+        return super().read(file_path)

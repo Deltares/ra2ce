@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from dataclasses import dataclass
-from typing import Any
+from pathlib import Path
 
 from pandas import DataFrame
 
@@ -29,9 +29,9 @@ from ra2ce.analysis.losses.time_values.time_values import TimeValues
 @dataclass
 class TimeValuesReader(LossesInputDataReaderBase):
     csv_columns = ["trip_types", "value_of_time", "occupants"]
-    data_type = type[TimeValues]
+    data_type = TimeValues
 
-    def _parse_df(self, df: DataFrame) -> type[TimeValues]:
+    def _parse_df(self, df: DataFrame) -> TimeValues:
         _time_values = TimeValues()
 
         for _, row in df.iterrows():
@@ -40,3 +40,6 @@ class TimeValuesReader(LossesInputDataReaderBase):
             _time_values.occupants.append(int(row["occupants"]))
 
         return _time_values
+
+    def read(self, file_path: Path | None) -> TimeValues:
+        return super().read(file_path)
