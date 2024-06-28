@@ -99,7 +99,7 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     trip_purposes: list[TripPurposeEnum] = field(
         default_factory=lambda: [TripPurposeEnum.NONE]
     )
-    resilience_curve_file: Optional[Path] = None
+    resilience_curves_file: Optional[Path] = None
     traffic_intensities_file: Optional[Path] = None
     values_of_time_file: Optional[Path] = None
     # the redundancy analysis) and the intensities

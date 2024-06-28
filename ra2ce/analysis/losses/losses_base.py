@@ -36,8 +36,8 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
-from ra2ce.analysis.losses.resilience_curve.resilience_curve_reader import (
-    ResilienceCurveReader,
+from ra2ce.analysis.losses.resilience_curves.resilience_curves_reader import (
+    ResilienceCurvesReader,
 )
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
@@ -108,8 +108,8 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         self.intensities = _load_df_from_csv(
             Path(self.analysis.traffic_intensities_file), [], self.link_id
         )  # per day
-        self.resilience_curve = ResilienceCurveReader().read(
-            self.analysis.resilience_curve_file
+        self.resilience_curves = ResilienceCurvesReader().read(
+            self.analysis.resilience_curves_file
         )
         self.values_of_time = _load_df_from_csv(
             Path(self.analysis.values_of_time_file), [], None, sep=";"
@@ -126,11 +126,11 @@ class LossesBase(AnalysisLossesProtocol, ABC):
     def _check_validity_analysis_files(self):
         if (
             self.analysis.traffic_intensities_file is None
-            or self.analysis.resilience_curve_file is None
+            or self.analysis.resilience_curves_file is None
             or self.analysis.values_of_time_file is None
         ):
             raise ValueError(
-                f"traffic_intensities_file, resilience_curve_file, and values_of_time_file should be given"
+                f"traffic_intensities_file, resilience_curves_file, and values_of_time_file should be given"
             )
 
     def _check_validity_df(self):
@@ -331,7 +331,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
         _check_validity_criticality_analysis()
 
-        _hazard_intensity_ranges = self.resilience_curve.ranges
+        _hazard_intensity_ranges = self.resilience_curves.ranges
         events = self.criticality_analysis.filter(regex=r"^EV(?!1_fr)")
         # Read the performance_change stating the functionality drop
         if "key" in self.criticality_analysis.columns:
@@ -561,10 +561,10 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         _relevant_link_type = self._get_relevant_link_type(vlh_row, row_hazard_range)
         _divisor = self._get_divisor(_relevant_link_type, row_hazard_range)
 
-        duration_steps = self.resilience_curve.get_duration_steps(
+        duration_steps = self.resilience_curves.get_duration_steps(
             _relevant_link_type, row_hazard_range
         )
-        functionality_loss_ratios = self.resilience_curve.get_functionality_loss_ratio(
+        functionality_loss_ratios = self.resilience_curves.get_functionality_loss_ratio(
             _relevant_link_type, row_hazard_range
         )
 

@@ -22,7 +22,7 @@ from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 
 @dataclass(kw_only=True)
-class ResilienceCurve:
+class ResilienceCurves:
     link_type: list[RoadTypeEnum] = field(default_factory=list)
     hazard_range: list[tuple[float, float]] = field(default_factory=list)
     duration_steps: list[list[float]] = field(default_factory=list)
