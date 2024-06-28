@@ -42,6 +42,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
+from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
@@ -128,6 +129,9 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         # losses
         _section.traffic_cols = self._parser.getlist(
             section_name, "traffic_cols", fallback=_section.traffic_cols
+        )
+        _section.part_of_day = PartOfDayEnum.get_enum(
+            self._parser.get(section_name, "part_of_day", fallback=None)
         )
         _section.trip_purposes = list(
             map(
