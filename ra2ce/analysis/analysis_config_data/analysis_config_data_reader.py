@@ -145,11 +145,6 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             "duration_event",
             fallback=_section.duration_event,
         )
-        _section.hours_per_day = self._parser.getfloat(
-            section_name,
-            "hours_per_day",
-            fallback=_section.hours_per_day,
-        )
 
         # accessibility analyses
         _section.threshold = self._parser.getfloat(
