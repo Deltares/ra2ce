@@ -1,6 +1,6 @@
 import random
 from typing import Callable, Iterator
-
+import math
 import networkx as nx
 import numpy as np
 import pytest
@@ -25,15 +25,29 @@ from ra2ce.network.networks_utils import line_length
 def _detailed_edge_comparison(
     graph1: nx.MultiDiGraph | nx.MultiGraph, graph2: nx.MultiDiGraph | nx.MultiGraph
 ) -> bool:
-    for u, v, k, data in graph1.edges(keys=True, data=True):
-        if data != graph2.get_edge_data(u, v, k):
-            return False
+    def _dicts_comparison(
+        graph1: nx.MultiDiGraph | nx.MultiGraph, graph2: nx.MultiDiGraph | nx.MultiGraph
+    ) -> bool:
+        for u, v, k, data1 in graph1.edges(keys=True, data=True):
+            data2 = graph2.get_edge_data(u, v, k)
+            for key1, value1 in data1.items():
+                if key1 not in data2:
+                    return False
+                if isinstance(value1, float) and math.isnan(value1):
+                    if not math.isnan(data2[key1]):
+                        return False
+                    continue
+                if value1 != data2[key1]:
+                    return False
+        return True
 
-    for u, v, k, data in graph2.edges(keys=True, data=True):
-        if data != graph1.get_edge_data(u, v, k):
-            return False
+    check_1_2 = _dicts_comparison(graph1, graph2)
+    check_2_1 = _dicts_comparison(graph2, graph1)
 
-    return True
+    if check_1_2 and check_2_1:
+        return True
+    else:
+        return False
 
 
 class TestNetworkGraphSimplificator:
@@ -118,9 +132,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
         def create_nx_multidigraph():
             _nx_digraph = nx.MultiDiGraph()
             for i in range(1, 16):
-                random_x = random.randint(0, 5) * random.choice([-1, 1])
-                random_y = random.randint(0, 5) * random.choice([-1, 1])
-                _nx_digraph.add_node(i, x=random_x, y=random_y)
+                _nx_digraph.add_node(i, x=i, y=i * 10)
 
             _nx_digraph.add_edge(1, 2, a=np.nan)
             _nx_digraph.add_edge(2, 1, a=np.nan)
