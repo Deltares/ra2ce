@@ -19,13 +19,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import logging
 import math
 from abc import ABC, abstractmethod
-from ast import literal_eval
 from collections import defaultdict
 from pathlib import Path
-from typing import Optional
 
 import geopandas as gpd
 import pandas as pd
@@ -33,40 +30,21 @@ import pandas as pd
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
+from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.resilience_curves.resilience_curves_reader import (
     ResilienceCurvesReader,
 )
+from ra2ce.analysis.losses.time_values.time_values_reader import TimeValuesReader
+from ra2ce.analysis.losses.traffic_intensities.traffic_intensities_reader import (
+    TrafficIntensitiesReader,
+)
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
-from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
-
-
-def _load_df_from_csv(
-    csv_path: Path,
-    columns_to_interpret: list[str],
-    index: Optional[str | None],
-    sep: str = ",",
-) -> pd.DataFrame:
-    if csv_path is None or not csv_path.exists():
-        logging.warning("No `csv` file found at {}.".format(csv_path))
-        return pd.DataFrame()
-
-    _csv_dataframe = pd.read_csv(csv_path, sep=sep, on_bad_lines="skip")
-    if "geometry" in _csv_dataframe.columns:
-        raise Exception(f"The csv file in {csv_path} should not have a geometry column")
-
-    if any(columns_to_interpret):
-        _csv_dataframe[columns_to_interpret] = _csv_dataframe[
-            columns_to_interpret
-        ].applymap(literal_eval)
-    if index:
-        _csv_dataframe.set_index(index, inplace=True)
-    return _csv_dataframe
 
 
 class LossesBase(AnalysisLossesProtocol, ABC):
@@ -94,7 +72,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
         self.link_id = analysis_config.config_data.network.file_id
         self.link_type_column = analysis_config.config_data.network.link_type_column
-        self.trip_purposes = self.analysis.trip_purposes
+        self.trip_purposes: list[PartOfDayEnum] = self.analysis.trip_purposes
 
         self.performance_metric = f"diff_{self.analysis.weighing}"
 
@@ -105,17 +83,15 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         self.production_loss_per_capita_per_hour = (
             self.analysis.production_loss_per_capita_per_hour
         )
+
         self._check_validity_analysis_files()
-        self.intensities = _load_df_from_csv(
-            Path(self.analysis.traffic_intensities_file), [], self.link_id
-        )  # per day
+        self.intensities = TrafficIntensitiesReader(self.link_id).read(
+            self.analysis.traffic_intensities_file
+        )
         self.resilience_curves = ResilienceCurvesReader().read(
             self.analysis.resilience_curves_file
         )
-        self.values_of_time = _load_df_from_csv(
-            Path(self.analysis.values_of_time_file), [], None, sep=";"
-        )
-        self._check_validity_df()
+        self.values_of_time = TimeValuesReader().read(self.analysis.values_of_time_file)
 
         self.input_path = analysis_input.input_path
         self.static_path = analysis_input.static_path
@@ -134,28 +110,6 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                 f"traffic_intensities_file, resilience_curves_file, and values_of_time_file should be given"
             )
 
-    def _check_validity_df(self):
-        """
-        Check spelling of the required input csv files. If user writes wrong spelling, it will raise an error
-        when initializing the class.
-        """
-        _required_values_of_time_keys = ["trip_types", "value_of_time", "occupants"]
-        if not all(
-            key in self.values_of_time.columns for key in _required_values_of_time_keys
-        ):
-            raise ValueError(
-                f"Missing required columns in values_of_time: {_required_values_of_time_keys}"
-            )
-
-        if (
-            self.link_id not in self.intensities.columns
-            and self.link_id not in self.intensities.index.name
-        ):
-            raise ValueError(
-                f"""traffic_intensities_file and input graph do not have the same link_id.
-        {self.link_id} is passed for feature ids of the graph"""
-            )
-
     def _get_vot_intensity_per_trip_purpose(self) -> dict[str, pd.DataFrame]:
         """
         Generates a dictionary with all available `vot_purpose` with their intensity as a `pd.DataFrame`.
@@ -170,19 +124,22 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                 "intensity_" + partofday_trip_purpose_name
             )
             # read and set the vot's
-            _vot_dict[vot_var_name] = self.values_of_time.loc[
-                self.values_of_time["trip_types"] == trip_purpose.config_value,
-                "value_of_time",
-            ].item()
-            _vot_dict[occupancy_var_name] = self.values_of_time.loc[
-                self.values_of_time["trip_types"] == trip_purpose.config_value,
-                "occupants",
-            ].item()
+            _vot_dict[vot_var_name] = self.values_of_time.get_value_of_time(
+                trip_purpose
+            )
+            _vot_dict[occupancy_var_name] = self.values_of_time.get_occupants(
+                trip_purpose
+            )
             # read and set the intensities
             _vot_dict[partofday_trip_purpose_intensity_name] = (
-                self.intensities_simplified_graph[partofday_trip_purpose_name]
+                self.intensities.get_intensity(
+                    self.criticality_analysis.index.values,
+                    self.part_of_day,
+                    trip_purpose,
+                )
                 / self.hours_per_day
             )
+
         return dict(_vot_dict)
 
     def _get_disrupted_criticality_analysis_results(
@@ -233,35 +190,6 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         self.criticality_analysis_non_disrupted = (
             self.criticality_analysis_non_disrupted.reset_index()
         )
-
-    def _get_intensities_simplified_graph(self) -> pd.DataFrame:
-        _intensities_simplified_graph_list = []
-
-        for index in self.criticality_analysis.index.values:
-            if isinstance(index, tuple):
-                filtered_intensities = self.intensities[
-                    self.intensities.index.isin(index)
-                ]
-
-                # Create a new DataFrame with the index set to tuple_of_indices and the maximum values as the values
-                max_intensities = filtered_intensities.max().to_frame().T
-                max_intensities.index = [index]
-
-                row_data = max_intensities.squeeze()
-            else:
-                row_data = self.intensities.loc[int(index)]
-
-            _intensities_simplified_graph_list.append(row_data)
-        _intensities_simplified_graph = pd.DataFrame(
-            _intensities_simplified_graph_list,
-            index=self.criticality_analysis.index.values,
-        )
-        # no duplicate exists in the intensities and _intensities_simplified_graph. each link has its own intensity and
-        # ID in these files
-        _intensities_simplified_graph = _intensities_simplified_graph[
-            ~_intensities_simplified_graph.index.duplicated(keep="first")
-        ]
-        return _intensities_simplified_graph
 
     def calculate_vehicle_loss_hours(self) -> gpd.GeoDataFrame:
         """
@@ -584,8 +512,6 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         self._get_disrupted_criticality_analysis_results(
             criticality_analysis=criticality_analysis
         )
-
-        self.intensities_simplified_graph = self._get_intensities_simplified_graph()
 
         self.vot_intensity_per_trip_collection = (
             self._get_vot_intensity_per_trip_purpose()
