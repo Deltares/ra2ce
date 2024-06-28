@@ -17,7 +17,6 @@
 from ast import literal_eval
 from pathlib import Path
 from re import findall
-from typing import Any
 
 import pandas as pd
 

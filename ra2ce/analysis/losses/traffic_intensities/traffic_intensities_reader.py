@@ -14,11 +14,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
 
+from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.losses.losses_input_data_reader_base import (
     LossesInputDataReaderBase,
@@ -26,19 +26,20 @@ from ra2ce.analysis.losses.losses_input_data_reader_base import (
 from ra2ce.analysis.losses.traffic_intensities.traffic_intensities import (
     TrafficIntensities,
 )
-from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 
 
-@dataclass
 class TrafficIntensitiesReader(LossesInputDataReaderBase):
     csv_columns = ["link_id"]
     separator = ","
     data_type = TrafficIntensities
 
+    def __init__(self, link_id: str) -> None:
+        self.csv_columns = [link_id]
+
     def _parse_df(self, df: pd.DataFrame) -> TrafficIntensities:
         _traffic_intensities = TrafficIntensities()
         for col in df:
-            if col == "link_id":
+            if col == self.csv_columns[0]:
                 _traffic_intensities.link_id = df[col].tolist()
                 continue
             _col_parts = col.split("_")

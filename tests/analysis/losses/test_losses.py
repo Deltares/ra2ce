@@ -10,6 +10,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionLosses,
 )
+from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
@@ -18,7 +19,6 @@ from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtoco
 from ra2ce.analysis.losses.losses_base import LossesBase
 from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
 from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
-from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data
 

@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.losses.losses_input_data_reader_base import (
     LossesInputDataReaderBase,
@@ -11,7 +12,6 @@ from ra2ce.analysis.losses.traffic_intensities.traffic_intensities_reader import
     TrafficIntensitiesReader,
 )
 from ra2ce.common.io.readers.file_reader_protocol import FileReaderProtocol
-from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 
 
 class TestTimeValuesReader:

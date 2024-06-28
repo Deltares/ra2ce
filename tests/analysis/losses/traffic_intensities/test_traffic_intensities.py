@@ -1,8 +1,8 @@
+from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.losses.traffic_intensities.traffic_intensities import (
     TrafficIntensities,
 )
-from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 
 
 class TestTrafficIntensities:

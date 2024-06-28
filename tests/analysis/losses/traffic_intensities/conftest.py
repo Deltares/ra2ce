@@ -3,8 +3,8 @@ from typing import Iterator
 
 import pytest
 
+from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
-from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 from tests import test_data
 
 
