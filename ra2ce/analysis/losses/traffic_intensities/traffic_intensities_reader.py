@@ -18,7 +18,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
+from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
+    TrafficPeriodEnum,
+)
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.losses.losses_input_data_reader_base import (
     LossesInputDataReaderBase,
@@ -30,7 +32,7 @@ from ra2ce.analysis.losses.traffic_intensities.traffic_intensities import (
 
 class TrafficIntensitiesReader(LossesInputDataReaderBase):
     """
-    Class to read the traffic intensities per part of day from a csv file.
+    Class to read the traffic intensities per traffic period from a csv file.
     """
 
     csv_columns = []
@@ -47,9 +49,9 @@ class TrafficIntensitiesReader(LossesInputDataReaderBase):
                 _traffic_intensities.link_id = df[col].tolist()
                 continue
             _col_parts = col.split("_")
-            _part_of_day = PartOfDayEnum.get_enum(_col_parts[0])
+            _traffic_period = TrafficPeriodEnum.get_enum(_col_parts[0])
             _trip_purpose = TripPurposeEnum.get_enum(_col_parts[1])
-            _traffic_intensities.intensities[(_part_of_day, _trip_purpose)] = df[
+            _traffic_intensities.intensities[(_traffic_period, _trip_purpose)] = df[
                 col
             ].tolist()
         return _traffic_intensities

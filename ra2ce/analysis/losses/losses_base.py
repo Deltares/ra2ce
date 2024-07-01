@@ -29,7 +29,9 @@ import pandas as pd
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
-from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
+from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
+    TrafficPeriodEnum,
+)
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
@@ -76,9 +78,10 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
         self.performance_metric = f"diff_{self.analysis.weighing}"
 
-        self.part_of_day: PartOfDayEnum = self.analysis.part_of_day
         self.analysis_type = self.analysis.analysis
-        self.hours_per_day: float = 24  # we consider here only daily losses
+        self.traffic_period: TrafficPeriodEnum = self.analysis.traffic_period
+        self.hours_per_traffic_period: float = self.analysis.hours_per_traffic_period
+
         self.production_loss_per_capita_per_hour = (
             self.analysis.production_loss_per_capita_per_hour
         )
@@ -414,9 +417,9 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         for trip_type in self.trip_purposes:
             intensity_trip_type = (
                 self.intensities.calculate_intensity(
-                    vlh_row[self.link_id], self.part_of_day, trip_type
+                    vlh_row[self.link_id], self.traffic_period, trip_type
                 )
-                / self.hours_per_day
+                / self.hours_per_traffic_period
             )
 
             occupancy_trip_type = self.values_of_time.get_occupants(trip_type)
@@ -465,9 +468,9 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         for trip_type in self.trip_purposes:
             intensity_trip_type = (
                 self.intensities.calculate_intensity(
-                    vlh_row[self.link_id], self.part_of_day, trip_type
+                    vlh_row[self.link_id], self.traffic_period, trip_type
                 )
-                / self.hours_per_day
+                / self.hours_per_traffic_period
             )
 
             vot_trip_type = self.values_of_time.get_value_of_time(trip_type)

@@ -42,9 +42,11 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
-from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
+)
+from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
+    TrafficPeriodEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
@@ -130,8 +132,13 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         _section.traffic_cols = self._parser.getlist(
             section_name, "traffic_cols", fallback=_section.traffic_cols
         )
-        _section.part_of_day = PartOfDayEnum.get_enum(
-            self._parser.get(section_name, "part_of_day", fallback=None)
+        _section.traffic_period = TrafficPeriodEnum.get_enum(
+            self._parser.get(section_name, "traffic_period", fallback=None)
+        )
+        _section.hours_per_traffic_period = self._parser.getint(
+            section_name,
+            "hours_per_traffic_period",
+            fallback=_section.hours_per_traffic_period,
         )
         _section.trip_purposes = list(
             map(
