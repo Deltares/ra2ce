@@ -4,6 +4,7 @@ from ra2ce.configuration.ra2ce_enum_base import Ra2ceEnumBase
 
 
 class PartOfDayEnum(Ra2ceEnumBase):
+    NONE = 0
     DAY = 1
     EVENING = 2
     INVALID = 99
