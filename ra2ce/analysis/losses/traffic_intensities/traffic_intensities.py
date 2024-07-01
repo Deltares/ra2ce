@@ -40,7 +40,7 @@ class TrafficIntensities:
         trip_purpose: TripPurposeEnum,
     ) -> int:
         """
-        Calculate the traffic intensity per traffic periodfor a specific link
+        Calculate the traffic intensity per traffic period for a specific link
         for a trip purpose.
 
         For a simplified graph, the link_id could be a tuple of link_ids.
