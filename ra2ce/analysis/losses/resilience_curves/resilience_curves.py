@@ -39,8 +39,8 @@ class ResilienceCurves:
     def _get_index(
         self, link_type: RoadTypeEnum, hazard_range: tuple[float, float]
     ) -> int:
-        _link_type_indices = np.where(np.array(self.link_type) == link_type)[0]
-        _hazard_indices = np.where(np.array(self.hazard_range) == hazard_range)[0]
+        _link_type_indices = np.nonzero(np.array(self.link_type) == link_type)[0]
+        _hazard_indices = np.nonzero(np.array(self.hazard_range) == hazard_range)[0]
         return int(np.intersect1d(_link_type_indices, _hazard_indices)[0])
 
     def has_resilience_curve(

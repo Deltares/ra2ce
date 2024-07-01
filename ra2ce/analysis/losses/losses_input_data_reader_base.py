@@ -33,7 +33,7 @@ class LossesInputDataReaderBase(ABC, FileReaderProtocol):
 
     csv_columns: list[str] = []
     separator: str = ";"
-    object_type: type[Any] = None
+    object_type: type[Any]
 
     @abstractmethod
     def _parse_df(self, df: pd.DataFrame) -> Any:
@@ -50,7 +50,7 @@ class LossesInputDataReaderBase(ABC, FileReaderProtocol):
 
     def read(self, file_path: Path | None) -> Any:
         if not file_path or not file_path.exists():
-            logging.warning("No `csv` file found at %s.", file_path)
+            logging.warning("No csv file found at %s.", file_path)
             return self.object_type()
 
         _df = pd.read_csv(file_path, sep=self.separator, on_bad_lines="skip")

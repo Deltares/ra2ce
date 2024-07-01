@@ -106,7 +106,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             or self.analysis.values_of_time_file is None
         ):
             raise ValueError(
-                f"traffic_intensities_file, resilience_curves_file, and values_of_time_file should be given"
+                "traffic_intensities_file, resilience_curves_file, and values_of_time_file should be given"
             )
 
     def _get_disrupted_criticality_analysis_results(
