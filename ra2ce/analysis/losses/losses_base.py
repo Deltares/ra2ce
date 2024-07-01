@@ -21,7 +21,6 @@
 
 import math
 from abc import ABC, abstractmethod
-from collections import defaultdict
 from pathlib import Path
 
 import geopandas as gpd
@@ -31,6 +30,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
+from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
@@ -72,7 +72,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
         self.link_id = analysis_config.config_data.network.file_id
         self.link_type_column = analysis_config.config_data.network.link_type_column
-        self.trip_purposes: list[PartOfDayEnum] = self.analysis.trip_purposes
+        self.trip_purposes: list[TripPurposeEnum] = self.analysis.trip_purposes
 
         self.performance_metric = f"diff_{self.analysis.weighing}"
 
@@ -109,38 +109,6 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             raise ValueError(
                 f"traffic_intensities_file, resilience_curves_file, and values_of_time_file should be given"
             )
-
-    def _get_vot_intensity_per_trip_purpose(self) -> dict[str, pd.DataFrame]:
-        """
-        Generates a dictionary with all available `vot_purpose` with their intensity as a `pd.DataFrame`.
-        """
-        _vot_dict = defaultdict(pd.DataFrame)
-
-        for trip_purpose in self.trip_purposes:
-            vot_var_name = f"vot_{trip_purpose}"
-            occupancy_var_name = f"occupants_{trip_purpose}"
-            partofday_trip_purpose_name = f"{self.part_of_day}_{trip_purpose}"
-            partofday_trip_purpose_intensity_name = (
-                "intensity_" + partofday_trip_purpose_name
-            )
-            # read and set the vot's
-            _vot_dict[vot_var_name] = self.values_of_time.get_value_of_time(
-                trip_purpose
-            )
-            _vot_dict[occupancy_var_name] = self.values_of_time.get_occupants(
-                trip_purpose
-            )
-            # read and set the intensities
-            _vot_dict[partofday_trip_purpose_intensity_name] = (
-                self.intensities.calculate_intensity(
-                    self.criticality_analysis.index.values,
-                    self.part_of_day,
-                    trip_purpose,
-                )
-                / self.hours_per_day
-            )
-
-        return dict(_vot_dict)
 
     def _get_disrupted_criticality_analysis_results(
         self, criticality_analysis: gpd.GeoDataFrame
@@ -396,12 +364,12 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         """
         vlh_total = 0
         for trip_type in self.trip_purposes:
-            intensity_trip_type = self.vot_intensity_per_trip_collection[
-                f"intensity_{self.part_of_day}_{trip_type}"
-            ].loc[[vlh_row[self.link_id]]]
-            occupancy_trip_type = float(
-                self.vot_intensity_per_trip_collection[f"occupants_{trip_type}"]
+            intensity_trip_type = self.intensities.get_intensity(
+                vlh_row[self.link_id], self.part_of_day, trip_type
             )
+
+            occupancy_trip_type = self.values_of_time.get_occupants(trip_type)
+
             # TODO: improve formula based on road_type, water_heigth resilience_curves.csv (duration*loss_ratio) instead of duration_event
             # Compare with other function
             vlh_trip_type_event_series = (
@@ -472,13 +440,11 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
         # get vlh_trip_type_event
         for trip_type in self.trip_purposes:
-            intensity_trip_type = self.vot_intensity_per_trip_collection[
-                f"intensity_{self.part_of_day}_{trip_type}"
-            ].loc[[vlh_row[self.link_id]]]
-
-            vot_trip_type = float(
-                self.vot_intensity_per_trip_collection[f"vot_{trip_type}"]
+            intensity_trip_type = self.intensities.get_intensity(
+                vlh_row[self.link_id], self.part_of_day, trip_type
             )
+
+            vot_trip_type = self.values_of_time.get_value_of_time(trip_type)
 
             vlh_trip_type_event_series = sum(
                 (
@@ -511,10 +477,6 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
         self._get_disrupted_criticality_analysis_results(
             criticality_analysis=criticality_analysis
-        )
-
-        self.vot_intensity_per_trip_collection = (
-            self._get_vot_intensity_per_trip_purpose()
         )
 
         self.result = self.calculate_vehicle_loss_hours()
