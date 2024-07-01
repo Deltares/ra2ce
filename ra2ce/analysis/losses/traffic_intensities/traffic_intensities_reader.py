@@ -14,6 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -48,9 +49,9 @@ class TrafficIntensitiesReader(LossesInputDataReaderBase):
             if col == self.csv_columns[0]:
                 _traffic_intensities.link_id = df[col].tolist()
                 continue
-            _col_parts = col.split("_")
-            _traffic_period = TrafficPeriodEnum.get_enum(_col_parts[0])
-            _trip_purpose = TripPurposeEnum.get_enum(_col_parts[1])
+            _col_parts = re.findall(r"(.+)_(\w+)", col)  # split on last underscore
+            _traffic_period = TrafficPeriodEnum.get_enum(_col_parts[0][0])
+            _trip_purpose = TripPurposeEnum.get_enum(_col_parts[0][1])
             _traffic_intensities.intensities[(_traffic_period, _trip_purpose)] = df[
                 col
             ].tolist()

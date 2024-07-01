@@ -1,4 +1,4 @@
-ID,evening_total,evening_freight,evening_commute,evening_business,evening_other,day_freight,day_commute,day_business,day_other,day_total
+ID,evening_peak_total,evening_peak_freight,evening_peak_commute,evening_peak_business,evening_peak_other,day_freight,day_commute,day_business,day_other,day_total
 0,0,0,0,0,0,15,31,66,44,156
 1,0,0,0,0,0,90,22,95,98,305
 2,0,0,0,0,0,28,29,18,13,88
