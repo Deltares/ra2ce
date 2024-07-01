@@ -412,12 +412,15 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         )
 
         for trip_type in self.trip_purposes:
-            intensity_trip_type = self.intensities.calculate_intensity(
-                vlh_row[self.link_id], self.part_of_day, trip_type
+            intensity_trip_type = (
+                self.intensities.calculate_intensity(
+                    vlh_row[self.link_id], self.part_of_day, trip_type
+                )
+                / self.hours_per_day
             )
 
             occupancy_trip_type = self.values_of_time.get_occupants(trip_type)
-            vlh_trip_type_event_series = sum(
+            vlh_trip_type_event = sum(
                 (
                     intensity_trip_type
                     * duration
@@ -430,7 +433,6 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                     duration_steps, functionality_loss_ratios
                 )
             )
-            vlh_trip_type_event = vlh_trip_type_event_series.squeeze()
             vehicle_loss_hours.loc[
                 [vlh_row.name], f"vlh_{trip_type}_{hazard_col_name}"
             ] = vlh_trip_type_event
@@ -461,13 +463,16 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
         # get vlh_trip_type_event
         for trip_type in self.trip_purposes:
-            intensity_trip_type = self.intensities.calculate_intensity(
-                vlh_row[self.link_id], self.part_of_day, trip_type
+            intensity_trip_type = (
+                self.intensities.calculate_intensity(
+                    vlh_row[self.link_id], self.part_of_day, trip_type
+                )
+                / self.hours_per_day
             )
 
             vot_trip_type = self.values_of_time.get_value_of_time(trip_type)
 
-            vlh_trip_type_event_series = sum(
+            vlh_trip_type_event = sum(
                 (
                     intensity_trip_type
                     * duration
@@ -480,7 +485,6 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                     duration_steps, functionality_loss_ratios
                 )
             )
-            vlh_trip_type_event = vlh_trip_type_event_series.squeeze()
             vehicle_loss_hours.loc[
                 [vlh_row.name], f"vlh_{trip_type}_{hazard_col_name}"
             ] = vlh_trip_type_event
