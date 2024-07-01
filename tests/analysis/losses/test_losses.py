@@ -210,12 +210,6 @@ class TestLosses:
         _losses._get_disrupted_criticality_analysis_results(
             _losses.criticality_analysis
         )
-        _losses.intensities_simplified_graph = (
-            _losses._get_intensities_simplified_graph()
-        )
-        _losses.vot_intensity_per_trip_collection = (
-            _losses._get_vot_intensity_per_trip_purpose()
-        )
 
         # 2. Run test.
 
