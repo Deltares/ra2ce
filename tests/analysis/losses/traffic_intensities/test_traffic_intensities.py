@@ -9,20 +9,20 @@ from ra2ce.analysis.losses.traffic_intensities.traffic_intensities import (
 
 class TestTrafficIntensities:
     @pytest.mark.parametrize(
-        "link_ids, expected",
+        "link_id, expected",
         [
-            pytest.param([2, 3, 5], [5, 7, 8], id="from list[int]"),
-            pytest.param([(2, 3, 5)], [8], id="from tuple[int]"),
-            pytest.param([2, (3, 5)], [5, 8], id="from combination"),
+            pytest.param(2, 5, id="from int (link 2)"),
+            pytest.param(5, 8, id="from int (link 5)"),
+            pytest.param((2, 5), 8, id="from tuple[int]"),
         ],
     )
-    def test_get_traffic_intensity(
+    def test_calculate_traffic_intensity(
         self,
         traffic_intensities_data: dict[
             tuple[PartOfDayEnum, TripPurposeEnum], list[int]
         ],
-        link_ids: list[int | tuple[int, int]],
-        expected: list[int],
+        link_id: int | tuple[int, int],
+        expected: int,
     ):
         # 1. Define test data
         _traffic_intensities = TrafficIntensities(link_id=list(range(1, 6)))
@@ -33,13 +33,8 @@ class TestTrafficIntensities:
         _trip_purpose = TripPurposeEnum.BUSINESS
 
         # 2. Execute test
-<<<<<<< HEAD
         _result = _traffic_intensities.calculate_intensity(
-            _link_ids,
-=======
-        _result = _traffic_intensities.get_intensities(
-            link_ids,
->>>>>>> 0f3863c34704fe853459a04a009accc12472c03a
+            link_id,
             _part_of_day,
             _trip_purpose,
         )

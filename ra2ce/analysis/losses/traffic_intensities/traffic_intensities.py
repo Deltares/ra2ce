@@ -27,27 +27,32 @@ class TrafficIntensities:
         default_factory=dict
     )
 
-    def get_intensity(
+    def calculate_intensity(
         self,
         link_id: int | tuple[int, int],
         part_of_day: PartOfDayEnum,
         trip_purpose: TripPurposeEnum,
     ) -> int:
+        """
+        Calculate the traffic intensity for a specific link
+        for a specific part of the day and trip purpose.
+
+        For a simplified graph, the link_id could be a tuple of link_ids.
+        In that case the maximum intensity of the links is returned.
+
+        Args:
+            link_id (int | tuple[int, int]): The link id(s)
+            part_of_day (PartOfDayEnum): Part of the day
+            trip_purpose (TripPurposeEnum): Trip purpose
+
+        Returns:
+            int: The intensity for that (set of) link(s)
+        """
         if isinstance(link_id, tuple):
             return max(
-                self.get_intensity(_id, part_of_day, trip_purpose) for _id in link_id
+                self.calculate_intensity(_id, part_of_day, trip_purpose)
+                for _id in link_id
             )
         return self.intensities[(part_of_day, trip_purpose)][
             self.link_id.index(link_id)
         ]
-
-    def get_intensities(
-        self,
-        link_ids: list[int | tuple[int, int]],
-        part_of_day: PartOfDayEnum,
-        trip_purpose: TripPurposeEnum,
-    ) -> list[int]:
-        return list(
-            self.get_intensity(_link_id, part_of_day, trip_purpose)
-            for _link_id in link_ids
-        )

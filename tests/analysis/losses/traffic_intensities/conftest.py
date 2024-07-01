@@ -21,7 +21,7 @@ def get_traffic_intensities_data() -> Iterator[
     dict[tuple[PartOfDayEnum, TripPurposeEnum], list[int]]
 ]:
     """
-    Get traffic intensities data for testing.
+    Get traffic intensities data for testing (links 1:5).
 
     Yields:
         Iterator[dict[tuple[PartOfDayEnum, RoadTypeEnum], list[int]]]: Traffic intensities data.
