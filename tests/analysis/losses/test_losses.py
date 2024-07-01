@@ -120,7 +120,6 @@ class TestLosses:
         "traffic_period",
         [
             pytest.param(TrafficPeriodEnum.DAY),
-            # pytest.param(PartOfDayEnum.EVENING_PEAK)
         ],
     )
     def test_calc_vlh(self, traffic_period: TrafficPeriodEnum):
