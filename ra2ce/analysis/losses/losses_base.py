@@ -179,9 +179,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                     return (x, y)
             raise ValueError(f"No matching range found for height {height}")
 
-        def _create_result(
-            vlh: gpd.GeoDataFrame, connectivity_attribute: str
-        ) -> gpd.GeoDataFrame:
+        def _create_result(vlh: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
             """
 
             Args: vlh: calculated vehicle_loss_hours GeoDataFrame. For single_link_losses it only includes the
@@ -335,9 +333,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                             event,
                         )
 
-        vehicle_loss_hours_result = _create_result(
-            vehicle_loss_hours, connectivity_attribute
-        )
+        vehicle_loss_hours_result = _create_result(vehicle_loss_hours)
         return vehicle_loss_hours_result
 
     def _calculate_production_loss_per_capita(
@@ -364,7 +360,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         """
         vlh_total = 0
         for trip_type in self.trip_purposes:
-            intensity_trip_type = self.intensities.get_intensity(
+            intensity_trip_type = self.intensities.calculate_intensity(
                 vlh_row[self.link_id], self.part_of_day, trip_type
             )
 
@@ -440,7 +436,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
         # get vlh_trip_type_event
         for trip_type in self.trip_purposes:
-            intensity_trip_type = self.intensities.get_intensity(
+            intensity_trip_type = self.intensities.calculate_intensity(
                 vlh_row[self.link_id], self.part_of_day, trip_type
             )
 
