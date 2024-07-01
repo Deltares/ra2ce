@@ -140,11 +140,6 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             "production_loss_per_capita_per_hour",
             fallback=_section.production_loss_per_capita_per_hour,
         )
-        _section.hours_per_day = self._parser.getfloat(
-            section_name,
-            "hours_per_day",
-            fallback=_section.hours_per_day,
-        )
 
         # accessibility analyses
         _section.threshold = self._parser.getfloat(
