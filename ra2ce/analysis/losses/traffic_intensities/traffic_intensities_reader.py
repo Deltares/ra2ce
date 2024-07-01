@@ -30,7 +30,7 @@ from ra2ce.analysis.losses.traffic_intensities.traffic_intensities import (
 
 class TrafficIntensitiesReader(LossesInputDataReaderBase):
     """
-    Class to read the traffic intensities per part of day from a csv file.
+    Class to read the traffic intensities per hour per part of day and trip purpose from a csv file.
     """
 
     csv_columns = []
@@ -44,6 +44,7 @@ class TrafficIntensitiesReader(LossesInputDataReaderBase):
         _traffic_intensities = TrafficIntensities()
         for col in df:
             if col == self.csv_columns[0]:
+                # Link id column
                 _traffic_intensities.link_id = df[col].tolist()
                 continue
             _col_parts = col.split("_")
