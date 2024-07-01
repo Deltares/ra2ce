@@ -25,7 +25,7 @@ class TestResilienceCurveReader:
         self,
         resilience_curves_csv: Path,
         resilience_curves_data: list[
-            tuple[RoadTypeEnum, float, float, list[float], list[float]]
+            tuple[RoadTypeEnum, tuple[float, float], list[float], list[float]]
         ],
     ):
         # 1. Define test data
