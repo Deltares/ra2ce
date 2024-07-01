@@ -11,9 +11,9 @@ class TestTrafficIntensities:
     @pytest.mark.parametrize(
         "link_id, expected",
         [
-            pytest.param(2, 5, id="from int (link 2)"),
-            pytest.param(5, 8, id="from int (link 5)"),
-            pytest.param((2, 5), 8, id="from tuple[int]"),
+            pytest.param(2, 5.0, id="from int (link 2)"),
+            pytest.param(5, 8.0, id="from int (link 5)"),
+            pytest.param((2, 5), 8.0, id="from tuple[int]"),
         ],
     )
     def test_calculate_traffic_intensity(
@@ -22,7 +22,7 @@ class TestTrafficIntensities:
             tuple[PartOfDayEnum, TripPurposeEnum], list[int]
         ],
         link_id: int | tuple[int, int],
-        expected: int,
+        expected: float,
     ):
         # 1. Define test data
         _traffic_intensities = TrafficIntensities(link_id=list(range(1, 6)))
@@ -40,4 +40,4 @@ class TestTrafficIntensities:
         )
 
         # 3. Verify expectations
-        assert _result == expected
+        assert _result == pytest.approx(expected)

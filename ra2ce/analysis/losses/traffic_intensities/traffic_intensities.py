@@ -28,7 +28,7 @@ class TrafficIntensities:
     """
 
     link_id: list[int | tuple[int, int]] = field(default_factory=list)
-    intensities: dict[tuple[PartOfDayEnum, TripPurposeEnum], list[int]] = field(
+    intensities: dict[tuple[PartOfDayEnum, TripPurposeEnum], list[float]] = field(
         default_factory=dict
     )
 
@@ -37,7 +37,7 @@ class TrafficIntensities:
         link_id: int | tuple[int, int],
         part_of_day: PartOfDayEnum,
         trip_purpose: TripPurposeEnum,
-    ) -> int:
+    ) -> float:
         """
         Calculate the traffic intensity for a specific link
         for a specific part of day for a specific trip purpose.
@@ -51,7 +51,7 @@ class TrafficIntensities:
             trip_purpose (TripPurposeEnum): Trip purpose
 
         Returns:
-            int: The intensity for that (set of) link(s)
+            float: The intensity for the (set of) link(s)
         """
         if isinstance(link_id, tuple):
             return max(

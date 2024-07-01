@@ -18,21 +18,21 @@ def get_traffic_intensities_csv_filepath() -> Iterator[Path]:
 
 @pytest.fixture(name="traffic_intensities_data")
 def get_traffic_intensities_data() -> Iterator[
-    dict[tuple[PartOfDayEnum, TripPurposeEnum], list[int]]
+    dict[tuple[PartOfDayEnum, TripPurposeEnum], list[float]]
 ]:
     """
     Get traffic intensities data for testing (links 1:5).
 
     Yields:
-        Iterator[dict[tuple[PartOfDayEnum, RoadTypeEnum], list[int]]]: Traffic intensities data.
+        Iterator[dict[tuple[PartOfDayEnum, RoadTypeEnum], list[float]]]: Traffic intensities data.
     """
     yield {
-        (PartOfDayEnum.EVENING, TripPurposeEnum.FREIGHT): [0, 0, 0, 0, 0],
-        (PartOfDayEnum.EVENING, TripPurposeEnum.COMMUTE): [10, 2, 8, 20, 4],
-        (PartOfDayEnum.EVENING, TripPurposeEnum.BUSINESS): [20, 5, 7, 10, 8],
-        (PartOfDayEnum.EVENING, TripPurposeEnum.OTHER): [0, 0, 0, 0, 0],
-        (PartOfDayEnum.DAY, TripPurposeEnum.FREIGHT): [0, 0, 0, 0, 0],
-        (PartOfDayEnum.DAY, TripPurposeEnum.COMMUTE): [10, 2, 8, 20, 4],
-        (PartOfDayEnum.DAY, TripPurposeEnum.BUSINESS): [20, 5, 7, 10, 8],
-        (PartOfDayEnum.DAY, TripPurposeEnum.OTHER): [0, 0, 0, 0, 0],
+        (PartOfDayEnum.EVENING, TripPurposeEnum.FREIGHT): [0.0, 0.0, 0.0, 0.0, 0.0],
+        (PartOfDayEnum.EVENING, TripPurposeEnum.COMMUTE): [10.0, 2.0, 8.0, 20.0, 4.0],
+        (PartOfDayEnum.EVENING, TripPurposeEnum.BUSINESS): [20.0, 5.0, 7.0, 10.0, 8.0],
+        (PartOfDayEnum.EVENING, TripPurposeEnum.OTHER): [0.0, 0.0, 0.0, 0.0, 0.0],
+        (PartOfDayEnum.DAY, TripPurposeEnum.FREIGHT): [0.0, 0.0, 0.0, 0.0, 0.0],
+        (PartOfDayEnum.DAY, TripPurposeEnum.COMMUTE): [10.0, 2.0, 8.0, 20.0, 4.0],
+        (PartOfDayEnum.DAY, TripPurposeEnum.BUSINESS): [20.0, 5.0, 7.0, 10.0, 8.0],
+        (PartOfDayEnum.DAY, TripPurposeEnum.OTHER): [0.0, 0.0, 0.0, 0.0, 0.0],
     }

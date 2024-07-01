@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.losses.losses_input_data_reader_base import (
@@ -41,6 +43,6 @@ class TestTimeValuesReader:
         assert isinstance(_traffic_intensities, TrafficIntensities)
         for _key in traffic_intensities_data:
             assert _key in _traffic_intensities.intensities
-            assert (
-                traffic_intensities_data[_key] == _traffic_intensities.intensities[_key]
+            assert traffic_intensities_data[_key] == pytest.approx(
+                _traffic_intensities.intensities[_key]
             )
