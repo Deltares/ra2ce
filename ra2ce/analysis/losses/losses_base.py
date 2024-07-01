@@ -417,9 +417,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             )
 
             occupancy_trip_type = self.values_of_time.get_occupants(trip_type)
-            # TODO: improve formula based on road_type, water_heigth resilience_curves.csv (duration*loss_ratio) instead of duration_event
-            # Compare with other function
-            vlh_trip_type_event_series = (sum(
+            vlh_trip_type_event_series = sum(
                 (
                     intensity_trip_type
                     * duration
@@ -431,6 +429,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                 for duration, loss_ratio in zip(
                     duration_steps, functionality_loss_ratios
                 )
+            )
             vlh_trip_type_event = vlh_trip_type_event_series.squeeze()
             vehicle_loss_hours.loc[
                 [vlh_row.name], f"vlh_{trip_type}_{hazard_col_name}"
