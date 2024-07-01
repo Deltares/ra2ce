@@ -28,6 +28,10 @@ from ra2ce.analysis.losses.time_values.time_values import TimeValues
 
 @dataclass
 class TimeValuesReader(LossesInputDataReaderBase):
+    """
+    Class to read the time values from a csv file.
+    """
+
     csv_columns = ["trip_types", "value_of_time", "occupants"]
     data_type = TimeValues
 

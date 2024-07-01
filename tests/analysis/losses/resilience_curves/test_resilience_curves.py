@@ -85,7 +85,7 @@ class TestResilienceCurve:
         expected: float,
     ):
         # 2. Execute test
-        _result = valid_resilience_curves.get_disruption(link_type, hazard_range)
+        _result = valid_resilience_curves.calculate_disruption(link_type, hazard_range)
 
         # 3. Verify expectations
         assert _result == pytest.approx(expected)

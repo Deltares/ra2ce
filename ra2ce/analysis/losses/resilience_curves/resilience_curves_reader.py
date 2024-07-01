@@ -28,6 +28,10 @@ from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 
 class ResilienceCurvesReader(LossesInputDataReaderBase):
+    """
+    Class to read the resilience curves from a csv file.
+    """
+
     csv_columns = [
         "link_type_hazard_intensity",
         "duration_steps",

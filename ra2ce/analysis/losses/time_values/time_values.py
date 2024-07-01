@@ -21,6 +21,10 @@ from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurp
 
 @dataclass(kw_only=True)
 class TimeValues:
+    """
+    Class to store the time values for different trip types.
+    """
+
     trip_types: list[TripPurposeEnum] = field(default_factory=list)
     value_of_time: list[int] = field(default_factory=list)
     occupants: list[int] = field(default_factory=list)

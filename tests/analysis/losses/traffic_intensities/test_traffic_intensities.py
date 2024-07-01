@@ -22,7 +22,7 @@ class TestTrafficIntensities:
         _link_ids = [2, 3, 5]
 
         # 2. Execute test
-        _result = _traffic_intensities.get_intensity(
+        _result = _traffic_intensities.calculate_intensity(
             _link_ids,
             _part_of_day,
             _trip_purpose,

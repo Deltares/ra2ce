@@ -23,17 +23,32 @@ from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurp
 
 @dataclass(kw_only=True)
 class TrafficIntensities:
+    """
+    Class to store the traffic intensities for different parts of the day and trip types.
+    """
+
     link_id: list[int] = field(default_factory=list)
     intensities: dict[tuple[PartOfDayEnum, TripPurposeEnum], list[int]] = field(
         default_factory=dict
     )
 
-    def get_intensity(
+    def calculate_intensity(
         self,
         link_ids: list[int],
         part_of_day: PartOfDayEnum,
         trip_purpose: TripPurposeEnum,
     ) -> int:
+        """
+        Calculate the intensity for a given set of links, part of the day and trip purpose.
+
+        Args:
+            link_ids (list[int]): The links to calculate the intensity for.
+            part_of_day (PartOfDayEnum): Part of the day.
+            trip_purpose (TripPurposeEnum): Trip purpose.
+
+        Returns:
+            int:
+        """
         _idx = list(
             filter(lambda x: self.link_id[x] in link_ids, range(len(self.link_id)))
         )
