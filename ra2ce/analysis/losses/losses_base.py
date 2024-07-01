@@ -100,7 +100,6 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
         self.part_of_day: PartOfDayEnum = self.analysis.part_of_day
         self.analysis_type = self.analysis.analysis
-        self.duration_event: float = self.analysis.duration_event
         self.hours_per_day: float = self.analysis.hours_per_day
         self.production_loss_per_capita_per_hour = (
             self.analysis.production_loss_per_capita_per_hour
@@ -425,7 +424,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                         math.isnan(row_performance_change) and row_connectivity == 0
                     ) or row_performance_change == 0:
                         self._calculate_production_loss_per_capita(
-                            vehicle_loss_hours, vlh_row, event
+                            vehicle_loss_hours, row_hazard_range, vlh_row, event
                         )
                     elif not (
                         math.isnan(row_performance_change)
@@ -444,64 +443,10 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         )
         return vehicle_loss_hours_result
 
-    def _calculate_production_loss_per_capita(
-        self,
-        vehicle_loss_hours: gpd.GeoDataFrame,
-        vlh_row: pd.Series,
-        hazard_col_name: str,
-    ):
-        """
-        In cases where there is no alternative route in the event of disruption of the road, we propose to use a
-        proxy for the assessment of losses from the interruption of services from the road in these cases where no
-        alternative routes exist.
-        The assumption for the proxy is that a loss of production will occur from the
-        interruption of the road, equal to the size of the added value from the persons that cannot make use of the
-        road, measured in the regional GDP per capita. This assumption constitutes both the loss of production within
-        the area that cannot be reached, as well the loss of production outside the area due to the inability of the
-        workers from within the cut-off area to arrive at their place of production outside this area.
-
-        The daily loss of productivity for each link section without detour routes, when they are
-        disrupted is then obtained multiplying the traffic intensity by the total occupancy per vehicle type,
-        including drivers, by the daily loss of productivity per capita per hour.
-
-        the unit of time is hour.
-        """
-        vlh_total = 0
-        for trip_type in self.trip_purposes:
-            intensity_trip_type = self.vot_intensity_per_trip_collection[
-                f"intensity_{self.part_of_day}_{trip_type}"
-            ].loc[[vlh_row[self.link_id]]]
-            occupancy_trip_type = float(
-                self.vot_intensity_per_trip_collection[f"occupants_{trip_type}"]
-            )
-            # TODO: improve formula based on road_type, water_heigth resilience_curves.csv (duration*loss_ratio) instead of duration_event
-            # Compare with other function
-            vlh_trip_type_event_series = (
-                self.duration_event
-                * intensity_trip_type
-                * occupancy_trip_type
-                * self.production_loss_per_capita_per_hour
-            )
-            vlh_trip_type_event = vlh_trip_type_event_series.squeeze()
-            vehicle_loss_hours.loc[
-                [vlh_row.name], f"vlh_{trip_type}_{hazard_col_name}"
-            ] = vlh_trip_type_event
-            vlh_total += vlh_trip_type_event
-        vehicle_loss_hours.loc[
-            [vlh_row.name], f"vlh_{hazard_col_name}_total"
-        ] = vlh_total
-
-    def _populate_vehicle_loss_hour(
-        self,
-        vehicle_loss_hours: gpd.GeoDataFrame,
-        row_hazard_range: tuple[float, float],
-        vlh_row: pd.Series,
-        performance_change: float,
-        hazard_col_name: str,
-    ):
-
+    def _get_relevant_link_type(
+        self, vlh_row: pd.Series, row_hazard_range: tuple[float, float]
+    ) -> RoadTypeEnum:
         # Check if the resilience curve is present for the link type and hazard intensity
-        vlh_total = 0
         _relevant_link_type = None
         if isinstance(vlh_row[self.link_type_column], list):
             # Find the link type with the highest disruption for the given hazard intensity
@@ -526,14 +471,95 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                 f"'{_link_type}' with range {row_hazard_range} was not found in the introduced resilience_curves"
             )
 
-        divisor = 100  # high value assuming the road is almost inaccessible
+        return _relevant_link_type
+
+    def _get_divisor(
+        self, relevant_link_type: RoadTypeEnum, row_hazard_range: tuple[float, float]
+    ):
         if all(
             ratio <= 1
             for ratio in self.resilience_curves.get_functionality_loss_ratio(
-                _relevant_link_type, row_hazard_range
+                relevant_link_type, row_hazard_range
             )
         ):
-            divisor = 1
+            return 1
+        return 100  # high value assuming the road is almost inaccessible
+
+    def _calculate_production_loss_per_capita(
+        self,
+        vehicle_loss_hours: gpd.GeoDataFrame,
+        row_hazard_range: tuple[float, float],
+        vlh_row: pd.Series,
+        hazard_col_name: str,
+    ):
+        """
+        In cases where there is no alternative route in the event of disruption of the road, we propose to use a
+        proxy for the assessment of losses from the interruption of services from the road in these cases where no
+        alternative routes exist.
+        The assumption for the proxy is that a loss of production will occur from the
+        interruption of the road, equal to the size of the added value from the persons that cannot make use of the
+        road, measured in the regional GDP per capita. This assumption constitutes both the loss of production within
+        the area that cannot be reached, as well the loss of production outside the area due to the inability of the
+        workers from within the cut-off area to arrive at their place of production outside this area.
+
+        The daily loss of productivity for each link section without detour routes, when they are
+        disrupted is then obtained multiplying the traffic intensity by the total occupancy per vehicle type,
+        including drivers, by the daily loss of productivity per capita per hour.
+
+        The unit of time is hour.
+        """
+        vlh_total = 0
+        _relevant_link_type = self._get_relevant_link_type(vlh_row, row_hazard_range)
+        _divisor = self._get_divisor(_relevant_link_type, row_hazard_range)
+
+        duration_steps = self.resilience_curves.get_duration_steps(
+            _relevant_link_type, row_hazard_range
+        )
+        functionality_loss_ratios = self.resilience_curves.get_functionality_loss_ratio(
+            _relevant_link_type, row_hazard_range
+        )
+
+        for trip_type in self.trip_purposes:
+            intensity_trip_type = self.vot_intensity_per_trip_collection[
+                f"intensity_{self.part_of_day}_{trip_type}"
+            ].loc[[vlh_row[self.link_id]]]
+            occupancy_trip_type = float(
+                self.vot_intensity_per_trip_collection[f"occupants_{trip_type}"]
+            )
+            vlh_trip_type_event_series = sum(
+                (
+                    intensity_trip_type
+                    * duration
+                    * loss_ratio
+                    * occupancy_trip_type
+                    * self.production_loss_per_capita_per_hour
+                )
+                / _divisor
+                for duration, loss_ratio in zip(
+                    duration_steps, functionality_loss_ratios
+                )
+            )
+            vlh_trip_type_event = vlh_trip_type_event_series.squeeze()
+            vehicle_loss_hours.loc[
+                [vlh_row.name], f"vlh_{trip_type}_{hazard_col_name}"
+            ] = vlh_trip_type_event
+            vlh_total += vlh_trip_type_event
+        vehicle_loss_hours.loc[
+            [vlh_row.name], f"vlh_{hazard_col_name}_total"
+        ] = vlh_total
+
+    def _populate_vehicle_loss_hour(
+        self,
+        vehicle_loss_hours: gpd.GeoDataFrame,
+        row_hazard_range: tuple[float, float],
+        vlh_row: pd.Series,
+        performance_change: float,
+        hazard_col_name: str,
+    ):
+
+        vlh_total = 0
+        _relevant_link_type = self._get_relevant_link_type(vlh_row, row_hazard_range)
+        _divisor = self._get_divisor(_relevant_link_type, row_hazard_range)
 
         duration_steps = self.resilience_curves.get_duration_steps(
             _relevant_link_type, row_hazard_range
@@ -560,7 +586,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                     * performance_change
                     * vot_trip_type
                 )
-                / divisor
+                / _divisor
                 for duration, loss_ratio in zip(
                     duration_steps, functionality_loss_ratios
                 )

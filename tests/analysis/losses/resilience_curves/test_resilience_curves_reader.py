@@ -1,8 +1,5 @@
 from pathlib import Path
 
-from ra2ce.analysis.losses.losses_input_data_reader_base import (
-    LossesInputDataReaderBase,
-)
 from ra2ce.analysis.losses.resilience_curves.resilience_curves import ResilienceCurves
 from ra2ce.analysis.losses.resilience_curves.resilience_curves_reader import (
     ResilienceCurvesReader,
@@ -19,7 +16,6 @@ class TestResilienceCurveReader:
         # 2. Verify expections
         assert isinstance(_reader, ResilienceCurvesReader)
         assert isinstance(_reader, FileReaderProtocol)
-        assert isinstance(_reader, LossesInputDataReaderBase)
 
     def test_read_resilience_curves(
         self,
