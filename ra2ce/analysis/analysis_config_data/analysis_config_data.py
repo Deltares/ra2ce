@@ -98,7 +98,7 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     traffic_period: TrafficPeriodEnum = field(
         default_factory=lambda: TrafficPeriodEnum.DAY
     )
-    hours_per_traffic_period: int = 24
+    hours_per_traffic_period: int = 0
     performance: str = "diff_time"  # "diff_time" or "diff_length" relates to the used criticality metric
     trip_purposes: list[TripPurposeEnum] = field(
         default_factory=lambda: [TripPurposeEnum.NONE]

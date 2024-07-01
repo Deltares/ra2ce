@@ -19,6 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+import logging
 import math
 from abc import ABC, abstractmethod
 from pathlib import Path
@@ -81,6 +82,14 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         self.analysis_type = self.analysis.analysis
         self.traffic_period: TrafficPeriodEnum = self.analysis.traffic_period
         self.hours_per_traffic_period: float = self.analysis.hours_per_traffic_period
+        if (
+            self.traffic_period != TrafficPeriodEnum.DAY
+            and not self.hours_per_traffic_period
+        ):
+            self.hours_per_traffic_period = 24
+            logging.warning(
+                "No value set for `hours_per_traffic_period`. Assuming 24 hours per day."
+            )
 
         self.production_loss_per_capita_per_hour = (
             self.analysis.production_loss_per_capita_per_hour
