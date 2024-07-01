@@ -116,13 +116,7 @@ class TestLosses:
         assert isinstance(_losses, LossesBase)
         assert isinstance(_losses, losses_analysis)
 
-    @pytest.mark.parametrize(
-        "traffic_period",
-        [
-            pytest.param(TrafficPeriodEnum.DAY),
-        ],
-    )
-    def test_calc_vlh(self, traffic_period: TrafficPeriodEnum):
+    def test_calc_vlh(self):
         def create_linestring(row):
             node_a_coords = (
                 node_coordinates_df.loc[
@@ -167,7 +161,8 @@ class TestLosses:
         )
 
         _analysis = AnalysisSectionLosses(
-            traffic_period=traffic_period,
+            traffic_period=TrafficPeriodEnum.DAY,
+            hours_per_traffic_period=24,
             threshold=0,
             resilience_curves_file=_losses_csv_data.joinpath("resilience_curve.csv"),
             traffic_intensities_file=_losses_csv_data.joinpath(
