@@ -61,11 +61,31 @@ class ResilienceCurves:
     def get_duration_steps(
         self, link_type: RoadTypeEnum, hazard_range: tuple[float, float]
     ) -> list[float]:
+        """
+        Get the duration steps for a given link type and hazard range.
+
+        Args:
+            link_type (RoadTypeEnum): The type of the link.
+            hazard_range (tuple[float, float]): The range of the hazard.
+
+        Returns:
+            list[float]: The duration steps.
+        """
         return self.duration_steps[self._get_index(link_type, hazard_range)]
 
     def get_functionality_loss_ratio(
         self, link_type: RoadTypeEnum, hazard_range: tuple[float, float]
     ) -> list[float]:
+        """
+        Get the functionality loss ratio for a given link type and hazard range.
+
+        Args:
+            link_type (RoadTypeEnum): The type of the link.
+            hazard_range (tuple[float, float]): The range of the hazard.
+
+        Returns:
+            list[float]: The functionality loss ratio.
+        """
         return self.functionality_loss_ratio[self._get_index(link_type, hazard_range)]
 
     def calculate_disruption(

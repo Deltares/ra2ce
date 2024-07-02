@@ -33,7 +33,25 @@ class TimeValues:
         return self.trip_types.index(trip_type)
 
     def get_value_of_time(self, trip_type: TripPurposeEnum) -> int:
+        """
+        Get the value of time for a given trip type.
+
+        Args:
+            trip_type (TripPurposeEnum): The type of the trip.
+
+        Returns:
+            int: The value of time.
+        """
         return self.value_of_time[self._get_index(trip_type)]
 
     def get_occupants(self, trip_type: TripPurposeEnum) -> int:
+        """
+        Get the occupants for a given trip type.
+
+        Args:
+            trip_type (TripPurposeEnum): The type of the trip.
+
+        Returns:
+            int: The occupants.
+        """
         return self.occupants[self._get_index(trip_type)]
