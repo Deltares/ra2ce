@@ -12,13 +12,13 @@ class TestResilienceCurve:
             tuple[RoadTypeEnum, tuple[float, float], list[float], list[float]]
         ],
     ):
-        _resilience_curves = ResilienceCurves()
-        for _data in resilience_curves_data:
-            _resilience_curves.link_type.append(_data[0])
-            _resilience_curves.hazard_range.append(_data[1])
-            _resilience_curves.duration_steps.append(_data[2])
-            _resilience_curves.functionality_loss_ratio.append(_data[3])
-        return _resilience_curves
+        _data_tuples = tuple(zip(*resilience_curves_data))
+        return ResilienceCurves(
+            link_type=_data_tuples[0],
+            hazard_range=_data_tuples[1],
+            duration_steps=_data_tuples[2],
+            functionality_loss_ratio=_data_tuples[3],
+        )
 
     @pytest.mark.parametrize(
         "link_type, hazard_range, expected",
@@ -73,8 +73,8 @@ class TestResilienceCurve:
     @pytest.mark.parametrize(
         "link_type, hazard_range, expected",
         [
-            pytest.param(RoadTypeEnum.MOTORWAY, (0.2, 0.5), 5.0, id="Motorway 0.2"),
-            pytest.param(RoadTypeEnum.MOTORWAY, (0.5, 1.2), 3.2, id="Motorway 0.5"),
+            pytest.param(RoadTypeEnum.MOTORWAY, (0.2, 0.5), 5.0, id="Motorway 0.2-0.5"),
+            pytest.param(RoadTypeEnum.MOTORWAY, (0.5, 1.2), 3.2, id="Motorway 0.5-1.2"),
         ],
     )
     def test_calculate_disruption(
@@ -84,8 +84,8 @@ class TestResilienceCurve:
         hazard_range: tuple[float, float],
         expected: float,
     ):
-        # 2. Execute test
+        # 1. Execute test
         _result = valid_resilience_curves.calculate_disruption(link_type, hazard_range)
 
-        # 3. Verify expectations
+        # 2. Verify expectations
         assert _result == pytest.approx(expected)
