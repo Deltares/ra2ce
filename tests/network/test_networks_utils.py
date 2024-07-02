@@ -265,12 +265,6 @@ class TestDeleteDuplicates:
             assert any(_point.almost_equals(_p) for _p in _points[:3])
 
 
-class TestCreateSimplifiedGraph:
-    def test_with_none_graph_complex_doesnot_raise(self):
-        _return_result = nu.create_simplified_graph(None, "")
-        assert _return_result == (None, None, None)
-
-
 class TestGdfCheckCreateUniqueIds:
     def test_with_user_defined_identifier(self):
         # 1. Define test data.
@@ -334,36 +328,6 @@ class TestGraphCheckCreateUniqueIds:
         # 3. Verify final expectations
         assert _return_graph == _graph
         assert _return_id == _find_id
-
-
-class TestGraphCreateUniqueIds:
-    def test_with_missing_id_data(self):
-        # 1. Define test data
-        _graph = nx.MultiGraph()
-        _graph.add_edge(2, 3, weight=5)
-        _graph.add_edge(2, 1, weight=2)
-        _new_id_name = "dummy_id"
-
-        # 2. Run test
-        _return_graph = nu.graph_create_unique_ids(_graph, _new_id_name)
-
-        # 3. Verify final expectations
-        assert _return_graph == _graph
-        _dicts_keys = [_k[-1].keys() for _k in _graph.edges.data(keys=True)]
-        assert all(_new_id_name in _keys for _keys in _dicts_keys)
-
-    def test_with_existing_id(self):
-        # 1. Define test data
-        _graph = nx.MultiGraph()
-        _graph.add_edge(2, 3, weight=5)
-        _graph.add_edge(2, 1, weight=2)
-        _new_id_name = "weight"
-
-        # 2. Run test
-        _return_graph = nu.graph_create_unique_ids(_graph, _new_id_name)
-
-        # 3. Verify final expectations
-        assert _return_graph == _graph
 
 
 class TestNetworksUtils:

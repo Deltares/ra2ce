@@ -34,6 +34,7 @@ from ra2ce.network.exporters.json_exporter import JsonExporter
 from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
+from ra2ce.network.network_simplification import NetworkGraphSimplificator
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
@@ -54,6 +55,9 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
     road_types: list[RoadTypeEnum]
 
     def __init__(self, config_data: NetworkConfigData) -> None:
+        self.attributes_to_exclude_in_simplification = (
+            config_data.network.attributes_to_exclude_in_simplification
+        )
         self.output_graph_dir = config_data.output_graph_dir
         self.graph_crs = config_data.crs
 
@@ -72,7 +76,6 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         clean graph as the `polygon_graph` property.
 
         Args:
-            config_data (NetworkConfigData): Basic configuration data which contain information required the different methods of this wrapper.
             polygon (BaseGeometry): Base polygon from which to generate the graph.
 
         Returns:
@@ -134,9 +137,10 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
     def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
 
         # Create 'graph_simple'
-        graph_simple, graph_complex, link_tables = nut.create_simplified_graph(
-            self.polygon_graph
-        )
+        graph_simple, graph_complex, link_tables = NetworkGraphSimplificator(
+            graph_complex=self.polygon_graph,
+            attributes_to_exclude=self.attributes_to_exclude_in_simplification,
+        ).simplify()
 
         # Assign the average speed and time to the graphs
         graph_simple = AvgSpeedCalculator(graph_simple, self.output_graph_dir).assign()

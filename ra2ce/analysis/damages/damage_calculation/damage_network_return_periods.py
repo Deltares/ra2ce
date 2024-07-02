@@ -50,10 +50,10 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         self,
         road_gdf: GeoDataFrame,
         val_cols: list[str],
-        representative_damage_percentile: float,
+        representative_damage_percentage: float,
     ):
         # Construct using the parent class __init__
-        super().__init__(road_gdf, val_cols, representative_damage_percentile)
+        super().__init__(road_gdf, val_cols, representative_damage_percentage)
 
         self.return_periods = set(
             [x.split("_")[1] for x in val_cols]
@@ -64,13 +64,13 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
 
     @classmethod
     def construct_from_csv(
-        cls, path: Path, representative_damage_percentile: float, sep: str = ";"
+        cls, path: Path, representative_damage_percentage: float, sep: str = ";"
     ):
         road_gdf = pd.read_csv(path, sep=sep)
         val_cols = [
             c for c in road_gdf.columns if c.startswith("F_")
         ]  # Find everything starting with 'F'
-        return cls(road_gdf, val_cols, representative_damage_percentile)
+        return cls(road_gdf, val_cols, representative_damage_percentage)
 
     ### Controlers for return period based damage and risk calculations
     def main(self, damage_function: DamageCurveEnum, manual_damage_functions):
