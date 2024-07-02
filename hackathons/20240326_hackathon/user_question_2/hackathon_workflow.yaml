@@ -1,0 +1,172 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: ra2ce-hackathon-uq2-
+spec:
+  entrypoint: scenario-workflow
+  templates:
+  - name: scenario-workflow
+    steps:
+    - - name: define-subdirs
+        template: read-members
+    - - name: run-scenario
+        template: run-scenario
+        arguments:
+          parameters:
+          - name: member
+            value: "{{item}}"
+        withParam: "{{steps.define-subdirs.outputs.result}}"
+    - - name: post-processing
+        template: post-processing
+
+  - name: read-members
+    script:
+      image: 798877697266.dkr.ecr.eu-west-1.amazonaws.com/boto3:latest
+      workingDir: /data
+      command: [python]
+      source: |
+        import boto3
+        import json
+
+        bucket = 'ra2ce-data'
+        prefix = 'sfincs_floodmaps_sub/'
+        
+        client = boto3.client('s3')
+        result = client.list_objects(Bucket=bucket, Prefix=prefix, Delimiter='/')
+
+        members = []
+        for o in result.get('Contents'):
+            mem = o.get('Key').split('/')[1].split('.')[0]
+            if mem != "":
+              members.append(mem)
+        print(json.dumps(members))
+
+  - name: run-scenario
+    container:
+      image: containers.deltares.nl/ra2ce/ra2ce:latest
+      command: ["python", "/scripts/user_question_2/hazard_overlay_cloud_run_analysis.py"]
+    nodeSelector:
+      beta.kubernetes.io/instance-type: "m5.xlarge"
+    inputs:
+      parameters:
+        - name: member
+      artifacts:
+        - name: input
+          path: /input/{{inputs.parameters.member}}.tif
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: sfincs_floodmaps_sub/{{inputs.parameters.member}}.tif
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+        - name: data
+          path: /data
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: beira_qualimane_sfincs_fm/data
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+        - name: scripts
+          path: /scripts
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: beira_qualimane_sfincs_fm/scripts
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+    outputs:
+      artifacts:
+      - name: ra2ce-output
+        path: /data
+        s3:
+          bucket: ra2ce-data
+          endpoint: s3.amazonaws.com
+          region: eu-west-1
+          key: beira_qualimane_sfincs_fm/output_q2/{{inputs.parameters.member}}/
+          accessKeySecret:
+            name: my-s3-credentials
+            key: accessKey
+          secretKeySecret:
+            name: my-s3-credentials
+            key: secretKey
+        archive:
+          none: {}
+
+  - name: post-processing
+    container:
+      image: containers.deltares.nl/ra2ce/ra2ce:latest
+      command: ["python", "/scripts/user_question_2/post_processing.py"]
+      #command: [sh, "-c", "for I in $(seq 1 1000) ; do echo $I ; sleep 1s; done"]
+    nodeSelector:
+      beta.kubernetes.io/instance-type: "m5.xlarge"
+    inputs:
+      artifacts:
+        - name: output
+          path: /data
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: beira_qualimane_sfincs_fm/output_q2
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+        - name: scripts
+          path: /scripts
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: beira_qualimane_sfincs_fm/scripts
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+    outputs:
+      artifacts:
+        - name: pp_output
+          path: /output
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: beira_qualimane_sfincs_fm/postprocessing_output_q2
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
