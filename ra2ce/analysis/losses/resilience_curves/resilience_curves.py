@@ -23,6 +23,10 @@ from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 @dataclass(kw_only=True)
 class ResilienceCurves:
+    """
+    Class to store the resilience curves for different link types.
+    """
+
     link_type: list[RoadTypeEnum] = field(default_factory=list)
     hazard_range: list[tuple[float, float]] = field(default_factory=list)
     duration_steps: list[list[float]] = field(default_factory=list)
@@ -35,26 +39,68 @@ class ResilienceCurves:
     def _get_index(
         self, link_type: RoadTypeEnum, hazard_range: tuple[float, float]
     ) -> int:
-        _link_type_indices = np.where(np.array(self.link_type) == link_type)[0]
-        _hazard_indices = np.where(np.array(self.hazard_range) == hazard_range)[0]
+        _link_type_indices = np.nonzero(np.array(self.link_type) == link_type)[0]
+        _hazard_indices = np.nonzero(np.array(self.hazard_range) == hazard_range)[0]
         return int(np.intersect1d(_link_type_indices, _hazard_indices)[0])
 
-    def has_resilience_curve(self, link_type: RoadTypeEnum, hazard_min: float) -> bool:
-        return self._get_index(link_type, hazard_min) != None
+    def has_resilience_curve(
+        self, link_type: RoadTypeEnum, hazard_range: tuple[float, float]
+    ) -> bool:
+        """
+        Check if a resilience curve exists for a given link type and hazard range.
+
+        Args:
+            link_type (RoadTypeEnum): The type of the link.
+            hazard_range (tuple[float, float]): The range of the hazard.
+
+        Returns:
+            bool: True if the resilience curve exists.
+        """
+        return self._get_index(link_type, hazard_range) != None
 
     def get_duration_steps(
         self, link_type: RoadTypeEnum, hazard_range: tuple[float, float]
     ) -> list[float]:
+        """
+        Get the duration steps for a given link type and hazard range.
+
+        Args:
+            link_type (RoadTypeEnum): The type of the link.
+            hazard_range (tuple[float, float]): The range of the hazard.
+
+        Returns:
+            list[float]: The duration steps.
+        """
         return self.duration_steps[self._get_index(link_type, hazard_range)]
 
     def get_functionality_loss_ratio(
         self, link_type: RoadTypeEnum, hazard_range: tuple[float, float]
     ) -> list[float]:
+        """
+        Get the functionality loss ratio for a given link type and hazard range.
+
+        Args:
+            link_type (RoadTypeEnum): The type of the link.
+            hazard_range (tuple[float, float]): The range of the hazard.
+
+        Returns:
+            list[float]: The functionality loss ratio.
+        """
         return self.functionality_loss_ratio[self._get_index(link_type, hazard_range)]
 
-    def get_disruption(
+    def calculate_disruption(
         self, link_type: RoadTypeEnum, hazard_range: tuple[float, float]
     ) -> float:
+        """
+        Calculate the disruption for a given link type and hazard range.
+
+        Args:
+            link_type (RoadTypeEnum): The type of the link.
+            hazard_range (tuple[float, float]): The range of the hazard.
+
+        Returns:
+            float: The calculated disruption.
+        """
         return sum(
             map(
                 lambda x, y: x * y,

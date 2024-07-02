@@ -77,7 +77,7 @@ class TestResilienceCurve:
             pytest.param(RoadTypeEnum.MOTORWAY, (0.5, 1.2), 3.2, id="Motorway 0.5-1.2"),
         ],
     )
-    def test_get_disruption(
+    def test_calculate_disruption(
         self,
         valid_resilience_curves: ResilienceCurves,
         link_type: RoadTypeEnum,
@@ -85,7 +85,7 @@ class TestResilienceCurve:
         expected: float,
     ):
         # 1. Execute test
-        _result = valid_resilience_curves.get_disruption(link_type, hazard_range)
+        _result = valid_resilience_curves.calculate_disruption(link_type, hazard_range)
 
         # 2. Verify expectations
         assert _result == pytest.approx(expected)
