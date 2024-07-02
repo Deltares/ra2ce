@@ -66,7 +66,7 @@ class TestLosses:
         # 3. Verify final expectations.
         assert (
             str(exc.value)
-            == "traffic_intensities_file, resilience_curve_file, and values_of_time_file should be given"
+            == "traffic_intensities_file, resilience_curves_file, and values_of_time_file should be given"
         )
 
     def test_initialize_with_data(self, losses_analysis: type[AnalysisLossesProtocol]):
@@ -87,7 +87,7 @@ class TestLosses:
 
         _analysis = AnalysisSectionLosses(
             part_of_day=PartOfDayEnum.DAY,
-            resilience_curve_file=test_data.joinpath(
+            resilience_curves_file=test_data.joinpath(
                 "losses", "csv_data_for_losses", "resilience_curve.csv"
             ),
             traffic_intensities_file=test_data.joinpath(
@@ -168,7 +168,7 @@ class TestLosses:
         _analysis = AnalysisSectionLosses(
             part_of_day=part_of_day,
             threshold=0,
-            resilience_curve_file=_losses_csv_data.joinpath("resilience_curve.csv"),
+            resilience_curves_file=_losses_csv_data.joinpath("resilience_curve.csv"),
             traffic_intensities_file=_losses_csv_data.joinpath(
                 "traffic_intensities.csv"
             ),
