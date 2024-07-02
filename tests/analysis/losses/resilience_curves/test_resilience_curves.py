@@ -73,8 +73,8 @@ class TestResilienceCurve:
     @pytest.mark.parametrize(
         "link_type, hazard_range, expected",
         [
-            pytest.param(RoadTypeEnum.MOTORWAY, (0.2, 0.5), 5.0, id="Motorway 0.2"),
-            pytest.param(RoadTypeEnum.MOTORWAY, (0.5, 1.2), 3.2, id="Motorway 0.5"),
+            pytest.param(RoadTypeEnum.MOTORWAY, (0.2, 0.5), 5.0, id="Motorway 0.2-0.5"),
+            pytest.param(RoadTypeEnum.MOTORWAY, (0.5, 1.2), 3.2, id="Motorway 0.5-1.2"),
         ],
     )
     def test_get_disruption(
@@ -84,8 +84,8 @@ class TestResilienceCurve:
         hazard_range: tuple[float, float],
         expected: float,
     ):
-        # 2. Execute test
+        # 1. Execute test
         _result = valid_resilience_curves.get_disruption(link_type, hazard_range)
 
-        # 3. Verify expectations
+        # 2. Verify expectations
         assert _result == pytest.approx(expected)
