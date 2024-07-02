@@ -12,6 +12,7 @@ def get_time_values_csv_filepath() -> Iterator[Path]:
     _csv_file = test_data.joinpath(
         "losses", "csv_data_for_losses", "values_of_time.csv"
     )
+    assert _csv_file.is_file()
     yield _csv_file
 
 

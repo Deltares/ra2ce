@@ -50,7 +50,7 @@ class TrafficIntensities:
             trip_purpose (TripPurposeEnum): Trip purpose
 
         Returns:
-            int: The intensity for that (set of) link(s)
+            int: The intensity for that (set of) link(s) (vehicles per traffic period)
         """
         if isinstance(link_id, tuple):
             return max(

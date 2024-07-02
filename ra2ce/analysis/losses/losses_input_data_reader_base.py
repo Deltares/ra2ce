@@ -50,7 +50,11 @@ class LossesInputDataReaderBase(ABC, FileReaderProtocol):
 
     def read(self, file_path: Path | None) -> Any:
         if not file_path or not file_path.exists():
-            logging.warning("No csv file found at %s.", file_path)
+            logging.warning(
+                "No csv file found at %s. Using default values for %s.",
+                file_path,
+                self.object_type,
+            )
             return self.object_type()
 
         _df = pd.read_csv(file_path, sep=self.separator, on_bad_lines="skip")

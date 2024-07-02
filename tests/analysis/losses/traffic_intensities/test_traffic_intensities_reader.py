@@ -17,7 +17,7 @@ from ra2ce.common.io.readers.file_reader_protocol import FileReaderProtocol
 class TestTimeValuesReader:
     def test_initialize(self):
         # 1. Run test
-        _reader = TrafficIntensitiesReader()
+        _reader = TrafficIntensitiesReader("link_id")
 
         # 2. Verify expections
         assert isinstance(_reader, TrafficIntensitiesReader)
@@ -35,12 +35,15 @@ class TestTimeValuesReader:
         assert traffic_intensities_csv.is_file()
 
         # 2. Execute test
-        _traffic_intensities = TrafficIntensitiesReader().read(traffic_intensities_csv)
+        _traffic_intensities = TrafficIntensitiesReader("link_id").read(
+            traffic_intensities_csv
+        )
 
         # 3. Verify expectations
         assert isinstance(_traffic_intensities, TrafficIntensities)
-        for _key in traffic_intensities_data:
-            assert _key in _traffic_intensities.intensities
+        for _traffic_key, _traffic_data_reference in traffic_intensities_data.items():
+            assert _traffic_key in _traffic_intensities.intensities
             assert (
-                traffic_intensities_data[_key] == _traffic_intensities.intensities[_key]
+                _traffic_data_reference
+                == _traffic_intensities.intensities[_traffic_key]
             )

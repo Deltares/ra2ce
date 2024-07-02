@@ -13,6 +13,7 @@ def get_traffic_intensities_csv_filepath() -> Iterator[Path]:
     _csv_file = test_data.joinpath(
         "losses", "csv_data_for_losses", "traffic_intensities.csv"
     )
+    assert _csv_file.is_file()
     yield _csv_file
 
 

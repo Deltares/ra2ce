@@ -29,13 +29,17 @@ class TestTimeValuesReader:
 
         # 2. Execute test
         _times_values = TimeValuesReader().read(time_values_csv)
+        _times_values.get_occupants(TripPurposeEnum.BUSINESS)
 
         # 3. Verify expectations
         _trip_types, _value_of_time, _occupants = zip(*time_values_data)
         assert isinstance(_times_values, TimeValues)
-        assert len(_times_values.trip_types) == len(_trip_types)
-        assert all(_val in _trip_types for _val in _times_values.trip_types)
-        assert len(_times_values.value_of_time) == len(_value_of_time)
-        assert all(_val in _value_of_time for _val in _times_values.value_of_time)
-        assert len(_times_values.occupants) == len(_occupants)
-        assert all(_val in _occupants for _val in _times_values.occupants)
+
+        def check_data(data, reference_data) -> bool:
+            return len(data) == len(reference_data) and all(
+                _val in reference_data for _val in list(set(data))
+            )
+
+        assert check_data(_times_values.trip_types, _trip_types)
+        assert check_data(_times_values.value_of_time, _value_of_time)
+        assert check_data(_times_values.occupants, _occupants)

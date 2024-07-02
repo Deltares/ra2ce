@@ -12,6 +12,7 @@ def get_resilience_curves_csv_filepath() -> Iterator[Path]:
     _csv_file = test_data.joinpath(
         "losses", "csv_data_for_losses", "resilience_curve.csv"
     )
+    assert _csv_file.is_file()
     yield _csv_file
 
 
