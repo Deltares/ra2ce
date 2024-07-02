@@ -71,7 +71,13 @@ class TestLosses:
             == "traffic_intensities_file, resilience_curves_file, and values_of_time_file should be given"
         )
 
-    def test_initialize_with_data(self, losses_analysis: type[AnalysisLossesProtocol]):
+    def test_initialize_with_data(
+        self,
+        losses_analysis: type[AnalysisLossesProtocol],
+        resilience_curves_csv: Path,
+        traffic_intensities_csv: Path,
+        time_values_csv: Path,
+    ):
         # 1. Define test data
         _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
@@ -89,15 +95,9 @@ class TestLosses:
 
         _analysis = AnalysisSectionLosses(
             traffic_period=TrafficPeriodEnum.DAY,
-            resilience_curves_file=test_data.joinpath(
-                "losses", "csv_data_for_losses", "resilience_curve.csv"
-            ),
-            traffic_intensities_file=test_data.joinpath(
-                "losses", "csv_data_for_losses", "traffic_intensities.csv"
-            ),
-            values_of_time_file=test_data.joinpath(
-                "losses", "csv_data_for_losses", "values_of_time.csv"
-            ),
+            resilience_curves_file=resilience_curves_csv,
+            traffic_intensities_file=traffic_intensities_csv,
+            values_of_time_file=time_values_csv,
             name="single_link_redundancy_losses_test",
             trip_purposes=[TripPurposeEnum.BUSINESS, TripPurposeEnum.COMMUTE],
         )
@@ -116,7 +116,12 @@ class TestLosses:
         assert isinstance(_losses, LossesBase)
         assert isinstance(_losses, losses_analysis)
 
-    def test_calc_vlh(self):
+    def test_calc_vlh(
+        self,
+        resilience_curves_csv: Path,
+        traffic_intensities_csv: Path,
+        time_values_csv: Path,
+    ):
         def create_linestring(row):
             node_a_coords = (
                 node_coordinates_df.loc[
@@ -164,11 +169,9 @@ class TestLosses:
             traffic_period=TrafficPeriodEnum.DAY,
             hours_per_traffic_period=24,
             threshold=0,
-            resilience_curves_file=_losses_csv_data.joinpath("resilience_curve.csv"),
-            traffic_intensities_file=_losses_csv_data.joinpath(
-                "traffic_intensities.csv"
-            ),
-            values_of_time_file=_losses_csv_data.joinpath("values_of_time.csv"),
+            resilience_curves_file=resilience_curves_csv,
+            traffic_intensities_file=traffic_intensities_csv,
+            values_of_time_file=time_values_csv,
             name="single_link_redundancy_losses_test",
             trip_purposes=[TripPurposeEnum.BUSINESS, TripPurposeEnum.COMMUTE],
             weighing=WeighingEnum.LENGTH,
