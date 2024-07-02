@@ -83,10 +83,10 @@ class TestDamages:
         val_cols = [
             col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
         ]
-        _representative_damage_percentile = 100
+        _representative_damage_percentage = 100
         # DO ACTUAL DAMAGE CALCULATION
         event_gdf = DamageNetworkEvents(
-            road_gdf, val_cols, _representative_damage_percentile
+            road_gdf, val_cols, _representative_damage_percentage
         )
         event_gdf.main(damage_function=damage_function)
 
@@ -120,9 +120,9 @@ class TestDamages:
         val_cols = [
             col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
         ]
-        _representative_damage_percentile = 100
+        _representative_damage_percentage = 100
         event_gdf = DamageNetworkEvents(
-            road_gdf, val_cols, _representative_damage_percentile
+            road_gdf, val_cols, _representative_damage_percentage
         )
         event_gdf.main(damage_function=damage_function)
 
@@ -183,11 +183,11 @@ class TestDamages:
             col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
         ]
 
-        _representative_damage_percentile = 100
+        _representative_damage_percentage = 100
 
         # DO ACTUAL DAMAGE CALCULATION
         event_gdf = DamageNetworkEvents(
-            road_gdf, val_cols, _representative_damage_percentile
+            road_gdf, val_cols, _representative_damage_percentage
         )
         event_gdf.main(damage_function=damage_function)
 
@@ -268,11 +268,11 @@ class TestDamages:
         fun0 = manual_damage_functions.loaded[0]
         assert fun0.prefix == "te"
 
-        _representative_damage_percentile = 100
+        _representative_damage_percentage = 100
 
         # DO ACTUAL DAMAGE CALCULATION
         event_gdf = DamageNetworkEvents(
-            road_gdf, val_cols, _representative_damage_percentile
+            road_gdf, val_cols, _representative_damage_percentage
         )
         event_gdf.main(
             damage_function=damage_function,
@@ -370,7 +370,7 @@ class TestDamages:
 
     def test_construct_damage_network_return_periods(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-            risk_data_file, sep=";", representative_damage_percentile=100
+            risk_data_file, sep=";", representative_damage_percentage=100
         )
         assert (
             type(damage_network) == DamageNetworkReturnPeriods
@@ -378,7 +378,7 @@ class TestDamages:
 
     def test_risk_calculation_default(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-            risk_data_file, sep=";", representative_damage_percentile=100
+            risk_data_file, sep=";", representative_damage_percentage=100
         )
         damage_network.control_risk_calculation(mode=RiskCalculationModeEnum.DEFAULT)
         assert (
@@ -388,7 +388,7 @@ class TestDamages:
     def test_risk_calculation_cutoff(self, risk_data_file: Path):
         for rp in [15, 200, 25]:
             damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-                risk_data_file, sep=";", representative_damage_percentile=100
+                risk_data_file, sep=";", representative_damage_percentage=100
             )
             damage_network.control_risk_calculation(
                 mode=RiskCalculationModeEnum.CUT_FROM_YEAR, year=rp
@@ -401,7 +401,7 @@ class TestDamages:
 
     def test_risk_calculation_triangle_to_null(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-            risk_data_file, sep=";", representative_damage_percentile=100
+            risk_data_file, sep=";", representative_damage_percentage=100
         )
         for triangle_rp in [8, 2]:
             damage_network.control_risk_calculation(
