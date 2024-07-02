@@ -10,7 +10,9 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionLosses,
 )
-from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
+from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
+    TrafficPeriodEnum,
+)
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
@@ -50,7 +52,7 @@ class TestLosses:
         )
 
         _config.config_data.input_path = Path("sth")
-        _analysis = AnalysisSectionLosses(part_of_day=None)
+        _analysis = AnalysisSectionLosses(traffic_period=None)
 
         _analysis_input = AnalysisInputWrapper.from_input(
             analysis=_analysis,
@@ -86,7 +88,7 @@ class TestLosses:
         _config_data.network.link_type_column = "link_type"
 
         _analysis = AnalysisSectionLosses(
-            part_of_day=PartOfDayEnum.DAY,
+            traffic_period=TrafficPeriodEnum.DAY,
             resilience_curves_file=test_data.joinpath(
                 "losses", "csv_data_for_losses", "resilience_curve.csv"
             ),
@@ -114,14 +116,7 @@ class TestLosses:
         assert isinstance(_losses, LossesBase)
         assert isinstance(_losses, losses_analysis)
 
-    @pytest.mark.parametrize(
-        "part_of_day",
-        [
-            pytest.param(PartOfDayEnum.DAY),
-            # pytest.param(PartOfDayEnum.EVENING)
-        ],
-    )
-    def test_calc_vlh(self, part_of_day: PartOfDayEnum):
+    def test_calc_vlh(self):
         def create_linestring(row):
             node_a_coords = (
                 node_coordinates_df.loc[
@@ -166,7 +161,8 @@ class TestLosses:
         )
 
         _analysis = AnalysisSectionLosses(
-            part_of_day=part_of_day,
+            traffic_period=TrafficPeriodEnum.DAY,
+            hours_per_traffic_period=24,
             threshold=0,
             resilience_curves_file=_losses_csv_data.joinpath("resilience_curve.csv"),
             traffic_intensities_file=_losses_csv_data.joinpath(

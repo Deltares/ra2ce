@@ -1,6 +1,8 @@
 import pytest
 
-from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
+from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
+    TrafficPeriodEnum,
+)
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.losses.traffic_intensities.traffic_intensities import (
     TrafficIntensities,
@@ -19,7 +21,7 @@ class TestTrafficIntensities:
     def test_calculate_traffic_intensity(
         self,
         traffic_intensities_data: dict[
-            tuple[PartOfDayEnum, TripPurposeEnum], list[int]
+            tuple[TrafficPeriodEnum, TripPurposeEnum], list[int]
         ],
         link_id: int | tuple[int, int],
         expected: int,
@@ -29,13 +31,13 @@ class TestTrafficIntensities:
         for _key in traffic_intensities_data:
             _traffic_intensities.intensities[_key] = traffic_intensities_data[_key]
 
-        _part_of_day = PartOfDayEnum.DAY
+        _traffic_period = TrafficPeriodEnum.DAY
         _trip_purpose = TripPurposeEnum.BUSINESS
 
         # 2. Execute test
         _result = _traffic_intensities.calculate_intensity(
             link_id,
-            _part_of_day,
+            _traffic_period,
             _trip_purpose,
         )
 

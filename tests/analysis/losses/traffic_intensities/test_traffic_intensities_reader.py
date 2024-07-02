@@ -1,6 +1,8 @@
 from pathlib import Path
 
-from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
+from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
+    TrafficPeriodEnum,
+)
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.losses.losses_input_data_reader_base import (
     LossesInputDataReaderBase,
@@ -28,7 +30,7 @@ class TestTimeValuesReader:
         self,
         traffic_intensities_csv: Path,
         traffic_intensities_data: dict[
-            tuple[PartOfDayEnum, TripPurposeEnum], list[int]
+            tuple[TrafficPeriodEnum, TripPurposeEnum], list[int]
         ],
     ):
         # 1. Define test data

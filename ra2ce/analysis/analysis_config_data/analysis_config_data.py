@@ -35,9 +35,11 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
-from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
+)
+from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
+    TrafficPeriodEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
@@ -93,7 +95,10 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     # losses
     traffic_cols: list[str] = field(default_factory=list)
     production_loss_per_capita_per_hour: float = math.nan
-    part_of_day: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
+    traffic_period: TrafficPeriodEnum = field(
+        default_factory=lambda: TrafficPeriodEnum.DAY
+    )
+    hours_per_traffic_period: int = 0
     performance: str = "diff_time"  # "diff_time" or "diff_length" relates to the used criticality metric
     trip_purposes: list[TripPurposeEnum] = field(
         default_factory=lambda: [TripPurposeEnum.NONE]

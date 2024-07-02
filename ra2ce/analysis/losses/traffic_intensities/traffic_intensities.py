@@ -16,7 +16,9 @@
 """
 from dataclasses import dataclass, field
 
-from ra2ce.analysis.analysis_config_data.enums.part_of_day_enum import PartOfDayEnum
+from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
+    TrafficPeriodEnum,
+)
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 
 
@@ -27,18 +29,18 @@ class TrafficIntensities:
     """
 
     link_id: list[int | tuple[int, int]] = field(default_factory=list)
-    intensities: dict[tuple[PartOfDayEnum, TripPurposeEnum], list[int]] = field(
+    intensities: dict[tuple[TrafficPeriodEnum, TripPurposeEnum], list[int]] = field(
         default_factory=dict
     )
 
     def calculate_intensity(
         self,
         link_id: int | tuple[int, int],
-        part_of_day: PartOfDayEnum,
+        traffic_period: TrafficPeriodEnum,
         trip_purpose: TripPurposeEnum,
     ) -> int:
         """
-        Calculate the traffic intensity per part of day for a specific link
+        Calculate the traffic intensity per traffic period for a specific link
         for a trip purpose.
 
         For a simplified graph, the link_id could be a tuple of link_ids.
@@ -46,7 +48,7 @@ class TrafficIntensities:
 
         Args:
             link_id (int | tuple[int, int]): The link id(s)
-            part_of_day (PartOfDayEnum): Part of the day
+            traffic_period (TrafficPeriodEnum): Part of the day
             trip_purpose (TripPurposeEnum): Trip purpose
 
         Returns:
@@ -54,9 +56,9 @@ class TrafficIntensities:
         """
         if isinstance(link_id, tuple):
             return max(
-                self.calculate_intensity(_id, part_of_day, trip_purpose)
+                self.calculate_intensity(_id, traffic_period, trip_purpose)
                 for _id in link_id
             )
-        return self.intensities[(part_of_day, trip_purpose)][
+        return self.intensities[(traffic_period, trip_purpose)][
             self.link_id.index(link_id)
         ]
