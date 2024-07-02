@@ -50,10 +50,10 @@ class ResilienceCurvesReader(FileReaderProtocol):
                 literal_eval(row["functionality_loss_ratio"])
             )
 
-        if len(_duration_steps) != len(_functionality_loss_ratio):
-            raise ValueError(
-                "Duration steps and functionality loss ratio should have the same length"
-            )
+            if len(_duration_steps[-1]) != len(_functionality_loss_ratio[-1]):
+                raise ValueError(
+                    f"Duration steps and functionality loss ratio should have the same length ({_link_type_hazard_intensity})."
+                )
 
         return ResilienceCurves(
             link_type=_link_type,
