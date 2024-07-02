@@ -329,6 +329,7 @@ class TestGraphCheckCreateUniqueIds:
         assert _return_graph == _graph
         assert _return_id == _find_id
 
+
 class TestNetworksUtils:
     def test_get_normalized_geojson_polygon_from_geojson(self):
         # 1. Define test data.

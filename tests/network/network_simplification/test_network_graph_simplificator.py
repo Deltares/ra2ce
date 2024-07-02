@@ -1,6 +1,7 @@
+import math
 import random
 from typing import Callable, Iterator
-import math
+
 import networkx as nx
 import numpy as np
 import pytest
