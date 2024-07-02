@@ -61,6 +61,13 @@ class ResilienceCurvesReader(LossesInputDataReaderBase):
                 literal_eval(row["functionality_loss_ratio"])
             )
 
+        if len(_resilience_curves.duration_steps) != len(
+            _resilience_curves.functionality_loss_ratio
+        ):
+            raise ValueError(
+                "Duration steps and functionality loss ratio should have the same length."
+            )
+
         return _resilience_curves
 
     def read(self, file_path: Path | None) -> ResilienceCurves:
