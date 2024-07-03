@@ -1,5 +1,8 @@
 from pathlib import Path
 
+import pandas as pd
+import pytest
+
 from ra2ce.analysis.losses.losses_input_data_reader_base import (
     LossesInputDataReaderBase,
 )
@@ -48,3 +51,22 @@ class TestResilienceCurveReader:
             )
             assert len(_functionality_loss_ratio) == len(_expected_value[3])
             assert all(_val in _expected_value[3] for _val in _functionality_loss_ratio)
+
+    def test__parse_df_mismatching_data_length(self):
+        # 1. Define test data
+        _resilience_curves_data = pd.DataFrame(
+            {
+                "link_type_hazard_intensity": ["motorway_0.1-0.2", "motorway_0.3-0.4"],
+                "duration_steps": ["[1, 2]", "[1, 2, 3, 4]"],
+                "functionality_loss_ratio": ["[0.1, 0.2]", "[0.1, 0.2, 0.3]"],
+            }
+        )
+
+        # 2. Execute test
+        with pytest.raises(ValueError) as exc_err:
+            ResilienceCurvesReader()._parse_df(_resilience_curves_data)
+
+        # 3. Verify expectations
+        assert str(exc_err.value).startswith(
+            "Duration steps and functionality loss ratio should have the same length"
+        )

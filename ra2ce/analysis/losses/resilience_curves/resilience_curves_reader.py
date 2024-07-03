@@ -47,18 +47,19 @@ class ResilienceCurvesReader(LossesInputDataReaderBase):
 
         _resilience_curves = {}
         for _, row in df.iterrows():
-            (_lt, _h_min, _h_max) = parse_link_type_hazard_intensity(
-                row["link_type_hazard_intensity"]
+            _link_type_hazard_intensity = row["link_type_hazard_intensity"]
+            _lt, _h_min, _h_max = parse_link_type_hazard_intensity(
+                _link_type_hazard_intensity
             )
+            _ds_list = literal_eval(row["duration_steps"])
+            _flr_list = literal_eval(row["functionality_loss_ratio"])
+            if len(_ds_list) != len(_flr_list):
+                raise ValueError(
+                    f"Duration steps and functionality loss ratio should have the same length ({_link_type_hazard_intensity})."
+                )
             _resilience_curves[
                 (RoadTypeEnum.get_enum(_lt), (float(_h_min), float(_h_max)))
-            ] = [
-                (float(_d), float(_flr))
-                for _d, _flr in zip(
-                    literal_eval(row["duration_steps"]),
-                    literal_eval(row["functionality_loss_ratio"]),
-                )
-            ]
+            ] = [(float(_ds), float(_flr)) for _ds, _flr in zip(_ds_list, _flr_list)]
 
         return ResilienceCurves(resilience_curves=_resilience_curves)
 
