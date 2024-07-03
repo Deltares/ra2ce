@@ -25,12 +25,7 @@ class TimeValues:
     Class to store the time values for different trip types.
     """
 
-    trip_types: list[TripPurposeEnum] = field(default_factory=list)
-    value_of_time: list[int] = field(default_factory=list)
-    occupants: list[int] = field(default_factory=list)
-
-    def _get_index(self, trip_type: TripPurposeEnum) -> int:
-        return self.trip_types.index(trip_type)
+    time_values: dict[TripPurposeEnum, tuple[int, int]] = field(default_factory=dict)
 
     def get_value_of_time(self, trip_type: TripPurposeEnum) -> int:
         """
@@ -42,7 +37,7 @@ class TimeValues:
         Returns:
             int: The value of time.
         """
-        return self.value_of_time[self._get_index(trip_type)]
+        return self.time_values[trip_type][0]
 
     def get_occupants(self, trip_type: TripPurposeEnum) -> int:
         """
@@ -54,4 +49,4 @@ class TimeValues:
         Returns:
             int: The occupants.
         """
-        return self.occupants[self._get_index(trip_type)]
+        return self.time_values[trip_type][1]

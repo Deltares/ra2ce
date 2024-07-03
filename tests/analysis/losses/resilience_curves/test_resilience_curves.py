@@ -12,13 +12,11 @@ class TestResilienceCurve:
             tuple[RoadTypeEnum, tuple[float, float], list[float], list[float]]
         ],
     ):
-        _data_tuples = tuple(zip(*resilience_curves_data))
-        return ResilienceCurves(
-            link_type=_data_tuples[0],
-            hazard_range=_data_tuples[1],
-            duration_steps=_data_tuples[2],
-            functionality_loss_ratio=_data_tuples[3],
-        )
+        _resilience_curves = {
+            (_link, _hazard): list(zip(_loss, _ratio))
+            for _link, _hazard, _loss, _ratio in resilience_curves_data
+        }
+        return ResilienceCurves(resilience_curves=_resilience_curves)
 
     @pytest.mark.parametrize(
         "link_type, hazard_range, expected",

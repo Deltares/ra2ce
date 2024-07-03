@@ -36,14 +36,14 @@ class TimeValuesReader(LossesInputDataReaderBase):
     data_type = TimeValues
 
     def _parse_df(self, df: DataFrame) -> TimeValues:
-        _time_values = TimeValues()
+        _time_values = {
+            TripPurposeEnum.get_enum(_trip_type): (_value_of_time, _occupants)
+            for (_trip_type, _value_of_time, _occupants) in zip(
+                df["trip_types"], df["value_of_time"], df["occupants"]
+            )
+        }
 
-        for _, row in df.iterrows():
-            _time_values.trip_types.append(TripPurposeEnum.get_enum(row["trip_types"]))
-            _time_values.value_of_time.append(int(row["value_of_time"]))
-            _time_values.occupants.append(int(row["occupants"]))
-
-        return _time_values
+        return TimeValues(time_values=_time_values)
 
     def read(self, file_path: Path | None) -> TimeValues:
         return super().read(file_path)

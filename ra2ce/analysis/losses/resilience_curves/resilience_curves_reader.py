@@ -45,30 +45,22 @@ class ResilienceCurvesReader(LossesInputDataReaderBase):
         ) -> tuple[str, str, str]:
             return findall(r"^(\w+)_([\d.]+)-([\d.]+)$", link_type_hazard_intensity)[0]
 
-        _resilience_curves = ResilienceCurves()
-
+        _resilience_curves = {}
         for _, row in df.iterrows():
-            _link_type_hazard_intensity = row["link_type_hazard_intensity"]
-            _lt, _h_min, _h_max = parse_link_type_hazard_intensity(
-                _link_type_hazard_intensity
+            (_lt, _h_min, _h_max) = parse_link_type_hazard_intensity(
+                row["link_type_hazard_intensity"]
             )
-            _resilience_curves.link_type.append(RoadTypeEnum.get_enum(_lt))
-            _resilience_curves.hazard_range.append((float(_h_min), float(_h_max)))
-            _resilience_curves.duration_steps.append(
-                literal_eval(row["duration_steps"])
-            )
-            _resilience_curves.functionality_loss_ratio.append(
-                literal_eval(row["functionality_loss_ratio"])
-            )
+            _resilience_curves[
+                (RoadTypeEnum.get_enum(_lt), (float(_h_min), float(_h_max)))
+            ] = [
+                (float(_d), float(_flr))
+                for _d, _flr in zip(
+                    literal_eval(row["duration_steps"]),
+                    literal_eval(row["functionality_loss_ratio"]),
+                )
+            ]
 
-        if len(_resilience_curves.duration_steps) != len(
-            _resilience_curves.functionality_loss_ratio
-        ):
-            raise ValueError(
-                "Duration steps and functionality loss ratio should have the same length."
-            )
-
-        return _resilience_curves
+        return ResilienceCurves(resilience_curves=_resilience_curves)
 
     def read(self, file_path: Path | None) -> ResilienceCurves:
         return super().read(file_path)
