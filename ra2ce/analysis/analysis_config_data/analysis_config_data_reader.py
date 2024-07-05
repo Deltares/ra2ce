@@ -45,7 +45,10 @@ from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnu
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeEnum
+from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
+    TrafficPeriodEnum,
+)
+from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.ini_configuration_reader_protocol import (
     ConfigDataReaderProtocol,
@@ -129,6 +132,14 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         _section.traffic_cols = self._parser.getlist(
             section_name, "traffic_cols", fallback=_section.traffic_cols
         )
+        _section.traffic_period = TrafficPeriodEnum.get_enum(
+            self._parser.get(section_name, "traffic_period", fallback=None)
+        )
+        _section.hours_per_traffic_period = self._parser.getint(
+            section_name,
+            "hours_per_traffic_period",
+            fallback=_section.hours_per_traffic_period,
+        )
         _section.trip_purposes = list(
             map(
                 TripPurposeEnum.get_enum,
@@ -139,11 +150,6 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             section_name,
             "production_loss_per_capita_per_hour",
             fallback=_section.production_loss_per_capita_per_hour,
-        )
-        _section.duration_event = self._parser.getfloat(
-            section_name,
-            "duration_event",
-            fallback=_section.duration_event,
         )
 
         # accessibility analyses
