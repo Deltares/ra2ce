@@ -115,7 +115,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         dam_cols = [c for c in self.gdf.columns if c.startswith("dam")]
         _to_integrate = self.gdf[dam_cols]
         _to_integrate.columns = [
-            float(c.split("_")[1].replace("RP", "")) for c in _to_integrate.columns
+            float(c.split("_")[1].replace("EV", "")) for c in _to_integrate.columns
         ]
         _to_integrate = _to_integrate.sort_index(
             axis="columns", ascending=False
