@@ -273,11 +273,11 @@ class DamageNetworkBase(ABC):
             damage_values = row["dam_{}_{}_quartiles".format(curve_name, event)]
 
             # Quantile values corresponding to the damage values
-            percentiles = [0, 25, 50, 75, 100]
+            percentages = [0, 25, 50, 75, 100]
 
             # Perform linear interpolation using interp1d from scipy
             _interpolator = interp1d(
-                percentiles, damage_values, kind="linear", fill_value="extrapolate"
+                percentages, damage_values, kind="linear", fill_value="extrapolate"
             )
 
             # Interpolate the damage value for the given representative_damage_percentage
@@ -331,7 +331,7 @@ class DamageNetworkBase(ABC):
         cols_to_scale = ["lower_damage", "upper_damage"]
         df = scale_damage_using_lanes(lane_scale_factors, df, cols_to_scale)
 
-        # create separate column for each percentile of construction costs (is faster then tuple)
+        # create separate column for each percentage of construction costs (is faster then tuple)
         for percentage in [
             0,
             25,

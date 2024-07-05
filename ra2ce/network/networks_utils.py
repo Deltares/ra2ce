@@ -20,6 +20,7 @@
 """
 import itertools
 import logging
+import math
 import os
 import sys
 import warnings
@@ -38,7 +39,6 @@ from geopy import distance
 from numpy.ma import MaskedArray
 from osgeo import gdal
 from osmnx import graph_to_gdfs
-from osmnx.simplification import simplify_graph
 from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
@@ -980,38 +980,6 @@ def delete_duplicates(all_points: list[Point]) -> list[Point]:
     return uniquepoints
 
 
-def create_simplified_graph(
-    graph_complex: nx.Graph, new_id: str = "rfid"
-) -> tuple[nx.Graph, nx.Graph, tuple[dict, dict]]:
-    """Create a simplified graph with unique ids from a complex graph"""
-    logging.info("Simplifying graph")
-    try:
-        graph_complex = graph_create_unique_ids(graph_complex, "{}_c".format(new_id))
-
-        # Create simplified graph and add unique ids
-        graph_simple = simplify_graph_count(graph_complex)
-        graph_simple = graph_create_unique_ids(graph_simple, new_id)
-
-        # Create look_up_tables between graphs with unique ids
-        simple_to_complex, complex_to_simple = graph_link_simple_id_to_complex(
-            graph_simple, new_id=new_id
-        )
-
-        # Store id table and add simple ids to complex graph
-        id_tables = (simple_to_complex, complex_to_simple)
-        graph_complex = add_simple_id_to_graph_complex(
-            graph_complex, complex_to_simple, new_id
-        )
-        logging.info("Simplified graph succesfully created")
-    except Exception as exc:
-        graph_simple = None
-        id_tables = None
-        logging.error(
-            "Did not create a simplified version of the graph ({})".format(exc)
-        )
-    return graph_simple, graph_complex, id_tables
-
-
 def gdf_check_create_unique_ids(
     gdf: gpd.GeoDataFrame, id_name: str, new_id_name: str = "rfid"
 ) -> tuple[gpd.GeoDataFrame, str]:
@@ -1074,19 +1042,6 @@ def graph_check_create_unique_ids(
     return graph, id_name
 
 
-def graph_create_unique_ids(graph: nx.Graph, new_id_name: str = "rfid") -> nx.Graph:
-    # Check if new_id_name exists and if unique
-    u, v, k = list(graph.edges)[0]
-    if new_id_name in graph.edges[u, v, k]:
-        return graph
-    # TODO: decide if we always add a new ID (in iGraph this is different)
-    # if len(set([str(e[-1][new_id_name]) for e in graph.edges.data(keys=True)])) < len(graph.edges()):
-    for i, (u, v, k) in enumerate(graph.edges(keys=True)):
-        graph[u][v][k][new_id_name] = i + 1
-    logging.info("Added a new unique identifier field '{}'.".format(new_id_name))
-    return graph
-
-
 def add_missing_geoms_graph(graph: nx.Graph, geom_name: str = "geometry") -> nx.Graph:
     # Not all nodes have geometry attributed (some only x and y coordinates) so add a geometry columns
     nodes_without_geom = [
@@ -1110,7 +1065,8 @@ def add_missing_geoms_graph(graph: nx.Graph, geom_name: str = "geometry") -> nx.
 
 def add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
     """
-    Add missing x and y attributes to nodes
+    Add missing x and y attributes to nodes.
+    TODO: Should this be moved to `network_simplification`?
 
     Args:
         graph (nx.Graph): Graph to add x and y attributes to
@@ -1125,32 +1081,6 @@ def add_x_y_to_nodes(graph: nx.Graph) -> nx.Graph:
             data.setdefault("x", round(geometry.x, 7))
             data.setdefault("y", round(geometry.y, 7))
     return graph
-
-
-def simplify_graph_count(complex_graph: nx.Graph) -> nx.Graph:
-    """
-    Simplify the graph after adding missing x and y attributes to nodes
-
-    Args:
-        complex_graph (nx.Graph): Graph to simplify
-
-    Returns:
-        nx.Graph: Simplified graph
-    """
-    complex_graph = add_x_y_to_nodes(complex_graph)
-    simple_graph = simplify_graph(
-        complex_graph, strict=True, remove_rings=True, track_merged=False
-    )
-
-    logging.info(
-        "Graph simplified from %s to %s nodes and %s to %s edges.",
-        complex_graph.number_of_nodes(),
-        simple_graph.number_of_nodes(),
-        complex_graph.number_of_edges(),
-        simple_graph.number_of_edges(),
-    )
-
-    return simple_graph
 
 
 def graph_from_gdf(
@@ -1432,7 +1362,7 @@ def get_graph_edges_extent(
         if maxy > max_y:
             max_y = maxy
 
-    return (min_x, max_x, min_y, max_y)
+    return min_x, max_x, min_y, max_y
 
 
 def reproject_graph(original_graph: nx.Graph, crs_in: str, crs_out: str) -> nx.Graph:

@@ -174,6 +174,12 @@ class Network:
         return updated_graph
 
     def _get_new_network_and_graph(self, export_types: list[str]) -> None:
+        """
+        TODO: This method should be relying on a generic definition of a network result
+        from `.get_network`. This means, instead of getting `_base_graph, _network_gdf`
+        we get a generic `_ra2ce_network_wrapper` from which can later on just do a
+        `.simplify_network` or `.add_eges`, etc. using inheritance.
+        """
 
         _base_graph, _network_gdf = NetworkWrapperFactory(
             self._config_data

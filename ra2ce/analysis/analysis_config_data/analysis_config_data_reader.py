@@ -217,6 +217,11 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             "evaluation_period",
             fallback=_section.evaluation_period,
         )
+        _section.evaluation_period = self._parser.getfloat(
+            section_name,
+            "representative_damage_percentage",
+            fallback=_section.representative_damage_percentage,
+        )
         _section.interest_rate = self._parser.getfloat(
             section_name,
             "interest_rate",

@@ -50,6 +50,7 @@ class NetworkSection:
     polygon: Optional[Path] = None
     network_type: NetworkTypeEnum = field(default_factory=lambda: NetworkTypeEnum.NONE)
     road_types: list[RoadTypeEnum] = field(default_factory=list)
+    attributes_to_exclude_in_simplification: list[str] = field(default_factory=list)
     save_gpkg: bool = False
 
 
