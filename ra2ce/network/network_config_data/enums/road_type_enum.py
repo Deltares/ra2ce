@@ -20,3 +20,7 @@ class RoadTypeEnum(Ra2ceEnumBase):
     CULVERT = 15
     UNCLASSIFIED = 98
     INVALID = 99
+
+    @classmethod
+    def get_enum(cls, input: str | None) -> Ra2ceEnumBase:
+        return super().get_enum(input)
