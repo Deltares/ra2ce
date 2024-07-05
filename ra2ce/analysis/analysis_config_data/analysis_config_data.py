@@ -38,11 +38,13 @@ from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnu
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.trip_purposes import TripPurposeEnum
+from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
+    TrafficPeriodEnum,
+)
+from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.common.configuration.config_data_protocol import ConfigDataProtocol
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
-from ra2ce.network.network_config_data.enums.part_of_day_enum import PartOfDayEnum
 from ra2ce.network.network_config_data.network_config_data import (
     NetworkSection,
     OriginsDestinationsSection,
@@ -92,17 +94,16 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     disruption_per_category: str = ""
     # losses
     traffic_cols: list[str] = field(default_factory=list)
-    duration_event: float = (
-        math.nan
-    )  # TODO remove the deprecated attribute that have been replaced by csv
     production_loss_per_capita_per_hour: float = math.nan
-    part_of_day: PartOfDayEnum = field(default_factory=lambda: PartOfDayEnum.DAY)
+    traffic_period: TrafficPeriodEnum = field(
+        default_factory=lambda: TrafficPeriodEnum.DAY
+    )
+    hours_per_traffic_period: int = 0
     performance: str = "diff_time"  # "diff_time" or "diff_length" relates to the used criticality metric
-    hours_per_day: float = 24  # 24 hours per day we consider here only daily losses.
     trip_purposes: list[TripPurposeEnum] = field(
         default_factory=lambda: [TripPurposeEnum.NONE]
     )
-    resilience_curve_file: Optional[Path] = None
+    resilience_curves_file: Optional[Path] = None
     traffic_intensities_file: Optional[Path] = None
     values_of_time_file: Optional[Path] = None
     # the redundancy analysis) and the intensities
@@ -137,7 +138,7 @@ class AnalysisSectionDamages(AnalysisSectionBase):
     climate_factor: float = math.nan
     climate_period: float = math.nan
     # road damage
-    representative_damage_percentile: float = 100
+    representative_damage_percentage: float = 100
     event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.INVALID)
     damage_curve: DamageCurveEnum = field(
         default_factory=lambda: DamageCurveEnum.INVALID
