@@ -58,7 +58,7 @@ def get_traffic_intensities_data() -> Iterator[
     yield {
         (TrafficPeriodEnum.EVENING_PEAK, TripPurposeEnum.FREIGHT): [0, 0, 0, 0, 0, 0],
         (TrafficPeriodEnum.EVENING_PEAK, TripPurposeEnum.COMMUTE): [10, 2, 8, 20, 4, 4],
-        (TrafficPeriodEnum.EVENING_PEAK, TripPurposeEnum.BUSINESS): [20, 5, 7, 10, 8],
+        (TrafficPeriodEnum.EVENING_PEAK, TripPurposeEnum.BUSINESS): [20, 5, 7, 10, 8, 8],
         (TrafficPeriodEnum.EVENING_PEAK, TripPurposeEnum.OTHER): [0, 0, 0, 0, 0, 0],
         (TrafficPeriodEnum.DAY, TripPurposeEnum.FREIGHT): [0, 0, 0, 0, 0, 0],
         (TrafficPeriodEnum.DAY, TripPurposeEnum.COMMUTE): [10, 2, 8, 20, 4, 4],
