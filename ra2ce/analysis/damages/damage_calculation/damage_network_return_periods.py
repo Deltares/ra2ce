@@ -98,8 +98,8 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
 
     def control_risk_calculation(
         self,
-        mode: RiskCalculationModeEnum = RiskCalculationModeEnum.DEFAULT,
-        year: int = 0,
+        mode: RiskCalculationModeEnum,
+        year: int,
     ):
         """
         Controler of the risk calculation, which calls the correct risk (integration) functions
@@ -156,8 +156,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
                 # risk is return frequency of cutoff
                 # times the damage of the most extreme event
                 _to_integrate = _to_integrate.fillna(0)
-                _risk = _to_integrate[_rps[0]] / year
-                # _max_RP = max(_to_integrate.columns)
+                _risk = _to_integrate[max(_to_integrate.columns)] / year
 
             self.gdf["risk"] = _risk
 
