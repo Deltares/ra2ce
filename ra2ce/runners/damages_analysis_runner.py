@@ -24,9 +24,13 @@ import re
 import time
 
 import geopandas as gpd
+import networkx as nx
 import numpy as np
+import pandas as pd
+from networkx import MultiDiGraph
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
+from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.analysis_result_wrapper_exporter import (
@@ -40,6 +44,53 @@ from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 class DamagesAnalysisRunner(AnalysisRunner):
     def __str__(self) -> str:
         return "Damages Analysis Runner"
+
+    @staticmethod
+    def _update_link_based_values(
+        damages_link_based_graph: nx.MultiDiGraph | nx.MultiGraph,
+        result_segment_based: pd.DataFrame,
+        segment_id_column: str,
+        result_column: str,
+        segment_values_list: str,
+    ) -> nx.MultiDiGraph | nx.MultiGraph:
+        """
+        Derive the values in the provided graph (link_based) based on the results of the segment-based graph.
+
+        Parameters:
+        - damages_link_based_graph (nx.MultiDiGraph | nx.MultiGraph): The graph with link-based damage data.
+        - result_segment_based (pd.DataFrame): DataFrame containing segment-based damage data.
+        - segment_id_column (str): The column name in both the graph data and DataFrame representing segment IDs.
+        - result_column (str): The column name in the graph data and DataFrame representing the damage result.
+        - segment_values_list (str): The column name in the graph data to store the segment damage values.
+
+        Returns:
+        - damages_link_based_graph (nx.MultiDiGraph | nx.MultiGraph)
+        """
+        for u, v, key, data in damages_link_based_graph.edges(keys=True, data=True):
+            damages_link_based_graph[u][v][key][segment_values_list] = []
+            damages_link_based_graph[u][v][key][result_column] = 0
+
+        # Lookup segment_id_list for each edge
+        for u, v, key, data in damages_link_based_graph.edges(keys=True, data=True):
+            link_value = data[result_column]
+            segment_id_list = (
+                data[segment_id_column]
+                if isinstance(data[segment_id_column], list)
+                else [data[segment_id_column]]
+            )
+
+            # Read value for each segment_id & append to segment_values_list and calculate link_value
+            for segment_id in segment_id_list:
+                segment_value = result_segment_based.loc[
+                    result_segment_based[segment_id_column] == segment_id,
+                    result_column,
+                ].squeeze()
+
+                data[segment_values_list].append(round(segment_value, 2))
+                link_value += round(segment_value, 2)
+
+            data[result_column] = round(link_value, 2)
+        return damages_link_based_graph
 
     @staticmethod
     def can_run(ra2ce_input: ConfigWrapper) -> bool:
@@ -105,35 +156,60 @@ class DamagesAnalysisRunner(AnalysisRunner):
                 raise ValueError(f"damage curve {damage_curve} is invalid")
 
             for damage_result_column in damage_result_columns:
-                for u, v, key, data in damages_link_based_graph.edges(
-                    keys=True, data=True
-                ):
-                    damages_link_based_graph[u][v][key]["damage_segments_list"] = []
-                    damages_link_based_graph[u][v][key][damage_result_column] = 0
-
-                # Step 2: Lookup segment_id_list for each edge
-                for u, v, key, data in damages_link_based_graph.edges(
-                    keys=True, data=True
-                ):
-                    link_damage = data[damage_result_column]
-                    segment_id_list = (
-                        data[segment_id_column]
-                        if isinstance(data[segment_id_column], list)
-                        else [data[segment_id_column]]
+                # Step 2: Get damage of each link.
+                # Read damage for each segment_id & append to damage_segments_list and calculate link_damage
+                damages_link_based_graph = (
+                    DamagesAnalysisRunner._update_link_based_values(
+                        damages_link_based_graph=damages_link_based_graph,
+                        result_segment_based=result_segment_based,
+                        segment_id_column=segment_id_column,
+                        result_column=damage_result_column,
+                        segment_values_list=f"{damage_result_column}_segments",
                     )
+                )
+            #     for u, v, key, data in damages_link_based_graph.edges(
+            #         keys=True, data=True
+            #     ):
+            #         damages_link_based_graph[u][v][key]["damage_segments_list"] = []
+            #         damages_link_based_graph[u][v][key][damage_result_column] = 0
+            #
+            #     # Step 2: Lookup segment_id_list for each edge
+            #     for u, v, key, data in damages_link_based_graph.edges(
+            #         keys=True, data=True
+            #     ):
+            #         link_damage = data[damage_result_column]
+            #         segment_id_list = (
+            #             data[segment_id_column]
+            #             if isinstance(data[segment_id_column], list)
+            #             else [data[segment_id_column]]
+            #         )
+            #
+            #         # Step 3: Read damage for each segment_id & append to damage_segments_list and calculate link_damage
+            #         for segment_id in segment_id_list:
+            #             segment_damage = result_segment_based.loc[
+            #                 result_segment_based[segment_id_column] == segment_id,
+            #                 damage_result_column,
+            #             ].squeeze()
+            #             if np.isnan(segment_damage):
+            #                 segment_damage = 0
+            #             data["damage_segments_list"].append(round(segment_damage, 2))
+            #             link_damage += round(segment_damage, 2)
+            #
+            #         data[damage_result_column] = round(link_damage, 2)
 
-                    # Step 3: Read damage for each segment_id & append to damage_segments_list and calculate link_damage
-                    for segment_id in segment_id_list:
-                        segment_damage = result_segment_based.loc[
-                            result_segment_based[segment_id_column] == segment_id,
-                            damage_result_column,
-                        ].squeeze()
-                        if np.isnan(segment_damage):
-                            segment_damage = 0
-                        data["damage_segments_list"].append(round(segment_damage, 2))
-                        link_damage += round(segment_damage, 2)
+        # Step 3: get risk of each link.
+        # Read risk for each segment_id & append to risk_segments_list and calculate link_risk
+        if analysis.analysis.event_type == EventTypeEnum.RETURN_PERIOD:
+            risk_result_columns = ["risk"]
+        for risk_result_column in risk_result_columns:
+            damages_link_based_graph = DamagesAnalysisRunner._update_link_based_values(
+                damages_link_based_graph=damages_link_based_graph,
+                result_segment_based=result_segment_based,
+                segment_id_column=segment_id_column,
+                result_column=risk_result_column,
+                segment_values_list=f"{risk_result_column}_segments",
+            )
 
-                    data[damage_result_column] = round(link_damage, 2)
         # Step 4: Convert the edge attributes to a GeoDataFrame
         edge_attributes = []
         for u, v, key, data in damages_link_based_graph.edges(keys=True, data=True):
