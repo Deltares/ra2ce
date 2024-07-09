@@ -380,7 +380,9 @@ class TestDamages:
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
             risk_data_file, sep=";", representative_damage_percentage=100
         )
-        damage_network.control_risk_calculation(mode=RiskCalculationModeEnum.DEFAULT)
+        damage_network.control_risk_calculation(
+            mode=RiskCalculationModeEnum.DEFAULT, year=0
+        )
         assert (
             damage_network.gdf["risk"][0] == damage_network.gdf["ref_risk_default"][0]
         )
