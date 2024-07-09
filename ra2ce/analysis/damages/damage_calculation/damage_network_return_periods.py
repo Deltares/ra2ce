@@ -168,7 +168,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
 
             _rps = list(_to_integrate.columns)
 
-            if year >= min(_rps):
+            if year >= min(_rps) and year != 0:
                 raise ValueError(
                     """
                 RA2CE cannot calculate risk in 'triangle_to_null' mode if 
@@ -178,6 +178,12 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
                         year, min(_rps)
                     )
                 )
+
+            if year == 0:
+                logging.warning(
+                    "Available lane data cannot simply be converted to float/int, RA2CE will try a clean-up."
+                )
+                year = 1
 
             _to_integrate = self.rework_damage_data_triangle_to_null(
                 _to_integrate, year
