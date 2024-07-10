@@ -33,6 +33,9 @@ from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import
 from ra2ce.analysis.damages.damage_calculation.damage_network_base import (
     DamageNetworkBase,
 )
+from ra2ce.analysis.damages.shape_to_integrate_object.to_integrate_shaper_factory import (
+    ToIntegrateShaperFactory,
+)
 
 
 class DamageNetworkReturnPeriods(DamageNetworkBase):
@@ -98,97 +101,99 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
 
     def control_risk_calculation(
         self,
+        damage_function: DamageCurveEnum,
         mode: RiskCalculationModeEnum,
         year: int,
     ):
         """
-        Controler of the risk calculation, which calls the correct risk (integration) functions
+        Controller of the risk calculation, which calls the correct risk (integration) functions
 
         Arguments:
+            *damage_function* (DamageCurveEnum) : defines the damage estimation method
             *mode* (RiskCalculationModeEnum) : the sort of risk calculation that you want to do, can be:
                                 ‘default’, 'cut_from_YYYY_year’, ‘triangle_to_null_YYYY_year’
             *year* (int) : the cutoff year/return period of the risk calculation
+            :param damage_function:
         """
         self.verify_damage_data_for_risk_calculation()
 
         # prepare the parameters of the risk calculation
-        dam_cols = [c for c in self.gdf.columns if c.startswith("dam")]
-        _to_integrate = self.gdf[dam_cols]
-        _to_integrate.columns = [
-            float(c.split("_")[1].replace("RP", "")) for c in _to_integrate.columns
-        ]
-        _to_integrate = _to_integrate.sort_index(
-            axis="columns", ascending=False
-        )  # from large to small RP
+        to_integrate_shaper = ToIntegrateShaperFactory.get_shaper(
+            gdf=self.gdf, damage_function=damage_function
+        )
+        dam_cols = to_integrate_shaper.get_damage_columns()
+        _to_integrate_list = to_integrate_shaper.shape_to_integrate_object(
+            damage_columns=dam_cols
+        )
 
-        if mode == RiskCalculationModeEnum.DEFAULT:
+        for _to_integrate in _to_integrate_list:
+            if mode == RiskCalculationModeEnum.DEFAULT:
 
-            _to_integrate = self.rework_damage_data_default(_to_integrate)
-            _risk = self.integrate_df_trapezoidal(_to_integrate.copy())
-            self.gdf["risk"] = _risk
-
-        elif mode == RiskCalculationModeEnum.CUT_FROM_YEAR:
-            """
-            In this mode, the integration mimics the presence of a flood protection
-            """
-            _rps = list(_to_integrate.columns)
-
-            if year <= min(_rps):
-                raise ValueError(
-                    """
-                RA2CE cannot calculate risk in 'cut_from' mode if 
-                Return period of the cutoff ({}) <= smallest available return period ({})
-                Use 'default' mode or 'triangle_to_null_mode' instead.
-                                    """.format(
-                        year, min(_rps)
-                    )
-                )
-
-            elif (
-                min(_rps) < year < max(_rps)
-            ):  # if protection level is between min and max RP
-                _to_integrate = self.rework_damage_data_cut_from(_to_integrate, year)
+                _to_integrate = self.rework_damage_data_default(_to_integrate)
                 _risk = self.integrate_df_trapezoidal(_to_integrate.copy())
 
-            elif year >= max(
-                _rps
-            ):  # cutoff is larger or equal than largest return period
-                # risk is return frequency of cutoff
-                # times the damage of the most extreme event
-                _to_integrate = _to_integrate.fillna(0)
-                _risk = _to_integrate[max(_to_integrate.columns)] / year
+            elif mode == RiskCalculationModeEnum.CUT_FROM_YEAR:
+                """
+                In this mode, the integration mimics the presence of a flood protection
+                """
+                _rps = list(_to_integrate.columns)
 
-            self.gdf["risk"] = _risk
-
-        elif mode == RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR:
-            """
-            In this mode, an extra data point with zero damage is added at some distance from the smallest known RP,
-            and the area of the Triangle this creates is also calculated
-            """
-
-            _rps = list(_to_integrate.columns)
-
-            if year >= min(_rps) and year != 0:
-                raise ValueError(
-                    """
-                RA2CE cannot calculate risk in 'triangle_to_null' mode if 
-                Return period of the triangle ({}) >= smallest available return period ({})
-                Use 'default' mode or 'cut_from' instead.
-                                    """.format(
-                        year, min(_rps)
+                if year <= min(_rps):
+                    raise ValueError(
+                        """
+                    RA2CE cannot calculate risk in 'cut_from' mode if 
+                    Return period of the cutoff ({}) <= smallest available return period ({})
+                    Use 'default' mode or 'triangle_to_null_mode' instead.
+                                        """.format(
+                            year, min(_rps)
+                        )
                     )
-                )
 
-            if year == 0:
-                logging.warning(
-                    "Available lane data cannot simply be converted to float/int, RA2CE will try a clean-up."
-                )
-                year = 1
+                elif (
+                    min(_rps) < year < max(_rps)
+                ):  # if protection level is between min and max RP
+                    _to_integrate = self.rework_damage_data_cut_from(
+                        _to_integrate, year
+                    )
+                    _risk = self.integrate_df_trapezoidal(_to_integrate.copy())
 
-            _to_integrate = self.rework_damage_data_triangle_to_null(
-                _to_integrate, year
-            )
-            _risk = self.integrate_df_trapezoidal(_to_integrate.copy())
+                elif year >= max(
+                    _rps
+                ):  # cutoff is larger or equal than largest return period
+                    # risk is return frequency of cutoff
+                    # times the damage of the most extreme event
+                    _to_integrate = _to_integrate.fillna(0)
+                    _risk = _to_integrate[max(_to_integrate.columns)] / year
+
+            elif mode == RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR:
+                """
+                In this mode, an extra data point with zero damage is added at some distance from the smallest known RP,
+                and the area of the Triangle this creates is also calculated
+                """
+
+                _rps = list(_to_integrate.columns)
+
+                if year >= min(_rps) and year != 0:
+                    raise ValueError(
+                        """
+                    RA2CE cannot calculate risk in 'triangle_to_null' mode if 
+                    Return period of the triangle ({}) >= smallest available return period ({})
+                    Use 'default' mode or 'cut_from' instead.
+                                        """.format(
+                            year, min(_rps)
+                        )
+                    )
+
+                if year == 0:
+                    logging.warning(
+                        "Available lane data cannot simply be converted to float/int, RA2CE will try a clean-up."
+                    )
+                    year = 1
+
+                _to_integrate = self.rework_damage_data_triangle_to_null(
+                    _to_integrate, year
+                )
+                _risk = self.integrate_df_trapezoidal(_to_integrate.copy())
 
             self.gdf["risk"] = _risk
 
