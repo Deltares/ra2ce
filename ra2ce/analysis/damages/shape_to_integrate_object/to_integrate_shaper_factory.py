@@ -4,6 +4,9 @@ from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCu
 from ra2ce.analysis.damages.shape_to_integrate_object.hz_to_integrate_shaper import (
     HzToIntegrateShaper,
 )
+from ra2ce.analysis.damages.shape_to_integrate_object.man_to_integrate_shaper import (
+    ManToIntegrateShaper,
+)
 from ra2ce.analysis.damages.shape_to_integrate_object.osd_to_integrate_shaper import (
     OsdToIntegrateShaper,
 )
@@ -22,7 +25,7 @@ class ToIntegrateShaperFactory:
         if damage_function == DamageCurveEnum.OSD:
             return OsdToIntegrateShaper(gdf)
         if damage_function == DamageCurveEnum.MAN:
-            pass
+            return ManToIntegrateShaper(gdf)
 
         raise NotImplementedError(
             f"damage function {damage_function} not yet supported."

@@ -96,7 +96,8 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
 
         if damage_function == DamageCurveEnum.MAN:
             self.calculate_damage_manual_functions(
-                events=self.events, manual_damage_functions=manual_damage_functions
+                events=self.return_periods,
+                manual_damage_functions=manual_damage_functions,
             )
 
     def control_risk_calculation(
