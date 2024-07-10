@@ -179,14 +179,16 @@ class DamagesAnalysisRunner(AnalysisRunner):
             risk_result_columns = [
                 col for col in result_segment_based.columns if re.match(pattern, col)
             ]
-        for risk_result_column in risk_result_columns:
-            damages_link_based_graph = DamagesAnalysisRunner._update_link_based_values(
-                damages_link_based_graph=damages_link_based_graph,
-                result_segment_based=result_segment_based,
-                segment_id_column=segment_id_column,
-                result_column=risk_result_column,
-                segment_values_list=f"{risk_result_column}_segments",
-            )
+            for risk_result_column in risk_result_columns:
+                damages_link_based_graph = (
+                    DamagesAnalysisRunner._update_link_based_values(
+                        damages_link_based_graph=damages_link_based_graph,
+                        result_segment_based=result_segment_based,
+                        segment_id_column=segment_id_column,
+                        result_column=risk_result_column,
+                        segment_values_list=f"{risk_result_column}_segments",
+                    )
+                )
 
         # Step 4: Convert the edge attributes to a GeoDataFrame
         edge_attributes = []
