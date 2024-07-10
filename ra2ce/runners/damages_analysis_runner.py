@@ -167,35 +167,6 @@ class DamagesAnalysisRunner(AnalysisRunner):
                         segment_values_list=f"{damage_result_column}_segments",
                     )
                 )
-            #     for u, v, key, data in damages_link_based_graph.edges(
-            #         keys=True, data=True
-            #     ):
-            #         damages_link_based_graph[u][v][key]["damage_segments_list"] = []
-            #         damages_link_based_graph[u][v][key][damage_result_column] = 0
-            #
-            #     # Step 2: Lookup segment_id_list for each edge
-            #     for u, v, key, data in damages_link_based_graph.edges(
-            #         keys=True, data=True
-            #     ):
-            #         link_damage = data[damage_result_column]
-            #         segment_id_list = (
-            #             data[segment_id_column]
-            #             if isinstance(data[segment_id_column], list)
-            #             else [data[segment_id_column]]
-            #         )
-            #
-            #         # Step 3: Read damage for each segment_id & append to damage_segments_list and calculate link_damage
-            #         for segment_id in segment_id_list:
-            #             segment_damage = result_segment_based.loc[
-            #                 result_segment_based[segment_id_column] == segment_id,
-            #                 damage_result_column,
-            #             ].squeeze()
-            #             if np.isnan(segment_damage):
-            #                 segment_damage = 0
-            #             data["damage_segments_list"].append(round(segment_damage, 2))
-            #             link_damage += round(segment_damage, 2)
-            #
-            #         data[damage_result_column] = round(link_damage, 2)
 
         # Step 3: get risk of each link.
         # Read risk for each segment_id & append to risk_segments_list and calculate link_risk
