@@ -384,7 +384,8 @@ class TestDamages:
             DamageCurveEnum.HZ, mode=RiskCalculationModeEnum.DEFAULT, year=0
         )
         assert (
-            damage_network.gdf["risk"][0] == damage_network.gdf["ref_risk_default"][0]
+            damage_network.gdf[f"risk_{DamageCurveEnum.HZ.name}"][0]
+            == damage_network.gdf["ref_risk_default"][0]
         )
 
     def test_risk_calculation_cutoff(self, risk_data_file: Path):
@@ -397,7 +398,9 @@ class TestDamages:
                 mode=RiskCalculationModeEnum.CUT_FROM_YEAR,
                 year=rp,
             )
-            test_result = round(damage_network.gdf["risk"][0], 0)
+            test_result = round(
+                damage_network.gdf[f"risk_{DamageCurveEnum.HZ.name}"][0], 0
+            )
             reference_result = round(
                 damage_network.gdf["ref_risk_cut_from_{}_year".format(rp)][0], 0
             )
@@ -413,7 +416,9 @@ class TestDamages:
                 mode=RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR,
                 year=triangle_rp,
             )
-            test_result = round(damage_network.gdf["risk"][0], 0)
+            test_result = round(
+                damage_network.gdf[f"risk_{DamageCurveEnum.HZ.name}"][0], 0
+            )
             reference_result = round(
                 damage_network.gdf[
                     "ref_risk_triangle_to_null_{}_year".format(triangle_rp)
