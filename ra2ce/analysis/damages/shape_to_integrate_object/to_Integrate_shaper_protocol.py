@@ -8,7 +8,7 @@ from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCu
 class ToIntegrateShaperProtocol(Protocol):
     gdf: gpd.GeoDataFrame
 
-    def get_damage_columns(self) -> float:
+    def get_return_periods(self) -> list:
         """
         Gets the columns' names that have damages calculated
 
@@ -16,7 +16,9 @@ class ToIntegrateShaperProtocol(Protocol):
             list: columns' name that have damages calculated.
         """
 
-    def shape_to_integrate_object(self, damage_columns: list) -> list[gpd.GeoDataFrame]:
+    def shape_to_integrate_object(
+        self, return_periods: list
+    ) -> dict[str : gpd.GeoDataFrame]:
         """
         Gets the return periods and create columns for risk calculation for each damage curve and return period
         Returns:

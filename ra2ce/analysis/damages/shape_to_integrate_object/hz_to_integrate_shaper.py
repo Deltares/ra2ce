@@ -1,5 +1,6 @@
 import geopandas as gpd
 
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.damages.shape_to_integrate_object.to_Integrate_shaper_protocol import (
     ToIntegrateShaperProtocol,
 )
@@ -11,13 +12,19 @@ class HzToIntegrateShaper(ToIntegrateShaperProtocol):
     def __init__(self, gdf):
         self.gdf = gdf
 
-    def get_damage_columns(self) -> list:
-        return [c for c in self.gdf.columns if c.startswith("dam")]
+    def get_return_periods(self) -> list:
+        return sorted(c for c in self.gdf.columns if c.startswith("dam"))
 
-    def shape_to_integrate_object(self, damage_columns: list) -> list[gpd.GeoDataFrame]:
-        _to_integrate = self.gdf[damage_columns]
+    def shape_to_integrate_object(
+        self, return_periods: list
+    ) -> dict[str : gpd.GeoDataFrame]:
+        _to_integrate = self.gdf[return_periods]
 
         _to_integrate.columns = [
             float(c.split("_")[1].replace("RP", "")) for c in _to_integrate.columns
         ]
-        return [_to_integrate.sort_index(axis="columns", ascending=False)]
+        return {
+            DamageCurveEnum.HZ.name: _to_integrate.sort_index(
+                axis="columns", ascending=False
+            )
+        }

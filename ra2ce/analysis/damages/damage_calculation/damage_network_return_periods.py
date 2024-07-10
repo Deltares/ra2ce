@@ -121,12 +121,12 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         to_integrate_shaper = ToIntegrateShaperFactory.get_shaper(
             gdf=self.gdf, damage_function=damage_function
         )
-        dam_cols = to_integrate_shaper.get_damage_columns()
-        _to_integrate_list = to_integrate_shaper.shape_to_integrate_object(
-            damage_columns=dam_cols
+        return_periods = to_integrate_shaper.get_return_periods()
+        _to_integrate_dict = to_integrate_shaper.shape_to_integrate_object(
+            return_periods=return_periods
         )
 
-        for _to_integrate in _to_integrate_list:
+        for vulnerability_curve_name, _to_integrate in _to_integrate_dict.items():
             if mode == RiskCalculationModeEnum.DEFAULT:
 
                 _to_integrate = self.rework_damage_data_default(_to_integrate)
@@ -195,7 +195,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
                 )
                 _risk = self.integrate_df_trapezoidal(_to_integrate.copy())
 
-            self.gdf["risk"] = _risk
+            self.gdf[f"risk_{vulnerability_curve_name}"] = _risk
 
     def verify_damage_data_for_risk_calculation(self):
         """
