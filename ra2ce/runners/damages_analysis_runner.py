@@ -87,6 +87,10 @@ class DamagesAnalysisRunner(AnalysisRunner):
                 ].squeeze()
 
                 data[segment_values_list].append(round(segment_value, 2))
+
+                if np.isnan(segment_value):
+                    segment_value = 0
+
                 link_value += round(segment_value, 2)
 
             data[result_column] = round(link_value, 2)
