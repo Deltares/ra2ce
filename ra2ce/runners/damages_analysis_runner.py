@@ -171,7 +171,10 @@ class DamagesAnalysisRunner(AnalysisRunner):
         # Step 3: get risk of each link.
         # Read risk for each segment_id & append to risk_segments_list and calculate link_risk
         if analysis.analysis.event_type == EventTypeEnum.RETURN_PERIOD:
-            risk_result_columns = ["risk"]
+            pattern = r"(risk.*)"
+            risk_result_columns = [
+                col for col in result_segment_based.columns if re.match(pattern, col)
+            ]
         for risk_result_column in risk_result_columns:
             damages_link_based_graph = DamagesAnalysisRunner._update_link_based_values(
                 damages_link_based_graph=damages_link_based_graph,
