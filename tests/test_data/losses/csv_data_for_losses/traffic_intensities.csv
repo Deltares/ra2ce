@@ -1,6 +1,7 @@
-link_id,evening_total,evening_freight,evening_commute,evening_business,evening_other,day_freight,day_commute,day_business,day_other,day_total
+link_id,evening_peak_total,evening_peak_freight,evening_peak_commute,evening_peak_business,evening_peak_other,day_freight,day_commute,day_business,day_other,day_total
 1,0,0,10,20,0,0,10,20,0,30
 2,0,0,2,5,0,0,2,5,0,7
 3,0,0,8,7,0,0,8,7,0,15
 4,0,0,20,10,0,0,20,10,0,30
 5,0,0,4,8,0,0,4,8,0,12
+6,0,0,4,8,0,0,4,8,0,12
