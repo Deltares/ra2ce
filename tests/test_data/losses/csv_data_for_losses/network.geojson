@@ -6,5 +6,6 @@
 { "type": "Feature", "properties": { "segment_id": 4, "name": "Rotterdam-Den Haag", "link_id": 3, "link_type": "motorway" }, "geometry": { "type": "LineString", "coordinates": [ [ 4.477733, 51.92442 ], [ 4.325633, 52.080167 ] ] } },
 { "type": "Feature", "properties": { "segment_id": 5, "name": "Den Haag-Amsterdam", "link_id": 4, "link_type": "motorway" }, "geometry": { "type": "LineString", "coordinates": [ [ 4.325633, 52.080167 ], [ 4.895168, 52.370216 ] ] } },
 { "type": "Feature", "properties": { "segment_id": 7, "name": "Rotterdam-Amsterdam", "link_id": 5, "link_type": "motorway" }, "geometry": { "type": "LineString", "coordinates": [ [ 4.477733, 51.92442 ], [ 4.895168, 52.370216 ] ] } }
+{ "type": "Feature", "properties": { "segment_id": 8, "name": "Rotterdam-Breda", "link_id": 6, "link_type": "motorway" }, "geometry": { "type": "LineString", "coordinates": [ [ 4.477733, 51.92442 ], [ 3.895168, 51.370216 ] ] } }
 ]
 }
