@@ -169,6 +169,7 @@ class TestLosses:
             traffic_period=TrafficPeriodEnum.DAY,
             hours_per_traffic_period=24,
             threshold=0,
+            production_loss_per_capita_per_hour=20,
             resilience_curves_file=resilience_curves_csv,
             traffic_intensities_file=traffic_intensities_csv,
             values_of_time_file=time_values_csv,
