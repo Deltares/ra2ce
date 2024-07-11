@@ -1,5 +1,5 @@
 trip_types;value_of_time;occupants
-business;20;2
-commute;10;3
-freight;200;1
-other;100;20
+business;450;2
+commute;200;3
+freight;2000;1
+other;2000;10
