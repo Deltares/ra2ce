@@ -7,9 +7,6 @@ from .gws_convertor import GWSRDConvertor
 # N:\Projects\11210000\11210292\B. Measurements and calculations\Dealing with uncertainties
 
 
-
-
-    
 path_to_metadata = Path(
     r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\projects\RACE\RA2CE Proba 2024\scenariolist2024_0_1.csv")
 
@@ -19,8 +16,8 @@ rename_dict = {
     'y-coordinaten doorbraaklocatie': 'y',
     'x-coordinaten doorbraaklocatie': 'x',
     "Overschrijdingsfrequentie": "return_period",
-
 }
+
 df = df.rename(columns=rename_dict)
 print(df.head())
 print(tabulate(df.head(), headers='keys', tablefmt='psql'))
