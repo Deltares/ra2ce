@@ -381,10 +381,11 @@ class TestDamages:
             risk_data_file, sep=";", representative_damage_percentage=100
         )
         damage_network.control_risk_calculation(
-            mode=RiskCalculationModeEnum.DEFAULT, year=0
+            DamageCurveEnum.HZ, mode=RiskCalculationModeEnum.DEFAULT, year=0
         )
         assert (
-            damage_network.gdf["risk"][0] == damage_network.gdf["ref_risk_default"][0]
+            damage_network.gdf[f"risk_{DamageCurveEnum.HZ.name}"][0]
+            == damage_network.gdf["ref_risk_default"][0]
         )
 
     def test_risk_calculation_cutoff(self, risk_data_file: Path):
@@ -393,9 +394,13 @@ class TestDamages:
                 risk_data_file, sep=";", representative_damage_percentage=100
             )
             damage_network.control_risk_calculation(
-                mode=RiskCalculationModeEnum.CUT_FROM_YEAR, year=rp
+                DamageCurveEnum.HZ,
+                mode=RiskCalculationModeEnum.CUT_FROM_YEAR,
+                year=rp,
             )
-            test_result = round(damage_network.gdf["risk"][0], 0)
+            test_result = round(
+                damage_network.gdf[f"risk_{DamageCurveEnum.HZ.name}"][0], 0
+            )
             reference_result = round(
                 damage_network.gdf["ref_risk_cut_from_{}_year".format(rp)][0], 0
             )
@@ -407,9 +412,13 @@ class TestDamages:
         )
         for triangle_rp in [8, 2]:
             damage_network.control_risk_calculation(
-                mode=RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR, year=triangle_rp
+                DamageCurveEnum.HZ,
+                mode=RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR,
+                year=triangle_rp,
             )
-            test_result = round(damage_network.gdf["risk"][0], 0)
+            test_result = round(
+                damage_network.gdf[f"risk_{DamageCurveEnum.HZ.name}"][0], 0
+            )
             reference_result = round(
                 damage_network.gdf[
                     "ref_risk_triangle_to_null_{}_year".format(triangle_rp)
