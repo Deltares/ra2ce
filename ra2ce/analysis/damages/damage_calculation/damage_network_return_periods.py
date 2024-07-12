@@ -129,15 +129,15 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
 
         for vulnerability_curve_name, _to_integrate in _to_integrate_dict.items():
             if mode == RiskCalculationModeEnum.DEFAULT:
-
                 _to_integrate = self.rework_damage_data_default(_to_integrate)
                 _risk = self.integrate_df_trapezoidal(_to_integrate.copy())
 
-            elif mode == RiskCalculationModeEnum.CUT_FROM_YEAR:
+            _rps = list(_to_integrate.columns)
+
+            if mode == RiskCalculationModeEnum.CUT_FROM_YEAR:
                 """
                 In this mode, the integration mimics the presence of a flood protection
                 """
-                _rps = list(_to_integrate.columns)
 
                 if year <= min(_rps):
                     raise ValueError(
@@ -171,8 +171,6 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
                 In this mode, an extra data point with zero damage is added at some distance from the smallest known RP,
                 and the area of the Triangle this creates is also calculated
                 """
-
-                _rps = list(_to_integrate.columns)
 
                 if year >= min(_rps) and year != 0:
                     raise ValueError(
