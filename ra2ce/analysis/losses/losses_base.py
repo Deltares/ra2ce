@@ -433,7 +433,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             vlh_trip_type_event = sum(
                 (
                     intensity_trip_type
-                    * duration
+                    * duration**2
                     * loss_ratio
                     * occupancy_trip_type
                     * self.production_loss_per_capita_per_hour
@@ -442,7 +442,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                 for duration, loss_ratio in zip(
                     duration_steps, functionality_loss_ratios
                 )
-            ) * sum(duration_steps)
+            )
 
             vehicle_loss_hours.loc[
                 [vlh_row.name], f"vlh_{trip_type}_{hazard_col_name}"
