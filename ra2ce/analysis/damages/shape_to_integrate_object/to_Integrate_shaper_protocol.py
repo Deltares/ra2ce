@@ -1,5 +1,6 @@
-import geopandas as gpd
 from typing import Any, Protocol, runtime_checkable
+
+import geopandas as gpd
 
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 

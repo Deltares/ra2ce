@@ -1,6 +1,7 @@
+import re
+
 import geopandas as gpd
 import pandas as pd
-import re
 
 from ra2ce.analysis.damages.shape_to_integrate_object.to_Integrate_shaper_protocol import (
     ToIntegrateShaperProtocol,
