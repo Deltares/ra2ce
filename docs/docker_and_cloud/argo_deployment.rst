@@ -1,3 +1,5 @@
+.. _argo_deployment:
+
 Deploying Argo Workflows with Helm on Amazon EKS
 ================================================
 
