@@ -2,8 +2,7 @@ from abc import ABC, abstractmethod
 
 import geopandas as gpd
 import numpy as np
-
-from typing import re
+import re
 
 
 class RiskCalculationBase(ABC):
