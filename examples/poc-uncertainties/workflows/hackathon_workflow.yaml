@@ -10,8 +10,6 @@ spec:
     steps:
     - - name: define-subdirs
         template: read-members
-    # - - name: hello-world
-    #     template: hello-world
     - - name: run-scenario
         template: run-scenario
         arguments:
@@ -47,8 +45,10 @@ spec:
 
   - name: run-scenario
     container:
-      image: containers.deltares.nl/ra2ce/ra2ce:uncertainty_hackathon
-      command: ["python", "/scripts/workflow_hazard_overlay.py"]
+      image: 798877697266.dkr.ecr.eu-west-1.amazonaws.com/boto3:latest
+      command: 
+        - "python"
+        - "/scripts/workflow_hazard_overlay.py"
     nodeSelector:
       beta.kubernetes.io/instance-type: "t3.small"
     inputs:

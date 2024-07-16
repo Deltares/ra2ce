@@ -1,42 +1,33 @@
-# Run with `docker build -t ra2ce .`
-FROM  mambaorg/micromamba:1.4-alpine AS full
+FROM continuumio/miniconda3
 
-# ENV_NAME is starting a bash inm this environment 
+SHELL ["/bin/bash","-l", "-c"]
 
-ENV HOME=/home/mambauser
-ENV ENV_NAME=ra2ce_env
-ENV PYTHONPATH="/home/mambauser:$PYTHONPATH"
+WORKDIR /root/
 
-# Setting workspace vbriables
+# Install Miniconda
+RUN /opt/conda/bin/conda init bash && \
+    /opt/conda/bin/conda config --add channels conda-forge && \
+    /opt/conda/bin/conda update conda -y && \
+    /opt/conda/bin/conda install -c conda-forge mamba -y && \
+    /opt/conda/bin/conda clean -afy
 
-WORKDIR ${HOME}
-USER mambauser
-# RUN apt-get -qq update && apt-get install --yes --no-install-recommends libgdal-dev libgeos-dev libproj-dev && apt-get -qq purge && apt-get -qq clean && rm -rf /var/lib/apt/lists/*
-COPY .config/docker_environment.yml pyproject.toml README.md ${HOME}/
-RUN mkdir -p ${HOME}/.jupyter
-COPY .config/jupyter/* ${HOME}/.jupyter
+# =================================
 
-# Creating ra2ce2_env
+# Add conda bin to path
+ENV PATH /opt/conda/bin:$PATH
 
-RUN micromamba create -f docker_environment.yml -y --no-pyc \
-    && micromamba clean -ayf \
-    && rm -rf ${HOME}/.cache \
-    && find /opt/conda/ -follow -type f -name '*.a' -delete \
-    && find /opt/conda/ -follow -type f -name '*.pyc' -delete \
-    && find /opt/conda/ -follow -type f -name '*.js.map' -delete  \
-    && rm docker_environment.yml
-COPY examples/ ${HOME}/examples
-COPY ra2ce/ ${HOME}/ra2ce
+# Copy paths
+COPY .config/docker_environment.yml environment.yml
 
-ARG MAMBA_DOCKERFILE_ACTIVATE=1
+# Create environment
+RUN mamba env create -f environment.yml
 
-RUN pip install .
+# Make RUN commands use the new environment:
+# SHELL ["conda", "run", "--no-capture-output", "-n", "ra2ce_env", "/bin/bash", "-c"]
+# RUN pip install .
 
-# Installing notabook and Jupyter  lab
-# this is now in the docker_environment.yml
+# Set up environment
+RUN echo "conda activate ra2ce_env" >> ~/.bashrc
 
-# # Expose the Jupyter port
-# EXPOSE 8080
-
-# # # Start Jupyter Notebook
-# CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8080", "--allow-root"]
+# Set entrypoint to bash
+ENTRYPOINT ["bash", "-l", "-c"]
