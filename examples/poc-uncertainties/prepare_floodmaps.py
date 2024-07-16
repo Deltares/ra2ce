@@ -2,6 +2,9 @@
 
 from pathlib import Path
 
+from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
+from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
+from ra2ce.network.network_config_data.network_config_data import NetworkSection, HazardSection, NetworkConfigData
 from ra2ce.ra2ce_handler import Ra2ceHandler
 
 """
@@ -12,21 +15,43 @@ from ra2ce.ra2ce_handler import Ra2ceHandler
 # Create one network configuration per provided hazard.
 # We assume the whole input directory will be mounted in `/data`
 _root_dir = Path("./input_model")
-print(_root_dir)
+# _root_dir = Path(r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\projects\RACE\RA2CE Proba 2024\input_model")
+static_path=_root_dir.joinpath("static")
+output_path=static_path.joinpath("output_graph")
 
 assert _root_dir.exists()
 
-_network_file = _root_dir.joinpath("network.ini")
-assert _network_file.exists()
+# _network_file = _root_dir.joinpath("network.ini")
+# assert _network_file.exists()
 
 _tif_data_directory = Path("./flood_maps/event1")
 assert _tif_data_directory.exists()
 
+
+# Replacement for network ini:
+_network_section = NetworkSection(
+    source= SourceEnum.SHAPEFILE,       #Used to specify the shapefile name of the (road) network to do the analysis with, when creating a network from a shapefile.
+    primary_file = [_root_dir/"static"/"network"/"edges_NISv_RD_new_LinkNr.shp"], #soecify in the RA2CE folder setup where the network is locates
+    save_gpkg=True
+)
+
+
+
+#pass the specified sections as arguments for configuration
+_network_config_data = NetworkConfigData(
+    root_path=_root_dir,
+    static_path=static_path,
+    output_path=output_path,
+    network=_network_section,
+    )
+
 # Run analysis
-_handler = Ra2ceHandler(_network_file, analysis=None)
+_handler = Ra2ceHandler.from_config(_network_config_data, None)
 _handler.input_config.network_config.config_data.hazard.hazard_map = [
     list(_tif_data_directory.glob("*.tif"))[0]
 ]
+_handler.input_config.network_config.config_data.hazard.hazard_crs = "EPSG:28992"
+_handler.input_config.network_config.config_data.hazard.aggregate_wl = AggregateWlEnum.MAX
 
 # Try to get only RELEVANT info messages.
 import warnings
