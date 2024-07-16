@@ -21,6 +21,7 @@ from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtoco
 from ra2ce.analysis.losses.losses_base import LossesBase
 from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
 from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
+from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data
 
@@ -154,6 +155,7 @@ class TestLosses:
 
         _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
+        _network_config.config_data.hazard.aggregate_wl = AggregateWlEnum.MAX
         _valid_analysis_ini = test_data.joinpath("losses", "analyses.ini")
         _config = AnalysisConfigWrapper.from_data_with_network(
             _valid_analysis_ini, _config_data, _network_config
