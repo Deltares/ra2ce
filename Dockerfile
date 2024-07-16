@@ -28,11 +28,15 @@ RUN micromamba create -f docker_environment.yml -y --no-pyc \
 COPY examples/ ${HOME}/examples
 COPY ra2ce/ ${HOME}/ra2ce
 
+ARG MAMBA_DOCKERFILE_ACTIVATE=1
+
+RUN pip install .
+
 # Installing notabook and Jupyter  lab
 # this is now in the docker_environment.yml
 
-# Expose the Jupyter port
-EXPOSE 8080
+# # Expose the Jupyter port
+# EXPOSE 8080
 
-# Start Jupyter Notebook
-CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8080", "--allow-root"]
+# # # Start Jupyter Notebook
+# CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8080", "--allow-root"]
