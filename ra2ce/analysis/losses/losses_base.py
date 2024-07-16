@@ -137,24 +137,28 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             )
         else:
             criticality_analysis = criticality_analysis.drop_duplicates(["u", "v"])
-
-        # filter out all links not affected by the hazard
-        if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
-            self.criticality_analysis = criticality_analysis[
-                criticality_analysis["EV1_ma"] > self.analysis.threshold
-            ]
-        elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
-            self.criticality_analysis = criticality_analysis[
-                criticality_analysis["EV1_max"] > self.analysis.threshold
-            ]
-        elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
-            self.criticality_analysis = criticality_analysis[
-                criticality_analysis["EV1_mean"] > self.analysis.threshold
-            ]
-        elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
-            self.criticality_analysis = criticality_analysis[
-                criticality_analysis["EV1_min"] > self.analysis.threshold
-            ]
+        #  ToDO: check hazard overlay with AggregateWlEnum.NONE or INVALID
+        self.criticality_analysis = criticality_analysis[
+            criticality_analysis[f"EV1_{self.analysis_config.config_data.aggregate_wl}"]
+            > self.analysis.threshold
+        ]
+        # # filter out all links not affected by the hazard
+        # if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
+        #     self.criticality_analysis = criticality_analysis[
+        #         criticality_analysis["EV1_ma"] > self.analysis.threshold
+        #     ]
+        # elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
+        #     self.criticality_analysis = criticality_analysis[
+        #         criticality_analysis["EV1_max"] > self.analysis.threshold
+        #     ]
+        # elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
+        #     self.criticality_analysis = criticality_analysis[
+        #         criticality_analysis["EV1_mean"] > self.analysis.threshold
+        #     ]
+        # elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
+        #     self.criticality_analysis = criticality_analysis[
+        #         criticality_analysis["EV1_min"] > self.analysis.threshold
+        #     ]
 
         self.criticality_analysis_non_disrupted = criticality_analysis[
             ~criticality_analysis.index.isin(self.criticality_analysis.index)
