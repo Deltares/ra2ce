@@ -121,7 +121,7 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     save_traffic: bool = False
 
     # risk or estimated annual losses related
-    event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.INVALID)
+    event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.NONE)
     risk_calculation_mode: RiskCalculationModeEnum = field(
         default_factory=lambda: RiskCalculationModeEnum.NONE
     )
@@ -146,7 +146,7 @@ class AnalysisSectionDamages(AnalysisSectionBase):
     climate_period: float = math.nan
     # road damage
     representative_damage_percentage: float = 100
-    event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.INVALID)
+    event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.NONE)
     damage_curve: DamageCurveEnum = field(
         default_factory=lambda: DamageCurveEnum.INVALID
     )
