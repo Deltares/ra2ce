@@ -17,11 +17,12 @@ spec:
     inputs:
       artifacts:
         - name: data
-          path: /data
+          path: /data # Where it will be mounted.
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
-            key: input/data
+
+            key: uncertainty_hackathon/data # Where it is located in the s3
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials
@@ -32,11 +33,11 @@ spec:
           archive:
             none: {}
         - name: scripts
-          path: /scripts
+          path: /scripts # Where it will be mounted.
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
-            key: input/scripts
+            key: uncertainty_hackathon/scripts # Where it is located in the s3
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials
@@ -49,12 +50,12 @@ spec:
     outputs:
       artifacts:
       - name: ra2ce-output
-        path: /data
+        path: /data # Where it will be mounted.
         s3:
           bucket: ra2ce-data
           endpoint: s3.amazonaws.com
           region: eu-west-1
-          key: output
+          key: uncertainty_hackathon/output # Where it is located in the s3
           accessKeySecret:
             name: my-s3-credentials
             key: accessKey
