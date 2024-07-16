@@ -107,7 +107,9 @@ class Damages(AnalysisDamagesProtocol):
             ):  # Check if risk_calculation is demanded
                 if self.analysis.risk_calculation_mode != RiskCalculationModeEnum.NONE:
                     return_period_gdf.control_risk_calculation(
-                        mode=self.analysis.risk_calculation_mode
+                        self.analysis.damage_curve,
+                        mode=self.analysis.risk_calculation_mode,
+                        year=self.analysis.risk_calculation_year,
                     )
 
             else:
