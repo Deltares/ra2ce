@@ -1,0 +1,76 @@
+from abc import ABC, abstractmethod
+
+import geopandas as gpd
+import numpy as np
+
+from typing import re
+
+
+class RiskCalculationBase(ABC):
+    def __init__(self, risk_calculation_year: int, losses_gdf: gpd.GeoDataFrame):
+        self.risk_calculation_year: int = risk_calculation_year
+        self.losses_gdf: gpd.GeoDataFrame = losses_gdf
+        self.return_periods: set = self._get_return_periods()
+        self.max_return_period: int = max(self.return_periods)
+        self.min_return_period: int = min(self.return_periods)
+        self._to_integrate: gpd.GeoDataFrame = self._get_to_integrate()
+
+    def _get_return_periods(self):
+        # Find the hazard columns; these may be events or return periods
+        hazard_column = [
+            c
+            for c in self.losses_gdf.columns
+            if c.startswith("RP") or c.startswith("EV")
+        ]
+        return_periods = set(
+            [x.split("_")[1] for x in hazard_column]
+        )  # set of unique return_periods
+        return return_periods
+
+    @staticmethod
+    def _extract_columns_by_pattern(
+        pattern_text: str, gdf: gpd.GeoDataFrame
+    ) -> set[str]:
+        """
+        Extract column names based on the provided regex pattern.
+        """
+        pattern = re.compile(pattern_text)
+        columns = {pattern.search(c).group(1) for c in gdf.columns if pattern.search(c)}
+        return columns
+
+    def _get_to_integrate(self) -> gpd.GeoDataFrame:
+        loss_columns = sorted(
+            self._extract_columns_by_pattern(
+                pattern_text=r"(vlh.*.total)", gdf=self.losses_gdf
+            )
+        )
+        _to_integrate = self.losses_gdf[loss_columns]
+
+        _to_integrate.columns = [
+            float(c.split("_")[1].replace("RP", "")) for c in _to_integrate.columns
+        ]
+        return _to_integrate
+
+    @abstractmethod
+    def rework_damage_data(self) -> gpd.GeoDataFrame:
+        #  this should work on the self._to_integrate
+        pass
+
+    def integrate_df_trapezoidal(self) -> np.array:
+        """
+        Arguments:
+            *df* (pd.DataFrame) :
+                Column names should contain return periods (years)
+                Each row should contain a set of damages for one object
+
+        Returns:
+            np.array : integrated result per row
+
+        """
+        # convert return periods to frequencies
+        self._to_integrate.columns = [1 / RP for RP in self._to_integrate.columns]
+        # sort columns by ascending frequency
+        self._to_integrate = self._to_integrate.sort_index(axis="columns")
+        values = self._to_integrate.values
+        frequencies = self._to_integrate.columns
+        return np.trapz(values, frequencies, axis=1)

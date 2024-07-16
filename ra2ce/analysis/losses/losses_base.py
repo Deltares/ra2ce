@@ -30,6 +30,10 @@ import pandas as pd
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
+from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
+from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
+    RiskCalculationModeEnum,
+)
 from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
     TrafficPeriodEnum,
 )
@@ -39,6 +43,9 @@ from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.resilience_curves.resilience_curves_reader import (
     ResilienceCurvesReader,
+)
+from ra2ce.analysis.losses.risk_calculation.risk_calculation_factory import (
+    RiskCalculationFactory,
 )
 from ra2ce.analysis.losses.time_values.time_values_reader import TimeValuesReader
 from ra2ce.analysis.losses.traffic_intensities.traffic_intensities_reader import (
@@ -516,4 +523,24 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         )
 
         self.result = self.calculate_vehicle_loss_hours()
+
+        # Calculate the risk or estimated annual losses if applicable
+        if (
+            self.analysis.event_type == EventTypeEnum.RETURN_PERIOD
+            and self.analysis.risk_calculation_mode != RiskCalculationModeEnum.INVALID
+            and self.analysis.risk_calculation_mode != RiskCalculationModeEnum.NONE
+        ):
+            risk_calculation = RiskCalculationFactory.get_risk_calculation(
+                risk_calculation_mode=self.analysis.risk_calculation_mode,
+                risk_calculation_year=self.analysis.risk_calculation_year,
+                losses_gdf=self.result,
+            )
+
+            # self.result.control_risk_calculation(
+            #     self.analysis.damage_curve,
+            #     mode=self.analysis.risk_calculation_mode,
+            #     year=self.analysis.risk_calculation_year,
+            # )
+            pass
+
         return self.result

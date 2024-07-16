@@ -120,6 +120,13 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     category_field_name: str = ""
     save_traffic: bool = False
 
+    # risk or estimated annual losses related
+    event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.INVALID)
+    risk_calculation_mode: RiskCalculationModeEnum = field(
+        default_factory=lambda: RiskCalculationModeEnum.NONE
+    )
+    risk_calculation_year: int = 0
+
 
 @dataclass
 class AnalysisSectionDamages(AnalysisSectionBase):
