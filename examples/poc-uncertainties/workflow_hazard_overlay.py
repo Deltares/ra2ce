@@ -15,14 +15,10 @@ from ra2ce.ra2ce_handler import Ra2ceHandler
 # Create one network configuration per provided hazard.
 # We assume the whole input directory will be mounted in `/data`
 _root_dir = Path("./input_model")
-# _root_dir = Path(r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\projects\RACE\RA2CE Proba 2024\input_model")
 static_path=_root_dir.joinpath("static")
-output_path=static_path.joinpath("output_graph")
+output_path=_root_dir.joinpath("output_workflow1/event1")
 
 assert _root_dir.exists()
-
-# _network_file = _root_dir.joinpath("network.ini")
-# assert _network_file.exists()
 
 _tif_data_directory = Path("./flood_maps/event1")
 assert _tif_data_directory.exists()
@@ -34,8 +30,6 @@ _network_section = NetworkSection(
     primary_file = [_root_dir/"static"/"network"/"edges_NISv_RD_new_LinkNr.shp"], #soecify in the RA2CE folder setup where the network is locates
     save_gpkg=True
 )
-
-
 
 #pass the specified sections as arguments for configuration
 _network_config_data = NetworkConfigData(
