@@ -53,7 +53,6 @@ class RiskCalculationBase(ABC):
 
     @abstractmethod
     def rework_damage_data(self) -> gpd.GeoDataFrame:
-        #  this should work on the self._to_integrate
         pass
 
     def integrate_df_trapezoidal(self) -> np.array:
@@ -64,7 +63,7 @@ class RiskCalculationBase(ABC):
                 Each row should contain a set of damages for one object
 
         Returns:
-            np.array : integrated result per row
+            np. Array : integrated result per row
 
         """
         # convert return periods to frequencies

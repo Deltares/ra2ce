@@ -17,6 +17,7 @@ class RiskCalculationTriangleToNullYear(RiskCalculationBase, ABC):
 
     def __init__(self, risk_calculation_year: int, losses_gdf: gpd.GeoDataFrame):
         super().__init__(risk_calculation_year, losses_gdf)
+        self._to_integrate = self.rework_damage_data()
 
     def rework_damage_data(self) -> gpd.GeoDataFrame:
         """
