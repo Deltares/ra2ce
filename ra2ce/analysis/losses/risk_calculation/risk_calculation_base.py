@@ -67,7 +67,7 @@ class RiskCalculationBase(ABC):
 
         """
         # convert return periods to frequencies
-        self._to_integrate.columns = [1 / RP for RP in self._to_integrate.columns]
+        self._to_integrate.columns = [1 / rp for rp in self._to_integrate.columns]
         # sort columns by ascending frequency
         self._to_integrate = self._to_integrate.sort_index(axis="columns")
         values = self._to_integrate.values
