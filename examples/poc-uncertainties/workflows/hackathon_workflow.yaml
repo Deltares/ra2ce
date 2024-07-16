@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
   namespace: argo
-  generateName: ra2ce-uncertainty-
+  generateName: ra2ce-uncertainty-uq1-
 spec:
   entrypoint: scenario-workflow
   templates:
@@ -10,6 +10,8 @@ spec:
     steps:
     - - name: define-subdirs
         template: read-members
+    # - - name: hello-world
+    #     template: hello-world
     - - name: run-scenario
         template: run-scenario
         arguments:
@@ -26,21 +28,20 @@ spec:
       workingDir: /data
       command: [python]
       source: |
-        import boto3
-        import json
+          import json
+          import boto3
 
-        # s3://ra2ce-data/uncertainty_hackathon/flood_maps/
-        bucket = 'ra2ce-data'
-        prefix = 'uncertainty_hackathon/flood_maps/'
-        
-        client = boto3.client('s3')
-        result = client.list_objects(Bucket=bucket, Prefix=prefix, Delimiter='/')
-        print(result)
-        members = []
-        for _sub_prefix in result.get('CommonPrefixes'):
-            _prefix = _sub_prefix['Prefix']
-            members.append(_prefix)
-        print(json.dumps(members))
+          # s3://ra2ce-data/uncertainty_hackathon/flood_maps/
+          bucket = "ra2ce-data"
+          prefix = "uncertainty_hackathon/flood_maps/"
+
+          client = boto3.client("s3")
+          result = client.list_objects(Bucket=bucket, Prefix=prefix, Delimiter="/")
+          members = []
+          for _sub_prefix in result.get("CommonPrefixes"):
+              _prefix = _sub_prefix["Prefix"]
+              members.append(_prefix)
+          print(json.dumps(members))
 
   - name: run-scenario
     container:
@@ -52,7 +53,7 @@ spec:
       parameters:
         - name: member
       artifacts:
-        - name: input
+        - name: events
           path: /events/{{inputs.parameters.member}} # How we mount it.
           s3:
             endpoint: s3.amazonaws.com
@@ -67,8 +68,8 @@ spec:
               key: secretKey
           archive:
             none: {}
-        - name: input_model
-          path: /input_model # How we mount it.
+        - name: modeldata
+          path: /modeldata # How we mount it.
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
@@ -100,7 +101,7 @@ spec:
     outputs:
       artifacts:
       - name: ra2ce-output
-        path: /input_model
+        path: /data
         s3:
           bucket: ra2ce-data
           endpoint: s3.amazonaws.com
