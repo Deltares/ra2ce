@@ -52,7 +52,7 @@ class RiskCalculationBase(ABC):
         return _to_integrate
 
     @abstractmethod
-    def rework_damage_data(self) -> gpd.GeoDataFrame:
+    def _rework_damage_data(self) -> gpd.GeoDataFrame:
         pass
 
     def integrate_df_trapezoidal(self) -> np.array:

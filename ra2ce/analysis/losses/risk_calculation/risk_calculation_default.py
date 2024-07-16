@@ -10,9 +10,9 @@ from ra2ce.analysis.losses.risk_calculation.risk_calculation_base import (
 class RiskCalculationDefault(RiskCalculationBase, ABC):
     def __init__(self, risk_calculation_year: int, losses_gdf: gpd.GeoDataFrame):
         super().__init__(risk_calculation_year, losses_gdf)
-        self._to_integrate = self.rework_damage_data()
+        self._to_integrate = self._rework_damage_data()
 
-    def rework_damage_data(self) -> gpd.GeoDataFrame:
+    def _rework_damage_data(self) -> gpd.GeoDataFrame:
         """
         Rework the damage data to make it suitable for integration (risk calculation) in default mode
         """
