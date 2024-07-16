@@ -29,6 +29,8 @@ spec:
       command: [python]
       source: |
           import json
+          from pathlib import Path
+
           import boto3
 
           # s3://ra2ce-data/uncertainty_hackathon/flood_maps/
@@ -40,7 +42,7 @@ spec:
           members = []
           for _sub_prefix in result.get("CommonPrefixes"):
               _prefix = _sub_prefix["Prefix"]
-              members.append(_prefix)
+              members.append(Path(_prefix).name)
           print(json.dumps(members))
 
   - name: run-scenario
@@ -48,7 +50,7 @@ spec:
       image: containers.deltares.nl/ra2ce/ra2ce:latest
       command: ["python", "/scripts/workflow_hazard_overlay.py"]
     nodeSelector:
-      beta.kubernetes.io/instance-type: "m5.xlarge"
+      beta.kubernetes.io/instance-type: "t3.small"
     inputs:
       parameters:
         - name: member
@@ -58,7 +60,7 @@ spec:
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
-            key: "{{inputs.parameters.member}}"
+            key: "uncertainty_hackathon/flood_maps/{{inputs.parameters.member}}"
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials
@@ -73,7 +75,7 @@ spec:
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
-            key: uncertainty_hackathon/workspace
+            key: uncertainty_hackathon/working_dir
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials

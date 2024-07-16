@@ -21,7 +21,9 @@ assert _root_dir.exists()
 static_path = _root_dir.joinpath("static")
 
 
-_events_data_directory = Path("/events")
+_events_data_directory = Path(
+    "/events", "uncertainty_hackathon", "flood_maps", "event1"
+)
 assert _events_data_directory.exists()
 
 _event_directory = list(_events_data_directory.iterdir())[0]
