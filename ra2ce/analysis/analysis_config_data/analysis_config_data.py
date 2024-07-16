@@ -48,6 +48,7 @@ from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateW
 from ra2ce.network.network_config_data.network_config_data import (
     NetworkSection,
     OriginsDestinationsSection,
+    HazardSection,
 )
 
 LossesAnalysisNameList: list[str] = list(
@@ -175,6 +176,7 @@ class AnalysisConfigData(ConfigDataProtocol):
         default_factory=OriginsDestinationsSection
     )
     network: NetworkSection = field(default_factory=NetworkSection)
+    aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     hazard_names: list[str] = field(default_factory=list)
 
     @property

@@ -117,6 +117,9 @@ class Ra2ceHandler:
                 _analysis_config.config_data.origins_destinations = (
                     _handler.input_config.network_config.config_data.origins_destinations
                 )
+                _analysis_config.config_data.aggregate_wl = (
+                    _handler.input_config.network_config.config_data.hazard.aggregate_wl
+                )
                 _analysis_config.graph_files = (
                     _handler.input_config.network_config.graph_files
                 )
