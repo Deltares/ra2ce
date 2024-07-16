@@ -138,27 +138,22 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         else:
             criticality_analysis = criticality_analysis.drop_duplicates(["u", "v"])
         #  ToDO: check hazard overlay with AggregateWlEnum.NONE or INVALID
-        self.criticality_analysis = criticality_analysis[
-            criticality_analysis[f"EV1_{self.analysis_config.config_data.aggregate_wl}"]
-            > self.analysis.threshold
+
+        aggregate_wl_suffix = self.analysis_config.config_data.aggregate_wl.name[
+            :2
+        ].lower()
+        hazard_aggregate_wl_columns = [
+            c
+            for c in criticality_analysis.columns
+            if (c.startswith("RP") or c.startswith("EV"))
+            and c.endswith(f"_{aggregate_wl_suffix}")
         ]
-        # # filter out all links not affected by the hazard
-        # if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
-        #     self.criticality_analysis = criticality_analysis[
-        #         criticality_analysis["EV1_ma"] > self.analysis.threshold
-        #     ]
-        # elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
-        #     self.criticality_analysis = criticality_analysis[
-        #         criticality_analysis["EV1_max"] > self.analysis.threshold
-        #     ]
-        # elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
-        #     self.criticality_analysis = criticality_analysis[
-        #         criticality_analysis["EV1_mean"] > self.analysis.threshold
-        #     ]
-        # elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
-        #     self.criticality_analysis = criticality_analysis[
-        #         criticality_analysis["EV1_min"] > self.analysis.threshold
-        #     ]
+        self.criticality_analysis = criticality_analysis[
+            (
+                criticality_analysis[hazard_aggregate_wl_columns]
+                > self.analysis.threshold
+            ).any(axis=1)
+        ]
 
         self.criticality_analysis_non_disrupted = criticality_analysis[
             ~criticality_analysis.index.isin(self.criticality_analysis.index)
@@ -247,7 +242,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         _check_validity_criticality_analysis()
 
         _hazard_intensity_ranges = self.resilience_curves.ranges
-        events = self.criticality_analysis.filter(regex=r"^EV(?!1_fr)")
+        events = self.criticality_analysis.filter(regex=r"^(EV|RP)(?!\d+_fr)")
         # Read the performance_change stating the functionality drop
         if "key" in self.criticality_analysis.columns:
             performance_change = self.criticality_analysis[
@@ -306,52 +301,53 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         )
         for event in events.columns.tolist():
             for _, vlh_row in vehicle_loss_hours.iterrows():
-                row_hazard_range = _get_range(vlh_row[event])
-                row_connectivity = vlh_row[connectivity_attribute]
-                row_performance_changes = performance_change.loc[
-                    [vlh_row[self.link_id]]
-                ]
-                if "key" in vlh_row.index:
-                    key = vlh_row["key"]
-                else:
-                    key = 0
-                (u, v, k) = (
-                    vlh_row["u"],
-                    vlh_row["v"],
-                    key,
-                )
-                # allow link_id not to be unique in the graph (results reliability is up to the user)
-                # this can happen for instance when a directed graph should be made from an input network
-                for performance_row in row_performance_changes.iterrows():
-                    row_performance_change = performance_row[-1][
-                        f"{self.performance_metric}"
+                if vlh_row[event] > self.analysis.threshold:
+                    row_hazard_range = _get_range(vlh_row[event])
+                    row_connectivity = vlh_row[connectivity_attribute]
+                    row_performance_changes = performance_change.loc[
+                        [vlh_row[self.link_id]]
                     ]
-                    if "key" in performance_row[-1].index:
-                        performance_key = performance_row[-1]["key"]
+                    if "key" in vlh_row.index:
+                        key = vlh_row["key"]
                     else:
-                        performance_key = 0
-                    row_u_v_k = (
-                        performance_row[-1]["u"],
-                        performance_row[-1]["v"],
-                        performance_key,
+                        key = 0
+                    (u, v, k) = (
+                        vlh_row["u"],
+                        vlh_row["v"],
+                        key,
                     )
-                    if (
-                        math.isnan(row_performance_change) and row_connectivity == 0
-                    ) or row_performance_change == 0:
-                        self._calculate_production_loss_per_capita(
-                            vehicle_loss_hours, row_hazard_range, vlh_row, event
+                    # allow link_id not to be unique in the graph (results reliability is up to the user)
+                    # this can happen for instance when a directed graph should be made from an input network
+                    for performance_row in row_performance_changes.iterrows():
+                        row_performance_change = performance_row[-1][
+                            f"{self.performance_metric}"
+                        ]
+                        if "key" in performance_row[-1].index:
+                            performance_key = performance_row[-1]["key"]
+                        else:
+                            performance_key = 0
+                        row_u_v_k = (
+                            performance_row[-1]["u"],
+                            performance_row[-1]["v"],
+                            performance_key,
                         )
-                    elif not (
-                        math.isnan(row_performance_change)
-                        and math.isnan(row_connectivity)
-                    ) and ((u, v, k) == row_u_v_k):
-                        self._populate_vehicle_loss_hour(
-                            vehicle_loss_hours,
-                            row_hazard_range,
-                            vlh_row,
-                            row_performance_change,
-                            event,
-                        )
+                        if (
+                            math.isnan(row_performance_change) and row_connectivity == 0
+                        ) or row_performance_change == 0:
+                            self._calculate_production_loss_per_capita(
+                                vehicle_loss_hours, row_hazard_range, vlh_row, event
+                            )
+                        elif not (
+                            math.isnan(row_performance_change)
+                            and math.isnan(row_connectivity)
+                        ) and ((u, v, k) == row_u_v_k):
+                            self._populate_vehicle_loss_hour(
+                                vehicle_loss_hours,
+                                row_hazard_range,
+                                vlh_row,
+                                row_performance_change,
+                                event,
+                            )
 
         vehicle_loss_hours_result = _create_result(vehicle_loss_hours)
         return vehicle_loss_hours_result
