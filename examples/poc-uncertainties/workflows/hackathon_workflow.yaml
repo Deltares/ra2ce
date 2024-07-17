@@ -47,6 +47,13 @@ spec:
     container:
       image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
       command: [python, "/scripts/workflow_hazard_overlay.py"]
+      resources:
+        requests:
+          cpu: 1
+          memory: "4Gi"
+        limits:
+          cpu: 1
+          memory: "4Gi"
     nodeSelector:
       beta.kubernetes.io/instance-type: "m5.xlarge"
     inputs:

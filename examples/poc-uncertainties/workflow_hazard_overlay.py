@@ -29,6 +29,7 @@ assert _event_directory.exists()
 
 # Define output directory
 output_path = Path("/output_workflow1", "events", _event_directory.name)
+output_path.mkdir(parents=True, exist_ok=True)
 
 # Replacement for network ini:
 _primary_file = _root_dir.joinpath("static", "network", "edges_NISv_RD_new_LinkNr.shp")
