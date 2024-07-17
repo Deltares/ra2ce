@@ -1,5 +1,33 @@
 # Changelog
 
+## v0.9.2 (2024-07-17)
+
+### Feat
+
+- 470 refactor losses analysis structure
+- 321 skip overlay segmented graph
+- 462 docs and other changes
+- It is now possible to run an analysis by simply providing dataclasses or ini files. (#461)
+- 455 rename runners
+- 453 adjust analysis direct
+- 451 adjust analysis\indirect
+- 449 adjust analysis config data
+- gitignore updated
+- gitignore updated
+- gitignore updated
+- representative_damage_percentile added and used to output a representative damage
+- divisor added to accept %-based or less-than-one functionality losses in the resilience_curve file
+- filter criticality_analysis based on the flood threshold.
+
+### Fix
+
+- 435 fix exception in case no lanes in any of the road types
+- 472 fix od analyses using weighing time
+- 488 fix weighing time redundancy analyses
+- 433 avg speed 0
+- 468 set hazard field name to str
+- 410 replace simplify graph with OSMNX
+
 ## v0.9.1 (2024-04-12)
 
 - Removal of sensitive data throughout repository's history.
