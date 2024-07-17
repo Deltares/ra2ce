@@ -32,7 +32,9 @@ print("\n")
 _selected_hazard_file = _hazard_files[0]
 
 # Define output directory
-output_path = Path("/output_workflow1", "events", _event_directory.name)
+output_path = Path(
+    "/output_workflow1", "events", _event_directory.name, _selected_hazard_file.stem
+)
 output_path.mkdir(parents=True, exist_ok=True)
 
 
@@ -78,5 +80,7 @@ _handler.configure()
 _handler.run_analysis()
 
 # Copy static directory to output.
-_static_output = output_path.joinpath(_selected_hazard_file.stem, "static")
-shutil.copytree(static_path, _static_output, dirs_exist_ok=True)
+_static_output = output_path.joinpath("output_graph")
+shutil.copytree(
+    static_path.joinpath("output_graph"), _static_output, dirs_exist_ok=True
+)
