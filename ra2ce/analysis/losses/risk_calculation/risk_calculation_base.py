@@ -22,7 +22,7 @@ class RiskCalculationBase(ABC):
             if c.startswith("RP") or c.startswith("EV")
         ]
         return_periods = set(
-            [x.split("_")[1] for x in hazard_column]
+            [float(x.split("_")[0].replace("RP", "")) for x in hazard_column]
         )  # set of unique return_periods
         return return_periods
 
