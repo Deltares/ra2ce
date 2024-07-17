@@ -8,8 +8,6 @@ spec:
   templates:
   - name: scenario-workflow
     steps:
-    - - name: check-ra2ce-version
-        template: check-ra2ce
     - - name: define-events
         template: get-events
     - - name: run-scenario
@@ -19,18 +17,9 @@ spec:
           - name: event_floodmap
             value: "{{item}}"
         withParam: "{{steps.define-events.outputs.result}}"
-    # - - name: post-processing
-    #     template: post-processing
-  - name: check-ra2ce
-    script:
-      image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
-      command: [python]
-      source: |
-          from ra2ce import __version__
-          print(__version__)
   - name: get-events
     script:
-      image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
+      image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty_local
       workingDir: /modeldata
       command: [python]
       source: |
@@ -57,7 +46,7 @@ spec:
           print(json.dumps(members))
   - name: run-scenario
     container:
-      image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
+      image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty_pypi
       command: [python, "/scripts/workflow_hazard_overlay.py"]
       resources:
         requests:
