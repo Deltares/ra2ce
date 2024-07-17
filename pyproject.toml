@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ra2ce"
-version = "0.9.2"
+version = "0.9.1"
 description = "Risk Assessment and Adaptation for Critical infrastructurE (RA2CE)."
 authors = [
   "Margreet van Marle <Margreet.vanMarle@deltares.nl>", 
@@ -126,7 +126,7 @@ multi_line_output = 3
 name = "cz_conventional_commits"
 changelog_file = "docs/changelog.md"
 update_changelog_on_bump = true
-version = "0.9.2"
+version = "0.9.1"
 tag_format = "v$major.$minor.$patch"
 version_files= [
     "ra2ce/__init__.py",
