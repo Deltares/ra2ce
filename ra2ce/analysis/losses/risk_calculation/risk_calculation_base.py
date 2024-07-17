@@ -16,11 +16,7 @@ class RiskCalculationBase(ABC):
 
     def _get_return_periods(self):
         # Find the hazard columns; these may be events or return periods
-        hazard_column = [
-            c
-            for c in self.losses_gdf.columns
-            if c.startswith("RP") or c.startswith("EV")
-        ]
+        hazard_column = [c for c in self.losses_gdf.columns if c.startswith("RP")]
         return_periods = set(
             [float(x.split("_")[0].replace("RP", "")) for x in hazard_column]
         )  # set of unique return_periods
