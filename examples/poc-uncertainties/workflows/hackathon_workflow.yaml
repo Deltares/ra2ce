@@ -108,7 +108,7 @@ spec:
     outputs:
       artifacts:
       - name: ra2ce-output
-        path: /data
+        path: /modeldata
         s3:
           bucket: ra2ce-data
           endpoint: s3.amazonaws.com
