@@ -10,13 +10,20 @@ spec:
     steps:
     - - name: define-events
         template: get-events-output-graphs
+    - - name: get-vulnerability-curve
+        template: get-vulnerability-curve
+        arguments:
+          parameters:
+          - name: output_floodmap
+            value: "{{item}}"
+        withParam: "{{steps.define-events.outputs.result}}"
     - - name: run-scenario
         template: run-scenario
         arguments:
           parameters:
           - name: output_floodmap
             value: "{{item}}"
-        withParam: "{{steps.define-events.outputs.result}}"
+        withParam: "{{steps.get-vulnerability-curve.outputs.result}}"
 
   - name: get-events-output-graphs
     script:
@@ -67,12 +74,27 @@ spec:
       parameters:
         - name: output_floodmap
       artifacts:
-        - name: events
+        - name: output_graph
           path: /modeldata/static/output_graph # How we mount it.
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
             key: "uncertainty_hackathon/output_1/{{inputs.parameters.event_floodmap}}"
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+        - name: vulnerability_curves
+          path: /vulnerability_curves # How we mount it
+          s3: 
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: uncertainty_hackathon/vulnerability_curves
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials
