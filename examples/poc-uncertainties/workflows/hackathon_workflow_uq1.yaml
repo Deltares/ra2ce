@@ -8,6 +8,8 @@ spec:
   templates:
   - name: scenario-workflow
     steps:
+    - - name: check-ra2ce-version
+        template: check-ra2ce
     - - name: define-events
         template: get-events
     - - name: run-scenario
@@ -19,7 +21,13 @@ spec:
         withParam: "{{steps.define-events.outputs.result}}"
     # - - name: post-processing
     #     template: post-processing
-
+  - name: check-ra2ce
+    script:
+      image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
+      command: [python]
+      source: |
+          from ra2ce import __version__
+          print(__version__)
   - name: get-events
     script:
       image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
@@ -28,13 +36,12 @@ spec:
       source: |
           import json
           from pathlib import Path
-
           import boto3
 
           # s3://ra2ce-data/uncertainty_hackathon/flood_maps/
           bucket = "ra2ce-data"
           _root_dir = "uncertainty_hackathon/flood_maps/"
-
+          
           client = boto3.client("s3")
           result = client.list_objects(Bucket=bucket, Prefix=_root_dir, Delimiter="/")
           members = []
