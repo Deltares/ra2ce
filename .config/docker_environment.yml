@@ -10,6 +10,3 @@ dependencies:
   # with: conda install -c conda-forge poetry=1.3.2
   - conda-forge::poetry=1.3.2
   - conda-forge::pandoc
-  - pip
-  - pip:
-    - git+https://github.com/Deltares/ra2ce.git

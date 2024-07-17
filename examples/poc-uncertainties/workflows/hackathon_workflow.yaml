@@ -22,7 +22,7 @@ spec:
 
   - name: read-members
     script:
-      image: containers.deltares.nl/ra2ce/ra2ce:custom_boto3
+      image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
       workingDir: /data
       command: [python]
       source: |
@@ -45,10 +45,10 @@ spec:
 
   - name: run-scenario
     container:
-      image: containers.deltares.nl/ra2ce/ra2ce:custom_boto3
+      image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
       command: [python, "/scripts/workflow_hazard_overlay.py"]
     nodeSelector:
-      beta.kubernetes.io/instance-type: "t3.small"
+      beta.kubernetes.io/instance-type: "m5.xlarge"
     inputs:
       parameters:
         - name: member
