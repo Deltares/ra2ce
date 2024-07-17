@@ -27,8 +27,16 @@ assert _events_data_directory.exists()
 _event_directory = list(_events_data_directory.iterdir())[0]
 assert _event_directory.exists()
 
+_hazard_files = list(_event_directory.glob("*.tif"))
+print(_hazard_files)
+print("\n")
+
+_hazard_file = _hazard_files[0]
+# To avoid overwritting during postprocessing
+_output_name = _event_directory.name + "_" + _hazard_file.stem
+
 # Define output directory
-output_path = Path("/output_workflow1", "events", _event_directory.name)
+output_path = Path("/output_workflow1", "events", _output_name)
 output_path.mkdir(parents=True, exist_ok=True)
 
 # Replacement for network ini:
@@ -52,9 +60,7 @@ _network_config_data = NetworkConfigData(
 
 # Run analysis
 _handler = Ra2ceHandler.from_config(_network_config_data, None)
-_handler.input_config.network_config.config_data.hazard.hazard_map = [
-    list(_event_directory.glob("*.tif"))[0]
-]
+_handler.input_config.network_config.config_data.hazard.hazard_map = [_hazard_file]
 _handler.input_config.network_config.config_data.hazard.hazard_crs = "EPSG:28992"
 _handler.input_config.network_config.config_data.hazard.aggregate_wl = (
     AggregateWlEnum.MAX

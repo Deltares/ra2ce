@@ -8,22 +8,22 @@ spec:
   templates:
   - name: scenario-workflow
     steps:
-    - - name: define-subdirs
-        template: read-members
+    - - name: define-events
+        template: get-events
     - - name: run-scenario
         template: run-scenario
         arguments:
           parameters:
-          - name: member
+          - name: event_floodmap
             value: "{{item}}"
-        withParam: "{{steps.define-subdirs.outputs.result}}"
+        withParam: "{{steps.define-events.outputs.result}}"
     # - - name: post-processing
     #     template: post-processing
 
-  - name: read-members
+  - name: get-events
     script:
       image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
-      workingDir: /data
+      workingDir: /modeldata
       command: [python]
       source: |
           import json
@@ -33,16 +33,21 @@ spec:
 
           # s3://ra2ce-data/uncertainty_hackathon/flood_maps/
           bucket = "ra2ce-data"
-          prefix = "uncertainty_hackathon/flood_maps/"
+          _root_dir = "uncertainty_hackathon/flood_maps/"
 
           client = boto3.client("s3")
-          result = client.list_objects(Bucket=bucket, Prefix=prefix, Delimiter="/")
+          result = client.list_objects(Bucket=bucket, Prefix=_root_dir, Delimiter="/")
           members = []
           for _sub_prefix in result.get("CommonPrefixes"):
               _prefix = _sub_prefix["Prefix"]
-              members.append(Path(_prefix).name)
+              _prefix_path = Path(_prefix)
+              _prefix_result = client.list_objects(Bucket=bucket, Prefix=_prefix, Delimiter="/")
+              _event_files = [
+                  str(Path(_c["Key"]).relative_to(_prefix_path.parent))
+                  for _c in _prefix_result.get("Contents")
+              ]
+              members.extend(_event_files)
           print(json.dumps(members))
-
   - name: run-scenario
     container:
       image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
@@ -58,14 +63,14 @@ spec:
       beta.kubernetes.io/instance-type: "m5.xlarge"
     inputs:
       parameters:
-        - name: member
+        - name: event_floodmap
       artifacts:
         - name: events
-          path: /events/{{inputs.parameters.member}} # How we mount it.
+          path: /events/{{inputs.parameters.event_floodmap}} # How we mount it.
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
-            key: "uncertainty_hackathon/flood_maps/{{inputs.parameters.member}}"
+            key: "uncertainty_hackathon/flood_maps/{{inputs.parameters.event_floodmap}}"
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials
@@ -113,7 +118,7 @@ spec:
           bucket: ra2ce-data
           endpoint: s3.amazonaws.com
           region: eu-west-1
-          key: uncertainty_hackathon/output_1/{{inputs.parameters.member}}/
+          key: uncertainty_hackathon/output_1/{{inputs.parameters.event_floodmap}}/
           accessKeySecret:
             name: my-s3-credentials
             key: accessKey
