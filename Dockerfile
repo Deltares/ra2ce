@@ -1,37 +1,16 @@
-# Run with `docker build -t ra2ce .`
-FROM  mambaorg/micromamba:1.4-alpine AS full
+# 1. To build this docker run:
+# `docker build -t ra2ce`
 
-# ENV_NAME is starting a bash inm this environment 
+FROM python:3.10
 
-ENV HOME="/home/mambauser"
-ENV ENV_NAME=ra2ce_env
+RUN apt-get update && apt-get install -y libgdal-dev
 
-ENV PATH="${PATH}:/home/mambauser"
+# The following step happens in the `workflow.yaml`
+# COPY hackathon/hazard_overlay_cloud_run.py ./scripts/run_hazard_overlay.py
+RUN pip install ra2ce
 
-# Setting workspace vbriables
+CMD ["python", "/script/run_race.py"]
 
-WORKDIR ${HOME}
-USER mambauser
-# RUN apt-get -qq update && apt-get install --yes --no-install-recommends libgdal-dev libgeos-dev libproj-dev && apt-get -qq purge && apt-get -qq clean && rm -rf /var/lib/apt/lists/*
-COPY .config/environment.yml pyproject.toml README.md ${HOME}/
-# Creating ra2ce2_env
-
-RUN micromamba create -f environment.yml -y --no-pyc \
-    && micromamba clean -ayf \
-    && rm -rf ${HOME}/.cache \
-    && find /opt/conda/ -follow -type f -name '*.a' -delete \
-    && find /opt/conda/ -follow -type f -name '*.pyc' -delete \
-    && find /opt/conda/ -follow -type f -name '*.js.map' -delete  \
-    && rm environment.yml
-
-# COPY examples/ ${HOME}/examples
-COPY ra2ce/ ${HOME}/ra2ce
-
-ENV PYTHONPATH="$/opt/conda/envs/ra2ce_env/bin:${PYTHONPATH}"
-ENV PATH="/opt/conda/envs/ra2ce_env/bin:${PATH}"
-RUN echo "conda activate ra2ce_env"
-
-SHELL ["/bin/bash","-l", "-c"]
-
-EXPOSE 5000
-CMD ["python"]
+# 2. Make sure you push it to the deltares containers
+# docker tag ra2ce containers.deltares.nl/ra2ce/ra2ce:latest
+# docker push containers.deltares.nl/ra2ce/ra2ce:latest

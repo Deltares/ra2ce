@@ -46,7 +46,7 @@ spec:
   - name: run-scenario
     container:
       image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
-      command: ["python", "/scripts/workflow_hazard_overlay.py"]
+      command: [python, "/scripts/workflow_hazard_overlay.py"]
     nodeSelector:
       beta.kubernetes.io/instance-type: "t3.small"
     inputs:
