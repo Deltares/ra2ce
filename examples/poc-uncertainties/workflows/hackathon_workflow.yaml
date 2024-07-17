@@ -47,7 +47,7 @@ spec:
                   for _c in _prefix_result.get("Contents")
               ]
               members.extend(_event_files)
-          print(json.dumps(members))
+          print(json.dumps(members[:3]))
   - name: run-scenario
     container:
       image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
@@ -112,13 +112,13 @@ spec:
             none: {}
     outputs:
       artifacts:
-      - name: ra2ce-output
-        path: /modeldata
+      - name: ra2ce-analysis-output
+        path: /output_workflow1/events
         s3:
           bucket: ra2ce-data
           endpoint: s3.amazonaws.com
           region: eu-west-1
-          key: uncertainty_hackathon/output_1/{{inputs.parameters.event_floodmap}}/
+          key: uncertainty_hackathon/output_1/
           accessKeySecret:
             name: my-s3-credentials
             key: accessKey
@@ -127,7 +127,6 @@ spec:
             key: secretKey
         archive:
           none: {}
-
   # - name: post-processing
   #   container:
   #     image: containers.deltares.nl/ra2ce/ra2ce:latest

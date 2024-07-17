@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
@@ -18,8 +19,6 @@ from ra2ce.ra2ce_handler import Ra2ceHandler
 # We assume the whole input directory will be mounted in `/data`
 _root_dir = Path("/modeldata")
 assert _root_dir.exists()
-static_path = _root_dir.joinpath("static")
-
 
 _events_data_directory = Path("/events")
 assert _events_data_directory.exists()
@@ -30,14 +29,16 @@ assert _event_directory.exists()
 _hazard_files = list(_event_directory.glob("*.tif"))
 print(_hazard_files)
 print("\n")
-
-_hazard_file = _hazard_files[0]
-# To avoid overwritting during postprocessing
-_output_name = _event_directory.name + "_" + _hazard_file.stem
+_selected_hazard_file = _hazard_files[0]
 
 # Define output directory
-output_path = Path("/output_workflow1", "events", _output_name)
+output_path = Path("/output_workflow1", "events", _event_directory.name)
 output_path.mkdir(parents=True, exist_ok=True)
+
+
+# Define static file
+static_path = _root_dir.joinpath("static")
+
 
 # Replacement for network ini:
 _primary_file = _root_dir.joinpath("static", "network", "edges_NISv_RD_new_LinkNr.shp")
@@ -60,7 +61,9 @@ _network_config_data = NetworkConfigData(
 
 # Run analysis
 _handler = Ra2ceHandler.from_config(_network_config_data, None)
-_handler.input_config.network_config.config_data.hazard.hazard_map = [_hazard_file]
+_handler.input_config.network_config.config_data.hazard.hazard_map = [
+    _selected_hazard_file
+]
 _handler.input_config.network_config.config_data.hazard.hazard_crs = "EPSG:28992"
 _handler.input_config.network_config.config_data.hazard.aggregate_wl = (
     AggregateWlEnum.MAX
@@ -73,3 +76,7 @@ warnings.filterwarnings("ignore")
 
 _handler.configure()
 _handler.run_analysis()
+
+# Copy static directory to output.
+_static_output = output_path.joinpath(_selected_hazard_file.stem, "static")
+shutil.copytree(static_path, _static_output, dirs_exist_ok=True)
