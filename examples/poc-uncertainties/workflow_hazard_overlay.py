@@ -21,9 +21,7 @@ assert _root_dir.exists()
 static_path = _root_dir.joinpath("static")
 
 
-_events_data_directory = Path(
-    "/events", "uncertainty_hackathon", "flood_maps", "event1"
-)
+_events_data_directory = Path("/events")
 assert _events_data_directory.exists()
 
 _event_directory = list(_events_data_directory.iterdir())[0]
@@ -33,10 +31,12 @@ assert _event_directory.exists()
 output_path = Path("/output_workflow1", "events", _event_directory.name)
 
 # Replacement for network ini:
+_primary_file = _root_dir.joinpath("static", "network", "edges_NISv_RD_new_LinkNr.shp")
+assert _primary_file.exists()
 _network_section = NetworkSection(
     source=SourceEnum.SHAPEFILE,  # Used to specify the shapefile name of the (road) network to do the analysis with, when creating a network from a shapefile.
     primary_file=[
-        _root_dir.joinpath("static", "network", "edges_NISv_RD_new_LinkNr.shp")
+        _primary_file
     ],  # soecify in the RA2CE folder setup where the network is locates
     save_gpkg=True,
 )

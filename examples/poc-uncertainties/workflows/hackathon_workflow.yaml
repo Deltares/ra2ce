@@ -22,7 +22,7 @@ spec:
 
   - name: read-members
     script:
-      image: 798877697266.dkr.ecr.eu-west-1.amazonaws.com/boto3:latest
+      image: containers.deltares.nl/ra2ce/ra2ce:custom_boto3
       workingDir: /data
       command: [python]
       source: |
@@ -45,7 +45,7 @@ spec:
 
   - name: run-scenario
     container:
-      image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
+      image: containers.deltares.nl/ra2ce/ra2ce:custom_boto3
       command: [python, "/scripts/workflow_hazard_overlay.py"]
     nodeSelector:
       beta.kubernetes.io/instance-type: "t3.small"
