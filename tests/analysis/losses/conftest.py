@@ -32,7 +32,7 @@ def get_resilience_curves_data() -> (
     """
     yield [
         (RoadTypeEnum.MOTORWAY, (0.2, 0.5), [3.0, 5.0], [1.0, 0.4]),
-        (RoadTypeEnum.MOTORWAY, (0.5, 1.2), [2.0, 4.0], [1.0, 0.3]),
+        (RoadTypeEnum.MOTORWAY, (0.5, 1.2), [6.0, 10.0], [1.0, 0.4]),
     ]
 
 

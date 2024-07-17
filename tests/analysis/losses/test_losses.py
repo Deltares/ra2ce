@@ -222,6 +222,7 @@ class TestLosses:
                 "losses", "csv_data_for_losses", "results_test_calc_vlh.csv"
             )
         )
+        _expected_result.reset_index(inplace=True)
 
         # 3. Verify final expectations.
         assert isinstance(_result, pd.DataFrame)
@@ -234,4 +235,9 @@ class TestLosses:
         pd.testing.assert_frame_equal(
             _result[["vlh_business_EV2_mi", "vlh_EV2_mi_total"]],
             _expected_result[["vlh_business_EV2_mi", "vlh_EV2_mi_total"]],
+        )
+        assert "vlh_business_RP100_me" in _result
+        pd.testing.assert_frame_equal(
+            _result[["vlh_business_RP100_me", "vlh_RP100_me_total"]],
+            _expected_result[["vlh_business_RP100_me", "vlh_RP100_me_total"]],
         )
