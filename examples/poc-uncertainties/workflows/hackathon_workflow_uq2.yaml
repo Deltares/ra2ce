@@ -2,56 +2,58 @@ apiVersion: argoproj.io/v1alpha1
 kind: Workflow
 metadata:
   namespace: argo
-  generateName: ra2ce-uncertainty-uq1-
+  generateName: ra2ce-uncertainty-uq2-
 spec:
   entrypoint: scenario-workflow
   templates:
   - name: scenario-workflow
     steps:
     - - name: define-events
-        template: get-events
+        template: get-events-output-graphs
     - - name: run-scenario
         template: run-scenario
         arguments:
           parameters:
-          - name: event_floodmap
+          - name: output_floodmap
             value: "{{item}}"
         withParam: "{{steps.define-events.outputs.result}}"
-    # - - name: post-processing
-    #     template: post-processing
 
-  - name: get-events
+  - name: get-events-output-graphs
     script:
       image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
       workingDir: /modeldata
       command: [python]
       source: |
-          import json
-          from pathlib import Path
+        import json
+        import random
+        from pathlib import Path
 
-          import boto3
+        import boto3
 
-          # s3://ra2ce-data/uncertainty_hackathon/flood_maps/
-          bucket = "ra2ce-data"
-          _root_dir = "uncertainty_hackathon/flood_maps/"
+        # s3://ra2ce-data/uncertainty_hackathon/flood_maps/
+        bucket = "ra2ce-data"
+        _root_dir = "uncertainty_hackathon/output_1/"
 
-          client = boto3.client("s3")
-          result = client.list_objects(Bucket=bucket, Prefix=_root_dir, Delimiter="/")
-          members = []
-          for _sub_prefix in result.get("CommonPrefixes"):
-              _prefix = _sub_prefix["Prefix"]
-              _prefix_path = Path(_prefix)
-              _prefix_result = client.list_objects(Bucket=bucket, Prefix=_prefix, Delimiter="/")
-              _event_files = [
-                  str(Path(_c["Key"]).relative_to(_prefix_path.parent))
-                  for _c in _prefix_result.get("Contents")
-              ]
-              members.extend(_event_files)
-          print(json.dumps(members))
+        client = boto3.client("s3")
+        result = client.list_objects(Bucket=bucket, Prefix=_root_dir, Delimiter="/")
+        _selected_events = []
+        n_runs = 100
+        for _sub_prefix in result.get("CommonPrefixes"):
+            _prefix = _sub_prefix["Prefix"]
+            _prefix_path = Path(_prefix)
+            _prefix_result = client.list_objects(Bucket=bucket, Prefix=_prefix, Delimiter="/")
+            _event_files = [
+                str(Path(_c["Key"].joinpath("output_graph")).relative_to(_prefix_path.parent))
+                for _c in _prefix_result.get("Contents")
+            ]
+            for n in range(n_runs):
+              _selected_events.append(random.choice(_event_files))
+        print(json.dumps(_selected_events))
+
   - name: run-scenario
     container:
       image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
-      command: [python, "/scripts/workflow_hazard_overlay.py"]
+      command: [python, "/scripts/other_script.py"]
       resources:
         requests:
           cpu: 1
@@ -63,14 +65,14 @@ spec:
       beta.kubernetes.io/instance-type: "m5.xlarge"
     inputs:
       parameters:
-        - name: event_floodmap
+        - name: output_floodmap
       artifacts:
         - name: events
-          path: /events/{{inputs.parameters.event_floodmap}} # How we mount it.
+          path: /modeldata/static/output_graph # How we mount it.
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
-            key: "uncertainty_hackathon/flood_maps/{{inputs.parameters.event_floodmap}}"
+            key: "uncertainty_hackathon/output_1/{{inputs.parameters.event_floodmap}}"
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials
@@ -113,12 +115,12 @@ spec:
     outputs:
       artifacts:
       - name: ra2ce-analysis-output
-        path: /output_workflow1/events
+        path: /output_workflow2/events
         s3:
           bucket: ra2ce-data
           endpoint: s3.amazonaws.com
           region: eu-west-1
-          key: uncertainty_hackathon/output_1/
+          key: uncertainty_hackathon/output_2/
           accessKeySecret:
             name: my-s3-credentials
             key: accessKey
