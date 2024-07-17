@@ -230,3 +230,8 @@ class TestLosses:
             _result[["vlh_business_EV1_ma", "vlh_commute_EV1_ma"]],
             _expected_result[["vlh_business_EV1_ma", "vlh_commute_EV1_ma"]],
         )
+        assert "vlh_business_EV2_mi" in _result
+        pd.testing.assert_frame_equal(
+            _result[["vlh_business_EV2_mi", "vlh_EV2_mi_total"]],
+            _expected_result[["vlh_business_EV2_mi", "vlh_EV2_mi_total"]],
+        )

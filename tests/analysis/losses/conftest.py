@@ -14,16 +14,16 @@ from tests import test_data
 @pytest.fixture(name="resilience_curves_csv")
 def get_resilience_curves_csv_filepath() -> Iterator[Path]:
     _csv_file = test_data.joinpath(
-        "losses", "csv_data_for_losses", "resilience_curve.csv"
+        "losses", "csv_data_for_losses", "resilience_curves.csv"
     )
     assert _csv_file.is_file()
     yield _csv_file
 
 
 @pytest.fixture(name="resilience_curves_data")
-def get_resilience_curves_data() -> Iterator[
-    list[tuple[RoadTypeEnum, tuple[float, float], list[float], list[float]]]
-]:
+def get_resilience_curves_data() -> (
+    Iterator[list[tuple[RoadTypeEnum, tuple[float, float], list[float], list[float]]]]
+):
     """
     Get resilience curve data for testing.
 
@@ -46,9 +46,9 @@ def get_traffic_intensities_csv_filepath() -> Iterator[Path]:
 
 
 @pytest.fixture(name="traffic_intensities_data")
-def get_traffic_intensities_data() -> Iterator[
-    dict[tuple[TrafficPeriodEnum, TripPurposeEnum], list[int]]
-]:
+def get_traffic_intensities_data() -> (
+    Iterator[dict[tuple[TrafficPeriodEnum, TripPurposeEnum], list[int]]]
+):
     """
     Get traffic intensities data for testing (links 1:5).
 
