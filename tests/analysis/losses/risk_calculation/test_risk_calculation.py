@@ -79,4 +79,3 @@ class TestRiskCalculation:
                 [f"risk_vlh_total_{risk_calculation_info[0].name.lower()}"]
             ],
         )
-        a = 0
