@@ -92,5 +92,14 @@ class RiskCalculationCutFromYear(RiskCalculationBase, ABC):
             # risk is return frequency of cutoff
             # times the damage to the most extreme event
             self._to_integrate = self._to_integrate.fillna(0)
+            self._to_integrate[self.risk_calculation_year] = self._to_integrate[
+                self.max_return_period
+            ]
+            self._to_integrate[float("inf")] = self._to_integrate[
+                self.max_return_period
+            ]
+            self._to_integrate = self._to_integrate[
+                [self.risk_calculation_year, float("inf")]
+            ]
 
         return self._to_integrate
