@@ -17,8 +17,12 @@ for _sub_prefix in result.get("CommonPrefixes"):
     _prefix_path = Path(_prefix)
     _prefix_result = client.list_objects(Bucket=bucket, Prefix=_prefix, Delimiter="/")
     _event_files = [
-        str(Path(_c["Key"].joinpath("output_graph")).relative_to(_prefix_path.parent))
-        for _c in _prefix_result.get("Contents")
+        str(
+            (Path(_c["Prefix"]).joinpath("output_graph")).relative_to(
+                _prefix_path.parent
+            )
+        )
+        for _c in _prefix_result.get("CommonPrefixes")
     ]
     for n in range(n_runs):
         _selected_events.append(random.choice(_event_files))

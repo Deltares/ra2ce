@@ -50,11 +50,15 @@ spec:
             _prefix_path = Path(_prefix)
             _prefix_result = client.list_objects(Bucket=bucket, Prefix=_prefix, Delimiter="/")
             _event_files = [
-                str(Path(_c["Key"].joinpath("output_graph")).relative_to(_prefix_path.parent))
-                for _c in _prefix_result.get("Contents")
+                str(
+                    (Path(_c["Prefix"]).joinpath("output_graph")).relative_to(
+                        _prefix_path.parent
+                    )
+                )
+                for _c in _prefix_result.get("CommonPrefixes")
             ]
             for n in range(n_runs):
-              _selected_events.append(random.choice(_event_files))
+                _selected_events.append(random.choice(_event_files))
         print(json.dumps(_selected_events))
 
   - name: run-scenario
@@ -151,59 +155,4 @@ spec:
             key: secretKey
         archive:
           none: {}
-  # - name: post-processing
-  #   container:
-  #     image: containers.deltares.nl/ra2ce/ra2ce:latest
-  #     command: ["python", "/scripts/user_question_1/post_processing.py"]
-  #     #command: [sh, "-c", "for I in $(seq 1 1000) ; do echo $I ; sleep 1s; done"]
-  #   nodeSelector:
-  #     beta.kubernetes.io/instance-type: "m5.xlarge"
-  #   inputs:
-  #     artifacts:
-  #       - name: output
-  #         path: /data
-  #         s3:
-  #           endpoint: s3.amazonaws.com
-  #           bucket: ra2ce-data
-  #           key: beira_qualimane_sfincs_fm/output_q1
-  #           region: eu-west-1
-  #           accessKeySecret:
-  #             name: my-s3-credentials
-  #             key: accessKey
-  #           secretKeySecret:
-  #             name: my-s3-credentials
-  #             key: secretKey
-  #         archive:
-  #           none: {}
-  #       - name: scripts
-  #         path: /scripts
-  #         s3:
-  #           endpoint: s3.amazonaws.com
-  #           bucket: ra2ce-data
-  #           key: beira_qualimane_sfincs_fm/scripts
-  #           region: eu-west-1
-  #           accessKeySecret:
-  #             name: my-s3-credentials
-  #             key: accessKey
-  #           secretKeySecret:
-  #             name: my-s3-credentials
-  #             key: secretKey
-  #         archive:
-  #           none: {}
-  #   outputs:
-  #     artifacts:
-  #       - name: pp_output
-  #         path: /output
-  #         s3:
-  #           endpoint: s3.amazonaws.com
-  #           bucket: ra2ce-data
-  #           key: beira_qualimane_sfincs_fm/postprocessing_output_q1
-  #           region: eu-west-1
-  #           accessKeySecret:
-  #             name: my-s3-credentials
-  #             key: accessKey
-  #           secretKeySecret:
-  #             name: my-s3-credentials
-  #             key: secretKey
-  #         archive:
-  #           none: {}
+ 
