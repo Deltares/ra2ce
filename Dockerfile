@@ -1,23 +1,20 @@
-# 1. To build this docker run:
+# To build this docker run:
 # `docker build -t ra2ce`
-FROM python:3.10
 
+FROM python:3.10
 
 RUN apt-get update && apt-get install -y libgdal-dev
 
 # Copy the directories with the local ra2ce.
-COPY ra2ce/ ra2ce/
-COPY README.md README.md
-COPY LICENSE LICENSE
-COPY pyproject.toml pyproject.toml
+WORKDIR /ra2ce_src
+COPY README.md LICENSE pyproject.toml poetry.lock /ra2ce_src/
+COPY ra2ce /ra2ce_src/ra2ce
 
 # Install the required packages
 RUN pip install poetry
-RUN poetry install
-RUN pip install --no-cache-dir boto3
+RUN poetry config virtualenvs.create false
+RUN poetry install --without dev,docs,jupyter
+RUN apt-get clean autoclean
 
-CMD ["python"]
-
-# 2. Make sure you push it to the deltares containers
-# docker tag ra2ce containers.deltares.nl/ra2ce/ra2ce:latest
-# docker push containers.deltares.nl/ra2ce/ra2ce:latest
+# Define the endpoint
+CMD ["python3"]
