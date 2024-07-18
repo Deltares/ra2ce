@@ -8,18 +8,12 @@ spec:
   templates:
   - name: scenario-workflow
     steps:
-    - - name: check-ra2ce-pypi
+    - - name: check-ra2ce
         template: check-ra2ce
         arguments:
           parameters:
           - name: ra2ce_tag
-            value: poetry_01
-      - name: check-ra2ce-local
-        template: check-ra2ce
-        arguments:
-          parameters:
-          - name: ra2ce_tag
-            value: poetry_03
+            value: hackathon_july_local
   - name: check-ra2ce
     script:
       image: "containers.deltares.nl/ra2ce/ra2ce:{{inputs.parameters.ra2ce_tag}}"
