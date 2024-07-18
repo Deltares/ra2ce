@@ -1,3 +1,4 @@
+# This script is meant to be run local, not in the cloud.
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -37,9 +38,9 @@ for i in range(40):
 
 
 # increase font size:
-# plt.legend(fontsize=15)
-# plt.xlabel("water height (m)", fontsize=15)
-# plt.ylabel("% damage", fontsize=15)
-# plt.title("Random S-curves (Logistic Distribution)")
-# plt.grid(True)
-# plt.show()
+plt.legend(fontsize=15)
+plt.xlabel("water height (m)", fontsize=15)
+plt.ylabel("% damage", fontsize=15)
+plt.title("Random S-curves (Logistic Distribution)")
+plt.grid(True)
+plt.show()

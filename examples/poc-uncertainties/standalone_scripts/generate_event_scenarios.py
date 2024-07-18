@@ -1,3 +1,4 @@
+# This script is meant to run IN THE CLOUD
 import json
 import random
 from pathlib import Path
