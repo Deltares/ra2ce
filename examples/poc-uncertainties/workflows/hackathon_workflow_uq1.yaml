@@ -8,18 +8,50 @@ spec:
   templates:
   - name: scenario-workflow
     steps:
-    - - name: define-events
+    - - name: check-ra2ce
+        template: check-ra2ce
+        arguments:
+          parameters:
+          - name: ra2ce_tag
+            value: hackathon_uncertainty_pypi
+      - name: define-events
         template: get-events
     - - name: run-scenario
         template: run-scenario
         arguments:
           parameters:
+          - name: ra2ce_tag
+            value: hackathon_uncertainty_pypi
           - name: event_floodmap
             value: "{{item}}"
         withParam: "{{steps.define-events.outputs.result}}"
+  - name: check-ra2ce
+    script:
+      image: "containers.deltares.nl/ra2ce/ra2ce:{{inputs.parameters.ra2ce_tag}}"
+      command: [python, "/scripts/check_ra2ce_version.py"]
+    inputs: 
+      parameters:
+        - name: ra2ce_tag
+          # value: "{{workflow.parameters.ra2ce_tag}}"
+      artifacts:
+        - name: scripts
+          path: /scripts
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: uncertainty_hackathon/scripts
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
   - name: get-events
     script:
-      image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty_local
+      image: 798877697266.dkr.ecr.eu-west-1.amazonaws.com/boto3:latest
       workingDir: /modeldata
       command: [python]
       source: |
@@ -46,7 +78,7 @@ spec:
           print(json.dumps(members))
   - name: run-scenario
     container:
-      image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty_pypi
+      image: "containers.deltares.nl/ra2ce/ra2ce:{{inputs.parameters.ra2ce_tag}}"
       command: [python, "/scripts/workflow_hazard_overlay.py"]
       resources:
         requests:
@@ -59,6 +91,7 @@ spec:
       beta.kubernetes.io/instance-type: "m5.xlarge"
     inputs:
       parameters:
+        - name: ra2ce_tag
         - name: event_floodmap
       artifacts:
         - name: events
