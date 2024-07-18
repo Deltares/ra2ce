@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  namespace: argo
+  generateName: ra2ce-hackathon-july-uq1-
+spec:
+  entrypoint: scenario-workflow
+  templates:
+  - name: scenario-workflow
+    steps:
+    - - name: check-ra2ce
+        template: check-ra2ce
+        arguments:
+          parameters:
+          - name: ra2ce_tag
+            value: hackathon_july_pypi
+      - name: check-ra2ce
+        template: check-ra2ce
+        arguments:
+          parameters:
+          - name: ra2ce_tag
+            value: hackathon_july_local
+  - name: check-ra2ce
+    script:
+      image: "containers.deltares.nl/ra2ce/ra2ce:{{inputs.parameters.ra2ce_tag}}"
+      command: [python, "/scripts/check_ra2ce_version.py"]
+    inputs: 
+      parameters:
+        - name: ra2ce_tag
+      artifacts:
+        - name: scripts
+          path: /scripts
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: uncertainty_hackathon/scripts
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
