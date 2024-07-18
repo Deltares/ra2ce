@@ -87,7 +87,7 @@ spec:
         - name: output_floodmap
       artifacts:
         - name: output_graph
-          path: /modeldata/static/output_graph # How we mount it.
+          path: /output_graph # How we mount it.
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
