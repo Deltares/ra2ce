@@ -38,7 +38,7 @@ spec:
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
-            key: uncertainty_hackathon/scripts
+            key: hackathon_uncertainty/scripts
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials
@@ -60,7 +60,7 @@ spec:
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
-            key: uncertainty_hackathon/scripts
+            key: hackathon_uncertainty/scripts
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials
@@ -93,7 +93,7 @@ spec:
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
-            key: "uncertainty_hackathon/flood_maps/{{inputs.parameters.event_floodmap}}"
+            key: "hackathon_uncertainty/flood_maps/{{inputs.parameters.event_floodmap}}"
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials
@@ -108,7 +108,7 @@ spec:
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
-            key: uncertainty_hackathon/working_dir
+            key: hackathon_uncertainty/working_dir
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials
@@ -123,7 +123,7 @@ spec:
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
-            key: uncertainty_hackathon/scripts
+            key: hackathon_uncertainty/scripts
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials
@@ -141,7 +141,7 @@ spec:
           bucket: ra2ce-data
           endpoint: s3.amazonaws.com
           region: eu-west-1
-          key: uncertainty_hackathon/output_1/
+          key: hackathon_uncertainty/output_1/
           accessKeySecret:
             name: my-s3-credentials
             key: accessKey
