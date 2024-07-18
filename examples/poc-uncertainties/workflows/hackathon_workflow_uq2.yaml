@@ -5,6 +5,10 @@ metadata:
   generateName: ra2ce-uncertainty-uq2-
 spec:
   entrypoint: scenario-workflow
+  arguments:
+    parameters:
+      - name: ra2ce_image
+        value: containers.deltares.nl/ra2ce/ra2ce:hackathon_july_local
   templates:
   - name: scenario-workflow
     steps:
@@ -12,25 +16,19 @@ spec:
         template: get-events-output-graphs
       - name: check-ra2ce
         template: check-ra2ce
-        arguments:
-          parameters:
-          - name: ra2ce_tag
-            value: hackathon_uncertainty
     - - name: run-scenario
         template: run-scenario
         arguments:
           parameters:
           - name: output_floodmap
             value: "{{item}}"
-        withParam: "{{steps.get-output-graphs.outputs.result}}"
+        withParam: "{{steps.get-events-output-graphs.outputs.result}}"
 
   - name: check-ra2ce
     script:
-      image: "containers.deltares.nl/ra2ce/ra2ce:{{inputs.parameters.ra2ce_tag}}"
+      image: "{{workflow.parameters.ra2ce_image}}"
       command: [python, "/scripts/check_ra2ce_version.py"]
     inputs: 
-      parameters:
-        - name: ra2ce_tag
       artifacts:
         - name: scripts
           path: /scripts
@@ -53,11 +51,28 @@ spec:
       image: 798877697266.dkr.ecr.eu-west-1.amazonaws.com/boto3:latest
       workingDir: /modeldata
       command: [python, "/scripts/generate_event_scenarios.py"]
+    inputs: 
+      artifacts:
+        - name: scripts
+          path: /scripts
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: uncertainty_hackathon/scripts
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
 
   - name: run-scenario
     container:
-      image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
-      command: [python, "/scripts/other_script.py"]
+      image: "{{workflow.parameters.ra2ce_image}}"
+      command: [python, "/scripts/workflow_damages_temp.py"]
       resources:
         requests:
           cpu: 1
@@ -134,12 +149,12 @@ spec:
     outputs:
       artifacts:
       - name: ra2ce-analysis-output
-        path: /output_workflow2/events
+        path: /output_workflow2
         s3:
           bucket: ra2ce-data
           endpoint: s3.amazonaws.com
           region: eu-west-1
-          key: uncertainty_hackathon/output_2/
+          key: uncertainty_hackathon/output_2/{{inputs.parameters.output_floodmap}}
           accessKeySecret:
             name: my-s3-credentials
             key: accessKey

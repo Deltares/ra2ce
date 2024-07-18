@@ -1,5 +1,6 @@
 import os
 import random
+import shutil
 from pathlib import Path
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
@@ -38,6 +39,13 @@ _selected_vulnerability_curve = random.choice(list(_vulnerability_curves.glob("*
 print(_selected_vulnerability_curve)
 for _file in _root_dir.rglob("*"):
     print(_file.relative_to(_root_dir))
+
+_results_dir = Path("/output_workflow2")
+shutil.copytree(_root_dir, _results_dir)
+shutil.copyfile(
+    _selected_vulnerability_curve,
+    _results_dir.joinpath("vulnerability_curve", _selected_vulnerability_curve.name),
+)
 
 # _tif_data_directory = Path("/flood_maps/event1")
 # vc = _root_dir.joinpath("vulnerability_curves/damage_functions/all_road_types")
