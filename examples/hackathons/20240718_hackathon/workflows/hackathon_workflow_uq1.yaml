@@ -8,18 +8,18 @@ spec:
   templates:
   - name: scenario-workflow
     steps:
-    - - name: check-ra2ce
+    - - name: check-ra2ce-pypi
         template: check-ra2ce
         arguments:
           parameters:
           - name: ra2ce_tag
-            value: hackathon_july_pypi
-      - name: check-ra2ce
+            value: poetry_01
+      - name: check-ra2ce-local
         template: check-ra2ce
         arguments:
           parameters:
           - name: ra2ce_tag
-            value: hackathon_july_local
+            value: poetry_03
   - name: check-ra2ce
     script:
       image: "containers.deltares.nl/ra2ce/ra2ce:{{inputs.parameters.ra2ce_tag}}"
@@ -33,7 +33,7 @@ spec:
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
-            key: uncertainty_hackathon/scripts
+            key: hackathon_july/scripts
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials
