@@ -54,6 +54,23 @@ spec:
       image: 798877697266.dkr.ecr.eu-west-1.amazonaws.com/boto3:latest
       workingDir: /modeldata
       command: [python, "/scripts/collect_data.py"]
+    inputs: 
+      artifacts:
+        - name: scripts
+          path: /scripts
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: uncertainty_hackathon/scripts
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
   - name: run-scenario
     container:
       image: "containers.deltares.nl/ra2ce/ra2ce:{{inputs.parameters.ra2ce_tag}}"
