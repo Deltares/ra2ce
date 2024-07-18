@@ -8,8 +8,14 @@ spec:
   templates:
   - name: scenario-workflow
     steps:
-    - - name: define-events
+    - - name: get-events-output-graphs
         template: get-events-output-graphs
+      - name: check-ra2ce
+        template: check-ra2ce
+        arguments:
+          parameters:
+          - name: ra2ce_tag
+            value: hackathon_uncertainty
     - - name: get-vulnerability-curve
         template: get-vulnerability-curve
         arguments:
@@ -25,41 +31,73 @@ spec:
             value: "{{item}}"
         withParam: "{{steps.get-vulnerability-curve.outputs.result}}"
 
+  - name: check-ra2ce
+    script:
+      image: "containers.deltares.nl/ra2ce/ra2ce:{{inputs.parameters.ra2ce_tag}}"
+      command: [python, "/scripts/check_ra2ce_version.py"]
+    inputs: 
+      parameters:
+        - name: ra2ce_tag
+      artifacts:
+        - name: scripts
+          path: /scripts
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: uncertainty_hackathon/scripts
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+
   - name: get-events-output-graphs
     script:
-      image: containers.deltares.nl/ra2ce/ra2ce:hackathon_uncertainty
+      image: 798877697266.dkr.ecr.eu-west-1.amazonaws.com/boto3:latest
       workingDir: /modeldata
-      command: [python]
-      source: |
-        import json
-        import random
-        from pathlib import Path
+      command: [python, "/scripts/generate_event_scenarios.py"]
 
-        import boto3
-
-        # s3://ra2ce-data/uncertainty_hackathon/flood_maps/
-        bucket = "ra2ce-data"
-        _root_dir = "uncertainty_hackathon/output_1/"
-
-        client = boto3.client("s3")
-        result = client.list_objects(Bucket=bucket, Prefix=_root_dir, Delimiter="/")
-        _selected_events = []
-        n_runs = 100
-        for _sub_prefix in result.get("CommonPrefixes"):
-            _prefix = _sub_prefix["Prefix"]
-            _prefix_path = Path(_prefix)
-            _prefix_result = client.list_objects(Bucket=bucket, Prefix=_prefix, Delimiter="/")
-            _event_files = [
-                str(
-                    (Path(_c["Prefix"]).joinpath("output_graph")).relative_to(
-                        _prefix_path.parent
-                    )
-                )
-                for _c in _prefix_result.get("CommonPrefixes")
-            ]
-            for n in range(n_runs):
-                _selected_events.append(random.choice(_event_files))
-        print(json.dumps(_selected_events))
+  - name: get-vulnerability-curve
+    script:
+      image: 798877697266.dkr.ecr.eu-west-1.amazonaws.com/boto3:latest
+      workingDir: /modeldata
+      command: [python, "/scripts/select_vulnerability_curves.py"]
+    inputs:
+      artifacts:
+        - name: scripts
+          path: /scripts
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: uncertainty_hackathon/scripts
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+        - name: vulnerability_curves
+          path: /vulnerability_curves
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: uncertainty_hackathon/vulnerability_curves
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
 
   - name: run-scenario
     container:

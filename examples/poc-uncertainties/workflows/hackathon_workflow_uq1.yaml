@@ -16,15 +16,15 @@ spec:
             value: hackathon_uncertainty
       - name: define-events
         template: get-events
-    # - - name: run-scenario
-    #     template: run-scenario
-    #     arguments:
-    #       parameters:
-    #       - name: ra2ce_tag
-    #         value: hackathon_uncertainty
-    #       - name: event_floodmap
-    #         value: "{{item}}"
-    #     withParam: "{{steps.define-events.outputs.result}}"
+    - - name: run-scenario
+        template: run-scenario
+        arguments:
+          parameters:
+          - name: ra2ce_tag
+            value: hackathon_uncertainty
+          - name: event_floodmap
+            value: "{{item}}"
+        withParam: "{{steps.define-events.outputs.result}}"
   - name: check-ra2ce
     script:
       image: "containers.deltares.nl/ra2ce/ra2ce:{{inputs.parameters.ra2ce_tag}}"
@@ -32,7 +32,6 @@ spec:
     inputs: 
       parameters:
         - name: ra2ce_tag
-          # value: "{{workflow.parameters.ra2ce_tag}}"
       artifacts:
         - name: scripts
           path: /scripts
