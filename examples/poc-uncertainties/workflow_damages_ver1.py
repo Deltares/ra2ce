@@ -23,25 +23,29 @@ from ra2ce.ra2ce_handler import Ra2ceHandler
 
 # Define locations in mounted drive
 _root_dir = Path("/modeldata")
-assert _root_dir.exists()
-
 _static_path = _root_dir.joinpath("static")
+_static_output_graph_path = _root_dir.joinpath("static", "output_graph")
+assert _root_dir.exists()
 assert _static_path.exists()
 
-_output_path = _root_dir.joinpath("static", "output_graph")
-assert _output_path.exists()
+for _file in _root_dir.rglob("*"):
+    print(_file.relative_to(_root_dir))
 
+# Graph with overlayed events
+_output_graph = Path("/output_graph")
+assert _output_graph.exists()
+
+# Vulnerability curves
 _vulnerability_curves = Path("/vulnerability_curves")
 assert _vulnerability_curves.exists()
 
 # Select a random vulnerability cuve
 _selected_vulnerability_curve = random.choice(list(_vulnerability_curves.glob("*.csv")))
 print(_selected_vulnerability_curve)
-for _file in _root_dir.rglob("*"):
-    print(_file.relative_to(_root_dir))
 
 _results_dir = Path("/output_workflow2")
-shutil.copytree(_root_dir, _results_dir)
+shutil.copytree(_root_dir, _results_dir.joinpath("base_model"))
+shutil.copytree(_output_graph, _results_dir.joinpath("output_graph"))
 shutil.copyfile(
     _selected_vulnerability_curve,
     _results_dir.joinpath("vulnerability_curve", _selected_vulnerability_curve.name),

@@ -3,9 +3,9 @@ from pathlib import Path
 
 import boto3
 
-# s3://ra2ce-data/uncertainty_hackathon/flood_maps/
+# s3://ra2ce-data/hackathon_uncertainty/flood_maps/
 bucket = "ra2ce-data"
-_root_dir = "uncertainty_hackathon/flood_maps/"
+_root_dir = "hackathon_uncertainty/flood_maps/"
 
 client = boto3.client("s3")
 result = client.list_objects(Bucket=bucket, Prefix=_root_dir, Delimiter="/")
