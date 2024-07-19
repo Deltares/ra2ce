@@ -20,7 +20,7 @@ spec:
         template: run-script
         arguments:
           parameters:
-          - name: hazard_file
+          - name: hazard_name
             value: "{{item}}"
         withParam: "{{steps.collect-hazard-cases.outputs.result}}"
   - name: collect-hazard-cases
@@ -73,16 +73,35 @@ spec:
           memory: "4Gi"
     nodeSelector:
       beta.kubernetes.io/instance-type: "m5.xlarge"
+    outputs:
+      parameters:
+        - name: hazard_name
+      artifacts:
+        - name: result_exposure_and_od_analysis
+          path: /exposure_and_od_analysis/output/multi_link_origin_closest_destination
+          s3: 
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: "hackathon_july/uq3_results/{{inputs.parameters.hazard_name}}"
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}     
     inputs:
       parameters:
-        - name: hazard_file
+        - name: hazard_name
       artifacts:
         - name: selected_hazard_file
-          path: "/hazard_files/{{inputs.parameters.hazard_file}}"
+          path: "/hazard_files/{{inputs.parameters.hazard_name}}.tif"
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
-            key: "hackathon_july/hazard_files/{{inputs.parameters.hazard_file}}"
+            key: "hackathon_july/hazard_files/{{inputs.parameters.hazard_name}}.tif"
             region: eu-west-1
             accessKeySecret:
               name: my-s3-credentials

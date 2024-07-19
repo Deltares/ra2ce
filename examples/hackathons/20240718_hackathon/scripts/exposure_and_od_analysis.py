@@ -67,6 +67,7 @@ _base_graph_dir = _static_path.joinpath("output_graph")
 
 _output_path = _root_dir.joinpath("output")
 _output_path.mkdir(parents=True, exist_ok=True)
+_results_to_collect = _output_path.joinpath("multi_link_origin_closest_destination")
 
 # Hazard files
 _hazard_files = list(Path("/hazard_files").glob("*.tif"))
@@ -155,3 +156,8 @@ _handler = Ra2ceHandler.from_config(_network_config_data, _analysis_config_data)
 _handler.input_config.network_config.graph_files = _graph_files
 _handler.configure()
 _handler.run_analysis()
+
+
+# Verify results
+assert _results_to_collect.exists()
+assert any(list(_results_to_collect.glob("*")))
