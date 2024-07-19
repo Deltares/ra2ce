@@ -13,15 +13,17 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.network import RoadTypeEnum
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.network.graph_files.network_file import NetworkFile
 from ra2ce.network.hazard.hazard_names import HazardNames
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
+from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
 from ra2ce.network.network_config_data.network_config_data import (
     HazardSection,
     NetworkConfigData,
-    OriginsDestinationsSection,
+    OriginsDestinationsSection, NetworkSection,
 )
 from ra2ce.ra2ce_handler import Ra2ceHandler
 
@@ -68,6 +70,8 @@ _base_graph_dir = _static_path.joinpath("output_graph")
 _output_path = _root_dir.joinpath("output")
 _output_path.mkdir(parents=True, exist_ok=True)
 _results_to_collect = _output_path.joinpath("multi_link_origin_closest_destination")
+network_polygon_file = _root_dir.joinpath("static", "network", "buffer_polygon_OD.geojson")
+
 
 # Hazard files
 _hazard_files = list(Path("/hazard_files").glob("*.tif"))
@@ -99,11 +103,28 @@ _origin_destination_section = OriginsDestinationsSection(
     category="category",
 )
 
+
+_network_section = NetworkSection(
+    source=SourceEnum.OSM_DOWNLOAD,  # Used to specify the shapefile name of the (road) network to do the analysis with, when creating a network from a shapefile.
+    polygon=network_polygon_file,
+    save_gpkg=True,
+    road_types=[
+        RoadTypeEnum.RESIDENTIAL,
+        RoadTypeEnum.TERTIARY,
+        RoadTypeEnum.UNCLASSIFIED,
+        RoadTypeEnum.SECONDARY,
+        RoadTypeEnum.PRIMARY,
+        RoadTypeEnum.TRUNK,
+        RoadTypeEnum.MOTORWAY
+        ],
+)
+
 _network_config_data = NetworkConfigData(
     root_path=_root_dir,
     static_path=_static_path,
     output_path=_output_path,
     hazard=_hazard_section,
+    network=_network_section,
     origins_destinations=_origin_destination_section,
 )
 _network_config_data.network.save_gpkg = True
