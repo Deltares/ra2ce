@@ -27,6 +27,45 @@ spec:
     script:
       image: "{{workflow.parameters.ra2ce_image}}"
       command: [python, "/scripts/exposure_and_od_analysis.py"]      
+    inputs:
+      parameters:
+        - name: hazard_file
+      artifacts:
+        - name: exposure_and_od_analysis
+          path: /exposure_and_od_analysis
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: hackathon_july/working_dir
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+        - name: scripts
+          path: /scripts
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: hackathon_july/scripts
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+  
+  - name: run-script
+    script:
+      image: "{{workflow.parameters.ra2ce_image}}"
+      command: [python, "/scripts/exposure_and_od_analysis.py"]
       resources:
         requests:
           cpu: 1
@@ -86,42 +125,6 @@ spec:
           archive:
             none: {}
   
-  - name: run-script
-    script:
-      image: "{{workflow.parameters.ra2ce_image}}"
-      command: [python, "/scripts/exposure_and_od_analysis.py"]
-    inputs: 
-      artifacts:
-        - name: exposure_and_od_analysis
-          path: /exposure_and_od_analysis
-          s3:
-            endpoint: s3.amazonaws.com
-            bucket: ra2ce-data
-            key: hackathon_july/working_dir
-            region: eu-west-1
-            accessKeySecret:
-              name: my-s3-credentials
-              key: accessKey
-            secretKeySecret:
-              name: my-s3-credentials
-              key: secretKey
-          archive:
-            none: {}
-        - name: scripts
-          path: /scripts
-          s3:
-            endpoint: s3.amazonaws.com
-            bucket: ra2ce-data
-            key: hackathon_july/scripts
-            region: eu-west-1
-            accessKeySecret:
-              name: my-s3-credentials
-              key: accessKey
-            secretKeySecret:
-              name: my-s3-credentials
-              key: secretKey
-          archive:
-            none: {}
   - name: check-ra2ce
     script:
       image: "{{workflow.parameters.ra2ce_image}}"
