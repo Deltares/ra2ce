@@ -23,6 +23,8 @@ spec:
           - name: hazard_name
             value: "{{item}}"
         withParam: "{{steps.collect-hazard-cases.outputs.result}}"
+    - - name: post-process-data
+        template: postprocess-script
   - name: collect-hazard-cases
     script:
       image: 798877697266.dkr.ecr.eu-west-1.amazonaws.com/boto3:latest
@@ -59,7 +61,68 @@ spec:
               key: secretKey
           archive:
             none: {}
-  
+  - name: postprocess-script
+    script:
+      image: "{{workflow.parameters.ra2ce_image}}"
+      command: [python, "/scripts/postprocess_output.py"]
+      resources:
+        requests:
+          cpu: 1
+          memory: "1Gi"
+        limits:
+          cpu: 1
+          memory: "1Gi"
+    nodeSelector:
+      beta.kubernetes.io/instance-type: "t3.small"
+    outputs:
+      artifacts:
+        - name: postprocess_results
+          path: /postprocess_result
+          s3: 
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: "hackathon_july/uq3_result_postprocess/"
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}     
+    inputs:
+      artifacts:
+        - name: uq3_result_collection
+          path: /uq3_results
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: "hackathon_july/uq3_results/"
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}          
+        - name: scripts
+          path: /scripts
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: hackathon_july/scripts
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}  
   - name: run-script
     script:
       image: "{{workflow.parameters.ra2ce_image}}"

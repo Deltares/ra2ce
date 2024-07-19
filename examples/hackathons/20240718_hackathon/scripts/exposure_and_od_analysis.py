@@ -23,7 +23,8 @@ from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
 from ra2ce.network.network_config_data.network_config_data import (
     HazardSection,
     NetworkConfigData,
-    OriginsDestinationsSection, NetworkSection,
+    NetworkSection,
+    OriginsDestinationsSection,
 )
 from ra2ce.ra2ce_handler import Ra2ceHandler
 
@@ -70,7 +71,9 @@ _base_graph_dir = _static_path.joinpath("output_graph")
 _output_path = _root_dir.joinpath("output")
 _output_path.mkdir(parents=True, exist_ok=True)
 _results_to_collect = _output_path.joinpath("multi_link_origin_closest_destination")
-network_polygon_file = _root_dir.joinpath("static", "network", "buffer_polygon_OD.geojson")
+network_polygon_file = _root_dir.joinpath(
+    "static", "network", "buffer_polygon_OD.geojson"
+)
 
 
 # Hazard files
@@ -115,8 +118,8 @@ _network_section = NetworkSection(
         RoadTypeEnum.SECONDARY,
         RoadTypeEnum.PRIMARY,
         RoadTypeEnum.TRUNK,
-        RoadTypeEnum.MOTORWAY
-        ],
+        RoadTypeEnum.MOTORWAY,
+    ],
 )
 
 _network_config_data = NetworkConfigData(
