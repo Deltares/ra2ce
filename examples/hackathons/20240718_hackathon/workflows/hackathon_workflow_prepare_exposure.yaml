@@ -1,0 +1,179 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  namespace: argo
+  generateName: ra2ce-hackathon-july-uq3-prepare-
+spec:
+  entrypoint: scenario-workflow
+  arguments:
+    parameters: 
+    - name: ra2ce_tag
+      value: hackathon_july_local
+  templates:
+  - name: scenario-workflow
+    steps:
+    - - name: create-polygons
+        template: create-polygons
+    - - name: create-network
+        template: create-network
+      - name: create-destinations
+        template: create-destinations
+  - name: create-polygons
+    script:
+      image: "containers.deltares.nl/ra2ce/ra2ce:{{workflow.parameters.ra2ce_tag}}"
+      command: [python, "/scripts/create_polygons.py"]
+    inputs: 
+      artifacts:
+      - name: scripts
+        path: /scripts
+        s3:
+          endpoint: s3.amazonaws.com
+          bucket: ra2ce-data
+          key: hackathon_july/scripts
+          region: eu-west-1
+          accessKeySecret:
+            name: my-s3-credentials
+            key: accessKey
+          secretKeySecret:
+            name: my-s3-credentials
+            key: secretKey
+        archive:
+          none: {}
+      - name: hazard-files
+        path: /hazard_files
+        s3:
+          endpoint: s3.amazonaws.com
+          bucket: ra2ce-data
+          key: hackathon_july/hazard_files
+          region: eu-west-1
+          accessKeySecret:
+            name: my-s3-credentials
+            key: accessKey
+          secretKeySecret:
+            name: my-s3-credentials
+            key: secretKey
+        archive:
+          none: {}
+    outputs:
+      artifacts:
+      - name: polygons
+        path: /static/network
+        s3:
+          endpoint: s3.amazonaws.com
+          bucket: ra2ce-data
+          key: hackathon_july/output_prepare/static/network
+          region: eu-west-1
+          accessKeySecret:
+            name: my-s3-credentials
+            key: accessKey
+          secretKeySecret:
+            name: my-s3-credentials
+            key: secretKey
+        archive:
+          none: {}
+  - name: create-network
+    script:
+      image: "containers.deltares.nl/ra2ce/ra2ce:{{workflow.parameters.ra2ce_tag}}"
+      command: [python, "/scripts/create_network.py"]
+    inputs:
+      artifacts:
+      - name: scripts
+        path: /scripts
+        s3:
+          endpoint: s3.amazonaws.com
+          bucket: ra2ce-data
+          key: hackathon_july/scripts
+          region: eu-west-1
+          accessKeySecret:
+            name: my-s3-credentials
+            key: accessKey
+          secretKeySecret:
+            name: my-s3-credentials
+            key: secretKey
+        archive:
+          none: {}
+      - name: network-polygon
+        path: /static/network/buffer_polygon_network.geojson
+        s3:
+          endpoint: s3.amazonaws.com
+          bucket: ra2ce-data
+          key: hackathon_july/output_prepare/static/network/buffer_polygon_network.geojson
+          region: eu-west-1
+          accessKeySecret:
+            name: my-s3-credentials
+            key: accessKey
+          secretKeySecret:
+            name: my-s3-credentials
+            key: secretKey
+        archive:
+          none: {}
+    outputs:
+      artifacts:
+      - name: output-graph
+        path: /static/output_graph
+        s3:
+          endpoint: s3.amazonaws.com
+          bucket: ra2ce-data
+          key: hackathon_july/output_prepare/static/output_graph
+          region: eu-west-1
+          accessKeySecret:
+            name: my-s3-credentials
+            key: accessKey
+          secretKeySecret:
+            name: my-s3-credentials
+            key: secretKey
+        archive:
+          none: {}
+  - name: create-destinations
+    script:
+      image: "containers.deltares.nl/ra2ce/ra2ce:{{workflow.parameters.ra2ce_tag}}"
+      command: [python, "/scripts/create_destinations.py"]
+    inputs:
+      artifacts:
+      - name: scripts
+        path: /scripts
+        s3:
+          endpoint: s3.amazonaws.com
+          bucket: ra2ce-data
+          key: hackathon_july/scripts
+          region: eu-west-1
+          accessKeySecret:
+            name: my-s3-credentials
+            key: accessKey
+          secretKeySecret:
+            name: my-s3-credentials
+            key: secretKey
+        archive:
+          none: {}
+      - name: network-polygon
+        path: /static/network/buffer_polygon_OD.geojson
+        s3:
+          endpoint: s3.amazonaws.com
+          bucket: ra2ce-data
+          key: hackathon_july/output_prepare/static/network/buffer_polygon_OD.geojson
+          region: eu-west-1
+          accessKeySecret:
+            name: my-s3-credentials
+            key: accessKey
+          secretKeySecret:
+            name: my-s3-credentials
+            key: secretKey
+        archive:
+          none: {}
+    outputs:
+      artifacts:
+      - name: network
+        path: /static/network
+        s3:
+          endpoint: s3.amazonaws.com
+          bucket: ra2ce-data
+          key: hackathon_july/output_prepare/static/network
+          region: eu-west-1
+          accessKeySecret:
+            name: my-s3-credentials
+            key: accessKey
+          secretKeySecret:
+            name: my-s3-credentials
+            key: secretKey
+        archive:
+          none: {}

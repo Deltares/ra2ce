@@ -80,6 +80,9 @@ network_polygon_file = _root_dir.joinpath(
 _hazard_files = list(Path("/hazard_files").glob("*.tif"))
 print(f"Hazard files found: {len(_hazard_files)}")
 _selected_hazard_file = _hazard_files[0]
+print(f"Selected file: {_selected_hazard_file}")
+assert _selected_hazard_file.is_file()
+
 # THIS PROJECTION IS REQUIRED FOR THE HACKATHON JULY 2024
 _hazard_crs = "EPSG:4326"
 
