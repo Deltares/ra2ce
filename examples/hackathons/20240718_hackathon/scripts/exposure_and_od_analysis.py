@@ -72,7 +72,8 @@ _output_path.mkdir(parents=True, exist_ok=True)
 _hazard_files = list(Path("/hazard_files").glob("*.tif"))
 print(f"Hazard files found: {len(_hazard_files)}")
 _selected_hazard_file = _hazard_files[0]
-hazard_crs = "EPSG:32736"  # for the hackathon case => "EPSG:4326"
+# THIS PROJECTION IS REQUIRED FOR THE HACKATHON JULY 2024
+_hazard_crs = "EPSG:4326"
 
 
 # Loop?
@@ -82,7 +83,7 @@ _hazard_section = HazardSection(
     hazard_id=None,
     hazard_field_name="waterdepth",
     aggregate_wl=AggregateWlEnum.MAX,
-    hazard_crs=hazard_crs,
+    hazard_crs=_hazard_crs,
     overlay_segmented_network=False,
 )
 
