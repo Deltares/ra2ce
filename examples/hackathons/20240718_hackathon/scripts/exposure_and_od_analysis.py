@@ -27,20 +27,6 @@ from ra2ce.ra2ce_handler import Ra2ceHandler
 
 
 # Functions
-def get_all_files(directory: str) -> list[Path]:
-    """
-    Get all file names in the specified directory.
-
-    Args:
-        directory (str): The path to the directory.
-
-    Returns:
-        List[str]: A list of file names in the directory.
-    """
-    p = Path(directory)
-    return [file for file in p.iterdir() if file.is_file()]
-
-
 def read_pickle(file_path: str):
     """
     Read a pickle file.
@@ -74,6 +60,7 @@ def read_gpkg_to_gdf(file_path: str, layer: str = None) -> gpd.GeoDataFrame:
 
 
 # Definition of paths
+# Base Model
 _root_dir = Path("/exposure_and_od_analysis")
 _static_path = _root_dir.joinpath("static")
 _base_graph_dir = _static_path.joinpath("output_graph")
@@ -81,9 +68,10 @@ _base_graph_dir = _static_path.joinpath("output_graph")
 _output_path = _root_dir.joinpath("output")
 _output_path.mkdir(parents=True, exist_ok=True)
 
-hazard_files = get_all_files(_static_path.joinpath("hazard"))
-print("Hazard files found: " + len(hazard_files))
-_selected_hazard_file = hazard_files[0]
+# Hazard files
+_hazard_files = list(Path("/hazard_files").glob("*.tif"))
+print(f"Hazard files found: {len(_hazard_files)}")
+_selected_hazard_file = _hazard_files[0]
 hazard_crs = "EPSG:32736"  # for the hackathon case => "EPSG:4326"
 
 
