@@ -46,11 +46,13 @@ assert _selected_vulnerability_curve.exists()
 
 print("Copying content to `/output_workflow2`")
 _results_dir = Path("/output_workflow2")
+_results_vc_dir = _results_dir.joinpath("vulnerability_curve")
+_results_vc_dir.mkdir(parents=True, exist_ok=True)
 shutil.copytree(_root_dir, _results_dir.joinpath("base_model"))
 shutil.copytree(_output_graph, _results_dir.joinpath("output_graph"))
 shutil.copy(
     _selected_vulnerability_curve,
-    _results_dir.joinpath("vulnerability_curve", _selected_vulnerability_curve.name),
+    _results_vc_dir.joinpath(_selected_vulnerability_curve.name),
 )
 print("Copied all contents to `/output_workflow2`")
 for _content in _results_dir.rglob("*"):
