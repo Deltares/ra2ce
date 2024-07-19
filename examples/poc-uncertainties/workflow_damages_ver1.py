@@ -42,15 +42,19 @@ assert _vulnerability_curves.exists()
 # Select a random vulnerability cuve
 _selected_vulnerability_curve = random.choice(list(_vulnerability_curves.glob("*.csv")))
 print(_selected_vulnerability_curve)
+assert _selected_vulnerability_curve.exists()
 
+print("Copying content to `/output_workflow2`")
 _results_dir = Path("/output_workflow2")
 shutil.copytree(_root_dir, _results_dir.joinpath("base_model"))
 shutil.copytree(_output_graph, _results_dir.joinpath("output_graph"))
-shutil.copyfile(
+shutil.copy(
     _selected_vulnerability_curve,
     _results_dir.joinpath("vulnerability_curve", _selected_vulnerability_curve.name),
 )
-
+print("Copied all contents to `/output_workflow2`")
+for _content in _results_dir.rglob("*"):
+    print(_content)
 # _tif_data_directory = Path("/flood_maps/event1")
 # vc = _root_dir.joinpath("vulnerability_curves/damage_functions/all_road_types")
 
