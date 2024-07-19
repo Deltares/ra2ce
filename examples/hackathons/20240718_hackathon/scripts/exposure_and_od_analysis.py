@@ -70,7 +70,7 @@ _output_path.mkdir(parents=True, exist_ok=True)
 
 # Hazard files
 _hazard_files = list(Path("/hazard_files").glob("*.tif"))
-print("Hazard files found: " + len(_hazard_files))
+print(f"Hazard files found: {len(_hazard_files)}")
 _selected_hazard_file = _hazard_files[0]
 hazard_crs = "EPSG:32736"  # for the hackathon case => "EPSG:4326"
 

@@ -25,11 +25,9 @@ spec:
         withParam: "{{steps.collect-hazard-cases.outputs.result}}"
   - name: collect-hazard-cases
     script:
-      image: "{{workflow.parameters.ra2ce_image}}"
-      command: [python, "/scripts/exposure_and_od_analysis.py"]      
+      image: 798877697266.dkr.ecr.eu-west-1.amazonaws.com/boto3:latest
+      command: [python, "/scripts/collect_hazard_data.py"]      
     inputs:
-      parameters:
-        - name: hazard_file
       artifacts:
         - name: exposure_and_od_analysis
           path: /exposure_and_od_analysis
@@ -80,7 +78,7 @@ spec:
         - name: hazard_file
       artifacts:
         - name: selected_hazard_file
-          path: /hazard_files
+          path: "/hazard_files/{{inputs.parameters.hazard_file}}"
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
