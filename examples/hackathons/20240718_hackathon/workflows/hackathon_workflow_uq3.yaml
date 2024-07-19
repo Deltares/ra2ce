@@ -1,0 +1,145 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  namespace: argo
+  generateName: ra2ce-hackathon-july-uq3-
+spec:
+  entrypoint: scenario-workflow
+  arguments:
+    parameters:
+    - name: ra2ce_image
+      value: containers.deltares.nl/ra2ce/ra2ce:hackathon_july_local
+  templates:
+  - name: scenario-workflow
+    steps:
+    - - name: check-ra2ce
+        template: check-ra2ce
+      - name: collect-hazard-cases
+        template: collect-hazard-cases
+    - - name: run-scenario
+        template: run-script
+        arguments:
+          parameters:
+          - name: hazard_file
+            value: "{{item}}"
+        withParam: "{{steps.collect-hazard-cases.outputs.result}}"
+  - name: collect-hazard-cases
+    script:
+      image: "{{workflow.parameters.ra2ce_image}}"
+      command: [python, "/scripts/exposure_and_od_analysis.py"]      
+      resources:
+        requests:
+          cpu: 1
+          memory: "4Gi"
+        limits:
+          cpu: 1
+          memory: "4Gi"
+    nodeSelector:
+      beta.kubernetes.io/instance-type: "m5.xlarge"
+    inputs:
+      parameters:
+        - name: hazard_file
+      artifacts:
+        - name: selected_hazard_file
+          path: /hazard_files
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: "hackathon_july/hazard_files/{{inputs.parameters.hazard_file}}"
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}          
+        - name: exposure_and_od_analysis
+          path: /exposure_and_od_analysis
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: hackathon_july/working_dir
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+        - name: scripts
+          path: /scripts
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: hackathon_july/scripts
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+  
+  - name: run-script
+    script:
+      image: "{{workflow.parameters.ra2ce_image}}"
+      command: [python, "/scripts/exposure_and_od_analysis.py"]
+    inputs: 
+      artifacts:
+        - name: exposure_and_od_analysis
+          path: /exposure_and_od_analysis
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: hackathon_july/working_dir
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+        - name: scripts
+          path: /scripts
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: hackathon_july/scripts
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
+  - name: check-ra2ce
+    script:
+      image: "{{workflow.parameters.ra2ce_image}}"
+      command: [python, "/scripts/check_ra2ce_version.py"]
+    inputs: 
+      artifacts:
+        - name: scripts
+          path: /scripts
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: hackathon_july/scripts
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
