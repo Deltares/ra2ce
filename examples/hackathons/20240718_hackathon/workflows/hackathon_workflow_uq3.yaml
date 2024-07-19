@@ -74,8 +74,6 @@ spec:
     nodeSelector:
       beta.kubernetes.io/instance-type: "m5.xlarge"
     outputs:
-      parameters:
-        - name: hazard_name
       artifacts:
         - name: result_exposure_and_od_analysis
           path: /exposure_and_od_analysis/output/multi_link_origin_closest_destination

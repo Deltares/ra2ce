@@ -1,0 +1,78 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  namespace: argo
+  generateName: ra2ce-hackathon-july-uq3-
+spec:
+  entrypoint: scenario-workflow
+  arguments:
+    parameters:
+    - name: ra2ce_image
+      value: containers.deltares.nl/ra2ce/ra2ce:hackathon_july_local
+  templates:
+  - name: scenario-workflow
+    steps:
+    - - name: process-uq3-output
+        template: run-script
+  - name: run-script
+    script:
+      image: "{{workflow.parameters.ra2ce_image}}"
+      command: [python, "/scripts/postprocess_output.py"]
+      resources:
+        requests:
+          cpu: 1
+          memory: "1Gi"
+        limits:
+          cpu: 1
+          memory: "1Gi"
+    nodeSelector:
+      beta.kubernetes.io/instance-type: "t3.small"
+    outputs:
+      artifacts:
+        - name: postprocess_results
+          path: /postprocess_result
+          s3: 
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: "hackathon_july/uq3_result_postprocess/"
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}     
+    inputs:
+      artifacts:
+        - name: uq3_result_collection
+          path: /uq3_results
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: "hackathon_july/uq3_results/"
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}          
+        - name: scripts
+          path: /scripts
+          s3:
+            endpoint: s3.amazonaws.com
+            bucket: ra2ce-data
+            key: hackathon_july/scripts
+            region: eu-west-1
+            accessKeySecret:
+              name: my-s3-credentials
+              key: accessKey
+            secretKeySecret:
+              name: my-s3-credentials
+              key: secretKey
+          archive:
+            none: {}
