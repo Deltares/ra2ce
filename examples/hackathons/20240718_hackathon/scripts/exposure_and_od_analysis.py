@@ -187,4 +187,4 @@ _handler.run_analysis()
 
 # Verify results
 assert _results_to_collect.exists()
-assert any(list(_results_to_collect.glob("*")))
+assert any(list(_results_to_collect.glob("*_with_hazard.gpkg")))
