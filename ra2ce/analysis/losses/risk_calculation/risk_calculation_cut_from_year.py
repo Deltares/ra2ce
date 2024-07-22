@@ -41,7 +41,7 @@ class RiskCalculationCutFromYear(RiskCalculationBase):
                 _dropcols = [
                     rp for rp in self.return_periods if rp < self.risk_calculation_year
                 ]
-                self._to_integrate = self._to_integrate.drop(columns=_dropcols)
+                self._to_integrate.drop(columns=_dropcols, inplace=True)
             else:
                 # find position of first RP value < PL
                 # pos = self.return_periods.index(next(i for i in self.return_periods if i < _cutoff_rp))
