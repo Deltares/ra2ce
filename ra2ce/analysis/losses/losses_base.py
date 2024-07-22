@@ -190,7 +190,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             for range_tuple in _hazard_intensity_ranges:
                 x, y = range_tuple
                 if x <= height <= y:
-                    return (x, y)
+                    return x, y
             raise ValueError(f"No matching range found for height {height}")
 
         def _create_result(vlh: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -310,11 +310,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                         key = vlh_row["key"]
                     else:
                         key = 0
-                    (u, v, k) = (
-                        vlh_row["u"],
-                        vlh_row["v"],
-                        key,
-                    )
+                    (u, v) = (vlh_row["u"], vlh_row["v"])
                     # allow link_id not to be unique in the graph (results reliability is up to the user)
                     # this can happen for instance when a directed graph should be made from an input network
                     for performance_row in row_performance_changes.iterrows():
@@ -339,7 +335,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                         elif not (
                             math.isnan(row_performance_change)
                             and math.isnan(row_connectivity)
-                        ) and ((u, v, k) == row_u_v_k):
+                        ) and ((u, v, key) == row_u_v_k):
                             self._populate_vehicle_loss_hour(
                                 vehicle_loss_hours,
                                 row_hazard_range,
