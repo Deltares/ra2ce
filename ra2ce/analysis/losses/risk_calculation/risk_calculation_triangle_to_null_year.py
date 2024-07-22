@@ -19,6 +19,7 @@ class RiskCalculationTriangleToNullYear(RiskCalculationBase):
         """
         Rework the damage data to make it suitable for integration (risk calculation) in triangle_to_null_year mode
         """
+        _to_integrate = self._to_integrate
         if (
             self.risk_calculation_year >= self.min_return_period
             and self.risk_calculation_year != 0
@@ -39,16 +40,16 @@ class RiskCalculationTriangleToNullYear(RiskCalculationBase):
             )
             self.risk_calculation_year = 1
 
-        self._to_integrate[float("inf")] = self._to_integrate[self.max_return_period]
+        _to_integrate[float("inf")] = _to_integrate[self.max_return_period]
 
         # At the return period of the self.risk_calculation_year, set all damage values to zero
-        self._to_integrate[self.risk_calculation_year] = 0
+        _to_integrate[self.risk_calculation_year] = 0
 
-        self._to_integrate = self._to_integrate.sort_index(
+        _to_integrate = _to_integrate.sort_index(
             axis="columns", ascending=False
         )  # from large to small RP
 
-        self._to_integrate = self._to_integrate.fillna(0)
+        _to_integrate = _to_integrate.fillna(0)
 
         logging.info(
             """Risk calculation runs in 'triangle to null' mode. 
@@ -63,4 +64,4 @@ class RiskCalculationTriangleToNullYear(RiskCalculationBase):
             )
         )
 
-        return self._to_integrate
+        return _to_integrate
