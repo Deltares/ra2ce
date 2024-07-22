@@ -75,6 +75,8 @@ spec:
     script:
       image: "containers.deltares.nl/ra2ce/ra2ce:{{workflow.parameters.ra2ce_tag}}"
       command: [python, "/scripts/create_network.py"]
+    nodeSelector:
+      beta.kubernetes.io/instance-type: "m5.xlarge"
     inputs:
       artifacts:
       - name: scripts

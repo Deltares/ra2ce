@@ -45,9 +45,7 @@ _extent_polygon = box(_min_lon, _min_lat, _max_lon, _max_lat)
 to_geojson(_extent_polygon, network_path.joinpath("extent_polygon.geojson"))
 
 # Create stretched polygons for OD (5% buffer) and network (10% buffer)
-_od_polygon = _extent_polygon.buffer(
-    ((_max_lon - _min_lon) * 0.05), quad_segs=4, cap_style="square"
-)
+_od_polygon = _extent_polygon.buffer(((_max_lon - _min_lon) * 0.05))
 to_geojson(_od_polygon, network_path.joinpath("buffer_polygon_OD.geojson"))
 
 _network_polygon = _extent_polygon.buffer(((_max_lon - _min_lon) * 0.1))
