@@ -53,7 +53,6 @@ from ra2ce.analysis.losses.traffic_intensities.traffic_intensities_reader import
 )
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
-from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 
