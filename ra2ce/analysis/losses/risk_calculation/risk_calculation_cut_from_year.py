@@ -31,7 +31,7 @@ class RiskCalculationCutFromYear(RiskCalculationBase):
         elif (
             self.min_return_period < self.risk_calculation_year < self.max_return_period
         ):
-            self.return_periods = list(self._to_integrate.columns)
+            self.return_periods = set(self._to_integrate.columns)
 
             if self.risk_calculation_year in self.return_periods:
                 _dropcols = [
@@ -39,11 +39,6 @@ class RiskCalculationCutFromYear(RiskCalculationBase):
                 ]
                 self._to_integrate.drop(columns=_dropcols, inplace=True)
             else:
-                # find position of first RP value < PL
-                # pos = self.return_periods.index(next(i for i in self.return_periods if i < _cutoff_rp))
-                # _to_integrate = _to_integrate[self.return_periods[0:pos+1]]
-                # remove all the values with smaller RPs than the PL
-
                 _frequencies = self._to_integrate.copy()
                 _frequencies.columns = [1 / c for c in _frequencies.columns]
 
