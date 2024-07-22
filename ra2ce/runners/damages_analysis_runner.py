@@ -27,7 +27,6 @@ import geopandas as gpd
 import networkx as nx
 import numpy as np
 import pandas as pd
-from networkx import MultiDiGraph
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
