@@ -72,7 +72,7 @@ class TestResilienceCurve:
         "link_type, hazard_range, expected",
         [
             pytest.param(RoadTypeEnum.MOTORWAY, (0.2, 0.5), 5.0, id="Motorway 0.2-0.5"),
-            pytest.param(RoadTypeEnum.MOTORWAY, (0.5, 1.2), 10, id="Motorway 0.5-1.2"),
+            pytest.param(RoadTypeEnum.MOTORWAY, (0.5, 1.2), 10.0, id="Motorway 0.5-1.2"),
         ],
     )
     def test_calculate_disruption(
