@@ -155,3 +155,4 @@ examples/data/*/static/output_graph/
 examples/data/*/output/
 examples/cache/
 /ra2ce/.idea/ra2ce.iml
+/examples/hackathons/20240718_hackathon/UQ3/exposure_and_od_analysis/*
