@@ -9,7 +9,7 @@ from ra2ce.analysis.losses.risk_calculation.risk_calculation_base import (
 )
 
 
-class RiskCalculationCutFromYear(RiskCalculationBase, ABC):
+class RiskCalculationCutFromYear(RiskCalculationBase):
     """
     In this mode, the integration mimics the presence of a flood protection
     """

@@ -9,7 +9,7 @@ from ra2ce.analysis.losses.risk_calculation.risk_calculation_base import (
 )
 
 
-class RiskCalculationTriangleToNullYear(RiskCalculationBase, ABC):
+class RiskCalculationTriangleToNullYear(RiskCalculationBase):
     """
     In this mode, an extra data point with zero damage is added at some distance from the smallest known RP,
     and the area of the Triangle this creates is also calculated
