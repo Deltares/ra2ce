@@ -6,13 +6,20 @@ import re
 
 
 class RiskCalculationBase(ABC):
+    risk_calculation_year: int
+    losses_gdf: gpd.GeoDataFrame
+    return_periods: set
+    max_return_period: int
+    min_return_period: int
+    _to_integrate: gpd.GeoDataFrame
+
     def __init__(self, risk_calculation_year: int, losses_gdf: gpd.GeoDataFrame):
-        self.risk_calculation_year: int = risk_calculation_year
-        self.losses_gdf: gpd.GeoDataFrame = losses_gdf
-        self.return_periods: set = self._get_return_periods()
-        self.max_return_period: int = max(self.return_periods)
-        self.min_return_period: int = min(self.return_periods)
-        self._to_integrate: gpd.GeoDataFrame = self._get_to_integrate()
+        self.risk_calculation_year = risk_calculation_year
+        self.losses_gdf = losses_gdf
+        self.return_periods = self._get_return_periods()
+        self.max_return_period = max(self.return_periods)
+        self.min_return_period = min(self.return_periods)
+        self._to_integrate = self._get_to_integrate()
 
     def _get_return_periods(self):
         # Find the hazard columns; these may be events or return periods
