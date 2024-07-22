@@ -42,6 +42,10 @@ class TestRiskCalculation:
         self, risk_calculation_info: tuple[RiskCalculationModeEnum, int]
     ):
         # 1. get the expected results
+        assert test_data.joinpath(
+            "losses", "csv_data_for_losses", "results_test_calc_vlh.csv"
+        ).exists()
+
         _expected_result = pd.read_csv(
             test_data.joinpath(
                 "losses", "csv_data_for_losses", "results_test_calc_vlh.csv"
