@@ -29,20 +29,21 @@ class RiskCalculationBase(ABC):
         )  # set of unique return_periods
         return return_periods
 
-    @staticmethod
-    def _extract_columns_by_pattern(
-        pattern_text: str, gdf: gpd.GeoDataFrame
-    ) -> set[str]:
-        """
-        Extract column names based on the provided regex pattern.
-        """
-        pattern = re.compile(pattern_text)
-        columns = {pattern.search(c).group(1) for c in gdf.columns if pattern.search(c)}
-        return columns
-
     def _get_to_integrate(self) -> gpd.GeoDataFrame:
+        def _extract_columns_by_pattern(
+            pattern_text: str, gdf: gpd.GeoDataFrame
+        ) -> set[str]:
+            """
+            Extract column names based on the provided regex pattern.
+            """
+            pattern = re.compile(pattern_text)
+            columns = {
+                pattern.search(c).group(1) for c in gdf.columns if pattern.search(c)
+            }
+            return columns
+
         loss_columns = sorted(
-            self._extract_columns_by_pattern(
+            _extract_columns_by_pattern(
                 pattern_text=r"(vlh.*.total)", gdf=self.losses_gdf
             )
         )
