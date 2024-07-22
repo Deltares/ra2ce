@@ -37,27 +37,42 @@ class RiskCalculationCutFromYear(RiskCalculationBase):
                 ]
                 self._to_integrate.drop(columns=_dropcols, inplace=True)
             else:
-                _frequencies = self._to_integrate.copy()
-                _frequencies.columns = [1 / c for c in _frequencies.columns]
+                # _frequencies = self._to_integrate.copy()
+                # _frequencies.columns = [1 / c for c in _frequencies.columns]
 
-                _frequencies[1 / self.risk_calculation_year] = np.nan
-                _frequencies = _frequencies.interpolate(method="index", axis=1)
+                # _frequencies[1 / self.risk_calculation_year] = np.nan
+                # _frequencies = _frequencies.interpolate(method="index", axis=1)
 
-                # Drop the columns outside the cutoff
-                _dropcols = [
-                    c
-                    for c in _frequencies.columns
-                    if c > 1 / self.risk_calculation_year
-                ]
-                _frequencies.drop(columns=_dropcols, inplace=True)
+                # # Drop the columns outside the cutoff
+                # _dropcols = [
+                #     c
+                #     for c in _frequencies.columns
+                #     if c > 1 / self.risk_calculation_year
+                # ]
+                # _frequencies.drop(columns=_dropcols, inplace=True)
 
-                self._to_integrate = _frequencies
+                # self._to_integrate = _frequencies.copy()
+                # self._to_integrate.columns = [1 / c for c in self._to_integrate.columns]
+
                 # Copy the maximum return period with an infinitely high damage
                 self._to_integrate[float("inf")] = self._to_integrate[
                     self.max_return_period
                 ]
 
+                self._to_integrate[self.risk_calculation_year] = np.nan
+                self._to_integrate.interpolate(method="index", axis=1, inplace=True)
+
+                _dropcols = [
+                    c
+                    for c in self._to_integrate.columns
+                    if c < self.risk_calculation_year
+                ]
+                self._to_integrate.drop(columns=_dropcols, inplace=True)
                 self._to_integrate = self._to_integrate.fillna(0)
+
+                self._to_integrate = self._to_integrate[
+                    sorted(self._to_integrate.columns, reverse=True)
+                ]
 
             logging.info(
                 """Risk calculation runs in 'cut_from' mode. 
