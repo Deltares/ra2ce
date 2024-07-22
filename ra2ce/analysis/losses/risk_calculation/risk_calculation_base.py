@@ -48,7 +48,7 @@ class RiskCalculationBase(ABC):
                 pattern_text=r"(vlh.*.total)", gdf=self.losses_gdf
             )
         )
-        _to_integrate = self.losses_gdf[loss_columns]
+        _to_integrate = self.losses_gdf[loss_columns].copy()
 
         _to_integrate.columns = [
             float(c.split("_")[1].replace("RP", "")) for c in _to_integrate.columns

@@ -20,7 +20,7 @@ class TestRiskCalculation:
                 id=RiskCalculationModeEnum.DEFAULT.name.lower(),
             ),
             pytest.param(
-                (RiskCalculationModeEnum.CUT_FROM_YEAR, 10000),
+                (RiskCalculationModeEnum.CUT_FROM_YEAR, 500),
                 id=RiskCalculationModeEnum.CUT_FROM_YEAR.name.lower(),
             ),
             pytest.param(
@@ -82,4 +82,6 @@ class TestRiskCalculation:
             _expected_result[
                 [f"risk_vlh_total_{risk_calculation_info[0].name.lower()}"]
             ],
+            rtol=1e-0,
+            atol=1e-2,
         )

@@ -31,28 +31,28 @@ class RiskCalculationCutFromYear(RiskCalculationBase):
         elif (
             self.min_return_period < self.risk_calculation_year < self.max_return_period
         ):
-            self.return_periods = set(self._to_integrate.columns)
-
             if self.risk_calculation_year in self.return_periods:
                 _dropcols = [
                     rp for rp in self.return_periods if rp < self.risk_calculation_year
                 ]
                 self._to_integrate.drop(columns=_dropcols, inplace=True)
             else:
-                self._to_integrate.columns = [1 / c for c in self._to_integrate.columns]
+                _frequencies = self._to_integrate.copy()
+                _frequencies.columns = [1 / c for c in _frequencies.columns]
 
-                self._to_integrate[1 / self.risk_calculation_year] = np.nan
-                self._to_integrate = self._to_integrate.interpolate(
-                    method="index", axis=1
-                )
+                _frequencies[1 / self.risk_calculation_year] = np.nan
+                _frequencies = _frequencies.interpolate(method="index", axis=1)
 
                 # Drop the columns outside the cutoff
                 _dropcols = [
                     c
-                    for c in self._to_integrate.columns
+                    for c in _frequencies.columns
                     if c > 1 / self.risk_calculation_year
                 ]
-                self._to_integrate.drop(columns=_dropcols, inplace=True)
+                _frequencies.drop(columns=_dropcols, inplace=True)
+
+                self._to_integrate = _frequencies.copy()
+                self._to_integrate.columns = [1 / c for c in self._to_integrate.columns]
 
                 # Copy the maximum return period with an infinitely high damage
                 self._to_integrate[float("inf")] = self._to_integrate[
