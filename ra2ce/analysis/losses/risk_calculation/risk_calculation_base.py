@@ -53,9 +53,9 @@ class RiskCalculationBase(ABC):
             float(c.split("_")[1].replace("RP", "")) for c in _to_integrate.columns
         ]
 
-        _to_integrate = self._rework_damage_data()
+        self._to_integrate = _to_integrate
 
-        return _to_integrate
+        return self._rework_damage_data()
 
     @abstractmethod
     def _rework_damage_data(self) -> gpd.GeoDataFrame:
