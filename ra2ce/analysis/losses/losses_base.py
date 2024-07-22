@@ -522,8 +522,8 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         # Calculate the risk or estimated annual losses if applicable
         if (
             self.analysis.event_type == EventTypeEnum.RETURN_PERIOD
-            and self.analysis.risk_calculation_mode != RiskCalculationModeEnum.INVALID
-            and self.analysis.risk_calculation_mode != RiskCalculationModeEnum.NONE
+            and self.analysis.risk_calculation_mode
+            not in (RiskCalculationModeEnum.INVALID, RiskCalculationModeEnum.NONE)
         ):
             risk_calculation = RiskCalculationFactory.get_risk_calculation(
                 risk_calculation_mode=self.analysis.risk_calculation_mode,
