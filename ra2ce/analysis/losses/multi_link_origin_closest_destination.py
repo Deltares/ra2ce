@@ -66,6 +66,10 @@ class MultiLinkOriginClosestDestination(AnalysisLossesProtocol):
         logging.info("Results saved to: {}".format(save_path))
 
     def execute(self) -> GeoDataFrame:
+        logging.info(
+            "Executing {} analysis.".format(MultiLinkOriginClosestDestination.__name__)
+        )
+
         def _save_gpkg_analysis(
             base_graph,
             to_save_gdf: list[GeoDataFrame],

@@ -11,7 +11,6 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.network import RoadTypeEnum
-from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.network.hazard.hazard_names import HazardNames
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
@@ -25,21 +24,25 @@ from ra2ce.ra2ce_handler import Ra2ceHandler
 from ra2ce.ra2ce_logger import Ra2ceLogger
 
 # Initialize console logger
-Ra2ceLogger.initialize_console_logger("cloud_run_logger")
+Ra2ceLogger.initialize_console_logger("cloud_run_cli_logger")
 
 # Definition of paths
 # Base Model
 _root_dir = Path("/exposure_and_od_analysis")
 # Override root location when running in local machine.
-# aux_root = Path(__file__).parent.parent
+aux_root = Path(__file__).parent.parent
 # _root_dir = aux_root
 _static_path = _root_dir.joinpath("static")
 _base_graph_dir = _static_path.joinpath("output_graph")
+_network_polygon_file = _static_path.joinpath("network", "buffer_polygon_OD.geojson")
 
 _output_path = _root_dir.joinpath("output")
 _output_path.mkdir(parents=True, exist_ok=True)
+
+
+# Create extra logger in the expected directory with results to collect.
 _results_to_collect = _output_path.joinpath("multi_link_origin_closest_destination")
-network_polygon_file = _static_path.joinpath("network", "buffer_polygon_OD.geojson")
+Ra2ceLogger.initialize_file_logger(_results_to_collect, "cloud_runner_file_logger")
 
 
 # Hazard files
@@ -53,7 +56,6 @@ assert _selected_hazard_file.is_file()
 _hazard_crs = "EPSG:4326"
 
 
-# Loop?
 # Make the NetworkConfigData
 _hazard_section = HazardSection(
     hazard_map=[_selected_hazard_file],
@@ -78,7 +80,7 @@ _origin_destination_section = OriginsDestinationsSection(
 
 _network_section = NetworkSection(
     source=SourceEnum.OSM_DOWNLOAD,  # Used to specify the shapefile name of the (road) network to do the analysis with, when creating a network from a shapefile.
-    polygon=network_polygon_file,
+    polygon=_network_polygon_file,
     save_gpkg=True,
     road_types=[
         RoadTypeEnum.RESIDENTIAL,
@@ -100,6 +102,7 @@ _network_config_data = NetworkConfigData(
     origins_destinations=_origin_destination_section,
 )
 _network_config_data.network.save_gpkg = True
+assert _network_config_data.output_graph_dir == _base_graph_dir
 
 # Make the AnalysisConfigData
 _analysis_section = AnalysisSectionLosses(
@@ -126,25 +129,9 @@ _analysis_config_data.hazard_names = HazardNames.from_config(_analysis_config_wr
 
 
 # Read graphs with built-in functionality.
-_graph_files = GraphFilesCollection.set_files(_base_graph_dir)
-print("Loaded graph files. {}".format(print(_graph_files.__dict__)))
+Ra2ceHandler.run_with_config_data(_network_config_data, _analysis_config_data)
 
-_handler = Ra2ceHandler.run_with_config_data(
-    _network_config_data, _analysis_config_data
-)
-
-# Run analysis
-_handler.input_config.network_config.graph_files = _graph_files
-_handler.configure()
-_handler.run_analysis()
-
-
-# Verify results
-# assert _results_to_collect.exists()
-# assert any(list(_results_to_collect.glob("*_with_hazard.gpkg")))
-
+# Print found files
 _found_files = list(_results_to_collect.rglob("*"))
-for _ff in _found_files:
-    print(_ff)
 _dummy_result_file = _results_to_collect.joinpath("dummy_file.txt")
 _dummy_result_file.write_text("\n".join(list(map(str, _found_files))), encoding="utf-8")

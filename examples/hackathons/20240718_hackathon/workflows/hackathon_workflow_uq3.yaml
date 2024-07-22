@@ -8,7 +8,7 @@ spec:
   arguments:
     parameters:
     - name: ra2ce_image
-      value: containers.deltares.nl/ra2ce/ra2ce:hackathon_july_local
+      value: containers.deltares.nl/ra2ce/ra2ce:hackathon_july_alpha
   templates:
   - name: scenario-workflow
     steps:
@@ -158,7 +158,7 @@ spec:
         - name: hazard_name
       artifacts:
         - name: selected_hazard_file
-          path: "/hazard_files/{{inputs.parameters.hazard_name}}.tif"
+          path: "/exposure_and_od_analysis/hazard_files/{{inputs.parameters.hazard_name}}.tif"
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
