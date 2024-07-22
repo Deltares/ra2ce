@@ -14,10 +14,6 @@ class RiskCalculationCutFromYear(RiskCalculationBase):
     In this mode, the integration mimics the presence of a flood protection
     """
 
-    def __init__(self, risk_calculation_year: int, losses_gdf: gpd.GeoDataFrame):
-        super().__init__(risk_calculation_year, losses_gdf)
-        self._to_integrate = self._rework_damage_data()
-
     def _rework_damage_data(self) -> gpd.GeoDataFrame:
         """
         Rework the damage data to make it suitable for integration (risk calculation) in cut_from_year mode

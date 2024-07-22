@@ -20,6 +20,7 @@ class RiskCalculationBase(ABC):
         self.max_return_period = max(self.return_periods)
         self.min_return_period = min(self.return_periods)
         self._to_integrate = self._get_to_integrate()
+        self._to_integrate = self._rework_damage_data()
 
     def _get_return_periods(self):
         # Find the hazard columns; these may be events or return periods
