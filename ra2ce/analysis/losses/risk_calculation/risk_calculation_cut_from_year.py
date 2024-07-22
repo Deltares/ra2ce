@@ -51,9 +51,7 @@ class RiskCalculationCutFromYear(RiskCalculationBase):
                 ]
                 _frequencies.drop(columns=_dropcols, inplace=True)
 
-                self._to_integrate = _frequencies.copy()
-                self._to_integrate.columns = [1 / c for c in self._to_integrate.columns]
-
+                self._to_integrate = _frequencies
                 # Copy the maximum return period with an infinitely high damage
                 self._to_integrate[float("inf")] = self._to_integrate[
                     self.max_return_period
