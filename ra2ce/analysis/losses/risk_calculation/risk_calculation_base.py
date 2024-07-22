@@ -20,6 +20,7 @@ class RiskCalculationBase(ABC):
         self.max_return_period = max(self.return_periods)
         self.min_return_period = min(self.return_periods)
         self._to_integrate = self._get_to_integrate()
+        self._rework_damage_data()
 
     def _get_return_periods(self):
         # Find the hazard columns; these may be events or return periods
@@ -52,13 +53,10 @@ class RiskCalculationBase(ABC):
         _to_integrate.columns = [
             float(c.split("_")[1].replace("RP", "")) for c in _to_integrate.columns
         ]
-
-        self._to_integrate = _to_integrate
-
-        return self._rework_damage_data()
+        return _to_integrate
 
     @abstractmethod
-    def _rework_damage_data(self) -> gpd.GeoDataFrame:
+    def _rework_damage_data(self):
         pass
 
     def integrate_df_trapezoidal(self) -> np.array:

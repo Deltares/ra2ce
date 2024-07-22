@@ -14,11 +14,10 @@ class RiskCalculationCutFromYear(RiskCalculationBase):
     In this mode, the integration mimics the presence of a flood protection
     """
 
-    def _rework_damage_data(self) -> gpd.GeoDataFrame:
+    def _rework_damage_data(self):
         """
         Rework the damage data to make it suitable for integration (risk calculation) in cut_from_year mode
         """
-        _to_integrate = self._to_integrate
         if self.risk_calculation_year <= self.min_return_period:
             raise ValueError(
                 """
@@ -32,35 +31,35 @@ class RiskCalculationCutFromYear(RiskCalculationBase):
         elif (
             self.min_return_period < self.risk_calculation_year < self.max_return_period
         ):
-            self.return_periods = set(_to_integrate.columns)
+            self.return_periods = set(self._to_integrate.columns)
 
             if self.risk_calculation_year in self.return_periods:
                 _dropcols = [
                     rp for rp in self.return_periods if rp < self.risk_calculation_year
                 ]
-                _to_integrate.drop(columns=_dropcols, inplace=True)
+                self._to_integrate.drop(columns=_dropcols, inplace=True)
             else:
-                _frequencies = _to_integrate.copy()
-                _frequencies.columns = [1 / c for c in _frequencies.columns]
+                self._to_integrate.columns = [1 / c for c in self._to_integrate.columns]
 
-                _frequencies[1 / self.risk_calculation_year] = np.nan
-                _frequencies = _frequencies.interpolate(method="index", axis=1)
+                self._to_integrate[1 / self.risk_calculation_year] = np.nan
+                self._to_integrate = self._to_integrate.interpolate(
+                    method="index", axis=1
+                )
 
                 # Drop the columns outside the cutoff
                 _dropcols = [
                     c
-                    for c in _frequencies.columns
+                    for c in self._to_integrate.columns
                     if c > 1 / self.risk_calculation_year
                 ]
-                _frequencies.drop(columns=_dropcols, inplace=True)
-
-                _to_integrate = _frequencies
-                _to_integrate.columns = [1 / c for c in _to_integrate.columns]
+                self._to_integrate.drop(columns=_dropcols, inplace=True)
 
                 # Copy the maximum return period with an infinitely high damage
-                _to_integrate[float("inf")] = _to_integrate[self.max_return_period]
+                self._to_integrate[float("inf")] = self._to_integrate[
+                    self.max_return_period
+                ]
 
-                _to_integrate = _to_integrate.fillna(0)
+                self._to_integrate = self._to_integrate.fillna(0)
 
             logging.info(
                 """Risk calculation runs in 'cut_from' mode. 
@@ -81,11 +80,13 @@ class RiskCalculationCutFromYear(RiskCalculationBase):
         ):  # cutoff is larger or equal than the largest return period
             # risk is return frequency of cutoff
             # times the damage to the most extreme event
-            _to_integrate = _to_integrate.fillna(0)
-            _to_integrate[self.risk_calculation_year] = _to_integrate[
+            self._to_integrate = self._to_integrate.fillna(0)
+            self._to_integrate[self.risk_calculation_year] = self._to_integrate[
                 self.max_return_period
             ]
-            _to_integrate[float("inf")] = _to_integrate[self.max_return_period]
-            _to_integrate = _to_integrate[[self.risk_calculation_year, float("inf")]]
-
-        return _to_integrate
+            self._to_integrate[float("inf")] = self._to_integrate[
+                self.max_return_period
+            ]
+            self._to_integrate = self._to_integrate[
+                [self.risk_calculation_year, float("inf")]
+            ]
