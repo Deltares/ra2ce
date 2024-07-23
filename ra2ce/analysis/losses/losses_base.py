@@ -138,9 +138,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             criticality_analysis = criticality_analysis.drop_duplicates(["u", "v"])
         #  ToDO: check hazard overlay with AggregateWlEnum.NONE or INVALID
 
-        aggregate_wl_suffix = self.analysis_config.config_data.aggregate_wl.name[
-            :2
-        ].lower()
+        aggregate_wl_suffix = self.analysis_config.config_data.aggregate_wl.get_suffix()
         hazard_aggregate_wl_columns = [
             c
             for c in criticality_analysis.columns
@@ -159,10 +157,10 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         ]
         # link_id from list to tuple
         if len(self.criticality_analysis_non_disrupted) > 0:
-            self.criticality_analysis_non_disrupted[
-                self.link_id
-            ] = self.criticality_analysis_non_disrupted[self.link_id].apply(
-                lambda x: tuple(x) if isinstance(x, list) else x
+            self.criticality_analysis_non_disrupted[self.link_id] = (
+                self.criticality_analysis_non_disrupted[self.link_id].apply(
+                    lambda x: tuple(x) if isinstance(x, list) else x
+                )
             )
         self.criticality_analysis[self.link_id] = self.criticality_analysis[
             self.link_id
@@ -450,9 +448,9 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                 [vlh_row.name], f"vlh_{trip_type}_{hazard_col_name}"
             ] = vlh_trip_type_event
             vlh_total += vlh_trip_type_event
-        vehicle_loss_hours.loc[
-            [vlh_row.name], f"vlh_{hazard_col_name}_total"
-        ] = vlh_total
+        vehicle_loss_hours.loc[[vlh_row.name], f"vlh_{hazard_col_name}_total"] = (
+            vlh_total
+        )
 
     def _populate_vehicle_loss_hour(
         self,
@@ -502,9 +500,9 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                 [vlh_row.name], f"vlh_{trip_type}_{hazard_col_name}"
             ] = vlh_trip_type_event
             vlh_total += vlh_trip_type_event
-        vehicle_loss_hours.loc[
-            [vlh_row.name], f"vlh_{hazard_col_name}_total"
-        ] = vlh_total
+        vehicle_loss_hours.loc[[vlh_row.name], f"vlh_{hazard_col_name}_total"] = (
+            vlh_total
+        )
 
     @abstractmethod
     def _get_criticality_analysis(self) -> AnalysisLossesProtocol:
