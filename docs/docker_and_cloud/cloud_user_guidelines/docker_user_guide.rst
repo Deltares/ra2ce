@@ -1,6 +1,6 @@
-.. _cloud_user_guide:
+.. _docker_user_guide:
 
-Cloud User Guide
+Docker User Guide
 ==================
 
 Introduction
