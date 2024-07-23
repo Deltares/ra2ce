@@ -1,7 +1,7 @@
-.. _cloud_user_guidelines:
+.. _using_cloud_services:
 
-Cloud "user" guidelines
-=======================
+Using cloud services
+====================
 
 A variety of different cloud services are available to run ra2ce "on the cloud", both internal and external to Deltares facilities. Here we list the ones we have tested and therefore can provide (certain) support.
 
@@ -19,5 +19,6 @@ In this subsection you can finde user guidelines on how to use all of them.
    :caption: Table of Contents
    :maxdepth: 1
 
-   deltares_hpc_user_guide
    docker_user_guide
+   deltares_harbor
+   deltares_hpc_user_guide
