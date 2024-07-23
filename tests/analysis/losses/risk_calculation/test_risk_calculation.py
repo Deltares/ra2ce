@@ -96,17 +96,18 @@ class TestRiskCalculation:
         assert isinstance(_risk_calculation_info[1], int)
         yield _risk_calculation_info
 
-    def test_risk_calculation_factory(
-        self,
-        risk_calculation_info: tuple[RiskCalculationModeEnum, int],
-        _expected_factory_results: dict,
-    ):
+    @pytest.fixture(name="_losses")
+    def get_losses(self) -> pd.DataFrame:
+        assert test_data.joinpath(
+            "losses", "csv_data_for_losses", "results_test_calc_vlh.csv"
+        ).exists()
+
         _test_calc_vlh = pd.read_csv(
             test_data.joinpath(
                 "losses", "csv_data_for_losses", "results_test_calc_vlh.csv"
             )
         )
-        _losses = _test_calc_vlh.drop(
+        yield _test_calc_vlh.drop(
             columns=[
                 "EV1_ma",
                 "EV2_mi",
@@ -121,6 +122,13 @@ class TestRiskCalculation:
                 "risk_vlh_total_cut_from_year",
             ]
         )
+
+    def test_risk_calculation_factory(
+        self,
+        risk_calculation_info: tuple[RiskCalculationModeEnum, int],
+        _expected_factory_results: dict,
+        _losses: pd.DataFrame,
+    ):
         _risk_calculation = RiskCalculationFactory.get_risk_calculation(
             risk_calculation_mode=risk_calculation_info[0],
             risk_calculation_year=risk_calculation_info[1],
@@ -140,13 +148,11 @@ class TestRiskCalculation:
         )
 
     def test_risk_calculation_result(
-        self, risk_calculation_info: tuple[RiskCalculationModeEnum, int]
+        self,
+        risk_calculation_info: tuple[RiskCalculationModeEnum, int],
+        _losses: pd.DataFrame,
     ):
         # 1. get the expected results
-        assert test_data.joinpath(
-            "losses", "csv_data_for_losses", "results_test_calc_vlh.csv"
-        ).exists()
-
         _expected_result = pd.read_csv(
             test_data.joinpath(
                 "losses", "csv_data_for_losses", "results_test_calc_vlh.csv"
@@ -154,21 +160,6 @@ class TestRiskCalculation:
         )
 
         # 2. run
-        _losses = _expected_result.drop(
-            columns=[
-                "EV1_ma",
-                "EV2_mi",
-                "vlh_business_EV1_ma",
-                "vlh_commute_EV1_ma",
-                "vlh_EV1_ma_total",
-                "vlh_business_EV2_mi",
-                "vlh_commute_EV2_mi",
-                "vlh_EV2_mi_total",
-                "risk_vlh_total_default",
-                "risk_vlh_total_triangle_to_null_year",
-                "risk_vlh_total_cut_from_year",
-            ]
-        )
         risk_calculation = RiskCalculationFactory.get_risk_calculation(
             risk_calculation_mode=risk_calculation_info[0],
             risk_calculation_year=risk_calculation_info[1],
