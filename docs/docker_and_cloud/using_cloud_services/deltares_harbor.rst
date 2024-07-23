@@ -22,7 +22,7 @@ In principle anyone should have ``pull`` rights (allows to download the docker i
 
 Once ``push`` permissions are granted your local docker machine needs to know of its location, you can do so by simply running the following command:
 
-.. code-block:: sh
+.. code-block:: bash
 
     docker login -u <<deltares_email>> -p <<cli_secret>>
 

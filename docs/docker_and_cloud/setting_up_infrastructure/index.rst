@@ -3,11 +3,22 @@
 Setting up infrastructure 
 =========================
 
-In this section we explore the multiple possibilities regarding 'cloud running'. For such purpose we have documentation covering two different concepts:
+At the moment, the infrastructure to run "on the cloud" consists of three main components
 
-- Setting up infrastructure.
-   - Building a docker container.
-   - Installation and deployment of cloud services.
-- Using the infrastructure for specific purposes.
-   - Using existing docker images.
-   - Running ``ra2ce`` on different cloud services.
+- Amazon web services s3.
+   - Stores data.
+   - Runs docker components through Kubernetes
+- Kubernetes.
+   - Creates and runs the ``ra2ce`` docker images in containers.
+   - Runs custom scripts in the related containers.
+- Argo.
+   - "Orchastrates" how a workflow will be run in the s3 using kubernetes.
+   - Workflows ar ``*.yml`` files describing the node types and resources to use at each step of a cloud run.
+
+
+.. toctree::
+   :caption: Table of Contents
+   :maxdepth: 1
+
+   kubernetes_deployment
+   argo_deployment

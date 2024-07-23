@@ -19,7 +19,7 @@ user guide does not work as expected use the Wiki to see if anything changed.
 
 In short, you can access the H7 using SSH or RDP.
 
-.. code-block:: sh
+.. code-block:: bash
 
   ssh h7.directory.intra
 
@@ -28,7 +28,7 @@ slurm_job.sh file that also needs to be moved to an accessible location (the sam
 
 Navigate to the p drive on the head node
 
-.. code-block:: sh
+.. code-block:: bash
 
   cd /p/<<project number>>
 
@@ -40,7 +40,7 @@ See all options on the Wiki:
 
 In the slurm job for Ra2ce we just run 1 command.
 
-.. code-block:: sh
+.. code-block:: bash
     
   docker run --mount src=${PWD},target=/data,type=bind containers.deltares.nl/ra2ce/ra2ce:latest python /data/run_race.py``
 
@@ -57,7 +57,7 @@ In the slurm job for Ra2ce we just run 1 command.
 
 Make sure your run_race.py writes to the mounted drive or you will lose your output once the job is finished.
 
-.. code-block:: sh
+.. code-block:: bash
 
     sbatch slurm_job.sh
 
