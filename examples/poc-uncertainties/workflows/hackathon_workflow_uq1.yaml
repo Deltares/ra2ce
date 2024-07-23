@@ -13,7 +13,7 @@ spec:
         arguments:
           parameters:
           - name: ra2ce_tag
-            value: hackathon_uncertainty
+            value: latest
       - name: define-events
         template: get-events
     - - name: run-scenario
@@ -21,13 +21,13 @@ spec:
         arguments:
           parameters:
           - name: ra2ce_tag
-            value: hackathon_uncertainty
+            value: latest
           - name: event_floodmap
             value: "{{item}}"
         withParam: "{{steps.define-events.outputs.result}}"
   - name: check-ra2ce
     script:
-      image: "containers.deltares.nl/ra2ce/ra2ce:{{inputs.parameters.ra2ce_tag}}"
+      image: "containers.deltares.nl/ra2ce/ra2ce_hackathon_dealing_with_uncertainty_poc:{{inputs.parameters.ra2ce_tag}}"
       command: [python, "/scripts/check_ra2ce_version.py"]
     inputs: 
       parameters:
@@ -72,7 +72,7 @@ spec:
             none: {}
   - name: run-scenario
     container:
-      image: "containers.deltares.nl/ra2ce/ra2ce:{{inputs.parameters.ra2ce_tag}}"
+      image: "containers.deltares.nl/ra2ce/ra2ce_hackathon_dealing_with_uncertainty_poc:{{inputs.parameters.ra2ce_tag}}"
       command: [python, "/scripts/workflow_hazard_overlay.py"]
       resources:
         requests:
