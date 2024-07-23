@@ -73,7 +73,7 @@ Prerequisites
 Before following this guide, ensure you have the following:
 
 - A Kubernetes cluster set up.
-- `kubectl` installed and configured to connect to your Kubernetes cluster.
+- ``kubectl`` installed and configured to connect to your Kubernetes cluster.
 - Docker container image pushed to a container registry accessible to your Kubernetes cluster.
 
 Steps
@@ -83,19 +83,19 @@ Steps
 
 2. **Create Deployment YAML**: Create a YAML file specifying the details of the container you want to run. An example YAML file is available in /infra/workflow/pod.yaml:
 
-   Replace `<your-image-name>:<tag>` with the full image name and tag of your Docker container image, and `<port>` with the port your container listens on.
+   Replace ``<your-image-name>:<tag>`` with the full image name and tag of your Docker container image, and ``<port>`` with the port your container listens on.
 
-3. **Apply Deployment**: Apply the deployment YAML using `kubectl`:
+3. **Apply Deployment**: Apply the deployment YAML using ``kubectl``:
 
-   .. code-block:: sh
+   .. code-block:: bash
 
       kubectl apply -f pod.yaml
 
-   Replace `pod.yaml` with the filename of your deployment YAML file.
+   Replace ``pod.yaml`` with the filename of your deployment YAML file.
 
 4. **Verify Deployment**: Check if the deployment was successful:
 
-   .. code-block:: sh
+   .. code-block:: bash
 
       kubectl get pods
 
@@ -105,19 +105,19 @@ Steps
 
    - To view container logs:
 
-     .. code-block:: sh
+     .. code-block:: bash
 
         kubectl logs <pod-name>
 
-     Replace `<pod-name>` with the name of your pod.
+     Replace ``<pod-name>`` with the name of your pod.
 
    - To execute a command in the container:
 
-     .. code-block:: sh
+     .. code-block:: bash
 
         kubectl exec -it <pod-name> -- <command>
 
-     Replace `<command>` with the command you want to execute in the container.
+     Replace ``<command>`` with the command you want to execute in the container.
 
 Running a Ra2ce workflow in Argo
 ---------------------------------
@@ -133,27 +133,27 @@ Prerequisites
 Before following this guide, ensure you have the following:
 
 - A Kubernetes cluster set up.
-- `kubectl` installed and configured to connect to your Kubernetes cluster.
-- Argo Workflows installed in your Kubernetes cluster. You can install Argo Workflows by following the official documentation: https://argoproj.github.io/argo-workflows/
+- ``kubectl`` installed and configured to connect to your Kubernetes cluster.
+- Argo Workflows installed in your Kubernetes cluster. You can install Argo Workflows by following the official documentation: `<https://argoproj.github.io/argo-workflows/>`_ 
 
 Steps
 -----
 
-1. **Create Workflow YAML**: Create a workflow YAML file specifying the steps of your workflow. An example YAML file is available in /infra/workflow/pod.yaml:
+1. **Create Workflow YAML**: Create a workflow YAML file specifying the steps of your workflow. An example YAML file is available in ``/infra/workflow/pod.yaml``:
 
-   Replace `<your-image-name>:<tag>` with the Docker container image you want to use in your workflow.
+   Replace ``<your-image-name>:<tag>`` with the Docker container image you want to use in your workflow.
 
-2. **Submit Workflow**: Submit the workflow YAML using `kubectl`:
+2. **Submit Workflow**: Submit the workflow YAML using ``kubectl``:
 
    .. code-block:: sh
 
       kubectl apply -f workflow.yaml
 
-   Replace `workflow.yaml` with the filename of your workflow YAML file.
+   Replace ``workflow.yaml`` with the filename of your workflow YAML file.
 
 3. **Check Workflow Status**: Monitor the status of your workflow using Argo CLI or Argo UI. To use Argo CLI:
 
-   - Install Argo CLI by following the official documentation: https://argoproj.github.io/argo-workflows/cli/
+   - Install Argo CLI by following the official documentation: `<https://argoproj.github.io/argo-workflows/cli/>`_ 
    - Check the status of your workflow:
 
      .. code-block:: sh
@@ -168,4 +168,4 @@ Steps
 
         argo get <workflow-name>
 
-     Replace `<workflow-name>` with the name of your workflow.
+     Replace ``<workflow-name>`` with the name of your workflow.
