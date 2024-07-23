@@ -1,6 +1,6 @@
 .. _setting_up_infrastructure:
 
-Setting up infrastructure
+Setting up infrastructure 
 =========================
 
 In this section we explore the multiple possibilities regarding 'cloud running'. For such purpose we have documentation covering two different concepts:

@@ -1,6 +1,6 @@
-.. _hpc_user_guide:
+.. _deltares_hpc_user_guide:
 
-HPC User Guide
+Deltares HPC User Guide
 ==================
 
 Introduction
