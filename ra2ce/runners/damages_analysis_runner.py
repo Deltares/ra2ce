@@ -128,7 +128,7 @@ class DamagesAnalysisRunner(AnalysisRunner):
         event_cols = [
             col
             for col in result_segment_based.columns
-            if (col[0].isupper() and col[1] == "_")
+            if (len(col) > 1 and col[0].isupper() and col[1] == "_")
         ]
         events = set([x.split("_")[1] for x in event_cols])  # set of unique events
 
