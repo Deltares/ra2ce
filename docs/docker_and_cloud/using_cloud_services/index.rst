@@ -8,10 +8,10 @@ A variety of different cloud services are available to run ra2ce "on the cloud",
 Available cloud services:
 
 - Ra2ce S3 (Amazon web services, aws).
-    - Allows to run docker containers by using kubernets.
-    - Allows to store data to use in the containers.
+  - Allows to run docker containers by using kubernets.
+  - Allows to store data to use in the containers.
 - Deltares docker harbor.
-    - Allows to push and pull ra2ce docker images.
+  - Allows to push and pull ra2ce docker images.
 
 .. toctree::
    :caption: Table of Contents
