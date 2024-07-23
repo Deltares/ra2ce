@@ -24,4 +24,4 @@ In this section we explore the multiple possibilities regarding 'cloud running'.
 
    setting_up_infrastructure/index
    using_cloud_services/index
-   examples_guidelines/index
+   cloud_user_guidelines/index
