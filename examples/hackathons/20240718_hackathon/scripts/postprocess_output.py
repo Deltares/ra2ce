@@ -9,8 +9,8 @@ from pathlib import Path
 # needs to be funneled into a postprocessing artifact.
 _uq3_results = Path("/uq3_results")
 # Uncomment this once we have real output results data stored in the s3
-# assert _uq3_results.exists()
-# assert any(list(_uq3_results.rglob("*")))
+assert _uq3_results.exists()
+assert any(list(_uq3_results.rglob("*")))
 
 # Move (or generate) your results to be collected into s3 here
 _postprocess_results = Path("/postprocess_result")
