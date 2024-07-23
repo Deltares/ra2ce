@@ -72,6 +72,7 @@ spec:
         archive:
           none: {}
   - name: create-network
+    # NOTE: this step fails due to OOM error (137). Increasing the node didn't help.
     script:
       image: "containers.deltares.nl/ra2ce/ra2ce:{{workflow.parameters.ra2ce_tag}}"
       command: [python, "/scripts/create_network.py"]
