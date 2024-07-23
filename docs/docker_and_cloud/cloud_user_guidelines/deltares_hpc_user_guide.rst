@@ -40,7 +40,9 @@ See all options on the Wiki:
 
 In the slurm job for Ra2ce we just run 1 command.
 
-docker run --mount src=${PWD},target=/data,type=bind containers.deltares.nl/ra2ce/ra2ce:latest python /data/run_race.py
+.. code-block:: sh
+    
+  docker run --mount src=${PWD},target=/data,type=bind containers.deltares.nl/ra2ce/ra2ce:latest python /data/run_race.py``
 
 +------------------------------------------------+---------------------------------------------------------------+
 | Command                                        | Description                                                   |
