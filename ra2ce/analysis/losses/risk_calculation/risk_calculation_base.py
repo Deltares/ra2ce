@@ -8,19 +8,28 @@ import re
 class RiskCalculationBase(ABC):
     risk_calculation_year: int
     losses_gdf: gpd.GeoDataFrame
-    return_periods: set
-    max_return_period: int
-    min_return_period: int
-    _to_integrate: gpd.GeoDataFrame
 
     def __init__(self, risk_calculation_year: int, losses_gdf: gpd.GeoDataFrame):
         self.risk_calculation_year = risk_calculation_year
         self.losses_gdf = losses_gdf
-        self.return_periods = self._get_return_periods()
-        self.max_return_period = max(self.return_periods)
-        self.min_return_period = min(self.return_periods)
+        self.__post_init__()
+
+    def __post_init__(self):
+        """Private method to __post_init__ computed attributes."""
         self._to_integrate = self._get_to_integrate()
         self._rework_damage_data()
+
+    @property
+    def return_periods(self) -> set[int]:
+        return self._get_return_periods()
+
+    @property
+    def max_return_period(self) -> int:
+        return max(self.return_periods)
+
+    @property
+    def min_return_period(self) -> int:
+        return min(self.return_periods)
 
     def _get_return_periods(self):
         # Find the hazard columns; these may be events or return periods
@@ -48,6 +57,8 @@ class RiskCalculationBase(ABC):
                 pattern_text=r"(vlh.*.total)", gdf=self.losses_gdf
             )
         )
+        loss_columns = [c for c in loss_columns if c.split("_")[1].startswith("RP")]
+
         _to_integrate = self.losses_gdf[loss_columns].copy()
 
         _to_integrate.columns = [
