@@ -1,7 +1,7 @@
-.. _examples_guidelines:
+.. _cloud_user_guidelines:
 
-User guidelines
-====================
+Cloud "user" guidelines
+=======================
 
 This subsection gathers all our documented use cases for running ``ra2ce`` on the cloud. These guidelines are targetted for (Deltares) ``ra2ce`` users who wish to perform cloud computation runs in a 'validated' form.
 
