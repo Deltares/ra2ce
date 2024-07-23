@@ -14,15 +14,19 @@ How to build the cloud docker image
 Assuming access to a Linux box with Docker installed, or in Windows a Docker Desktop installation. You can do the 
 following:
 
-    $ git clone git@github.com:Deltares/ra2ce.git
-    $ cd ra2ce
-    $ docker build -t ra2ce:latest -f Dockerfile .
+   .. code-block:: bash
 
-These instructions will build a docker image. After a good while, you should end up with::
+      git clone git@github.com:Deltares/ra2ce.git
+      cd ra2ce
+      docker build -t ra2ce:latest -f Dockerfile .
 
-    $ docker images
-    REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
-    ra2ce         latest    616f672677f2   19 hours ago   1.01GB
+These instructions will build a docker image. After a good while, you should end up with:
+
+   .. code-block:: bash
+
+      $ docker images
+      REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
+      ra2ce         latest    616f672677f2   19 hours ago   1.01GB
 
 Remark that this is a local image only.
 
@@ -32,7 +36,9 @@ Running Ra2ce Docker container locally
 
 To run the Docker container locally you can execute the following command:
 
-$ docker run -it ra2ce bash
+.. code-block:: bash
+   
+   docker run -it ra2ce bash
 
 This will create a Docker container from the specified image and start an interactive shell in which you can enter commands
 
@@ -41,7 +47,9 @@ Instead you can start Ra2ce from the command line or write an input script (Pyth
 
 If you wish to include files (i.e. input files and run files) you can mount folders to your Docker container on run with for example:
 
-$ docker run -it -v $PWD/workflow:/scripts -v $PWD/tests/test_data/acceptance_test_data/:/data ra2ce_package bash
+.. code-block:: bash
+   
+   docker run -it -v $PWD/workflow:/scripts -v $PWD/tests/test_data/acceptance_test_data/:/data ra2ce_package bash
 
 After that you can call run_race.py. Output files will be available in the acceptance_test_data folder
 
@@ -58,14 +66,14 @@ In a cloud environment this is not possible so we have additional requirements:
 
 Currently we have tested Ra2ce using the following tech stack:
 
-- Kubernetes (AWS EKS) as compute environment. If there is no environment currently available check the /infra/README.md on how to set it up.
+- Kubernetes (AWS EKS) as compute environment. If there is no environment currently available check the ``/infra/README.md`` on how to set it up.
 - AWS S3 as data storage layer.
-- Argo Workflow as workflow orchestrator. If there is no Argo deployment currently available see /infra/workflow/README.md on how to deploy Argo.
+- Argo Workflow as workflow orchestrator. If there is no Argo deployment currently available see ``/infra/workflow/README.md`` on how to deploy Argo.
 
 Running a singular Ra2ce container in Kubernetes
 -------------------------------------------------
 
-In Kubernetes, you can deploy Docker containers stored in container registries such as Docker Hub or any other container registry provider. This guide illustrates how to run a Docker container from an existing container registry using `kubectl`.
+In Kubernetes, you can deploy Docker containers stored in container registries such as Docker Hub or any other container registry provider. This guide illustrates how to run a Docker container from an existing container registry using ``kubectl``.
 
 Prerequisites
 -------------
@@ -81,7 +89,7 @@ Steps
 
 1. **List Available Images**: First, list the available Docker container images in your container registry. You will need the full image name for the subsequent steps.
 
-2. **Create Deployment YAML**: Create a YAML file specifying the details of the container you want to run. An example YAML file is available in /infra/workflow/pod.yaml:
+2. **Create Deployment YAML**: Create a YAML file specifying the details of the container you want to run. An example YAML file is available in ``/infra/workflow/pod.yaml``:
 
    Replace ``<your-image-name>:<tag>`` with the full image name and tag of your Docker container image, and ``<port>`` with the port your container listens on.
 
@@ -101,7 +109,7 @@ Steps
 
    You should see your deployment listed with 1 desired replica and 1 current replica.
 
-5. **Access the Running Container**: You can access the logs of the running container or execute commands within the container using `kubectl`. For example:
+5. **Access the Running Container**: You can access the logs of the running container or execute commands within the container using ``kubectl``. For example:
 
    - To view container logs:
 
@@ -134,7 +142,7 @@ Before following this guide, ensure you have the following:
 
 - A Kubernetes cluster set up.
 - ``kubectl`` installed and configured to connect to your Kubernetes cluster.
-- Argo Workflows installed in your Kubernetes cluster. You can install Argo Workflows by following the official documentation: `<https://argoproj.github.io/argo-workflows/>`_ 
+- Argo Workflows installed in your Kubernetes cluster. You can install Argo Workflows by following the official documentation: `<https://argoproj.github.io/argo-workflows/>`_
 
 Steps
 -----
@@ -145,7 +153,7 @@ Steps
 
 2. **Submit Workflow**: Submit the workflow YAML using ``kubectl``:
 
-   .. code-block:: sh
+   .. code-block:: bash
 
       kubectl apply -f workflow.yaml
 
@@ -153,10 +161,10 @@ Steps
 
 3. **Check Workflow Status**: Monitor the status of your workflow using Argo CLI or Argo UI. To use Argo CLI:
 
-   - Install Argo CLI by following the official documentation: `<https://argoproj.github.io/argo-workflows/cli/>`_ 
+   - Install Argo CLI by following the official documentation: `<https://argoproj.github.io/argo-workflows/cli/>`_
    - Check the status of your workflow:
 
-     .. code-block:: sh
+     .. code-block:: bash
 
         argo list
 
@@ -164,7 +172,7 @@ Steps
 
    - To view detailed information about your workflow:
 
-     .. code-block:: sh
+     .. code-block:: bash
 
         argo get <workflow-name>
 
