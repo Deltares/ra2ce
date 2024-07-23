@@ -3,9 +3,9 @@
 Setting up infrastructure 
 =========================
 
-At the moment, the infrastructure to run "on the cloud" consists of three main components
+At the moment, the ``ra2ce`` "cloud" infrastructure consists of three main components:
 
-- Amazon web services s3.
+- Amazon web services `s3 <https://deltares.awsapps.com/>`_.
    - Stores data.
    - Runs docker components through Kubernetes
 - Kubernetes.

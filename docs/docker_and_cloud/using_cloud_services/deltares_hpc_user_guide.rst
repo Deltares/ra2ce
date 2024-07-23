@@ -1,7 +1,7 @@
 .. _deltares_hpc_user_guide:
 
 Deltares HPC User Guide
-==================
+=======================
 
 Introduction
 ---------------------------------

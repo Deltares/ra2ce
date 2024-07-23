@@ -11,8 +11,8 @@ Prerequisites
 Before deploying the EKS cluster, ensure you have the following prerequisites:
 
 - An AWS account with appropriate permissions to create resources like VPCs, subnets, EKS clusters, and EC2 instances.
-- Terraform installed on your local machine. You can download it from `here <https://www.terraform.io/downloads.html>`_ and follow the installation instructions.
-- AWS CLI configured with appropriate credentials. You can install and configure AWS CLI by following the instructions `here <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html>`_.
+- Terraform installed on your local machine. You can download it from `terraform official website <https://www.terraform.io/downloads.html>`_ and follow the installation instructions.
+- AWS CLI configured with appropriate credentials. You can install and configure AWS CLI by following `the official user guidelines <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html>`_.
 
 Deployment Steps
 ----------------

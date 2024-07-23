@@ -30,3 +30,6 @@ Once ``push`` permissions are granted your local docker machine needs to know of
     To retrieve your ``cli_secret`` go to `<https://containers.deltares.nl/>`_ then click on your user on the top right side of the window, a menu will emerge, select ``User Profile`` and then copy the ``CLI secret`` with the copy functionality.
 
 To push your image just run your usual ``docker push`` command but do not forget to correctly tag your image with the ra2ce repository ``containers.deltares.nl/ra2ce/name_of_your_mage:desired_tag``.
+
+.. note::
+    In order to make sure your custom branch is being picked up, we recommend bumping its version manually, if you have installed the ``conda`` environment you should be able to run the `commitizen <https://commitizen-tools.github.io/commitizen/>`_ bump line ``cz bump --devrelease your_custom_release_number``.
