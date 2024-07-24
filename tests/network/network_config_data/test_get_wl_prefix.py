@@ -14,12 +14,14 @@ class TestGetWlPrefix:
                 id=AggregateWlEnum.MAX.name.lower(),
             ),
             pytest.param(
-                AggregateWlEnum.MAX,
+                AggregateWlEnum.MIN,
+                "mi",
                 id=AggregateWlEnum.MIN.name.lower(),
             ),
             pytest.param(
                 AggregateWlEnum.MEAN,
-                id=AggregateWlEnum.MAX.name.lower(),
+                "me",
+                id=AggregateWlEnum.MEAN.name.lower(),
             ),
         ],
     )
