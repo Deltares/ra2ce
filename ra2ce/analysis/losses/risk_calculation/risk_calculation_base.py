@@ -78,8 +78,6 @@ class RiskCalculationBase(ABC):
 
         """
         # convert return periods to frequencies
-        _to_integrate = self._to_integrate.copy()
-        _to_integrate.columns = sorted(1 / rp for rp in self._to_integrate.columns)
-        values = _to_integrate.values
-        frequencies = _to_integrate.columns
+        values = self._to_integrate.values
+        frequencies = sorted(1 / rp for rp in self._to_integrate.columns)
         return np.trapz(values, frequencies, axis=1)
