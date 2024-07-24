@@ -47,7 +47,7 @@ def _get_risk_calculation_info(
     yield _risk_calculation_info
 
 
-@pytest.fixture(name="_losses")
+@pytest.fixture(name="losses")
 def get_losses() -> pd.DataFrame:
     assert test_data.joinpath(
         "losses", "csv_data_for_losses", "results_test_calc_vlh.csv"
@@ -71,7 +71,7 @@ def get_losses() -> pd.DataFrame:
     )
 
 
-@pytest.fixture(name="_expected_factory_results")
+@pytest.fixture(name="expected_factory_results")
 def get_expected_factory_results() -> dict:
     _expected_factory_results = {
         RiskCalculationModeEnum.DEFAULT: {
@@ -122,29 +122,28 @@ def get_expected_factory_results() -> dict:
 
 
 class TestRiskCalculationFactory:
-
     def test_risk_calculation_factory(
         self,
         risk_calculation_info: tuple[RiskCalculationModeEnum, int],
-        _expected_factory_results: dict,
-        _losses: pd.DataFrame,
+        expected_factory_results: dict,
+        losses: pd.DataFrame,
     ):
         _risk_calculation = RiskCalculationFactory.get_risk_calculation(
             risk_calculation_mode=risk_calculation_info[0],
             risk_calculation_year=risk_calculation_info[1],
-            losses_gdf=_losses,
+            losses_gdf=losses,
         )
 
         assert isinstance(
             _risk_calculation,
-            _expected_factory_results[risk_calculation_info[0]]["class"],
+            expected_factory_results[risk_calculation_info[0]]["class"],
         )
         assert sorted(_risk_calculation._return_periods) == sorted(
-            _expected_factory_results["_return_periods"]
+            expected_factory_results["_return_periods"]
         )
         pd.testing.assert_frame_equal(
             _risk_calculation._to_integrate,
-            _expected_factory_results[risk_calculation_info[0]]["_to_integrate"],
+            expected_factory_results[risk_calculation_info[0]]["_to_integrate"],
         )
 
 
@@ -152,7 +151,7 @@ class TestRiskCalculation:
     def test_risk_calculation_result(
         self,
         risk_calculation_info: tuple[RiskCalculationModeEnum, int],
-        _losses: pd.DataFrame,
+        losses: pd.DataFrame,
     ):
         # 1. get the expected results
         _expected_result = pd.read_csv(
@@ -165,14 +164,14 @@ class TestRiskCalculation:
         risk_calculation = RiskCalculationFactory.get_risk_calculation(
             risk_calculation_mode=risk_calculation_info[0],
             risk_calculation_year=risk_calculation_info[1],
-            losses_gdf=_losses,
+            losses_gdf=losses,
         )
         risk = risk_calculation.integrate_df_trapezoidal()
-        _losses[f"risk_vlh_total_{risk_calculation_info[0].name.lower()}"] = risk
+        losses[f"risk_vlh_total_{risk_calculation_info[0].name.lower()}"] = risk
 
         # 3. Verify final expectations.
         pd.testing.assert_frame_equal(
-            _losses[[f"risk_vlh_total_{risk_calculation_info[0].name.lower()}"]],
+            losses[[f"risk_vlh_total_{risk_calculation_info[0].name.lower()}"]],
             _expected_result[
                 [f"risk_vlh_total_{risk_calculation_info[0].name.lower()}"]
             ],
