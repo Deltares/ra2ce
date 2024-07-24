@@ -5,8 +5,7 @@ from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateW
 
 class TestGetWlPrefix:
     @pytest.mark.parametrize(
-        "aggregate_wl",
-        "expected_prefix",
+        "aggregate_wl, expected_prefix",
         [
             pytest.param(
                 AggregateWlEnum.MAX,
