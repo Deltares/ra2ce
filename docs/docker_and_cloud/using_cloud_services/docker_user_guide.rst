@@ -6,6 +6,8 @@ Docker User Guide
 Introduction
 ---------------------------------
 This user guide introduces how to run Ra2ce in a public cloud environment.
+Make sure you have installed docker from the original source `<https://www.docker.com/products/docker-desktop/>`_ . 
+We assume the reader has a windows machine, otherwise please find the corresponding docker binaries for your own Operating System in the official `<https://docs.docker.com/desktop/>`_. 
 
 
 How to build the cloud docker image

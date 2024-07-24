@@ -1,4 +1,4 @@
-.. _kubernetes_deployement:
+.. _kubernetes_deployment:
 
 Deploying Kubernetes on Amazon EKS Cluster with Terraform
 =========================================================

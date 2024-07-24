@@ -22,3 +22,4 @@ In this subsection you can finde user guidelines on how to use all of them.
    docker_user_guide
    deltares_harbor
    deltares_hpc_user_guide
+   hackathon_user_guide
