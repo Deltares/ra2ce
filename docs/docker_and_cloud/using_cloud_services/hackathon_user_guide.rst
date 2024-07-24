@@ -40,14 +40,8 @@ First, lets bump the local ``ra2ce`` version (assume we work based on a ``v0.9.2
         increment detected: PATCH
 
 .. warning::
-    This creates a local tag, which you don't need to push (and it's best not to). If you wish to continue working without incrementing the patch number you can do the following:
+    This creates a local tag, which you don't need to push (and it's best not to).
     
-    - Modify any of the files from the repository.
-    - Commit the changes.
-    - Execute the above command without the ``--increment patch`` option: ::
-        
-        $ cz bump --devrelease 0 
-        bump: version 0.9.2 → 0.9.2.dev0
 
 We can build a docker image based on the docker file located in the repo
 
@@ -65,11 +59,44 @@ The command line looks like: ``(ra2ce_env) 4780e47b2a88:/ra2ce_src~$``, and you 
     .. code-block:: bash
     
         $ docker run -it ra2ce:latest python -c "import ra2ce; print(ra2ce.__version__)"
-        0.9.2.dev1
+        0.9.3.dev1
 
 
 Push a docker image
 -----------------------
+
+**Prerequiste**: have rights to publish on the registry (ask owner of the ra2ce project on registry) 
+ 
+
+The first time, you need to login and connect with the registry. Go to https://containers.deltares.nl and to the profile page to retrieve your personal CLI_SECRET, then run: 
+docker login -u <<deltares_email>> -p <<cli_secret>>https://containers.deltares.nl 
+
+Cd ra2ce 
+
+Docker build -t containers.deltares.nl/ra2ce/ra2ce:matthias_test .  (registry_name/project_name/container_name:tag_name) 
+
+ 
+
+You can the image: 
+
+Docker run -it containers.deltares.nl/ra2ce/ra2ce:matthias_test 
+
+Docker run -it containers.deltares.nl/ra2ce/ra2ce:matthias_test bash 
+
+Docker run -it containers.deltares.nl/ra2ce/ra2ce:matthias_test python 
+
+ 
+
+Then push to the online registry: 
+
+Docker push containers.deltares.nl/ra2ce/ra2ce:matthias_test 
+
+ 
+
+How to link to the Argo worfklow? 
+
+In image, specify the path of the image: containers.deltares.nl/ra2ce/ra2ce:matthias_test 
+
 
 Use argo workflows
 ----------------------
