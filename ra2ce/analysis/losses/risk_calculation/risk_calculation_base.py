@@ -12,10 +12,6 @@ class RiskCalculationBase(ABC):
     def __init__(self, risk_calculation_year: int, losses_gdf: gpd.GeoDataFrame):
         self.risk_calculation_year = risk_calculation_year
         self.losses_gdf = losses_gdf
-        self.__post_init__()
-
-    def __post_init__(self):
-        """Private method to __post_init__ computed attributes."""
         self._to_integrate = self._get_to_integrate()
         self._rework_damage_data()
 
