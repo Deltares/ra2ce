@@ -102,7 +102,8 @@ Use argo workflows
 
 - Have kubectl installed (:ref:`docker_user_guide_installation`)
 - Have argo installed (:ref:`argo_local_installation`)
-- Have aws installed (:ref:``)
+- Have aws installed (You can install and configure AWS CLI by following `the official user guidelines <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html>`_)
+
 
 1. In ``C:\Users\{you_username}\.aws``, modify ``config``, so that: 
 
