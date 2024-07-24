@@ -15,6 +15,8 @@ They can subsequently be retrieved as ``containers.deltares.nl/ra2ce/ra2ce:desir
 
 In addition, other branches can also be manually triggered from TeamCity. These images can be retrieved as ``containers.deltares.nl/ra2ce/ra2ce_name_of_the_branch:latest``
 
+.. _deltares_harbor_access_rights:
+
 Access permissions
 ------------------
 

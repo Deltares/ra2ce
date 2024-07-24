@@ -65,37 +65,37 @@ The command line looks like: ``(ra2ce_env) 4780e47b2a88:/ra2ce_src~$``, and you 
 Push a docker image
 -----------------------
 
-**Prerequiste**: have rights to publish on the registry (ask owner of the ra2ce project on registry) 
+**Prerequisites**: 
+    - Have rights to publish on the registry (check :ref:`_deltares_harbor_access_rights`).
+ 
+ We (re)build the image with the correct registry prefix.
+
+    .. code-block:: bash
+
+        cd ra2ce 
+        Docker build -t containers.deltares.nl/ra2ce/ra2ce:matthias_test .
+    
+    .. note::
+        (containers.deltares.nl/ra2ce/ra2ce:matthias_test) 
+        (registry_name/project_name/container_name:tag_name) 
  
 
-The first time, you need to login and connect with the registry. Go to https://containers.deltares.nl and to the profile page to retrieve your personal CLI_SECRET, then run: 
-docker login -u <<deltares_email>> -p <<cli_secret>>https://containers.deltares.nl 
+You can check again whether the image is correctly built with any of the following commands: 
 
-Cd ra2ce 
+    .. code-block:: bash
 
-Docker build -t containers.deltares.nl/ra2ce/ra2ce:matthias_test .  (registry_name/project_name/container_name:tag_name) 
+        docker run -it containers.deltares.nl/ra2ce/ra2ce:user_test 
+        docker run -it containers.deltares.nl/ra2ce/ra2ce:user_test bash 
+        docker run -it containers.deltares.nl/ra2ce/ra2ce:user_test python -c "import ra2ce; print(ra2ce.__version__)"
 
- 
-
-You can the image: 
-
-Docker run -it containers.deltares.nl/ra2ce/ra2ce:matthias_test 
-
-Docker run -it containers.deltares.nl/ra2ce/ra2ce:matthias_test bash 
-
-Docker run -it containers.deltares.nl/ra2ce/ra2ce:matthias_test python 
-
- 
 
 Then push to the online registry: 
 
-Docker push containers.deltares.nl/ra2ce/ra2ce:matthias_test 
+    .. code-block::
+        
+        docker push containers.deltares.nl/ra2ce/ra2ce:user_test 
 
  
-
-How to link to the Argo worfklow? 
-
-In image, specify the path of the image: containers.deltares.nl/ra2ce/ra2ce:matthias_test 
 
 
 Use argo workflows
