@@ -13,6 +13,15 @@ Before deploying Argo Workflows, ensure you have the following prerequisites:
 - An Amazon EKS cluster. Refer to the kubernetes_deployment.rst in the project directory for instructions on deploying an EKS cluster with Terraform.
 - ``kubectl`` configured to interact with the deployed EKS cluster.
 
+.. _argo_local_installation:
+
+Local installation
+------------------
+
+1. Download argo cli from the official website `<https://argo-workflows.readthedocs.io/en/latest/>`
+2. Move the ``argo.exe`` to your directory of preference, here we will say ``C:\\cloud\\argo``.
+3. Add said location to your ``PATH`` variables. 
+
 Deployment Steps
 ----------------
 

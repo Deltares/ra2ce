@@ -1,13 +1,33 @@
 .. _docker_user_guide:
 
+==================
 Docker User Guide
 ==================
 
+---------------------------------
 Introduction
 ---------------------------------
 This user guide introduces how to run Ra2ce in a public cloud environment.
-Make sure you have installed docker from the original source `<https://www.docker.com/products/docker-desktop/>`_ . 
-We assume the reader has a windows machine, otherwise please find the corresponding docker binaries for your own Operating System in the official `<https://docs.docker.com/desktop/>`_. 
+
+.. _docker_user_guide_installation:
+
+Installation
+--------------------
+
+We assume the reader has a windows machine, otherwise please find the corresponding binaries for your own Operating System. 
+
+
+- Docker:
+
+   Install docker from the original source `<https://www.docker.com/products/docker-desktop/>`_ . 
+
+- Kubernetes (kubectl):
+
+   Install kubernetes cli from the original website `<https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/>`_.
+
+.. note::
+   It is recommended having ``docker`` and ``kubectl`` in your ``PATH`` environment variables. 
+   Make sure your command line recognizes said commands in order to follow this user guide.
 
 
 How to build the cloud docker image
