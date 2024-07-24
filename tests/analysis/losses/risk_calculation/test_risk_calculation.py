@@ -116,7 +116,7 @@ def get_expected_factory_results() -> dict:
                 columns=[np.inf, 1000, 100, 1],
             ),
         },
-        "return_periods": {100, 1000},
+        "_return_periods": {100, 1000},
     }
     yield _expected_factory_results
 
@@ -139,8 +139,8 @@ class TestRiskCalculationFactory:
             _risk_calculation,
             _expected_factory_results[risk_calculation_info[0]]["class"],
         )
-        assert sorted(_risk_calculation.return_periods) == sorted(
-            _expected_factory_results["return_periods"]
+        assert sorted(_risk_calculation._return_periods) == sorted(
+            _expected_factory_results["_return_periods"]
         )
         pd.testing.assert_frame_equal(
             _risk_calculation._to_integrate,
