@@ -4,12 +4,10 @@
 Docker User Guide
 ==================
 
----------------------------------
-Introduction
----------------------------------
 This user guide introduces how to run Ra2ce in a public cloud environment.
 
 .. _docker_user_guide_installation:
+
 
 Installation
 --------------------
@@ -54,7 +52,7 @@ Remark that this is a local image only.
 
 
 Running Ra2ce Docker container locally
---------------------------------------
+======================================
 
 To run the Docker container locally you can execute the following command:
 
@@ -75,8 +73,9 @@ If you wish to include files (i.e. input files and run files) you can mount fold
 
 After that you can call run_race.py. Output files will be available in the acceptance_test_data folder
 
+
 Running Ra2ce container in a cloud environment
-----------------------------------------------
+===============================================
 
 In the local example you are running a Docker container entirely locally and thus can mount your own hard drive with input data.
 
@@ -92,13 +91,15 @@ Currently we have tested Ra2ce using the following tech stack:
 - AWS S3 as data storage layer.
 - Argo Workflow as workflow orchestrator. If there is no Argo deployment currently available see ``/infra/workflow/README.md`` on how to deploy Argo.
 
+
 Running a singular Ra2ce container in Kubernetes
 -------------------------------------------------
 
 In Kubernetes, you can deploy Docker containers stored in container registries such as Docker Hub or any other container registry provider. This guide illustrates how to run a Docker container from an existing container registry using ``kubectl``.
 
+
 Prerequisites
--------------
+^^^^^^^^^^^^^^
 
 Before following this guide, ensure you have the following:
 
@@ -106,8 +107,9 @@ Before following this guide, ensure you have the following:
 - ``kubectl`` installed and configured to connect to your Kubernetes cluster.
 - Docker container image pushed to a container registry accessible to your Kubernetes cluster.
 
+
 Steps
------
+^^^^^^
 
 1. **List Available Images**: First, list the available Docker container images in your container registry. You will need the full image name for the subsequent steps.
 
@@ -149,16 +151,15 @@ Steps
 
      Replace ``<command>`` with the command you want to execute in the container.
 
+
 Running a Ra2ce workflow in Argo
 ---------------------------------
 
-Introduction
-------------
-
 Argo Workflows is an open-source workflow engine optimized for Kubernetes. This guide demonstrates how to run a simple Argo workflow on your Kubernetes cluster.
 
+
 Prerequisites
--------------
+^^^^^^^^^^^^^^
 
 Before following this guide, ensure you have the following:
 
@@ -166,8 +167,9 @@ Before following this guide, ensure you have the following:
 - ``kubectl`` installed and configured to connect to your Kubernetes cluster.
 - Argo Workflows installed in your Kubernetes cluster. You can install Argo Workflows by following the official documentation: `<https://argoproj.github.io/argo-workflows/>`_
 
+
 Steps
------
+^^^^^^
 
 1. **Create Workflow YAML**: Create a workflow YAML file specifying the steps of your workflow. An example YAML file is available in ``/infra/workflow/pod.yaml``:
 
