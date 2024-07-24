@@ -25,14 +25,15 @@ Build and run a docker image
 ---------------------------------
 
 **Prerequisites**: 
+
     - Have docker desktop installed and the application open (check introduction of :ref:`docker_user_guide`). 
-    - Have the ``ra2ce`` repository checked out in your machine (check how to install ``ra2ce`` in :ref:`_install_ra2ce_devmode`).
-        - This guideline will be based on a checkout tagged version ``v0.9.2``
+    - Have the ``ra2ce`` repository checked out in your machine (check how to install ``ra2ce`` in :ref:`install_ra2ce_devmode`).
     - Run a command line using said check-out as your working directory.
 
-First, lets bump the local ``ra2ce`` version so we can track whether our image has been correctly built later on.
+First, lets bump the local ``ra2ce`` version (assume we work based on a ``v0.9.2`` ``ra2ce`` checkout) so we can track whether our image has been correctly built later on.
 
     .. code-block:: bash
+        
         $ cz bump --devrelease 0 --increment patch
         bump: version 0.9.2 → 0.9.3.dev0
         tag to create: v0.9.3
@@ -51,28 +52,24 @@ First, lets bump the local ``ra2ce`` version so we can track whether our image h
 We can build a docker image based on the docker file located in the repo
 
     .. code-block:: bash
+
         cd ra2ce 
         docker build -t ra2ce:latest . 
         docker images        (this returns a list of all images available.) 
         docker run -it ra2ce:latest /bin/bash       (adapt IMAGE_ID) 
 
  
-The command line looks like: ``(ra2ce_env) 4780e47b2a88:~$ ``, and you can navigate it by using ``cd`` and ``ls`` (it's a Linux container).
+The command line looks like: ``(ra2ce_env) 4780e47b2a88:/ra2ce_src~$``, and you can navigate it by using ``cd`` and ``ls`` (it's a Linux container).
 ``ra2ce`` should be installed in the image and ready to be used as a "package", you can verify its installation by simply running:
+    
     .. code-block:: bash
+    
         $ docker run -it ra2ce:latest python -c "import ra2ce; print(ra2ce.__version__)"
         0.9.2.dev1
 
 
-Do now ``cd`` to the directory of the python and run: 
-
-python -m workflow_hazard_overlay.py 
-
-Poetry install      (if necessary) 
-
-
-2. Push a docker image
+Push a docker image
 -----------------------
 
-3. Use argo workflows
+Use argo workflows
 ----------------------
