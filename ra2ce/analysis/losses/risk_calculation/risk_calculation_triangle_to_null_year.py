@@ -1,8 +1,4 @@
-from abc import ABC
-import geopandas as gpd
 import logging
-
-import numpy as np
 
 from ra2ce.analysis.losses.risk_calculation.risk_calculation_base import (
     RiskCalculationBase,
@@ -20,7 +16,7 @@ class RiskCalculationTriangleToNullYear(RiskCalculationBase):
         Rework the damage data to make it suitable for integration (risk calculation) in triangle_to_null_year mode
         """
         if (
-            self.risk_calculation_year >= self.min_return_period
+            self.risk_calculation_year >= self._min_return_period
             and self.risk_calculation_year != 0
         ):
             raise ValueError(
@@ -29,7 +25,7 @@ class RiskCalculationTriangleToNullYear(RiskCalculationBase):
             Return period of the triangle ({}) >= smallest available return period ({})
             Use 'default' mode or 'cut_from' instead.
                                 """.format(
-                    self.risk_calculation_year, self.min_return_period
+                    self.risk_calculation_year, self._min_return_period
                 )
             )
 
@@ -39,7 +35,7 @@ class RiskCalculationTriangleToNullYear(RiskCalculationBase):
             )
             self.risk_calculation_year = 1
 
-        self._to_integrate[float("inf")] = self._to_integrate[self.max_return_period]
+        self._to_integrate[float("inf")] = self._to_integrate[self._max_return_period]
 
         # At the return period of the self.risk_calculation_year, set all damage values to zero
         self._to_integrate[self.risk_calculation_year] = 0
@@ -57,8 +53,8 @@ class RiskCalculationTriangleToNullYear(RiskCalculationBase):
                                     - at the end of the triangle {}, damage = 0
 
                                 """.format(
-                self.max_return_period,
-                self.max_return_period,
+                self._max_return_period,
+                self._max_return_period,
                 self.risk_calculation_year,
             )
         )

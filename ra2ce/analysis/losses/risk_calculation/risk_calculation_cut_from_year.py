@@ -1,5 +1,3 @@
-from abc import ABC
-import geopandas as gpd
 import logging
 
 import numpy as np
@@ -18,28 +16,30 @@ class RiskCalculationCutFromYear(RiskCalculationBase):
         """
         Rework the damage data to make it suitable for integration (risk calculation) in cut_from_year mode
         """
-        if self.risk_calculation_year <= self.min_return_period:
+        if self.risk_calculation_year <= self._min_return_period:
             raise ValueError(
                 """
             RA2CE cannot calculate risk in 'cut_from' mode if 
             Return period of the cutoff ({}) <= smallest available return period ({})
             Use 'default' mode or 'triangle_to_null_mode' instead.
                                 """.format(
-                    self.risk_calculation_year, self.min_return_period
+                    self.risk_calculation_year, self._min_return_period
                 )
             )
         elif (
-            self.min_return_period < self.risk_calculation_year < self.max_return_period
+            self._min_return_period
+            < self.risk_calculation_year
+            < self._max_return_period
         ):
-            if self.risk_calculation_year in self.return_periods:
+            if self.risk_calculation_year in self._return_periods:
                 _dropcols = [
-                    rp for rp in self.return_periods if rp < self.risk_calculation_year
+                    rp for rp in self._return_periods if rp < self.risk_calculation_year
                 ]
                 self._to_integrate.drop(columns=_dropcols, inplace=True)
             else:
                 # Copy the maximum return period with an infinitely high damage
                 self._to_integrate[float("inf")] = self._to_integrate[
-                    self.max_return_period
+                    self._max_return_period
                 ]
 
                 self._to_integrate[self.risk_calculation_year] = np.nan
@@ -65,23 +65,23 @@ class RiskCalculationCutFromYear(RiskCalculationBase):
                                         - no damage for al RPs > RP_cutoff ({})
     
                                     """.format(
-                    self.max_return_period,
-                    self.max_return_period,
+                    self._max_return_period,
+                    self._max_return_period,
                     self.risk_calculation_year,
                 )
             )
 
         elif (
-            self.risk_calculation_year >= self.max_return_period
+            self.risk_calculation_year >= self._max_return_period
         ):  # cutoff is larger or equal than the largest return period
             # risk is return frequency of cutoff
             # times the damage to the most extreme event
             self._to_integrate = self._to_integrate.fillna(0)
             self._to_integrate[self.risk_calculation_year] = self._to_integrate[
-                self.max_return_period
+                self._max_return_period
             ]
             self._to_integrate[float("inf")] = self._to_integrate[
-                self.max_return_period
+                self._max_return_period
             ]
             self._to_integrate = self._to_integrate[
                 [self.risk_calculation_year, float("inf")]

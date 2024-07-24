@@ -16,24 +16,24 @@ class RiskCalculationBase(ABC):
         self._rework_damage_data()
 
     @property
-    def return_periods(self) -> set[int]:
+    def _return_periods(self) -> set[int]:
         return self._get_return_periods()
 
     @property
-    def max_return_period(self) -> int:
-        return max(self.return_periods)
+    def _max_return_period(self) -> int:
+        return max(self._return_periods)
 
     @property
-    def min_return_period(self) -> int:
-        return min(self.return_periods)
+    def _min_return_period(self) -> int:
+        return min(self._return_periods)
 
     def _get_return_periods(self):
         # Find the hazard columns; these may be events or return periods
         hazard_column = [c for c in self.losses_gdf.columns if c.startswith("RP")]
-        return_periods = set(
+        rps = set(
             [float(x.split("_")[0].replace("RP", "")) for x in hazard_column]
-        )  # set of unique return_periods
-        return return_periods
+        )  # set of unique rps
+        return rps
 
     def _get_to_integrate(self) -> gpd.GeoDataFrame:
         def _extract_columns_by_pattern(
