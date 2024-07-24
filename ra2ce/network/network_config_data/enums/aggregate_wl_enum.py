@@ -8,5 +8,6 @@ class AggregateWlEnum(Ra2ceEnumBase):
     MEAN = 3
     INVALID = 99
 
-    def get_suffix(self):
+    def get_wl_prefix(self):
+        """gets the first two letters of the Enum.name used in hazard overlay, damages and losses analysis."""
         return self.name[:2].lower()
