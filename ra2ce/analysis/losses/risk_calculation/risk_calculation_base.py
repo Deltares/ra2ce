@@ -27,7 +27,7 @@ class RiskCalculationBase(ABC):
     def _min_return_period(self) -> int:
         return min(self._return_periods)
 
-    def _get_return_periods(self):
+    def _get_return_periods(self) -> set:
         # Find the hazard columns; these may be events or return periods
         hazard_column = [c for c in self.losses_gdf.columns if c.startswith("RP")]
         rps = set(

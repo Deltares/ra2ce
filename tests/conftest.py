@@ -27,7 +27,7 @@ def _get_valid_analysis_ini_fixture() -> Iterator[Path]:
     yield _ini_file
 
 
-@pytest.fixture(name="losses")
+@pytest.fixture(name="losses_fixture")
 def get_losses() -> pd.DataFrame:
     assert test_data.joinpath(
         "losses", "csv_data_for_losses", "results_test_calc_vlh.csv"

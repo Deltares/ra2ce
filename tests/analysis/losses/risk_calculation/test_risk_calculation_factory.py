@@ -13,12 +13,12 @@ class TestRiskCalculationFactory:
         self,
         risk_calculation_info: tuple[RiskCalculationModeEnum, int],
         expected_factory_results: dict,
-        losses: pd.DataFrame,
+        losses_fixture: pd.DataFrame,
     ):
         _risk_calculation = RiskCalculationFactory.get_risk_calculation(
             risk_calculation_mode=risk_calculation_info[0],
             risk_calculation_year=risk_calculation_info[1],
-            losses_gdf=losses,
+            losses_gdf=losses_fixture,
         )
 
         assert isinstance(
