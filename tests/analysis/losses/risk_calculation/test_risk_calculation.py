@@ -11,7 +11,7 @@ from tests import test_data
 class TestRiskCalculation:
     def test_risk_calculation_result(
         self,
-        risk_calculation_info: tuple[RiskCalculationModeEnum, int],
+        risk_calculation_info_fixture: tuple[RiskCalculationModeEnum, int],
         losses_fixture: pd.DataFrame,
     ):
         # 1. get the expected results
@@ -23,18 +23,22 @@ class TestRiskCalculation:
 
         # 2. run
         risk_calculation = RiskCalculationFactory.get_risk_calculation(
-            risk_calculation_mode=risk_calculation_info[0],
-            risk_calculation_year=risk_calculation_info[1],
+            risk_calculation_mode=risk_calculation_info_fixture[0],
+            risk_calculation_year=risk_calculation_info_fixture[1],
             losses_gdf=losses_fixture,
         )
         risk = risk_calculation.integrate_df_trapezoidal()
-        losses_fixture[f"risk_vlh_total_{risk_calculation_info[0].name.lower()}"] = risk
+        losses_fixture[
+            f"risk_vlh_total_{risk_calculation_info_fixture[0].name.lower()}"
+        ] = risk
 
         # 3. Verify final expectations.
         pd.testing.assert_frame_equal(
-            losses_fixture[[f"risk_vlh_total_{risk_calculation_info[0].name.lower()}"]],
+            losses_fixture[
+                [f"risk_vlh_total_{risk_calculation_info_fixture[0].name.lower()}"]
+            ],
             _expected_result[
-                [f"risk_vlh_total_{risk_calculation_info[0].name.lower()}"]
+                [f"risk_vlh_total_{risk_calculation_info_fixture[0].name.lower()}"]
             ],
             rtol=1e-0,
             atol=1e-2,

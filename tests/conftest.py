@@ -28,14 +28,12 @@ def _get_valid_analysis_ini_fixture() -> Iterator[Path]:
 
 
 @pytest.fixture(name="losses_fixture")
-def get_losses() -> pd.DataFrame:
-    assert test_data.joinpath(
+def get_losses_fixture() -> Iterator[pd.DataFrame]:
+    _csv_results_filepath = test_data.joinpath(
         "losses", "csv_data_for_losses", "results_test_calc_vlh.csv"
-    ).exists()
-
-    _test_calc_vlh = pd.read_csv(
-        test_data.joinpath("losses", "csv_data_for_losses", "results_test_calc_vlh.csv")
     )
+    assert _csv_results_filepath.exists()
+    _test_calc_vlh = pd.read_csv(_csv_results_filepath)
     yield _test_calc_vlh.drop(
         columns=[
             "EV1_ma",
@@ -116,9 +114,9 @@ def get_expected_factory_results() -> dict:
             id=RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR.name.lower(),
         ),
     ],
-    name="risk_calculation_info",
+    name="risk_calculation_info_fixture",
 )
-def _get_risk_calculation_info(
+def _get_risk_calculation_info_fixture(
     request: pytest.FixtureRequest,
 ) -> Iterator[tuple[RiskCalculationModeEnum, int]]:
     _risk_calculation_info = request.param
