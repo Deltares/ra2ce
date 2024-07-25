@@ -1,4 +1,5 @@
 import logging
+import geopandas as gpd
 
 from ra2ce.analysis.losses.risk_calculation.risk_calculation_base import (
     RiskCalculationBase,
@@ -11,10 +12,11 @@ class RiskCalculationTriangleToNullYear(RiskCalculationBase):
     and the area of the Triangle this creates is also calculated
     """
 
-    def _rework_damage_data(self):
+    def _get_network_risk_calculations(self) -> gpd.GeoDataFrame:
         """
         Rework the damage data to make it suitable for integration (risk calculation) in triangle_to_null_year mode
         """
+        _data_to_integrate = self._get_to_integrate()
         if (
             self.risk_calculation_year >= self._min_return_period
             and self.risk_calculation_year != 0
@@ -35,16 +37,16 @@ class RiskCalculationTriangleToNullYear(RiskCalculationBase):
             )
             self.risk_calculation_year = 1
 
-        self._to_integrate[float("inf")] = self._to_integrate[self._max_return_period]
+        _data_to_integrate[float("inf")] = _data_to_integrate[self._max_return_period]
 
         # At the return period of the self.risk_calculation_year, set all damage values to zero
-        self._to_integrate[self.risk_calculation_year] = 0
+        _data_to_integrate[self.risk_calculation_year] = 0
 
-        self._to_integrate = self._to_integrate.sort_index(
+        _data_to_integrate = _data_to_integrate.sort_index(
             axis="columns", ascending=False
         )  # from large to small RP
 
-        self._to_integrate = self._to_integrate.fillna(0)
+        _data_to_integrate = _data_to_integrate.fillna(0)
 
         logging.info(
             """Risk calculation runs in 'triangle to null' mode. 
@@ -58,3 +60,4 @@ class RiskCalculationTriangleToNullYear(RiskCalculationBase):
                 self.risk_calculation_year,
             )
         )
+        return _data_to_integrate

@@ -1,4 +1,5 @@
 import logging
+import geopandas as gpd
 
 import numpy as np
 
@@ -12,10 +13,11 @@ class RiskCalculationCutFromYear(RiskCalculationBase):
     In this mode, the integration mimics the presence of a flood protection
     """
 
-    def _rework_damage_data(self):
+    def _get_network_risk_calculations(self) -> gpd.GeoDataFrame:
         """
         Rework the damage data to make it suitable for integration (risk calculation) in cut_from_year mode
         """
+        _data_to_integrate = self._get_to_integrate()
         if self.risk_calculation_year <= self._min_return_period:
             raise ValueError(
                 """
@@ -35,26 +37,26 @@ class RiskCalculationCutFromYear(RiskCalculationBase):
                 _dropcols = [
                     rp for rp in self._return_periods if rp < self.risk_calculation_year
                 ]
-                self._to_integrate.drop(columns=_dropcols, inplace=True)
+                _data_to_integrate.drop(columns=_dropcols, inplace=True)
             else:
                 # Copy the maximum return period with an infinitely high damage
-                self._to_integrate[float("inf")] = self._to_integrate[
+                _data_to_integrate[float("inf")] = _data_to_integrate[
                     self._max_return_period
                 ]
 
-                self._to_integrate[self.risk_calculation_year] = np.nan
-                self._to_integrate.interpolate(method="index", axis=1, inplace=True)
+                _data_to_integrate[self.risk_calculation_year] = np.nan
+                _data_to_integrate.interpolate(method="index", axis=1, inplace=True)
 
                 _dropcols = [
                     c
-                    for c in self._to_integrate.columns
+                    for c in _data_to_integrate.columns
                     if c < self.risk_calculation_year
                 ]
-                self._to_integrate.drop(columns=_dropcols, inplace=True)
-                self._to_integrate = self._to_integrate.fillna(0)
+                _data_to_integrate.drop(columns=_dropcols, inplace=True)
+                _data_to_integrate = _data_to_integrate.fillna(0)
 
-                self._to_integrate = self._to_integrate[
-                    sorted(self._to_integrate.columns, reverse=True)
+                _data_to_integrate = _data_to_integrate[
+                    sorted(_data_to_integrate.columns, reverse=True)
                 ]
 
             logging.info(
@@ -76,13 +78,14 @@ class RiskCalculationCutFromYear(RiskCalculationBase):
         ):  # cutoff is larger or equal than the largest return period
             # risk is return frequency of cutoff
             # times the damage to the most extreme event
-            self._to_integrate = self._to_integrate.fillna(0)
-            self._to_integrate[self.risk_calculation_year] = self._to_integrate[
+            _data_to_integrate = _data_to_integrate.fillna(0)
+            _data_to_integrate[self.risk_calculation_year] = _data_to_integrate[
                 self._max_return_period
             ]
-            self._to_integrate[float("inf")] = self._to_integrate[
+            _data_to_integrate[float("inf")] = _data_to_integrate[
                 self._max_return_period
             ]
-            self._to_integrate = self._to_integrate[
+            _data_to_integrate = _data_to_integrate[
                 [self.risk_calculation_year, float("inf")]
             ]
+        return _data_to_integrate

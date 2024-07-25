@@ -28,7 +28,3 @@ class TestRiskCalculationFactory:
         assert sorted(_risk_calculation._return_periods) == sorted(
             expected_factory_results["_return_periods"]
         )
-        pd.testing.assert_frame_equal(
-            _risk_calculation._to_integrate,
-            expected_factory_results[risk_calculation_info_fixture[0]]["_to_integrate"],
-        )

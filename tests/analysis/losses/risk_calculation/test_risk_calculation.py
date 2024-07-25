@@ -27,7 +27,7 @@ class TestRiskCalculation:
             risk_calculation_year=risk_calculation_info_fixture[1],
             losses_gdf=losses_fixture,
         )
-        risk = risk_calculation.integrate_df_trapezoidal()
+        risk = risk_calculation.get_integration_of_df_trapezoidal()
         losses_fixture[
             f"risk_vlh_total_{risk_calculation_info_fixture[0].name.lower()}"
         ] = risk

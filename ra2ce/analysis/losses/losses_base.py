@@ -530,7 +530,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                 risk_calculation_year=self.analysis.risk_calculation_year,
                 losses_gdf=self.result,
             )
-            risk = risk_calculation.integrate_df_trapezoidal()
+            risk = risk_calculation.get_integration_of_df_trapezoidal()
             self.result[f"risk_vlh_total"] = risk
 
         return self.result

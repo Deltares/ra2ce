@@ -12,8 +12,6 @@ class RiskCalculationBase(ABC):
     def __init__(self, risk_calculation_year: int, losses_gdf: gpd.GeoDataFrame):
         self.risk_calculation_year = risk_calculation_year
         self.losses_gdf = losses_gdf
-        self._to_integrate = self._get_to_integrate()
-        self._rework_damage_data()
 
     @property
     def _return_periods(self) -> set[int]:
@@ -63,10 +61,10 @@ class RiskCalculationBase(ABC):
         return _to_integrate
 
     @abstractmethod
-    def _rework_damage_data(self):
+    def _get_network_risk_calculations(self) -> gpd.GeoDataFrame:
         pass
 
-    def integrate_df_trapezoidal(self) -> np.array:
+    def get_integration_of_df_trapezoidal(self) -> np.array:
         """
         Arguments:
             *df* (pd.DataFrame) :
@@ -77,7 +75,6 @@ class RiskCalculationBase(ABC):
             np. Array : integrated result per row
 
         """
-        # convert return periods to frequencies
-        values = self._to_integrate.values
-        frequencies = sorted(1 / rp for rp in self._to_integrate.columns)
-        return np.trapz(values, frequencies, axis=1)
+        _risk_calculations = self._get_network_risk_calculations()
+        frequencies = sorted(1 / rp for rp in _risk_calculations.columns)
+        return np.trapz(_risk_calculations.values, frequencies, axis=1)
