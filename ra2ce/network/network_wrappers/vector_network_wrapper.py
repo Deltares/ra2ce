@@ -20,6 +20,7 @@
 """
 
 import logging
+import math
 from pathlib import Path
 from typing import Any
 
@@ -39,6 +40,7 @@ from ra2ce.network.network_simplification import NetworkGraphSimplificator
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
+from ra2ce.network.segmentation import Segmentation
 
 
 class VectorNetworkWrapper(NetworkWrapperProtocol):
@@ -68,6 +70,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         self.output_graph_dir = config_data.output_graph_dir
 
         # Cleanup
+        self.segmentation_length = config_data.cleanup.segmentation_length
         self.delete_duplicate_nodes = config_data.cleanup.delete_duplicate_nodes
 
     def get_network(
@@ -110,6 +113,13 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         logging.info("Start converting the graph to a geodataframe")
         edges_complex, _ = nut.graph_to_gdf(graph_complex)
         logging.info("Finished converting the graph to a geodataframe")
+
+        # Segment the complex graph
+        if not math.isnan(self.segmentation_length):
+            edges_complex = Segmentation(edges_complex, self.segmentation_length)
+            edges_complex = edges_complex.apply_segmentation()
+            if edges_complex.crs is None:  # The CRS might have disappeared.
+                edges_complex.crs = self.crs  # set the right CRS
 
         # Save the link tables linking complex and simple IDs
         self._export_linking_tables(link_tables)

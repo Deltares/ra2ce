@@ -34,7 +34,7 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
 
     Variables:
         *self.edges_input* (Geopandas DataFrame) : the edges that are to be segmented
-        *self.segmentation_length* (float) : segmentation lenght in degrees #Todo also in meters?
+        *self.segmentation_length* (float) : segmentation length in degrees #Todo also in meters?
         *self.save_files* (Boolean) : save segmented graph?
 
     Result:
@@ -52,7 +52,7 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
         self.segmentation_length = segmentation_length
         self.save_files = save_files  # Todo not implemented yet
 
-    def apply_segmentation(self):
+    def apply_segmentation(self) -> gpd.GeoDataFrame:
         self.cut_gdf()
         logging.info(
             "Finished segmenting the geodataframe with split length: {} degree".format(

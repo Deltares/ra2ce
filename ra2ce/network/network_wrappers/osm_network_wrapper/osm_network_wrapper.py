@@ -18,6 +18,7 @@
 from __future__ import annotations
 
 import logging
+import math
 from pathlib import Path
 from typing import Any
 
@@ -46,6 +47,7 @@ from ra2ce.network.network_wrappers.osm_network_wrapper.osm_utils import (
     is_endnode_check,
     modify_graph,
 )
+from ra2ce.network.segmentation import Segmentation
 
 
 class OsmNetworkWrapper(NetworkWrapperProtocol):
@@ -66,6 +68,9 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         self.road_types = config_data.network.road_types
         self.polygon_graph = self._get_clean_graph_from_osm(config_data.network.polygon)
         self.is_directed = config_data.network.directed
+
+        # Cleanup
+        self.segmentation_length = config_data.cleanup.segmentation_length
 
     @classmethod
     def with_polygon(
@@ -152,6 +157,13 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         logging.info("Start converting the graph to a geodataframe")
         edges_complex, _ = nut.graph_to_gdf(graph_complex)
         logging.info("Finished converting the graph to a geodataframe")
+
+        # Segment the complex graph
+        if not math.isnan(self.segmentation_length):
+            edges_complex = Segmentation(edges_complex, self.segmentation_length)
+            edges_complex = edges_complex.apply_segmentation()
+            if edges_complex.crs is None:  # The CRS might have disappeared.
+                edges_complex.crs = self.graph_crs  # set the right CRS
 
         # Save the link tables linking complex and simple IDs
         self._export_linking_tables(link_tables)
