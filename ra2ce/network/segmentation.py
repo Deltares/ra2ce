@@ -76,9 +76,12 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
         )  # reference at the equator. The conversion is more accurate at the equator and changes as you move towards the poles.
 
         # Calculate the destination point segmentation_length_in_metre north (latitude direction)
-        distance.geodesic.ELLIPSOID = self.edges_input.crs.ellipsoid.name.replace(
-            " ", "-"
-        )
+        try:
+            distance.geodesic.ELLIPSOID = self.edges_input.crs.ellipsoid.name.replace(
+                " ", "-"
+            )
+        except:
+            distance.geodesic.ELLIPSOID = "WGS-84"
 
         destination_point_lat = distance.geodesic(
             meters=segmentation_length_in_metre
