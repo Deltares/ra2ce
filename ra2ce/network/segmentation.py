@@ -21,8 +21,10 @@
 
 import logging
 from decimal import Decimal
+from typing import Union
 
 import geopandas as gpd
+from geopy import distance
 from shapely.geometry import LineString, MultiLineString, Point
 
 from ra2ce.network.networks_utils import cut as network_cut
@@ -34,7 +36,7 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
 
     Variables:
         *self.edges_input* (Geopandas DataFrame) : the edges that are to be segmented
-        *self.segmentation_length* (float) : segmentation length in degrees #Todo also in meters?
+        *self.segmentation_length* (float) : segmentation length in metres
         *self.save_files* (Boolean) : save segmented graph?
 
     Result:
@@ -43,14 +45,48 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
 
     """
 
-    def __init__(self, edges_input, segmentation_length, save_files: bool = False):
+    def __init__(
+        self,
+        edges_input: gpd.GeoDataFrame,
+        segmentation_length: float,
+        save_files: bool = False,
+    ):
         # General
         self.edges_input = edges_input  # Edges GeoDataFrame
         self.edges_segmented = (
             None  # This is where the result will be saved Edges GeoDataframe
         )
-        self.segmentation_length = segmentation_length
+        self.link_tables = (
+            None  # will include dictionaries simple_ids to complex and vice-versa
+        )
+        self._get_segmentation_length_from_metre(segmentation_length)
         self.save_files = save_files  # Todo not implemented yet
+
+    def _get_segmentation_length_from_metre(self, segmentation_length_in_metre: float):
+        """
+        Convert a length in meters to degrees at a given latitude.
+
+        Args:
+        - segmentation_length_in_metre: Length in meters to be converted.
+        """
+
+        origin = (
+            0,
+            0,
+        )  # reference at the equator. The conversion is more accurate at the equator and changes as you move towards the poles.
+
+        # Calculate the destination point segmentation_length_in_metre north (latitude direction)
+        distance.geodesic.ELLIPSOID = self.edges_input.crs.ellipsoid.name.replace(
+            " ", "-"
+        )
+
+        destination_point_lat = distance.geodesic(
+            meters=segmentation_length_in_metre
+        ).destination(origin, bearing=0)
+
+        self.segmentation_length = (
+            destination_point_lat.latitude - origin[0]
+        )  # length in degrees
 
     def apply_segmentation(self) -> gpd.GeoDataFrame:
         self.cut_gdf()
@@ -127,7 +163,7 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
             split_length (float): Length by which to split the linestring into equal segments.
 
         Returns:
-            result_list (list): List of LineString objects that all have the same length split_lenght.
+            result_list (list): list of LineString objects that all have the same length split_lenght.
         """
 
         n_segments = self.number_of_segments(linestring, split_length)
@@ -173,7 +209,7 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
         for column in columns:
             data[column] = []
 
-        count = 0
+        count = 1
         for _, row in gdf.iterrows():
             geom = row["geometry"]
             assert type(geom) == LineString or type(geom) == MultiLineString
@@ -188,3 +224,50 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
                 data["splt_id"].append(count)
                 count += 1
         self.edges_segmented = gpd.GeoDataFrame(data)
+
+    def generate_link_tables(
+        self,
+    ) -> tuple[dict[int, Union[int, list[int]]], dict[int, int]]:
+        """
+        Generate mappings from a GeoDataFrame and two dictionaries.
+
+        Args:
+        - dicts: Tuple of two dictionaries.
+            - First dictionary maps rfid to rfid_c (integer or list of integers).
+            - Second dictionary maps rfid_c to rfid (integer).
+
+        Returns:
+        - A tuple containing two dictionaries:
+            - The first dictionary maps rfid to splt_id or list of splt_id.
+            - The second dictionary maps splt_id to rfid.
+        """
+        # Initialize result dictionaries
+        splt_id_to_rfid = {}
+        rfid_to_splt_id = {}
+
+        # Create a mapping from splt_id to rfid
+        for _, row in self.edges_segmented.iterrows():
+            splt_id = row["splt_id"]
+            rfid = row["rfid"]
+            splt_id_to_rfid[splt_id] = rfid
+
+        # Create a mapping from rfid to splt_id
+        for _, row in self.edges_segmented.iterrows():
+            splt_id = row["splt_id"]
+            rfid = row["rfid"]
+            rfid_c = row["rfid_c"]
+
+            # Determine the expected rfid from rfid_c
+            if rfid in rfid_to_splt_id:
+                if isinstance(rfid_to_splt_id[rfid], list):
+                    rfid_to_splt_id[rfid].append(splt_id)
+                else:
+                    rfid_to_splt_id[rfid] = [rfid_to_splt_id[rfid], splt_id]
+            else:
+                rfid_to_splt_id[rfid] = splt_id
+
+        # Sort the dictionaries by their keys
+        splt_id_to_rfid_sorted = dict(sorted(splt_id_to_rfid.items()))
+        rfid_to_splt_id_sorted = dict(sorted(rfid_to_splt_id.items()))
+        self.link_tables = (rfid_to_splt_id_sorted, splt_id_to_rfid_sorted)
+        return self.link_tables
