@@ -2,11 +2,11 @@
 
 Analysis module
 ================
-RA2CE's analysis module can perform several analyses on infrastructure networks. First, a network needs te be created. Visit the :ref:`network_module` for a better understanding of how this works. In the analysis module we distuingish a module focused on direct monetary road damages (damages) and an analysis module for network criticality and origin-destination analyses (losses). The latter are developed from a 'societal losses due to hazards' point of view and provide insight into the hazard impact on the network and the disruption of network services to society. 
+RA2CE's analysis module can perform several analyses on infrastructure networks. First, a network needs te be created. Visit the :ref:`network_module` for a better understanding of how this works. In the analysis module we distinguish a module focused on direct monetary road damages (damages) and an analysis module for network criticality and origin-destination analyses (losses). The latter are developed from a 'societal losses due to hazards' point of view and provide insight into the hazard impact on the network and the disruption of network services to society.
 
-Direct/physical damages
+Damages
 -------------------------------------
-The physical ‘damage to the network’ depends on the intensity of the hazard in relation to how the network (and its assets) are built and its current condition (e.g. type, state of maintenance, dimensions). Here, the hazard intensity and asset condition are linked to a percentage of damage, via vulnerability functions/ fragility curves. To develop these vulnerability curves data is needed about replacements costs per asset type and the potential damage per hazard intensity. This data can be collected during a workshop with for example national road agencies and the technicians. The output of the analyses consist of damage maps per hazard (e.g. flooding, landslides), per return period or per event, per asset and per road segment.
+The physical *damage to the network* (referred to as damages here) depends on the intensity of the hazard in relation to how the network (and its assets) are built and its current condition (e.g. type, state of maintenance, dimensions). Here, the hazard intensity and asset condition are linked to a percentage of damage, via vulnerability functions/ fragility curves. To develop these vulnerability curves data is needed about replacements costs per asset type and the potential damage per hazard intensity. This data can be collected during a workshop with for example national road agencies and the technicians. The output of the analyses consist of damage maps per hazard (e.g. flooding, landslides), per return period or per event, per asset and per road segment.
 
 Possible (built-in) options for vulnerability curves include:
 
@@ -84,14 +84,16 @@ Possible (built-in) options for vulnerability curves include:
     save_shp = True
     save_csv = True
 
-Indirect losses / Network criticality
+Losses / Network criticality
 -------------------------------------
 
 ======================================================   =====================
 Analysis                                                   Name in analysis.ini
 ======================================================   =====================
-Single link redundancy                                   single_link_redundancy
+Single-link redundancy                                   single_link_redundancy
 Multi-link redundancy                                    multi_link_redundancy
+Single-link losses                                       single_link_losses
+Multi-link losses                                        multi_link_losses
 Origin-Destination, defined OD couples, no disruption    optimal_route_origin_destination
 Origin-Destination, defined OD couples, no disruption    multi_link_origin_destination
 Origin-Destination, O to closest D, disruption           optimal_route_origin_closest_destination
@@ -101,7 +103,7 @@ Equity and traffic analysis                              part of optimal_route_o
 ======================================================   =====================
 
 **Single link redundancy**
-With this analysis, you gain insight into the criticality of each link in the network. A redundancy analysis is performed for each seperate link. It identifies the best existing alternative route if that particular edge would be disrupted. If there is no redundancy, it identifies the lack of alternative routes. This is performed sequentially, for each link of the network. The redundancy of each link is expressed in 1) total distance or total time for the alternative route, 2) difference in distance/time between the alternative route and the original route, 3) and if there is an alternative route available, or not.
+With this analysis, you gain insight into the criticality of each link in the network. A redundancy analysis is performed for each separate link. It identifies the best existing alternative route if that particular edge would be disrupted. If there is no redundancy, it identifies the lack of alternative routes. This is performed sequentially, for each link of the network. The redundancy of each link is expressed in 1) total distance or total time for the alternative route, 2) difference in distance/time between the alternative route and the original route, 3) and if there is an alternative route available, or not.
 
 **network.ini**
 ::
@@ -176,6 +178,56 @@ This analysis provides insight into the impact of a hazard in terms of detour ti
     threshold = 0.5
     save_gpkg = True
     save_csv = True
+
+**Single-link losses**
+With this analysis, you gain insight into the economic losses due to a hazard. This analysis uses single-link redundancy as its underlying criticality method. Similar to the redundancy analysis, this analysis is performed for each separate link. The output will include Vehicle Loss Hours (VLH) of the disrupted links in a currency (e.g., €) for a given part of the day (e.g., morning rush hour) for each trip purpose (e.g., freight, business, etc.). The output type is gpkg, with generated columns in the result file such as vlh_<trip purpose>_<EVi>_<method> or vlh_<trip purpose>_<RPj>_<method> and vlh_total_<EVi>_<method> or vlh_total_<RPj>_<method> (if event-based or return-period based analyses respectively. EV stands for event and RP stands for return period). The vlh_total column sums all vlh_<trip purpose> columns. An example is vlh_business_EV1_ma, where EVi refers to each flood map (introduced as events without return periods) introduced in the network.ini, and method refers to min, mean, max water level aggregation method. The input required includes hazard maps, traffic intensity (AADT, annual average daily traffic), a shapefile of the network under study with the file_id column matching the link_id column of the traffic intensity file (both columns should have the same values to trace links with similar ID numbers in both files), values of time or distance for each trip purpose, and a resilience curve, which is a CSV file representing the function loss and the duration of the corresponding function loss. The default traffic period is 'day'. For shorter hazard periods or based on specific user considerations, the user can set the traffic period (see Partofday Enums) and specify the number of hours per traffic period with hours_per_traffic_period = X (hrs). In this case, traffic intensities are measured as vehicles per traffic period. Here are the analysis steps:
+
+
+
+**network.ini**
+::
+
+    [project]
+    name = example_losses
+
+    [network]
+    directed = False
+    source = shapefile
+    primary_file = network.shp
+    diversion_file = None
+    file_id = ID
+    link_type_column = highway
+    polygon = None
+    network_type = None
+    road_types = None
+    save_gpkg = True
+
+    [hazard]
+    hazard_map = max_flood_depth.tif
+    hazard_id = None
+    hazard_field_name = None
+    aggregate_wl = max
+    hazard_crs = EPSG:32736
+
+**analyses.ini**
+::
+
+    [project]
+    name = example_losses
+
+    [analysis1]
+    name = example_redundancy
+    analysis = single_link_losses
+    weighing = time  # time or length
+    threshold = 0
+    production_loss_per_capita_per_hour = 12
+    trip_purposes = business,commute,freight,other
+    traffic_intensities_file = <full file path or name>
+    resilience_curves_file = <full file path or name>
+    values_of_time_file = <full file path or name>
+    save_csv = True
+    save_gpkg = True
+
 
 **Origin-Destination, defined OD couples**
 RA2CE allows for origin-destination analyses. This analysis finds the shortest (distance-weighed) or quickest (time-weighed) route between all Origins and all Destinations inputted by the user, with and without disruption. The origins and destinations need to be defined by the user. This requires a certain data structure. See the origins-destinations examples notebooks to learn how to do this.  
@@ -415,7 +467,7 @@ This analysis finds the sections of the network that are fully isolated from the
 
 
 **Traffic and equity analysis**
-This analysis allows for network criticality analysis taking into account three distributive equity principles: utilitarian, egalitarian and prioritarian principles. For more background knowledge on these principles and the application on transport network criticality analysis, please read: https://www.sciencedirect.com/science/article/pii/S0965856420308077> The purpose of the equity analysis is providing insight into how different distributive principles can result in different prioritizations of the network. While we usually prioritize network interventions based on the number of people that use the road, equity principles allow us to also take into account the function of the network for for example underpriviliged communities. Depending on the equity principle applied, your network prioritization might change, which can change decision-making.
+This analysis allows for network criticality analysis taking into account three distributive equity principles: utilitarian, egalitarian and prioritarian principles. For more background knowledge on these principles and the application on transport network criticality analysis, please read: https://www.sciencedirect.com/science/article/pii/S0965856420308077> The purpose of the equity analysis is providing insight into how different distributive principles can result in different prioritization of the network. While we usually prioritize network interventions based on the number of people that use the road, equity principles allow us to also take into account the function of the network for for example underprivileged communities. Depending on the equity principle applied, your network prioritization might change, which can change decision-making.
 This analysis is set up generically so that the user can determine the equity weights themselves. This can for example be GINI-coefficients or social vulnerability scores. The user-defined equity weights will feed into the prioritarian principle. The equity analysis example notebook will guide you through the use of this analysis.     
 
 **network.ini**
@@ -445,7 +497,7 @@ This analysis is set up generically so that the user can determine the equity we
     origin_count = values #necessary if traffic on each edge should be recorded in optimal_route_origin_destination
     origin_out_fraction = 1
     category = category #column name in destinations specifying the different destination categories (e.g. hospital, school, etc.)
-    region = region.shp #a shapefile outlining the reigon's geometry, necessary for distributional / equity analysis
+    region = region.shp #a shapefile outlining the region's geometry, necessary for distributional / equity analysis
     region_var = DESA #the region's name recorded in a column of the region shapefile
 
     [hazard]
