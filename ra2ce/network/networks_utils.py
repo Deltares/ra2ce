@@ -1385,6 +1385,7 @@ def reproject_graph(original_graph: nx.Graph, crs_in: str, crs_out: str) -> nx.G
     _reprojected_graph = original_graph.copy()
     set_values = gdf_out.to_dict(orient="index")
     nx.set_edge_attributes(_reprojected_graph, values=set_values)
+    _reprojected_graph.graph["crs"] = crs_out
     return _reprojected_graph
 
 
