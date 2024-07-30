@@ -74,7 +74,7 @@ Possible (built-in) options for vulnerability curves include:
     name = example's damages analysis
     analysis = damages
     event_type = return_period
-    risk_calculation = None/default/cut_from_YYYY_year/triangle_to_null_YYYY_year
+    risk_calculation_mode = None/default/cut_from_year/triangle_to_null_year  # see the risk calculation section bellow
     damage_curve = HZ/OSD/MAN
     aggregate_wl = max
     threshold = 0.5
@@ -187,7 +187,21 @@ With this analysis, you gain insight into the economic losses due to a hazard. T
 
 The output will include Vehicle Loss Hours (VLH) of the disrupted links in a currency (e.g., €) for a given part of the day (e.g., morning rush hour) for each trip purpose (e.g., freight, business, etc.). The output type is gpkg, with generated columns in the result file such as vlh_<trip purpose>_<EVi>_<method> or vlh_<trip purpose>_<RPj>_<method> and vlh_total_<EVi>_<method> or vlh_total_<RPj>_<method> (if event-based or return-period based analyses respectively). EV stands for event and RP stands for return period). The vlh_total column sums all vlh_<trip purpose> columns. An example is vlh_business_EV1_ma, where EVi refers to each flood map (introduced as events without return periods) introduced in the network.ini or the configuration, and method refers to min, mean, max water level aggregation method.
 
-The input required includes hazard maps, traffic intensity (AADT, annual average daily traffic), a shapefile of the network under study with the file_id column matching the link_id column of the traffic intensity file (both columns should have the same values to trace links with similar ID numbers in both files), values of time or distance for each trip purpose, and resilience curves stored in a CSV file representing the function loss and the corresponding function loss duration for different water heights and link types. The default traffic_period parameter is 'day'. For shorter hazard periods or based on specific user considerations, the user can set the traffic period (see Partofday Enums) and specify the number of hours per traffic period with hours_per_traffic_period = X (hrs). In this case, traffic intensities are measured as vehicles per traffic period.
+For an analysis with hazards with return periods, a risk column is also calculated which represents the risk or estimated annual losses of the included hazards (with return periods).
+
+The input required includes:
+
+- hazard maps, If hazards with return periods are included, their file name should include *RP_X* where X is the return period year;
+
+- traffic intensity (AADT, annual average daily traffic;
+
+- a shapefile of the network under study with the file_id column matching the link_id column of the traffic intensity file (both columns should have the same values to trace links with similar ID numbers in both files);
+
+- values of time or length for each trip purpose, and;
+
+- resilience curves stored in a CSV file representing the function loss and the corresponding function loss duration for different water heights and link types.
+
+PLease note that the default traffic_period parameter is 'day'. For shorter hazard periods or based on specific user considerations, the user can set the traffic period (see Partofday Enums) and specify the number of hours per traffic period with hours_per_traffic_period = X (hrs). In this case, traffic intensities are measured as vehicles per traffic period.
 
 Here are the analysis steps:
 
@@ -203,7 +217,7 @@ Here are the analysis steps:
 
 Bellow and example of the required ini files.
 
-**network.ini**
+**network.ini for event-based analyses**
 ::
 
     [project]
@@ -228,7 +242,7 @@ Bellow and example of the required ini files.
     aggregate_wl = max
     hazard_crs = EPSG:32736
 
-**analyses.ini**
+**analyses.ini for event-based analyses**
 ::
 
     [project]
@@ -247,11 +261,61 @@ Bellow and example of the required ini files.
     save_csv = True
     save_gpkg = True
 
+**network.ini for return period-based analyses**
+::
+
+    [project]
+    name = example_losses
+
+    [network]
+    directed = False
+    source = shapefile
+    primary_file = network.shp
+    diversion_file = None
+    file_id = ID
+    link_type_column = highway
+    polygon = None
+    network_type = None
+    road_types = None
+    save_gpkg = True
+
+    [hazard]
+    hazard_map = RP_1000.tif, RP_100.tif, RP_10.tif
+    hazard_id = None
+    hazard_field_name = None
+    aggregate_wl = max
+    hazard_crs = EPSG:32736
+
+**analyses.ini for return period-based analysis**
+::
+
+    [project]
+    name = example_losses
+
+    [analysis1]
+    name = example_redundancy
+    analysis = single_link_losses
+    event_type = return_period
+    risk_calculation_mode = triangle_to_null_year  # default, cut_from_year, or triangle_to_null_year see the risk calculation section bellow
+    risk_calculation_year = 2
+    weighing = time
+    threshold = 0
+    production_loss_per_capita_per_hour = 12
+    traffic_period = day
+    trip_purposes = business,commute,freight,other
+    traffic_intensities_file = None
+    resilience_curves_file = None
+    values_of_time_file = None
+    save_csv = True
+    save_gpkg = True
+
 **Multiple-link losses**
 
 With this analysis, you gain insight into the economic losses due to a hazard. This analysis uses multiple-link redundancy as its underlying criticality method. Similar to the redundancy and single-link losses analyses, this analysis is performed for each separate link.
 
 The output consists of Vehicle Loss Hours (VLH) of the disrupted links, expressed in currency (e.g., €), for a specific part of the day (e.g., morning rush hour) and for each trip purpose (e.g., freight, business, etc.). The output type is a GPKG file, which will include columns like vlh_<trip purpose><EVi><method> or vlh_<trip purpose><RPj><method> (for event-based or return-period based analyses, respectively). "EV" stands for event, and "RP" stands for return period. There will also be a column vlh_total_<EVi><method> or vlh_total<RPj><method>, representing the sum of all vlh<trip purpose>. For instance, vlh_business_EV1_ma is an example of such a column. "EVi" refers to each flood map introduced in the network.ini, and "method" refers to the min, mean, or max method of calculation.
+
+For an analysis with hazards with return periods, a risk column is also calculated which represents the risk or estimated annual losses of the included hazards (with return periods).
 
 The input data includes:
 
@@ -259,7 +323,7 @@ The input data includes:
 
 - Traffic intensity data (AADT, annual average daily traffic).
 
-- A shapefile of the network under study, where the shapefile file_id column should match the link id column of the traffic intensity data. The link id and file id columns in both datasets should have the same values, ensuring traceable links.
+- A shapefile of the network under study, where the shapefile file_id column should match the link id column of the traffic intensity data. The link id and file id columns in both datasets should have the same values, ensuring traceable links. If hazards with return periods are included, their file name should include *RP_X* where X is the return period year.
 
 - Values of time or length for each trip purpose.
 
@@ -281,7 +345,7 @@ The analysis steps include:
 
 Bellow and example of the required ini files.
 
-**network.ini**
+**network.ini for event-based analyses**
 ::
 
     [project]
@@ -306,7 +370,7 @@ Bellow and example of the required ini files.
     aggregate_wl = max
     hazard_crs = EPSG:32736
 
-**analyses.ini**
+**analyses.ini for event-based analysis**
 ::
 
     [project]
@@ -318,6 +382,53 @@ Bellow and example of the required ini files.
     threshold = 0  # the water height threshold above which the link will be inundated
     weighing = time  # time or length
     production_loss_per_capita_per_hour = 42
+    trip_purposes = business,commute,freight,other
+    traffic_intensities_file = None
+    resilience_curves_file = None
+    values_of_time_file = None
+    save_csv = True
+    save_gpkg = True
+
+**network.ini for return period-based analyses**
+::
+
+    [project]
+    name = example_losses
+
+    [network]
+    directed = False
+    source = shapefile
+    primary_file = network.shp
+    diversion_file = None
+    file_id = ID
+    link_type_column = highway
+    polygon = None
+    network_type = None
+    road_types = None
+    save_gpkg = True
+
+    [hazard]
+    hazard_map = RP_1000.tif, RP_100.tif, RP_10.tif
+    hazard_id = None
+    hazard_field_name = None
+    aggregate_wl = max
+    hazard_crs = EPSG:32736
+
+**analyses.ini for return period-based analysis**
+::
+
+    [project]
+    name = example_losses
+
+    [analysis1]
+    name = example_redundancy
+    analysis = multi_link_losses
+    event_type = return_period
+    risk_calculation_mode = cut_from_year  # default, cut_from_year, or triangle_to_null_year see the risk calculation section bellow
+    risk_calculation_year = 500
+    threshold = 0
+    weighing = time
+    production_loss_per_capita_per_hour = 42
     traffic_period = day
     trip_purposes = business,commute,freight,other
     traffic_intensities_file = None
@@ -325,6 +436,7 @@ Bellow and example of the required ini files.
     values_of_time_file = None
     save_csv = True
     save_gpkg = True
+
 
 **Origin-Destination, defined OD couples**
 
@@ -623,3 +735,52 @@ This analysis is set up generically so that the user can determine the equity we
     equity_weight = region_weight.csv #equity-weighted factors for each region, should be stored in static/network. Note that 'region' and 'region_var' should present in network.ini
     save_gpkg = True
     save_csv = True
+
+
+Risk calculation method
+-------------------------------------
+
+The flood risk, in terms of expected annual damage or losses (EAD or EAL) in currency per year, is calculated by integration over the damage per return frequency.
+
+This requires several assumptions that significantly impact the outcomes (Olsen et al., 2015). We use the trapezoidal rule to numerically integrate over the known combinations of the return periods and damage. For example, consider a run where damage is known for the 100, 50, 20 and 10 year return period (see Figures bellow).
+
+The main assumptions that influence the outcomes are:
+
+- How to handle damage with a return period larger than the largest known return period. (e.g. > 100 years)
+
+- How to handle damage with a return period larger than the lowest return period.
+
+- Is there a protection level above which no damage will occur?
+
+RA2CE can calculate the EAD in three different modes:
+
+**Default mode: [risk_calculation_mode = default]**
+
+- For all RPs larger than the largest known RP (first part of the x-axis, see figure bellow), assume that the damage equals the damage of the largest known RP.
+
+- No damage for all events with a return period smaller than the smallest known RP.
+
+- No accounting for flood risk protection.
+
+.. image:: ../_resources/default.png
+
+
+**Cut_from mode: [risk_calculation_mode = cut_from_year]**
+
+- For all RPs larger than the largest known RP (first part of the x-axis, see figure bellow), assume that the damage equals the damage of the largest known RP.
+
+- No risk for all events with a return period smaller than the smallest known RP.
+
+- All damage cause by events with a RP > cut_off (an integer as the risk_calculation_year parameter), does not contribute to risk.
+
+.. image:: ../_resources/cut_from_year.png
+
+**Triangle_to_null mode: [risk_calculation_mode = triangle_to_null_year]**
+
+- For all RPs larger than the largest known RP (first part of the x-axis, see figure bellow), assume that the damage equals the damage of the largest known RP.
+
+- From the lowest return period, draw a triangle to a certain value (an integer as the risk_calculation_year parameter), and add the area of this triangle to the risk
+
+- No accounting for flood risk protection.
+
+.. image:: ../_resources/triangle_to_null.png
