@@ -10,9 +10,134 @@ The physical *damage to the network* (referred to as damages here) depends on th
 
 Possible (built-in) options for vulnerability curves include:
 
-- *Global*: Huizinga curves
-- *Europe*: OSdaMage functions
-- *Your own damage curves*: Manual function.
+- *Global*: Huizinga curves (HZ analysis name)
+- *Europe*: OSdaMage functions (OSD analysis name)
+- *Costume damage curves*: Manual function (MAN analysis name)
+
+**Huizinga damage estimation**
+
+For more information on the Huizinga damage functions please refer to *Global flood depth-damage functions: Methodology and the database with guidelines* written by Huizinga et al.
+
+Here we explain the input, output, and main steps to perform the damage analysis based on this method.
+
+The output consists of estimating the damages per each link and segment in two different output files. The unit of measurement is a currency, and the output type is gpkg. The generated columns in the result file include:
+
+#. Link-based damage output file:
+    - damage_segments_list: A list of damages of all segments which comprise each link.
+    - dam_<EVi>_HZ or dam_<RPj>_HZ (for event-based or return-period based analyses respectively): The total damage of each link.
+
+#. Segmented damage output file:
+    - dam_<EVi>_HZ or dam_<RPj>_HZ (for event-based or return-period based analyses respectively): The total damage of each segment.
+
+#. For an analysis with hazards with return periods, a risk column is also calculated which represents the risk or estimated annual losses of the included hazards (with return periods).
+
+Here, EVi refers to each hazard map without a return period introduced in the network configuration, and RPj refers to each hazard map with a return period introduced in the network configuration.
+
+The input requirements include:
+
+#. A hazard map.
+#. A road network, which can be defined in several ways:
+    - Automatically downloading a network from the extent of the introduced hazard map.
+    - Introducing a polygon representing the region of interest.
+    - Introducing a Shapefile representing the network under study.
+
+The main steps are:
+#. Exposure Analysis: Identify the impacted links where the water depth exceeds the threshold.
+
+#. Damage Estimation:
+    - Using Huizinga Vulnerability Curves:
+    - Determine the maximum damage value per meter for each road based on the road type and number of lanes. The maximum damage values per kilometer are defined by the Huizinga function.
+    - Relate water depth to the maximum damage value since water depth determines the actual amount of damage.
+        - The maximum damage per kilometer (when a road is completely demolished) is converted to values per meter.
+        - The relation between water depth levels and the estimated percentage of road damage is defined by the Huizinga curve. For instance, at a flood depth of 1.5m, the damage value is estimated to be 55% of the maximum damage for a specific road type with a certain number of lanes.
+        - Calculate 55% of the maximum damage value per meter of the road.
+        - Relate this value to the length of the road by multiplying the damage value per meter by the length fraction of the road that is actually damaged (inundated fraction * total length of the road).
+    - Finally, the damage value per meter of the road segment is multiplied by the length of the damaged segment.
+
+**OSdamage damage estimation**
+
+For more information on the Huizinga damage functions please refer to *Flood risk assessment of the European road network* written by van Ginkel et al.
+
+The output consists of:
+
+#. Per link and segment (in Graph and Network objects, respectively) in two different output files:
+
+    - Estimated damages as a tuple (quartile, in currency).
+    - Representative damage for each damage curve. The representative percentage can be defined by the user (default is 100%). This percentage reflects a single value representing the damage between the lower and higher bounds (the tuple mentioned above).
+
+#. Output type: gpkg.
+
+#. Generated columns in the result file:
+
+    - Segmented damage output file (for event-based or return-period based analyses, respectively):
+        - dam_<Ci>_<EVj>_quartiles or dam_<Ci>_<RPx>_quartiles: Tuple, damages between the lower and upper bounds for each segment and each damage curve.
+        - dam_<Ci>_<EVj>_representative or dam_<Ci>_<RPx>_representative: representative_damage_percentile * max(dam_<Ci>_<EVj>_quartiles).
+    - Link-based damage output file:
+        - dam_<Ci>_<EVj>_representative or dam_<Ci>_<RPx>_representative: Sum of representative_damage_percentile * max(dam_<Ci>_<EVj>_quartiles) for all segments making up a road link.
+        - damage_segments_list: A list of damages for all segments comprising each link.
+    - For an analysis with hazards with return periods, a risk column is also calculated which represents the risk or estimated annual losses of the included hazards (with return periods).
+    - Notes:
+        - Ci refers to the 6 vulnerability curves in the OSdamage approach.
+        - EVj refers to each flood map introduced in the network.ini.
+        - RPx refers to each hazard map with a return period introduced in the network configuration.
+
+The input requirements include:
+
+#. Hazard map.
+
+#. Road network: It is possible but not necessary to define the network by:
+
+    - Automatically downloading a network from the extent of the introduced hazard map.
+    - Introducing a polygon representing the region of interest.
+    - Introducing a Shapefile representing the network under study.
+
+The analysis Steps are:
+
+#. Exposure Analysis: Identify the impacted links where the water depth exceeds the threshold.
+
+#. Damage Estimation Based on OSdamage Vulnerability Curves:
+    - Look up the relevant vulnerability curves: for each flooding event, the road construction costs, and maximum damage per road type, differentiated between low flow (low-flow velocities) and high flow (high-flow velocities). These values represent the average for the former EU-28, in millions of euros (year 2015) per kilometer. There will be 6 vulnerability curves (C1 to C6).
+    - Define a lower and higher bound of construction damage for each road type.
+    - For the number of lanes of each road edge, read a lane factor and multiply it into the lower and higher bounds of maximum damage for each road type.
+    - Derive (interpolate) the percentage of the max damage of each vulnerability curve based on the water depth of each inundated road edge.
+    - Calculate quartiles of damage between the lower and higher bounds for each road edge based on the lower and higher maximum damage, road type, lane numbers, and the length of the inundated road edge for each damage curve (representing the road type state and flow velocity).
+
+**Custom damage functions (manual function)**
+
+The output consists of:
+
+- Per link and segment (in Graph and Network objects, respectively) in two different output files.
+- Output type: gpkg.
+- Generated columns in the result file:
+    - Segmented and Link-based Damage Output File:
+        - dam_<EVi>_<XY> or dam_<RPx>_<XY>: damage per link or segment.
+    - Link-based Damage Output File:
+        - damage_segments_list: A list of damages for all segments comprising each link.
+    - For an analysis with hazards with return periods, a risk column is also calculated which represents the risk or estimated annual losses of the included hazards (with return periods).
+    - Notes:
+        - EVi: refers to each flood map introduced in the network configuration.
+        - RPx: refers to each hazard map with a return period introduced in the network configuration.
+        - XY: first two letters of the vulnerability curve’s name.
+
+The input requirements include:
+
+- Hazard map.
+- Road network: It is possible but not necessary to define the network by:
+    - Automatically downloading a network from the extent of the introduced hazard map.
+    - Introducing a polygon.
+    - Introducing a Shapefile.
+- Vulnerability curves: More than one vulnerability curve can be introduced.
+    - In the input_data folder of the analysis folder, create a folder (e.g., damage_functions) and store subfolders (named to represent each vulnerability curve) containing the vulnerability curves. The curves should be represented by "damage percentage-water depth" and "road type/number of lanes-maximum damage" CSV files. Included road types should correspond to those in the road network used as input.
+
+The analysis Steps are:
+
+- Exposure Analysis: Identify impacted links where the water depth exceeds the threshold.
+- Estimate Damages Based on Introduced Vulnerability Curves:
+    - For each vulnerability curve and flooding event, read the maximum damage for each road type and number of lanes from the "road type/number of lanes-maximum damage" CSV files.
+    - Calculate damage for each road edge by linking the water depth to the damage severity percentage (interpolating values in the "damage percentage-water depth" file), maximum damage, and the length of the inundated segments.
+
+
+Bellow and example of the required ini files.
 
 **network.ini for event-based analyses**
 ::
@@ -77,7 +202,7 @@ Possible (built-in) options for vulnerability curves include:
     save_gpkg = True
 
     [hazard]
-    hazard_map = RP_1000.tif, RP_100.tif, RP_10.tif
+    hazard_map = RP_1000.tif, RP_100.tif, RP_10.tif  # name should have RP_X, X is the return period name
     hazard_id = None
     hazard_field_name = None
     aggregate_wl = max
@@ -229,9 +354,7 @@ Here are the analysis steps:
 #. Perform Single Link Redundancy: Filter the impacted graph links and execute a single link redundancy analysis on these links to obtain the detour time or length (alt_time/length) and the "detour" attribute. The "detour" attribute indicates whether a link has an alternative route or not when removed.
 
 #. Calculate Vehicle Loss Hours (VLH):
-
     - For impacted links with a detour, calculate VLH using the value of time/length, detour time/length, function loss, and its corresponding function loss duration.
-
     - For impacted links without a detour, apply the principle of loss of production. This involves calculating productivity loss using the number of people commuting on the impacted link without a detour, productivity loss per capita per day, and the event duration.
 
 Bellow and example of the required ini files.
@@ -299,7 +422,7 @@ Bellow and example of the required ini files.
     save_gpkg = True
 
     [hazard]
-    hazard_map = RP_1000.tif, RP_100.tif, RP_10.tif
+    hazard_map = RP_1000.tif, RP_100.tif, RP_10.tif  # name should have RP_X, X is the return period name
     hazard_id = None
     hazard_field_name = None
     aggregate_wl = max
@@ -357,9 +480,7 @@ The analysis steps include:
 #. Multi-link Redundancy Analysis: Determine the detour time or length (alt_time/length) and the “connected” attribute. The "connected" attribute indicates whether a link has a detour or not when removed, as part of the multi-link redundancy analysis.
 
 #. Calculate Vehicle Loss Hours (VLH):
-
     - For impacted links with a detour, VLH is calculated using the value of time or length, detour time or length, function loss, and its corresponding function loss duration.
-    
     - For impacted links without a detour, the principle of loss of production is applied. This involves calculating productivity loss based on the number of people commuting through the impacted link without a detour, the productivity loss per capita per day, and the duration of the event.
 
 Bellow and example of the required ini files.
@@ -427,7 +548,7 @@ Bellow and example of the required ini files.
     save_gpkg = True
 
     [hazard]
-    hazard_map = RP_1000.tif, RP_100.tif, RP_10.tif
+    hazard_map = RP_1000.tif, RP_100.tif, RP_10.tif  # name should have RP_X, X is the return period name
     hazard_id = None
     hazard_field_name = None
     aggregate_wl = max
