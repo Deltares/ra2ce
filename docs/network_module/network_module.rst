@@ -191,3 +191,14 @@ Note: the origin-destination parameters are explained in the :ref:`analysis_modu
     aggregate_wl = max                          # max / min / mean
     hazard_crs = None                           # EPSG code / projection that can be read by pyproj / None
     overlay_segmented_graph = True              # True / False
+
+Network simplification
+---------------------------------------------------------------------------------------
+
+By simplification it is meant to merge links from intersection to intersection.
+
+By default, a simplified graph will be generated and exported. It is possible to exclude links with certain attributes from being merged to other links that have different values for the attributes of interest.
+
+For instance, there might be a case in which we would like to merge links that are not bridges together and merge bridges together. This can be the case for tunnels or any other link type.
+
+To allow such simplification, attributes_to_exclude_in_simplification parameter should be passed (as a list of strings) in the NetworkSection of the NetworkConfigData. Alternatively attributes_to_exclude_in_simplification should be passed (e.g., attributes_to_exclude_in_simplification = bridge, tunnel) in the network.ini file, section network.
