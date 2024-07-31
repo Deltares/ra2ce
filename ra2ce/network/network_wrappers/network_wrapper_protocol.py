@@ -18,14 +18,37 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+import math
 from typing import Protocol, runtime_checkable
 
 from geopandas import GeoDataFrame
 from networkx import MultiGraph
 
+from ra2ce.network.segmentation import Segmentation
+
 
 @runtime_checkable
 class NetworkWrapperProtocol(Protocol):
+    def segment_graph(self, edges_complex: GeoDataFrame) -> GeoDataFrame:
+        """
+        Segments a complex graph based on the given segmentation length.
+
+        Args:
+        - segmentation_length (Optional[float]): The length to segment the graph edges. If None, no segmentation is applied.
+        - edges_complex (gpd.GeoDataFrame): The GeoDataFrame containing the complex graph edges.
+        - crs (str): The coordinate reference system to apply if the CRS is missing after segmentation.
+
+        Returns:
+        - gpd.GeoDataFrame: The segmented edges_complex GeoDataFrame.
+        """
+        if not math.isnan(self.segmentation_length):
+            segmentation = Segmentation(edges_complex, self.segmentation_length)
+            edges_complex = segmentation.apply_segmentation()
+            if edges_complex.crs is None:  # The CRS might have disappeared.
+                edges_complex.crs = self.crs  # set the right CRS
+
+        return edges_complex
+
     def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
         """
         Gets a network built within this wrapper instance. No arguments are accepted, the `__init__` method is meant to assign all required attributes for a wrapper.
