@@ -12,40 +12,34 @@ Possible (built-in) options for vulnerability curves include:
 
 - *Global*: Huizinga curves
 - *Europe*: OSdaMage functions
-- *TO BE IMPLEMENTED*: your own damage curves
+- *Your own damage curves*: Manual function.
 
-**network.ini**
+**network.ini for event-based analyses**
 ::
 
     [project]
-    name = example_damages
+    name = example_losses
 
     [network]
     directed = False
-    source = OSM download
-    primary_file = None
+    source = shapefile
+    primary_file = network.shp
     diversion_file = None
-    file_id = id
-    polygon = my_extent.geojson
-    network_type = drive
-    road_types = motorway, motorway_link
+    file_id = ID
+    link_type_column = highway
+    polygon = None
+    network_type = None
+    road_types = None
     save_gpkg = True
-
-    [origins_destinations]
-    origins = None
-    destinations = None
-    origins_names = None
-    destinations_names = None
-    id_name_origin_destination = None
-    origin_count = None
 
     [hazard]
     hazard_map = max_flood_depth.tif
     hazard_id = None
-    hazard_crs = EPSG:4326
+    hazard_field_name = None
     aggregate_wl = max
+    hazard_crs = EPSG:32736
 
-**analysis.ini for an event-based case**
+**analysis.ini for event-based analyses**
 ::
 
     [project]
@@ -64,7 +58,32 @@ Possible (built-in) options for vulnerability curves include:
     save_shp = True
     save_csv = True
 
-**analysis.ini for an occurring event with a wide range of possible return periods**
+**network.ini for return period-based analyses**
+::
+
+    [project]
+    name = example_losses
+
+    [network]
+    directed = False
+    source = shapefile
+    primary_file = network.shp
+    diversion_file = None
+    file_id = ID
+    link_type_column = highway
+    polygon = None
+    network_type = None
+    road_types = None
+    save_gpkg = True
+
+    [hazard]
+    hazard_map = RP_1000.tif, RP_100.tif, RP_10.tif
+    hazard_id = None
+    hazard_field_name = None
+    aggregate_wl = max
+    hazard_crs = EPSG:32736
+
+**analysis.ini for return period-based analyses**
 ::
 
     [project]
