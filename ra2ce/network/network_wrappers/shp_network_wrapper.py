@@ -191,9 +191,5 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
         graph_complex, edges_complex = self._get_complex_graph_and_edges(edges, id_name)
 
         edges_complex = self.segment_graph(edges_complex, export_link_table=False)
-        # if not math.isnan(self.segmentation_length):
-        #     segmentation = Segmentation(edges_complex, self.segmentation_length)
-        #     edges_complex = segmentation.apply_segmentation()
-        #     if edges_complex.crs is None:  # The CRS might have disappeared.
-        #         edges_complex.crs = self.crs  # set the right CRS
+
         return graph_complex, edges_complex

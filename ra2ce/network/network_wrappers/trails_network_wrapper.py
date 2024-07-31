@@ -92,13 +92,6 @@ class TrailsNetworkWrapper(NetworkWrapperProtocol):
 
         # Segment the complex graph
         edges_complex = self.segment_graph(edges, export_link_table=False)
-        # if self.segmentation_length:
-        #     logging.info("TRAILS importer: start segmentation graph")
-        #     to_segment = Segmentation(edges, self.segmentation_length)
-        #     edges_simple_segmented = to_segment.apply_segmentation()
-        #     if edges_simple_segmented.crs is None:  # The CRS might have disappeared.
-        #         edges_simple_segmented.crs = edges.crs  # set the right CRS
-        #         edges_complex = edges_simple_segmented
 
         graph_complex = graph_simple  # NOTE THAT DIFFERENCE
         # BETWEEN SIMPLE AND COMPLEX DOES NOT EXIST WHEN IMPORTING WITH TRAILS

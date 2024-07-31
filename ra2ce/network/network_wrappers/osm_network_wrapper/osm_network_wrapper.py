@@ -61,7 +61,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
             config_data.network.attributes_to_exclude_in_simplification
         )
         self.output_graph_dir = config_data.output_graph_dir
-        self.graph_crs = config_data.crs
+        self.crs = config_data.crs
 
         # Network
         self.network_type = config_data.network.network_type
@@ -162,15 +162,6 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         edges_complex, link_tables = self.segment_graph(
             edges_complex, export_link_table=True
         )
-        # if not math.isnan(self.segmentation_length):
-        #     segmentation = Segmentation(edges_complex, self.segmentation_length)
-        #     edges_complex = segmentation.apply_segmentation()
-        #     if edges_complex.crs is None:  # The CRS might have disappeared.
-        #         edges_complex.crs = self.graph_crs  # set the right CRS
-        #
-        #     link_tables = segmentation.generate_link_tables()
-        #     edges_complex.drop(columns=["rfid_c"], inplace=True)
-        #     edges_complex.rename(columns={"splt_id": "rfid_c"}, inplace=True)
 
         # Save the link tables linking complex and simple IDs
         self._export_linking_tables(link_tables)
@@ -269,7 +260,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
             )
         )
         if "crs" not in _complex_graph.graph.keys():
-            _complex_graph.graph["crs"] = self.graph_crs
+            _complex_graph.graph["crs"] = self.crs
         self.get_clean_graph(_complex_graph)
         return _complex_graph
 

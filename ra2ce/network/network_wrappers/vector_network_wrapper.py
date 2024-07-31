@@ -118,15 +118,6 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         edges_complex, link_tables = self.segment_graph(
             edges_complex, export_link_table=True
         )
-        # if not math.isnan(self.segmentation_length):
-        #     segmentation = Segmentation(edges_complex, self.segmentation_length)
-        #     edges_complex = segmentation.apply_segmentation()
-        #     if edges_complex.crs is None:  # The CRS might have disappeared.
-        #         edges_complex.crs = self.crs  # set the right CRS
-        #
-        #     link_tables = segmentation.generate_link_tables()
-        #     edges_complex.drop(columns=["rfid_c"], inplace=True)
-        #     edges_complex.rename(columns={"splt_id": "rfid_c"}, inplace=True)
 
         # Save the link tables linking complex and simple IDs
         self._export_linking_tables(link_tables)
