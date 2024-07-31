@@ -86,7 +86,9 @@ class to read in a shapefile, clean it and process it to a network. The third on
 
 Network from vector data using the network.ini initalization file
 -----------------------------------------------------------------------
-The user can also read in a pre-defined shapefile using the ra2ce_basics_from_gpkg example notebook, where the user can practice with pre-defined data and required folder structure and data format. The user can upload their own shapefile (vector data), store it in the RA2CE static>network folder and specify the name of the file in the network.ini. 
+The user can also read in a pre-defined shapefile using the ra2ce_basics_from_gpkg example notebook, where the user can practice with pre-defined data and required folder structure and data format. The user can upload their own shapefile (vector data), store it in the RA2CE static>network folder and specify the name of the file in the network.ini.
+
+file_id and link_type_column (NetworkSection of the NetworkConfigData or in the network section of network.ini) should refer to the id column and road type columns of the shapefile.
 
 **network.ini**
 ::
@@ -100,6 +102,7 @@ The user can also read in a pre-defined shapefile using the ra2ce_basics_from_gp
     primary_file = my_shapefile.shp
     diversion_file = None
     file_id = id #specify the ID column in your vector data
+    link_type_column = highway
     polygon = None
     network_type = drive #if you want to use the drivable roads
     road_types = motorway, motorway_link, trunk, trunk_link #specify road types up to 'residential' and 'unclassified', visit OSM to learn more.
