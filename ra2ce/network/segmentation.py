@@ -27,7 +27,7 @@ import geopandas as gpd
 from geopy import distance
 from shapely.geometry import LineString, MultiLineString, Point
 
-from ra2ce.network.networks_utils import cut as network_cut
+from ra2ce.network.networks_utils import cut as network_cut, line_length
 
 
 class Segmentation:  # Todo: more naturally, this would be METHOD of the network class.
@@ -222,6 +222,12 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
                 for key, value in row.items():
                     if key == "geometry":
                         data[key].append(linestring)
+                    elif key == "length":
+                        data[key].append(line_length(linestring, self.edges_input.crs))
+                    elif key == "time":
+                        data[key].append(
+                            round((row["length"] / row["avgspeed"]) / 1000, 5)
+                        )
                     else:
                         data[key].append(value)
                 data["splt_id"].append(count)
