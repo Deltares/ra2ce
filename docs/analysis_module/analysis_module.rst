@@ -4,6 +4,15 @@ Analysis module
 ================
 RA2CE's analysis module can perform several analyses on infrastructure networks. First, a network needs te be created. Visit the :ref:`network_module` for a better understanding of how this works. In the analysis module we distinguish a module focused on direct monetary road damages (damages) and an analysis module for network criticality and origin-destination analyses (losses). The latter are developed from a 'societal losses due to hazards' point of view and provide insight into the hazard impact on the network and the disruption of network services to society.
 
+Configuration
+-------------------------------------
+Before describing the included analyses, we describe two main ways of setting-up the configurations needed for the analyses:
+
+#. Creating .ini files for network and analysis. Ra2ceHandler.run_with_ini_files() should be used to create a handler instance, used to run analyses.
+#. Instantiating the NetworkConfigData and AnalysisConfigData objects to pass required network and analysis configuration parameters (different for each analysis). Ra2ceHandler.run_with_config_data() should be used to create a handler instance, used to run analyses.
+
+In the examples in this page the first approach is shown. In the example folders a few examples on the second approach is also given.
+
 Damages
 -------------------------------------
 The physical *damage to the network* (referred to as damages here) depends on the intensity of the hazard in relation to how the network (and its assets) are built and its current condition (e.g. type, state of maintenance, dimensions). Here, the hazard intensity and asset condition are linked to a percentage of damage, via vulnerability functions/ fragility curves. To develop these vulnerability curves data is needed about replacements costs per asset type and the potential damage per hazard intensity. This data can be collected during a workshop with for example national road agencies and the technicians. The output of the analyses consist of damage maps per hazard (e.g. flooding, landslides), per return period or per event, per asset and per road segment.
