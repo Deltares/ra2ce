@@ -19,7 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import math
-from typing import Protocol, runtime_checkable, Union
+from typing import Protocol, runtime_checkable, Union, Optional
 
 from geopandas import GeoDataFrame
 from networkx import MultiGraph
@@ -30,7 +30,7 @@ from ra2ce.network.segmentation import Segmentation
 @runtime_checkable
 class NetworkWrapperProtocol(Protocol):
     def segment_graph(
-        self, edges: GeoDataFrame, export_link_table: bool
+        self, edges: GeoDataFrame, export_link_table: bool, link_tables: tuple
     ) -> Union[GeoDataFrame, tuple[GeoDataFrame, tuple]]:
         """
         Segments a complex graph based on the given segmentation length.
@@ -50,12 +50,15 @@ class NetworkWrapperProtocol(Protocol):
                 segmented_edges.crs = self.crs  # set the right CRS
 
             if export_link_table:
-                link_tables = segmentation.generate_link_tables()
+                updated_link_tables = segmentation.generate_link_tables()
                 segmented_edges.drop(columns=["rfid_c"], inplace=True)
                 segmented_edges.rename(columns={"splt_id": "rfid_c"}, inplace=True)
-                return segmented_edges, link_tables
-
+                return segmented_edges, updated_link_tables
             return segmented_edges
+
+        elif export_link_table:
+            return edges, link_tables
+
         else:
             return edges
 

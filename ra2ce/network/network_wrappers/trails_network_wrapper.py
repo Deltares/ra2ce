@@ -91,7 +91,9 @@ class TrailsNetworkWrapper(NetworkWrapperProtocol):
         )
 
         # Segment the complex graph
-        edges_complex = self.segment_graph(edges, export_link_table=False)
+        edges_complex = self.segment_graph(
+            edges, export_link_table=False, link_tables=tuple()
+        )
 
         graph_complex = graph_simple  # NOTE THAT DIFFERENCE
         # BETWEEN SIMPLE AND COMPLEX DOES NOT EXIST WHEN IMPORTING WITH TRAILS

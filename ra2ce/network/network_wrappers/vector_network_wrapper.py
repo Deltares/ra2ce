@@ -116,7 +116,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         # Segment the complex graph
         edges_complex, link_tables = self.segment_graph(
-            edges_complex, export_link_table=True
+            edges_complex, export_link_table=True, link_tables=link_tables
         )
 
         # Save the link tables linking complex and simple IDs
