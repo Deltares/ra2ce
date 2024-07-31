@@ -20,7 +20,6 @@
 """
 
 import logging
-import math
 
 import geopandas as gpd
 import networkx as nx
@@ -32,7 +31,6 @@ from ra2ce.network.network_config_data.network_config_data import NetworkConfigD
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
-from ra2ce.network.segmentation import Segmentation
 
 
 class ShpNetworkWrapper(NetworkWrapperProtocol):

@@ -30,7 +30,6 @@ from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
 from ra2ce.network.networks_utils import graph_from_gdf
-from ra2ce.network.segmentation import Segmentation
 
 
 class TrailsNetworkWrapper(NetworkWrapperProtocol):

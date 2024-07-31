@@ -20,7 +20,6 @@
 """
 
 import logging
-import math
 from pathlib import Path
 from typing import Any
 
@@ -40,7 +39,6 @@ from ra2ce.network.network_simplification import NetworkGraphSimplificator
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
-from ra2ce.network.segmentation import Segmentation
 
 
 class VectorNetworkWrapper(NetworkWrapperProtocol):

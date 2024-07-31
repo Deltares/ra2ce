@@ -18,7 +18,6 @@
 from __future__ import annotations
 
 import logging
-import math
 from pathlib import Path
 from typing import Any
 
@@ -47,7 +46,6 @@ from ra2ce.network.network_wrappers.osm_network_wrapper.osm_utils import (
     is_endnode_check,
     modify_graph,
 )
-from ra2ce.network.segmentation import Segmentation
 
 
 class OsmNetworkWrapper(NetworkWrapperProtocol):
