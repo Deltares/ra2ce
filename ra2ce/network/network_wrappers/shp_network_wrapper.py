@@ -190,8 +190,6 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
 
         graph_complex, edges_complex = self._get_complex_graph_and_edges(edges, id_name)
 
-        edges_complex = self.segment_graph(
-            edges_complex, export_link_table=False, link_tables=tuple()
-        )
+        edges_complex = self.segment_graph(edges_complex, export_link_table=False)
 
         return graph_complex, edges_complex

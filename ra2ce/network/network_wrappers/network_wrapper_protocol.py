@@ -18,6 +18,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+import logging
 import math
 from typing import Protocol, runtime_checkable, Union, Optional
 
@@ -30,7 +31,10 @@ from ra2ce.network.segmentation import Segmentation
 @runtime_checkable
 class NetworkWrapperProtocol(Protocol):
     def segment_graph(
-        self, edges: GeoDataFrame, export_link_table: bool, link_tables: tuple
+        self,
+        edges: GeoDataFrame,
+        export_link_table: bool,
+        link_tables: Optional[tuple] = None,
     ) -> Union[GeoDataFrame, tuple[GeoDataFrame, tuple]]:
         """
         Segments a complex graph based on the given segmentation length.
@@ -55,10 +59,11 @@ class NetworkWrapperProtocol(Protocol):
                 segmented_edges.rename(columns={"splt_id": "rfid_c"}, inplace=True)
                 return segmented_edges, updated_link_tables
             return segmented_edges
-
-        elif export_link_table:
+        elif export_link_table and link_tables:
             return edges, link_tables
-
+        elif export_link_table and not link_tables:
+            logging.warning("empty link_tables is passed")
+            return edges, tuple()
         else:
             return edges
 
