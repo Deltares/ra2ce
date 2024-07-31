@@ -190,7 +190,7 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
 
         graph_complex, edges_complex = self._get_complex_graph_and_edges(edges, id_name)
 
-        edges_complex = self.segment_graph(edges_complex)
+        edges_complex = self.segment_graph(edges_complex, export_link_table=False)
         # if not math.isnan(self.segmentation_length):
         #     segmentation = Segmentation(edges_complex, self.segmentation_length)
         #     edges_complex = segmentation.apply_segmentation()

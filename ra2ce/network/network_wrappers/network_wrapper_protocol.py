@@ -19,7 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import math
-from typing import Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable, Union
 
 from geopandas import GeoDataFrame
 from networkx import MultiGraph
@@ -29,7 +29,9 @@ from ra2ce.network.segmentation import Segmentation
 
 @runtime_checkable
 class NetworkWrapperProtocol(Protocol):
-    def segment_graph(self, edges_complex: GeoDataFrame) -> GeoDataFrame:
+    def segment_graph(
+        self, edges: GeoDataFrame, export_link_table: bool
+    ) -> Union[GeoDataFrame, tuple[GeoDataFrame, tuple]]:
         """
         Segments a complex graph based on the given segmentation length.
 
@@ -42,12 +44,20 @@ class NetworkWrapperProtocol(Protocol):
         - gpd.GeoDataFrame: The segmented edges_complex GeoDataFrame.
         """
         if not math.isnan(self.segmentation_length):
-            segmentation = Segmentation(edges_complex, self.segmentation_length)
-            edges_complex = segmentation.apply_segmentation()
-            if edges_complex.crs is None:  # The CRS might have disappeared.
-                edges_complex.crs = self.crs  # set the right CRS
+            segmentation = Segmentation(edges, self.segmentation_length)
+            segmented_edges = segmentation.apply_segmentation()
+            if segmented_edges.crs is None:  # The CRS might have disappeared.
+                segmented_edges.crs = self.crs  # set the right CRS
 
-        return edges_complex
+            if export_link_table:
+                link_tables = segmentation.generate_link_tables()
+                segmented_edges.drop(columns=["rfid_c"], inplace=True)
+                segmented_edges.rename(columns={"splt_id": "rfid_c"}, inplace=True)
+                return segmented_edges, link_tables
+
+            return segmented_edges
+        else:
+            return edges
 
     def get_network(self) -> tuple[MultiGraph, GeoDataFrame]:
         """
