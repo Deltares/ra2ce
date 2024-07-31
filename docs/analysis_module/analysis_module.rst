@@ -42,8 +42,9 @@ The input requirements include:
     - Introducing a Shapefile representing the network under study.
 
 The main steps are:
-#. Exposure Analysis: Identify the impacted links where the water depth exceeds the threshold.
 
+#. Exposure Analysis: 
+    - Identify the impacted links where the water depth exceeds the threshold.
 #. Damage Estimation:
     - Using Huizinga Vulnerability Curves:
     - Determine the maximum damage value per meter for each road based on the road type and number of lanes. The maximum damage values per kilometer are defined by the Huizinga function.
@@ -60,15 +61,11 @@ For more information on the Huizinga damage functions please refer to *Flood ris
 
 The output consists of:
 
-#. Per link and segment (in Graph and Network objects, respectively) in two different output files:
-
+#. Per link and segment (in Graph and Network objects, respectively):
     - Estimated damages as a tuple (quartile, in currency).
     - Representative damage for each damage curve. The representative percentage can be defined by the user (default is 100%). This percentage reflects a single value representing the damage between the lower and higher bounds (the tuple mentioned above).
-
 #. Output type: gpkg.
-
 #. Generated columns in the result file:
-
     - Segmented damage output file (for event-based or return-period based analyses, respectively):
         - dam_<Ci>_<EVj>_quartiles or dam_<Ci>_<RPx>_quartiles: Tuple, damages between the lower and upper bounds for each segment and each damage curve.
         - dam_<Ci>_<EVj>_representative or dam_<Ci>_<RPx>_representative: representative_damage_percentile * max(dam_<Ci>_<EVj>_quartiles).
@@ -84,9 +81,7 @@ The output consists of:
 The input requirements include:
 
 #. Hazard map.
-
-#. Road network: It is possible but not necessary to define the network by:
-
+#. Network
     - Automatically downloading a network from the extent of the introduced hazard map.
     - Introducing a polygon representing the region of interest.
     - Introducing a Shapefile representing the network under study.
@@ -94,7 +89,6 @@ The input requirements include:
 The analysis Steps are:
 
 #. Exposure Analysis: Identify the impacted links where the water depth exceeds the threshold.
-
 #. Damage Estimation Based on OSdamage Vulnerability Curves:
     - Look up the relevant vulnerability curves: for each flooding event, the road construction costs, and maximum damage per road type, differentiated between low flow (low-flow velocities) and high flow (high-flow velocities). These values represent the average for the former EU-28, in millions of euros (year 2015) per kilometer. There will be 6 vulnerability curves (C1 to C6).
     - Define a lower and higher bound of construction damage for each road type.
@@ -122,7 +116,7 @@ The output consists of:
 The input requirements include:
 
 - Hazard map.
-- Road network: It is possible but not necessary to define the network by:
+- Network:
     - Automatically downloading a network from the extent of the introduced hazard map.
     - Introducing a polygon.
     - Introducing a Shapefile.
