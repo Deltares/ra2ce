@@ -16,19 +16,27 @@ spec:
         template: get-events-output-graphs
       - name: check-ra2ce
         template: check-ra2ce
+        arguments:
+          parameters:
+          - name: ra2ce_tag
+            value: latest
     - - name: run-scenario
         template: run-scenario
         arguments:
           parameters:
+          - name: ra2ce_tag
+            value: latest
           - name: output_floodmap
             value: "{{item}}"
         withParam: "{{steps.get-events-output-graphs.outputs.result}}"
 
   - name: check-ra2ce
     script:
-      image: "{{workflow.parameters.ra2ce_image}}"
+      image: "containers.deltares.nl/ra2ce/ra2ce_hackathon_dealing_with_uncertainty_poc:{{inputs.parameters.ra2ce_tag}}"
       command: [python, "/scripts/check_ra2ce_version.py"]
-    inputs: 
+    inputs:
+      parameters:
+        - name: ra2ce_tag
       artifacts:
         - name: scripts
           path: /scripts
@@ -69,10 +77,10 @@ spec:
           archive:
             none: {}
 
-  - name: run-scenario
+  - name: run-damage
     container:
-      image: "{{workflow.parameters.ra2ce_image}}"
-      command: [python, "/scripts/workflow_damages_temp.py"]
+      image: "containers.deltares.nl/ra2ce/ra2ce_hackathon_dealing_with_uncertainty_poc:{{inputs.parameters.ra2ce_tag}}"
+      command: [python, "/scripts/workflow_damages.py"]
       resources:
         requests:
           cpu: 1
@@ -86,8 +94,8 @@ spec:
       parameters:
         - name: output_floodmap
       artifacts:
-        - name: output_graph
-          path: /output_graph # How we mount it.
+        - name: output_graph_1
+          path: /output_graph_1 # How we mount it.
           s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data

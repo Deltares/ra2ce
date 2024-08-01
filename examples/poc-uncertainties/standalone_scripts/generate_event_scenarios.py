@@ -12,7 +12,7 @@ _root_dir = "hackathon_uncertainty/output_1/"
 client = boto3.client("s3")
 result = client.list_objects(Bucket=bucket, Prefix=_root_dir, Delimiter="/")
 _selected_events = []
-n_runs = 100
+n_runs = 10
 for _sub_prefix in result.get("CommonPrefixes"):
     _prefix = _sub_prefix["Prefix"]
     _prefix_path = Path(_prefix)
