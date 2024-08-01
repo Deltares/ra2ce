@@ -1,7 +1,7 @@
-.. _kubernetes_deployement:
+.. _kubernetes_deployment:
 
-Deploying Amazon EKS Cluster with Terraform
-============================================
+Deploying Kubernetes on Amazon EKS Cluster with Terraform
+=========================================================
 
 This guide outlines the steps to deploy an Amazon EKS cluster using Terraform. The Terraform configuration provided here automates the setup process, making it easier to create and manage an EKS cluster on AWS.
 
@@ -11,8 +11,8 @@ Prerequisites
 Before deploying the EKS cluster, ensure you have the following prerequisites:
 
 - An AWS account with appropriate permissions to create resources like VPCs, subnets, EKS clusters, and EC2 instances.
-- Terraform installed on your local machine. You can download it from `here <https://www.terraform.io/downloads.html>`_ and follow the installation instructions.
-- AWS CLI configured with appropriate credentials. You can install and configure AWS CLI by following the instructions `here <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html>`_.
+- Terraform installed on your local machine. You can download it from `terraform official website <https://www.terraform.io/downloads.html>`_ and follow the installation instructions.
+- AWS CLI configured with appropriate credentials. You can install and configure AWS CLI by following `the official user guidelines <https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html>`_.
 
 Deployment Steps
 ----------------
@@ -21,13 +21,13 @@ Follow these steps to deploy the Amazon EKS cluster:
 
 1. **Clone the Repository:**
 
-   ::
+   .. code-block:: bash
 
       git clone <repository-url>
 
 2. **Navigate to the Project Directory:**
 
-   ::
+   .. code-block:: bash
 
       cd <repository-directory>
 
@@ -46,13 +46,13 @@ Follow these steps to deploy the Amazon EKS cluster:
 
 5. **Initialize Terraform:**
 
-   ::
+   .. code-block:: bash
 
       terraform init
 
 6. **Deploy the EKS Cluster:**
 
-   ::
+   .. code-block:: bash
 
       terraform apply
 
@@ -66,7 +66,7 @@ Follow these steps to deploy the Amazon EKS cluster:
 
    Use the provided kubeconfig file and ``kubectl`` to interact with the deployed EKS cluster:
 
-   ::
+   .. code-block:: bash
 
       export KUBECONFIG=$(pwd)/kubeconfig_<your-cluster-name>
 
@@ -81,7 +81,7 @@ To avoid incurring unnecessary costs, remember to clean up the resources once yo
 
 1. **Destroy Resources:**
 
-   ::
+   .. code-block:: bash
 
       terraform destroy
 
@@ -108,7 +108,7 @@ The nodegroups that are currently available within AWS EKS are:
 Adjusting the nodegroups
 -------------------------
 
-The size of the nodegroup is adjustable by using eksctl (`https://eksctl.io/`). Eksctl does not work well with AWS SSO unfortunately. You will need to configure your credentials manually.
+The size of the nodegroup is adjustable by using eksctl (`<https://eksctl.io/>`_). Eksctl does not work well with AWS SSO unfortunately. You will need to configure your credentials manually.
 
 To increase the current number of nodes (and “overwrite” the Kubernetes behavior):
 

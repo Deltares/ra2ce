@@ -1,5 +1,5 @@
 # Minimal makefile for Sphinx documentation
-#
+# Build from ra2ce root directory with `poetry run docs\make html`
 
 # You can set these variables from the command line.
 SPHINXOPTS    =

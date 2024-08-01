@@ -16,28 +16,30 @@ CLI only
 +++++++++++++++++++++++++++
 If only interested in using the tool via command-line interface follow these steps:
 
-::
+  .. code-block:: bash
 
-  pip install ra2ce
+    pip install ra2ce
   
 Alternatively you can install the latest version available on GitHub or a specific tag / commit hash by using the symbol `@`:
 
-::
+  .. code-block:: bash
 
-  pip install git+https://github.com/Deltares/ra2ce.git
-  pip install git+https://github.com/Deltares/ra2ce.git@v0.3.1
+    pip install git+https://github.com/Deltares/ra2ce.git
+    pip install git+https://github.com/Deltares/ra2ce.git@v0.3.1
 
+
+.. _install_ra2ce_devmode:
 
 Development mode
 +++++++++++++++++++++++++++
 When running a development environment with Anaconda, the user may follow these steps in command line:
 
-::
+  .. code-block:: bash
 
-  cd <to the main repository RA2CE folder>
-  conda env create -f .config\environment.yml
-  conda activate ra2ce_env
-  poetry install
+    cd <to the main repository RA2CE folder>
+    conda env create -f .config\environment.yml
+    conda activate ra2ce_env
+    poetry install
 
 
 Docker and cloud

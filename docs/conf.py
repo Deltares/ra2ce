@@ -116,7 +116,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "Risk Assessment and Adaptation for Critical infrastructurE"
-copyright = "2020, Deltares"
+copyright = "2024, Deltares"
 author = "Margreet van Marle\\Frederique de Groen\\Lieke Meijer\\Sahand Asgarpour\\Carles Soriano Perez"
 
 # The version info for the project you're documenting, acts as replacement
