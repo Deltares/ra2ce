@@ -207,7 +207,9 @@ class MultiLinkIsolatedLocations(AnalysisLossesProtocol):
                 network_hz_indirect = self.get_network_with_edge_fid(graph_hz_indirect)
                 network_hz_indirect[f"i_type_{hazard_name[:-3]}"] = "isolated"
                 # reproject the datasets to be able to make a buffer in meters
-                network_hz_indirect = network_hz_indirect.set_crs(crs=crs)
+                network_hz_indirect = network_hz_indirect.set_crs(
+                    crs=crs, allow_override=True
+                )
                 network_hz_indirect.to_crs(crs=nearest_utm, inplace=True)
 
             # get flooded network
@@ -216,7 +218,9 @@ class MultiLinkIsolatedLocations(AnalysisLossesProtocol):
                 network_hz_direct = self.get_network_with_edge_fid(graph_hz_direct)
                 network_hz_direct[f"i_type_{hazard_name[:-3]}"] = "flooded"
                 # reproject the datasets to be able to make a buffer in meters
-                network_hz_direct = network_hz_direct.set_crs(crs=crs)
+                network_hz_direct = network_hz_direct.set_crs(
+                    crs=crs, allow_override=True
+                )
                 network_hz_direct.to_crs(crs=nearest_utm, inplace=True)
 
             # get hazard roads
