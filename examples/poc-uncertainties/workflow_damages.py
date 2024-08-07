@@ -126,7 +126,7 @@ output_files = list(output_path.iterdir())
 print(f"Files in output path: {output_files}")
 # Copy static directory to output.
 # _output_2 = output_path.joinpath("output_damage")
-_output_2 = output_path.joinpath("/output_workflow2")
+_output_2 = output_path.joinpath("/output_workflow2")  # destination directory should match the path in argo workflow
 shutil.copytree(
-    output_path, _output_2, dirs_exist_ok=True
+    output_path.joinpath("damages"), _output_2, dirs_exist_ok=True
 )
