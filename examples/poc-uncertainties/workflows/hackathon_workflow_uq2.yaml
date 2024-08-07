@@ -20,8 +20,8 @@ spec:
           parameters:
           - name: ra2ce_tag
             value: latest
-    - - name: run-scenario
-        template: run-scenario
+    - - name: run-damage
+        template: run-damage
         arguments:
           parameters:
           - name: ra2ce_tag
