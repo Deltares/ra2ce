@@ -167,7 +167,7 @@ spec:
           bucket: ra2ce-data
           endpoint: s3.amazonaws.com
           region: eu-west-1
-          key: hackathon_uncertainty/output_2/{{inputs.parameters.output_floodmap}}
+          key: hackathon_uncertainty/output_2/{{workflow.name}}/{{inputs.parameters.output_floodmap}}
           accessKeySecret:
             name: my-s3-credentials
             key: accessKey
