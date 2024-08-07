@@ -15,7 +15,7 @@ path_results = Path(r'P:\moonshot2-casestudy\RA2CE_HACKATHON_JULY\results')
 
 events = [x for x in path_results.iterdir() if x.is_dir()]
 event = "TC_0064"
-category = "hospital"
+category = "clinic"
 print(events)
 
 # load data shared for all events
@@ -199,8 +199,8 @@ df.to_csv(path_results.joinpath("results.csv"))
 print(final_destinations_gdf)
 print(final_destinations_gdf.columns)
 print((final_destinations_gdf.dtypes=='geometry').sum()>1)
-final_destinations_gdf.to_file(path_results.joinpath("destinations_events.gpkg"), driver="GPKG")
-final_destinations_gdf.to_file(path_results.joinpath("destinations_events.geojson"), driver="GeoJSON")
+final_destinations_gdf.to_file(path_results.joinpath(f"destinations_events_{category}.gpkg"), driver="GPKG")
+final_destinations_gdf.to_file(path_results.joinpath(f"destinations_events_{category}.geojson"), driver="GeoJSON")
 
 
 
