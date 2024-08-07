@@ -29,7 +29,6 @@ spec:
           - name: output_floodmap
             value: "{{item}}"
         withParam: "{{steps.get-events-output-graphs.outputs.result}}"
-
   - name: check-ra2ce
     script:
       image: "containers.deltares.nl/ra2ce/ra2ce_hackathon_dealing_with_uncertainty_poc:{{inputs.parameters.ra2ce_tag}}"
@@ -80,7 +79,12 @@ spec:
   - name: run-damage
     container:
       image: "containers.deltares.nl/ra2ce/ra2ce_hackathon_dealing_with_uncertainty_poc:{{inputs.parameters.ra2ce_tag}}"
-      command: [python, "/scripts/workflow_damages.py"]
+      command: [ sh, -c ]
+      args:
+        - |
+          mkdir -p /modeldata/output && \
+          mkdir -p /output_workflow2 && \
+          python /scripts/workflow_damages.py
       resources:
         requests:
           cpu: 1
@@ -92,6 +96,7 @@ spec:
       beta.kubernetes.io/instance-type: "m5.xlarge"
     inputs:
       parameters:
+        - name: ra2ce_tag
         - name: output_floodmap
       artifacts:
         - name: output_graph_1
@@ -111,7 +116,7 @@ spec:
             none: {}
         - name: vulnerability_curves
           path: /vulnerability_curves # How we mount it
-          s3: 
+          s3:
             endpoint: s3.amazonaws.com
             bucket: ra2ce-data
             key: hackathon_uncertainty/vulnerability_curves
@@ -171,4 +176,3 @@ spec:
             key: secretKey
         archive:
           none: {}
- 

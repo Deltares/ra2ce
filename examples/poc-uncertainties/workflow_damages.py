@@ -14,37 +14,26 @@ from ra2ce.ra2ce_handler import Ra2ceHandler
 
 # Create one network configuration per provided hazard.
 # We assume the whole input directory will be mounted in `/modeldata`
-_root_dir = Path("./modeldata")
+_root_dir = Path("/modeldata")
 assert _root_dir.exists()
 
 # We assume the output graph of workflow 1 are mounted in the /output_graph_1 directory for the selected event_scenario
-_output_1 = Path("./output_graph_1")
+_output_1 = Path("/output_graph_1")
 assert _output_1.exists()
 
 # We also mount the vulnerability curves in the case we use predefined curves provided by users.
-_vulnerability_data_directory = Path("./vulnerability_curves")
+_vulnerability_data_directory = Path("/vulnerability_curves")
 assert _vulnerability_data_directory
 
 
 _static_path=_root_dir.joinpath("static")
 
-_event_directory = list(_output_1.iterdir())[0]
-assert _event_directory.exists()
-
-_scenario_directory = list(_event_directory.iterdir())[0]
-assert _scenario_directory.exists()
-
-output_graph_1 = _scenario_directory.joinpath("output_graph")  # directory with the output graph from workflow 1
-assert output_graph_1.exists()
-
-
-print(_scenario_directory.stem)
-print("\n")
-# _selected_hazard_file = _hazard_files[0]
 
 # Define output directory
 output_path = _root_dir.joinpath("output")
 assert output_path.exists()
+with open(output_path.joinpath("debug_file.txt"), "w") as f:
+    f.write("This is a debug file.")
 
 _tif_data_directory = _static_path.joinpath("hazard")
 assert _tif_data_directory.exists()
@@ -59,7 +48,7 @@ for _file in destination_directory.iterdir():
     if _file.is_file():
         _file.unlink()
 
-for _file in output_graph_1.iterdir():
+for _file in _output_1.iterdir():
     # copy the file into destination directory
     shutil.copy(_file, destination_directory)
 
@@ -132,8 +121,12 @@ _handler.configure()
 _handler.run_analysis()
 
 
+
+output_files = list(output_path.iterdir())
+print(f"Files in output path: {output_files}")
 # Copy static directory to output.
-_static_output = output_path.joinpath("output_damage")
+# _output_2 = output_path.joinpath("output_damage")
+_output_2 = output_path.joinpath("/output_workflow2")
 shutil.copytree(
-    _static_path.joinpath("output_graph"), _static_output, dirs_exist_ok=True
+    output_path, _output_2, dirs_exist_ok=True
 )
