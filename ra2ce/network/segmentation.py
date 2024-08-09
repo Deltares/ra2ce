@@ -27,7 +27,8 @@ import geopandas as gpd
 from geopy import distance
 from shapely.geometry import LineString, MultiLineString, Point
 
-from ra2ce.network.networks_utils import cut as network_cut, line_length
+from ra2ce.network.networks_utils import cut as network_cut
+from ra2ce.network.networks_utils import line_length
 
 
 class Segmentation:  # Todo: more naturally, this would be METHOD of the network class.

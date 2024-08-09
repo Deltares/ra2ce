@@ -20,7 +20,7 @@
 """
 import logging
 import math
-from typing import Protocol, runtime_checkable, Union, Optional
+from typing import Optional, Protocol, Union, runtime_checkable
 
 from geopandas import GeoDataFrame
 from networkx import MultiGraph
