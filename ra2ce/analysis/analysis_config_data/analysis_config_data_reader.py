@@ -129,6 +129,17 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             self._parser.get(section_name, "loss_type", fallback=None)
         )
         # losses
+        _section.event_type = EventTypeEnum.get_enum(
+            self._parser.get(section_name, "event_type", fallback=None)
+        )
+        _section.risk_calculation_mode = RiskCalculationModeEnum.get_enum(
+            self._parser.get(section_name, "risk_calculation_mode", fallback=None)
+        )
+        _section.risk_calculation_year = self._parser.getint(
+            section_name,
+            "risk_calculation_year",
+            fallback=_section.risk_calculation_year,
+        )
         _section.traffic_cols = self._parser.getlist(
             section_name, "traffic_cols", fallback=_section.traffic_cols
         )

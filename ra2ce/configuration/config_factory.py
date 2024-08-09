@@ -125,6 +125,9 @@ class ConfigFactory:
             _network_config.config_data.origins_destinations = (
                 _network_data.origins_destinations
             )
+            _network_config.config_data.hazard.aggregate_wl = (
+                _network_data.hazard.aggregate_wl
+            )
         else:
             logging.error(
                 f"Network configuration not found. Value provided: {_output_network_ini_file}"

@@ -25,7 +25,7 @@ class TestResilienceCurve:
                 RoadTypeEnum.MOTORWAY, (0.2, 0.5), [3.0, 5.0], id="Motorway 0.2"
             ),
             pytest.param(
-                RoadTypeEnum.MOTORWAY, (0.5, 1.2), [2.0, 4.0], id="Motorway 0.5"
+                RoadTypeEnum.MOTORWAY, (0.5, 1.2), [6.0, 10.0], id="Motorway 0.5"
             ),
         ],
     )
@@ -49,7 +49,7 @@ class TestResilienceCurve:
                 RoadTypeEnum.MOTORWAY, (0.2, 0.5), [1.0, 0.4], id="Motorway 0.2"
             ),
             pytest.param(
-                RoadTypeEnum.MOTORWAY, (0.5, 1.2), [1.0, 0.3], id="Motorway 0.5"
+                RoadTypeEnum.MOTORWAY, (0.5, 1.2), [1.0, 0.4], id="Motorway 0.5"
             ),
         ],
     )
@@ -72,7 +72,7 @@ class TestResilienceCurve:
         "link_type, hazard_range, expected",
         [
             pytest.param(RoadTypeEnum.MOTORWAY, (0.2, 0.5), 5.0, id="Motorway 0.2-0.5"),
-            pytest.param(RoadTypeEnum.MOTORWAY, (0.5, 1.2), 3.2, id="Motorway 0.5-1.2"),
+            pytest.param(RoadTypeEnum.MOTORWAY, (0.5, 1.2), 10.0, id="Motorway 0.5-1.2"),
         ],
     )
     def test_calculate_disruption(

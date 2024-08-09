@@ -85,6 +85,9 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
         _new_analysis.config_data.origins_destinations = (
             network_config.config_data.origins_destinations
         )
+        _new_analysis.config_data.aggregate_wl = (
+            network_config.config_data.hazard.aggregate_wl
+        )
         # Graphs are retrieved from the already configured object
         _new_analysis.graph_files = network_config.graph_files
 

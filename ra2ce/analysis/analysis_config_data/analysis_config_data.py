@@ -108,7 +108,6 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     values_of_time_file: Optional[Path] = None
     # the redundancy analysis) and the intensities
     # accessibility analyses
-    aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     threshold: float = 0.0
     threshold_destinations: float = math.nan
     uniform_duration: float = math.nan
@@ -119,6 +118,13 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     threshold_locations: float = math.nan
     category_field_name: str = ""
     save_traffic: bool = False
+
+    # risk or estimated annual losses related
+    event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.NONE)
+    risk_calculation_mode: RiskCalculationModeEnum = field(
+        default_factory=lambda: RiskCalculationModeEnum.NONE
+    )
+    risk_calculation_year: int = 0
 
 
 @dataclass
@@ -139,7 +145,7 @@ class AnalysisSectionDamages(AnalysisSectionBase):
     climate_period: float = math.nan
     # road damage
     representative_damage_percentage: float = 100
-    event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.INVALID)
+    event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.NONE)
     damage_curve: DamageCurveEnum = field(
         default_factory=lambda: DamageCurveEnum.INVALID
     )
@@ -168,6 +174,7 @@ class AnalysisConfigData(ConfigDataProtocol):
         default_factory=OriginsDestinationsSection
     )
     network: NetworkSection = field(default_factory=NetworkSection)
+    aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     hazard_names: list[str] = field(default_factory=list)
 
     @property
