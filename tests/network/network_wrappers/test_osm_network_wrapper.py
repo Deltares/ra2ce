@@ -40,7 +40,7 @@ class TestOsmNetworkWrapper:
         # 3. Verify final expectations.
         assert isinstance(_wrapper, OsmNetworkWrapper)
         assert isinstance(_wrapper, NetworkWrapperProtocol)
-        assert _wrapper.graph_crs.to_epsg() == 4326
+        assert _wrapper.crs.to_epsg() == 4326
 
     @staticmethod
     def _get_dummy_network_config_data() -> NetworkConfigData:
