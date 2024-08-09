@@ -68,6 +68,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         self.output_graph_dir = config_data.output_graph_dir
 
         # Cleanup
+        self.segmentation_length = config_data.cleanup.segmentation_length
         self.delete_duplicate_nodes = config_data.cleanup.delete_duplicate_nodes
 
     def get_network(
@@ -110,6 +111,11 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         logging.info("Start converting the graph to a geodataframe")
         edges_complex, _ = nut.graph_to_gdf(graph_complex)
         logging.info("Finished converting the graph to a geodataframe")
+
+        # Segment the complex graph
+        edges_complex, link_tables = self.segment_graph(
+            edges_complex, export_link_table=True, link_tables=link_tables
+        )
 
         # Save the link tables linking complex and simple IDs
         self._export_linking_tables(link_tables)
