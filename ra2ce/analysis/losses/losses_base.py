@@ -357,7 +357,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             _max_disruption = 0
             for _row_link_type in vlh_row[self.link_type_column]:
                 _link_type = RoadTypeEnum.get_enum(_row_link_type)
-                disruption = self.resilience_curves.get_disruption(
+                disruption = self.resilience_curves.calculate_disruption(
                     _link_type, row_hazard_range
                 )
                 if disruption > _max_disruption:
