@@ -19,11 +19,11 @@ class MockedDNB(DamageNetworkBase):
 class TestDamageNetworkBase:
     def test_init_network_base_raises(self):
         with pytest.raises(TypeError):
-            DamageNetworkBase(None, [], 50)
+            DamageNetworkBase(None, [], 50, 'highway')
 
     def test_main_raises_error(self):
         # 1. Define test data.
-        _dnb = MockedDNB(None, [], 50)
+        _dnb = MockedDNB(None, [], 50, 'highway')
 
         # 2. Run test
         with pytest.raises(ValueError) as exc_err:
@@ -34,7 +34,7 @@ class TestDamageNetworkBase:
 
     def test_create_mask(self):
         # 1. Define test data.
-        _dnb = MockedDNB(None, [], 50)
+        _dnb = MockedDNB(None, [], 50, 'highway')
         _dnb.gdf = gpd.GeoDataFrame.from_dict({"geometry": [None, None]})
         _dnb.val_cols = ["_fr"]
         assert "geometry" in _dnb.gdf.columns
@@ -47,7 +47,7 @@ class TestDamageNetworkBase:
 
     def test_replace_none_with_nan(self):
         # 1. Define test data.
-        _dnb = MockedDNB(None, [], 50)
+        _dnb = MockedDNB(None, [], 50, 'highway')
         _dnb.gdf = gpd.GeoDataFrame.from_dict(
             {"dam_abc": [None, None], "dam_cde": [None, None]}
         )
