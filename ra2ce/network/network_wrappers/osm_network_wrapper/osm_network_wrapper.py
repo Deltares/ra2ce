@@ -59,13 +59,16 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
             config_data.network.attributes_to_exclude_in_simplification
         )
         self.output_graph_dir = config_data.output_graph_dir
-        self.graph_crs = config_data.crs
+        self.crs = config_data.crs
 
         # Network
         self.network_type = config_data.network.network_type
         self.road_types = config_data.network.road_types
         self.polygon_graph = self._get_clean_graph_from_osm(config_data.network.polygon)
         self.is_directed = config_data.network.directed
+
+        # Cleanup
+        self.segmentation_length = config_data.cleanup.segmentation_length
 
     @classmethod
     def with_polygon(
@@ -152,6 +155,11 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         logging.info("Start converting the graph to a geodataframe")
         edges_complex, _ = nut.graph_to_gdf(graph_complex)
         logging.info("Finished converting the graph to a geodataframe")
+
+        # Segment the complex graph
+        edges_complex, link_tables = self.segment_graph(
+            edges_complex, export_link_table=True, link_tables=link_tables
+        )
 
         # Save the link tables linking complex and simple IDs
         self._export_linking_tables(link_tables)
@@ -250,7 +258,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
             )
         )
         if "crs" not in _complex_graph.graph.keys():
-            _complex_graph.graph["crs"] = self.graph_crs
+            _complex_graph.graph["crs"] = self.crs
         self.get_clean_graph(_complex_graph)
         return _complex_graph
 
