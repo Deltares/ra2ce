@@ -6,7 +6,7 @@ import pytest
 
 from ra2ce.network.avg_speed.avg_speed_calculator import AvgSpeedCalculator
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
-from tests import test_data, test_results
+from tests import test_results
 
 _SPEED_SECONDARY = 80.0
 _SPEED_TERTIARY = 30.0
@@ -41,7 +41,7 @@ class TestAvgSpeedCalculator:
 
     def test_initialize(self, valid_network: nx.MultiGraph):
         # 1. Run test
-        _calculator = AvgSpeedCalculator(valid_network, None)
+        _calculator = AvgSpeedCalculator(valid_network, "highway", None)
 
         # 2. Verify expectations
         assert isinstance(_calculator, AvgSpeedCalculator)
@@ -68,7 +68,7 @@ class TestAvgSpeedCalculator:
 
     def test_calculate_without_output_dir(self, valid_network: nx.MultiGraph):
         # 1. Run test
-        _calculator = AvgSpeedCalculator(valid_network, None)
+        _calculator = AvgSpeedCalculator(valid_network, "highway", None)
 
         # 2. Verify expectations
         assert _calculator.avg_speed is not None
@@ -104,7 +104,7 @@ class TestAvgSpeedCalculator:
         _csv_path.unlink(missing_ok=True)
 
         # 2. Run test
-        _calculator = AvgSpeedCalculator(valid_network, _csv_dir)
+        _calculator = AvgSpeedCalculator(valid_network, "highway", _csv_dir)
 
         # 3. Verify expectations
         assert _csv_path.is_file()
@@ -116,14 +116,14 @@ class TestAvgSpeedCalculator:
         assert avg_speed_csv.is_file()
 
         # 2. Run test
-        _calculator = AvgSpeedCalculator(valid_network, avg_speed_csv.parent)
+        _calculator = AvgSpeedCalculator(valid_network, "highway", avg_speed_csv.parent)
 
         # 3. Verify expectations
         assert len(_calculator.avg_speed.road_types) > 0
 
     def test_assign(self, valid_network: nx.MultiGraph):
         # 1. Define test data
-        _calculator = AvgSpeedCalculator(valid_network, None)
+        _calculator = AvgSpeedCalculator(valid_network, "highway", None)
 
         # 2. Run test
         _calculator.assign()

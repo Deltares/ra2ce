@@ -103,9 +103,11 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         ).simplify()
 
         # Assign the average speed and time to the graphs
-        graph_simple = AvgSpeedCalculator(graph_simple, self.output_graph_dir).assign()
+        graph_simple = AvgSpeedCalculator(
+            graph_simple, self.link_type_column, self.output_graph_dir
+        ).assign()
         graph_complex = AvgSpeedCalculator(
-            graph_complex, self.output_graph_dir
+            graph_complex, self.link_type_column, self.output_graph_dir
         ).assign()
 
         logging.info("Start converting the graph to a geodataframe")

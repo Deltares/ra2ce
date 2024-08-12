@@ -36,10 +36,14 @@ class AvgSpeedCalculator:
     """
 
     graph: nx.Graph
+    link_type_column: str
     avg_speed: AvgSpeed
 
-    def __init__(self, graph: nx.Graph, output_graph_dir: Path | None) -> None:
+    def __init__(
+        self, graph: nx.Graph, link_type_column: str, output_graph_dir: Path | None
+    ) -> None:
         self.graph = graph
+        self.link_type_column = link_type_column
         self.avg_speed = self._calculate(output_graph_dir)
 
     @staticmethod
@@ -182,7 +186,7 @@ class AvgSpeedCalculator:
         )
         if all(_length_array) and any(_maxspeed_array):
             # Add time weighing - Define and assign average speeds; or take the average speed from an existing CSV
-            _avg_speed = self._get_avg_speed("highway")
+            _avg_speed = self._get_avg_speed(self.link_type_column)
             if output_graph_dir:
                 AvgSpeedWriter().export(
                     output_graph_dir.joinpath("avg_speed.csv"), _avg_speed
@@ -207,7 +211,7 @@ class AvgSpeedCalculator:
         """
 
         def get_speed(edata: dict) -> float:
-            _rt = edata.get("highway", None)
+            _rt = edata.get(self.link_type_column, None)
             _speed = self.parse_speed(edata.get("maxspeed", None))
             if not _speed:
                 _speed = self.avg_speed.get_avg_speed(AvgSpeed.get_road_type_list(_rt))
