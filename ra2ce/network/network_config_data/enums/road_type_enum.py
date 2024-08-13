@@ -18,6 +18,7 @@ class RoadTypeEnum(Ra2ceEnumBase):
     TUNNEL = 13
     BRIDGE = 14
     CULVERT = 15
+    RAIL = 16
     UNCLASSIFIED = 98
     INVALID = 99
 
