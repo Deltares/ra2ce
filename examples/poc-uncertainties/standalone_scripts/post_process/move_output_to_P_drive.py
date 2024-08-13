@@ -21,6 +21,8 @@ result = client.list_objects(Bucket=bucket, Prefix=_root_dir, Delimiter="/")
 for event in result.get("CommonPrefixes"):
     prefix = event.get("Prefix")
     event_name = Path(prefix).name     # extract the event name:
+    if event_name != "event3":
+        continue
     query_event = client.list_objects(Bucket=bucket, Prefix=prefix, Delimiter="/")
 
     scenarios = [scenario["Prefix"] for scenario in query_event.get("CommonPrefixes")]
@@ -41,6 +43,9 @@ for event in result.get("CommonPrefixes"):
 
             # copy files in destination dir:
             for _file in query_run.get("Contents"):
+                # only keep .gpkg files
+                if not _file["Key"].endswith(".gpkg"):
+                    continue
                 _file_name = Path(_file["Key"]).name
                 _destination_file = _event_dir.joinpath(_file_name)
                 _file_content = client.get_object(Bucket=bucket, Key=_file["Key"])["Body"].read()
