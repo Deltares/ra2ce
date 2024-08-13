@@ -41,8 +41,8 @@ def get_losses_fixture() -> Iterator[pd.DataFrame]:
     )
 
 
-@pytest.fixture(name="expected_factory_results")
-def get_expected_factory_results() -> dict:
+@pytest.fixture(name="expected_factory_results_fixture")
+def get_expected_factory_results_fixture() -> Iterator[dict]:
     _expected_factory_results = {
         RiskCalculationModeEnum.DEFAULT: {
             "class": RiskCalculationDefault,

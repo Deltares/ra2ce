@@ -12,7 +12,7 @@ class TestRiskCalculationFactory:
     def test_risk_calculation_factory(
         self,
         risk_calculation_info_fixture: tuple[RiskCalculationModeEnum, int],
-        expected_factory_results: dict,
+        expected_factory_results_fixture: dict,
         losses_fixture: pd.DataFrame,
     ):
         _risk_calculation = RiskCalculationFactory.get_risk_calculation(
@@ -23,8 +23,8 @@ class TestRiskCalculationFactory:
 
         assert isinstance(
             _risk_calculation,
-            expected_factory_results[risk_calculation_info_fixture[0]]["class"],
+            expected_factory_results_fixture[risk_calculation_info_fixture[0]]["class"],
         )
         assert sorted(_risk_calculation._return_periods) == sorted(
-            expected_factory_results["_return_periods"]
+            expected_factory_results_fixture["_return_periods"]
         )
