@@ -113,6 +113,8 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         self.output_path = analysis_input.output_path
         self.hazard_names = analysis_input.hazard_names
 
+        self.criticality_analysis = gpd.GeoDataFrame()
+        self.criticality_analysis_non_disrupted = gpd.GeoDataFrame()
         self.result = gpd.GeoDataFrame()
 
     def _check_validity_analysis_files(self):
@@ -159,10 +161,10 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         ]
         # link_id from list to tuple
         if len(self.criticality_analysis_non_disrupted) > 0:
-            self.criticality_analysis_non_disrupted[
-                self.link_id
-            ] = self.criticality_analysis_non_disrupted[self.link_id].apply(
-                lambda x: tuple(x) if isinstance(x, list) else x
+            self.criticality_analysis_non_disrupted[self.link_id] = (
+                self.criticality_analysis_non_disrupted[self.link_id].apply(
+                    lambda x: tuple(x) if isinstance(x, list) else x
+                )
             )
         self.criticality_analysis[self.link_id] = self.criticality_analysis[
             self.link_id
@@ -450,9 +452,9 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                 [vlh_row.name], f"vlh_{trip_type}_{hazard_col_name}"
             ] = vlh_trip_type_event
             vlh_total += vlh_trip_type_event
-        vehicle_loss_hours.loc[
-            [vlh_row.name], f"vlh_{hazard_col_name}_total"
-        ] = vlh_total
+        vehicle_loss_hours.loc[[vlh_row.name], f"vlh_{hazard_col_name}_total"] = (
+            vlh_total
+        )
 
     def _populate_vehicle_loss_hour(
         self,
@@ -502,9 +504,9 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                 [vlh_row.name], f"vlh_{trip_type}_{hazard_col_name}"
             ] = vlh_trip_type_event
             vlh_total += vlh_trip_type_event
-        vehicle_loss_hours.loc[
-            [vlh_row.name], f"vlh_{hazard_col_name}_total"
-        ] = vlh_total
+        vehicle_loss_hours.loc[[vlh_row.name], f"vlh_{hazard_col_name}_total"] = (
+            vlh_total
+        )
 
     @abstractmethod
     def _get_criticality_analysis(self) -> AnalysisLossesProtocol:
