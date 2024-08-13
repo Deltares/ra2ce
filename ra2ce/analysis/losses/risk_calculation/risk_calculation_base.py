@@ -8,22 +8,24 @@ import re
 class RiskCalculationBase(ABC):
     risk_calculation_year: int
     losses_gdf: gpd.GeoDataFrame
+    _return_periods: set[int]
 
     def __init__(self, risk_calculation_year: int, losses_gdf: gpd.GeoDataFrame):
         self.risk_calculation_year = risk_calculation_year
         self.losses_gdf = losses_gdf
+        self._return_periods = self._get_return_periods()
 
     @property
-    def _return_periods(self) -> set[int]:
-        return self._get_return_periods()
+    def return_periods(self):
+        return self._return_periods
 
     @property
     def _max_return_period(self) -> int:
-        return max(self._return_periods)
+        return max(self.return_periods)
 
     @property
     def _min_return_period(self) -> int:
-        return min(self._return_periods)
+        return min(self.return_periods)
 
     def _get_return_periods(self) -> set:
         # Find the hazard columns; these may be events or return periods
@@ -78,3 +80,5 @@ class RiskCalculationBase(ABC):
         _risk_calculations = self._get_network_risk_calculations()
         frequencies = sorted(1 / rp for rp in _risk_calculations.columns)
         return np.trapz(_risk_calculations.values, frequencies, axis=1)
+
+
