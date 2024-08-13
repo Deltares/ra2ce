@@ -119,6 +119,8 @@ class AvgSpeedCalculator:
                 for _, _, edata in self.graph.edges.data()
                 if (edata[road_type_col_name] == _rt) & ("maxspeed" in edata)
             ]
+            # Filter out edges with speed 0
+            edge_data = [(s, l) for s, l in edge_data if s > 0]
             if not edge_data:
                 _avg_speed.set_avg_speed(AvgSpeed.get_road_type_list(_rt), 0.0)
             else:

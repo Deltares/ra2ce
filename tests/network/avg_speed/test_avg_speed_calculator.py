@@ -36,7 +36,13 @@ class TestAvgSpeedCalculator:
             maxspeed=str(round(_SPEED_SECONDARY)),
             length=2200.0,
         )
-        _graph.add_edge(1, 4, key=5, highway="['primary', 'tertiary']", length=5000.0)
+        _graph.add_edge(
+            1,
+            4,
+            key=5,
+            highway="['primary', 'tertiary']",
+            length=5000.0,
+        )
         yield _graph
 
     def test_initialize(self, valid_network: nx.MultiGraph):
@@ -56,7 +62,7 @@ class TestAvgSpeedCalculator:
             pytest.param("60;50", 55.0, id="; as separator"),
             pytest.param("60-50", 55.0, id="- as separator"),
             pytest.param("60|50", 55.0, id="| as separator"),
-            pytest.param("50 mph", 80.4672, id="Mph string"),
+            pytest.param("50 mph", 80.4672, id="mph string"),
         ],
     )
     def test_parse_speed(self, speed: str, expected: float):
@@ -66,7 +72,7 @@ class TestAvgSpeedCalculator:
         # 2. Verify expectations
         assert _result == pytest.approx(expected)
 
-    def test_calculate_without_output_dir(self, valid_network: nx.MultiGraph):
+    def test_calculate(self, valid_network: nx.MultiGraph):
         # 1. Run test
         _calculator = AvgSpeedCalculator(valid_network, "highway", None)
 
@@ -94,6 +100,20 @@ class TestAvgSpeedCalculator:
             _calculator.avg_speed.get_avg_speed([RoadTypeEnum.INVALID])
             == _SPEED_DEFAULT
         )
+
+    def test_calculate_skips_zero_speed_edges(self):
+        # 1 Define test data
+        _graph = nx.MultiGraph()
+        _graph.add_nodes_from([1, 2])
+        _graph.add_edge(1, 2, highway="tertiary", maxspeed="0", length=1000.0)
+        _graph.add_edge(1, 2, highway="tertiary", maxspeed="10", length=200.0)
+        _graph.add_edge(1, 2, highway="tertiary", maxspeed="16", length=400.0)
+
+        # 2. Run test
+        _calculator = AvgSpeedCalculator(_graph, "highway", None)
+
+        # 3. Verify expectations
+        assert _calculator.avg_speed.get_avg_speed([RoadTypeEnum.TERTIARY]) == 14
 
     def test_calculate_with_empty_output_dir_creates_csv(
         self, valid_network: nx.MultiGraph, request: pytest.FixtureRequest
