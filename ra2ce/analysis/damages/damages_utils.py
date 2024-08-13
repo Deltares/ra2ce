@@ -19,7 +19,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
 import logging
 from typing import Any, List
 
@@ -134,10 +133,7 @@ def create_summary_statistics(gdf: GeoDataFrame) -> dict:
         list(_val for _val in _lanes_dict.values() if not np.isnan(_val))
     )
     # Round the mean to the nearest integer
-    rounded_value = round(lanes_values)
-    # Convert the rounded value to a float with .0
-    default_value = float(rounded_value)  
-
+    default_value = round(lanes_values, 0)
     # Replace nan with the calculated average
     return {
         _road_type: _lanes if not np.isnan(_lanes) else default_value
