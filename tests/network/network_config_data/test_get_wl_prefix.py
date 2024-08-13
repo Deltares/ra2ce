@@ -28,7 +28,7 @@ class TestGetWlPrefix:
         self, aggregate_wl: AggregateWlEnum, expected_prefix: str
     ):
         # 1./2. Define test data / Run test
-        _prefix = aggregate_wl.get_wl_prefix()
+        _prefix = aggregate_wl.get_wl_abbreviation()
 
         # 3. Verify results
         assert _prefix == expected_prefix

@@ -138,14 +138,14 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             criticality_analysis = criticality_analysis.drop_duplicates(["u", "v"])
         #  ToDO: check hazard overlay with AggregateWlEnum.NONE or INVALID
 
-        aggregate_wl_prefix = (
-            self.analysis_config.config_data.aggregate_wl.get_wl_prefix()
+        aggregate_wl_abbreviation = (
+            self.analysis_config.config_data.aggregate_wl.get_wl_abbreviation()
         )
         hazard_aggregate_wl_columns = [
             c
             for c in criticality_analysis.columns
             if (c.startswith("RP") or c.startswith("EV"))
-            and c.endswith(f"_{aggregate_wl_prefix}")
+            and c.endswith(f"_{aggregate_wl_abbreviation}")
         ]
         self.criticality_analysis = criticality_analysis[
             (
