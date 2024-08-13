@@ -69,8 +69,8 @@ class TestDamagesUtils:
         [
             pytest.param([0, 1, 3], [0, 1, 3], id="Valid lanes"),
             pytest.param([np.nan, 1, 3], [2, 1, 3], id="First lane invalid"),
-            pytest.param([0, np.nan, 3], [0, 1.5, 3], id="Middle lane invalid"),
-            pytest.param([0, 1, np.nan], [0, 1, 0.5], id="Last lane invalid"),
+            pytest.param([0, np.nan, 3], [0, 2, 3], id="Middle lane invalid"),
+            pytest.param([0, 1, np.nan], [0, 1, 1], id="Last lane invalid"),
             pytest.param(
                 [np.nan, np.nan, np.nan],
                 [np.nan, np.nan, np.nan],
