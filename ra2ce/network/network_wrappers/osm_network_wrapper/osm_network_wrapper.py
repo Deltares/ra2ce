@@ -66,6 +66,7 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         self.road_types = config_data.network.road_types
         self.polygon_graph = self._get_clean_graph_from_osm(config_data.network.polygon)
         self.is_directed = config_data.network.directed
+        self.link_type_column = config_data.network.link_type_column
 
         # Cleanup
         self.segmentation_length = config_data.cleanup.segmentation_length
@@ -146,9 +147,11 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         ).simplify()
 
         # Assign the average speed and time to the graphs
-        graph_simple = AvgSpeedCalculator(graph_simple, self.output_graph_dir).assign()
+        graph_simple = AvgSpeedCalculator(
+            graph_simple, self.link_type_column, self.output_graph_dir
+        ).assign()
         graph_complex = AvgSpeedCalculator(
-            graph_complex, self.output_graph_dir
+            graph_complex, self.link_type_column, self.output_graph_dir
         ).assign()
 
         # Create 'edges_complex', convert complex graph to geodataframe
