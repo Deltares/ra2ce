@@ -133,7 +133,7 @@ def create_summary_statistics(gdf: GeoDataFrame) -> dict:
         list(_val for _val in _lanes_dict.values() if not np.isnan(_val))
     )
     # Round the mean to the nearest integer
-    default_value = round(lanes_values, 0)
+    default_value = np.ceil(lanes_values)
     # Replace nan with the calculated average
     return {
         _road_type: _lanes if not np.isnan(_lanes) else default_value
