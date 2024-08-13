@@ -130,9 +130,13 @@ def create_summary_statistics(gdf: GeoDataFrame) -> dict:
 
     # get a default value if any key of the dictionary is nan
     # (because the mode operation on the 'lanes' column for a road type results in an empty array)
-    default_value = np.mean(
+    lanes_values = np.mean(
         list(_val for _val in _lanes_dict.values() if not np.isnan(_val))
     )
+    # Round the mean to the nearest integer
+    rounded_value = round(lanes_values)
+    # Convert the rounded value to a float with .0
+    default_value = float(rounded_value)  
 
     # Replace nan with the calculated average
     return {
