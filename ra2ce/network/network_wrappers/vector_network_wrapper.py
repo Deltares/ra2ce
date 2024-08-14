@@ -49,8 +49,8 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
     """
 
     def __init__(
-        self,
-        config_data: NetworkConfigData,
+            self,
+            config_data: NetworkConfigData,
     ) -> None:
         self.attributes_to_exclude_in_simplification = (
             config_data.network.attributes_to_exclude_in_simplification
@@ -72,7 +72,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         self.delete_duplicate_nodes = config_data.cleanup.delete_duplicate_nodes
 
     def get_network(
-        self,
+            self,
     ) -> tuple[nx.Graph, gpd.GeoDataFrame]:
         """Gets a network built from vector files.
 
@@ -91,6 +91,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
                     "avgspeed",
                     "bridge",
                     "tunnel",
+                    "lanes"
                 ],
             )
         else:
@@ -102,6 +103,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
                     "avgspeed",
                     "bridge",
                     "tunnel",
+                    "lanes"
                 ],
             )
         edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
@@ -200,8 +202,8 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         # Iterate through nodes and add representative nodes to the mapping
         for node, data in tqdm(
-            graph_complex.nodes(data=True),
-            desc="Creating graph with removed node duplicates",
+                graph_complex.nodes(data=True),
+                desc="Creating graph with removed node duplicates",
         ):
             location = (round(data["geometry"].x, 7), round(data["geometry"].y, 7))
             if location not in location_to_representative:
@@ -217,7 +219,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         # Add edges to the updated_graph
         for u, v, data in tqdm(
-            graph_complex.edges(data=True), desc="Adding edges to the updated graph"
+                graph_complex.edges(data=True), desc="Adding edges to the updated graph"
         ):
             u_representative = location_to_representative.get(
                 (
@@ -267,9 +269,9 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         return updated_graph
 
     def _create_graph_from_gdf(
-        self,
-        geo_dataframe: gpd.GeoDataFrame,
-        edge_attributes_to_include: list,
+            self,
+            geo_dataframe: gpd.GeoDataFrame,
+            edge_attributes_to_include: list,
     ) -> nx.Graph | nx.DiGraph:
         """
         Creates a simple undirected graph with node and edge geometries based on a given GeoDataFrame.
@@ -317,7 +319,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         return _networkx_graph
 
     def _get_direct_graph_from_vector(
-        self, gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
+            self, gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
     ) -> nx.DiGraph:
         """Creates a simple directed graph with node and edge geometries based on a given GeoDataFrame.
 
@@ -338,7 +340,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         return self._create_graph_from_gdf(gdf, edge_attributes_to_include)
 
     def _get_undirected_graph_from_vector(
-        self, gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
+            self, gdf: gpd.GeoDataFrame, edge_attributes_to_include: list
     ) -> nx.Graph:
         """Creates a simple undirected graph with node and edge geometries based on a given GeoDataFrame.
 
@@ -357,7 +359,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
     @staticmethod
     def get_network_edges_and_nodes_from_graph(
-        graph: nx.Graph,
+            graph: nx.Graph,
     ) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
         """Sets up network nodes and edges from a given graph.
 
@@ -373,7 +375,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         # TODO ths function use conventions. Good to make consistant convention with osm
         nodes, edges = momepy.nx_to_gdf(graph, nodeID="node_fid")
         edges["edge_fid"] = (
-            edges["node_start"].astype(str) + "_" + edges["node_end"].astype(str)
+                edges["node_start"].astype(str) + "_" + edges["node_end"].astype(str)
         )
         edges.rename(
             {"node_start": "node_A", "node_end": "node_B"}, axis=1, inplace=True
