@@ -20,7 +20,7 @@ class TestDamageNetworkReturnPeriods:
 
         # 2. Run test.
         _damage = DamageNetworkReturnPeriods(
-            _road_gf, _val_cols, _representative_damage_percentage
+            _road_gf, _val_cols, _representative_damage_percentage, "highway"
         )
 
         # 2. Verify expectations.
@@ -32,12 +32,12 @@ class TestDamageNetworkReturnPeriods:
         # 1. Define test data.
         _road_gf = None
         _val_cols = []
-        _representative_damage_percentage = None
+        _representative_damage_percentage = 100
 
         # 2. Run test.
         with pytest.raises(ValueError) as exc_err:
             DamageNetworkReturnPeriods(
-                _road_gf, _val_cols, _representative_damage_percentage
+                _road_gf, _val_cols, _representative_damage_percentage, "highway"
             )
 
         # 3. Verify expectations
@@ -58,7 +58,7 @@ class TestDamageNetworkReturnPeriods:
         # 1. Define test data.
         _road_gf = None
         _val_cols = ["an_me", "an_fr"]
-        _damage = DamageNetworkReturnPeriods(_road_gf, _val_cols)
+        _damage = DamageNetworkReturnPeriods(_road_gf, _val_cols, 100, "highway")
         _manual_functions = None
         # 2. Run test.
         _damage.main(damage_function, _manual_functions)

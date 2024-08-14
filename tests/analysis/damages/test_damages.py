@@ -86,7 +86,7 @@ class TestDamages:
         _representative_damage_percentage = 100
         # DO ACTUAL DAMAGE CALCULATION
         event_gdf = DamageNetworkEvents(
-            road_gdf, val_cols, _representative_damage_percentage
+            road_gdf, val_cols, _representative_damage_percentage, "highway"
         )
         event_gdf.main(damage_function=damage_function)
 
@@ -122,7 +122,7 @@ class TestDamages:
         ]
         _representative_damage_percentage = 100
         event_gdf = DamageNetworkEvents(
-            road_gdf, val_cols, _representative_damage_percentage
+            road_gdf, val_cols, _representative_damage_percentage, "highway"
         )
         event_gdf.main(damage_function=damage_function)
 
@@ -187,7 +187,7 @@ class TestDamages:
 
         # DO ACTUAL DAMAGE CALCULATION
         event_gdf = DamageNetworkEvents(
-            road_gdf, val_cols, _representative_damage_percentage
+            road_gdf, val_cols, _representative_damage_percentage, "highway"
         )
         event_gdf.main(damage_function=damage_function)
 
@@ -272,7 +272,7 @@ class TestDamages:
 
         # DO ACTUAL DAMAGE CALCULATION
         event_gdf = DamageNetworkEvents(
-            road_gdf, val_cols, _representative_damage_percentage
+            road_gdf, val_cols, _representative_damage_percentage, "highway"
         )
         event_gdf.main(
             damage_function=damage_function,
@@ -315,7 +315,7 @@ class TestDamages:
 
         manual_damage_functions = self._load_manual_damage_function()
 
-        event_gdf = DamageNetworkEvents(road_gdf, val_cols)
+        event_gdf = DamageNetworkEvents(road_gdf, val_cols, 100, "highway")
         event_gdf.main(
             damage_function=damage_function,
             manual_damage_functions=manual_damage_functions,
@@ -370,7 +370,7 @@ class TestDamages:
 
     def test_construct_damage_network_return_periods(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-            risk_data_file, sep=";", representative_damage_percentage=100
+            risk_data_file, sep=";", representative_damage_percentage=100, link_type_column="highway"
         )
         assert (
             type(damage_network) == DamageNetworkReturnPeriods
@@ -378,7 +378,7 @@ class TestDamages:
 
     def test_risk_calculation_default(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-            risk_data_file, sep=";", representative_damage_percentage=100
+            risk_data_file, sep=";", representative_damage_percentage=100, link_type_column="highway"
         )
         damage_network.control_risk_calculation(
             DamageCurveEnum.HZ, mode=RiskCalculationModeEnum.DEFAULT, year=0
@@ -391,7 +391,7 @@ class TestDamages:
     def test_risk_calculation_cutoff(self, risk_data_file: Path):
         for rp in [15, 200, 25]:
             damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-                risk_data_file, sep=";", representative_damage_percentage=100
+                risk_data_file, sep=";", representative_damage_percentage=100, link_type_column="highway"
             )
             damage_network.control_risk_calculation(
                 DamageCurveEnum.HZ,
@@ -408,7 +408,7 @@ class TestDamages:
 
     def test_risk_calculation_triangle_to_null(self, risk_data_file: Path):
         damage_network = DamageNetworkReturnPeriods.construct_from_csv(
-            risk_data_file, sep=";", representative_damage_percentage=100
+            risk_data_file, sep=";", representative_damage_percentage=100, link_type_column="highway"
         )
         for triangle_rp in [8, 2]:
             damage_network.control_risk_calculation(

@@ -11,6 +11,7 @@ from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeE
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.damages.damage.manual_damage_functions import ManualDamageFunctions
@@ -31,12 +32,14 @@ class Damages(AnalysisDamagesProtocol):
     def __init__(
         self,
         analysis_input: AnalysisInputWrapper,
+        analysis_config: AnalysisConfigWrapper
     ) -> None:
         self.analysis = analysis_input.analysis
         self.graph_file = None
         self.graph_file_hazard = analysis_input.graph_file_hazard
         self.input_path = analysis_input.input_path
         self.output_path = analysis_input.output_path
+        self.link_type_column = analysis_config.config_data.network.link_type_column
 
     def execute(self) -> GeoDataFrame:
         def _rename_road_gdf_to_conventions(road_gdf_columns: list[str]) -> list[str]:
@@ -84,7 +87,7 @@ class Damages(AnalysisDamagesProtocol):
         # Choose between event or return period based analysis
         if self.analysis.event_type == EventTypeEnum.EVENT:
             event_gdf = DamageNetworkEvents(
-                road_gdf, val_cols, self.analysis.representative_damage_percentage
+                road_gdf, val_cols, self.analysis.representative_damage_percentage, self.link_type_column
             )
             event_gdf.main(
                 damage_function=damage_function,
@@ -95,7 +98,7 @@ class Damages(AnalysisDamagesProtocol):
 
         elif self.analysis.event_type == EventTypeEnum.RETURN_PERIOD:
             return_period_gdf = DamageNetworkReturnPeriods(
-                road_gdf, val_cols, self.analysis.representative_damage_percentage
+                road_gdf, val_cols, self.analysis.representative_damage_percentage, self.link_type_column
             )
             return_period_gdf.main(
                 damage_function=damage_function,

@@ -17,7 +17,7 @@ class TestDamageNetworkEvents:
         _representative_damage_percentage = 100
         # 2. Run test
         _dne = DamageNetworkEvents(
-            _road_gf, _val_cols, _representative_damage_percentage
+            _road_gf, _val_cols, _representative_damage_percentage, "highway"
         )
 
         # 3. Verify final expectations
@@ -34,7 +34,7 @@ class TestDamageNetworkEvents:
         # 2. Run test.
         with pytest.raises(ValueError) as exc_err:
             _dne = DamageNetworkEvents(
-                _road_gf, _val_cols, _representative_damage_percentage
+                _road_gf, _val_cols, _representative_damage_percentage, "highway"
             )
 
         # 3. Verify final expectations.
@@ -51,7 +51,7 @@ class TestDamageNetworkEvents:
             col for col in road_gdf.columns if (col[0].isupper() and col[1] == "_")
         ]
 
-        event_gdf = DamageNetworkEvents(road_gdf, val_cols)
+        event_gdf = DamageNetworkEvents(road_gdf, val_cols, 100, "highway")
         event_gdf.main(damage_function="HZ")
 
         test_outcomes = event_gdf.gdf

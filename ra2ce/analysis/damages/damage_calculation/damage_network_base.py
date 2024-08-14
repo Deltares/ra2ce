@@ -45,6 +45,7 @@ class DamageNetworkBase(ABC):
         road_gdf: GeoDataFrame,
         val_cols: list[str],
         representative_damage_percentage: float,
+        link_type_column: str
     ):
         """Construct the Data"""
         self.val_cols = val_cols
@@ -52,6 +53,7 @@ class DamageNetworkBase(ABC):
         # set of hazard info per event
         self.stats = set([x.split("_")[-1] for x in val_cols])
         self.representative_damage_percentage = representative_damage_percentage
+        self.link_type_column = link_type_column
         # TODO: also track the damage cols after the dam calculation, that is useful for the risk calc. module
         # TODO: also create constructors of the children of this class
 
@@ -146,7 +148,7 @@ class DamageNetworkBase(ABC):
         )  # The lookup class contains all kinds of data
         gdf = self.gdf
         gdf.rename(
-            columns={"highway": "infra_type"}, inplace=True
+            columns={self.link_type_column: "infra_type"}, inplace=True
         )  # Todo: this should probably not be done here
         gdf["road_type"] = gdf["infra_type"]
         gdf = gdf.replace({"road_type": road_mapping_dict})

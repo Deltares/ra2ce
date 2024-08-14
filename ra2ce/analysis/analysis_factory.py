@@ -82,7 +82,7 @@ class AnalysisFactory:
         )
 
         if analysis.analysis == AnalysisDamagesEnum.DAMAGES:
-            return Damages(_analysis_input)
+            return Damages(_analysis_input, analysis_config)
 
         if analysis.analysis == AnalysisDamagesEnum.EFFECTIVENESS_MEASURES:
             return EffectivenessMeasures(_analysis_input)
