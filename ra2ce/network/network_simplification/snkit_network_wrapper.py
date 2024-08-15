@@ -139,9 +139,14 @@ class SnkitNetworkWrapper:
             elif col_name == "demand_edge":
                 return max(col_data)
             elif col_data.dtype == "O":
-                return "; ".join(
-                    str(item) for item in col_data if isinstance(item, str)
-                )
+                col_data_unique_values = list(set(col_data))
+                if len(col_data_unique_values) == 1:
+                    return col_data_unique_values[0]
+                else:
+                    return str(col_data_unique_values)
+                # return "; ".join(
+                #     str(item) for item in col_data if isinstance(item, str)
+                # )
             else:
                 return col_data.iloc[0]
 
@@ -159,9 +164,14 @@ class SnkitNetworkWrapper:
             elif col_name in ["maxspeed", "avgspeed"]:
                 return col_data.mean()
             elif col_data.dtype == "O":
-                return "; ".join(
-                    str(item) for item in col_data if isinstance(item, str)
-                )
+                col_data_unique_values = list(set(col_data))
+                if len(col_data_unique_values) == 1:
+                    return col_data_unique_values[0]
+                else:
+                    return str(col_data_unique_values)
+                # return "; ".join(
+                #     str(item) for item in col_data if isinstance(item, str)
+                # )
             else:
                 return col_data.iloc[0]
 
