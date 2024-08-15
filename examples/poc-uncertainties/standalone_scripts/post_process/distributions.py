@@ -10,8 +10,8 @@ from plotly import graph_objects as go
 path = Path(
     r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\projects\RACE\RA2CE Proba 2024\output_monte_carlo\output_13_08_test/")
 
-matplotlib = False
-plotly = True
+matplotlib = True
+plotly = False
 event_1 = path.joinpath("event1/")
 event_2 = path.joinpath("event2/")
 event_3 = path.joinpath("event3/")
@@ -45,16 +45,16 @@ if matplotlib:
     plt.legend()
     # plt.show()
 
-    n=100
-
-    h,e = np.histogram(damages_1, bins=100, density=True)
-    x = np.linspace(e.min(), e.max())
-    plt.figure(figsize=(8,6))
-    plt.bar(e[:-1], h, width=np.diff(e), ec='k', align='edge', label='histogram')
-
-    # plot the real KDE
-    kde = sts.gaussian_kde(damages_1)
-    plt.plot(x, kde.pdf(x), c='C1', lw=8, label='KDE')
+    # n=100
+    #
+    # h,e = np.histogram(damages_1, bins=100, density=True)
+    # x = np.linspace(e.min(), e.max())
+    # plt.figure(figsize=(8,6))
+    # plt.bar(e[:-1], h, width=np.diff(e), ec='k', align='edge', label='histogram')
+    #
+    # # plot the real KDE
+    # kde = sts.gaussian_kde(damages_1)
+    # plt.plot(x, kde.pdf(x), c='C1', lw=8, label='KDE')
 
 
     # plot the KDE
