@@ -80,6 +80,9 @@ class NetworkGraphSimplificator:
 
     def _get_graph_simple(self) -> NxGraph:
         if any(self.attributes_to_exclude):
+            self.graph_complex = (
+                self.graph_complex.to_directed()
+            )  # simplification function requires nx.MultiDiGraph
             _graph_simple = NetworkSimplificationWithAttributeExclusion(
                 nx_graph=self.graph_complex,
                 attributes_to_exclude=self.attributes_to_exclude,
