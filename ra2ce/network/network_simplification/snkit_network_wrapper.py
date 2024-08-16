@@ -144,9 +144,6 @@ class SnkitNetworkWrapper:
                     return col_data_unique_values[0]
                 else:
                     return str(col_data_unique_values)
-                # return "; ".join(
-                #     str(item) for item in col_data if isinstance(item, str)
-                # )
             else:
                 return col_data.iloc[0]
 
@@ -169,9 +166,6 @@ class SnkitNetworkWrapper:
                     return col_data_unique_values[0]
                 else:
                     return str(col_data_unique_values)
-                # return "; ".join(
-                #     str(item) for item in col_data if isinstance(item, str)
-                # )
             else:
                 return col_data.iloc[0]
 
