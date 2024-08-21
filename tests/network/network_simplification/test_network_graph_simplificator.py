@@ -1,11 +1,10 @@
 import math
-import random
 from typing import Callable, Iterator
 
 import networkx as nx
 import numpy as np
 import pytest
-from shapely.geometry import LineString, Point
+from shapely.geometry import LineString
 
 from ra2ce.network import add_missing_geoms_graph
 from ra2ce.network.network_simplification.network_graph_simplificator import (
@@ -132,7 +131,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
     def _get_nx_digraph_factory(self) -> Iterator[Callable[[], nx.MultiDiGraph]]:
         def create_nx_multidigraph():
             _nx_digraph = nx.MultiDiGraph()
-            for i in range(1, 16):
+            for i in range(1, 19):
                 _nx_digraph.add_node(i, x=i, y=i * 10)
 
             _nx_digraph.add_edge(1, 2, a=np.nan)
@@ -152,6 +151,10 @@ class TestNetworkSimplificationWithAttributeExclusion:
             _nx_digraph.add_edge(13, 14, a="yes")
             _nx_digraph.add_edge(14, 15, a="yes")
             _nx_digraph.add_edge(15, 11, a="yes")
+            _nx_digraph.add_edge(1, 16, a="yes")
+            _nx_digraph.add_edge(16, 1, a="yes")
+            _nx_digraph.add_edge(16, 17, a="yes")
+            _nx_digraph.add_edge(16, 18, a="yes")
 
             _nx_digraph = add_missing_geoms_graph(_nx_digraph, "geometry")
             _nx_digraph.graph["crs"] = "EPSG:4326"
@@ -167,7 +170,8 @@ class TestNetworkSimplificationWithAttributeExclusion:
     ) -> nx.MultiGraph:
         _nx_digraph = nx_digraph_factory()
         _result_digraph = nx.MultiGraph()
-        node_ids_degrees = {2: 1, 4: 2, 7: 2, 8: 4, 11: 3, 12: 2}
+        # node_ids_degrees = {2: 1, 4: 2, 7: 2, 8: 4, 11: 3, 12: 2}
+        node_ids_degrees = {2: 1, 4: 2, 7: 2, 8: 4, 11: 3, 12: 2, 16: 4, 17: 1, 18: 1}
         for node_id, degree in node_ids_degrees.items():
             node_data = _nx_digraph.nodes[node_id]
             node_data["id"] = node_id
@@ -186,6 +190,21 @@ class TestNetworkSimplificationWithAttributeExclusion:
                     _nx_digraph.nodes[2]["geometry"],
                     _nx_digraph.nodes[3]["geometry"],
                     _nx_digraph.nodes[4]["geometry"],
+                ]
+            ),
+        )
+
+        _result_digraph.add_edge(
+            2,
+            16,
+            a="None",
+            from_node=2,
+            to_node=16,
+            geometry=LineString(
+                [
+                    _nx_digraph.nodes[2]["geometry"],
+                    _nx_digraph.nodes[1]["geometry"],
+                    _nx_digraph.nodes[16]["geometry"],
                 ]
             ),
         )
@@ -276,6 +295,50 @@ class TestNetworkSimplificationWithAttributeExclusion:
             ),
         )
 
+        _result_digraph.add_edge(
+            16,
+            4.0,
+            a="None",
+            from_node=16,
+            to_node=4,
+            geometry=LineString(
+                [
+                    _nx_digraph.nodes[16]["geometry"],
+                    _nx_digraph.nodes[1]["geometry"],
+                    _nx_digraph.nodes[2]["geometry"],
+                    _nx_digraph.nodes[3]["geometry"],
+                    _nx_digraph.nodes[4]["geometry"],
+                ]
+            ),
+        )
+
+        _result_digraph.add_edge(
+            16,
+            17,
+            a="None",
+            from_node=16,
+            to_node=17,
+            geometry=LineString(
+                [
+                    _nx_digraph.nodes[16]["geometry"],
+                    _nx_digraph.nodes[17]["geometry"],
+                ]
+            ),
+        )
+
+        _result_digraph.add_edge(
+            16,
+            18,
+            a="None",
+            from_node=16,
+            to_node=18,
+            geometry=LineString(
+                [
+                    _nx_digraph.nodes[16]["geometry"],
+                    _nx_digraph.nodes[18]["geometry"],
+                ]
+            ),
+        )
         _result_digraph.graph["crs"] = "EPSG:4326"
 
         snkit_network = NxToSnkitNetworkConverter(
