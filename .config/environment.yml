@@ -1,4 +1,4 @@
-name: ra2ce_env
+name: ra2ce_graz_env
 channels:
   - conda-forge
   - nodefaults
