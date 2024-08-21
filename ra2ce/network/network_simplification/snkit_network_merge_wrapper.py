@@ -26,6 +26,8 @@ from shapely.ops import linemerge
 from snkit.network import Network as SnkitNetwork
 from tqdm import tqdm
 
+from ra2ce.network.network_simplification.snkit_network_wrapper import SnkitNetworkWrapper
+
 NxGraph = nx.Graph | nx.MultiGraph | nx.MultiDiGraph
 
 
@@ -94,6 +96,22 @@ def merge_edges(
         updated_edges_gdf = updated_edges_gdf.drop(columns=["id"])
         return updated_edges_gdf
 
+    def _filter_degree_4(degree_4s: set) -> set:
+        degree_4_filtered = set()
+        snkit_network_wrapper = SnkitNetworkWrapper(
+            snkit_network=snkit_network,
+        )
+        networkx_graph = snkit_network_wrapper.to_networkx()
+        for degree_4_node_id in degree_4s:
+            # Get the predecessors (antecedents) and successors (precedents)
+            predecessors = list(networkx_graph.predecessors(degree_4_node_id))
+            successors = list(networkx_graph.successors(degree_4_node_id))
+
+            # Check if there is exactly one predecessor and one successor: 1->2, 2->3, 2->1, 3->2 => filters on 2
+            if len(predecessors) == 1 and len(successors) == 1:
+                degree_4_filtered.add(degree_4_node_id)
+        return degree_4_filtered
+
     def _get_edge_paths(node_set: set, snkit_network: SnkitNetwork) -> list:
         # Convert edges to an adjacency list using vectorized operations
         edge_dict = defaultdict(set)
@@ -137,6 +155,12 @@ def merge_edges(
 
     degree_2 = list(snkit_network.nodes[id_col].loc[snkit_network.nodes.degree == 2])
     degree_2_set = set(degree_2)
+
+    degree_4 = list(snkit_network.nodes[id_col].loc[snkit_network.nodes.degree == 4])
+    degree_4_set = set(degree_4)
+    degree_4 = _filter_degree_4(degree_4_set)
+
+    # ToDo: Add the filtered degree_2 and 4 sets to get the edge paths
     edge_paths = _get_edge_paths(degree_2_set, snkit_network)
 
     edge_ids_to_update = _get_edge_ids_to_update(edge_paths)
