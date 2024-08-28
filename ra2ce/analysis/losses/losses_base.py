@@ -319,10 +319,9 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                         row_performance_change = performance_row[-1][
                             f"{self.performance_metric}"
                         ]
+                        performance_key = 0
                         if "key" in performance_row[-1].index:
                             performance_key = performance_row[-1]["key"]
-                        else:
-                            performance_key = 0
                         row_u_v_k = (
                             performance_row[-1]["u"],
                             performance_row[-1]["v"],
