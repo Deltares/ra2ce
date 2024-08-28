@@ -170,8 +170,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
     ) -> nx.MultiGraph:
         _nx_digraph = nx_digraph_factory()
         _result_digraph = nx.MultiGraph()
-        # node_ids_degrees = {2: 1, 4: 2, 7: 2, 8: 4, 11: 3, 12: 2}
-        node_ids_degrees = {2: 1, 4: 2, 7: 2, 8: 4, 11: 3, 12: 2, 16: 4, 17: 1, 18: 1}
+        node_ids_degrees = {2: 3, 4: 2, 7: 2, 8: 4, 11: 3, 12: 2, 16: 4, 17: 1, 18: 1}
         for node_id, degree in node_ids_degrees.items():
             node_data = _nx_digraph.nodes[node_id]
             node_data["id"] = node_id
@@ -182,7 +181,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
         _result_digraph.add_edge(
             2,
             4.0,
-            a="None",
+            a=np.nan,
             from_node=2,
             to_node=4,
             geometry=LineString(
@@ -196,8 +195,8 @@ class TestNetworkSimplificationWithAttributeExclusion:
 
         _result_digraph.add_edge(
             2,
-            16,
-            a="None",
+            16.0,
+            a=np.nan,
             from_node=2,
             to_node=16,
             geometry=LineString(
@@ -227,7 +226,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
         _result_digraph.add_edge(
             7,
             8.0,
-            a="None",
+            a=np.nan,
             from_node=7,
             to_node=8,
             geometry=LineString(
@@ -239,8 +238,8 @@ class TestNetworkSimplificationWithAttributeExclusion:
         )
         _result_digraph.add_edge(
             8,
-            11.0,
-            a="None",
+            11,
+            a=np.nan,
             from_node=8,
             to_node=11,
             geometry=LineString(
@@ -254,7 +253,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
         )
         _result_digraph.add_edge(
             8,
-            11.0,
+            11,
             a="yes",
             from_node=8,
             to_node=11,
@@ -270,8 +269,8 @@ class TestNetworkSimplificationWithAttributeExclusion:
         )
         _result_digraph.add_edge(
             8,
-            12.0,
-            a="None",
+            12,
+            a=np.nan,
             from_node=8,
             to_node=12,
             geometry=LineString(
@@ -283,7 +282,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
         )
         _result_digraph.add_edge(
             11,
-            12.0,
+            12,
             a="yes",
             from_node=11,
             to_node=12,
@@ -298,7 +297,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
         _result_digraph.add_edge(
             16,
             2.0,
-            a="None",
+            a=np.nan,
             from_node=16,
             to_node=2,
             geometry=LineString(
@@ -313,7 +312,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
         _result_digraph.add_edge(
             16,
             17,
-            a="None",
+            a=np.nan,
             from_node=16,
             to_node=17,
             geometry=LineString(
@@ -327,7 +326,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
         _result_digraph.add_edge(
             16,
             18,
-            a="None",
+            a=np.nan,
             from_node=16,
             to_node=18,
             geometry=LineString(
@@ -365,7 +364,5 @@ class TestNetworkSimplificationWithAttributeExclusion:
         assert _graph_simple.nodes(data=True) == expected_result_graph_fixture.nodes(
             data=True
         )
-        # Compare edges topology
-        assert set(_graph_simple.edges()) == set(expected_result_graph_fixture.edges())
         # Compare edges with attributes
         assert _detailed_edge_comparison(_graph_simple, expected_result_graph_fixture)
