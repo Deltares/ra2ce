@@ -21,12 +21,11 @@ from collections import defaultdict
 import geopandas as gpd
 import networkx as nx
 import pandas as pd
+from networkx import MultiGraph
 from shapely.geometry import LineString, MultiLineString, MultiPoint, Point
 from shapely.ops import linemerge
 from snkit.network import Network as SnkitNetwork
 from tqdm import tqdm
-
-from ra2ce.network.network_simplification.snkit_network_wrapper import SnkitNetworkWrapper
 
 NxGraph = nx.Graph | nx.MultiGraph | nx.MultiDiGraph
 
@@ -97,6 +96,8 @@ def merge_edges(
         return updated_edges_gdf
 
     def _filter_degree_4(degree_4s: set) -> set:
+        from ra2ce.network.network_simplification.snkit_network_wrapper import SnkitNetworkWrapper
+
         degree_4_filtered = set()
         snkit_network_wrapper = SnkitNetworkWrapper(
             snkit_network=snkit_network,
@@ -108,11 +109,13 @@ def merge_edges(
             successors = list(networkx_graph.successors(degree_4_node_id))
 
             # Check if there is exactly one predecessor and one successor: 1->2, 2->3, 2->1, 3->2 => filters on 2
-            if len(predecessors) == 1 and len(successors) == 1:
+            if sorted(predecessors) == sorted(successors):
                 degree_4_filtered.add(degree_4_node_id)
         return degree_4_filtered
 
     def _get_edge_paths(node_set: set, snkit_network: SnkitNetwork) -> list:
+        def unique_ids_from_to(gdf: gpd.GeoDataFrame, from_col: str, to_col: str) -> set:
+            return set(gdf[from_col]) ^ set(gdf[to_col])
         # Convert edges to an adjacency list using vectorized operations
         edge_dict = defaultdict(set)
         from_ids = snkit_network.edges["from_id"].values
@@ -125,7 +128,9 @@ def merge_edges(
         edge_paths = []
 
         while node_set:
+            intermediates = set()
             popped_node = node_set.pop()
+            intermediates.add(popped_node)
             node_path = {popped_node}
             candidates = {popped_node}
             while candidates:
@@ -135,17 +140,28 @@ def merge_edges(
                 for match in matches:
                     if match in node_set:
                         candidates.add(match)
+                        intermediates.add(match)
                         node_path.add(match)
                         node_set.remove(match)
                     else:
                         node_path.add(match)
             if len(node_path) >= 2:
-                edge_paths.append(
-                    snkit_network.edges.loc[
-                        (snkit_network.edges.from_id.isin(node_path))
-                        & (snkit_network.edges.to_id.isin(node_path))
+                intermediate_edges = snkit_network.edges[
+                    snkit_network.edges.from_id.isin(intermediates) &
+                    snkit_network.edges.to_id.isin(intermediates)
                     ]
-                )
+
+                unique_from_id = set(intermediate_edges["from_id"]) - set(intermediate_edges["to_id"])
+                entering_edge = snkit_network.edges[snkit_network.edges.to_id.isin(unique_from_id)]
+
+                unique_to_id = set(intermediate_edges["to_id"]) - set(intermediate_edges["from_id"])
+                leaving_edge = snkit_network.edges[snkit_network.edges.from_id.isin(unique_to_id)]
+
+                # Add the unique edges to the intermediate edges
+                edge_paths_gdf = intermediate_edges.append([entering_edge, leaving_edge])
+
+                # Append the result to edge_paths
+                edge_paths = edge_paths.append(edge_paths_gdf)
         return edge_paths
 
     if "degree" not in snkit_network.nodes.columns:
@@ -158,10 +174,12 @@ def merge_edges(
 
     degree_4 = list(snkit_network.nodes[id_col].loc[snkit_network.nodes.degree == 4])
     degree_4_set = set(degree_4)
-    degree_4 = _filter_degree_4(degree_4_set)
+    filtered_degree_4_set = _filter_degree_4(degree_4_set)
+
+    nodes_of_interest = degree_2_set | filtered_degree_4_set
 
     # ToDo: Add the filtered degree_2 and 4 sets to get the edge paths
-    edge_paths = _get_edge_paths(degree_2_set, snkit_network)
+    edge_paths = _get_edge_paths(sorted(nodes_of_interest), snkit_network)
 
     edge_ids_to_update = _get_edge_ids_to_update(edge_paths)
     edges_to_keep = snkit_network.edges[

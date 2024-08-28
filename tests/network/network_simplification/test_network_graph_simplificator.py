@@ -151,10 +151,10 @@ class TestNetworkSimplificationWithAttributeExclusion:
             _nx_digraph.add_edge(13, 14, a="yes")
             _nx_digraph.add_edge(14, 15, a="yes")
             _nx_digraph.add_edge(15, 11, a="yes")
-            _nx_digraph.add_edge(1, 16, a="yes")
-            _nx_digraph.add_edge(16, 1, a="yes")
-            _nx_digraph.add_edge(16, 17, a="yes")
-            _nx_digraph.add_edge(16, 18, a="yes")
+            _nx_digraph.add_edge(1, 16, a=np.nan)
+            _nx_digraph.add_edge(16, 1, a=np.nan)
+            _nx_digraph.add_edge(16, 17, a=np.nan)
+            _nx_digraph.add_edge(16, 18, a=np.nan)
 
             _nx_digraph = add_missing_geoms_graph(_nx_digraph, "geometry")
             _nx_digraph.graph["crs"] = "EPSG:4326"
@@ -297,17 +297,15 @@ class TestNetworkSimplificationWithAttributeExclusion:
 
         _result_digraph.add_edge(
             16,
-            4.0,
+            2.0,
             a="None",
             from_node=16,
-            to_node=4,
+            to_node=2,
             geometry=LineString(
                 [
                     _nx_digraph.nodes[16]["geometry"],
                     _nx_digraph.nodes[1]["geometry"],
                     _nx_digraph.nodes[2]["geometry"],
-                    _nx_digraph.nodes[3]["geometry"],
-                    _nx_digraph.nodes[4]["geometry"],
                 ]
             ),
         )
