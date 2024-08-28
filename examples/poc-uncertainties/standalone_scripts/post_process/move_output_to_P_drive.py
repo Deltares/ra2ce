@@ -21,7 +21,7 @@ result = client.list_objects(Bucket=bucket, Prefix=_root_dir, Delimiter="/")
 for event in result.get("CommonPrefixes"):
     prefix = event.get("Prefix")
     event_name = Path(prefix).name     # extract the event name:
-    if event_name != "event3":
+    if event_name != "event6":
         continue
     query_event = client.list_objects(Bucket=bucket, Prefix=prefix, Delimiter="/")
 

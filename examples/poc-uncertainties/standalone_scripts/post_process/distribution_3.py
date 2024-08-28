@@ -19,7 +19,8 @@ plotly = True
 event_1 = path.joinpath("event1/")
 event_2 = path.joinpath("event2/")
 event_3 = path.joinpath("event3/")
-gdf_1 = gpd.read_file(event_3.joinpath("damage_link_res.gpkg"))
+event_6 = path.joinpath("event6/")
+gdf_1 = gpd.read_file(event_6.joinpath("damage_link_res.gpkg"))
 
 run_names_1 = [col for col in gdf_1.columns if col.startswith("scenario")]
 print(run_names_1)
@@ -51,10 +52,11 @@ df = pd.DataFrame(data={"run_names": run_names_1, "damages": damages_1})
 # add scenario columns based on run_names
 df["scenario"] = df["run_names"].apply(lambda x: x.split("_")[1])
 
+# increase size marker of the same
 fig = px.scatter(df, x="run_names", y="damages", color="scenario")
 # can also do
 
 
 fig.show()
 # save the figure
-fig.write_html("distribution_3_Event2.html")
+fig.write_html("distribution_3_Event6.html")

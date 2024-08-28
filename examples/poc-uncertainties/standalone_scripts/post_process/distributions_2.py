@@ -15,7 +15,8 @@ plotly = True
 event_1 = path.joinpath("event1/")
 event_2 = path.joinpath("event2/")
 event_3 = path.joinpath("event3/")
-gdf_1 = gpd.read_file(event_3.joinpath("damage_link_res.gpkg"))
+event_6 = path.joinpath("event6/")
+gdf_1 = gpd.read_file(event_6.joinpath("damage_link_res.gpkg"))
 
 run_names_1 = [col for col in gdf_1.columns if col.startswith("scenario")]
 
@@ -30,13 +31,13 @@ damages_1 = gdf_1[run_names_1].sum(axis=0).to_numpy() / 1e6
 damagege = gdf_1[names].sum(axis=0).to_numpy() / 1e6
 
 
-fig, axs = plt.subplots(5, 2)
+fig, axs = plt.subplots(6, 2)
 col = 0
 row = 0
 for scenario in unique_scenario_names:
     # make a new subplot for each scenario
     print(row, col)
-    if row == 5:
+    if row == 6:
         row = 0
         col =1
     names = [col for col in gdf_1.columns if scenario in col]

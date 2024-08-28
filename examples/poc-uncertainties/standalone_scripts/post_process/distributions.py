@@ -15,13 +15,16 @@ plotly = False
 event_1 = path.joinpath("event1/")
 event_2 = path.joinpath("event2/")
 event_3 = path.joinpath("event3/")
+event_6 = path.joinpath("event6/")
 gdf_1 = gpd.read_file(event_1.joinpath("damage_link_res.gpkg"))
 gdf_2 = gpd.read_file(event_2.joinpath("damage_link_res.gpkg"))
 gdf_3 = gpd.read_file(event_3.joinpath("damage_link_res.gpkg"))
+gdf_6 = gpd.read_file(event_6.joinpath("damage_link_res.gpkg"))
 
 run_names_1 = [col for col in gdf_1.columns if col.startswith("scenario")]
 run_names_2 = [col for col in gdf_2.columns if col.startswith("scenario")]
 run_names_3 = [col for col in gdf_3.columns if col.startswith("scenario")]
+run_names_6 = [col for col in gdf_6.columns if col.startswith("scenario")]
 
 
 print(run_names_1)
@@ -32,12 +35,14 @@ print(run_names_1)
 damages_1 = gdf_1[run_names_1].sum(axis=0).to_numpy() / 1e6
 damages_2 = gdf_2[run_names_2].sum(axis=0).to_numpy() / 1e6
 damages_3 = gdf_3[run_names_3].sum(axis=0).to_numpy() / 1e6
+damages_6 = gdf_6[run_names_6].sum(axis=0).to_numpy() / 1e6
 
 # plot histogram
 if matplotlib:
-    plt.hist(damages_1, bins=100, label="EV1: Nordzee Zuid-Holland_10000")
-    plt.hist(damages_2, bins=100, label="EV2: Nordzee Zuid-Holland_100000")
-    plt.hist(damages_3, bins=100, label="EV3: Nordzee Zuid-Holland_1000000")
+    # plt.hist(damages_1, bins=100, label="EV1: Nordzee Zuid-Holland_10000")
+    # plt.hist(damages_2, bins=100, label="EV2: Nordzee Zuid-Holland_100000")
+    # plt.hist(damages_3, bins=100, label="EV3: Nordzee Zuid-Holland_1000000")
+    plt.hist(damages_1, bins=100, label="EV1: ")
     plt.xlabel("Damages (million euros)")
     plt.ylabel("Frequency")
     plt.title("Histogram of damages")

@@ -3,7 +3,7 @@ import geopandas as gpd
 
 # path of the event results. We combine all the runs in a single shapefile per event!
 path = Path(
-    r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\projects\RACE\RA2CE Proba 2024\output_monte_carlo\output_13_08_test\event3")
+    r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\projects\RACE\RA2CE Proba 2024\output_monte_carlo\output_13_08_test\event6")
 
 path_link_based_combined_results = path.joinpath("damage_link_based_combined.gpkg")
 path_segmented_combined_results = path.joinpath("damage_segmented_combined.gpkg")
