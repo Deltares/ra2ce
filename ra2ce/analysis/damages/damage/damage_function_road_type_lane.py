@@ -157,11 +157,24 @@ class DamageFunctionByRoadTypeByLane:
             hazard_prefix, event_prefix
         )  # fraction column is hardcoded
 
-        df[result_col] = round(
-            df[max_dam_col].astype(float)  # max damage (euro/m)
-            * interpolator(df[hazard_severity_col].astype(float))  # damage curve  (-)
-            * df["length"]  # segment length (m)
-            * df[hazard_fraction_col],
+        # Ensure necessary columns are float types
+        df[max_dam_col] = df[max_dam_col].astype(float)
+        df[hazard_severity_col] = df[hazard_severity_col].astype(float)
+        df["length"] = df["length"].astype(float)
+        df[hazard_fraction_col] = df[hazard_fraction_col].astype(float)
+
+        # Fill or handle NaNs as needed
+        df.fillna(0, inplace=True)
+
+        # Define a lambda function to calculate the result for each row
+        calculate_damage = lambda row: round(
+            row[max_dam_col]
+            * interpolator(row[hazard_severity_col])
+            * row["length"]
+            * row[hazard_fraction_col],
             0,
-        )  # round to whole numbers
+        )
+
+        # Apply the function to each row and store the result in the desired column
+        df[result_col] = df.apply(calculate_damage, axis=1)
         return df
