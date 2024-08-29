@@ -163,9 +163,6 @@ class DamageFunctionByRoadTypeByLane:
         df["length"] = df["length"].astype(float)
         df[hazard_fraction_col] = df[hazard_fraction_col].astype(float)
 
-        # Fill or handle NaNs as needed
-        df.fillna(0, inplace=True)
-
         # Define a lambda function to calculate the result for each row
         calculate_damage = lambda row: round(
             row[max_dam_col]
