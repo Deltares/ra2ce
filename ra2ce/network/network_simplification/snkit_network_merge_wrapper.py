@@ -132,9 +132,6 @@ def merge_edges(
         return degree_4_filtered
 
     def _get_edge_paths(node_set: set, snkit_network: SnkitNetwork) -> list:
-        def unique_ids_from_to(gdf: gpd.GeoDataFrame, from_col: str, to_col: str) -> set:
-            return set(gdf[from_col]) ^ set(gdf[to_col])
-
         def _find_and_append_degree_4_paths(
                 _edge_paths: list
         ) -> None:
@@ -145,35 +142,44 @@ def merge_edges(
                     (snkit_network.edges['to_id'] == node2)
                     ]
                 return edge if not edge.empty else None
+            
+            def construct_path(start_node: int|float, end_node: int|float, intermediates: list):
+                path = []
+                current_node = start_node
+                _intermediates = intermediates.copy()
 
-            boundary_nodes = node_path.difference(filtered_degree_4_set)
-            intermediates_list = list(intermediates)
+                while _intermediates:
+                    for next_node in _intermediates:
+                        edge = retrieve_edge(current_node, next_node)
+                        if edge is not None:
+                            path.append(edge)
+                            _intermediates.remove(next_node)
+                            current_node = next_node
+                            break
+
+                final_edge = retrieve_edge(current_node, end_node)
+                if final_edge is not None:
+                    path.append(final_edge)
+
+                if len(path) > 0 and all(edge is not None for edge in path):
+                    return pd.concat(path)  # Combine edges into a single GeoDataFrame
+                return None
+
+            boundary_nodes = list(node_path - filtered_degree_4_set)
             if len(boundary_nodes) == 2:
                 from_node, to_node = boundary_nodes
+                intermediates = list(node_path & filtered_degree_4_set)
 
-                # Forward path: from_node -> intermediates -> to_node
-                forward_path = [
-                    retrieve_edge(intermediates_list[i], intermediates_list[i + 1])
-                    for i in range(len(intermediates) - 1)
-                ]
-                forward_path.insert(0, retrieve_edge(from_node, intermediates_list[0]))
-                forward_path.append(retrieve_edge(intermediates_list[-1], to_node))
-
-                if all(edge is not None for edge in forward_path):
-                    forward_gdf = pd.concat(forward_path)  # Combine edges into a single GeoDataFrame
+                # Construct and append the forward path
+                forward_gdf = construct_path(from_node, to_node, intermediates)
+                if forward_gdf is not None:
                     _edge_paths.append(forward_gdf)
 
-                # Backward path: to_node -> intermediates (reversed) -> from_node
-                backward_path = [
-                    retrieve_edge(intermediates_list[i + 1], intermediates_list[i])
-                    for i in range(len(intermediates) - 1)
-                ]
-                backward_path.insert(0, retrieve_edge(to_node, intermediates_list[-1]))
-                backward_path.append(retrieve_edge(intermediates_list[0], from_node))
-
-                if all(edge is not None for edge in backward_path):
-                    backward_gdf = pd.concat(backward_path)  # Combine edges into a single GeoDataFrame
+                # Construct and append the backward path
+                backward_gdf = construct_path(to_node, from_node, intermediates)
+                if backward_gdf is not None:
                     _edge_paths.append(backward_gdf)
+
 
         # Convert edges to an adjacency list using vectorized operations
         edge_dict = defaultdict(set)
