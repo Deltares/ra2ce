@@ -46,6 +46,7 @@ from ra2ce.network.network_wrappers.osm_network_wrapper.osm_utils import (
     is_endnode_check,
     modify_graph,
 )
+from ra2ce.network.segmentation import Segmentation
 
 
 class OsmNetworkWrapper(NetworkWrapperProtocol):
@@ -160,8 +161,12 @@ class OsmNetworkWrapper(NetworkWrapperProtocol):
         logging.info("Finished converting the graph to a geodataframe")
 
         # Segment the complex graph
-        edges_complex, link_tables = self.segment_graph(
-            edges_complex, export_link_table=True, link_tables=link_tables
+        edges_complex, link_tables = Segmentation.segment_graph(
+            self.segmentation_length,
+            self.crs,
+            edges_complex,
+            export_link_table=True,
+            link_tables=link_tables,
         )
 
         # Save the link tables linking complex and simple IDs

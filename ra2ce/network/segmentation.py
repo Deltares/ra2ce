@@ -20,8 +20,9 @@
 """
 
 import logging
+import math
 from decimal import Decimal
-from typing import Union
+from typing import Optional, Union
 
 import geopandas as gpd
 from geopy import distance
@@ -45,6 +46,45 @@ class Segmentation:  # Todo: more naturally, this would be METHOD of the network
 
 
     """
+
+    @staticmethod
+    def segment_graph(
+        segmentation_length: float,
+        crs: float,
+        edges: gpd.GeoDataFrame,
+        export_link_table: bool,
+        link_tables: Optional[tuple] = None,
+    ) -> Union[gpd.GeoDataFrame, tuple[gpd.GeoDataFrame, tuple]]:
+        """
+        Segments a complex graph based on the given segmentation length.
+
+        Args:
+        - segmentation_length (Optional[float]): The length to segment the graph edges. If None, no segmentation is applied.
+        - edges_complex (gpd.GeoDataFrame): The GeoDataFrame containing the complex graph edges.
+        - crs (str): The coordinate reference system to apply if the CRS is missing after segmentation.
+
+        Returns:
+        - gpd.GeoDataFrame: The segmented edges_complex GeoDataFrame.
+        """
+        if not math.isnan(segmentation_length):
+            segmentation = Segmentation(edges, segmentation_length)
+            segmented_edges = segmentation.apply_segmentation()
+            if segmented_edges.crs is None:  # The CRS might have disappeared.
+                segmented_edges.crs = crs  # set the right CRS
+
+            if export_link_table:
+                updated_link_tables = segmentation.generate_link_tables()
+                segmented_edges.drop(columns=["rfid_c"], inplace=True)
+                segmented_edges.rename(columns={"splt_id": "rfid_c"}, inplace=True)
+                return segmented_edges, updated_link_tables
+            return segmented_edges
+        elif export_link_table and link_tables:
+            return edges, link_tables
+        elif export_link_table and not link_tables:
+            logging.warning("empty link_tables is passed")
+            return edges, tuple()
+        else:
+            return edges
 
     def __init__(
         self,
