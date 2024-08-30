@@ -5,11 +5,13 @@ Installation
 
 RA2CE can be operated via the command-line interface with two commands. 
 Before RA2CE can be used, the correct Python environment needs to be installed 
-(see *environment.yml*). Anaconda is a well-known environment manager for Python 
-and can be used to install the correct environment and run RA2CE via its 
-command-line interface. It is recommended to install Anaconda, instead of 
-`miniconda`, so that you have all required packages already available during the 
-following steps.
+(see *environment.yml*), this can be done with a conda environment manager such
+as `miniforge <https://github.com/conda-forge/miniforge>`_ or `micromamba <https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html>`_.
+
+.. note::
+  Important! In compliance with Deltares open-source policy it is recommended to use either ``miniforge`` or ``micromamba``
+  as they both have ``conda-forge`` as the default package channel. If you wish to use another conda distribution please 
+  make sure the default channel is set to ``conda-forge`` to avoid issues with Deltares open-source policy.
 
 
 CLI only
