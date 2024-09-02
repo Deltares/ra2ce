@@ -39,6 +39,7 @@ from ra2ce.network.network_simplification import NetworkGraphSimplificator
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
+from ra2ce.network.segmentation import Segmentation
 
 
 class VectorNetworkWrapper(NetworkWrapperProtocol):
@@ -129,8 +130,12 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         logging.info("Finished converting the graph to a geodataframe")
 
         # Segment the complex graph
-        edges_complex, link_tables = self.segment_graph(
-            edges_complex, export_link_table=True, link_tables=link_tables
+        edges_complex, link_tables = Segmentation.segment_graph(
+            self.segmentation_length,
+            self.crs,
+            edges_complex,
+            export_link_table=True,
+            link_tables=link_tables,
         )
 
         # Save the link tables linking complex and simple IDs
