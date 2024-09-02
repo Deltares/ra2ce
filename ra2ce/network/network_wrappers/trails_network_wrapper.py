@@ -30,6 +30,7 @@ from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
 from ra2ce.network.networks_utils import graph_from_gdf
+from ra2ce.network.segmentation import Segmentation
 
 
 class TrailsNetworkWrapper(NetworkWrapperProtocol):
@@ -90,7 +91,9 @@ class TrailsNetworkWrapper(NetworkWrapperProtocol):
         )
 
         # Segment the complex graph
-        edges_complex = self.segment_graph(edges, export_link_table=False)
+        edges_complex = Segmentation.segment_graph(
+            self.segmentation_length, self.crs, edges, export_link_table=False
+        )
 
         graph_complex = graph_simple  # NOTE THAT DIFFERENCE
         # BETWEEN SIMPLE AND COMPLEX DOES NOT EXIST WHEN IMPORTING WITH TRAILS

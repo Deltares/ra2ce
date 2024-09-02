@@ -31,6 +31,7 @@ from ra2ce.network.network_config_data.network_config_data import NetworkConfigD
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
+from ra2ce.network.segmentation import Segmentation
 
 
 class ShpNetworkWrapper(NetworkWrapperProtocol):
@@ -188,6 +189,8 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
 
         graph_complex, edges_complex = self._get_complex_graph_and_edges(edges, id_name)
 
-        edges_complex = self.segment_graph(edges_complex, export_link_table=False)
+        edges_complex = Segmentation.segment_graph(
+            self.segmentation_length, self.crs, edges_complex, export_link_table=False
+        )
 
         return graph_complex, edges_complex
