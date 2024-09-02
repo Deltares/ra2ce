@@ -982,20 +982,6 @@ files = [
 ]
 
 [[package]]
-name = "gdal"
-version = "3.5.1"
-description = "GDAL: Geospatial Data Abstraction Library"
-category = "main"
-optional = false
-python-versions = ">=3.6.0"
-files = [
-    {file = "GDAL-3.5.1.tar.gz", hash = "sha256:e2cfe1f338b9d84e8f6d93883712344d6d27ebaffaaa24733603a7713949a2be"},
-]
-
-[package.extras]
-numpy = ["numpy (>1.0.0)"]
-
-[[package]]
 name = "geographiclib"
 version = "2.0"
 description = "The geodesic routines from GeographicLib"
@@ -4742,4 +4728,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9, <3.11"
-content-hash = "b366a4070c5329084a9e11140fbe358eb637c6bba66784d523664b6d2278c516"
+content-hash = "14e5c82186348a4139d3bb7718bef030491596ccabdf88c7aa21d29ab6c1fe5b"

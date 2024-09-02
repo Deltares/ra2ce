@@ -4,6 +4,5 @@ channels:
   - nodefaults
 dependencies:
   - python=3.10
-  - conda-forge::gdal=3.5.1
   - conda-forge::pandoc
   - teamcity-messages
