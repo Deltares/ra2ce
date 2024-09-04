@@ -61,7 +61,7 @@ def merge_edges(
         SnkitNetwork: _description_
     """
 
-    def _node_connectivity_degree(node, snkit_network: SnkitNetwork) -> int:
+    def node_connectivity_degree(node, snkit_network: SnkitNetwork) -> int:
         return len(
             snkit_network.edges[
                 (snkit_network.edges.from_id == node)
@@ -69,13 +69,13 @@ def merge_edges(
             ]
         )
 
-    def _get_edge_ids_to_update(edges_list: list) -> list:
+    def get_edge_ids_to_update(edges_list: list) -> list:
         ids_to_update = []
         for edges in edges_list:
             ids_to_update.extend(edges.id.tolist())
         return ids_to_update
 
-    def _get_merged_edges(
+    def get_merged_edges(
         paths_to_group: list,
         by: list,
         aggfunc: str | dict,
@@ -98,7 +98,7 @@ def merge_edges(
         updated_edges_gdf = updated_edges_gdf.drop(columns=["id"])
         return updated_edges_gdf
 
-    def _filter_node(_node_set: set, _degrees: int) -> set:
+    def filter_node(_node_set: set, _degrees: int) -> set:
         _filtered = set()
         for _node_id in _node_set:
             # Get the predecessors (antecedents) and successors (precedents) to make sure for to filter correctly
@@ -115,8 +115,8 @@ def merge_edges(
                 _filtered.add(_node_id)
         return _filtered
 
-    def _get_edge_paths(node_set: set, _snkit_network: SnkitNetwork) -> list:
-        def _get_adjacency_list(edges_gdf: gpd.GeoDataFrame, from_id_column: str = "from_id",
+    def get_edge_paths(node_set: set, _snkit_network: SnkitNetwork) -> list:
+        def get_adjacency_list(edges_gdf: gpd.GeoDataFrame, from_id_column: str = "from_id",
                                 to_id_column: str = "to_id") -> defaultdict:
             # Convert the edges of a GeoDataFrame to an adjacency list using vectorized operations.
             _edge_dict = defaultdict(set)
@@ -130,7 +130,7 @@ def merge_edges(
 
             return _edge_dict
 
-        def _retrieve_edge(node1: int | float, node2: int | float) -> gpd.GeoDataFrame:
+        def retrieve_edge(node1: int | float, node2: int | float) -> gpd.GeoDataFrame:
             """Retrieve the edge from snkit_network.edges GeoDataFrame between two nodes."""
             edge = _snkit_network.edges[
                 (_snkit_network.edges['from_id'] == node1) &
@@ -138,21 +138,21 @@ def merge_edges(
                 ]
             return edge if not edge.empty else None
 
-        def _construct_path(start_node: int | float, end_node: int | float, __intermediates: list) -> pd.DataFrame | None:
+        def construct_path(start_node: int | float, end_node: int | float, __intermediates: list) -> pd.DataFrame | None:
             path = []
             current_node = start_node
             _intermediates = __intermediates.copy()
 
             while _intermediates:
                 for next_node in _intermediates:
-                    edge = _retrieve_edge(current_node, next_node)
+                    edge = retrieve_edge(current_node, next_node)
                     if edge is not None:
                         path.append(edge)
                         _intermediates.remove(next_node)
                         current_node = next_node
                         break
 
-            final_edge = _retrieve_edge(current_node, end_node)
+            final_edge = retrieve_edge(current_node, end_node)
             if final_edge is not None:
                 path.append(final_edge)
 
@@ -160,27 +160,29 @@ def merge_edges(
                 return pd.concat(path)  # Combine edges into a single GeoDataFrame
             return None
 
-        def _find_and_append_degree_4_paths(
+        def find_and_append_degree_4_paths(
                 _edge_paths: list
-        ) -> None:
+        ) -> list:
+            _edge_paths_results = _edge_paths
             boundary_nodes = list(node_path - filtered_degree_4_set)
             if len(boundary_nodes) == 2:
                 from_node, to_node = boundary_nodes
                 _intermediates = list(node_path & filtered_degree_4_set)
 
                 # Construct and append the forward path
-                forward_gdf = _construct_path(from_node, to_node, _intermediates)
+                forward_gdf = construct_path(from_node, to_node, _intermediates)
                 if forward_gdf is not None:
-                    _edge_paths.append(forward_gdf)
+                    _edge_paths_results.append(forward_gdf)
 
                 # Construct and append the backward path
-                backward_gdf = _construct_path(to_node, from_node, _intermediates)
+                backward_gdf = construct_path(to_node, from_node, _intermediates)
                 if backward_gdf is not None:
-                    _edge_paths.append(backward_gdf)
+                    _edge_paths_results.append(backward_gdf)
+            return _edge_paths_results
 
         # Convert edges to an adjacency list using vectorized operations
-        edge_dict = _get_adjacency_list(edges_gdf=snkit_network.edges)
-        _edge_paths = []
+        edge_dict = get_adjacency_list(edges_gdf=snkit_network.edges)
+        _edge_paths: list = []
 
         # find the edge paths for the nodes in node_set
         while node_set:
@@ -212,7 +214,7 @@ def merge_edges(
             if len(node_path) >= 2:
                 if any(node_path.intersection(filtered_degree_4_set)):
                     # node_path has nodes with degree 4 => get the forward and backward paths
-                    _find_and_append_degree_4_paths(_edge_paths)
+                    _edge_paths = find_and_append_degree_4_paths(_edge_paths)
                 else:
                     # node_path has nodes with degree 2 => find the edges connected to the intermediates
                     edge_paths_gdf = snkit_network.edges[
@@ -225,7 +227,7 @@ def merge_edges(
     # Adds degree column which is needed to find the to-be-simplified nodes and edges.
     if "degree" not in snkit_network.nodes.columns:
         snkit_network.nodes["degree"] = snkit_network.nodes[id_col].apply(
-            lambda x: _node_connectivity_degree(x, snkit_network)
+            lambda x: node_connectivity_degree(x, snkit_network)
         )
 
     # Filter on the nodes with degree 2 and 4 which suffice the following criteria:
@@ -233,29 +235,22 @@ def merge_edges(
     # E.g. filters on 2 in 1->2, 1->5, 2->3, 3->4, 3->5
     # For _node_set with all degree 4: Check if the predecessors and successors are the same nodes.
     # E.g. filters on 2 in 1->2, 2->3, 2->1, 3->2.
-    degree_2 = list(snkit_network.nodes[id_col].loc[snkit_network.nodes.degree == 2])
-    degree_2_set = set(degree_2)
-    filtered_degree_2_set = _filter_node(degree_2_set, _degrees=2)
+    degree_2_set = set(list(snkit_network.nodes[id_col].loc[snkit_network.nodes.degree == 2]))
+    filtered_degree_2_set = filter_node(degree_2_set, _degrees=2)
 
-    degree_4 = list(snkit_network.nodes[id_col].loc[snkit_network.nodes.degree == 4])
-    degree_4_set = set(degree_4)
-    filtered_degree_4_set = _filter_node(degree_4_set, _degrees=4)
+    degree_4_set = set(list(snkit_network.nodes[id_col].loc[snkit_network.nodes.degree == 4]))
+    filtered_degree_4_set = filter_node(degree_4_set, _degrees=4)
 
     nodes_of_interest = filtered_degree_2_set | filtered_degree_4_set
 
-    edge_paths = _get_edge_paths(sorted(nodes_of_interest), snkit_network)
+    edge_paths = get_edge_paths(sorted(nodes_of_interest), snkit_network)
 
-    edge_ids_to_update = _get_edge_ids_to_update(edge_paths)
+    edge_ids_to_update = get_edge_ids_to_update(edge_paths)
     edges_to_keep = snkit_network.edges[
         ~snkit_network.edges["id"].isin(edge_ids_to_update)
     ]
 
-    updated_edges = _get_merged_edges(
-        paths_to_group=edge_paths,
-        by=by,
-        aggfunc=aggregate_func,
-        net=snkit_network,
-    )
+    updated_edges = get_merged_edges(paths_to_group=edge_paths, by=by, aggfunc=aggregate_func, net=snkit_network)
     edges_to_keep = edges_to_keep.drop(columns=["id"])
     updated_edges = updated_edges.reset_index(drop=True)
 
@@ -270,7 +265,7 @@ def merge_edges(
 
     merged_snkit_network = SnkitNetwork(nodes=new_nodes_gdf, edges=new_edges_gdf)
     merged_snkit_network.nodes["degree"] = merged_snkit_network.nodes[id_col].apply(
-        lambda x: _node_connectivity_degree(x, merged_snkit_network)
+        lambda x: node_connectivity_degree(x, merged_snkit_network)
     )
 
     return merged_snkit_network
