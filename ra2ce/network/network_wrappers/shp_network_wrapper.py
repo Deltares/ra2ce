@@ -20,7 +20,6 @@
 """
 
 import logging
-import math
 
 import geopandas as gpd
 import networkx as nx
@@ -190,9 +189,8 @@ class ShpNetworkWrapper(NetworkWrapperProtocol):
 
         graph_complex, edges_complex = self._get_complex_graph_and_edges(edges, id_name)
 
-        if not math.isnan(self.segmentation_length):
-            edges_complex = Segmentation(edges_complex, self.segmentation_length)
-            edges_complex = edges_complex.apply_segmentation()
-            if edges_complex.crs is None:  # The CRS might have dissapeared.
-                edges_complex.crs = self.crs  # set the right CRS
+        edges_complex = Segmentation.segment_graph(
+            self.segmentation_length, self.crs, edges_complex, export_link_table=False
+        )
+
         return graph_complex, edges_complex

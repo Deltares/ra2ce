@@ -39,6 +39,7 @@ from ra2ce.network.network_simplification import NetworkGraphSimplificator
 from ra2ce.network.network_wrappers.network_wrapper_protocol import (
     NetworkWrapperProtocol,
 )
+from ra2ce.network.segmentation import Segmentation
 
 
 class VectorNetworkWrapper(NetworkWrapperProtocol):
@@ -68,6 +69,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         self.output_graph_dir = config_data.output_graph_dir
 
         # Cleanup
+        self.segmentation_length = config_data.cleanup.segmentation_length
         self.delete_duplicate_nodes = config_data.cleanup.delete_duplicate_nodes
 
     def get_network(
@@ -83,11 +85,25 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         gdf = self.clean_vector(gdf)
         if self.directed:
             graph = self._get_direct_graph_from_vector(
-                gdf=gdf, edge_attributes_to_include=["avgspeed", "bridge", "tunnel"]
+                gdf=gdf,
+                edge_attributes_to_include=[
+                    "length",
+                    "maxspeed",
+                    "avgspeed",
+                    "bridge",
+                    "tunnel",
+                ],
             )
         else:
             graph = self._get_undirected_graph_from_vector(
-                gdf, edge_attributes_to_include=["avgspeed", "bridge", "tunnel"]
+                gdf,
+                edge_attributes_to_include=[
+                    "length",
+                    "maxspeed",
+                    "avgspeed",
+                    "bridge",
+                    "tunnel",
+                ],
             )
         edges, nodes = self.get_network_edges_and_nodes_from_graph(graph)
         graph_complex = nut.graph_from_gdf(edges, nodes, node_id="node_fid")
@@ -102,14 +118,25 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         ).simplify()
 
         # Assign the average speed and time to the graphs
-        graph_simple = AvgSpeedCalculator(graph_simple, self.output_graph_dir).assign()
+        graph_simple = AvgSpeedCalculator(
+            graph_simple, self.link_type_column, self.output_graph_dir
+        ).assign()
         graph_complex = AvgSpeedCalculator(
-            graph_complex, self.output_graph_dir
+            graph_complex, self.link_type_column, self.output_graph_dir
         ).assign()
 
         logging.info("Start converting the graph to a geodataframe")
         edges_complex, _ = nut.graph_to_gdf(graph_complex)
         logging.info("Finished converting the graph to a geodataframe")
+
+        # Segment the complex graph
+        edges_complex, link_tables = Segmentation.segment_graph(
+            self.segmentation_length,
+            self.crs,
+            edges_complex,
+            export_link_table=True,
+            link_tables=link_tables,
+        )
 
         # Save the link tables linking complex and simple IDs
         self._export_linking_tables(link_tables)

@@ -37,7 +37,6 @@ import rasterio
 import rtree
 from geopy import distance
 from numpy.ma import MaskedArray
-from osgeo import gdal
 from osmnx import graph_to_gdfs
 from rasterio.features import shapes
 from rasterio.mask import mask
@@ -1279,28 +1278,6 @@ def read_merge_shp(shp_file_analyse, id_name, shp_file_diversion=[], crs_=4326):
     return lines
 
 
-def check_hazard_extent_resolution(list_hazards):
-    """Checks whether the extent of a list of hazard rasters is exactly the same.
-
-    Args:
-        list_hazards (list of pathlib paths or strings): A list of paths to the hazard map rasters of which
-            the extent needs to be checked
-
-    Returns:
-        (bool): True if the extents are exactly the same, False if they are not.
-    """
-    if len(list_hazards) == 1:
-        return True
-    check_hazard_extent = [
-        gdal.Open(str(haz)).GetGeoTransform() for haz in list_hazards
-    ]
-    if len(set(check_hazard_extent)) == 1:
-        # All hazard have the exact same extents and resolution
-        return True
-    else:
-        return False
-
-
 def get_extent(dataset):
     cols = dataset.RasterXSize
     rows = dataset.RasterYSize
@@ -1385,6 +1362,7 @@ def reproject_graph(original_graph: nx.Graph, crs_in: str, crs_out: str) -> nx.G
     _reprojected_graph = original_graph.copy()
     set_values = gdf_out.to_dict(orient="index")
     nx.set_edge_attributes(_reprojected_graph, values=set_values)
+    _reprojected_graph.graph["crs"] = crs_out
     return _reprojected_graph
 
 
