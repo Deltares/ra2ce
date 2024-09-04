@@ -175,28 +175,39 @@ def merge_edges(
 
         _edge_paths = []
 
+        # find the edge paths for the nodes in node_set
         while node_set:
+            # for each node in node_set find other nodes on the path
             intermediates = set()
             popped_node = node_set.pop()
+            # intermediates are the nodes in the node_path that are between two other nodes in the path
             intermediates.add(popped_node)
             node_path = {popped_node}
             candidates = {popped_node}
             while candidates:
                 popped_cand = candidates.pop()
+                # matches are the nodes that belong to a node_path
                 matches = edge_dict[popped_cand]
                 matches = matches - node_path
                 for match in matches:
                     intermediates.add(popped_cand)
+                    # if the found node on the path is in the node_set, then keep looking for other connected nodes on
+                    # the path
                     if match in node_set:
                         candidates.add(match)
                         node_path.add(match)
                         node_set.remove(match)
+                    # If the found node is not in node_set stop.
                     else:
                         node_path.add(match)
+            # After finding all nodes on a path find the edges that are connected to these nodes.
+            # Finding the edges is different for the nodes in the node path with degree 2 and 4.
             if len(node_path) >= 2:
                 if any(node_path.intersection(filtered_degree_4_set)):
+                    # node_path has nodes with degree 4 => get the forward and backward paths
                     _find_and_append_degree_4_paths(_edge_paths)
                 else:
+                    # node_path has nodes with degree 4 => find the edges connected to the intermediates
                     edge_paths_gdf = snkit_network.edges[
                         snkit_network.edges.from_id.isin(intermediates) |
                         snkit_network.edges.to_id.isin(intermediates)
