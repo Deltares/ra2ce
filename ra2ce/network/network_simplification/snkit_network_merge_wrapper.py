@@ -97,30 +97,22 @@ def merge_edges(
         updated_edges_gdf = updated_edges_gdf.drop(columns=["id"])
         return updated_edges_gdf
 
-    def _filter_degree_2(degree_2s: set) -> set:
-        degree_2_filtered = set()
-        for degree_2_node_id in degree_2s:
-            # Get the predecessors (antecedents) and successors (precedents) to make sure for each node with the degree
-            # of 2 there is only one predecessor and successor. E.g. filters on 2 in 1->2, 1->5, 2->3, 3->4, 3->5
-            predecessors = list(networkx_graph.predecessors(degree_2_node_id))
-            successors = list(networkx_graph.successors(degree_2_node_id))
+    def _filter_node(_node_set: set, _degrees: int) -> set:
+        _filtered = set()
+        for _node_id in _node_set:
+            # Get the predecessors (antecedents) and successors (precedents) to make sure for to filter correctly
+            # For _node_set with all degree 2: this filters on the nodes that have only one predecessor and successor.
+            # E.g. filters on 2 in 1->2, 1->5, 2->3, 3->4, 3->5
+            # For _node_set with all degree 4: Check if the predecessors and successors are the same nodes.
+            # E.g. filters on 2 in 1->2, 2->3, 2->1, 3->2.
+            predecessors = list(networkx_graph.predecessors(_node_id))
+            successors = list(networkx_graph.successors(_node_id))
 
-            # Check if there is one predecessor and one successor.
-            if len(predecessors) == len(successors) == 1:
-                degree_2_filtered.add(degree_2_node_id)
-        return degree_2_filtered
-
-    def _filter_degree_4(degree_4s: set) -> set:
-        degree_4_filtered = set()
-        for degree_4_node_id in degree_4s:
-            # Get the predecessors (antecedents) and successors (precedents) for filtering.
-            # E.g. : 1->2, 2->3, 2->1, 3->2 => filters on 2
-            predecessors = list(networkx_graph.predecessors(degree_4_node_id))
-            successors = list(networkx_graph.successors(degree_4_node_id))
-            # Check if the predecessors and successors are the same nodes
-            if sorted(predecessors) == sorted(successors):
-                degree_4_filtered.add(degree_4_node_id)
-        return degree_4_filtered
+            # Check the degree of the _node_set and the corresponding criterium.
+            if ((_degrees == 2 and len(predecessors) == len(successors) == 1) or
+                    (_degrees == 4 and sorted(predecessors) == sorted(successors))):
+                _filtered.add(_node_id)
+        return _filtered
 
     def _get_edge_paths(node_set: set, snkit_network: SnkitNetwork) -> list:
         def _find_and_append_degree_4_paths(
@@ -220,11 +212,11 @@ def merge_edges(
 
     degree_2 = list(snkit_network.nodes[id_col].loc[snkit_network.nodes.degree == 2])
     degree_2_set = set(degree_2)
-    filtered_degree_2_set = _filter_degree_2(degree_2_set)
+    filtered_degree_2_set = _filter_node(degree_2_set, _degrees=2)
 
     degree_4 = list(snkit_network.nodes[id_col].loc[snkit_network.nodes.degree == 4])
     degree_4_set = set(degree_4)
-    filtered_degree_4_set = _filter_degree_4(degree_4_set)
+    filtered_degree_4_set = _filter_node(degree_4_set, _degrees=4)
 
     nodes_of_interest = filtered_degree_2_set | filtered_degree_4_set
 
