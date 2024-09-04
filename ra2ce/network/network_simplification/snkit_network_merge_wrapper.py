@@ -100,9 +100,11 @@ def merge_edges(
     def _filter_node(_node_set: set, _degrees: int) -> set:
         _filtered = set()
         for _node_id in _node_set:
-            # Get the predecessors (antecedents) and successors (precedents) for filtering:
+            # Get the predecessors (antecedents) and successors (precedents) to make sure for to filter correctly
             # For _node_set with all degree 2: this filters on the nodes that have only one predecessor and successor.
+            # E.g. filters on 2 in 1->2, 1->5, 2->3, 3->4, 3->5
             # For _node_set with all degree 4: Check if the predecessors and successors are the same nodes.
+            # E.g. filters on 2 in 1->2, 2->3, 2->1, 3->2.
             predecessors = list(networkx_graph.predecessors(_node_id))
             successors = list(networkx_graph.successors(_node_id))
 
@@ -208,16 +210,21 @@ def merge_edges(
         snkit_network.nodes["degree"] = snkit_network.nodes[id_col].apply(
             lambda x: _node_connectivity_degree(x, snkit_network)
         )
+
     # Filter on the nodes with degree 2 and 4 which suffice the following criteria:
     # For _node_set with all degree 2: this filters on the nodes that have only one predecessor and successor.
     # E.g. filters on 2 in 1->2, 1->5, 2->3, 3->4, 3->5
     # For _node_set with all degree 4: Check if the predecessors and successors are the same nodes.
     # E.g. filters on 2 in 1->2, 2->3, 2->1, 3->2.
-    nodes_of_interest = set()
-    for degree in [2,4]:
-        nodes_with_degree_set = set(list(snkit_network.nodes[id_col].loc[snkit_network.nodes.degree == degree]))
-        filtered_nodes_with_degree_set = _filter_node(nodes_with_degree_set, _degrees=degree)
-        nodes_of_interest = nodes_of_interest | filtered_nodes_with_degree_set
+    degree_2 = list(snkit_network.nodes[id_col].loc[snkit_network.nodes.degree == 2])
+    degree_2_set = set(degree_2)
+    filtered_degree_2_set = _filter_node(degree_2_set, _degrees=2)
+
+    degree_4 = list(snkit_network.nodes[id_col].loc[snkit_network.nodes.degree == 4])
+    degree_4_set = set(degree_4)
+    filtered_degree_4_set = _filter_node(degree_4_set, _degrees=4)
+
+    nodes_of_interest = filtered_degree_2_set | filtered_degree_4_set
 
     edge_paths = _get_edge_paths(sorted(nodes_of_interest), snkit_network)
 
