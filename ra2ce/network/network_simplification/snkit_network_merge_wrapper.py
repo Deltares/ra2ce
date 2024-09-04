@@ -20,6 +20,7 @@ from collections import defaultdict
 
 import geopandas as gpd
 import networkx as nx
+import numpy as np
 import pandas as pd
 from networkx import MultiGraph
 from shapely.geometry import LineString, MultiLineString, MultiPoint, Point
@@ -114,65 +115,71 @@ def merge_edges(
                 _filtered.add(_node_id)
         return _filtered
 
-    def _get_edge_paths(node_set: set, snkit_network: SnkitNetwork) -> list:
+    def _get_edge_paths(node_set: set, _snkit_network: SnkitNetwork) -> list:
+        def _get_adjacency_list(edges_gdf: gpd.GeoDataFrame, from_id_column: str = "from_id",
+                                to_id_column: str = "to_id") -> defaultdict:
+            # Convert the edges of a GeoDataFrame to an adjacency list using vectorized operations.
+            _edge_dict = defaultdict(set)
+            # Extract the 'from_id' and 'to_id' columns as numpy arrays for efficient processing
+            from_ids = edges_gdf[from_id_column].values
+            to_ids = edges_gdf[to_id_column].values
+            # Vectorized operation to populate the adjacency list
+            for from_id, to_id in np.nditer([from_ids, to_ids]):
+                _edge_dict[from_id].add(to_id)
+                _edge_dict[to_id].add(from_id)
+
+            return _edge_dict
+
+        def _retrieve_edge(node1: int | float, node2: int | float) -> gpd.GeoDataFrame:
+            """Retrieve the edge from snkit_network.edges GeoDataFrame between two nodes."""
+            edge = _snkit_network.edges[
+                (_snkit_network.edges['from_id'] == node1) &
+                (_snkit_network.edges['to_id'] == node2)
+                ]
+            return edge if not edge.empty else None
+
+        def _construct_path(start_node: int | float, end_node: int | float, __intermediates: list) -> pd.DataFrame | None:
+            path = []
+            current_node = start_node
+            _intermediates = __intermediates.copy()
+
+            while _intermediates:
+                for next_node in _intermediates:
+                    edge = _retrieve_edge(current_node, next_node)
+                    if edge is not None:
+                        path.append(edge)
+                        _intermediates.remove(next_node)
+                        current_node = next_node
+                        break
+
+            final_edge = _retrieve_edge(current_node, end_node)
+            if final_edge is not None:
+                path.append(final_edge)
+
+            if len(path) > 0 and all(edge is not None for edge in path):
+                return pd.concat(path)  # Combine edges into a single GeoDataFrame
+            return None
+
         def _find_and_append_degree_4_paths(
                 _edge_paths: list
         ) -> None:
-            def retrieve_edge(node1: int|float, node2: int|float) -> gpd.GeoDataFrame:
-                """Retrieve the edge from snkit_network.edges GeoDataFrame between two nodes."""
-                edge = snkit_network.edges[
-                    (snkit_network.edges['from_id'] == node1) &
-                    (snkit_network.edges['to_id'] == node2)
-                    ]
-                return edge if not edge.empty else None
-            
-            def construct_path(start_node: int|float, end_node: int|float, intermediates: list) -> pd.DataFrame | None:
-                path = []
-                current_node = start_node
-                _intermediates = intermediates.copy()
-
-                while _intermediates:
-                    for next_node in _intermediates:
-                        edge = retrieve_edge(current_node, next_node)
-                        if edge is not None:
-                            path.append(edge)
-                            _intermediates.remove(next_node)
-                            current_node = next_node
-                            break
-
-                final_edge = retrieve_edge(current_node, end_node)
-                if final_edge is not None:
-                    path.append(final_edge)
-
-                if len(path) > 0 and all(edge is not None for edge in path):
-                    return pd.concat(path)  # Combine edges into a single GeoDataFrame
-                return None
-
             boundary_nodes = list(node_path - filtered_degree_4_set)
             if len(boundary_nodes) == 2:
                 from_node, to_node = boundary_nodes
-                intermediates = list(node_path & filtered_degree_4_set)
+                _intermediates = list(node_path & filtered_degree_4_set)
 
                 # Construct and append the forward path
-                forward_gdf = construct_path(from_node, to_node, intermediates)
+                forward_gdf = _construct_path(from_node, to_node, _intermediates)
                 if forward_gdf is not None:
                     _edge_paths.append(forward_gdf)
 
                 # Construct and append the backward path
-                backward_gdf = construct_path(to_node, from_node, intermediates)
+                backward_gdf = _construct_path(to_node, from_node, _intermediates)
                 if backward_gdf is not None:
                     _edge_paths.append(backward_gdf)
 
-
         # Convert edges to an adjacency list using vectorized operations
-        edge_dict = defaultdict(set)
-        from_ids = snkit_network.edges["from_id"].values
-        to_ids = snkit_network.edges["to_id"].values
-
-        for from_id, to_id in zip(from_ids, to_ids):
-            edge_dict[from_id].add(to_id)
-            edge_dict[to_id].add(from_id)
-
+        edge_dict = _get_adjacency_list(edges_gdf=snkit_network.edges)
         _edge_paths = []
 
         # find the edge paths for the nodes in node_set
@@ -207,12 +214,11 @@ def merge_edges(
                     # node_path has nodes with degree 4 => get the forward and backward paths
                     _find_and_append_degree_4_paths(_edge_paths)
                 else:
-                    # node_path has nodes with degree 4 => find the edges connected to the intermediates
+                    # node_path has nodes with degree 2 => find the edges connected to the intermediates
                     edge_paths_gdf = snkit_network.edges[
                         snkit_network.edges.from_id.isin(intermediates) |
                         snkit_network.edges.to_id.isin(intermediates)
                         ]
-                    # Append the result to edge_paths
                     _edge_paths.append(edge_paths_gdf)
         return _edge_paths
 
