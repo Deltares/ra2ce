@@ -47,6 +47,14 @@ class SnkitNetworkWrapper:
     edge_from_id_column_name: str = "from_id"
     edge_to_id_column_name: str = "to_id"
 
+    def __init__(self, snkit_network: Network, node_id_column_name: str = "id",
+                 edge_from_id_column_name: str = "from_id", edge_to_id_column_name: str = "to_id") -> None:
+        self.snkit_network = snkit_network
+        self.node_id_column_name = node_id_column_name
+        self.edge_from_id_column_name = edge_from_id_column_name
+        self.edge_to_id_column_name = edge_to_id_column_name
+        self.networkx_graph: NxGraph = self.to_networkx()
+
     @classmethod
     def from_networkx(
         cls,
@@ -91,6 +99,7 @@ class SnkitNetworkWrapper:
         # Overwrite the existing network with the merged edges.
         self.snkit_network = merge_edges(
             snkit_network=self.snkit_network,
+            networkx_graph=self.networkx_graph,
             aggregate_func=_aggregate_function,
             by=_attributes_to_exclude,
             id_col="id",

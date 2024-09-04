@@ -41,6 +41,7 @@ its current state.
 
 def merge_edges(
     snkit_network: SnkitNetwork,
+    networkx_graph: NxGraph,
     aggregate_func: str | dict,
     by: str | list,
     id_col: str,
@@ -50,6 +51,7 @@ def merge_edges(
 
     Args:
         snkit_network (SnkitNetwork): network to merge.
+        networkx_graph (NxGraph): networkx graph to merge
         aggregate_func (str | dict): Aggregation function to apply.
         by (str | list): Arguments (column names).
         id_col (str, optional): Name of the column representing the 'id'.
@@ -96,13 +98,7 @@ def merge_edges(
         return updated_edges_gdf
 
     def _filter_degree_2(degree_2s: set) -> set:
-        from ra2ce.network.network_simplification.snkit_network_wrapper import SnkitNetworkWrapper
-
         degree_2_filtered = set()
-        snkit_network_wrapper = SnkitNetworkWrapper(
-            snkit_network=snkit_network,
-        )
-        networkx_graph = snkit_network_wrapper.to_networkx()
         for degree_2_node_id in degree_2s:
             # Get the predecessors (antecedents) and successors (precedents)
             predecessors = list(networkx_graph.predecessors(degree_2_node_id))
@@ -114,13 +110,7 @@ def merge_edges(
         return degree_2_filtered
 
     def _filter_degree_4(degree_4s: set) -> set:
-        from ra2ce.network.network_simplification.snkit_network_wrapper import SnkitNetworkWrapper
-
         degree_4_filtered = set()
-        snkit_network_wrapper = SnkitNetworkWrapper(
-            snkit_network=snkit_network,
-        )
-        networkx_graph = snkit_network_wrapper.to_networkx()
         for degree_4_node_id in degree_4s:
             # Get the predecessors (antecedents) and successors (precedents)
             predecessors = list(networkx_graph.predecessors(degree_4_node_id))
