@@ -38,27 +38,31 @@ The output consists of estimating the damages per each link and segment in two d
 - Segmented damage output file:
     - dam_<EVi>_HZ or dam_<RPj>_HZ (for event-based or return-period based analyses respectively): The total damage of each segment.
 
-- For an analysis with hazards with return periods, a risk column is also calculated which represents the risk or estimated annual losses of the included hazards (with return periods).
+- For an analysis with hazards with return periods':
+    - a risk column is also calculated which represents the risk or estimated annual losses of the included hazards (with return periods).
 
 Here, EVi refers to each hazard map without a return period introduced in the network configuration, and RPj refers to each hazard map with a return period introduced in the network configuration.
 
 The input requirements include:
 
-- A hazard map.
-- Network
+- Hazard map:
+    - with or without return period.
+- Network:
     - Automatically downloading a network from the extent of the introduced hazard map.
     - Introducing a polygon representing the region of interest.
     - Introducing a Shapefile representing the network under study.
-- Segmentation_length in metre. If links have lengths above this, they will be segmented.
+- Segmentation_length (metre):
+    - If links have lengths above this, they will be segmented.
 
 
 The main steps are:
 
-#. Exposure Analysis: Identify the impacted links where the water depth exceeds the threshold.
+#. Exposure Analysis:
+    - Identifies the impacted links where the water depth exceeds the threshold.
 #. Damage Estimation:
     #. Using Huizinga Vulnerability Curves:
-    #. Determine the maximum damage value per meter for each road based on the road type and number of lanes. The maximum damage values per kilometer are defined by the Huizinga function.
-    #. Relate water depth to the maximum damage value since water depth determines the actual amount of damage.
+    #. Determining the maximum damage value per meter for each road based on the road type and number of lanes. The maximum damage values per kilometer are defined by the Huizinga function.
+    #. Relating water depth to the maximum damage value since water depth determines the actual amount of damage.
         - The maximum damage per kilometer (when a road is completely demolished) is converted to values per meter.
         - The relation between water depth levels and the estimated percentage of road damage is defined by the Huizinga curve. For instance, at a flood depth of 1.5m, the damage value is estimated to be 55% of the maximum damage for a specific road type with a certain number of lanes.
         - Calculate 55% of the maximum damage value per meter of the road.
@@ -69,12 +73,11 @@ The main steps are:
 
 For more information on the Huizinga damage functions please refer to *Flood risk assessment of the European road network* written by van Ginkel et al.
 
-The output consists of:
+The output (gpkg) consists of:
 
 - Per link and segment (in Graph and Network objects, respectively):
     - Estimated damages as a tuple (quartile, in currency).
     - Representative damage for each damage curve. The representative percentage can be defined by the user (default is 100%). This percentage reflects a single value representing the damage between the lower and higher bounds (the tuple mentioned above).
-- Output type: gpkg.
 - Generated columns in the result file:
     - Segmented damage output file (for event-based or return-period based analyses, respectively):
         - dam_<Ci>_<EVj>_quartiles or dam_<Ci>_<RPx>_quartiles: Tuple, damages between the lower and upper bounds for each segment and each damage curve.
@@ -90,7 +93,8 @@ The output consists of:
 
 The input requirements include:
 
-- Hazard map.
+- Hazard map:
+    - with or without return period.
 - Network
     - Automatically downloading a network from the extent of the introduced hazard map.
     - Introducing a polygon representing the region of interest.
@@ -99,7 +103,8 @@ The input requirements include:
 
 The analysis Steps are:
 
-#. Exposure Analysis: Identify the impacted links where the water depth exceeds the threshold.
+#. Exposure Analysis:
+    - Identifies the impacted links where the water depth exceeds the threshold.
 #. Damage Estimation Based on OSdamage Vulnerability Curves:
     #. Look up the relevant vulnerability curves: for each flooding event, the road construction costs, and maximum damage per road type, differentiated between low flow (low-flow velocities) and high flow (high-flow velocities). These values represent the average for the former EU-28, in millions of euros (year 2015) per kilometer. There will be 6 vulnerability curves (C1 to C6).
     #. Define a lower and higher bound of construction damage for each road type.
@@ -126,7 +131,8 @@ The output consists of:
 
 The input requirements include:
 
-- Hazard map.
+- Hazard map:
+    - with or without return period.
 - Network:
     - Automatically downloading a network from the extent of the introduced hazard map.
     - Introducing a polygon.
@@ -137,7 +143,8 @@ The input requirements include:
 
 The analysis Steps are:
 
-#. Exposure Analysis: Identify impacted links where the water depth exceeds the threshold.
+#. Exposure Analysis:
+    - Identifies the impacted links where the water depth exceeds the threshold.
 #. Estimate Damages Based on Introduced Vulnerability Curves:
     - For each vulnerability curve and flooding event, read the maximum damage for each road type and number of lanes from the "road type/number of lanes-maximum damage" CSV files.
     - Calculate damage for each road edge by linking the water depth to the damage severity percentage (interpolating values in the "damage percentage-water depth" file), maximum damage, and the length of the inundated segments.
@@ -369,7 +376,8 @@ PLease note that the default traffic_period parameter is 'day'. For shorter haza
 
 Here are the analysis steps:
 
-#. Exposure Analysis: Identify the impacted links where the water depth exceeds the threshold.
+#. Exposure Analysis:
+    - Identifies the impacted links where the water depth exceeds the threshold.
 
 #. Perform Single Link Redundancy: Filter the impacted graph links and execute a single link redundancy analysis on these links to obtain the detour time or length (alt_time/length) and the "detour" attribute. The "detour" attribute indicates whether a link has an alternative route or not when removed.
 
@@ -495,7 +503,8 @@ The default traffic_period parameter is 'day'. For shorter hazard periods or bas
 
 The analysis steps include:
 
-#. Exposure Analysis: Identify impacted links where the water depth exceeds the threshold.
+#. Exposure Analysis:
+    - Identifies the impacted links where the water depth exceeds the threshold.
 
 #. Multi-link Redundancy Analysis: Determine the detour time or length (alt_time/length) and the “connected” attribute. The "connected" attribute indicates whether a link has a detour or not when removed, as part of the multi-link redundancy analysis.
 
