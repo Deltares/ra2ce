@@ -100,11 +100,12 @@ def merge_edges(
     def _filter_degree_2(degree_2s: set) -> set:
         degree_2_filtered = set()
         for degree_2_node_id in degree_2s:
-            # Get the predecessors (antecedents) and successors (precedents)
+            # Get the predecessors (antecedents) and successors (precedents) to make sure for each node with the degree
+            # of 2 there is only one predecessor and successor. E.g. filters on 2 in 1->2, 1->5, 2->3, 3->4, 3->5
             predecessors = list(networkx_graph.predecessors(degree_2_node_id))
             successors = list(networkx_graph.successors(degree_2_node_id))
 
-            # Check if there is exactly one predecessor and one successor: 1->2, 2->3, 2->1, 3->2 => filters on 2
+            # Check if there is one predecessor and one successor.
             if len(predecessors) == len(successors) == 1:
                 degree_2_filtered.add(degree_2_node_id)
         return degree_2_filtered
