@@ -25,7 +25,7 @@ from ra2ce.network.networks_utils import line_length
 def _detailed_edge_comparison(
     graph1: nx.MultiDiGraph | nx.MultiGraph, graph2: nx.MultiDiGraph | nx.MultiGraph
 ) -> bool:
-    def _dicts_comparison(
+    def dicts_comparison(
         _graph1: nx.MultiDiGraph | nx.MultiGraph, _graph2: nx.MultiDiGraph | nx.MultiGraph
     ) -> bool:
         for u, v, k, data1 in _graph1.edges(keys=True, data=True):
