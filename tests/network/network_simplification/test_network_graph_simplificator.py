@@ -49,8 +49,8 @@ def _detailed_edge_comparison(
                 return False
         return True
 
-    check_1_2 = _dicts_comparison(graph1, graph2)
-    check_2_1 = _dicts_comparison(graph2, graph1)
+    check_1_2 = dicts_comparison(graph1, graph2)
+    check_2_1 = dicts_comparison(graph2, graph1)
 
     if check_1_2 and check_2_1:
         return True
