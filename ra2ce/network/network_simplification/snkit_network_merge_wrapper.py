@@ -117,7 +117,6 @@ def merge_edges(
             # E.g. : 1->2, 2->3, 2->1, 3->2 => filters on 2
             predecessors = list(networkx_graph.predecessors(degree_4_node_id))
             successors = list(networkx_graph.successors(degree_4_node_id))
-
             # Check if the predecessors and successors are the same nodes
             if sorted(predecessors) == sorted(successors):
                 degree_4_filtered.add(degree_4_node_id)
@@ -135,7 +134,7 @@ def merge_edges(
                     ]
                 return edge if not edge.empty else None
             
-            def construct_path(start_node: int|float, end_node: int|float, intermediates: list):
+            def construct_path(start_node: int|float, end_node: int|float, intermediates: list) -> pd.DataFrame | None:
                 path = []
                 current_node = start_node
                 _intermediates = intermediates.copy()
