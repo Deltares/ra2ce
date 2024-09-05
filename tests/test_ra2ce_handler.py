@@ -69,8 +69,7 @@ class TestRa2ceHandler:
         # This ensures we handle both unparametrized and parametrized tests.
         if _test_case_dir.exists():
             shutil.rmtree(_test_case_dir)
-        if not _test_case_dir.parent.exists():
-            _test_case_dir.parent.mkdir()
+        _test_case_dir.parent.mkdir(exist_ok=True)
 
         shutil.copytree(_reference_dir, _test_case_dir)
         yield _test_case_dir
