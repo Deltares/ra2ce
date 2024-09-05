@@ -267,7 +267,7 @@ class HazardOverlay:
         all_agg_types = {
             "max": "maximum",
             "min": "minimum",
-            "mean": "average",
+            "mean": "mean",
             "fr": "fraction of network segment impacted by hazard",
         }
         chosen_agg_types = [
