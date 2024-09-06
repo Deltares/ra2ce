@@ -149,18 +149,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         # Check if all geometries between nodes are there, if not, add them as a straight line.
         graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
 
-        # Create look_up_tables between graphs with unique ids
-        (
-            _simple_to_complex,
-            _complex_to_simple,
-        ) = self._graph_link_simple_id_to_complex(graph_simple)
-        # Store id table and add simple ids to complex graph
-        _id_tables = (_simple_to_complex, _complex_to_simple)
-        graph_complex = self._add_simple_id_to_graph_complex(
-            graph_complex, _complex_to_simple, self.new_id
-        )
-        self._export_linking_tables(_id_tables)
-
+        graph_simple = nut.add_complex_id_to_graph_simple(graph_simple, link_tables[0], "rfid")
 
         logging.info("Finished converting the complex graph to a simple graph")
 

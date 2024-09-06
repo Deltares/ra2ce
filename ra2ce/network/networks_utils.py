@@ -1580,3 +1580,42 @@ def buffer_geometry(
         cap_style=cap_stype,
     )
     return gdf
+
+def add_complex_id_to_graph_simple(
+    simple_graph: nx.classes.Graph, simple_to_complex, simple_id: str
+) -> nx.classes.Graph:
+    """Adds the appropriate ID of the complex graph to each edge of the simple graph as a new attribute 'rfid_c'
+
+    Arguments:
+        simple_graph (Graph) : The simple graph, to update its 'rfid_c'
+        simple_to_complex (dict) : lookup table linking complex to simple graphs
+        simple_id (str): simple_id attribute to update
+
+    Returns:
+        simple_graph (Graph) : Same object, with added attribute 'rfid_c'
+
+    """
+
+    obtained_simple_ids = nx.get_edge_attributes(
+        simple_graph, f"{simple_id}"
+    )  # {(u,v,k) : 'rfid'}
+    complex_ids_per_simple_id = obtained_simple_ids  # start with a copy
+
+    for key, value in obtained_simple_ids.items():  # {(u,v,k) : 'rfid'}
+        try:
+            new_value = simple_to_complex[
+                value
+            ]  # find simple id belonging to the complex id
+            complex_ids_per_simple_id[key] = new_value
+        except KeyError as e:
+            logging.error(
+                "Could not find the simple ID belonging to complex ID %s; value set to None. Full error: %s",
+                key,
+                e,
+            )
+            complex_ids_per_simple_id[key] = None
+
+    # Now the format of simple_ids_per_complex_id is: {(u,v,k) : 'rfid}
+    nx.set_edge_attributes(simple_graph, complex_ids_per_simple_id, f"{simple_id}_c")
+
+    return simple_graph
