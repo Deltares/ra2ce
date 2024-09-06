@@ -290,6 +290,11 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             nx.Graph: NetworkX graph object with node and edge geometries and specified attributes.
         """
         _networkx_graph = nx.DiGraph(crs=geo_dataframe.crs, approach="primal")
+
+        for edge_attribute_to_include in edge_attributes_to_include:
+            if edge_attribute_to_include not in geo_dataframe.columns:
+                raise ValueError(f"{edge_attribute_to_include} is expected to be in the introduced network")
+
         for _, row in geo_dataframe.iterrows():
             link_id = row.get(self.file_id, None)
             link_type = row.get(self.link_type_column, None)
