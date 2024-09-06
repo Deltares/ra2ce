@@ -148,6 +148,20 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         # Check if all geometries between nodes are there, if not, add them as a straight line.
         graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
+
+        # Create look_up_tables between graphs with unique ids
+        (
+            _simple_to_complex,
+            _complex_to_simple,
+        ) = self._graph_link_simple_id_to_complex(graph_simple)
+        # Store id table and add simple ids to complex graph
+        _id_tables = (_simple_to_complex, _complex_to_simple)
+        graph_complex = self._add_simple_id_to_graph_complex(
+            graph_complex, _complex_to_simple, self.new_id
+        )
+        self._export_linking_tables(_id_tables)
+
+
         logging.info("Finished converting the complex graph to a simple graph")
 
         return graph_simple, edges_complex
@@ -290,10 +304,6 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             nx.Graph: NetworkX graph object with node and edge geometries and specified attributes.
         """
         _networkx_graph = nx.DiGraph(crs=geo_dataframe.crs, approach="primal")
-
-        for edge_attribute_to_include in edge_attributes_to_include:
-            if edge_attribute_to_include not in geo_dataframe.columns:
-                raise ValueError(f"{edge_attribute_to_include} is expected to be in the introduced network")
 
         for _, row in geo_dataframe.iterrows():
             link_id = row.get(self.file_id, None)
