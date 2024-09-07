@@ -88,13 +88,9 @@ class SnkitNetworkWrapper:
         _attributes_to_exclude = filter_excluded_attributes()
 
         if "demand_edge" not in _attributes_to_exclude:
-            _aggregate_function = self._aggfunc_with_demand_edge(
-                cols, _attributes_to_exclude
-            )
+            _aggregate_function = self._aggrfunc(cols, _attributes_to_exclude, with_demand=True)
         else:
-            _aggregate_function = self._aggfunc_no_demand_edge(
-                cols, _attributes_to_exclude
-            )
+            _aggregate_function = self._aggrfunc(cols, _attributes_to_exclude, with_demand=False)
 
         # Overwrite the existing network with the merged edges.
         self.snkit_network = merge_edges(
@@ -137,7 +133,7 @@ class SnkitNetworkWrapper:
             edge_to_id_column_name=self.edge_to_id_column_name,
         ).convert()
 
-    def _aggfunc_with_demand_edge(self, cols, attributes_to_exclude: list[str]):
+    def _aggrfunc(self, cols, attributes_to_exclude: list[str], with_demand: bool):
         def aggregate_column(col_data, col_name: str):
             if col_name in attributes_to_exclude:
                 return col_data.iloc[0]
@@ -145,30 +141,8 @@ class SnkitNetworkWrapper:
                 return list(col_data)
             elif col_name in ["maxspeed", "avgspeed"]:
                 return col_data.mean()
-            elif col_name == "demand_edge":
+            elif with_demand and col_name == "demand_edge":
                 return max(col_data)
-            elif col_data.dtype == "O":
-                col_data_unique_values = list(set(col_data))
-                if len(col_data_unique_values) == 1:
-                    return col_data_unique_values[0]
-                else:
-                    return str(col_data_unique_values)
-            else:
-                return col_data.iloc[0]
-
-        return {
-            col: (lambda col_data, col_name=col: aggregate_column(col_data, col_name))
-            for col in cols
-        }
-
-    def _aggfunc_no_demand_edge(self, cols, attributes_to_exclude: list[str]):
-        def aggregate_column(col_data, col_name: str):
-            if col_name in attributes_to_exclude:
-                return col_data.iloc[0]
-            elif col_name == "rfid_c":
-                return list(col_data)
-            elif col_name in ["maxspeed", "avgspeed"]:
-                return col_data.mean()
             elif col_data.dtype == "O":
                 col_data_unique_values = list(set(col_data))
                 if len(col_data_unique_values) == 1:

@@ -51,6 +51,7 @@ class NxToSnkitNetworkConverter:
         """
         # Extract graph values
         _crs = self.networkx_graph.graph.get("crs", None)
+        # add x and y to the nodes of a graph
         self.networkx_graph = add_x_y_to_nodes(self.networkx_graph)
 
         # Create new network
