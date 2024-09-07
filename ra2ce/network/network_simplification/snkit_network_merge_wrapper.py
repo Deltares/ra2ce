@@ -125,8 +125,8 @@ def merge_edges(
             to_ids = edges_gdf[to_id_column].values
             # Vectorized operation to populate the adjacency list
             for from_id, to_id in np.nditer([from_ids, to_ids]):
-                _edge_dict[from_id].add(to_id)
-                _edge_dict[to_id].add(from_id)
+                _edge_dict[int(from_id)].add(int(to_id))
+                _edge_dict[int(to_id)].add(int(from_id))
 
             return _edge_dict
 
