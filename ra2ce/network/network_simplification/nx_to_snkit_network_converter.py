@@ -25,6 +25,8 @@ from numpy import int64 as npInt64
 from shapely.geometry import LineString, Point
 from snkit.network import Network as SnkitNetwork
 
+from ra2ce.network import add_x_y_to_nodes
+
 NxGraph = nx.Graph | nx.MultiGraph | nx.MultiDiGraph
 
 
@@ -49,6 +51,8 @@ class NxToSnkitNetworkConverter:
         """
         # Extract graph values
         _crs = self.networkx_graph.graph.get("crs", None)
+        # add x and y to the nodes of a graph
+        self.networkx_graph = add_x_y_to_nodes(self.networkx_graph)
 
         # Create new network
         snkit_network = SnkitNetwork()
