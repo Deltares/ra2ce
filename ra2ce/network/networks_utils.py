@@ -1596,12 +1596,15 @@ def add_complex_id_to_graph_simple(
 
     """
 
+    # {(u,v,k) : 'rfid'}
     obtained_simple_ids = nx.get_edge_attributes(
         simple_graph, f"{simple_id}"
-    )  # {(u,v,k) : 'rfid'}
-    complex_ids_per_simple_id = obtained_simple_ids  # start with a copy
+    )
+    # start with a copy
+    complex_ids_per_simple_id = obtained_simple_ids
 
-    for key, value in obtained_simple_ids.items():  # {(u,v,k) : 'rfid'}
+    # {(u,v,k) : 'rfid'}
+    for key, value in obtained_simple_ids.items():  
         try:
             new_value = simple_to_complex[
                 value
