@@ -138,19 +138,22 @@ def merge_edges(
                 ]
             return edge if not edge.empty else None
 
-        def construct_path(start_node: int | float, end_node: int | float, intermediates: list) -> pd.DataFrame | None:
+        def construct_path(start_node: int | float, end_node: int | float, intermediate_nodes: list) -> pd.DataFrame | None:
             path = []
             current_node = start_node
-            _intermediates = intermediates.copy()
+            _intermediates = intermediate_nodes.copy()
 
-            while _intermediates:
-                for next_node in _intermediates:
-                    edge = retrieve_edge(current_node, next_node)
-                    if edge is not None:
-                        path.append(edge)
-                        _intermediates.remove(next_node)
-                        current_node = next_node
-                        break
+            _explored_nodes = []
+            # Ensure we go through all the items.
+            for _ in range(len(intermediate_nodes)):
+                # Filter out nodes already used for edge retrieval
+                _to_explore = filter(lambda x: x not in _explored_nodes, intermediate_nodes)
+                for _next_node in _to_explore:
+                    _edge = retrieve_edge(current_node, _next_node)
+                    if _edge is not None:
+                        path.append(_edge)
+                        _explored_nodes.append(_next_node)
+                        current_node = _next_node
 
             final_edge = retrieve_edge(current_node, end_node)
             if final_edge is not None:
