@@ -1,6 +1,6 @@
 import logging
-import geopandas as gpd
 
+import geopandas as gpd
 import numpy as np
 
 from ra2ce.analysis.losses.risk_calculation.risk_calculation_base import (

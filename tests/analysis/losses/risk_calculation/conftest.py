@@ -109,7 +109,7 @@ def get_expected_factory_results_fixture() -> Iterator[dict]:
     name="risk_calculation_info_fixture",
 )
 def _get_risk_calculation_info_fixture(
-        request: pytest.FixtureRequest,
+    request: pytest.FixtureRequest,
 ) -> Iterator[tuple[RiskCalculationModeEnum, int]]:
     _risk_calculation_info = request.param
     assert isinstance(_risk_calculation_info[0], RiskCalculationModeEnum)

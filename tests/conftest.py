@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import Iterator
+
 import pytest
+
 from tests import acceptance_test_data
 
 

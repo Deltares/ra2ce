@@ -150,7 +150,9 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
         graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
 
         #  Update rfid_c after segmentation, which created more edges n teh complex graph
-        graph_simple = nut.add_complex_id_to_graph_simple(graph_simple, link_tables[0], "rfid")
+        graph_simple = nut.add_complex_id_to_graph_simple(
+            graph_simple, link_tables[0], "rfid"
+        )
 
         logging.info("Finished converting the complex graph to a simple graph")
 

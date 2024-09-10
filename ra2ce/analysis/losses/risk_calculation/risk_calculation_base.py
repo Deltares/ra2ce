@@ -1,8 +1,8 @@
+import re
 from abc import ABC, abstractmethod
 
 import geopandas as gpd
 import numpy as np
-import re
 
 
 class RiskCalculationBase(ABC):
@@ -80,5 +80,3 @@ class RiskCalculationBase(ABC):
         _risk_calculations = self._get_network_risk_calculations()
         frequencies = sorted(1 / rp for rp in _risk_calculations.columns)
         return np.trapz(_risk_calculations.values, frequencies, axis=1)
-
-

@@ -1,4 +1,5 @@
 import geopandas as gpd
+
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
