@@ -8,8 +8,8 @@ Configuration
 -------------------------------------
 Before describing the included analyses, we describe two main ways of setting-up the configurations needed for the analyses:
 
-#. Creating .ini files for network and analysis. Ra2ceHandler.run_with_ini_files() should be used to create a handler instance, used to run analyses.
-#. Instantiating the NetworkConfigData and AnalysisConfigData objects to pass required network and analysis configuration parameters (different for each analysis). Ra2ceHandler.run_with_config_data() should be used to create a handler instance, used to run analyses.
+#. Creating ``.ini`` files for network and analysis. ``Ra2ceHandler.run_with_ini_files()`` should be used to create a handler instance, used to run analyses.
+#. Instantiating the ``NetworkConfigData`` and ``AnalysisConfigData`` objects to pass required network and analysis configuration parameters (different for each analysis). ``Ra2ceHandler.run_with_config_data()`` should be used to create a handler instance, used to run analyses.
 
 In the examples in this page the first approach is shown. In the example folders a few examples on the second approach is also given.
 
