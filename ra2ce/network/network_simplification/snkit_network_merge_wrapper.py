@@ -116,8 +116,8 @@ def merge_edges(
         return _filtered
 
     def get_edge_paths(node_set: set, _snkit_network: SnkitNetwork) -> list:
-        def get_adjacency_list(edges_gdf: gpd.GeoDataFrame, from_id_column: str = "from_id",
-                                to_id_column: str = "to_id") -> defaultdict:
+        def get_adjacency_list(edges_gdf: gpd.GeoDataFrame, from_id_column: str,
+                                to_id_column: str) -> defaultdict:
             # Convert the edges of a GeoDataFrame to an adjacency list using vectorized operations.
             _edge_dict = defaultdict(set)
             # Extract the 'from_id' and 'to_id' columns as numpy arrays for efficient processing
@@ -138,10 +138,10 @@ def merge_edges(
                 ]
             return edge if not edge.empty else None
 
-        def construct_path(start_node: int | float, end_node: int | float, __intermediates: list) -> pd.DataFrame | None:
+        def construct_path(start_node: int | float, end_node: int | float, intermediates: list) -> pd.DataFrame | None:
             path = []
             current_node = start_node
-            _intermediates = __intermediates.copy()
+            _intermediates = intermediates.copy()
 
             while _intermediates:
                 for next_node in _intermediates:
@@ -181,7 +181,7 @@ def merge_edges(
             return _edge_paths_results
 
         # Convert edges to an adjacency list using vectorized operations
-        edge_dict = get_adjacency_list(edges_gdf=snkit_network.edges)
+        edge_dict = get_adjacency_list(edges_gdf=snkit_network.edges, from_id_column="from_id", to_id_column="to_id")
         _edge_paths: list = []
 
         # find the edge paths for the nodes in node_set
