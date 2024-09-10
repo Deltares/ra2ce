@@ -1485,7 +1485,7 @@ def add_simple_id_to_graph_complex(
         complex_graph, "{}_c".format(new_id)
     )
     # start with a copy
-    simple_ids_per_complex_id = obtained_complex_ids.deepcopy()
+    simple_ids_per_complex_id = deepcopy(obtained_complex_ids)
 
     # {(u,v,k) : 'rfid_c'}
     for key, value in obtained_complex_ids.items():
@@ -1605,7 +1605,7 @@ def add_complex_id_to_graph_simple(
         simple_graph, f"{simple_id}"
     )
     # start with a copy
-    complex_ids_per_simple_id = obtained_simple_ids.deepcopy()
+    complex_ids_per_simple_id = deepcopy(obtained_simple_ids)
 
     # {(u,v,k) : 'rfid'}
     for key, value in obtained_simple_ids.items():  
