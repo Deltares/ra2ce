@@ -30,6 +30,10 @@ import pandas as pd
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
+from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
+from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
+    RiskCalculationModeEnum,
+)
 from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
     TrafficPeriodEnum,
 )
@@ -40,13 +44,15 @@ from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtoco
 from ra2ce.analysis.losses.resilience_curves.resilience_curves_reader import (
     ResilienceCurvesReader,
 )
+from ra2ce.analysis.losses.risk_calculation.risk_calculation_factory import (
+    RiskCalculationFactory,
+)
 from ra2ce.analysis.losses.time_values.time_values_reader import TimeValuesReader
 from ra2ce.analysis.losses.traffic_intensities.traffic_intensities_reader import (
     TrafficIntensitiesReader,
 )
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
-from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 
@@ -107,6 +113,8 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         self.output_path = analysis_input.output_path
         self.hazard_names = analysis_input.hazard_names
 
+        self.criticality_analysis = gpd.GeoDataFrame()
+        self.criticality_analysis_non_disrupted = gpd.GeoDataFrame()
         self.result = gpd.GeoDataFrame()
 
     def _check_validity_analysis_files(self):
@@ -130,24 +138,23 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             )
         else:
             criticality_analysis = criticality_analysis.drop_duplicates(["u", "v"])
+        #  ToDO: check hazard overlay with AggregateWlEnum.NONE or INVALID
 
-        # filter out all links not affected by the hazard
-        if self.analysis.aggregate_wl == AggregateWlEnum.NONE:
-            self.criticality_analysis = criticality_analysis[
-                criticality_analysis["EV1_ma"] > self.analysis.threshold
-            ]
-        elif self.analysis.aggregate_wl == AggregateWlEnum.MAX:
-            self.criticality_analysis = criticality_analysis[
-                criticality_analysis["EV1_max"] > self.analysis.threshold
-            ]
-        elif self.analysis.aggregate_wl == AggregateWlEnum.MEAN:
-            self.criticality_analysis = criticality_analysis[
-                criticality_analysis["EV1_mean"] > self.analysis.threshold
-            ]
-        elif self.analysis.aggregate_wl == AggregateWlEnum.MIN:
-            self.criticality_analysis = criticality_analysis[
-                criticality_analysis["EV1_min"] > self.analysis.threshold
-            ]
+        aggregate_wl_abbreviation = (
+            self.analysis_config.config_data.aggregate_wl.get_wl_abbreviation()
+        )
+        hazard_aggregate_wl_columns = [
+            c
+            for c in criticality_analysis.columns
+            if (c.startswith("RP") or c.startswith("EV"))
+            and c.endswith(f"_{aggregate_wl_abbreviation}")
+        ]
+        self.criticality_analysis = criticality_analysis[
+            (
+                criticality_analysis[hazard_aggregate_wl_columns]
+                > self.analysis.threshold
+            ).any(axis=1)
+        ]
 
         self.criticality_analysis_non_disrupted = criticality_analysis[
             ~criticality_analysis.index.isin(self.criticality_analysis.index)
@@ -185,7 +192,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             for range_tuple in _hazard_intensity_ranges:
                 x, y = range_tuple
                 if x <= height <= y:
-                    return (x, y)
+                    return x, y
             raise ValueError(f"No matching range found for height {height}")
 
         def _create_result(vlh: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
@@ -236,7 +243,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         _check_validity_criticality_analysis()
 
         _hazard_intensity_ranges = self.resilience_curves.ranges
-        events = self.criticality_analysis.filter(regex=r"^EV(?!1_fr)")
+        events = self.criticality_analysis.filter(regex=r"^(EV|RP)(?!\d+_fr)")
         # Read the performance_change stating the functionality drop
         if "key" in self.criticality_analysis.columns:
             performance_change = self.criticality_analysis[
@@ -295,52 +302,48 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         )
         for event in events.columns.tolist():
             for _, vlh_row in vehicle_loss_hours.iterrows():
-                row_hazard_range = _get_range(vlh_row[event])
-                row_connectivity = vlh_row[connectivity_attribute]
-                row_performance_changes = performance_change.loc[
-                    [vlh_row[self.link_id]]
-                ]
-                if "key" in vlh_row.index:
-                    key = vlh_row["key"]
-                else:
-                    key = 0
-                (u, v, k) = (
-                    vlh_row["u"],
-                    vlh_row["v"],
-                    key,
-                )
-                # allow link_id not to be unique in the graph (results reliability is up to the user)
-                # this can happen for instance when a directed graph should be made from an input network
-                for performance_row in row_performance_changes.iterrows():
-                    row_performance_change = performance_row[-1][
-                        f"{self.performance_metric}"
+                if vlh_row[event] > self.analysis.threshold:
+                    row_hazard_range = _get_range(vlh_row[event])
+                    row_connectivity = vlh_row[connectivity_attribute]
+                    row_performance_changes = performance_change.loc[
+                        [vlh_row[self.link_id]]
                     ]
-                    if "key" in performance_row[-1].index:
-                        performance_key = performance_row[-1]["key"]
+                    if "key" in vlh_row.index:
+                        key = vlh_row["key"]
                     else:
+                        key = 0
+                    (u, v) = (vlh_row["u"], vlh_row["v"])
+                    # allow link_id not to be unique in the graph (results reliability is up to the user)
+                    # this can happen for instance when a directed graph should be made from an input network
+                    for performance_row in row_performance_changes.iterrows():
+                        row_performance_change = performance_row[-1][
+                            f"{self.performance_metric}"
+                        ]
                         performance_key = 0
-                    row_u_v_k = (
-                        performance_row[-1]["u"],
-                        performance_row[-1]["v"],
-                        performance_key,
-                    )
-                    if (
-                        math.isnan(row_performance_change) and row_connectivity == 0
-                    ) or row_performance_change == 0:
-                        self._calculate_production_loss_per_capita(
-                            vehicle_loss_hours, row_hazard_range, vlh_row, event
+                        if "key" in performance_row[-1].index:
+                            performance_key = performance_row[-1]["key"]
+                        row_u_v_k = (
+                            performance_row[-1]["u"],
+                            performance_row[-1]["v"],
+                            performance_key,
                         )
-                    elif not (
-                        math.isnan(row_performance_change)
-                        and math.isnan(row_connectivity)
-                    ) and ((u, v, k) == row_u_v_k):
-                        self._populate_vehicle_loss_hour(
-                            vehicle_loss_hours,
-                            row_hazard_range,
-                            vlh_row,
-                            row_performance_change,
-                            event,
-                        )
+                        if (
+                            math.isnan(row_performance_change) and row_connectivity == 0
+                        ) or row_performance_change == 0:
+                            self._calculate_production_loss_per_capita(
+                                vehicle_loss_hours, row_hazard_range, vlh_row, event
+                            )
+                        elif not (
+                            math.isnan(row_performance_change)
+                            and math.isnan(row_connectivity)
+                        ) and ((u, v, key) == row_u_v_k):
+                            self._populate_vehicle_loss_hour(
+                                vehicle_loss_hours,
+                                row_hazard_range,
+                                vlh_row,
+                                row_performance_change,
+                                event,
+                            )
 
         vehicle_loss_hours_result = _create_result(vehicle_loss_hours)
         return vehicle_loss_hours_result
@@ -355,7 +358,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             _max_disruption = 0
             for _row_link_type in vlh_row[self.link_type_column]:
                 _link_type = RoadTypeEnum.get_enum(_row_link_type)
-                disruption = self.resilience_curves.get_disruption(
+                disruption = self.resilience_curves.calculate_disruption(
                     _link_type, row_hazard_range
                 )
                 if disruption > _max_disruption:
@@ -516,4 +519,19 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         )
 
         self.result = self.calculate_vehicle_loss_hours()
+
+        # Calculate the risk or estimated annual losses if applicable
+        if (
+            self.analysis.event_type == EventTypeEnum.RETURN_PERIOD
+            and self.analysis.risk_calculation_mode
+            not in (RiskCalculationModeEnum.INVALID, RiskCalculationModeEnum.NONE)
+        ):
+            risk_calculation = RiskCalculationFactory.get_risk_calculation(
+                risk_calculation_mode=self.analysis.risk_calculation_mode,
+                risk_calculation_year=self.analysis.risk_calculation_year,
+                losses_gdf=self.result,
+            )
+            risk = risk_calculation.get_integration_of_df_trapezoidal()
+            self.result[f"risk_vlh_total"] = risk
+
         return self.result
