@@ -95,7 +95,7 @@ class SnkitNetworkWrapper:
         # Overwrite the existing network with the merged edges.
         self.snkit_network = merge_edges(
             snkit_network=self.snkit_network,
-            networkx_graph=self.networkx_graph,
+            networkx_graph=self.to_networkx(),
             aggregate_func=_aggregate_function,
             by=_attributes_to_exclude,
             id_col="id",
