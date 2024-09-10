@@ -43,12 +43,12 @@ class SnkitNetworkWrapper:
     """
 
     snkit_network: Network
-    node_id_column_name: str = "id"
-    edge_from_id_column_name: str = "from_id"
-    edge_to_id_column_name: str = "to_id"
+    node_id_column_name: str
+    edge_from_id_column_name: str
+    edge_to_id_column_name: str
 
-    def __init__(self, snkit_network: Network, node_id_column_name: str = "id",
-                 edge_from_id_column_name: str = "from_id", edge_to_id_column_name: str = "to_id") -> None:
+    def __init__(self, snkit_network: Network, node_id_column_name: str,
+                 edge_from_id_column_name: str, edge_to_id_column_name: str) -> None:
         self.snkit_network = snkit_network
         self.node_id_column_name = node_id_column_name
         self.edge_from_id_column_name = edge_from_id_column_name
