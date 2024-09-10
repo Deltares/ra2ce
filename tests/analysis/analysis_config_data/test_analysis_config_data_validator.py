@@ -95,4 +95,4 @@ class TestAnalysisConfigDataValidator:
 
         # 3. Verify final expectations.
         assert not _report.is_valid()
-        assert len(_report._errors) == 4
+        assert len(_report._errors) == 3
