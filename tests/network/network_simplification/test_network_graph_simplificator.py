@@ -4,6 +4,8 @@ from typing import Callable, Iterator
 import networkx as nx
 import numpy as np
 import pytest
+from altgraph.Graph import Graph
+from networkx import DiGraph
 from shapely.geometry import LineString
 
 from ra2ce.network import add_missing_geoms_graph
@@ -176,6 +178,23 @@ class TestNetworkSimplificationWithAttributeExclusion:
     def _get_expected_result_graph_fixture(
         self, nx_digraph_factory: nx.MultiDiGraph
     ) -> nx.MultiGraph:
+        def add_edge_with_attributes(graph_to_shape: Graph | DiGraph, edge_u: int | float, edge_v: int | float, a_value: str, edge_node_ids: list) -> Graph | DiGraph:
+            # Create a copy of the input graph
+            shaped_graph = graph_to_shape.copy()
+
+            # Extract geometries programmatically using edge_node_ids
+            geometry_list = [graph_to_shape.nodes[n_id]["geometry"] for n_id in edge_node_ids]
+
+            shaped_graph.add_edge(
+                edge_u,
+                edge_v,
+                a=a_value,
+                from_node=edge_u,
+                to_node=edge_v,
+                geometry=LineString(geometry_list),
+            )
+            return shaped_graph
+
         _nx_digraph = nx_digraph_factory()
         _result_digraph = nx.MultiDiGraph()
         node_ids_degrees = {2: 3, 4: 2, 7: 2, 8: 4, 11: 3, 12: 2, 16: 4, 17: 1, 18: 1}
@@ -186,163 +205,38 @@ class TestNetworkSimplificationWithAttributeExclusion:
             _result_digraph.add_node(node_id, **node_data)
         _result_digraph = add_missing_geoms_graph(_result_digraph, "geometry")
 
-        _result_digraph.add_edge(
-            2,
-            4.0,
-            a='None',
-            from_node=2,
-            to_node=4,
-            geometry=LineString(
-                [
-                    _nx_digraph.nodes[2]["geometry"],
-                    _nx_digraph.nodes[3]["geometry"],
-                    _nx_digraph.nodes[4]["geometry"],
-                ]
-            ),
+        _result_digraph = add_edge_with_attributes(
+            _result_digraph, 2, 4.0, 'None', [2, 3, 4]
         )
-
-        _result_digraph.add_edge(
-            2,
-            16.0,
-            a='None',
-            from_node=2,
-            to_node=16,
-            geometry=LineString(
-                [
-                    _nx_digraph.nodes[2]["geometry"],
-                    _nx_digraph.nodes[1]["geometry"],
-                    _nx_digraph.nodes[16]["geometry"],
-                ]
-            ),
+        _result_digraph = add_edge_with_attributes(
+            _result_digraph, 2, 16.0, 'None', [2, 1, 16]
         )
-
-        _result_digraph.add_edge(
-            4,
-            7.0,
-            a="yes",
-            from_node=4,
-            to_node=7,
-            geometry=LineString(
-                [
-                    _nx_digraph.nodes[4]["geometry"],
-                    _nx_digraph.nodes[5]["geometry"],
-                    _nx_digraph.nodes[6]["geometry"],
-                    _nx_digraph.nodes[7]["geometry"],
-                ]
-            ),
+        _result_digraph = add_edge_with_attributes(
+            _result_digraph, 4, 7.0, 'yes', [4, 5, 6, 7]
         )
-        _result_digraph.add_edge(
-            7,
-            8.0,
-            a='None',
-            from_node=7,
-            to_node=8,
-            geometry=LineString(
-                [
-                    _nx_digraph.nodes[7]["geometry"],
-                    _nx_digraph.nodes[8]["geometry"],
-                ]
-            ),
+        _result_digraph = add_edge_with_attributes(
+            _result_digraph, 7, 8.0, 'None', [7, 8]
         )
-        _result_digraph.add_edge(
-            8,
-            11,
-            a='None',
-            from_node=8,
-            to_node=11,
-            geometry=LineString(
-                [
-                    _nx_digraph.nodes[8]["geometry"],
-                    _nx_digraph.nodes[9]["geometry"],
-                    _nx_digraph.nodes[10]["geometry"],
-                    _nx_digraph.nodes[11]["geometry"],
-                ]
-            ),
+        _result_digraph = add_edge_with_attributes(
+            _result_digraph, 8, 11, 'None', [8, 9, 10, 11]
         )
-        _result_digraph.add_edge(
-            8,
-            11,
-            a="yes",
-            from_node=8,
-            to_node=11,
-            geometry=LineString(
-                [
-                    _nx_digraph.nodes[8]["geometry"],
-                    _nx_digraph.nodes[13]["geometry"],
-                    _nx_digraph.nodes[14]["geometry"],
-                    _nx_digraph.nodes[15]["geometry"],
-                    _nx_digraph.nodes[11]["geometry"],
-                ]
-            ),
+        _result_digraph = add_edge_with_attributes(
+            _result_digraph, 8, 11, 'yes', [8, 13, 14, 15, 11]
         )
-        _result_digraph.add_edge(
-            8,
-            12,
-            a='None',
-            from_node=8,
-            to_node=12,
-            geometry=LineString(
-                [
-                    _nx_digraph.nodes[8]["geometry"],
-                    _nx_digraph.nodes[12]["geometry"],
-                ]
-            ),
+        _result_digraph = add_edge_with_attributes(
+            _result_digraph, 8, 12, 'None', [8, 12]
         )
-        _result_digraph.add_edge(
-            11,
-            12,
-            a="yes",
-            from_node=11,
-            to_node=12,
-            geometry=LineString(
-                [
-                    _nx_digraph.nodes[11]["geometry"],
-                    _nx_digraph.nodes[12]["geometry"],
-                ]
-            ),
+        _result_digraph = add_edge_with_attributes(
+            _result_digraph, 11, 12, 'yes', [11, 12]
         )
-
-        _result_digraph.add_edge(
-            16,
-            2.0,
-            a='None',
-            from_node=16,
-            to_node=2,
-            geometry=LineString(
-                [
-                    _nx_digraph.nodes[16]["geometry"],
-                    _nx_digraph.nodes[1]["geometry"],
-                    _nx_digraph.nodes[2]["geometry"],
-                ]
-            ),
+        _result_digraph = add_edge_with_attributes(
+            _result_digraph, 16, 2.0, 'None', [16, 1, 2]
         )
-
-        _result_digraph.add_edge(
-            16,
-            17,
-            a='None',
-            from_node=16,
-            to_node=17,
-            geometry=LineString(
-                [
-                    _nx_digraph.nodes[16]["geometry"],
-                    _nx_digraph.nodes[17]["geometry"],
-                ]
-            ),
+        _result_digraph = add_edge_with_attributes(
+            _result_digraph, 16, 17, 'None', [16, 17]
         )
-
-        _result_digraph.add_edge(
-            16,
-            18,
-            a='None',
-            from_node=16,
-            to_node=18,
-            geometry=LineString(
-                [
-                    _nx_digraph.nodes[16]["geometry"],
-                    _nx_digraph.nodes[18]["geometry"],
-                ]
-            ),
+        _result_digraph = add_edge_with_attributes(
+            _result_digraph, 16, 18, 'None', [16, 18]
         )
         _result_digraph.graph["crs"] = "EPSG:4326"
 
