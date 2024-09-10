@@ -182,7 +182,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
             shaped_graph = graph_to_shape.copy()
 
             # Extract geometries programmatically using edge_node_ids
-            geometry_list = [graph_to_shape.nodes[n_id]["geometry"] for n_id in edge_node_ids]
+            geometry_list = [_nx_digraph.nodes[n_id]["geometry"] for n_id in edge_node_ids]
 
             shaped_graph.add_edge(
                 edge_u,
