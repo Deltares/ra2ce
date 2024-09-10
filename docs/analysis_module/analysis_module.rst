@@ -275,7 +275,12 @@ Equity and traffic analysis                              part of optimal_route_o
 
 **Single link redundancy**
 
-With this analysis, you gain insight into the criticality of each link in the network. A redundancy analysis is performed for each separate link. It identifies the best existing alternative route if that particular edge would be disrupted. If there is no redundancy, it identifies the lack of alternative routes. This is performed sequentially, for each link of the network. The redundancy of each link is expressed in 1) total distance or total time for the alternative route, 2) difference in distance/time between the alternative route and the original route, 3) and if there is an alternative route available, or not.
+With this analysis, you gain insight into the criticality of each link in the network. A redundancy analysis is performed for each separate link. It identifies the best existing alternative route if that particular edge would be disrupted. If there is no redundancy, it identifies the lack of alternative routes. This is performed sequentially, for each link of the network. The redundancy of each link is expressed in:
+
+ 1. total distance or total time for the alternative route, 
+ 2. difference in distance/time between the alternative route and the original route, 
+ 3. last, if there is an alternative route available, or not.
+ 
 
 **network.ini**
 ::
