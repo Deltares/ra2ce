@@ -87,6 +87,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             graph = self._get_direct_graph_from_vector(
                 gdf=gdf,
                 edge_attributes_to_include=[
+                    "lanes",
                     "length",
                     "maxspeed",
                     "avgspeed",
@@ -98,6 +99,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             graph = self._get_undirected_graph_from_vector(
                 gdf,
                 edge_attributes_to_include=[
+                    "lanes",
                     "length",
                     "maxspeed",
                     "avgspeed",
@@ -146,6 +148,10 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
 
         # Check if all geometries between nodes are there, if not, add them as a straight line.
         graph_simple = nut.add_missing_geoms_graph(graph_simple, geom_name="geometry")
+
+        #  Update rfid_c after segmentation, which created more edges n teh complex graph
+        graph_simple = nut.add_complex_id_to_graph_simple(graph_simple, link_tables[0], "rfid")
+
         logging.info("Finished converting the complex graph to a simple graph")
 
         return graph_simple, edges_complex
@@ -288,6 +294,7 @@ class VectorNetworkWrapper(NetworkWrapperProtocol):
             nx.Graph: NetworkX graph object with node and edge geometries and specified attributes.
         """
         _networkx_graph = nx.DiGraph(crs=geo_dataframe.crs, approach="primal")
+
         for _, row in geo_dataframe.iterrows():
             link_id = row.get(self.file_id, None)
             link_type = row.get(self.link_type_column, None)
