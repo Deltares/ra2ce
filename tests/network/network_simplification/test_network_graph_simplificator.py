@@ -141,8 +141,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
     def _get_nx_digraph_factory(self) -> Iterator[Callable[[], nx.MultiDiGraph]]:
         def create_nx_multidigraph():
             _nx_digraph = nx.MultiDiGraph()
-            for i in range(1, 19):
-                _nx_digraph.add_node(i, x=i, y=i * 10)
+            _nx_digraph.add_nodes_from([(i, {'x': i, 'y': i * 10}) for i in range(1, 19)])
 
             _nx_digraph.add_edge(1, 2, a='None')
             _nx_digraph.add_edge(2, 1, a='None')
