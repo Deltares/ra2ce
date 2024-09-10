@@ -20,7 +20,7 @@
 """
 import itertools
 import logging
-import math
+from copy import deepcopy
 import os
 import sys
 import warnings
@@ -1480,16 +1480,20 @@ def add_simple_id_to_graph_complex(
 
     """
 
+    # {(u,v,k) : 'rfid_c'}
     obtained_complex_ids = nx.get_edge_attributes(
         complex_graph, "{}_c".format(new_id)
-    )  # {(u,v,k) : 'rfid_c'}
-    simple_ids_per_complex_id = obtained_complex_ids  # start with a copy
+    )
+    # start with a copy
+    simple_ids_per_complex_id = obtained_complex_ids.deepcopy()
 
-    for key, value in obtained_complex_ids.items():  # {(u,v,k) : 'rfid_c'}
+    # {(u,v,k) : 'rfid_c'}
+    for key, value in obtained_complex_ids.items():
         try:
+            # find simple id belonging to the complex id
             new_value = complex_to_simple[
                 value
-            ]  # find simple id belonging to the complex id
+            ]
             simple_ids_per_complex_id[key] = new_value
         except KeyError as e:
             logging.error(
@@ -1601,14 +1605,15 @@ def add_complex_id_to_graph_simple(
         simple_graph, f"{simple_id}"
     )
     # start with a copy
-    complex_ids_per_simple_id = obtained_simple_ids
+    complex_ids_per_simple_id = obtained_simple_ids.deepcopy()
 
     # {(u,v,k) : 'rfid'}
     for key, value in obtained_simple_ids.items():  
         try:
+            # find simple id belonging to the complex id
             new_value = simple_to_complex[
                 value
-            ]  # find simple id belonging to the complex id
+            ]
             complex_ids_per_simple_id[key] = new_value
         except KeyError as e:
             logging.error(
