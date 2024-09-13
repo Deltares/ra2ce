@@ -86,7 +86,9 @@ class to read in a shapefile, clean it and process it to a network. The third on
 
 Network from vector data using the network.ini initalization file
 -----------------------------------------------------------------------
-The user can also read in a pre-defined shapefile using the ra2ce_basics_from_gpkg example notebook, where the user can practice with pre-defined data and required folder structure and data format. The user can upload their own shapefile (vector data), store it in the RA2CE static>network folder and specify the name of the file in the network.ini. 
+The user can also read in a pre-defined shapefile using the ra2ce_basics_from_gpkg example notebook, where the user can practice with pre-defined data and required folder structure and data format. The user can upload their own shapefile (vector data), store it in the RA2CE static>network folder and specify the name of the file in the network.ini.
+
+file_id and link_type_column (NetworkSection of the NetworkConfigData or in the network section of network.ini) should refer to the id column and road type columns of the shapefile.
 
 **network.ini**
 ::
@@ -100,6 +102,7 @@ The user can also read in a pre-defined shapefile using the ra2ce_basics_from_gp
     primary_file = my_shapefile.shp
     diversion_file = None
     file_id = id #specify the ID column in your vector data
+    link_type_column = highway
     polygon = None
     network_type = drive #if you want to use the drivable roads
     road_types = motorway, motorway_link, trunk, trunk_link #specify road types up to 'residential' and 'unclassified', visit OSM to learn more.
@@ -191,3 +194,14 @@ Note: the origin-destination parameters are explained in the :ref:`analysis_modu
     aggregate_wl = max                          # max / min / mean
     hazard_crs = None                           # EPSG code / projection that can be read by pyproj / None
     overlay_segmented_graph = True              # True / False
+
+Network simplification
+---------------------------------------------------------------------------------------
+
+By simplification it is meant to merge links from intersection to intersection.
+
+By default, a simplified graph will be generated and exported. It is possible to exclude links with certain attributes from being merged to other links that have different values for the attributes of interest.
+
+For instance, there might be a case in which we would like to merge links that are not bridges together and merge bridges together. This can be the case for tunnels or any other link type.
+
+To allow such simplification, attributes_to_exclude_in_simplification parameter should be passed (as a list of strings) in the NetworkSection of the NetworkConfigData. Alternatively attributes_to_exclude_in_simplification should be passed (e.g., attributes_to_exclude_in_simplification = bridge, tunnel) in the network.ini file, section network.
