@@ -53,13 +53,12 @@ class SnkitNetworkWrapper:
         self.node_id_column_name = node_id_column_name
         self.edge_from_id_column_name = edge_from_id_column_name
         self.edge_to_id_column_name = edge_to_id_column_name
-        self.networkx_graph: NxGraph = self.to_networkx()
 
     @classmethod
     def from_networkx(
-        cls,
-        networkx_graph: NxGraph,
-        column_names_dict: dict[str, str],
+            cls,
+            networkx_graph: NxGraph,
+            column_names_dict: dict[str, str],
     ) -> SnkitNetworkWrapper:
         """
         Generates a `SnkitNetworkWrapper` based on the given `NxGraph`.
@@ -108,7 +107,7 @@ class SnkitNetworkWrapper:
         )  # length in m
         self.snkit_network.edges = self.snkit_network.edges[
             self.snkit_network.edges["length"] != 0
-        ]  # Remove zero-length edges
+            ]  # Remove zero-length edges
 
         def convert_to_line_string(geometry_to_convert) -> MultiLineString:
             if isinstance(geometry_to_convert, MultiLineString):
