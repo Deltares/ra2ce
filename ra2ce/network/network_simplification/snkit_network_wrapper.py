@@ -47,8 +47,13 @@ class SnkitNetworkWrapper:
     edge_from_id_column_name: str
     edge_to_id_column_name: str
 
-    def __init__(self, snkit_network: Network, node_id_column_name: str,
-                 edge_from_id_column_name: str, edge_to_id_column_name: str) -> None:
+    def __init__(
+        self,
+        snkit_network: Network,
+        node_id_column_name: str,
+        edge_from_id_column_name: str,
+        edge_to_id_column_name: str,
+    ) -> None:
         self.snkit_network = snkit_network
         self.node_id_column_name = node_id_column_name
         self.edge_from_id_column_name = edge_from_id_column_name
@@ -56,9 +61,9 @@ class SnkitNetworkWrapper:
 
     @classmethod
     def from_networkx(
-            cls,
-            networkx_graph: NxGraph,
-            column_names_dict: dict[str, str],
+        cls,
+        networkx_graph: NxGraph,
+        column_names_dict: dict[str, str],
     ) -> SnkitNetworkWrapper:
         """
         Generates a `SnkitNetworkWrapper` based on the given `NxGraph`.
@@ -87,9 +92,13 @@ class SnkitNetworkWrapper:
         _attributes_to_exclude = filter_excluded_attributes()
 
         if "demand_edge" not in _attributes_to_exclude:
-            _aggregate_function = self._aggrfunc(cols, _attributes_to_exclude, with_demand=True)
+            _aggregate_function = self._aggrfunc(
+                cols, _attributes_to_exclude, with_demand=True
+            )
         else:
-            _aggregate_function = self._aggrfunc(cols, _attributes_to_exclude, with_demand=False)
+            _aggregate_function = self._aggrfunc(
+                cols, _attributes_to_exclude, with_demand=False
+            )
 
         # Overwrite the existing network with the merged edges.
         self.snkit_network = merge_edges(
@@ -107,7 +116,7 @@ class SnkitNetworkWrapper:
         )  # length in m
         self.snkit_network.edges = self.snkit_network.edges[
             self.snkit_network.edges["length"] != 0
-            ]  # Remove zero-length edges
+        ]  # Remove zero-length edges
 
         def convert_to_line_string(geometry_to_convert) -> MultiLineString:
             if isinstance(geometry_to_convert, MultiLineString):
