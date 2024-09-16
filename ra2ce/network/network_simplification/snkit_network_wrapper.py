@@ -43,9 +43,21 @@ class SnkitNetworkWrapper:
     """
 
     snkit_network: Network
-    node_id_column_name: str = "id"
-    edge_from_id_column_name: str = "from_id"
-    edge_to_id_column_name: str = "to_id"
+    node_id_column_name: str
+    edge_from_id_column_name: str
+    edge_to_id_column_name: str
+
+    def __init__(
+        self,
+        snkit_network: Network,
+        node_id_column_name: str,
+        edge_from_id_column_name: str,
+        edge_to_id_column_name: str,
+    ) -> None:
+        self.snkit_network = snkit_network
+        self.node_id_column_name = node_id_column_name
+        self.edge_from_id_column_name = edge_from_id_column_name
+        self.edge_to_id_column_name = edge_to_id_column_name
 
     @classmethod
     def from_networkx(
@@ -80,13 +92,18 @@ class SnkitNetworkWrapper:
         _attributes_to_exclude = filter_excluded_attributes()
 
         if "demand_edge" not in _attributes_to_exclude:
-            _aggregate_function = self._aggrfunc(cols, _attributes_to_exclude, with_demand=True)
+            _aggregate_function = self._aggrfunc(
+                cols, _attributes_to_exclude, with_demand=True
+            )
         else:
-            _aggregate_function = self._aggrfunc(cols, _attributes_to_exclude, with_demand=False)
+            _aggregate_function = self._aggrfunc(
+                cols, _attributes_to_exclude, with_demand=False
+            )
 
         # Overwrite the existing network with the merged edges.
         self.snkit_network = merge_edges(
             snkit_network=self.snkit_network,
+            networkx_graph=self.to_networkx(),
             aggregate_func=_aggregate_function,
             by=_attributes_to_exclude,
             id_col="id",

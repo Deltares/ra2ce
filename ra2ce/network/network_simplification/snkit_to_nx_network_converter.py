@@ -33,7 +33,7 @@ class SnkitToNxNetworkConverter:
     edge_from_id_column_name: str = "from_id"
     edge_to_id_column_name: str = "to_id"
 
-    def convert(self) -> nx.MultiGraph:
+    def convert(self) -> nx.MultiDiGraph:
         """
         Converts the given `snkit.network.Network` into a matching
         `networkx.MultiGraph`.
@@ -42,10 +42,10 @@ class SnkitToNxNetworkConverter:
             snkit_network (SnkitNetwork): The snkit network to convert.
 
         Returns:
-            `networkx.MultiGraph`: The converted graph.
+            `networkx.MultiDiGraph`: The converted graph.
         """
         # Define new graph
-        _nx_graph = nx.MultiGraph()
+        _nx_graph = nx.MultiDiGraph()
         _crs = self.snkit_network.edges.crs
 
         # Add nodes to the graph
