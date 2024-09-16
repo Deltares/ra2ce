@@ -25,11 +25,11 @@ from ra2ce.network.networks_utils import line_length
 
 
 def _detailed_edge_comparison(
-        graph1: nx.MultiDiGraph | nx.MultiGraph, graph2: nx.MultiDiGraph | nx.MultiGraph
+    graph1: nx.MultiDiGraph | nx.MultiGraph, graph2: nx.MultiDiGraph | nx.MultiGraph
 ) -> bool:
     def dicts_comparison(
-            graph_a: nx.MultiDiGraph | nx.MultiGraph,
-            graph_b: nx.MultiDiGraph | nx.MultiGraph,
+        graph_a: nx.MultiDiGraph | nx.MultiGraph,
+        graph_b: nx.MultiDiGraph | nx.MultiGraph,
     ) -> bool:
         for u, v, k, data1 in graph_a.edges(keys=True, data=True):
             geom1 = data1["geometry"]
@@ -64,7 +64,7 @@ def _detailed_edge_comparison(
 class TestNetworkGraphSimplificator:
     @pytest.fixture(name="network_graph_simplificator_factory")
     def _get_network_graph_simplificator(
-            self,
+        self,
     ) -> Iterator[Callable[[], NetworkGraphSimplificator]]:
         def get_network_graph_simplificator() -> NetworkGraphSimplificator:
             return NetworkGraphSimplificator(
@@ -74,8 +74,8 @@ class TestNetworkGraphSimplificator:
         yield get_network_graph_simplificator
 
     def test_validate_fixture_init(
-            self,
-            network_graph_simplificator_factory: Callable[[], NetworkGraphSimplificator],
+        self,
+        network_graph_simplificator_factory: Callable[[], NetworkGraphSimplificator],
     ):
         # 1. Define test data.
         _network_graph_simplificator = network_graph_simplificator_factory()
@@ -91,9 +91,9 @@ class TestNetworkGraphSimplificator:
         yield _graph
 
     def test__graph_create_unique_ids_with_missing_id_data(
-            self,
-            network_graph_simplificator_factory: Callable[[], NetworkGraphSimplificator],
-            multigraph_fixture: nx.MultiGraph,
+        self,
+        network_graph_simplificator_factory: Callable[[], NetworkGraphSimplificator],
+        multigraph_fixture: nx.MultiGraph,
     ):
         # 1. Define test data
         _network_graph_simplificator = network_graph_simplificator_factory()
@@ -111,9 +111,9 @@ class TestNetworkGraphSimplificator:
         assert all(_new_id_name in _keys for _keys in _dicts_keys)
 
     def test__graph_create_unique_ids_with_existing_id(
-            self,
-            network_graph_simplificator_factory: NetworkGraphSimplificator,
-            multigraph_fixture: nx.MultiGraph,
+        self,
+        network_graph_simplificator_factory: NetworkGraphSimplificator,
+        multigraph_fixture: nx.MultiGraph,
     ):
         # 1. Define test data
         _network_graph_simplificator = network_graph_simplificator_factory()
@@ -132,7 +132,7 @@ class TestNetworkGraphSimplificator:
 class TestNetworkSimplificationWithAttributeExclusion:
     @pytest.fixture(name="network_simplification_with_attribute_exclusion")
     def _get_network_simplification_with_attribute_exclusion(
-            self,
+        self,
     ) -> Iterator[NetworkSimplificationWithAttributeExclusion]:
         yield NetworkSimplificationWithAttributeExclusion(
             nx_graph=None, attributes_to_exclude=[]
@@ -178,14 +178,14 @@ class TestNetworkSimplificationWithAttributeExclusion:
 
     @pytest.fixture(name="expected_result_graph_fixture")
     def _get_expected_result_graph_fixture(
-            self, nx_digraph_factory: nx.MultiDiGraph
+        self, nx_digraph_factory: nx.MultiDiGraph
     ) -> nx.MultiGraph:
         def add_edge_with_attributes(
-                graph_to_shape: Graph | DiGraph,
-                edge_u: int | float,
-                edge_v: int | float,
-                a_value: str,
-                edge_node_ids: list,
+            graph_to_shape: Graph | DiGraph,
+            edge_u: int | float,
+            edge_v: int | float,
+            a_value: str,
+            edge_node_ids: list,
         ) -> Graph | DiGraph:
             # Create a copy of the input graph
             shaped_graph = graph_to_shape.copy()
@@ -262,10 +262,10 @@ class TestNetworkSimplificationWithAttributeExclusion:
         return SnkitToNxNetworkConverter(snkit_network=snkit_network).convert()
 
     def test_simplify_graph(
-            self,
-            network_simplification_with_attribute_exclusion: NetworkSimplificationWithAttributeExclusion,
-            nx_digraph_factory: Callable[[], nx.MultiDiGraph],
-            expected_result_graph_fixture: nx.MultiDiGraph,
+        self,
+        network_simplification_with_attribute_exclusion: NetworkSimplificationWithAttributeExclusion,
+        nx_digraph_factory: Callable[[], nx.MultiDiGraph],
+        expected_result_graph_fixture: nx.MultiDiGraph,
     ):
         network_simplification_with_attribute_exclusion.nx_graph = nx_digraph_factory()
         network_simplification_with_attribute_exclusion.attributes_to_exclude = ["a"]
