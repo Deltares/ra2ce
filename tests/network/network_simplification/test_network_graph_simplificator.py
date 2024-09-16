@@ -146,27 +146,27 @@ class TestNetworkSimplificationWithAttributeExclusion:
                 [(i, {"x": i, "y": i * 10}) for i in range(1, 19)]
             )
 
-            _nx_digraph.add_edge(1, 2, a="None")
-            _nx_digraph.add_edge(2, 1, a="None")
-            _nx_digraph.add_edge(2, 3, a="None")
-            _nx_digraph.add_edge(3, 4, a="None")
-            _nx_digraph.add_edge(4, 5, a="yes")
-            _nx_digraph.add_edge(5, 6, a="yes")
-            _nx_digraph.add_edge(6, 7, a="yes")
-            _nx_digraph.add_edge(7, 8, a="None")
-            _nx_digraph.add_edge(8, 9, a="None")
-            _nx_digraph.add_edge(8, 12, a="None")
-            _nx_digraph.add_edge(8, 13, a="yes")
-            _nx_digraph.add_edge(9, 10, a="None")
-            _nx_digraph.add_edge(10, 11, a="None")
-            _nx_digraph.add_edge(11, 12, a="yes")
-            _nx_digraph.add_edge(13, 14, a="yes")
-            _nx_digraph.add_edge(14, 15, a="yes")
-            _nx_digraph.add_edge(15, 11, a="yes")
-            _nx_digraph.add_edge(1, 16, a="None")
-            _nx_digraph.add_edge(16, 1, a="None")
-            _nx_digraph.add_edge(16, 17, a="None")
-            _nx_digraph.add_edge(16, 18, a="None")
+            _nx_digraph.add_edge(1, 2, bridge="None")
+            _nx_digraph.add_edge(2, 1, bridge="None")
+            _nx_digraph.add_edge(2, 3, bridge="None")
+            _nx_digraph.add_edge(3, 4, bridge="None")
+            _nx_digraph.add_edge(4, 5, bridge="yes")
+            _nx_digraph.add_edge(5, 6, bridge="yes")
+            _nx_digraph.add_edge(6, 7, bridge="yes")
+            _nx_digraph.add_edge(7, 8, bridge="None")
+            _nx_digraph.add_edge(8, 9, bridge="None")
+            _nx_digraph.add_edge(8, 12, bridge="None")
+            _nx_digraph.add_edge(8, 13, bridge="yes")
+            _nx_digraph.add_edge(9, 10, bridge="None")
+            _nx_digraph.add_edge(10, 11, bridge="None")
+            _nx_digraph.add_edge(11, 12, bridge="yes")
+            _nx_digraph.add_edge(13, 14, bridge="yes")
+            _nx_digraph.add_edge(14, 15, bridge="yes")
+            _nx_digraph.add_edge(15, 11, bridge="yes")
+            _nx_digraph.add_edge(1, 16, bridge="None")
+            _nx_digraph.add_edge(16, 1, bridge="None")
+            _nx_digraph.add_edge(16, 17, bridge="None")
+            _nx_digraph.add_edge(16, 18, bridge="None")
 
             _nx_digraph = add_missing_geoms_graph(_nx_digraph, "geometry")
             _nx_digraph.graph["crs"] = "EPSG:4326"
@@ -184,7 +184,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
             graph_to_shape: Graph | DiGraph,
             edge_u: int | float,
             edge_v: int | float,
-            a_value: str,
+            value_to_exclude: str,
             edge_node_ids: list,
         ) -> Graph | DiGraph:
             # Create a copy of the input graph
@@ -198,7 +198,7 @@ class TestNetworkSimplificationWithAttributeExclusion:
             shaped_graph.add_edge(
                 edge_u,
                 edge_v,
-                a=a_value,
+                bridge=value_to_exclude,
                 from_node=edge_u,
                 to_node=edge_v,
                 geometry=LineString(geometry_list),
@@ -268,7 +268,9 @@ class TestNetworkSimplificationWithAttributeExclusion:
         expected_result_graph_fixture: nx.MultiDiGraph,
     ):
         network_simplification_with_attribute_exclusion.nx_graph = nx_digraph_factory()
-        network_simplification_with_attribute_exclusion.attributes_to_exclude = ["a"]
+        network_simplification_with_attribute_exclusion.attributes_to_exclude = [
+            "bridge"
+        ]
 
         _graph_simple = network_simplification_with_attribute_exclusion.simplify_graph()
 
