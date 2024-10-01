@@ -146,6 +146,7 @@ class AnalysisFactory:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
+                graph_file=analysis_config.graph_files.origins_destinations_graph,
                 graph_file_hazard=analysis_config.graph_files.origins_destinations_graph_hazard,
             )
             return OptimalRouteOriginClosestDestination(analysis_input=_analysis_input)
