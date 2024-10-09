@@ -1,8 +1,0 @@
-name: ra2ce_env
-channels:
-  - conda-forge
-  - nodefaults
-dependencies:
-  - python=3.10
-  - conda-forge::pandoc
-  - teamcity-messages
