@@ -20,6 +20,7 @@ ARG CONDA_ENV="${SRC_ROOT}/.env"
 # -v {your_ra2ce_checkout_dir}:/usr/src/app
 WORKDIR $SRC_ROOT/app
 COPY environment.yml $SRC_ROOT/.config/environment.yml
+COPY ra2ce_test_cases $SRC_ROOT/test_external_data
 
 RUN conda init bash \
     && . ~/.bashrc \
