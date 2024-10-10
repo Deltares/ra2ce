@@ -10,6 +10,7 @@ FROM condaforge/miniforge3:latest
 RUN apt-get update && apt-get install libgl1 -y
 
 ARG SRC_ROOT="/usr/src"
+ARG TEST_CASES=ra2ce_test_cases # Optional default value to be `ra2ce_test_cases`
 
 # For persisting the environment remember to mount it as well:
 # -v {your_local_tmp_dir}:/usr/src/.env
@@ -20,7 +21,7 @@ ARG CONDA_ENV="${SRC_ROOT}/.env"
 # -v {your_ra2ce_checkout_dir}:/usr/src/app
 WORKDIR $SRC_ROOT/app
 COPY environment.yml $SRC_ROOT/.config/environment.yml
-COPY ra2ce_test_cases $SRC_ROOT/test_external_data
+COPY ${TEST_CASES} $SRC_ROOT/test_external_data
 
 RUN conda init bash \
     && . ~/.bashrc \
