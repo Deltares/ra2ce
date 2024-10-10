@@ -9,3 +9,4 @@ dependencies:
   # with: conda install -c conda-forge poetry=1.3.2
   - conda-forge::poetry=1.3.2
   - conda-forge::pandoc
+  - conda-forge::teamcity-messages
