@@ -1,0 +1,770 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Deploying Kubernetes on Amazon EKS Cluster with Terraform &#8212; Risk Assessment and Adaptation for Critical infrastructurE 0.9.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=365ca57ee442770a23c6" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6" />
+  <script src="../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=365ca57ee442770a23c6"></script>
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/sphinx_highlight.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'docker_and_cloud/setting_up_infrastructure/kubernetes_deployment';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Deploying Argo Workflows with Helm on Amazon EKS" href="argo_deployment.html" />
+    <link rel="prev" title="Setting up infrastructure" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation/installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../contributing/index.html">
+                        Contributing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../technical_documentation/technical_documentation.html">
+                        Technical Documentation
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../changelog_wrapper.html">
+                        Changelog
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item"><nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../../overview.html">
+                        Overview
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation/installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../examples/index.html">
+                        Examples
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../contributing/index.html">
+                        Contributing
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../technical_documentation/technical_documentation.html">
+                        Technical Documentation
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../changelog_wrapper.html">
+                        Changelog
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item"><nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../about/about.html">RA2CE</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../installation/installation.html">Installation</a><input checked class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../examples/index.html">Examples</a><input checked class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../examples/basic_examples.html">Basic examples</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/example_ra2ce_basics.html">RA2CE basics: set up RA2CE and configure a road network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/example_equity_analysis.html">RA2CE feature: Equity analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/example_single_link_redundancy.html">RA2CE feature: single link redundancy without the example data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/example_single_link_losses.html">RA2CE feature: Single link losses analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/example_multi_link_losses.html">RA2CE feature: Multi-link losses analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/example_origin_destination_analysis.html">RA2CE feature: Origin-destination analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/example_damages_huizinga.html">RA2CE feature: Damages analysis (Huizinga)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/example_damages_manual.html">RA2CE feature: Damages analysis (manual)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/example_damages_OSdamage.html">RA2CE feature: Damages analysis (OSdaMage)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/example_hazard_overlay.html">RA2CE feature: Hazard overlay</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/example_isolated_locations.html">RA2CE feature: Isolated locations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/example_optimal_route_origin_destination.html">RA2CE feature: Optimal routes between origins and destinations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/example_ra2ce_basics_fromgpkg.html">RA2CE basics: set up RA2CE and configure a road network from a pre-defined shapefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/example_download_network_using_a_polygon.html">Download a Network using a polygon</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/example_set_up_origin_destination_no_data_DIY.html">RA2CE basics: setting up an origin-destination analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/pizza_course_material_DIY.html">RA2CE: Do It Yourself</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../examples/hackathon_sessions.html">Hackathon sessions</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/hackathons/20240326_hackathon/summary_2024q1.html">Hackathon Q1 - 2024</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../examples/technical_meetings.html">Technical meetings</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/tech_meetings/20240403_run_without_ini_files_DIY.html">Tech Meeting 2024 Q1 - Run with(out) <code class="docutils literal notranslate"><span class="pre">ini</span></code> files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_examples/tech_meetings/20240403_using_enums_DIY.html">Tech Meeting 2024 Q1 - Enumerations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../network_module/network_module.html">Network Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../analysis_module/analysis_module.html">Analysis module</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../index.html">Docker and Cloud guide</a><input checked class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="index.html">Setting up infrastructure</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Deploying Kubernetes on Amazon EKS Cluster with Terraform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="argo_deployment.html">Deploying Argo Workflows with Helm on Amazon EKS</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../using_cloud_services/index.html">Using cloud services</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-8"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../using_cloud_services/docker_user_guide.html">Docker User Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../using_cloud_services/deltares_harbor.html">Deltares Docker Harbor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../using_cloud_services/deltares_hpc_user_guide.html">Deltares HPC User Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../using_cloud_services/hackathon_user_guide.html">Hackathon User Guide</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../contributing/index.html">Contributing</a><input checked class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-9"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing/design_principles.html">Design principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../contributing/implementation_decisions.html">Implementation decisions</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../technical_documentation/technical_documentation.html">Technical Documentation</a><input checked class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-10"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../technical_documentation/network_package.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../technical_documentation/analysis_package.html">Analysis</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../publications/publications.html">Publications</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../overview.html" class="nav-link">Overview</a></li>
+    
+    
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Setting up infrastructure</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Deploying...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="deploying-kubernetes-on-amazon-eks-cluster-with-terraform">
+<span id="kubernetes-deployment"></span><h1>Deploying Kubernetes on Amazon EKS Cluster with Terraform<a class="headerlink" href="#deploying-kubernetes-on-amazon-eks-cluster-with-terraform" title="Permalink to this heading">#</a></h1>
+<p>This guide outlines the steps to deploy an Amazon EKS cluster using Terraform. The Terraform configuration provided here automates the setup process, making it easier to create and manage an EKS cluster on AWS.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this heading">#</a></h2>
+<p>Before deploying the EKS cluster, ensure you have the following prerequisites:</p>
+<ul class="simple">
+<li><p>An AWS account with appropriate permissions to create resources like VPCs, subnets, EKS clusters, and EC2 instances.</p></li>
+<li><p>Terraform installed on your local machine. You can download it from <a class="reference external" href="https://www.terraform.io/downloads.html">terraform official website</a> and follow the installation instructions.</p></li>
+<li><p>AWS CLI configured with appropriate credentials. You can install and configure AWS CLI by following <a class="reference external" href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html">the official user guidelines</a>.</p></li>
+</ul>
+</section>
+<section id="deployment-steps">
+<h2>Deployment Steps<a class="headerlink" href="#deployment-steps" title="Permalink to this heading">#</a></h2>
+<p>Follow these steps to deploy the Amazon EKS cluster:</p>
+<ol class="arabic">
+<li><p><strong>Clone the Repository:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>&lt;repository-url&gt;
+</pre></div>
+</div>
+</li>
+<li><p><strong>Navigate to the Project Directory:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>&lt;repository-directory&gt;
+</pre></div>
+</div>
+</li>
+<li><p><strong>Update Terraform Backend Configuration:</strong></p>
+<p>Edit the <code class="docutils literal notranslate"><span class="pre">backend.tf</span></code> file and replace <code class="docutils literal notranslate"><span class="pre">your-bucket-name</span></code> with your S3 bucket name. Ensure that the bucket is already created, and a DynamoDB table is set up for state locking.</p>
+</li>
+<li><p><strong>Modify Terraform Configuration:</strong></p>
+<p>Update the <code class="docutils literal notranslate"><span class="pre">main.tf</span></code> file with your desired configurations:</p>
+<ul class="simple">
+<li><p>Replace <code class="docutils literal notranslate"><span class="pre">region</span></code> with your preferred AWS region.</p></li>
+<li><p>Modify <code class="docutils literal notranslate"><span class="pre">cluster_name</span></code> with your desired EKS cluster name.</p></li>
+<li><p>Update <code class="docutils literal notranslate"><span class="pre">subnets</span></code> with the IDs of your desired subnets.</p></li>
+<li><p>Adjust <code class="docutils literal notranslate"><span class="pre">instance_type</span></code> and <code class="docutils literal notranslate"><span class="pre">key_name</span></code> in the <code class="docutils literal notranslate"><span class="pre">node_groups</span></code> section with your preferred EC2 instance type and key pair name.</p></li>
+</ul>
+</li>
+<li><p><strong>Initialize Terraform:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>terraform<span class="w"> </span>init
+</pre></div>
+</div>
+</li>
+<li><p><strong>Deploy the EKS Cluster:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>terraform<span class="w"> </span>apply
+</pre></div>
+</div>
+</li>
+<li><p><strong>Accessing the Cluster:</strong></p>
+<p>After the deployment completes, you will get the following outputs:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">cluster_endpoint</span></code>: The endpoint URL of the EKS cluster.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">kubeconfig</span></code>: The generated kubeconfig file to authenticate with the EKS cluster using <code class="docutils literal notranslate"><span class="pre">kubectl</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">config_map_aws_auth</span></code>: The ConfigMap YAML used to configure AWS authentication for the EKS cluster.</p></li>
+</ul>
+<p>Use the provided kubeconfig file and <code class="docutils literal notranslate"><span class="pre">kubectl</span></code> to interact with the deployed EKS cluster:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="k">$(</span><span class="nb">pwd</span><span class="k">)</span>/kubeconfig_&lt;your-cluster-name&gt;
+
+aws<span class="w"> </span>eks<span class="w"> </span>--region<span class="w"> </span>eu-west-1<span class="w"> </span>update-kubeconfig<span class="w"> </span>--name<span class="w"> </span>ra2ce_cluster
+
+kubectl<span class="w"> </span>get<span class="w"> </span>svc
+</pre></div>
+</div>
+</li>
+</ol>
+</section>
+<section id="clean-up">
+<h2>Clean Up<a class="headerlink" href="#clean-up" title="Permalink to this heading">#</a></h2>
+<p>To avoid incurring unnecessary costs, remember to clean up the resources once you’re done using the EKS cluster:</p>
+<ol class="arabic">
+<li><p><strong>Destroy Resources:</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>terraform<span class="w"> </span>destroy
+</pre></div>
+</div>
+</li>
+<li><p><strong>Manual Clean Up:</strong></p>
+<p>Ensure all resources associated with the EKS cluster are deleted from the AWS Management Console, including EKS cluster, EC2 instances, security groups, etc.</p>
+</li>
+</ol>
+</section>
+<section id="further-customization">
+<h2>Further Customization<a class="headerlink" href="#further-customization" title="Permalink to this heading">#</a></h2>
+<p>You can either configure the terraform template to add other node groups or follow this documentation to use EKSCTL:</p>
+</section>
+<section id="nodegroups">
+<h2>Nodegroups<a class="headerlink" href="#nodegroups" title="Permalink to this heading">#</a></h2>
+<p>The nodegroups that are currently available within AWS EKS are:</p>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head" colspan="8"><p>CLUSTER       | NODEGROUP NAME   | MIN SIZE| MAX SIZE| DESIRED CAPACITY| INSTANCE TYPE| vCPU | MEMORY</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td colspan="8"><p>ra2ce-cluster | argo-main        | 1       | 25      | 1                | t3-small     |      |</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="adjusting-the-nodegroups">
+<h2>Adjusting the nodegroups<a class="headerlink" href="#adjusting-the-nodegroups" title="Permalink to this heading">#</a></h2>
+<p>The size of the nodegroup is adjustable by using eksctl (<a class="reference external" href="https://eksctl.io/">https://eksctl.io/</a>). Eksctl does not work well with AWS SSO unfortunately. You will need to configure your credentials manually.</p>
+<p>To increase the current number of nodes (and “overwrite” the Kubernetes behavior):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>eksctl<span class="w"> </span>scale<span class="w"> </span>nodegroup<span class="w"> </span>--cluster<span class="o">=</span>ra2ce-cluster<span class="w"> </span>--nodes<span class="o">=</span><span class="m">1</span><span class="w"> </span>--region<span class="o">=</span>eu-west-1<span class="w"> </span>argo-main
+</pre></div>
+</div>
+<p>This can be done before running a big job where you know you will need a certain number of nodes. This way the Argo workflow does not wait before the needed nodes are available. Kubernetes will still remove nodes if they are not used in a certain time window.</p>
+<p>To increase/decrease the minimum number of nodes of a nodegroup:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>eksctl<span class="w"> </span>scale<span class="w"> </span>nodegroup<span class="w"> </span>--cluster<span class="o">=</span>ra2ce-cluster<span class="w"> </span>--nodes-min<span class="o">=</span><span class="m">0</span><span class="w"> </span>--region<span class="o">=</span>eu-west-1<span class="w"> </span>argo-main
+</pre></div>
+</div>
+<p>To increase/decrease the maximum number of nodes of a nodegroup:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>eksctl<span class="w"> </span>scale<span class="w"> </span>nodegroup<span class="w"> </span>--cluster<span class="o">=</span>ra2ce-cluster<span class="w"> </span>--nodes-max<span class="o">=</span><span class="m">25</span><span class="w"> </span>--region<span class="o">=</span>eu-west-1<span class="w"> </span>argo-main
+</pre></div>
+</div>
+</section>
+<section id="adding-node-groups">
+<h2>Adding Node Groups<a class="headerlink" href="#adding-node-groups" title="Permalink to this heading">#</a></h2>
+<p>To add a new node group to your existing EKS cluster, you can use the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>eksctl<span class="w"> </span>create<span class="w"> </span>nodegroup<span class="w"> </span>--cluster<span class="o">=</span>ra2ce-cluster<span class="w"> </span>--region<span class="o">=</span>eu-west-1<span class="w"> </span>--name<span class="o">=</span>newNodeGroup<span class="w"> </span>--node-type<span class="o">=</span>t3.medium<span class="w"> </span>--nodes<span class="o">=</span><span class="m">3</span><span class="w"> </span>--nodes-min<span class="o">=</span><span class="m">1</span><span class="w"> </span>--nodes-max<span class="o">=</span><span class="m">5</span>
+</pre></div>
+</div>
+<p>This command creates a new node group named “newNodeGroup” with instance type t3.medium and initial 3 nodes. You can adjust the <cite>–nodes-min</cite> and <cite>–nodes-max</cite> parameters as needed.</p>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  <!-- Previous / next buttons -->
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Setting up infrastructure</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="argo_deployment.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Deploying Argo Workflows with Helm on Amazon EKS</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#prerequisites">Prerequisites</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#deployment-steps">Deployment Steps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clean-up">Clean Up</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#further-customization">Further Customization</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nodegroups">Nodegroups</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adjusting-the-nodegroups">Adjusting the nodegroups</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-node-groups">Adding Node Groups</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/docker_and_cloud/setting_up_infrastructure/kubernetes_deployment.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+  <div class="tocsection sourcelink">
+    <a href="../../_sources/docker_and_cloud/setting_up_infrastructure/kubernetes_deployment.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=365ca57ee442770a23c6"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=365ca57ee442770a23c6"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item"><p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.3.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
