@@ -7,7 +7,7 @@
 
 FROM condaforge/miniforge3:latest
 
-RUN apt-get update && apt-get install libgl1 -y
+RUN apt-get update && apt-get install libgl1 -y && apt-get install --reinstall make
 
 ARG SRC_ROOT="/usr/src"
 
