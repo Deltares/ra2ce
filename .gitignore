@@ -152,6 +152,6 @@ dmypy.json
 
 # Examples data
 examples/data/*/static/output_graph/
-#examples/data/*/output/
+examples/data/*/output/
 examples/cache/
 /ra2ce/.idea/ra2ce.iml
