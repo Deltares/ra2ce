@@ -1,7 +1,7 @@
 # To build this docker run:
 # `docker build -t ra2ce_core_dev`
 # To run the docker for pytest:
-# `docker run -v {your_ra2ce_checkout_dir}:/usr/src/app/ -v {ra2ce_env_dir}:/usr/src/.env -t ra2ce_core_dev`
+# `docker run -v {your_ra2ce_checkout_dir}:/usr/src/app/ -v {ra2ce_env_dir}:/usr/src/.env -it ra2ce_core_dev`
 # `poetry install`
 # `poetry run pytest -m {your_pytest_arguments}`
 
@@ -16,7 +16,7 @@ ARG SRC_ROOT="/usr/src"
 ARG CONDA_ENV="${SRC_ROOT}/.env"
 
 # Install conda environment
-# This location needs to be mounted with your vrtool checout:
+# This location needs to be mounted with your vrtool checkout:
 # -v {your_ra2ce_checkout_dir}:/usr/src/app
 WORKDIR $SRC_ROOT/app
 COPY environment.yml $SRC_ROOT/.config/environment.yml

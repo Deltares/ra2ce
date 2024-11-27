@@ -13,7 +13,8 @@ COPY ra2ce /ra2ce_src/ra2ce
 # Install the required packages
 RUN pip install poetry
 RUN poetry config virtualenvs.create false
-RUN poetry install --without dev,docs,jupyter
+# RUN poetry install --without dev,docs,jupyter
+RUN poetry install
 RUN apt-get clean autoclean
 
 # Define the endpoint
