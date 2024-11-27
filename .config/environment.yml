@@ -3,10 +3,10 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
-  - conda-forge::python=3.10
+  - conda-forge::python=3.11
   # Install poetry 1.3.2 (1.4.*) gives issues.
   # If this does not work then exclude it from the environment and install it manually
   # with: conda install -c conda-forge poetry=1.3.2
-  - conda-forge::poetry=1.3.2
+  # - conda-forge::poetry
   - conda-forge::pandoc
   - conda-forge::teamcity-messages
