@@ -236,6 +236,18 @@ class AnalysisConfigData(ConfigDataProtocol):
             filter(lambda x: isinstance(x, AnalysisSectionLosses), self.analyses)
         )
 
+    @property
+    def adaptation(self) -> AnalysisSectionAdaptation:
+        """
+        Get the adaptation analysis from config.
+
+        Returns:
+            AnalysisSectionAdaptation: Adaptation analysis.
+        """
+        return next(
+            filter(lambda x: isinstance(x, AnalysisSectionAdaptation), self.analyses)
+        )
+
     @staticmethod
     def get_data_output(ini_file: Path) -> Path:
         return ini_file.parent.joinpath("output")
