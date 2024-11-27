@@ -158,6 +158,40 @@ class AnalysisSectionDamages(AnalysisSectionBase):
 
 
 @dataclass
+class AnalysisSectionAdaptation(AnalysisSectionBase):
+    """
+    Reflects all possible settings that an adaptation analysis section might contain.
+    """
+
+    discount_rate: float = 0.0
+    time_horizon: float = 0.0
+    VAT: float = 0.0
+    climate_factor: float = 0.0
+    initial_frequency: float = 0.0
+    # The option to not implement any adaptation measure
+    no_intervention_option: AnalysisSectionAdaptationOption = field(
+        default_factory=lambda: AnalysisSectionAdaptationOption()
+    )
+    adaptation_options: list[AnalysisSectionAdaptationOption] = field(
+        default_factory=list
+    )
+
+
+@dataclass
+class AnalysisSectionAdaptationOption:
+    """
+    Reflects all possible settings that an adaptation option might contain.
+    The id should be unique and is used to determine the location of the input and output files.
+    """
+
+    id: str = ""
+    name: str = ""
+    construction_cost: float = 0.0
+    maintenance_interval: float = math.inf
+    maintenance_cost: float = 0.0
+
+
+@dataclass
 class AnalysisConfigData(ConfigDataProtocol):
     """
     Reflects all config data from analysis.ini with defaults set.

@@ -26,6 +26,7 @@ from shutil import copyfile
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
+    AnalysisSectionAdaptation,
     AnalysisSectionBase,
     AnalysisSectionDamages,
     AnalysisSectionLosses,
@@ -276,14 +277,20 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         return _section
 
+    def _get_analysis_section_adaptation(
+        self, section_name: str
+    ) -> AnalysisSectionAdaptation:
+        _section = AnalysisSectionAdaptation(**self._parser[section_name])
+        return _section
+
     def get_analysis_sections(self) -> list[AnalysisSectionBase]:
         """
         Extracts info from [analysis<n>] sections
 
         Returns:
-            list[AnalysisSection]: List of analyses (both damages and losses)
+            list[AnalysisSection]: List of analyses (damages, losses and adaptation)
         """
-        _analysis_sections = []
+        _analysis_sections: list[AnalysisSectionBase] = []
 
         _section_names = list(
             section_name
@@ -296,6 +303,8 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
                 _analysis_section = self._get_analysis_section_damages(_section_name)
             elif _analysis_type in LossesAnalysisNameList:
                 _analysis_section = self._get_analysis_section_losses(_section_name)
+            elif _analysis_type == "adaptation":
+                _analysis_section = self._get_analysis_section_adaptation(_section_name)
             else:
                 raise ValueError(f"Analysis {_analysis_type} not supported.")
             _analysis_sections.append(_analysis_section)
