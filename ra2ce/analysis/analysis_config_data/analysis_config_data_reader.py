@@ -324,7 +324,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
                 _analysis_section = self._get_analysis_section_damages(_section_name)
             elif _analysis_type in LossesAnalysisNameList:
                 _analysis_section = self._get_analysis_section_losses(_section_name)
-            elif _analysis_type == "adaptation":
+            elif _analysis_type == AnalysisDamagesEnum.ADAPTATION.config_value:
                 _analysis_section = self._get_analysis_section_adaptation(_section_name)
             else:
                 raise ValueError(f"Analysis {_analysis_type} not supported.")
