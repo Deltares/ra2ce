@@ -27,6 +27,7 @@ from shutil import copyfile
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionAdaptation,
+    AnalysisSectionAdaptationOption,
     AnalysisSectionBase,
     AnalysisSectionDamages,
     AnalysisSectionLosses,
@@ -280,7 +281,27 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
     def _get_analysis_section_adaptation(
         self, section_name: str
     ) -> AnalysisSectionAdaptation:
+        def _get_adaptation_option(
+            section_name: str,
+        ) -> AnalysisSectionAdaptationOption:
+            return AnalysisSectionAdaptationOption(**self._parser[section_name])
+
         _section = AnalysisSectionAdaptation(**self._parser[section_name])
+
+        _adaptation_options = list(
+            _adaptation_option
+            for _adaptation_option in self._parser.sections()
+            if "adaptationoption" in _adaptation_option
+        )
+        if len(_adaptation_options) > 0:
+            _section.no_intervention_option = _get_adaptation_option(
+                _adaptation_options[0]
+            )
+        for _adaptation_option in _adaptation_options[1:]:
+            _section.adaptation_options.append(
+                _get_adaptation_option(_adaptation_option)
+            )
+
         return _section
 
     def get_analysis_sections(self) -> list[AnalysisSectionBase]:
