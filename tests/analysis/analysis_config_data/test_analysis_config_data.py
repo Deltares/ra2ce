@@ -2,6 +2,8 @@ import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
+    AnalysisSectionAdaptation,
+    AnalysisSectionAdaptationOption,
     AnalysisSectionDamages,
     AnalysisSectionLosses,
     DamagesAnalysisNameList,
@@ -35,6 +37,15 @@ class TestAnalysisConfigData:
             _config.analyses.append(
                 AnalysisSectionDamages(analysis=AnalysisDamagesEnum.get_enum(_damages))
             )
+        _adaptation_config = AnalysisSectionAdaptation()
+        _adaptation_config.no_intervention_option = AnalysisSectionAdaptationOption(
+            id="AO0"
+        )
+        _adaptation_config.adaptation_options = [
+            AnalysisSectionAdaptationOption(id="AO1"),
+            AnalysisSectionAdaptationOption(id="AO2"),
+        ]
+        _config.analyses.append(AnalysisSectionAdaptation())
         yield _config
 
     def test_losses(self, valid_config: AnalysisConfigData):
@@ -58,6 +69,22 @@ class TestAnalysisConfigData:
 
         # 3. Verify expectations
         assert all(item in _damages for item in DamagesAnalysisNameList)
+
+    def test_adaptation(self, valid_config: AnalysisConfigData):
+        # 1. Define test data
+
+        # 2. Run test
+        _adaptation = valid_config.adaptation
+
+        # 3. Verify expectations
+        assert isinstance(_adaptation, AnalysisSectionAdaptation)
+        assert isinstance(
+            _adaptation.no_intervention_option, AnalysisSectionAdaptationOption
+        )
+        assert all(
+            isinstance(_item, AnalysisSectionAdaptationOption)
+            for _item in _adaptation.adaptation_options
+        )
 
     def test_get_data_output(self):
         # 1. Define test data
