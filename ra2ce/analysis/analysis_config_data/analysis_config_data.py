@@ -163,9 +163,10 @@ class AnalysisSectionAdaptation(AnalysisSectionBase):
     Reflects all possible settings that an adaptation analysis section might contain.
     """
 
+    analysis: str = ""
     discount_rate: float = 0.0
     time_horizon: float = 0.0
-    VAT: float = 0.0
+    vat: float = 0.0
     climate_factor: float = 0.0
     initial_frequency: float = 0.0
     # The option to not implement any adaptation measure
