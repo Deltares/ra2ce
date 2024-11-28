@@ -1,3 +1,5 @@
+import pytest
+
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
     AdaptationOptionCollection,
@@ -29,3 +31,14 @@ class TestAdaptationOptionCollection:
         )
         for i, _option in enumerate(_collection.adaptation_options):
             assert _option.id == f"AO{i+1}"
+
+    def test_from_config_no_adaptation_raises(self):
+        # 1./Define test data.
+        _config = AnalysisConfigData()
+
+        # 2. Run test.
+        with pytest.raises(ValueError) as _exc:
+            AdaptationOptionCollection.from_config(_config)
+
+        # 3. Verify expectations.
+        assert _exc.match("No adaptation section found in the analysis config data.")

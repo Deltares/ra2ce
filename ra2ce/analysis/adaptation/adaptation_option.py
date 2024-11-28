@@ -50,23 +50,30 @@ class AdaptationOption:
         losses_section: AnalysisSectionLosses,
     ) -> AdaptationOption:
         # Add adaptation id to paths
-        def add_id_to_path(input_path: Path | None) -> Path | None:
+        def extend_path(analysis: str, input_path: Path | None) -> Path | None:
             if not input_path:
                 return None
-            return input_path.parent.joinpath(adaptation_option.id, input_path.name)
+            return input_path.parent.joinpath(
+                adaptation_option.id, analysis, input_path.name
+            )
+
+        if not damages_section or not losses_section:
+            raise ValueError(
+                "Damages and losses sections are required to create an adaptation option."
+            )
 
         _damages_section = deepcopy(damages_section)
         # TODO: who does this work with damages files?
 
         _losses_section = deepcopy(losses_section)
-        _losses_section.resilience_curves_file = add_id_to_path(
-            losses_section.resilience_curves_file
+        _losses_section.resilience_curves_file = extend_path(
+            "losses", losses_section.resilience_curves_file
         )
-        _losses_section.traffic_intensities_file = add_id_to_path(
-            losses_section.traffic_intensities_file
+        _losses_section.traffic_intensities_file = extend_path(
+            "losses", losses_section.traffic_intensities_file
         )
-        _losses_section.values_of_time_file = add_id_to_path(
-            losses_section.values_of_time_file
+        _losses_section.values_of_time_file = extend_path(
+            "losses", losses_section.values_of_time_file
         )
 
         return cls(
