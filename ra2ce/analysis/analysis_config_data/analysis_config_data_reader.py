@@ -295,7 +295,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             if "adaptationoption" in _adaptation_option
         )
         if len(_adaptation_options) > 0:
-            _section.no_intervention_option = _get_adaptation_option(
+            _section.no_adaptation_option = _get_adaptation_option(
                 _adaptation_options[0]
             )
         for _adaptation_option in _adaptation_options[1:]:
