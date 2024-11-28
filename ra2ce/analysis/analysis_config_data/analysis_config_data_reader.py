@@ -293,11 +293,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             for _adaptation_option in self._parser.sections()
             if "adaptationoption" in _adaptation_option
         )
-        if len(_adaptation_options) > 0:
-            _section.no_intervention_option = _get_adaptation_option(
-                _adaptation_options[0]
-            )
-        for _adaptation_option in _adaptation_options[1:]:
+        for _adaptation_option in _adaptation_options:
             _section.adaptation_options.append(
                 _get_adaptation_option(_adaptation_option)
             )
