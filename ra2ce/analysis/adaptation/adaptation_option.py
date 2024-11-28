@@ -49,12 +49,12 @@ class AdaptationOption:
         damages_section: AnalysisSectionDamages,
         losses_section: AnalysisSectionLosses,
     ) -> AdaptationOption:
-        # Add adaptation id to paths
+        # Adjust path to the input files
         def extend_path(analysis: str, input_path: Path | None) -> Path | None:
             if not input_path:
                 return None
             return input_path.parent.joinpath(
-                "data", adaptation_option.id, analysis, input_path.name
+                "input", adaptation_option.id, analysis, input_path.name
             )
 
         if not damages_section or not losses_section:

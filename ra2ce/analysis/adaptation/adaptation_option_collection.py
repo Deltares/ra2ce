@@ -67,6 +67,7 @@ class AdaptationOptionCollection:
                     analysis_config_data.adaptation.losses_analysis
                 ),
             )
+            # First option is the no adaptation option
             if i == 0:
                 _collection.no_adaptation_option = _option
                 continue
