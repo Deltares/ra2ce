@@ -27,7 +27,7 @@ class TestDamagesAnalysisRunner:
     ):
         # 1. Define test data.
         dummy_ra2ce_input.analysis_config.config_data.analyses = [
-            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES)
+            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.DAMAGES)
         ]
         dummy_ra2ce_input.network_config.config_data.hazard.hazard_map = "A value"
 
@@ -54,7 +54,7 @@ class TestDamagesAnalysisRunner:
     ):
         # 1. Define test data.
         dummy_ra2ce_input.analysis_config.config_data.analyses = [
-            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES)
+            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.DAMAGES)
         ]
 
         # 2. Run test.
@@ -68,7 +68,7 @@ class TestDamagesAnalysisRunner:
     ):
         # 1. Define test data.
         dummy_ra2ce_input.analysis_config.config_data.analyses = [
-            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES)
+            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.DAMAGES)
         ]
         dummy_ra2ce_input.network_config = None
 
