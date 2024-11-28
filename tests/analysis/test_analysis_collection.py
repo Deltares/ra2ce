@@ -20,7 +20,6 @@ from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtoco
 
 _unsupported_damages_analyses = [
     AnalysisDamagesEnum.EFFECTIVENESS_MEASURES,
-    AnalysisDamagesEnum.ADAPTATION,
     AnalysisDamagesEnum.INVALID,
 ]
 _unsupported_losses_analyses = [AnalysisLossesEnum.INVALID]
