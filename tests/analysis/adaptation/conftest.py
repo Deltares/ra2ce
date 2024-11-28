@@ -31,7 +31,7 @@ def _get_valid_adaptation_config_fixture(
 
     # Losses
     _losses_section = AnalysisSectionLosses(
-        analysis=AnalysisLossesEnum.MULTI_LINK_LOSSES,
+        analysis=AnalysisLossesEnum.SINGLE_LINK_LOSSES,
         resilience_curves_file=_root_path.joinpath("resilience_curves.csv"),
         traffic_intensities_file=_root_path.joinpath("traffic_intensities.csv"),
         values_of_time_file=_root_path.joinpath("values_of_time.csv"),
@@ -51,10 +51,11 @@ def _get_valid_adaptation_config_fixture(
         )
     _adaptation_section = AnalysisSectionAdaptation(
         analysis=AnalysisEnum.ADAPTATION,
+        losses_analysis=AnalysisLossesEnum.SINGLE_LINK_LOSSES,
         adaptation_options=_adaptation_collection,
     )
 
-    return AnalysisConfigData(
+    yield AnalysisConfigData(
         root_path=_root_path,
         analyses=[_damages_section, _losses_section, _adaptation_section],
     )

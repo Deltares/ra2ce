@@ -66,7 +66,9 @@ class AdaptationOptionCollection:
             _option = AdaptationOption.from_config(
                 _config_option,
                 analysis_config_data.get_analysis(AnalysisDamagesEnum.DAMAGES),
-                analysis_config_data.get_analysis(AnalysisLossesEnum.MULTI_LINK_LOSSES),
+                analysis_config_data.get_analysis(
+                    analysis_config_data.adaptation.losses_analysis
+                ),
             )
             if i == 0:
                 _collection.no_adaptation_option = _option

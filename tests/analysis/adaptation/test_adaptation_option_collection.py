@@ -17,12 +17,7 @@ class TestAdaptationOptionCollection:
         assert isinstance(_collection, AdaptationOptionCollection)
 
     def test_from_config(self, valid_adaptation_config: AnalysisConfigData):
-        # 1. Define test data.
-        _losses = valid_adaptation_config.get_analysis(
-            AnalysisLossesEnum.SINGLE_LINK_LOSSES
-        )
-
-        # 2. Define test data./Run test.
+        # 1./2. Define test data./Run test.
         _collection = AdaptationOptionCollection.from_config(valid_adaptation_config)
 
         # 3. Verify expectations.
