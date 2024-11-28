@@ -1,7 +1,7 @@
 # To build this docker run:
 # `docker build -t ra2ce`
 
-FROM python:3.10
+FROM python:3.11
 
 RUN apt-get update && apt-get install -y libgdal-dev
 
