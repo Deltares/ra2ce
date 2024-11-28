@@ -26,9 +26,9 @@ def _get_valid_adaptation_config_fixture(
 ) -> Iterator[AnalysisConfigData]:
     _adaptation_options = ["AO0", "AO1", "AO2"]
     _root_path = test_results.joinpath(request.node.name, "adaptation")
-    _input_path = _root_path.joinpath("data")
+    _input_path = _root_path.joinpath("input")
     _static_path = _root_path.joinpath("static")
-    _output_path = _root_path.joinpath("data")
+    _output_path = _root_path.joinpath("output")
 
     # Create the input files
     if _root_path.exists():
@@ -40,7 +40,7 @@ def _get_valid_adaptation_config_fixture(
         copytree(test_data.joinpath("adaptation", "input"), _ao_path)
     copytree(test_data.joinpath("adaptation", "static"), _static_path)
 
-    # Create the c  onfig
+    # Create the config
     # - damages
     _damages_section = AnalysisSectionDamages(
         analysis=AnalysisDamagesEnum.DAMAGES,
