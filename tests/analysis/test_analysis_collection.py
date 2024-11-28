@@ -19,7 +19,6 @@ from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProt
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 
 _unsupported_damages_analyses = [
-    AnalysisDamagesEnum.EFFECTIVENESS_MEASURES,
     AnalysisDamagesEnum.INVALID,
 ]
 _unsupported_losses_analyses = [AnalysisLossesEnum.INVALID]

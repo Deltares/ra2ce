@@ -218,42 +218,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         _section.save_csv = self._parser.getboolean(
             section_name, "save_csv", fallback=_section.save_csv
         )
-        # adaptation/effectiveness measures
-        _section.return_period = self._parser.getfloat(
-            section_name,
-            "return_period",
-            fallback=_section.return_period,
-        )
-        _section.repair_costs = self._parser.getfloat(
-            section_name,
-            "repair_costs",
-            fallback=_section.repair_costs,
-        )
-        _section.evaluation_period = self._parser.getfloat(
-            section_name,
-            "evaluation_period",
-            fallback=_section.evaluation_period,
-        )
-        _section.evaluation_period = self._parser.getfloat(
-            section_name,
-            "representative_damage_percentage",
-            fallback=_section.representative_damage_percentage,
-        )
-        _section.interest_rate = self._parser.getfloat(
-            section_name,
-            "interest_rate",
-            fallback=_section.interest_rate,
-        )
-        _section.climate_factor = self._parser.getfloat(
-            section_name,
-            "climate_factor",
-            fallback=_section.climate_factor,
-        )
-        _section.climate_period = self._parser.getfloat(
-            section_name,
-            "climate_period",
-            fallback=_section.climate_period,
-        )
+
         # road damage
         _section.event_type = EventTypeEnum.get_enum(
             self._parser.get(section_name, "event_type", fallback=None)
