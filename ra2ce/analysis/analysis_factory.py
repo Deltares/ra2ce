@@ -19,6 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from ra2ce.analysis.adaptation.adaptation import Adaptation
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionDamages,
     AnalysisSectionLosses,
@@ -26,6 +27,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
@@ -82,6 +84,9 @@ class AnalysisFactory:
 
         if analysis.analysis == AnalysisDamagesEnum.DAMAGES:
             return Damages(_analysis_input)
+
+        if analysis.analysis == AnalysisEnum.ADAPTATION:
+            return Adaptation(_analysis_input)
 
         raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
 
