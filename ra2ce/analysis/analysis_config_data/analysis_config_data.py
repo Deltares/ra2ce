@@ -170,6 +170,10 @@ class AnalysisSectionAdaptation(AnalysisSectionBase):
     vat: float = 0.0
     climate_factor: float = 0.0
     initial_frequency: float = 0.0
+    # The option to not implement any adaptation measure
+    no_adaptation_option: AnalysisSectionAdaptationOption = field(
+        default_factory=lambda: AnalysisSectionAdaptationOption()
+    )
     adaptation_options: list[AnalysisSectionAdaptationOption] = field(
         default_factory=list
     )
