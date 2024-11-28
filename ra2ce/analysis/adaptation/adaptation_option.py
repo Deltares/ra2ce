@@ -54,7 +54,7 @@ class AdaptationOption:
             if not input_path:
                 return None
             return input_path.parent.joinpath(
-                adaptation_option.id, analysis, input_path.name
+                "data", adaptation_option.id, analysis, input_path.name
             )
 
         if not damages_section or not losses_section:

@@ -16,6 +16,13 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 class TestAdaptationOption:
     def test_from_config(self, valid_adaptation_config: AnalysisConfigData):
         # 1. Define test data.
+        _orig_path = valid_adaptation_config.losses_list[0].resilience_curves_file
+        _expected_path = _orig_path.parent.joinpath(
+            "data",
+            valid_adaptation_config.adaptation.adaptation_options[0].id,
+            "losses",
+            _orig_path.name,
+        )
 
         # 2. Run test.
         _option = AdaptationOption.from_config(
@@ -33,8 +40,7 @@ class TestAdaptationOption:
         assert _option.id == "AO0"
         assert _option.damages_config.analysis == AnalysisDamagesEnum.DAMAGES
         assert _option.losses_config.analysis == AnalysisLossesEnum.SINGLE_LINK_LOSSES
-
-        # TODO: test adding the adaptation id to the paths
+        assert _option.losses_config.resilience_curves_file == _expected_path
 
     def test_from_config_no_damages_losses_raises(self):
         # 1. Define test data.

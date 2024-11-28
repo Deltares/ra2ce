@@ -23,7 +23,11 @@ from tests import test_results
 def _get_valid_adaptation_config_fixture(
     request: pytest.FixtureRequest,
 ) -> Iterator[AnalysisConfigData]:
-    _root_path = test_results.joinpath(request.node.name)
+    _adaptation_options = ["AO0", "AO1", "AO2"]
+    _root_path = test_results.joinpath(request.node.name, "adaptation")
+
+    # TODO: create the input files
+
     # Damages
     _damages_section = AnalysisSectionDamages(
         analysis=AnalysisDamagesEnum.DAMAGES,
@@ -39,10 +43,10 @@ def _get_valid_adaptation_config_fixture(
 
     # Adaptation
     _adaptation_collection = []
-    for i in range(3):
+    for i, _option in enumerate(_adaptation_options):
         _adaptation_collection.append(
             AnalysisSectionAdaptationOption(
-                id=f"AO{i}",
+                id=_option,
                 name=f"Option {i}",
                 construction_cost=1000.0,
                 maintenance_interval=5.0,
