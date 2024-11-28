@@ -71,9 +71,7 @@ class TestAnalysisConfigData:
         assert all(item in _damages for item in DamagesAnalysisNameList)
 
     def test_adaptation(self, valid_config: AnalysisConfigData):
-        # 1. Define test data
-
-        # 2. Run test
+        # 1./2. Define test data/Run test
         _adaptation = valid_config.adaptation
 
         # 3. Verify expectations
