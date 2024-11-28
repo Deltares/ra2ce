@@ -1,3 +1,4 @@
+from shutil import copytree, rmtree
 from typing import Iterator
 
 import pytest
@@ -16,7 +17,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
-from tests import test_results
+from tests import test_data, test_results
 
 
 @pytest.fixture(name="valid_adaptation_config")
@@ -25,15 +26,26 @@ def _get_valid_adaptation_config_fixture(
 ) -> Iterator[AnalysisConfigData]:
     _adaptation_options = ["AO0", "AO1", "AO2"]
     _root_path = test_results.joinpath(request.node.name, "adaptation")
+    _input_path = _root_path.joinpath("data")
+    _static_path = _root_path.joinpath("static")
+    _output_path = _root_path.joinpath("data")
 
-    # TODO: create the input files
+    # Create the input files
+    if _root_path.exists():
+        rmtree(_root_path)
 
-    # Damages
+    _input_path.mkdir(parents=True)
+    for _option in _adaptation_options:
+        _ao_path = _input_path.joinpath(_option)
+        copytree(test_data.joinpath("adaptation", "input"), _ao_path)
+    copytree(test_data.joinpath("adaptation", "static"), _static_path)
+
+    # Create the c  onfig
+    # - damages
     _damages_section = AnalysisSectionDamages(
         analysis=AnalysisDamagesEnum.DAMAGES,
     )
-
-    # Losses
+    # - losses
     _losses_section = AnalysisSectionLosses(
         analysis=AnalysisLossesEnum.SINGLE_LINK_LOSSES,
         resilience_curves_file=_root_path.joinpath(
@@ -46,8 +58,7 @@ def _get_valid_adaptation_config_fixture(
             "damage_functions", "values_of_time.csv"
         ),
     )
-
-    # Adaptation
+    # - adaptation
     _adaptation_collection = []
     for i, _option in enumerate(_adaptation_options):
         _adaptation_collection.append(
@@ -67,5 +78,8 @@ def _get_valid_adaptation_config_fixture(
 
     yield AnalysisConfigData(
         root_path=_root_path,
+        input_path=_input_path,
+        static_path=_static_path,
+        output_path=_output_path,
         analyses=[_damages_section, _losses_section, _adaptation_section],
     )
