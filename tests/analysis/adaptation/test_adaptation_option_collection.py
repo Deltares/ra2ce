@@ -33,7 +33,7 @@ class TestAdaptationOptionCollection:
             assert _option.id == f"AO{i+1}"
 
     def test_from_config_no_adaptation_raises(self):
-        # 1./Define test data.
+        # 1. Define test data.
         _config = AnalysisConfigData()
 
         # 2. Run test.
