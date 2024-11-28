@@ -63,7 +63,6 @@ class AdaptationOption:
             )
 
         _damages_section = deepcopy(damages_section)
-        # TODO: who does this work with damages files?
 
         _losses_section = deepcopy(losses_section)
         _losses_section.resilience_curves_file = extend_path(
