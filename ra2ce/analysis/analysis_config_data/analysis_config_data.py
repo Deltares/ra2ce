@@ -165,6 +165,7 @@ class AnalysisSectionAdaptation(AnalysisSectionBase):
     """
 
     analysis: AnalysisEnum = AnalysisEnum.ADAPTATION
+    losses_analysis: AnalysisLossesEnum = AnalysisLossesEnum.SINGLE_LINK_LOSSES
     discount_rate: float = 0.0
     time_horizon: float = 0.0
     vat: float = 0.0

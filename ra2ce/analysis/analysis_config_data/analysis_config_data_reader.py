@@ -288,6 +288,11 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             return AnalysisSectionAdaptationOption(**self._parser[section_name])
 
         _section = AnalysisSectionAdaptation(**self._parser[section_name])
+        _section.losses_analysis = (
+            _section.losses_analysis
+        ) = AnalysisDamagesEnum.get_enum(
+            self._parser.get(section_name, "losses_analysis", fallback=None)
+        )
 
         _adaptation_options = list(
             _adaptation_option
