@@ -35,7 +35,6 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
-from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
@@ -90,17 +89,13 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     )
     # general
     weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
-    loss_per_distance: str = ""
-    loss_type: LossTypeEnum = field(default_factory=lambda: LossTypeEnum.NONE)
-    disruption_per_category: str = ""
+
     # losses
-    traffic_cols: list[str] = field(default_factory=list)
     production_loss_per_capita_per_hour: float = math.nan
     traffic_period: TrafficPeriodEnum = field(
         default_factory=lambda: TrafficPeriodEnum.DAY
     )
     hours_per_traffic_period: int = 0
-    performance: str = "diff_time"  # "diff_time" or "diff_length" relates to the used criticality metric
     trip_purposes: list[TripPurposeEnum] = field(
         default_factory=lambda: [TripPurposeEnum.NONE]
     )
@@ -111,12 +106,9 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     # accessibility analyses
     threshold: float = 0.0
     threshold_destinations: float = math.nan
-    uniform_duration: float = math.nan
-    gdp_percapita: float = math.nan
     equity_weight: str = ""
     calculate_route_without_disruption: bool = False
     buffer_meters: float = math.nan
-    threshold_locations: float = math.nan
     category_field_name: str = ""
     save_traffic: bool = False
 
