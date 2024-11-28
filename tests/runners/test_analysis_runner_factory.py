@@ -35,7 +35,7 @@ class TestAnalysisRunnerFactory:
         _config_wrapper.analysis_config.config_data = AnalysisConfigData(
             analyses=[
                 AnalysisSectionDamages(
-                    analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES
+                    analysis=AnalysisDamagesEnum.DAMAGES
                 ),
                 AnalysisSectionLosses(
                     analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY
