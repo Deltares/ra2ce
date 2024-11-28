@@ -136,13 +136,6 @@ class AnalysisSectionDamages(AnalysisSectionBase):
     analysis: AnalysisDamagesEnum = field(
         default_factory=lambda: AnalysisDamagesEnum.INVALID
     )
-    # adaptation/effectiveness measures
-    return_period: float = math.nan
-    repair_costs: float = math.nan
-    evaluation_period: float = math.nan
-    interest_rate: float = math.nan
-    climate_factor: float = math.nan
-    climate_period: float = math.nan
     # road damage
     representative_damage_percentage: float = 100
     event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.NONE)
