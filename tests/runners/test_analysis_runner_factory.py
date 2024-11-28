@@ -34,9 +34,7 @@ class TestAnalysisRunnerFactory:
         _config_wrapper = DummyRa2ceInput()
         _config_wrapper.analysis_config.config_data = AnalysisConfigData(
             analyses=[
-                AnalysisSectionDamages(
-                    analysis=AnalysisDamagesEnum.DAMAGES
-                ),
+                AnalysisSectionDamages(analysis=AnalysisDamagesEnum.DAMAGES),
                 AnalysisSectionLosses(
                     analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY
                 ),
