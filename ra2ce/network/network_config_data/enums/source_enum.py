@@ -4,6 +4,7 @@ from ra2ce.configuration.ra2ce_enum_base import Ra2ceEnumBase
 
 
 class SourceEnum(Ra2ceEnumBase):
+    NONE = 0
     OSB_BPF = 1
     OSM_DOWNLOAD = 2
     SHAPEFILE = 3
