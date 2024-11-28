@@ -26,6 +26,8 @@ from shutil import copyfile
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
+    AnalysisSectionAdaptation,
+    AnalysisSectionAdaptationOption,
     AnalysisSectionBase,
     AnalysisSectionDamages,
     AnalysisSectionLosses,
@@ -36,6 +38,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
@@ -241,14 +244,45 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         return _section
 
+    def _get_analysis_section_adaptation(
+        self, section_name: str
+    ) -> AnalysisSectionAdaptation:
+        def _get_adaptation_option(
+            section_name: str,
+        ) -> AnalysisSectionAdaptationOption:
+            return AnalysisSectionAdaptationOption(**self._parser[section_name])
+
+        _section = AnalysisSectionAdaptation(**self._parser[section_name])
+        _section.losses_analysis = (
+            _section.losses_analysis
+        ) = AnalysisDamagesEnum.get_enum(
+            self._parser.get(section_name, "losses_analysis", fallback=None)
+        )
+
+        _adaptation_options = list(
+            _adaptation_option
+            for _adaptation_option in self._parser.sections()
+            if "adaptationoption" in _adaptation_option
+        )
+        if len(_adaptation_options) > 0:
+            _section.no_adaptation_option = _get_adaptation_option(
+                _adaptation_options[0]
+            )
+        for _adaptation_option in _adaptation_options[1:]:
+            _section.adaptation_options.append(
+                _get_adaptation_option(_adaptation_option)
+            )
+
+        return _section
+
     def get_analysis_sections(self) -> list[AnalysisSectionBase]:
         """
         Extracts info from [analysis<n>] sections
 
         Returns:
-            list[AnalysisSection]: List of analyses (both damages and losses)
+            list[AnalysisSection]: List of analyses (damages, losses and adaptation)
         """
-        _analysis_sections = []
+        _analysis_sections: list[AnalysisSectionBase] = []
 
         _section_names = list(
             section_name
@@ -261,6 +295,8 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
                 _analysis_section = self._get_analysis_section_damages(_section_name)
             elif _analysis_type in LossesAnalysisNameList:
                 _analysis_section = self._get_analysis_section_losses(_section_name)
+            elif _analysis_type == AnalysisEnum.ADAPTATION.config_value:
+                _analysis_section = self._get_analysis_section_adaptation(_section_name)
             else:
                 raise ValueError(f"Analysis {_analysis_type} not supported.")
             _analysis_sections.append(_analysis_section)

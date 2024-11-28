@@ -29,6 +29,7 @@ from typing import Optional
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
@@ -151,6 +152,42 @@ class AnalysisSectionDamages(AnalysisSectionBase):
 
 
 @dataclass
+class AnalysisSectionAdaptation(AnalysisSectionBase):
+    """
+    Reflects all possible settings that an adaptation analysis section might contain.
+    """
+
+    analysis: AnalysisEnum = AnalysisEnum.ADAPTATION
+    losses_analysis: AnalysisLossesEnum = AnalysisLossesEnum.SINGLE_LINK_LOSSES
+    discount_rate: float = 0.0
+    time_horizon: float = 0.0
+    vat: float = 0.0
+    climate_factor: float = 0.0
+    initial_frequency: float = 0.0
+    # The option to not implement any adaptation measure
+    no_adaptation_option: AnalysisSectionAdaptationOption = field(
+        default_factory=lambda: AnalysisSectionAdaptationOption()
+    )
+    adaptation_options: list[AnalysisSectionAdaptationOption] = field(
+        default_factory=list
+    )
+
+
+@dataclass
+class AnalysisSectionAdaptationOption:
+    """
+    Reflects all possible settings that an adaptation option might contain.
+    The id should be unique and is used to determine the location of the input and output files.
+    """
+
+    id: str = ""
+    name: str = ""
+    construction_cost: float = 0.0
+    maintenance_interval: float = math.inf
+    maintenance_cost: float = 0.0
+
+
+@dataclass
 class AnalysisConfigData(ConfigDataProtocol):
     """
     Reflects all config data from analysis.ini with defaults set.
@@ -192,6 +229,18 @@ class AnalysisConfigData(ConfigDataProtocol):
         """
         return list(
             filter(lambda x: isinstance(x, AnalysisSectionLosses), self.analyses)
+        )
+
+    @property
+    def adaptation(self) -> AnalysisSectionAdaptation:
+        """
+        Get the adaptation analysis from config.
+
+        Returns:
+            AnalysisSectionAdaptation: Adaptation analysis.
+        """
+        return next(
+            filter(lambda x: isinstance(x, AnalysisSectionAdaptation), self.analyses)
         )
 
     @staticmethod
