@@ -27,9 +27,6 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisCon
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
-)
 
 
 @dataclass

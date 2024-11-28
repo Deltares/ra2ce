@@ -3,9 +3,6 @@ from ra2ce.analysis.adaptation.adaptation_option_collection import (
     AdaptationOptionCollection,
 )
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
-)
 
 
 class TestAdaptationOptionCollection:
