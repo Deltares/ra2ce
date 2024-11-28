@@ -29,6 +29,7 @@ from typing import Optional
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
@@ -163,16 +164,12 @@ class AnalysisSectionAdaptation(AnalysisSectionBase):
     Reflects all possible settings that an adaptation analysis section might contain.
     """
 
-    analysis: str = ""
+    analysis: AnalysisEnum = AnalysisEnum.ADAPTATION
     discount_rate: float = 0.0
     time_horizon: float = 0.0
     vat: float = 0.0
     climate_factor: float = 0.0
     initial_frequency: float = 0.0
-    # The option to not implement any adaptation measure
-    no_intervention_option: AnalysisSectionAdaptationOption = field(
-        default_factory=lambda: AnalysisSectionAdaptationOption()
-    )
     adaptation_options: list[AnalysisSectionAdaptationOption] = field(
         default_factory=list
     )
