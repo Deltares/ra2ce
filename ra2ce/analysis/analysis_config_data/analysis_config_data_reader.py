@@ -38,6 +38,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
@@ -324,7 +325,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
                 _analysis_section = self._get_analysis_section_damages(_section_name)
             elif _analysis_type in LossesAnalysisNameList:
                 _analysis_section = self._get_analysis_section_losses(_section_name)
-            elif _analysis_type == AnalysisDamagesEnum.ADAPTATION.config_value:
+            elif _analysis_type == AnalysisEnum.ADAPTATION.config_value:
                 _analysis_section = self._get_analysis_section_adaptation(_section_name)
             else:
                 raise ValueError(f"Analysis {_analysis_type} not supported.")
