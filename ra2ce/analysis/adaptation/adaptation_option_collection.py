@@ -24,6 +24,12 @@ from dataclasses import dataclass, field
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
+)
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
+)
 
 
 @dataclass
@@ -45,17 +51,24 @@ class AdaptationOptionCollection:
         cls,
         analysis_config_data: AnalysisConfigData,
     ) -> AdaptationOptionCollection:
-        return cls(
+        _collection = cls(
             discount_rate=analysis_config_data.adaptation.discount_rate,
             time_horizon=analysis_config_data.adaptation.time_horizon,
             vat=analysis_config_data.adaptation.vat,
             climate_factor=analysis_config_data.adaptation.climate_factor,
             initial_frequency=analysis_config_data.adaptation.initial_frequency,
-            no_intervention_option=AdaptationOption.from_config(
-                analysis_config_data.adaptation.adaptation_options[0]
-            ),
-            adaptation_options=[
-                AdaptationOption.from_config(option)
-                for option in analysis_config_data.adaptation_options
-            ],
         )
+        for i, _config_option in enumerate(
+            analysis_config_data.adaptation.adaptation_options
+        ):
+            _option = AdaptationOption.from_config(
+                _config_option,
+                analysis_config_data.get_analysis(AnalysisDamagesEnum.DAMAGES),
+                analysis_config_data.get_analysis(AnalysisLossesEnum.LOSSES),
+            )
+            if i == 0:
+                _collection.no_intervention_option = _option
+                continue
+            _collection.adaptation_options.append(_option)
+
+        return _collection

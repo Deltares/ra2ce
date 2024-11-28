@@ -29,6 +29,7 @@ from typing import Optional
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
@@ -243,6 +244,17 @@ class AnalysisConfigData(ConfigDataProtocol):
         return next(
             filter(lambda x: isinstance(x, AnalysisSectionAdaptation), self.analyses)
         )
+
+    def get_analysis(
+        self, analysis: AnalysisEnum | AnalysisDamagesEnum | AnalysisLossesEnum
+    ) -> AnalysisSectionBase | None:
+        """
+        Get a certain analysis from config.
+
+        Returns:
+            AnalysisSectionBase: The analysis.
+        """
+        return next(filter(x.analysis == analysis for x in self.analyses), None)
 
     @staticmethod
     def get_data_output(ini_file: Path) -> Path:
