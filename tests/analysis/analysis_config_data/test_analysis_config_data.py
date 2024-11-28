@@ -74,9 +74,6 @@ class TestAnalysisConfigData:
 
         # 3. Verify expectations
         assert isinstance(_adaptation, AnalysisSectionAdaptation)
-        assert isinstance(
-            _adaptation.no_adaptation_option, AnalysisSectionAdaptationOption
-        )
         assert all(
             isinstance(_item, AnalysisSectionAdaptationOption)
             for _item in _adaptation.adaptation_options

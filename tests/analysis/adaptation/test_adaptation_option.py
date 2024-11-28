@@ -18,7 +18,7 @@ class TestAdaptationOption:
         # 1. Define test data.
         _orig_path = valid_adaptation_config.losses_list[0].resilience_curves_file
         _expected_path = _orig_path.parent.joinpath(
-            "data",
+            "input",
             valid_adaptation_config.adaptation.adaptation_options[0].id,
             "losses",
             _orig_path.name,
