@@ -1,0 +1,60 @@
+from typing import Iterator
+
+import pytest
+
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
+    AnalysisSectionAdaptation,
+    AnalysisSectionAdaptationOption,
+    AnalysisSectionDamages,
+    AnalysisSectionLosses,
+)
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
+)
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
+)
+from tests import test_results
+
+
+@pytest.fixture(name="valid_adaptation_config")
+def _get_valid_adaptation_config_fixture(
+    request: pytest.FixtureRequest,
+) -> Iterator[AnalysisConfigData]:
+    _root_path = test_results.joinpath(request.node.name)
+    # Damages
+    _damages_section = AnalysisSectionDamages(
+        analysis=AnalysisDamagesEnum.DAMAGES,
+    )
+
+    # Losses
+    _losses_section = AnalysisSectionLosses(
+        analysis=AnalysisLossesEnum.MULTI_LINK_LOSSES,
+        resilience_curves_file=_root_path.joinpath("resilience_curves.csv"),
+        traffic_intensities_file=_root_path.joinpath("traffic_intensities.csv"),
+        values_of_time_file=_root_path.joinpath("values_of_time.csv"),
+    )
+
+    # Adaptation
+    _adaptation_collection = []
+    for i in range(3):
+        _adaptation_collection.append(
+            AnalysisSectionAdaptationOption(
+                id=f"AO{i}",
+                name=f"Option {i}",
+                construction_cost=1000.0,
+                maintenance_interval=5.0,
+                maintenance_cost=100.0,
+            )
+        )
+    _adaptation_section = AnalysisSectionAdaptation(
+        analysis=AnalysisEnum.ADAPTATION,
+        adaptation_options=_adaptation_collection,
+    )
+
+    return AnalysisConfigData(
+        root_path=_root_path,
+        analyses=[_damages_section, _losses_section, _adaptation_section],
+    )

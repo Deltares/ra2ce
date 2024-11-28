@@ -43,7 +43,7 @@ class AdaptationOptionCollection:
     vat: float = 0.0
     climate_factor: float = 0.0
     initial_frequency: float = 0.0
-    no_intervention_option: AdaptationOption = AdaptationOption()
+    no_adaptation_option: AdaptationOption = AdaptationOption()
     adaptation_options: list[AdaptationOption] = field(default_factory=list)
 
     @classmethod
@@ -51,6 +51,8 @@ class AdaptationOptionCollection:
         cls,
         analysis_config_data: AnalysisConfigData,
     ) -> AdaptationOptionCollection:
+        if not analysis_config_data.adaptation:
+            raise ValueError("No adaptation section found in the analysis config data.")
         _collection = cls(
             discount_rate=analysis_config_data.adaptation.discount_rate,
             time_horizon=analysis_config_data.adaptation.time_horizon,
@@ -64,10 +66,10 @@ class AdaptationOptionCollection:
             _option = AdaptationOption.from_config(
                 _config_option,
                 analysis_config_data.get_analysis(AnalysisDamagesEnum.DAMAGES),
-                analysis_config_data.get_analysis(AnalysisLossesEnum.LOSSES),
+                analysis_config_data.get_analysis(AnalysisLossesEnum.MULTI_LINK_LOSSES),
             )
             if i == 0:
-                _collection.no_intervention_option = _option
+                _collection.no_adaptation_option = _option
                 continue
             _collection.adaptation_options.append(_option)
 

@@ -234,7 +234,7 @@ class AnalysisConfigData(ConfigDataProtocol):
         )
 
     @property
-    def adaptation(self) -> AnalysisSectionAdaptation:
+    def adaptation(self) -> AnalysisSectionAdaptation | None:
         """
         Get the adaptation analysis from config.
 
@@ -242,7 +242,8 @@ class AnalysisConfigData(ConfigDataProtocol):
             AnalysisSectionAdaptation: Adaptation analysis.
         """
         return next(
-            filter(lambda x: isinstance(x, AnalysisSectionAdaptation), self.analyses)
+            filter(lambda x: isinstance(x, AnalysisSectionAdaptation), self.analyses),
+            None,
         )
 
     def get_analysis(
@@ -254,7 +255,7 @@ class AnalysisConfigData(ConfigDataProtocol):
         Returns:
             AnalysisSectionBase: The analysis.
         """
-        return next(filter(x.analysis == analysis for x in self.analyses), None)
+        return next(filter(lambda x: x.analysis == analysis, self.analyses), None)
 
     @staticmethod
     def get_data_output(ini_file: Path) -> Path:
