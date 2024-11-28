@@ -38,7 +38,7 @@ class TestAnalysisConfigData:
                 AnalysisSectionDamages(analysis=AnalysisDamagesEnum.get_enum(_damages))
             )
         _adaptation_config = AnalysisSectionAdaptation()
-        _adaptation_config.no_intervention_option = AnalysisSectionAdaptationOption(
+        _adaptation_config.no_adaptation_option = AnalysisSectionAdaptationOption(
             id="AO0"
         )
         _adaptation_config.adaptation_options = [
@@ -79,7 +79,7 @@ class TestAnalysisConfigData:
         # 3. Verify expectations
         assert isinstance(_adaptation, AnalysisSectionAdaptation)
         assert isinstance(
-            _adaptation.no_intervention_option, AnalysisSectionAdaptationOption
+            _adaptation.no_adaptation_option, AnalysisSectionAdaptationOption
         )
         assert all(
             isinstance(_item, AnalysisSectionAdaptationOption)

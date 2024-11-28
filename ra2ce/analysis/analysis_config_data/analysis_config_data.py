@@ -164,7 +164,7 @@ class AnalysisSectionAdaptation(AnalysisSectionBase):
     Reflects all possible settings that an adaptation analysis section might contain.
     """
 
-    analysis: str = ""
+    analysis: AnalysisEnum = AnalysisEnum.ADAPTATION
     discount_rate: float = 0.0
     time_horizon: float = 0.0
     vat: float = 0.0
