@@ -16,7 +16,7 @@ ARG SRC_ROOT="/usr/src"
 ARG CONDA_ENV="${SRC_ROOT}/.env"
 
 # Install conda environment
-# This location needs to be mounted with your vrtool checkout:
+# This location needs to be mounted with your ra2ce checkout:
 # -v {your_ra2ce_checkout_dir}:/usr/src/app
 WORKDIR $SRC_ROOT/app
 COPY environment.yml $SRC_ROOT/.config/environment.yml
