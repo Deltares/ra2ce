@@ -20,12 +20,38 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 from tests import test_data, test_results
 
 
+class AdaptationOptionCases:
+    config_cases: list[AnalysisSectionAdaptationOption] = [
+        AnalysisSectionAdaptationOption(
+            id="AO0",
+            name="No adaptation",
+        ),
+        AnalysisSectionAdaptationOption(
+            id="AO1",
+            name="Cheap construction, expensive maintenance",
+            construction_cost=1000.0,
+            construction_interval=10.0,
+            maintenance_cost=200.0,
+            maintenance_interval=3.0,
+        ),
+        AnalysisSectionAdaptationOption(
+            id="AO2",
+            name="Expensive construction, cheap maintenance",
+            construction_cost=5000.0,
+            construction_interval=100.0,
+            maintenance_cost=50.0,
+            maintenance_interval=3.0,
+        ),
+    ]
+    cost: list[float] = [0.0, 2693.684211, 5231.908660]
+    cases = list(zip(config_cases, cost))
+
+
 @pytest.fixture(name="valid_adaptation_config")
 def _get_valid_adaptation_config_fixture(
     request: pytest.FixtureRequest,
 ) -> Iterator[AnalysisConfigData]:
-    _adaptation_options = ["AO0", "AO1", "AO2"]
-    _root_path = test_results.joinpath(request.node.name, "adaptation")
+    _root_path = test_results.joinpath(request.node.name)
     _input_path = _root_path.joinpath("input")
     _static_path = _root_path.joinpath("static")
     _output_path = _root_path.joinpath("output")
@@ -35,8 +61,8 @@ def _get_valid_adaptation_config_fixture(
         rmtree(_root_path)
 
     _input_path.mkdir(parents=True)
-    for _option in _adaptation_options:
-        _ao_path = _input_path.joinpath(_option)
+    for _option in AdaptationOptionCases.config_cases:
+        _ao_path = _input_path.joinpath(_option.id)
         copytree(test_data.joinpath("adaptation", "input"), _ao_path)
     copytree(test_data.joinpath("adaptation", "static"), _static_path)
 
@@ -59,21 +85,12 @@ def _get_valid_adaptation_config_fixture(
         ),
     )
     # - adaptation
-    _adaptation_collection = []
-    for i, _option in enumerate(_adaptation_options):
-        _adaptation_collection.append(
-            AnalysisSectionAdaptationOption(
-                id=_option,
-                name=f"Option {i}",
-                construction_cost=1000.0,
-                maintenance_interval=5.0,
-                maintenance_cost=100.0,
-            )
-        )
     _adaptation_section = AnalysisSectionAdaptation(
         analysis=AnalysisEnum.ADAPTATION,
         losses_analysis=AnalysisLossesEnum.SINGLE_LINK_LOSSES,
-        adaptation_options=_adaptation_collection,
+        adaptation_options=AdaptationOptionCases.config_cases,
+        discount_rate=0.025,
+        time_horizon=20,
     )
 
     yield AnalysisConfigData(

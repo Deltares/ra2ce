@@ -20,9 +20,8 @@
 """
 from __future__ import annotations
 
-import math
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
@@ -37,8 +36,9 @@ class AdaptationOption:
     id: str = ""
     name: str = ""
     construction_cost: float = 0.0
-    maintenance_interval: float = math.inf
+    construction_interval: float = 1000.0
     maintenance_cost: float = 0.0
+    maintenance_interval: float = 1000.0
     damages_config: AnalysisSectionDamages = None
     losses_config: AnalysisSectionLosses = None
 
@@ -76,11 +76,7 @@ class AdaptationOption:
         )
 
         return cls(
-            id=adaptation_option.id,
-            name=adaptation_option.name,
-            construction_cost=adaptation_option.construction_cost,
-            maintenance_interval=adaptation_option.maintenance_interval,
-            maintenance_cost=adaptation_option.maintenance_cost,
+            **asdict(adaptation_option),
             damages_config=_damages_section,
             losses_config=_losses_section,
         )
