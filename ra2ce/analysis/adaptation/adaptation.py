@@ -18,6 +18,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from copy import deepcopy
 from pathlib import Path
 
 from geopandas import GeoDataFrame
@@ -61,14 +62,20 @@ class Adaptation(AnalysisDamagesProtocol):
         """
         return self.calculate_bc_ratio()
 
-    def run_cost(self) -> GeoDataFrame | None:
+    def run_cost(self) -> GeoDataFrame:
         """
         Calculate the cost for all adaptation options.
         """
         # Open the network without hazard data
-        road_gdf = self.graph_file.get_graph()
+        _cost_gdf = deepcopy(self.graph_file.get_graph())
+        for _option in self._adaptation_options.adaptation_options:
+            _cost = _option.calculate_cost(
+                self._adaptation_options.time_horizon,
+                self._adaptation_options.discount_rate,
+            )
+            _cost_gdf[f"costs_{_option.id}"] = _cost
 
-        return 0.0
+        return _cost_gdf
 
     def run_benefit(self) -> GeoDataFrame | None:
         """
