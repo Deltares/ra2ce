@@ -39,8 +39,19 @@ class AdaptationOptionCollection:
     time_horizon: float = 0.0
     climate_factor: float = 0.0
     initial_frequency: float = 0.0
-    no_adaptation_option: AdaptationOption = None
-    adaptation_options: list[AdaptationOption] = field(default_factory=list)
+    all_options: list[AdaptationOption] = field(default_factory=list)
+
+    @property
+    def reference_option(self) -> AdaptationOption:
+        if not self.all_options:
+            return None
+        return self.all_options[0]
+
+    @property
+    def adaptation_options(self) -> list[AdaptationOption]:
+        if len(self.all_options) < 2:
+            return []
+        return self.all_options[1:]
 
     @classmethod
     def from_config(
@@ -56,20 +67,19 @@ class AdaptationOptionCollection:
             initial_frequency=analysis_config_data.adaptation.initial_frequency,
         )
 
-        for i, _config_option in enumerate(
-            analysis_config_data.adaptation.adaptation_options
-        ):
-            _option = AdaptationOption.from_config(
-                _config_option,
-                analysis_config_data.get_analysis(AnalysisDamagesEnum.DAMAGES),
-                analysis_config_data.get_analysis(
-                    analysis_config_data.adaptation.losses_analysis
-                ),
+        _damages_analysis = analysis_config_data.get_analysis(
+            AnalysisDamagesEnum.DAMAGES
+        )
+        _losses_analysis = analysis_config_data.get_analysis(
+            analysis_config_data.adaptation.losses_analysis
+        )
+        for _config_option in analysis_config_data.adaptation.adaptation_options:
+            _collection.all_options.append(
+                AdaptationOption.from_config(
+                    _config_option,
+                    _damages_analysis,
+                    _losses_analysis,
+                )
             )
-            # First option is the no adaptation option
-            if i == 0:
-                _collection.no_adaptation_option = _option
-                continue
-            _collection.adaptation_options.append(_option)
 
         return _collection

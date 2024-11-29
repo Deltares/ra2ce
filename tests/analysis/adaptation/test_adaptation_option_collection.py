@@ -22,8 +22,8 @@ class TestAdaptationOptionCollection:
         # 3. Verify expectations.
         assert isinstance(_collection, AdaptationOptionCollection)
 
-        assert isinstance(_collection.no_adaptation_option, AdaptationOption)
-        assert _collection.no_adaptation_option.id == "AO0"
+        assert isinstance(_collection.reference_option, AdaptationOption)
+        assert _collection.reference_option.id == "AO0"
 
         assert len(_collection.adaptation_options) == 2
         assert all(
