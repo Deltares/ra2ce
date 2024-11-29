@@ -80,3 +80,46 @@ class AdaptationOption:
             damages_config=_damages_section,
             losses_config=_losses_section,
         )
+
+    def calculate_cost(self, time_horizon: float, discount_rate: float) -> float:
+        """
+        Calculate the net present value unit cost (per meter) of the adaptation option.
+
+        Args:
+            time_horizon (float): The total time horizon of the analysis.
+            discount_rate (float): The discount rate to apply to the costs.
+
+        Returns:
+            float: The net present value unit cost of the adaptation option.
+        """
+
+        def calc_years(from_year: float, to_year: float, interval: float) -> range:
+            return range(
+                round(from_year),
+                round(min(to_year, time_horizon)),
+                round(interval),
+            )
+
+        def calc_cost(cost: float, year: float) -> float:
+            return cost * (1 - discount_rate) ** year
+
+        _constr_years = calc_years(
+            0,
+            time_horizon,
+            self.construction_interval,
+        )
+        _lifetime_cost = 0.0
+        for _constr_year in _constr_years:
+            # Calculate the present value of the construction cost
+            _lifetime_cost += calc_cost(self.construction_cost, _constr_year)
+
+            # Calculate the present value of the maintenance cost
+            _maint_years = calc_years(
+                _constr_year + self.maintenance_interval,
+                _constr_year + self.construction_interval,
+                self.maintenance_interval,
+            )
+            for _maint_year in _maint_years:
+                _lifetime_cost += calc_cost(self.maintenance_cost, _maint_year)
+
+        return _lifetime_cost

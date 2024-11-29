@@ -60,27 +60,3 @@ class TestAdaptation:
         valid_adaptation_config: AnalysisConfigData,
     ):
         pass
-
-    @pytest.mark.parametrize(
-        "adaptation_option",
-        AdaptationOptionCases.cases,
-    )
-    def test_calculate_option_cost(
-        self,
-        valid_adaptation_input: AnalysisInputWrapper,
-        valid_adaptation_config: AnalysisConfigData,
-        adaptation_option: tuple[AnalysisSectionAdaptation, float],
-    ):
-        # 1. Define test data.
-        _adaptation = Adaptation(valid_adaptation_input, valid_adaptation_config)
-        _option = AdaptationOption.from_config(
-            adaptation_option[0],
-            valid_adaptation_config.damages_list[0],
-            valid_adaptation_config.losses_list[0],
-        )
-
-        # 2. Run test.
-        _cost = _adaptation.calculate_option_cost(_option)
-
-        # 3. Verify expectations.
-        assert _cost == pytest.approx(adaptation_option[1])

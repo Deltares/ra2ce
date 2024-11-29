@@ -22,7 +22,6 @@ from pathlib import Path
 
 from geopandas import GeoDataFrame
 
-from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
     AdaptationOptionCollection,
 )
@@ -48,6 +47,10 @@ class Adaptation(AnalysisDamagesProtocol):
         self, analysis_input: AnalysisInputWrapper, analysis_config: AnalysisConfigData
     ):
         self.analysis = analysis_input.analysis
+        self.graph_file = analysis_input.graph_file
+        self.graph_file_hazard = analysis_input.graph_file_hazard
+        self.input_path = analysis_input.input_path
+        self.output_path = analysis_input.output_path
         self._adaptation_options = AdaptationOptionCollection.from_config(
             analysis_config
         )
@@ -58,53 +61,24 @@ class Adaptation(AnalysisDamagesProtocol):
         """
         return self.calculate_bc_ratio()
 
-    def calculate_option_cost(self, option: AdaptationOption) -> float:
-        def calc_years(from_year: float, to_year: float, interval: float) -> range:
-            return range(
-                round(from_year),
-                round(min(to_year, self._adaptation_options.time_horizon)),
-                round(interval),
-            )
-
-        def calc_cost(cost: float, year: float) -> float:
-            return cost * (1 - self._adaptation_options.discount_rate) ** year
-
-        _constr_years = calc_years(
-            0,
-            self._adaptation_options.time_horizon,
-            option.construction_interval,
-        )
-        _lifetime_cost = 0.0
-        for _constr_year in _constr_years:
-            # Calculate the present value of the construction cost
-            _lifetime_cost += calc_cost(option.construction_cost, _constr_year)
-
-            # Calculate the present value of the maintenance cost
-            _maint_years = calc_years(
-                _constr_year + option.maintenance_interval,
-                _constr_year + option.construction_interval,
-                option.maintenance_interval,
-            )
-            for _maint_year in _maint_years:
-                _lifetime_cost += calc_cost(option.maintenance_cost, _maint_year)
-
-        return _lifetime_cost
-
     def run_cost(self) -> GeoDataFrame | None:
         """
-        Calculate the cost of the adaptation.
+        Calculate the cost for all adaptation options.
         """
+        # Open the network without hazard data
+        road_gdf = self.graph_file.get_graph()
+
         return 0.0
 
     def run_benefit(self) -> GeoDataFrame | None:
         """
-        Calculate the benefit of the adaptation.
+        Calculate the benefit for all adaptation options
         """
         return 0.0
 
     def calculate_bc_ratio(self) -> GeoDataFrame | None:
         """
-        Calculate the benefit-cost ratio of the adaptation.
+        Calculate the benefit-cost ratio for all adaptation options
         """
         self.run_cost()
         self.run_benefit()
