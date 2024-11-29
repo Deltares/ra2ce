@@ -82,7 +82,11 @@ class TestAdaptation:
     ):
         # 1. Define test data.
         _adaptation = Adaptation(valid_adaptation_input, valid_adaptation_config)
-        _option = AdaptationOption.from_config(adaptation_option=adaptation_option[0])
+        _option = AdaptationOption.from_config(
+            adaptation_option[0],
+            valid_adaptation_config.damages_list[0],
+            valid_adaptation_config.losses_list[0],
+        )
 
         # 2. Run test.
         _cost = _adaptation.calculate_option_cost(_option)
