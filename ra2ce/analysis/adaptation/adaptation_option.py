@@ -39,8 +39,8 @@ class AdaptationOption:
     construction_interval: float
     maintenance_cost: float
     maintenance_interval: float
-    damages_config: AnalysisSectionDamages = None
-    losses_config: AnalysisSectionLosses = None
+    damages_config: AnalysisSectionDamages
+    losses_config: AnalysisSectionLosses
 
     @classmethod
     def from_config(

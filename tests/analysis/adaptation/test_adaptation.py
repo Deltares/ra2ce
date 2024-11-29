@@ -6,7 +6,10 @@ from geopandas import GeoDataFrame
 
 from ra2ce.analysis.adaptation.adaptation import Adaptation
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
+    AnalysisSectionAdaptation,
+)
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
@@ -75,13 +78,14 @@ class TestAdaptation:
         self,
         valid_adaptation_input: AnalysisInputWrapper,
         valid_adaptation_config: AnalysisConfigData,
-        adaptation_option: tuple[AdaptationOption, float],
+        adaptation_option: tuple[AnalysisSectionAdaptation, float],
     ):
         # 1. Define test data.
         _adaptation = Adaptation(valid_adaptation_input, valid_adaptation_config)
+        _option = AdaptationOption.from_config(adaptation_option=adaptation_option[0])
 
         # 2. Run test.
-        _cost = _adaptation.calculate_option_cost(adaptation_option[0])
+        _cost = _adaptation.calculate_option_cost(_option)
 
         # 3. Verify expectations.
         assert _cost == pytest.approx(adaptation_option[1])

@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Optional
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
+    AnalysisSectionAdaptation,
     AnalysisSectionDamages,
     AnalysisSectionLosses,
 )
@@ -18,7 +19,7 @@ from ra2ce.network.network_config_data.network_config_data import (
 
 @dataclass
 class AnalysisInputWrapper:
-    analysis: AnalysisSectionDamages | AnalysisSectionLosses
+    analysis: AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation
     graph_file: Optional[GraphFileProtocol]
     graph_file_hazard: Optional[GraphFileProtocol]
     input_path: Path

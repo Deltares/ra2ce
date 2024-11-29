@@ -76,6 +76,9 @@ class AnalysisFactory:
         Returns:
             AnalysisDamagesProtocol: The damages analysis to be executed.
         """
+        if not analysis:
+            return None
+
         _analysis_input = AnalysisInputWrapper.from_input(
             analysis=analysis,
             analysis_config=analysis_config,
@@ -86,7 +89,7 @@ class AnalysisFactory:
             return Damages(_analysis_input)
 
         if analysis.analysis == AnalysisEnum.ADAPTATION:
-            return Adaptation(_analysis_input)
+            return Adaptation(_analysis_input, analysis_config.config_data)
 
         raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
 
@@ -108,6 +111,9 @@ class AnalysisFactory:
         Returns:
             AnalysisLossesProtocol: The losses analysis to be executed.
         """
+        if not analysis:
+            return None
+
         if analysis.analysis == AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,

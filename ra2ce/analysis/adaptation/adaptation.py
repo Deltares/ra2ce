@@ -47,7 +47,7 @@ class Adaptation(AnalysisDamagesProtocol):
     def __init__(
         self, analysis_input: AnalysisInputWrapper, analysis_config: AnalysisConfigData
     ):
-        self.analysis_input = analysis_input
+        self.analysis = analysis_input.analysis
         self._adaptation_options = AdaptationOptionCollection.from_config(
             analysis_config
         )
