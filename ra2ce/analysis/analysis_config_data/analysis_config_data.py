@@ -29,12 +29,12 @@ from typing import Optional
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
-from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
@@ -89,17 +89,13 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     )
     # general
     weighing: WeighingEnum = field(default_factory=lambda: WeighingEnum.NONE)
-    loss_per_distance: str = ""
-    loss_type: LossTypeEnum = field(default_factory=lambda: LossTypeEnum.NONE)
-    disruption_per_category: str = ""
+
     # losses
-    traffic_cols: list[str] = field(default_factory=list)
     production_loss_per_capita_per_hour: float = math.nan
     traffic_period: TrafficPeriodEnum = field(
         default_factory=lambda: TrafficPeriodEnum.DAY
     )
     hours_per_traffic_period: int = 0
-    performance: str = "diff_time"  # "diff_time" or "diff_length" relates to the used criticality metric
     trip_purposes: list[TripPurposeEnum] = field(
         default_factory=lambda: [TripPurposeEnum.NONE]
     )
@@ -110,12 +106,9 @@ class AnalysisSectionLosses(AnalysisSectionBase):
     # accessibility analyses
     threshold: float = 0.0
     threshold_destinations: float = math.nan
-    uniform_duration: float = math.nan
-    gdp_percapita: float = math.nan
     equity_weight: str = ""
     calculate_route_without_disruption: bool = False
     buffer_meters: float = math.nan
-    threshold_locations: float = math.nan
     category_field_name: str = ""
     save_traffic: bool = False
 
@@ -136,13 +129,6 @@ class AnalysisSectionDamages(AnalysisSectionBase):
     analysis: AnalysisDamagesEnum = field(
         default_factory=lambda: AnalysisDamagesEnum.INVALID
     )
-    # adaptation/effectiveness measures
-    return_period: float = math.nan
-    repair_costs: float = math.nan
-    evaluation_period: float = math.nan
-    interest_rate: float = math.nan
-    climate_factor: float = math.nan
-    climate_period: float = math.nan
     # road damage
     representative_damage_percentage: float = 100
     event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.NONE)
@@ -155,6 +141,42 @@ class AnalysisSectionDamages(AnalysisSectionBase):
     risk_calculation_year: int = 0
     create_table: bool = False
     file_name: Optional[Path] = None
+
+
+@dataclass
+class AnalysisSectionAdaptation(AnalysisSectionBase):
+    """
+    Reflects all possible settings that an adaptation analysis section might contain.
+    """
+
+    analysis: AnalysisEnum = AnalysisEnum.ADAPTATION
+    losses_analysis: AnalysisLossesEnum = AnalysisLossesEnum.SINGLE_LINK_LOSSES
+    discount_rate: float = 0.0
+    time_horizon: float = 0.0
+    vat: float = 0.0
+    climate_factor: float = 0.0
+    initial_frequency: float = 0.0
+    # The option to not implement any adaptation measure
+    no_adaptation_option: AnalysisSectionAdaptationOption = field(
+        default_factory=lambda: AnalysisSectionAdaptationOption()
+    )
+    adaptation_options: list[AnalysisSectionAdaptationOption] = field(
+        default_factory=list
+    )
+
+
+@dataclass
+class AnalysisSectionAdaptationOption:
+    """
+    Reflects all possible settings that an adaptation option might contain.
+    The id should be unique and is used to determine the location of the input and output files.
+    """
+
+    id: str = ""
+    name: str = ""
+    construction_cost: float = 0.0
+    maintenance_interval: float = math.inf
+    maintenance_cost: float = 0.0
 
 
 @dataclass
@@ -199,6 +221,18 @@ class AnalysisConfigData(ConfigDataProtocol):
         """
         return list(
             filter(lambda x: isinstance(x, AnalysisSectionLosses), self.analyses)
+        )
+
+    @property
+    def adaptation(self) -> AnalysisSectionAdaptation:
+        """
+        Get the adaptation analysis from config.
+
+        Returns:
+            AnalysisSectionAdaptation: Adaptation analysis.
+        """
+        return next(
+            filter(lambda x: isinstance(x, AnalysisSectionAdaptation), self.analyses)
         )
 
     @staticmethod

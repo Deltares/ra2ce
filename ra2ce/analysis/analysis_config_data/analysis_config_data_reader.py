@@ -26,6 +26,8 @@ from shutil import copyfile
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
+    AnalysisSectionAdaptation,
+    AnalysisSectionAdaptationOption,
     AnalysisSectionBase,
     AnalysisSectionDamages,
     AnalysisSectionLosses,
@@ -36,12 +38,12 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
-from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
@@ -125,9 +127,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             _section.weighing = WeighingEnum.LENGTH
         else:
             _section.weighing = WeighingEnum.get_enum(_weighing)
-        _section.loss_type = LossTypeEnum.get_enum(
-            self._parser.get(section_name, "loss_type", fallback=None)
-        )
+
         # losses
         _section.event_type = EventTypeEnum.get_enum(
             self._parser.get(section_name, "event_type", fallback=None)
@@ -139,9 +139,6 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             section_name,
             "risk_calculation_year",
             fallback=_section.risk_calculation_year,
-        )
-        _section.traffic_cols = self._parser.getlist(
-            section_name, "traffic_cols", fallback=_section.traffic_cols
         )
         _section.traffic_period = TrafficPeriodEnum.get_enum(
             self._parser.get(section_name, "traffic_period", fallback=None)
@@ -174,16 +171,6 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             "threshold_destinations",
             fallback=_section.threshold_destinations,
         )
-        _section.uniform_duration = self._parser.getfloat(
-            section_name,
-            "uniform_duration",
-            fallback=_section.uniform_duration,
-        )
-        _section.gdp_percapita = self._parser.getfloat(
-            section_name,
-            "gdp_percapita",
-            fallback=_section.gdp_percapita,
-        )
         _section.calculate_route_without_disruption = self._parser.getboolean(
             section_name,
             "calculate_route_without_disruption",
@@ -193,11 +180,6 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             section_name,
             "buffer_meters",
             fallback=_section.buffer_meters,
-        )
-        _section.threshold_locations = self._parser.getfloat(
-            section_name,
-            "threshold_locations",
-            fallback=_section.threshold_locations,
         )
         _section.save_traffic = self._parser.getboolean(
             section_name, "save_traffic", fallback=_section.save_traffic
@@ -218,42 +200,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         _section.save_csv = self._parser.getboolean(
             section_name, "save_csv", fallback=_section.save_csv
         )
-        # adaptation/effectiveness measures
-        _section.return_period = self._parser.getfloat(
-            section_name,
-            "return_period",
-            fallback=_section.return_period,
-        )
-        _section.repair_costs = self._parser.getfloat(
-            section_name,
-            "repair_costs",
-            fallback=_section.repair_costs,
-        )
-        _section.evaluation_period = self._parser.getfloat(
-            section_name,
-            "evaluation_period",
-            fallback=_section.evaluation_period,
-        )
-        _section.evaluation_period = self._parser.getfloat(
-            section_name,
-            "representative_damage_percentage",
-            fallback=_section.representative_damage_percentage,
-        )
-        _section.interest_rate = self._parser.getfloat(
-            section_name,
-            "interest_rate",
-            fallback=_section.interest_rate,
-        )
-        _section.climate_factor = self._parser.getfloat(
-            section_name,
-            "climate_factor",
-            fallback=_section.climate_factor,
-        )
-        _section.climate_period = self._parser.getfloat(
-            section_name,
-            "climate_period",
-            fallback=_section.climate_period,
-        )
+
         # road damage
         _section.event_type = EventTypeEnum.get_enum(
             self._parser.get(section_name, "event_type", fallback=None)
@@ -276,14 +223,45 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         )
         return _section
 
+    def _get_analysis_section_adaptation(
+        self, section_name: str
+    ) -> AnalysisSectionAdaptation:
+        def _get_adaptation_option(
+            section_name: str,
+        ) -> AnalysisSectionAdaptationOption:
+            return AnalysisSectionAdaptationOption(**self._parser[section_name])
+
+        _section = AnalysisSectionAdaptation(**self._parser[section_name])
+        _section.losses_analysis = (
+            _section.losses_analysis
+        ) = AnalysisDamagesEnum.get_enum(
+            self._parser.get(section_name, "losses_analysis", fallback=None)
+        )
+
+        _adaptation_options = list(
+            _adaptation_option
+            for _adaptation_option in self._parser.sections()
+            if "adaptationoption" in _adaptation_option
+        )
+        if len(_adaptation_options) > 0:
+            _section.no_adaptation_option = _get_adaptation_option(
+                _adaptation_options[0]
+            )
+        for _adaptation_option in _adaptation_options[1:]:
+            _section.adaptation_options.append(
+                _get_adaptation_option(_adaptation_option)
+            )
+
+        return _section
+
     def get_analysis_sections(self) -> list[AnalysisSectionBase]:
         """
         Extracts info from [analysis<n>] sections
 
         Returns:
-            list[AnalysisSection]: List of analyses (both damages and losses)
+            list[AnalysisSection]: List of analyses (damages, losses and adaptation)
         """
-        _analysis_sections = []
+        _analysis_sections: list[AnalysisSectionBase] = []
 
         _section_names = list(
             section_name
@@ -296,6 +274,8 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
                 _analysis_section = self._get_analysis_section_damages(_section_name)
             elif _analysis_type in LossesAnalysisNameList:
                 _analysis_section = self._get_analysis_section_losses(_section_name)
+            elif _analysis_type == AnalysisEnum.ADAPTATION.config_value:
+                _analysis_section = self._get_analysis_section_adaptation(_section_name)
             else:
                 raise ValueError(f"Analysis {_analysis_type} not supported.")
             _analysis_sections.append(_analysis_section)
