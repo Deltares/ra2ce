@@ -56,7 +56,7 @@ class Adaptation(AnalysisDamagesProtocol):
             analysis_config
         )
 
-    def execute(self) -> GeoDataFrame | None:
+    def execute(self) -> GeoDataFrame:
         """
         Run the adaptation analysis.
         """
@@ -77,16 +77,16 @@ class Adaptation(AnalysisDamagesProtocol):
 
         return _cost_gdf
 
-    def run_benefit(self) -> GeoDataFrame | None:
+    def run_benefit(self) -> GeoDataFrame:
         """
         Calculate the benefit for all adaptation options
         """
-        return 0.0
+        return None
 
-    def calculate_bc_ratio(self) -> GeoDataFrame | None:
+    def calculate_bc_ratio(self) -> GeoDataFrame:
         """
         Calculate the benefit-cost ratio for all adaptation options
         """
-        self.run_cost()
-        self.run_benefit()
-        return 0.0
+        _cost_gdf = self.run_cost()
+        _benefit_gdf = self.run_benefit()
+        return None
