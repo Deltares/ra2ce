@@ -156,10 +156,6 @@ class AnalysisSectionAdaptation(AnalysisSectionBase):
     vat: float = 0.0
     climate_factor: float = 0.0
     initial_frequency: float = 0.0
-    # The option to not implement any adaptation measure
-    no_adaptation_option: AnalysisSectionAdaptationOption = field(
-        default_factory=lambda: AnalysisSectionAdaptationOption()
-    )
     adaptation_options: list[AnalysisSectionAdaptationOption] = field(
         default_factory=list
     )
@@ -224,7 +220,7 @@ class AnalysisConfigData(ConfigDataProtocol):
         )
 
     @property
-    def adaptation(self) -> AnalysisSectionAdaptation:
+    def adaptation(self) -> AnalysisSectionAdaptation | None:
         """
         Get the adaptation analysis from config.
 
@@ -232,8 +228,20 @@ class AnalysisConfigData(ConfigDataProtocol):
             AnalysisSectionAdaptation: Adaptation analysis.
         """
         return next(
-            filter(lambda x: isinstance(x, AnalysisSectionAdaptation), self.analyses)
+            filter(lambda x: isinstance(x, AnalysisSectionAdaptation), self.analyses),
+            None,
         )
+
+    def get_analysis(
+        self, analysis: AnalysisEnum | AnalysisDamagesEnum | AnalysisLossesEnum
+    ) -> AnalysisSectionBase | None:
+        """
+        Get a certain analysis from config.
+
+        Returns:
+            AnalysisSectionBase: The analysis.
+        """
+        return next(filter(lambda x: x.analysis == analysis, self.analyses), None)
 
     @staticmethod
     def get_data_output(ini_file: Path) -> Path:
