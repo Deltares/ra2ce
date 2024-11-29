@@ -36,9 +36,9 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 class AdaptationOption:
     id: str
     name: str
-    construction_cost: float = 0.0
-    maintenance_interval: float = math.inf
-    maintenance_cost: float = 0.0
+    construction_cost: float
+    maintenance_interval: float
+    maintenance_cost: float
     damages_config: AnalysisSectionDamages = None
     losses_config: AnalysisSectionLosses = None
 
