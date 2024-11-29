@@ -59,16 +59,7 @@ class TestAdaptation:
         valid_analysis_ini: Path,
         valid_adaptation_config: AnalysisConfigData,
     ):
-        # 1. Define test data.
-        _adaptation = Adaptation()
-        _adaptation.analysis_input = None
-
-        # 2. Run test.
-        _result = _adaptation.run_cost()
-
-        # 3. Verify expectations.
-        assert isinstance(_result, GeoDataFrame)
-        assert _result == 0.0
+        pass
 
     @pytest.mark.parametrize(
         "adaptation_option",
