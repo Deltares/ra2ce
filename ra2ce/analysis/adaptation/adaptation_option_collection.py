@@ -37,10 +37,9 @@ class AdaptationOptionCollection:
 
     discount_rate: float = 0.0
     time_horizon: float = 0.0
-    vat: float = 0.0
     climate_factor: float = 0.0
     initial_frequency: float = 0.0
-    no_adaptation_option: AdaptationOption = AdaptationOption()
+    no_adaptation_option: AdaptationOption = None
     adaptation_options: list[AdaptationOption] = field(default_factory=list)
 
     @classmethod
@@ -53,10 +52,10 @@ class AdaptationOptionCollection:
         _collection = cls(
             discount_rate=analysis_config_data.adaptation.discount_rate,
             time_horizon=analysis_config_data.adaptation.time_horizon,
-            vat=analysis_config_data.adaptation.vat,
             climate_factor=analysis_config_data.adaptation.climate_factor,
             initial_frequency=analysis_config_data.adaptation.initial_frequency,
         )
+
         for i, _config_option in enumerate(
             analysis_config_data.adaptation.adaptation_options
         ):

@@ -159,11 +159,13 @@ class AnalysisSectionAdaptation(AnalysisSectionBase):
 
     analysis: AnalysisEnum = AnalysisEnum.ADAPTATION
     losses_analysis: AnalysisLossesEnum = AnalysisLossesEnum.SINGLE_LINK_LOSSES
+    # Economical settings
     discount_rate: float = 0.0
     time_horizon: float = 0.0
-    vat: float = 0.0
+    # Hazard settings
     climate_factor: float = 0.0
     initial_frequency: float = 0.0
+    # First option is the no adaptation option
     adaptation_options: list[AnalysisSectionAdaptationOption] = field(
         default_factory=list
     )
@@ -179,8 +181,9 @@ class AnalysisSectionAdaptationOption:
     id: str = ""
     name: str = ""
     construction_cost: float = 0.0
-    maintenance_interval: float = math.inf
+    construction_interval: float = 1000.0
     maintenance_cost: float = 0.0
+    maintenance_interval: float = 1000.0
 
 
 @dataclass
