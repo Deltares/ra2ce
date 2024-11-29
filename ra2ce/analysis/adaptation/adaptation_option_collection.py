@@ -37,7 +37,6 @@ class AdaptationOptionCollection:
 
     discount_rate: float = 0.0
     time_horizon: float = 0.0
-    vat: float = 0.0
     climate_factor: float = 0.0
     initial_frequency: float = 0.0
     all_options: list[AdaptationOption] = field(default_factory=list)
@@ -64,7 +63,6 @@ class AdaptationOptionCollection:
         _collection = cls(
             discount_rate=analysis_config_data.adaptation.discount_rate,
             time_horizon=analysis_config_data.adaptation.time_horizon,
-            vat=analysis_config_data.adaptation.vat,
             climate_factor=analysis_config_data.adaptation.climate_factor,
             initial_frequency=analysis_config_data.adaptation.initial_frequency,
         )
