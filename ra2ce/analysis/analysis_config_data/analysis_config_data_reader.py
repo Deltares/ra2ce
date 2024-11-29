@@ -44,7 +44,6 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
-from ra2ce.analysis.analysis_config_data.enums.loss_type_enum import LossTypeEnum
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
@@ -128,9 +127,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             _section.weighing = WeighingEnum.LENGTH
         else:
             _section.weighing = WeighingEnum.get_enum(_weighing)
-        _section.loss_type = LossTypeEnum.get_enum(
-            self._parser.get(section_name, "loss_type", fallback=None)
-        )
+
         # losses
         _section.event_type = EventTypeEnum.get_enum(
             self._parser.get(section_name, "event_type", fallback=None)
@@ -142,9 +139,6 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             section_name,
             "risk_calculation_year",
             fallback=_section.risk_calculation_year,
-        )
-        _section.traffic_cols = self._parser.getlist(
-            section_name, "traffic_cols", fallback=_section.traffic_cols
         )
         _section.traffic_period = TrafficPeriodEnum.get_enum(
             self._parser.get(section_name, "traffic_period", fallback=None)
@@ -177,16 +171,6 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             "threshold_destinations",
             fallback=_section.threshold_destinations,
         )
-        _section.uniform_duration = self._parser.getfloat(
-            section_name,
-            "uniform_duration",
-            fallback=_section.uniform_duration,
-        )
-        _section.gdp_percapita = self._parser.getfloat(
-            section_name,
-            "gdp_percapita",
-            fallback=_section.gdp_percapita,
-        )
         _section.calculate_route_without_disruption = self._parser.getboolean(
             section_name,
             "calculate_route_without_disruption",
@@ -196,11 +180,6 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             section_name,
             "buffer_meters",
             fallback=_section.buffer_meters,
-        )
-        _section.threshold_locations = self._parser.getfloat(
-            section_name,
-            "threshold_locations",
-            fallback=_section.threshold_locations,
         )
         _section.save_traffic = self._parser.getboolean(
             section_name, "save_traffic", fallback=_section.save_traffic
