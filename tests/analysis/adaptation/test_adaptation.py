@@ -67,6 +67,6 @@ class TestAdaptation:
         assert all(
             [
                 f"costs_{_option.id}" in _cost_gdf.columns
-                for _option in _adaptation._adaptation_collection.adaptation_options
+                for _option in _adaptation.adaptation_collection.adaptation_options
             ]
         )

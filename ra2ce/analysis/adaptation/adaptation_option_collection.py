@@ -83,3 +83,15 @@ class AdaptationOptionCollection:
             )
 
         return _collection
+
+    def calculate_option_cost(self) -> dict[AdaptationOption, float]:
+        """
+        Calculate the cost for all adaptation options.
+        """
+        return {
+            _option: _option.calculate_cost(
+                self.time_horizon,
+                self.discount_rate,
+            )
+            for _option in self.adaptation_options
+        }

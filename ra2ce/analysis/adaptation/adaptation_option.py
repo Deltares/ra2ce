@@ -42,6 +42,9 @@ class AdaptationOption:
     damages_config: AnalysisSectionDamages
     losses_config: AnalysisSectionLosses
 
+    def __hash__(self) -> int:
+        return hash(self.id)
+
     @classmethod
     def from_config(
         cls,

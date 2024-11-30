@@ -41,7 +41,7 @@ class Adaptation(AnalysisDamagesProtocol):
     graph_file_hazard: NetworkFile
     input_path: Path
     output_path: Path
-    _adaptation_collection: AdaptationOptionCollection
+    adaptation_collection: AdaptationOptionCollection
 
     # TODO: add the proper protocol for the adaptation analysis.
     def __init__(
@@ -52,7 +52,7 @@ class Adaptation(AnalysisDamagesProtocol):
         self.graph_file_hazard = analysis_input.graph_file_hazard
         self.input_path = analysis_input.input_path
         self.output_path = analysis_input.output_path
-        self._adaptation_collection = AdaptationOptionCollection.from_config(
+        self.adaptation_collection = AdaptationOptionCollection.from_config(
             analysis_config
         )
 
@@ -68,11 +68,10 @@ class Adaptation(AnalysisDamagesProtocol):
         """
         # Open the network without hazard data
         _cost_gdf = deepcopy(self.graph_file.get_graph())
-        for _option in self._adaptation_collection.adaptation_options:
-            _cost = _option.calculate_cost(
-                self._adaptation_collection.time_horizon,
-                self._adaptation_collection.discount_rate,
-            )
+        for (
+            _option,
+            _cost,
+        ) in self.adaptation_collection.calculate_option_cost().items():
             _cost_gdf[f"costs_{_option.id}"] = _cost
 
         return _cost_gdf
