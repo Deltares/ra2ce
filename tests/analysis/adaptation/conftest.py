@@ -24,6 +24,7 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from tests import test_data, test_results
 
 
@@ -136,4 +137,5 @@ def _get_valid_adaptation_config_fixture(
             _multi_link_losses_section,
             _adaptation_section,
         ],
+        aggregate_wl=AggregateWlEnum.MEAN,
     )
