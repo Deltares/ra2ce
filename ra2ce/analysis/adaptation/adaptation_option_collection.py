@@ -76,6 +76,7 @@ class AdaptationOptionCollection:
         for _config_option in analysis_config_data.adaptation.adaptation_options:
             _collection.all_options.append(
                 AdaptationOption.from_config(
+                    analysis_config_data.root_path,
                     _config_option,
                     _damages_analysis,
                     _losses_analysis,
@@ -83,3 +84,15 @@ class AdaptationOptionCollection:
             )
 
         return _collection
+
+    def calculate_option_cost(self) -> dict[AdaptationOption, float]:
+        """
+        Calculate the cost for all adaptation options.
+        """
+        return {
+            _option: _option.calculate_cost(
+                self.time_horizon,
+                self.discount_rate,
+            )
+            for _option in self.adaptation_options
+        }

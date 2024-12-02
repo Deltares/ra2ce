@@ -5,17 +5,12 @@ import pytest
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.adaptation.adaptation import Adaptation
-from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
-    AnalysisSectionAdaptation,
-)
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
-from tests import test_data, test_results
-from tests.analysis.adaptation.conftest import AdaptationOptionCases
+from tests import test_results
 
 
 class TestAdaptation:
@@ -39,24 +34,39 @@ class TestAdaptation:
         _analysis_input = AnalysisInputWrapper.from_input(
             analysis=valid_adaptation_config.adaptation,
             analysis_config=_config,
-            graph_file=_config.graph_files.base_graph_hazard,
-            graph_file_hazard=_config.graph_files.base_graph_hazard,
+            graph_file=_config.graph_files.base_network,
+            graph_file_hazard=_config.graph_files.base_network_hazard,
         )
 
         yield _analysis_input
 
-    @pytest.fixture(name="acceptance_adaptation_option")
-    def test_initialize(self, valid_adaptation_input: AnalysisInputWrapper):
+    def test_initialize(
+        self,
+        valid_adaptation_input: AnalysisInputWrapper,
+        valid_adaptation_config: AnalysisConfigData,
+    ):
         # 1./2. Define test data./Run test.
-        _adaptation = Adaptation(valid_adaptation_input)
+        _adaptation = Adaptation(valid_adaptation_input, valid_adaptation_config)
 
         # 3. Verify expectations.
         assert isinstance(_adaptation, Adaptation)
 
-    def test_execute_cost(
+    def test_run_cost(
         self,
-        request: pytest.FixtureRequest,
-        valid_analysis_ini: Path,
+        valid_adaptation_input: AnalysisInputWrapper,
         valid_adaptation_config: AnalysisConfigData,
     ):
-        pass
+        # 1. Define test data.
+        _adaptation = Adaptation(valid_adaptation_input, valid_adaptation_config)
+
+        # 2. Run test.
+        _cost_gdf = _adaptation.run_cost()
+
+        # 3. Verify expectations.
+        assert isinstance(_cost_gdf, GeoDataFrame)
+        assert all(
+            [
+                f"costs_{_option.id}" in _cost_gdf.columns
+                for _option in _adaptation.adaptation_collection.adaptation_options
+            ]
+        )
