@@ -23,7 +23,6 @@ from pathlib import Path
 
 from geopandas import GeoDataFrame
 
-from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
     AdaptationOptionCollection,
 )
@@ -33,7 +32,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
-from ra2ce.analysis.damages.damages import Damages
+from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.network.graph_files.network_file import NetworkFile
 
 
@@ -44,6 +43,7 @@ class Adaptation(AnalysisDamagesProtocol):
     input_path: Path
     output_path: Path
     adaptation_collection: AdaptationOptionCollection
+    losses_analysis: type[AnalysisLossesProtocol]
 
     # TODO: add the proper protocol for the adaptation analysis.
     def __init__(
@@ -75,37 +75,26 @@ class Adaptation(AnalysisDamagesProtocol):
         for (
             _option,
             _cost,
-        ) in self.adaptation_collection.calculate_option_cost().items():
+        ) in self.adaptation_collection.calculate_options_cost().items():
             _cost_gdf[f"costs_{_option.id}"] = _cost
 
         return _cost_gdf
-
-    def _run_damages(self, option: AdaptationOption) -> GeoDataFrame | None:
-        """
-        Calculate the damages for a single adaptation option
-        """
-        _damages = Damages(option.damages_input)
-        return _damages.execute()
-
-    def _run_losses(self, option: AdaptationOption) -> GeoDataFrame | None:
-        """
-        Calculate the losses for a single adaptation option
-
-        Returns:
-            GeoDataFrame: The losses for the adaptation option.
-        """
-        return None
 
     def run_benefit(self) -> GeoDataFrame:
         """
         Calculate the benefit for all adaptation options
         """
         _benefit_gdf = deepcopy(self.graph_file.get_graph())
-        for _option in self.adaptation_collection.all_options:
-            _result = self._run_damages(_option)
-            _dam_cols = _result.filter(like="dam_EV").columns
-            for _col in _dam_cols:
-                _benefit_gdf[f"{_option.id}_{_col}"] = _result[_col]
+
+        _impact = self.adaptation_collection.calculation_options_impact(_benefit_gdf)
+
+        # for _option in self.adaptation_collection.all_options:
+        #     _damages_result = self.calculation_options_impact(_option)
+        #     _dam_cols = _damages_result.filter(like="dam_EV").columns
+        #     for _col in _dam_cols:
+        #         _benefit_gdf[f"{_option.id}_{_col}"] = _damages_result[_col]
+        #     _losses_result = self._run_losses(_option)
+        #     _los_cols = _losses_result.filter(like="vhl").columns
 
         return None
 

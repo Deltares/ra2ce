@@ -37,7 +37,9 @@ class ResilienceCurvesReader(LossesInputDataReaderBase):
         "duration_steps",
         "functionality_loss_ratio",
     ]
-    data_type = ResilienceCurves
+
+    def __init__(self) -> None:
+        self.object_type = ResilienceCurves
 
     def _parse_df(self, df: pd.DataFrame) -> ResilienceCurves:
         def parse_link_type_hazard_intensity(

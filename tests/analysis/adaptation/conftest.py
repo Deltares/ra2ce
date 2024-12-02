@@ -1,5 +1,5 @@
 from pathlib import Path
-from shutil import copytree, rmtree
+from shutil import copy, copytree, rmtree
 from typing import Iterator
 
 import pytest
@@ -26,7 +26,12 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
+from ra2ce.network.network_config_data.network_config_data import (
+    NetworkConfigData,
+    NetworkSection,
+)
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data, test_results
 
@@ -62,7 +67,7 @@ class AdaptationOptionCases:
 def _get_valid_adaptation_config_fixture(
     request: pytest.FixtureRequest,
     valid_analysis_ini: Path,
-) -> Iterator[AnalysisConfigWrapper]:
+) -> Iterator[tuple[AnalysisInputWrapper, AnalysisConfigWrapper]]:
     def get_losses_section(analysis: AnalysisLossesEnum) -> AnalysisSectionLosses:
         return AnalysisSectionLosses(
             analysis=analysis,
@@ -100,6 +105,20 @@ def _get_valid_adaptation_config_fixture(
     copytree(test_data.joinpath("adaptation", "static"), _static_path)
 
     # Create the config
+
+    # - network
+    _network_section = NetworkSection(
+        file_id="ID",
+        link_type_column="highway",
+    )
+    _network_config_data = NetworkConfigData(
+        static_path=test_results.joinpath(request.node.name, "static"),
+        network=_network_section,
+    )
+    _network_config = NetworkConfigWrapper.from_data(
+        valid_analysis_ini, _network_config_data
+    )
+
     # - damages
     _damages_section = AnalysisSectionDamages(
         analysis=AnalysisDamagesEnum.DAMAGES,
@@ -138,8 +157,15 @@ def _get_valid_adaptation_config_fixture(
         aggregate_wl=AggregateWlEnum.MEAN,
     )
 
-    _network_config = NetworkConfigWrapper()
-
-    yield AnalysisConfigWrapper.from_data_with_network(
+    _analysis_config = AnalysisConfigWrapper.from_data_with_network(
         valid_analysis_ini, _analysis_data, _network_config
     )
+
+    _analysis_input = AnalysisInputWrapper.from_input(
+        analysis=_analysis_config.config_data.adaptation,
+        analysis_config=_analysis_config,
+        graph_file=_analysis_config.graph_files.base_network,
+        graph_file_hazard=_analysis_config.graph_files.base_network_hazard,
+    )
+
+    yield (_analysis_input, _analysis_config)

@@ -24,6 +24,8 @@ from copy import deepcopy
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+from geopandas import GeoDataFrame
+
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionAdaptationOption,
@@ -31,8 +33,14 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
+)
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.damages.damages import Damages
+from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
+from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
 
 
 @dataclass
@@ -45,6 +53,8 @@ class AdaptationOption:
     maintenance_interval: float
     damages_input: AnalysisInputWrapper
     losses_input: AnalysisInputWrapper
+    losses_analysis: AnalysisLossesEnum
+    analysis_config: AnalysisConfigWrapper
 
     def __hash__(self) -> int:
         return hash(self.id)
@@ -68,7 +78,7 @@ class AdaptationOption:
         Returns:
             AdaptationOption: The created adaptation option.
         """
-        # Adjust path to the input files
+        # Adjust path to the files (should be in Adaptation/input)
         def construct_path(
             orig_path: Path,
             analysis: str,
@@ -76,7 +86,14 @@ class AdaptationOption:
         ) -> Path:
             if not orig_path:
                 return None
-            return orig_path.parent.joinpath(adaptation_option.id, analysis, folder)
+            # Orig is directory: add stuff at the end
+            if not (orig_path.suffix):
+                return orig_path.parent.joinpath(
+                    "input", adaptation_option.id, analysis, folder
+                )
+            return orig_path.parent.parent.joinpath(
+                "input", adaptation_option.id, analysis, folder, orig_path.name
+            )
 
         def replace_paths(
             config_data: AnalysisConfigData, analysis: str
@@ -111,7 +128,7 @@ class AdaptationOption:
         _damages_input = AnalysisInputWrapper.from_input(
             analysis=_damages_analysis,
             analysis_config=_damages_config,
-            graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
+            graph_file_hazard=analysis_config.graph_files.base_network_hazard,
         )
 
         # Create config for the losses analysis
@@ -120,6 +137,16 @@ class AdaptationOption:
         _losses_analysis = _losses_config.config_data.get_analysis(
             analysis_config.config_data.adaptation.losses_analysis
         )
+        _losses_analysis.traffic_intensities_file = construct_path(
+            _losses_analysis.traffic_intensities_file, "losses", "input"
+        )
+        _losses_analysis.resilience_curves_file = construct_path(
+            _losses_analysis.resilience_curves_file, "losses", "input"
+        )
+        _losses_analysis.values_of_time_file = construct_path(
+            _losses_analysis.values_of_time_file, "losses", "input"
+        )
+        _losses_analysis
         _losses_input = AnalysisInputWrapper.from_input(
             analysis=_losses_analysis,
             analysis_config=_losses_config,
@@ -131,6 +158,8 @@ class AdaptationOption:
             **asdict(adaptation_option),
             damages_input=_damages_input,
             losses_input=_losses_input,
+            losses_analysis=analysis_config.config_data.adaptation.losses_analysis,
+            analysis_config=analysis_config,
         )
 
     def calculate_cost(self, time_horizon: float, discount_rate: float) -> float:
@@ -175,3 +204,25 @@ class AdaptationOption:
                 _lifetime_cost += calc_cost(self.maintenance_cost, _maint_year)
 
         return _lifetime_cost
+
+    def calculate_impact(self) -> GeoDataFrame:
+        """
+        Calculate the impact of the adaptation option.
+
+        Returns:
+            float: The impact of the adaptation option.
+        """
+        _damages = Damages(self.damages_input)
+        _damages_gdf = _damages.execute()
+
+        if self.losses_analysis is AnalysisLossesEnum.SINGLE_LINK_LOSSES:
+            _losses = SingleLinkLosses(self.losses_input, self.analysis_config)
+        elif self.losses_analysis is AnalysisLossesEnum.MULTI_LINK_LOSSES:
+            _losses = MultiLinkLosses(self.losses_input, self.analysis_config)
+        else:
+            raise NotImplementedError(
+                f"Losses analysis {self.losses_analysis} not implemented"
+            )
+        _losses_gdf = _losses.execute()
+
+        return _damages_gdf

@@ -20,10 +20,12 @@
 """
 from __future__ import annotations
 
+from copy import deepcopy
 from dataclasses import dataclass, field
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.network.graph_files.network_file import NetworkFile
 
 
 @dataclass
@@ -68,8 +70,8 @@ class AdaptationOptionCollection:
             AdaptationOptionCollection: The created collection of adaptation options.
         """
         if (
-            not analysis_config.config_data
-            or not analysis_config.config_data.adaptation
+            analysis_config.config_data is None
+            or analysis_config.config_data.adaptation is None
         ):
             raise ValueError("No adaptation section found in the analysis config data.")
 
@@ -89,7 +91,7 @@ class AdaptationOptionCollection:
 
         return _collection
 
-    def calculate_option_cost(self) -> dict[AdaptationOption, float]:
+    def calculate_options_cost(self) -> dict[AdaptationOption, float]:
         """
         Calculate the cost for all adaptation options.
 
@@ -103,3 +105,11 @@ class AdaptationOptionCollection:
             )
             for _option in self.adaptation_options
         }
+
+    def calculation_options_impact(self, _input_graph: NetworkFile) -> NetworkFile:
+        for _option in self.all_options:
+            _impact = _option.calculate_impact()
+
+        _damage_result = None
+
+        return None

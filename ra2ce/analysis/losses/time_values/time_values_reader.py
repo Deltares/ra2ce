@@ -33,7 +33,9 @@ class TimeValuesReader(LossesInputDataReaderBase):
     """
 
     csv_columns = ["trip_types", "value_of_time", "occupants"]
-    data_type = TimeValues
+
+    def __init__(self) -> None:
+        self.object_type = TimeValues
 
     def _parse_df(self, df: DataFrame) -> TimeValues:
         _time_values = {
