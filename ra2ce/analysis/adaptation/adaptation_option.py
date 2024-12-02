@@ -55,6 +55,19 @@ class AdaptationOption:
         analysis_config: AnalysisConfigWrapper,
         adaptation_option: AnalysisSectionAdaptationOption,
     ) -> AdaptationOption:
+        """
+        Classmethod to create an adaptation option from an analysis configuration and an adaptation option.
+
+        Args:
+            analysis_config (AnalysisConfigWrapper): Analysis config input
+            adaptation_option (AnalysisSectionAdaptationOption): Adaptation option input
+
+        Raises:
+            ValueError: If damages and losses sections are not present in the analysis config data.
+
+        Returns:
+            AdaptationOption: The created adaptation option.
+        """
         # Adjust path to the input files
         def construct_path(
             orig_path: Path,

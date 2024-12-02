@@ -59,6 +59,18 @@ class AdaptationOptionCollection:
         cls,
         analysis_config: AnalysisConfigWrapper,
     ) -> AdaptationOptionCollection:
+        """
+        Classmethod to create a collection of adaptation options from an analysis configuration.
+
+        Args:
+            analysis_config (AnalysisConfigWrapper): Analysis config input
+
+        Raises:
+            ValueError: If no adaptation section is found in the analysis config data.
+
+        Returns:
+            AdaptationOptionCollection: The created collection of adaptation options.
+        """
         if (
             not analysis_config.config_data
             or not analysis_config.config_data.adaptation
@@ -84,6 +96,9 @@ class AdaptationOptionCollection:
     def calculate_option_cost(self) -> dict[AdaptationOption, float]:
         """
         Calculate the cost for all adaptation options.
+
+        Returns:
+            dict[AdaptationOption, float]: The calculated cost for all adaptation options.
         """
         return {
             _option: _option.calculate_cost(

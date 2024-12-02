@@ -28,7 +28,6 @@ from ra2ce.analysis.adaptation.adaptation_option_collection import (
     AdaptationOptionCollection,
 )
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
     AnalysisSectionAdaptation,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
@@ -85,23 +84,15 @@ class Adaptation(AnalysisDamagesProtocol):
         """
         Calculate the damages for a single adaptation option
         """
-        _analysis_input = AnalysisInputWrapper(
-            analysis=option.damages_config,
-            graph_file=self.graph_file,
-            graph_file_hazard=self.graph_file_hazard,
-            input_path=option.input_path,
-            static_path=option.static_path,
-            output_path=option.output_path,
-            hazard_names=None,  # TODO: are these needed?
-            origins_destinations=None,
-            file_id=None,
-        )
-        _damages = Damages(_analysis_input)
+        _damages = Damages(option.damages_input)
         return _damages.execute()
 
     def _run_losses(self, option: AdaptationOption) -> GeoDataFrame | None:
         """
         Calculate the losses for a single adaptation option
+
+        Returns:
+            GeoDataFrame: The losses for the adaptation option.
         """
         return None
 
@@ -124,4 +115,4 @@ class Adaptation(AnalysisDamagesProtocol):
         """
         _cost_gdf = self.run_cost()
         _benefit_gdf = self.run_benefit()
-        return None
+        return _cost_gdf
