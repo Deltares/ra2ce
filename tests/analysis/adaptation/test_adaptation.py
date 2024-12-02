@@ -70,3 +70,17 @@ class TestAdaptation:
                 for _option in _adaptation.adaptation_collection.adaptation_options
             ]
         )
+
+    def test_run_benefit(
+        self,
+        valid_adaptation_input: AnalysisInputWrapper,
+        valid_adaptation_config: AnalysisConfigWrapper,
+    ):
+        # 1. Define test data.
+        _adaptation = Adaptation(valid_adaptation_input, valid_adaptation_config)
+
+        # 2. Run test.
+        _result = _adaptation.run_benefit()
+
+        # 3. Verify expectations.
+        assert isinstance(_result, GeoDataFrame)
