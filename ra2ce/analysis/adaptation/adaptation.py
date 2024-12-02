@@ -97,13 +97,22 @@ class Adaptation(AnalysisDamagesProtocol):
         _damages = Damages(_analysis_input)
         return _damages.execute()
 
+    def _run_losses(self, option: AdaptationOption) -> GeoDataFrame | None:
+        """
+        Calculate the losses for a single adaptation option
+        """
+        return None
+
     def run_benefit(self) -> GeoDataFrame:
         """
         Calculate the benefit for all adaptation options
         """
         _benefit_gdf = deepcopy(self.graph_file.get_graph())
-        for _option in self.adaptation_collection.adaptation_options:
+        for _option in self.adaptation_collection.all_options:
             _result = self._run_damages(_option)
+            _dam_cols = _result.filter(like="dam_EV").columns
+            for _col in _dam_cols:
+                _benefit_gdf[f"{_option.id}_{_col}"] = _result[_col]
 
         return None
 
