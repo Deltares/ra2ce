@@ -17,6 +17,13 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
+from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
+from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
+    TrafficPeriodEnum,
+)
+from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
+from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from tests import test_data, test_results
 
 
@@ -70,10 +77,25 @@ def _get_valid_adaptation_config_fixture(
     # - damages
     _damages_section = AnalysisSectionDamages(
         analysis=AnalysisDamagesEnum.DAMAGES,
+        event_type=EventTypeEnum.EVENT,
+        damage_curve=DamageCurveEnum.MAN,
+        save_gpkg=True,
+        save_csv=True,
     )
     # - losses
     _losses_section = AnalysisSectionLosses(
-        analysis=AnalysisLossesEnum.SINGLE_LINK_LOSSES,
+        analysis=AnalysisLossesEnum.MULTI_LINK_LOSSES,
+        event_type=EventTypeEnum.EVENT,
+        weighing=WeighingEnum.TIME,
+        threshold=0.5,
+        production_loss_per_capita_per_hour=42,
+        traffic_period=TrafficPeriodEnum.DAY,
+        trip_purposes=[
+            TripPurposeEnum.BUSINESS,
+            TripPurposeEnum.COMMUTE,
+            TripPurposeEnum.FREIGHT,
+            TripPurposeEnum.OTHER,
+        ],
         resilience_curves_file=_root_path.joinpath(
             "damage_functions", "resilience_curves.csv"
         ),
@@ -83,11 +105,13 @@ def _get_valid_adaptation_config_fixture(
         values_of_time_file=_root_path.joinpath(
             "damage_functions", "values_of_time.csv"
         ),
+        save_gpkg=True,
+        save_csv=True,
     )
     # - adaptation
     _adaptation_section = AnalysisSectionAdaptation(
         analysis=AnalysisEnum.ADAPTATION,
-        losses_analysis=AnalysisLossesEnum.SINGLE_LINK_LOSSES,
+        losses_analysis=AnalysisLossesEnum.MULTI_LINK_LOSSES,
         adaptation_options=AdaptationOptionCases.config_cases,
         discount_rate=0.025,
         time_horizon=20,
