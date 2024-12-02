@@ -47,6 +47,18 @@ class AdaptationOption:
     def __hash__(self) -> int:
         return hash(self.id)
 
+    @property
+    def input_path(self) -> Path:
+        return self.damages_root.joinpath("input")
+
+    @property
+    def static_path(self) -> Path:
+        return self.damages_root.joinpath("static")
+
+    @property
+    def output_path(self) -> Path:
+        return self.damages_root.joinpath("output")
+
     @classmethod
     def from_config(
         cls,
