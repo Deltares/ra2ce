@@ -90,12 +90,12 @@ class Adaptation(AnalysisDamagesProtocol):
         impact_gdf = self.run_impact()
         impact_array = impact_gdf["impact"].to_numpy()
 
-        def calc_net_impact_time_horizon(event_damage: float):
+        def calc_net_impact_time_horizon(event_impact: float):
             years_array = np.arange(0, self.adaptation_collection.time_horizon)
             frequency_per_year = self.adaptation_collection.initial_frequency + years_array * self.adaptation_collection.climate_factor
             discount = (1 + self.adaptation_collection.discount_rate) ** years_array
 
-            damage_per_year = event_damage * frequency_per_year / discount
+            damage_per_year = event_impact * frequency_per_year / discount
             return np.sum(damage_per_year)
 
         net_impact_array = np.array([calc_net_impact_time_horizon(damage) for damage in impact_array])
