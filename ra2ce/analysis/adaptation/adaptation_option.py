@@ -39,7 +39,9 @@ class AdaptationOption:
     construction_interval: float
     maintenance_cost: float
     maintenance_interval: float
+    damages_root: Path
     damages_config: AnalysisSectionDamages
+    losses_root: Path
     losses_config: AnalysisSectionLosses
 
     def __hash__(self) -> int:
@@ -48,14 +50,18 @@ class AdaptationOption:
     @classmethod
     def from_config(
         cls,
+        root_path: Path,
         adaptation_option: AnalysisSectionAdaptationOption,
         damages_section: AnalysisSectionDamages,
         losses_section: AnalysisSectionLosses,
     ) -> AdaptationOption:
         # Adjust path to the input files
-        def extend_path(analysis: str, input_path: Path | None) -> Path | None:
+        def extend_path(analysis: str, input_path: Path) -> Path:
             if not input_path:
                 return None
+            # Input is directory: add stuff at the end
+            if not (input_path.suffix):
+                return input_path.joinpath("input", adaptation_option.id, analysis)
             return input_path.parent.joinpath(
                 "input", adaptation_option.id, analysis, input_path.name
             )
@@ -65,8 +71,10 @@ class AdaptationOption:
                 "Damages and losses sections are required to create an adaptation option."
             )
 
+        _damages_root = extend_path("damages", root_path)
         _damages_section = deepcopy(damages_section)
 
+        _losses_root = extend_path("losses", root_path)
         _losses_section = deepcopy(losses_section)
         _losses_section.resilience_curves_file = extend_path(
             "losses", losses_section.resilience_curves_file
@@ -80,7 +88,9 @@ class AdaptationOption:
 
         return cls(
             **asdict(adaptation_option),
+            damages_root=_damages_root,
             damages_config=_damages_section,
+            losses_root=_losses_root,
             losses_config=_losses_section,
         )
 
