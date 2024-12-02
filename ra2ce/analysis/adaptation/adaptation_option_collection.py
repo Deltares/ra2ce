@@ -23,10 +23,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
-from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
-    AnalysisDamagesEnum,
-)
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 
 

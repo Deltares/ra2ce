@@ -4,7 +4,6 @@ from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
     AdaptationOptionCollection,
 )
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 
 
