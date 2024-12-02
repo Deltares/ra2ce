@@ -77,15 +77,9 @@ def _get_valid_adaptation_config_fixture(
                 TripPurposeEnum.FREIGHT,
                 TripPurposeEnum.OTHER,
             ],
-            resilience_curves_file=_root_path.joinpath(
-                "damage_functions", "resilience_curves.csv"
-            ),
-            traffic_intensities_file=_root_path.joinpath(
-                "damage_functions", "traffic_intensities.csv"
-            ),
-            values_of_time_file=_root_path.joinpath(
-                "damage_functions", "values_of_time.csv"
-            ),
+            resilience_curves_file=_input_path.joinpath("resilience_curves.csv"),
+            traffic_intensities_file=_input_path.joinpath("traffic_intensities.csv"),
+            values_of_time_file=_input_path.joinpath("values_of_time.csv"),
             save_gpkg=True,
             save_csv=True,
         )
