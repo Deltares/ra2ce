@@ -1,5 +1,5 @@
 from pathlib import Path
-from shutil import copy, copytree, rmtree
+from shutil import copytree, rmtree
 from typing import Iterator
 
 import pytest

@@ -205,7 +205,7 @@ class AdaptationOption:
 
         return _lifetime_cost
 
-    def calculate_impact(self) -> GeoDataFrame:
+    def calculate_impact(self, benefit_graph: GeoDataFrame) -> GeoDataFrame:
         """
         Calculate the impact of the adaptation option.
 
@@ -214,6 +214,9 @@ class AdaptationOption:
         """
         _damages = Damages(self.damages_input)
         _damages_gdf = _damages.execute()
+        _dam_cols = _damages_gdf.filter(regex="dam_").columns
+        for _col in _dam_cols:
+            benefit_graph[_col] = _damages_gdf[_col]
 
         if self.losses_analysis is AnalysisLossesEnum.SINGLE_LINK_LOSSES:
             _losses = SingleLinkLosses(self.losses_input, self.analysis_config)
@@ -224,5 +227,8 @@ class AdaptationOption:
                 f"Losses analysis {self.losses_analysis} not implemented"
             )
         _losses_gdf = _losses.execute()
+        _los_cols = _losses_gdf.columns  # TODO: Check the columns
 
-        return _damages_gdf
+        # TODO: Calculate the impact of the adaptation option
+
+        return benefit_graph

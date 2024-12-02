@@ -20,7 +20,6 @@
 """
 from __future__ import annotations
 
-from copy import deepcopy
 from dataclasses import dataclass, field
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
@@ -106,10 +105,8 @@ class AdaptationOptionCollection:
             for _option in self.adaptation_options
         }
 
-    def calculation_options_impact(self, _input_graph: NetworkFile) -> NetworkFile:
+    def calculation_options_impact(self, benefit_graph: NetworkFile) -> NetworkFile:
         for _option in self.all_options:
-            _impact = _option.calculate_impact()
+            benefit_graph = _option.calculate_impact(benefit_graph)
 
-        _damage_result = None
-
-        return None
+        return benefit_graph

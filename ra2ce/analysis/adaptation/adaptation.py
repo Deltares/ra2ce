@@ -86,15 +86,9 @@ class Adaptation(AnalysisDamagesProtocol):
         """
         _benefit_gdf = deepcopy(self.graph_file.get_graph())
 
-        _impact = self.adaptation_collection.calculation_options_impact(_benefit_gdf)
-
-        # for _option in self.adaptation_collection.all_options:
-        #     _damages_result = self.calculation_options_impact(_option)
-        #     _dam_cols = _damages_result.filter(like="dam_EV").columns
-        #     for _col in _dam_cols:
-        #         _benefit_gdf[f"{_option.id}_{_col}"] = _damages_result[_col]
-        #     _losses_result = self._run_losses(_option)
-        #     _los_cols = _losses_result.filter(like="vhl").columns
+        _benefit_gdf = self.adaptation_collection.calculation_options_impact(
+            _benefit_gdf
+        )
 
         return None
 
