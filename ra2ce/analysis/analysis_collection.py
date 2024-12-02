@@ -33,6 +33,7 @@ from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtoco
 class AnalysisCollection:
     damages_analyses: list[AnalysisDamagesProtocol] = field(default_factory=list)
     losses_analyses: list[AnalysisLossesProtocol] = field(default_factory=list)
+    adaptation_analysis: AnalysisDamagesProtocol = None
 
     @classmethod
     def from_config(cls, analysis_config: AnalysisConfigWrapper) -> AnalysisCollection:
@@ -54,4 +55,7 @@ class AnalysisCollection:
                 AnalysisFactory.get_losses_analysis(analysis, analysis_config)
                 for analysis in analysis_config.config_data.losses_list
             ],
+            adaptation_analysis=AnalysisFactory.get_damages_analysis(
+                analysis_config.config_data.adaptation, analysis_config
+            ),
         )
