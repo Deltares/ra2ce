@@ -15,7 +15,15 @@ from tests.analysis.adaptation.conftest import AdaptationOptionCases
 
 
 class TestAdaptationOption:
-    def test_from_config(self, valid_adaptation_config: AnalysisConfigData):
+    @pytest.mark.parametrize(
+        "losses_analysis",
+        [AnalysisLossesEnum.SINGLE_LINK_LOSSES, AnalysisLossesEnum.MULTI_LINK_LOSSES],
+    )
+    def test_from_config(
+        self,
+        valid_adaptation_config: AnalysisConfigData,
+        losses_analysis: AnalysisLossesEnum,
+    ):
         # 1. Define test data.
         _orig_path = valid_adaptation_config.losses_list[0].resilience_curves_file
         _expected_path = _orig_path.parent.joinpath(
@@ -32,16 +40,14 @@ class TestAdaptationOption:
             damages_section=valid_adaptation_config.get_analysis(
                 AnalysisDamagesEnum.DAMAGES
             ),
-            losses_section=valid_adaptation_config.get_analysis(
-                AnalysisLossesEnum.SINGLE_LINK_LOSSES
-            ),
+            losses_section=valid_adaptation_config.get_analysis(losses_analysis),
         )
 
         # 3. Verify expectations.
         assert isinstance(_option, AdaptationOption)
         assert _option.id == "AO0"
         assert _option.damages_config.analysis == AnalysisDamagesEnum.DAMAGES
-        assert _option.losses_config.analysis == AnalysisLossesEnum.SINGLE_LINK_LOSSES
+        assert _option.losses_config.analysis == losses_analysis
         assert _option.losses_config.resilience_curves_file == _expected_path
 
     def test_from_config_no_damages_losses_raises(self):

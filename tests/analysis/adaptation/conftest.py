@@ -58,6 +58,33 @@ class AdaptationOptionCases:
 def _get_valid_adaptation_config_fixture(
     request: pytest.FixtureRequest,
 ) -> Iterator[AnalysisConfigData]:
+    def get_losses_section(analysis: AnalysisLossesEnum) -> AnalysisSectionLosses:
+        return AnalysisSectionLosses(
+            analysis=analysis,
+            event_type=EventTypeEnum.EVENT,
+            weighing=WeighingEnum.TIME,
+            threshold=0.5,
+            production_loss_per_capita_per_hour=42,
+            traffic_period=TrafficPeriodEnum.DAY,
+            trip_purposes=[
+                TripPurposeEnum.BUSINESS,
+                TripPurposeEnum.COMMUTE,
+                TripPurposeEnum.FREIGHT,
+                TripPurposeEnum.OTHER,
+            ],
+            resilience_curves_file=_root_path.joinpath(
+                "damage_functions", "resilience_curves.csv"
+            ),
+            traffic_intensities_file=_root_path.joinpath(
+                "damage_functions", "traffic_intensities.csv"
+            ),
+            values_of_time_file=_root_path.joinpath(
+                "damage_functions", "values_of_time.csv"
+            ),
+            save_gpkg=True,
+            save_csv=True,
+        )
+
     _root_path = test_results.joinpath(request.node.name)
     _input_path = _root_path.joinpath("input")
     _static_path = _root_path.joinpath("static")
@@ -83,30 +110,11 @@ def _get_valid_adaptation_config_fixture(
         save_csv=True,
     )
     # - losses
-    _losses_section = AnalysisSectionLosses(
-        analysis=AnalysisLossesEnum.MULTI_LINK_LOSSES,
-        event_type=EventTypeEnum.EVENT,
-        weighing=WeighingEnum.TIME,
-        threshold=0.5,
-        production_loss_per_capita_per_hour=42,
-        traffic_period=TrafficPeriodEnum.DAY,
-        trip_purposes=[
-            TripPurposeEnum.BUSINESS,
-            TripPurposeEnum.COMMUTE,
-            TripPurposeEnum.FREIGHT,
-            TripPurposeEnum.OTHER,
-        ],
-        resilience_curves_file=_root_path.joinpath(
-            "damage_functions", "resilience_curves.csv"
-        ),
-        traffic_intensities_file=_root_path.joinpath(
-            "damage_functions", "traffic_intensities.csv"
-        ),
-        values_of_time_file=_root_path.joinpath(
-            "damage_functions", "values_of_time.csv"
-        ),
-        save_gpkg=True,
-        save_csv=True,
+    _single_link_losses_section = get_losses_section(
+        AnalysisLossesEnum.SINGLE_LINK_LOSSES
+    )
+    _multi_link_losses_section = get_losses_section(
+        AnalysisLossesEnum.MULTI_LINK_LOSSES
     )
     # - adaptation
     _adaptation_section = AnalysisSectionAdaptation(
@@ -122,5 +130,10 @@ def _get_valid_adaptation_config_fixture(
         input_path=_input_path,
         static_path=_static_path,
         output_path=_output_path,
-        analyses=[_damages_section, _losses_section, _adaptation_section],
+        analyses=[
+            _damages_section,
+            _single_link_losses_section,
+            _multi_link_losses_section,
+            _adaptation_section,
+        ],
     )
