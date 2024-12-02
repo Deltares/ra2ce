@@ -22,6 +22,7 @@ from copy import deepcopy
 from pathlib import Path
 
 import numpy as np
+from cleo.helpers import option
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
@@ -87,21 +88,23 @@ class Adaptation(AnalysisDamagesProtocol):
         """
         Calculate the impact for all adaptation options
         """
-        impact_gdf = self.run_impact()
-        impact_array = impact_gdf["impact"].to_numpy()
+        _impact_gdf = self.run_impact()
+        for _option in self.adaptation_collection.adaptation_options:
 
-        def calc_net_impact_time_horizon(event_impact: float):
-            years_array = np.arange(0, self.adaptation_collection.time_horizon)
-            frequency_per_year = self.adaptation_collection.initial_frequency + years_array * self.adaptation_collection.climate_factor
-            discount = (1 + self.adaptation_collection.discount_rate) ** years_array
+            _impact_array = _impact_gdf[f"impact_{_option.id}"].to_numpy()
 
-            damage_per_year = event_impact * frequency_per_year / discount
-            return np.sum(damage_per_year)
+            def calc_net_impact_time_horizon(event_impact: float):
+                _years_array = np.arange(0, self.adaptation_collection.time_horizon)
+                _frequency_per_year = self.adaptation_collection.initial_frequency + _years_array * self.adaptation_collection.climate_factor
+                _discount = (1 + self.adaptation_collection.discount_rate) ** _years_array
 
-        net_impact_array = np.array([calc_net_impact_time_horizon(damage) for damage in impact_array])
-        impact_gdf["net_impact"] = net_impact_array
+                _damage_per_year = event_impact * _frequency_per_year / _discount
+                return np.sum(_damage_per_year)
 
-        return impact_gdf
+            _net_impact_array = np.array([calc_net_impact_time_horizon(damage) for damage in _impact_array])
+            _impact_gdf[f"net_present_impact_{_option.id}"] = _net_impact_array
+
+        return _impact_gdf
 
     def run_benefit(self) -> GeoDataFrame:
         """
