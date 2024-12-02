@@ -48,7 +48,9 @@ class Adaptation(AnalysisDamagesProtocol):
 
     # TODO: add the proper protocol for the adaptation analysis.
     def __init__(
-        self, analysis_input: AnalysisInputWrapper, analysis_config: AnalysisConfigData
+        self,
+        analysis_input: AnalysisInputWrapper,
+        analysis_config: AnalysisConfigWrapper,
     ):
         self.analysis = analysis_input.analysis
         self.graph_file = analysis_input.graph_file

@@ -32,7 +32,9 @@ class AnalysisInputWrapper:
     @classmethod
     def from_input(
         cls,
-        analysis: AnalysisSectionDamages | AnalysisSectionLosses,
+        analysis: AnalysisSectionDamages
+        | AnalysisSectionLosses
+        | AnalysisSectionAdaptation,
         analysis_config: AnalysisConfigWrapper,
         graph_file: Optional[GraphFileProtocol] = None,
         graph_file_hazard: Optional[GraphFileProtocol] = None,

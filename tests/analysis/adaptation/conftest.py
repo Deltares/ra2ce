@@ -1,3 +1,4 @@
+from pathlib import Path
 from shutil import copytree, rmtree
 from typing import Iterator
 
@@ -24,7 +25,9 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
+from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data, test_results
 
 
@@ -58,7 +61,8 @@ class AdaptationOptionCases:
 @pytest.fixture(name="valid_adaptation_config")
 def _get_valid_adaptation_config_fixture(
     request: pytest.FixtureRequest,
-) -> Iterator[AnalysisConfigData]:
+    valid_analysis_ini: Path,
+) -> Iterator[AnalysisConfigWrapper]:
     def get_losses_section(analysis: AnalysisLossesEnum) -> AnalysisSectionLosses:
         return AnalysisSectionLosses(
             analysis=analysis,
@@ -126,7 +130,7 @@ def _get_valid_adaptation_config_fixture(
         time_horizon=20,
     )
 
-    yield AnalysisConfigData(
+    _analysis_data = AnalysisConfigData(
         root_path=_root_path,
         input_path=_input_path,
         static_path=_static_path,
@@ -138,4 +142,10 @@ def _get_valid_adaptation_config_fixture(
             _adaptation_section,
         ],
         aggregate_wl=AggregateWlEnum.MEAN,
+    )
+
+    _network_config = NetworkConfigWrapper()
+
+    yield AnalysisConfigWrapper.from_data_with_network(
+        valid_analysis_ini, _analysis_data, _network_config
     )

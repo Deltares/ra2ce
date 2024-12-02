@@ -25,10 +25,14 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
     AnalysisSectionAdaptationOption,
-    AnalysisSectionDamages,
-    AnalysisSectionLosses,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
+)
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 
 
 @dataclass
@@ -39,71 +43,81 @@ class AdaptationOption:
     construction_interval: float
     maintenance_cost: float
     maintenance_interval: float
-    damages_root: Path
-    damages_config: AnalysisSectionDamages
-    losses_root: Path
-    losses_config: AnalysisSectionLosses
+    damages_input: AnalysisInputWrapper
+    losses_input: AnalysisInputWrapper
 
     def __hash__(self) -> int:
         return hash(self.id)
 
-    @property
-    def input_path(self) -> Path:
-        return self.damages_root.joinpath("input")
-
-    @property
-    def static_path(self) -> Path:
-        return self.damages_root.joinpath("static")
-
-    @property
-    def output_path(self) -> Path:
-        return self.damages_root.joinpath("output")
-
     @classmethod
     def from_config(
         cls,
-        root_path: Path,
+        analysis_config: AnalysisConfigWrapper,
         adaptation_option: AnalysisSectionAdaptationOption,
-        damages_section: AnalysisSectionDamages,
-        losses_section: AnalysisSectionLosses,
     ) -> AdaptationOption:
         # Adjust path to the input files
-        def extend_path(analysis: str, input_path: Path) -> Path:
-            if not input_path:
+        def construct_path(
+            orig_path: Path,
+            analysis: str,
+            folder: str,
+        ) -> Path:
+            if not orig_path:
                 return None
-            # Input is directory: add stuff at the end
-            if not (input_path.suffix):
-                return input_path.joinpath("input", adaptation_option.id, analysis)
-            return input_path.parent.joinpath(
-                "input", adaptation_option.id, analysis, input_path.name
-            )
+            return orig_path.parent.joinpath(adaptation_option.id, analysis, folder)
 
-        if not damages_section or not losses_section:
+        def replace_paths(
+            config_data: AnalysisConfigData, analysis: str
+        ) -> AnalysisConfigData:
+            config_data.input_path = construct_path(
+                config_data.input_path, analysis, "input"
+            )
+            config_data.static_path = construct_path(
+                config_data.static_path, analysis, "static"
+            )
+            config_data.output_path = construct_path(
+                config_data.output_path, analysis, "output"
+            )
+            return config_data
+
+        if (
+            not analysis_config.config_data.damages_list
+            or not analysis_config.config_data.losses_list
+        ):
             raise ValueError(
                 "Damages and losses sections are required to create an adaptation option."
             )
 
-        _damages_root = extend_path("damages", root_path)
-        _damages_section = deepcopy(damages_section)
+        # Create config for the damages analysis
+        _damages_config = deepcopy(analysis_config)
+        _damages_config.config_data = replace_paths(
+            _damages_config.config_data, "damages"
+        )
+        _damages_analysis = _damages_config.config_data.get_analysis(
+            AnalysisDamagesEnum.DAMAGES
+        )
+        _damages_input = AnalysisInputWrapper.from_input(
+            analysis=_damages_analysis,
+            analysis_config=_damages_config,
+            graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
+        )
 
-        _losses_root = extend_path("losses", root_path)
-        _losses_section = deepcopy(losses_section)
-        _losses_section.resilience_curves_file = extend_path(
-            "losses", losses_section.resilience_curves_file
+        # Create config for the losses analysis
+        _losses_config = deepcopy(analysis_config)
+        _losses_config.config_data = replace_paths(_losses_config.config_data, "losses")
+        _losses_analysis = _losses_config.config_data.get_analysis(
+            analysis_config.config_data.adaptation.losses_analysis
         )
-        _losses_section.traffic_intensities_file = extend_path(
-            "losses", losses_section.traffic_intensities_file
-        )
-        _losses_section.values_of_time_file = extend_path(
-            "losses", losses_section.values_of_time_file
+        _losses_input = AnalysisInputWrapper.from_input(
+            analysis=_losses_analysis,
+            analysis_config=_losses_config,
+            graph_file=analysis_config.graph_files.base_graph,
+            graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
         )
 
         return cls(
             **asdict(adaptation_option),
-            damages_root=_damages_root,
-            damages_config=_damages_section,
-            losses_root=_losses_root,
-            losses_config=_losses_section,
+            damages_input=_damages_input,
+            losses_input=_losses_input,
         )
 
     def calculate_cost(self, time_horizon: float, discount_rate: float) -> float:

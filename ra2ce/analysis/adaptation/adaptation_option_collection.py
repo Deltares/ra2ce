@@ -27,6 +27,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisCon
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 
 
 @dataclass
@@ -56,30 +57,25 @@ class AdaptationOptionCollection:
     @classmethod
     def from_config(
         cls,
-        analysis_config_data: AnalysisConfigData,
+        analysis_config: AnalysisConfigWrapper,
     ) -> AdaptationOptionCollection:
-        if not analysis_config_data.adaptation:
+        if (
+            not analysis_config.config_data
+            or not analysis_config.config_data.adaptation
+        ):
             raise ValueError("No adaptation section found in the analysis config data.")
-        _collection = cls(
-            discount_rate=analysis_config_data.adaptation.discount_rate,
-            time_horizon=analysis_config_data.adaptation.time_horizon,
-            climate_factor=analysis_config_data.adaptation.climate_factor,
-            initial_frequency=analysis_config_data.adaptation.initial_frequency,
-        )
 
-        _damages_analysis = analysis_config_data.get_analysis(
-            AnalysisDamagesEnum.DAMAGES
+        _collection = cls(
+            discount_rate=analysis_config.config_data.adaptation.discount_rate,
+            time_horizon=analysis_config.config_data.adaptation.time_horizon,
+            climate_factor=analysis_config.config_data.adaptation.climate_factor,
+            initial_frequency=analysis_config.config_data.adaptation.initial_frequency,
         )
-        _losses_analysis = analysis_config_data.get_analysis(
-            analysis_config_data.adaptation.losses_analysis
-        )
-        for _config_option in analysis_config_data.adaptation.adaptation_options:
+        for _config_option in analysis_config.config_data.adaptation.adaptation_options:
             _collection.all_options.append(
                 AdaptationOption.from_config(
-                    analysis_config_data.root_path,
+                    analysis_config,
                     _config_option,
-                    _damages_analysis,
-                    _losses_analysis,
                 )
             )
 

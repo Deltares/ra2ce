@@ -19,7 +19,7 @@ class TestAdaptation:
         self,
         request: pytest.FixtureRequest,
         valid_analysis_ini: Path,
-        valid_adaptation_config: AnalysisConfigData,
+        valid_adaptation_config: AnalysisConfigWrapper,
     ) -> Iterator[AnalysisInputWrapper]:
         _network_config_data = NetworkConfigData(
             static_path=test_results.joinpath(request.node.name, "static")
@@ -28,11 +28,11 @@ class TestAdaptation:
             valid_analysis_ini, _network_config_data
         )
         _config = AnalysisConfigWrapper.from_data_with_network(
-            valid_analysis_ini, valid_adaptation_config, _network_config
+            valid_analysis_ini, valid_adaptation_config.config_data, _network_config
         )
 
         _analysis_input = AnalysisInputWrapper.from_input(
-            analysis=valid_adaptation_config.adaptation,
+            analysis=valid_adaptation_config.config_data.adaptation,
             analysis_config=_config,
             graph_file=_config.graph_files.base_network,
             graph_file_hazard=_config.graph_files.base_network_hazard,
@@ -43,7 +43,7 @@ class TestAdaptation:
     def test_initialize(
         self,
         valid_adaptation_input: AnalysisInputWrapper,
-        valid_adaptation_config: AnalysisConfigData,
+        valid_adaptation_config: AnalysisConfigWrapper,
     ):
         # 1./2. Define test data./Run test.
         _adaptation = Adaptation(valid_adaptation_input, valid_adaptation_config)
@@ -54,7 +54,7 @@ class TestAdaptation:
     def test_run_cost(
         self,
         valid_adaptation_input: AnalysisInputWrapper,
-        valid_adaptation_config: AnalysisConfigData,
+        valid_adaptation_config: AnalysisConfigWrapper,
     ):
         # 1. Define test data.
         _adaptation = Adaptation(valid_adaptation_input, valid_adaptation_config)
