@@ -86,7 +86,7 @@ class Adaptation(AnalysisDamagesProtocol):
 
     def run_net_present_impact(self) -> GeoDataFrame:
         """
-        Calculate the impact for all adaptation options
+        Calculate the net present impact for all adaptation options for the entire time horizon.
         """
         _impact_gdf = self.run_impact()
         for _option in self.adaptation_collection.adaptation_options:
