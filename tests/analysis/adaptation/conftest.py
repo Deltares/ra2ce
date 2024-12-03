@@ -121,6 +121,10 @@ def _get_valid_adaptation_config_fixture(
     for _option in AdaptationOptionCases.config_cases:
         _ao_path = _input_path.joinpath(_option.id)
         copytree(test_data.joinpath("adaptation", "input"), _ao_path)
+        copytree(
+            test_data.joinpath("adaptation", "static"),
+            _ao_path.joinpath("losses", "static"),
+        )
     copytree(test_data.joinpath("adaptation", "static"), _static_path)
 
     # Create the config
