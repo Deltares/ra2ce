@@ -29,6 +29,7 @@ from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from ra2ce.network.network_config_data.network_config_data import (
+    HazardSection,
     NetworkConfigData,
     NetworkSection,
 )
@@ -130,12 +131,14 @@ def _get_valid_adaptation_config_fixture(
     # Create the config
 
     # - network
+    _hazard_section = HazardSection(aggregate_wl=AggregateWlEnum.MEAN)
     _network_section = NetworkSection(
         file_id="ID",
         link_type_column="highway",
     )
     _network_config_data = NetworkConfigData(
         static_path=test_results.joinpath(request.node.name, "static"),
+        hazard=_hazard_section,
         network=_network_section,
     )
     _network_config = NetworkConfigWrapper.from_data(None, _network_config_data)
