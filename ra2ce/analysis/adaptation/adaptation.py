@@ -78,6 +78,8 @@ class Adaptation(AnalysisDamagesProtocol):
         ) in self.adaptation_collection.calculate_options_cost().items():
             _cost_gdf[f"{_option.id}_cost"] = _cost
 
+        # TODO: calculate link cost instead of unit cost
+
         return _cost_gdf
 
     def run_benefit(self) -> GeoDataFrame:
@@ -98,4 +100,9 @@ class Adaptation(AnalysisDamagesProtocol):
         """
         _cost_gdf = self.run_cost()
         _benefit_gdf = self.run_benefit()
+
+        # TODO: apply economic discounting
+        # TODO: calculate B/C ratio
+        # TODO: apply overlay
+
         return _cost_gdf
