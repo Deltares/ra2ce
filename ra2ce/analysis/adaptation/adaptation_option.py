@@ -117,7 +117,7 @@ class AdaptationOption:
                 "Damages and losses sections are required to create an adaptation option."
             )
 
-        # Create config for the damages analysis
+        # Create input for the damages analysis
         _damages_config = deepcopy(analysis_config)
         _damages_config.config_data = replace_paths(
             _damages_config.config_data, "damages"
@@ -131,7 +131,7 @@ class AdaptationOption:
             graph_file_hazard=analysis_config.graph_files.base_network_hazard,
         )
 
-        # Create config for the losses analysis
+        # Create input for the losses analysis
         _losses_config = deepcopy(analysis_config)
         _losses_config.config_data = replace_paths(_losses_config.config_data, "losses")
         _losses_analysis = _losses_config.config_data.get_analysis(

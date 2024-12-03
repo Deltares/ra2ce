@@ -43,7 +43,6 @@ class Adaptation(AnalysisDamagesProtocol):
 
     analysis: AnalysisSectionAdaptation
     graph_file: NetworkFile
-    graph_file_hazard: NetworkFile
     input_path: Path
     output_path: Path
     adaptation_collection: AdaptationOptionCollection
@@ -56,9 +55,6 @@ class Adaptation(AnalysisDamagesProtocol):
     ):
         self.analysis = analysis_input.analysis
         self.graph_file = analysis_input.graph_file
-        self.graph_file_hazard = analysis_input.graph_file_hazard
-        self.input_path = analysis_input.input_path
-        self.output_path = analysis_input.output_path
         self.adaptation_collection = AdaptationOptionCollection.from_config(
             analysis_config
         )

@@ -154,7 +154,7 @@ class AnalysisFactory:
                 graph_file=analysis_config.graph_files.origins_destinations_graph,
                 graph_file_hazard=analysis_config.graph_files.origins_destinations_graph_hazard,
             )
-            return OptimalRouteOriginClosestDestination(analysis_input=_analysis_input)
+            return OptimalRouteOriginClosestDestination(_analysis_input)
 
         if (
             analysis.analysis
@@ -220,7 +220,6 @@ class AnalysisFactory:
             analysis=analysis,
             analysis_config=analysis_config,
             graph_file=analysis_config.graph_files.base_network,
-            graph_file_hazard=analysis_config.graph_files.base_network_hazard,
         )
 
         if analysis.analysis == AnalysisEnum.ADAPTATION:
