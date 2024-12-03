@@ -92,7 +92,7 @@ class AdaptationOptionCollection:
 
     def calculate_options_cost(self) -> dict[AdaptationOption, float]:
         """
-        Calculate the cost for all adaptation options.
+        Calculate the unit cost for all adaptation options.
 
         Returns:
             dict[AdaptationOption, float]: The calculated cost for all adaptation options.

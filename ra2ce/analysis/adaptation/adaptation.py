@@ -68,15 +68,15 @@ class Adaptation(AnalysisDamagesProtocol):
 
     def run_cost(self) -> GeoDataFrame:
         """
-        Calculate the cost for all adaptation options.
+        Calculate the unit cost for all adaptation options.
         """
-        # Open the network without hazard data
-        _cost_gdf = deepcopy(self.graph_file_hazard.get_graph())
+        _cost_gdf = deepcopy(self.graph_file.get_graph())
+
         for (
             _option,
             _cost,
         ) in self.adaptation_collection.calculate_options_cost().items():
-            _cost_gdf[f"costs_{_option.id}"] = _cost
+            _cost_gdf[f"{_option.id}_cost"] = _cost
 
         return _cost_gdf
 

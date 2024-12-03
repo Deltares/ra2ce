@@ -30,7 +30,7 @@ class TestAdaptation:
         assert isinstance(_cost_gdf, GeoDataFrame)
         assert all(
             [
-                f"costs_{_option.id}" in _cost_gdf.columns
+                f"{_option.id}_cost" in _cost_gdf.columns
                 for _option in _adaptation.adaptation_collection.adaptation_options
             ]
         )
