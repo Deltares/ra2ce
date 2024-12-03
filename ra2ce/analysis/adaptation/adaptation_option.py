@@ -212,12 +212,13 @@ class AdaptationOption:
         Returns:
             float: The impact of the adaptation option.
         """
+        # Damages analysis
         _damages = Damages(self.damages_input)
         _damages_gdf = _damages.execute()
-        _dam_cols = _damages_gdf.filter(regex="dam_").columns
-        for _col in _dam_cols:
-            benefit_graph[_col] = _damages_gdf[_col]
+        _dam_col = _damages_gdf.filter(regex="dam_").columns[0]
+        benefit_graph[f"{self.id}_{_dam_col}"] = _damages_gdf[_dam_col]
 
+        # Losses analysis
         if self.losses_analysis is AnalysisLossesEnum.SINGLE_LINK_LOSSES:
             _losses = SingleLinkLosses(self.losses_input, self.analysis_config)
         elif self.losses_analysis is AnalysisLossesEnum.MULTI_LINK_LOSSES:
@@ -227,8 +228,12 @@ class AdaptationOption:
                 f"Losses analysis {self.losses_analysis} not implemented"
             )
         _losses_gdf = _losses.execute()
-        _los_cols = _losses_gdf.columns  # TODO: Check the columns
+        _los_col = _losses_gdf.filter(regex="vlh_.*_total").columns[0]
+        benefit_graph[f"{self.id}_{_los_col}"] = _losses_gdf[_los_col]
 
-        # TODO: Calculate the impact of the adaptation option
+        # Calculate the impact (summing the damages and losses values)
+        benefit_graph[f"{self.id}_impact"] = (
+            benefit_graph[[f"{self.id}_{_dam_col}", f"{self.id}_{_los_col}"]]
+        ).sum(axis=1)
 
         return benefit_graph

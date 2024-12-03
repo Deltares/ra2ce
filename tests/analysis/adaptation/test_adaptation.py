@@ -47,3 +47,9 @@ class TestAdaptation:
 
         # 3. Verify expectations.
         assert isinstance(_result, GeoDataFrame)
+        assert all(
+            [
+                f"{_option.id}_impact" in _result.columns
+                for _option in _adaptation.adaptation_collection.all_options
+            ]
+        )

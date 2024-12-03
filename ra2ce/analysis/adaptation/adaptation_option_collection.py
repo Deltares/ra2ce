@@ -106,6 +106,15 @@ class AdaptationOptionCollection:
         }
 
     def calculation_options_impact(self, benefit_graph: NetworkFile) -> NetworkFile:
+        """
+        Calculate the impact of all adaptation options (including the reference option).
+
+        Args:
+            benefit_graph (NetworkFile): The graph to which the impact of the adaptation options will be added.
+
+        Returns:
+            NetworkFile: The calculated impact of all adaptation options.
+        """
         for _option in self.all_options:
             benefit_graph = _option.calculate_impact(benefit_graph)
 
