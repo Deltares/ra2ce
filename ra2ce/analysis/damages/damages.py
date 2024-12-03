@@ -12,6 +12,7 @@ from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import
     RiskCalculationModeEnum,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.damages.damage.manual_damage_functions import ManualDamageFunctions
 from ra2ce.analysis.damages.damage_calculation import (
@@ -38,7 +39,7 @@ class Damages(AnalysisDamagesProtocol):
         self.input_path = analysis_input.input_path
         self.output_path = analysis_input.output_path
 
-    def execute(self) -> GeoDataFrame:
+    def execute(self) -> AnalysisResultWrapper:
         def _rename_road_gdf_to_conventions(road_gdf_columns: list[str]) -> list[str]:
             """
             Rename the columns in the road_gdf to the conventions of the ra2ce documentation
@@ -91,7 +92,7 @@ class Damages(AnalysisDamagesProtocol):
                 manual_damage_functions=manual_damage_functions,
             )
 
-            return event_gdf.gdf
+            return AnalysisResultWrapper(analysis_result=event_gdf.gdf, analysis=self)
 
         elif self.analysis.event_type == EventTypeEnum.RETURN_PERIOD:
             return_period_gdf = DamageNetworkReturnPeriods(
@@ -118,7 +119,9 @@ class Damages(AnalysisDamagesProtocol):
                              Add key [risk_calculation_mode] to analyses.ini."""
                 )
 
-            return return_period_gdf.gdf
+            return AnalysisResultWrapper(
+                analysis_result=return_period_gdf.gdf, analysis=self
+            )
 
         raise ValueError(
             "The hazard calculation does not know what to do if the analysis specifies {}".format(

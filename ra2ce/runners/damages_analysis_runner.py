@@ -46,6 +46,23 @@ class DamagesAnalysisRunner(AnalysisRunner):
         return "Damages Analysis Runner"
 
     @staticmethod
+    def can_run(ra2ce_input: ConfigWrapper) -> bool:
+        if (
+            not ra2ce_input.analysis_config
+            or not ra2ce_input.analysis_config.config_data.damages_list
+        ):
+            return False
+        if not ra2ce_input.network_config:
+            return False
+        _network_config = ra2ce_input.network_config.config_data
+        if not _network_config.hazard or not _network_config.hazard.hazard_map:
+            logging.error(
+                "Please define a hazard map in your network.ini file. Unable to calculate damages."
+            )
+            return False
+        return True
+
+    @staticmethod
     def _update_link_based_values(
         damages_link_based_graph: nx.MultiDiGraph | nx.MultiGraph,
         result_segment_based: pd.DataFrame,
@@ -97,30 +114,12 @@ class DamagesAnalysisRunner(AnalysisRunner):
         return damages_link_based_graph
 
     @staticmethod
-    def can_run(ra2ce_input: ConfigWrapper) -> bool:
-        if (
-            not ra2ce_input.analysis_config
-            or not ra2ce_input.analysis_config.config_data.damages_list
-        ):
-            return False
-        if not ra2ce_input.network_config:
-            return False
-        _network_config = ra2ce_input.network_config.config_data
-        if not _network_config.hazard or not _network_config.hazard.hazard_map:
-            logging.error(
-                "Please define a hazard map in your network.ini file. Unable to calculate damages."
-            )
-            return False
-        return True
-
-    @staticmethod
     def _get_result_link_based(
         analysis: AnalysisDamagesProtocol,
-        analysis_config: AnalysisConfigWrapper,
+        base_graph_hazard: nx.MultiGraph,
         result_segment_based: gpd.GeoDataFrame,
     ) -> gpd.GeoDataFrame:
         # Step 00: define parameters
-        base_graph_hazard_graph = analysis_config.graph_files.base_graph_hazard.graph
         damage_curve = analysis.analysis.damage_curve
         segment_id_column = "rfid_c"
 
@@ -133,7 +132,7 @@ class DamagesAnalysisRunner(AnalysisRunner):
         events = set([x.split("_")[1] for x in event_cols])  # set of unique events
 
         # Step 0: create a deep copy of the base_graph_hazard to compose further as the final outcome of this process
-        damages_link_based_graph = base_graph_hazard_graph.copy()
+        damages_link_based_graph = base_graph_hazard.copy()
 
         # Step 1: Create a new attribute damage_segments_list for each edge
         for event in events:
@@ -212,7 +211,7 @@ class DamagesAnalysisRunner(AnalysisRunner):
             _result_segmented = analysis.execute()
             _result_link_based = self._get_result_link_based(
                 analysis=analysis,
-                analysis_config=analysis_config,
+                base_graph_hazard=analysis_config.graph_files.base_graph_hazard.graph,
                 result_segment_based=_result_segmented,
             )
             analysis_name = analysis.analysis.name
