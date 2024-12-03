@@ -55,6 +55,7 @@ class Adaptation(AnalysisDamagesProtocol):
     ):
         self.analysis = analysis_input.analysis
         self.graph_file = analysis_input.graph_file
+        self.graph_file_hazard = analysis_input.graph_file_hazard
         self.adaptation_collection = AdaptationOptionCollection.from_config(
             analysis_config
         )
@@ -70,7 +71,7 @@ class Adaptation(AnalysisDamagesProtocol):
         Calculate the cost for all adaptation options.
         """
         # Open the network without hazard data
-        _cost_gdf = deepcopy(self.graph_file.get_graph())
+        _cost_gdf = deepcopy(self.graph_file_hazard.get_graph())
         for (
             _option,
             _cost,
