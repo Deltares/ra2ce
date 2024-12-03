@@ -91,8 +91,9 @@ def _get_valid_adaptation_config_fixture(
             analysis=analysis,
             event_type=EventTypeEnum.EVENT,
             weighing=WeighingEnum.TIME,
-            threshold=0.5,
+            threshold=0,
             production_loss_per_capita_per_hour=42,
+            hours_per_traffic_period=8,
             traffic_period=TrafficPeriodEnum.DAY,
             trip_purposes=[
                 TripPurposeEnum.BUSINESS,
