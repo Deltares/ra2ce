@@ -32,18 +32,21 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
-from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.network.graph_files.network_file import NetworkFile
 
 
 class Adaptation(AnalysisDamagesProtocol):
+    """
+    Execute the adaptation analysis.
+    For each adaptation option a damages and losses analysis is executed.
+    """
+
     analysis: AnalysisSectionAdaptation
     graph_file: NetworkFile
     graph_file_hazard: NetworkFile
     input_path: Path
     output_path: Path
     adaptation_collection: AdaptationOptionCollection
-    losses_analysis: type[AnalysisLossesProtocol]
 
     # TODO: add the proper protocol for the adaptation analysis.
     def __init__(
@@ -90,7 +93,7 @@ class Adaptation(AnalysisDamagesProtocol):
             _benefit_gdf
         )
 
-        return None
+        return _benefit_gdf
 
     def calculate_bc_ratio(self) -> GeoDataFrame:
         """

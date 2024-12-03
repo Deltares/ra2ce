@@ -37,6 +37,10 @@ from tests import test_data, test_results
 
 
 class AdaptationOptionCases:
+    """
+    Test cases for the adaptation options.
+    """
+
     config_cases: list[AnalysisSectionAdaptationOption] = [
         AnalysisSectionAdaptationOption(
             id="AO0",
@@ -68,6 +72,18 @@ def _get_valid_adaptation_config_fixture(
     request: pytest.FixtureRequest,
     valid_analysis_ini: Path,
 ) -> Iterator[tuple[AnalysisInputWrapper, AnalysisConfigWrapper]]:
+    """
+    Create valid input and config for the adaptation analysis.
+
+    Args:
+        request (pytest.FixtureRequest): Pytest fixture request.
+        valid_analysis_ini (Path): Path to a valid analysis ini file.
+
+    Yields:
+        Iterator[tuple[AnalysisInputWrapper, AnalysisConfigWrapper]]:
+            Tuple with the input and config for the adaptation analysis.
+    """
+
     def get_losses_section(analysis: AnalysisLossesEnum) -> AnalysisSectionLosses:
         return AnalysisSectionLosses(
             analysis=analysis,
@@ -115,9 +131,7 @@ def _get_valid_adaptation_config_fixture(
         static_path=test_results.joinpath(request.node.name, "static"),
         network=_network_section,
     )
-    _network_config = NetworkConfigWrapper.from_data(
-        valid_analysis_ini, _network_config_data
-    )
+    _network_config = NetworkConfigWrapper.from_data(None, _network_config_data)
 
     # - damages
     _damages_section = AnalysisSectionDamages(
