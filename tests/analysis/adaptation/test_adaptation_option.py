@@ -11,6 +11,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from tests.analysis.adaptation.conftest import AdaptationOptionCases
 
 
@@ -21,25 +22,28 @@ class TestAdaptationOption:
     )
     def test_from_config(
         self,
-        valid_adaptation_config: AnalysisConfigWrapper,
+        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
         losses_analysis: AnalysisLossesEnum,
     ):
         # 1. Define test data.
-        _orig_path = valid_adaptation_config.config_data.input_path
+        _orig_path = valid_adaptation_config[1].config_data.input_path
         _expected_path = _orig_path.parent.joinpath(
-            valid_adaptation_config.config_data.adaptation.adaptation_options[0].id,
+            "input",
+            valid_adaptation_config[1].config_data.adaptation.adaptation_options[0].id,
             "losses",
             "input",
         )
 
-        valid_adaptation_config.config_data.adaptation.losses_analysis = losses_analysis
+        valid_adaptation_config[
+            1
+        ].config_data.adaptation.losses_analysis = losses_analysis
 
         # 2. Run test.
         _option = AdaptationOption.from_config(
-            analysis_config=valid_adaptation_config,
-            adaptation_option=valid_adaptation_config.config_data.adaptation.adaptation_options[
-                0
-            ],
+            analysis_config=valid_adaptation_config[1],
+            adaptation_option=valid_adaptation_config[
+                1
+            ].config_data.adaptation.adaptation_options[0],
         )
 
         # 3. Verify expectations.
@@ -71,16 +75,16 @@ class TestAdaptationOption:
     )
     def test_calculate_option_cost(
         self,
-        valid_adaptation_config: AnalysisConfigWrapper,
+        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
         adaptation_option: tuple[AnalysisSectionAdaptation, float],
     ):
         # 1. Define test data.
         _option = AdaptationOption.from_config(
-            analysis_config=valid_adaptation_config,
+            analysis_config=valid_adaptation_config[1],
             adaptation_option=adaptation_option[0],
         )
-        _time_horizon = valid_adaptation_config.config_data.adaptation.time_horizon
-        _discount_rate = valid_adaptation_config.config_data.adaptation.discount_rate
+        _time_horizon = valid_adaptation_config[1].config_data.adaptation.time_horizon
+        _discount_rate = valid_adaptation_config[1].config_data.adaptation.discount_rate
 
         # 2. Run test.
         _cost = _option.calculate_cost(_time_horizon, _discount_rate)
