@@ -25,8 +25,9 @@ class AnalysisBase(ABC, AnalysisProtocol):
         Returns:
             AnalysisResultWrapper: Wrapping result with configuration details.
         """
+        _results = [_ar for _ar in analysis_result]
         return AnalysisResultWrapper(
-            analyses_results=list(analysis_result),
+            analysis_result=_results,
             analysis_config=self.analysis,
             output_path=self.output_path,
         )

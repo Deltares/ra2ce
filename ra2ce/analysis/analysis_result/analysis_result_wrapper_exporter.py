@@ -42,7 +42,7 @@ class AnalysisResultWrapperExporter:
         if not result_wrapper.is_valid_result():
             return
 
-        for _analysis_result in result_wrapper.analyses_results:
+        for _analysis_result in result_wrapper.analysis_result:
             if result_wrapper.analysis_config.save_gpkg:
                 self._export_gdf(
                     _analysis_result,

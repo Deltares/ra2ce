@@ -103,4 +103,4 @@ class SingleLinkRedundancy(AnalysisBase, AnalysisLossesProtocol):
         # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
         # todo: input here this option
 
-        return self.generate_result_wrapper(analysis_result=_gdf_graph)
+        return self.generate_result_wrapper(_gdf_graph)

@@ -69,11 +69,11 @@ class DamagesAnalysisRunner(AnalysisRunner):
 
             analysis_name = analysis.analysis.name
             for _result, suffix in zip(
-                _result_tuples_wrapped.analyses_results,
+                _result_tuples_wrapped.analysis_result,
                 ["segmented", "link_based"],
             ):
                 _result_wrapper = AnalysisResultWrapper(
-                    analyses_results=[_result],
+                    analysis_result=[_result],
                     analysis_config=analysis.analysis,
                     output_path=analysis.output_path,
                 )

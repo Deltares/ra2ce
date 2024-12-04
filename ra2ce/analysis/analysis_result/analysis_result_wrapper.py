@@ -37,7 +37,7 @@ class AnalysisResultWrapper:
     Dataclass to wrap one (or many) analysis results with their related analysis configuration.
     """
 
-    analyses_results: list[GeoDataFrame]
+    analysis_result: list[GeoDataFrame]
     analysis_config: AnalysisSectionLosses | AnalysisSectionDamages | AnalysisSectionAdaptation
     output_path: Path
 
@@ -78,8 +78,8 @@ class AnalysisResultWrapper:
         Returns:
             GeoDataFrame | None: First declared analysis result.
         """
-        if any(self.analyses_results):
-            return self.analyses_results[0]
+        if any(self.analysis_result):
+            return self.analysis_result[0]
         return None
 
     def is_valid_result(self) -> bool:
@@ -93,6 +93,9 @@ class AnalysisResultWrapper:
         def valid_analysis(analysis_gdf: GeoDataFrame) -> bool:
             return isinstance(analysis_gdf, GeoDataFrame) and not analysis_gdf.empty
 
-        return any(self.analyses_results) and all(
-            map(valid_analysis, self.analyses_results)
+        # Because of geopandas comparison operator we cannot simply do `if any(self.analysis_result)`
+        return (
+            isinstance(self.analysis_result, list)
+            and len(self.analysis_result) > 0
+            and all(map(valid_analysis, self.analysis_result))
         )
