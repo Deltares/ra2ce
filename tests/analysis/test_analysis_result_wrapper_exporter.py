@@ -69,27 +69,27 @@ class TestAnalysisResultWrapperExporter:
         # 1. Define test data.
         _exporter = AnalysisResultWrapperExporter()
 
-        assert wrapper.analysis.output_path.exists() is False
+        assert wrapper.output_path.exists() is False
         assert wrapper.is_valid_result()
 
         # 2. Run test.
         _exporter.export_result(wrapper)
 
         # 3. Verify expectations
-        assert wrapper.analysis.output_path.exists()
-        _result_files = list(wrapper.analysis.output_path.rglob(f"*.{extension}"))
+        assert wrapper.output_path.exists()
+        _result_files = list(wrapper.output_path.rglob(f"*.{extension}"))
         assert any(_result_files)
 
     def test_given_valid_result_export_gdf(
         self, valid_result_wrapper: AnalysisResultWrapper
     ):
         # 1. Define test data.
-        valid_result_wrapper.analysis.analysis.save_gpkg = True
+        valid_result_wrapper.analysis_config.save_gpkg = True
         self._export_valid_result_to_expected_format(valid_result_wrapper, "gpkg")
 
     def test_given_valid_result_export_csv(
         self, valid_result_wrapper: AnalysisResultWrapper
     ):
         # 1. Define test data.
-        valid_result_wrapper.analysis.analysis.save_csv = True
+        valid_result_wrapper.analysis_config.save_csv = True
         self._export_valid_result_to_expected_format(valid_result_wrapper, "csv")
