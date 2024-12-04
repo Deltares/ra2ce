@@ -42,16 +42,17 @@ class AnalysisResultWrapperExporter:
         if not result_wrapper.is_valid_result():
             return
 
-        if result_wrapper.analysis_config.save_gpkg:
-            self._export_gdf(
-                result_wrapper.analysis_result,
-                result_wrapper.base_export_path.with_suffix(".gpkg"),
-            )
-        if result_wrapper.analysis_config.save_csv:
-            self._export_csv(
-                result_wrapper.analysis_result,
-                result_wrapper.base_export_path.with_suffix(".csv"),
-            )
+        for _analysis_result in result_wrapper.analyses_results:
+            if result_wrapper.analysis_config.save_gpkg:
+                self._export_gdf(
+                    _analysis_result,
+                    result_wrapper.base_export_path.with_suffix(".gpkg"),
+                )
+            if result_wrapper.analysis_config.save_csv:
+                self._export_csv(
+                    _analysis_result,
+                    result_wrapper.base_export_path.with_suffix(".csv"),
+                )
 
     def _export_gdf(self, gdf: GeoDataFrame, export_path: Path):
         """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp

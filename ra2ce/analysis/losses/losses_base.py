@@ -519,7 +519,7 @@ class LossesBase(AnalysisLossesProtocol, AnalysisBase, ABC):
         )
 
         self._get_disrupted_criticality_analysis_results(
-            criticality_analysis=_criticality_analysis_result_wrapper.analysis_result
+            criticality_analysis=_criticality_analysis_result_wrapper.get_single_analysis()
         )
 
         self.result = self.calculate_vehicle_loss_hours()

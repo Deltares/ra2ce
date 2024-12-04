@@ -13,20 +13,20 @@ class AnalysisBase(ABC, AnalysisProtocol):
     """
 
     def generate_result_wrapper(
-        self, analysis_result: GeoDataFrame
+        self, *analysis_result: GeoDataFrame
     ) -> AnalysisResultWrapper:
         """
         Creates a result wrapper based on a given `GeoDataFrame` result for
         the calling analysis (`AnalysisProtocol`).
 
         Args:
-            analysis_result (GeoDataFrame): Resulting dataframe of an analysis.
+            analysis_result (list[GeoDataFrame]): Resulting dataframes of an analysis.
 
         Returns:
             AnalysisResultWrapper: Wrapping result with configuration details.
         """
         return AnalysisResultWrapper(
-            analysis_result=analysis_result,
+            analyses_results=list(analysis_result),
             analysis_config=self.analysis,
             output_path=self.output_path,
         )

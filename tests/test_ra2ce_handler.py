@@ -159,9 +159,8 @@ class TestRa2ceHandler:
         _found_result = results[0]
         assert isinstance(_found_result, AnalysisResultWrapper)
         assert isinstance(_found_result.analysis_config, AnalysisSectionBase)
-        assert isinstance(_found_result.analysis_result, GeoDataFrame)
         assert isinstance(_found_result.output_path, Path)
-        assert _found_result.analysis_result.empty is False
+        assert _found_result.is_valid_result()
 
     @pytest.mark.slow_test
     def test_run_with_ini_files_given_valid_files(

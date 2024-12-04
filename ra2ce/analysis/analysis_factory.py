@@ -87,7 +87,9 @@ class AnalysisFactory:
         )
 
         if analysis.analysis == AnalysisDamagesEnum.DAMAGES:
-            return Damages(_analysis_input)
+            return Damages(
+                _analysis_input, analysis_config.graph_files.base_graph_hazard.graph
+            )
 
         if analysis.analysis == AnalysisEnum.ADAPTATION:
             return Adaptation(_analysis_input, analysis_config.config_data)

@@ -37,12 +37,9 @@ class AnalysisResultWrapper:
     Dataclass to wrap one (or many) analysis results with their related analysis configuration.
     """
 
-    analysis_result: GeoDataFrame
-
-    output_path: Path
-
-    # AnalysisProtocol options
+    analyses_results: list[GeoDataFrame]
     analysis_config: AnalysisSectionLosses | AnalysisSectionDamages | AnalysisSectionAdaptation
+    output_path: Path
 
     _custom_name: str = ""
 
@@ -74,14 +71,28 @@ class AnalysisResultWrapper:
             self.analysis_config.analysis.config_value, self.analysis_name
         )
 
-    def is_valid_result(self) -> bool:
+    def get_single_analysis(self) -> GeoDataFrame | None:
         """
-        Validates whether the `analysis_result` in this wrapper is valid.
+        Returns the first declared analysis result if exists, otherwise None.
 
         Returns:
-            bool: validity of `analysis_result`.
+            GeoDataFrame | None: First declared analysis result.
         """
-        return (
-            isinstance(self.analysis_result, GeoDataFrame)
-            and not self.analysis_result.empty
+        if any(self.analyses_results):
+            return self.analyses_results[0]
+        return None
+
+    def is_valid_result(self) -> bool:
+        """
+        Validates whether the `analyses_results` in this wrapper are all valid.
+
+        Returns:
+            bool: validation of `analyses_results`.
+        """
+
+        def valid_analysis(analysis_gdf: GeoDataFrame) -> bool:
+            return isinstance(analysis_gdf, GeoDataFrame) and not analysis_gdf.empty
+
+        return any(self.analyses_results) and all(
+            map(valid_analysis, self.analyses_results)
         )
