@@ -55,7 +55,7 @@ class AnalysisCollection:
                 AnalysisFactory.get_losses_analysis(analysis, analysis_config)
                 for analysis in analysis_config.config_data.losses_list
             ],
-            adaptation_analysis=AnalysisFactory.get_damages_analysis(
+            adaptation_analysis=AnalysisFactory.get_adaptation_analysis(
                 analysis_config.config_data.adaptation, analysis_config
             ),
         )

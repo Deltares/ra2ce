@@ -18,6 +18,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from copy import deepcopy
 from pathlib import Path
 
 from geopandas import GeoDataFrame
@@ -26,60 +27,82 @@ from ra2ce.analysis.adaptation.adaptation_option_collection import (
     AdaptationOptionCollection,
 )
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
     AnalysisSectionAdaptation,
 )
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.network.graph_files.network_file import NetworkFile
 
 
 class Adaptation(AnalysisDamagesProtocol):
+    """
+    Execute the adaptation analysis.
+    For each adaptation option a damages and losses analysis is executed.
+    """
+
     analysis: AnalysisSectionAdaptation
     graph_file: NetworkFile
-    graph_file_hazard: NetworkFile
     input_path: Path
     output_path: Path
-    _adaptation_options: AdaptationOptionCollection
+    adaptation_collection: AdaptationOptionCollection
 
     # TODO: add the proper protocol for the adaptation analysis.
     def __init__(
-        self, analysis_input: AnalysisInputWrapper, analysis_config: AnalysisConfigData
+        self,
+        analysis_input: AnalysisInputWrapper,
+        analysis_config: AnalysisConfigWrapper,
     ):
         self.analysis = analysis_input.analysis
         self.graph_file = analysis_input.graph_file
         self.graph_file_hazard = analysis_input.graph_file_hazard
-        self.input_path = analysis_input.input_path
-        self.output_path = analysis_input.output_path
-        self._adaptation_options = AdaptationOptionCollection.from_config(
+        self.adaptation_collection = AdaptationOptionCollection.from_config(
             analysis_config
         )
 
-    def execute(self) -> GeoDataFrame | None:
+    def execute(self) -> GeoDataFrame:
         """
         Run the adaptation analysis.
         """
         return self.calculate_bc_ratio()
 
-    def run_cost(self) -> GeoDataFrame | None:
+    def run_cost(self) -> GeoDataFrame:
         """
-        Calculate the cost for all adaptation options.
+        Calculate the unit cost for all adaptation options.
         """
-        # Open the network without hazard data
-        road_gdf = self.graph_file.get_graph()
+        _cost_gdf = deepcopy(self.graph_file.get_graph())
 
-        return 0.0
+        for (
+            _option,
+            _cost,
+        ) in self.adaptation_collection.calculate_options_cost().items():
+            _cost_gdf[f"{_option.id}_cost"] = _cost
 
-    def run_benefit(self) -> GeoDataFrame | None:
+        # TODO: calculate link cost instead of unit cost
+
+        return _cost_gdf
+
+    def run_benefit(self) -> GeoDataFrame:
         """
         Calculate the benefit for all adaptation options
         """
-        return 0.0
+        _benefit_gdf = deepcopy(self.graph_file.get_graph())
 
-    def calculate_bc_ratio(self) -> GeoDataFrame | None:
+        _benefit_gdf = self.adaptation_collection.calculation_options_impact(
+            _benefit_gdf
+        )
+
+        return _benefit_gdf
+
+    def calculate_bc_ratio(self) -> GeoDataFrame:
         """
         Calculate the benefit-cost ratio for all adaptation options
         """
-        self.run_cost()
-        self.run_benefit()
-        return 0.0
+        _cost_gdf = self.run_cost()
+        _benefit_gdf = self.run_benefit()
+
+        # TODO: apply economic discounting
+        # TODO: calculate B/C ratio
+        # TODO: apply overlay
+
+        return _cost_gdf

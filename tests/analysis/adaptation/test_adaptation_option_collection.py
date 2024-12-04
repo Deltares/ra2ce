@@ -4,7 +4,8 @@ from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
     AdaptationOptionCollection,
 )
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 
 
 class TestAdaptationOptionCollection:
@@ -15,9 +16,12 @@ class TestAdaptationOptionCollection:
         # 3. Verify expectations.
         assert isinstance(_collection, AdaptationOptionCollection)
 
-    def test_from_config(self, valid_adaptation_config: AnalysisConfigData):
+    def test_from_config(
+        self,
+        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+    ):
         # 1./2. Define test data./Run test.
-        _collection = AdaptationOptionCollection.from_config(valid_adaptation_config)
+        _collection = AdaptationOptionCollection.from_config(valid_adaptation_config[1])
 
         # 3. Verify expectations.
         assert isinstance(_collection, AdaptationOptionCollection)
@@ -34,7 +38,7 @@ class TestAdaptationOptionCollection:
 
     def test_from_config_no_adaptation_raises(self):
         # 1. Define test data.
-        _config = AnalysisConfigData()
+        _config = AnalysisConfigWrapper()
 
         # 2. Run test.
         with pytest.raises(ValueError) as _exc:

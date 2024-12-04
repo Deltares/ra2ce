@@ -237,7 +237,7 @@ class AnalysisConfigData(ConfigDataProtocol):
 
     def get_analysis(
         self, analysis: AnalysisEnum | AnalysisDamagesEnum | AnalysisLossesEnum
-    ) -> AnalysisSectionBase | None:
+    ) -> AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation | None:
         """
         Get a certain analysis from config.
 

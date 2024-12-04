@@ -38,10 +38,10 @@ class TrafficIntensitiesReader(LossesInputDataReaderBase):
 
     csv_columns = []
     separator = ","
-    data_type = TrafficIntensities
 
     def __init__(self, link_id: str) -> None:
         self.csv_columns = [link_id]
+        self.object_type = TrafficIntensities
 
     def _parse_df(self, df: pd.DataFrame) -> TrafficIntensities:
         _traffic_intensities = TrafficIntensities()

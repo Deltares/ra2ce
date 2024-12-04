@@ -21,6 +21,7 @@
 
 from ra2ce.analysis.adaptation.adaptation import Adaptation
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
+    AnalysisSectionAdaptation,
     AnalysisSectionDamages,
     AnalysisSectionLosses,
 )
@@ -88,9 +89,6 @@ class AnalysisFactory:
         if analysis.analysis == AnalysisDamagesEnum.DAMAGES:
             return Damages(_analysis_input)
 
-        if analysis.analysis == AnalysisEnum.ADAPTATION:
-            return Adaptation(_analysis_input, analysis_config.config_data)
-
         raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
 
     @staticmethod
@@ -156,7 +154,7 @@ class AnalysisFactory:
                 graph_file=analysis_config.graph_files.origins_destinations_graph,
                 graph_file_hazard=analysis_config.graph_files.origins_destinations_graph_hazard,
             )
-            return OptimalRouteOriginClosestDestination(analysis_input=_analysis_input)
+            return OptimalRouteOriginClosestDestination(_analysis_input)
 
         if (
             analysis.analysis
@@ -194,5 +192,37 @@ class AnalysisFactory:
                 graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
             return MultiLinkIsolatedLocations(_analysis_input)
+
+        raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
+
+    @staticmethod
+    def get_adaptation_analysis(
+        analysis: AnalysisSectionAdaptation,
+        analysis_config: AnalysisConfigWrapper,
+    ) -> AnalysisDamagesProtocol:
+        """
+        Create an analysis based on the given analysis configuration.
+
+        Args:
+            analysis (AnalysisSectionAdaptation): Analysis section.
+            analysis_config (AnalysisConfigWrapper): Analysis configuration.
+
+        Raises:
+            NotImplementedError: The analysis type is not implemented.
+
+        Returns:
+            AnalysisAdaptationProtocol: The adaptation analysis to be executed.
+        """
+        if not analysis:
+            return None
+
+        _analysis_input = AnalysisInputWrapper.from_input(
+            analysis=analysis,
+            analysis_config=analysis_config,
+            graph_file=analysis_config.graph_files.base_network,
+        )
+
+        if analysis.analysis == AnalysisEnum.ADAPTATION:
+            return Adaptation(_analysis_input, analysis_config)
 
         raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")

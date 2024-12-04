@@ -24,11 +24,23 @@ from copy import deepcopy
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+from geopandas import GeoDataFrame
+
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
     AnalysisSectionAdaptationOption,
-    AnalysisSectionDamages,
-    AnalysisSectionLosses,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
+)
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
+)
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.damages.damages import Damages
+from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
+from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
 
 
 @dataclass
@@ -39,46 +51,115 @@ class AdaptationOption:
     construction_interval: float
     maintenance_cost: float
     maintenance_interval: float
-    damages_config: AnalysisSectionDamages
-    losses_config: AnalysisSectionLosses
+    damages_input: AnalysisInputWrapper
+    losses_input: AnalysisInputWrapper
+    losses_analysis: AnalysisLossesEnum
+    analysis_config: AnalysisConfigWrapper
+
+    def __hash__(self) -> int:
+        return hash(self.id)
 
     @classmethod
     def from_config(
         cls,
+        analysis_config: AnalysisConfigWrapper,
         adaptation_option: AnalysisSectionAdaptationOption,
-        damages_section: AnalysisSectionDamages,
-        losses_section: AnalysisSectionLosses,
     ) -> AdaptationOption:
-        # Adjust path to the input files
-        def extend_path(analysis: str, input_path: Path | None) -> Path | None:
-            if not input_path:
+        """
+        Classmethod to create an adaptation option from an analysis configuration and an adaptation option.
+
+        Args:
+            analysis_config (AnalysisConfigWrapper): Analysis config input
+            adaptation_option (AnalysisSectionAdaptationOption): Adaptation option input
+
+        Raises:
+            ValueError: If damages and losses sections are not present in the analysis config data.
+
+        Returns:
+            AdaptationOption: The created adaptation option.
+        """
+        # Adjust path to the files (should be in Adaptation/input)
+        def construct_path(
+            orig_path: Path,
+            analysis: str,
+            folder: str,
+        ) -> Path:
+            if not orig_path:
                 return None
-            return input_path.parent.joinpath(
-                "input", adaptation_option.id, analysis, input_path.name
+            # Orig is directory: add stuff at the end
+            if not (orig_path.suffix):
+                return orig_path.parent.joinpath(
+                    "input", adaptation_option.id, analysis, folder
+                )
+            return orig_path.parent.parent.joinpath(
+                "input", adaptation_option.id, analysis, folder, orig_path.name
             )
 
-        if not damages_section or not losses_section:
+        def replace_paths(
+            config_data: AnalysisConfigData, analysis: str
+        ) -> AnalysisConfigData:
+            config_data.input_path = construct_path(
+                config_data.input_path, analysis, "input"
+            )
+            config_data.static_path = construct_path(
+                config_data.static_path, analysis, "static"
+            )
+            config_data.output_path = construct_path(
+                config_data.output_path, analysis, "output"
+            )
+            return config_data
+
+        if (
+            not analysis_config.config_data.damages_list
+            or not analysis_config.config_data.losses_list
+        ):
             raise ValueError(
                 "Damages and losses sections are required to create an adaptation option."
             )
 
-        _damages_section = deepcopy(damages_section)
+        # Create input for the damages analysis
+        _damages_config = deepcopy(analysis_config)
+        _damages_config.config_data = replace_paths(
+            _damages_config.config_data, "damages"
+        )
+        _damages_analysis = _damages_config.config_data.get_analysis(
+            AnalysisDamagesEnum.DAMAGES
+        )
+        _damages_input = AnalysisInputWrapper.from_input(
+            analysis=_damages_analysis,
+            analysis_config=_damages_config,
+            graph_file_hazard=analysis_config.graph_files.base_network_hazard,
+        )
 
-        _losses_section = deepcopy(losses_section)
-        _losses_section.resilience_curves_file = extend_path(
-            "losses", losses_section.resilience_curves_file
+        # Create input for the losses analysis
+        _losses_config = deepcopy(analysis_config)
+        _losses_config.config_data = replace_paths(_losses_config.config_data, "losses")
+        _losses_analysis = _losses_config.config_data.get_analysis(
+            analysis_config.config_data.adaptation.losses_analysis
         )
-        _losses_section.traffic_intensities_file = extend_path(
-            "losses", losses_section.traffic_intensities_file
+        _losses_analysis.traffic_intensities_file = construct_path(
+            _losses_analysis.traffic_intensities_file, "losses", "input"
         )
-        _losses_section.values_of_time_file = extend_path(
-            "losses", losses_section.values_of_time_file
+        _losses_analysis.resilience_curves_file = construct_path(
+            _losses_analysis.resilience_curves_file, "losses", "input"
+        )
+        _losses_analysis.values_of_time_file = construct_path(
+            _losses_analysis.values_of_time_file, "losses", "input"
+        )
+        _losses_analysis
+        _losses_input = AnalysisInputWrapper.from_input(
+            analysis=_losses_analysis,
+            analysis_config=_losses_config,
+            graph_file=analysis_config.graph_files.base_graph,
+            graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
         )
 
         return cls(
             **asdict(adaptation_option),
-            damages_config=_damages_section,
-            losses_config=_losses_section,
+            damages_input=_damages_input,
+            losses_input=_losses_input,
+            losses_analysis=analysis_config.config_data.adaptation.losses_analysis,
+            analysis_config=analysis_config,
         )
 
     def calculate_cost(self, time_horizon: float, discount_rate: float) -> float:
@@ -123,3 +204,36 @@ class AdaptationOption:
                 _lifetime_cost += calc_cost(self.maintenance_cost, _maint_year)
 
         return _lifetime_cost
+
+    def calculate_impact(self, benefit_graph: GeoDataFrame) -> GeoDataFrame:
+        """
+        Calculate the impact of the adaptation option.
+
+        Returns:
+            float: The impact of the adaptation option.
+        """
+        # Damages analysis
+        _damages = Damages(self.damages_input)
+        _damages_gdf = _damages.execute()
+        _dam_col = _damages_gdf.filter(regex="dam_").columns[0]
+        benefit_graph[f"{self.id}_{_dam_col}"] = _damages_gdf[_dam_col]
+
+        # Losses analysis
+        if self.losses_analysis is AnalysisLossesEnum.SINGLE_LINK_LOSSES:
+            _losses = SingleLinkLosses(self.losses_input, self.analysis_config)
+        elif self.losses_analysis is AnalysisLossesEnum.MULTI_LINK_LOSSES:
+            _losses = MultiLinkLosses(self.losses_input, self.analysis_config)
+        else:
+            raise NotImplementedError(
+                f"Losses analysis {self.losses_analysis} not implemented"
+            )
+        _losses_gdf = _losses.execute()
+        _los_col = _losses_gdf.filter(regex="vlh_.*_total").columns[0]
+        benefit_graph[f"{self.id}_{_los_col}"] = _losses_gdf[_los_col]
+
+        # Calculate the impact (summing the damages and losses values)
+        benefit_graph[f"{self.id}_impact"] = (
+            benefit_graph[[f"{self.id}_{_dam_col}", f"{self.id}_{_los_col}"]]
+        ).sum(axis=1)
+
+        return benefit_graph
