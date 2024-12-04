@@ -70,7 +70,7 @@ class AdaptationOptionCases:
     )
 
 
-@pytest.fixture(name="valid_adaptation_config", scope="session")
+@pytest.fixture(name="valid_adaptation_config", scope="package")
 def _get_valid_adaptation_config_fixture(
     request: pytest.FixtureRequest,
     valid_analysis_ini: Path,
