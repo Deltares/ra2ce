@@ -22,8 +22,6 @@
 from pathlib import Path
 from typing import Optional, Protocol
 
-from geopandas import GeoDataFrame
-
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisSectionBase
 from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.network.graph_files.graph_files_protocol import GraphFileProtocol

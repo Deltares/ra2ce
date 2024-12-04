@@ -6,6 +6,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.origin_closest_destination import OriginClosestDestination
 from ra2ce.network.graph_files.graph_file import GraphFile
@@ -65,7 +66,7 @@ class MultiLinkOriginClosestDestination(AnalysisLossesProtocol):
         gdf.to_file(save_path, driver="GPKG")
         logging.info("Results saved to: {}".format(save_path))
 
-    def execute(self) -> GeoDataFrame:
+    def execute(self) -> AnalysisResultWrapper:
         def _save_gpkg_analysis(
             base_graph,
             to_save_gdf: list[GeoDataFrame],
@@ -168,4 +169,9 @@ class MultiLinkOriginClosestDestination(AnalysisLossesProtocol):
                 index=False,
             )
 
-        return None
+        # TODO: This does not seem correct, why were we returning None?
+        return AnalysisResultWrapper(
+            analysis_result=None,
+            output_path=self.output_path,
+            analysis_config=self.analysis,
+        )

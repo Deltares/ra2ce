@@ -12,6 +12,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.weighing_analysis.weighing_analysis_factory import (
     WeighingAnalysisFactory,
@@ -75,7 +76,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
                 )
         return df_calculated, gdf_graph
 
-    def execute(self) -> gpd.GeoDataFrame:
+    def execute(self) -> AnalysisResultWrapper:
         """Calculates the multi-link redundancy of a NetworkX graph.
 
         The function removes all links of a variable that have a minimum value
@@ -83,7 +84,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
         any available. This function only removes one group at the time and saves the data from removing that group.
 
         Returns:
-            aggregated_results (GeoDataFrame): The results of the analysis aggregated into a table.
+            AnalysisResultWrapper: The results of the analysis aggregated into a table.
         """
 
         def _is_not_none(value):
@@ -197,4 +198,8 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
 
             results.append(gdf)
 
-        return pd.concat(results, ignore_index=True)
+        return AnalysisResultWrapper(
+            analysis_result=pd.concat(results, ignore_index=True),
+            analysis_config=self.analysis,
+            output_path=self.output_path,
+        )

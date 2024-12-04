@@ -20,16 +20,40 @@
 """
 
 from dataclasses import dataclass
+from pathlib import Path
 
-import geopandas as gpd
+from geopandas import GeoDataFrame
 
-from ra2ce.analysis.analysis_protocol import AnalysisProtocol
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
+    AnalysisSectionAdaptation,
+    AnalysisSectionDamages,
+    AnalysisSectionLosses,
+)
 
 
-@dataclass
+@dataclass(kw_only=True)
 class AnalysisResultWrapper:
-    analysis_result: gpd.GeoDataFrame
-    analysis: AnalysisProtocol
+    """
+    Dataclass to wrap one (or many) analysis results with their related analysis configuration.
+    """
+
+    analysis_result: GeoDataFrame
+
+    output_path: Path
+
+    # AnalysisProtocol options
+    analysis_config: AnalysisSectionLosses | AnalysisSectionDamages | AnalysisSectionAdaptation
+
+    @property
+    def base_export_path(self) -> Path:
+        """
+        Gets the base export path to use for different formats..
+
+        Returns:
+            Path: base path without extension for exporting results.
+        """
+        _analysis_name = self.analysis_config.name.replace(" ", "_")
+        return self.output_path.joinpath(_analysis_name)
 
     def is_valid_result(self) -> bool:
         """
@@ -39,6 +63,6 @@ class AnalysisResultWrapper:
             bool: validity of `analysis_result`.
         """
         return (
-            isinstance(self.analysis_result, gpd.GeoDataFrame)
+            isinstance(self.analysis_result, GeoDataFrame)
             and not self.analysis_result.empty
         )

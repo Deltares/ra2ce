@@ -22,6 +22,7 @@
 import logging
 from copy import deepcopy
 from pathlib import Path
+from unittest import result
 
 from geopandas import GeoDataFrame
 
@@ -42,21 +43,15 @@ class AnalysisResultWrapperExporter:
         if not result_wrapper.is_valid_result():
             return
 
-        _analysis = result_wrapper.analysis
-        _output_path = _analysis.output_path.joinpath(
-            _analysis.analysis.analysis.config_value
-        )
-        _analysis_name = _analysis.analysis.name.replace(" ", "_")
-
-        if _analysis.analysis.save_gpkg:
+        if result_wrapper.analysis_config.save_gpkg:
             self._export_gdf(
                 result_wrapper.analysis_result,
-                _output_path.joinpath(_analysis_name + ".gpkg"),
+                result_wrapper.base_export_path.with_suffix(".gpkg"),
             )
-        if _analysis.analysis.save_csv:
+        if result_wrapper.analysis_config.save_csv:
             self._export_csv(
                 result_wrapper.analysis_result,
-                _output_path.joinpath(_analysis_name + ".csv"),
+                result_wrapper.base_export_path.with_suffix(".csv"),
             )
 
     def _export_gdf(self, gdf: GeoDataFrame, export_path: Path):

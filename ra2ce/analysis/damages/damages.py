@@ -39,6 +39,15 @@ class Damages(AnalysisDamagesProtocol):
         self.input_path = analysis_input.input_path
         self.output_path = analysis_input.output_path
 
+    def _generate_result_wrapper(
+        self, result_graph: GeoDataFrame
+    ) -> AnalysisResultWrapper:
+        return AnalysisResultWrapper(
+            analysis_result=result_graph,
+            output_path=self.output_path,
+            analysis_config=self.analysis,
+        )
+
     def execute(self) -> AnalysisResultWrapper:
         def _rename_road_gdf_to_conventions(road_gdf_columns: list[str]) -> list[str]:
             """
@@ -92,7 +101,7 @@ class Damages(AnalysisDamagesProtocol):
                 manual_damage_functions=manual_damage_functions,
             )
 
-            return AnalysisResultWrapper(analysis_result=event_gdf.gdf, analysis=self)
+            return self._generate_result_wrapper(event_gdf.gdf)
 
         elif self.analysis.event_type == EventTypeEnum.RETURN_PERIOD:
             return_period_gdf = DamageNetworkReturnPeriods(
@@ -119,9 +128,7 @@ class Damages(AnalysisDamagesProtocol):
                              Add key [risk_calculation_mode] to analyses.ini."""
                 )
 
-            return AnalysisResultWrapper(
-                analysis_result=return_period_gdf.gdf, analysis=self
-            )
+            return self._generate_result_wrapper(return_period_gdf.gdf)
 
         raise ValueError(
             "The hazard calculation does not know what to do if the analysis specifies {}".format(

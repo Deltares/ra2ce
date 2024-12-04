@@ -10,6 +10,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.optimal_route_origin_destination import (
     OptimalRouteOriginDestination,
@@ -346,7 +347,7 @@ class MultiLinkOriginDestination(AnalysisLossesProtocol):
 
         return origin_impact_master, region_impact_master
 
-    def execute(self) -> GeoDataFrame:
+    def execute(self) -> AnalysisResultWrapper:
         _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
         gdf = self.multi_link_origin_destination(
             self.graph_file_hazard.get_graph(), self.analysis
@@ -385,4 +386,8 @@ class MultiLinkOriginDestination(AnalysisLossesProtocol):
         )
         disruption_impact_df.to_csv(impact_csv_path, index=False)
 
-        return gdf
+        return AnalysisResultWrapper(
+            analysis_result=gdf,
+            output_path=self.output_path,
+            analysis_config=self.analysis,
+        )

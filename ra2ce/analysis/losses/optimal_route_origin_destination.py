@@ -11,6 +11,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
@@ -209,7 +210,7 @@ class OptimalRouteOriginDestination(AnalysisLossesProtocol):
             equity,
         ).optimal_route_od_link()
 
-    def execute(self) -> GeoDataFrame:
+    def execute(self) -> AnalysisResultWrapper:
         _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
 
         gdf = self.optimal_route_origin_destination(
@@ -239,4 +240,4 @@ class OptimalRouteOriginDestination(AnalysisLossesProtocol):
             )
             route_traffic_df.to_csv(impact_csv_path, index=False)
 
-        return gdf
+        return AnalysisResultWrapper(gdf, self)
