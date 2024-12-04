@@ -162,7 +162,7 @@ class AdaptationOption:
             analysis_config=analysis_config,
         )
 
-    def calculate_cost(self, time_horizon: float, discount_rate: float) -> float:
+    def calculate_unit_cost(self, time_horizon: float, discount_rate: float) -> float:
         """
         Calculate the net present value unit cost (per meter) of the adaptation option.
 

@@ -68,17 +68,17 @@ class Adaptation(AnalysisDamagesProtocol):
 
     def run_cost(self) -> GeoDataFrame:
         """
-        Calculate the unit cost for all adaptation options.
+        Calculate the link cost for all adaptation options.
         """
         _cost_gdf = deepcopy(self.graph_file.get_graph())
 
         for (
             _option,
             _cost,
-        ) in self.adaptation_collection.calculate_options_cost().items():
-            _cost_gdf[f"{_option.id}_cost"] = _cost
-
-        # TODO: calculate link cost instead of unit cost
+        ) in self.adaptation_collection.calculate_options_unit_cost().items():
+            _cost_gdf[f"{_option.id}_cost"] = _cost_gdf.apply(
+                lambda x, cost=_cost: x["length"] * cost, axis=1
+            )
 
         return _cost_gdf
 
