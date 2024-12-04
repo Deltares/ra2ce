@@ -7,7 +7,9 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.adaptation.adaptation import Adaptation
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_input.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from tests import test_results
@@ -50,6 +52,7 @@ class TestAdaptation:
 
         # 3. Verify expectations.
         assert isinstance(_adaptation, Adaptation)
+        assert isinstance(_adaptation, AnalysisBase)
 
     def test_run_cost(
         self,

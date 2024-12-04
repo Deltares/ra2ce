@@ -24,8 +24,8 @@ import math
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-import geopandas as gpd
 import pandas as pd
+from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
@@ -39,7 +39,9 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 )
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_input.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.resilience_curves.resilience_curves_reader import (
     ResilienceCurvesReader,
@@ -56,7 +58,7 @@ from ra2ce.network.hazard.hazard_names import HazardNames
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 
-class LossesBase(AnalysisLossesProtocol, ABC):
+class LossesBase(AnalysisLossesProtocol, AnalysisBase, ABC):
     """
     This class is the base class for the Losses analyses, containing the common methods and attributes.
     Based on the analysis type a different criticality analysis is executed.
@@ -113,9 +115,9 @@ class LossesBase(AnalysisLossesProtocol, ABC):
         self.output_path = analysis_input.output_path
         self.hazard_names = analysis_input.hazard_names
 
-        self.criticality_analysis = gpd.GeoDataFrame()
-        self.criticality_analysis_non_disrupted = gpd.GeoDataFrame()
-        self.result = gpd.GeoDataFrame()
+        self.criticality_analysis = GeoDataFrame()
+        self.criticality_analysis_non_disrupted = GeoDataFrame()
+        self.result = GeoDataFrame()
 
     def _check_validity_analysis_files(self):
         if (
@@ -128,7 +130,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             )
 
     def _get_disrupted_criticality_analysis_results(
-        self, criticality_analysis: gpd.GeoDataFrame
+        self, criticality_analysis: GeoDataFrame
     ):
         criticality_analysis.reset_index(inplace=True)
 
@@ -175,7 +177,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             self.criticality_analysis_non_disrupted.reset_index()
         )
 
-    def calculate_vehicle_loss_hours(self) -> gpd.GeoDataFrame:
+    def calculate_vehicle_loss_hours(self) -> GeoDataFrame:
         """
         This function opens an existing table with traffic data and value of time to calculate losses based on
         detouring values. It also includes a traffic jam estimation.
@@ -195,7 +197,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
                     return x, y
             raise ValueError(f"No matching range found for height {height}")
 
-        def _create_result(vlh: gpd.GeoDataFrame) -> gpd.GeoDataFrame:
+        def _create_result(vlh: GeoDataFrame) -> GeoDataFrame:
             """
 
             Args: vlh: calculated vehicle_loss_hours GeoDataFrame. For single_link_losses it only includes the
@@ -295,7 +297,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             left_on=self.link_id,
             right_index=True,
         )
-        vehicle_loss_hours = gpd.GeoDataFrame(
+        vehicle_loss_hours = GeoDataFrame(
             vehicle_loss_hours_df,
             geometry="geometry",
             crs=self.criticality_analysis.crs,
@@ -392,7 +394,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
     def _calculate_production_loss_per_capita(
         self,
-        vehicle_loss_hours: gpd.GeoDataFrame,
+        vehicle_loss_hours: GeoDataFrame,
         row_hazard_range: tuple[float, float],
         vlh_row: pd.Series,
         hazard_col_name: str,
@@ -457,7 +459,7 @@ class LossesBase(AnalysisLossesProtocol, ABC):
 
     def _populate_vehicle_loss_hour(
         self,
-        vehicle_loss_hours: gpd.GeoDataFrame,
+        vehicle_loss_hours: GeoDataFrame,
         row_hazard_range: tuple[float, float],
         vlh_row: pd.Series,
         performance_change: float,
@@ -511,11 +513,13 @@ class LossesBase(AnalysisLossesProtocol, ABC):
     def _get_criticality_analysis(self) -> AnalysisLossesProtocol:
         pass
 
-    def execute(self) -> gpd.GeoDataFrame:
-        criticality_analysis = self._get_criticality_analysis().execute()
+    def execute(self) -> AnalysisResultWrapper:
+        _criticality_analysis_result_wrapper = (
+            self._get_criticality_analysis().execute()
+        )
 
         self._get_disrupted_criticality_analysis_results(
-            criticality_analysis=criticality_analysis
+            criticality_analysis=_criticality_analysis_result_wrapper.analysis_result
         )
 
         self.result = self.calculate_vehicle_loss_hours()
@@ -534,4 +538,4 @@ class LossesBase(AnalysisLossesProtocol, ABC):
             risk = risk_calculation.get_integration_of_df_trapezoidal()
             self.result[f"risk_vlh_total"] = risk
 
-        return self.result
+        return self.generate_result_wrapper(self.result)

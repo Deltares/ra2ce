@@ -16,6 +16,7 @@ from ra2ce.analysis.analysis_config_data.enums.traffic_period_enum import (
 from ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum import TripPurposeEnum
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_input.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.losses_base import LossesBase
@@ -116,6 +117,7 @@ class TestLosses:
         # 3. Verify final expectations.
         assert isinstance(_losses, LossesBase)
         assert isinstance(_losses, losses_analysis)
+        assert isinstance(_losses, AnalysisBase)
 
     def test_calc_vlh(
         self,
