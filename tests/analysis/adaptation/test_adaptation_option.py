@@ -73,10 +73,10 @@ class TestAdaptationOption:
         "adaptation_option",
         AdaptationOptionCases.cases,
     )
-    def test_calculate_option_cost(
+    def test_calculate_option_cost_returns_float(
         self,
         valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
-        adaptation_option: tuple[AnalysisSectionAdaptation, float],
+        adaptation_option: tuple[AnalysisSectionAdaptation, float, float],
     ):
         # 1. Define test data.
         _option = AdaptationOption.from_config(
@@ -90,4 +90,5 @@ class TestAdaptationOption:
         _cost = _option.calculate_cost(_time_horizon, _discount_rate)
 
         # 3. Verify expectations.
+        assert isinstance(_cost, float)
         assert _cost == pytest.approx(adaptation_option[1])
