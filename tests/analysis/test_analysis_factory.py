@@ -15,6 +15,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_factory import AnalysisFactory
+from ra2ce.analysis.analysis_input.analysis_base import AnalysisBase
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 
@@ -71,6 +72,7 @@ class TestAnalysisFactory:
 
         # 3. Verify expectations.
         assert isinstance(_result, AnalysisDamagesProtocol)
+        assert isinstance(_result, AnalysisBase)
         assert _result.graph_file_hazard == _config.graph_files.base_network_hazard
         assert _result.analysis == _analysis
 
@@ -87,5 +89,6 @@ class TestAnalysisFactory:
 
         # 3. Verify expectations.
         assert isinstance(_result, AnalysisLossesProtocol)
+        assert isinstance(_result, AnalysisBase)
         assert _result.graph_file == _config.graph_files.base_graph
         assert _result.analysis == _analysis
