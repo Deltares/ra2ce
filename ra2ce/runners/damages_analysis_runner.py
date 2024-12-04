@@ -207,15 +207,16 @@ class DamagesAnalysisRunner(AnalysisRunner):
             )
             starttime = time.time()
 
-            _result_segmented = analysis.execute()
+            _result_segmented_wrapped = analysis.execute()
             _result_link_based = self._get_result_link_based(
                 analysis=analysis,
                 base_graph_hazard=analysis_config.graph_files.base_graph_hazard.graph,
-                result_segment_based=_result_segmented,
+                result_segment_based=_result_segmented_wrapped.analysis_result,
             )
             analysis_name = analysis.analysis.name
             for _result, suffix in zip(
-                [_result_segmented, _result_link_based], ["segmented", "link_based"]
+                [_result_segmented_wrapped.analysis_result, _result_link_based],
+                ["segmented", "link_based"],
             ):
                 _result_wrapper = AnalysisResultWrapper(
                     analysis_result=_result,
