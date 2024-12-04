@@ -3,13 +3,13 @@ from pathlib import Path
 import networkx as nx
 import numpy as np
 import osmnx
-from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
+from ra2ce.analysis.analysis_input.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.weighing_analysis.weighing_analysis_factory import (
     WeighingAnalysisFactory,
@@ -18,7 +18,7 @@ from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
 
 
-class SingleLinkRedundancy(AnalysisLossesProtocol):
+class SingleLinkRedundancy(AnalysisBase, AnalysisLossesProtocol):
     analysis: AnalysisSectionLosses
     graph_file: GraphFile
     input_path: Path
@@ -103,4 +103,4 @@ class SingleLinkRedundancy(AnalysisLossesProtocol):
         # Extra calculation possible (like multiplying the disruption time with the cost for disruption)
         # todo: input here this option
 
-        return AnalysisResultWrapper(_gdf_graph, self)
+        return self.generate_result_wrapper(analysis_result=_gdf_graph)

@@ -11,8 +11,9 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_input.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.weighing_analysis.weighing_analysis_factory import (
     WeighingAnalysisFactory,
@@ -21,7 +22,7 @@ from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
 
 
-class MultiLinkRedundancy(AnalysisLossesProtocol):
+class MultiLinkRedundancy(AnalysisBase, AnalysisLossesProtocol):
     analysis: AnalysisSectionLosses
     graph_file_hazard: GraphFile
     input_path: Path
@@ -198,8 +199,6 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
 
             results.append(gdf)
 
-        return AnalysisResultWrapper(
-            analysis_result=pd.concat(results, ignore_index=True),
-            analysis_config=self.analysis,
-            output_path=self.output_path,
+        return self.generate_result_wrapper(
+            analysis_result=pd.concat(results, ignore_index=True)
         )

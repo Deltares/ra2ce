@@ -10,8 +10,9 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
+from ra2ce.analysis.analysis_input.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.traffic_analysis.traffic_analysis_factory import (
     TrafficAnalysisFactory,
@@ -23,7 +24,7 @@ from ra2ce.network.network_config_data.network_config_data import (
 )
 
 
-class OptimalRouteOriginDestination(AnalysisLossesProtocol):
+class OptimalRouteOriginDestination(AnalysisBase, AnalysisLossesProtocol):
     analysis: AnalysisSectionLosses
     graph_file: GraphFile
     input_path: Path
@@ -240,4 +241,4 @@ class OptimalRouteOriginDestination(AnalysisLossesProtocol):
             )
             route_traffic_df.to_csv(impact_csv_path, index=False)
 
-        return AnalysisResultWrapper(gdf, self)
+        return self.generate_result_wrapper(analysis_result=gdf)

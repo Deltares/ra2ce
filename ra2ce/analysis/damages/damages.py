@@ -11,8 +11,9 @@ from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeE
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
+from ra2ce.analysis.analysis_input.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.damages.damage.manual_damage_functions import ManualDamageFunctions
 from ra2ce.analysis.damages.damage_calculation import (
@@ -22,7 +23,7 @@ from ra2ce.analysis.damages.damage_calculation import (
 from ra2ce.network.graph_files.network_file import NetworkFile
 
 
-class Damages(AnalysisDamagesProtocol):
+class Damages(AnalysisBase, AnalysisDamagesProtocol):
     analysis: AnalysisSectionDamages
     graph_file: NetworkFile
     graph_file_hazard: NetworkFile
@@ -38,15 +39,6 @@ class Damages(AnalysisDamagesProtocol):
         self.graph_file_hazard = analysis_input.graph_file_hazard
         self.input_path = analysis_input.input_path
         self.output_path = analysis_input.output_path
-
-    def _generate_result_wrapper(
-        self, result_graph: GeoDataFrame
-    ) -> AnalysisResultWrapper:
-        return AnalysisResultWrapper(
-            analysis_result=result_graph,
-            output_path=self.output_path,
-            analysis_config=self.analysis,
-        )
 
     def execute(self) -> AnalysisResultWrapper:
         def _rename_road_gdf_to_conventions(road_gdf_columns: list[str]) -> list[str]:
@@ -101,7 +93,7 @@ class Damages(AnalysisDamagesProtocol):
                 manual_damage_functions=manual_damage_functions,
             )
 
-            return self._generate_result_wrapper(event_gdf.gdf)
+            return self.generate_result_wrapper(event_gdf.gdf)
 
         elif self.analysis.event_type == EventTypeEnum.RETURN_PERIOD:
             return_period_gdf = DamageNetworkReturnPeriods(
@@ -128,7 +120,7 @@ class Damages(AnalysisDamagesProtocol):
                              Add key [risk_calculation_mode] to analyses.ini."""
                 )
 
-            return self._generate_result_wrapper(return_period_gdf.gdf)
+            return self.generate_result_wrapper(return_period_gdf.gdf)
 
         raise ValueError(
             "The hazard calculation does not know what to do if the analysis specifies {}".format(

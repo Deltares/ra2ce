@@ -5,8 +5,9 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
+from ra2ce.analysis.analysis_input.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.origin_closest_destination import OriginClosestDestination
 from ra2ce.network.graph_files.graph_file import GraphFile
@@ -18,7 +19,7 @@ from ra2ce.network.networks_utils import graph_to_gpkg
 from ra2ce.ra2ce_logger import logging
 
 
-class MultiLinkOriginClosestDestination(AnalysisLossesProtocol):
+class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
     analysis: AnalysisSectionLosses
     graph_file: GraphFile
     graph_file_hazard: GraphFile
@@ -170,8 +171,4 @@ class MultiLinkOriginClosestDestination(AnalysisLossesProtocol):
             )
 
         # TODO: This does not seem correct, why were we returning None?
-        return AnalysisResultWrapper(
-            analysis_result=None,
-            output_path=self.output_path,
-            analysis_config=self.analysis,
-        )
+        return self.generate_result_wrapper(analysis_result=None)

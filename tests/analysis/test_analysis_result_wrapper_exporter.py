@@ -9,8 +9,8 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
-from ra2ce.analysis.analysis_result_wrapper_exporter import (
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper_exporter import (
     AnalysisResultWrapperExporter,
 )
 from tests import test_results
@@ -24,7 +24,9 @@ class TestAnalysisResultWrapperExporter:
     def test_given_invalid_result_doesnot_raise(self):
         # 1. Define test data
         _exporter = AnalysisResultWrapperExporter()
-        _result_wrapper = AnalysisResultWrapper(analysis=None, analysis_result=None)
+        _result_wrapper = AnalysisResultWrapper(
+            analysis_config=None, analysis_result=None, output_path=None
+        )
         assert _result_wrapper.is_valid_result() is False
 
         # 2. Run test
@@ -50,12 +52,15 @@ class TestAnalysisResultWrapperExporter:
             }
         )
 
+        _mocked_analysis = MockedAnalysis()
         _result_wrapper = AnalysisResultWrapper(
-            analysis=MockedAnalysis(), analysis_result=_result_gfd
+            analysis_config=_mocked_analysis.analysis,
+            output_path=_mocked_analysis.output_path,
+            analysis_result=_result_gfd,
         )
 
-        if _result_wrapper.analysis.output_path.exists():
-            shutil.rmtree(_result_wrapper.analysis.output_path)
+        if _result_wrapper.output_path.exists():
+            shutil.rmtree(_result_wrapper.output_path)
         return _result_wrapper
 
     def _export_valid_result_to_expected_format(

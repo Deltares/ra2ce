@@ -1,7 +1,7 @@
 import geopandas as gpd
 import pytest
 
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 
 
 class TestAnalysisResultWrapper:
@@ -12,7 +12,9 @@ class TestAnalysisResultWrapper:
 
         # 2. Run test.
         _result_wrapper = AnalysisResultWrapper(
-            analysis_result=_analysis_result, analysis=_analysis
+            analysis_result=_analysis_result,
+            analysis_config=_analysis,
+            output_path=None,
         )
 
         # 3. Verify expectations.
@@ -30,7 +32,7 @@ class TestAnalysisResultWrapper:
     ):
         # 1. Define test data.
         _result_wrapper = AnalysisResultWrapper(
-            analysis_result=invalid_geodataframe, analysis=None
+            analysis_result=invalid_geodataframe, analysis_config=None, output_path=None
         )
 
         # 2. Run test.
@@ -43,7 +45,7 @@ class TestAnalysisResultWrapper:
         # 1. Define test data.
         _geo_dataframe = gpd.GeoDataFrame.from_dict(dict(dummy=[(4.2, 2.4), (42, 24)]))
         _result_wrapper = AnalysisResultWrapper(
-            analysis_result=_geo_dataframe, analysis=None
+            analysis_result=_geo_dataframe, analysis_config=None, output_path=None
         )
 
         # 2. Run test.

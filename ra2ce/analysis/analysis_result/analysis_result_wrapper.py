@@ -44,6 +44,24 @@ class AnalysisResultWrapper:
     # AnalysisProtocol options
     analysis_config: AnalysisSectionLosses | AnalysisSectionDamages | AnalysisSectionAdaptation
 
+    _custom_name: str = ""
+
+    @property
+    def analysis_name(self) -> str:
+        """
+        Gets the analysis name from the configuration and formats it for exporting.
+
+        Returns:
+            str: The formatted analysis name.
+        """
+        if not self._custom_name:
+            return self.analysis_config.name.replace(" ", "_")
+        return self._custom_name
+
+    @analysis_name.setter
+    def analysis_name(self, new_name: str):
+        self._custom_name = new_name
+
     @property
     def base_export_path(self) -> Path:
         """
@@ -52,8 +70,7 @@ class AnalysisResultWrapper:
         Returns:
             Path: base path without extension for exporting results.
         """
-        _analysis_name = self.analysis_config.name.replace(" ", "_")
-        return self.output_path.joinpath(_analysis_name)
+        return self.output_path.joinpath(self.analysis_name)
 
     def is_valid_result(self) -> bool:
         """

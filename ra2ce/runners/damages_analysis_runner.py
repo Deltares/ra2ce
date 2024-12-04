@@ -27,13 +27,12 @@ import geopandas as gpd
 import networkx as nx
 import numpy as np
 import pandas as pd
-from networkx import MultiDiGraph
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
-from ra2ce.analysis.analysis_result_wrapper_exporter import (
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper_exporter import (
     AnalysisResultWrapperExporter,
 )
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
@@ -219,9 +218,11 @@ class DamagesAnalysisRunner(AnalysisRunner):
                 [_result_segmented, _result_link_based], ["segmented", "link_based"]
             ):
                 _result_wrapper = AnalysisResultWrapper(
-                    analysis_result=_result, analysis=analysis
+                    analysis_result=_result,
+                    analysis_config=analysis.analysis,
+                    output_path=analysis.output_path,
                 )
-                _result_wrapper.analysis.analysis.name = analysis_name + "_" + suffix
+                _result_wrapper.analysis_name = analysis_name + "_" + suffix
                 _results.append(_result_wrapper)
 
                 AnalysisResultWrapperExporter().export_result(_result_wrapper)

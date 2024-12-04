@@ -30,12 +30,13 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionAdaptation,
 )
+from ra2ce.analysis.analysis_input.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.network.graph_files.network_file import NetworkFile
 
 
-class Adaptation(AnalysisDamagesProtocol):
+class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
     analysis: AnalysisSectionAdaptation
     graph_file: NetworkFile
     graph_file_hazard: NetworkFile
@@ -60,7 +61,7 @@ class Adaptation(AnalysisDamagesProtocol):
         """
         Run the adaptation analysis.
         """
-        return self.calculate_bc_ratio()
+        return self.generate_result_wrapper(self.calculate_bc_ratio())
 
     def run_cost(self) -> GeoDataFrame:
         """

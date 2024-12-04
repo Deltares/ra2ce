@@ -22,11 +22,10 @@
 import logging
 from copy import deepcopy
 from pathlib import Path
-from unittest import result
 
 from geopandas import GeoDataFrame
 
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 
 
 class AnalysisResultWrapperExporter:
