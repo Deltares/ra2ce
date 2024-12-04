@@ -354,13 +354,12 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
             self.graph_file_hazard.get_graph(), self.analysis
         )
         self._analysis_input.graph_file = self._analysis_input.graph_file_hazard
-        gdf_not_disrupted = OptimalRouteOriginDestination(
+        _orod_result_wrapper = OptimalRouteOriginDestination(
             self._analysis_input
         ).execute()
-        (
-            disruption_impact_df,
-            gdf_ori,
-        ) = self.multi_link_origin_destination_impact(gdf, gdf_not_disrupted)
+        (disruption_impact_df, gdf_ori,) = self.multi_link_origin_destination_impact(
+            gdf, _orod_result_wrapper.analysis_result
+        )
         try:
             assert self.origins_destinations.region
             (
