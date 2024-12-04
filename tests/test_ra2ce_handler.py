@@ -5,7 +5,10 @@ from typing import Iterator
 import pytest
 from geopandas import GeoDataFrame
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
+    AnalysisSectionBase,
+)
 from ra2ce.analysis.analysis_config_data.analysis_config_data_reader import (
     AnalysisConfigDataReader,
 )
@@ -155,8 +158,9 @@ class TestRa2ceHandler:
         assert len(results) == 1
         _found_result = results[0]
         assert isinstance(_found_result, AnalysisResultWrapper)
-        assert isinstance(_found_result.analysis, SingleLinkRedundancy)
+        assert isinstance(_found_result.analysis_config, AnalysisSectionBase)
         assert isinstance(_found_result.analysis_result, GeoDataFrame)
+        assert isinstance(_found_result.output_path, Path)
         assert _found_result.analysis_result.empty is False
 
     @pytest.mark.slow_test
