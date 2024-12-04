@@ -14,7 +14,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from pandas import DataFrame
@@ -32,10 +32,10 @@ class TimeValuesReader(LossesInputDataReaderBase):
     Class to read the time values from a csv file.
     """
 
-    csv_columns = ["trip_types", "value_of_time", "occupants"]
-
-    def __init__(self) -> None:
-        self.object_type = TimeValues
+    object_type: type = TimeValues
+    csv_columns: list[str] = field(
+        default_factory=lambda: ["trip_types", "value_of_time", "occupants"]
+    )
 
     def _parse_df(self, df: DataFrame) -> TimeValues:
         _time_values = {
