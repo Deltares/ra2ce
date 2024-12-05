@@ -45,7 +45,7 @@ class AnalysisResultWrapper(AnalysisResultWrapperProtocol):
             GeoDataFrame | None: First declared analysis result.
         """
         if any(self.results_collection):
-            return self.results_collection[0]
+            return self.results_collection[0].analysis_result
         return None
 
     def is_valid_result(self) -> bool:
