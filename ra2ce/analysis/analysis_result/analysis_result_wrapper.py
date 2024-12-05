@@ -24,10 +24,13 @@ from dataclasses import dataclass, field
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_result.analysis_result import AnalysisResult
+from ra2ce.analysis.analysis_result.analysis_result_wrapper_.protocol import (
+    AnalysisResultWrapperProtocol,
+)
 
 
 @dataclass(kw_only=True)
-class AnalysisResultWrapper:
+class AnalysisResultWrapper(AnalysisResultWrapperProtocol):
     """
     Dataclass to wrap a collection of analysis results.
     """
@@ -46,13 +49,6 @@ class AnalysisResultWrapper:
         return None
 
     def is_valid_result(self) -> bool:
-        """
-        Validates whether the `analyses_results` in this wrapper are all valid.
-
-        Returns:
-            bool: validation of `analyses_results`.
-        """
-
         # Because of geopandas comparison operator we cannot simply do `if any(self.analysis_result)`
         return any(self.results_collection) and all(
             map(AnalysisResult.is_valid_result, self.results_collection)

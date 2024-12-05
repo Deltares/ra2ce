@@ -24,10 +24,10 @@ import time
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.analysis_result.analysis_result_wrapper_exporter import (
     AnalysisResultWrapperExporter,
 )
+from ra2ce.analysis.damages.damages_result_wrapper import DamagesResultWrapper
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 
@@ -53,9 +53,7 @@ class DamagesAnalysisRunner(AnalysisRunner):
             return False
         return True
 
-    def run(
-        self, analysis_config: AnalysisConfigWrapper
-    ) -> list[AnalysisResultWrapper]:
+    def run(self, analysis_config: AnalysisConfigWrapper) -> list[DamagesResultWrapper]:
         _analysis_collection = AnalysisCollection.from_config(analysis_config)
         _results = []
         for analysis in _analysis_collection.damages_analyses:
@@ -65,22 +63,8 @@ class DamagesAnalysisRunner(AnalysisRunner):
             )
             starttime = time.time()
 
-            _result_tuples_wrapped = analysis.execute()
-
-            analysis_name = analysis.analysis.name
-            for _result, suffix in zip(
-                _result_tuples_wrapped.analysis_result,
-                ["segmented", "link_based"],
-            ):
-                _result_wrapper = AnalysisResultWrapper(
-                    analysis_result=[_result],
-                    analysis_config=analysis.analysis,
-                    output_path=analysis.output_path,
-                )
-                _result_wrapper.analysis_name = analysis_name + "_" + suffix
-                _results.append(_result_wrapper)
-
-                AnalysisResultWrapperExporter().export_result(_result_wrapper)
+            _result_wrapper = analysis.execute()
+            AnalysisResultWrapperExporter().export_result(_result_wrapper)
 
             endtime = time.time()
             logging.info(

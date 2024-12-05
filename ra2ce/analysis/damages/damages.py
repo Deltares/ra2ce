@@ -17,6 +17,7 @@ from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import
     RiskCalculationModeEnum,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_result.analysis_result import AnalysisResult
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.damages.damage.manual_damage_functions import ManualDamageFunctions
@@ -24,6 +25,7 @@ from ra2ce.analysis.damages.damage_calculation import (
     DamageNetworkEvents,
     DamageNetworkReturnPeriods,
 )
+from ra2ce.analysis.damages.damages_result_wrapper import DamagesResultWrapper
 from ra2ce.network.graph_files.network_file import NetworkFile
 
 
@@ -147,12 +149,29 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
         Returns:
             AnalysisResultWrapper: Result wrapper containing both link and segmented based graphs.
         """
+        _result_segmented_based = analyses_results[0]
         _result_link_based = self._get_result_link_based(
             base_graph_hazard=self.reference_base_graph_hazard,
-            result_segment_based=analyses_results[0],
+            result_segment_based=_result_segmented_based,
         )
 
-        return super().generate_result_wrapper(*analyses_results, _result_link_based)
+        _analysis_result_link_based = AnalysisResult(
+            analysis_result=_result_link_based,
+            analysis_config=self.analysis,
+            output_path=self.output_path,
+        )
+        _analysis_result_link_based.analysis_name = self.analysis.name + "_link_based"
+        _analysis_result_segmented_based = AnalysisResult(
+            analysis_result=_result_segmented_based,
+            analysis_config=self.analysis,
+            output_path=self.output_path,
+        )
+        _analysis_result_link_based.analysis_name = self.analysis.name + "_segmented"
+
+        return DamagesResultWrapper(
+            segment_based_result=_analysis_result_segmented_based,
+            link_based_result=_analysis_result_link_based,
+        )
 
     def _update_link_based_values(
         self,
