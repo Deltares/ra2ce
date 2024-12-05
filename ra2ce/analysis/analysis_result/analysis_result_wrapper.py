@@ -49,7 +49,6 @@ class AnalysisResultWrapper(AnalysisResultWrapperProtocol):
         return None
 
     def is_valid_result(self) -> bool:
-        # Because of geopandas comparison operator we cannot simply do `if any(self.analysis_result)`
         return any(self.results_collection) and all(
             map(AnalysisResult.is_valid_result, self.results_collection)
         )
