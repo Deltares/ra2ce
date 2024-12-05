@@ -3,10 +3,8 @@ from abc import ABC
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol
-from ra2ce.analysis.analysis_result.analysis_result_wrapper import (
-    AnalysisResult,
-    AnalysisResultWrapper,
-)
+from ra2ce.analysis.analysis_result.analysis_result import AnalysisResult
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 
 
 class AnalysisBase(ABC, AnalysisProtocol):
