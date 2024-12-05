@@ -4,7 +4,7 @@ import geopandas as gpd
 import pytest
 from shapely import Point
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisSectionBase
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
@@ -36,7 +36,7 @@ class TestAnalysisResultWrapperExporter:
     ) -> AnalysisResultWrapper:
         class MockedAnalysis(AnalysisProtocol):
             def __init__(self) -> None:
-                _analysis = AnalysisConfigData.ANALYSIS_SECTION(
+                _analysis = AnalysisSectionBase(
                     name="Mocked Analysis", save_csv=False, save_gpkg=False
                 )
                 _analysis.analysis = AnalysisLossesEnum.SINGLE_LINK_LOSSES
