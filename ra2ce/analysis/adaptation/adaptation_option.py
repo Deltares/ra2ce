@@ -78,18 +78,17 @@ class AdaptationOption:
             )
 
         # Create input for the analyses
-        _analyses = []
-        for _analysis in [
-            AnalysisDamagesEnum.DAMAGES,
-            analysis_config.config_data.adaptation.losses_analysis,
-        ]:
-            _analyses.append(
-                AdaptationOptionAnalysis.from_config(
-                    analysis_config=analysis_config,
-                    analysis_type=_analysis,
-                    option_id=adaptation_option.id,
-                )
+        _analyses = [
+            AdaptationOptionAnalysis.from_config(
+                analysis_config=analysis_config,
+                analysis_type=_analysis,
+                option_id=adaptation_option.id,
             )
+            for _analysis in [
+                AnalysisDamagesEnum.DAMAGES,
+                analysis_config.config_data.adaptation.losses_analysis,
+            ]
+        ]
 
         return cls(
             **asdict(adaptation_option),

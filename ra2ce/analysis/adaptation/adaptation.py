@@ -71,10 +71,14 @@ class Adaptation(AnalysisDamagesProtocol):
 
     def run_cost(self) -> GeoDataFrame:
         """
-        Calculate the link cost for all adaptation options.
+        <<<<<<< HEAD
+                Calculate the link cost for all adaptation options.
+        =======
+                Calculate the unit cost for all adaptation options.
+        >>>>>>> master
 
-        Returns:
-            GeoDataFrame: The result of the cost calculation.
+                Returns:
+                    GeoDataFrame: The result of the cost calculation.
         """
         _cost_gdf = deepcopy(self.graph_file.get_graph())
 
