@@ -155,22 +155,22 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
             result_segment_based=_result_segmented_based,
         )
 
-        _analysis_result_link_based = AnalysisResult(
-            analysis_result=_result_link_based,
-            analysis_config=self.analysis,
-            output_path=self.output_path,
-        )
-        _analysis_result_link_based.analysis_name = self.analysis.name + "_link_based"
-        _analysis_result_segmented_based = AnalysisResult(
-            analysis_result=_result_segmented_based,
-            analysis_config=self.analysis,
-            output_path=self.output_path,
-        )
-        _analysis_result_link_based.analysis_name = self.analysis.name + "_segmented"
+        def get_analysis_result(gdf_result: GeoDataFrame, name: str) -> AnalysisResult:
+            _ar = AnalysisResult(
+                analysis_result=gdf_result,
+                analysis_config=self.analysis,
+                output_path=self.output_path,
+            )
+            _ar.analysis_name = name
+            return _ar
 
         return DamagesResultWrapper(
-            segment_based_result=_analysis_result_segmented_based,
-            link_based_result=_analysis_result_link_based,
+            segment_based_result=get_analysis_result(
+                _result_segmented_based, self.analysis.name + "_segmented"
+            ),
+            link_based_result=get_analysis_result(
+                _result_link_based, self.analysis.name + "_link_based"
+            ),
         )
 
     def _update_link_based_values(
