@@ -12,7 +12,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_data.analysis_config_data_reader import (
     AnalysisConfigDataReader,
 )
-from ra2ce.analysis.analysis_result.analysis_result_wrapper_.protocol import (
+from ra2ce.analysis.analysis_result.analysis_result_wrapper_protocol import (
     AnalysisResultWrapperProtocol,
 )
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
