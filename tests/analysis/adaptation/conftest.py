@@ -64,9 +64,10 @@ class AdaptationOptionCases:
             maintenance_interval=3.0,
         ),
     ]
-    cost: list[float] = [0.0, 2693.684211, 5231.908660]
-    cases: list[tuple[AnalysisSectionAdaptationOption, float]] = list(
-        zip(config_cases, cost)
+    unit_cost: list[float] = [0.0, 2693.684211, 5231.908660]
+    total_cost: list[float] = [0.0, 633015.789583, 1229498.535112]
+    cases: list[tuple[AnalysisSectionAdaptationOption, float, float]] = list(
+        zip(config_cases, unit_cost, total_cost)
     )
 
 
@@ -124,7 +125,7 @@ def _get_valid_adaptation_config_fixture(
         copytree(test_data.joinpath("adaptation", "input"), _ao_path)
         copytree(
             test_data.joinpath("adaptation", "static"),
-            _ao_path.joinpath("losses", "static"),
+            _ao_path.joinpath("multi_link_losses", "static"),
         )
     copytree(test_data.joinpath("adaptation", "static"), _static_path)
 

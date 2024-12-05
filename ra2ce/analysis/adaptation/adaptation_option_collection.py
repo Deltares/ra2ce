@@ -22,9 +22,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from geopandas import GeoDataFrame
+
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.network.graph_files.network_file import NetworkFile
 
 
 @dataclass
@@ -105,12 +106,12 @@ class AdaptationOptionCollection:
             for _option in self.adaptation_options
         }
 
-    def calculation_options_impact(self, benefit_graph: NetworkFile) -> NetworkFile:
+    def calculation_options_impact(self, benefit_graph: GeoDataFrame) -> GeoDataFrame:
         """
         Calculate the impact of all adaptation options (including the reference option).
 
         Args:
-            benefit_graph (NetworkFile): The graph to which the impact of the adaptation options will be added.
+            benefit_graph (GeoDataFrame): The graph to which the impact of the adaptation options will be added.
 
         Returns:
             NetworkFile: The calculated impact of all adaptation options.

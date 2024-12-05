@@ -11,7 +11,7 @@ class Ra2ceEnumBase(Enum):
     """
 
     @classmethod
-    def get_enum(cls, input: str | None) -> Ra2ceEnumBase:
+    def get_enum(cls, input_str: str | None) -> Ra2ceEnumBase:
         """
         Create an enum from a given input string.
 
@@ -24,9 +24,9 @@ class Ra2ceEnumBase(Enum):
             INVALID: This entry is used if the config value is invalid.
         """
         try:
-            if not input:
+            if not input_str:
                 return cls.NONE
-            return cls[input.upper().strip()]
+            return cls[input_str.upper().strip()]
         except (AttributeError, KeyError):
             return cls.INVALID
 
