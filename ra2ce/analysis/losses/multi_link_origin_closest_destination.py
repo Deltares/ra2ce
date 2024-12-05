@@ -171,4 +171,4 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
             )
 
         # TODO: This does not seem correct, why were we returning None?
-        return self.generate_result_wrapper(analysis_result=None)
+        return self.generate_result_wrapper(None)

@@ -241,4 +241,4 @@ class OptimalRouteOriginDestination(AnalysisBase, AnalysisLossesProtocol):
             )
             route_traffic_df.to_csv(impact_csv_path, index=False)
 
-        return self.generate_result_wrapper(analysis_result=gdf)
+        return self.generate_result_wrapper(gdf)

@@ -114,4 +114,4 @@ class OptimalRouteOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol)
             del opt_routes["geometry"]
             opt_routes.to_csv(csv_path, index=False)
         # TODO: This does not seem correct, why were we returning None?
-        return self.generate_result_wrapper(analysis_result=None)
+        return self.generate_result_wrapper(None)

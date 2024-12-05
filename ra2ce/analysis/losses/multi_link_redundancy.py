@@ -199,6 +199,4 @@ class MultiLinkRedundancy(AnalysisBase, AnalysisLossesProtocol):
 
             results.append(gdf)
 
-        return self.generate_result_wrapper(
-            analysis_result=pd.concat(results, ignore_index=True)
-        )
+        return self.generate_result_wrapper(pd.concat(results, ignore_index=True))

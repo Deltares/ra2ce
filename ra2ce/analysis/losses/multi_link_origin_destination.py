@@ -386,4 +386,4 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
         )
         disruption_impact_df.to_csv(impact_csv_path, index=False)
 
-        return self.generate_result_wrapper(analysis_result=gdf)
+        return self.generate_result_wrapper(gdf)
