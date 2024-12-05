@@ -45,8 +45,8 @@ class TestAdaptationOption:
         assert isinstance(_option, AdaptationOption)
         assert _option.id == _config_option.id
         assert len(_option.analyses) == 2
-        assert Damages in [x.analysis_type for x in _option.analyses]
-        assert losses_analysis in [x.analysis_type for x in _option.analyses]
+        assert Damages in [x.analysis_class for x in _option.analyses]
+        assert losses_analysis in [x.analysis_class for x in _option.analyses]
 
     def test_from_config_no_damages_losses_raises(self):
         # 1. Define test data.

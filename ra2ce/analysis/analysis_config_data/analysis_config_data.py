@@ -185,7 +185,7 @@ class AnalysisConfigData(ConfigDataProtocol):
     Additionally, some attributes from the network config are added for completeness (files, origins_destinations, network, hazard_names)
     """
 
-    ANALYSIS_TYPE = (
+    ANALYSIS_SECTION = (
         AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation
     )
 
@@ -194,7 +194,7 @@ class AnalysisConfigData(ConfigDataProtocol):
     output_path: Optional[Path] = None
     static_path: Optional[Path] = None
     project: ProjectSection = field(default_factory=ProjectSection)
-    analyses: list[ANALYSIS_TYPE] = field(default_factory=list)
+    analyses: list[ANALYSIS_SECTION] = field(default_factory=list)
     origins_destinations: Optional[OriginsDestinationsSection] = field(
         default_factory=OriginsDestinationsSection
     )
@@ -220,7 +220,7 @@ class AnalysisConfigData(ConfigDataProtocol):
                 return None
             _orig_parts = orig_path.parts
             _rel_path = Path(*_orig_parts[len(self.root_path.parts) :])
-            return new_root.joinpath("input", analysis_type.config_value, _rel_path)
+            return new_root.joinpath(analysis_type.config_value, _rel_path)
 
         self.input_path = reroot_path(self.input_path)
         self.static_path = reroot_path(self.static_path)
@@ -282,7 +282,7 @@ class AnalysisConfigData(ConfigDataProtocol):
 
     def get_analysis(
         self, analysis: AnalysisEnum | AnalysisDamagesEnum | AnalysisLossesEnum
-    ) -> ANALYSIS_TYPE | None:
+    ) -> ANALYSIS_SECTION | None:
         """
         Get a certain analysis from config.
 

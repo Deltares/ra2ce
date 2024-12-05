@@ -116,9 +116,7 @@ class TestAnalysisConfigData:
         valid_config.root_path = _file.parent
         _analysis.resilience_curves_file = _file
         _root_path = Path("new_root/another_dir")
-        _expected_path = _root_path.joinpath(
-            "input", _analysis_type.config_value, _file.name
-        )
+        _expected_path = _root_path.joinpath(_analysis_type.config_value, _file.name)
 
         # 2. Run test
         _result = valid_config.reroot_analysis_config(_analysis_type, _root_path)

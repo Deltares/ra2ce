@@ -22,14 +22,9 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import dataclass
-from pathlib import Path
 
 from geopandas import GeoDataFrame
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
-    AnalysisSectionLosses,
-)
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -46,7 +41,7 @@ from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
 
 @dataclass
 class AdaptationOptionAnalysis:
-    analysis_type: type[Damages | LossesBase]
+    analysis_class: type[Damages | LossesBase]
     analysis_input: AnalysisInputWrapper
     result_col: str
 
@@ -55,7 +50,7 @@ class AdaptationOptionAnalysis:
         analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
     ) -> tuple[type[Damages | LossesBase], str]:
         """
-        Get the analysis type and the result column for the given analysis.
+        Get the analysis class and the result column for the given analysis.
 
         Args:
             analysis (AnalysisDamagesEnum | AnalysisLossesEnum): The type of analysis.
@@ -64,7 +59,7 @@ class AdaptationOptionAnalysis:
             NotImplementedError: The analysis type is not implemented.
 
         Returns:
-            tuple[type[Damages | LossesBase], str]: The analysis type and the result column.
+            tuple[type[Damages | LossesBase], str]: The analysis class and the result column.
         """
         if analysis_type == AnalysisDamagesEnum.DAMAGES:
             return (Damages, "dam_")
@@ -102,6 +97,8 @@ class AdaptationOptionAnalysis:
             )
         )
 
+        # Create analysis input
+        _analysis = _analysis_config.config_data.get_analysis(analysis_type)
         if analysis_type == AnalysisDamagesEnum.DAMAGES:
             _graph_file = None
             _graph_file_hazard = analysis_config.graph_files.base_network_hazard
@@ -110,16 +107,17 @@ class AdaptationOptionAnalysis:
             _graph_file_hazard = analysis_config.graph_files.base_graph_hazard
 
         _analysis_input = AnalysisInputWrapper.from_input(
-            analysis=_analysis_config.config_data.adaptation,
+            analysis=_analysis,
             analysis_config=_analysis_config,
             graph_file=_graph_file,
             graph_file_hazard=_graph_file_hazard,
         )
 
-        _analysis_type, _result_col = cls.get_analysis(analysis_type)
+        # Create output object
+        _analysis_class, _result_col = cls.get_analysis(analysis_type)
 
         return cls(
-            analysis_type=_analysis_type,
+            analysis_class=_analysis_class,
             analysis_input=_analysis_input,
             result_col=_result_col,
         )
@@ -134,6 +132,6 @@ class AdaptationOptionAnalysis:
         Returns:
             DataFrame: The results of the analysis.
         """
-        if self.analysis_type == Damages:
-            return self.analysis_type(self.analysis_input).execute()
-        return self.analysis_type(self.analysis_input, analysis_config).execute()
+        if self.analysis_class == Damages:
+            return self.analysis_class(self.analysis_input).execute()
+        return self.analysis_class(self.analysis_input, analysis_config).execute()

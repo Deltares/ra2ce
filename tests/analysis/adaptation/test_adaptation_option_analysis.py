@@ -94,4 +94,4 @@ class TestAnalysisOptionAnalysis:
 
         # 3. Verify expectations.
         assert isinstance(_result, AdaptationOptionAnalysis)
-        assert _result.analysis_type == expected_analysis
+        assert _result.analysis_class == expected_analysis
