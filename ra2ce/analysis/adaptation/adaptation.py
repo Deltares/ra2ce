@@ -110,8 +110,12 @@ class Adaptation(AnalysisDamagesProtocol):
         """
         Calculate the benefit-cost ratio for all adaptation options.
 
+        Args:
+            benefit_gdf (GeoDataFrame): Gdf containing the benefit of the adaptation options.
+            cost_gdf (GeoDataFrame): Gdf containing the cost of the adaptation options.
+
         Returns:
-            GeoDataFrame: The result of the benefit-cost ratio calculation.
+            GeoDataFrame: Gdf containing the benefit-cost ratio of the adaptation options.
         """
         for _option in self.adaptation_collection.adaptation_options:
             benefit_gdf[f"{_option.id}_cost"] = cost_gdf[f"{_option.id}_cost"]
