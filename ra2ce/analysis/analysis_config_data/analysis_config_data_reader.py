@@ -28,7 +28,6 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionAdaptation,
     AnalysisSectionAdaptationOption,
-    AnalysisSectionBase,
     AnalysisSectionDamages,
     AnalysisSectionLosses,
     DamagesAnalysisNameList,

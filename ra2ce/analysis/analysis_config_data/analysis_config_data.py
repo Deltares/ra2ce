@@ -287,7 +287,8 @@ class AnalysisConfigData(ConfigDataProtocol):
         Get a certain analysis from config.
 
         Returns:
-            AnalysisSectionBase: The analysis.
+            AnalysisSectionLosses | AnalysisSectionDamages | AnalysisSectionAdaptation:
+                The analysis.
         """
         return next(filter(lambda x: x.analysis == analysis, self.analyses), None)
 
