@@ -3,7 +3,10 @@ from abc import ABC
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol
-from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import (
+    AnalysisResult,
+    AnalysisResultWrapper,
+)
 
 
 class AnalysisBase(ABC, AnalysisProtocol):
@@ -25,9 +28,14 @@ class AnalysisBase(ABC, AnalysisProtocol):
         Returns:
             AnalysisResultWrapper: Wrapping result with configuration details.
         """
-        _results = [_ar for _ar in analysis_result]
+
+        def get_analysis_result(gdf_result: GeoDataFrame) -> AnalysisResult:
+            return AnalysisResult(
+                analysis_result=gdf_result,
+                analysis_config=self.analysis,
+                output_path=self.output_path,
+            )
+
         return AnalysisResultWrapper(
-            analysis_result=_results,
-            analysis_config=self.analysis,
-            output_path=self.output_path,
+            results_collection=list(map(get_analysis_result, analysis_result))
         )

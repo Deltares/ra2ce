@@ -42,16 +42,16 @@ class AnalysisResultWrapperExporter:
         if not result_wrapper.is_valid_result():
             return
 
-        for _analysis_result in result_wrapper.analysis_result:
-            if result_wrapper.analysis_config.save_gpkg:
+        for _analysis_result in result_wrapper.results_collection:
+            if _analysis_result.analysis_config.save_gpkg:
                 self._export_gdf(
                     _analysis_result,
-                    result_wrapper.base_export_path.with_suffix(".gpkg"),
+                    _analysis_result.base_export_path.with_suffix(".gpkg"),
                 )
-            if result_wrapper.analysis_config.save_csv:
+            if _analysis_result.analysis_config.save_csv:
                 self._export_csv(
                     _analysis_result,
-                    result_wrapper.base_export_path.with_suffix(".csv"),
+                    _analysis_result.base_export_path.with_suffix(".csv"),
                 )
 
     def _export_gdf(self, gdf: GeoDataFrame, export_path: Path):

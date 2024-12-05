@@ -19,7 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from geopandas import GeoDataFrame
@@ -32,12 +32,12 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 
 
 @dataclass(kw_only=True)
-class AnalysisResultWrapper:
+class AnalysisResult:
     """
-    Dataclass to wrap one (or many) analysis results with their related analysis configuration.
+    Dataclass to represent an analysis result (`GeoDataFrame`) and its related configuration.
     """
 
-    analysis_result: list[GeoDataFrame]
+    analysis_result: GeoDataFrame
     analysis_config: AnalysisSectionLosses | AnalysisSectionDamages | AnalysisSectionAdaptation
     output_path: Path
 
@@ -71,6 +71,29 @@ class AnalysisResultWrapper:
             self.analysis_config.analysis.config_value, self.analysis_name
         )
 
+    def is_valid_result(self) -> bool:
+        """
+        Validates whether this `analysis_result` in this wrapper is valid.
+
+        Returns:
+            bool: validation of the `analysis_result`.
+        """
+
+        # Because of geopandas comparison operator we cannot simply do `if any(self.analysis_result)`
+        return (
+            isinstance(self.analysis_result, GeoDataFrame)
+            and not self.analysis_result.empty
+        )
+
+
+@dataclass(kw_only=True)
+class AnalysisResultWrapper:
+    """
+    Dataclass to wrap a collection of analysis results.
+    """
+
+    results_collection: list[AnalysisResult] = field(default_factory=lambda: [])
+
     def get_single_analysis(self) -> GeoDataFrame | None:
         """
         Returns the first declared analysis result if exists, otherwise None.
@@ -90,12 +113,5 @@ class AnalysisResultWrapper:
             bool: validation of `analyses_results`.
         """
 
-        def valid_analysis(analysis_gdf: GeoDataFrame) -> bool:
-            return isinstance(analysis_gdf, GeoDataFrame) and not analysis_gdf.empty
-
         # Because of geopandas comparison operator we cannot simply do `if any(self.analysis_result)`
-        return (
-            isinstance(self.analysis_result, list)
-            and len(self.analysis_result) > 0
-            and all(map(valid_analysis, self.analysis_result))
-        )
+        return all(map(AnalysisResult.is_valid_result, self.results_collection))
