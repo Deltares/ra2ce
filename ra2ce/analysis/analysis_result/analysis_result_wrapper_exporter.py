@@ -45,12 +45,12 @@ class AnalysisResultWrapperExporter:
         for _analysis_result in result_wrapper.results_collection:
             if _analysis_result.analysis_config.save_gpkg:
                 self._export_gdf(
-                    _analysis_result,
+                    _analysis_result.analysis_result,
                     _analysis_result.base_export_path.with_suffix(".gpkg"),
                 )
             if _analysis_result.analysis_config.save_csv:
                 self._export_csv(
-                    _analysis_result,
+                    _analysis_result.analysis_result,
                     _analysis_result.base_export_path.with_suffix(".csv"),
                 )
 

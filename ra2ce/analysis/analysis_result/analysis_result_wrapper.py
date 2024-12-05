@@ -52,6 +52,8 @@ class AnalysisResult:
             str: The formatted analysis name.
         """
         if not self._custom_name:
+            if not self.analysis_config:
+                return ""
             return self.analysis_config.name.replace(" ", "_")
         return self._custom_name
 
@@ -101,8 +103,8 @@ class AnalysisResultWrapper:
         Returns:
             GeoDataFrame | None: First declared analysis result.
         """
-        if any(self.analysis_result):
-            return self.analysis_result[0]
+        if any(self.results_collection):
+            return self.results_collection[0]
         return None
 
     def is_valid_result(self) -> bool:
@@ -114,4 +116,6 @@ class AnalysisResultWrapper:
         """
 
         # Because of geopandas comparison operator we cannot simply do `if any(self.analysis_result)`
-        return all(map(AnalysisResult.is_valid_result, self.results_collection))
+        return any(self.results_collection) and all(
+            map(AnalysisResult.is_valid_result, self.results_collection)
+        )
