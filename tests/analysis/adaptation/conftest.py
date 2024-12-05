@@ -49,8 +49,17 @@ class AdaptationOptionCases:
             maintenance_cost=50.0,
             maintenance_interval=3.0,
         ),
+        AnalysisSectionAdaptationOption(
+            id="AO3",
+            name="No construction",
+            construction_cost=.0,
+            construction_interval=.0,
+            maintenance_cost=1100.0,
+            maintenance_interval=1.0,
+        ),
+
     ]
-    cost: list[float] = [0.0, 2693.684211, 5231.908660]
+    cost: list[float] = [0.0, 2693.684211, 5231.908660, 17481.74207]
     cases = list(zip(config_cases, cost))
 
 
