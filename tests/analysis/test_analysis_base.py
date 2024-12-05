@@ -1,4 +1,3 @@
-import pytest
 from geopandas import GeoDataFrame
 from shapely import Point
 
@@ -36,9 +35,12 @@ class TestAnalysisBase:
         # 3. Verify expectations.
         assert isinstance(_result_wrapper, AnalysisResultWrapper)
         assert len(_result_wrapper.results_collection) == 1
-        _single_result = _result_wrapper.get_single_analysis()
+        _single_result = _result_wrapper.results_collection[0]
         assert isinstance(_single_result, AnalysisResult)
         assert _single_result.analysis_result.equals(_result_gfd)
+        assert _single_result.analysis_result.equals(
+            _result_wrapper.get_single_result()
+        )
         assert _single_result.analysis_config == mocked_analysis.analysis
 
     def test_generate_result_wrapper_multiple_results(

@@ -37,7 +37,7 @@ class AnalysisResultWrapper(AnalysisResultWrapperProtocol):
 
     results_collection: list[AnalysisResult] = field(default_factory=lambda: [])
 
-    def get_single_analysis(self) -> GeoDataFrame | None:
+    def get_single_result(self) -> GeoDataFrame | None:
         """
         Returns the first declared analysis result if exists, otherwise None.
 
