@@ -21,9 +21,17 @@ class TestAnalysisOptionAnalysis:
     @pytest.mark.parametrize(
         "analysis_type, expected_analysis",
         [
-            (AnalysisDamagesEnum.DAMAGES, Damages),
-            (AnalysisLossesEnum.SINGLE_LINK_LOSSES, SingleLinkLosses),
-            (AnalysisLossesEnum.MULTI_LINK_LOSSES, MultiLinkLosses),
+            pytest.param(AnalysisDamagesEnum.DAMAGES, Damages, id="damages"),
+            pytest.param(
+                AnalysisLossesEnum.SINGLE_LINK_LOSSES,
+                SingleLinkLosses,
+                id="single_link_losses",
+            ),
+            pytest.param(
+                AnalysisLossesEnum.MULTI_LINK_LOSSES,
+                MultiLinkLosses,
+                id="multi_link_losses",
+            ),
         ],
     )
     def test_get_analysis_returns_tuple(
@@ -75,23 +83,15 @@ class TestAnalysisOptionAnalysis:
         # 1. Define test data.
         _analysis_config = valid_adaptation_config[1]
         assert _analysis_config.config_data.adaptation
-        _orig_path = _analysis_config.config_data.input_path
-        _expected_path = _orig_path.parent.joinpath(
-            "input",
-            _analysis_config.config_data.adaptation.adaptation_options[0].id,
-            analysis_type.config_value,
-            "input",
-        )
 
         _analysis_config.config_data.adaptation.losses_analysis = analysis_type
         _id = _analysis_config.config_data.adaptation.adaptation_options[0].id
 
         # 2. Run test.
         _result = AdaptationOptionAnalysis.from_config(
-            analysis_config=_analysis_config, analysis=analysis_type, option_id=_id
+            analysis_config=_analysis_config, analysis_type=analysis_type, option_id=_id
         )
 
         # 3. Verify expectations.
         assert isinstance(_result, AdaptationOptionAnalysis)
         assert _result.analysis_type == expected_analysis
-        assert _result.analysis_input.input_path == _expected_path

@@ -86,7 +86,7 @@ class AdaptationOption:
             _analyses.append(
                 AdaptationOptionAnalysis.from_config(
                     analysis_config=analysis_config,
-                    analysis=_analysis,
+                    analysis_type=_analysis,
                     option_id=adaptation_option.id,
                 )
             )

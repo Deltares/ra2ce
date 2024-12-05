@@ -202,6 +202,47 @@ class AnalysisConfigData(ConfigDataProtocol):
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     hazard_names: list[str] = field(default_factory=list)
 
+    def reroot_analysis_config(
+        self,
+        analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
+        new_root: Path,
+    ) -> AnalysisConfigData:
+        """
+        Reroot dependent analysis in config data to the input of another analysis.
+
+        Returns:
+            AnalysisConfigData: The rerooted config data.
+        """
+
+        def reroot_path(orig_path: Optional[Path]) -> Optional[Path]:
+            # Rewrite the path to the new root
+            if not orig_path or not self.root_path:
+                return None
+            _orig_parts = orig_path.parts
+            _rel_path = Path(*_orig_parts[len(self.root_path.parts) :])
+            return new_root.joinpath("input", analysis_type.config_value, _rel_path)
+
+        self.input_path = reroot_path(self.input_path)
+        self.static_path = reroot_path(self.static_path)
+        self.output_path = reroot_path(self.output_path)
+
+        # Rewrite the paths of the files in the analysis
+        _analysis = self.get_analysis(analysis_type)
+        if isinstance(_analysis, AnalysisSectionDamages):
+            _analysis.file_name = reroot_path(_analysis.file_name)
+        elif isinstance(_analysis, AnalysisSectionLosses):
+            _analysis.resilience_curves_file = reroot_path(
+                _analysis.resilience_curves_file
+            )
+            _analysis.traffic_intensities_file = reroot_path(
+                _analysis.traffic_intensities_file
+            )
+            _analysis.values_of_time_file = reroot_path(_analysis.values_of_time_file)
+
+        self.root_path = new_root
+
+        return self
+
     @property
     def damages_list(self) -> list[AnalysisSectionDamages]:
         """

@@ -78,7 +78,7 @@ class AdaptationOptionAnalysis:
     def from_config(
         cls,
         analysis_config: AnalysisConfigWrapper,
-        analysis: AnalysisLossesEnum | AnalysisDamagesEnum,
+        analysis_type: AnalysisLossesEnum | AnalysisDamagesEnum,
         option_id: str,
     ) -> AdaptationOptionAnalysis:
         """
@@ -86,54 +86,23 @@ class AdaptationOptionAnalysis:
 
         Args:
             analysis_config (AnalysisConfigWrapper): The analysis configuration.
-            analysis (AnalysisLossesEnum | AnalysisDamagesEnum): The type of analysis.
+            analysis_type (AnalysisLossesEnum | AnalysisDamagesEnum): The type of analysis.
             option_id (str): The ID of the adaptation option.
 
         Returns:
             AdaptationOptionAnalysis: The created AdaptationOptionAnalysis.
         """
 
-        def construct_path(
-            orig_path: Path,
-            folder: str,
-        ) -> Path:
-            # Adjust path to the files (should be in Adaptation/input)
-            if not orig_path:
-                return None
-            # Orig is directory: add stuff at the end
-            if not (orig_path.suffix):
-                return orig_path.parent.joinpath(
-                    "input", option_id, analysis.config_value, folder
-                )
-            return orig_path.parent.parent.joinpath(
-                "input", option_id, analysis.config_value, folder, orig_path.name
-            )
-
-        def replace_paths(config_data: AnalysisConfigData) -> AnalysisConfigData:
-            # Replace paths in the config data
-            config_data.input_path = construct_path(config_data.input_path, "input")
-            config_data.static_path = construct_path(config_data.static_path, "static")
-            config_data.output_path = construct_path(config_data.output_path, "output")
-            return config_data
-
         # Need a deepcopy to avoid mixing up configs across analyses.
         _analysis_config = deepcopy(analysis_config)
+        _analysis_config.config_data = (
+            _analysis_config.config_data.reroot_analysis_config(
+                analysis_type,
+                analysis_config.config_data.root_path.joinpath("input", option_id),
+            )
+        )
 
-        # Replace all paths in the config data to point to the nested options folder.
-        _analysis_config.config_data = replace_paths(_analysis_config.config_data)
-        _analysis_data = _analysis_config.config_data.get_analysis(analysis)
-        if isinstance(_analysis_data, AnalysisSectionLosses):
-            _analysis_data.traffic_intensities_file = construct_path(
-                _analysis_data.traffic_intensities_file, "input"
-            )
-            _analysis_data.resilience_curves_file = construct_path(
-                _analysis_data.resilience_curves_file, "input"
-            )
-            _analysis_data.values_of_time_file = construct_path(
-                _analysis_data.values_of_time_file, "input"
-            )
-
-        if analysis == AnalysisDamagesEnum.DAMAGES:
+        if analysis_type == AnalysisDamagesEnum.DAMAGES:
             _graph_file = None
             _graph_file_hazard = analysis_config.graph_files.base_network_hazard
         else:
@@ -141,13 +110,13 @@ class AdaptationOptionAnalysis:
             _graph_file_hazard = analysis_config.graph_files.base_graph_hazard
 
         _analysis_input = AnalysisInputWrapper.from_input(
-            analysis=_analysis_data,
+            analysis=_analysis_config.config_data.adaptation,
             analysis_config=_analysis_config,
             graph_file=_graph_file,
             graph_file_hazard=_graph_file_hazard,
         )
 
-        _analysis_type, _result_col = cls.get_analysis(analysis)
+        _analysis_type, _result_col = cls.get_analysis(analysis_type)
 
         return cls(
             analysis_type=_analysis_type,
