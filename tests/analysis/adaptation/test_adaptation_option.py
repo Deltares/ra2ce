@@ -68,7 +68,7 @@ class TestAdaptationOption:
         "adaptation_option",
         AdaptationOptionCases.cases,
     )
-    def test_calculate_option_cost_returns_float(
+    def test_calculate_unit_cost_returns_float(
         self,
         valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
         adaptation_option: tuple[AnalysisSectionAdaptation, float, float],
@@ -82,7 +82,7 @@ class TestAdaptationOption:
         _discount_rate = valid_adaptation_config[1].config_data.adaptation.discount_rate
 
         # 2. Run test.
-        _cost = _option.calculate_cost(_time_horizon, _discount_rate)
+        _cost = _option.calculate_unit_cost(_time_horizon, _discount_rate)
 
         # 3. Verify expectations.
         assert isinstance(_cost, float)
