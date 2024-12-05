@@ -63,12 +63,18 @@ class Adaptation(AnalysisDamagesProtocol):
     def execute(self) -> GeoDataFrame:
         """
         Run the adaptation analysis.
+
+        Returns:
+            GeoDataFrame: The result of the adaptation analysis.
         """
         return self.calculate_bc_ratio()
 
     def run_cost(self) -> GeoDataFrame:
         """
         Calculate the unit cost for all adaptation options.
+
+        Returns:
+            GeoDataFrame: The result of the cost calculation.
         """
         _cost_gdf = deepcopy(self.graph_file.get_graph())
 
@@ -84,19 +90,21 @@ class Adaptation(AnalysisDamagesProtocol):
 
     def run_benefit(self) -> GeoDataFrame:
         """
-        Calculate the benefit for all adaptation options
+        Calculate the benefit for all adaptation options.
+
+        Returns:
+            GeoDataFrame: The result of the benefit calculation.
         """
         _benefit_gdf = deepcopy(self.graph_file.get_graph())
 
-        _benefit_gdf = self.adaptation_collection.calculation_options_impact(
-            _benefit_gdf
-        )
-
-        return _benefit_gdf
+        return self.adaptation_collection.calculation_options_impact(_benefit_gdf)
 
     def calculate_bc_ratio(self) -> GeoDataFrame:
         """
-        Calculate the benefit-cost ratio for all adaptation options
+        Calculate the benefit-cost ratio for all adaptation options.
+
+        Returns:
+            GeoDataFrame: The result of the benefit-cost ratio calculation.
         """
         _cost_gdf = self.run_cost()
         _benefit_gdf = self.run_benefit()

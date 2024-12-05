@@ -20,27 +20,20 @@
 """
 from __future__ import annotations
 
-from copy import deepcopy
 from dataclasses import asdict, dataclass
-from pathlib import Path
 
 from geopandas import GeoDataFrame
 
+from ra2ce.analysis.adaptation.adaptation_option_analysis import (
+    AdaptationOptionAnalysis,
+)
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
     AnalysisSectionAdaptationOption,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
-)
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
-from ra2ce.analysis.damages.damages import Damages
-from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
-from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
 
 
 @dataclass
@@ -51,9 +44,7 @@ class AdaptationOption:
     construction_interval: float
     maintenance_cost: float
     maintenance_interval: float
-    damages_input: AnalysisInputWrapper
-    losses_input: AnalysisInputWrapper
-    losses_analysis: AnalysisLossesEnum
+    analyses: list[AdaptationOptionAnalysis]
     analysis_config: AnalysisConfigWrapper
 
     def __hash__(self) -> int:
@@ -66,7 +57,7 @@ class AdaptationOption:
         adaptation_option: AnalysisSectionAdaptationOption,
     ) -> AdaptationOption:
         """
-        Classmethod to create an adaptation option from an analysis configuration and an adaptation option.
+        Classmethod to create an AdaptationOption from an analysis configuration and an adaptation option.
 
         Args:
             analysis_config (AnalysisConfigWrapper): Analysis config input
@@ -78,37 +69,6 @@ class AdaptationOption:
         Returns:
             AdaptationOption: The created adaptation option.
         """
-        # Adjust path to the files (should be in Adaptation/input)
-        def construct_path(
-            orig_path: Path,
-            analysis: str,
-            folder: str,
-        ) -> Path:
-            if not orig_path:
-                return None
-            # Orig is directory: add stuff at the end
-            if not (orig_path.suffix):
-                return orig_path.parent.joinpath(
-                    "input", adaptation_option.id, analysis, folder
-                )
-            return orig_path.parent.parent.joinpath(
-                "input", adaptation_option.id, analysis, folder, orig_path.name
-            )
-
-        def replace_paths(
-            config_data: AnalysisConfigData, analysis: str
-        ) -> AnalysisConfigData:
-            config_data.input_path = construct_path(
-                config_data.input_path, analysis, "input"
-            )
-            config_data.static_path = construct_path(
-                config_data.static_path, analysis, "static"
-            )
-            config_data.output_path = construct_path(
-                config_data.output_path, analysis, "output"
-            )
-            return config_data
-
         if (
             not analysis_config.config_data.damages_list
             or not analysis_config.config_data.losses_list
@@ -117,48 +77,23 @@ class AdaptationOption:
                 "Damages and losses sections are required to create an adaptation option."
             )
 
-        # Create input for the damages analysis
-        _damages_config = deepcopy(analysis_config)
-        _damages_config.config_data = replace_paths(
-            _damages_config.config_data, "damages"
-        )
-        _damages_analysis = _damages_config.config_data.get_analysis(
-            AnalysisDamagesEnum.DAMAGES
-        )
-        _damages_input = AnalysisInputWrapper.from_input(
-            analysis=_damages_analysis,
-            analysis_config=_damages_config,
-            graph_file_hazard=analysis_config.graph_files.base_network_hazard,
-        )
-
-        # Create input for the losses analysis
-        _losses_config = deepcopy(analysis_config)
-        _losses_config.config_data = replace_paths(_losses_config.config_data, "losses")
-        _losses_analysis = _losses_config.config_data.get_analysis(
-            analysis_config.config_data.adaptation.losses_analysis
-        )
-        _losses_analysis.traffic_intensities_file = construct_path(
-            _losses_analysis.traffic_intensities_file, "losses", "input"
-        )
-        _losses_analysis.resilience_curves_file = construct_path(
-            _losses_analysis.resilience_curves_file, "losses", "input"
-        )
-        _losses_analysis.values_of_time_file = construct_path(
-            _losses_analysis.values_of_time_file, "losses", "input"
-        )
-        _losses_analysis
-        _losses_input = AnalysisInputWrapper.from_input(
-            analysis=_losses_analysis,
-            analysis_config=_losses_config,
-            graph_file=analysis_config.graph_files.base_graph,
-            graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
-        )
+        # Create input for the analyses
+        _analyses = []
+        for _analysis in [
+            AnalysisDamagesEnum.DAMAGES,
+            analysis_config.config_data.adaptation.losses_analysis,
+        ]:
+            _analyses.append(
+                AdaptationOptionAnalysis.from_config(
+                    analysis_config=analysis_config,
+                    analysis=_analysis,
+                    option_id=adaptation_option.id,
+                )
+            )
 
         return cls(
             **asdict(adaptation_option),
-            damages_input=_damages_input,
-            losses_input=_losses_input,
-            losses_analysis=analysis_config.config_data.adaptation.losses_analysis,
+            analyses=_analyses,
             analysis_config=analysis_config,
         )
 
@@ -212,28 +147,13 @@ class AdaptationOption:
         Returns:
             float: The impact of the adaptation option.
         """
-        # Damages analysis
-        _damages = Damages(self.damages_input)
-        _damages_gdf = _damages.execute()
-        _dam_col = _damages_gdf.filter(regex="dam_").columns[0]
-        benefit_graph[f"{self.id}_{_dam_col}"] = _damages_gdf[_dam_col]
-
-        # Losses analysis
-        if self.losses_analysis is AnalysisLossesEnum.SINGLE_LINK_LOSSES:
-            _losses = SingleLinkLosses(self.losses_input, self.analysis_config)
-        elif self.losses_analysis is AnalysisLossesEnum.MULTI_LINK_LOSSES:
-            _losses = MultiLinkLosses(self.losses_input, self.analysis_config)
-        else:
-            raise NotImplementedError(
-                f"Losses analysis {self.losses_analysis} not implemented"
-            )
-        _losses_gdf = _losses.execute()
-        _los_col = _losses_gdf.filter(regex="vlh_.*_total").columns[0]
-        benefit_graph[f"{self.id}_{_los_col}"] = _losses_gdf[_los_col]
+        for _analysis in self.analyses:
+            _result = _analysis.execute(self.analysis_config)
+            _col = _result.filter(regex=_analysis.result_col).columns[0]
+            benefit_graph[f"{self.id}_{_col}"] = _result[_col]
 
         # Calculate the impact (summing the damages and losses values)
-        benefit_graph[f"{self.id}_impact"] = (
-            benefit_graph[[f"{self.id}_{_dam_col}", f"{self.id}_{_los_col}"]]
-        ).sum(axis=1)
+        _option_cols = benefit_graph.filter(regex=f"{self.id}_").columns
+        benefit_graph[f"{self.id}_impact"] = benefit_graph[_option_cols].sum(axis=1)
 
         return benefit_graph

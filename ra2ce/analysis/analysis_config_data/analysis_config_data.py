@@ -185,12 +185,16 @@ class AnalysisConfigData(ConfigDataProtocol):
     Additionally, some attributes from the network config are added for completeness (files, origins_destinations, network, hazard_names)
     """
 
+    ANALYSIS_TYPE = (
+        AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation
+    )
+
     root_path: Optional[Path] = None
     input_path: Optional[Path] = None
     output_path: Optional[Path] = None
     static_path: Optional[Path] = None
     project: ProjectSection = field(default_factory=ProjectSection)
-    analyses: list[AnalysisSectionBase] = field(default_factory=list)
+    analyses: list[ANALYSIS_TYPE] = field(default_factory=list)
     origins_destinations: Optional[OriginsDestinationsSection] = field(
         default_factory=OriginsDestinationsSection
     )
@@ -237,7 +241,7 @@ class AnalysisConfigData(ConfigDataProtocol):
 
     def get_analysis(
         self, analysis: AnalysisEnum | AnalysisDamagesEnum | AnalysisLossesEnum
-    ) -> AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation | None:
+    ) -> ANALYSIS_TYPE | None:
         """
         Get a certain analysis from config.
 
