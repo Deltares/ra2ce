@@ -2,65 +2,61 @@ import pytest
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
     AnalysisSectionAdaptation,
-)
-from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
-    AnalysisDamagesEnum,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.damages.damages import Damages
+from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
+from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
 from tests.analysis.adaptation.conftest import AdaptationOptionCases
 
 
 class TestAdaptationOption:
     @pytest.mark.parametrize(
-        "losses_analysis",
-        [AnalysisLossesEnum.SINGLE_LINK_LOSSES, AnalysisLossesEnum.MULTI_LINK_LOSSES],
+        "losses_analysis_type, losses_analysis",
+        [
+            (AnalysisLossesEnum.SINGLE_LINK_LOSSES, SingleLinkLosses),
+            (AnalysisLossesEnum.MULTI_LINK_LOSSES, MultiLinkLosses),
+        ],
     )
-    def test_from_config(
+    def test_from_config_returns_object_with_2_analyses(
         self,
-        valid_adaptation_config: AnalysisConfigData,
-        losses_analysis: AnalysisLossesEnum,
+        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+        losses_analysis_type: AnalysisLossesEnum,
+        losses_analysis: type[SingleLinkLosses | MultiLinkLosses],
     ):
         # 1. Define test data.
-        _orig_path = valid_adaptation_config.losses_list[0].resilience_curves_file
-        _expected_path = _orig_path.parent.joinpath(
-            "input",
-            valid_adaptation_config.adaptation.adaptation_options[0].id,
-            "losses",
-            _orig_path.name,
-        )
+        _config_data = valid_adaptation_config[1].config_data
+        assert _config_data.adaptation
+        _config_data.adaptation.losses_analysis = losses_analysis_type
+        _config_option = _config_data.adaptation.adaptation_options[0]
 
         # 2. Run test.
         _option = AdaptationOption.from_config(
-            root_path=valid_adaptation_config.root_path,
-            adaptation_option=valid_adaptation_config.adaptation.adaptation_options[0],
-            damages_section=valid_adaptation_config.get_analysis(
-                AnalysisDamagesEnum.DAMAGES
-            ),
-            losses_section=valid_adaptation_config.get_analysis(losses_analysis),
+            analysis_config=valid_adaptation_config[1],
+            adaptation_option=_config_option,
         )
 
         # 3. Verify expectations.
         assert isinstance(_option, AdaptationOption)
-        assert _option.id == "AO0"
-        assert _option.damages_config.analysis == AnalysisDamagesEnum.DAMAGES
-        assert _option.losses_config.analysis == losses_analysis
-        assert _option.losses_config.resilience_curves_file == _expected_path
+        assert _option.id == _config_option.id
+        assert len(_option.analyses) == 2
+        assert Damages in [x.analysis_class for x in _option.analyses]
+        assert losses_analysis in [x.analysis_class for x in _option.analyses]
 
     def test_from_config_no_damages_losses_raises(self):
         # 1. Define test data.
-        _config = AnalysisConfigData()
+        _config = AnalysisConfigWrapper()
 
         # 2. Run test.
         with pytest.raises(ValueError) as _exc:
             AdaptationOption.from_config(
-                root_path=_config.root_path,
+                analysis_config=_config,
                 adaptation_option=AnalysisSectionAdaptation(),
-                damages_section=None,
-                losses_section=None,
             )
 
         # 3. Verify expectations.
@@ -72,23 +68,22 @@ class TestAdaptationOption:
         "adaptation_option",
         AdaptationOptionCases.cases,
     )
-    def test_calculate_option_cost(
+    def test_calculate_option_cost_returns_float(
         self,
-        valid_adaptation_config: AnalysisConfigData,
-        adaptation_option: tuple[AnalysisSectionAdaptation, float],
+        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+        adaptation_option: tuple[AnalysisSectionAdaptation, float, float],
     ):
         # 1. Define test data.
         _option = AdaptationOption.from_config(
-            root_path=valid_adaptation_config.root_path,
+            analysis_config=valid_adaptation_config[1],
             adaptation_option=adaptation_option[0],
-            damages_section=valid_adaptation_config.damages_list[0],
-            losses_section=valid_adaptation_config.losses_list[0],
         )
-        _time_horizon = valid_adaptation_config.adaptation.time_horizon
-        _discount_rate = valid_adaptation_config.adaptation.discount_rate
+        _time_horizon = valid_adaptation_config[1].config_data.adaptation.time_horizon
+        _discount_rate = valid_adaptation_config[1].config_data.adaptation.discount_rate
 
         # 2. Run test.
         _cost = _option.calculate_cost(_time_horizon, _discount_rate)
 
         # 3. Verify expectations.
+        assert isinstance(_cost, float)
         assert _cost == pytest.approx(adaptation_option[1])
