@@ -25,13 +25,15 @@ from pathlib import Path
 
 from geopandas import GeoDataFrame
 
-from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper_protocol import (
+    AnalysisResultWrapperProtocol,
+)
 
 
 class AnalysisResultWrapperExporter:
     def export_result(
         self,
-        result_wrapper: AnalysisResultWrapper,
+        result_wrapper: AnalysisResultWrapperProtocol,
     ):
         """
         Exports the given result into the analysis requested formats ( `.gpkg` and / or `.csv`).

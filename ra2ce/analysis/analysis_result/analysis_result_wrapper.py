@@ -24,7 +24,7 @@ from dataclasses import dataclass, field
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_result.analysis_result import AnalysisResult
-from ra2ce.analysis.analysis_result.analysis_result_wrapper_.protocol import (
+from ra2ce.analysis.analysis_result.analysis_result_wrapper_protocol import (
     AnalysisResultWrapperProtocol,
 )
 
