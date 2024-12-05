@@ -128,18 +128,37 @@ class AdaptationOption:
         def calc_cost(cost: float, year: float) -> float:
             return cost * (1 - discount_rate) ** year
 
-        _assessment_years = calc_years(
-            0,
-            time_horizon,
-            1,
-        )
+        # _assessment_years = calc_years(
+        #     1,
+        #     time_horizon + 1,
+        #     1,
+        # )
+        # _lifetime_cost = self.construction_cost
+        # for _constr_year in _assessment_years:
+        #
+        #     if self.construction_interval > 0 and _constr_year in range(0, time_horizon, round(self.construction_interval)):
+        #         _lifetime_cost += calc_cost(self.construction_cost, _constr_year)
+        #
+        #     if self.maintenance_interval > 0 and _constr_year in range(0, time_horizon, round(self.maintenance_interval)):
+        #         _lifetime_cost += calc_cost(self.maintenance_cost, _constr_year)
+
+        _constr_years = calc_years(
+                0,
+                time_horizon,
+                self.construction_interval,
+            )
         _lifetime_cost = 0.0
-        for _constr_year in _assessment_years:
+        for _constr_year in _constr_years:
+        # Calculate the present value of the construction cost
+            _lifetime_cost += calc_cost(self.construction_cost, _constr_year)
 
-            if self.construction_interval > 0 and _constr_year in range(0, time_horizon, round(self.construction_interval)):
-                _lifetime_cost += calc_cost(self.construction_cost, _constr_year)
-
-            if self.maintenance_interval > 0 and _constr_year in range(0, time_horizon, round(self.maintenance_interval)):
-                _lifetime_cost += calc_cost(self.maintenance_cost, _constr_year)
+        # Calculate the present value of the maintenance cost
+        _maint_years = calc_years(
+            _constr_year + self.maintenance_interval,
+            _constr_year + self.construction_interval,
+            self.maintenance_interval,
+        )
+        for _maint_year in _maint_years:
+            _lifetime_cost += calc_cost(self.maintenance_cost, _maint_year)
 
         return _lifetime_cost

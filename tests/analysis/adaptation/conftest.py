@@ -53,7 +53,7 @@ class AdaptationOptionCases:
             id="AO3",
             name="No construction",
             construction_cost=.0,
-            construction_interval=.0,
+            construction_interval=20,
             maintenance_cost=1100.0,
             maintenance_interval=1.0,
         ),
