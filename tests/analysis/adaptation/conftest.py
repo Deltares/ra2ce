@@ -73,14 +73,12 @@ class AdaptationOptionCases:
 
 @pytest.fixture(name="valid_adaptation_config", scope="package")
 def _get_valid_adaptation_config_fixture(
-    request: pytest.FixtureRequest,
     valid_analysis_ini: Path,
 ) -> Iterator[tuple[AnalysisInputWrapper, AnalysisConfigWrapper]]:
     """
     Create valid input and config for the adaptation analysis.
 
     Args:
-        request (pytest.FixtureRequest): Pytest fixture request.
         valid_analysis_ini (Path): Path to a valid analysis ini file.
 
     Yields:
@@ -110,7 +108,7 @@ def _get_valid_adaptation_config_fixture(
             save_csv=True,
         )
 
-    _root_path = test_results.joinpath(request.node.name)
+    _root_path = test_results.joinpath("adaptation")
     _input_path = _root_path.joinpath("input")
     _static_path = _root_path.joinpath("static")
     _output_path = _root_path.joinpath("output")
@@ -138,7 +136,7 @@ def _get_valid_adaptation_config_fixture(
         link_type_column="highway",
     )
     _network_config_data = NetworkConfigData(
-        static_path=test_results.joinpath(request.node.name, "static"),
+        static_path=test_results.joinpath("adaptation", "static"),
         hazard=_hazard_section,
         network=_network_section,
     )
