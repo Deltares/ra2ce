@@ -45,11 +45,10 @@ def _get_analysis_result_builder_fixture() -> Iterator[
     yield create_analysis_result
 
 
-@pytest.fixture(name="mocked_analysis_result_wrapper")
-def _get_valid_mocked_result_wrapper(
+@pytest.fixture(name="mocked_analysis")
+def _get_mocked_analysis(
     test_result_param_case: Path,
-    analysis_result_builder: Callable[[GeoDataFrame], AnalysisResult],
-) -> Iterator[AnalysisResultWrapper]:
+) -> Iterator[AnalysisProtocol]:
     class MockedAnalysis(AnalysisProtocol):
         def __init__(self) -> None:
             _analysis = AnalysisSectionBase(
@@ -59,6 +58,14 @@ def _get_valid_mocked_result_wrapper(
             self.analysis = _analysis
             self.output_path = test_result_param_case
 
+    yield MockedAnalysis()
+
+
+@pytest.fixture(name="mocked_analysis_result_wrapper")
+def _get_valid_mocked_result_wrapper(
+    analysis_result_builder: Callable[[GeoDataFrame], AnalysisResult],
+    mocked_analysis: AnalysisProtocol,
+) -> Iterator[AnalysisResultWrapper]:
     _result_gfd = GeoDataFrame(
         {
             "dummy_column": ["left", "right"],
@@ -66,13 +73,12 @@ def _get_valid_mocked_result_wrapper(
         }
     )
 
-    _mocked_analysis = MockedAnalysis()
     _result_wrapper = AnalysisResultWrapper()
     _result_wrapper.results_collection.append(
         analysis_result_builder(
             gdf_result=_result_gfd,
-            analysis_config=_mocked_analysis.analysis,
-            output_path=_mocked_analysis.output_path,
+            analysis_config=mocked_analysis.analysis,
+            output_path=mocked_analysis.output_path,
         )
     )
     _single_result = _result_wrapper.results_collection[0]
