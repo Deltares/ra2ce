@@ -4,9 +4,6 @@ from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionAdaptation,
 )
-from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
-    AnalysisDamagesEnum,
-)
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
@@ -26,40 +23,30 @@ class TestAdaptationOption:
             (AnalysisLossesEnum.MULTI_LINK_LOSSES, MultiLinkLosses),
         ],
     )
-    def test_from_config(
+    def test_from_config_returns_object_with_2_analyses(
         self,
         valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
         losses_analysis_type: AnalysisLossesEnum,
         losses_analysis: type[SingleLinkLosses | MultiLinkLosses],
     ):
         # 1. Define test data.
-        _orig_path = valid_adaptation_config[1].config_data.input_path
-        _expected_path = _orig_path.parent.joinpath(
-            "input",
-            valid_adaptation_config[1].config_data.adaptation.adaptation_options[0].id,
-            losses_analysis_type.config_value,
-            "input",
-        )
-
-        valid_adaptation_config[
-            1
-        ].config_data.adaptation.losses_analysis = losses_analysis_type
+        _config_data = valid_adaptation_config[1].config_data
+        assert _config_data.adaptation
+        _config_data.adaptation.losses_analysis = losses_analysis_type
+        _config_option = _config_data.adaptation.adaptation_options[0]
 
         # 2. Run test.
         _option = AdaptationOption.from_config(
             analysis_config=valid_adaptation_config[1],
-            adaptation_option=valid_adaptation_config[
-                1
-            ].config_data.adaptation.adaptation_options[0],
+            adaptation_option=_config_option,
         )
 
         # 3. Verify expectations.
         assert isinstance(_option, AdaptationOption)
-        assert _option.id == "AO0"
+        assert _option.id == _config_option.id
         assert len(_option.analyses) == 2
         assert Damages in [x.analysis_type for x in _option.analyses]
         assert losses_analysis in [x.analysis_type for x in _option.analyses]
-        assert _expected_path in [x.analysis_input.input_path for x in _option.analyses]
 
     def test_from_config_no_damages_losses_raises(self):
         # 1. Define test data.

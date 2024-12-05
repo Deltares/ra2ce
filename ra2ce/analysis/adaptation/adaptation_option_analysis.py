@@ -24,7 +24,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 
-from pandas import DataFrame
+from geopandas import GeoDataFrame
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
@@ -51,8 +51,8 @@ class AdaptationOptionAnalysis:
     result_col: str
 
     @staticmethod
-    def get_analysis_type(
-        analysis: AnalysisDamagesEnum | AnalysisLossesEnum,
+    def get_analysis(
+        analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
     ) -> tuple[type[Damages | LossesBase], str]:
         """
         Get the analysis type and the result column for the given analysis.
@@ -66,13 +66,13 @@ class AdaptationOptionAnalysis:
         Returns:
             tuple[type[Damages | LossesBase], str]: The analysis type and the result column.
         """
-        if analysis == AnalysisDamagesEnum.DAMAGES:
+        if analysis_type == AnalysisDamagesEnum.DAMAGES:
             return (Damages, "dam_")
-        elif analysis == AnalysisLossesEnum.SINGLE_LINK_LOSSES:
+        elif analysis_type == AnalysisLossesEnum.SINGLE_LINK_LOSSES:
             return (SingleLinkLosses, "vlh_.*_total")
-        elif analysis == AnalysisLossesEnum.MULTI_LINK_LOSSES:
+        elif analysis_type == AnalysisLossesEnum.MULTI_LINK_LOSSES:
             return (MultiLinkLosses, "vlh_.*_total")
-        raise NotImplementedError(f"Analysis {analysis} not implemented")
+        raise NotImplementedError(f"Analysis {analysis_type} not implemented")
 
     @classmethod
     def from_config(
@@ -147,7 +147,7 @@ class AdaptationOptionAnalysis:
             graph_file_hazard=_graph_file_hazard,
         )
 
-        _analysis_type, _result_col = cls.get_analysis_type(analysis)
+        _analysis_type, _result_col = cls.get_analysis(analysis)
 
         return cls(
             analysis_type=_analysis_type,
@@ -155,7 +155,7 @@ class AdaptationOptionAnalysis:
             result_col=_result_col,
         )
 
-    def execute(self, analysis_config: AnalysisConfigWrapper) -> DataFrame:
+    def execute(self, analysis_config: AnalysisConfigWrapper) -> GeoDataFrame:
         """
         Execute the analysis.
 
