@@ -40,3 +40,42 @@ class TestAnalysisBase:
         assert isinstance(_single_result, AnalysisResult)
         assert _single_result.analysis_result.equals(_result_gfd)
         assert _single_result.analysis_config == mocked_analysis.analysis
+
+    def test_generate_result_wrapper_multiple_results(
+        self, mocked_analysis: AnalysisProtocol
+    ):
+        # 1. Define test data.
+        _result_gfd_one = GeoDataFrame(
+            {
+                "dummy_column": ["left", "right"],
+                "geometry": [Point(420, 240), Point(42, 24)],
+            }
+        )
+        _result_gfd_two = GeoDataFrame(
+            {
+                "dummy_column": ["left", "right"],
+                "geometry": [Point(420, 240), Point(42, 24)],
+            }
+        )
+        _analysis_base = AnalysisBase()
+        _analysis_base.analysis = mocked_analysis.analysis
+        _analysis_base.output_path = mocked_analysis.output_path
+
+        # 2. Run test.
+        _result_wrapper = _analysis_base.generate_result_wrapper(
+            _result_gfd_one, _result_gfd_two
+        )
+
+        # 3. Verify expectations.
+        assert isinstance(_result_wrapper, AnalysisResultWrapper)
+        assert len(_result_wrapper.results_collection) == 2
+
+        def verify_analysis_result(
+            analysis_result: AnalysisResult, result_gfd: GeoDataFrame
+        ):
+            assert isinstance(analysis_result, AnalysisResult)
+            assert analysis_result.analysis_result.equals(result_gfd)
+            assert analysis_result.analysis_config == mocked_analysis.analysis
+
+        verify_analysis_result(_result_wrapper.results_collection[0], _result_gfd_one)
+        verify_analysis_result(_result_wrapper.results_collection[1], _result_gfd_two)
