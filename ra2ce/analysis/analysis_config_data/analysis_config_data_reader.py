@@ -250,14 +250,14 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
 
         return _section
 
-    def get_analysis_sections(self) -> list[AnalysisSectionBase]:
+    def get_analysis_sections(self) -> list[AnalysisConfigData.ANALYSIS_SECTION]:
         """
         Extracts info from [analysis<n>] sections
 
         Returns:
-            list[AnalysisSectionBase]: List of analyses
+            list[ANALYSIS_SECTION]: List of analyses
         """
-        _analysis_sections: list[AnalysisSectionBase] = []
+        _analysis_sections: list[AnalysisConfigData.ANALYSIS_SECTION] = []
 
         _section_names = list(
             section_name
