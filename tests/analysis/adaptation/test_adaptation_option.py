@@ -1,4 +1,7 @@
+from dataclasses import dataclass
+
 import pytest
+from geopandas import GeoDataFrame
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
@@ -71,7 +74,7 @@ class TestAdaptationOption:
     def test_calculate_unit_cost_returns_float(
         self,
         valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
-        adaptation_option: tuple[AnalysisSectionAdaptation, float, float],
+        adaptation_option: tuple[AnalysisSectionAdaptation, tuple[float, float, float]],
     ):
         # 1. Define test data.
         _option = AdaptationOption.from_config(
@@ -86,4 +89,49 @@ class TestAdaptationOption:
 
         # 3. Verify expectations.
         assert isinstance(_cost, float)
-        assert _cost == pytest.approx(adaptation_option[1])
+        assert _cost == pytest.approx(adaptation_option[1][0])
+
+    def test_calculate_impact_returns_gdf(self) -> GeoDataFrame:
+        @dataclass
+        class MockAnalysis:
+            # Mock to avoid the need to run the impact analysis.
+            analysis_name: str
+            result_col: str
+            result: float
+
+            def execute(self, _: AnalysisConfigWrapper) -> GeoDataFrame:
+                _result_gdf = GeoDataFrame(range(_nof_rows))
+                _result_gdf[self.result_col] = self.result
+                return _result_gdf
+
+        # 1. Define test data.
+        _id = "Option1"
+        _nof_rows = 10
+        _analyses = [
+            MockAnalysis(
+                analysis_name=f"Analysis_{i}",
+                result_col=f"Result_{i}",
+                result=(i + 1) * 1.0e6,
+            )
+            for i in range(2)
+        ]
+        _option = AdaptationOption(
+            id=_id,
+            name=None,
+            construction_cost=None,
+            construction_interval=None,
+            maintenance_cost=None,
+            maintenance_interval=None,
+            analyses=_analyses,
+            analysis_config=None,
+        )
+        _benefit_gdf = GeoDataFrame(range(_nof_rows))
+
+        # 2. Run test.
+        _result = _option.calculate_impact(_benefit_gdf)
+
+        # 3. Verify expectations.
+        assert isinstance(_result, GeoDataFrame)
+        assert _result[f"{_id}_impact"].sum(axis=0) == pytest.approx(
+            _nof_rows * sum(x.result for x in _analyses)
+        )

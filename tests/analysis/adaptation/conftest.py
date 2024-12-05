@@ -66,9 +66,10 @@ class AdaptationOptionCases:
     ]
     unit_cost: list[float] = [0.0, 2693.684211, 5231.908660]
     total_cost: list[float] = [0.0, 97411702.122141, 189201512.873560]
-    cases: list[tuple[AnalysisSectionAdaptationOption, float, float]] = list(
-        zip(config_cases, unit_cost, total_cost)
-    )
+    total_benefit: list[float] = [0.0, 0.0, 0.0]
+    cases: list[
+        tuple[AnalysisSectionAdaptationOption, tuple[float, float, float]]
+    ] = list(zip(config_cases, zip(unit_cost, total_cost, total_benefit)))
 
 
 @pytest.fixture(name="valid_adaptation_config")

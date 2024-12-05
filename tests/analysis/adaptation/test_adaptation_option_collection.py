@@ -1,4 +1,7 @@
+from dataclasses import dataclass
+
 import pytest
+from geopandas import GeoDataFrame
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
@@ -60,3 +63,39 @@ class TestAdaptationOptionCollection:
         # 3. Verify expectations.
         assert isinstance(_result, dict)
         assert all(_option in _result for _option in _collection.adaptation_options)
+
+    def test_calculate_options_benefit(self):
+        @dataclass
+        class MockOption:
+            # Mock to avoid the need to run the impact analysis.
+            id: str
+            impact: float
+
+            def calculate_impact(self, benefit_graph: GeoDataFrame) -> float:
+                benefit_graph[f"{self.id}_impact"] = self.impact
+                return benefit_graph
+
+        # 1. Define test data.
+        _nof_rows = 10
+        _reference_benefit = 3.0e6
+        _options = {f"Option{i}": _reference_benefit + (i * 1.0e6) for i in range(3)}
+        _graph = GeoDataFrame(range(_nof_rows))
+        _collection = AdaptationOptionCollection(
+            all_options=[MockOption(id=x, impact=y) for x, y in _options.items()]
+        )
+
+        # 2. Run test.
+        _result = _collection.calculation_options_benefit(_graph)
+
+        # 3. Verify expectations.
+        assert isinstance(_result, GeoDataFrame)
+        assert all(
+            f"{_option.id}_benefit" in _result.columns
+            for _option in _collection.adaptation_options
+        )
+        assert all(
+            _result[f"{_id}_benefit"].sum(axis=0)
+            == pytest.approx(_nof_rows * (_impact - _reference_benefit))
+            for _id, _impact in _options.items()
+            if _id != "Option0"
+        )

@@ -97,7 +97,7 @@ class Adaptation(AnalysisDamagesProtocol):
         """
         _benefit_gdf = deepcopy(self.graph_file.get_graph())
 
-        return self.adaptation_collection.calculation_options_impact(_benefit_gdf)
+        return self.adaptation_collection.calculation_options_benefit(_benefit_gdf)
 
     def calculate_bc_ratio(self) -> GeoDataFrame:
         """

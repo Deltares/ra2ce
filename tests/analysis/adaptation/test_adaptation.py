@@ -26,17 +26,17 @@ class TestAdaptation:
         _adaptation = Adaptation(valid_adaptation_config[0], valid_adaptation_config[1])
 
         # 2. Run test.
-        _cost_gdf = _adaptation.run_cost()
+        _result = _adaptation.run_cost()
 
         # 3. Verify expectations.
-        assert isinstance(_cost_gdf, GeoDataFrame)
+        assert isinstance(_result, GeoDataFrame)
         assert all(
-            f"{_option.id}_cost" in _cost_gdf.columns
+            f"{_option.id}_cost" in _result.columns
             for _option in _adaptation.adaptation_collection.adaptation_options
         )
-        for _option, _, _total_cost in AdaptationOptionCases.cases[1:]:
-            assert _cost_gdf[f"{_option.id}_cost"].sum(axis=0) == pytest.approx(
-                _total_cost
+        for _option, _expected in AdaptationOptionCases.cases[1:]:
+            assert _result[f"{_option.id}_cost"].sum(axis=0) == pytest.approx(
+                _expected[1]
             )
 
     def test_run_benefit_returns_gdf(
@@ -53,7 +53,11 @@ class TestAdaptation:
         assert isinstance(_result, GeoDataFrame)
         assert all(
             [
-                f"{_option.id}_impact" in _result.columns
-                for _option in _adaptation.adaptation_collection.all_options
+                f"{_option.id}_benefit" in _result.columns
+                for _option in _adaptation.adaptation_collection.adaptation_options
             ]
         )
+        for _option, _expected in AdaptationOptionCases.cases[1:]:
+            assert _result[f"{_option.id}_benefit"].sum(axis=0) == pytest.approx(
+                _expected[2]
+            )
