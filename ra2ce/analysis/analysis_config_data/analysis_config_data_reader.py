@@ -234,7 +234,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         _section = AnalysisSectionAdaptation(**self._parser[section_name])
         _section.losses_analysis = (
             _section.losses_analysis
-        ) = AnalysisDamagesEnum.get_enum(
+        ) = AnalysisLossesEnum.get_enum(
             self._parser.get(section_name, "losses_analysis", fallback=None)
         )
 
@@ -255,7 +255,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         Extracts info from [analysis<n>] sections
 
         Returns:
-            list[AnalysisSection]: List of analyses (damages, losses and adaptation)
+            list[AnalysisSectionBase]: List of analyses
         """
         _analysis_sections: list[AnalysisSectionBase] = []
 

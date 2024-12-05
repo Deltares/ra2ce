@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from ra2ce.configuration.ra2ce_enum_base import Ra2ceEnumBase
 
 
@@ -12,3 +14,7 @@ class AnalysisLossesEnum(Ra2ceEnumBase):
     MULTI_LINK_LOSSES = 8
     MULTI_LINK_ISOLATED_LOCATIONS = 9
     INVALID = 99
+
+    @classmethod
+    def get_enum(cls, input_str: str | None) -> AnalysisLossesEnum:
+        return AnalysisLossesEnum(super().get_enum(input_str))

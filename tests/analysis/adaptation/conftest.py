@@ -125,7 +125,7 @@ def _get_valid_adaptation_config_fixture(
         copytree(test_data.joinpath("adaptation", "input"), _ao_path)
         copytree(
             test_data.joinpath("adaptation", "static"),
-            _ao_path.joinpath("losses", "static"),
+            _ao_path.joinpath("multi_link_losses", "static"),
         )
     copytree(test_data.joinpath("adaptation", "static"), _static_path)
 
