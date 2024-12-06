@@ -24,14 +24,14 @@ from typing import Optional, Protocol
 
 from geopandas import GeoDataFrame
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisSectionBase
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.network.graph_files.graph_files_protocol import GraphFileProtocol
 
 
 class AnalysisProtocol(Protocol):
     graph_file: Optional[GraphFileProtocol]
     graph_file_hazard: Optional[GraphFileProtocol]
-    analysis: AnalysisSectionBase
+    analysis: AnalysisConfigData.ANALYSIS_SECTION
     input_path: Path
     output_path: Path
 
