@@ -33,6 +33,9 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper_protocol import (
+    AnalysisResultWrapperProtocol,
+)
 from ra2ce.analysis.damages.damages import Damages
 from ra2ce.analysis.losses.losses_base import LossesBase
 from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
@@ -122,7 +125,9 @@ class AdaptationOptionAnalysis:
             result_col=_result_col,
         )
 
-    def execute(self, analysis_config: AnalysisConfigWrapper) -> GeoDataFrame:
+    def execute(
+        self, analysis_config: AnalysisConfigWrapper
+    ) -> AnalysisResultWrapperProtocol:
         """
         Execute the analysis.
 
