@@ -28,7 +28,6 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionAdaptation,
     AnalysisSectionAdaptationOption,
-    AnalysisSectionBase,
     AnalysisSectionDamages,
     AnalysisSectionLosses,
     DamagesAnalysisNameList,
@@ -234,7 +233,7 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         _section = AnalysisSectionAdaptation(**self._parser[section_name])
         _section.losses_analysis = (
             _section.losses_analysis
-        ) = AnalysisDamagesEnum.get_enum(
+        ) = AnalysisLossesEnum.get_enum(
             self._parser.get(section_name, "losses_analysis", fallback=None)
         )
 
@@ -250,14 +249,14 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
 
         return _section
 
-    def get_analysis_sections(self) -> list[AnalysisSectionBase]:
+    def get_analysis_sections(self) -> list[AnalysisConfigData.ANALYSIS_SECTION]:
         """
         Extracts info from [analysis<n>] sections
 
         Returns:
-            list[AnalysisSection]: List of analyses (damages, losses and adaptation)
+            list[ANALYSIS_SECTION]: List of analyses
         """
-        _analysis_sections: list[AnalysisSectionBase] = []
+        _analysis_sections: list[AnalysisConfigData.ANALYSIS_SECTION] = []
 
         _section_names = list(
             section_name

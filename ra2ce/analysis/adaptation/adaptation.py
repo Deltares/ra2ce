@@ -28,31 +28,35 @@ from ra2ce.analysis.adaptation.adaptation_option_collection import (
 )
 from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisConfigData,
     AnalysisSectionAdaptation,
 )
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.network.graph_files.network_file import NetworkFile
 
 
 class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
+    """
+    Execute the adaptation analysis.
+    For each adaptation option a damages and losses analysis is executed.
+    """
+
     analysis: AnalysisSectionAdaptation
     graph_file: NetworkFile
-    graph_file_hazard: NetworkFile
     input_path: Path
     output_path: Path
     adaptation_collection: AdaptationOptionCollection
 
     # TODO: add the proper protocol for the adaptation analysis.
     def __init__(
-        self, analysis_input: AnalysisInputWrapper, analysis_config: AnalysisConfigData
+        self,
+        analysis_input: AnalysisInputWrapper,
+        analysis_config: AnalysisConfigWrapper,
     ):
         self.analysis = analysis_input.analysis
         self.graph_file = analysis_input.graph_file
         self.graph_file_hazard = analysis_input.graph_file_hazard
-        self.input_path = analysis_input.input_path
-        self.output_path = analysis_input.output_path
         self.adaptation_collection = AdaptationOptionCollection.from_config(
             analysis_config
         )
@@ -60,33 +64,54 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
     def execute(self) -> GeoDataFrame:
         """
         Run the adaptation analysis.
+
+        Returns:
+            GeoDataFrame: The result of the adaptation analysis.
         """
         return self.generate_result_wrapper(self.calculate_bc_ratio())
 
     def run_cost(self) -> GeoDataFrame:
         """
-        Calculate the cost for all adaptation options.
+        Calculate the unit cost for all adaptation options.
+
+        Returns:
+            GeoDataFrame: The result of the cost calculation.
         """
-        # Open the network without hazard data
         _cost_gdf = deepcopy(self.graph_file.get_graph())
+
         for (
             _option,
             _cost,
-        ) in self.adaptation_collection.calculate_option_cost().items():
-            _cost_gdf[f"costs_{_option.id}"] = _cost
+        ) in self.adaptation_collection.calculate_options_unit_cost().items():
+            _cost_gdf[f"{_option.id}_cost"] = _cost_gdf.apply(
+                lambda x, cost=_cost: x["length"] * cost, axis=1
+            )
 
         return _cost_gdf
 
     def run_benefit(self) -> GeoDataFrame:
         """
-        Calculate the benefit for all adaptation options
+        Calculate the benefit for all adaptation options.
+
+        Returns:
+            GeoDataFrame: The result of the benefit calculation.
         """
-        return None
+        _benefit_gdf = deepcopy(self.graph_file.get_graph())
+
+        return self.adaptation_collection.calculation_options_impact(_benefit_gdf)
 
     def calculate_bc_ratio(self) -> GeoDataFrame:
         """
-        Calculate the benefit-cost ratio for all adaptation options
+        Calculate the benefit-cost ratio for all adaptation options.
+
+        Returns:
+            GeoDataFrame: The result of the benefit-cost ratio calculation.
         """
         _cost_gdf = self.run_cost()
         _benefit_gdf = self.run_benefit()
-        return None
+
+        # TODO: apply economic discounting
+        # TODO: calculate B/C ratio
+        # TODO: apply overlay
+
+        return _cost_gdf

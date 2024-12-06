@@ -102,7 +102,7 @@ class LossesBase(AnalysisLossesProtocol, AnalysisBase, ABC):
         )
 
         self._check_validity_analysis_files()
-        self.intensities = TrafficIntensitiesReader(self.link_id).read(
+        self.intensities = TrafficIntensitiesReader([self.link_id]).read(
             self.analysis.traffic_intensities_file
         )
         self.resilience_curves = ResilienceCurvesReader().read(
