@@ -139,15 +139,15 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
         self, *analyses_results: GeoDataFrame
     ) -> AnalysisResultWrapper:
         """
-        Overloading of the paranet `generate_result_wrapper` to convert the
+        Overloading of the parent `generate_result_wrapper` to convert the
         analysis_result which is segment base into a link base and return
         both.
 
         Args:
-            analyses_results (list[GeoDataFrame]): Original segmented based result.
+            analyses_results (list[GeoDataFrame]): Original segment based result.
 
         Returns:
-            AnalysisResultWrapper: Result wrapper containing both link and segmented based graphs.
+            AnalysisResultWrapper: Result wrapper containing both link and segment based graphs.
         """
         _result_segment_based = analyses_results[0]
         _result_link_based = self._get_result_link_based(
