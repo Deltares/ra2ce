@@ -51,9 +51,9 @@ class Adaptation(AnalysisDamagesProtocol):
 
     # TODO: add the proper protocol for the adaptation analysis.
     def __init__(
-            self,
-            analysis_input: AnalysisInputWrapper,
-            analysis_config: AnalysisConfigWrapper,
+        self,
+        analysis_input: AnalysisInputWrapper,
+        analysis_config: AnalysisConfigWrapper,
     ):
         self.analysis = analysis_input.analysis
         self.graph_file = analysis_input.graph_file
@@ -73,43 +73,22 @@ class Adaptation(AnalysisDamagesProtocol):
 
     def run_cost(self) -> GeoDataFrame:
         """
-                Calculate the unit cost for all adaptation options.
+        Calculate the unit cost for all adaptation options.
 
-                Returns:
-                    GeoDataFrame: The result of the cost calculation.
+        Returns:
+            GeoDataFrame: The result of the cost calculation.
         """
         _cost_gdf = deepcopy(self.graph_file.get_graph())
 
         for (
-                _option,
-                _cost,
+            _option,
+            _cost,
         ) in self.adaptation_collection.calculate_options_unit_cost().items():
             _cost_gdf[f"{_option.id}_cost"] = _cost_gdf.apply(
                 lambda x, cost=_cost: x["length"] * cost, axis=1
             )
 
         return _cost_gdf
-
-    def run_net_present_impact(self) -> GeoDataFrame:
-        """
-        Calculate the net present impact for all adaptation options for the entire time horizon.
-        """
-        # _impact_gdf = self.run_impact()
-        for _option in self.adaptation_collection.adaptation_options:
-            _impact_array = _impact_gdf[f"impact_{_option.id}"].to_numpy()
-
-            def calc_net_impact_time_horizon(event_impact: float):
-                _years_array = np.arange(0, self.adaptation_collection.time_horizon)
-                _frequency_per_year = self.adaptation_collection.initial_frequency + _years_array * self.adaptation_collection.climate_factor
-                _discount = (1 + self.adaptation_collection.discount_rate) ** _years_array
-
-                _damage_per_year = event_impact * _frequency_per_year / _discount
-                return np.sum(_damage_per_year)
-
-            _net_impact_array = np.array([calc_net_impact_time_horizon(damage) for damage in _impact_array])
-            _impact_gdf[f"net_present_impact_{_option.id}"] = _net_impact_array
-
-        return _impact_gdf
 
     def run_benefit(self) -> GeoDataFrame:
         """
