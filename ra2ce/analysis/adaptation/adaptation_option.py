@@ -78,18 +78,17 @@ class AdaptationOption:
             )
 
         # Create input for the analyses
-        _analyses = []
-        for _analysis in [
-            AnalysisDamagesEnum.DAMAGES,
-            analysis_config.config_data.adaptation.losses_analysis,
-        ]:
-            _analyses.append(
-                AdaptationOptionAnalysis.from_config(
-                    analysis_config=analysis_config,
-                    analysis=_analysis,
-                    option_id=adaptation_option.id,
-                )
+        _analyses = [
+            AdaptationOptionAnalysis.from_config(
+                analysis_config=analysis_config,
+                analysis_type=_analysis,
+                option_id=adaptation_option.id,
             )
+            for _analysis in [
+                AnalysisDamagesEnum.DAMAGES,
+                analysis_config.config_data.adaptation.losses_analysis,
+            ]
+        ]
 
         return cls(
             **asdict(adaptation_option),
@@ -97,7 +96,7 @@ class AdaptationOption:
             analysis_config=analysis_config,
         )
 
-    def calculate_cost(self, time_horizon: float, discount_rate: float) -> float:
+    def calculate_unit_cost(self, time_horizon: float, discount_rate: float) -> float:
         """
         Calculate the net present value unit cost (per meter) of the adaptation option.
 
