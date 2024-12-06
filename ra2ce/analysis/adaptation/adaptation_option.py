@@ -96,7 +96,6 @@ class AdaptationOption:
             analysis_config=analysis_config,
         )
 
-
     def calculate_unit_cost(self, time_horizon: float, discount_rate: float) -> float:
         """
         Calculate the net present value unit cost (per meter) of the adaptation option.
@@ -140,7 +139,9 @@ class AdaptationOption:
 
         return _lifetime_cost
 
-    def calculate_impact(self, benefit_graph: GeoDataFrame, net_present_value_factor: float) -> GeoDataFrame:
+    def calculate_impact(
+        self, benefit_graph: GeoDataFrame, net_present_value_factor: float
+    ) -> GeoDataFrame:
         """
         Calculate the impact of the adaptation option.
 
@@ -157,6 +158,8 @@ class AdaptationOption:
         benefit_graph[f"{self.id}_impact"] = benefit_graph[_option_cols].sum(axis=1)
 
         # convert event impact into time-horizon impact
-        benefit_graph[f"{self.id}_impact"] = benefit_graph[f"{self.id}_impact"] * net_present_value_factor
+        benefit_graph[f"{self.id}_impact"] = (
+            benefit_graph[f"{self.id}_impact"] * net_present_value_factor
+        )
 
         return benefit_graph

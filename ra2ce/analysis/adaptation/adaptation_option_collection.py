@@ -98,7 +98,9 @@ class AdaptationOptionCollection:
         obtain the net present value.
         """
         _years_array = np.arange(0, self.time_horizon)
-        _frequency_per_year = self.initial_frequency + _years_array * self.climate_factor
+        _frequency_per_year = (
+            self.initial_frequency + _years_array * self.climate_factor
+        )
         _discount = (1 + self.discount_rate) ** _years_array
         _ratio = _frequency_per_year / _discount
         return _ratio.sum()
@@ -131,6 +133,8 @@ class AdaptationOptionCollection:
         net_present_value_factor = self.get_net_present_value_factor()
 
         for _option in self.all_options:
-            benefit_graph = _option.calculate_impact(benefit_graph, net_present_value_factor)
+            benefit_graph = _option.calculate_impact(
+                benefit_graph, net_present_value_factor
+            )
 
         return benefit_graph
