@@ -111,7 +111,7 @@ class AdaptationOption:
         def calc_years(from_year: float, to_year: float, interval: float) -> range:
             return range(
                 round(from_year),
-                round(min(to_year, time_horizon))+1,
+                round(min(to_year, time_horizon)) + 1,
                 round(interval),
             )
 
@@ -120,16 +120,20 @@ class AdaptationOption:
 
         _assessment_years = calc_years(
             1,
-            time_horizon,
+            round(time_horizon),
             1,
         )
         _lifetime_cost = self.construction_cost
         for _constr_year in _assessment_years:
 
-            if self.construction_interval > 0 and _constr_year in range(0, time_horizon, round(self.construction_interval)):
+            if self.construction_interval > 0 and _constr_year in range(
+                0, round(time_horizon), round(self.construction_interval)
+            ):
                 _lifetime_cost += calc_cost(self.construction_cost, _constr_year)
 
-            if self.maintenance_interval > 0 and _constr_year in range(0, time_horizon + 1, round(self.maintenance_interval)): # +1 here need but no above
+            if self.maintenance_interval > 0 and _constr_year in range(
+                0, round(time_horizon) + 1, round(self.maintenance_interval)
+            ):  # +1 here need but no above
                 _lifetime_cost += calc_cost(self.maintenance_cost, _constr_year)
 
         return _lifetime_cost
