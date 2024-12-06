@@ -59,7 +59,7 @@ class AdaptationOptionCases:
         ),
 
     ]
-    cost: list[float] = [0.0, 2714.5607997006227, 5233.340599493724, 17148.078514211506]
+    cost: list[float] = [0.0, 2714.560799, 5233.340599, 17148.078514]
     cases = list(zip(config_cases, cost))
 
 
