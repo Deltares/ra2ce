@@ -2,6 +2,7 @@ import pytest
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.adaptation.adaptation import Adaptation
+from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from tests.analysis.adaptation.conftest import AdaptationOptionCases
@@ -17,6 +18,7 @@ class TestAdaptation:
 
         # 3. Verify expectations.
         assert isinstance(_adaptation, Adaptation)
+        assert isinstance(_adaptation, AnalysisBase)
 
     def test_run_cost_returns_gdf(
         self,
@@ -34,7 +36,7 @@ class TestAdaptation:
             f"{_option.id}_cost" in _cost_gdf.columns
             for _option in _adaptation.adaptation_collection.adaptation_options
         )
-        for _option, _, _total_cost in AdaptationOptionCases.cases[1:]:
+        for _option, _total_cost in AdaptationOptionCases.cases[1:]:
             assert _cost_gdf[f"{_option.id}_cost"].sum(axis=0) == pytest.approx(
                 _total_cost
             )

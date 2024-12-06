@@ -3,6 +3,7 @@ from pathlib import Path
 
 import pytest
 
+from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionDamages,
     AnalysisSectionLosses,
@@ -71,6 +72,7 @@ class TestAnalysisFactory:
 
         # 3. Verify expectations.
         assert isinstance(_result, AnalysisDamagesProtocol)
+        assert isinstance(_result, AnalysisBase)
         assert _result.graph_file_hazard == _config.graph_files.base_network_hazard
         assert _result.analysis == _analysis
 
@@ -87,5 +89,6 @@ class TestAnalysisFactory:
 
         # 3. Verify expectations.
         assert isinstance(_result, AnalysisLossesProtocol)
+        assert isinstance(_result, AnalysisBase)
         assert _result.graph_file == _config.graph_files.base_graph
         assert _result.analysis == _analysis

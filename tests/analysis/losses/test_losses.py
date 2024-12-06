@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 from shapely.geometry import LineString
 
+from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionLosses,
@@ -116,6 +117,7 @@ class TestLosses:
         # 3. Verify final expectations.
         assert isinstance(_losses, LossesBase)
         assert isinstance(_losses, losses_analysis)
+        assert isinstance(_losses, AnalysisBase)
 
     def test_calc_vlh(
         self,

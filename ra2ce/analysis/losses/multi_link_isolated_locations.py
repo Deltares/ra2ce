@@ -7,17 +7,19 @@ import pandas as pd
 from geopandas import GeoDataFrame, overlay, read_feather
 from pyproj import CRS
 
+from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
 from ra2ce.network.networks_utils import buffer_geometry, graph_to_gdf
 
 
-class MultiLinkIsolatedLocations(AnalysisLossesProtocol):
+class MultiLinkIsolatedLocations(AnalysisBase, AnalysisLossesProtocol):
     analysis: AnalysisSectionLosses
     graph_file_hazard: GraphFile
     input_path: Path
@@ -268,7 +270,7 @@ class MultiLinkIsolatedLocations(AnalysisLossesProtocol):
 
         return locations_hz, aggregation
 
-    def execute(self) -> GeoDataFrame:
+    def execute(self) -> AnalysisResultWrapper:
         _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
 
         (gdf, df) = self.multi_link_isolated_locations(
@@ -280,4 +282,4 @@ class MultiLinkIsolatedLocations(AnalysisLossesProtocol):
         )
         df.to_csv(df_path, index=False)
 
-        return gdf
+        return self.generate_result_wrapper(gdf)

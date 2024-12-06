@@ -5,12 +5,16 @@ from typing import Iterator
 import pytest
 from geopandas import GeoDataFrame
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
+from ra2ce.analysis.analysis_config_data.analysis_config_data import (
+    AnalysisConfigData,
+    AnalysisSectionBase,
+)
 from ra2ce.analysis.analysis_config_data.analysis_config_data_reader import (
     AnalysisConfigDataReader,
 )
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
-from ra2ce.analysis.losses.single_link_redundancy import SingleLinkRedundancy
+from ra2ce.analysis.analysis_result.analysis_result_wrapper_protocol import (
+    AnalysisResultWrapperProtocol,
+)
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
 from ra2ce.network.network_config_data.network_config_data_reader import (
     NetworkConfigDataReader,
@@ -150,14 +154,18 @@ class TestRa2ceHandler:
         assert _test_dir.joinpath("output").exists()
 
     def _validate_run_results_with_simple_test_case(
-        self, results: list[AnalysisResultWrapper]
+        self, results: list[AnalysisResultWrapperProtocol]
     ):
         assert len(results) == 1
         _found_result = results[0]
-        assert isinstance(_found_result, AnalysisResultWrapper)
-        assert isinstance(_found_result.analysis, SingleLinkRedundancy)
-        assert isinstance(_found_result.analysis_result, GeoDataFrame)
-        assert _found_result.analysis_result.empty is False
+        assert isinstance(_found_result, AnalysisResultWrapperProtocol)
+        assert _found_result.is_valid_result()
+
+        assert any(_found_result.results_collection)
+        for _ra in _found_result.results_collection:
+            assert isinstance(_ra.analysis_result, GeoDataFrame)
+            assert isinstance(_ra.analysis_config, AnalysisSectionBase)
+            assert isinstance(_ra.output_path, Path)
 
     @pytest.mark.slow_test
     def test_run_with_ini_files_given_valid_files(
