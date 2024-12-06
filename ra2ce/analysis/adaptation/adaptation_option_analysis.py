@@ -133,5 +133,7 @@ class AdaptationOptionAnalysis:
             DataFrame: The results of the analysis.
         """
         if self.analysis_class == Damages:
-            return self.analysis_class(self.analysis_input).execute()
+            return self.analysis_class(
+                self.analysis_input, analysis_config.graph_files.base_graph_hazard.graph
+            ).execute()
         return self.analysis_class(self.analysis_input, analysis_config).execute()
