@@ -135,11 +135,15 @@ class AdaptationOptionAnalysis:
             Series: The relevant result column of the analysis.
         """
         if self.analysis_class == Damages:
-            _result_wrapper = self.analysis_class(self.analysis_input).execute()
+            _result_wrapper = self.analysis_class(
+                self.analysis_input,
+                analysis_config.graph_files.base_graph_hazard.get_graph(),
+            ).execute()
+            # Take the link based result
+            _result = _result_wrapper.results_collection[1].analysis_result
         else:
             _result_wrapper = self.analysis_class(
                 self.analysis_input, analysis_config
             ).execute()
-        return _result_wrapper.get_single_result.filter(regex=self.result_col).iloc[
-            :, 0
-        ]
+            _result = _result_wrapper.get_single_result()
+        return _result.filter(regex=self.result_col).iloc[:, 0]

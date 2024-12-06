@@ -75,7 +75,7 @@ class TestAdaptationOptionCollection:
             id: str
             impact: float
 
-            def calculate_impact(self) -> Series:
+            def calculate_impact(self, _) -> Series:
                 return Series(self.impact, index=range(_nof_rows))
 
         # 1. Define test data.

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from geopandas import GeoDataFrame
 from pandas import Series
@@ -5,6 +7,8 @@ from pandas import Series
 from ra2ce.analysis.adaptation.adaptation_option_analysis import (
     AdaptationOptionAnalysis,
 )
+from ra2ce.analysis.analysis_base import AnalysisBase
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -100,13 +104,18 @@ class TestAnalysisOptionAnalysis:
         assert _result.analysis_class == expected_analysis
 
     def test_execute_returns_series(self):
-        class MockAnalysis(AnalysisProtocol):
+        class MockAnalysis(AnalysisBase, AnalysisProtocol):
+            analysis: AnalysisConfigData.ANALYSIS_SECTION = None
+            output_path: Path = None
+
             def __init__(self, *args) -> None:
                 pass
 
             def execute(self):
-                return GeoDataFrame.from_dict(
-                    {_col_name: range(10), "other_column": range(1, 11, 1)}
+                return self.generate_result_wrapper(
+                    GeoDataFrame.from_dict(
+                        {_col_name: range(10), "other_column": range(1, 11, 1)}
+                    )
                 )
 
         # 1. Define test data.

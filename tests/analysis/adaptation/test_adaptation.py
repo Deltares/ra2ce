@@ -44,7 +44,7 @@ class TestAdaptation:
         )
         for _option, _expected in AdaptationOptionCases.cases[1:]:
             assert _result[f"{_option.id}_cost"].sum(axis=0) == pytest.approx(
-                _expected[1]
+                _expected[0]
             )
 
     def test_run_benefit_returns_gdf(
@@ -67,7 +67,7 @@ class TestAdaptation:
         )
         for _option, _expected in AdaptationOptionCases.cases[1:]:
             assert _result[f"{_option.id}_benefit"].sum(axis=0) == pytest.approx(
-                _expected[2]
+                _expected[1]
             )
 
     @pytest.fixture(name="mocked_adaptation")

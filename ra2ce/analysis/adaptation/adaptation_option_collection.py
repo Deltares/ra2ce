@@ -129,17 +129,12 @@ class AdaptationOptionCollection:
             GeoDataFrame: The calculated impact of all adaptation options.
         """
         net_present_value_factor = self.get_net_present_value_factor()
-
         _benefit_gdf = GeoDataFrame()
-        for _option in self.all_options:
-            _benefit_gdf = _option.calculate_impact(
-                _benefit_gdf, net_present_value_factor
-            )
 
         # Calculate impact of reference option
         _benefit_gdf[
             f"{self.reference_option.id}_impact"
-        ] = self.reference_option.calculate_impact()
+        ] = self.reference_option.calculate_impact(net_present_value_factor)
 
         # Calculate impact and benefit of adaptation options
         for _option in self.adaptation_options:

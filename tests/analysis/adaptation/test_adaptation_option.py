@@ -156,7 +156,7 @@ class TestAdaptationOption:
         )
 
         # 2. Run test.
-        _result = _option.calculate_impact()
+        _result = _option.calculate_impact(1.0)
 
         # 3. Verify expectations.
         assert isinstance(_result, Series)
