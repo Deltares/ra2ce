@@ -72,7 +72,12 @@ class AdaptationOptionCases:
             maintenance_interval=1.0,
         ),
     ]
-    unit_cost: list[float] = [0.0, 2714.560799, 5233.340599, 17148.078514]
+    unit_cost: list[float] = [
+        0.0,
+        2714.560799,
+        5233.340599,
+        17148.078514,
+    ]  # Can be removed
     total_cost: list[float] = [0.0, 98166662.199573, 189253296.099491, 620125963.309431]
     cases: list[tuple[AnalysisSectionAdaptationOption, float, float]] = list(
         zip(config_cases, unit_cost, total_cost)
