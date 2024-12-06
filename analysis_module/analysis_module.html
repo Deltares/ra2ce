@@ -1,0 +1,1661 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Analysis module &#8212; Risk Assessment and Adaptation for Critical infrastructurE 0.9.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'analysis_module/analysis_module';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Docker and Cloud guide" href="../docker_and_cloud/index.html" />
+    <link rel="prev" title="Network Module" href="../network_module/network_module.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.9.2" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation/installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing/index.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../changelog_wrapper.html">
+    Changelog
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation/installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing/index.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changelog_wrapper.html">
+    Changelog
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/about.html">RA2CE</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../installation/installation.html">Installation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../examples/index.html">Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../examples/basic_examples.html">Basic examples</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/example_ra2ce_basics.html">RA2CE basics: set up RA2CE and configure a road network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/example_equity_analysis.html">RA2CE feature: Equity analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/example_single_link_redundancy.html">RA2CE feature: single link redundancy without the example data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/example_single_link_losses.html">RA2CE feature: Single link losses analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/example_multi_link_losses.html">RA2CE feature: Multi-link losses analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/example_origin_destination_analysis.html">RA2CE feature: Origin-destination analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/example_damages_huizinga.html">RA2CE feature: Damages analysis (Huizinga)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/example_damages_manual.html">RA2CE feature: Damages analysis (manual)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/example_damages_OSdamage.html">RA2CE feature: Damages analysis (OSdaMage)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/example_hazard_overlay.html">RA2CE feature: Hazard overlay</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/example_isolated_locations.html">RA2CE feature: Isolated locations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/example_optimal_route_origin_destination.html">RA2CE feature: Optimal routes between origins and destinations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/example_ra2ce_basics_fromgpkg.html">RA2CE basics: set up RA2CE and configure a road network from a pre-defined shapefile</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/example_download_network_using_a_polygon.html">Download a Network using a polygon</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/example_set_up_origin_destination_no_data_DIY.html">RA2CE basics: setting up an origin-destination analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/pizza_course_material_DIY.html">RA2CE: Do It Yourself</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../examples/hackathon_sessions.html">Hackathon sessions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/hackathons/20240326_hackathon/summary_2024q1.html">Hackathon Q1 - 2024</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../examples/technical_meetings.html">Technical meetings</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/tech_meetings/20240403_run_without_ini_files_DIY.html">Tech Meeting 2024 Q1 - Run with(out) <code class="docutils literal notranslate"><span class="pre">ini</span></code> files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../_examples/tech_meetings/20240403_using_enums_DIY.html">Tech Meeting 2024 Q1 - Enumerations</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../network_module/network_module.html">Network Module</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Analysis module</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../docker_and_cloud/index.html">Docker and Cloud guide</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../docker_and_cloud/setting_up_infrastructure/index.html">Setting up infrastructure</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../docker_and_cloud/setting_up_infrastructure/kubernetes_deployment.html">Deploying Kubernetes on Amazon EKS Cluster with Terraform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../docker_and_cloud/setting_up_infrastructure/argo_deployment.html">Deploying Argo Workflows with Helm on Amazon EKS</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../docker_and_cloud/using_cloud_services/index.html">Using cloud services</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../docker_and_cloud/using_cloud_services/docker_user_guide.html">Docker User Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../docker_and_cloud/using_cloud_services/deltares_harbor.html">Deltares Docker Harbor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../docker_and_cloud/using_cloud_services/deltares_hpc_user_guide.html">Deltares HPC User Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../docker_and_cloud/using_cloud_services/hackathon_user_guide.html">Hackathon User Guide</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../contributing/index.html">Contributing</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contributing/design_principles.html">Design principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing/implementation_decisions.html">Implementation decisions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../technical_documentation/technical_documentation.html">Technical Documentation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../technical_documentation/network_package.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../technical_documentation/analysis_package.html">Analysis</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications/publications.html">Publications</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../overview.html" class="nav-link">Overview</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Analysis module</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="analysis-module">
+<span id="id1"></span><h1>Analysis module<a class="headerlink" href="#analysis-module" title="Permalink to this heading">#</a></h1>
+<p>RA2CE’s analysis module can perform several analyses on infrastructure networks. First, a network needs te be created. Visit the <a class="reference internal" href="../network_module/network_module.html#network-module"><span class="std std-ref">Network Module</span></a> for a better understanding of how this works. In the analysis module we distinguish a module focused on direct monetary road damages (damages) and an analysis module for network criticality and origin-destination analyses (losses). The latter are developed from a ‘societal losses due to hazards’ point of view and provide insight into the hazard impact on the network and the disruption of network services to society.</p>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading">#</a></h2>
+<p>Before describing the included analyses, we describe two main ways of setting-up the configurations needed for the analyses:</p>
+<ol class="arabic simple">
+<li><p>Creating <code class="docutils literal notranslate"><span class="pre">.ini</span></code> files for network and analysis. <code class="docutils literal notranslate"><span class="pre">Ra2ceHandler.run_with_ini_files()</span></code> should be used to create a handler instance, used to run analyses.</p></li>
+<li><p>Instantiating the <code class="docutils literal notranslate"><span class="pre">NetworkConfigData</span></code> and <code class="docutils literal notranslate"><span class="pre">AnalysisConfigData</span></code> objects to pass required network and analysis configuration parameters (different for each analysis). <code class="docutils literal notranslate"><span class="pre">Ra2ceHandler.run_with_config_data()</span></code> should be used to create a handler instance, used to run analyses.</p></li>
+</ol>
+<p>In the examples in this page the first approach is shown. In the example folders a few examples on the second approach is also given.</p>
+</section>
+<section id="damages">
+<h2>Damages<a class="headerlink" href="#damages" title="Permalink to this heading">#</a></h2>
+<p>The physical <em>damage to the network</em> (referred to as damages here) depends on the intensity of the hazard in relation to how the network (and its assets) are built and its current condition (e.g. type, state of maintenance, dimensions). Here, the hazard intensity and asset condition are linked to a percentage of damage, via vulnerability functions/ fragility curves. To develop these vulnerability curves data is needed about replacements costs per asset type and the potential damage per hazard intensity. This data can be collected during a workshop with for example national road agencies and the technicians. The output of the analyses consist of damage maps per hazard (e.g. flooding, landslides), per return period or per event, per asset and per road segment.</p>
+<p>Possible (built-in) options for vulnerability curves include:</p>
+<ul class="simple">
+<li><p><em>Global</em>: Huizinga curves (HZ analysis name)</p></li>
+<li><p><em>Europe</em>: OSdaMage functions (OSD analysis name)</p></li>
+<li><p><em>Costume damage curves</em>: Manual function (MAN analysis name)</p></li>
+</ul>
+<p><strong>Huizinga damage estimation</strong></p>
+<p>For more information on the Huizinga damage functions please refer to <em>Global flood depth-damage functions: Methodology and the database with guidelines</em> written by Huizinga et al.</p>
+<p>Here we explain the input, output, and main steps to perform the damage analysis based on this method.</p>
+<p>The output consists of estimating the damages per each link and segment in two different output files. The unit of measurement is a currency, and the output type is gpkg. The generated columns in the result file include:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Link-based damage output file:</dt><dd><ul>
+<li><p>damage_segments_list: A list of damages of all segments which comprise each link.</p></li>
+<li><p>dam_&lt;EVi&gt;_HZ or dam_&lt;RPj&gt;_HZ (for event-based or return-period based analyses respectively): The total damage of each link.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Segmented damage output file:</dt><dd><ul>
+<li><p>dam_&lt;EVi&gt;_HZ or dam_&lt;RPj&gt;_HZ (for event-based or return-period based analyses respectively): The total damage of each segment.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>For an analysis with hazards with return periods’:</dt><dd><ul>
+<li><p>a risk column is also calculated which represents the risk or estimated annual losses of the included hazards (with return periods).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>Here, EVi refers to each hazard map without a return period introduced in the network configuration, and RPj refers to each hazard map with a return period introduced in the network configuration.</p>
+<p>The input requirements include:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Hazard map:</dt><dd><ul>
+<li><p>with or without return period.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Network:</dt><dd><ul>
+<li><p>Automatically downloading a network from the extent of the introduced hazard map.</p></li>
+<li><p>Introducing a polygon representing the region of interest.</p></li>
+<li><p>Introducing a Shapefile representing the network under study.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Segmentation_length (metre):</dt><dd><ul>
+<li><p>If links have lengths above this, they will be segmented.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>The main steps are:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>Exposure Analysis:</dt><dd><ul class="simple">
+<li><p>Identifies the impacted links where the water depth exceeds the threshold.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Damage Estimation:</dt><dd><ol class="arabic simple">
+<li><p>Using Huizinga Vulnerability Curves:</p></li>
+<li><p>Determining the maximum damage value per meter for each road based on the road type and number of lanes. The maximum damage values per kilometer are defined by the Huizinga function.</p></li>
+<li><dl class="simple">
+<dt>Relating water depth to the maximum damage value since water depth determines the actual amount of damage.</dt><dd><ul class="simple">
+<li><p>The maximum damage per kilometer (when a road is completely demolished) is converted to values per meter.</p></li>
+<li><p>The relation between water depth levels and the estimated percentage of road damage is defined by the Huizinga curve. For instance, at a flood depth of 1.5m, the damage value is estimated to be 55% of the maximum damage for a specific road type with a certain number of lanes.</p></li>
+<li><p>Calculate 55% of the maximum damage value per meter of the road.</p></li>
+<li><p>Relate this value to the length of the road by multiplying the damage value per meter by the length fraction of the road that is actually damaged (inundated fraction * total length of the road).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Finally, the damage value per meter of the road segment is multiplied by the length of the damaged segment.</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+<p><strong>OSdamage damage estimation</strong></p>
+<p>For more information on the Huizinga damage functions please refer to <em>Flood risk assessment of the European road network</em> written by van Ginkel et al.</p>
+<p>The output (gpkg) consists of:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Per link and segment (in Graph and Network objects, respectively):</dt><dd><ul>
+<li><p>Estimated damages as a tuple (quartile, in currency).</p></li>
+<li><p>Representative damage for each damage curve. The representative percentage can be defined by the user (default is 100%). This percentage reflects a single value representing the damage between the lower and higher bounds (the tuple mentioned above).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Generated columns in the result file:</dt><dd><ul>
+<li><dl class="simple">
+<dt>Segmented damage output file (for event-based or return-period based analyses, respectively):</dt><dd><ul>
+<li><p>dam_&lt;Ci&gt;_&lt;EVj&gt;_quartiles or dam_&lt;Ci&gt;_&lt;RPx&gt;_quartiles: Tuple, damages between the lower and upper bounds for each segment and each damage curve.</p></li>
+<li><p>dam_&lt;Ci&gt;_&lt;EVj&gt;_representative or dam_&lt;Ci&gt;_&lt;RPx&gt;_representative: representative_damage_percentile * max(dam_&lt;Ci&gt;_&lt;EVj&gt;_quartiles).</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Link-based damage output file:</dt><dd><ul>
+<li><p>dam_&lt;Ci&gt;_&lt;EVj&gt;_representative or dam_&lt;Ci&gt;_&lt;RPx&gt;_representative: Sum of representative_damage_percentile * max(dam_&lt;Ci&gt;_&lt;EVj&gt;_quartiles) for all segments making up a road link.</p></li>
+<li><p>damage_segments_list: A list of damages for all segments comprising each link.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>For an analysis with hazards with return periods, a risk column is also calculated which represents the risk or estimated annual losses of the included hazards (with return periods).</p></li>
+<li><dl class="simple">
+<dt>Notes:</dt><dd><ul>
+<li><p>Ci refers to the 6 vulnerability curves in the OSdamage approach.</p></li>
+<li><p>EVj refers to each flood map introduced in the network.ini.</p></li>
+<li><p>RPx refers to each hazard map with a return period introduced in the network configuration.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>The input requirements include:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Hazard map:</dt><dd><ul>
+<li><p>with or without return period.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Network</dt><dd><ul>
+<li><p>Automatically downloading a network from the extent of the introduced hazard map.</p></li>
+<li><p>Introducing a polygon representing the region of interest.</p></li>
+<li><p>Introducing a Shapefile representing the network under study.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Segmentation_length in metre. If links have lengths above this, they will be segmented.</p></li>
+</ul>
+<p>The analysis Steps are:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>Exposure Analysis:</dt><dd><ul class="simple">
+<li><p>Identifies the impacted links where the water depth exceeds the threshold.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Damage Estimation Based on OSdamage Vulnerability Curves:</dt><dd><ol class="arabic simple">
+<li><p>Look up the relevant vulnerability curves: for each flooding event, the road construction costs, and maximum damage per road type, differentiated between low flow (low-flow velocities) and high flow (high-flow velocities). These values represent the average for the former EU-28, in millions of euros (year 2015) per kilometer. There will be 6 vulnerability curves (C1 to C6).</p></li>
+<li><p>Define a lower and higher bound of construction damage for each road type.</p></li>
+<li><p>For the number of lanes of each road edge, read a lane factor and multiply it into the lower and higher bounds of maximum damage for each road type.</p></li>
+<li><p>Derive (interpolate) the percentage of the max damage of each vulnerability curve based on the water depth of each inundated road edge.</p></li>
+<li><p>Calculate quartiles of damage between the lower and higher bounds for each road edge based on the lower and higher maximum damage, road type, lane numbers, and the length of the inundated road edge for each damage curve (representing the road type state and flow velocity).</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+<p><strong>Custom damage functions (manual function)</strong></p>
+<p>The output consists of:</p>
+<ul class="simple">
+<li><p>Per link and segment (in Graph and Network objects, respectively) in two different output files.</p></li>
+<li><p>Output type: gpkg.</p></li>
+<li><dl class="simple">
+<dt>Generated columns in the result file:</dt><dd><ul>
+<li><dl class="simple">
+<dt>Segmented and Link-based Damage Output File:</dt><dd><ul>
+<li><p>dam_&lt;EVi&gt;_&lt;XY&gt; or dam_&lt;RPx&gt;_&lt;XY&gt;: damage per link or segment.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Link-based Damage Output File:</dt><dd><ul>
+<li><p>damage_segments_list: A list of damages for all segments comprising each link.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>For an analysis with hazards with return periods, a risk column is also calculated which represents the risk or estimated annual losses of the included hazards (with return periods).</p></li>
+<li><dl class="simple">
+<dt>Notes:</dt><dd><ul>
+<li><p>EVi: refers to each flood map introduced in the network configuration.</p></li>
+<li><p>RPx: refers to each hazard map with a return period introduced in the network configuration.</p></li>
+<li><p>XY: first two letters of the vulnerability curve’s name.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>The input requirements include:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Hazard map:</dt><dd><ul>
+<li><p>with or without return period.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Network:</dt><dd><ul>
+<li><p>Automatically downloading a network from the extent of the introduced hazard map.</p></li>
+<li><p>Introducing a polygon.</p></li>
+<li><p>Introducing a Shapefile.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Segmentation_length in metre. If links have lengths above this, they will be segmented.</p></li>
+<li><dl class="simple">
+<dt>Vulnerability curves: More than one vulnerability curve can be introduced.</dt><dd><ul>
+<li><p>In the input_data folder of the analysis folder, create a folder (e.g., damage_functions) and store subfolders (named to represent each vulnerability curve) containing the vulnerability curves. The curves should be represented by “damage percentage-water depth” and “road type/number of lanes-maximum damage” CSV files. Included road types should correspond to those in the road network used as input.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<p>The analysis Steps are:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>Exposure Analysis:</dt><dd><ul class="simple">
+<li><p>Identifies the impacted links where the water depth exceeds the threshold.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Estimate Damages Based on Introduced Vulnerability Curves:</dt><dd><ul class="simple">
+<li><p>For each vulnerability curve and flooding event, read the maximum damage for each road type and number of lanes from the “road type/number of lanes-maximum damage” CSV files.</p></li>
+<li><p>Calculate damage for each road edge by linking the water depth to the damage severity percentage (interpolating values in the “damage percentage-water depth” file), maximum damage, and the length of the inundated segments.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+<p>Bellow and example of the required ini files.</p>
+<p><strong>network.ini for event-based analyses</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">network</span><span class="p">]</span>
+<span class="n">directed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">shapefile</span>
+<span class="n">primary_file</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">diversion_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">file_id</span> <span class="o">=</span> <span class="n">ID</span>
+<span class="n">link_type_column</span> <span class="o">=</span> <span class="n">highway</span>
+<span class="n">polygon</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">network_type</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">road_types</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="p">[</span><span class="n">hazard</span><span class="p">]</span>
+<span class="n">hazard_map</span> <span class="o">=</span> <span class="n">max_flood_depth</span><span class="o">.</span><span class="n">tif</span>
+<span class="n">hazard_id</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">hazard_field_name</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">aggregate_wl</span> <span class="o">=</span> <span class="nb">max</span>
+<span class="n">hazard_crs</span> <span class="o">=</span> <span class="n">EPSG</span><span class="p">:</span><span class="mi">32736</span>
+
+<span class="p">[</span><span class="n">cleanup</span><span class="p">]</span>
+<span class="n">snapping_threshold</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">segmentation_length</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">merge_lines</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">merge_on_id</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">cut_at_intersections</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+<p><strong>analysis.ini for event-based analyses</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_damages</span>
+
+<span class="p">[</span><span class="n">analysis1</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example</span><span class="s1">&#39;s damages analysis</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">damages</span>
+<span class="n">event_type</span> <span class="o">=</span> <span class="n">event</span>
+<span class="n">damage_curve</span> <span class="o">=</span> <span class="n">HZ</span><span class="o">/</span><span class="n">OSD</span><span class="o">/</span><span class="n">MAN</span>
+<span class="n">aggregate_wl</span> <span class="o">=</span> <span class="nb">max</span>
+<span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">weighing</span> <span class="o">=</span> <span class="n">length</span>
+<span class="n">buffer_meters</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">category_field_name</span> <span class="o">=</span> <span class="n">category</span>
+<span class="n">save_shp</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">save_csv</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p><strong>network.ini for return period-based analyses</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">network</span><span class="p">]</span>
+<span class="n">directed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">shapefile</span>
+<span class="n">primary_file</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">diversion_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">file_id</span> <span class="o">=</span> <span class="n">ID</span>
+<span class="n">link_type_column</span> <span class="o">=</span> <span class="n">highway</span>
+<span class="n">polygon</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">network_type</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">road_types</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="p">[</span><span class="n">hazard</span><span class="p">]</span>
+<span class="n">hazard_map</span> <span class="o">=</span> <span class="n">RP_1000</span><span class="o">.</span><span class="n">tif</span><span class="p">,</span> <span class="n">RP_100</span><span class="o">.</span><span class="n">tif</span><span class="p">,</span> <span class="n">RP_10</span><span class="o">.</span><span class="n">tif</span>  <span class="c1"># name should have RP_X, X is the return period name</span>
+<span class="n">hazard_id</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">hazard_field_name</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">aggregate_wl</span> <span class="o">=</span> <span class="nb">max</span>
+<span class="n">hazard_crs</span> <span class="o">=</span> <span class="n">EPSG</span><span class="p">:</span><span class="mi">32736</span>
+
+<span class="p">[</span><span class="n">cleanup</span><span class="p">]</span>
+<span class="n">snapping_threshold</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">segmentation_length</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">merge_lines</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">merge_on_id</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">cut_at_intersections</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+<p><strong>analysis.ini for return period-based analyses</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_damages</span>
+
+<span class="p">[</span><span class="n">analysis1</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example</span><span class="s1">&#39;s damages analysis</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">damages</span>
+<span class="n">event_type</span> <span class="o">=</span> <span class="n">return_period</span>
+<span class="n">risk_calculation_mode</span> <span class="o">=</span> <span class="kc">None</span><span class="o">/</span><span class="n">default</span><span class="o">/</span><span class="n">cut_from_year</span><span class="o">/</span><span class="n">triangle_to_null_year</span>  <span class="c1"># see the risk calculation section bellow</span>
+<span class="n">damage_curve</span> <span class="o">=</span> <span class="n">HZ</span><span class="o">/</span><span class="n">OSD</span><span class="o">/</span><span class="n">MAN</span>
+<span class="n">aggregate_wl</span> <span class="o">=</span> <span class="nb">max</span>
+<span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">weighing</span> <span class="o">=</span> <span class="n">length</span>
+<span class="n">buffer_meters</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">category_field_name</span> <span class="o">=</span> <span class="n">category</span>
+<span class="n">save_shp</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">save_csv</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</section>
+<section id="losses-network-criticality">
+<h2>Losses / Network criticality<a class="headerlink" href="#losses-network-criticality" title="Permalink to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Analysis</p></th>
+<th class="head"><p>Name in analysis.ini</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Single-link redundancy</p></td>
+<td><p>single_link_redundancy</p></td>
+</tr>
+<tr class="row-odd"><td><p>Multi-link redundancy</p></td>
+<td><p>multi_link_redundancy</p></td>
+</tr>
+<tr class="row-even"><td><p>Single-link losses</p></td>
+<td><p>single_link_losses</p></td>
+</tr>
+<tr class="row-odd"><td><p>Multi-link losses</p></td>
+<td><p>multi_link_losses</p></td>
+</tr>
+<tr class="row-even"><td><p>Origin-Destination, defined OD couples, no disruption</p></td>
+<td><p>optimal_route_origin_destination</p></td>
+</tr>
+<tr class="row-odd"><td><p>Origin-Destination, defined OD couples, no disruption</p></td>
+<td><p>multi_link_origin_destination</p></td>
+</tr>
+<tr class="row-even"><td><p>Origin-Destination, O to closest D, disruption</p></td>
+<td><p>optimal_route_origin_closest_destination</p></td>
+</tr>
+<tr class="row-odd"><td><p>Origin-Destination, O to closest D, disruption</p></td>
+<td><p>multi_link_origin_closest_destination</p></td>
+</tr>
+<tr class="row-even"><td><p>Isolated locations</p></td>
+<td><p>multi_link_isolated_locations</p></td>
+</tr>
+<tr class="row-odd"><td><p>Equity and traffic analysis</p></td>
+<td><p>part of optimal_route_origin_destination</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Single link redundancy</strong></p>
+<p>With this analysis, you gain insight into the criticality of each link in the network. A redundancy analysis is performed for each separate link. It identifies the best existing alternative route if that particular edge would be disrupted. If there is no redundancy, it identifies the lack of alternative routes. This is performed sequentially, for each link of the network. The redundancy of each link is expressed in:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>total distance or total time for the alternative route,</p></li>
+<li><p>difference in distance/time between the alternative route and the original route,</p></li>
+<li><p>last, if there is an alternative route available, or not.</p></li>
+</ol>
+</div></blockquote>
+<p><strong>network.ini</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">network</span><span class="p">]</span>
+<span class="n">directed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">OSM</span> <span class="n">download</span>
+<span class="n">primary_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">diversion_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">file_id</span> <span class="o">=</span> <span class="n">rfid_c</span>
+<span class="n">polygon</span> <span class="o">=</span> <span class="n">Extent_Network_wgs84</span><span class="o">.</span><span class="n">geojson</span>
+<span class="n">network_type</span> <span class="o">=</span> <span class="n">drive</span>
+<span class="n">road_types</span> <span class="o">=</span> <span class="n">motorway</span><span class="p">,</span><span class="n">motorway_link</span><span class="p">,</span><span class="n">primary</span><span class="p">,</span><span class="n">primary_link</span><span class="p">,</span><span class="n">secondary</span><span class="p">,</span><span class="n">secondary_link</span><span class="p">,</span><span class="n">tertiary</span><span class="p">,</span><span class="n">tertiary_link</span><span class="p">,</span><span class="n">residential</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p><strong>analyses.ini</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">analysis1</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_redundancy</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">single_link_redundancy</span>
+<span class="n">weighing</span> <span class="o">=</span> <span class="n">distance</span>
+<span class="n">save_shp</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">save_csv</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p><strong>Multi-link redundancy</strong></p>
+<p>This analysis provides insight into the impact of a hazard in terms of detour time and alternative route length. This analysis can be performed when there is a hazard map. The hazard map indicates which links are disrupted. The analysis removes multiple disrupted links of the network. For each disrupted link, a redundancy analysis is performed that identifies the best existing alternative route. If there is no redundancy, the lack of alternative routes is specified. The redundancy of each link is expressed in 1) total distance or time for the alternative route, 2) difference in distance/time between the alternative route and the original route (additional distance/time), and 3) whether there is an alternative route available, or not. The user can specify the threshold (in meters) to indicate when a network is considered disrupted. For example, for flooding, the threshold could be a maximum of 0.5 m water on a network segment. Network segments with water depths &lt; 0.5m will then not be considered as flooded.</p>
+<p><strong>network.ini</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">network</span><span class="p">]</span>
+<span class="n">directed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">OSM</span> <span class="n">download</span>
+<span class="n">primary_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">diversion_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">file_id</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">polygon</span> <span class="o">=</span> <span class="n">Extent_Network_wgs84</span><span class="o">.</span><span class="n">geojson</span>
+<span class="n">network_type</span> <span class="o">=</span> <span class="n">drive</span>
+<span class="n">road_types</span> <span class="o">=</span> <span class="n">motorway</span><span class="p">,</span><span class="n">motorway_link</span><span class="p">,</span><span class="n">primary</span><span class="p">,</span><span class="n">primary_link</span><span class="p">,</span><span class="n">secondary</span><span class="p">,</span><span class="n">secondary_link</span><span class="p">,</span><span class="n">tertiary</span><span class="p">,</span><span class="n">tertiary_link</span><span class="p">,</span><span class="n">residential</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="p">[</span><span class="n">hazard</span><span class="p">]</span>
+<span class="n">hazard_map</span> <span class="o">=</span> <span class="n">max_flood_depth</span><span class="o">.</span><span class="n">tif</span>
+<span class="n">hazard_id</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">hazard_field_name</span> <span class="o">=</span> <span class="n">waterdepth</span>
+<span class="n">aggregate_wl</span> <span class="o">=</span> <span class="nb">max</span>
+<span class="n">hazard_crs</span> <span class="o">=</span> <span class="n">EPSG</span><span class="p">:</span><span class="mi">32736</span>
+</pre></div>
+</div>
+<p><strong>analyses.ini</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">analysis1</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_redundancy_multi</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">multi_link_redundancy</span>
+<span class="n">weighing</span> <span class="o">=</span> <span class="n">time</span>
+<span class="n">aggregate_wl</span> <span class="o">=</span> <span class="nb">max</span>
+<span class="n">threshold</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">save_csv</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p><strong>Single-link losses</strong></p>
+<p>With this analysis, you gain insight into the economic losses due to a hazard. This analysis uses single-link redundancy as its underlying criticality method. Similar to the redundancy analysis, this analysis is performed for each separate link.</p>
+<p>The output will include Vehicle Loss Hours (VLH) of the disrupted links in a currency (e.g., €) for a given part of the day (e.g., morning rush hour) for each trip purpose (e.g., freight, business, etc.). The output type is gpkg, with generated columns in the result file such as vlh_&lt;trip purpose&gt;_&lt;EVi&gt;_&lt;method&gt; or vlh_&lt;trip purpose&gt;_&lt;RPj&gt;_&lt;method&gt; and vlh_total_&lt;EVi&gt;_&lt;method&gt; or vlh_total_&lt;RPj&gt;_&lt;method&gt; (if event-based or return-period based analyses respectively). EV stands for event and RP stands for return period). The vlh_total column sums all vlh_&lt;trip purpose&gt; columns. An example is vlh_business_EV1_ma, where EVi refers to each flood map (introduced as events without return periods) introduced in the network.ini or the configuration, and method refers to min, mean, max water level aggregation method.</p>
+<p>For an analysis with hazards with return periods, a risk column is also calculated which represents the risk or estimated annual losses of the included hazards (with return periods).</p>
+<p>The input required includes:</p>
+<ul class="simple">
+<li><p>hazard maps, If hazards with return periods are included, their file name should include <em>RP_X</em> where X is the return period year;</p></li>
+<li><p>traffic intensity (AADT, annual average daily traffic;</p></li>
+<li><p>a shapefile of the network under study with the file_id column matching the link_id column of the traffic intensity file (both columns should have the same values to trace links with similar ID numbers in both files);</p></li>
+<li><p>values of time or length for each trip purpose, and;</p></li>
+<li><p>resilience curves stored in a CSV file representing the function loss and the corresponding function loss duration for different water heights and link types.</p></li>
+</ul>
+<p>PLease note that the default traffic_period parameter is ‘day’. For shorter hazard periods or based on specific user considerations, the user can set the traffic period (see Partofday Enums) and specify the number of hours per traffic period with hours_per_traffic_period = X (hrs). In this case, traffic intensities are measured as vehicles per traffic period.</p>
+<p>Here are the analysis steps:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>Exposure Analysis:</dt><dd><ul class="simple">
+<li><p>Identifies the impacted links where the water depth exceeds the threshold.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Perform Single Link Redundancy: Filter the impacted graph links and execute a single link redundancy analysis on these links to obtain the detour time or length (alt_time/length) and the “detour” attribute. The “detour” attribute indicates whether a link has an alternative route or not when removed.</p></li>
+<li><dl class="simple">
+<dt>Calculate Vehicle Loss Hours (VLH):</dt><dd><ol class="arabic simple">
+<li><p>For impacted links with a detour, calculate VLH using the value of time/length, detour time/length, function loss, and its corresponding function loss duration.</p></li>
+<li><p>For impacted links without a detour, apply the principle of loss of production. This involves calculating productivity loss using the number of people commuting on the impacted link without a detour, productivity loss per capita per day, and the event duration.</p></li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+<p>Bellow and example of the required ini files.</p>
+<p><strong>network.ini for event-based analyses</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">network</span><span class="p">]</span>
+<span class="n">directed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">shapefile</span>
+<span class="n">primary_file</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">diversion_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">file_id</span> <span class="o">=</span> <span class="n">ID</span>
+<span class="n">link_type_column</span> <span class="o">=</span> <span class="n">highway</span>
+<span class="n">polygon</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">network_type</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">road_types</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="p">[</span><span class="n">hazard</span><span class="p">]</span>
+<span class="n">hazard_map</span> <span class="o">=</span> <span class="n">max_flood_depth</span><span class="o">.</span><span class="n">tif</span>
+<span class="n">hazard_id</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">hazard_field_name</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">aggregate_wl</span> <span class="o">=</span> <span class="nb">max</span>
+<span class="n">hazard_crs</span> <span class="o">=</span> <span class="n">EPSG</span><span class="p">:</span><span class="mi">32736</span>
+</pre></div>
+</div>
+<p><strong>analyses.ini for event-based analyses</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">analysis1</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_redundancy</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">single_link_losses</span>
+<span class="n">weighing</span> <span class="o">=</span> <span class="n">time</span>  <span class="c1"># time or length</span>
+<span class="n">threshold</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">production_loss_per_capita_per_hour</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">trip_purposes</span> <span class="o">=</span> <span class="n">business</span><span class="p">,</span><span class="n">commute</span><span class="p">,</span><span class="n">freight</span><span class="p">,</span><span class="n">other</span>
+<span class="n">traffic_intensities_file</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">full</span> <span class="n">file</span> <span class="n">path</span> <span class="ow">or</span> <span class="n">name</span><span class="o">&gt;</span>
+<span class="n">resilience_curves_file</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">full</span> <span class="n">file</span> <span class="n">path</span> <span class="ow">or</span> <span class="n">name</span><span class="o">&gt;</span>
+<span class="n">values_of_time_file</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">full</span> <span class="n">file</span> <span class="n">path</span> <span class="ow">or</span> <span class="n">name</span><span class="o">&gt;</span>
+<span class="n">save_csv</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p><strong>network.ini for return period-based analyses</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">network</span><span class="p">]</span>
+<span class="n">directed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">shapefile</span>
+<span class="n">primary_file</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">diversion_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">file_id</span> <span class="o">=</span> <span class="n">ID</span>
+<span class="n">link_type_column</span> <span class="o">=</span> <span class="n">highway</span>
+<span class="n">polygon</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">network_type</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">road_types</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="p">[</span><span class="n">hazard</span><span class="p">]</span>
+<span class="n">hazard_map</span> <span class="o">=</span> <span class="n">RP_1000</span><span class="o">.</span><span class="n">tif</span><span class="p">,</span> <span class="n">RP_100</span><span class="o">.</span><span class="n">tif</span><span class="p">,</span> <span class="n">RP_10</span><span class="o">.</span><span class="n">tif</span>  <span class="c1"># name should have RP_X, X is the return period name</span>
+<span class="n">hazard_id</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">hazard_field_name</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">aggregate_wl</span> <span class="o">=</span> <span class="nb">max</span>
+<span class="n">hazard_crs</span> <span class="o">=</span> <span class="n">EPSG</span><span class="p">:</span><span class="mi">32736</span>
+</pre></div>
+</div>
+<p><strong>analyses.ini for return period-based analysis</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">analysis1</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_redundancy</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">single_link_losses</span>
+<span class="n">event_type</span> <span class="o">=</span> <span class="n">return_period</span>
+<span class="n">risk_calculation_mode</span> <span class="o">=</span> <span class="n">triangle_to_null_year</span>  <span class="c1"># default, cut_from_year, or triangle_to_null_year see the risk calculation section bellow</span>
+<span class="n">risk_calculation_year</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">weighing</span> <span class="o">=</span> <span class="n">time</span>
+<span class="n">threshold</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">production_loss_per_capita_per_hour</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">traffic_period</span> <span class="o">=</span> <span class="n">day</span>
+<span class="n">trip_purposes</span> <span class="o">=</span> <span class="n">business</span><span class="p">,</span><span class="n">commute</span><span class="p">,</span><span class="n">freight</span><span class="p">,</span><span class="n">other</span>
+<span class="n">traffic_intensities_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">resilience_curves_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">values_of_time_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">save_csv</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p><strong>Multiple-link losses</strong></p>
+<p>With this analysis, you gain insight into the economic losses due to a hazard. This analysis uses multiple-link redundancy as its underlying criticality method. Similar to the redundancy and single-link losses analyses, this analysis is performed for each separate link.</p>
+<p>The output consists of Vehicle Loss Hours (VLH) of the disrupted links, expressed in currency (e.g., €), for a specific part of the day (e.g., morning rush hour) and for each trip purpose (e.g., freight, business, etc.). The output type is a GPKG file, which will include columns like vlh_&lt;trip purpose&gt;&lt;EVi&gt;&lt;method&gt; or vlh_&lt;trip purpose&gt;&lt;RPj&gt;&lt;method&gt; (for event-based or return-period based analyses, respectively). “EV” stands for event, and “RP” stands for return period. There will also be a column vlh_total_&lt;EVi&gt;&lt;method&gt; or vlh_total&lt;RPj&gt;&lt;method&gt;, representing the sum of all vlh&lt;trip purpose&gt;. For instance, vlh_business_EV1_ma is an example of such a column. “EVi” refers to each flood map introduced in the network.ini, and “method” refers to the min, mean, or max method of calculation.</p>
+<p>For an analysis with hazards with return periods, a risk column is also calculated which represents the risk or estimated annual losses of the included hazards (with return periods).</p>
+<p>The input data includes:</p>
+<ul class="simple">
+<li><p>A hazard map.</p></li>
+<li><p>Traffic intensity data (AADT, annual average daily traffic).</p></li>
+<li><p>A shapefile of the network under study, where the shapefile file_id column should match the link id column of the traffic intensity data. The link id and file id columns in both datasets should have the same values, ensuring traceable links. If hazards with return periods are included, their file name should include <em>RP_X</em> where X is the return period year.</p></li>
+<li><p>Values of time or length for each trip purpose.</p></li>
+<li><p>Resilience curves stored in a CSV file representing the function loss and the corresponding function loss duration for different water heights and link types.</p></li>
+</ul>
+<p>The default traffic_period parameter is ‘day’. For shorter hazard periods or based on specific user considerations, the user can set the traffic period (see Partofday Enums) and specify the number of hours per traffic period with hours_per_traffic_period = X (hrs). In this case, traffic intensities are measured as vehicles per traffic period.</p>
+<p>The analysis steps include:</p>
+<ol class="arabic simple">
+<li><dl class="simple">
+<dt>Exposure Analysis:</dt><dd><ul class="simple">
+<li><p>Identifies the impacted links where the water depth exceeds the threshold.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p>Multi-link Redundancy Analysis: Determine the detour time or length (alt_time/length) and the “connected” attribute. The “connected” attribute indicates whether a link has a detour or not when removed, as part of the multi-link redundancy analysis.</p></li>
+<li><dl class="simple">
+<dt>Calculate Vehicle Loss Hours (VLH):</dt><dd><ul class="simple">
+<li><p>For impacted links with a detour, VLH is calculated using the value of time or length, detour time or length, function loss, and its corresponding function loss duration.</p></li>
+<li><p>For impacted links without a detour, the principle of loss of production is applied. This involves calculating productivity loss based on the number of people commuting through the impacted link without a detour, the productivity loss per capita per day, and the duration of the event.</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+<p>Bellow and example of the required ini files.</p>
+<p><strong>network.ini for event-based analyses</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">network</span><span class="p">]</span>
+<span class="n">directed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">shapefile</span>
+<span class="n">primary_file</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">diversion_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">file_id</span> <span class="o">=</span> <span class="n">ID</span>
+<span class="n">link_type_column</span> <span class="o">=</span> <span class="n">highway</span>
+<span class="n">polygon</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">network_type</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">road_types</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="p">[</span><span class="n">hazard</span><span class="p">]</span>
+<span class="n">hazard_map</span> <span class="o">=</span> <span class="n">max_flood_depth</span><span class="o">.</span><span class="n">tif</span>
+<span class="n">hazard_id</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">hazard_field_name</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">aggregate_wl</span> <span class="o">=</span> <span class="nb">max</span>
+<span class="n">hazard_crs</span> <span class="o">=</span> <span class="n">EPSG</span><span class="p">:</span><span class="mi">32736</span>
+</pre></div>
+</div>
+<p><strong>analyses.ini for event-based analysis</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">analysis1</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_redundancy</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">multi_link_losses</span>
+<span class="n">threshold</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># the water height threshold above which the link will be inundated</span>
+<span class="n">weighing</span> <span class="o">=</span> <span class="n">time</span>  <span class="c1"># time or length</span>
+<span class="n">production_loss_per_capita_per_hour</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="n">trip_purposes</span> <span class="o">=</span> <span class="n">business</span><span class="p">,</span><span class="n">commute</span><span class="p">,</span><span class="n">freight</span><span class="p">,</span><span class="n">other</span>
+<span class="n">traffic_intensities_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">resilience_curves_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">values_of_time_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">save_csv</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p><strong>network.ini for return period-based analyses</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">network</span><span class="p">]</span>
+<span class="n">directed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">shapefile</span>
+<span class="n">primary_file</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">diversion_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">file_id</span> <span class="o">=</span> <span class="n">ID</span>
+<span class="n">link_type_column</span> <span class="o">=</span> <span class="n">highway</span>
+<span class="n">polygon</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">network_type</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">road_types</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="p">[</span><span class="n">hazard</span><span class="p">]</span>
+<span class="n">hazard_map</span> <span class="o">=</span> <span class="n">RP_1000</span><span class="o">.</span><span class="n">tif</span><span class="p">,</span> <span class="n">RP_100</span><span class="o">.</span><span class="n">tif</span><span class="p">,</span> <span class="n">RP_10</span><span class="o">.</span><span class="n">tif</span>  <span class="c1"># name should have RP_X, X is the return period name</span>
+<span class="n">hazard_id</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">hazard_field_name</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">aggregate_wl</span> <span class="o">=</span> <span class="nb">max</span>
+<span class="n">hazard_crs</span> <span class="o">=</span> <span class="n">EPSG</span><span class="p">:</span><span class="mi">32736</span>
+</pre></div>
+</div>
+<p><strong>analyses.ini for return period-based analysis</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">analysis1</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_redundancy</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">multi_link_losses</span>
+<span class="n">event_type</span> <span class="o">=</span> <span class="n">return_period</span>
+<span class="n">risk_calculation_mode</span> <span class="o">=</span> <span class="n">cut_from_year</span>  <span class="c1"># default, cut_from_year, or triangle_to_null_year see the risk calculation section bellow</span>
+<span class="n">risk_calculation_year</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">threshold</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">weighing</span> <span class="o">=</span> <span class="n">time</span>
+<span class="n">production_loss_per_capita_per_hour</span> <span class="o">=</span> <span class="mi">42</span>
+<span class="n">traffic_period</span> <span class="o">=</span> <span class="n">day</span>
+<span class="n">trip_purposes</span> <span class="o">=</span> <span class="n">business</span><span class="p">,</span><span class="n">commute</span><span class="p">,</span><span class="n">freight</span><span class="p">,</span><span class="n">other</span>
+<span class="n">traffic_intensities_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">resilience_curves_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">values_of_time_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">save_csv</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p><strong>Origin-Destination, defined OD couples</strong></p>
+<p>RA2CE allows for origin-destination analyses. This analysis finds the shortest (distance-weighed) or quickest (time-weighed) route between all Origins and all Destinations inputted by the user, with and without disruption. The origins and destinations need to be defined by the user. This requires a certain data structure. See the origins-destinations examples notebooks to learn how to do this.</p>
+<p><strong>network.ini for the case without hazard</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">network</span><span class="p">]</span>
+<span class="n">directed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">OSM</span> <span class="n">download</span>
+<span class="n">primary_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">diversion_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">file_id</span> <span class="o">=</span> <span class="n">rfid_c</span>
+<span class="n">polygon</span> <span class="o">=</span> <span class="n">Extent_Network_wgs84</span><span class="o">.</span><span class="n">geojson</span>
+<span class="n">network_type</span> <span class="o">=</span> <span class="n">drive</span>
+<span class="n">road_types</span> <span class="o">=</span> <span class="n">motorway</span><span class="p">,</span><span class="n">motorway_link</span><span class="p">,</span><span class="n">primary</span><span class="p">,</span><span class="n">primary_link</span><span class="p">,</span><span class="n">secondary</span><span class="p">,</span><span class="n">secondary_link</span><span class="p">,</span><span class="n">tertiary</span><span class="p">,</span><span class="n">tertiary_link</span><span class="p">,</span><span class="n">residential</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="p">[</span><span class="n">origins_destinations</span><span class="p">]</span>
+<span class="n">origins</span> <span class="o">=</span> <span class="n">origins_worldpop_wgs84</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">destinations</span> <span class="o">=</span> <span class="n">destinations_all_good_wgs84</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">origins_names</span> <span class="o">=</span> <span class="n">A</span>
+<span class="n">destinations_names</span> <span class="o">=</span> <span class="n">B</span>
+<span class="n">id_name_origin_destination</span> <span class="o">=</span> <span class="n">OBJECTID</span>
+<span class="n">origin_count</span> <span class="o">=</span> <span class="n">POPULATION</span>
+<span class="n">origin_out_fraction</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">category</span> <span class="o">=</span> <span class="n">category</span>
+</pre></div>
+</div>
+<p><strong>analyses.ini for the case without hazard</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">analysis1</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_od</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">optimal_route_origin_destination</span>
+<span class="n">weighing</span> <span class="o">=</span> <span class="n">distance</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">save_csv</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p><strong>network.ini for the case with hazard</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">network</span><span class="p">]</span>
+<span class="n">directed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">OSM</span> <span class="n">download</span>
+<span class="n">primary_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">diversion_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">file_id</span> <span class="o">=</span> <span class="n">rfid_c</span>
+<span class="n">polygon</span> <span class="o">=</span> <span class="n">Extent_Network_wgs84</span><span class="o">.</span><span class="n">geojson</span>
+<span class="n">network_type</span> <span class="o">=</span> <span class="n">drive</span>
+<span class="n">road_types</span> <span class="o">=</span> <span class="n">motorway</span><span class="p">,</span><span class="n">motorway_link</span><span class="p">,</span><span class="n">primary</span><span class="p">,</span><span class="n">primary_link</span><span class="p">,</span><span class="n">secondary</span><span class="p">,</span><span class="n">secondary_link</span><span class="p">,</span><span class="n">tertiary</span><span class="p">,</span><span class="n">tertiary_link</span><span class="p">,</span><span class="n">residential</span>
+<span class="n">save_shp</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="p">[</span><span class="n">origins_destinations</span><span class="p">]</span>
+<span class="n">origins</span> <span class="o">=</span> <span class="n">origins_worldpop_wgs84</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">destinations</span> <span class="o">=</span> <span class="n">destinations_all_good_wgs84</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">origins_names</span> <span class="o">=</span> <span class="n">A</span>
+<span class="n">destinations_names</span> <span class="o">=</span> <span class="n">B</span>
+<span class="n">id_name_origin_destination</span> <span class="o">=</span> <span class="n">OBJECTID</span>
+<span class="n">origin_count</span> <span class="o">=</span> <span class="n">POPULATION</span>
+<span class="n">origin_out_fraction</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">category</span> <span class="o">=</span> <span class="n">category</span>
+</pre></div>
+</div>
+<p><strong>analyses.ini for the case with hazard</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">analysis1</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_od</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">multi_link_origin_destination</span>
+<span class="n">weighing</span> <span class="o">=</span> <span class="n">distance</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">save_csv</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p><strong>Origin-Destination, defined origins to closest destinations</strong>
+This analysis finds the shortest (distance-weighed) or quickest (time-weighed) route from all Origins to the closest Destinations inputted by the user, with and without disruption. It is possible to create different destination categories (e.g. hospitals, schools and shelters). In that case, RA2CE finds the routes from all origins to the closest destination per destination category (i.e. from each origin to the closest hospital, the closest school and the closest shelter).</p>
+<p><strong>network.ini for the case without hazard</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">network</span><span class="p">]</span>
+<span class="n">directed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">OSM</span> <span class="n">download</span>
+<span class="n">primary_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">diversion_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">file_id</span> <span class="o">=</span> <span class="n">rfid_c</span>
+<span class="n">polygon</span> <span class="o">=</span> <span class="n">Extent_Network_wgs84</span><span class="o">.</span><span class="n">geojson</span>
+<span class="n">network_type</span> <span class="o">=</span> <span class="n">drive</span>
+<span class="n">road_types</span> <span class="o">=</span> <span class="n">motorway</span><span class="p">,</span><span class="n">motorway_link</span><span class="p">,</span><span class="n">primary</span><span class="p">,</span><span class="n">primary_link</span><span class="p">,</span><span class="n">secondary</span><span class="p">,</span><span class="n">secondary_link</span><span class="p">,</span><span class="n">tertiary</span><span class="p">,</span><span class="n">tertiary_link</span><span class="p">,</span><span class="n">residential</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="p">[</span><span class="n">origins_destinations</span><span class="p">]</span>
+<span class="n">origins</span> <span class="o">=</span> <span class="n">origins_worldpop_wgs84</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">destinations</span> <span class="o">=</span> <span class="n">destinations_all_good_wgs84</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">origins_names</span> <span class="o">=</span> <span class="n">A</span>
+<span class="n">destinations_names</span> <span class="o">=</span> <span class="n">B</span>
+<span class="n">id_name_origin_destination</span> <span class="o">=</span> <span class="n">OBJECTID</span>
+<span class="n">origin_count</span> <span class="o">=</span> <span class="n">POPULATION</span>
+<span class="n">origin_out_fraction</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">category</span> <span class="o">=</span> <span class="n">category</span>
+</pre></div>
+</div>
+<p><strong>analyses.ini for the case without hazard</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">analysis1</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_od</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">optimal_route_origin_closest_destination</span>
+<span class="n">weighing</span> <span class="o">=</span> <span class="n">distance</span>
+<span class="n">save_gpkg</span><span class="o">=</span> <span class="kc">True</span>
+<span class="n">save_csv</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p><strong>network.ini for the case with hazard</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">network</span><span class="p">]</span>
+<span class="n">directed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">OSM</span> <span class="n">download</span>
+<span class="n">primary_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">diversion_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">file_id</span> <span class="o">=</span> <span class="n">rfid_c</span>
+<span class="n">polygon</span> <span class="o">=</span> <span class="n">Extent_Network_wgs84</span><span class="o">.</span><span class="n">geojson</span>
+<span class="n">network_type</span> <span class="o">=</span> <span class="n">drive</span>
+<span class="n">road_types</span> <span class="o">=</span> <span class="n">motorway</span><span class="p">,</span><span class="n">motorway_link</span><span class="p">,</span><span class="n">primary</span><span class="p">,</span><span class="n">primary_link</span><span class="p">,</span><span class="n">secondary</span><span class="p">,</span><span class="n">secondary_link</span><span class="p">,</span><span class="n">tertiary</span><span class="p">,</span><span class="n">tertiary_link</span><span class="p">,</span><span class="n">residential</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="p">[</span><span class="n">origins_destinations</span><span class="p">]</span>
+<span class="n">origins</span> <span class="o">=</span> <span class="n">origins_worldpop_wgs84</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">destinations</span> <span class="o">=</span> <span class="n">destinations_all_good_wgs84</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">origins_names</span> <span class="o">=</span> <span class="n">A</span>
+<span class="n">destinations_names</span> <span class="o">=</span> <span class="n">B</span>
+<span class="n">id_name_origin_destination</span> <span class="o">=</span> <span class="n">OBJECTID</span>
+<span class="n">origin_count</span> <span class="o">=</span> <span class="n">POPULATION</span>
+<span class="n">origin_out_fraction</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">category</span> <span class="o">=</span> <span class="n">category</span>
+
+<span class="p">[</span><span class="n">hazard</span><span class="p">]</span>
+<span class="n">hazard_map</span> <span class="o">=</span> <span class="n">max_flood_depth</span><span class="o">.</span><span class="n">tif</span>
+<span class="n">hazard_id</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">hazard_field_name</span> <span class="o">=</span> <span class="n">waterdepth</span>
+<span class="n">aggregate_wl</span> <span class="o">=</span> <span class="nb">max</span>
+<span class="n">hazard_crs</span> <span class="o">=</span> <span class="n">EPSG</span><span class="p">:</span><span class="mi">32736</span>
+</pre></div>
+</div>
+<p><strong>analyses.ini for the case with hazard</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">analysis1</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_od</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">multi_link_origin_closest_destination</span>
+<span class="n">aggregate_wl</span> <span class="o">=</span> <span class="nb">max</span>
+<span class="n">threshold</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">weighing</span> <span class="o">=</span> <span class="n">distance</span>
+<span class="n">calculate_route_without_disruption</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">save_csv</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p><strong>Isolated locations</strong></p>
+<p>This analysis finds the sections of the network that are fully isolated from the rest of the network (also named disconnected islands), because of network disruption due to a hazard. &lt;UNDER DEVELOPMENT&gt;</p>
+<p><strong>network.ini</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">network</span><span class="p">]</span>
+<span class="n">directed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">OSM</span> <span class="n">download</span>
+<span class="n">primary_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">diversion_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">file_id</span> <span class="o">=</span> <span class="n">rfid_c</span>
+<span class="n">polygon</span> <span class="o">=</span> <span class="n">Extent_Network_wgs84</span><span class="o">.</span><span class="n">geojson</span>
+<span class="n">network_type</span> <span class="o">=</span> <span class="n">drive</span>
+<span class="n">road_types</span> <span class="o">=</span> <span class="n">motorway</span><span class="p">,</span><span class="n">motorway_link</span><span class="p">,</span><span class="n">trunk</span><span class="p">,</span><span class="n">trunk_link</span><span class="p">,</span><span class="n">primary</span><span class="p">,</span><span class="n">primary_link</span><span class="p">,</span><span class="n">secondary</span><span class="p">,</span><span class="n">secondary_link</span><span class="p">,</span><span class="n">tertiary</span><span class="p">,</span><span class="n">tertiary_link</span><span class="p">,</span><span class="n">unclassified</span><span class="p">,</span><span class="n">residential</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="p">[</span><span class="n">origins_destinations</span><span class="p">]</span>
+<span class="n">origins</span> <span class="o">=</span> <span class="n">origins_worldpop_wgs84</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">destinations</span> <span class="o">=</span> <span class="n">destinations_all_good_wgs84</span><span class="o">.</span><span class="n">shp</span>
+<span class="n">origins_names</span> <span class="o">=</span> <span class="n">A</span>
+<span class="n">destinations_names</span> <span class="o">=</span> <span class="n">B</span>
+<span class="n">id_name_origin_destination</span> <span class="o">=</span> <span class="n">OBJECTID</span>
+<span class="n">origin_count</span> <span class="o">=</span> <span class="n">POPULATION</span>
+<span class="n">origin_out_fraction</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">category</span> <span class="o">=</span> <span class="n">category</span>
+
+<span class="p">[</span><span class="n">hazard</span><span class="p">]</span>
+<span class="n">hazard_map</span> <span class="o">=</span> <span class="n">max_flood_depth</span><span class="o">.</span><span class="n">tif</span>
+<span class="n">hazard_id</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">hazard_field_name</span> <span class="o">=</span> <span class="n">waterdepth</span>
+<span class="n">aggregate_wl</span> <span class="o">=</span> <span class="nb">max</span>
+<span class="n">hazard_crs</span> <span class="o">=</span> <span class="n">EPSG</span><span class="p">:</span><span class="mi">4326</span>
+
+<span class="p">[</span><span class="n">isolation</span><span class="p">]</span>
+<span class="n">locations</span> <span class="o">=</span> <span class="n">origins_worldpop_wgs84</span><span class="o">.</span><span class="n">shp</span>
+</pre></div>
+</div>
+<p><strong>analyses.ini</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">analysis1</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_locations</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">multi_link_isolated_locations</span>
+<span class="n">aggregate_wl</span> <span class="o">=</span> <span class="nb">max</span>
+<span class="n">threshold</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">weighing</span> <span class="o">=</span> <span class="n">length</span>
+<span class="n">buffer_meters</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">category_field_name</span> <span class="o">=</span> <span class="n">category</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">save_csv</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p><strong>Traffic and equity analysis</strong></p>
+<p>This analysis allows for network criticality analysis taking into account three distributive equity principles: utilitarian, egalitarian and prioritarian principles. For more background knowledge on these principles and the application on transport network criticality analysis, please read: <a class="reference external" href="https://www.sciencedirect.com/science/article/pii/S0965856420308077">https://www.sciencedirect.com/science/article/pii/S0965856420308077</a>&gt; The purpose of the equity analysis is providing insight into how different distributive principles can result in different prioritization of the network. While we usually prioritize network interventions based on the number of people that use the road, equity principles allow us to also take into account the function of the network for for example underprivileged communities. Depending on the equity principle applied, your network prioritization might change, which can change decision-making.
+This analysis is set up generically so that the user can determine the equity weights themselves. This can for example be GINI-coefficients or social vulnerability scores. The user-defined equity weights will feed into the prioritarian principle. The equity analysis example notebook will guide you through the use of this analysis.</p>
+<p><strong>network.ini</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">example_losses</span>
+
+<span class="p">[</span><span class="n">network</span><span class="p">]</span>
+<span class="n">directed</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="n">source</span> <span class="o">=</span> <span class="n">OSM</span> <span class="n">download</span>
+<span class="n">primary_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">diversion_file</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">file_id</span> <span class="o">=</span> <span class="n">rfid_c</span>
+<span class="n">polygon</span> <span class="o">=</span> <span class="n">Extent_Network_wgs84</span><span class="o">.</span><span class="n">geojson</span>
+<span class="n">network_type</span> <span class="o">=</span> <span class="n">drive</span>
+<span class="n">road_types</span> <span class="o">=</span> <span class="n">motorway</span><span class="p">,</span><span class="n">motorway_link</span><span class="p">,</span><span class="n">trunk</span><span class="p">,</span><span class="n">trunk_link</span><span class="p">,</span><span class="n">primary</span><span class="p">,</span><span class="n">primary_link</span><span class="p">,</span><span class="n">secondary</span><span class="p">,</span><span class="n">secondary_link</span><span class="p">,</span><span class="n">tertiary</span><span class="p">,</span><span class="n">tertiary_link</span><span class="p">,</span><span class="n">unclassified</span><span class="p">,</span><span class="n">residential</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+
+<span class="p">[</span><span class="n">origins_destinations</span><span class="p">]</span>
+<span class="n">origins</span> <span class="o">=</span> <span class="n">origins_points</span><span class="o">.</span><span class="n">shp</span> <span class="c1"># Must be in the static/network folder, belongs to this analysis. origins should hold counts (e.g. how many people live in the origin)</span>
+<span class="n">destinations</span> <span class="o">=</span> <span class="n">destination_points</span><span class="o">.</span><span class="n">shp</span> <span class="c1"># Must be in the static/network folder, belongs to this analysis</span>
+<span class="n">origins_names</span> <span class="o">=</span> <span class="n">A</span>
+<span class="n">destinations_names</span> <span class="o">=</span> <span class="n">B</span>
+<span class="n">id_name_origin_destination</span> <span class="o">=</span> <span class="n">OBJECTID</span>
+<span class="n">origin_count</span> <span class="o">=</span> <span class="n">values</span> <span class="c1">#necessary if traffic on each edge should be recorded in optimal_route_origin_destination</span>
+<span class="n">origin_out_fraction</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">category</span> <span class="o">=</span> <span class="n">category</span> <span class="c1">#column name in destinations specifying the different destination categories (e.g. hospital, school, etc.)</span>
+<span class="n">region</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">shp</span> <span class="c1">#a shapefile outlining the region&#39;s geometry, necessary for distributional / equity analysis</span>
+<span class="n">region_var</span> <span class="o">=</span> <span class="n">DESA</span> <span class="c1">#the region&#39;s name recorded in a column of the region shapefile</span>
+
+<span class="p">[</span><span class="n">hazard</span><span class="p">]</span>
+<span class="n">hazard_map</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">hazard_id</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">hazard_field_name</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">aggregate_wl</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">hazard_crs</span> <span class="o">=</span> <span class="kc">None</span>
+</pre></div>
+</div>
+<p><strong>analyses.ini</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">project</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">equity_analysis</span>
+
+<span class="p">[</span><span class="n">analysis1</span><span class="p">]</span>
+<span class="n">name</span> <span class="o">=</span> <span class="n">optimal</span> <span class="n">route</span> <span class="n">origin</span> <span class="n">destination</span>
+<span class="n">analysis</span> <span class="o">=</span> <span class="n">optimal_route_origin_destination</span>
+<span class="n">weighing</span> <span class="o">=</span> <span class="n">length</span>
+<span class="n">save_traffic</span> <span class="o">=</span> <span class="kc">True</span> <span class="c1">#True if you want to record the traffic in each edge</span>
+<span class="n">equity_weight</span> <span class="o">=</span> <span class="n">region_weight</span><span class="o">.</span><span class="n">csv</span> <span class="c1">#equity-weighted factors for each region, should be stored in static/network. Note that &#39;region&#39; and &#39;region_var&#39; should present in network.ini</span>
+<span class="n">save_gpkg</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="n">save_csv</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+</section>
+<section id="risk-calculation-method">
+<h2>Risk calculation method<a class="headerlink" href="#risk-calculation-method" title="Permalink to this heading">#</a></h2>
+<p>The flood risk, in terms of expected annual damage or losses (EAD or EAL) in currency per year, is calculated by integration over the damage per return frequency.</p>
+<p>This requires several assumptions that significantly impact the outcomes (Olsen et al., 2015). We use the trapezoidal rule to numerically integrate over the known combinations of the return periods and damage. For example, consider a run where damage is known for the 100, 50, 20 and 10 year return period (see Figures bellow).</p>
+<p>The main assumptions that influence the outcomes are:</p>
+<ul class="simple">
+<li><p>How to handle damage with a return period larger than the largest known return period. (e.g. &gt; 100 years)</p></li>
+<li><p>How to handle damage with a return period larger than the lowest return period.</p></li>
+<li><p>Is there a protection level above which no damage will occur?</p></li>
+</ul>
+<p>RA2CE can calculate the EAD in three different modes:</p>
+<p><strong>Default mode: [risk_calculation_mode = default]</strong></p>
+<ul class="simple">
+<li><p>For all RPs larger than the largest known RP (first part of the x-axis, see figure bellow), assume that the damage equals the damage of the largest known RP.</p></li>
+<li><p>No damage for all events with a return period smaller than the smallest known RP.</p></li>
+<li><p>No accounting for flood risk protection.</p></li>
+</ul>
+<img alt="../_images/default.png" src="../_images/default.png" />
+<p><strong>Cut_from mode: [risk_calculation_mode = cut_from_year]</strong></p>
+<ul class="simple">
+<li><p>For all RPs larger than the largest known RP (first part of the x-axis, see figure bellow), assume that the damage equals the damage of the largest known RP.</p></li>
+<li><p>No risk for all events with a return period smaller than the smallest known RP.</p></li>
+<li><p>All damage cause by events with a RP &gt; cut_off (an integer as the risk_calculation_year parameter), does not contribute to risk.</p></li>
+</ul>
+<img alt="../_images/cut_from_year.png" src="../_images/cut_from_year.png" />
+<p><strong>Triangle_to_null mode: [risk_calculation_mode = triangle_to_null_year]</strong></p>
+<ul class="simple">
+<li><p>For all RPs larger than the largest known RP (first part of the x-axis, see figure bellow), assume that the damage equals the damage of the largest known RP.</p></li>
+<li><p>From the lowest return period, draw a triangle to a certain value (an integer as the risk_calculation_year parameter), and add the area of this triangle to the risk</p></li>
+<li><p>No accounting for flood risk protection.</p></li>
+</ul>
+<img alt="../_images/triangle_to_null.png" src="../_images/triangle_to_null.png" />
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../network_module/network_module.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Network Module</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../docker_and_cloud/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Docker and Cloud guide</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration">Configuration</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#damages">Damages</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#losses-network-criticality">Losses / Network criticality</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#risk-calculation-method">Risk calculation method</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/analysis_module/analysis_module.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/analysis_module/analysis_module.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
