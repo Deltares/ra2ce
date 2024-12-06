@@ -60,3 +60,20 @@ class TestAdaptationOptionCollection:
         # 3. Verify expectations.
         assert isinstance(_result, dict)
         assert all(_option in _result for _option in _collection.adaptation_options)
+
+    def test_calculate_correct_get_net_present_value_factor(
+        self,
+        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+    ):
+        # 1. Define test data.
+        _collection = AdaptationOptionCollection.from_config(valid_adaptation_config[1])
+
+        # 2. Run test.
+        _result = _collection.get_net_present_value_factor()
+
+        # 3. Verify expectations.
+        assert isinstance(_result, float)
+        assert _result == pytest.approx(0.2109011023, rel=1e-9)
+
+
+
