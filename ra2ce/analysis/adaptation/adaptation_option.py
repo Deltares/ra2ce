@@ -158,8 +158,7 @@ class AdaptationOption:
         benefit_graph[f"{self.id}_impact"] = benefit_graph[_option_cols].sum(axis=1)
 
         # convert event impact into time-horizon impact
-        benefit_graph[f"{self.id}_impact"] = (
-            benefit_graph[f"{self.id}_impact"] * net_present_value_factor
+        benefit_graph[f"{self.id}_impact"] *= net_present_value_factor
         )
 
         return benefit_graph
