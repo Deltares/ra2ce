@@ -21,6 +21,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
+from itertools import pairwise
 
 from geopandas import GeoDataFrame
 
@@ -108,35 +109,29 @@ class AdaptationOption:
             float: The net present value unit cost of the adaptation option.
         """
 
-        def calc_years(from_year: float, to_year: float, interval: float) -> range:
-            return range(
-                round(from_year),
-                round(min(to_year, time_horizon)) + 1,
-                round(interval),
-            )
+        def is_constr_year(year: float) -> bool:
+            if self.construction_interval == 0:
+                return False
+            return (round(year) % round(self.construction_interval)) == 0
 
-        def calc_cost(cost: float, year: float) -> float:
-            return cost / (1 + discount_rate) ** year
+        def is_maint_year(year: float) -> bool:
+            if self.maintenance_interval == 0:
+                return False
+            if self.construction_interval > 0:
+                # Take year relative to last construction year
+                year = round(year) % round(self.construction_interval)
+            return (year % round(self.maintenance_interval)) == 0
 
-        _assessment_years = calc_years(
-            1,
-            round(time_horizon),
-            1,
-        )
-        _lifetime_cost = self.construction_cost
-        for _constr_year in _assessment_years:
+        def calculate_cost(year) -> float:
+            if is_constr_year(year):
+                _cost = self.construction_cost
+            elif is_maint_year(year):
+                _cost = self.maintenance_cost
+            else:
+                return 0.0
+            return _cost / (1 + discount_rate) ** year
 
-            if self.construction_interval > 0 and _constr_year in range(
-                0, round(time_horizon), round(self.construction_interval)
-            ):
-                _lifetime_cost += calc_cost(self.construction_cost, _constr_year)
-
-            if self.maintenance_interval > 0 and _constr_year in range(
-                0, round(time_horizon) + 1, round(self.maintenance_interval)
-            ):  # +1 here need but no above
-                _lifetime_cost += calc_cost(self.maintenance_cost, _constr_year)
-
-        return _lifetime_cost
+        return sum(calculate_cost(_year) for _year in range(0, round(time_horizon), 1))
 
     def calculate_impact(self, benefit_graph: GeoDataFrame) -> GeoDataFrame:
         """
