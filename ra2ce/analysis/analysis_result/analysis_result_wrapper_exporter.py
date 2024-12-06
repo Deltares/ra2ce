@@ -25,13 +25,15 @@ from pathlib import Path
 
 from geopandas import GeoDataFrame
 
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper_protocol import (
+    AnalysisResultWrapperProtocol,
+)
 
 
 class AnalysisResultWrapperExporter:
     def export_result(
         self,
-        result_wrapper: AnalysisResultWrapper,
+        result_wrapper: AnalysisResultWrapperProtocol,
     ):
         """
         Exports the given result into the analysis requested formats ( `.gpkg` and / or `.csv`).
@@ -42,22 +44,17 @@ class AnalysisResultWrapperExporter:
         if not result_wrapper.is_valid_result():
             return
 
-        _analysis = result_wrapper.analysis
-        _output_path = _analysis.output_path.joinpath(
-            _analysis.analysis.analysis.config_value
-        )
-        _analysis_name = _analysis.analysis.name.replace(" ", "_")
-
-        if _analysis.analysis.save_gpkg:
-            self._export_gdf(
-                result_wrapper.analysis_result,
-                _output_path.joinpath(_analysis_name + ".gpkg"),
-            )
-        if _analysis.analysis.save_csv:
-            self._export_csv(
-                result_wrapper.analysis_result,
-                _output_path.joinpath(_analysis_name + ".csv"),
-            )
+        for _analysis_result in result_wrapper.results_collection:
+            if _analysis_result.analysis_config.save_gpkg:
+                self._export_gdf(
+                    _analysis_result.analysis_result,
+                    _analysis_result.base_export_path.with_suffix(".gpkg"),
+                )
+            if _analysis_result.analysis_config.save_csv:
+                self._export_csv(
+                    _analysis_result.analysis_result,
+                    _analysis_result.base_export_path.with_suffix(".csv"),
+                )
 
     def _export_gdf(self, gdf: GeoDataFrame, export_path: Path):
         """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp

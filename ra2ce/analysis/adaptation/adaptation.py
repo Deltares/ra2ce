@@ -26,6 +26,7 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
     AdaptationOptionCollection,
 )
+from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionAdaptation,
 )
@@ -35,7 +36,7 @@ from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProt
 from ra2ce.network.graph_files.network_file import NetworkFile
 
 
-class Adaptation(AnalysisDamagesProtocol):
+class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
     """
     Execute the adaptation analysis.
     For each adaptation option a damages and losses analysis is executed.
@@ -67,18 +68,14 @@ class Adaptation(AnalysisDamagesProtocol):
         Returns:
             GeoDataFrame: The result of the adaptation analysis.
         """
-        return self.calculate_bc_ratio()
+        return self.generate_result_wrapper(self.calculate_bc_ratio())
 
     def run_cost(self) -> GeoDataFrame:
         """
-        <<<<<<< HEAD
-                Calculate the link cost for all adaptation options.
-        =======
-                Calculate the unit cost for all adaptation options.
-        >>>>>>> master
+        Calculate the unit cost for all adaptation options.
 
-                Returns:
-                    GeoDataFrame: The result of the cost calculation.
+        Returns:
+            GeoDataFrame: The result of the cost calculation.
         """
         _cost_gdf = deepcopy(self.graph_file.get_graph())
 
