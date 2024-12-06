@@ -161,6 +161,5 @@ class AdaptationOption:
 
         # convert event impact into time-horizon impact
         benefit_graph[f"{self.id}_impact"] *= net_present_value_factor
-        )
 
         return benefit_graph
