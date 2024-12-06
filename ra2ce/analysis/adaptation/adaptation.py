@@ -21,8 +21,6 @@
 from copy import deepcopy
 from pathlib import Path
 
-import numpy as np
-from cleo.helpers import option
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
