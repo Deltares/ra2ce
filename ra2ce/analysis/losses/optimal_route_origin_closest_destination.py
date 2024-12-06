@@ -3,10 +3,12 @@ from pathlib import Path
 
 from geopandas import GeoDataFrame
 
+from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.origin_closest_destination import OriginClosestDestination
 from ra2ce.network.graph_files.graph_file import GraphFile
@@ -17,7 +19,7 @@ from ra2ce.network.network_config_data.network_config_data import (
 from ra2ce.network.networks_utils import graph_to_gpkg
 
 
-class OptimalRouteOriginClosestDestination(AnalysisLossesProtocol):
+class OptimalRouteOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
     analysis: AnalysisSectionLosses
     graph_file_hazard: GraphFile
     input_path: Path
@@ -63,7 +65,7 @@ class OptimalRouteOriginClosestDestination(AnalysisLossesProtocol):
         gdf.to_file(save_path, driver="GPKG")
         logging.info("Results saved to: {}".format(save_path))
 
-    def execute(self) -> GeoDataFrame:
+    def execute(self) -> AnalysisResultWrapper:
         def _save_gpkg_analysis(
             base_graph,
             to_save_gdf: list[GeoDataFrame],
@@ -111,5 +113,5 @@ class OptimalRouteOriginClosestDestination(AnalysisLossesProtocol):
             )
             del opt_routes["geometry"]
             opt_routes.to_csv(csv_path, index=False)
-
-        return None
+        # TODO: This does not seem correct, why were we returning None?
+        return self.generate_result_wrapper(None)

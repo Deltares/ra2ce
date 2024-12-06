@@ -19,38 +19,36 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from typing import Protocol, runtime_checkable
+from dataclasses import dataclass, field
 
-from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from geopandas import GeoDataFrame
+
+from ra2ce.analysis.analysis_result.analysis_result import AnalysisResult
 from ra2ce.analysis.analysis_result.analysis_result_wrapper_protocol import (
     AnalysisResultWrapperProtocol,
 )
-from ra2ce.configuration.config_wrapper import ConfigWrapper
 
 
-@runtime_checkable
-class AnalysisRunner(Protocol):
-    @staticmethod
-    def can_run(ra2ce_input: ConfigWrapper) -> bool:
+@dataclass(kw_only=True)
+class AnalysisResultWrapper(AnalysisResultWrapperProtocol):
+    """
+    Dataclass to wrap a collection of analysis results.
+    """
+
+    results_collection: list[AnalysisResult] = field(default_factory=lambda: [])
+
+    def get_single_result(self) -> GeoDataFrame | None:
         """
-        Validates whether the given `ConfigWrapper` is eligibile for this `AnalysisRunner`.
-
-        Args:
-            ra2ce_input (ConfigWrapper): Configuration desired to run.
+        Returns the first declared analysis result if exists, otherwise None.
 
         Returns:
-            bool: Whether the `ConfigWrapper` can be run or not.
+            GeoDataFrame | None: First declared analysis result.
         """
+        if any(self.results_collection):
+            return self.results_collection[0].analysis_result
+        return None
 
-    def run(
-        self, analysis_config: AnalysisConfigWrapper
-    ) -> list[AnalysisResultWrapperProtocol]:
-        """
-        Runs this `AnalysisRunner` with the given analysis configuration.
-
-        Args:
-            analysis_config (AnalysisConfigWrapper): Analysis configuration representation to be run on this `AnalysisRunner`.
-
-        Returns:
-            list[AnalysisResultWrapperProtocol]: List of all results for all ran analysis.
-        """
+    def is_valid_result(self) -> bool:
+        return any(self.results_collection) and all(
+            map(AnalysisResult.is_valid_result, self.results_collection)
+        )
