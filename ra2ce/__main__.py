@@ -26,7 +26,7 @@ from typing import Optional
 
 import click
 
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.ra2ce_handler import Ra2ceHandler
 
 

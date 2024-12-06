@@ -19,26 +19,19 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from dataclasses import dataclass
+from typing import Protocol, runtime_checkable
 
-import geopandas as gpd
-
-from ra2ce.analysis.analysis_protocol import AnalysisProtocol
+from ra2ce.analysis.analysis_result.analysis_result import AnalysisResult
 
 
-@dataclass
-class AnalysisResultWrapper:
-    analysis_result: gpd.GeoDataFrame
-    analysis: AnalysisProtocol
+@runtime_checkable
+class AnalysisResultWrapperProtocol(Protocol):
+    results_collection: list[AnalysisResult]
 
     def is_valid_result(self) -> bool:
         """
-        Validates whether the `analysis_result` in this wrapper is valid.
+        Validates whether the "analysis results" (`results_collection`) in this wrapper are all valid.
 
         Returns:
-            bool: validity of `analysis_result`.
+            bool: validation of `results_collection`.
         """
-        return (
-            isinstance(self.analysis_result, gpd.GeoDataFrame)
-            and not self.analysis_result.empty
-        )

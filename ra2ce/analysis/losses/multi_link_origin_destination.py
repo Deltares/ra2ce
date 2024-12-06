@@ -6,10 +6,12 @@ import numpy as np
 import pandas as pd
 from geopandas import GeoDataFrame, read_feather, read_file
 
+from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.optimal_route_origin_destination import (
     OptimalRouteOriginDestination,
@@ -21,7 +23,7 @@ from ra2ce.network.network_config_data.network_config_data import (
 )
 
 
-class MultiLinkOriginDestination(AnalysisLossesProtocol):
+class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
     analysis: AnalysisSectionLosses
     graph_file_hazard: GraphFile
     input_path: Path
@@ -346,19 +348,18 @@ class MultiLinkOriginDestination(AnalysisLossesProtocol):
 
         return origin_impact_master, region_impact_master
 
-    def execute(self) -> GeoDataFrame:
+    def execute(self) -> AnalysisResultWrapper:
         _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
         gdf = self.multi_link_origin_destination(
             self.graph_file_hazard.get_graph(), self.analysis
         )
         self._analysis_input.graph_file = self._analysis_input.graph_file_hazard
-        gdf_not_disrupted = OptimalRouteOriginDestination(
+        _orod_result_wrapper = OptimalRouteOriginDestination(
             self._analysis_input
         ).execute()
-        (
-            disruption_impact_df,
-            gdf_ori,
-        ) = self.multi_link_origin_destination_impact(gdf, gdf_not_disrupted)
+        (disruption_impact_df, gdf_ori,) = self.multi_link_origin_destination_impact(
+            gdf, _orod_result_wrapper.get_single_result()
+        )
         try:
             assert self.origins_destinations.region
             (
@@ -385,4 +386,4 @@ class MultiLinkOriginDestination(AnalysisLossesProtocol):
         )
         disruption_impact_df.to_csv(impact_csv_path, index=False)
 
-        return gdf
+        return self.generate_result_wrapper(gdf)

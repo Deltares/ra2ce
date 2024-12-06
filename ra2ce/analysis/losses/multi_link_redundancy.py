@@ -7,11 +7,13 @@ import numpy as np
 import osmnx
 import pandas as pd
 
+from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.weighing_enum import WeighingEnum
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.analysis.losses.weighing_analysis.weighing_analysis_factory import (
     WeighingAnalysisFactory,
@@ -20,7 +22,7 @@ from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.network.hazard.hazard_names import HazardNames
 
 
-class MultiLinkRedundancy(AnalysisLossesProtocol):
+class MultiLinkRedundancy(AnalysisBase, AnalysisLossesProtocol):
     analysis: AnalysisSectionLosses
     graph_file_hazard: GraphFile
     input_path: Path
@@ -75,7 +77,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
                 )
         return df_calculated, gdf_graph
 
-    def execute(self) -> gpd.GeoDataFrame:
+    def execute(self) -> AnalysisResultWrapper:
         """Calculates the multi-link redundancy of a NetworkX graph.
 
         The function removes all links of a variable that have a minimum value
@@ -83,7 +85,7 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
         any available. This function only removes one group at the time and saves the data from removing that group.
 
         Returns:
-            aggregated_results (GeoDataFrame): The results of the analysis aggregated into a table.
+            AnalysisResultWrapper: The results of the analysis aggregated into a table.
         """
 
         def _is_not_none(value):
@@ -197,4 +199,4 @@ class MultiLinkRedundancy(AnalysisLossesProtocol):
 
             results.append(gdf)
 
-        return pd.concat(results, ignore_index=True)
+        return self.generate_result_wrapper(pd.concat(results, ignore_index=True))

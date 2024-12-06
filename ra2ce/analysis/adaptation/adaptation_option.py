@@ -147,9 +147,11 @@ class AdaptationOption:
             float: The impact of the adaptation option.
         """
         for _analysis in self.analyses:
-            _result = _analysis.execute(self.analysis_config)
-            _col = _result.filter(regex=_analysis.result_col).columns[0]
-            benefit_graph[f"{self.id}_{_col}"] = _result[_col]
+            _result_wrapper = _analysis.execute(self.analysis_config)
+            # Assumes a single result.
+            _analysis_result = _result_wrapper.results_collection[0].analysis_result
+            _col = _analysis_result.filter(regex=_analysis.result_col).columns[0]
+            benefit_graph[f"{self.id}_{_col}"] = _analysis_result[_col]
 
         # Calculate the impact (summing the damages and losses values)
         _option_cols = benefit_graph.filter(regex=f"{self.id}_").columns
