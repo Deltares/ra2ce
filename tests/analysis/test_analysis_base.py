@@ -2,6 +2,7 @@ from geopandas import GeoDataFrame
 from shapely import Point
 
 from ra2ce.analysis.analysis_base import AnalysisBase
+from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.analysis_result.analysis_result import AnalysisResult
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
