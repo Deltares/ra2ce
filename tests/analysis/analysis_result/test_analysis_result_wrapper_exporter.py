@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
