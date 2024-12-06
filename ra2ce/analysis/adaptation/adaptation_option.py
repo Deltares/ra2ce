@@ -23,6 +23,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 
 from geopandas import GeoDataFrame
+from pandas import Series
 
 from ra2ce.analysis.adaptation.adaptation_option_analysis import (
     AdaptationOptionAnalysis,
@@ -132,27 +133,18 @@ class AdaptationOption:
 
         return sum(calculate_cost(_year) for _year in range(0, round(time_horizon), 1))
 
-    def calculate_impact(
-        self, benefit_graph: GeoDataFrame, net_present_value_factor: float
-    ) -> GeoDataFrame:
+    def calculate_impact(self, net_present_value_factor: float) -> Series:
         """
         Calculate the impact of the adaptation option.
 
         Returns:
-            float: The impact of the adaptation option.
+            Series: The impact of the adaptation option.
         """
+        _result_gdf = GeoDataFrame()
         for _analysis in self.analyses:
-            _result_wrapper = _analysis.execute(self.analysis_config)
-            # Assumes a single result.
-            _analysis_result = _result_wrapper.results_collection[0].analysis_result
-            _col = _analysis_result.filter(regex=_analysis.result_col).columns[0]
-            benefit_graph[f"{self.id}_{_col}"] = _analysis_result[_col]
+            _result_gdf[_analysis.analysis_type] = _analysis.execute(
+                self.analysis_config
+            )
 
-        # Calculate the impact (summing the damages and losses values)
-        _option_cols = benefit_graph.filter(regex=f"{self.id}_").columns
-        benefit_graph[f"{self.id}_impact"] = benefit_graph[_option_cols].sum(axis=1)
-
-        # convert event impact into time-horizon impact
-        benefit_graph[f"{self.id}_impact"] *= net_present_value_factor
-
-        return benefit_graph
+        # Calculate the impact (summing the results of the analyses)
+        return _result_gdf.sum(axis=1) * net_present_value_factor

@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
 import pytest
+from geopandas import GeoDataFrame
+from pandas import Series
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
@@ -119,3 +121,45 @@ class TestAdaptationOption:
         # 3. Verify expectations.
         assert isinstance(_result, float)
         assert _result == pytest.approx(net_unit_cost)
+
+    def test_calculate_impact_returns_series(self) -> GeoDataFrame:
+        @dataclass
+        # Mock to avoid the need to run the impact analysis.
+        class MockAdaptationOptionAnalysis:
+            analysis_type: str
+            result_col: str
+            result: float
+
+            def execute(self, _: AnalysisConfigWrapper) -> Series:
+                return Series(self.result, index=range(_nof_rows))
+
+        # 1. Define test data.
+        _nof_rows = 10
+        _analyses = [
+            MockAdaptationOptionAnalysis(
+                analysis_type=f"Analysis_{i}",
+                result_col=f"Result_{i}",
+                result=(i + 1) * 1.0e6,
+            )
+            for i in range(2)
+        ]
+        _id = "Option1"
+        _option = AdaptationOption(
+            id=_id,
+            name=None,
+            construction_cost=None,
+            construction_interval=None,
+            maintenance_cost=None,
+            maintenance_interval=None,
+            analyses=_analyses,
+            analysis_config=None,
+        )
+
+        # 2. Run test.
+        _result = _option.calculate_impact(1.0)
+
+        # 3. Verify expectations.
+        assert isinstance(_result, Series)
+        assert _result.sum() == pytest.approx(
+            _nof_rows * sum(x.result for x in _analyses)
+        )

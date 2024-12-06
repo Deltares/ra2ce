@@ -68,22 +68,30 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
         Returns:
             GeoDataFrame: The result of the adaptation analysis.
         """
-        return self.generate_result_wrapper(self.calculate_bc_ratio())
+        _cost_gdf = self.run_cost()
+        _benefit_gdf = self.run_benefit()
+
+        _benefit_gdf = self.calculate_bc_ratio(_benefit_gdf, _cost_gdf)
+
+        return _benefit_gdf
 
     def run_cost(self) -> GeoDataFrame:
         """
-        Calculate the unit cost for all adaptation options.
+        Calculate the link cost for all adaptation options.
 
         Returns:
             GeoDataFrame: The result of the cost calculation.
+        Returns:
+            GeoDataFrame: The result of the cost calculation.
         """
-        _cost_gdf = deepcopy(self.graph_file.get_graph())
+        _orig_gdf = self.graph_file.get_graph()
 
+        _cost_gdf = GeoDataFrame()
         for (
             _option,
             _cost,
         ) in self.adaptation_collection.calculate_options_unit_cost().items():
-            _cost_gdf[f"{_option.id}_cost"] = _cost_gdf.apply(
+            _cost_gdf[f"{_option.id}_cost"] = _orig_gdf.apply(
                 lambda x, cost=_cost: x["length"] * cost, axis=1
             )
 
@@ -96,22 +104,27 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
         Returns:
             GeoDataFrame: The result of the benefit calculation.
         """
-        _benefit_gdf = deepcopy(self.graph_file.get_graph())
+        return self.adaptation_collection.calculate_options_benefit()
 
-        return self.adaptation_collection.calculation_options_impact(_benefit_gdf)
-
-    def calculate_bc_ratio(self) -> GeoDataFrame:
+    def calculate_bc_ratio(
+        self, benefit_gdf: GeoDataFrame, cost_gdf: GeoDataFrame
+    ) -> GeoDataFrame:
         """
         Calculate the benefit-cost ratio for all adaptation options.
 
+        Args:
+            benefit_gdf (GeoDataFrame): Gdf containing the benefit of the adaptation options.
+            cost_gdf (GeoDataFrame): Gdf containing the cost of the adaptation options.
+
         Returns:
-            GeoDataFrame: The result of the benefit-cost ratio calculation.
+            GeoDataFrame: Gdf containing the benefit-cost ratio of the adaptation options.
         """
-        _cost_gdf = self.run_cost()
-        _benefit_gdf = self.run_benefit()
+        for _option in self.adaptation_collection.adaptation_options:
+            benefit_gdf[f"{_option.id}_cost"] = cost_gdf[f"{_option.id}_cost"]
+            benefit_gdf[f"{_option.id}_bc_ratio"] = benefit_gdf[
+                f"{_option.id}_benefit"
+            ].replace(float("nan"), 0) / benefit_gdf[f"{_option.id}_cost"].replace(
+                0, float("nan")
+            )
 
-        # TODO: apply economic discounting
-        # TODO: calculate B/C ratio
-        # TODO: apply overlay
-
-        return _cost_gdf
+        return benefit_gdf
