@@ -23,6 +23,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 
 from geopandas import GeoDataFrame
+from pandas import Series
 
 from ra2ce.analysis.adaptation.adaptation_option_analysis import (
     AdaptationOptionAnalysis,
@@ -139,20 +140,18 @@ class AdaptationOption:
 
         return _lifetime_cost
 
-    def calculate_impact(self, benefit_graph: GeoDataFrame) -> GeoDataFrame:
+    def calculate_impact(self) -> Series:
         """
         Calculate the impact of the adaptation option.
 
         Returns:
-            float: The impact of the adaptation option.
+            Series: The impact of the adaptation option.
         """
+        _result_gdf = GeoDataFrame()
         for _analysis in self.analyses:
-            _result = _analysis.execute(self.analysis_config)
-            _col = _result.filter(regex=_analysis.result_col).columns[0]
-            benefit_graph[f"{self.id}_{_col}"] = _result[_col]
+            _result_gdf[_analysis.analysis_type] = _analysis.execute(
+                self.analysis_config
+            )
 
-        # Calculate the impact (summing the damages and losses values)
-        _option_cols = benefit_graph.filter(regex=f"{self.id}_").columns
-        benefit_graph[f"{self.id}_impact"] = benefit_graph[_option_cols].sum(axis=1)
-
-        return benefit_graph
+        # Calculate the impact (summing the results of the analyses)
+        return _result_gdf.sum(axis=1)

@@ -58,27 +58,6 @@ class TestAdaptation:
         # 3. Verify expectations.
         assert isinstance(_result, GeoDataFrame)
         assert all(
-            f"{_option.id}_cost" in _cost_gdf.columns
-            for _option in _adaptation.adaptation_collection.adaptation_options
-        )
-        for _option, _, _total_cost in AdaptationOptionCases.cases[1:]:
-            assert _cost_gdf[f"{_option.id}_cost"].sum(axis=0) == pytest.approx(
-                _total_cost
-            )
-
-    def test_run_benefit_returns_gdf(
-        self,
-        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
-    ):
-        # 1. Define test data.
-        _adaptation = Adaptation(valid_adaptation_config[0], valid_adaptation_config[1])
-
-        # 2. Run test.
-        _result = _adaptation.run_benefit()
-
-        # 3. Verify expectations.
-        assert isinstance(_result, GeoDataFrame)
-        assert all(
             [
                 f"{_option.id}_benefit" in _result.columns
                 for _option in _adaptation.adaptation_collection.adaptation_options

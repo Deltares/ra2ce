@@ -106,23 +106,27 @@ class AdaptationOptionCollection:
             for _option in self.adaptation_options
         }
 
-    def calculation_options_benefit(self, benefit_graph: GeoDataFrame) -> GeoDataFrame:
+    def calculate_options_benefit(self) -> GeoDataFrame:
         """
         Calculate the benefit of all adaptation options.
-
-        Args:
-            benefit_graph (GeoDataFrame): The graph to which the benefit of the adaptation options will be added.
+        The benefit is calculated by subtracting the impact of the reference option from the impact of the adaptation option.
 
         Returns:
-            NetworkFile: The calculated impact of all adaptation options.
+            GeoDataFrame: The calculated impact of all adaptation options.
         """
-        for _option in self.all_options:
-            benefit_graph = _option.calculate_impact(benefit_graph)
+        _benefit_gdf = GeoDataFrame()
 
+        # Calculate impact of reference option
+        _benefit_gdf[
+            f"{self.reference_option.id}_impact"
+        ] = self.reference_option.calculate_impact()
+
+        # Calculate impact and benefit of adaptation options
         for _option in self.adaptation_options:
-            benefit_graph[f"{_option.id}_benefit"] = (
-                benefit_graph[f"{_option.id}_impact"]
-                - benefit_graph[f"{self.reference_option.id}_impact"]
+            _benefit_gdf[f"{_option.id}_impact"] = _option.calculate_impact()
+            _benefit_gdf[f"{_option.id}_benefit"] = (
+                _benefit_gdf[f"{_option.id}_impact"]
+                - _benefit_gdf[f"{self.reference_option.id}_impact"]
             )
 
-        return benefit_graph
+        return _benefit_gdf

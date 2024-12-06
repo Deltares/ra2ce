@@ -92,6 +92,7 @@ def _get_valid_adaptation_config_fixture(
     def get_losses_section(analysis: AnalysisLossesEnum) -> AnalysisSectionLosses:
         return AnalysisSectionLosses(
             analysis=analysis,
+            name="Losses",
             event_type=EventTypeEnum.EVENT,
             weighing=WeighingEnum.TIME,
             threshold=0,
@@ -148,6 +149,7 @@ def _get_valid_adaptation_config_fixture(
     # - damages
     _damages_section = AnalysisSectionDamages(
         analysis=AnalysisDamagesEnum.DAMAGES,
+        name="Damages",
         event_type=EventTypeEnum.EVENT,
         damage_curve=DamageCurveEnum.MAN,
         save_gpkg=True,
@@ -163,6 +165,7 @@ def _get_valid_adaptation_config_fixture(
     # - adaptation
     _adaptation_section = AnalysisSectionAdaptation(
         analysis=AnalysisEnum.ADAPTATION,
+        name="Adaptation",
         losses_analysis=AnalysisLossesEnum.MULTI_LINK_LOSSES,
         adaptation_options=AdaptationOptionCases.config_cases,
         discount_rate=0.025,

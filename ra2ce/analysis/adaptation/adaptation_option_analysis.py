@@ -23,7 +23,7 @@ from __future__ import annotations
 from copy import deepcopy
 from dataclasses import dataclass
 
-from geopandas import GeoDataFrame
+from pandas import Series
 
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -41,12 +41,13 @@ from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
 
 @dataclass
 class AdaptationOptionAnalysis:
+    analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum
     analysis_class: type[Damages | LossesBase]
     analysis_input: AnalysisInputWrapper
     result_col: str
 
     @staticmethod
-    def get_analysis(
+    def get_analysis_info(
         analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
     ) -> tuple[type[Damages | LossesBase], str]:
         """
@@ -59,10 +60,10 @@ class AdaptationOptionAnalysis:
             NotImplementedError: The analysis type is not implemented.
 
         Returns:
-            tuple[type[Damages | LossesBase], str]: The analysis class and the result column.
+            tuple[type[Damages | LossesBase], str]: The analysis class and the regex to find the result column.
         """
         if analysis_type == AnalysisDamagesEnum.DAMAGES:
-            return (Damages, "dam_")
+            return (Damages, "dam_.*")
         elif analysis_type == AnalysisLossesEnum.SINGLE_LINK_LOSSES:
             return (SingleLinkLosses, "vlh_.*_total")
         elif analysis_type == AnalysisLossesEnum.MULTI_LINK_LOSSES:
@@ -114,15 +115,16 @@ class AdaptationOptionAnalysis:
         )
 
         # Create output object
-        _analysis_class, _result_col = cls.get_analysis(analysis_type)
+        _analysis_class, _result_col = cls.get_analysis_info(analysis_type)
 
         return cls(
+            analysis_type=analysis_type,
             analysis_class=_analysis_class,
             analysis_input=_analysis_input,
             result_col=_result_col,
         )
 
-    def execute(self, analysis_config: AnalysisConfigWrapper) -> GeoDataFrame:
+    def execute(self, analysis_config: AnalysisConfigWrapper) -> Series:
         """
         Execute the analysis.
 
@@ -130,8 +132,12 @@ class AdaptationOptionAnalysis:
             analysis_config (AnalysisConfigWrapper): The config for the analysis.
 
         Returns:
-            DataFrame: The results of the analysis.
+            Series: The relevant result column of the analysis.
         """
         if self.analysis_class == Damages:
-            return self.analysis_class(self.analysis_input).execute()
-        return self.analysis_class(self.analysis_input, analysis_config).execute()
+            _result = self.analysis_class(self.analysis_input).execute()
+        else:
+            _result = self.analysis_class(
+                self.analysis_input, analysis_config
+            ).execute()
+        return _result.filter(regex=self.result_col).iloc[:, 0]

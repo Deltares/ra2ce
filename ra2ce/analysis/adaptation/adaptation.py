@@ -81,13 +81,14 @@ class Adaptation(AnalysisDamagesProtocol):
         Returns:
             GeoDataFrame: The result of the cost calculation.
         """
-        _cost_gdf = deepcopy(self.graph_file.get_graph())
+        _orig_gdf = self.graph_file.get_graph()
 
+        _cost_gdf = GeoDataFrame()
         for (
             _option,
             _cost,
         ) in self.adaptation_collection.calculate_options_unit_cost().items():
-            _cost_gdf[f"{_option.id}_cost"] = _cost_gdf.apply(
+            _cost_gdf[f"{_option.id}_cost"] = _orig_gdf.apply(
                 lambda x, cost=_cost: x["length"] * cost, axis=1
             )
 
@@ -100,9 +101,7 @@ class Adaptation(AnalysisDamagesProtocol):
         Returns:
             GeoDataFrame: The result of the benefit calculation.
         """
-        _benefit_gdf = deepcopy(self.graph_file.get_graph())
-
-        return self.adaptation_collection.calculation_options_benefit(_benefit_gdf)
+        return self.adaptation_collection.calculate_options_benefit()
 
     def calculate_bc_ratio(
         self, benefit_gdf: GeoDataFrame, cost_gdf: GeoDataFrame
