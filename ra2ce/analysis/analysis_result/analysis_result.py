@@ -24,11 +24,7 @@ from pathlib import Path
 
 from geopandas import GeoDataFrame
 
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionAdaptation,
-    AnalysisSectionDamages,
-    AnalysisSectionLosses,
-)
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 
 
 @dataclass(kw_only=True)
@@ -38,7 +34,7 @@ class AnalysisResult:
     """
 
     analysis_result: GeoDataFrame
-    analysis_config: AnalysisSectionLosses | AnalysisSectionDamages | AnalysisSectionAdaptation
+    analysis_config: AnalysisConfigData.ANALYSIS_SECTION
     output_path: Path
 
     _custom_name: str = ""

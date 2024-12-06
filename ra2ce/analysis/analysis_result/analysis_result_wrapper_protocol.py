@@ -30,8 +30,8 @@ class AnalysisResultWrapperProtocol(Protocol):
 
     def is_valid_result(self) -> bool:
         """
-        Validates whether the `analyses_results` in this wrapper are all valid.
+        Validates whether the "analysis results" (`results_collection`) in this wrapper are all valid.
 
         Returns:
-            bool: validation of `analyses_results`.
+            bool: validation of `results_collection`.
         """
