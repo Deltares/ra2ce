@@ -166,6 +166,8 @@ def _get_valid_adaptation_config_fixture(
         adaptation_options=AdaptationOptionCases.config_cases,
         discount_rate=0.025,
         time_horizon=20,
+        climate_factor=0.00036842,
+        initial_frequency=0.01,
     )
 
     _analysis_data = AnalysisConfigData(

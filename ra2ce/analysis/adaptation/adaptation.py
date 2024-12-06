@@ -51,9 +51,9 @@ class Adaptation(AnalysisDamagesProtocol):
 
     # TODO: add the proper protocol for the adaptation analysis.
     def __init__(
-        self,
-        analysis_input: AnalysisInputWrapper,
-        analysis_config: AnalysisConfigWrapper,
+            self,
+            analysis_input: AnalysisInputWrapper,
+            analysis_config: AnalysisConfigWrapper,
     ):
         self.analysis = analysis_input.analysis
         self.graph_file = analysis_input.graph_file
@@ -73,11 +73,7 @@ class Adaptation(AnalysisDamagesProtocol):
 
     def run_cost(self) -> GeoDataFrame:
         """
-        <<<<<<< HEAD
-                Calculate the link cost for all adaptation options.
-        =======
                 Calculate the unit cost for all adaptation options.
-        >>>>>>> master
 
                 Returns:
                     GeoDataFrame: The result of the cost calculation.
@@ -85,8 +81,8 @@ class Adaptation(AnalysisDamagesProtocol):
         _cost_gdf = deepcopy(self.graph_file.get_graph())
 
         for (
-            _option,
-            _cost,
+                _option,
+                _cost,
         ) in self.adaptation_collection.calculate_options_unit_cost().items():
             _cost_gdf[f"{_option.id}_cost"] = _cost_gdf.apply(
                 lambda x, cost=_cost: x["length"] * cost, axis=1
@@ -94,19 +90,12 @@ class Adaptation(AnalysisDamagesProtocol):
 
         return _cost_gdf
 
-    def run_impact(self) -> GeoDataFrame:
-        """
-        Calculate the impact for all adaptation options
-        """
-        return None
-
     def run_net_present_impact(self) -> GeoDataFrame:
         """
         Calculate the net present impact for all adaptation options for the entire time horizon.
         """
-        _impact_gdf = self.run_impact()
+        # _impact_gdf = self.run_impact()
         for _option in self.adaptation_collection.adaptation_options:
-
             _impact_array = _impact_gdf[f"impact_{_option.id}"].to_numpy()
 
             def calc_net_impact_time_horizon(event_impact: float):
