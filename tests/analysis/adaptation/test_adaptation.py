@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Iterator
 
 import pytest
 from geopandas import GeoDataFrame
@@ -88,50 +89,54 @@ class TestAdaptation:
                 _expected[2]
             )
 
-    def test_calculate_bc_ratio_returns_gdf(
-        self,
-    ):
-        # Mocks to avoid complex setup.
+    @pytest.fixture(name="mocked_adaptation")
+    def _get_mocked_adaptation_fixture(self) -> Iterator[Adaptation]:
+        # Mock to avoid complex setup.
+        @dataclass
+        class MockAdaptationOption:
+            id: str
+
         class MockAdaptation(Adaptation):
             adaptation_collection: AdaptationOptionCollection = (
-                AdaptationOptionCollection()
+                AdaptationOptionCollection(
+                    all_options=[
+                        MockAdaptationOption(id=f"Option{x}") for x in range(2)
+                    ]
+                )
             )
 
             def __init__(self):
                 pass
 
-        @dataclass
-        class MockAdaptationOption(Adaptation):
-            id: str
+        yield MockAdaptation()
 
+    def test_calculate_bc_ratio_returns_gdf(
+        self,
+        mocked_adaptation: Adaptation,
+    ):
         # 1. Define test data.
-        _adaptation = MockAdaptation()
-        _adaptation.adaptation_collection = AdaptationOptionCollection(
-            all_options=[MockAdaptationOption(id=f"Option{x}") for x in range(2)]
-        )
-
         _nof_rows = 10
         _benefit_gdf = GeoDataFrame(range(_nof_rows))
         _cost_gdf = GeoDataFrame(range(_nof_rows))
         for i, _option in enumerate(
-            _adaptation.adaptation_collection.adaptation_options
+            mocked_adaptation.adaptation_collection.adaptation_options
         ):
             _benefit_gdf[f"{_option.id}_benefit"] = 4.0 + i
             _cost_gdf[f"{_option.id}_cost"] = 1.0 + i
 
         # 2. Run test.
-        _result = _adaptation.calculate_bc_ratio(_benefit_gdf, _cost_gdf)
+        _result = mocked_adaptation.calculate_bc_ratio(_benefit_gdf, _cost_gdf)
 
         # 3. Verify expectations.
         assert isinstance(_result, GeoDataFrame)
         assert all(
             [
                 f"{_option.id}_bc_ratio" in _result.columns
-                for _option in _adaptation.adaptation_collection.adaptation_options
+                for _option in mocked_adaptation.adaptation_collection.adaptation_options
             ]
         )
         for i, _option in enumerate(
-            _adaptation.adaptation_collection.adaptation_options
+            mocked_adaptation.adaptation_collection.adaptation_options
         ):
             assert _result[f"{_option.id}_bc_ratio"].sum(axis=0) == pytest.approx(
                 _nof_rows * (4.0 + i) / (1.0 + i)
