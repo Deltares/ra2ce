@@ -20,15 +20,20 @@
 """
 from __future__ import annotations
 
-from copy import deepcopy
 from dataclasses import asdict, dataclass
-from pathlib import Path
 
+from geopandas import GeoDataFrame
+
+from ra2ce.analysis.adaptation.adaptation_option_analysis import (
+    AdaptationOptionAnalysis,
+)
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionAdaptationOption,
-    AnalysisSectionDamages,
-    AnalysisSectionLosses,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
+)
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 
 
 @dataclass
@@ -39,74 +44,59 @@ class AdaptationOption:
     construction_interval: float
     maintenance_cost: float
     maintenance_interval: float
-    damages_root: Path
-    damages_config: AnalysisSectionDamages
-    losses_root: Path
-    losses_config: AnalysisSectionLosses
+    analyses: list[AdaptationOptionAnalysis]
+    analysis_config: AnalysisConfigWrapper
 
     def __hash__(self) -> int:
         return hash(self.id)
 
-    @property
-    def input_path(self) -> Path:
-        return self.damages_root.joinpath("input")
-
-    @property
-    def static_path(self) -> Path:
-        return self.damages_root.joinpath("static")
-
-    @property
-    def output_path(self) -> Path:
-        return self.damages_root.joinpath("output")
-
     @classmethod
     def from_config(
         cls,
-        root_path: Path,
+        analysis_config: AnalysisConfigWrapper,
         adaptation_option: AnalysisSectionAdaptationOption,
-        damages_section: AnalysisSectionDamages,
-        losses_section: AnalysisSectionLosses,
     ) -> AdaptationOption:
-        # Adjust path to the input files
-        def extend_path(analysis: str, input_path: Path) -> Path:
-            if not input_path:
-                return None
-            # Input is directory: add stuff at the end
-            if not (input_path.suffix):
-                return input_path.joinpath("input", adaptation_option.id, analysis)
-            return input_path.parent.joinpath(
-                "input", adaptation_option.id, analysis, input_path.name
-            )
+        """
+        Classmethod to create an AdaptationOption from an analysis configuration and an adaptation option.
 
-        if not damages_section or not losses_section:
+        Args:
+            analysis_config (AnalysisConfigWrapper): Analysis config input
+            adaptation_option (AnalysisSectionAdaptationOption): Adaptation option input
+
+        Raises:
+            ValueError: If damages and losses sections are not present in the analysis config data.
+
+        Returns:
+            AdaptationOption: The created adaptation option.
+        """
+        if (
+            not analysis_config.config_data.damages_list
+            or not analysis_config.config_data.losses_list
+        ):
             raise ValueError(
                 "Damages and losses sections are required to create an adaptation option."
             )
 
-        _damages_root = extend_path("damages", root_path)
-        _damages_section = deepcopy(damages_section)
-
-        _losses_root = extend_path("losses", root_path)
-        _losses_section = deepcopy(losses_section)
-        _losses_section.resilience_curves_file = extend_path(
-            "losses", losses_section.resilience_curves_file
-        )
-        _losses_section.traffic_intensities_file = extend_path(
-            "losses", losses_section.traffic_intensities_file
-        )
-        _losses_section.values_of_time_file = extend_path(
-            "losses", losses_section.values_of_time_file
-        )
+        # Create input for the analyses
+        _analyses = [
+            AdaptationOptionAnalysis.from_config(
+                analysis_config=analysis_config,
+                analysis_type=_analysis,
+                option_id=adaptation_option.id,
+            )
+            for _analysis in [
+                AnalysisDamagesEnum.DAMAGES,
+                analysis_config.config_data.adaptation.losses_analysis,
+            ]
+        ]
 
         return cls(
             **asdict(adaptation_option),
-            damages_root=_damages_root,
-            damages_config=_damages_section,
-            losses_root=_losses_root,
-            losses_config=_losses_section,
+            analyses=_analyses,
+            analysis_config=analysis_config,
         )
 
-    def calculate_cost(self, time_horizon: float, discount_rate: float) -> float:
+    def calculate_unit_cost(self, time_horizon: float, discount_rate: float) -> float:
         """
         Calculate the net present value unit cost (per meter) of the adaptation option.
 
@@ -143,3 +133,21 @@ class AdaptationOption:
                 _lifetime_cost += calc_cost(self.maintenance_cost, _constr_year)
 
         return _lifetime_cost
+
+    def calculate_impact(self, benefit_graph: GeoDataFrame) -> GeoDataFrame:
+        """
+        Calculate the impact of the adaptation option.
+
+        Returns:
+            float: The impact of the adaptation option.
+        """
+        for _analysis in self.analyses:
+            _result = _analysis.execute(self.analysis_config)
+            _col = _result.filter(regex=_analysis.result_col).columns[0]
+            benefit_graph[f"{self.id}_{_col}"] = _result[_col]
+
+        # Calculate the impact (summing the damages and losses values)
+        _option_cols = benefit_graph.filter(regex=f"{self.id}_").columns
+        benefit_graph[f"{self.id}_impact"] = benefit_graph[_option_cols].sum(axis=1)
+
+        return benefit_graph

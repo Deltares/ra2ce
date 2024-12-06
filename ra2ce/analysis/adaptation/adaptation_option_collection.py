@@ -22,11 +22,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from geopandas import GeoDataFrame
+
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
-from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
-from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
-    AnalysisDamagesEnum,
-)
+from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 
 
 @dataclass
@@ -56,43 +55,68 @@ class AdaptationOptionCollection:
     @classmethod
     def from_config(
         cls,
-        analysis_config_data: AnalysisConfigData,
+        analysis_config: AnalysisConfigWrapper,
     ) -> AdaptationOptionCollection:
-        if not analysis_config_data.adaptation:
-            raise ValueError("No adaptation section found in the analysis config data.")
-        _collection = cls(
-            discount_rate=analysis_config_data.adaptation.discount_rate,
-            time_horizon=analysis_config_data.adaptation.time_horizon,
-            climate_factor=analysis_config_data.adaptation.climate_factor,
-            initial_frequency=analysis_config_data.adaptation.initial_frequency,
-        )
+        """
+        Classmethod to create a collection of adaptation options from an analysis configuration.
 
-        _damages_analysis = analysis_config_data.get_analysis(
-            AnalysisDamagesEnum.DAMAGES
+        Args:
+            analysis_config (AnalysisConfigWrapper): Analysis config input
+
+        Raises:
+            ValueError: If no adaptation section is found in the analysis config data.
+
+        Returns:
+            AdaptationOptionCollection: The created collection of adaptation options.
+        """
+        if (
+            analysis_config.config_data is None
+            or analysis_config.config_data.adaptation is None
+        ):
+            raise ValueError("No adaptation section found in the analysis config data.")
+
+        _collection = cls(
+            discount_rate=analysis_config.config_data.adaptation.discount_rate,
+            time_horizon=analysis_config.config_data.adaptation.time_horizon,
+            climate_factor=analysis_config.config_data.adaptation.climate_factor,
+            initial_frequency=analysis_config.config_data.adaptation.initial_frequency,
         )
-        _losses_analysis = analysis_config_data.get_analysis(
-            analysis_config_data.adaptation.losses_analysis
-        )
-        for _config_option in analysis_config_data.adaptation.adaptation_options:
+        for _config_option in analysis_config.config_data.adaptation.adaptation_options:
             _collection.all_options.append(
                 AdaptationOption.from_config(
-                    analysis_config_data.root_path,
+                    analysis_config,
                     _config_option,
-                    _damages_analysis,
-                    _losses_analysis,
                 )
             )
 
         return _collection
 
-    def calculate_option_cost(self) -> dict[AdaptationOption, float]:
+    def calculate_options_unit_cost(self) -> dict[AdaptationOption, float]:
         """
-        Calculate the cost for all adaptation options.
+        Calculate the unit cost for all adaptation options.
+
+        Returns:
+            dict[AdaptationOption, float]: The calculated cost for all adaptation options.
         """
         return {
-            _option: _option.calculate_cost(
+            _option: _option.calculate_unit_cost(
                 self.time_horizon,
                 self.discount_rate,
             )
             for _option in self.adaptation_options
         }
+
+    def calculation_options_impact(self, benefit_graph: GeoDataFrame) -> GeoDataFrame:
+        """
+        Calculate the impact of all adaptation options (including the reference option).
+
+        Args:
+            benefit_graph (GeoDataFrame): The graph to which the impact of the adaptation options will be added.
+
+        Returns:
+            NetworkFile: The calculated impact of all adaptation options.
+        """
+        for _option in self.all_options:
+            benefit_graph = _option.calculate_impact(benefit_graph)
+
+        return benefit_graph

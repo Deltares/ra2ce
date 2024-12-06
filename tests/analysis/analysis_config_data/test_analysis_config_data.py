@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
@@ -13,6 +15,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
@@ -47,9 +50,7 @@ class TestAnalysisConfigData:
         yield _config
 
     def test_losses(self, valid_config: AnalysisConfigData):
-        # 1. Define test data
-
-        # 2. Run test
+        # 1./2. Define test data/Run test
         _losses = [
             _config.analysis.config_value for _config in valid_config.losses_list
         ]
@@ -58,9 +59,7 @@ class TestAnalysisConfigData:
         assert all(item in _losses for item in LossesAnalysisNameList)
 
     def test_damages(self, valid_config: AnalysisConfigData):
-        # 1. Define test data
-
-        # 2. Run test
+        # 1./2. Define test data/Run test
         _damages = [
             _config.analysis.config_value for _config in valid_config.damages_list
         ]
@@ -89,3 +88,39 @@ class TestAnalysisConfigData:
 
         # 3. Verify expectations.
         assert _return_value == _expected_value
+
+    @pytest.mark.parametrize(
+        "analysis_type",
+        (
+            *AnalysisLossesEnum.list_valid_options(),
+            *AnalysisDamagesEnum.list_valid_options(),
+            AnalysisEnum.ADAPTATION,
+        ),
+    )
+    def test_get_analysis_returns_analysis_config(
+        self,
+        valid_config: AnalysisConfigData,
+        analysis_type: AnalysisLossesEnum | AnalysisDamagesEnum | AnalysisEnum,
+    ):
+        # 1./2. Define test data/Run test
+        _result = valid_config.get_analysis(analysis_type)
+
+        # 3. Verify expectations
+        assert _result.analysis == analysis_type
+
+    def test_reroot_analysis_config(self, valid_config: AnalysisConfigData):
+        # 1. Define test data
+        _analysis_type = AnalysisLossesEnum.SINGLE_LINK_LOSSES
+        _analysis = valid_config.get_analysis(_analysis_type)
+        _file = Path("old_root/a_dir/file.ext")
+        valid_config.root_path = _file.parent
+        _analysis.resilience_curves_file = _file
+        _root_path = Path("new_root/another_dir")
+        _expected_path = _root_path.joinpath(_analysis_type.config_value, _file.name)
+
+        # 2. Run test
+        _result = valid_config.reroot_analysis_config(_analysis_type, _root_path)
+
+        # 3. Verify expectations
+        _result_analysis = _result.get_analysis(_analysis_type)
+        assert _result_analysis.resilience_curves_file == _expected_path
