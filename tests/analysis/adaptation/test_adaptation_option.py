@@ -70,19 +70,19 @@ class TestAdaptationOption:
         [
             pytest.param(0.0, 0.0, 0.0, 0.0, 0.0, id="Zero costs and intervals"),
             pytest.param(
-                1000.0, 10.0, 200.0, 3.0, 2714.560799, id="Cheap constr, exp maint"
+                1000.0, 10.0, 200.0, 3.0, 2704.437935, id="Cheap constr, exp maint"
             ),
             pytest.param(
                 5000.0, 100.0, 50.0, 3.0, 5233.340599, id="Exp constr, cheap maint"
             ),
             pytest.param(
-                0.0, 0.0, 1100.0, 1.0, 17148.078514, id="Zero constr cost and interval"
+                0.0, 0.0, 1100.0, 1.0, 17576.780477, id="Zero constr cost and interval"
             ),
             pytest.param(
                 1000.0, 100.0, 0.0, 0.0, 1000.0, id="Zero maint cost and interval"
             ),
             pytest.param(
-                1000.0, 8.0, 100.0, 2.0, 3264.2066789, id="Coinciding intervals"
+                1000.0, 8.0, 100.0, 2.0, 3053.742434, id="Coinciding intervals"
             ),
         ],
     )

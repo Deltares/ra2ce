@@ -29,7 +29,10 @@ class TestAdaptationOptionCollection:
         assert isinstance(_collection.reference_option, AdaptationOption)
         assert _collection.reference_option.id == "AO0"
 
-        assert len(_collection.adaptation_options) == 3
+        assert len(_collection.all_options) == len(
+            valid_adaptation_config[1].config_data.adaptation.adaptation_options
+        )
+
         assert all(
             isinstance(x, AdaptationOption) for x in _collection.adaptation_options
         )

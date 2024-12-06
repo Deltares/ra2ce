@@ -34,7 +34,7 @@ class TestAdaptation:
             f"{_option.id}_cost" in _cost_gdf.columns
             for _option in _adaptation.adaptation_collection.adaptation_options
         )
-        for _option, _, _total_cost in AdaptationOptionCases.cases[1:]:
+        for _option, _total_cost in AdaptationOptionCases.cases[1:]:
             assert _cost_gdf[f"{_option.id}_cost"].sum(axis=0) == pytest.approx(
                 _total_cost
             )
