@@ -65,8 +65,9 @@ class AdaptationOptionCases:
         ),
     ]
     total_cost: list[float] = [0.0, 97800589.027952, 189253296.099491]
-    cases: list[tuple[AnalysisSectionAdaptationOption, float]] = list(
-        zip(config_cases, total_cost)
+    total_benefit: list[float] = [0.0, 0.0, 0.0]
+    cases: list[tuple[AnalysisSectionAdaptationOption, tuple[float, float]]] = list(
+        zip(config_cases, zip(total_cost, total_benefit))
     )
 
 
@@ -90,6 +91,7 @@ def _get_valid_adaptation_config_fixture(
     def get_losses_section(analysis: AnalysisLossesEnum) -> AnalysisSectionLosses:
         return AnalysisSectionLosses(
             analysis=analysis,
+            name="Losses",
             event_type=EventTypeEnum.EVENT,
             weighing=WeighingEnum.TIME,
             threshold=0,
@@ -146,6 +148,7 @@ def _get_valid_adaptation_config_fixture(
     # - damages
     _damages_section = AnalysisSectionDamages(
         analysis=AnalysisDamagesEnum.DAMAGES,
+        name="Damages",
         event_type=EventTypeEnum.EVENT,
         damage_curve=DamageCurveEnum.MAN,
         save_gpkg=True,
@@ -161,10 +164,13 @@ def _get_valid_adaptation_config_fixture(
     # - adaptation
     _adaptation_section = AnalysisSectionAdaptation(
         analysis=AnalysisEnum.ADAPTATION,
+        name="Adaptation",
         losses_analysis=AnalysisLossesEnum.MULTI_LINK_LOSSES,
         adaptation_options=AdaptationOptionCases.config_cases,
         discount_rate=0.025,
         time_horizon=20,
+        climate_factor=0.00036842,
+        initial_frequency=0.01,
     )
 
     _analysis_data = AnalysisConfigData(

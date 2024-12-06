@@ -22,6 +22,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+import numpy as np
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
@@ -91,6 +92,19 @@ class AdaptationOptionCollection:
 
         return _collection
 
+    def get_net_present_value_factor(self) -> float:
+        """
+        Calculate the net present value factor for the entire time horizon. To be multiplied to the event impact to
+        obtain the net present value.
+        """
+        _years_array = np.arange(0, self.time_horizon)
+        _frequency_per_year = (
+            self.initial_frequency + _years_array * self.climate_factor
+        )
+        _discount = (1 + self.discount_rate) ** _years_array
+        _ratio = _frequency_per_year / _discount
+        return _ratio.sum()
+
     def calculate_options_unit_cost(self) -> dict[AdaptationOption, float]:
         """
         Calculate the unit cost for all adaptation options.
@@ -106,17 +120,30 @@ class AdaptationOptionCollection:
             for _option in self.adaptation_options
         }
 
-    def calculation_options_impact(self, benefit_graph: GeoDataFrame) -> GeoDataFrame:
+    def calculate_options_benefit(self) -> GeoDataFrame:
         """
-        Calculate the impact of all adaptation options (including the reference option).
-
-        Args:
-            benefit_graph (GeoDataFrame): The graph to which the impact of the adaptation options will be added.
+        Calculate the benefit of all adaptation options.
+        The benefit is calculated by subtracting the impact of the reference option from the impact of the adaptation option.
 
         Returns:
-            NetworkFile: The calculated impact of all adaptation options.
+            GeoDataFrame: The calculated impact of all adaptation options.
         """
-        for _option in self.all_options:
-            benefit_graph = _option.calculate_impact(benefit_graph)
+        net_present_value_factor = self.get_net_present_value_factor()
+        _benefit_gdf = GeoDataFrame()
 
-        return benefit_graph
+        # Calculate impact of reference option
+        _benefit_gdf[
+            f"{self.reference_option.id}_impact"
+        ] = self.reference_option.calculate_impact(net_present_value_factor)
+
+        # Calculate impact and benefit of adaptation options
+        for _option in self.adaptation_options:
+            _benefit_gdf[f"{_option.id}_impact"] = _option.calculate_impact(
+                net_present_value_factor
+            )
+            _benefit_gdf[f"{_option.id}_benefit"] = (
+                _benefit_gdf[f"{_option.id}_impact"]
+                - _benefit_gdf[f"{self.reference_option.id}_impact"]
+            )
+
+        return _benefit_gdf
