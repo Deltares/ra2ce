@@ -132,7 +132,9 @@ class AdaptationOption:
 
         return sum(calculate_cost(_year) for _year in range(0, round(time_horizon), 1))
 
-    def calculate_impact(self, benefit_graph: GeoDataFrame) -> GeoDataFrame:
+    def calculate_impact(
+        self, benefit_graph: GeoDataFrame, net_present_value_factor: float
+    ) -> GeoDataFrame:
         """
         Calculate the impact of the adaptation option.
 
@@ -149,5 +151,8 @@ class AdaptationOption:
         # Calculate the impact (summing the damages and losses values)
         _option_cols = benefit_graph.filter(regex=f"{self.id}_").columns
         benefit_graph[f"{self.id}_impact"] = benefit_graph[_option_cols].sum(axis=1)
+
+        # convert event impact into time-horizon impact
+        benefit_graph[f"{self.id}_impact"] *= net_present_value_factor
 
         return benefit_graph

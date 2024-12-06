@@ -22,6 +22,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+import numpy as np
 from geopandas import GeoDataFrame
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
@@ -91,6 +92,19 @@ class AdaptationOptionCollection:
 
         return _collection
 
+    def get_net_present_value_factor(self) -> float:
+        """
+        Calculate the net present value factor for the entire time horizon. To be multiplied to the event impact to
+        obtain the net present value.
+        """
+        _years_array = np.arange(0, self.time_horizon)
+        _frequency_per_year = (
+            self.initial_frequency + _years_array * self.climate_factor
+        )
+        _discount = (1 + self.discount_rate) ** _years_array
+        _ratio = _frequency_per_year / _discount
+        return _ratio.sum()
+
     def calculate_options_unit_cost(self) -> dict[AdaptationOption, float]:
         """
         Calculate the unit cost for all adaptation options.
@@ -116,7 +130,11 @@ class AdaptationOptionCollection:
         Returns:
             NetworkFile: The calculated impact of all adaptation options.
         """
+        net_present_value_factor = self.get_net_present_value_factor()
+
         for _option in self.all_options:
-            benefit_graph = _option.calculate_impact(benefit_graph)
+            benefit_graph = _option.calculate_impact(
+                benefit_graph, net_present_value_factor
+            )
 
         return benefit_graph
