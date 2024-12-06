@@ -33,7 +33,10 @@ class TestAdaptationOptionCollection:
         assert isinstance(_collection.reference_option, AdaptationOption)
         assert _collection.reference_option.id == "AO0"
 
-        assert len(_collection.adaptation_options) == 2
+        assert len(_collection.all_options) == len(
+            valid_adaptation_config[1].config_data.adaptation.adaptation_options
+        )
+
         assert all(
             isinstance(x, AdaptationOption) for x in _collection.adaptation_options
         )
@@ -98,3 +101,19 @@ class TestAdaptationOptionCollection:
             for _id, _impact in _options.items()
             if _id != "Option0"
         )
+
+    def test_calculate_correct_get_net_present_value_factor(
+        self,
+        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+    ):
+        # 1. Define test data.
+        _config_wrapper = valid_adaptation_config[1]
+        assert isinstance(_config_wrapper, AnalysisConfigWrapper)
+        _collection = AdaptationOptionCollection.from_config(_config_wrapper)
+
+        # 2. Run test.
+        _result = _collection.get_net_present_value_factor()
+
+        # 3. Verify expectations.
+        assert isinstance(_result, float)
+        assert _result == pytest.approx(0.2109011023, rel=1e-9)

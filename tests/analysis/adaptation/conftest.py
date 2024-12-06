@@ -64,8 +64,7 @@ class AdaptationOptionCases:
             maintenance_interval=3.0,
         ),
     ]
-    unit_cost: list[float] = [0.0, 2693.684211, 5231.908660]
-    total_cost: list[float] = [0.0, 97411702.122141, 189201512.873560]
+    total_cost: list[float] = [0.0, 97800589.027952, 189253296.099491]
     total_benefit: list[float] = [0.0, 0.0, 0.0]
     cases: list[
         tuple[AnalysisSectionAdaptationOption, tuple[float, float, float]]
@@ -170,6 +169,8 @@ def _get_valid_adaptation_config_fixture(
         adaptation_options=AdaptationOptionCases.config_cases,
         discount_rate=0.025,
         time_horizon=20,
+        climate_factor=0.00036842,
+        initial_frequency=0.01,
     )
 
     _analysis_data = AnalysisConfigData(

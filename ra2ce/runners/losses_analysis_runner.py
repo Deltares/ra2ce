@@ -24,8 +24,8 @@ import time
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
-from ra2ce.analysis.analysis_result_wrapper_exporter import (
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper_exporter import (
     AnalysisResultWrapperExporter,
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper
@@ -57,11 +57,7 @@ class LossesAnalysisRunner(AnalysisRunner):
             )
             starttime = time.time()
 
-            _result = analysis.execute()
-            _result_wrapper = AnalysisResultWrapper(
-                analysis_result=_result, analysis=analysis
-            )
-
+            _result_wrapper = analysis.execute()
             _results.append(_result_wrapper)
             AnalysisResultWrapperExporter().export_result(_result_wrapper)
 

@@ -1,19 +1,21 @@
-import geopandas as gpd
-import pytest
+from typing import Callable
 
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
+import pytest
+from geopandas import GeoDataFrame
+
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import (
+    AnalysisResult,
+    AnalysisResultWrapper,
+)
 
 
 class TestAnalysisResultWrapper:
     def test_initialize(self):
         # 1. Define test data.
-        _analysis_result = None
-        _analysis = None
+        _results_collection = []
 
         # 2. Run test.
-        _result_wrapper = AnalysisResultWrapper(
-            analysis_result=_analysis_result, analysis=_analysis
-        )
+        _result_wrapper = AnalysisResultWrapper(results_collection=_results_collection)
 
         # 3. Verify expectations.
         assert isinstance(_result_wrapper, AnalysisResultWrapper)
@@ -22,15 +24,17 @@ class TestAnalysisResultWrapper:
         "invalid_geodataframe",
         [
             pytest.param(None, id="No GeoDataFrame provided"),
-            pytest.param(gpd.GeoDataFrame(), id="Empty GeoDataFrame"),
+            pytest.param(GeoDataFrame(), id="Empty GeoDataFrame"),
         ],
     )
     def test_given_invalid_result_when_is_valid_result_returns_false(
-        self, invalid_geodataframe: gpd.GeoDataFrame
+        self,
+        invalid_geodataframe: GeoDataFrame,
+        analysis_result_builder: Callable[[GeoDataFrame], AnalysisResult],
     ):
         # 1. Define test data.
         _result_wrapper = AnalysisResultWrapper(
-            analysis_result=invalid_geodataframe, analysis=None
+            results_collection=[analysis_result_builder(invalid_geodataframe)]
         )
 
         # 2. Run test.
@@ -39,11 +43,13 @@ class TestAnalysisResultWrapper:
         # 3. Verify expectations.
         assert _result is False
 
-    def test_given_valid_result_when_is_valid_result_returns_true(self):
+    def test_given_valid_result_when_is_valid_result_returns_true(
+        self, analysis_result_builder: Callable[[GeoDataFrame], AnalysisResult]
+    ):
         # 1. Define test data.
-        _geo_dataframe = gpd.GeoDataFrame.from_dict(dict(dummy=[(4.2, 2.4), (42, 24)]))
+        _geo_dataframe = GeoDataFrame.from_dict(dict(dummy=[(4.2, 2.4), (42, 24)]))
         _result_wrapper = AnalysisResultWrapper(
-            analysis_result=_geo_dataframe, analysis=None
+            results_collection=[analysis_result_builder(_geo_dataframe)]
         )
 
         # 2. Run test.

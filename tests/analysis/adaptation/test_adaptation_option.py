@@ -16,7 +16,6 @@ from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.damages.damages import Damages
 from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
 from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
-from tests.analysis.adaptation.conftest import AdaptationOptionCases
 
 
 class TestAdaptationOption:
@@ -69,28 +68,59 @@ class TestAdaptationOption:
         )
 
     @pytest.mark.parametrize(
-        "adaptation_option",
-        AdaptationOptionCases.cases,
+        "constr_cost, constr_interval, maint_cost, maint_interval, net_unit_cost",
+        [
+            pytest.param(0.0, 0.0, 0.0, 0.0, 0.0, id="Zero costs and intervals"),
+            pytest.param(
+                1000.0, 10.0, 200.0, 3.0, 2704.437935, id="Cheap constr, exp maint"
+            ),
+            pytest.param(
+                5000.0, 100.0, 50.0, 3.0, 5233.340599, id="Exp constr, cheap maint"
+            ),
+            pytest.param(
+                0.0, 0.0, 1100.0, 1.0, 17576.780477, id="Zero constr cost and interval"
+            ),
+            pytest.param(
+                1000.0, 100.0, 0.0, 0.0, 1000.0, id="Zero maint cost and interval"
+            ),
+            pytest.param(
+                1000.0, 8.0, 100.0, 2.0, 3053.742434, id="Coinciding intervals"
+            ),
+        ],
     )
     def test_calculate_unit_cost_returns_float(
         self,
-        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
-        adaptation_option: tuple[AnalysisSectionAdaptation, tuple[float, float, float]],
+        constr_cost: float,
+        constr_interval: float,
+        maint_cost: float,
+        maint_interval: float,
+        net_unit_cost: float,
     ):
+        # Mock to avoid complex setup.
+        @dataclass
+        class MockAdaptationOption(AdaptationOption):
+            id: str
+
         # 1. Define test data.
-        _option = AdaptationOption.from_config(
-            analysis_config=valid_adaptation_config[1],
-            adaptation_option=adaptation_option[0],
+        _option = MockAdaptationOption(
+            id="AnOption",
+            name=None,
+            construction_cost=constr_cost,
+            construction_interval=constr_interval,
+            maintenance_cost=maint_cost,
+            maintenance_interval=maint_interval,
+            analyses=[],
+            analysis_config=None,
         )
-        _time_horizon = valid_adaptation_config[1].config_data.adaptation.time_horizon
-        _discount_rate = valid_adaptation_config[1].config_data.adaptation.discount_rate
+        _time_horizon = 20.0
+        _discount_rate = 0.025
 
         # 2. Run test.
-        _cost = _option.calculate_unit_cost(_time_horizon, _discount_rate)
+        _result = _option.calculate_unit_cost(_time_horizon, _discount_rate)
 
         # 3. Verify expectations.
-        assert isinstance(_cost, float)
-        assert _cost == pytest.approx(adaptation_option[1][0])
+        assert isinstance(_result, float)
+        assert _result == pytest.approx(net_unit_cost)
 
     def test_calculate_impact_returns_series(self) -> GeoDataFrame:
         @dataclass

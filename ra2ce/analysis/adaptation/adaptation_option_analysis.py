@@ -135,9 +135,11 @@ class AdaptationOptionAnalysis:
             Series: The relevant result column of the analysis.
         """
         if self.analysis_class == Damages:
-            _result = self.analysis_class(self.analysis_input).execute()
+            _result_wrapper = self.analysis_class(self.analysis_input).execute()
         else:
-            _result = self.analysis_class(
+            _result_wrapper = self.analysis_class(
                 self.analysis_input, analysis_config
             ).execute()
-        return _result.filter(regex=self.result_col).iloc[:, 0]
+        return _result_wrapper.get_single_result.filter(regex=self.result_col).iloc[
+            :, 0
+        ]

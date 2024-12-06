@@ -8,6 +8,7 @@ from ra2ce.analysis.adaptation.adaptation import Adaptation
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
     AdaptationOptionCollection,
 )
+from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from tests.analysis.adaptation.conftest import AdaptationOptionCases
@@ -23,6 +24,7 @@ class TestAdaptation:
 
         # 3. Verify expectations.
         assert isinstance(_adaptation, Adaptation)
+        assert isinstance(_adaptation, AnalysisBase)
 
     def test_run_cost_returns_gdf(
         self,
