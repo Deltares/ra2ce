@@ -66,9 +66,9 @@ class TestAdaptationOptionCollection:
         valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
     ):
         # 1. Define test data.
-        _input_wrapper = valid_adaptation_config[1]
-        assert isinstance(_input_wrapper, AnalysisInputWrapper)
-        _collection = AdaptationOptionCollection.from_config(_input_wrapper)
+        _config_wrapper = valid_adaptation_config[1]
+        assert isinstance(_config_wrapper, AnalysisConfigWrapper)
+        _collection = AdaptationOptionCollection.from_config(_config_wrapper)
 
         # 2. Run test.
         _result = _collection.get_net_present_value_factor()
