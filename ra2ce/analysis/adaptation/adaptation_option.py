@@ -21,7 +21,6 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
-from itertools import pairwise
 
 from geopandas import GeoDataFrame
 
