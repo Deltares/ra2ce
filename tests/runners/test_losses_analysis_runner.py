@@ -8,19 +8,12 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.losses_analysis_runner import LossesAnalysisRunner
-from tests.runners.dummy_classes import DummyRa2ceInput
 
 
 class TestLossesAnalysisRunner:
     def test_init_losses_analysis_runner(self):
         _runner = LossesAnalysisRunner()
         assert str(_runner) == "Losses Analysis Runner"
-
-    @pytest.fixture
-    def dummy_ra2ce_input(self):
-        _ra2ce_input = DummyRa2ceInput()
-        assert isinstance(_ra2ce_input, ConfigWrapper)
-        yield _ra2ce_input
 
     def test_given_losses_configuration_can_run(self, dummy_ra2ce_input: ConfigWrapper):
         # 1. Define test data.

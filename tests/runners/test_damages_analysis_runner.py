@@ -1,5 +1,3 @@
-import pytest
-
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionDamages,
 )
@@ -8,19 +6,12 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.damages_analysis_runner import DamagesAnalysisRunner
-from tests.runners.dummy_classes import DummyRa2ceInput
 
 
 class TestDamagesAnalysisRunner:
     def test_init_damages_analysis_runner(self):
         _runner = DamagesAnalysisRunner()
         assert str(_runner) == "Damages Analysis Runner"
-
-    @pytest.fixture
-    def dummy_ra2ce_input(self):
-        _ra2ce_input = DummyRa2ceInput()
-        assert isinstance(_ra2ce_input, ConfigWrapper)
-        yield _ra2ce_input
 
     def test_given_damages_configuration_can_run(
         self, dummy_ra2ce_input: ConfigWrapper
