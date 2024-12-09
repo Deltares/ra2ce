@@ -22,7 +22,6 @@
 import logging
 import time
 from abc import abstractmethod
-from typing import Type
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol

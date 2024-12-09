@@ -25,6 +25,7 @@ from typing import Type
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.configuration.config_wrapper import ConfigWrapper
+from ra2ce.runners.adaptation_analysis_runner import AdaptationAnalysisRunner
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 from ra2ce.runners.damages_analysis_runner import DamagesAnalysisRunner
 from ra2ce.runners.losses_analysis_runner import LossesAnalysisRunner
@@ -42,7 +43,13 @@ class AnalysisRunnerFactory:
         Returns:
             list[AnalysisRunner]: Supported runners for the given configuration.
         """
-        _available_runners = [DamagesAnalysisRunner, LossesAnalysisRunner]
+        if not ra2ce_input.analysis_config:
+            return []
+        _available_runners = [
+            DamagesAnalysisRunner,
+            LossesAnalysisRunner,
+            AdaptationAnalysisRunner,
+        ]
         _supported_runners = [
             _runner for _runner in _available_runners if _runner.can_run(ra2ce_input)
         ]
