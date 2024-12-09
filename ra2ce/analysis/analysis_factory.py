@@ -222,7 +222,7 @@ class AnalysisFactory:
         _analysis_input = AnalysisInputWrapper.from_input(
             analysis=analysis,
             analysis_config=analysis_config,
-            graph_file=analysis_config.graph_files.base_network,
+            graph_file_hazard=analysis_config.graph_files.base_network_hazard,
         )
 
         if analysis.analysis == AnalysisEnum.ADAPTATION:
