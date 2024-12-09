@@ -88,7 +88,8 @@ class AnalysisFactory:
 
         if analysis.analysis == AnalysisDamagesEnum.DAMAGES:
             return Damages(
-                _analysis_input, analysis_config.graph_files.base_graph_hazard.graph
+                _analysis_input,
+                analysis_config.graph_files.base_graph_hazard.get_graph(),
             )
 
         raise NotImplementedError(f"Analysis {analysis.analysis} not implemented")
