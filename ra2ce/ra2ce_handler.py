@@ -178,7 +178,7 @@ class Ra2ceHandler:
             logging.error(_error)
             raise ValueError(_error)
 
-        _runner = AnalysisRunnerFactory.get_runner(self.input_config)
+        _runner = AnalysisRunnerFactory.get_supported_runners(self.input_config)
         return _runner.run(self.input_config.analysis_config)
 
     @staticmethod

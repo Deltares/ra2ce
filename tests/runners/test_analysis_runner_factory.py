@@ -20,7 +20,7 @@ from tests.runners.dummy_classes import DummyRa2ceInput
 class TestAnalysisRunnerFactory:
     def test_get_runner_unknown_input_raises_error(self):
         with pytest.raises(ValueError) as exc_err:
-            AnalysisRunnerFactory.get_runner(DummyRa2ceInput())
+            AnalysisRunnerFactory.get_supported_runners(DummyRa2ceInput())
 
         assert (
             str(exc_err.value)
@@ -44,7 +44,7 @@ class TestAnalysisRunnerFactory:
         _config_wrapper.network_config.config_data.hazard.hazard_map = 4224
 
         # 2. Run test.
-        _runner = AnalysisRunnerFactory.get_runner(_config_wrapper)
+        _runner = AnalysisRunnerFactory.get_supported_runners(_config_wrapper)
 
         # 3. Verify final expectations.
         assert isinstance(_runner, AnalysisRunner)

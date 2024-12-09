@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Type
 
 import pytest
 
+from ra2ce.analysis.adaptation.adaptation import Adaptation
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionAdaptation,
@@ -17,8 +19,11 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
+from ra2ce.analysis.damages.damages import Damages
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
+from ra2ce.analysis.losses.losses_base import LossesBase
 
 
 class TestAnalysisCollection:
@@ -139,3 +144,33 @@ class TestAnalysisCollection:
         assert (
             _collection.adaptation_analysis.analysis.analysis == AnalysisEnum.ADAPTATION
         )
+
+    @pytest.mark.parametrize(
+        "analysis_type",
+        [
+            pytest.param(LossesBase, id="Losses (base) type"),
+            pytest.param(Damages, id="Damages type"),
+            pytest.param(Adaptation, id="Adaptation type"),
+        ],
+    )
+    def test_of_type_provides_expected_analysis(
+        self, analysis_type: Type[AnalysisProtocol]
+    ):
+        """
+        Simplified test to check whether the `issubclass` statement
+        works as expected with our types (as they are checked against
+        protocols).
+        """
+        # 1. Define test data.
+        _collection = AnalysisCollection()
+        _collection.adaptation_analysis = "Adaptation"
+        _collection.damages_analyses.append("Damages")
+        _collection.losses_analyses.append("LossesBase")
+
+        # 2. Run test.
+        _results = _collection.of_type(analysis_type)
+
+        # 3. Verify expectations.
+        assert isinstance(_results, list)
+        assert len(_results) == 1
+        assert _results[0] == analysis_type.__name__

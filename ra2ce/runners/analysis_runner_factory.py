@@ -20,7 +20,10 @@
 """
 
 import logging
+from typing import Type
 
+from ra2ce.analysis.analysis_collection import AnalysisCollection
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 from ra2ce.runners.damages_analysis_runner import DamagesAnalysisRunner
@@ -29,15 +32,15 @@ from ra2ce.runners.losses_analysis_runner import LossesAnalysisRunner
 
 class AnalysisRunnerFactory:
     @staticmethod
-    def get_runner(ra2ce_input: ConfigWrapper) -> AnalysisRunner:
+    def get_supported_runners(ra2ce_input: ConfigWrapper) -> list[Type[AnalysisRunner]]:
         """
-        Gets the supported first analysis runner for the given input. The runner is initialized within this method.
+        Gets the supported analysis runners for the given input.
 
         Args:
             ra2ce_input (Ra2ceInput): Input representing a set of network and analysis ini configurations.
 
         Returns:
-            AnalysisRunner: Initialized Ra2ce analysis runner.
+            list[AnalysisRunner]: Supported runners for the given configuration.
         """
         _available_runners = [DamagesAnalysisRunner, LossesAnalysisRunner]
         _supported_runners = [
@@ -49,7 +52,18 @@ class AnalysisRunnerFactory:
             raise ValueError(_err_mssg)
 
         # Initialized selected supported runner (First one available).
-        _selected_runner = _supported_runners[0]()
         if len(_supported_runners) > 1:
-            logging.warning(f"More than one runner available, using {_selected_runner}")
-        return _selected_runner
+            logging.warning(
+                "More than one runner available, computation time could be longer than expected."
+            )
+        return _supported_runners
+
+    @staticmethod
+    def run(ra2ce_input: ConfigWrapper) -> list[AnalysisResultWrapper]:
+        _supported_runners = AnalysisRunnerFactory.get_supported_runners(ra2ce_input)
+        _analysis_collection = AnalysisCollection.from_config(ra2ce_input)
+        _results = []
+        for _runner_type in _supported_runners:
+            _run_results = _runner_type().run(_analysis_collection)
+            _results.extend(_run_results)
+        return _results
