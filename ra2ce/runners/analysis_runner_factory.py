@@ -61,7 +61,9 @@ class AnalysisRunnerFactory:
     @staticmethod
     def run(ra2ce_input: ConfigWrapper) -> list[AnalysisResultWrapper]:
         _supported_runners = AnalysisRunnerFactory.get_supported_runners(ra2ce_input)
-        _analysis_collection = AnalysisCollection.from_config(ra2ce_input)
+        _analysis_collection = AnalysisCollection.from_config(
+            ra2ce_input.analysis_config
+        )
         _results = []
         for _runner_type in _supported_runners:
             _run_results = _runner_type().run(_analysis_collection)
