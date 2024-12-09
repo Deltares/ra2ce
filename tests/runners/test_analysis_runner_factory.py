@@ -44,7 +44,11 @@ class TestAnalysisRunnerFactory:
         _config_wrapper.network_config.config_data.hazard.hazard_map = 4224
 
         # 2. Run test.
-        _runner = AnalysisRunnerFactory.get_supported_runners(_config_wrapper)
+        _supported_runners = AnalysisRunnerFactory.get_supported_runners(
+            _config_wrapper
+        )
 
         # 3. Verify final expectations.
-        assert isinstance(_runner, AnalysisRunner)
+        assert isinstance(_supported_runners, list)
+        assert len(_supported_runners) == 2
+        assert all(issubclass(_sr, AnalysisRunner) for _sr in _supported_runners)

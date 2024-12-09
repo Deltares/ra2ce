@@ -39,17 +39,6 @@ class SimpleAnalysisRunnerBase(AnalysisRunner):
     def __str__(self) -> str:
         raise NotImplementedError()
 
-    @property
-    @abstractmethod
-    def supported_analyses(self) -> Type[AnalysisProtocol]:
-        """
-        Gets the supported analysis for a concrete runner.
-
-        Returns:
-            Type[AnalysisProtocol]: Supported analysis type.
-        """
-        raise NotImplementedError()
-
     @staticmethod
     @abstractmethod
     def can_run(ra2ce_input: ConfigWrapper) -> bool:
