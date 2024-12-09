@@ -23,6 +23,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 
 from geopandas import GeoDataFrame
+from pandas import Series
 
 from ra2ce.analysis.adaptation.adaptation_option_analysis import (
     AdaptationOptionAnalysis,
@@ -108,53 +109,42 @@ class AdaptationOption:
             float: The net present value unit cost of the adaptation option.
         """
 
-        def calc_years(from_year: float, to_year: float, interval: float) -> range:
-            return range(
-                round(from_year),
-                round(min(to_year, time_horizon)),
-                round(interval),
-            )
+        def is_constr_year(year: float) -> bool:
+            if self.construction_interval == 0:
+                return False
+            return (round(year) % round(self.construction_interval)) == 0
 
-        def calc_cost(cost: float, year: float) -> float:
-            return cost * (1 - discount_rate) ** year
+        def is_maint_year(year: float) -> bool:
+            if self.maintenance_interval == 0:
+                return False
+            if self.construction_interval > 0:
+                # Take year relative to last construction year
+                year = round(year) % round(self.construction_interval)
+            return (year % round(self.maintenance_interval)) == 0
 
-        _constr_years = calc_years(
-            0,
-            time_horizon,
-            self.construction_interval,
-        )
-        _lifetime_cost = 0.0
-        for _constr_year in _constr_years:
-            # Calculate the present value of the construction cost
-            _lifetime_cost += calc_cost(self.construction_cost, _constr_year)
+        def calculate_cost(year) -> float:
+            if is_constr_year(year):
+                _cost = self.construction_cost
+            elif is_maint_year(year):
+                _cost = self.maintenance_cost
+            else:
+                return 0.0
+            return _cost / (1 + discount_rate) ** year
 
-            # Calculate the present value of the maintenance cost
-            _maint_years = calc_years(
-                _constr_year + self.maintenance_interval,
-                _constr_year + self.construction_interval,
-                self.maintenance_interval,
-            )
-            for _maint_year in _maint_years:
-                _lifetime_cost += calc_cost(self.maintenance_cost, _maint_year)
+        return sum(calculate_cost(_year) for _year in range(0, round(time_horizon), 1))
 
-        return _lifetime_cost
-
-    def calculate_impact(self, benefit_graph: GeoDataFrame) -> GeoDataFrame:
+    def calculate_impact(self, net_present_value_factor: float) -> Series:
         """
         Calculate the impact of the adaptation option.
 
         Returns:
-            float: The impact of the adaptation option.
+            Series: The impact of the adaptation option.
         """
+        _result_gdf = GeoDataFrame()
         for _analysis in self.analyses:
-            _result_wrapper = _analysis.execute(self.analysis_config)
-            # Assumes a single result.
-            _analysis_result = _result_wrapper.results_collection[0].analysis_result
-            _col = _analysis_result.filter(regex=_analysis.result_col).columns[0]
-            benefit_graph[f"{self.id}_{_col}"] = _analysis_result[_col]
+            _result_gdf[_analysis.analysis_type] = _analysis.execute(
+                self.analysis_config
+            )
 
-        # Calculate the impact (summing the damages and losses values)
-        _option_cols = benefit_graph.filter(regex=f"{self.id}_").columns
-        benefit_graph[f"{self.id}_impact"] = benefit_graph[_option_cols].sum(axis=1)
-
-        return benefit_graph
+        # Calculate the impact (summing the results of the analyses)
+        return _result_gdf.sum(axis=1) * net_present_value_factor

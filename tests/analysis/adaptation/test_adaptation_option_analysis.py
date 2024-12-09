@@ -1,8 +1,14 @@
+from pathlib import Path
+
 import pytest
+from geopandas import GeoDataFrame
+from pandas import Series
 
 from ra2ce.analysis.adaptation.adaptation_option_analysis import (
     AdaptationOptionAnalysis,
 )
+from ra2ce.analysis.analysis_base import AnalysisBase
+from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -11,6 +17,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.damages.damages import Damages
 from ra2ce.analysis.losses.losses_base import LossesBase
 from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
@@ -40,7 +47,7 @@ class TestAnalysisOptionAnalysis:
         expected_analysis: type[Damages | LossesBase],
     ):
         # 1./2. Define test data./Run test.
-        _result = AdaptationOptionAnalysis.get_analysis(analysis_type)
+        _result = AdaptationOptionAnalysis.get_analysis_info(analysis_type)
 
         # 3. Verify expectations.
         assert isinstance(_result, tuple)
@@ -53,7 +60,7 @@ class TestAnalysisOptionAnalysis:
 
         # 2. Run test.
         with pytest.raises(NotImplementedError) as exc:
-            AdaptationOptionAnalysis.get_analysis(_analysis_type)
+            AdaptationOptionAnalysis.get_analysis_info(_analysis_type)
 
         # 3. Verify expectations.
         assert exc.match(f"Analysis {_analysis_type} not implemented")
@@ -95,3 +102,34 @@ class TestAnalysisOptionAnalysis:
         # 3. Verify expectations.
         assert isinstance(_result, AdaptationOptionAnalysis)
         assert _result.analysis_class == expected_analysis
+
+    def test_execute_returns_series(self):
+        class MockAnalysis(AnalysisBase, AnalysisProtocol):
+            analysis: AnalysisConfigData.ANALYSIS_SECTION = None
+            output_path: Path = None
+
+            def __init__(self, *args) -> None:
+                pass
+
+            def execute(self):
+                return self.generate_result_wrapper(
+                    GeoDataFrame.from_dict(
+                        {_col_name: range(10), "other_column": range(1, 11, 1)}
+                    )
+                )
+
+        # 1. Define test data.
+        _col_name = "result_column"
+        _analysis = AdaptationOptionAnalysis(
+            analysis_type=AnalysisDamagesEnum.DAMAGES,
+            analysis_class=MockAnalysis,
+            analysis_input=None,
+            result_col="result.*",
+        )
+
+        # 2. Run test.
+        _result = _analysis.execute(None)
+
+        # 3. Verify expectations.
+        assert isinstance(_result, Series)
+        assert _result.sum() == 45
