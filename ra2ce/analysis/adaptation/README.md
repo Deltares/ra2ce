@@ -1,10 +1,10 @@
 # Adaptation
-<img align="right" src="./adaptation_class.drawio.png">
-
 The subpackage `ra2ce.analysis.adapatation` contains all classes related to an adaptation analysis.
 
+![image](./adaptation_class.drawio.png)
+
 An `Adaptation` analysis calculates the ratio between the benefits and the costs of given adaptation options on the infrastructure.
-The different options are listed in an `AdaptationOptionCollection`, where the first entry is the `reference_option` (situation in which no adaptation is done).
+The `AdaptionOption`s are listed in an `AdaptationOptionCollection`, where the first entry is the `reference_option` (situation in which no adaptation is done).
 
 The collection contains various properties that are relevant for the calculations:
 - `time_horizon`: the period for which the analysis is done
@@ -22,7 +22,7 @@ The impact of an option is calculated by determining the damages and losses that
 The losses are calculated by running either the `SingleLinkLosses` or `MultiLinkLosses` analysis on the network.
 Which losses analysis is run is determined by `AnalysisConfigData.AnalysisSectionAdaptation.losses_analysis`.
 
-The configuration of the damages and the losses analyses are derived from their standard configuration in the section `AnalysisSectionDamages` and `AnalysisSectionLosses` and are stored in `AdaptationOptionAnalysis` for a specific option.
+The configuration of the damages and the losses analyses are derived from their standard configuration in the section `AnalysisSectionDamages` and `AnalysisSectionLosses`, which are stored in `AdaptationOptionAnalysis` for a specific option.
 
 ## Cost calculation
 The cost of an adaptation is calculated per link in the network by multiplying the unit cost of an adaptation with the length of the link.

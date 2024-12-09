@@ -33,12 +33,14 @@ from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 class AdaptationOptionCollection:
     """
     Collection of adaptation options with all their related properties.
+    The first entry in `all_options` is the `reference_option`,
+    where the read adaptations are given in `adaptation_options`.
     """
 
-    discount_rate: float = 0.0
     time_horizon: float = 0.0
-    climate_factor: float = 0.0
+    discount_rate: float = 0.0
     initial_frequency: float = 0.0
+    climate_factor: float = 0.0
     all_options: list[AdaptationOption] = field(default_factory=list)
 
     @property
@@ -77,10 +79,10 @@ class AdaptationOptionCollection:
             raise ValueError("No adaptation section found in the analysis config data.")
 
         _collection = cls(
-            discount_rate=analysis_config.config_data.adaptation.discount_rate,
             time_horizon=analysis_config.config_data.adaptation.time_horizon,
-            climate_factor=analysis_config.config_data.adaptation.climate_factor,
+            discount_rate=analysis_config.config_data.adaptation.discount_rate,
             initial_frequency=analysis_config.config_data.adaptation.initial_frequency,
+            climate_factor=analysis_config.config_data.adaptation.climate_factor,
         )
         for _config_option in analysis_config.config_data.adaptation.adaptation_options:
             _collection.all_options.append(
