@@ -18,6 +18,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from ra2ce.analysis.analysis_collection import AnalysisCollection
+from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.simple_analysis_runner_base import SimpleAnalysisRunnerBase
 
@@ -25,6 +27,12 @@ from ra2ce.runners.simple_analysis_runner_base import SimpleAnalysisRunnerBase
 class LossesAnalysisRunner(SimpleAnalysisRunnerBase):
     def __str__(self) -> str:
         return "Losses Analysis Runner"
+
+    @staticmethod
+    def filter_supported_analyses(
+        analysis_collection: AnalysisCollection,
+    ) -> list[AnalysisLossesProtocol]:
+        return analysis_collection.losses_analyses
 
     @staticmethod
     def can_run(ra2ce_input: ConfigWrapper) -> bool:

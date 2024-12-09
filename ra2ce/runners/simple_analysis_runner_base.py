@@ -41,6 +41,22 @@ class SimpleAnalysisRunnerBase(AnalysisRunner):
 
     @staticmethod
     @abstractmethod
+    def filter_supported_analyses(
+        analysis_collection: AnalysisCollection,
+    ) -> list[AnalysisProtocol]:
+        """
+        Gets the supported analysis for a concrete runner.
+
+        Args:
+            analysis_collection (AnalysisCollection): Collection of analyses to filter.
+
+        Returns:
+            list[AnalysisProtocol]: Supported analyses from the provided collection.
+        """
+        raise NotImplementedError()
+
+    @staticmethod
+    @abstractmethod
     def can_run(ra2ce_input: ConfigWrapper) -> bool:
         raise NotImplementedError()
 
@@ -48,7 +64,7 @@ class SimpleAnalysisRunnerBase(AnalysisRunner):
         self, analysis_collection: AnalysisCollection
     ) -> list[AnalysisResultWrapper]:
         _results = []
-        for analysis in analysis_collection.of_type(self.supported_analyses):
+        for analysis in self.filter_supported_analyses(analysis_collection):
             logging.info(
                 "----------------------------- Started analyzing '%s'  -----------------------------",
                 analysis.analysis.name,

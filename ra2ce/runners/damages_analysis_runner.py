@@ -21,6 +21,8 @@
 
 import logging
 
+from ra2ce.analysis.analysis_collection import AnalysisCollection
+from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.simple_analysis_runner_base import SimpleAnalysisRunnerBase
 
@@ -28,6 +30,12 @@ from ra2ce.runners.simple_analysis_runner_base import SimpleAnalysisRunnerBase
 class DamagesAnalysisRunner(SimpleAnalysisRunnerBase):
     def __str__(self) -> str:
         return "Damages Analysis Runner"
+
+    @staticmethod
+    def filter_supported_analyses(
+        analysis_collection: AnalysisCollection,
+    ) -> list[AnalysisDamagesProtocol]:
+        return analysis_collection.damages_analyses
 
     @staticmethod
     def can_run(ra2ce_input: ConfigWrapper) -> bool:
