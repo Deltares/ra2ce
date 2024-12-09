@@ -17,10 +17,6 @@ class TestDamagesAnalysisRunner:
         self, dummy_ra2ce_input: ConfigWrapper
     ):
         # 1. Define test data.
-        dummy_ra2ce_input.analysis_config.config_data.analyses = [
-            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.DAMAGES)
-        ]
-        dummy_ra2ce_input.network_config.config_data.hazard.hazard_map = "A value"
 
         # 2. Run test.
         _result = DamagesAnalysisRunner.can_run(dummy_ra2ce_input)
