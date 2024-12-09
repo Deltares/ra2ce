@@ -14,12 +14,16 @@ class TestDamagesAnalysisRunner:
         assert str(_runner) == "Damages Analysis Runner"
 
     def test_given_damages_configuration_can_run(
-        self, dummy_ra2ce_input: ConfigWrapper
+        self, damages_ra2ce_input: ConfigWrapper
     ):
         # 1. Define test data.
+        assert any(
+            isinstance(_ad, AnalysisSectionDamages)
+            for _ad in damages_ra2ce_input.analysis_config.config_data.analyses
+        )
 
         # 2. Run test.
-        _result = DamagesAnalysisRunner.can_run(dummy_ra2ce_input)
+        _result = DamagesAnalysisRunner.can_run(damages_ra2ce_input)
 
         # 3. Verify expectations.
         assert _result
