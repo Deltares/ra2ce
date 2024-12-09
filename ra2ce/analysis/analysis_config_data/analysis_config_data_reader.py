@@ -236,6 +236,11 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
         ) = AnalysisLossesEnum.get_enum(
             self._parser.get(section_name, "losses_analysis", fallback=None)
         )
+        _section.hazard_fraction_cost = self._parser.getboolean(
+            section_name,
+            "hazard_fraction_costs",
+            fallback=_section.hazard_fraction_cost,
+        )
 
         _adaptation_options = list(
             _adaptation_option

@@ -64,7 +64,7 @@ class AdaptationOptionCases:
             maintenance_interval=3.0,
         ),
     ]
-    total_cost: list[float] = [0.0, 97800589.027952, 189253296.099491]
+    total_cost: list[float] = [0.0, 10073869.180362, 19493880.004279]
     total_benefit: list[float] = [0.0, 0.0, 0.0]
     cases: list[tuple[AnalysisSectionAdaptationOption, tuple[float, float]]] = list(
         zip(config_cases, zip(total_cost, total_benefit))
@@ -167,10 +167,11 @@ def _get_valid_adaptation_config_fixture(
         name="Adaptation",
         losses_analysis=AnalysisLossesEnum.MULTI_LINK_LOSSES,
         adaptation_options=AdaptationOptionCases.config_cases,
-        discount_rate=0.025,
         time_horizon=20,
-        climate_factor=0.00036842,
+        discount_rate=0.025,
         initial_frequency=0.01,
+        climate_factor=0.00036842,
+        hazard_fraction_cost=True,
     )
 
     _analysis_data = AnalysisConfigData(

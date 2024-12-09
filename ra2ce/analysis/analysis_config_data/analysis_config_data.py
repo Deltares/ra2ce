@@ -152,11 +152,12 @@ class AnalysisSectionAdaptation(AnalysisSectionBase):
     analysis: AnalysisEnum = AnalysisEnum.ADAPTATION
     losses_analysis: AnalysisLossesEnum = AnalysisLossesEnum.SINGLE_LINK_LOSSES
     # Economical settings
-    discount_rate: float = 0.0
     time_horizon: float = 0.0
+    discount_rate: float = 0.0
     # Hazard settings
-    climate_factor: float = 0.0
     initial_frequency: float = 0.0
+    climate_factor: float = 0.0
+    hazard_fraction_cost: bool = False
     # First option is the no adaptation option
     adaptation_options: list[AnalysisSectionAdaptationOption] = field(
         default_factory=list
