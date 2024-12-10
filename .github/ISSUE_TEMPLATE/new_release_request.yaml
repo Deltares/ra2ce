@@ -1,0 +1,31 @@
+---
+name: New Release Request
+description: Suggest a release for Ra2ce
+labels: [enhancement]
+
+body:
+  - type: dropdown
+    id: checks
+    attributes:
+      description: What kind of release is this? (Format `vMAJOR.Minor.patch`)
+      label: Kind of release `vMAJOR.Minor.patch`
+      options:
+        - MAJOR
+        - Minor
+        - patch
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      description: >
+        Please provide a clear and concise description of why this release is required
+      label: Release Description
+    validations:
+      required: true
+  - type: checkboxes
+    attributes:
+      label: Ra2ce release checks
+      options:
+        - label: Branch `master` is stable (all quality gates are approved), and latest documentation can be built.
+          required: true
