@@ -22,9 +22,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Type
 
+from ra2ce.analysis.adaptation.adaptation import Adaptation
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_factory import AnalysisFactory
+from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 
@@ -33,7 +36,28 @@ from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtoco
 class AnalysisCollection:
     damages_analyses: list[AnalysisDamagesProtocol] = field(default_factory=list)
     losses_analyses: list[AnalysisLossesProtocol] = field(default_factory=list)
-    adaptation_analysis: AnalysisDamagesProtocol = None
+    adaptation_analysis: Adaptation = None
+
+    def of_type(self, analysis_type: Type[AnalysisProtocol]) -> list[AnalysisProtocol]:
+        """
+        Method emulating the `OfType<T>` built-in .Net equivalent to retrieve
+        the analyses matching the provided type.
+
+        Args:
+            analysis_type (Type[AnalysisProtocol]): The requested analysis type.
+
+        Returns:
+            list[AnalysisProtocol]: All the analyses matching the provided type.
+        """
+        if issubclass(analysis_type, Adaptation):
+            # Adaptation implements `AnalysisDamagesProtocol`,
+            # so it needs to be checked first.
+            return [self.adaptation_analysis]
+        if issubclass(analysis_type, AnalysisLossesProtocol):
+            return self.losses_analyses
+        if issubclass(analysis_type, AnalysisDamagesProtocol):
+            return self.damages_analyses
+        raise ValueError("Analysis type {} not supported.".format(analysis_type))
 
     @classmethod
     def from_config(cls, analysis_config: AnalysisConfigWrapper) -> AnalysisCollection:
