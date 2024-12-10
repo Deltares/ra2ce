@@ -20,9 +20,12 @@
 """
 from __future__ import annotations
 
+import logging
 from copy import deepcopy
 from dataclasses import dataclass
 
+from geopandas import GeoDataFrame
+from numpy import nan
 from pandas import Series
 
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
@@ -69,7 +72,7 @@ class AdaptationOptionAnalysis:
             return (SingleLinkLosses, "^vlh_.*_total$")
         elif analysis_type == AnalysisLossesEnum.MULTI_LINK_LOSSES:
             return (MultiLinkLosses, "^vlh_.*_total$")
-        raise NotImplementedError(f"Analysis {analysis_type} not implemented")
+        raise NotImplementedError(f"Analysis {analysis_type} not supported")
 
     @classmethod
     def from_config(
@@ -125,6 +128,27 @@ class AdaptationOptionAnalysis:
             result_col=_result_col,
         )
 
+    def get_result_column(self, gdf: GeoDataFrame) -> Series:
+        """
+        Get a column from the dataframe based on the provided regex.
+
+        Args:
+            gdf (GeoDataFrame): The dataframe to search in.
+            regex (str): Regex to match the column.
+
+        Returns:
+            Series: The relevant column.
+        """
+        _result_col = gdf.filter(regex=self.result_col)
+        if _result_col.empty:
+            logging.warning(
+                "No column found in dataframe matching the regex %s for analaysis %s. Returning NaN.",
+                self.result_col,
+                self.analysis_type,
+            )
+            return Series(nan, index=gdf.index)
+        return _result_col.iloc[:, 0]
+
     def execute(self, analysis_config: AnalysisConfigWrapper) -> Series:
         """
         Execute the analysis.
@@ -147,4 +171,4 @@ class AdaptationOptionAnalysis:
                 self.analysis_input, analysis_config
             ).execute()
             _result = _result_wrapper.get_single_result()
-        return _result.filter(regex=self.result_col).iloc[:, 0]
+        return self.get_result_column(_result)

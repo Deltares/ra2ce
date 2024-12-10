@@ -78,7 +78,8 @@ class AdaptationOption:
                 "Damages and/or losses sections are required to create an adaptation option."
             )
 
-        # Create input for the analyses (if given in config)
+        # Create input for the damages and losses analyses (if present in config)
+        _config_analyses = [x.analysis for x in analysis_config.config_data.analyses]
         _analyses = [
             AdaptationOptionAnalysis.from_config(
                 analysis_config=analysis_config,
@@ -89,8 +90,7 @@ class AdaptationOption:
                 AnalysisDamagesEnum.DAMAGES,
                 analysis_config.config_data.adaptation.losses_analysis,
             ]
-            if _analysis_type
-            in (x.analysis for x in analysis_config.config_data.analyses)
+            if _analysis_type in _config_analyses
         ]
 
         return cls(
