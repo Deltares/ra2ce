@@ -3,7 +3,8 @@
 This module contains all protocols and classes related to performing an analysis on a graph or network.
 Analyses can be identified as:
 - `damages`: calculating the direct damages to the infrastructure (roads) due to a hazard (e.g. flood),
-- `losses`: calculating the economical losses that are a consequence of the damage to the infrastructure.
+- `losses`: calculating the economical losses that are a consequence of the damage to the infrastructure,
+- `adaptation`: calculating the benefit/cost-ratio of given adaptation options.
 
 Each analysis should comply to the `AnalysisProtocol`.
 
