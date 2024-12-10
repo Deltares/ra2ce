@@ -43,7 +43,7 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
     """
 
     analysis: AnalysisSectionAdaptation
-    graph_file: NetworkFile
+    graph_file_hazard: NetworkFile
     input_path: Path
     output_path: Path
     adaptation_collection: AdaptationOptionCollection
@@ -55,7 +55,6 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
         analysis_config: AnalysisConfigWrapper,
     ):
         self.analysis = analysis_input.analysis
-        self.graph_file = analysis_input.graph_file
         self.graph_file_hazard = analysis_input.graph_file_hazard
         self.adaptation_collection = AdaptationOptionCollection.from_config(
             analysis_config
@@ -79,13 +78,14 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
     def run_cost(self) -> GeoDataFrame:
         """
         Calculate the link cost for all adaptation options.
+        The unit cost is multiplied by the length of the link.
+        If the hazard fraction cost is enabled, the cost is multiplied by the fraction of the link that is impacted.
 
         Returns:
             GeoDataFrame: The result of the cost calculation.
-        Returns:
-            GeoDataFrame: The result of the cost calculation.
         """
-        _orig_gdf = self.graph_file.get_graph()
+        _orig_gdf = self.graph_file_hazard.get_graph()
+        _fraction_col = _orig_gdf.filter(regex="EV.*_fr").columns[0]
 
         _cost_gdf = GeoDataFrame()
         for (
@@ -95,6 +95,9 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
             _cost_gdf[f"{_option.id}_cost"] = _orig_gdf.apply(
                 lambda x, cost=_cost: x["length"] * cost, axis=1
             )
+            # Only calculate the cost for the impacted fraction of the links.
+            if self.analysis.hazard_fraction_cost:
+                _cost_gdf[f"{_option.id}_cost"] *= _orig_gdf[_fraction_col]
 
         return _cost_gdf
 
