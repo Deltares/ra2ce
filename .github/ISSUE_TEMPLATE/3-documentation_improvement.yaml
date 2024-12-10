@@ -1,7 +1,9 @@
 ---
 name: Documentation Improvement
 description: Report wrong or missing documentation
-labels: [documentation, needs-refinement]
+labels: [documentation, triage-required]
+type: task
+projects: [RA2CE backlog]
 
 body:
   - type: checkboxes
