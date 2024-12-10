@@ -73,15 +73,15 @@ class AdaptationOptionCases:
 
 @pytest.fixture(name="valid_adaptation_config")
 def _get_valid_adaptation_config_fixture(
-    request: pytest.FixtureRequest,
     valid_analysis_ini: Path,
+    test_result_param_case: Path,
 ) -> Iterator[AnalysisConfigWrapper]:
     """
     Create valid config for the adaptation analysis.
 
     Args:
-        request (pytest.FixtureRequest): Pytest fixture request.
         valid_analysis_ini (Path): Path to a valid analysis ini file.
+        test_result_param_case (Path): Path to a valid folder for the test results.
 
     Yields:
         Iterator[AnalysisConfigWrapper]: The config for the adaptation analysis.
@@ -111,7 +111,7 @@ def _get_valid_adaptation_config_fixture(
         )
 
     # Define the paths
-    _root_path = test_results.joinpath(request.node.name)
+    _root_path = test_result_param_case
     _input_path = _root_path.joinpath("input")
     _static_path = _root_path.joinpath("static")
     _output_path = _root_path.joinpath("output")
@@ -125,7 +125,7 @@ def _get_valid_adaptation_config_fixture(
         link_type_column="highway",
     )
     _network_config_data = NetworkConfigData(
-        static_path=test_results.joinpath(request.node.name, "static"),
+        static_path=test_results.joinpath(_static_path),
         hazard=_hazard_section,
         network=_network_section,
     )
@@ -212,6 +212,11 @@ def _get_valid_adaptation_config_with_input_fixture(
     copytree(
         test_data.joinpath("adaptation", "static"),
         valid_adaptation_config.config_data.static_path,
+    )
+
+    # Read graph/network files
+    valid_adaptation_config.graph_files = NetworkConfigWrapper.read_graphs_from_config(
+        valid_adaptation_config.config_data.static_path.joinpath("output_graph")
     )
 
     _analysis_input = AnalysisInputWrapper.from_input(
