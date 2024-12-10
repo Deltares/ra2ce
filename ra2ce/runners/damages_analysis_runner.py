@@ -20,21 +20,22 @@
 """
 
 import logging
-import time
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
-from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.analysis_result.analysis_result_wrapper_exporter import (
-    AnalysisResultWrapperExporter,
-)
-from ra2ce.analysis.damages.damages_result_wrapper import DamagesResultWrapper
+from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.configuration.config_wrapper import ConfigWrapper
-from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
+from ra2ce.runners.simple_analysis_runner_base import SimpleAnalysisRunnerBase
 
 
-class DamagesAnalysisRunner(AnalysisRunner):
+class DamagesAnalysisRunner(SimpleAnalysisRunnerBase):
     def __str__(self) -> str:
         return "Damages Analysis Runner"
+
+    @staticmethod
+    def filter_supported_analyses(
+        analysis_collection: AnalysisCollection,
+    ) -> list[AnalysisDamagesProtocol]:
+        return analysis_collection.damages_analyses
 
     @staticmethod
     def can_run(ra2ce_input: ConfigWrapper) -> bool:
@@ -52,25 +53,3 @@ class DamagesAnalysisRunner(AnalysisRunner):
             )
             return False
         return True
-
-    def run(self, analysis_config: AnalysisConfigWrapper) -> list[DamagesResultWrapper]:
-        _analysis_collection = AnalysisCollection.from_config(analysis_config)
-        _results = []
-        for analysis in _analysis_collection.damages_analyses:
-            logging.info(
-                "----------------------------- Started analyzing '%s'  -----------------------------",
-                analysis.analysis.name,
-            )
-            starttime = time.time()
-
-            _result_wrapper = analysis.execute()
-            AnalysisResultWrapperExporter().export_result(_result_wrapper)
-
-            endtime = time.time()
-            logging.info(
-                "----------------------------- Analysis '%s' finished. "
-                "Time: %ss  -----------------------------",
-                analysis.analysis.name,
-                str(round(endtime - starttime, 2)),
-            )
-        return _results
