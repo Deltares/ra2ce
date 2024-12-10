@@ -38,7 +38,7 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
     reference_base_graph_hazard: MultiGraph
 
     def __init__(
-        self, analysis_input: AnalysisInputWrapper, base_graph_hazard: MultiGraph
+        self, analysis_input: AnalysisInputWrapper, base_graph_hazard: MultiGraph | None
     ) -> None:
         self.analysis = analysis_input.analysis
         self.graph_file = None
@@ -149,12 +149,6 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
         Returns:
             AnalysisResultWrapper: Result wrapper containing both link and segment based graphs.
         """
-        _result_segment_based = analyses_results[0]
-        _result_link_based = self._get_result_link_based(
-            base_graph_hazard=self.reference_base_graph_hazard,
-            result_segment_based=_result_segment_based,
-        )
-
         def get_analysis_result(gdf_result: GeoDataFrame, name: str) -> AnalysisResult:
             _ar = AnalysisResult(
                 analysis_result=gdf_result,
@@ -163,6 +157,16 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
             )
             _ar.analysis_name = name
             return _ar
+
+        _result_segment_based = analyses_results[0]
+        if self.reference_base_graph_hazard:
+            _result_link_based = self._get_result_link_based(
+                base_graph_hazard=self.reference_base_graph_hazard,
+                result_segment_based=_result_segment_based,
+            )
+        else:
+            _result_link_based = GeoDataFrame(data=None,
+                                              crs=_result_segment_based.crs, geometry=_result_segment_based.geometry)
 
         return DamagesResultWrapper(
             segment_based_result=get_analysis_result(
