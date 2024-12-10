@@ -20,10 +20,14 @@ from tests.analysis.adaptation.conftest import AdaptationOptionCases
 class TestAdaptation:
     def test_initialize(
         self,
-        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+        valid_adaptation_config_with_input: tuple[
+            AnalysisInputWrapper, AnalysisConfigWrapper
+        ],
     ):
         # 1./2. Define test data./Run test.
-        _adaptation = Adaptation(valid_adaptation_config[0], valid_adaptation_config[1])
+        _adaptation = Adaptation(
+            valid_adaptation_config_with_input[0], valid_adaptation_config_with_input[1]
+        )
 
         # 3. Verify expectations.
         assert isinstance(_adaptation, Adaptation)
@@ -31,10 +35,14 @@ class TestAdaptation:
 
     def test_run_cost_returns_gdf(
         self,
-        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+        valid_adaptation_config_with_input: tuple[
+            AnalysisInputWrapper, AnalysisConfigWrapper
+        ],
     ):
         # 1. Define test data.
-        _adaptation = Adaptation(valid_adaptation_config[0], valid_adaptation_config[1])
+        _adaptation = Adaptation(
+            valid_adaptation_config_with_input[0], valid_adaptation_config_with_input[1]
+        )
 
         # 2. Run test.
         _result = _adaptation.run_cost()
@@ -52,10 +60,14 @@ class TestAdaptation:
 
     def test_run_benefit_returns_gdf(
         self,
-        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+        valid_adaptation_config_with_input: tuple[
+            AnalysisInputWrapper, AnalysisConfigWrapper
+        ],
     ):
         # 1. Define test data.
-        _adaptation = Adaptation(valid_adaptation_config[0], valid_adaptation_config[1])
+        _adaptation = Adaptation(
+            valid_adaptation_config_with_input[0], valid_adaptation_config_with_input[1]
+        )
 
         # 2. Run test.
         _result = _adaptation.run_benefit()

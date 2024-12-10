@@ -28,30 +28,63 @@ class TestAdaptationOption:
     )
     def test_from_config_returns_object_with_2_analyses(
         self,
-        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+        valid_adaptation_config: AnalysisConfigWrapper,
         losses_analysis_type: AnalysisLossesEnum,
         losses_analysis: type[SingleLinkLosses | MultiLinkLosses],
     ):
         # 1. Define test data.
-        _config_data = valid_adaptation_config[1].config_data
+        _config_data = valid_adaptation_config.config_data
         assert _config_data.adaptation
         _config_data.adaptation.losses_analysis = losses_analysis_type
+
         _config_option = _config_data.adaptation.adaptation_options[0]
 
         # 2. Run test.
-        _option = AdaptationOption.from_config(
-            analysis_config=valid_adaptation_config[1],
+        _result = AdaptationOption.from_config(
+            analysis_config=valid_adaptation_config,
             adaptation_option=_config_option,
         )
 
         # 3. Verify expectations.
-        assert isinstance(_option, AdaptationOption)
-        assert _option.id == _config_option.id
-        assert len(_option.analyses) == 2
-        assert Damages in [x.analysis_class for x in _option.analyses]
-        assert losses_analysis in [x.analysis_class for x in _option.analyses]
+        assert isinstance(_result, AdaptationOption)
+        assert _result.id == _config_option.id
+        assert len(_result.analyses) == 2
+        assert Damages in [x.analysis_class for x in _result.analyses]
+        assert losses_analysis in [x.analysis_class for x in _result.analyses]
 
-    def test_from_config_no_damages_losses_raises(self):
+    @pytest.mark.parametrize(
+        "keep_analyses",
+        [
+            pytest.param("damages_list", id="Only damages"),
+            pytest.param("losses_list", id="Only losses"),
+        ],
+    )
+    def test_from_config_only_damages_or_losses_returns_object_with_1_analysis(
+        self,
+        valid_adaptation_config: AnalysisConfigWrapper,
+        keep_analyses: str,
+    ):
+        # 1. Define test data.
+        _config_data = valid_adaptation_config.config_data
+        assert _config_data.adaptation
+        # Keep the given analyses and the adaptation.
+        _keep_list = getattr(_config_data, keep_analyses)
+        _config_data.analyses = _keep_list + [_config_data.adaptation]
+
+        _config_option = _config_data.adaptation.adaptation_options[0]
+
+        # 2. Run test.
+        _result = AdaptationOption.from_config(
+            analysis_config=valid_adaptation_config,
+            adaptation_option=_config_option,
+        )
+
+        # 3. Verify expectations.
+        assert isinstance(_result, AdaptationOption)
+        assert _result.id == _config_option.id
+        assert len(_result.analyses) == 1
+
+    def test_from_config_no_damages_and_no_losses_raises(self):
         # 1. Define test data.
         _config = AnalysisConfigWrapper()
 
@@ -64,7 +97,7 @@ class TestAdaptationOption:
 
         # 3. Verify expectations.
         assert _exc.match(
-            "Damages and losses sections are required to create an adaptation option."
+            "Damages and/or losses sections are required to create an adaptation option."
         )
 
     @pytest.mark.parametrize(
