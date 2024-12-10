@@ -89,13 +89,7 @@ class TestAdaptation:
     def valid_gdf(self) -> GeoDataFrame:
         return GeoDataFrame(
             geometry=[Point(x, 0) for x in range(10)],
-            crs="EPSG:4326",
         )
-        # return GeoDataFrame.from_dict(
-        #     {"u": range(10), "v": range(10)},
-        #     geometry=[Point(x, 0) for x in range(10)],
-        #     crs="EPSG:4326",
-        # )
 
     @pytest.fixture(name="mocked_adaptation")
     def _get_mocked_adaptation_fixture(
@@ -157,11 +151,15 @@ class TestAdaptation:
 
     def test_output_gdf_can_be_exported_to_gpkg(
         self,
-        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+        valid_adaptation_config_with_input: tuple[
+            AnalysisInputWrapper, AnalysisConfigWrapper
+        ],
         test_result_param_case: Path,
     ):
         # 1. Define test data.
-        _adaptation = Adaptation(valid_adaptation_config[0], valid_adaptation_config[1])
+        _adaptation = Adaptation(
+            valid_adaptation_config_with_input[0], valid_adaptation_config_with_input[1]
+        )
 
         # 2. Run test.
         _result = _adaptation.execute().results_collection[0]
