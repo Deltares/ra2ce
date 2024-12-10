@@ -122,6 +122,9 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
         Returns:
             GeoDataFrame: Gdf containing the benefit-cost ratio of the adaptation options.
         """
+        _orig_gdf = self.graph_file_hazard.get_graph()
+        benefit_gdf["geometry"] = _orig_gdf.geometry
+
         for _option in self.adaptation_collection.adaptation_options:
             benefit_gdf[f"{_option.id}_cost"] = cost_gdf[f"{_option.id}_cost"]
             benefit_gdf[f"{_option.id}_bc_ratio"] = benefit_gdf[

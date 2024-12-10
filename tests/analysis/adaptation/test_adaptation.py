@@ -3,6 +3,7 @@ from typing import Iterator
 
 import pytest
 from geopandas import GeoDataFrame
+from shapely import Point
 
 from ra2ce.analysis.adaptation.adaptation import Adaptation
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
@@ -11,6 +12,7 @@ from ra2ce.analysis.adaptation.adaptation_option_collection import (
 from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.network.graph_files.network_file import NetworkFile
 from tests.analysis.adaptation.conftest import AdaptationOptionCases
 
 
@@ -78,6 +80,11 @@ class TestAdaptation:
             id: str
 
         class MockAdaptation(Adaptation):
+            graph_file_hazard = NetworkFile(
+                graph=GeoDataFrame(
+                    geometry=[Point(x, 0) for x in range(10)], crs="EPSG:4326"
+                )
+            )
             adaptation_collection: AdaptationOptionCollection = (
                 AdaptationOptionCollection(
                     all_options=[
@@ -99,6 +106,7 @@ class TestAdaptation:
         _nof_rows = 10
         _benefit_gdf = GeoDataFrame(range(_nof_rows))
         _cost_gdf = GeoDataFrame(range(_nof_rows))
+
         for i, _option in enumerate(
             mocked_adaptation.adaptation_collection.adaptation_options
         ):
@@ -110,6 +118,7 @@ class TestAdaptation:
 
         # 3. Verify expectations.
         assert isinstance(_result, GeoDataFrame)
+        assert "geometry" in _result.columns
         assert all(
             [
                 f"{_option.id}_bc_ratio" in _result.columns
