@@ -39,7 +39,7 @@ from ra2ce.network.graph_files.network_file import NetworkFile
 class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
     """
     Execute the adaptation analysis.
-    For each adaptation option a damages and losses analysis is executed.
+    For each adaptation option a damages and/or losses analysis is executed.
     """
 
     analysis: AnalysisSectionAdaptation
@@ -48,7 +48,6 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
     output_path: Path
     adaptation_collection: AdaptationOptionCollection
 
-    # TODO: add the proper protocol for the adaptation analysis.
     def __init__(
         self,
         analysis_input: AnalysisInputWrapper,
