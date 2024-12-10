@@ -1,6 +1,6 @@
 name: Bug Report
 description: Report an incorrect behavior for Ra2ce.
-labels: [bug, Needs refinement]
+labels: [bug, triage-required]
 type: bug
 projects: [RA2CE backlog]
 

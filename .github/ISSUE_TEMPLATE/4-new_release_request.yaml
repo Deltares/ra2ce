@@ -1,7 +1,7 @@
 ---
 name: New Release Request
 description: Suggest a release for Ra2ce
-labels: [enhancement, needs-refinement]
+labels: [enhancement, triage-required]
 type: task
 projects: [RA2CE backlog]
 
