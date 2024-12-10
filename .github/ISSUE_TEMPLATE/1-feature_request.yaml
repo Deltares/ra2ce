@@ -1,9 +1,9 @@
 ---
 name: Feature Request
 description: Suggest an improvement for Ra2ce
-labels: [enhancement, triage-required]
+labels: [enhancement, "triage required"]
 type: feature
-projects: [RA2CE backlog]
+projects: ["Deltares/69"]
 
 body:
   - type: dropdown

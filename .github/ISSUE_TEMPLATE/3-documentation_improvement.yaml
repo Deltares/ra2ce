@@ -1,9 +1,9 @@
 ---
 name: Documentation Improvement
 description: Report wrong or missing documentation
-labels: [documentation, triage-required]
+labels: [documentation, "triage required"]
 type: task
-projects: [RA2CE backlog]
+projects: ["Deltares/69"]
 
 body:
   - type: checkboxes
