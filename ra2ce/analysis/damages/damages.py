@@ -165,8 +165,7 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
                 result_segment_based=_result_segment_based,
             )
         else:
-            _result_link_based = GeoDataFrame(data=None,
-                                              crs=_result_segment_based.crs, geometry=_result_segment_based.geometry)
+            _result_link_based = GeoDataFrame(data=None)
 
         return DamagesResultWrapper(
             segment_based_result=get_analysis_result(
