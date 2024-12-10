@@ -73,7 +73,7 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
                 opt_routes_with_hazard = GeoDataFrame(data=None)
             else:
                 (
-                    base_graph,
+                    _base_graph,
                     origins,
                     destinations,
                     agg_results,
@@ -95,21 +95,24 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
             ) = analyzer.multi_link_origin_closest_destination()
             opt_routes_without_hazard = GeoDataFrame()
 
-        _nodes_graph, _edges_graph = get_nodes_and_edges_from_origin_graph(base_graph)
+        _nodes_graph, _edges_graph = get_nodes_and_edges_from_origin_graph(_base_graph)
         _analysis_result_wrapper = AnalysisResultWrapper(
             results_collection=[
                 get_analysis_result(origins, "_origins"),
                 get_analysis_result(destinations, "_destinations"),
-                get_analysis_result(
-                    opt_routes_without_hazard, "_optimal_routes_without_hazard"
-                ),
-                get_analysis_result(
-                    opt_routes_with_hazard, "_optimal_routes_with_hazard"
-                ),
+                get_analysis_result(destinations, "_optimal_routes"),
                 get_analysis_result(_nodes_graph, "_results_nodes"),
                 get_analysis_result(_edges_graph, "_results_edges"),
             ]
         )
+        if not opt_routes_with_hazard.empty:
+            _analysis_result_wrapper.results_collection.append(
+                get_analysis_result(opt_routes_without_hazard, "_optimal_routes")
+            )
+        if not opt_routes_without_hazard.empty:
+            _analysis_result_wrapper.results_collection.append(
+                get_analysis_result(opt_routes_with_hazard, "_optimal_routes")
+            )
 
         if self.graph_file_hazard.file is not None:
             agg_results.to_excel(
