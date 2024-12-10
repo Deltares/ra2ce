@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Type
 
 import pytest
 
+from ra2ce.analysis.adaptation.adaptation import Adaptation
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionAdaptation,
@@ -17,8 +19,11 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
+from ra2ce.analysis.damages.damages import Damages
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
+from ra2ce.analysis.losses.losses_base import LossesBase
 
 
 class TestAnalysisCollection:

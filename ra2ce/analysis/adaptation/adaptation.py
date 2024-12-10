@@ -18,7 +18,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-from copy import deepcopy
 from pathlib import Path
 
 from geopandas import GeoDataFrame
@@ -32,6 +31,7 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data import (
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.network.graph_files.network_file import NetworkFile
 
@@ -61,19 +61,19 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
             analysis_config
         )
 
-    def execute(self) -> GeoDataFrame:
+    def execute(self) -> AnalysisResultWrapper:
         """
         Run the adaptation analysis.
 
         Returns:
-            GeoDataFrame: The result of the adaptation analysis.
+            AnalysisResultWrapper: The result of the adaptation analysis.
         """
         _cost_gdf = self.run_cost()
         _benefit_gdf = self.run_benefit()
 
-        _benefit_gdf = self.calculate_bc_ratio(_benefit_gdf, _cost_gdf)
-
-        return _benefit_gdf
+        return self.generate_result_wrapper(
+            self.calculate_bc_ratio(_benefit_gdf, _cost_gdf)
+        )
 
     def run_cost(self) -> GeoDataFrame:
         """
