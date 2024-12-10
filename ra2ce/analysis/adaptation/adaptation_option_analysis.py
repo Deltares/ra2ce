@@ -63,11 +63,12 @@ class AdaptationOptionAnalysis:
             tuple[type[Damages | LossesBase], str]: The analysis class and the regex to find the result column.
         """
         if analysis_type == AnalysisDamagesEnum.DAMAGES:
-            return (Damages, "dam_.*")
+            # Columnname should start with "dam_" and should not end with "_segments"
+            return (Damages, "(?!.*_segments$)^dam_.*")
         elif analysis_type == AnalysisLossesEnum.SINGLE_LINK_LOSSES:
-            return (SingleLinkLosses, "vlh_.*_total")
+            return (SingleLinkLosses, "^vlh_.*_total$")
         elif analysis_type == AnalysisLossesEnum.MULTI_LINK_LOSSES:
-            return (MultiLinkLosses, "vlh_.*_total")
+            return (MultiLinkLosses, "^vlh_.*_total$")
         raise NotImplementedError(f"Analysis {analysis_type} not implemented")
 
     @classmethod
