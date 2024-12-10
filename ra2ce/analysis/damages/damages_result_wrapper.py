@@ -13,7 +13,10 @@ class DamagesResultWrapper(AnalysisResultWrapperProtocol):
 
     @property
     def results_collection(self) -> list[AnalysisResult]:
-        return [self.segment_based_result, self.link_based_result]
+        if len(self.link_based_result.analysis_result)==0:
+            return [self.segment_based_result, self.link_based_result]
+        else:
+            return [self.segment_based_result]
 
     def is_valid_result(self):
         return any(self.results_collection) and all(
