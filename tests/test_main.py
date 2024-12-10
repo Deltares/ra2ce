@@ -235,7 +235,9 @@ class TestMainCli:
             list(
                 chain(
                     *(
-                        list(map(lambda x: _verify_file(_analysis_dir / k / x), v))
+                        list(
+                            map(lambda x: _verify_file(_analysis_dir.joinpath(k, x)), v)
+                        )
                         for k, v in expected_analysis_files.items()
                     )
                 )

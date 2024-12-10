@@ -16,6 +16,7 @@ from ra2ce.network.hazard.hazard_names import HazardNames
 from ra2ce.network.network_config_data.network_config_data import (
     OriginsDestinationsSection,
 )
+from ra2ce.network.networks_utils import get_nodes_and_edges_from_origin_graph
 
 
 class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
@@ -62,7 +63,7 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
         analyzer = OriginClosestDestination(self._analysis_input)
         if self.analysis.calculate_route_without_disruption:
             (
-                _,
+                _base_graph,
                 opt_routes_without_hazard,
                 destinations,
             ) = analyzer.optimal_route_origin_closest_destination()
@@ -86,7 +87,7 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
                 )
         else:
             (
-                _,
+                _base_graph,
                 origins,
                 destinations,
                 agg_results,
@@ -94,6 +95,7 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
             ) = analyzer.multi_link_origin_closest_destination()
             opt_routes_without_hazard = GeoDataFrame()
 
+        _nodes_graph, _edges_graph = get_nodes_and_edges_from_origin_graph(base_graph)
         _analysis_result_wrapper = AnalysisResultWrapper(
             results_collection=[
                 get_analysis_result(origins, "_origins"),
@@ -104,6 +106,8 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
                 get_analysis_result(
                     opt_routes_with_hazard, "_optimal_routes_with_hazard"
                 ),
+                get_analysis_result(_nodes_graph, "_results_nodes"),
+                get_analysis_result(_edges_graph, "_results_edges"),
             ]
         )
 
