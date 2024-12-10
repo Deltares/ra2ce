@@ -9,7 +9,6 @@ from ra2ce.analysis.adaptation.adaptation_option_collection import (
     AdaptationOptionCollection,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 
 
 class TestAdaptationOptionCollection:
@@ -22,10 +21,10 @@ class TestAdaptationOptionCollection:
 
     def test_from_config_returns_object(
         self,
-        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+        valid_adaptation_config: AnalysisConfigWrapper,
     ):
         # 1./2. Define test data./Run test.
-        _collection = AdaptationOptionCollection.from_config(valid_adaptation_config[1])
+        _collection = AdaptationOptionCollection.from_config(valid_adaptation_config)
 
         # 3. Verify expectations.
         assert isinstance(_collection, AdaptationOptionCollection)
@@ -34,7 +33,7 @@ class TestAdaptationOptionCollection:
         assert _collection.reference_option.id == "AO0"
 
         assert len(_collection.all_options) == len(
-            valid_adaptation_config[1].config_data.adaptation.adaptation_options
+            valid_adaptation_config.config_data.adaptation.adaptation_options
         )
 
         assert all(
@@ -56,10 +55,10 @@ class TestAdaptationOptionCollection:
 
     def test_calculate_options_unit_cost_returns_dict(
         self,
-        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+        valid_adaptation_config: AnalysisConfigWrapper,
     ):
         # 1. Define test data.
-        _collection = AdaptationOptionCollection.from_config(valid_adaptation_config[1])
+        _collection = AdaptationOptionCollection.from_config(valid_adaptation_config)
 
         # 2. Run test.
         _result = _collection.calculate_options_unit_cost()
@@ -104,12 +103,10 @@ class TestAdaptationOptionCollection:
 
     def test_calculate_correct_get_net_present_value_factor(
         self,
-        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+        valid_adaptation_config: AnalysisConfigWrapper,
     ):
         # 1. Define test data.
-        _config_wrapper = valid_adaptation_config[1]
-        assert isinstance(_config_wrapper, AnalysisConfigWrapper)
-        _collection = AdaptationOptionCollection.from_config(_config_wrapper)
+        _collection = AdaptationOptionCollection.from_config(valid_adaptation_config)
 
         # 2. Run test.
         _result = _collection.get_net_present_value_factor()
