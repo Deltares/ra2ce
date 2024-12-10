@@ -72,23 +72,25 @@ class AdaptationOption:
         """
         if (
             not analysis_config.config_data.damages_list
-            or not analysis_config.config_data.losses_list
+            and not analysis_config.config_data.losses_list
         ):
             raise ValueError(
-                "Damages and losses sections are required to create an adaptation option."
+                "Damages and/or losses sections are required to create an adaptation option."
             )
 
-        # Create input for the analyses
+        # Create input for the damages and losses analyses (if present in config)
+        _config_analyses = [x.analysis for x in analysis_config.config_data.analyses]
         _analyses = [
             AdaptationOptionAnalysis.from_config(
                 analysis_config=analysis_config,
-                analysis_type=_analysis,
+                analysis_type=_analysis_type,
                 option_id=adaptation_option.id,
             )
-            for _analysis in [
+            for _analysis_type in [
                 AnalysisDamagesEnum.DAMAGES,
                 analysis_config.config_data.adaptation.losses_analysis,
             ]
+            if _analysis_type in _config_analyses
         ]
 
         return cls(
