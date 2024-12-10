@@ -1,8 +1,7 @@
 name: "GitHub Pages documentation"
 on:
-  - push
-  # push:
-    # branches: [ master ]
+  push:
+    branches: [ master ]
 
 permissions:
     contents: write
