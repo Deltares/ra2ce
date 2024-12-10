@@ -16,7 +16,6 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.damages.damages import Damages
 from ra2ce.analysis.losses.losses_base import LossesBase
@@ -54,16 +53,64 @@ class TestAnalysisOptionAnalysis:
         assert _result[0] == expected_analysis
         assert isinstance(_result[1], str)
 
-    def test_get_analysis_raises_not_implemented_error(self):
+    def test_get_analysis_raises_not_supported_error(self):
         # 1. Define test data.
-        _analysis_type = "not implemented"
+        _analysis_type = "not supported"
 
         # 2. Run test.
         with pytest.raises(NotImplementedError) as exc:
             AdaptationOptionAnalysis.get_analysis_info(_analysis_type)
 
         # 3. Verify expectations.
-        assert exc.match(f"Analysis {_analysis_type} not implemented")
+        assert exc.match(f"Analysis {_analysis_type} not supported")
+
+    @pytest.mark.parametrize(
+        "analysis_type, col_name, match",
+        [
+            pytest.param(
+                AnalysisDamagesEnum.DAMAGES, "dam_EV1_al", True, id="valid damages"
+            ),
+            pytest.param(
+                AnalysisDamagesEnum.DAMAGES,
+                "dam_EV1_al_segments",
+                False,
+                id="invalid damages",
+            ),
+            pytest.param(
+                AnalysisLossesEnum.SINGLE_LINK_LOSSES,
+                "vlh_EV1_me_total",
+                True,
+                id="valid losses",
+            ),
+            pytest.param(
+                AnalysisLossesEnum.SINGLE_LINK_LOSSES,
+                "vlh_business_EV1_me",
+                False,
+                id="invalid losses",
+            ),
+        ],
+    )
+    def test_get_result_column_based_on_regex(
+        self,
+        analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
+        col_name: str,
+        match: bool,
+    ):
+        # 1. Define test data.
+        _gdf = GeoDataFrame.from_dict({col_name: range(10)})
+        _result_col = AdaptationOptionAnalysis.get_analysis_info(analysis_type)[1]
+        _adaption_option_analysis = AdaptationOptionAnalysis(
+            analysis_type=analysis_type,
+            analysis_class=None,
+            analysis_input=None,
+            result_col=_result_col,
+        )
+
+        # 2. Run test.
+        _result = _adaption_option_analysis.get_result_column(_gdf)
+
+        # 3. Verify expectations.
+        assert (_result.sum() > 0) == match
 
     @pytest.mark.parametrize(
         "analysis_type, expected_analysis",
@@ -83,12 +130,12 @@ class TestAnalysisOptionAnalysis:
     )
     def test_from_config_returns_object(
         self,
-        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+        valid_adaptation_config: AnalysisConfigWrapper,
         analysis_type: AnalysisLossesEnum,
         expected_analysis: type[Damages | LossesBase],
     ):
         # 1. Define test data.
-        _analysis_config = valid_adaptation_config[1]
+        _analysis_config = valid_adaptation_config
         assert _analysis_config.config_data.adaptation
 
         _analysis_config.config_data.adaptation.losses_analysis = analysis_type
