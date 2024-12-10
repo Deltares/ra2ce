@@ -1,7 +1,7 @@
 ---
 name: Feature Request
 description: Suggest an improvement for Ra2ce
-labels: [enhancement, question]
+labels: [enhancement, needs-refinement]
 type: feature
 
 body:
