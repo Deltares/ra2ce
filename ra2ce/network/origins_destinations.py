@@ -98,9 +98,12 @@ def read_origin_destination_files(
 
     for op, on in zip(origin_paths, origin_names):
         origin_new = gpd.read_file(op, crs=crs_, engine="pyogrio")
-        try:
-            origin_new[od_id] * 2  # just for checking
-        except Exception:
+        if od_id not in origin_new.columns:
+            logging.warning(
+                "No origin found at %s for %s, using default index instead.".format(
+                    op, od_id
+                )
+            )
             origin_new[od_id] = origin_new.index
 
         if region_paths:
@@ -120,7 +123,7 @@ def read_origin_destination_files(
 
     for dp, dn in zip(destination_paths, destination_names):
         destination_new = gpd.read_file(dp, crs=crs_, engine="pyogrio")
-        if not destination_new[od_id].any():
+        if od_id not in destination_new.columns:
             logging.warning(
                 "No destination found at %s for %s, using default index instead.".format(
                     dp, od_id
