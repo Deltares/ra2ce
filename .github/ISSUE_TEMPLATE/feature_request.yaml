@@ -3,6 +3,7 @@ name: Feature Request
 description: Suggest an improvement for Ra2ce
 labels: [enhancement, needs-refinement]
 type: feature
+projects: [RA2CE backlog]
 
 body:
   - type: dropdown
