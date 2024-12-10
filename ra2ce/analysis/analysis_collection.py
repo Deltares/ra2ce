@@ -38,27 +38,6 @@ class AnalysisCollection:
     losses_analyses: list[AnalysisLossesProtocol] = field(default_factory=list)
     adaptation_analysis: Adaptation = None
 
-    def of_type(self, analysis_type: Type[AnalysisProtocol]) -> list[AnalysisProtocol]:
-        """
-        Method emulating the `OfType<T>` built-in .Net equivalent to retrieve
-        the analyses matching the provided type.
-
-        Args:
-            analysis_type (Type[AnalysisProtocol]): The requested analysis type.
-
-        Returns:
-            list[AnalysisProtocol]: All the analyses matching the provided type.
-        """
-        if issubclass(analysis_type, Adaptation):
-            # Adaptation implements `AnalysisDamagesProtocol`,
-            # so it needs to be checked first.
-            return [self.adaptation_analysis]
-        if issubclass(analysis_type, AnalysisLossesProtocol):
-            return self.losses_analyses
-        if issubclass(analysis_type, AnalysisDamagesProtocol):
-            return self.damages_analyses
-        raise ValueError("Analysis type {} not supported.".format(analysis_type))
-
     @classmethod
     def from_config(cls, analysis_config: AnalysisConfigWrapper) -> AnalysisCollection:
         """

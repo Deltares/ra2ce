@@ -144,33 +144,3 @@ class TestAnalysisCollection:
         assert (
             _collection.adaptation_analysis.analysis.analysis == AnalysisEnum.ADAPTATION
         )
-
-    @pytest.mark.parametrize(
-        "analysis_type",
-        [
-            pytest.param(LossesBase, id="Losses (base) type"),
-            pytest.param(Damages, id="Damages type"),
-            pytest.param(Adaptation, id="Adaptation type"),
-        ],
-    )
-    def test_of_type_provides_expected_analysis(
-        self, analysis_type: Type[AnalysisProtocol]
-    ):
-        """
-        Simplified test to check whether the `issubclass` statement
-        works as expected with our types (as they are checked against
-        protocols).
-        """
-        # 1. Define test data.
-        _collection = AnalysisCollection()
-        _collection.adaptation_analysis = "Adaptation"
-        _collection.damages_analyses.append("Damages")
-        _collection.losses_analyses.append("LossesBase")
-
-        # 2. Run test.
-        _results = _collection.of_type(analysis_type)
-
-        # 3. Verify expectations.
-        assert isinstance(_results, list)
-        assert len(_results) == 1
-        assert _results[0] == analysis_type.__name__
