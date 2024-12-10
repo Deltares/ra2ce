@@ -44,17 +44,6 @@ class OptimalRouteOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol)
         self._analysis_input = analysis_input
 
     def execute(self) -> AnalysisResultWrapper:
-        def get_analysis_result(
-            gdf_result: GeoDataFrame, suffix_name: str
-        ) -> AnalysisResult:
-            _ar = AnalysisResult(
-                analysis_result=gdf_result,
-                analysis_config=self.analysis,
-                output_path=self.output_path,
-            )
-            _ar.analysis_name = self.analysis.name.replace(" ", "_") + suffix_name
-            return _ar
-
         analyzer = OriginClosestDestination(self._analysis_input)
 
         # Get gdfs
@@ -63,11 +52,11 @@ class OptimalRouteOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol)
             opt_routes,
             destinations,
         ) = analyzer.optimal_route_origin_closest_destination()
-
+        _base_name = self.analysis.name.replace(" ", "_")
         return AnalysisResultWrapper(
             results_collection=[
-                get_analysis_result(base_graph, "_origins"),
-                get_analysis_result(destinations, "_destinations"),
-                get_analysis_result(opt_routes, "_optimal_routes"),
+                self._get_analysis_result(base_graph, _base_name + "_origins"),
+                self._get_analysis_result(destinations, _base_name + "_destinations"),
+                self._get_analysis_result(opt_routes, _base_name + "_optimal_routes"),
             ]
         )

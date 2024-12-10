@@ -47,17 +47,6 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
         self._analysis_input = analysis_input
 
     def execute(self) -> AnalysisResultWrapper:
-        def get_analysis_result(
-            gdf_result: GeoDataFrame, suffix_name: str
-        ) -> AnalysisResult:
-            _ar = AnalysisResult(
-                analysis_result=gdf_result,
-                analysis_config=self.analysis,
-                output_path=self.output_path,
-            )
-            _ar.analysis_name = self.analysis.name.replace(" ", "_") + suffix_name
-            return _ar
-
         _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
 
         analyzer = OriginClosestDestination(self._analysis_input)
@@ -96,22 +85,27 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
             opt_routes_without_hazard = GeoDataFrame()
 
         _nodes_graph, _edges_graph = get_nodes_and_edges_from_origin_graph(_base_graph)
+        _base_name = self.analysis.name.replace(" ", "_")
         _analysis_result_wrapper = AnalysisResultWrapper(
             results_collection=[
-                get_analysis_result(origins, "_origins"),
-                get_analysis_result(destinations, "_destinations"),
-                get_analysis_result(destinations, "_optimal_routes"),
-                get_analysis_result(_nodes_graph, "_results_nodes"),
-                get_analysis_result(_edges_graph, "_results_edges"),
+                self._get_analysis_result(origins, _base_name + "_origins"),
+                self._get_analysis_result(destinations, _base_name + "_destinations"),
+                self._get_analysis_result(destinations, _base_name + "_optimal_routes"),
+                self._get_analysis_result(_nodes_graph, _base_name + "_results_nodes"),
+                self._get_analysis_result(_edges_graph, _base_name + "_results_edges"),
             ]
         )
         if not opt_routes_with_hazard.empty:
             _analysis_result_wrapper.results_collection.append(
-                get_analysis_result(opt_routes_without_hazard, "_optimal_routes")
+                self._get_analysis_result(
+                    opt_routes_without_hazard, _base_name + "_optimal_routes"
+                )
             )
         if not opt_routes_without_hazard.empty:
             _analysis_result_wrapper.results_collection.append(
-                get_analysis_result(opt_routes_with_hazard, "_optimal_routes")
+                self._get_analysis_result(
+                    opt_routes_with_hazard, _base_name + "_optimal_routes"
+                )
             )
 
         if self.graph_file_hazard.file is not None:
