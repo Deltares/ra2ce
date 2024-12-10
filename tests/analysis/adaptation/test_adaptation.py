@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Iterator
 
 import pytest
@@ -72,8 +73,22 @@ class TestAdaptation:
                 _expected[1]
             )
 
+    @pytest.fixture
+    def valid_gdf(self) -> GeoDataFrame:
+        return GeoDataFrame(
+            geometry=[Point(x, 0) for x in range(10)],
+            crs="EPSG:4326",
+        )
+        # return GeoDataFrame.from_dict(
+        #     {"u": range(10), "v": range(10)},
+        #     geometry=[Point(x, 0) for x in range(10)],
+        #     crs="EPSG:4326",
+        # )
+
     @pytest.fixture(name="mocked_adaptation")
-    def _get_mocked_adaptation_fixture(self) -> Iterator[Adaptation]:
+    def _get_mocked_adaptation_fixture(
+        self, valid_gdf: GeoDataFrame
+    ) -> Iterator[Adaptation]:
         # Mock to avoid complex setup.
         @dataclass
         class MockAdaptationOption:
@@ -81,9 +96,7 @@ class TestAdaptation:
 
         class MockAdaptation(Adaptation):
             graph_file_hazard = NetworkFile(
-                graph=GeoDataFrame(
-                    geometry=[Point(x, 0) for x in range(10)], crs="EPSG:4326"
-                )
+                graph=valid_gdf,
             )
             adaptation_collection: AdaptationOptionCollection = (
                 AdaptationOptionCollection(
@@ -99,13 +112,11 @@ class TestAdaptation:
         yield MockAdaptation()
 
     def test_calculate_bc_ratio_returns_gdf(
-        self,
-        mocked_adaptation: Adaptation,
+        self, mocked_adaptation: Adaptation, valid_gdf: GeoDataFrame
     ):
         # 1. Define test data.
-        _nof_rows = 10
-        _benefit_gdf = GeoDataFrame(range(_nof_rows))
-        _cost_gdf = GeoDataFrame(range(_nof_rows))
+        _benefit_gdf = valid_gdf
+        _cost_gdf = valid_gdf
 
         for i, _option in enumerate(
             mocked_adaptation.adaptation_collection.adaptation_options
@@ -129,5 +140,26 @@ class TestAdaptation:
             mocked_adaptation.adaptation_collection.adaptation_options
         ):
             assert _result[f"{_option.id}_bc_ratio"].sum(axis=0) == pytest.approx(
-                _nof_rows * (4.0 + i) / (1.0 + i)
+                10 * (4.0 + i) / (1.0 + i)
             )
+
+    def test_output_gdf_can_be_exported_to_gpkg(
+        self,
+        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+        test_result_param_case: Path,
+    ):
+        # 1. Define test data.
+        _adaptation = Adaptation(valid_adaptation_config[0], valid_adaptation_config[1])
+
+        # 2. Run test.
+        _result = _adaptation.execute().results_collection[0]
+
+        _output_path = _result.output_path
+        _output_path.mkdir(parents=True, exist_ok=True)
+
+        _result.analysis_result.to_file(
+            _result.output_path.joinpath("adaptation_output.gpkg"), driver="GPKG"
+        )
+
+        # 3. Verify expectations.
+        assert test_result_param_case.exists()
