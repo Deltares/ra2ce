@@ -75,17 +75,16 @@ class AdaptationOptionCases:
 def _get_valid_adaptation_config_fixture(
     request: pytest.FixtureRequest,
     valid_analysis_ini: Path,
-) -> Iterator[tuple[AnalysisInputWrapper, AnalysisConfigWrapper]]:
+) -> Iterator[AnalysisConfigWrapper]:
     """
-    Create valid input and config for the adaptation analysis.
+    Create valid config for the adaptation analysis.
 
     Args:
         request (pytest.FixtureRequest): Pytest fixture request.
         valid_analysis_ini (Path): Path to a valid analysis ini file.
 
     Yields:
-        Iterator[tuple[AnalysisInputWrapper, AnalysisConfigWrapper]]:
-            Tuple with the input and config for the adaptation analysis.
+        Iterator[AnalysisConfigWrapper]: The config for the adaptation analysis.
     """
 
     def get_losses_section(analysis: AnalysisLossesEnum) -> AnalysisSectionLosses:
@@ -111,24 +110,11 @@ def _get_valid_adaptation_config_fixture(
             save_csv=True,
         )
 
+    # Define the paths
     _root_path = test_results.joinpath(request.node.name)
     _input_path = _root_path.joinpath("input")
     _static_path = _root_path.joinpath("static")
     _output_path = _root_path.joinpath("output")
-
-    # Create the input files
-    if _root_path.exists():
-        rmtree(_root_path)
-
-    _input_path.mkdir(parents=True)
-    for _option in AdaptationOptionCases.config_cases:
-        _ao_path = _input_path.joinpath(_option.id)
-        copytree(test_data.joinpath("adaptation", "input"), _ao_path)
-        copytree(
-            test_data.joinpath("adaptation", "static"),
-            _ao_path.joinpath("multi_link_losses", "static"),
-        )
-    copytree(test_data.joinpath("adaptation", "static"), _static_path)
 
     # Create the config
 
@@ -191,11 +177,47 @@ def _get_valid_adaptation_config_fixture(
         valid_analysis_ini, _analysis_data, _network_config
     )
 
-    _analysis_input = AnalysisInputWrapper.from_input(
-        analysis=_analysis_config.config_data.adaptation,
-        analysis_config=_analysis_config,
-        graph_file=_analysis_config.graph_files.base_network,
-        graph_file_hazard=_analysis_config.graph_files.base_network_hazard,
+    yield _analysis_config
+
+
+@pytest.fixture(name="valid_adaptation_config_with_input")
+def _get_valid_adaptation_config_with_input_fixture(
+    valid_adaptation_config: AnalysisConfigWrapper,
+) -> Iterator[tuple[AnalysisInputWrapper, AnalysisConfigWrapper]]:
+    """
+    Create valid adaptation config with analysis input and files.
+
+    Args:
+        valid_adaptation_config (AnalysisConfigWrapper): Valid adaptation config.
+
+    Yields:
+        Iterator[tuple[AnalysisInputWrapper, AnalysisConfigWrapper]]:
+            The adaptation input and config.
+    """
+    # Create the input files
+    _root_path = valid_adaptation_config.config_data.root_path
+    if _root_path.exists():
+        rmtree(_root_path)
+
+    _input_path = valid_adaptation_config.config_data.input_path
+    _input_path.mkdir(parents=True)
+    for _option in AdaptationOptionCases.config_cases:
+        _ao_path = _input_path.joinpath(_option.id)
+        copytree(test_data.joinpath("adaptation", "input"), _ao_path)
+        copytree(
+            test_data.joinpath("adaptation", "static"),
+            _ao_path.joinpath("multi_link_losses", "static"),
+        )
+    copytree(
+        test_data.joinpath("adaptation", "static"),
+        valid_adaptation_config.config_data.static_path,
     )
 
-    yield (_analysis_input, _analysis_config)
+    _analysis_input = AnalysisInputWrapper.from_input(
+        analysis=valid_adaptation_config.config_data.adaptation,
+        analysis_config=valid_adaptation_config,
+        graph_file=valid_adaptation_config.graph_files.base_network,
+        graph_file_hazard=valid_adaptation_config.graph_files.base_network_hazard,
+    )
+
+    yield (_analysis_input, valid_adaptation_config)

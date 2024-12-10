@@ -83,12 +83,12 @@ class TestAnalysisOptionAnalysis:
     )
     def test_from_config_returns_object(
         self,
-        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+        valid_adaptation_config: AnalysisConfigWrapper,
         analysis_type: AnalysisLossesEnum,
         expected_analysis: type[Damages | LossesBase],
     ):
         # 1. Define test data.
-        _analysis_config = valid_adaptation_config[1]
+        _analysis_config = valid_adaptation_config
         assert _analysis_config.config_data.adaptation
 
         _analysis_config.config_data.adaptation.losses_analysis = analysis_type

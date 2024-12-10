@@ -28,12 +28,12 @@ class TestAdaptationOption:
     )
     def test_from_config_returns_object_with_2_analyses(
         self,
-        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+        valid_adaptation_config: AnalysisConfigWrapper,
         losses_analysis_type: AnalysisLossesEnum,
         losses_analysis: type[SingleLinkLosses | MultiLinkLosses],
     ):
         # 1. Define test data.
-        _config_data = valid_adaptation_config[1].config_data
+        _config_data = valid_adaptation_config.config_data
         assert _config_data.adaptation
         _config_data.adaptation.losses_analysis = losses_analysis_type
 
@@ -41,7 +41,7 @@ class TestAdaptationOption:
 
         # 2. Run test.
         _result = AdaptationOption.from_config(
-            analysis_config=valid_adaptation_config[1],
+            analysis_config=valid_adaptation_config,
             adaptation_option=_config_option,
         )
 
@@ -61,11 +61,11 @@ class TestAdaptationOption:
     )
     def test_from_config_only_damages_or_losses_returns_object_with_1_analysis(
         self,
-        valid_adaptation_config: tuple[AnalysisInputWrapper, AnalysisConfigWrapper],
+        valid_adaptation_config: AnalysisConfigWrapper,
         keep_analyses: str,
     ):
         # 1. Define test data.
-        _config_data = valid_adaptation_config[1].config_data
+        _config_data = valid_adaptation_config.config_data
         assert _config_data.adaptation
         # Keep the given analyses and the adaptation.
         _keep_list = getattr(_config_data, keep_analyses)
@@ -75,7 +75,7 @@ class TestAdaptationOption:
 
         # 2. Run test.
         _result = AdaptationOption.from_config(
-            analysis_config=valid_adaptation_config[1],
+            analysis_config=valid_adaptation_config,
             adaptation_option=_config_option,
         )
 
