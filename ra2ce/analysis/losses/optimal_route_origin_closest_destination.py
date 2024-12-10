@@ -1,4 +1,3 @@
-import logging
 from pathlib import Path
 
 from geopandas import GeoDataFrame
@@ -17,7 +16,6 @@ from ra2ce.network.hazard.hazard_names import HazardNames
 from ra2ce.network.network_config_data.network_config_data import (
     OriginsDestinationsSection,
 )
-from ra2ce.network.networks_utils import graph_to_gpkg
 
 
 class OptimalRouteOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
@@ -46,14 +44,6 @@ class OptimalRouteOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol)
         self._analysis_input = analysis_input
 
     def execute(self) -> AnalysisResultWrapper:
-        analyzer = OriginClosestDestination(self._analysis_input)
-        (
-            _,
-            opt_routes,
-            destinations,
-        ) = analyzer.optimal_route_origin_closest_destination()
-
-        # TODO: This does not seem correct, why were we returning None?
         def get_analysis_result(
             gdf_result: GeoDataFrame, suffix_name: str
         ) -> AnalysisResult:
@@ -65,9 +55,18 @@ class OptimalRouteOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol)
             _ar.analysis_name = self.analysis.name.replace(" ", "_") + suffix_name
             return _ar
 
+        analyzer = OriginClosestDestination(self._analysis_input)
+
+        # Get gdfs
+        (
+            base_graph,
+            opt_routes,
+            destinations,
+        ) = analyzer.optimal_route_origin_closest_destination()
+
         return AnalysisResultWrapper(
             results_collection=[
-                # CSV
+                get_analysis_result(base_graph, "_origins"),
                 get_analysis_result(destinations, "_destinations"),
                 get_analysis_result(opt_routes, "_optimal_routes"),
             ]
