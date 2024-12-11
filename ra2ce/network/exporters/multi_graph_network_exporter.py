@@ -45,18 +45,11 @@ class MultiGraphNetworkExporter(NetworkExporterBase):
 
         # Export through the single gdf exporter
         _gdf_exporter = GeoDataFrameNetworkExporter(basename=self.basename)
-        _gdf_exporter.basename = self.basename + "_edges.gpkg"
+        _gdf_exporter.basename = self.basename + "_edge"
         _gdf_exporter.export_to_gpkg(output_dir, _edges_graph)
 
-        _gdf_exporter.basename = self.basename + "_nodes.gpkg"
+        _gdf_exporter.basename = self.basename + "_nodes"
         _gdf_exporter.export_to_gpkg(output_dir, _nodes_graph)
-
-        logging.info(
-            "Saved %s and %s in %s.",
-            self.basename + "_edges.gpkg",
-            self.basename + "_nodes.gpkg",
-            output_dir,
-        )
 
     def export_to_pickle(self, output_dir: Path, export_data: MULTIGRAPH_TYPE) -> None:
         self.pickle_path = output_dir.joinpath(self.basename + ".p")
