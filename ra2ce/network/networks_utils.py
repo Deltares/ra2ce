@@ -1182,34 +1182,6 @@ def get_nodes_and_edges_from_origin_graph(
     return _nodes, _edges
 
 
-@DeprecationWarning
-def graph_to_gpkg(origin_graph: nx.Graph, edge_gpkg: str, node_gpkg: str) -> None:
-    """
-    Arguments:
-        origin_graph [nx.Graph]: networkx graph object to be converted
-        edge_gpkg [str]: output path including extension for edges geopackage
-        node_gpkg [str]: output path including extension for nodes geopackage
-
-    Returns:
-        None
-    """
-    _nodes_graph, _edges_graph = get_nodes_and_edges_from_origin_graph(origin_graph)
-
-    logging.info("Saving nodes as shapefile: %s", node_gpkg)
-    logging.info("Saving edges as shapefile: %s", edge_gpkg)
-
-    # The encoding utf-8 might result in an empty shapefile if the wrong encoding is used.
-    for entity in [_nodes_graph, _edges_graph]:
-        if "osmid" in entity:
-            # Otherwise it gives this error: cannot insert osmid, already exist
-            entity["osmid_original"] = entity.pop("osmid")
-    for _path in [node_gpkg, edge_gpkg]:
-        if _path.exists():
-            _path.unlink()
-    _nodes_graph.to_file(node_gpkg, driver="GPKG", encoding="utf-8")
-    _edges_graph.to_file(edge_gpkg, driver="GPKG", encoding="utf-8")
-
-
 @staticmethod
 def get_normalized_geojson_polygon(geojson_path: Path) -> BaseGeometry:
     """
