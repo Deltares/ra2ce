@@ -85,15 +85,25 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
 
         _nodes_graph, _edges_graph = get_nodes_and_edges_from_origin_graph(_base_graph)
         _base_name = self.analysis.name.replace(" ", "_")
+        _opt_without_hazard = self._get_analysis_result(
+            opt_routes_without_hazard, _base_name + "_optimal_routes_without_hazard"
+        )
+        _opt_with_hazard = self._get_analysis_result(
+            opt_routes_with_hazard, _base_name + "_optimal_routes_with_hazard"
+        )
+
         _analysis_result_wrapper = AnalysisResultWrapper(
             results_collection=[
                 self._get_analysis_result(origins, _base_name + "_origins"),
                 self._get_analysis_result(destinations, _base_name + "_destinations"),
-                self._get_analysis_result(destinations, _base_name + "_optimal_routes"),
                 self._get_analysis_result(_nodes_graph, _base_name + "_results_nodes"),
                 self._get_analysis_result(_edges_graph, _base_name + "_results_edges"),
+                _opt_without_hazard,
+                _opt_with_hazard,
             ]
         )
+
+        # Legacy code, previously only done to export to CSV.
         if not opt_routes_with_hazard.empty:
             _analysis_result_wrapper.results_collection.append(
                 self._get_analysis_result(
