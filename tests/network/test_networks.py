@@ -105,7 +105,7 @@ class TestNetworks:
 
         # 3. Then verify expectations.
         def validate_file(filename: str):
-            _graph_file = _output_graph_dir / filename
+            _graph_file = _output_graph_dir.joinpath(filename)
             return _graph_file.is_file() and _graph_file.exists()
 
         assert isinstance(_network_controller, GraphFilesCollection)
