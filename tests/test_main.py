@@ -241,6 +241,4 @@ class TestMainCli:
             )
         _err_mssg = ", ".join(_not_generated_files)
         if any(_not_generated_files):
-            pytest.fail(
-                "The following expected files were not generated: {}".format(_err_mssg)
-            )
+            pytest.fail(f"The following expected files were not generated: {_err_mssg}")

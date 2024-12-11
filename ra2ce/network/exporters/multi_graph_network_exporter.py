@@ -46,10 +46,10 @@ class MultiGraphNetworkExporter(NetworkExporterBase):
         # Export through the single gdf exporter
         _gdf_exporter = GeoDataFrameNetworkExporter(basename=self.basename)
         _gdf_exporter.basename = self.basename + "_edges.gpkg"
-        _gdf_exporter.export(output_dir, _edges_graph)
+        _gdf_exporter.export_to_gpkg(output_dir, _edges_graph)
 
         _gdf_exporter.basename = self.basename + "_nodes.gpkg"
-        _gdf_exporter.export(output_dir, _nodes_graph)
+        _gdf_exporter.export_to_gpkg(output_dir, _nodes_graph)
 
         logging.info(
             "Saved %s and %s in %s.",
