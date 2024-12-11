@@ -104,17 +104,14 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
         )
 
         # Legacy code, previously only done to export to CSV.
-        if not opt_routes_with_hazard.empty:
-            _analysis_result_wrapper.results_collection.append(
-                self._get_analysis_result(
-                    opt_routes_without_hazard, _base_name + "_optimal_routes"
-                )
-            )
+        _opt_routes_name = _base_name + "_optimal_routes"
         if not opt_routes_without_hazard.empty:
             _analysis_result_wrapper.results_collection.append(
-                self._get_analysis_result(
-                    opt_routes_with_hazard, _base_name + "_optimal_routes"
-                )
+                self._get_analysis_result(opt_routes_with_hazard, _opt_routes_name)
+            )
+        if not opt_routes_with_hazard.empty:
+            _analysis_result_wrapper.results_collection.append(
+                self._get_analysis_result(opt_routes_without_hazard, _opt_routes_name)
             )
 
         if self.graph_file_hazard.file is not None:
