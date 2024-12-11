@@ -23,7 +23,6 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 
 from geopandas import GeoDataFrame
-from pandas import Series
 
 from ra2ce.analysis.adaptation.adaptation_option_analysis import (
     AdaptationOptionAnalysis,
@@ -50,6 +49,29 @@ class AdaptationOption:
 
     def __hash__(self) -> int:
         return hash(self.id)
+
+    @property
+    def cost_col(self) -> str:
+        return self._get_column_name("cost")
+
+    @property
+    def impact_col(self) -> str:
+        return self._get_column_name("impact")
+
+    @property
+    def benefit_col(self) -> str:
+        return self._get_column_name("benefit")
+
+    @property
+    def impact_col(self) -> str:
+        return self._get_column_name("impact")
+
+    @property
+    def bc_ratio_col(self) -> str:
+        return self._get_column_name("bc_ratio")
+
+    def _get_column_name(self, col_type: str) -> str:
+        return f"{self.id}_{col_type}"
 
     @classmethod
     def from_config(
@@ -135,18 +157,22 @@ class AdaptationOption:
 
         return sum(calculate_cost(_year) for _year in range(0, round(time_horizon), 1))
 
-    def calculate_impact(self, net_present_value_factor: float) -> Series:
+    def calculate_impact(self, net_present_value_factor: float) -> GeoDataFrame:
         """
         Calculate the impact of the adaptation option.
 
         Returns:
-            Series: The impact of the adaptation option.
+            GeoDataFrame: The impact of the adaptation option.
         """
         _result_gdf = GeoDataFrame()
         for _analysis in self.analyses:
-            _result_gdf[_analysis.analysis_type] = _analysis.execute(
-                self.analysis_config
-            )
+            _result_gdf[
+                f"{self.impact_col}_{_analysis.analysis_type.config_value}"
+            ] = _analysis.execute(self.analysis_config)
 
         # Calculate the impact (summing the results of the analyses)
-        return _result_gdf.sum(axis=1) * net_present_value_factor
+        _result_gdf[self.impact_col] = (
+            _result_gdf.sum(axis=1) * net_present_value_factor
+        )
+
+        return _result_gdf

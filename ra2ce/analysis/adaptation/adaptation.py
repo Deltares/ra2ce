@@ -92,12 +92,12 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
             _option,
             _cost,
         ) in self.adaptation_collection.calculate_options_unit_cost().items():
-            _cost_gdf[f"{_option.id}_cost"] = _orig_gdf.apply(
+            _cost_gdf[_option.cost_col] = _orig_gdf.apply(
                 lambda x, cost=_cost: x["length"] * cost, axis=1
             )
             # Only calculate the cost for the impacted fraction of the links.
             if self.analysis.hazard_fraction_cost:
-                _cost_gdf[f"{_option.id}_cost"] *= _orig_gdf[_fraction_col]
+                _cost_gdf[_option.cost_col] *= _orig_gdf[_fraction_col]
 
         return _cost_gdf
 
@@ -124,15 +124,22 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
             GeoDataFrame: Gdf containing the benefit-cost ratio of the adaptation options,
                 including the relevant attributes from the original graph (geometry).
         """
-        # Copy the relevant attributes from the original graph
+
+        def copy_column(from_gdf: GeoDataFrame, col_name: str) -> None:
+            benefit_gdf[col_name] = from_gdf[col_name]
+
+        # Copy relevant columns from the original graph
         _orig_gdf = self.graph_file_hazard.get_graph()
-        benefit_gdf["geometry"] = _orig_gdf.geometry
+        for _col in ["link_id", "geometry", "highway", "length"]:
+            copy_column(_orig_gdf, _col)
 
         for _option in self.adaptation_collection.adaptation_options:
-            benefit_gdf[f"{_option.id}_cost"] = cost_gdf[f"{_option.id}_cost"]
-            benefit_gdf[f"{_option.id}_bc_ratio"] = benefit_gdf[
-                f"{_option.id}_benefit"
-            ].replace(float("nan"), 0) / benefit_gdf[f"{_option.id}_cost"].replace(
+            # Copy cost columns from the cost gdf
+            copy_column(cost_gdf, _option.cost_col)
+
+            benefit_gdf[_option.bc_ratio_col] = benefit_gdf[
+                _option.benefit_col
+            ].replace(float("nan"), 0) / benefit_gdf[_option.cost_col].replace(
                 0, float("nan")
             )
 

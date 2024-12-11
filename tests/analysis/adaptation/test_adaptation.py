@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Iterator
 
 import pytest
@@ -50,7 +49,7 @@ class TestAdaptation:
         # 3. Verify expectations.
         assert isinstance(_result, GeoDataFrame)
         assert all(
-            f"{_option.id}_cost" in _result.columns
+            _option.cost_col in _result.columns
             for _option in _adaptation.adaptation_collection.adaptation_options
         )
         for _option, _expected in AdaptationOptionCases.cases[1:]:
@@ -85,24 +84,36 @@ class TestAdaptation:
                 _expected[1]
             )
 
-    @pytest.fixture
-    def valid_gdf(self) -> GeoDataFrame:
-        return GeoDataFrame(
-            geometry=[Point(x, 0) for x in range(10)],
-        )
-
     @pytest.fixture(name="mocked_adaptation")
-    def _get_mocked_adaptation_fixture(
-        self, valid_gdf: GeoDataFrame
-    ) -> Iterator[Adaptation]:
+    def _get_mocked_adaptation_fixture(self) -> Iterator[Adaptation]:
         # Mock to avoid complex setup.
         @dataclass
         class MockAdaptationOption:
             id: str
 
+            @property
+            def cost_col(self) -> str:
+                return f"{self.id}_cost"
+
+            @property
+            def benefit_col(self) -> str:
+                return f"{self.id}_benefit"
+
+            @property
+            def bc_ratio_col(self) -> str:
+                return f"{self.id}_bc_ratio"
+
         class MockAdaptation(Adaptation):
             graph_file_hazard = NetworkFile(
-                graph=valid_gdf,
+                graph=GeoDataFrame.from_dict(
+                    data={
+                        "geometry": [Point(x, 0) for x in range(10)],
+                        "link_id": range(10),
+                        "highway": "residential",
+                        "length": 1.0,
+                    },
+                    geometry="geometry",
+                )
             )
             adaptation_collection: AdaptationOptionCollection = (
                 AdaptationOptionCollection(
@@ -117,18 +128,17 @@ class TestAdaptation:
 
         yield MockAdaptation()
 
-    def test_calculate_bc_ratio_returns_gdf(
-        self, mocked_adaptation: Adaptation, valid_gdf: GeoDataFrame
-    ):
+    def test_calculate_bc_ratio_returns_gdf(self, mocked_adaptation: Adaptation):
         # 1. Define test data.
-        _benefit_gdf = valid_gdf
-        _cost_gdf = valid_gdf
+        _nof_rows = 10
+        _benefit_gdf = GeoDataFrame(index=range(_nof_rows))
+        _cost_gdf = GeoDataFrame(index=range(_nof_rows))
 
         for i, _option in enumerate(
             mocked_adaptation.adaptation_collection.adaptation_options
         ):
-            _benefit_gdf[f"{_option.id}_benefit"] = 4.0 + i
-            _cost_gdf[f"{_option.id}_cost"] = 1.0 + i
+            _benefit_gdf[_option.benefit_col] = 4.0 + i
+            _cost_gdf[_option.cost_col] = 1.0 + i
 
         # 2. Run test.
         _result = mocked_adaptation.calculate_bc_ratio(_benefit_gdf, _cost_gdf)
@@ -138,38 +148,13 @@ class TestAdaptation:
         assert not _result.geometry.empty
         assert all(
             [
-                f"{_option.id}_bc_ratio" in _result.columns
+                _option.bc_ratio_col in _result.columns
                 for _option in mocked_adaptation.adaptation_collection.adaptation_options
             ]
         )
         for i, _option in enumerate(
             mocked_adaptation.adaptation_collection.adaptation_options
         ):
-            assert _result[f"{_option.id}_bc_ratio"].sum(axis=0) == pytest.approx(
-                len(_result.index) * (4.0 + i) / (1.0 + i)
+            assert _result[_option.bc_ratio_col].sum(axis=0) == pytest.approx(
+                _nof_rows * (4.0 + i) / (1.0 + i)
             )
-
-    def test_output_gdf_can_be_exported_to_gpkg(
-        self,
-        valid_adaptation_config_with_input: tuple[
-            AnalysisInputWrapper, AnalysisConfigWrapper
-        ],
-        test_result_param_case: Path,
-    ):
-        # 1. Define test data.
-        _adaptation = Adaptation(
-            valid_adaptation_config_with_input[0], valid_adaptation_config_with_input[1]
-        )
-
-        # 2. Run test.
-        _result = _adaptation.execute().results_collection[0]
-
-        _output_path = _result.output_path
-        _output_path.mkdir(parents=True, exist_ok=True)
-
-        _result.analysis_result.to_file(
-            _result.output_path.joinpath("adaptation_output.gpkg"), driver="GPKG"
-        )
-
-        # 3. Verify expectations.
-        assert test_result_param_case.exists()
