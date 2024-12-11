@@ -35,7 +35,7 @@ NETWORK_TYPE = gpd.GeoDataFrame | MULTIGRAPH_TYPE
 @dataclass(kw_only=True)
 class NetworkExporterBase(Ra2ceExporterProtocol):
     basename: str
-    export_types: list[str] = field(default_factory=["pickle"])
+    export_types: list[str] = field(default_factory=lambda: ["pickle"])
     pickle_path: Path = None
 
     def export_to_gpkg(self, output_dir: Path, export_data: NETWORK_TYPE) -> None:
