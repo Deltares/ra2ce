@@ -58,6 +58,7 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
         self.adaptation_collection = AdaptationOptionCollection.from_config(
             analysis_config
         )
+        self.output_path=analysis_input.output_path
 
     def execute(self) -> AnalysisResultWrapper:
         """
