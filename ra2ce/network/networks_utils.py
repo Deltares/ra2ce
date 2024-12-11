@@ -1157,7 +1157,8 @@ def get_nodes_and_edges_from_origin_graph(
             resulting tuple of formatted `gpd.GeoDataFrame` for nodes and edges.
     """
     # now only multidigraphs and graphs are used
-    if isinstance(origin_graph, nx.Graph):
+    if type(origin_graph) == nx.Graph:
+        # isinstance / issubclass will not work as nx.MultiGraph would return True
         origin_graph = nx.MultiGraph(origin_graph)
 
     # The nodes should have a geometry attribute (perhaps on top of the x and y attributes)

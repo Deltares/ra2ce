@@ -24,6 +24,8 @@ import pickle
 from pathlib import Path
 from typing import Optional
 
+from geopandas import GeoDataFrame
+
 from ra2ce.network.exporters.geodataframe_network_exporter import (
     GeoDataFrameNetworkExporter,
 )
@@ -43,13 +45,16 @@ class MultiGraphNetworkExporter(NetworkExporterBase):
 
         _nodes_graph, _edges_graph = get_nodes_and_edges_from_origin_graph(export_data)
 
-        # Export through the single gdf exporter
-        _gdf_exporter = GeoDataFrameNetworkExporter(basename=self.basename)
-        _gdf_exporter.basename = self.basename + "_edges"
-        _gdf_exporter.export_to_gpkg(output_dir, _edges_graph)
+        def export_gdf(gdf_data: GeoDataFrame, suffix: str):
+            """
+            Different from `GeoDataFrameNetworkExporter` at `index=True`.
+            """
+            _export_file = output_dir.joinpath(self.basename + suffix + ".gpkg")
+            gdf_data.to_file(_export_file, index=True, driver="GPKG", encoding="utf-8")
+            logging.info("Saved %s in %s.", _export_file.stem, output_dir)
 
-        _gdf_exporter.basename = self.basename + "_nodes"
-        _gdf_exporter.export_to_gpkg(output_dir, _nodes_graph)
+        export_gdf(_edges_graph, "_edges")
+        export_gdf(_nodes_graph, "_nodes")
 
     def export_to_pickle(self, output_dir: Path, export_data: MULTIGRAPH_TYPE) -> None:
         self.pickle_path = output_dir.joinpath(self.basename + ".p")
