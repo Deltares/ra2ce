@@ -126,11 +126,14 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
         """
 
         def copy_column(from_gdf: GeoDataFrame, col_name: str) -> None:
-            benefit_gdf[col_name] = from_gdf[col_name]
+            if not col_name in from_gdf.columns:
+                return
+            benefit_gdf.insert(loc=0, column=col_name, value=from_gdf[col_name])
 
         # Copy relevant columns from the original graph
         _orig_gdf = self.graph_file_hazard.get_graph()
-        for _col in ["link_id", "geometry", "highway", "length"]:
+        benefit_gdf.set_geometry(_orig_gdf.geometry, inplace=True)
+        for _col in ["length", "highway", "infra_type", "link_id"]:
             copy_column(_orig_gdf, _col)
 
         for _option in self.adaptation_collection.adaptation_options:
