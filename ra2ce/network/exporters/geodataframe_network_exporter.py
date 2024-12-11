@@ -29,13 +29,18 @@ from ra2ce.network.exporters.network_exporter_base import NetworkExporterBase
 
 class GeoDataFrameNetworkExporter(NetworkExporterBase):
     def export_to_gpkg(self, output_dir: Path, export_data: gpd.GeoDataFrame) -> None:
-        _output_shp_path = output_dir / (self._basename + ".gpkg")
+        _output_gpkg_path = output_dir.joinpath(self.basename + ".gpkg")
+
+        if _output_gpkg_path.exists():
+            logging.info("Removing previous gpkg file %s.", _output_gpkg_path)
+            _output_gpkg_path.unlink()
+
         export_data.to_file(
-            _output_shp_path, index=False
-        )  # , encoding='utf-8' -Removed the encoding type because this causes some shapefiles not to save.
-        logging.info(f"Saved {_output_shp_path.stem} in {output_dir}.")
+            _output_gpkg_path, index=False, driver="GPKG", encoding="utf-8"
+        )
+        logging.info("Saved %s in %s.", _output_gpkg_path.stem, output_dir)
 
     def export_to_pickle(self, output_dir: Path, export_data: gpd.GeoDataFrame) -> None:
-        self.pickle_path = output_dir / (self._basename + ".feather")
+        self.pickle_path = output_dir.joinpath(self.basename + ".feather")
         export_data.to_feather(self.pickle_path, index=False)
-        logging.info(f"Saved {self.pickle_path.stem} in {output_dir}.")
+        logging.info("Saved %s in %s.", self.pickle_path.stem, output_dir)

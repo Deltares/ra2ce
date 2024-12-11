@@ -1182,11 +1182,9 @@ def get_nodes_and_edges_from_origin_graph(
     return _nodes, _edges
 
 
+@DeprecationWarning
 def graph_to_gpkg(origin_graph: nx.Graph, edge_gpkg: str, node_gpkg: str) -> None:
     """
-    [DEPRECATED] Please  use instead `AnalysisResultWrapperExporter`.
-    Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_gpkg and node_gpkg
-
     Arguments:
         origin_graph [nx.Graph]: networkx graph object to be converted
         edge_gpkg [str]: output path including extension for edges geopackage
@@ -1197,8 +1195,8 @@ def graph_to_gpkg(origin_graph: nx.Graph, edge_gpkg: str, node_gpkg: str) -> Non
     """
     _nodes_graph, _edges_graph = get_nodes_and_edges_from_origin_graph(origin_graph)
 
-    logging.info("Saving nodes as shapefile: %s".format(node_gpkg))
-    logging.info("Saving edges as shapefile: %s".format(edge_gpkg))
+    logging.info("Saving nodes as shapefile: %s", node_gpkg)
+    logging.info("Saving edges as shapefile: %s", edge_gpkg)
 
     # The encoding utf-8 might result in an empty shapefile if the wrong encoding is used.
     for entity in [_nodes_graph, _edges_graph]:

@@ -20,6 +20,7 @@
 """
 
 
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import geopandas as gpd
@@ -31,15 +32,11 @@ MULTIGRAPH_TYPE = nx.MultiGraph | nx.MultiDiGraph
 NETWORK_TYPE = gpd.GeoDataFrame | MULTIGRAPH_TYPE
 
 
+@dataclass(kw_only=True)
 class NetworkExporterBase(Ra2ceExporterProtocol):
-    _basename: str
-    _export_types: list[str] = ["pickle"]
-    pickle_path: Path
-
-    def __init__(self, basename: str, export_types: list[str]) -> None:
-        self._basename = basename
-        self._export_types = export_types
-        self.pickle_path = None
+    basename: str
+    export_types: list[str] = field(default_factory=["pickle"])
+    pickle_path: Path = None
 
     def export_to_gpkg(self, output_dir: Path, export_data: NETWORK_TYPE) -> None:
         """
@@ -70,8 +67,8 @@ class NetworkExporterBase(Ra2ceExporterProtocol):
             export_path (Path): Path to the output directory where to export the data.
             export_data (NETWORK_TYPE): Data that needs to be exported.
         """
-        if "pickle" in self._export_types:
+        if "pickle" in self.export_types:
             self.export_to_pickle(export_path, export_data)
 
-        if "gpkg" in self._export_types:
+        if "gpkg" in self.export_types:
             self.export_to_gpkg(export_path, export_data)

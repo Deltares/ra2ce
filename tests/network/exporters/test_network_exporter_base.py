@@ -10,7 +10,7 @@ class TestNetworkExporterBase:
         _exporter_base = NetworkExporterBase("a_name", [])
         assert isinstance(_exporter_base, NetworkExporterBase)
         assert isinstance(_exporter_base, Ra2ceExporterProtocol)
-        assert _exporter_base._export_types == []
+        assert _exporter_base.export_types == []
 
     @pytest.mark.parametrize("export_type", [("pickle"), ("gpkg")])
     def test_export_data(self, export_type: str, request: pytest.FixtureRequest):
