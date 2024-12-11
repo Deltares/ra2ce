@@ -228,18 +228,19 @@ class TestMainCli:
             return filepath.exists() and filepath.is_file()
 
         # Graph files
-        assert all(_verify_file(_graph_dir / _f) for _f in expected_graph_files)
+        assert all(_verify_file(_graph_dir.joinpath(_f)) for _f in expected_graph_files)
 
         # Analysis files
-        assert all(
-            list(
-                chain(
-                    *(
-                        list(
-                            map(lambda x: _verify_file(_analysis_dir.joinpath(k, x)), v)
-                        )
-                        for k, v in expected_analysis_files.items()
-                    )
+        _not_generated_files = []
+        for _subdir_name, _subdir_files in expected_analysis_files.items():
+            _not_generated_files.extend(
+                filter(
+                    lambda x: not _verify_file(_analysis_dir.joinpath(_subdir_name, x)),
+                    _subdir_files,
                 )
             )
-        )
+        _err_mssg = ", ".join(_not_generated_files)
+        if any(_not_generated_files):
+            pytest.fail(
+                "The following expected files were not generated: {}".format(_err_mssg)
+            )
