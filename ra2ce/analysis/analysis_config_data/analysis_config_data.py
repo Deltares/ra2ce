@@ -224,10 +224,8 @@ class AnalysisConfigData(ConfigDataProtocol):
             return new_root.joinpath(analysis_type.config_value, _rel_path)
 
         self.input_path = reroot_path(self.input_path)
-        self.static_path = reroot_path(self.static_path)
-        self.output_path = reroot_path(self.output_path)
 
-        # Rewrite the paths of the files in the analysis
+        # Rewrite the paths of the input files in the analysis config
         _analysis = self.get_analysis(analysis_type)
         if isinstance(_analysis, AnalysisSectionDamages):
             _analysis.file_name = reroot_path(_analysis.file_name)

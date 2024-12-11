@@ -200,18 +200,21 @@ def _get_valid_adaptation_config_with_input_fixture(
     if _root_path.exists():
         rmtree(_root_path)
 
+    # Duplicate input files per adaptation option
     _input_path = valid_adaptation_config.config_data.input_path
     _input_path.mkdir(parents=True)
     for _option in AdaptationOptionCases.config_cases:
         _ao_path = _input_path.joinpath(_option.id)
         copytree(test_data.joinpath("adaptation", "input"), _ao_path)
-        copytree(
-            test_data.joinpath("adaptation", "static"),
-            _ao_path.joinpath("multi_link_losses", "static"),
-        )
+
+    # Use the same static and output files for all adaptation options
     copytree(
         test_data.joinpath("adaptation", "static"),
         valid_adaptation_config.config_data.static_path,
+    )
+    copytree(
+        test_data.joinpath("adaptation", "output"),
+        valid_adaptation_config.config_data.output_path,
     )
 
     # Read graph/network files
