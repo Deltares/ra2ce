@@ -121,8 +121,10 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
             cost_gdf (GeoDataFrame): Gdf containing the cost of the adaptation options.
 
         Returns:
-            GeoDataFrame: Gdf containing the benefit-cost ratio of the adaptation options.
+            GeoDataFrame: Gdf containing the benefit-cost ratio of the adaptation options,
+                including the relevant attributes from the original graph (geometry).
         """
+        # Copy the relevant attributes from the original graph
         _orig_gdf = self.graph_file_hazard.get_graph()
         benefit_gdf["geometry"] = _orig_gdf.geometry
 

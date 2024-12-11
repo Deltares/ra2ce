@@ -135,7 +135,7 @@ class TestAdaptation:
 
         # 3. Verify expectations.
         assert isinstance(_result, GeoDataFrame)
-        assert "geometry" in _result.columns
+        assert not _result.geometry.empty
         assert all(
             [
                 f"{_option.id}_bc_ratio" in _result.columns
@@ -146,7 +146,7 @@ class TestAdaptation:
             mocked_adaptation.adaptation_collection.adaptation_options
         ):
             assert _result[f"{_option.id}_bc_ratio"].sum(axis=0) == pytest.approx(
-                10 * (4.0 + i) / (1.0 + i)
+                len(_result.index) * (4.0 + i) / (1.0 + i)
             )
 
     def test_output_gdf_can_be_exported_to_gpkg(
