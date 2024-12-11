@@ -1,6 +1,8 @@
 name: Bug Report
 description: Report an incorrect behavior for Ra2ce.
-labels: [Bug, Needs refinement]
+labels: [bug, "triage required"]
+type: bug
+projects: ["Deltares/69"]
 
 body:
   - type: checkboxes

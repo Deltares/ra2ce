@@ -1,7 +1,9 @@
 ---
 name: Documentation Improvement
 description: Report wrong or missing documentation
-labels: [Documentation, Needs refinement]
+labels: [documentation, "triage required"]
+type: task
+projects: ["Deltares/69"]
 
 body:
   - type: checkboxes

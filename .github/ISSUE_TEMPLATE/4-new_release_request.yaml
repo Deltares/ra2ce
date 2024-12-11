@@ -1,14 +1,20 @@
 ---
 name: New Release Request
 description: Suggest a release for Ra2ce
-labels: [enhancement]
+labels: [enhancement, "triage required"]
+type: task
+projects: ["Deltares/69"]
 
 body:
   - type: dropdown
     id: checks
     attributes:
-      description: What kind of release is this? (Format `vMAJOR.Minor.patch`)
-      label: Kind of release `vMAJOR.Minor.patch`
+      description: >
+        (Format `vMAJOR.Minor.patch`) 
+        `MAJOR`, for (big) architectural changes are introduced or and upgrade of Python version occurs. 
+        `Minor`, for new features.
+        `patch`, for bug fixes and cleanup tasks.
+      label: Kind of release
       options:
         - MAJOR
         - Minor
@@ -23,9 +29,3 @@ body:
       label: Release Description
     validations:
       required: true
-  - type: checkboxes
-    attributes:
-      label: Ra2ce release checks
-      options:
-        - label: Branch `master` is stable (all quality gates are approved), and latest documentation can be built.
-          required: true

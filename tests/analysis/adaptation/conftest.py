@@ -64,7 +64,7 @@ class AdaptationOptionCases:
             maintenance_interval=3.0,
         ),
     ]
-    total_cost: list[float] = [0.0, 97800589.027952, 189253296.099491]
+    total_cost: list[float] = [0.0, 10073869.180362, 19493880.004279]
     total_benefit: list[float] = [0.0, 0.0, 0.0]
     cases: list[tuple[AnalysisSectionAdaptationOption, tuple[float, float]]] = list(
         zip(config_cases, zip(total_cost, total_benefit))
@@ -73,19 +73,18 @@ class AdaptationOptionCases:
 
 @pytest.fixture(name="valid_adaptation_config")
 def _get_valid_adaptation_config_fixture(
-    request: pytest.FixtureRequest,
     valid_analysis_ini: Path,
-) -> Iterator[tuple[AnalysisInputWrapper, AnalysisConfigWrapper]]:
+    test_result_param_case: Path,
+) -> Iterator[AnalysisConfigWrapper]:
     """
-    Create valid input and config for the adaptation analysis.
+    Create valid config for the adaptation analysis.
 
     Args:
-        request (pytest.FixtureRequest): Pytest fixture request.
         valid_analysis_ini (Path): Path to a valid analysis ini file.
+        test_result_param_case (Path): Path to a valid folder for the test results.
 
     Yields:
-        Iterator[tuple[AnalysisInputWrapper, AnalysisConfigWrapper]]:
-            Tuple with the input and config for the adaptation analysis.
+        Iterator[AnalysisConfigWrapper]: The config for the adaptation analysis.
     """
 
     def get_losses_section(analysis: AnalysisLossesEnum) -> AnalysisSectionLosses:
@@ -111,24 +110,11 @@ def _get_valid_adaptation_config_fixture(
             save_csv=True,
         )
 
-    _root_path = test_results.joinpath(request.node.name)
+    # Define the paths
+    _root_path = test_result_param_case
     _input_path = _root_path.joinpath("input")
     _static_path = _root_path.joinpath("static")
     _output_path = _root_path.joinpath("output")
-
-    # Create the input files
-    if _root_path.exists():
-        rmtree(_root_path)
-
-    # Duplicate input files per adaptation option
-    _input_path.mkdir(parents=True)
-    for _option in AdaptationOptionCases.config_cases:
-        _ao_path = _input_path.joinpath(_option.id)
-        copytree(test_data.joinpath("adaptation", "input"), _ao_path)
-
-    # Use the same static and output files for all adaptation options
-    copytree(test_data.joinpath("adaptation", "static"), _static_path)
-    copytree(test_data.joinpath("adaptation", "output"), _output_path)
 
     # Create the config
 
@@ -139,7 +125,7 @@ def _get_valid_adaptation_config_fixture(
         link_type_column="highway",
     )
     _network_config_data = NetworkConfigData(
-        static_path=test_results.joinpath(request.node.name, "static"),
+        static_path=test_results.joinpath(_static_path),
         hazard=_hazard_section,
         network=_network_section,
     )
@@ -167,10 +153,11 @@ def _get_valid_adaptation_config_fixture(
         name="Adaptation",
         losses_analysis=AnalysisLossesEnum.MULTI_LINK_LOSSES,
         adaptation_options=AdaptationOptionCases.config_cases,
-        discount_rate=0.025,
         time_horizon=20,
-        climate_factor=0.00036842,
+        discount_rate=0.025,
         initial_frequency=0.01,
+        climate_factor=0.00036842,
+        hazard_fraction_cost=True,
     )
 
     _analysis_data = AnalysisConfigData(
@@ -191,11 +178,55 @@ def _get_valid_adaptation_config_fixture(
         valid_analysis_ini, _analysis_data, _network_config
     )
 
-    _analysis_input = AnalysisInputWrapper.from_input(
-        analysis=_analysis_config.config_data.adaptation,
-        analysis_config=_analysis_config,
-        graph_file=_analysis_config.graph_files.base_network,
-        graph_file_hazard=_analysis_config.graph_files.base_network_hazard,
+    yield _analysis_config
+
+
+@pytest.fixture(name="valid_adaptation_config_with_input")
+def _get_valid_adaptation_config_with_input_fixture(
+    valid_adaptation_config: AnalysisConfigWrapper,
+) -> Iterator[tuple[AnalysisInputWrapper, AnalysisConfigWrapper]]:
+    """
+    Create valid adaptation config with analysis input and files.
+
+    Args:
+        valid_adaptation_config (AnalysisConfigWrapper): Valid adaptation config.
+
+    Yields:
+        Iterator[tuple[AnalysisInputWrapper, AnalysisConfigWrapper]]:
+            The adaptation input and config.
+    """
+    # Create the input files
+    _root_path = valid_adaptation_config.config_data.root_path
+    if _root_path.exists():
+        rmtree(_root_path)
+
+    # Duplicate input files per adaptation option
+    _input_path = valid_adaptation_config.config_data.input_path
+    _input_path.mkdir(parents=True)
+    for _option in AdaptationOptionCases.config_cases:
+        _ao_path = _input_path.joinpath(_option.id)
+        copytree(test_data.joinpath("adaptation", "input"), _ao_path)
+
+    # Use the same static and output files for all adaptation options
+    copytree(
+        test_data.joinpath("adaptation", "static"),
+        valid_adaptation_config.config_data.static_path,
+    )
+    copytree(
+        test_data.joinpath("adaptation", "output"),
+        valid_adaptation_config.config_data.output_path,
     )
 
-    yield (_analysis_input, _analysis_config)
+    # Read graph/network files
+    valid_adaptation_config.graph_files = NetworkConfigWrapper.read_graphs_from_config(
+        valid_adaptation_config.config_data.static_path.joinpath("output_graph")
+    )
+
+    _analysis_input = AnalysisInputWrapper.from_input(
+        analysis=valid_adaptation_config.config_data.adaptation,
+        analysis_config=valid_adaptation_config,
+        graph_file=valid_adaptation_config.graph_files.base_network,
+        graph_file_hazard=valid_adaptation_config.graph_files.base_network_hazard,
+    )
+
+    yield (_analysis_input, valid_adaptation_config)
