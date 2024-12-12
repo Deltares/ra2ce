@@ -38,6 +38,3 @@ class ManualDamageFunctions:
     damage_functions: dict[str, DamageFunctionByRoadTypeByLane] = field(
         default_factory=dict
     )
-
-    def calculate_damage(self):
-        pass
