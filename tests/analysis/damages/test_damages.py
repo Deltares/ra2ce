@@ -7,12 +7,14 @@ from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCu
 from ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum import (
     RiskCalculationModeEnum,
 )
-from ra2ce.analysis.damages.damage.manual_damage_functions import ManualDamageFunctions
 from ra2ce.analysis.damages.damage_calculation.damage_network_events import (
     DamageNetworkEvents,
 )
 from ra2ce.analysis.damages.damage_calculation.damage_network_return_periods import (
     DamageNetworkReturnPeriods,
+)
+from ra2ce.analysis.damages.damage_functions.manual_damage_functions import (
+    ManualDamageFunctions,
 )
 from tests import test_data
 

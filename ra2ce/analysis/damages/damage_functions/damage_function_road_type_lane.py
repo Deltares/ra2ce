@@ -24,8 +24,10 @@ from pathlib import Path
 
 import pandas as pd
 
-from ra2ce.analysis.damages.damage.damage_fraction_uniform import DamageFractionUniform
-from ra2ce.analysis.damages.damage.max_damage import MaxDamageByRoadTypeByLane
+from ra2ce.analysis.damages.damage_functions.damage_fraction_uniform import (
+    DamageFractionUniform,
+)
+from ra2ce.analysis.damages.damage_functions.max_damage import MaxDamage
 
 
 class DamageFunctionByRoadTypeByLane:
@@ -41,7 +43,7 @@ class DamageFunctionByRoadTypeByLane:
 
     def __init__(
         self,
-        max_damage: MaxDamageByRoadTypeByLane = None,
+        max_damage: MaxDamage = None,
         damage_fraction: DamageFractionUniform = None,
         name: str = "",
         hazard: str = "flood",
@@ -53,7 +55,7 @@ class DamageFunctionByRoadTypeByLane:
         self.hazard = hazard
         self.type = type
         self.infra_type = infra_type
-        self.max_damage = max_damage  # Should be a MaxDamage object
+        self.max_damage: MaxDamage = max_damage  # Should be a MaxDamage object
         self.damage_fraction = (
             damage_fraction  # Should be a DamageFractionHazardSeverity object
         )
@@ -67,6 +69,7 @@ class DamageFunctionByRoadTypeByLane:
             )
         )
 
+    # TODO: convert this to a classmethod
     def from_input_folder(self, folder_path: Path):
         """Construct a set of damage functions from csv files located in the folder_path
 
@@ -95,7 +98,7 @@ class DamageFunctionByRoadTypeByLane:
             return result[0]
 
         # Load the max_damage object
-        max_damage = MaxDamageByRoadTypeByLane()
+        max_damage = MaxDamage()
         max_dam_path = find_unique_csv_file(folder_path, "max_damage")
         max_damage.from_csv(max_dam_path, sep=";")
 
@@ -106,6 +109,7 @@ class DamageFunctionByRoadTypeByLane:
         damage_fraction = DamageFractionUniform()
         dam_fraction_path = find_unique_csv_file(folder_path, "hazard_severity")
         damage_fraction.from_csv(dam_fraction_path, sep=";")
+
         self.damage_fraction = damage_fraction
 
         damage_fraction.create_interpolator()

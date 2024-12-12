@@ -1,4 +1,4 @@
-from ra2ce.analysis.damages.damage.max_damage import MaxDamageByRoadTypeByLane
+from ra2ce.analysis.damages.damage_functions.max_damage import MaxDamage
 
 
 class TestMaxDamageByRoadTypeByLane:
@@ -8,10 +8,10 @@ class TestMaxDamageByRoadTypeByLane:
         _dmg_unit = "else"
 
         # 2. Run test.
-        _damage = MaxDamageByRoadTypeByLane(_name, _dmg_unit)
+        _damage = MaxDamage(_name, _dmg_unit)
 
         # 3. Verify final expectations.
-        assert isinstance(_damage, MaxDamageByRoadTypeByLane)
+        assert isinstance(_damage, MaxDamage)
         assert _damage.name == _name
         assert _damage.damage_unit == _dmg_unit
 
@@ -19,7 +19,7 @@ class TestMaxDamageByRoadTypeByLane:
         # 1. Define test data.
         _name = "sth"
         _dmg_unit = "else"
-        _damage = MaxDamageByRoadTypeByLane(_name, _dmg_unit)
+        _damage = MaxDamage(_name, _dmg_unit)
 
         # 2. Run test.
         _damage.convert_length_unit(_dmg_unit)
@@ -32,7 +32,7 @@ class TestMaxDamageByRoadTypeByLane:
         _name = "my_damage"
         _dmg_unit = "sth/km"
         _desired_unit = "else/miles"
-        _damage = MaxDamageByRoadTypeByLane(_name, _dmg_unit)
+        _damage = MaxDamage(_name, _dmg_unit)
         _damage.data = 42.0
 
         # 2. Run test.

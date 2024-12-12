@@ -22,7 +22,7 @@
 import logging
 from pathlib import Path
 
-from ra2ce.analysis.damages.damage.damage_function_road_type_lane import (
+from ra2ce.analysis.damages.damage_functions.damage_function_road_type_lane import (
     DamageFunctionByRoadTypeByLane,
 )
 
@@ -34,6 +34,9 @@ class ManualDamageFunctions:
     Default behaviour is to find, load and apply all available functions
     At 22 sept 2022: only implemented workflow for DamageFunction_by_RoadType_by_Lane
     """
+
+    available: dict[str, DamageFunctionByRoadTypeByLane]
+    loaded: list[DamageFunctionByRoadTypeByLane]
 
     def __init__(self):
         self.available = (

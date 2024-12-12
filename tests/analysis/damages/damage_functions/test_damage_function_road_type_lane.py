@@ -1,6 +1,6 @@
 import pytest
 
-from ra2ce.analysis.damages.damage.damage_function_road_type_lane import (
+from ra2ce.analysis.damages.damage_functions.damage_function_road_type_lane import (
     DamageFunctionByRoadTypeByLane,
 )
 from tests import test_data

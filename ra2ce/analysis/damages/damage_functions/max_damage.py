@@ -26,7 +26,7 @@ from pathlib import Path
 import pandas as pd
 
 
-class MaxDamageByRoadTypeByLane:
+class MaxDamage:
     """
     Max damage per RoadType and per Lane
 

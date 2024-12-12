@@ -28,6 +28,9 @@ from geopandas import GeoDataFrame
 from scipy.interpolate import interp1d
 
 from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCurveEnum
+from ra2ce.analysis.damages.damage_functions.manual_damage_functions import (
+    ManualDamageFunctions,
+)
 from ra2ce.analysis.damages.damages_lookup import LookUp as lookup
 from ra2ce.analysis.damages.damages_lookup import dataframe_lookup
 from ra2ce.analysis.damages.damages_utils import (
@@ -168,8 +171,10 @@ class DamageNetworkBase(ABC):
             )
             self._gdf_mask = df.loc[~(df["road_type"] == "none")]
 
-    ### Damage handlers
-    def calculate_damage_manual_functions(self, events, manual_damage_functions):
+    ### Damage handlers: TODO: move to dataclass ManualDamageFunctions
+    def calculate_damage_manual_functions(
+        self, events, manual_damage_functions: ManualDamageFunctions
+    ):
         """
         Arguments:
             *events* (list) : list of events (or return periods) to iterate over, these should match the hazard column names
