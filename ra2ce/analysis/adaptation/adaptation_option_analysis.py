@@ -171,4 +171,5 @@ class AdaptationOptionAnalysis:
                 self.analysis_input, analysis_config
             ).execute()
             _result = _result_wrapper.get_single_result()
+
         return self.get_result_column(_result)

@@ -22,12 +22,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Type
 
 from ra2ce.analysis.adaptation.adaptation import Adaptation
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_factory import AnalysisFactory
-from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 
