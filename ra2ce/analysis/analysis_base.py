@@ -34,6 +34,18 @@ class AnalysisBase(ABC, AnalysisProtocol):
     the `AnalysisProtocol`.
     """
 
+    def _get_analysis_result(
+        self, gdf_result: GeoDataFrame, custom_name: str
+    ) -> AnalysisResult:
+        _ar = AnalysisResult(
+            analysis_result=gdf_result,
+            analysis_config=self.analysis,
+            output_path=self.output_path,
+        )
+        if custom_name:
+            _ar.analysis_name = custom_name
+        return _ar
+
     def generate_result_wrapper(
         self, *analysis_result: GeoDataFrame
     ) -> AnalysisResultWrapper:
@@ -48,13 +60,8 @@ class AnalysisBase(ABC, AnalysisProtocol):
             AnalysisResultWrapper: Wrapping result with configuration details.
         """
 
-        def get_analysis_result(gdf_result: GeoDataFrame) -> AnalysisResult:
-            return AnalysisResult(
-                analysis_result=gdf_result,
-                analysis_config=self.analysis,
-                output_path=self.output_path,
-            )
-
         return AnalysisResultWrapper(
-            results_collection=list(map(get_analysis_result, analysis_result))
+            results_collection=[
+                self._get_analysis_result(_ar, "") for _ar in analysis_result
+            ]
         )
