@@ -187,7 +187,9 @@ class DamageNetworkBase(ABC):
         # dataframe to carry out the damage calculation #todo: this is a bit dirty
         df = self._gdf_mask
 
-        assert manual_damage_functions is not None, "No damage functions were loaded"
+        assert (
+            len(manual_damage_functions.damage_functions) > 0
+        ), "No damage functions were loaded"
 
         for _damage_func in manual_damage_functions.damage_functions.values():
             # Add max damage values to df
