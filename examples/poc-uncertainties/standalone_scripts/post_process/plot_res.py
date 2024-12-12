@@ -26,7 +26,7 @@ data_df["Total damage"] = data_df["Total damage"] / 1e6
 
 
 plot_histogram_all(data_df)
-plot_histogram_by_hazard(data_df)
+# plot_histogram_by_hazard(data_df)
 plot_histogram_stacked(data_df)
 plot_box_plot_by_hazard(data_df)
 plot_box_plot_by_scenario(data_df)

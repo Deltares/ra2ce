@@ -12,3 +12,4 @@ class ProbabilisticEvent:
     # result
     damage: list[float] # list of damage for all the runs of the event
 
+

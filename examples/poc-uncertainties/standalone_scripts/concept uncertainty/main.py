@@ -7,13 +7,19 @@ path_res = Path(r"C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Un
 
 df = pd.read_csv(path_res.joinpath("damage_result.csv"), sep=";")
 
-print(df.head(5))
 
 # filter out the events
-df_1 = df[df["Hazard"].isin(["hazard1, hazard2, hazard3"])]
-print(df_1.head(5))
+df_1 = df[df["Hazard"].isin(["hazard1", "hazard2", "hazard3"])]
 
+haz_set_A = HazardProbabilisticEventsSet.from_res_df(df[df["Hazard"].isin(["hazard1", "hazard2", "hazard3"])], "Coastal hazard")
+haz_set_B = HazardProbabilisticEventsSet.from_res_df(df[df["Hazard"].isin(["hazard4", "hazard5"])], "Ijmuiden")
+haz_set_C = HazardProbabilisticEventsSet.from_res_df(df[df["Hazard"].isin(["hazard6", "hazard7"])], "Lek1")
+haz_set_D = HazardProbabilisticEventsSet.from_res_df(df[df["Hazard"].isin(["hazard8", "hazard9"])], "Lek2")
 
-haz_set = HazardProbabilisticEventsSet(path_res.joinpath("hazard_set.csv"))
+# print(haz_set_D)
+
+array =  haz_set_D.get_EAD_vector()
+print(array)
+haz_set_D.plot_violin()
 
 
