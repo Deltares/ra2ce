@@ -1,14 +1,14 @@
 from ra2ce.analysis.damages.damage_functions.max_damage import MaxDamage
 
 
-class TestMaxDamageByRoadTypeByLane:
+class TestMaxDamage:
     def test_init(self):
         # 1. Define test data.
         _name = "sth"
         _dmg_unit = "else"
 
         # 2. Run test.
-        _damage = MaxDamage(_name, _dmg_unit)
+        _damage = MaxDamage(name=_name, damage_unit=_dmg_unit)
 
         # 3. Verify final expectations.
         assert isinstance(_damage, MaxDamage)
@@ -19,10 +19,10 @@ class TestMaxDamageByRoadTypeByLane:
         # 1. Define test data.
         _name = "sth"
         _dmg_unit = "else"
-        _damage = MaxDamage(_name, _dmg_unit)
+        _damage = MaxDamage(name=_name, damage_unit=_dmg_unit)
 
         # 2. Run test.
-        _damage.convert_length_unit(_dmg_unit)
+        _damage._convert_length_unit(_dmg_unit)
 
         # 3. Verify expectations
         assert _damage.damage_unit == _dmg_unit
@@ -32,11 +32,11 @@ class TestMaxDamageByRoadTypeByLane:
         _name = "my_damage"
         _dmg_unit = "sth/km"
         _desired_unit = "else/miles"
-        _damage = MaxDamage(_name, _dmg_unit)
+        _damage = MaxDamage(name=_name, damage_unit=_dmg_unit)
         _damage.data = 42.0
 
         # 2. Run test.
-        _damage.convert_length_unit(_desired_unit)
+        _damage._convert_length_unit(_desired_unit)
 
         # 3. Verify expectations
         assert _damage.damage_unit == _dmg_unit

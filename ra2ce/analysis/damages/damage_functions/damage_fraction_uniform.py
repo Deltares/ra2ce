@@ -19,30 +19,34 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
+from scipy.interpolate import interp1d
 
 
+@dataclass(kw_only=True)
 class DamageFractionUniform:
     """
     Uniform: assuming the same curve for
     each road type and lane numbers and any other metadata
 
-
     self.raw_data (pd.DataFrame) : Raw data from the csv file
     self.data (pd.DataFrame) : index = hazard severity (e.g. flood depth); column 0 = damage fraction
-
     """
 
-    def __init__(self, name=None, hazard_unit=None):
-        self.name = name
-        self.hazard_unit = hazard_unit
-        self.interpolator = None
+    name: str = None
+    hazard_unit: str = None
+    data: pd.DataFrame = None
+    origin_path: Path = None
+    interpolator: interp1d = None
 
-    def from_csv(self, path: Path, sep=",") -> None:
+    @classmethod
+    def from_csv(cls, path: Path, sep=",") -> DamageFractionUniform:
         """Construct object from csv file. Damage curve name is inferred from filename
 
         Arguments:
@@ -71,23 +75,28 @@ class DamageFractionUniform:
 
 
         """
-        self.name = path.stem
-        self.raw_data = pd.read_csv(path, index_col=0, sep=sep)
-        self.origin_path = path  # to track the original path from which the object was constructed; maybe also date?
+        _name = path.stem
+        _raw_data = pd.read_csv(path, index_col=0, sep=sep)
+        _origin_path = path  # to track the original path from which the object was constructed; maybe also date?
 
         # identify unit and drop from data
-        self.hazard_unit = self.raw_data.index[0]
-        self.data = self.raw_data.drop(
-            self.hazard_unit
+        _hazard_unit = _raw_data.index[0]
+        _data = _raw_data.drop(
+            _hazard_unit
         )  # Todo: This could also be a series instead of DataFrame
 
         # convert data to floats
-        self.data = self.data.astype("float")
-        self.data.index = self.data.index.astype("float")
+        _data = _data.astype("float")
+        _data.index = _data.index.astype("float")
 
-        self.convert_hazard_severity_unit()
+        _damage_fraction = cls(
+            name=_name, hazard_unit=_hazard_unit, data=_data, origin_path=_origin_path
+        )
+        _damage_fraction._convert_hazard_severity_unit()
 
-    def convert_hazard_severity_unit(self, desired_unit="m") -> None:
+        return _damage_fraction
+
+    def _convert_hazard_severity_unit(self, desired_unit="m") -> None:
         """Converts hazard severity values to a different unit
         Arguments:
             self.hazard_unit - implicit (string)
@@ -124,8 +133,6 @@ class DamageFractionUniform:
         """Create interpolator object from loaded data
         sets result to self.interpolator (Scipy interp1d)
         """
-        from scipy.interpolate import interp1d
-
         x_values = self.data.index.values
         y_values = self.data.values[:, 0]
 

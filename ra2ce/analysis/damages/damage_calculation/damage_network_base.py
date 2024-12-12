@@ -189,14 +189,14 @@ class DamageNetworkBase(ABC):
 
         assert manual_damage_functions is not None, "No damage functions were loaded"
 
-        for _loaded_func in manual_damage_functions.loaded:
+        for _damage_func in manual_damage_functions.damage_functions.values():
             # Add max damage values to df
-            df = _loaded_func.add_max_damage(df, _loaded_func.prefix)
+            df = _damage_func.add_max_damage(df, _damage_func.prefix)
             for event in events:
                 # Add apply interpolator objects
                 event_prefix = event
-                df = _loaded_func.calculate_damage(
-                    df, _loaded_func.prefix, hazard_prefix, event_prefix
+                df = _damage_func.calculate_damage(
+                    df, _damage_func.prefix, hazard_prefix, event_prefix
                 )
 
         # Only transfer the final results to the damage column

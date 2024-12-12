@@ -13,8 +13,8 @@ from ra2ce.analysis.damages.damage_calculation.damage_network_events import (
 from ra2ce.analysis.damages.damage_calculation.damage_network_return_periods import (
     DamageNetworkReturnPeriods,
 )
-from ra2ce.analysis.damages.damage_functions.manual_damage_functions import (
-    ManualDamageFunctions,
+from ra2ce.analysis.damages.damage_functions.manual_damage_functions_reader import (
+    ManualDamageFunctionsReader,
 )
 from tests import test_data
 
@@ -214,13 +214,10 @@ class TestDamages:
             )
 
     def _load_manual_damage_function(self):
-        manual_damage_functions = ManualDamageFunctions()
-        manual_damage_functions.find_damage_functions(
-            folder=damages_test_data / "test_damage_functions"
+        manual_damage_functions = ManualDamageFunctionsReader().read(
+            damages_test_data.joinpath("test_damage_functions")
         )
-        manual_damage_functions.load_damage_functions()
-
-        fun0 = manual_damage_functions.loaded[0]
+        fun0 = list(manual_damage_functions.damage_functions.values())[0]
 
         # Check some damage fractions
         assert fun0.prefix == "te"
@@ -261,13 +258,10 @@ class TestDamages:
         ]
 
         # LOAD DAMAGE FUNCTIONS
-        manual_damage_functions = ManualDamageFunctions()
-        manual_damage_functions.find_damage_functions(
-            folder=damages_test_data / "test_damage_functions"
+        manual_damage_functions = ManualDamageFunctionsReader().read(
+            damages_test_data.joinpath("test_damage_functions")
         )
-        manual_damage_functions.load_damage_functions()
-
-        fun0 = manual_damage_functions.loaded[0]
+        fun0 = list(manual_damage_functions.damage_functions.values())[0]
         assert fun0.prefix == "te"
 
         _representative_damage_percentage = 100

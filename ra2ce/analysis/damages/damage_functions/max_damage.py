@@ -18,34 +18,28 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
 
 
+@dataclass(kw_only=True)
 class MaxDamage:
     """
     Max damage per RoadType and per Lane
-
-    Attributes:
-        self.name (str) : Name of the damage curve
-        self.data (pd.DataFrame) : columns contain number of lanes; rows contain the road types
-
-    Optional attributes:
-        self.origin_path (Path) : Path to the file from which the function was constructed
-        self.raw_data : The raw data read from the input file
-
-
     """
 
-    def __init__(self, name=None, damage_unit=None):
-        self.name = name
-        self.damage_unit = damage_unit
+    name: str = None
+    damage_unit: str = None
+    data: pd.DataFrame = None
+    origin_path: Path = None
 
-    def from_csv(self, path: Path, sep=",") -> None:
+    @classmethod
+    def from_csv(cls, path: Path, sep: str = ",") -> MaxDamage:
         """Construct object from csv file. Damage curve name is inferred from filename
 
         The first row describes the lane numbers per column and should have 'Road_type \ lanes' as index/first value.
@@ -58,32 +52,39 @@ class MaxDamage:
             *sep* (str) : csv seperator
         """
         default_output_unit = "euro/m"
-        self.name = path.stem
-        self.raw_data = pd.read_csv(path, index_col=r"Road_type \ lanes", sep=sep)
-        self.origin_path = path  # to track the original path from which the object was constructed; maybe also date?
+        _name = path.stem
+        _raw_data = pd.read_csv(path, index_col=r"Road_type \ lanes", sep=sep)
+        _origin_path = path  # to track the original path from which the object was constructed; maybe also date?
 
         ###Determine units
-        units = self.raw_data.loc["unit", :].unique()  # identify the unique units
+        units = _raw_data.loc["unit", :].unique()  # identify the unique units
         assert (
             len(units) == 1
         ), "Columns in the max damage csv seem to have different units, ra2ce cannot handle this"
         # case only one unique unit is identified
-        self.damage_unit = units[
+        _damage_unit = units[
             0
         ]  # should have the structure 'x/y' , e.g. euro/m, dollar/yard
 
-        self.data = self.raw_data.drop("unit")
-        self.data = self.data.astype("float")
+        _data = _raw_data.drop("unit")
+        _data = _data.astype("float")
 
-        # assume road types are in the rows; lane numbers in the columns
-        self.road_types = list(self.data.index)  # to method
         # assumes that the columns containst the lanes
-        self.data.columns = self.data.columns.astype("int")
+        _data.columns = _data.columns.astype("int")
 
-        if self.damage_unit != default_output_unit:
-            self.convert_length_unit()  # convert the unit
+        _max_damage = cls(
+            name=_name,
+            damage_unit=_damage_unit,
+            data=_data,
+            origin_path=_origin_path,
+        )
 
-    def convert_length_unit(self, desired_unit="euro/m"):
+        if _damage_unit != default_output_unit:
+            _max_damage._convert_length_unit()  # convert the unit
+
+        return _max_damage
+
+    def _convert_length_unit(self, desired_unit="euro/m"):
         """Converts max damage values to a different unit
         Arguments:
             self.damage_unit (implicit)
