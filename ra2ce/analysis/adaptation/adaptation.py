@@ -55,9 +55,12 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
     ):
         self.analysis = analysis_input.analysis
         self.graph_file_hazard = analysis_input.graph_file_hazard
+        self.input_path = analysis_input.input_path
+        self.output_path = analysis_input.output_path
         self.adaptation_collection = AdaptationOptionCollection.from_config(
             analysis_config
         )
+        self.output_path = analysis_input.output_path
 
     def execute(self) -> AnalysisResultWrapper:
         """
@@ -90,12 +93,12 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
             _option,
             _cost,
         ) in self.adaptation_collection.calculate_options_unit_cost().items():
-            _cost_gdf[f"{_option.id}_cost"] = _orig_gdf.apply(
+            _cost_gdf[_option.cost_col] = _orig_gdf.apply(
                 lambda x, cost=_cost: x["length"] * cost, axis=1
             )
             # Only calculate the cost for the impacted fraction of the links.
             if self.analysis.hazard_fraction_cost:
-                _cost_gdf[f"{_option.id}_cost"] *= _orig_gdf[_fraction_col]
+                _cost_gdf[_option.cost_col] *= _orig_gdf[_fraction_col]
 
         return _cost_gdf
 
@@ -119,13 +122,28 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
             cost_gdf (GeoDataFrame): Gdf containing the cost of the adaptation options.
 
         Returns:
-            GeoDataFrame: Gdf containing the benefit-cost ratio of the adaptation options.
+            GeoDataFrame: Gdf containing the benefit-cost ratio of the adaptation options,
+                including the relevant attributes from the original graph (geometry).
         """
+
+        def copy_column(from_gdf: GeoDataFrame, col_name: str) -> None:
+            if not col_name in from_gdf.columns:
+                return
+            benefit_gdf.insert(loc=0, column=col_name, value=from_gdf[col_name])
+
+        # Copy relevant columns from the original graph
+        _orig_gdf = self.graph_file_hazard.get_graph()
+        benefit_gdf.set_geometry(_orig_gdf.geometry, inplace=True)
+        for _col in ["length", "highway", "infra_type", "link_id"]:
+            copy_column(_orig_gdf, _col)
+
         for _option in self.adaptation_collection.adaptation_options:
-            benefit_gdf[f"{_option.id}_cost"] = cost_gdf[f"{_option.id}_cost"]
-            benefit_gdf[f"{_option.id}_bc_ratio"] = benefit_gdf[
-                f"{_option.id}_benefit"
-            ].replace(float("nan"), 0) / benefit_gdf[f"{_option.id}_cost"].replace(
+            # Copy cost columns from the cost gdf
+            copy_column(cost_gdf, _option.cost_col)
+
+            benefit_gdf[_option.bc_ratio_col] = benefit_gdf[
+                _option.benefit_col
+            ].replace(float("nan"), 0) / benefit_gdf[_option.cost_col].replace(
                 0, float("nan")
             )
 

@@ -15,8 +15,7 @@ from ra2ce.network.hazard.hazard_names import HazardNames
 from ra2ce.network.network_config_data.network_config_data import (
     OriginsDestinationsSection,
 )
-from ra2ce.network.networks_utils import graph_to_gpkg
-from ra2ce.ra2ce_logger import logging
+from ra2ce.network.networks_utils import get_nodes_and_edges_from_origin_graph
 
 
 class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
@@ -46,56 +45,13 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
         self.file_id = analysis_input.file_id
         self._analysis_input = analysis_input
 
-    def _save_gdf(self, gdf: GeoDataFrame, save_path: Path) -> None:
-        """Takes in a geodataframe object and outputs shapefiles at the paths indicated by edge_shp and node_shp
-
-        Arguments:
-            gdf [geodataframe]: geodataframe object to be converted
-            save_path [str]: output path including extension for edges shapefile
-        Returns:
-            None
-        """
-        # save to shapefile
-        gdf.crs = "epsg:4326"  # TODO: decide if this should be variable with e.g. an output_crs configured
-
-        for col in gdf.columns:
-            if gdf[col].dtype == object and col != gdf.geometry.name:
-                gdf[col] = gdf[col].astype(str)
-
-        if save_path.exists():
-            save_path.unlink()
-        gdf.to_file(save_path, driver="GPKG")
-        logging.info("Results saved to: {}".format(save_path))
-
     def execute(self) -> AnalysisResultWrapper:
-        def _save_gpkg_analysis(
-            base_graph,
-            to_save_gdf: list[GeoDataFrame],
-            to_save_gdf_names: list[str],
-        ):
-            for to_save, save_name in zip(to_save_gdf, to_save_gdf_names):
-                if not to_save.empty:
-                    gpkg_path = _output_path.joinpath(
-                        self.analysis.name.replace(" ", "_") + f"_{save_name}.gpkg"
-                    )
-                    self._save_gdf(to_save, gpkg_path)
-
-            # Save the Graph
-            gpkg_path_nodes = _output_path.joinpath(
-                self.analysis.name.replace(" ", "_") + "_results_nodes.gpkg"
-            )
-            gpkg_path_edges = _output_path.joinpath(
-                self.analysis.name.replace(" ", "_") + "_results_edges.gpkg"
-            )
-            graph_to_gpkg(base_graph, gpkg_path_edges, gpkg_path_nodes)
-
         _output_path = self.output_path.joinpath(self.analysis.analysis.config_value)
 
         analyzer = OriginClosestDestination(self._analysis_input)
-
         if self.analysis.calculate_route_without_disruption:
             (
-                base_graph,
+                _base_graph,
                 opt_routes_without_hazard,
                 destinations,
             ) = analyzer.optimal_route_origin_closest_destination()
@@ -105,7 +61,7 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
                 opt_routes_with_hazard = GeoDataFrame(data=None)
             else:
                 (
-                    base_graph,
+                    _base_graph,
                     origins,
                     destinations,
                     agg_results,
@@ -119,7 +75,7 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
                 )
         else:
             (
-                base_graph,
+                _base_graph,
                 origins,
                 destinations,
                 agg_results,
@@ -127,40 +83,34 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
             ) = analyzer.multi_link_origin_closest_destination()
             opt_routes_without_hazard = GeoDataFrame()
 
-        if self.analysis.save_gpkg:
-            # Save the GeoDataFrames
-            to_save_gdf = [
-                origins,
-                destinations,
-                opt_routes_without_hazard,
-                opt_routes_with_hazard,
+        _nodes_graph, _edges_graph = get_nodes_and_edges_from_origin_graph(_base_graph)
+        _base_name = self.analysis.name.replace(" ", "_")
+        _analysis_result_wrapper = AnalysisResultWrapper(
+            results_collection=[
+                self._get_analysis_result(origins, _base_name + "_origins"),
+                self._get_analysis_result(destinations, _base_name + "_destinations"),
+                self._get_analysis_result(_nodes_graph, _base_name + "_results_nodes"),
+                self._get_analysis_result(_edges_graph, _base_name + "_results_edges"),
+                self._get_analysis_result(
+                    opt_routes_without_hazard,
+                    _base_name + "_optimal_routes_without_hazard",
+                ),
+                self._get_analysis_result(
+                    opt_routes_with_hazard, _base_name + "_optimal_routes_with_hazard"
+                ),
             ]
-            to_save_gdf_names = [
-                "origins",
-                "destinations",
-                "optimal_routes_without_hazard",
-                "optimal_routes_with_hazard",
-            ]
-            _save_gpkg_analysis(base_graph, to_save_gdf, to_save_gdf_names)
-        if self.analysis.save_csv:
-            csv_path = _output_path.joinpath(
-                self.analysis.name.replace(" ", "_") + "_destinations.csv"
-            )
-            if "geometry" in destinations.columns:
-                del destinations["geometry"]
-            if not csv_path.parent.exists():
-                csv_path.parent.mkdir(parents=True)
-            destinations.to_csv(csv_path, index=False)
+        )
 
-            csv_path = _output_path.joinpath(
-                self.analysis.name.replace(" ", "_") + "_optimal_routes.csv"
+        # Legacy code, previously only done to export to CSV.
+        _opt_routes_name = _base_name + "_optimal_routes"
+        if not opt_routes_without_hazard.empty:
+            _analysis_result_wrapper.results_collection.append(
+                self._get_analysis_result(opt_routes_with_hazard, _opt_routes_name)
             )
-            if not opt_routes_without_hazard.empty:
-                del opt_routes_without_hazard["geometry"]
-                opt_routes_without_hazard.to_csv(csv_path, index=False)
-            if not opt_routes_with_hazard.empty:
-                del opt_routes_with_hazard["geometry"]
-                opt_routes_with_hazard.to_csv(csv_path, index=False)
+        if not opt_routes_with_hazard.empty:
+            _analysis_result_wrapper.results_collection.append(
+                self._get_analysis_result(opt_routes_without_hazard, _opt_routes_name)
+            )
 
         if self.graph_file_hazard.file is not None:
             agg_results.to_excel(
@@ -170,5 +120,4 @@ class MultiLinkOriginClosestDestination(AnalysisBase, AnalysisLossesProtocol):
                 index=False,
             )
 
-        # TODO: This does not seem correct, why were we returning None?
-        return self.generate_result_wrapper(None)
+        return _analysis_result_wrapper

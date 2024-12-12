@@ -1142,47 +1142,45 @@ def graph_to_gdf(
     return edges, nodes
 
 
-def graph_to_gpkg(origin_graph: nx.Graph, edge_gpkg: str, node_gpkg: str) -> None:
-    """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_gpkg and node_gpkg
+def get_nodes_and_edges_from_origin_graph(
+    origin_graph: nx.Graph,
+) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+    """
+    Takes in a networkx graph object and returns the `GeoDataFrame` with separated
+    nodes and edges.
 
     Arguments:
         origin_graph [nx.Graph]: networkx graph object to be converted
-        edge_gpkg [str]: output path including extension for edges geopackage
-        node_gpkg [str]: output path including extension for nodes geopackage
 
     Returns:
-        None
+        tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+            resulting tuple of formatted `gpd.GeoDataFrame` for nodes and edges.
     """
     # now only multidigraphs and graphs are used
     if type(origin_graph) == nx.Graph:
+        # isinstance / issubclass will not work as nx.MultiGraph would return True
         origin_graph = nx.MultiGraph(origin_graph)
 
     # The nodes should have a geometry attribute (perhaps on top of the x and y attributes)
-    nodes, edges = graph_to_gdfs(origin_graph, node_geometry=False)
+    _nodes, _edges = graph_to_gdfs(origin_graph, node_geometry=False)
 
-    dfs = [edges, nodes]
+    dfs = [_edges, _nodes]
     for df in dfs:
         for col in df.columns:
             if df[col].dtype == object and col != df.geometry.name:
                 df[col] = df[col].astype(str)
 
     # Add a CRS to the nodes
-    if nodes.crs is None and edges.crs is not None:
-        nodes.crs = edges.crs
-
-    logging.info("Saving nodes as shapefile: {}".format(node_gpkg))
-    logging.info("Saving edges as shapefile: {}".format(edge_gpkg))
+    if _nodes.crs is None and _edges.crs is not None:
+        _nodes.crs = _edges.crs
 
     # The encoding utf-8 might result in an empty shapefile if the wrong encoding is used.
-    for entity in [nodes, edges]:
+    for entity in [_nodes, _edges]:
         if "osmid" in entity:
             # Otherwise it gives this error: cannot insert osmid, already exist
             entity["osmid_original"] = entity.pop("osmid")
-    for _path in [node_gpkg, edge_gpkg]:
-        if _path.exists():
-            _path.unlink()
-    nodes.to_file(node_gpkg, driver="GPKG", encoding="utf-8")
-    edges.to_file(edge_gpkg, driver="GPKG", encoding="utf-8")
+
+    return _nodes, _edges
 
 
 @staticmethod

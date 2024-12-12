@@ -67,15 +67,25 @@ class TestAdaptationOptionCollection:
         assert isinstance(_result, dict)
         assert all(_option in _result for _option in _collection.adaptation_options)
 
-    def test_calculate_options_benefit_returns_series(self):
+    def test_calculate_options_benefit_returns_gdf(self):
         @dataclass
         class MockOption:
             # Mock to avoid the need to run the impact analysis.
             id: str
             impact: float
 
+            @property
+            def benefit_col(self) -> str:
+                return f"{self.id}_benefit"
+
+            @property
+            def impact_col(self) -> str:
+                return f"{self.id}_impact"
+
             def calculate_impact(self, _) -> Series:
-                return Series(self.impact, index=range(_nof_rows))
+                _impact_gdf = GeoDataFrame(index=range(10))
+                _impact_gdf[self.impact_col] = self.impact
+                return _impact_gdf
 
         # 1. Define test data.
         _nof_rows = 10
@@ -91,7 +101,7 @@ class TestAdaptationOptionCollection:
         # 3. Verify expectations.
         assert isinstance(_result, GeoDataFrame)
         assert all(
-            f"{_option.id}_benefit" in _result.columns
+            _option.benefit_col in _result.columns
             for _option in _collection.adaptation_options
         )
         assert all(
