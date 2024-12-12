@@ -1,6 +1,9 @@
 from pathlib import Path
 from shutil import copytree, rmtree
 
+from geopandas import read_file
+from geopandas.testing import assert_geodataframe_equal
+
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionAdaptation,
@@ -145,5 +148,10 @@ class TestAdaptationAnalysisRunner:
         assert _result_wrapper.is_valid_result() == True
 
         _analysis_result = _result_wrapper.results_collection[0]
-        assert _analysis_result.base_export_path.with_suffix(".gpkg").exists()
+        _output_gdf = _analysis_result.base_export_path.with_suffix(".gpkg")
+        assert _output_gdf.exists()
         assert _analysis_result.base_export_path.with_suffix(".csv").exists()
+
+        # Check the output geodataframe content
+        _gdf = read_file(_output_gdf)
+        assert_geodataframe_equal(_gdf, _analysis_result.analysis_result)
