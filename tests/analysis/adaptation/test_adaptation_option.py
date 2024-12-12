@@ -5,6 +5,9 @@ from geopandas import GeoDataFrame
 from pandas import Series
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
+from ra2ce.analysis.adaptation.adaptation_option_analysis import (
+    AdaptationOptionAnalysis,
+)
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionAdaptation,
 )
@@ -132,13 +135,8 @@ class TestAdaptationOption:
         maint_interval: float,
         net_unit_cost: float,
     ):
-        # Mock to avoid complex setup.
-        @dataclass
-        class MockAdaptationOption(AdaptationOption):
-            id: str
-
         # 1. Define test data.
-        _option = MockAdaptationOption(
+        _option = AdaptationOption(
             id="AnOption",
             name=None,
             construction_cost=constr_cost,
@@ -161,9 +159,7 @@ class TestAdaptationOption:
     def test_calculate_impact_returns_gdf(self) -> GeoDataFrame:
         @dataclass
         # Mock to avoid the need to run the impact analysis.
-        class MockAdaptationOptionAnalysis:
-            analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum
-            result_col: str
+        class MockAdaptationOptionAnalysis(AdaptationOptionAnalysis):
             result: float
 
             def execute(self, _: AnalysisConfigWrapper) -> Series:
@@ -174,6 +170,8 @@ class TestAdaptationOption:
         _analyses = [
             MockAdaptationOptionAnalysis(
                 analysis_type=_analysis_type,
+                analysis_class=None,
+                analysis_input=None,
                 result_col=f"Result_{i}",
                 result=(i + 1) * 1.0e6,
             )

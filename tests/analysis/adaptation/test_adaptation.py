@@ -6,6 +6,7 @@ from geopandas import GeoDataFrame
 from shapely import Point
 
 from ra2ce.analysis.adaptation.adaptation import Adaptation
+from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
     AdaptationOptionCollection,
 )
@@ -87,22 +88,6 @@ class TestAdaptation:
     @pytest.fixture(name="mocked_adaptation")
     def _get_mocked_adaptation_fixture(self) -> Iterator[Adaptation]:
         # Mock to avoid complex setup.
-        @dataclass
-        class MockAdaptationOption:
-            id: str
-
-            @property
-            def cost_col(self) -> str:
-                return f"{self.id}_cost"
-
-            @property
-            def benefit_col(self) -> str:
-                return f"{self.id}_benefit"
-
-            @property
-            def bc_ratio_col(self) -> str:
-                return f"{self.id}_bc_ratio"
-
         class MockAdaptation(Adaptation):
             graph_file_hazard = NetworkFile(
                 graph=GeoDataFrame.from_dict(
@@ -118,7 +103,17 @@ class TestAdaptation:
             adaptation_collection: AdaptationOptionCollection = (
                 AdaptationOptionCollection(
                     all_options=[
-                        MockAdaptationOption(id=f"Option{x}") for x in range(2)
+                        AdaptationOption(
+                            id=f"Option{x}",
+                            name=None,
+                            construction_cost=None,
+                            construction_interval=None,
+                            maintenance_cost=None,
+                            maintenance_interval=None,
+                            analyses=None,
+                            analysis_config=None,
+                        )
+                        for x in range(2)
                     ]
                 )
             )

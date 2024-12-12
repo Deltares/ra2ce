@@ -63,10 +63,6 @@ class AdaptationOption:
         return self._get_column_name("benefit")
 
     @property
-    def impact_col(self) -> str:
-        return self._get_column_name("impact")
-
-    @property
     def bc_ratio_col(self) -> str:
         return self._get_column_name("bc_ratio")
 
