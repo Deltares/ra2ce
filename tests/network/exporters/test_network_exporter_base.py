@@ -7,10 +7,10 @@ from tests import test_results
 
 class TestNetworkExporterBase:
     def test_initialize(self):
-        _exporter_base = NetworkExporterBase("a_name", [])
+        _exporter_base = NetworkExporterBase(basename="a_name", export_types=[])
         assert isinstance(_exporter_base, NetworkExporterBase)
         assert isinstance(_exporter_base, Ra2ceExporterProtocol)
-        assert _exporter_base._export_types == []
+        assert _exporter_base.export_types == []
 
     @pytest.mark.parametrize("export_type", [("pickle"), ("gpkg")])
     def test_export_data(self, export_type: str, request: pytest.FixtureRequest):
@@ -18,7 +18,9 @@ class TestNetworkExporterBase:
         _output_dir = test_results / request.node.name
 
         # 2. Run test.
-        _exporter_base = NetworkExporterBase("a_name", [export_type])
+        _exporter_base = NetworkExporterBase(
+            basename="a_name", export_types=[export_type]
+        )
         _result = _exporter_base.export(_output_dir, None)
 
         # 3. Verify expectations.
