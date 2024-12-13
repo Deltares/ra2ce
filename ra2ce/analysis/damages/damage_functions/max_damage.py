@@ -33,13 +33,16 @@ class MaxDamage:
     Max damage per RoadType and per Lane
     """
 
-    name: str = None
-    damage_unit: str = None
-    data: pd.DataFrame = None
+    name: str
+    damage_unit: str
+    data: pd.DataFrame
     origin_path: Path = None
 
+    def __post_init__(self):
+        self._convert_length_unit("euro/m")
+
     @classmethod
-    def from_csv(cls, path: Path, sep: str = ",") -> MaxDamage:
+    def from_csv(cls, csv_path: Path, sep: str) -> MaxDamage:
         """Construct object from csv file. Damage curve name is inferred from filename
 
         The first row describes the lane numbers per column and should have 'Road_type \ lanes' as index/first value.
@@ -48,13 +51,12 @@ class MaxDamage:
         the rest of the rows contains the different road types as index/first value; and the costs as values
 
         Arguments:
-            *path* (Path) : Path to the csv file
+            *csv_* (Path) : Path to the csv file
             *sep* (str) : csv seperator
         """
-        default_output_unit = "euro/m"
-        _name = path.stem
-        _raw_data = pd.read_csv(path, index_col=r"Road_type \ lanes", sep=sep)
-        _origin_path = path  # to track the original path from which the object was constructed; maybe also date?
+        _name = csv_path.stem
+        _raw_data = pd.read_csv(csv_path, index_col=r"Road_type \ lanes", sep=sep)
+        _origin_path = csv_path  # to track the original path from which the object was constructed; maybe also date?
 
         ###Determine units
         units = _raw_data.loc["unit", :].unique()  # identify the unique units
@@ -72,19 +74,14 @@ class MaxDamage:
         # assumes that the columns containst the lanes
         _data.columns = _data.columns.astype("int")
 
-        _max_damage = cls(
+        return cls(
             name=_name,
             damage_unit=_damage_unit,
             data=_data,
             origin_path=_origin_path,
         )
 
-        if _damage_unit != default_output_unit:
-            _max_damage._convert_length_unit()  # convert the unit
-
-        return _max_damage
-
-    def _convert_length_unit(self, desired_unit="euro/m"):
+    def _convert_length_unit(self, desired_unit: str):
         """Converts max damage values to a different unit
         Arguments:
             self.damage_unit (implicit)
@@ -94,7 +91,6 @@ class MaxDamage:
 
         """
         if desired_unit == self.damage_unit:
-            logging.info("Input damage units are already in the desired format")
             return
 
         original_length_unit = self.damage_unit.split("/")[1]
@@ -103,17 +99,19 @@ class MaxDamage:
         if original_length_unit != "km" or target_length_unit != "m":
             # We currently only support from 'km' to 'm'
             logging.warning(
-                "Damage scaling from {} to {} is not supported".format(
-                    self.damage_unit, desired_unit
-                )
+                "Damage scaling from %s to %s is not supported",
+                self.damage_unit,
+                desired_unit,
             )
             return
 
         scaling_factor = 1 / 1000
         self.data = self.data * scaling_factor
         logging.info(
-            "Damage data from {} was scaled by a factor {}, to convert from {} to {}".format(
-                self.origin_path, scaling_factor, self.damage_unit, desired_unit
-            )
+            "Damage data from %s was scaled by a factor %s, to convert from %s to %s",
+            self.origin_path,
+            scaling_factor,
+            self.damage_unit,
+            desired_unit,
         )
         self.damage_unit = desired_unit
