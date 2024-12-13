@@ -54,10 +54,9 @@ class ManualDamageFunctionsReader(FileReaderProtocol):
         }
 
         # Read the damage functions from the subfolders
-        _damage_functions = dict()
-        for _name, _path in _damage_function_folders.items():
-            _damage_functions[_name] = DamageFunctionByRoadTypeByLane.from_input_folder(
-                _name, _path
-            )
-
-        return ManualDamageFunctions(damage_functions=_damage_functions)
+        return ManualDamageFunctions(
+            damage_functions={
+                _name: DamageFunctionByRoadTypeByLane.from_input_folder(_name, _path)
+                for _name, _path in _damage_function_folders.items()
+            }
+        )

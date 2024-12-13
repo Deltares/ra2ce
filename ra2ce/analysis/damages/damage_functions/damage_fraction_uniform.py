@@ -39,20 +39,23 @@ class DamageFractionUniform:
     self.data (pd.DataFrame) : index = hazard severity (e.g. flood depth); column 0 = damage fraction
     """
 
-    name: str = None
-    hazard_unit: str = None
-    data: pd.DataFrame = None
-    origin_path: Path = None
+    name: str
+    hazard_unit: str
+    data: pd.DataFrame
+    origin_path: Path
     interpolator: interp1d = None
 
+    def __post_init__(self):
+        self._convert_hazard_severity_unit("m")
+
     @classmethod
-    def from_csv(cls, path: Path, sep=",") -> DamageFractionUniform:
+    def from_csv(cls, csv_path: Path, sep: str) -> DamageFractionUniform:
         """Construct object from csv file. Damage curve name is inferred from filename
 
         Arguments:
-            *path* (Path) : Path to the csv file
+            *csv_path* (Path) : Path to the csv file
             *sep* (str) : csv seperator
-            *output_unit* (str) : desired output unit (default = 'm')
+            *output_unit* (str) : desired output unit
 
         The CSV file should have the following structure:
          - column 1: hazard severity
@@ -75,9 +78,9 @@ class DamageFractionUniform:
 
 
         """
-        _name = path.stem
-        _raw_data = pd.read_csv(path, index_col=0, sep=sep)
-        _origin_path = path  # to track the original path from which the object was constructed; maybe also date?
+        _name = csv_path.stem
+        _raw_data = pd.read_csv(csv_path, index_col=0, sep=sep)
+        _origin_path = csv_path  # to track the original path from which the object was constructed; maybe also date?
 
         # identify unit and drop from data
         _hazard_unit = _raw_data.index[0]
@@ -89,14 +92,11 @@ class DamageFractionUniform:
         _data = _data.astype("float")
         _data.index = _data.index.astype("float")
 
-        _damage_fraction = cls(
+        return cls(
             name=_name, hazard_unit=_hazard_unit, data=_data, origin_path=_origin_path
         )
-        _damage_fraction._convert_hazard_severity_unit()
 
-        return _damage_fraction
-
-    def _convert_hazard_severity_unit(self, desired_unit="m") -> None:
+    def _convert_hazard_severity_unit(self, desired_unit: str) -> None:
         """Converts hazard severity values to a different unit
         Arguments:
             self.hazard_unit - implicit (string)
@@ -107,7 +107,7 @@ class DamageFractionUniform:
         """
         if desired_unit == self.hazard_unit:
             logging.info(
-                "Damage units are already in the desired format {}".format(desired_unit)
+                "Damage units are already in the desired format %s", desired_unit
             )
             return None
 
@@ -115,17 +115,19 @@ class DamageFractionUniform:
             scaling_factor = 1 / 100
             self.data.index = self.data.index * scaling_factor
             logging.info(
-                "Hazard severity from {} data was scaled by a factor {}, to convert from {} to {}".format(
-                    self.origin_path, scaling_factor, self.hazard_unit, desired_unit
-                )
+                "Hazard severity from %s data was scaled by a factor %s, to convert from %s to %s",
+                self.origin_path,
+                scaling_factor,
+                self.hazard_unit,
+                desired_unit,
             )
             self.damage_unit = desired_unit
             return None
         else:
             logging.warning(
-                "Hazard severity scaling from {} to {} is not  supported".format(
-                    self.hazard_unit, desired_unit
-                )
+                "Hazard severity scaling from %s to %s is not  supported",
+                self.hazard_unit,
+                desired_unit,
             )
             return None
 
