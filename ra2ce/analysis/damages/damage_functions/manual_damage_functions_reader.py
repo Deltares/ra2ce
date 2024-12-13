@@ -35,15 +35,27 @@ class ManualDamageFunctionsReader(FileReaderProtocol):
     """
 
     def read(self, file_path: Path) -> ManualDamageFunctions:
-        def find_damage_functions(folder: Path) -> dict[str, Path]:
-            return {
-                subfolder.stem: subfolder
-                for subfolder in folder.iterdir()
-                if subfolder.is_dir()
-            }
+        """
+        Read the manual damage functions from the given folder.
+        The folder should contain subfolders with the damage functions.
+        Each damage functions is constructed by reading the csv files for the max damage and damage fraction.
 
-        _damage_functions: dict[str, DamageFunctionByRoadTypeByLane] = dict()
-        for _name, _path in find_damage_functions(file_path).items():
+        Args:
+            file_path (Path): Pathm to the folder containing the manual damage functions folders
+
+        Returns:
+            ManualDamageFunctions: The manual damage functions
+        """
+        # Find subfolders with the damage functions
+        _damage_function_folders = {
+            subfolder.stem: subfolder
+            for subfolder in file_path.iterdir()
+            if subfolder.is_dir()
+        }
+
+        # Read the damage functions from the subfolders
+        _damage_functions = dict()
+        for _name, _path in _damage_function_folders.items():
             _damage_functions[_name] = DamageFunctionByRoadTypeByLane.from_input_folder(
                 _name, _path
             )
