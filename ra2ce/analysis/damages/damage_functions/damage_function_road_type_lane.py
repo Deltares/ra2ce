@@ -18,60 +18,47 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import annotations
 
-import logging
+from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
 
-from ra2ce.analysis.damages.damage.damage_fraction_uniform import DamageFractionUniform
-from ra2ce.analysis.damages.damage.max_damage import MaxDamageByRoadTypeByLane
+from ra2ce.analysis.damages.damage_functions.damage_fraction_uniform import (
+    DamageFractionUniform,
+)
+from ra2ce.analysis.damages.damage_functions.max_damage import MaxDamage
 
 
+@dataclass(kw_only=True)
 class DamageFunctionByRoadTypeByLane:
     """
     A damage function that has different max damages per road type, but a uniform damage_fraction curve
 
-
     The attributes need to be of the type:
-    self.max_damage (MaxDamage_byRoadType_byLane)
-    self.damage_fraction (DamageFractionHazardSeverityUniform)
-
+    self.max_damage (MaxDamage)
+    self.damage_fraction (DamageFractionUniform)
+    name (str)
     """
 
-    def __init__(
-        self,
-        max_damage: MaxDamageByRoadTypeByLane = None,
-        damage_fraction: DamageFractionUniform = None,
-        name: str = "",
-        hazard: str = "flood",
-        type: str = "depth_damage",
-        infra_type: str = "road",
-    ):
-        # Construct using the parent class __init__
-        self.name = name
-        self.hazard = hazard
-        self.type = type
-        self.infra_type = infra_type
-        self.max_damage = max_damage  # Should be a MaxDamage object
-        self.damage_fraction = (
-            damage_fraction  # Should be a DamageFractionHazardSeverity object
-        )
-        self.prefix = None  # Should be two characters long at maximum
+    max_damage: MaxDamage
+    damage_fraction: DamageFractionUniform
+    name: str
 
-    def set_prefix(self):
-        self.prefix = self.name[0:2]
-        logging.info(
-            "The prefix: '{}' refers to curve name '{}' in the results".format(
-                self.prefix, self.name
-            )
-        )
+    @property
+    def prefix(self) -> str:
+        return self.name[0:2] if len(self.name) > 2 else self.name
 
-    def from_input_folder(self, folder_path: Path):
+    @classmethod
+    def from_input_folder(
+        cls, name: str, folder_path: Path
+    ) -> DamageFunctionByRoadTypeByLane:
         """Construct a set of damage functions from csv files located in the folder_path
 
         Arguments:
-            *folder_path* (Pathlib Path) : path to folder where csv files can be found
+            name (str) : name of the damage function
+            folder_path (Pathlib Path) : path to folder where csv files can be found
         """
 
         def find_unique_csv_file(folder_path: Path, part_of_filename: str) -> Path:
@@ -95,23 +82,20 @@ class DamageFunctionByRoadTypeByLane:
             return result[0]
 
         # Load the max_damage object
-        max_damage = MaxDamageByRoadTypeByLane()
         max_dam_path = find_unique_csv_file(folder_path, "max_damage")
-        max_damage.from_csv(max_dam_path, sep=";")
-
-        self.max_damage = max_damage
+        max_damage = MaxDamage.from_csv(max_dam_path, ";")
 
         # Load the damage fraction function
         # search in the folder for something *damage_fraction
-        damage_fraction = DamageFractionUniform()
         dam_fraction_path = find_unique_csv_file(folder_path, "hazard_severity")
-        damage_fraction.from_csv(dam_fraction_path, sep=";")
-        self.damage_fraction = damage_fraction
+        damage_fraction = DamageFractionUniform.from_csv(dam_fraction_path, sep=";")
 
         damage_fraction.create_interpolator()
 
+        return cls(max_damage=max_damage, damage_fraction=damage_fraction, name=name)
+
     # Todo: these two below functions are maybe better implemented at a lower level?
-    def add_max_damage(self, df: pd.DataFrame, prefix: str = None):
+    def add_max_damage(self, df: pd.DataFrame, prefix: str) -> pd.DataFrame:
         """ "Ads the max damage value to the dataframe"""
         cols = df.columns
         assert "road_type" in cols, "no column 'road type' in df"

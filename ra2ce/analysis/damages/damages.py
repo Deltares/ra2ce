@@ -20,10 +20,15 @@ from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.analysis_result.analysis_result import AnalysisResult
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
-from ra2ce.analysis.damages.damage.manual_damage_functions import ManualDamageFunctions
 from ra2ce.analysis.damages.damage_calculation import (
     DamageNetworkEvents,
     DamageNetworkReturnPeriods,
+)
+from ra2ce.analysis.damages.damage_functions.manual_damage_functions import (
+    ManualDamageFunctions,
+)
+from ra2ce.analysis.damages.damage_functions.manual_damage_functions_reader import (
+    ManualDamageFunctionsReader,
 )
 from ra2ce.analysis.damages.damages_result_wrapper import DamagesResultWrapper
 from ra2ce.network.graph_files.network_file import NetworkFile
@@ -36,6 +41,7 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
     input_path: Path
     output_path: Path
     reference_base_graph_hazard: MultiGraph
+    manual_damage_functions: ManualDamageFunctions = None
 
     def __init__(
         self, analysis_input: AnalysisInputWrapper, base_graph_hazard: MultiGraph
@@ -46,6 +52,10 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
         self.input_path = analysis_input.input_path
         self.output_path = analysis_input.output_path
         self.reference_base_graph_hazard = base_graph_hazard
+        if self.analysis.damage_curve == DamageCurveEnum.MAN:
+            self.manual_damage_functions = ManualDamageFunctionsReader().read(
+                self.input_path.joinpath("damage_functions")
+            )
 
     def execute(self) -> AnalysisResultWrapper:
         def _rename_road_gdf_to_conventions(road_gdf_columns: list[str]) -> list[str]:
@@ -81,15 +91,6 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
         # Read the desired damage function
         damage_function = self.analysis.damage_curve
 
-        # If you want to use manual damage functions, these need to be loaded first
-        manual_damage_functions = None
-        if self.analysis.damage_curve == DamageCurveEnum.MAN:
-            manual_damage_functions = ManualDamageFunctions()
-            manual_damage_functions.find_damage_functions(
-                folder=(self.input_path.joinpath("damage_functions"))
-            )
-            manual_damage_functions.load_damage_functions()
-
         # Choose between event or return period based analysis
         if self.analysis.event_type == EventTypeEnum.EVENT:
             event_gdf = DamageNetworkEvents(
@@ -97,7 +98,7 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
             )
             event_gdf.main(
                 damage_function=damage_function,
-                manual_damage_functions=manual_damage_functions,
+                manual_damage_functions=self.manual_damage_functions,
             )
 
             return self.generate_result_wrapper(event_gdf.gdf)
@@ -108,7 +109,7 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
             )
             return_period_gdf.main(
                 damage_function=damage_function,
-                manual_damage_functions=manual_damage_functions,
+                manual_damage_functions=self.manual_damage_functions,
             )
 
             if (

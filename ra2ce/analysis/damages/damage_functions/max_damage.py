@@ -18,34 +18,31 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-
+from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
 
 
-class MaxDamageByRoadTypeByLane:
+@dataclass(kw_only=True)
+class MaxDamage:
     """
     Max damage per RoadType and per Lane
-
-    Attributes:
-        self.name (str) : Name of the damage curve
-        self.data (pd.DataFrame) : columns contain number of lanes; rows contain the road types
-
-    Optional attributes:
-        self.origin_path (Path) : Path to the file from which the function was constructed
-        self.raw_data : The raw data read from the input file
-
-
     """
 
-    def __init__(self, name=None, damage_unit=None):
-        self.name = name
-        self.damage_unit = damage_unit
+    name: str
+    damage_unit: str
+    data: pd.DataFrame
+    origin_path: Path = None
 
-    def from_csv(self, path: Path, sep=",") -> None:
+    def __post_init__(self):
+        self._convert_length_unit("euro/m")
+
+    @classmethod
+    def from_csv(cls, csv_path: Path, sep: str) -> MaxDamage:
         """Construct object from csv file. Damage curve name is inferred from filename
 
         The first row describes the lane numbers per column and should have 'Road_type \ lanes' as index/first value.
@@ -54,36 +51,37 @@ class MaxDamageByRoadTypeByLane:
         the rest of the rows contains the different road types as index/first value; and the costs as values
 
         Arguments:
-            *path* (Path) : Path to the csv file
+            *csv_* (Path) : Path to the csv file
             *sep* (str) : csv seperator
         """
-        default_output_unit = "euro/m"
-        self.name = path.stem
-        self.raw_data = pd.read_csv(path, index_col=r"Road_type \ lanes", sep=sep)
-        self.origin_path = path  # to track the original path from which the object was constructed; maybe also date?
+        _name = csv_path.stem
+        _raw_data = pd.read_csv(csv_path, index_col=r"Road_type \ lanes", sep=sep)
+        _origin_path = csv_path  # to track the original path from which the object was constructed; maybe also date?
 
         ###Determine units
-        units = self.raw_data.loc["unit", :].unique()  # identify the unique units
+        units = _raw_data.loc["unit", :].unique()  # identify the unique units
         assert (
             len(units) == 1
         ), "Columns in the max damage csv seem to have different units, ra2ce cannot handle this"
         # case only one unique unit is identified
-        self.damage_unit = units[
+        _damage_unit = units[
             0
         ]  # should have the structure 'x/y' , e.g. euro/m, dollar/yard
 
-        self.data = self.raw_data.drop("unit")
-        self.data = self.data.astype("float")
+        _data = _raw_data.drop("unit")
+        _data = _data.astype("float")
 
-        # assume road types are in the rows; lane numbers in the columns
-        self.road_types = list(self.data.index)  # to method
         # assumes that the columns containst the lanes
-        self.data.columns = self.data.columns.astype("int")
+        _data.columns = _data.columns.astype("int")
 
-        if self.damage_unit != default_output_unit:
-            self.convert_length_unit()  # convert the unit
+        return cls(
+            name=_name,
+            damage_unit=_damage_unit,
+            data=_data,
+            origin_path=_origin_path,
+        )
 
-    def convert_length_unit(self, desired_unit="euro/m"):
+    def _convert_length_unit(self, desired_unit: str):
         """Converts max damage values to a different unit
         Arguments:
             self.damage_unit (implicit)
@@ -93,7 +91,6 @@ class MaxDamageByRoadTypeByLane:
 
         """
         if desired_unit == self.damage_unit:
-            logging.info("Input damage units are already in the desired format")
             return
 
         original_length_unit = self.damage_unit.split("/")[1]
@@ -102,17 +99,19 @@ class MaxDamageByRoadTypeByLane:
         if original_length_unit != "km" or target_length_unit != "m":
             # We currently only support from 'km' to 'm'
             logging.warning(
-                "Damage scaling from {} to {} is not supported".format(
-                    self.damage_unit, desired_unit
-                )
+                "Damage scaling from %s to %s is not supported",
+                self.damage_unit,
+                desired_unit,
             )
             return
 
         scaling_factor = 1 / 1000
         self.data = self.data * scaling_factor
         logging.info(
-            "Damage data from {} was scaled by a factor {}, to convert from {} to {}".format(
-                self.origin_path, scaling_factor, self.damage_unit, desired_unit
-            )
+            "Damage data from %s was scaled by a factor %s, to convert from %s to %s",
+            self.origin_path,
+            scaling_factor,
+            self.damage_unit,
+            desired_unit,
         )
         self.damage_unit = desired_unit
