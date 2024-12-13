@@ -1,0 +1,885 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Download a Network using a polygon &#8212; Risk Assessment and Adaptation for Critical infrastructurE 0.9.2 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_examples/example_download_network_using_a_polygon';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RA2CE basics: setting up an origin-destination analysis" href="example_set_up_origin_destination_no_data_DIY.html" />
+    <link rel="prev" title="RA2CE basics: set up RA2CE and configure a road network from a pre-defined shapefile" href="example_ra2ce_basics_fromgpkg.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.9.2" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation/installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing/index.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../changelog_wrapper.html">
+    Changelog
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation/installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing/index.html">
+    Contributing
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../technical_documentation/technical_documentation.html">
+    Technical Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../changelog_wrapper.html">
+    Changelog
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/about.html">RA2CE</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../installation/installation.html">Installation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../examples/index.html">Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../examples/basic_examples.html">Basic examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="example_ra2ce_basics.html">RA2CE basics: set up RA2CE and configure a road network</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_equity_analysis.html">RA2CE feature: Equity analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_single_link_redundancy.html">RA2CE feature: single link redundancy without the example data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_single_link_losses.html">RA2CE feature: Single link losses analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_multi_link_losses.html">RA2CE feature: Multi-link losses analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_origin_destination_analysis.html">RA2CE feature: Origin-destination analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_damages_huizinga.html">RA2CE feature: Damages analysis (Huizinga)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_damages_manual.html">RA2CE feature: Damages analysis (manual)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_damages_OSdamage.html">RA2CE feature: Damages analysis (OSdaMage)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_hazard_overlay.html">RA2CE feature: Hazard overlay</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_isolated_locations.html">RA2CE feature: Isolated locations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_optimal_route_origin_destination.html">RA2CE feature: Optimal routes between origins and destinations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_ra2ce_basics_fromgpkg.html">RA2CE basics: set up RA2CE and configure a road network from a pre-defined shapefile</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Download a Network using a polygon</a></li>
+<li class="toctree-l3"><a class="reference internal" href="example_set_up_origin_destination_no_data_DIY.html">RA2CE basics: setting up an origin-destination analysis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pizza_course_material_DIY.html">RA2CE: Do It Yourself</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../examples/hackathon_sessions.html">Hackathon sessions</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="hackathons/20240326_hackathon/summary_2024q1.html">Hackathon Q1 - 2024</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../examples/technical_meetings.html">Technical meetings</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="tech_meetings/20240403_run_without_ini_files_DIY.html">Tech Meeting 2024 Q1 - Run with(out) <code class="docutils literal notranslate"><span class="pre">ini</span></code> files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tech_meetings/20240403_using_enums_DIY.html">Tech Meeting 2024 Q1 - Enumerations</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../network_module/network_module.html">Network Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../analysis_module/analysis_module.html">Analysis module</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../docker_and_cloud/index.html">Docker and Cloud guide</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../docker_and_cloud/setting_up_infrastructure/index.html">Setting up infrastructure</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../docker_and_cloud/setting_up_infrastructure/kubernetes_deployment.html">Deploying Kubernetes on Amazon EKS Cluster with Terraform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../docker_and_cloud/setting_up_infrastructure/argo_deployment.html">Deploying Argo Workflows with Helm on Amazon EKS</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../docker_and_cloud/using_cloud_services/index.html">Using cloud services</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../docker_and_cloud/using_cloud_services/docker_user_guide.html">Docker User Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../docker_and_cloud/using_cloud_services/deltares_harbor.html">Deltares Docker Harbor</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../docker_and_cloud/using_cloud_services/deltares_hpc_user_guide.html">Deltares HPC User Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../docker_and_cloud/using_cloud_services/hackathon_user_guide.html">Hackathon User Guide</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../contributing/index.html">Contributing</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contributing/design_principles.html">Design principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing/implementation_decisions.html">Implementation decisions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../technical_documentation/technical_documentation.html">Technical Documentation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../technical_documentation/network_package.html">Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../technical_documentation/analysis_package.html">Analysis</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications/publications.html">Publications</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../overview.html" class="nav-link">Overview</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../examples/index.html" class="nav-link">Examples</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../examples/basic_examples.html" class="nav-link">Basic examples</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Download a Network using a polygon</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="Download-a-Network-using-a-polygon">
+<h1>Download a Network using a polygon<a class="headerlink" href="#Download-a-Network-using-a-polygon" title="Permalink to this heading">#</a></h1>
+<p>This notebook contains examples for the RA2CE tool. We will guide you through the basics of RA2CE : Configuring a road network from a geojson file from your local drive or from polygon coordinates.</p>
+<p>First of all, we will import the packages we need to execute this notebook:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">folium</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">LineString</span><span class="p">,</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">box</span>
+</pre></div>
+</div>
+</div>
+<p>Next we will call the necessary RA2CE scripts for our code</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">ra2ce.network.networks_utils</span> <span class="k">as</span> <span class="nn">nut</span>
+<span class="kn">from</span> <span class="nn">ra2ce.network.network_config_data.enums.network_type_enum</span> <span class="kn">import</span> <span class="n">NetworkTypeEnum</span>
+<span class="kn">from</span> <span class="nn">ra2ce.network.network_config_data.enums.road_type_enum</span> <span class="kn">import</span> <span class="n">RoadTypeEnum</span>
+<span class="kn">from</span> <span class="nn">ra2ce.network.network_config_data.network_config_data</span> <span class="kn">import</span> <span class="p">(</span><span class="n">NetworkConfigData</span><span class="p">,</span><span class="n">NetworkSection</span><span class="p">,)</span>
+<span class="kn">from</span> <span class="nn">ra2ce.network.network_wrappers.osm_network_wrapper.osm_network_wrapper</span> <span class="kn">import</span> <span class="p">(</span><span class="n">OsmNetworkWrapper</span><span class="p">,)</span>
+<span class="kn">from</span> <span class="nn">ra2ce.network.exporters.geodataframe_network_exporter</span> <span class="kn">import</span> <span class="n">GeoDataFrameNetworkExporter</span>
+<span class="kn">from</span> <span class="nn">ra2ce.network.exporters.multi_graph_network_exporter</span> <span class="kn">import</span> <span class="n">MultiGraphNetworkExporter</span>
+<br/></pre></div>
+</div>
+</div>
+<section id="Folder-structure">
+<h2>Folder structure<a class="headerlink" href="#Folder-structure" title="Permalink to this heading">#</a></h2>
+<p>Before starting the examples, it is vital that you familiarize yourself with the RA2CE folder structure. RA2CE requires this folder structure to succesfully perform analyses. You can find the folder structure in the <strong>documentation</strong>.</p>
+<p>A project folder must contain the subfolders ‘output’ and ‘static’. An ‘input’ folder is optional for additional data sets but we will not use that in our example. It must also contain the network.ini and/or analyses.ini files. Within the subfolder ‘static’, RA2CE expects three subfolders: hazard, network, and output_graph. See below an example folder structure of “Project A”. This folder structure must be created by the user before running RA2CE.</p>
+<p>Below you can add the path to your project directory to your RA2CE analysis</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># specify the name of the path to the project folder where you created the RA2CE folder setup</span>
+<span class="n">root_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span><span class="s1">&#39;download_network_from_polygon&#39;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">root_dir</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Method-A-:-Configuring-a-road-network-from-OSM-using-a-polygon">
+<h2>Method A : Configuring a road network from OSM using a polygon<a class="headerlink" href="#Method-A-:-Configuring-a-road-network-from-OSM-using-a-polygon" title="Permalink to this heading">#</a></h2>
+<p>First we need to define the polygon. This should be a shapely polygon. In this notebook, the polygon is defined through geojson coordinates. These coordinates you can copy paste from <a class="reference external" href="https://geojson.io/#map=2/0/20">https://geojson.io/#map=2/0/20</a></p>
+<section id="Defining-a-polygon">
+<h3>Defining a polygon<a class="headerlink" href="#Defining-a-polygon" title="Permalink to this heading">#</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">geojson_data</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{},</span>
+      <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">[</span>
+          <span class="p">[</span>
+            <span class="p">[</span>
+              <span class="mf">4.925796685034555</span><span class="p">,</span>
+              <span class="mf">52.15567004009617</span>
+            <span class="p">],</span>
+            <span class="p">[</span>
+              <span class="mf">4.925796685034555</span><span class="p">,</span>
+              <span class="mf">51.969875228118696</span>
+            <span class="p">],</span>
+            <span class="p">[</span>
+              <span class="mf">5.263478289905265</span><span class="p">,</span>
+              <span class="mf">51.969875228118696</span>
+            <span class="p">],</span>
+            <span class="p">[</span>
+              <span class="mf">5.263478289905265</span><span class="p">,</span>
+              <span class="mf">52.15567004009617</span>
+            <span class="p">],</span>
+            <span class="p">[</span>
+              <span class="mf">4.925796685034555</span><span class="p">,</span>
+              <span class="mf">52.15567004009617</span>
+            <span class="p">]</span>
+          <span class="p">]</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Polygon&quot;</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+
+<span class="n">minx</span><span class="p">,</span> <span class="n">miny</span> <span class="o">=</span> <span class="n">geojson_data</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">maxx</span><span class="p">,</span> <span class="n">maxy</span> <span class="o">=</span> <span class="n">geojson_data</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="n">polygon</span> <span class="o">=</span> <span class="n">box</span><span class="p">(</span><span class="n">minx</span><span class="p">,</span> <span class="n">miny</span><span class="p">,</span> <span class="n">maxx</span><span class="p">,</span> <span class="n">maxy</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<p>Let’s explore the location of the polygon:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">gdf_polygon</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crs</span><span class="o">=</span><span class="s1">&#39;epsg:4326&#39;</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="p">[</span><span class="n">polygon</span><span class="p">])</span>
+<span class="n">gdf_polygon</span><span class="o">.</span><span class="n">explore</span><span class="p">(</span><span class="n">tiles</span><span class="o">=</span><span class="s2">&quot;CartoDB positron&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Set-parameters-and-initalize-a-RA2CE-run">
+<h3>Set parameters and initalize a RA2CE run<a class="headerlink" href="#Set-parameters-and-initalize-a-RA2CE-run" title="Permalink to this heading">#</a></h3>
+<p>Next we need to define the Network characteristics that needs to be downloaded</p>
+<p>First we choose what kind of network that we need for the analysis. This is handled by the variable network_type in this notebook. A network type can be :NONE/WALK/BIKE/DRIVE/DRIVE_SERVICE/ALL/INVALID</p>
+<p>The we can specify the resolution of the selected network by defining road_types. Road types includes :NONE,MOTORWAY,MOTORWAY_LINK,TRUNK,TRUNK_LINK,PRIMARY,PRIMARY_LINK,SECONDARY,SECONDARY_LINK,TERTIARY,TERTIARY_LINK,RESIDENTIAL,ROAD,TUNNEL,BRIDGE,CULVERT,UNCLASSIFIED,INVALID</p>
+<p>After that we can start accessing the data from OSM. Bear in mind that larger regions and / or the more detail included in the road network may increase download time (significantly)</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><br/><span></span><span class="c1">#First we define which roads we will want to download from OSM to create a network with</span>
+<span class="n">_network_section</span> <span class="o">=</span> <span class="n">NetworkSection</span><span class="p">(</span>
+    <span class="n">network_type</span><span class="o">=</span><span class="n">NetworkTypeEnum</span><span class="o">.</span><span class="n">DRIVE</span><span class="p">,</span>
+    <span class="n">road_types</span><span class="o">=</span><span class="p">[</span><span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">MOTORWAY</span><span class="p">,</span><span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">PRIMARY</span><span class="p">,</span><span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">ROAD</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="n">_network_config_data</span> <span class="o">=</span> <span class="n">NetworkConfigData</span><span class="p">(</span>
+    <span class="n">root_path</span><span class="o">=</span> <span class="n">root_dir</span><span class="p">,</span>
+    <span class="n">output_path</span><span class="o">=</span> <span class="n">root_dir</span><span class="o">/</span><span class="s2">&quot;output&quot;</span><span class="p">,</span>
+    <span class="n">network</span><span class="o">=</span><span class="n">_network_section</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="c1">#pass the specified sections as arguments for configuration</span>
+<span class="n">_network_config_data</span> <span class="o">=</span> <span class="n">NetworkConfigData</span><span class="p">(</span><span class="n">network</span><span class="o">=</span><span class="n">_network_section</span><span class="p">,</span> <span class="n">static_path</span><span class="o">=</span><span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;static&#39;</span><span class="p">))</span>
+<span class="c1">#download the network based on the polygon extent and the specified road characteristics</span>
+<span class="n">_graph</span><span class="p">,</span><span class="n">_gdf</span> <span class="o">=</span> <span class="n">OsmNetworkWrapper</span><span class="o">.</span><span class="n">get_network_from_polygon</span><span class="p">(</span><span class="n">_network_config_data</span><span class="p">,</span> <span class="n">polygon</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Explore-the-results">
+<h3>Explore the results<a class="headerlink" href="#Explore-the-results" title="Permalink to this heading">#</a></h3>
+<p>Lets explore the downloaded network</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">m</span> <span class="o">=</span> <span class="n">_gdf</span><span class="o">.</span><span class="n">explore</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;highway&#39;</span><span class="p">,</span> <span class="n">tiles</span><span class="o">=</span><span class="s2">&quot;CartoDB positron&quot;</span><span class="p">)</span>
+<span class="n">folium</span><span class="o">.</span><span class="n">GeoJson</span><span class="p">(</span><span class="n">gdf_polygon</span><span class="p">,</span>
+               <span class="n">style_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="s1">&#39;fillOpacity&#39;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+               <span class="n">tooltip</span><span class="o">=</span><span class="s1">&#39;polygon&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+<span class="n">folium</span><span class="o">.</span><span class="n">LayerControl</span><span class="p">()</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="n">m</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Method-B-:-Configuring-a-road-network-from-OSM-using-a-geojson-file-from-a-local-drive">
+<h2>Method B : Configuring a road network from OSM using a geojson file from a local drive<a class="headerlink" href="#Method-B-:-Configuring-a-road-network-from-OSM-using-a-geojson-file-from-a-local-drive" title="Permalink to this heading">#</a></h2>
+<p>You can also use a geojson file in your local drive to to carry out the same process.</p>
+<p>An easy way to use this option is by drawing a polygon at the location of choice at <a class="reference external" href="http://geojson.io/">geojson.io</a>. Another option is creating a polygon layer in a GIS and saving it as a <em>.geojson</em>.</p>
+<p>The geojson polygon should be saved in the <strong>static/network</strong> folder.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Add the path to your Geojson file.</span>
+<span class="n">_geojson_path</span> <span class="o">=</span> <span class="n">root_dir</span> <span class="o">/</span> <span class="s1">&#39;static&#39;</span><span class="o">/</span><span class="s1">&#39;network&#39;</span><span class="o">/</span><span class="s2">&quot;map.geojson&quot;</span>
+
+<span class="c1">#visualize the polygon</span>
+<span class="n">gdf_polygon</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">_geojson_path</span><span class="p">)</span>
+<span class="n">gdf_polygon</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crs</span><span class="o">=</span><span class="s1">&#39;epsg:4326&#39;</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="p">[</span><span class="n">polygon</span><span class="p">])</span>
+<span class="n">gdf_polygon</span><span class="o">.</span><span class="n">explore</span><span class="p">(</span><span class="n">tiles</span><span class="o">=</span><span class="s2">&quot;CartoDB positron&quot;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<section id="id1">
+<h3>Set parameters and initalize a RA2CE run<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h3>
+<p>Then you can specify the network characteristics the same way as defined in Method A</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#First we define which roads we will want to download from OSM to create a network with</span>
+<span class="n">_network_section</span> <span class="o">=</span> <span class="n">NetworkSection</span><span class="p">(</span>
+    <span class="n">polygon</span><span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">_geojson_path</span><span class="p">),</span>
+    <span class="n">network_type</span><span class="o">=</span><span class="n">NetworkTypeEnum</span><span class="o">.</span><span class="n">DRIVE</span><span class="p">,</span>
+    <span class="n">road_types</span><span class="o">=</span><span class="p">[</span><span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">MOTORWAY</span><span class="p">,</span><span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">PRIMARY</span><span class="p">,</span><span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">ROAD</span><span class="p">],</span>
+    <span class="n">save_gpkg</span><span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+
+<span class="p">)</span>
+
+<span class="c1">#pass the specified sections as arguments for configuration</span>
+<span class="n">_network_config_data</span> <span class="o">=</span> <span class="n">NetworkConfigData</span><span class="p">(</span>
+    <span class="n">root_path</span><span class="o">=</span> <span class="n">root_dir</span><span class="p">,</span>
+    <span class="n">output_path</span><span class="o">=</span> <span class="n">root_dir</span><span class="o">/</span><span class="s2">&quot;output&quot;</span><span class="p">,</span>
+    <span class="n">static_path</span><span class="o">=</span><span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;static&#39;</span><span class="p">),</span>
+    <span class="n">network</span><span class="o">=</span><span class="n">_network_section</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="c1">#download the network based on the polygon extent and the specified road characteristics</span>
+<span class="n">_graph</span><span class="p">,</span><span class="n">_gdf</span> <span class="o">=</span> <span class="n">OsmNetworkWrapper</span><span class="o">.</span><span class="n">get_network_from_geojson</span><span class="p">(</span><span class="n">_network_config_data</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="id2">
+<h3>Explore the results<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h3>
+<p>Lets explore the downloaded network</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">a</span> <span class="o">=</span> <span class="n">_gdf</span><span class="o">.</span><span class="n">explore</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s1">&#39;highway&#39;</span><span class="p">,</span> <span class="n">tiles</span><span class="o">=</span><span class="s2">&quot;CartoDB positron&quot;</span><span class="p">)</span>
+<span class="n">folium</span><span class="o">.</span><span class="n">GeoJson</span><span class="p">(</span><span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">_geojson_path</span><span class="p">),</span>
+               <span class="n">style_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="s1">&#39;fillOpacity&#39;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span>
+               <span class="n">tooltip</span><span class="o">=</span><span class="s1">&#39;polygon&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+<span class="n">folium</span><span class="o">.</span><span class="n">LayerControl</span><span class="p">()</span><span class="o">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">a</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="Finally-we-can-save-our-downloaded-network-to-the-RA2CE-folder-setup">
+<h2>Finally we can save our downloaded network to the RA2CE folder setup<a class="headerlink" href="#Finally-we-can-save-our-downloaded-network-to-the-RA2CE-folder-setup" title="Permalink to this heading">#</a></h2>
+<p>Finally, you can save the network that you downloaded through Method A or Method B to the output_graph folder in the RA2CE folder setup</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Export the graph</span>
+<span class="n">_exporter</span> <span class="o">=</span> <span class="n">MultiGraphNetworkExporter</span><span class="p">(</span><span class="n">basename</span><span class="o">=</span><span class="s1">&#39;base_graph&#39;</span><span class="p">,</span> <span class="n">export_types</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gpkg&#39;</span><span class="p">,</span> <span class="s1">&#39;pickle&#39;</span><span class="p">])</span>
+<span class="n">_exporter</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">export_path</span><span class="o">=</span><span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;static&#39;</span><span class="p">,</span><span class="s1">&#39;output_graph&#39;</span><span class="p">),</span> <span class="n">export_data</span><span class="o">=</span><span class="n">_graph</span><span class="p">)</span>
+
+<span class="c1"># Export the network</span>
+<span class="n">_exporter</span> <span class="o">=</span> <span class="n">GeoDataFrameNetworkExporter</span><span class="p">(</span><span class="n">basename</span><span class="o">=</span><span class="s1">&#39;base_network&#39;</span><span class="p">,</span> <span class="n">export_types</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;gpkg&#39;</span><span class="p">,</span> <span class="s1">&#39;pickle&#39;</span><span class="p">])</span>
+<span class="n">_exporter</span><span class="o">.</span><span class="n">export</span><span class="p">(</span><span class="n">export_path</span><span class="o">=</span><span class="n">root_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s1">&#39;static&#39;</span><span class="p">,</span><span class="s1">&#39;output_graph&#39;</span><span class="p">),</span> <span class="n">export_data</span><span class="o">=</span><span class="n">_gdf</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="example_ra2ce_basics_fromgpkg.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">RA2CE basics: set up RA2CE and configure a road network from a pre-defined shapefile</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="example_set_up_origin_destination_no_data_DIY.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">RA2CE basics: setting up an origin-destination analysis</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Folder-structure">Folder structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Method-A-:-Configuring-a-road-network-from-OSM-using-a-polygon">Method A : Configuring a road network from OSM using a polygon</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Defining-a-polygon">Defining a polygon</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Set-parameters-and-initalize-a-RA2CE-run">Set parameters and initalize a RA2CE run</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#Explore-the-results">Explore the results</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Method-B-:-Configuring-a-road-network-from-OSM-using-a-geojson-file-from-a-local-drive">Method B : Configuring a road network from OSM using a geojson file from a local drive</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Set parameters and initalize a RA2CE run</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">Explore the results</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#Finally-we-can-save-our-downloaded-network-to-the-RA2CE-folder-setup">Finally we can save our downloaded network to the RA2CE folder setup</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/_examples/example_download_network_using_a_polygon.ipynb">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/_examples/example_download_network_using_a_polygon.ipynb.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
