@@ -67,7 +67,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
 
     @classmethod
     def construct_from_csv(
-        cls, csv_path: Path, representative_damage_percentage: float, sep: str = ";"
+        cls, csv_path: Path, representative_damage_percentage: float, sep: str
     ):
         road_gdf = pd.read_csv(csv_path, sep=sep)
         val_cols = [
