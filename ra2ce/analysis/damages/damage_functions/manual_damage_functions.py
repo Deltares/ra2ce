@@ -19,6 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from collections import defaultdict
 from dataclasses import dataclass, field
 
 from ra2ce.analysis.damages.damage_functions.damage_function_road_type_lane import (
@@ -36,5 +37,5 @@ class ManualDamageFunctions:
     """
 
     damage_functions: dict[str, DamageFunctionByRoadTypeByLane] = field(
-        default_factory=dict
+        default_factory=lambda: defaultdict(DamageFunctionByRoadTypeByLane)
     )

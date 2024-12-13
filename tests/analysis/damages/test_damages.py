@@ -13,6 +13,9 @@ from ra2ce.analysis.damages.damage_calculation.damage_network_events import (
 from ra2ce.analysis.damages.damage_calculation.damage_network_return_periods import (
     DamageNetworkReturnPeriods,
 )
+from ra2ce.analysis.damages.damage_functions.manual_damage_functions import (
+    ManualDamageFunctions,
+)
 from ra2ce.analysis.damages.damage_functions.manual_damage_functions_reader import (
     ManualDamageFunctionsReader,
 )
@@ -217,6 +220,7 @@ class TestDamages:
         manual_damage_functions = ManualDamageFunctionsReader().read(
             damages_test_data.joinpath("test_damage_functions")
         )
+        assert isinstance(manual_damage_functions, ManualDamageFunctions)
         fun0 = list(manual_damage_functions.damage_functions.values())[0]
 
         # Check some damage fractions
@@ -261,6 +265,7 @@ class TestDamages:
         manual_damage_functions = ManualDamageFunctionsReader().read(
             damages_test_data.joinpath("test_damage_functions")
         )
+        assert isinstance(manual_damage_functions, ManualDamageFunctions)
         fun0 = list(manual_damage_functions.damage_functions.values())[0]
         assert fun0.prefix == "te"
 

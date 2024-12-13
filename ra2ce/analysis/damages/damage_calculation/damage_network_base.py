@@ -59,7 +59,11 @@ class DamageNetworkBase(ABC):
         # TODO: also create constructors of the children of this class
 
     @abstractmethod
-    def main(self, damage_function: DamageCurveEnum, manual_damage_functions):
+    def main(
+        self,
+        damage_function: DamageCurveEnum,
+        manual_damage_functions: ManualDamageFunctions,
+    ):
         """
         Controller for doing the EAD calculation
 
@@ -171,16 +175,17 @@ class DamageNetworkBase(ABC):
             )
             self._gdf_mask = df.loc[~(df["road_type"] == "none")]
 
-    ### Damage handlers: TODO: move to dataclass ManualDamageFunctions
+    ### Damage handlers
     def calculate_damage_manual_functions(
-        self, events, manual_damage_functions: ManualDamageFunctions
-    ):
+        self, events: list[str], manual_damage_functions: ManualDamageFunctions
+    ) -> None:
         """
-        Arguments:
-            *events* (list) : list of events (or return periods) to iterate over, these should match the hazard column names
-            *manual_damage_functions* (RA2CE ManualDamageFunctions object) :
-        """
+        Calculate the damage using the manual damage functions
 
+        Args:
+            events (list[str]): list of events (or return periods) to iterate over, these should match the hazard column names
+            manual_damage_functions (ManualDamageFunctions): The manual damage functions object
+        """
         # Todo: Dirty fixes, these should be read from the init
         hazard_prefix = "F"
 
@@ -208,7 +213,7 @@ class DamageNetworkBase(ABC):
             "Damage calculation with the manual damage functions was succesfull."
         )
 
-    def calculate_damage_HZ(self, events):
+    def calculate_damage_HZ(self, events: list[str]) -> None:
         """
         Arguments:
            *events* (list) = list of events (or return periods) to iterate over, these should match the hazard column names
@@ -272,7 +277,7 @@ class DamageNetworkBase(ABC):
             "calculate_damage_HZ(): Damage calculation with the Huizinga damage functions was successful"
         )
 
-    def calculate_damage_OSdaMage(self, events):
+    def calculate_damage_OSdaMage(self, events: list[str]) -> None:
         """Damage calculation with the OSdaMage functions"""
 
         def interpolate_damage(row, representative_damage_percentage):
@@ -423,7 +428,7 @@ class DamageNetworkBase(ABC):
         )
 
     ### Utils handlers
-    def create_mask(self):
+    def create_mask(self) -> None:
         """
         #Create a mask of only the dataframes with hazard data (to speed-up damage calculations)
         effect: *self._gdf_mask* = mask of only the rows with hazard data
@@ -441,8 +446,6 @@ class DamageNetworkBase(ABC):
             column_names.remove("geometry")
         self._gdf_mask = self._gdf_mask[column_names]
 
-    def replace_none_with_nan(self):
-        import numpy as np
-
+    def replace_none_with_nan(self) -> None:
         dam_cols = [c for c in self.gdf.columns if c.startswith("dam_")]
         self.gdf[dam_cols] = self.gdf[dam_cols].fillna(value=np.nan)

@@ -20,6 +20,7 @@ class TestManualDamageFunctionsReader:
     def test_read_returns_manual_damage_functions(self):
         # 1. Define test data
         _path = test_data.joinpath("damages", "test_damage_functions")
+        assert _path.exists()
 
         # 2. Execute test
         _result = ManualDamageFunctionsReader().read(_path)

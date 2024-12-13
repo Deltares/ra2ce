@@ -18,6 +18,8 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from __future__ import annotations
+
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -40,20 +42,23 @@ class DamageFunctionByRoadTypeByLane:
     name (str)
     """
 
-    max_damage: MaxDamage = None
-    damage_fraction: DamageFractionUniform = None
-    name: str = None
+    max_damage: MaxDamage
+    damage_fraction: DamageFractionUniform
+    name: str
 
     @property
     def prefix(self) -> str:
-        return self.name[0:2]
+        return self.name[0:2] if len(self.name) > 2 else self.name
 
     @classmethod
-    def from_input_folder(cls, name, folder_path: Path):
+    def from_input_folder(
+        cls, name: str, folder_path: Path
+    ) -> DamageFunctionByRoadTypeByLane:
         """Construct a set of damage functions from csv files located in the folder_path
 
         Arguments:
-            *folder_path* (Pathlib Path) : path to folder where csv files can be found
+            name (str) : name of the damage function
+            folder_path (Pathlib Path) : path to folder where csv files can be found
         """
 
         def find_unique_csv_file(folder_path: Path, part_of_filename: str) -> Path:
@@ -78,7 +83,7 @@ class DamageFunctionByRoadTypeByLane:
 
         # Load the max_damage object
         max_dam_path = find_unique_csv_file(folder_path, "max_damage")
-        max_damage = MaxDamage.from_csv(max_dam_path, sep=";")
+        max_damage = MaxDamage.from_csv(max_dam_path, ";")
 
         # Load the damage fraction function
         # search in the folder for something *damage_fraction
@@ -90,7 +95,7 @@ class DamageFunctionByRoadTypeByLane:
         return cls(max_damage=max_damage, damage_fraction=damage_fraction, name=name)
 
     # Todo: these two below functions are maybe better implemented at a lower level?
-    def add_max_damage(self, df: pd.DataFrame, prefix: str = None):
+    def add_max_damage(self, df: pd.DataFrame, prefix: str) -> pd.DataFrame:
         """ "Ads the max damage value to the dataframe"""
         cols = df.columns
         assert "road_type" in cols, "no column 'road type' in df"
