@@ -101,8 +101,9 @@ class LossesBase(AnalysisLossesProtocol, AnalysisBase, ABC):
             self.analysis.production_loss_per_capita_per_hour
         )
 
-        self._check_validity_analysis_files()
-        self.intensities = TrafficIntensitiesReader([self.link_id]).read(
+        # TODO: move this to the execute?
+        # self._check_validity_analysis_files()
+        self.intensities = TrafficIntensitiesReader(self.link_id).read(
             self.analysis.traffic_intensities_file
         )
         self.resilience_curves = ResilienceCurvesReader().read(

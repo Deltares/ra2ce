@@ -66,13 +66,23 @@ class AnalysisRunnerFactory:
         return _supported_runners
 
     @staticmethod
-    def run(ra2ce_input: ConfigWrapper) -> list[AnalysisResultWrapper]:
+    def run(
+        ra2ce_input: ConfigWrapper,
+        analysis_collection: AnalysisCollection,
+    ) -> list[AnalysisResultWrapper]:
+        """
+        Runs the given analysis collection.
+
+        Args:
+            ra2ce_input (Ra2ceInput): Input representing a set of network and analysis ini configurations.
+            analysis_collection (AnalysisCollection): Collection of analyses to run.
+
+        Returns:
+            list[AnalysisResultWrapper]: List of analysis results.
+        """
         _supported_runners = AnalysisRunnerFactory.get_supported_runners(ra2ce_input)
-        _analysis_collection = AnalysisCollection.from_config(
-            ra2ce_input.analysis_config
-        )
         _results = []
         for _runner_type in _supported_runners:
-            _run_results = _runner_type().run(_analysis_collection)
+            _run_results = _runner_type().run(analysis_collection)
             _results.extend(_run_results)
         return _results

@@ -64,14 +64,12 @@ class TestLosses:
         )
 
         # 2. Run test.
-        with pytest.raises(ValueError) as exc:
-            _losses = losses_analysis(_analysis_input, _config)
+        _losses = losses_analysis(_analysis_input, _config)
 
         # 3. Verify final expectations.
-        assert (
-            str(exc.value)
-            == "traffic_intensities_file, resilience_curves_file, and values_of_time_file should be given"
-        )
+        assert isinstance(_losses, LossesBase)
+        assert isinstance(_losses, losses_analysis)
+        assert isinstance(_losses, AnalysisBase)
 
     def test_initialize_with_data(
         self,

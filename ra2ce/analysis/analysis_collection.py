@@ -24,6 +24,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from ra2ce.analysis.adaptation.adaptation import Adaptation
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
+)
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
+)
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_factory import AnalysisFactory
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
@@ -47,6 +54,8 @@ class AnalysisCollection:
         Returns:
             AnalysisCollection: Collection of analyses to be executed.
         """
+        if not analysis_config:
+            return None
         return cls(
             damages_analyses=[
                 AnalysisFactory.get_damages_analysis(analysis, analysis_config)
@@ -60,3 +69,14 @@ class AnalysisCollection:
                 analysis_config.config_data.adaptation, analysis_config
             ),
         )
+
+    def get_analysis(
+        self, analysis_type: AnalysisEnum | AnalysisDamagesEnum | AnalysisLossesEnum
+    ) -> AnalysisLossesProtocol | AnalysisDamagesProtocol | Adaptation:
+        if analysis_type == AnalysisEnum.ADAPTATION:
+            return self.adaptation_analysis
+        if isinstance(analysis_type, AnalysisDamagesEnum):
+            return next((x for x in self.damages_analyses), None)
+        if isinstance(analysis_type, AnalysisLossesEnum):
+            return next((x for x in self.losses_analyses), None)
+        raise ValueError(f"Analysis type {analysis_type} not found in the collection.")
