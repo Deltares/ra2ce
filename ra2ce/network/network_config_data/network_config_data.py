@@ -46,7 +46,7 @@ class NetworkSection:
     primary_file: list[Path] = field(default_factory=list)
     diversion_file: list[Path] = field(default_factory=list)
     file_id: str = ""
-    link_type_column: str = ""
+    link_type_column: str = "highway"
     polygon: Optional[Path] = None
     network_type: NetworkTypeEnum = field(default_factory=lambda: NetworkTypeEnum.NONE)
     road_types: list[RoadTypeEnum] = field(default_factory=list)
@@ -82,7 +82,6 @@ class HazardSection:
     hazard_field_name: str = ""
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     hazard_crs: str = ""
-    scenario_cost: list[float] = field(default_factory=list)
     # If False no overlay of the segmented network will be created.
     overlay_segmented_network: bool = True
 

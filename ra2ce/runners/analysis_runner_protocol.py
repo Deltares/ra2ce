@@ -21,8 +21,10 @@
 
 from typing import Protocol, runtime_checkable
 
-from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_collection import AnalysisCollection
+from ra2ce.analysis.analysis_result.analysis_result_wrapper_protocol import (
+    AnalysisResultWrapperProtocol,
+)
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 
 
@@ -41,14 +43,14 @@ class AnalysisRunner(Protocol):
         """
 
     def run(
-        self, analysis_config: AnalysisConfigWrapper
-    ) -> list[AnalysisResultWrapper]:
+        self, analysis_collection: AnalysisCollection
+    ) -> list[AnalysisResultWrapperProtocol]:
         """
-        Runs this `AnalysisRunner` with the given analysis configuration.
+        Runs this `AnalysisRunner` for the given analysis collection.
 
         Args:
-            analysis_config (AnalysisConfigWrapper): Analysis configuration representation to be run on this `AnalysisRunner`.
+            analysis_collection (AnalysisCollection): Collection of analyses to be run on this `AnalysisRunner`.
 
         Returns:
-            list[AnalysisResultWrapper]: List of all results for all ran analysis.
+            list[AnalysisResultWrapperProtocol]: List of all results for all ran analysis.
         """

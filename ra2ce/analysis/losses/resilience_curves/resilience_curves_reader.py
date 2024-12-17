@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from ast import literal_eval
+from dataclasses import dataclass, field
 from pathlib import Path
 from re import findall
 
@@ -27,17 +28,20 @@ from ra2ce.analysis.losses.resilience_curves.resilience_curves import Resilience
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 
+@dataclass
 class ResilienceCurvesReader(LossesInputDataReaderBase):
     """
     Class to read the resilience curves from a csv file.
     """
 
-    csv_columns = [
-        "link_type_hazard_intensity",
-        "duration_steps",
-        "functionality_loss_ratio",
-    ]
-    data_type = ResilienceCurves
+    object_type: type = ResilienceCurves
+    csv_columns: list[str] = field(
+        default_factory=lambda: [
+            "link_type_hazard_intensity",
+            "duration_steps",
+            "functionality_loss_ratio",
+        ]
+    )
 
     def _parse_df(self, df: pd.DataFrame) -> ResilienceCurves:
         def parse_link_type_hazard_intensity(

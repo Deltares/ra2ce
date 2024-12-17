@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 from shapely.geometry import LineString
 
+from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
     AnalysisSectionLosses,
@@ -21,6 +22,7 @@ from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtoco
 from ra2ce.analysis.losses.losses_base import LossesBase
 from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
 from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
+from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 from tests import test_data
 
@@ -115,6 +117,7 @@ class TestLosses:
         # 3. Verify final expectations.
         assert isinstance(_losses, LossesBase)
         assert isinstance(_losses, losses_analysis)
+        assert isinstance(_losses, AnalysisBase)
 
     def test_calc_vlh(
         self,
@@ -154,6 +157,7 @@ class TestLosses:
 
         _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
+        _network_config.config_data.hazard.aggregate_wl = AggregateWlEnum.MAX
         _valid_analysis_ini = test_data.joinpath("losses", "analyses.ini")
         _config = AnalysisConfigWrapper.from_data_with_network(
             _valid_analysis_ini, _config_data, _network_config
@@ -220,6 +224,7 @@ class TestLosses:
                 "losses", "csv_data_for_losses", "results_test_calc_vlh.csv"
             )
         )
+        _expected_result.reset_index(inplace=True)
 
         # 3. Verify final expectations.
         assert isinstance(_result, pd.DataFrame)
@@ -227,4 +232,14 @@ class TestLosses:
         pd.testing.assert_frame_equal(
             _result[["vlh_business_EV1_ma", "vlh_commute_EV1_ma"]],
             _expected_result[["vlh_business_EV1_ma", "vlh_commute_EV1_ma"]],
+        )
+        assert "vlh_business_EV2_mi" in _result
+        pd.testing.assert_frame_equal(
+            _result[["vlh_business_EV2_mi", "vlh_EV2_mi_total"]],
+            _expected_result[["vlh_business_EV2_mi", "vlh_EV2_mi_total"]],
+        )
+        assert "vlh_business_RP100_me" in _result
+        pd.testing.assert_frame_equal(
+            _result[["vlh_business_RP100_me", "vlh_RP100_me_total"]],
+            _expected_result[["vlh_business_RP100_me", "vlh_RP100_me_total"]],
         )

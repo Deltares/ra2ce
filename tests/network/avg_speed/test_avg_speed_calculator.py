@@ -6,7 +6,7 @@ import pytest
 
 from ra2ce.network.avg_speed.avg_speed_calculator import AvgSpeedCalculator
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
-from tests import test_data, test_results
+from tests import test_results
 
 _SPEED_SECONDARY = 80.0
 _SPEED_TERTIARY = 30.0
@@ -36,12 +36,18 @@ class TestAvgSpeedCalculator:
             maxspeed=str(round(_SPEED_SECONDARY)),
             length=2200.0,
         )
-        _graph.add_edge(1, 4, key=5, highway="['primary', 'tertiary']", length=5000.0)
+        _graph.add_edge(
+            1,
+            4,
+            key=5,
+            highway="['primary', 'tertiary']",
+            length=5000.0,
+        )
         yield _graph
 
     def test_initialize(self, valid_network: nx.MultiGraph):
         # 1. Run test
-        _calculator = AvgSpeedCalculator(valid_network, None)
+        _calculator = AvgSpeedCalculator(valid_network, "highway", None)
 
         # 2. Verify expectations
         assert isinstance(_calculator, AvgSpeedCalculator)
@@ -56,7 +62,7 @@ class TestAvgSpeedCalculator:
             pytest.param("60;50", 55.0, id="; as separator"),
             pytest.param("60-50", 55.0, id="- as separator"),
             pytest.param("60|50", 55.0, id="| as separator"),
-            pytest.param("50 mph", 80.4672, id="Mph string"),
+            pytest.param("50 mph", 80.4672, id="mph string"),
         ],
     )
     def test_parse_speed(self, speed: str, expected: float):
@@ -66,9 +72,9 @@ class TestAvgSpeedCalculator:
         # 2. Verify expectations
         assert _result == pytest.approx(expected)
 
-    def test_calculate_without_output_dir(self, valid_network: nx.MultiGraph):
+    def test_calculate(self, valid_network: nx.MultiGraph):
         # 1. Run test
-        _calculator = AvgSpeedCalculator(valid_network, None)
+        _calculator = AvgSpeedCalculator(valid_network, "highway", None)
 
         # 2. Verify expectations
         assert _calculator.avg_speed is not None
@@ -95,6 +101,20 @@ class TestAvgSpeedCalculator:
             == _SPEED_DEFAULT
         )
 
+    def test_calculate_skips_zero_speed_edges(self):
+        # 1 Define test data
+        _graph = nx.MultiGraph()
+        _graph.add_nodes_from([1, 2])
+        _graph.add_edge(1, 2, highway="tertiary", maxspeed="0", length=1000.0)
+        _graph.add_edge(1, 2, highway="tertiary", maxspeed="10", length=200.0)
+        _graph.add_edge(1, 2, highway="tertiary", maxspeed="16", length=400.0)
+
+        # 2. Run test
+        _calculator = AvgSpeedCalculator(_graph, "highway", None)
+
+        # 3. Verify expectations
+        assert _calculator.avg_speed.get_avg_speed([RoadTypeEnum.TERTIARY]) == 14
+
     def test_calculate_with_empty_output_dir_creates_csv(
         self, valid_network: nx.MultiGraph, request: pytest.FixtureRequest
     ):
@@ -104,7 +124,7 @@ class TestAvgSpeedCalculator:
         _csv_path.unlink(missing_ok=True)
 
         # 2. Run test
-        _calculator = AvgSpeedCalculator(valid_network, _csv_dir)
+        _calculator = AvgSpeedCalculator(valid_network, "highway", _csv_dir)
 
         # 3. Verify expectations
         assert _csv_path.is_file()
@@ -116,14 +136,14 @@ class TestAvgSpeedCalculator:
         assert avg_speed_csv.is_file()
 
         # 2. Run test
-        _calculator = AvgSpeedCalculator(valid_network, avg_speed_csv.parent)
+        _calculator = AvgSpeedCalculator(valid_network, "highway", avg_speed_csv.parent)
 
         # 3. Verify expectations
         assert len(_calculator.avg_speed.road_types) > 0
 
     def test_assign(self, valid_network: nx.MultiGraph):
         # 1. Define test data
-        _calculator = AvgSpeedCalculator(valid_network, None)
+        _calculator = AvgSpeedCalculator(valid_network, "highway", None)
 
         # 2. Run test
         _calculator.assign()

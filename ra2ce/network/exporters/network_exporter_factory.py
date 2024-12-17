@@ -47,7 +47,7 @@ class NetworkExporterFactory:
         export_types: list[str],
     ) -> None:
         _exporter_type = self.get_exporter_type(network)
-        self._exporter = _exporter_type(basename, export_types)
+        self._exporter = _exporter_type(basename=basename, export_types=export_types)
         self._exporter.export(output_dir, network)
 
     def get_pickle_path(self) -> Path:

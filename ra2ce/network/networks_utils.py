@@ -20,10 +20,10 @@
 """
 import itertools
 import logging
-import math
 import os
 import sys
 import warnings
+from copy import deepcopy
 from pathlib import Path
 from statistics import mean
 from typing import Optional
@@ -37,7 +37,6 @@ import rasterio
 import rtree
 from geopy import distance
 from numpy.ma import MaskedArray
-from osgeo import gdal
 from osmnx import graph_to_gdfs
 from rasterio.features import shapes
 from rasterio.mask import mask
@@ -1143,47 +1142,45 @@ def graph_to_gdf(
     return edges, nodes
 
 
-def graph_to_gpkg(origin_graph: nx.Graph, edge_gpkg: str, node_gpkg: str) -> None:
-    """Takes in a networkx graph object and outputs shapefiles at the paths indicated by edge_gpkg and node_gpkg
+def get_nodes_and_edges_from_origin_graph(
+    origin_graph: nx.Graph,
+) -> tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+    """
+    Takes in a networkx graph object and returns the `GeoDataFrame` with separated
+    nodes and edges.
 
     Arguments:
         origin_graph [nx.Graph]: networkx graph object to be converted
-        edge_gpkg [str]: output path including extension for edges geopackage
-        node_gpkg [str]: output path including extension for nodes geopackage
 
     Returns:
-        None
+        tuple[gpd.GeoDataFrame, gpd.GeoDataFrame]:
+            resulting tuple of formatted `gpd.GeoDataFrame` for nodes and edges.
     """
     # now only multidigraphs and graphs are used
     if type(origin_graph) == nx.Graph:
+        # isinstance / issubclass will not work as nx.MultiGraph would return True
         origin_graph = nx.MultiGraph(origin_graph)
 
     # The nodes should have a geometry attribute (perhaps on top of the x and y attributes)
-    nodes, edges = graph_to_gdfs(origin_graph, node_geometry=False)
+    _nodes, _edges = graph_to_gdfs(origin_graph, node_geometry=False)
 
-    dfs = [edges, nodes]
+    dfs = [_edges, _nodes]
     for df in dfs:
         for col in df.columns:
             if df[col].dtype == object and col != df.geometry.name:
                 df[col] = df[col].astype(str)
 
     # Add a CRS to the nodes
-    if nodes.crs is None and edges.crs is not None:
-        nodes.crs = edges.crs
-
-    logging.info("Saving nodes as shapefile: {}".format(node_gpkg))
-    logging.info("Saving edges as shapefile: {}".format(edge_gpkg))
+    if _nodes.crs is None and _edges.crs is not None:
+        _nodes.crs = _edges.crs
 
     # The encoding utf-8 might result in an empty shapefile if the wrong encoding is used.
-    for entity in [nodes, edges]:
+    for entity in [_nodes, _edges]:
         if "osmid" in entity:
             # Otherwise it gives this error: cannot insert osmid, already exist
             entity["osmid_original"] = entity.pop("osmid")
-    for _path in [node_gpkg, edge_gpkg]:
-        if _path.exists():
-            _path.unlink()
-    nodes.to_file(node_gpkg, driver="GPKG", encoding="utf-8")
-    edges.to_file(edge_gpkg, driver="GPKG", encoding="utf-8")
+
+    return _nodes, _edges
 
 
 @staticmethod
@@ -1279,28 +1276,6 @@ def read_merge_shp(shp_file_analyse, id_name, shp_file_diversion=[], crs_=4326):
     return lines
 
 
-def check_hazard_extent_resolution(list_hazards):
-    """Checks whether the extent of a list of hazard rasters is exactly the same.
-
-    Args:
-        list_hazards (list of pathlib paths or strings): A list of paths to the hazard map rasters of which
-            the extent needs to be checked
-
-    Returns:
-        (bool): True if the extents are exactly the same, False if they are not.
-    """
-    if len(list_hazards) == 1:
-        return True
-    check_hazard_extent = [
-        gdal.Open(str(haz)).GetGeoTransform() for haz in list_hazards
-    ]
-    if len(set(check_hazard_extent)) == 1:
-        # All hazard have the exact same extents and resolution
-        return True
-    else:
-        return False
-
-
 def get_extent(dataset):
     cols = dataset.RasterXSize
     rows = dataset.RasterYSize
@@ -1385,6 +1360,7 @@ def reproject_graph(original_graph: nx.Graph, crs_in: str, crs_out: str) -> nx.G
     _reprojected_graph = original_graph.copy()
     set_values = gdf_out.to_dict(orient="index")
     nx.set_edge_attributes(_reprojected_graph, values=set_values)
+    _reprojected_graph.graph["crs"] = crs_out
     return _reprojected_graph
 
 
@@ -1502,16 +1478,16 @@ def add_simple_id_to_graph_complex(
 
     """
 
-    obtained_complex_ids = nx.get_edge_attributes(
-        complex_graph, "{}_c".format(new_id)
-    )  # {(u,v,k) : 'rfid_c'}
-    simple_ids_per_complex_id = obtained_complex_ids  # start with a copy
+    # {(u,v,k) : 'rfid_c'}
+    obtained_complex_ids = nx.get_edge_attributes(complex_graph, "{}_c".format(new_id))
+    # start with a copy
+    simple_ids_per_complex_id = deepcopy(obtained_complex_ids)
 
-    for key, value in obtained_complex_ids.items():  # {(u,v,k) : 'rfid_c'}
+    # {(u,v,k) : 'rfid_c'}
+    for key, value in obtained_complex_ids.items():
         try:
-            new_value = complex_to_simple[
-                value
-            ]  # find simple id belonging to the complex id
+            # find simple id belonging to the complex id
+            new_value = complex_to_simple[value]
             simple_ids_per_complex_id[key] = new_value
         except KeyError as e:
             logging.error(
@@ -1602,3 +1578,43 @@ def buffer_geometry(
         cap_style=cap_stype,
     )
     return gdf
+
+
+def add_complex_id_to_graph_simple(
+    simple_graph: nx.classes.Graph, simple_to_complex, simple_id: str
+) -> nx.classes.Graph:
+    """Adds the appropriate ID of the complex graph to each edge of the simple graph as a new attribute 'rfid_c'
+
+    Arguments:
+        simple_graph (Graph) : The simple graph, to update its 'rfid_c'
+        simple_to_complex (dict) : lookup table linking complex to simple graphs
+        simple_id (str): simple_id attribute to update
+
+    Returns:
+        simple_graph (Graph) : Same object, with added attribute 'rfid_c'
+
+    """
+
+    # {(u,v,k) : 'rfid'}
+    obtained_simple_ids = nx.get_edge_attributes(simple_graph, f"{simple_id}")
+    # start with a copy
+    complex_ids_per_simple_id = deepcopy(obtained_simple_ids)
+
+    # {(u,v,k) : 'rfid'}
+    for key, value in obtained_simple_ids.items():
+        try:
+            # find simple id belonging to the complex id
+            new_value = simple_to_complex[value]
+            complex_ids_per_simple_id[key] = new_value
+        except KeyError as e:
+            logging.error(
+                "Could not find the simple ID belonging to complex ID %s; value set to None. Full error: %s",
+                key,
+                e,
+            )
+            complex_ids_per_simple_id[key] = None
+
+    # Now the format of simple_ids_per_complex_id is: {(u,v,k) : 'rfid}
+    nx.set_edge_attributes(simple_graph, complex_ids_per_simple_id, f"{simple_id}_c")
+
+    return simple_graph

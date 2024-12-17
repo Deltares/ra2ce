@@ -120,7 +120,15 @@ class TestMainCli:
     @pytest.mark.parametrize(
         "case_data_dir",
         [
-            pytest.param("acceptance_test_data", id="Default test data"),
+            pytest.param(
+                "acceptance_test_data",
+                id="Default test data",
+                marks=[
+                    pytest.mark.skip(
+                        reason="Test superseeded by running all jupyter notebook examples"
+                    )
+                ],
+            ),
         ]
         + _external_test_cases,
         indirect=["case_data_dir"],
@@ -220,16 +228,17 @@ class TestMainCli:
             return filepath.exists() and filepath.is_file()
 
         # Graph files
-        assert all(_verify_file(_graph_dir / _f) for _f in expected_graph_files)
+        assert all(_verify_file(_graph_dir.joinpath(_f)) for _f in expected_graph_files)
 
         # Analysis files
-        assert all(
-            list(
-                chain(
-                    *(
-                        list(map(lambda x: _verify_file(_analysis_dir / k / x), v))
-                        for k, v in expected_analysis_files.items()
-                    )
+        _not_generated_files = []
+        for _subdir_name, _subdir_files in expected_analysis_files.items():
+            _not_generated_files.extend(
+                filter(
+                    lambda x: not _verify_file(_analysis_dir.joinpath(_subdir_name, x)),
+                    _subdir_files,
                 )
             )
-        )
+        _err_mssg = ", ".join(_not_generated_files)
+        if any(_not_generated_files):
+            pytest.fail(f"The following expected files were not generated: {_err_mssg}")

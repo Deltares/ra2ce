@@ -15,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 import re
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import pandas as pd
@@ -31,17 +32,15 @@ from ra2ce.analysis.losses.traffic_intensities.traffic_intensities import (
 )
 
 
+@dataclass
 class TrafficIntensitiesReader(LossesInputDataReaderBase):
     """
     Class to read the traffic intensities per traffic period from a csv file.
     """
 
-    csv_columns = []
-    separator = ","
-    data_type = TrafficIntensities
-
-    def __init__(self, link_id: str) -> None:
-        self.csv_columns = [link_id]
+    csv_columns: list[str] = field(default_factory=list)
+    separator: str = ","
+    object_type: type = TrafficIntensities
 
     def _parse_df(self, df: pd.DataFrame) -> TrafficIntensities:
         _traffic_intensities = TrafficIntensities()

@@ -1,28 +1,29 @@
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Type
 
 import pytest
 
+from ra2ce.analysis.adaptation.adaptation import Adaptation
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
+    AnalysisSectionAdaptation,
     AnalysisSectionDamages,
     AnalysisSectionLosses,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
+from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
+from ra2ce.analysis.damages.damages import Damages
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
-
-_unsupported_damages_analyses = [
-    AnalysisDamagesEnum.EFFECTIVENESS_MEASURES,
-    AnalysisDamagesEnum.INVALID,
-]
-_unsupported_losses_analyses = [AnalysisLossesEnum.INVALID]
+from ra2ce.analysis.losses.losses_base import LossesBase
 
 
 class TestAnalysisCollection:
@@ -59,8 +60,7 @@ class TestAnalysisCollection:
         "analysis",
         [
             pytest.param(_analysis_type)
-            for _analysis_type in AnalysisDamagesEnum
-            if _analysis_type not in _unsupported_damages_analyses
+            for _analysis_type in AnalysisDamagesEnum.list_valid_options()
         ],
     )
     def test_create_collection_with_damages_analyses(
@@ -89,8 +89,7 @@ class TestAnalysisCollection:
         "analysis",
         [
             pytest.param(_analysis_type)
-            for _analysis_type in AnalysisLossesEnum
-            if _analysis_type not in _unsupported_losses_analyses
+            for _analysis_type in AnalysisLossesEnum.list_valid_options()
         ],
     )
     def test_create_collection_with_losses_analyses(
@@ -128,3 +127,20 @@ class TestAnalysisCollection:
             _collection = AnalysisCollection.from_config(_config)
             # 3. Verify expectations.
             verify_expectations(_collection, analysis)
+
+    def test_create_collection_with_adaptation(self):
+        # 1. Define test data.
+        _config = AnalysisConfigWrapper()
+        _config.config_data.input_path = Path("Any path")
+        _config.config_data.analyses.append(
+            AnalysisSectionAdaptation(analysis=AnalysisEnum.ADAPTATION)
+        )
+
+        # 2. Run test.
+        _collection = AnalysisCollection.from_config(_config)
+
+        # 3. Verify expectations.
+        assert isinstance(_collection, AnalysisCollection)
+        assert (
+            _collection.adaptation_analysis.analysis.analysis == AnalysisEnum.ADAPTATION
+        )

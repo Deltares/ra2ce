@@ -32,7 +32,7 @@ from shapely.errors import ShapelyDeprecationWarning
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.analysis_result_wrapper import AnalysisResultWrapper
+from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
 from ra2ce.configuration.config_factory import ConfigFactory
 from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.network.network_config_data.network_config_data import NetworkConfigData
@@ -117,6 +117,9 @@ class Ra2ceHandler:
                 _analysis_config.config_data.origins_destinations = (
                     _handler.input_config.network_config.config_data.origins_destinations
                 )
+                _analysis_config.config_data.aggregate_wl = (
+                    _handler.input_config.network_config.config_data.hazard.aggregate_wl
+                )
                 _analysis_config.graph_files = (
                     _handler.input_config.network_config.graph_files
                 )
@@ -175,8 +178,7 @@ class Ra2ceHandler:
             logging.error(_error)
             raise ValueError(_error)
 
-        _runner = AnalysisRunnerFactory.get_runner(self.input_config)
-        return _runner.run(self.input_config.analysis_config)
+        return AnalysisRunnerFactory.run(self.input_config)
 
     @staticmethod
     def run_with_ini_files(

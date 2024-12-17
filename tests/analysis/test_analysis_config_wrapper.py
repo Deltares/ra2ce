@@ -75,7 +75,6 @@ class TestAnalysisConfigWrapper:
         _output_dir = test_results / request.node.name
         _analysis.config_data = AnalysisConfigData(output_path=_output_dir)
         _analysis.config_data.analyses = [
-            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.EFFECTIVENESS_MEASURES),
             AnalysisSectionLosses(analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY),
         ]
         if _output_dir.exists():
@@ -86,7 +85,6 @@ class TestAnalysisConfigWrapper:
 
         # 3. Verify expectations.
         assert _output_dir.exists()
-        assert _output_dir.joinpath("effectiveness_measures").exists()
         assert _output_dir.joinpath("single_link_redundancy").exists()
 
     def test_analysis_config_wrapper_valid_without_ini_file(self):
