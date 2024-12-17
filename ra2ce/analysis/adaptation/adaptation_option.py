@@ -162,13 +162,9 @@ class AdaptationOption:
         """
         _result_gdf = GeoDataFrame()
         for _analysis in self.analyses:
-            _result_gdf[
-                f"{self.impact_col}_{_analysis.analysis_type.config_value}"
-            ] = _analysis.execute(self.analysis_config)
+            _result_gdf = _analysis.execute(self.analysis_config)
 
         # Calculate the impact (summing the results of the analyses)
-        _result_gdf[self.impact_col] = (
-            _result_gdf.sum(axis=1) * net_present_value_factor
-        )
+        _result_gdf[self.impact_col] = _result_gdf["dam_EV1_al"] * net_present_value_factor
 
         return _result_gdf

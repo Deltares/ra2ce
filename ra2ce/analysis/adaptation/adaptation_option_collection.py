@@ -142,8 +142,8 @@ class AdaptationOptionCollection:
             for _col in _impact_gdf.columns:
                 _benefit_gdf[_col] = _impact_gdf[_col]
             _benefit_gdf[_option.benefit_col] = (
-                _benefit_gdf[_option.impact_col]
-                - _benefit_gdf[self.reference_option.impact_col]
+                _benefit_gdf[self.reference_option.impact_col]
+                 - _benefit_gdf[_option.impact_col]
             )
 
         return _benefit_gdf

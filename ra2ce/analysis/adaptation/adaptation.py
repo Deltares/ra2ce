@@ -85,7 +85,8 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
         Returns:
             GeoDataFrame: The result of the cost calculation.
         """
-        _orig_gdf = self.graph_file_hazard.get_graph()
+        # _orig_gdf = self.graph_file_hazard.get_graph()
+        _orig_gdf = self.run_benefit()
         _fraction_col = _orig_gdf.filter(regex="EV.*_fr").columns[0]
 
         _cost_gdf = GeoDataFrame()
@@ -132,11 +133,11 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
             benefit_gdf.insert(loc=0, column=col_name, value=from_gdf[col_name])
 
         # Copy relevant columns from the original graph
-        _orig_gdf = self.graph_file_hazard.get_graph()
-        benefit_gdf.set_geometry(_orig_gdf.geometry, inplace=True)
-        for _col in ["length", "highway", "infra_type", "link_id"]:
-            copy_column(_orig_gdf, _col)
-
+        # _orig_gdf = self.graph_file_hazard.get_graph()
+        # benefit_gdf.set_geometry(_orig_gdf.geometry, inplace=True)
+        # for _col in ["length", "highway", "infra_type", "link_id", "rfid"]:
+        #     copy_column(_orig_gdf, _col)
+        benefit_gdf["cost_AO1"] = cost_gdf["AO1_cost"]
         for _option in self.adaptation_collection.adaptation_options:
             # Copy cost columns from the cost gdf
             copy_column(cost_gdf, _option.cost_col)
@@ -146,5 +147,11 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
             ].replace(float("nan"), 0) / benefit_gdf[_option.cost_col].replace(
                 0, float("nan")
             )
+
+        #row for which osmid = 3513
+        #print(benefit_gdf[benefit_gdf['osmid'] == 3513])
+        # benefit_gdf[benefit_gdf['rfid'] == 572]
+        #origi_gdf len =3380 number of segments
+        #benefit_gdf len=625 number of link
 
         return benefit_gdf
