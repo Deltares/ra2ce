@@ -71,11 +71,11 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
         Returns:
             AnalysisResultWrapper: The result of the adaptation analysis.
         """
-        _cost_gdf = self.run_cost()
-        _benefit_gdf = self.run_benefit()
+        _cost_df = self.run_cost()
+        _benefit_df = self.run_benefit()
 
         return self.generate_result_wrapper(
-            self.calculate_bc_ratio(_benefit_gdf, _cost_gdf)
+            self.calculate_bc_ratio(_benefit_df, _cost_df)
         )
 
     def run_cost(self) -> DataFrame:
@@ -90,19 +90,19 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
         _orig_gdf = self.graph_file_hazard.get_graph()
         _fraction_col = _orig_gdf.filter(regex="EV.*_fr").columns[0]
 
-        _cost_gdf = _orig_gdf[["link_id"]].copy()
+        _cost_df = _orig_gdf[["link_id"]].copy()
         for (
             _option,
             _cost,
         ) in self.adaptation_collection.calculate_options_unit_cost().items():
-            _cost_gdf[_option.cost_col] = _orig_gdf.apply(
+            _cost_df[_option.cost_col] = _orig_gdf.apply(
                 lambda x, cost=_cost: x["length"] * cost, axis=1
             )
             # Only calculate the cost for the impacted fraction of the links.
             if self.analysis.hazard_fraction_cost:
-                _cost_gdf[_option.cost_col] *= _orig_gdf[_fraction_col]
+                _cost_df[_option.cost_col] *= _orig_gdf[_fraction_col]
 
-        return _cost_gdf
+        return _cost_df
 
     def run_benefit(self) -> DataFrame:
         """
@@ -120,8 +120,8 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
         Calculate the benefit-cost ratio for all adaptation options.
 
         Args:
-            benefit_gdf (DataFrame): Df containing the benefit of the adaptation options.
-            cost_gdf (DataFrame): Df containing the cost of the adaptation options.
+            benefit_df (DataFrame): Df containing the benefit of the adaptation options.
+            cost_df (DataFrame): Df containing the cost of the adaptation options.
 
         Returns:
             GeoDataFrame: Gdf containing the benefit-cost ratio of the adaptation options,
