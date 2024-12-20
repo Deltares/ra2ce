@@ -131,18 +131,18 @@ class AdaptationOptionCollection:
         net_present_value_factor = self.get_net_present_value_factor()
 
         # Calculate impact of reference option
-        _benefit_gdf = self.reference_option.calculate_impact(net_present_value_factor)
+        _benefit_df = self.reference_option.calculate_impact(net_present_value_factor)
 
         # Calculate impact and benefit of adaptation options
         for _option in self.adaptation_options:
             _impact_gdf = _option.calculate_impact(net_present_value_factor)
             # Copy columns except the id column
             _result_cols = _impact_gdf.filter(regex="^(?!link_id)").columns
-            _benefit_gdf[_result_cols] = _impact_gdf[_result_cols]
+            _benefit_df[_result_cols] = _impact_gdf[_result_cols]
             # Benefit = reference impact - adaptation impact
-            _benefit_gdf[_option.benefit_col] = (
-                _benefit_gdf[self.reference_option.net_impact_col]
-                - _benefit_gdf[_option.net_impact_col]
+            _benefit_df[_option.benefit_col] = (
+                _benefit_df[self.reference_option.net_impact_col]
+                - _benefit_df[_option.net_impact_col]
             )
 
-        return _benefit_gdf
+        return _benefit_df
