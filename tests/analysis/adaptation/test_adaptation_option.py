@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 import pytest
 from geopandas import GeoDataFrame
-from pandas import Series
+from pandas import DataFrame, Series
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.adaptation.adaptation_option_analysis import (
@@ -156,22 +156,29 @@ class TestAdaptationOption:
         assert isinstance(_result, float)
         assert _result == pytest.approx(net_unit_cost)
 
-    def test_calculate_impact_returns_gdf(self) -> GeoDataFrame:
+    def test_calculate_impact_returns_df(self):
         @dataclass
         # Mock to avoid the need to run the impact analysis.
         class MockAdaptationOptionAnalysis(AdaptationOptionAnalysis):
             result: float
 
-            def execute(self, _: AnalysisConfigWrapper) -> Series:
-                return Series(self.result, index=range(_nof_rows))
+            def execute(self, _: AnalysisConfigWrapper) -> DataFrame:
+                return GeoDataFrame.from_dict(
+                    {
+                        _id_col: range(10),
+                        self.analysis_type: self.result,
+                    }
+                )
 
         # 1. Define test data.
+        _id_col = "link_id"
         _nof_rows = 10
         _analyses = [
             MockAdaptationOptionAnalysis(
                 analysis_type=_analysis_type,
                 analysis_class=None,
                 analysis_input=None,
+                id_col=_id_col,
                 result_col=f"Result_{i}",
                 result=(i + 1) * 1.0e6,
             )
@@ -193,10 +200,10 @@ class TestAdaptationOption:
         )
 
         # 2. Run test.
-        _result = _option.calculate_impact(1.0)
+        _result = _option.calculate_impact(1.1)
 
         # 3. Verify expectations.
-        assert isinstance(_result, GeoDataFrame)
-        assert _result[_option.impact_col].sum() == pytest.approx(
+        assert isinstance(_result, DataFrame)
+        assert _result[_option.event_impact_col].sum() == pytest.approx(
             _nof_rows * sum(x.result for x in _analyses)
         )

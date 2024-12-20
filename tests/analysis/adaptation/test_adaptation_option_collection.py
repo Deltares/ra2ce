@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 
 import pytest
-from geopandas import GeoDataFrame
-from pandas import Series
+from pandas import DataFrame
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
@@ -67,46 +66,51 @@ class TestAdaptationOptionCollection:
         assert isinstance(_result, dict)
         assert all(_option in _result for _option in _collection.adaptation_options)
 
-    def test_calculate_options_benefit_returns_gdf(self):
+    def test_calculate_options_benefit_returns_df(self):
         @dataclass
-        class MockOption:
+        class MockOption(AdaptationOption):
             # Mock to avoid the need to run the impact analysis.
-            id: str
-            impact: float
+            impact: float = 0.0
 
-            @property
-            def benefit_col(self) -> str:
-                return f"{self.id}_benefit"
-
-            @property
-            def impact_col(self) -> str:
-                return f"{self.id}_impact"
-
-            def calculate_impact(self, _) -> Series:
-                _impact_gdf = GeoDataFrame(index=range(10))
-                _impact_gdf[self.impact_col] = self.impact
+            def calculate_impact(self, _) -> DataFrame:
+                _impact_gdf = DataFrame.from_dict({_id_col: range(10)})
+                _impact_gdf[self.net_impact_col] = self.impact
                 return _impact_gdf
 
         # 1. Define test data.
+        _id_col = "link_id"
         _nof_rows = 10
-        _reference_benefit = 3.0e6
-        _options = {f"Option{i}": _reference_benefit + (i * 1.0e6) for i in range(3)}
+        _reference_benefit = 5.0e6
+        _options = {f"Option{i}": _reference_benefit - (i * 1.0e6) for i in range(3)}
         _collection = AdaptationOptionCollection(
-            all_options=[MockOption(id=x, impact=y) for x, y in _options.items()]
+            all_options=[
+                MockOption(
+                    id=x,
+                    name=None,
+                    construction_cost=None,
+                    construction_interval=None,
+                    maintenance_cost=None,
+                    maintenance_interval=None,
+                    analyses=None,
+                    analysis_config=None,
+                    impact=y,
+                )
+                for x, y in _options.items()
+            ]
         )
 
         # 2. Run test.
         _result = _collection.calculate_options_benefit()
 
         # 3. Verify expectations.
-        assert isinstance(_result, GeoDataFrame)
+        assert isinstance(_result, DataFrame)
         assert all(
             _option.benefit_col in _result.columns
             for _option in _collection.adaptation_options
         )
         assert all(
             _result[f"{_id}_benefit"].sum(axis=0)
-            == pytest.approx(_nof_rows * (_impact - _reference_benefit))
+            == pytest.approx(_nof_rows * (_reference_benefit - _impact))
             for _id, _impact in _options.items()
             if _id != "Option0"
         )
