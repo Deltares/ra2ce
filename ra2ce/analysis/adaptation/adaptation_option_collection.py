@@ -23,7 +23,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 import numpy as np
-from geopandas import GeoDataFrame
+from pandas import DataFrame
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
@@ -120,7 +120,7 @@ class AdaptationOptionCollection:
             for _option in self.adaptation_options
         }
 
-    def calculate_options_benefit(self) -> GeoDataFrame:
+    def calculate_options_benefit(self) -> DataFrame:
         """
         Calculate the benefit of all adaptation options.
         The benefit is calculated by subtracting the impact of the reference option from the impact of the adaptation option.
@@ -129,21 +129,20 @@ class AdaptationOptionCollection:
             GeoDataFrame: The calculated impact of all adaptation options.
         """
         net_present_value_factor = self.get_net_present_value_factor()
-        _benefit_gdf = GeoDataFrame()
 
         # Calculate impact of reference option
-        _impact_gdf = self.reference_option.calculate_impact(net_present_value_factor)
-        for _col in _impact_gdf.columns:
-            _benefit_gdf[_col] = _impact_gdf[_col]
+        _benefit_gdf = self.reference_option.calculate_impact(net_present_value_factor)
 
         # Calculate impact and benefit of adaptation options
         for _option in self.adaptation_options:
             _impact_gdf = _option.calculate_impact(net_present_value_factor)
-            for _col in _impact_gdf.columns:
-                _benefit_gdf[_col] = _impact_gdf[_col]
+            # Copy columns except the id column
+            _result_cols = _impact_gdf.filter(regex="^(?!link_id)").columns
+            _benefit_gdf[_result_cols] = _impact_gdf[_result_cols]
+            # Benefit = reference impact - adaptation impact
             _benefit_gdf[_option.benefit_col] = (
-                _benefit_gdf[_option.impact_col]
-                - _benefit_gdf[self.reference_option.impact_col]
+                _benefit_gdf[self.reference_option.net_impact_col]
+                - _benefit_gdf[_option.net_impact_col]
             )
 
         return _benefit_gdf

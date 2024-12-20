@@ -21,12 +21,12 @@
 from __future__ import annotations
 
 import logging
+import math
 from copy import deepcopy
 from dataclasses import dataclass
 
 from geopandas import GeoDataFrame
-from numpy import nan
-from pandas import Series
+from pandas import DataFrame
 
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
@@ -37,6 +37,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.damages.damages import Damages
+from ra2ce.analysis.damages.damages_result_wrapper import DamagesResultWrapper
 from ra2ce.analysis.losses.losses_base import LossesBase
 from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
 from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
@@ -47,12 +48,13 @@ class AdaptationOptionAnalysis:
     analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum
     analysis_class: type[Damages | LossesBase]
     analysis_input: AnalysisInputWrapper
+    id_col: str
     result_col: str
 
     @staticmethod
     def get_analysis_info(
         analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
-    ) -> tuple[type[Damages | LossesBase], str]:
+    ) -> tuple[type[Damages | LossesBase], str, str]:
         """
         Get the analysis class and the result column for the given analysis.
 
@@ -63,15 +65,15 @@ class AdaptationOptionAnalysis:
             NotImplementedError: The analysis type is not implemented.
 
         Returns:
-            tuple[type[Damages | LossesBase], str]: The analysis class and the regex to find the result column.
+            tuple[type[Damages | LossesBase], str]: The analysis class, the name of column containing the id and the regex to find the result column.
         """
         if analysis_type == AnalysisDamagesEnum.DAMAGES:
             # Columnname should start with "dam_" and should not end with "_segments"
-            return (Damages, "(?!.*_segments$)^dam_.*")
+            return (Damages, "link_id", "(?!.*_segments$)^dam_.*")
         elif analysis_type == AnalysisLossesEnum.SINGLE_LINK_LOSSES:
-            return (SingleLinkLosses, "^vlh_.*_total$")
+            return (SingleLinkLosses, "link_id", "^vlh_.*_total$")
         elif analysis_type == AnalysisLossesEnum.MULTI_LINK_LOSSES:
-            return (MultiLinkLosses, "^vlh_.*_total$")
+            return (MultiLinkLosses, "link_id", "^vlh_.*_total$")
         raise NotImplementedError(f"Analysis {analysis_type} not supported")
 
     @classmethod
@@ -119,37 +121,41 @@ class AdaptationOptionAnalysis:
         )
 
         # Create output object
-        _analysis_class, _result_col = cls.get_analysis_info(analysis_type)
+        _analysis_class, _id_col, _result_col = cls.get_analysis_info(analysis_type)
 
         return cls(
             analysis_type=analysis_type,
             analysis_class=_analysis_class,
             analysis_input=_analysis_input,
+            id_col=_id_col,
             result_col=_result_col,
         )
 
-    def get_result_column(self, gdf: GeoDataFrame) -> Series:
+    def get_result_columns(self, result_gdf: GeoDataFrame) -> DataFrame:
         """
         Get a column from the dataframe based on the provided regex.
 
         Args:
             gdf (GeoDataFrame): The dataframe to search in.
-            regex (str): Regex to match the column.
 
         Returns:
-            Series: The relevant column.
+            DataFrame: The relevant columns.
         """
-        _result_col = gdf.filter(regex=self.result_col)
-        if _result_col.empty:
+        _result_cols = result_gdf.filter(regex=self.result_col).columns
+        if _result_cols.empty:
             logging.warning(
                 "No column found in dataframe matching the regex %s for analaysis %s. Returning NaN.",
                 self.result_col,
-                self.analysis_type,
+                self.analysis_type.config_value,
             )
-            return Series(nan, index=gdf.index)
-        return _result_col.iloc[:, 0]
+            return result_gdf[[self.id_col]].assign(
+                **{self.analysis_type.config_value: math.nan}
+            )
+        return result_gdf[[self.id_col, _result_cols[0]]].rename(
+            columns={_result_cols[0]: self.analysis_type.config_value}
+        )
 
-    def execute(self, analysis_config: AnalysisConfigWrapper) -> Series:
+    def execute(self, analysis_config: AnalysisConfigWrapper) -> DataFrame:
         """
         Execute the analysis.
 
@@ -157,19 +163,19 @@ class AdaptationOptionAnalysis:
             analysis_config (AnalysisConfigWrapper): The config for the analysis.
 
         Returns:
-            Series: The relevant result column of the analysis.
+            DataFrame: The relevant result columns of the analysis.
         """
         if self.analysis_class == Damages:
             _result_wrapper = self.analysis_class(
                 self.analysis_input,
                 analysis_config.graph_files.base_graph_hazard.get_graph(),
             ).execute()
-            # Take the link based result
-            _result = _result_wrapper.results_collection[1].analysis_result
+            assert isinstance(_result_wrapper, DamagesResultWrapper)
+            _result_gdf = _result_wrapper.link_based_result.analysis_result
         else:
             _result_wrapper = self.analysis_class(
                 self.analysis_input, analysis_config
             ).execute()
-            _result = _result_wrapper.get_single_result()
+            _result_gdf = _result_wrapper.get_single_result()
 
-        return self.get_result_column(_result)
+        return self.get_result_columns(_result_gdf)

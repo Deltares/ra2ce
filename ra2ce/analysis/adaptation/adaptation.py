@@ -18,9 +18,11 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+import math
 from pathlib import Path
 
 from geopandas import GeoDataFrame
+from pandas import DataFrame
 
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
     AdaptationOptionCollection,
@@ -76,19 +78,19 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
             self.calculate_bc_ratio(_benefit_gdf, _cost_gdf)
         )
 
-    def run_cost(self) -> GeoDataFrame:
+    def run_cost(self) -> DataFrame:
         """
         Calculate the link cost for all adaptation options.
         The unit cost is multiplied by the length of the link.
         If the hazard fraction cost is enabled, the cost is multiplied by the fraction of the link that is impacted.
 
         Returns:
-            GeoDataFrame: The result of the cost calculation.
+            DataFrame: The result of the cost calculation.
         """
         _orig_gdf = self.graph_file_hazard.get_graph()
         _fraction_col = _orig_gdf.filter(regex="EV.*_fr").columns[0]
 
-        _cost_gdf = GeoDataFrame()
+        _cost_gdf = _orig_gdf[["link_id"]].copy()
         for (
             _option,
             _cost,
@@ -102,49 +104,74 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
 
         return _cost_gdf
 
-    def run_benefit(self) -> GeoDataFrame:
+    def run_benefit(self) -> DataFrame:
         """
         Calculate the benefit for all adaptation options.
 
         Returns:
-            GeoDataFrame: The result of the benefit calculation.
+            DataFrame: The result of the benefit calculation.
         """
         return self.adaptation_collection.calculate_options_benefit()
 
     def calculate_bc_ratio(
-        self, benefit_gdf: GeoDataFrame, cost_gdf: GeoDataFrame
+        self, benefit_df: DataFrame, cost_df: DataFrame
     ) -> GeoDataFrame:
         """
         Calculate the benefit-cost ratio for all adaptation options.
 
         Args:
-            benefit_gdf (GeoDataFrame): Gdf containing the benefit of the adaptation options.
-            cost_gdf (GeoDataFrame): Gdf containing the cost of the adaptation options.
+            benefit_gdf (DataFrame): Df containing the benefit of the adaptation options.
+            cost_gdf (DataFrame): Df containing the cost of the adaptation options.
 
         Returns:
             GeoDataFrame: Gdf containing the benefit-cost ratio of the adaptation options,
                 including the relevant attributes from the original graph (geometry).
         """
 
-        def copy_column(from_gdf: GeoDataFrame, col_name: str) -> None:
-            if not col_name in from_gdf.columns:
-                return
-            benefit_gdf.insert(loc=0, column=col_name, value=from_gdf[col_name])
+        def merge_columns(
+            left_df: DataFrame, right_df: DataFrame, columns: list[str]
+        ) -> DataFrame:
+            # Merge 2 dataframes base on link_id
+            _id_col = "link_id"
+
+            # Add temporary key as the link_id to merge on contains inconsistent types (list[int] and int)
+            _merge_col = "temp_key"
+
+            left_df[_merge_col] = left_df[_id_col].apply(lambda x: str(x))
+            # Not all columns are present in both dataframes, so only merge the relevant columns
+            _columns = [_col for _col in columns if _col in left_df.columns]
+            if not _columns:
+                return right_df
+
+            right_df[_merge_col] = right_df[_id_col].apply(lambda x: str(x))
+            # Not each dataframe has the same entries in the link_id column, so use an outer merge
+            _merged_df = right_df.merge(
+                left_df[[_merge_col] + _columns],
+                on=_merge_col,
+                how="outer",
+            ).fillna(math.nan)
+
+            return _merged_df.drop(columns=[_merge_col])
 
         # Copy relevant columns from the original graph
         _orig_gdf = self.graph_file_hazard.get_graph()
-        benefit_gdf.set_geometry(_orig_gdf.geometry, inplace=True)
-        for _col in ["length", "highway", "infra_type", "link_id"]:
-            copy_column(_orig_gdf, _col)
+        _bc_ratio_gdf = _orig_gdf[["link_id"]]
+        _bc_ratio_gdf = merge_columns(
+            _orig_gdf, _bc_ratio_gdf, ["geometry", "infra_type", "highway", "length"]
+        )
 
         for _option in self.adaptation_collection.adaptation_options:
-            # Copy cost columns from the cost gdf
-            copy_column(cost_gdf, _option.cost_col)
+            # Copy benefit and cost column from the benefit and cost gdf
+            _bc_ratio_gdf = merge_columns(
+                benefit_df, _bc_ratio_gdf, [_option.benefit_col]
+            )
+            _bc_ratio_gdf = merge_columns(cost_df, _bc_ratio_gdf, [_option.cost_col])
 
-            benefit_gdf[_option.bc_ratio_col] = benefit_gdf[
+            # Calculate BC-ratio
+            _bc_ratio_gdf[_option.bc_ratio_col] = _bc_ratio_gdf[
                 _option.benefit_col
-            ].replace(float("nan"), 0) / benefit_gdf[_option.cost_col].replace(
+            ].replace(float("nan"), 0) / _bc_ratio_gdf[_option.cost_col].replace(
                 0, float("nan")
             )
 
-        return benefit_gdf
+        return GeoDataFrame(_bc_ratio_gdf).set_geometry("geometry")

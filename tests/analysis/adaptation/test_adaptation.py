@@ -1,8 +1,8 @@
-from dataclasses import dataclass
 from typing import Iterator
 
 import pytest
 from geopandas import GeoDataFrame
+from pandas import DataFrame
 from shapely import Point
 
 from ra2ce.analysis.adaptation.adaptation import Adaptation
@@ -33,7 +33,7 @@ class TestAdaptation:
         assert isinstance(_adaptation, Adaptation)
         assert isinstance(_adaptation, AnalysisBase)
 
-    def test_run_cost_returns_gdf(
+    def test_run_cost_returns_df(
         self,
         valid_adaptation_config_with_input: tuple[
             AnalysisInputWrapper, AnalysisConfigWrapper
@@ -48,7 +48,7 @@ class TestAdaptation:
         _result = _adaptation.run_cost()
 
         # 3. Verify expectations.
-        assert isinstance(_result, GeoDataFrame)
+        assert isinstance(_result, DataFrame)
         assert all(
             _option.cost_col in _result.columns
             for _option in _adaptation.adaptation_collection.adaptation_options
@@ -58,7 +58,7 @@ class TestAdaptation:
                 _expected[0]
             )
 
-    def test_run_benefit_returns_gdf(
+    def test_run_benefit_returns_df(
         self,
         valid_adaptation_config_with_input: tuple[
             AnalysisInputWrapper, AnalysisConfigWrapper
@@ -73,7 +73,7 @@ class TestAdaptation:
         _result = _adaptation.run_benefit()
 
         # 3. Verify expectations.
-        assert isinstance(_result, GeoDataFrame)
+        assert isinstance(_result, DataFrame)
         assert all(
             [
                 f"{_option.id}_benefit" in _result.columns
@@ -92,8 +92,8 @@ class TestAdaptation:
             graph_file_hazard = NetworkFile(
                 graph=GeoDataFrame.from_dict(
                     data={
-                        "geometry": [Point(x, 0) for x in range(10)],
                         "link_id": range(10),
+                        "geometry": [Point(x, 0) for x in range(10)],
                         "highway": "residential",
                         "length": 1.0,
                     },
@@ -125,18 +125,19 @@ class TestAdaptation:
 
     def test_calculate_bc_ratio_returns_gdf(self, mocked_adaptation: Adaptation):
         # 1. Define test data.
+        _id_col = "link_id"
         _nof_rows = 10
-        _benefit_gdf = GeoDataFrame(index=range(_nof_rows))
-        _cost_gdf = GeoDataFrame(index=range(_nof_rows))
+        _benefit_df = DataFrame.from_dict({_id_col: range(_nof_rows)})
+        _cost_df = DataFrame.from_dict({_id_col: range(_nof_rows)})
 
         for i, _option in enumerate(
             mocked_adaptation.adaptation_collection.adaptation_options
         ):
-            _benefit_gdf[_option.benefit_col] = 4.0 + i
-            _cost_gdf[_option.cost_col] = 1.0 + i
+            _benefit_df[_option.benefit_col] = 4.0 + i
+            _cost_df[_option.cost_col] = 1.0 + i
 
         # 2. Run test.
-        _result = mocked_adaptation.calculate_bc_ratio(_benefit_gdf, _cost_gdf)
+        _result = mocked_adaptation.calculate_bc_ratio(_benefit_df, _cost_df)
 
         # 3. Verify expectations.
         assert isinstance(_result, GeoDataFrame)
@@ -153,3 +154,28 @@ class TestAdaptation:
             assert _result[_option.bc_ratio_col].sum(axis=0) == pytest.approx(
                 _nof_rows * (4.0 + i) / (1.0 + i)
             )
+
+    def test_calculate_bc_ratio_matches_on_link_id(self, mocked_adaptation: Adaptation):
+        # 1. Define test data.
+        _id_col = "link_id"
+        _custom_id = [5, 6, 7, 8, 9, 0, 1, 2, 3, 4]
+        _benefit_df = DataFrame.from_dict(
+            {
+                _id_col: _custom_id,
+                "Option1_benefit": [i + 1 for i in _custom_id],
+            }
+        )
+        _cost_df = DataFrame.from_dict(
+            {
+                _id_col: list(reversed(_custom_id)),
+                "Option1_cost": [i + 1 for i in reversed(_custom_id)],
+            }
+        )
+
+        # 2. Run test.
+        _benefit_df = mocked_adaptation.calculate_bc_ratio(_benefit_df, _cost_df)
+
+        # 3. Verify expectations.
+        assert _benefit_df[
+            mocked_adaptation.adaptation_collection.adaptation_options[0].bc_ratio_col
+        ].sum(axis=0) == pytest.approx(10.0)
