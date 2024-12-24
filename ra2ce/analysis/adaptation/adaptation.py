@@ -136,10 +136,10 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
         # Copy relevant columns from the original graph
         _result = AdaptationPartialResult("link_id", self.graph_file_hazard.get_graph())
 
-        for _option in self.adaptation_collection.adaptation_options:
-            _result.merge_partial_results(benefit_result)
-            _result.merge_partial_results(cost_result)
+        _result.merge_partial_results(benefit_result)
+        _result.merge_partial_results(cost_result)
 
+        for _option in self.adaptation_collection.adaptation_options:
             # Calculate BC-ratio
             _bc_ratio = _result.get_option_column(
                 _option.id, AdaptationResultEnum.BENEFIT
