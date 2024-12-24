@@ -23,9 +23,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 import numpy as np
-from geopandas import GeoDataFrame
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
+from ra2ce.analysis.adaptation.adaptation_partial_result import AdaptationPartialResult
+from ra2ce.analysis.adaptation.adaptation_result_enum import AdaptationResultEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 
 
@@ -120,30 +121,31 @@ class AdaptationOptionCollection:
             for _option in self.adaptation_options
         }
 
-    def calculate_options_benefit(self) -> GeoDataFrame:
+    def calculate_options_benefit(self) -> AdaptationPartialResult:
         """
         Calculate the benefit of all adaptation options.
         The benefit is calculated by subtracting the impact of the reference option from the impact of the adaptation option.
 
         Returns:
-            GeoDataFrame: The calculated impact of all adaptation options.
+            AdaptationPartialResult: The calculated impact of all adaptation options.
         """
         net_present_value_factor = self.get_net_present_value_factor()
-        _benefit_gdf = GeoDataFrame()
 
         # Calculate impact of reference option
-        _impact_gdf = self.reference_option.calculate_impact(net_present_value_factor)
-        for _col in _impact_gdf.columns:
-            _benefit_gdf[_col] = _impact_gdf[_col]
+        _result = self.reference_option.calculate_impact(net_present_value_factor)
 
         # Calculate impact and benefit of adaptation options
         for _option in self.adaptation_options:
-            _impact_gdf = _option.calculate_impact(net_present_value_factor)
-            for _col in _impact_gdf.columns:
-                _benefit_gdf[_col] = _impact_gdf[_col]
-            _benefit_gdf[_option.benefit_col] = (
-                _benefit_gdf[_option.impact_col]
-                - _benefit_gdf[self.reference_option.impact_col]
+            _result.merge_partial_results(
+                _option.calculate_impact(net_present_value_factor)
             )
 
-        return _benefit_gdf
+            # Benefit = reference impact - adaptation impact
+            _benefit = _result.get_option_column(
+                self.reference_option.id, AdaptationResultEnum.NET_IMPACT
+            ) - _result.get_option_column(_option.id, AdaptationResultEnum.NET_IMPACT)
+            _result.put_option_column(
+                _option.id, AdaptationResultEnum.BENEFIT, _benefit
+            )
+
+        return _result

@@ -2,12 +2,14 @@ from dataclasses import dataclass
 
 import pytest
 from geopandas import GeoDataFrame
-from pandas import Series
+from pandas import DataFrame
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.adaptation.adaptation_option_analysis import (
     AdaptationOptionAnalysis,
 )
+from ra2ce.analysis.adaptation.adaptation_partial_result import AdaptationPartialResult
+from ra2ce.analysis.adaptation.adaptation_result_enum import AdaptationResultEnum
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionAdaptation,
 )
@@ -18,7 +20,6 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
-from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.damages.damages import Damages
 from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
 from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
@@ -156,22 +157,32 @@ class TestAdaptationOption:
         assert isinstance(_result, float)
         assert _result == pytest.approx(net_unit_cost)
 
-    def test_calculate_impact_returns_gdf(self) -> GeoDataFrame:
+    def test_calculate_impact_returns_result(self):
         @dataclass
-        # Mock to avoid the need to run the impact analysis.
+        # Mock to avoid the need to run the impact analyses.
         class MockAdaptationOptionAnalysis(AdaptationOptionAnalysis):
             result: float
 
-            def execute(self, _: AnalysisConfigWrapper) -> Series:
-                return Series(self.result, index=range(_nof_rows))
+            def execute(self, _: AnalysisConfigWrapper) -> DataFrame:
+                return AdaptationPartialResult(
+                    _id_col,
+                    GeoDataFrame.from_dict(
+                        {
+                            _id_col: range(10),
+                            self.analysis_type.config_value: self.result,
+                        }
+                    ),
+                )
 
         # 1. Define test data.
+        _id_col = "link_id"
         _nof_rows = 10
         _analyses = [
             MockAdaptationOptionAnalysis(
                 analysis_type=_analysis_type,
                 analysis_class=None,
                 analysis_input=None,
+                id_col=_id_col,
                 result_col=f"Result_{i}",
                 result=(i + 1) * 1.0e6,
             )
@@ -193,10 +204,10 @@ class TestAdaptationOption:
         )
 
         # 2. Run test.
-        _result = _option.calculate_impact(1.0)
+        _result = _option.calculate_impact(1.1)
 
         # 3. Verify expectations.
-        assert isinstance(_result, GeoDataFrame)
-        assert _result[_option.impact_col].sum() == pytest.approx(
-            _nof_rows * sum(x.result for x in _analyses)
-        )
+        assert isinstance(_result, AdaptationPartialResult)
+        assert _result.data_frame[
+            f"{_option.id}_{AdaptationResultEnum.EVENT_IMPACT}"
+        ].sum() == pytest.approx(_nof_rows * sum(x.result for x in _analyses))
