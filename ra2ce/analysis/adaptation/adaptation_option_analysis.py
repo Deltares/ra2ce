@@ -20,14 +20,10 @@
 """
 from __future__ import annotations
 
-import logging
-import math
 from copy import deepcopy
 from dataclasses import dataclass
 
-from geopandas import GeoDataFrame
-from pandas import DataFrame
-
+from ra2ce.analysis.adaptation.adaptation_partial_result import AdaptationPartialResult
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -131,31 +127,9 @@ class AdaptationOptionAnalysis:
             result_col=_result_col,
         )
 
-    def get_result_columns(self, result_gdf: GeoDataFrame) -> DataFrame:
-        """
-        Get a column from the dataframe based on the provided regex.
-
-        Args:
-            gdf (GeoDataFrame): The dataframe to search in.
-
-        Returns:
-            DataFrame: The relevant columns.
-        """
-        _result_cols = result_gdf.filter(regex=self.result_col).columns
-        if _result_cols.empty:
-            logging.warning(
-                "No column found in dataframe matching the regex %s for analaysis %s. Returning NaN.",
-                self.result_col,
-                self.analysis_type.config_value,
-            )
-            return result_gdf[[self.id_col]].assign(
-                **{self.analysis_type.config_value: math.nan}
-            )
-        return result_gdf[[self.id_col, _result_cols[0]]].rename(
-            columns={_result_cols[0]: self.analysis_type.config_value}
-        )
-
-    def execute(self, analysis_config: AnalysisConfigWrapper) -> DataFrame:
+    def execute(
+        self, analysis_config: AnalysisConfigWrapper
+    ) -> AdaptationPartialResult:
         """
         Execute the analysis.
 
@@ -163,7 +137,7 @@ class AdaptationOptionAnalysis:
             analysis_config (AnalysisConfigWrapper): The config for the analysis.
 
         Returns:
-            DataFrame: The relevant result columns of the analysis.
+            AdaptationPartialResult: The relevant result columns of the analysis.
         """
         if self.analysis_class == Damages:
             _result_wrapper = self.analysis_class(
@@ -178,4 +152,6 @@ class AdaptationOptionAnalysis:
             ).execute()
             _result_gdf = _result_wrapper.get_single_result()
 
-        return self.get_result_columns(_result_gdf)
+        return AdaptationPartialResult.from_gdf_with_matched_col(
+            _result_gdf, self.id_col, self.result_col, self.analysis_type
+        )

@@ -20,24 +20,18 @@
 """
 from __future__ import annotations
 
-import math
-from collections import defaultdict
 from dataclasses import asdict, dataclass
-from functools import reduce
-
-from pandas import DataFrame, merge
 
 from ra2ce.analysis.adaptation.adaptation_option_analysis import (
     AdaptationOptionAnalysis,
 )
+from ra2ce.analysis.adaptation.adaptation_partial_result import AdaptationPartialResult
+from ra2ce.analysis.adaptation.adaptation_result_enum import AdaptationResultEnum
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionAdaptationOption,
 )
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
-)
-from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
-    AnalysisLossesEnum,
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 
@@ -163,7 +157,9 @@ class AdaptationOption:
 
         return sum(calculate_cost(_year) for _year in range(0, round(time_horizon), 1))
 
-    def calculate_impact(self, net_present_value_factor: float) -> DataFrame:
+    def calculate_impact(
+        self, net_present_value_factor: float
+    ) -> AdaptationPartialResult:
         """
         Calculate the impact of the adaptation option.
 
@@ -171,50 +167,19 @@ class AdaptationOption:
             net_present_value_factor (float): The net present value factor to apply to the event impact.
 
         Returns:
-            DataFrame: The impact (event and net) of the adaptation option per link.
+            AdaptationPartialResult: The impact (event and net) of the adaptation option per link.
         """
-
-        def merge_results(
-            results_dict: dict[AnalysisDamagesEnum | AnalysisLossesEnum, DataFrame]
-        ) -> DataFrame:
-            # Merge all result dataframes base on link_id
-            _id_col = "link_id"
-
-            # Add temporary key as the id column to merge on contains inconsistent types (list[int] and int)
-            _merge_col = "temp_key"
-
-            for i, _result in enumerate(results_dict.values()):
-                _result[_merge_col] = _result[_id_col].apply(lambda x: str(x))
-                # Drop id column if not the first result to avoid duplicate columns
-                if i > 0:
-                    _result.drop(columns=[_id_col], inplace=True)
-
-            # Not each dataframe has the same entries in the link_id column, so use an outer merge
-            _merged_df = reduce(
-                lambda left, right: merge(left, right, on=[_merge_col], how="outer"),
-                results_dict.values(),
-            ).fillna(math.nan)
-
-            return _merged_df.drop(columns=[_merge_col])
-
         # Get all results from the analyses
-        _results: dict[
-            AnalysisDamagesEnum | AnalysisLossesEnum, DataFrame
-        ] = defaultdict(DataFrame)
+        _result = AdaptationPartialResult(None, None)
         for _analysis in self.analyses:
-            _results[_analysis.analysis_type] = _analysis.execute(self.analysis_config)
-        _result_df = merge_results(_results)
-
-        # Add option ID to result column names (skip ID column)
-        _result_df.rename(
-            columns={x: self._get_column_name(x) for x in _result_df.columns[1:]},
-            inplace=True,
-        )
+            _result.merge_partial_results(_analysis.execute(self.analysis_config))
+        _result.set_option_id(self.id)
 
         # Calculate the impact (summing the results of the analysis results per link)
-        _result_df[self.event_impact_col] = _result_df.filter(regex=self.id).sum(axis=1)
-        _result_df[self.net_impact_col] = (
-            _result_df[self.event_impact_col] * net_present_value_factor
+        _impact = _result.data_frame.filter(regex=self.id).sum(axis=1)
+        _result.add_option_column(self.id, AdaptationResultEnum.EVENT_IMPACT, _impact)
+        _result.add_option_column(
+            self.id, AdaptationResultEnum.NET_IMPACT, _impact * net_present_value_factor
         )
 
-        return _result_df
+        return _result

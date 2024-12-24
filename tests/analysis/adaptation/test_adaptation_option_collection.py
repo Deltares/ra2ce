@@ -1,12 +1,14 @@
 from dataclasses import dataclass
 
 import pytest
+from geopandas import GeoDataFrame
 from pandas import DataFrame
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
     AdaptationOptionCollection,
 )
+from ra2ce.analysis.adaptation.adaptation_partial_result import AdaptationPartialResult
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 
 
@@ -66,16 +68,17 @@ class TestAdaptationOptionCollection:
         assert isinstance(_result, dict)
         assert all(_option in _result for _option in _collection.adaptation_options)
 
-    def test_calculate_options_benefit_returns_df(self):
+    def test_calculate_options_benefit_returns_result(self):
         @dataclass
         class MockOption(AdaptationOption):
             # Mock to avoid the need to run the impact analysis.
             impact: float = 0.0
 
-            def calculate_impact(self, _) -> DataFrame:
-                _impact_gdf = DataFrame.from_dict({_id_col: range(10)})
-                _impact_gdf[self.net_impact_col] = self.impact
-                return _impact_gdf
+            def calculate_impact(self, _) -> AdaptationPartialResult:
+                _impact_gdf = GeoDataFrame.from_dict(
+                    {_id_col: range(10), self.net_impact_col: self.impact}
+                )
+                return AdaptationPartialResult(_id_col, _impact_gdf)
 
         # 1. Define test data.
         _id_col = "link_id"
@@ -103,13 +106,13 @@ class TestAdaptationOptionCollection:
         _result = _collection.calculate_options_benefit()
 
         # 3. Verify expectations.
-        assert isinstance(_result, DataFrame)
+        assert isinstance(_result, AdaptationPartialResult)
         assert all(
-            _option.benefit_col in _result.columns
+            _option.benefit_col in _result.data_frame.columns
             for _option in _collection.adaptation_options
         )
         assert all(
-            _result[f"{_id}_benefit"].sum(axis=0)
+            _result.data_frame[f"{_id}_benefit"].sum(axis=0)
             == pytest.approx(_nof_rows * (_reference_benefit - _impact))
             for _id, _impact in _options.items()
             if _id != "Option0"

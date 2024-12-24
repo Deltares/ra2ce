@@ -23,9 +23,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 import numpy as np
-from pandas import DataFrame
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
+from ra2ce.analysis.adaptation.adaptation_partial_result import AdaptationPartialResult
+from ra2ce.analysis.adaptation.adaptation_result_enum import AdaptationResultEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 
 
@@ -120,29 +121,31 @@ class AdaptationOptionCollection:
             for _option in self.adaptation_options
         }
 
-    def calculate_options_benefit(self) -> DataFrame:
+    def calculate_options_benefit(self) -> AdaptationPartialResult:
         """
         Calculate the benefit of all adaptation options.
         The benefit is calculated by subtracting the impact of the reference option from the impact of the adaptation option.
 
         Returns:
-            GeoDataFrame: The calculated impact of all adaptation options.
+            AdaptationPartialResult: The calculated impact of all adaptation options.
         """
         net_present_value_factor = self.get_net_present_value_factor()
 
         # Calculate impact of reference option
-        _benefit_df = self.reference_option.calculate_impact(net_present_value_factor)
+        _result = self.reference_option.calculate_impact(net_present_value_factor)
 
         # Calculate impact and benefit of adaptation options
         for _option in self.adaptation_options:
-            _impact_gdf = _option.calculate_impact(net_present_value_factor)
-            # Copy columns except the id column
-            _result_cols = _impact_gdf.filter(regex="^(?!link_id)").columns
-            _benefit_df[_result_cols] = _impact_gdf[_result_cols]
-            # Benefit = reference impact - adaptation impact
-            _benefit_df[_option.benefit_col] = (
-                _benefit_df[self.reference_option.net_impact_col]
-                - _benefit_df[_option.net_impact_col]
+            _result.merge_partial_results(
+                _option.calculate_impact(net_present_value_factor)
             )
 
-        return _benefit_df
+            # Benefit = reference impact - adaptation impact
+            _benefit = _result.get_option_column(
+                self.reference_option.id, AdaptationResultEnum.NET_IMPACT
+            ) - _result.get_option_column(_option.id, AdaptationResultEnum.NET_IMPACT)
+            _result.add_option_column(
+                _option.id, AdaptationResultEnum.BENEFIT, _benefit
+            )
+
+        return _result
