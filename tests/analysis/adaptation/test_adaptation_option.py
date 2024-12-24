@@ -209,5 +209,5 @@ class TestAdaptationOption:
         # 3. Verify expectations.
         assert isinstance(_result, AdaptationPartialResult)
         assert _result.data_frame[
-            f"{_option.id}_{AdaptationResultEnum.EVENT_IMPACT}
+            f"{_option.id}_{AdaptationResultEnum.EVENT_IMPACT}"
         ].sum() == pytest.approx(_nof_rows * sum(x.result for x in _analyses))

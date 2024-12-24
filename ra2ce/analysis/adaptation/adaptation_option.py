@@ -50,29 +50,6 @@ class AdaptationOption:
     def __hash__(self) -> int:
         return hash(self.id)
 
-    @property
-    def cost_col(self) -> str:
-        return self._get_column_name("cost")
-
-    @property
-    def net_impact_col(self) -> str:
-        return self._get_column_name("net_impact")
-
-    @property
-    def event_impact_col(self) -> str:
-        return self._get_column_name("event_impact")
-
-    @property
-    def benefit_col(self) -> str:
-        return self._get_column_name("benefit")
-
-    @property
-    def bc_ratio_col(self) -> str:
-        return self._get_column_name("bc_ratio")
-
-    def _get_column_name(self, col_type: str) -> str:
-        return f"{self.id}_{col_type}"
-
     @classmethod
     def from_config(
         cls,
@@ -173,12 +150,12 @@ class AdaptationOption:
         _result = AdaptationPartialResult(None, None)
         for _analysis in self.analyses:
             _result.merge_partial_results(_analysis.execute(self.analysis_config))
-        _result.set_option_id(self.id)
+        _result.add_option_id(self.id)
 
         # Calculate the impact (summing the results of the analysis results per link)
         _impact = _result.data_frame.filter(regex=self.id).sum(axis=1)
-        _result.add_option_column(self.id, AdaptationResultEnum.EVENT_IMPACT, _impact)
-        _result.add_option_column(
+        _result.put_option_column(self.id, AdaptationResultEnum.EVENT_IMPACT, _impact)
+        _result.put_option_column(
             self.id, AdaptationResultEnum.NET_IMPACT, _impact * net_present_value_factor
         )
 

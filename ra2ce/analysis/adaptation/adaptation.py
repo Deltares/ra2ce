@@ -104,7 +104,7 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
             if self.analysis.hazard_fraction_cost:
                 _cost_col *= _orig_gdf[_fraction_col]
 
-            _result.add_option_column(_option.id, AdaptationResultEnum.COST, _cost_col)
+            _result.put_option_column(_option.id, AdaptationResultEnum.COST, _cost_col)
 
         return _result
 
@@ -145,7 +145,7 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
                 _option.id, AdaptationResultEnum.BENEFIT
             ) / _result.get_option_column(_option.id, AdaptationResultEnum.COST)
 
-            _result.add_option_column(
+            _result.put_option_column(
                 _option.id, AdaptationResultEnum.BC_RATIO, _bc_ratio
             )
 

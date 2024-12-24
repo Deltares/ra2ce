@@ -2,7 +2,6 @@ from dataclasses import dataclass
 
 import pytest
 from geopandas import GeoDataFrame
-from pandas import DataFrame
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.adaptation.adaptation_option_collection import (
@@ -76,7 +75,7 @@ class TestAdaptationOptionCollection:
 
             def calculate_impact(self, _) -> AdaptationPartialResult:
                 _impact_gdf = GeoDataFrame.from_dict(
-                    {_id_col: range(10), self.net_impact_col: self.impact}
+                    {_id_col: range(10), f"{self.id}_net_impact": self.impact}
                 )
                 return AdaptationPartialResult(_id_col, _impact_gdf)
 
@@ -108,7 +107,7 @@ class TestAdaptationOptionCollection:
         # 3. Verify expectations.
         assert isinstance(_result, AdaptationPartialResult)
         assert all(
-            _option.benefit_col in _result.data_frame.columns
+            f"{_option.id}_benefit" in _result.data_frame.columns
             for _option in _collection.adaptation_options
         )
         assert all(

@@ -3,7 +3,8 @@ from __future__ import annotations
 import logging
 import math
 
-from geopandas import GeoDataFrame, GeoSeries
+from geopandas import GeoDataFrame
+from pandas import Series
 
 from ra2ce.analysis.adaptation.adaptation_result_enum import AdaptationResultEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
@@ -60,13 +61,6 @@ class AdaptationPartialResult:
             if _col not in self.standard_cols + [self._key_col]
         ]
 
-    def get_option_column_name(
-        self, option_id: str, col_type: AdaptationResultEnum | str
-    ) -> str:
-        if isinstance(col_type, AdaptationResultEnum):
-            return f"{option_id}_{col_type.config_value}"
-        return f"{option_id}_{col_type}"
-
     @classmethod
     def from_gdf_with_matched_col(
         cls,
@@ -75,6 +69,18 @@ class AdaptationPartialResult:
         regex: str,
         analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
     ) -> AdaptationPartialResult:
+        """
+        Create a new object from a GeoDataFrame with a column matching a regex.
+
+        Args:
+            gdf_in (GeoDataFrame): The input GeoDataFrame.
+            id_col (str): The ID column.
+            regex (str): The pattern to match.
+            analysis_type (AnalysisDamagesEnum | AnalysisLossesEnum): The type of the input analysis.
+
+        Returns:
+            AdaptationPartialResult: The object with the matched column.
+        """
         _result_cols = gdf_in.filter(regex=regex).columns
         _gdf = gdf_in[[id_col, "geometry"]].copy()
         if _result_cols.empty:
@@ -89,6 +95,12 @@ class AdaptationPartialResult:
         return cls(id_col, _gdf)
 
     def merge_partial_results(self, other: AdaptationPartialResult) -> None:
+        """
+        Merge the partial results of another analysis into this one.
+
+        Args:
+            other (AdaptationPartialResult): The other partial analysis results to merge.
+        """
         if other.data_frame.empty:
             return
 
@@ -105,19 +117,50 @@ class AdaptationPartialResult:
             other.data_frame, on=self._key_col, how="outer"
         ).fillna(math.nan)
 
-    def set_option_id(self, option_id: str) -> None:
+    def _get_option_column_name(
+        self, option_id: str, col_type: AdaptationResultEnum | str
+    ) -> str:
+        if isinstance(col_type, AdaptationResultEnum):
+            return f"{option_id}_{col_type.config_value}"
+        return f"{option_id}_{col_type}"
+
+    def add_option_id(self, option_id: str) -> None:
+        """
+        Add the option ID to the result column names.
+
+        Args:
+            option_id (str): The option ID.
+        """
         for _col in self.result_cols:
             self.data_frame.rename(
-                columns={_col: self.get_option_column_name(option_id, _col)},
+                columns={_col: self._get_option_column_name(option_id, _col)},
                 inplace=True,
             )
 
-    def add_option_column(
-        self, option_id: str, col_type: AdaptationResultEnum, column_data: GeoSeries
+    def put_option_column(
+        self, option_id: str, col_type: AdaptationResultEnum, column_data: Series
     ) -> None:
-        self.data_frame[self.get_option_column_name(option_id, col_type)] = column_data
+        """
+        Add a data column to the result for a specific adaptation option.
+
+        Args:
+            option_id (str): The ID of the adaptation option.
+            col_type (AdaptationResultEnum): The type of the column.
+            column_data (Series): The data to add.
+        """
+        self.data_frame[self._get_option_column_name(option_id, col_type)] = column_data
 
     def get_option_column(
         self, option_id: str, col_type: AdaptationResultEnum
-    ) -> GeoSeries:
-        return self.data_frame[self.get_option_column_name(option_id, col_type)]
+    ) -> Series:
+        """
+        Get a data column from the result for a specific adaptation option.
+
+        Args:
+            option_id (str): The ID of the adaptation option.
+            col_type (AdaptationResultEnum):
+
+        Returns:
+            Series: The data column.
+        """
+        return self.data_frame[self._get_option_column_name(option_id, col_type)]

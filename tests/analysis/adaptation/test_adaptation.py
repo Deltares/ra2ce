@@ -2,7 +2,6 @@ from typing import Iterator
 
 import pytest
 from geopandas import GeoDataFrame
-from pandas import DataFrame
 from shapely import Point
 
 from ra2ce.analysis.adaptation.adaptation import Adaptation
@@ -51,7 +50,7 @@ class TestAdaptation:
         # 3. Verify expectations.
         assert isinstance(_result, AdaptationPartialResult)
         assert all(
-            _option.cost_col in _result.data_frame.columns
+            f"{_option.id}_cost" in _result.data_frame.columns
             for _option in _adaptation.adaptation_collection.adaptation_options
         )
         for _option, _expected in AdaptationOptionCases.cases[1:]:
@@ -140,8 +139,8 @@ class TestAdaptation:
         for i, _option in enumerate(
             mocked_adaptation.adaptation_collection.adaptation_options
         ):
-            _benefit_result.data_frame[_option.benefit_col] = 4.0 + i
-            _cost_result.data_frame[_option.cost_col] = 1.0 + i
+            _benefit_result.data_frame[f"{_option.id}_benefit"] = 4.0 + i
+            _cost_result.data_frame[f"{_option.id}_cost"] = 1.0 + i
 
         # 2. Run test.
         _result = mocked_adaptation.calculate_bc_ratio(_benefit_result, _cost_result)
@@ -151,14 +150,14 @@ class TestAdaptation:
         assert not _result.data_frame.geometry.empty
         assert all(
             [
-                _option.bc_ratio_col in _result.data_frame.columns
+                f"{_option.id}_bc_ratio" in _result.data_frame.columns
                 for _option in mocked_adaptation.adaptation_collection.adaptation_options
             ]
         )
         for i, _option in enumerate(
             mocked_adaptation.adaptation_collection.adaptation_options
         ):
-            assert _result.data_frame[_option.bc_ratio_col].sum(
+            assert _result.data_frame[f"{_option.id}_bc_ratio"].sum(
                 axis=0
             ) == pytest.approx(_nof_rows * (4.0 + i) / (1.0 + i))
 
@@ -190,5 +189,5 @@ class TestAdaptation:
 
         # 3. Verify expectations.
         assert _result.data_frame[
-            mocked_adaptation.adaptation_collection.adaptation_options[0].bc_ratio_col
+            f"{mocked_adaptation.adaptation_collection.adaptation_options[0].id}_bc_ratio"
         ].sum(axis=0) == pytest.approx(10.0)

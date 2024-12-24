@@ -144,7 +144,7 @@ class AdaptationOptionCollection:
             _benefit = _result.get_option_column(
                 self.reference_option.id, AdaptationResultEnum.NET_IMPACT
             ) - _result.get_option_column(_option.id, AdaptationResultEnum.NET_IMPACT)
-            _result.add_option_column(
+            _result.put_option_column(
                 _option.id, AdaptationResultEnum.BENEFIT, _benefit
             )
 
