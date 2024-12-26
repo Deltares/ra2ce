@@ -29,7 +29,7 @@ In `AdaptationOptionAnalysis.get_analysis_info` it can be found which analysis t
 Note this logic resembles the logic in `AnalysisFactory`, which can't be used due to circular dependencies.
 Here also a regex expression is given to find the right column in the analysis result.
 
-The net present impact is calculated by summing the damages and/or the losses per link, taking into account the `initial_frequency` corrected by a `climate_factor`, and the `time_horizon` and `discount_rate`.
+The event impact is calculated by summing the damages and/or the losses per link. Based on this the net present impact is calculated, taking into account the `initial_frequency` corrected by a `climate_factor`, and the `time_horizon` and `discount_rate`.
 
 ## Cost calculation
 The cost of an adaptation is calculated per link in the network by multiplying the unit cost of an adaptation with the length of the link.
