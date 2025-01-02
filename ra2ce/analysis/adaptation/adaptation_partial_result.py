@@ -58,7 +58,6 @@ class AdaptationPartialResult:
         self.data_frame[self._key_col] = self.data_frame[self.id_col].apply(
             lambda x: str(x)
         )
-        self.data_frame.drop(columns=[self.id_col], inplace=True)
 
         # Set geometry column
         if "geometry" not in self.data_frame.columns:
