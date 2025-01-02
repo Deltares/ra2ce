@@ -16,13 +16,43 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 
 
 class TestAdaptationPartialResult:
-    def test_initialize(self):
+    def test_initialize_without_input(self):
         # 1./2. Define test data./Run test.
         _result = AdaptationPartialResult(None, None)
 
         # 3. Verify expectations.
         assert isinstance(_result, AdaptationPartialResult)
         assert isinstance(_result.data_frame, GeoDataFrame)
+
+    def test_initialize_with_input(self):
+        # 1. Define test data.
+        _id_col = "link_id"
+        _gdf = GeoDataFrame.from_dict(
+            {"link_id": range(10), "geometry": [Point(x, 0) for x in range(10)]}
+        )
+
+        # 2. Run test.
+        _result = AdaptationPartialResult(_id_col, _gdf)
+
+        # 3. Verify expectations.
+        assert isinstance(_result, AdaptationPartialResult)
+        assert _result.id_col == _id_col
+        assert _result.data_frame.shape[0] == 10
+        assert AdaptationPartialResult._key_col in _result.data_frame.columns
+        assert "geometry" in _result.data_frame.columns
+
+    def test_from_input_gdf_returns_object(self):
+        # 1. Define test data.
+        _gdf_in = GeoDataFrame.from_dict(
+            {"link_id": range(10), "geometry": [Point(x, 0) for x in range(10)]}
+        )
+
+        # 2. Run test.
+        _result = AdaptationPartialResult.from_input_gdf(_gdf_in)
+
+        # 3. Verify expectations.
+        assert isinstance(_result, AdaptationPartialResult)
+        assert _result.data_frame.shape[0] == 10
 
     @pytest.mark.parametrize(
         "analysis_type, col_name, match",
@@ -114,6 +144,40 @@ class TestAdaptationPartialResult:
         assert _this_result.data_frame.shape[0] == _this_nof_rows
         assert _this_result.data_frame[_this_result_col].sum() == pytest.approx(45)
         assert _this_result.data_frame[_other_result_col].sum() == pytest.approx(56)
+
+    def test_merge_partial_results_with_other_key_order(self):
+        # 1. Define test data.
+        _id_col = "link_id"
+        _custom_id = [5, 6, 7, 8, 9, 0, 1, 2, 3, 4]
+        _this_result = AdaptationPartialResult(
+            _id_col,
+            GeoDataFrame.from_dict(
+                {
+                    _id_col: _custom_id,
+                    "Result1": [i + 1 for i in _custom_id],
+                }
+            ),
+        )
+        _other_result = AdaptationPartialResult(
+            _id_col,
+            GeoDataFrame.from_dict(
+                {
+                    _id_col: list(reversed(_custom_id)),
+                    "Result2": [i + 1 for i in reversed(_custom_id)],
+                }
+            ),
+        )
+        assert not any(
+            _other_result.data_frame["Result2"] == _this_result.data_frame["Result1"]
+        )
+
+        # 2. Run test.
+        _this_result.merge_partial_results(_other_result)
+
+        # 3. Verify expectations.
+        assert all(
+            _this_result.data_frame["Result2"] == _this_result.data_frame["Result1"]
+        )
 
     def test_add_option_id(self):
         # 1. Define test data.

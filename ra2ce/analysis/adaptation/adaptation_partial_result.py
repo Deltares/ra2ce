@@ -1,3 +1,23 @@
+"""
+                    GNU GENERAL PUBLIC LICENSE
+                      Version 3, 29 June 2007
+
+    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+    Copyright (C) 2023 Stichting Deltares
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
 from __future__ import annotations
 
 import logging
@@ -20,21 +40,19 @@ class AdaptationPartialResult:
     Class to represent the partial result of an adaptation analysis.
     """
 
-    id_col: str
-    data_frame: GeoDataFrame
+    option_id: str = ""
+    id_col: str = "link_id"
+    data_frame: GeoDataFrame = GeoDataFrame()
     _key_col: str = "merge_key"
 
     def __init__(self, id_col: str | None, data_frame: GeoDataFrame | None) -> None:
         if id_col:
             self.id_col = id_col
-        else:
-            self.id_col = "link_id"
 
         if not isinstance(data_frame, GeoDataFrame) or data_frame.empty:
-            self.data_frame = GeoDataFrame()
             return
-        else:
-            self.data_frame = data_frame
+
+        self.data_frame = data_frame
 
         # Add column to merge on, dropping the original column
         self.data_frame[self._key_col] = self.data_frame[self.id_col].apply(
@@ -60,6 +78,21 @@ class AdaptationPartialResult:
             for _col in self.data_frame.columns
             if _col not in self.standard_cols + [self._key_col]
         ]
+
+    @classmethod
+    def from_input_gdf(cls, gdf_in: GeoDataFrame) -> AdaptationPartialResult:
+        """
+        Create a new object from a GeoDataFrame.
+
+        Args:
+            gdf_in (GeoDataFrame): The input GeoDataFrame.
+
+        Returns:
+            AdaptationPartialResult: The object with the input data.
+        """
+        return cls(
+            cls.id_col, GeoDataFrame(gdf_in.filter(items=[cls.id_col, "geometry"]))
+        )
 
     @classmethod
     def from_gdf_with_matched_col(
@@ -131,6 +164,7 @@ class AdaptationPartialResult:
         Args:
             option_id (str): The option ID.
         """
+        self.option_id = option_id
         for _col in self.result_cols:
             self.data_frame.rename(
                 columns={_col: self._get_option_column_name(option_id, _col)},
