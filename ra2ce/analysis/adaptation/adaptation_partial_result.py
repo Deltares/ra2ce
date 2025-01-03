@@ -51,7 +51,7 @@ class AdaptationPartialResult:
         if self.data_frame.empty:
             return
 
-        # Add column to merge on, dropping the original column
+        # Add column to merge on
         self.data_frame[self._key_col] = self.data_frame[self.id_col].apply(
             lambda x: str(x)
         )
@@ -60,7 +60,6 @@ class AdaptationPartialResult:
         if "geometry" not in self.data_frame.columns:
             logging.warning("No geometry column found in dataframe.")
             return
-
         self.data_frame.set_geometry("geometry")
 
     @property
@@ -137,6 +136,10 @@ class AdaptationPartialResult:
         if self.data_frame.empty:
             self.data_frame = other.data_frame
             return
+
+        # If results from 2 different options are merged, reset the option ID
+        if self.option_id and self.option_id != other.option_id:
+            self.option_id = ""
 
         # Filter out duplicate columns
         for _col in self.standard_cols:
