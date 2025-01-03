@@ -18,7 +18,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 class TestAdaptationPartialResult:
     def test_initialize_without_input(self):
         # 1./2. Define test data./Run test.
-        _result = AdaptationPartialResult(None, None)
+        _result = AdaptationPartialResult()
 
         # 3. Verify expectations.
         assert isinstance(_result, AdaptationPartialResult)
@@ -28,11 +28,11 @@ class TestAdaptationPartialResult:
         # 1. Define test data.
         _id_col = "link_id"
         _gdf = GeoDataFrame.from_dict(
-            {"link_id": range(10), "geometry": [Point(x, 0) for x in range(10)]}
+            {_id_col: range(10), "geometry": [Point(x, 0) for x in range(10)]}
         )
 
         # 2. Run test.
-        _result = AdaptationPartialResult(_id_col, _gdf)
+        _result = AdaptationPartialResult(id_col=_id_col, data_frame=_gdf)
 
         # 3. Verify expectations.
         assert isinstance(_result, AdaptationPartialResult)
@@ -150,8 +150,8 @@ class TestAdaptationPartialResult:
         _id_col = "link_id"
         _custom_id = [5, 6, 7, 8, 9, 0, 1, 2, 3, 4]
         _this_result = AdaptationPartialResult(
-            _id_col,
-            GeoDataFrame.from_dict(
+            id_col=_id_col,
+            data_frame=GeoDataFrame.from_dict(
                 {
                     _id_col: _custom_id,
                     "Result1": [i + 1 for i in _custom_id],
@@ -159,8 +159,8 @@ class TestAdaptationPartialResult:
             ),
         )
         _other_result = AdaptationPartialResult(
-            _id_col,
-            GeoDataFrame.from_dict(
+            id_col=_id_col,
+            data_frame=GeoDataFrame.from_dict(
                 {
                     _id_col: list(reversed(_custom_id)),
                     "Result2": [i + 1 for i in reversed(_custom_id)],

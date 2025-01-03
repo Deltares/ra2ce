@@ -119,8 +119,8 @@ class TestAdaptationOption:
 
         def execute(self, _: AnalysisConfigWrapper) -> DataFrame:
             return AdaptationPartialResult(
-                "link_id",
-                GeoDataFrame.from_dict(
+                id_col="link_id",
+                data_frame=GeoDataFrame.from_dict(
                     {
                         "link_id": range(10),
                         self.analysis_type.config_value: self.result,
@@ -161,8 +161,8 @@ class TestAdaptationOption:
     def _get_valid_reference_impact_fixture(self) -> Iterator[AdaptationPartialResult]:
         _ref_option_id = "Option0"
         _result = AdaptationPartialResult(
-            "link_id",
-            GeoDataFrame.from_dict(
+            id_col="link_id",
+            data_frame=GeoDataFrame.from_dict(
                 {
                     "link_id": range(10),
                     f"{_ref_option_id}_net_impact": range(10),

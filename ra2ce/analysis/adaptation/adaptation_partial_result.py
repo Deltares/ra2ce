@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import logging
 import math
+from dataclasses import dataclass, field
 
 from geopandas import GeoDataFrame
 from pandas import Series
@@ -35,6 +36,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 
 
+@dataclass
 class AdaptationPartialResult:
     """
     Class to represent the partial result of an adaptation analysis.
@@ -42,17 +44,12 @@ class AdaptationPartialResult:
 
     option_id: str = ""
     id_col: str = "link_id"
-    data_frame: GeoDataFrame = GeoDataFrame()
+    data_frame: GeoDataFrame = field(default_factory=GeoDataFrame)
     _key_col: str = "merge_key"
 
-    def __init__(self, id_col: str | None, data_frame: GeoDataFrame | None) -> None:
-        if id_col:
-            self.id_col = id_col
-
-        if not isinstance(data_frame, GeoDataFrame) or data_frame.empty:
+    def __post_init__(self) -> None:
+        if self.data_frame.empty:
             return
-
-        self.data_frame = data_frame
 
         # Add column to merge on, dropping the original column
         self.data_frame[self._key_col] = self.data_frame[self.id_col].apply(
@@ -90,7 +87,8 @@ class AdaptationPartialResult:
             AdaptationPartialResult: The object with the input data.
         """
         return cls(
-            cls.id_col, GeoDataFrame(gdf_in.filter(items=[cls.id_col, "geometry"]))
+            id_col=cls.id_col,
+            data_frame=GeoDataFrame(gdf_in.filter(items=[cls.id_col, "geometry"])),
         )
 
     @classmethod
@@ -124,7 +122,7 @@ class AdaptationPartialResult:
             _gdf[analysis_type.config_value] = math.nan
         else:
             _gdf[analysis_type.config_value] = gdf_in[_result_cols[0]]
-        return cls(id_col, _gdf)
+        return cls(id_col=id_col, data_frame=_gdf)
 
     def merge_partial_results(self, other: AdaptationPartialResult) -> None:
         """

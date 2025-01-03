@@ -18,6 +18,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
+from copy import deepcopy
 from pathlib import Path
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
@@ -82,10 +83,8 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
         Returns:
             AnalysisResultWrapper: The result of the adaptation analysis.
         """
-        _result = AdaptationPartialResult(None, None)
-
         _reference_impact = self.reference_option.get_impact()
-        _result.merge_partial_results(_reference_impact)
+        _result = deepcopy(_reference_impact)
 
         for _option in self.adaptation_options:
             _result.merge_partial_results(

@@ -231,7 +231,7 @@ class AdaptationOption:
             AdaptationPartialResult: The impact (event and net) of the adaptation option per link.
         """
         # Get all results from the analyses
-        _result = AdaptationPartialResult(None, None)
+        _result = AdaptationPartialResult()
         for _analysis in self.analyses:
             _result.merge_partial_results(_analysis.execute(self.analysis_config))
         _result.add_option_id(self.id)
