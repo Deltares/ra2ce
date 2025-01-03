@@ -3,20 +3,34 @@
 Network Module
 ==============
 
-The network module is a separate module created within ``RA2CE`` to help set up a RA2CE 
-model. It helps to easily, reproducibly and consistently build models from global 
-to local datasets. The network module's goal is to create an infrastructure network to be used in further analyses. There are two possibilities to create a network: 1) downloading a network from OpenStreetMap with RA2CE and 2) creating a network from vector data. Within the network module, it is additionally possible to determine the network's exposure to a user-specified hazard using the 'hazard overlay' functionality. There are two options to set up a RA2CE model: using scripting and using initalization files (network.ini and analysis.ini). Examples of how to use this module can be found in the :ref:`examples_index` and can be tested in the Binder environment. 
+The network module is a separate module created within ``RA2CE`` to help set up a RA2CE model.
+It helps to easily, reproducibly and consistently build models from global to local datasets.
+The network module's goal is to create an infrastructure network to be used in further analyses.
+There are two possibilities to create a network:
+#. downloading a network from OpenStreetMap with RA2CE;
+#. creating a network from vector data.
+
+Within the network module, it is additionally possible to determine the network's exposure to a user-specified hazard using the 'hazard overlay' functionality.
+There are two options to set up a RA2CE model: using scripting and using initialization files (network.ini and analysis.ini).
+Examples of how to use this module can be found in the :ref:`examples_index` and can be tested in the Binder environment. 
 
 Data requirements
 -------------------------------------
 The types of possible input file formats to create a network are:
 
-•	Shapefile of network;
-•	GeoJSON polygon of area of interest for downloading a network from OSM;
-•	OSM PBF file;
-•	Pickle – a python data format, also used to save graphs.
+- Shapefile of network;
+- GeoJSON polygon of area of interest for downloading a network from OSM;
+- OSM PBF file;
+- Pickle: a python data format, also used to save graphs.
 
-Depending on the required analysis, more data might be needed. Visit the :ref:`analysis_module` page to learn more or explore the :ref:`examples_index` in the Binder environment.
+Depending on the required analysis, more data might be needed.
+Visit the :ref:`analysis_module` page to learn more or explore the :ref:`examples_index` in the Binder environment.
+
+Overview of the network creation process
+----------------------------------------
+
+.. image:: ../_resources/network_overview.drawio.png
+
 
 Network from OpenStreetMap using scripting
 -----------------------------------------------------------------------------
@@ -27,6 +41,7 @@ package. The region of interest must be specified with a GeoJSON file.
 
 Additional functionalities in the :py:class:`~ra2ce.graph.network_wrappers.osm_network_wrapper.osm_network_wrapper.OsmNetworkWrapper` 
 class include:
+
 - Filtering the OSM data on (road) type
 - Assigning the average speed of a road segment based on the maximum speed limit data and road type from OSM
 - Adding the missing geometries of the edges (road segments) based on the nodes (intersections)
@@ -37,10 +52,14 @@ class include:
 
 Examples of how to use this module can be found in the :ref:`examples_index`.
 
-Network from OpenStreetMap using the network.ini initalization file
+Network from OpenStreetMap using the network.ini initialization file
 -----------------------------------------------------------------------------
-The network.ini file contains several parts: 1[project], 2[network], 3[origins_destinations], 4[hazard]. These subsections are used to set the parameters necessary for the creation of different networks. Here, we will focus on the [network] part, as this can be used to create a basic network. 
-To download a network from OpenStreetMap, the user needs to create a geojson of the extent for which they want to create a network. This .geojson polygon should be stored in the static>network folder of the RA2CE project folder. If you are not yet familiar with the folder setup of a RA2CE project, first visit :ref:`about`.
+The network.ini file contains several parts: 1[project], 2[network], 3[origins_destinations], 4[hazard].
+These subsections are used to set the parameters necessary for the creation of different networks.
+Here, we will focus on the [network] part, as this can be used to create a basic network. 
+To download a network from OpenStreetMap, the user needs to create a geojson of the extent for which they want to create a network.
+This .geojson polygon should be stored in the static>network folder of the RA2CE project folder.
+If you are not yet familiar with the folder setup of a RA2CE project, first visit :ref:`about`.
 
 To create a network from OSM, specify the following parameters in your network.ini file:
 
@@ -78,15 +97,15 @@ To create a network from OSM, specify the following parameters in your network.i
 Network from vector data using scripting
 --------------------------------------------
 
-There are three ways to create a network from vector data. The first is to clean the 
-data yourself before using the Network Module and to then use the :py:class:`~ra2ce.graph.network_wrappers.vector_network_wrapper.VectorNetworkWrapper`
-class to read and process the data (e.g., a GeoPackage) to a network. The second 
-is to use the :py:class:`~ra2ce.graph.network_wrappers.shp_network_wrapper.ShpNetworkWrapper`
-class to read in a shapefile, clean it and process it to a network. The third one is explained below:
+There are three ways to create a network from vector data.
+The first is to clean the data yourself before using the Network Module and to then use the :py:class:`~ra2ce.graph.network_wrappers.vector_network_wrapper.VectorNetworkWrapper` class to read and process the data (e.g., a GeoPackage) to a network.
+The second is to use the :py:class:`~ra2ce.graph.network_wrappers.shp_network_wrapper.ShpNetworkWrapper` class to read in a shapefile, clean it and process it to a network.
+The third one is explained below.
 
-Network from vector data using the network.ini initalization file
+Network from vector data using the network.ini initialization file
 -----------------------------------------------------------------------
-The user can also read in a pre-defined shapefile using the ra2ce_basics_from_gpkg example notebook, where the user can practice with pre-defined data and required folder structure and data format. The user can upload their own shapefile (vector data), store it in the RA2CE static>network folder and specify the name of the file in the network.ini.
+The user can also read in a pre-defined shapefile using the ra2ce_basics_from_gpkg example notebook, where the user can practice with pre-defined data and required folder structure and data format.
+The user can upload their own shapefile (vector data), store it in the RA2CE static>network folder and specify the name of the file in the network.ini.
 
 file_id and link_type_column (NetworkSection of the NetworkConfigData or in the network section of network.ini) should refer to the id column and road type columns of the shapefile.
 
@@ -125,7 +144,10 @@ file_id and link_type_column (NetworkSection of the NetworkConfigData or in the 
 Network overlay with hazard data
 --------------------------------------------------------
 
-It is possible to perform overlays with hazard data and the network. RA2CE can handle any hazard data in .tif format. It will return information on where the hazard touches the network and give the hazard attribute to the network (e.g. flood depth on a road segment). RA2CE can additionally use this information in analyses (for example to determine the impact of a hazard on the network and on the routes between origins-destinations)
+It is possible to perform overlays with hazard data and the network.
+RA2CE can handle any hazard data in .tif format.
+It will return information on where the hazard touches the network and give the hazard attribute to the network (e.g. flood depth on a road segment).
+RA2CE can additionally use this information in analyses (for example to determine the impact of a hazard on the network and on the routes between origins-destinations).
 
 Specify the hazard file name in the network.ini and set some additional parameters. For full explanation, please see the hazard_overlay example. 
 
