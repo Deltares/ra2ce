@@ -7,7 +7,9 @@ from shapely import Point
 from ra2ce.analysis.adaptation.adaptation_option_analysis import (
     AdaptationOptionAnalysis,
 )
-from ra2ce.analysis.adaptation.adaptation_partial_result import AdaptationPartialResult
+from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
+    AdaptationOptionPartialResult,
+)
 from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
@@ -47,7 +49,7 @@ class TestAnalysisOptionAnalysis:
         expected_analysis: type[Damages | LossesBase],
     ):
         # 1./2. Define test data./Run test.
-        _result = AdaptationOptionAnalysis.get_analysis_info(analysis_type)
+        _result = AdaptationOptionAnalysis._get_analysis_info(analysis_type)
 
         # 3. Verify expectations.
         assert isinstance(_result, tuple)
@@ -60,7 +62,7 @@ class TestAnalysisOptionAnalysis:
 
         # 2. Run test.
         with pytest.raises(NotImplementedError) as exc:
-            AdaptationOptionAnalysis.get_analysis_info(_analysis_type)
+            AdaptationOptionAnalysis._get_analysis_info(_analysis_type)
 
         # 3. Verify expectations.
         assert exc.match(f"Analysis {_analysis_type} not supported")
@@ -124,9 +126,11 @@ class TestAnalysisOptionAnalysis:
                 )
 
         # 1. Define test data.
+        _option_id = "Option1"
         _id_col = "link_id"
         _analysis_type = AnalysisDamagesEnum.DAMAGES
         _analysis = AdaptationOptionAnalysis(
+            option_id=_option_id,
             analysis_type=_analysis_type,
             analysis_class=MockAnalysis,
             analysis_input=None,
@@ -138,7 +142,7 @@ class TestAnalysisOptionAnalysis:
         _result = _analysis.execute(None)
 
         # 3. Verify expectations.
-        assert isinstance(_result, AdaptationPartialResult)
-        assert _result.data_frame[_analysis_type.config_value].sum() == pytest.approx(
-            55
-        )
+        assert isinstance(_result, AdaptationOptionPartialResult)
+        assert _result.data_frame[
+            f"{_option_id}_{_analysis_type.config_value}"
+        ].sum() == pytest.approx(55)

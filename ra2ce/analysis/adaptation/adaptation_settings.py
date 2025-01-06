@@ -27,8 +27,8 @@ import numpy as np
 class AdaptationSettings:
     discount_rate: float = 0.0
     time_horizon: float = 0.0
-    climate_factor: float = 0.0
     initial_frequency: float = 0.0
+    climate_factor: float = 0.0
 
     @property
     def net_present_value_factor(self) -> float:

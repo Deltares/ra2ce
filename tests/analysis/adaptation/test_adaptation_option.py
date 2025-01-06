@@ -12,7 +12,9 @@ from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.adaptation.adaptation_option_analysis import (
     AdaptationOptionAnalysis,
 )
-from ra2ce.analysis.adaptation.adaptation_partial_result import AdaptationPartialResult
+from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
+    AdaptationOptionPartialResult,
+)
 from ra2ce.analysis.adaptation.adaptation_result_enum import AdaptationResultEnum
 from ra2ce.analysis.adaptation.adaptation_settings import AdaptationSettings
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
@@ -118,12 +120,13 @@ class TestAdaptationOption:
         result: float
 
         def execute(self, _: AnalysisConfigWrapper) -> DataFrame:
-            return AdaptationPartialResult(
+            return AdaptationOptionPartialResult(
+                option_id=self.option_id,
                 id_col="link_id",
                 data_frame=GeoDataFrame.from_dict(
                     {
                         "link_id": range(10),
-                        self.analysis_type.config_value: self.result,
+                        f"{self.option_id}_{self.analysis_type.config_value}": self.result,
                     }
                 ),
             )
@@ -140,6 +143,7 @@ class TestAdaptationOption:
             maintenance_interval=3.0,
             analyses=[
                 TestAdaptationOption.MockAdaptationOptionAnalysis(
+                    option_id=_option_id,
                     analysis_type=AnalysisDamagesEnum.DAMAGES,
                     analysis_class=None,
                     analysis_input=None,
@@ -152,15 +156,18 @@ class TestAdaptationOption:
             adaptation_settings=AdaptationSettings(
                 discount_rate=0.025,
                 time_horizon=20.0,
-                climate_factor=0.001,
                 initial_frequency=0.01,
+                climate_factor=0.001,
             ),
         )
 
     @pytest.fixture(name="valid_reference_impact")
-    def _get_valid_reference_impact_fixture(self) -> Iterator[AdaptationPartialResult]:
+    def _get_valid_reference_impact_fixture(
+        self,
+    ) -> Iterator[AdaptationOptionPartialResult]:
         _ref_option_id = "Option0"
-        _result = AdaptationPartialResult(
+        _result = AdaptationOptionPartialResult(
+            option_id=_ref_option_id,
             id_col="link_id",
             data_frame=GeoDataFrame.from_dict(
                 {
@@ -177,7 +184,7 @@ class TestAdaptationOption:
     def test_get_bc_ratio_returns_result(
         self,
         valid_adaptation_option: AdaptationOption,
-        valid_reference_impact: AdaptationPartialResult,
+        valid_reference_impact: AdaptationOptionPartialResult,
     ):
         # 1. Define test data.
         _gdf_in = GeoDataFrame.from_dict(
@@ -196,21 +203,21 @@ class TestAdaptationOption:
         )
 
         # 3. Verify expectations.
-        assert isinstance(_result, AdaptationPartialResult)
+        assert isinstance(_result, AdaptationOptionPartialResult)
         assert _result.data_frame[
             f"{valid_adaptation_option.id}_bc_ratio"
         ].sum() == pytest.approx(0.0161828)
 
-    def test_get_benefit_returns_result(
+    def test__get_benefit_returns_result(
         self,
         valid_adaptation_option: AdaptationOption,
-        valid_reference_impact: AdaptationPartialResult,
+        valid_reference_impact: AdaptationOptionPartialResult,
     ):
         # 1. Run test.
-        _result = valid_adaptation_option.get_benefit(valid_reference_impact)
+        _result = valid_adaptation_option._get_benefit(valid_reference_impact)
 
         # 2. Verify expectations.
-        assert isinstance(_result, AdaptationPartialResult)
+        assert isinstance(_result, AdaptationOptionPartialResult)
         assert _result.data_frame[
             f"{valid_adaptation_option.id}_benefit"
         ].sum() == pytest.approx(42.014776)
@@ -222,7 +229,7 @@ class TestAdaptationOption:
             pytest.param(False, 64906.510430, id="Without fraction cost"),
         ],
     )
-    def test_get_cost_returns_result(
+    def test__get_cost_returns_result(
         self,
         valid_adaptation_option: AdaptationOption,
         hazard_fraction_cost: bool,
@@ -239,10 +246,10 @@ class TestAdaptationOption:
         )
 
         # 2. Run test.
-        _result = valid_adaptation_option.get_cost(_gdf_in, hazard_fraction_cost)
+        _result = valid_adaptation_option._get_cost(_gdf_in, hazard_fraction_cost)
 
         # 3. Verify expectations.
-        assert isinstance(_result, AdaptationPartialResult)
+        assert isinstance(_result, AdaptationOptionPartialResult)
         assert _result.data_frame[
             f"{valid_adaptation_option.id}_cost"
         ].sum() == pytest.approx(expected)
@@ -295,6 +302,7 @@ class TestAdaptationOption:
         _nof_rows = 10
         valid_adaptation_option.analyses = [
             TestAdaptationOption.MockAdaptationOptionAnalysis(
+                option_id=valid_adaptation_option.id,
                 analysis_type=_analysis_type,
                 analysis_class=None,
                 analysis_input=None,
@@ -312,7 +320,7 @@ class TestAdaptationOption:
         _result = valid_adaptation_option.get_impact()
 
         # 3. Verify expectations.
-        assert isinstance(_result, AdaptationPartialResult)
+        assert isinstance(_result, AdaptationOptionPartialResult)
         assert _result.data_frame[
             f"{valid_adaptation_option.id}_{AdaptationResultEnum.EVENT_IMPACT}"
         ].sum() == pytest.approx(

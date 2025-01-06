@@ -6,7 +6,9 @@ from shapely import Point
 from ra2ce.analysis.adaptation.adaptation_option_analysis import (
     AdaptationOptionAnalysis,
 )
-from ra2ce.analysis.adaptation.adaptation_partial_result import AdaptationPartialResult
+from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
+    AdaptationOptionPartialResult,
+)
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -15,43 +17,51 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 
 
-class TestAdaptationPartialResult:
-    def test_initialize_without_input(self):
+class TestAdaptationOptionPartialResult:
+    def test_initialize_with_minimal_input(self):
         # 1./2. Define test data./Run test.
-        _result = AdaptationPartialResult()
+        _option_id = "Option1"
+        _result = AdaptationOptionPartialResult(_option_id)
 
         # 3. Verify expectations.
-        assert isinstance(_result, AdaptationPartialResult)
+        assert isinstance(_result, AdaptationOptionPartialResult)
+        assert _result.option_id == _option_id
         assert isinstance(_result.data_frame, GeoDataFrame)
 
-    def test_initialize_with_input(self):
+    def test_initialize_with_full_input(self):
         # 1. Define test data.
+        _option_id = "Option1"
         _id_col = "link_id"
         _gdf = GeoDataFrame.from_dict(
             {_id_col: range(10), "geometry": [Point(x, 0) for x in range(10)]}
         )
 
         # 2. Run test.
-        _result = AdaptationPartialResult(id_col=_id_col, data_frame=_gdf)
+        _result = AdaptationOptionPartialResult(
+            option_id=_option_id, id_col=_id_col, data_frame=_gdf
+        )
 
         # 3. Verify expectations.
-        assert isinstance(_result, AdaptationPartialResult)
+        assert isinstance(_result, AdaptationOptionPartialResult)
+        assert _result.option_id == _option_id
         assert _result.id_col == _id_col
         assert _result.data_frame.shape[0] == 10
-        assert AdaptationPartialResult._key_col in _result.data_frame.columns
+        assert AdaptationOptionPartialResult._key_col in _result.data_frame.columns
         assert "geometry" in _result.data_frame.columns
 
     def test_from_input_gdf_returns_object(self):
         # 1. Define test data.
+        _option_id = "Option1"
         _gdf_in = GeoDataFrame.from_dict(
             {"link_id": range(10), "geometry": [Point(x, 0) for x in range(10)]}
         )
 
         # 2. Run test.
-        _result = AdaptationPartialResult.from_input_gdf(_gdf_in)
+        _result = AdaptationOptionPartialResult.from_input_gdf(_option_id, _gdf_in)
 
         # 3. Verify expectations.
-        assert isinstance(_result, AdaptationPartialResult)
+        assert isinstance(_result, AdaptationOptionPartialResult)
+        assert _result.option_id == _option_id
         assert _result.data_frame.shape[0] == 10
 
     @pytest.mark.parametrize(
@@ -87,29 +97,31 @@ class TestAdaptationPartialResult:
         match: bool,
     ):
         # 1. Define test data.
+        _option_id = "Option1"
         _id_col = "link_id"
         _gdf = GeoDataFrame.from_dict(
             {_id_col: range(10), "geometry": Point(1, 0), col_name: range(10)}
         )
-        _result_col = AdaptationOptionAnalysis.get_analysis_info(analysis_type)[2]
+        _result_col = AdaptationOptionAnalysis._get_analysis_info(analysis_type)[2]
 
         # 2. Run test.
-        _result = AdaptationPartialResult.from_gdf_with_matched_col(
-            _gdf, _id_col, _result_col, analysis_type
+        _result = AdaptationOptionPartialResult.from_gdf_with_matched_col(
+            _option_id, _gdf, _result_col, analysis_type
         )
 
         # 3. Verify expectations.
-        assert isinstance(_result, AdaptationPartialResult)
-        assert analysis_type.config_value in _result.data_frame.columns
-        assert (
-            _result.data_frame[analysis_type.config_value].sum() == pytest.approx(45)
-        ) == match
+        _result_col = f"{_option_id}_{analysis_type.config_value}"
+        assert isinstance(_result, AdaptationOptionPartialResult)
+        assert _result_col in _result.data_frame.columns
+        assert (_result.data_frame[_result_col].sum() == pytest.approx(45)) == match
 
-    def test_merge_partial_results_with_unequal_column_length(self):
+    def test_add_partial_results_with_unequal_column_length(self):
         # 1. Define test data.
+        _option_id = "Option1"
         _this_nof_rows = 10
         _this_result_col = "this_result"
-        _this_result = AdaptationPartialResult(
+        _this_result = AdaptationOptionPartialResult(
+            option_id=_option_id,
             id_col="this_link_id",
             data_frame=GeoDataFrame.from_dict(
                 {
@@ -121,7 +133,8 @@ class TestAdaptationPartialResult:
         )
         _other_nof_rows = 8
         _other_result_col = "other_result"
-        _other_result = AdaptationPartialResult(
+        _other_result = AdaptationOptionPartialResult(
+            option_id=_option_id,
             id_col="other_link_id",
             data_frame=GeoDataFrame.from_dict(
                 {
@@ -133,10 +146,10 @@ class TestAdaptationPartialResult:
         )
 
         # 2. Run test.
-        _this_result.merge_partial_results(_other_result)
+        _this_result += _other_result
 
         # 3. Verify expectations.
-        assert isinstance(_this_result, AdaptationPartialResult)
+        assert isinstance(_this_result, AdaptationOptionPartialResult)
         assert all(
             _col in _this_result.data_frame.columns
             for _col in [_this_result_col, _other_result_col]
@@ -145,11 +158,13 @@ class TestAdaptationPartialResult:
         assert _this_result.data_frame[_this_result_col].sum() == pytest.approx(45)
         assert _this_result.data_frame[_other_result_col].sum() == pytest.approx(56)
 
-    def test_merge_partial_results_with_other_key_order(self):
+    def test_add_partial_results_with_other_key_order(self):
         # 1. Define test data.
+        _option_id = "Option1"
         _id_col = "link_id"
         _custom_id = [5, 6, 7, 8, 9, 0, 1, 2, 3, 4]
-        _this_result = AdaptationPartialResult(
+        _this_result = AdaptationOptionPartialResult(
+            option_id=_option_id,
             id_col=_id_col,
             data_frame=GeoDataFrame.from_dict(
                 {
@@ -158,7 +173,8 @@ class TestAdaptationPartialResult:
                 }
             ),
         )
-        _other_result = AdaptationPartialResult(
+        _other_result = AdaptationOptionPartialResult(
+            option_id=_option_id,
             id_col=_id_col,
             data_frame=GeoDataFrame.from_dict(
                 {
@@ -172,47 +188,41 @@ class TestAdaptationPartialResult:
         )
 
         # 2. Run test.
-        _this_result.merge_partial_results(_other_result)
+        _this_result += _other_result
 
         # 3. Verify expectations.
         assert all(
             _this_result.data_frame["Result2"] == _this_result.data_frame["Result1"]
         )
 
-    def test_add_option_id(self):
+    def test_add_partial_results_with_different_option_ids_raises(self):
         # 1. Define test data.
-        _result_col1 = "result1"
-        _result_col2 = "result2"
-        _partial_result = AdaptationPartialResult(
-            id_col="link_id",
-            data_frame=GeoDataFrame.from_dict(
-                {
-                    "link_id": range(10),
-                    "geometry": [Point(x, 0) for x in range(10)],
-                    _result_col1: range(10),
-                    _result_col2: range(0, 20, 2),
-                }
-            ),
+        _id_col = "link_id"
+        _this_result = AdaptationOptionPartialResult(
+            option_id="Option1",
+            id_col=_id_col,
+            data_frame=GeoDataFrame.from_dict({_id_col: range(10)}),
         )
-        _option_id = "Option1"
+        _other_result = AdaptationOptionPartialResult(
+            option_id="Option2",
+            id_col=_id_col,
+            data_frame=GeoDataFrame.from_dict({_id_col: range(10)}),
+        )
 
         # 2. Run test.
-        _partial_result.add_option_id(_option_id)
+        with pytest.raises(ValueError) as exc:
+            _this_result += _other_result
 
         # 3. Verify expectations.
-        assert isinstance(_partial_result, AdaptationPartialResult)
-        assert all(
-            f"{_option_id}_{_col}" in _partial_result.data_frame.columns
-            for _col in [_result_col1, _result_col2]
-        )
-        assert all(
-            not _col in _partial_result.data_frame.columns
-            for _col in [_result_col1, _result_col2]
+        assert exc.match(
+            "Cannot merge partial results from different adaptation options."
         )
 
     def test_put_option_column(self):
         # 1. Define test data.
-        _partial_result = AdaptationPartialResult(
+        _option_id = "Option1"
+        _partial_result = AdaptationOptionPartialResult(
+            option_id=_option_id,
             id_col="link_id",
             data_frame=GeoDataFrame.from_dict(
                 {
@@ -222,25 +232,24 @@ class TestAdaptationPartialResult:
                 }
             ),
         )
-        _option_id = "Option1"
         _col_type = "cost"
         _data = Series(range(10), name="result2")
 
         # 2. Run test.
-        _partial_result.put_option_column(_option_id, _col_type, _data)
+        _partial_result.add_column(_col_type, _data)
 
         # 3. Verify expectations.
-        assert isinstance(_partial_result, AdaptationPartialResult)
-        assert f"{_option_id}_{_col_type}" in _partial_result.data_frame.columns
-        assert _partial_result.data_frame[
-            f"{_option_id}_{_col_type}"
-        ].sum() == pytest.approx(45)
+        _result_col = f"{_option_id}_{_col_type}"
+        assert isinstance(_partial_result, AdaptationOptionPartialResult)
+        assert _result_col in _partial_result.data_frame.columns
+        assert _partial_result.data_frame[_result_col].sum() == pytest.approx(45)
 
     def test_get_option_column(self):
         # 1. Define test data.
         _option_id = "Option1"
         _col_type = "cost"
-        _partial_result = AdaptationPartialResult(
+        _partial_result = AdaptationOptionPartialResult(
+            option_id=_option_id,
             id_col="link_id",
             data_frame=GeoDataFrame.from_dict(
                 {
@@ -252,7 +261,7 @@ class TestAdaptationPartialResult:
         )
 
         # 2. Run test.
-        _result = _partial_result.get_option_column(_option_id, _col_type)
+        _result = _partial_result.get_column(_col_type)
 
         # 3. Verify expectations.
         assert isinstance(_result, Series)

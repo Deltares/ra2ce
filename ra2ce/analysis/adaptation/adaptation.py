@@ -18,11 +18,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-from copy import deepcopy
 from pathlib import Path
 
 from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
-from ra2ce.analysis.adaptation.adaptation_partial_result import AdaptationPartialResult
 from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionAdaptation,
@@ -84,15 +82,15 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
             AnalysisResultWrapper: The result of the adaptation analysis.
         """
         _reference_impact = self.reference_option.get_impact()
-        _result = deepcopy(_reference_impact)
 
+        _result_gdf = _reference_impact.data_frame
         for _option in self.adaptation_options:
-            _result.merge_partial_results(
-                _option.get_bc_ratio(
-                    _reference_impact,
-                    self.graph_file_hazard.get_graph(),
-                    self.analysis.hazard_fraction_cost,
-                )
+            _bc_ratio_result = _option.get_bc_ratio(
+                _reference_impact,
+                self.graph_file_hazard.get_graph(),
+                self.analysis.hazard_fraction_cost,
             )
+            for _col in _bc_ratio_result.result_cols:
+                _result_gdf[_col] = _bc_ratio_result.data_frame[_col]
 
-        return self.generate_result_wrapper(_result.data_frame)
+        return self.generate_result_wrapper(_result_gdf)

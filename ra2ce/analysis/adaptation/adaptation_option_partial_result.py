@@ -37,12 +37,12 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 
 
 @dataclass
-class AdaptationPartialResult:
+class AdaptationOptionPartialResult:
     """
     Class to represent the partial result of an adaptation analysis.
     """
 
-    option_id: str = ""
+    option_id: str
     id_col: str = "link_id"
     data_frame: GeoDataFrame = field(default_factory=GeoDataFrame)
     _key_col: str = "merge_key"
@@ -62,6 +62,52 @@ class AdaptationPartialResult:
             return
         self.data_frame.set_geometry("geometry")
 
+    def __add__(
+        self, other: AdaptationOptionPartialResult
+    ) -> AdaptationOptionPartialResult:
+        _result = self.__class__(
+            option_id=self.option_id,
+            id_col=self.id_col,
+            data_frame=self.data_frame.copy(),
+        )
+        _result._merge_partial_results(other)
+        return _result
+
+    def __iadd__(
+        self, other: AdaptationOptionPartialResult
+    ) -> AdaptationOptionPartialResult:
+        self._merge_partial_results(other)
+        return self
+
+    def _merge_partial_results(self, other: AdaptationOptionPartialResult) -> None:
+        """
+        Merge the partial results of another analysis into this one.
+
+        Args:
+            other (AdaptationOptionPartialResult): The other partial analysis results to merge.
+        """
+        if other.data_frame.empty:
+            return
+
+        if self.data_frame.empty:
+            self.option_id = other.option_id
+            self.data_frame = other.data_frame
+            return
+
+        if self.option_id != other.option_id:
+            raise ValueError(
+                "Cannot merge partial results from different adaptation options."
+            )
+
+        # Filter out duplicate columns
+        for _col in self.standard_cols:
+            if _col in other.data_frame.columns:
+                other.data_frame.drop(columns=[_col], inplace=True)
+
+        self.data_frame = self.data_frame.merge(
+            other.data_frame, on=self._key_col, how="outer"
+        ).fillna(math.nan)
+
     @property
     def standard_cols(self) -> list[str]:
         return [self.id_col, "geometry"]
@@ -75,7 +121,9 @@ class AdaptationPartialResult:
         ]
 
     @classmethod
-    def from_input_gdf(cls, gdf_in: GeoDataFrame) -> AdaptationPartialResult:
+    def from_input_gdf(
+        cls, option_id: str, gdf_in: GeoDataFrame
+    ) -> AdaptationOptionPartialResult:
         """
         Create a new object from a GeoDataFrame.
 
@@ -83,9 +131,10 @@ class AdaptationPartialResult:
             gdf_in (GeoDataFrame): The input GeoDataFrame.
 
         Returns:
-            AdaptationPartialResult: The object with the input data.
+            AdaptationOptionPartialResult: The object with the input data.
         """
         return cls(
+            option_id=option_id,
             id_col=cls.id_col,
             data_frame=GeoDataFrame(gdf_in.filter(items=[cls.id_col, "geometry"])),
         )
@@ -93,108 +142,62 @@ class AdaptationPartialResult:
     @classmethod
     def from_gdf_with_matched_col(
         cls,
+        option_id: str,
         gdf_in: GeoDataFrame,
-        id_col: str,
         regex: str,
         analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
-    ) -> AdaptationPartialResult:
+    ) -> AdaptationOptionPartialResult:
         """
         Create a new object from a GeoDataFrame with a column matching a regex.
 
         Args:
+            option_id (str): The ID of the adaptation option.
             gdf_in (GeoDataFrame): The input GeoDataFrame.
-            id_col (str): The ID column.
             regex (str): The pattern to match.
             analysis_type (AnalysisDamagesEnum | AnalysisLossesEnum): The type of the input analysis.
 
         Returns:
-            AdaptationPartialResult: The object with the matched column.
+            AdaptationOptionPartialResult: The object with the matched column.
         """
+        _result = cls.from_input_gdf(option_id, gdf_in)
         _result_cols = gdf_in.filter(regex=regex).columns
-        _gdf = gdf_in[[id_col, "geometry"]].copy()
         if _result_cols.empty:
             logging.warning(
                 "No column found in dataframe matching the regex %s for analaysis %s. Returning NaN.",
                 regex,
                 analysis_type.config_value,
             )
-            _gdf[analysis_type.config_value] = math.nan
+            _result.add_column(analysis_type.config_value, math.nan)
         else:
-            _gdf[analysis_type.config_value] = gdf_in[_result_cols[0]]
-        return cls(id_col=id_col, data_frame=_gdf)
+            _result.add_column(analysis_type.config_value, gdf_in[_result_cols[0]])
 
-    def merge_partial_results(self, other: AdaptationPartialResult) -> None:
-        """
-        Merge the partial results of another analysis into this one.
+        return _result
 
-        Args:
-            other (AdaptationPartialResult): The other partial analysis results to merge.
-        """
-        if other.data_frame.empty:
-            return
-
-        if self.data_frame.empty:
-            self.data_frame = other.data_frame
-            return
-
-        # If results from 2 different options are merged, reset the option ID
-        if self.option_id and self.option_id != other.option_id:
-            self.option_id = ""
-
-        # Filter out duplicate columns
-        for _col in self.standard_cols:
-            if _col in other.data_frame.columns:
-                other.data_frame.drop(columns=[_col], inplace=True)
-
-        self.data_frame = self.data_frame.merge(
-            other.data_frame, on=self._key_col, how="outer"
-        ).fillna(math.nan)
-
-    def _get_option_column_name(
-        self, option_id: str, col_type: AdaptationResultEnum | str
-    ) -> str:
+    def _get_column_name(self, col_type: AdaptationResultEnum | str) -> str:
         if isinstance(col_type, AdaptationResultEnum):
-            return f"{option_id}_{col_type.config_value}"
-        return f"{option_id}_{col_type}"
+            return f"{self.option_id}_{col_type.config_value}"
+        return f"{self.option_id}_{col_type}"
 
-    def add_option_id(self, option_id: str) -> None:
-        """
-        Add the option ID to the result column names.
-
-        Args:
-            option_id (str): The option ID.
-        """
-        self.option_id = option_id
-        for _col in self.result_cols:
-            self.data_frame.rename(
-                columns={_col: self._get_option_column_name(option_id, _col)},
-                inplace=True,
-            )
-
-    def put_option_column(
-        self, option_id: str, col_type: AdaptationResultEnum, column_data: Series
+    def add_column(
+        self, col_type: AdaptationResultEnum | str, column_data: Series
     ) -> None:
         """
-        Add a data column to the result for a specific adaptation option.
+        Add a data column to the result.
 
         Args:
-            option_id (str): The ID of the adaptation option.
             col_type (AdaptationResultEnum): The type of the column.
             column_data (Series): The data to add.
         """
-        self.data_frame[self._get_option_column_name(option_id, col_type)] = column_data
+        self.data_frame[self._get_column_name(col_type)] = column_data
 
-    def get_option_column(
-        self, option_id: str, col_type: AdaptationResultEnum
-    ) -> Series:
+    def get_column(self, col_type: AdaptationResultEnum | str) -> Series:
         """
-        Get a data column from the result for a specific adaptation option.
+        Get a data column from the result.
 
         Args:
-            option_id (str): The ID of the adaptation option.
             col_type (AdaptationResultEnum):
 
         Returns:
             Series: The data column.
         """
-        return self.data_frame[self._get_option_column_name(option_id, col_type)]
+        return self.data_frame[self._get_column_name(col_type)]

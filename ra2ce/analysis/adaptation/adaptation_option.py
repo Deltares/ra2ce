@@ -28,7 +28,9 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.adaptation.adaptation_option_analysis import (
     AdaptationOptionAnalysis,
 )
-from ra2ce.analysis.adaptation.adaptation_partial_result import AdaptationPartialResult
+from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
+    AdaptationOptionPartialResult,
+)
 from ra2ce.analysis.adaptation.adaptation_result_enum import AdaptationResultEnum
 from ra2ce.analysis.adaptation.adaptation_settings import AdaptationSettings
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
@@ -51,9 +53,6 @@ class AdaptationOption:
     analyses: list[AdaptationOptionAnalysis]
     analysis_config: AnalysisConfigWrapper
     adaptation_settings: AdaptationSettings
-
-    def __hash__(self) -> int:
-        return hash(self.id)
 
     @classmethod
     def from_config(
@@ -86,9 +85,9 @@ class AdaptationOption:
         _config_analyses = [x.analysis for x in analysis_config.config_data.analyses]
         _analyses = [
             AdaptationOptionAnalysis.from_config(
-                analysis_config=analysis_config,
-                analysis_type=_analysis_type,
-                option_id=adaptation_option.id,
+                analysis_config,
+                _analysis_type,
+                adaptation_option.id,
             )
             for _analysis_type in [
                 AnalysisDamagesEnum.DAMAGES,
@@ -100,8 +99,8 @@ class AdaptationOption:
         _adaptation_settings = AdaptationSettings(
             discount_rate=analysis_config.config_data.adaptation.discount_rate,
             time_horizon=analysis_config.config_data.adaptation.time_horizon,
-            climate_factor=analysis_config.config_data.adaptation.climate_factor,
             initial_frequency=analysis_config.config_data.adaptation.initial_frequency,
+            climate_factor=analysis_config.config_data.adaptation.climate_factor,
         )
 
         return cls(
@@ -113,52 +112,51 @@ class AdaptationOption:
 
     def get_bc_ratio(
         self,
-        reference_impact: AdaptationPartialResult,
+        reference_impact: AdaptationOptionPartialResult,
         gdf_in: GeoDataFrame,
         hazard_fraction_cost: bool,
-    ) -> AdaptationPartialResult:
+    ) -> AdaptationOptionPartialResult:
         """
         Calculate the benefit-cost ratio of the adaptation option.
 
         Args:
-            reference_impact (AdaptationPartialResult): The impact of the reference option.
+            reference_impact (AdaptationOptionPartialResult): The impact of the reference option.
 
         Returns:
-            AdaptationPartialResult: The benefit-cost ratio of the adaptation option.
+            AdaptationOptionPartialResult: The benefit-cost ratio of the adaptation option.
         """
         # Calculate cost
-        _result = self.get_cost(gdf_in, hazard_fraction_cost)
+        _result = self._get_cost(gdf_in, hazard_fraction_cost)
 
         # Calculate impact/benefit
-        _result.merge_partial_results(self.get_benefit(reference_impact))
+        _result += self._get_benefit(reference_impact)
 
         # Calculate BC-ratio
-        _benefit = _result.get_option_column(self.id, AdaptationResultEnum.BENEFIT)
-        _cost = _result.get_option_column(self.id, AdaptationResultEnum.COST)
+        _benefit = _result.get_column(AdaptationResultEnum.BENEFIT)
+        _cost = _result.get_column(AdaptationResultEnum.COST)
 
-        _result.put_option_column(
-            self.id,
+        _result.add_column(
             AdaptationResultEnum.BC_RATIO,
             _benefit / _cost.replace(0, math.nan),
         )
         return _result
 
-    def get_benefit(
-        self, reference_impact: AdaptationPartialResult
-    ) -> AdaptationPartialResult:
+    def _get_benefit(
+        self, reference_impact: AdaptationOptionPartialResult
+    ) -> AdaptationOptionPartialResult:
         _result = self.get_impact()
 
         # Benefit = reference impact - adaptation impact
-        _benefit = reference_impact.get_option_column(
-            reference_impact.option_id, AdaptationResultEnum.NET_IMPACT
-        ) - _result.get_option_column(self.id, AdaptationResultEnum.NET_IMPACT)
-        _result.put_option_column(self.id, AdaptationResultEnum.BENEFIT, _benefit)
+        _benefit = reference_impact.get_column(
+            AdaptationResultEnum.NET_IMPACT
+        ) - _result.get_column(AdaptationResultEnum.NET_IMPACT)
+        _result.add_column(AdaptationResultEnum.BENEFIT, _benefit)
 
         return _result
 
-    def get_cost(
+    def _get_cost(
         self, gdf_in: GeoDataFrame, hazard_fraction_cost: bool
-    ) -> AdaptationPartialResult:
+    ) -> AdaptationOptionPartialResult:
         """
         Calculate the cost of the adaptation option.
 
@@ -166,9 +164,9 @@ class AdaptationOption:
             input_gdf (GeoDataFrame): The input GeoDataFrame.
 
         Returns:
-            AdaptationPartialResult: The cost of the adaptation option.
+            AdaptationOptionPartialResult: The cost of the adaptation option.
         """
-        _result = AdaptationPartialResult.from_input_gdf(gdf_in)
+        _result = AdaptationOptionPartialResult.from_input_gdf(self.id, gdf_in)
         _cost_col = gdf_in.apply(
             lambda x, cost=self._get_unit_cost(): x["length"] * cost, axis=1
         )
@@ -178,7 +176,7 @@ class AdaptationOption:
             _fraction_col = gdf_in.filter(regex="EV.*_fr").columns[0]
             _cost_col *= gdf_in[_fraction_col]
 
-        _result.put_option_column(self.id, AdaptationResultEnum.COST, _cost_col)
+        _result.add_column(AdaptationResultEnum.COST, _cost_col)
 
         return _result
 
@@ -220,7 +218,7 @@ class AdaptationOption:
             for _year in range(0, round(self.adaptation_settings.time_horizon), 1)
         )
 
-    def get_impact(self) -> AdaptationPartialResult:
+    def get_impact(self) -> AdaptationOptionPartialResult:
         """
         Calculate the impact of the adaptation option.
 
@@ -228,19 +226,17 @@ class AdaptationOption:
             net_present_value_factor (float): The net present value factor to apply to the event impact.
 
         Returns:
-            AdaptationPartialResult: The impact (event and net) of the adaptation option per link.
+            AdaptationOptionPartialResult: The impact (event and net) of the adaptation option per link.
         """
         # Get all results from the analyses
-        _result = AdaptationPartialResult()
+        _result = AdaptationOptionPartialResult(option_id=self.id)
         for _analysis in self.analyses:
-            _result.merge_partial_results(_analysis.execute(self.analysis_config))
-        _result.add_option_id(self.id)
+            _result += _analysis.execute(self.analysis_config)
 
         # Calculate the impact (summing the results of the analysis results per link)
         _impact = _result.data_frame.filter(regex=self.id).sum(axis=1)
-        _result.put_option_column(self.id, AdaptationResultEnum.EVENT_IMPACT, _impact)
-        _result.put_option_column(
-            self.id,
+        _result.add_column(AdaptationResultEnum.EVENT_IMPACT, _impact)
+        _result.add_column(
             AdaptationResultEnum.NET_IMPACT,
             _impact * self.adaptation_settings.net_present_value_factor,
         )

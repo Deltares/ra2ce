@@ -9,8 +9,8 @@ class TestAdaptationSettings:
         _settings = AdaptationSettings(
             discount_rate=0.025,
             time_horizon=20,
-            climate_factor=0.0001,
             initial_frequency=0.01,
+            climate_factor=0.0001,
         )
 
         # 2. Run test

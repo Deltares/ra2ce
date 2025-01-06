@@ -23,7 +23,9 @@ from __future__ import annotations
 from copy import deepcopy
 from dataclasses import dataclass
 
-from ra2ce.analysis.adaptation.adaptation_partial_result import AdaptationPartialResult
+from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
+    AdaptationOptionPartialResult,
+)
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -41,6 +43,7 @@ from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
 
 @dataclass
 class AdaptationOptionAnalysis:
+    option_id: str
     analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum
     analysis_class: type[Damages | LossesBase]
     analysis_input: AnalysisInputWrapper
@@ -48,7 +51,7 @@ class AdaptationOptionAnalysis:
     result_col: str
 
     @staticmethod
-    def get_analysis_info(
+    def _get_analysis_info(
         analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
     ) -> tuple[type[Damages | LossesBase], str, str]:
         """
@@ -61,7 +64,7 @@ class AdaptationOptionAnalysis:
             NotImplementedError: The analysis type is not implemented.
 
         Returns:
-            tuple[type[Damages | LossesBase], str]: The analysis class, the name of column containing the id and the regex to find the result column.
+            tuple[type[Damages | LossesBase], str, str]: The analysis class, the name of column containing the id and the regex to find the result column.
         """
         if analysis_type == AnalysisDamagesEnum.DAMAGES:
             # Columnname should start with "dam_" and should not end with "_segments"
@@ -110,16 +113,14 @@ class AdaptationOptionAnalysis:
             _graph_file_hazard = analysis_config.graph_files.base_graph_hazard
 
         _analysis_input = AnalysisInputWrapper.from_input(
-            analysis=_analysis,
-            analysis_config=_analysis_config,
-            graph_file=_graph_file,
-            graph_file_hazard=_graph_file_hazard,
+            _analysis, _analysis_config, _graph_file, _graph_file_hazard
         )
 
         # Create output object
-        _analysis_class, _id_col, _result_col = cls.get_analysis_info(analysis_type)
+        _analysis_class, _id_col, _result_col = cls._get_analysis_info(analysis_type)
 
         return cls(
+            option_id=option_id,
             analysis_type=analysis_type,
             analysis_class=_analysis_class,
             analysis_input=_analysis_input,
@@ -129,7 +130,7 @@ class AdaptationOptionAnalysis:
 
     def execute(
         self, analysis_config: AnalysisConfigWrapper
-    ) -> AdaptationPartialResult:
+    ) -> AdaptationOptionPartialResult:
         """
         Execute the analysis.
 
@@ -137,7 +138,7 @@ class AdaptationOptionAnalysis:
             analysis_config (AnalysisConfigWrapper): The config for the analysis.
 
         Returns:
-            AdaptationPartialResult: The relevant result columns of the analysis.
+            AdaptationOptionPartialResult: The relevant result columns of the analysis.
         """
         if self.analysis_class == Damages:
             _result_wrapper = self.analysis_class(
@@ -152,6 +153,9 @@ class AdaptationOptionAnalysis:
             ).execute()
             _result_gdf = _result_wrapper.get_single_result()
 
-        return AdaptationPartialResult.from_gdf_with_matched_col(
-            _result_gdf, self.id_col, self.result_col, self.analysis_type
+        return AdaptationOptionPartialResult.from_gdf_with_matched_col(
+            self.option_id,
+            _result_gdf,
+            self.result_col,
+            self.analysis_type,
         )
