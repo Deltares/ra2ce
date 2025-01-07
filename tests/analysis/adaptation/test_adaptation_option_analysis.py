@@ -49,7 +49,7 @@ class TestAnalysisOptionAnalysis:
         expected_analysis: type[Damages | LossesBase],
     ):
         # 1./2. Define test data./Run test.
-        _result = AdaptationOptionAnalysis._get_analysis_info(analysis_type)
+        _result = AdaptationOptionAnalysis.get_analysis_info(analysis_type)
 
         # 3. Verify expectations.
         assert isinstance(_result, tuple)
@@ -62,7 +62,7 @@ class TestAnalysisOptionAnalysis:
 
         # 2. Run test.
         with pytest.raises(NotImplementedError) as exc:
-            AdaptationOptionAnalysis._get_analysis_info(_analysis_type)
+            AdaptationOptionAnalysis.get_analysis_info(_analysis_type)
 
         # 3. Verify expectations.
         assert exc.match(f"Analysis {_analysis_type} not supported")
@@ -134,7 +134,6 @@ class TestAnalysisOptionAnalysis:
             analysis_type=_analysis_type,
             analysis_class=MockAnalysis,
             analysis_input=None,
-            id_col=_id_col,
             result_col="result.*",
         )
 

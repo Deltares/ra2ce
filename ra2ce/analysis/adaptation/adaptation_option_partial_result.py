@@ -40,19 +40,20 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 class AdaptationOptionPartialResult:
     """
     Class to represent the partial result of an adaptation analysis.
+    It wraps a GeoDataFrame with the results of the analysis and intermediate calculations.
     """
 
     option_id: str
-    id_col: str = "link_id"
     data_frame: GeoDataFrame = field(default_factory=GeoDataFrame)
+    _id_col: str = "link_id"
     _key_col: str = "merge_key"
 
     def __post_init__(self) -> None:
         if self.data_frame.empty:
             return
 
-        # Add column to merge on
-        self.data_frame[self._key_col] = self.data_frame[self.id_col].apply(
+        # Add column to merge on (needed bacause link_id can contain a mix of float and list[float])
+        self.data_frame[self._key_col] = self.data_frame[self._id_col].apply(
             lambda x: str(x)
         )
 
@@ -65,52 +66,58 @@ class AdaptationOptionPartialResult:
     def __add__(
         self, other: AdaptationOptionPartialResult
     ) -> AdaptationOptionPartialResult:
-        _result = self.__class__(
-            option_id=self.option_id,
-            id_col=self.id_col,
-            data_frame=self.data_frame.copy(),
-        )
-        _result._merge_partial_results(other)
-        return _result
+        return self.__class__(
+            option_id=self.option_id, data_frame=self.data_frame.copy()
+        ).__iadd__(other)
 
     def __iadd__(
         self, other: AdaptationOptionPartialResult
     ) -> AdaptationOptionPartialResult:
-        self._merge_partial_results(other)
-        return self
-
-    def _merge_partial_results(self, other: AdaptationOptionPartialResult) -> None:
-        """
-        Merge the partial results of another analysis into this one.
-
-        Args:
-            other (AdaptationOptionPartialResult): The other partial analysis results to merge.
-        """
         if other.data_frame.empty:
-            return
+            # Nothing to add
+            return self
 
         if self.data_frame.empty:
+            # Take data from the other object
             self.option_id = other.option_id
             self.data_frame = other.data_frame
-            return
+            return self
 
         if self.option_id != other.option_id:
             raise ValueError(
                 "Cannot merge partial results from different adaptation options."
             )
 
-        # Filter out duplicate columns
+        # Filter out duplicate columns (drop from the one with the least rows)
         for _col in self.standard_cols:
             if _col in other.data_frame.columns:
-                other.data_frame.drop(columns=[_col], inplace=True)
+                if self.data_frame.shape[0] >= other.data_frame.shape[0]:
+                    other.data_frame.drop(columns=[_col], inplace=True)
+                else:
+                    self.data_frame.drop(columns=[_col], inplace=True)
 
+        # Merge the dataframes on the key column
         self.data_frame = self.data_frame.merge(
             other.data_frame, on=self._key_col, how="outer"
         ).fillna(math.nan)
 
+        return self
+
+    def __eq__(self, other: AdaptationOptionPartialResult) -> bool:
+        """
+        Check if both object's dataframes have the same key column.
+
+        Args:
+            other (AdaptationOptionPartialResult): The object to compare with.
+
+        Returns:
+            bool: True if the key columns are equal.
+        """
+        return self.data_frame[self._key_col].equals(other.data_frame[self._key_col])
+
     @property
     def standard_cols(self) -> list[str]:
-        return [self.id_col, "geometry"]
+        return [self._id_col, "geometry"]
 
     @property
     def result_cols(self) -> list[str]:
@@ -125,7 +132,7 @@ class AdaptationOptionPartialResult:
         cls, option_id: str, gdf_in: GeoDataFrame
     ) -> AdaptationOptionPartialResult:
         """
-        Create a new object from a GeoDataFrame.
+        Create a new object from an input GeoDataFrame.
 
         Args:
             gdf_in (GeoDataFrame): The input GeoDataFrame.
@@ -135,8 +142,7 @@ class AdaptationOptionPartialResult:
         """
         return cls(
             option_id=option_id,
-            id_col=cls.id_col,
-            data_frame=GeoDataFrame(gdf_in.filter(items=[cls.id_col, "geometry"])),
+            data_frame=GeoDataFrame(gdf_in.filter(items=[cls._id_col, "geometry"])),
         )
 
     @classmethod
@@ -167,35 +173,37 @@ class AdaptationOptionPartialResult:
                 regex,
                 analysis_type.config_value,
             )
-            _result.add_column(analysis_type.config_value, math.nan)
+            _result.add_column(analysis_type, math.nan)
         else:
-            _result.add_column(analysis_type.config_value, gdf_in[_result_cols[0]])
+            _result.add_column(analysis_type, gdf_in[_result_cols[0]])
 
         return _result
 
-    def _get_column_name(self, col_type: AdaptationResultEnum | str) -> str:
-        if isinstance(col_type, AdaptationResultEnum):
-            return f"{self.option_id}_{col_type.config_value}"
-        return f"{self.option_id}_{col_type}"
+    def _get_column_name(
+        self, col_type: AdaptationResultEnum | AnalysisDamagesEnum | AnalysisLossesEnum
+    ) -> str:
+        return f"{self.option_id}_{col_type.config_value}"
 
     def add_column(
-        self, col_type: AdaptationResultEnum | str, column_data: Series
+        self,
+        col_type: AdaptationResultEnum | AnalysisDamagesEnum | AnalysisLossesEnum,
+        column_data: Series,
     ) -> None:
         """
         Add a data column to the result.
 
         Args:
-            col_type (AdaptationResultEnum): The type of the column.
+            col_type (AdaptationResultEnum | AnalysisDamagesEnum | AnalysisLossesEnum): The type of the column.
             column_data (Series): The data to add.
         """
         self.data_frame[self._get_column_name(col_type)] = column_data
 
-    def get_column(self, col_type: AdaptationResultEnum | str) -> Series:
+    def get_column(self, col_type: AdaptationResultEnum) -> Series:
         """
         Get a data column from the result.
 
         Args:
-            col_type (AdaptationResultEnum):
+            col_type (AdaptationResultEnum): The type of the column.
 
         Returns:
             Series: The data column.

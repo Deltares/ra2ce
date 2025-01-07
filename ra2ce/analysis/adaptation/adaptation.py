@@ -77,20 +77,26 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
     def execute(self) -> AnalysisResultWrapper:
         """
         Run the adaptation analysis.
+        This is done by calculating the impact of the reference option first.
+        Then the BC-ratio of the adaptation options is calculated.
+        The reference and option results are combined in a single result.
 
         Returns:
             AnalysisResultWrapper: The result of the adaptation analysis.
         """
         _reference_impact = self.reference_option.get_impact()
 
-        _result_gdf = _reference_impact.data_frame
+        _result_gdf = _reference_impact.data_frame.copy()
         for _option in self.adaptation_options:
-            _bc_ratio_result = _option.get_bc_ratio(
+            _option_result = _option.get_bc_ratio(
                 _reference_impact,
                 self.graph_file_hazard.get_graph(),
                 self.analysis.hazard_fraction_cost,
             )
-            for _col in _bc_ratio_result.result_cols:
-                _result_gdf[_col] = _bc_ratio_result.data_frame[_col]
+            # Copy the option result columns.
+            if _option_result != _reference_impact:
+                raise ValueError("The results don't contain the same link_ids.")
+            for _col in _option_result.result_cols:
+                _result_gdf[_col] = _option_result.data_frame[_col]
 
         return self.generate_result_wrapper(_result_gdf)

@@ -47,13 +47,12 @@ class AdaptationOptionAnalysis:
     analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum
     analysis_class: type[Damages | LossesBase]
     analysis_input: AnalysisInputWrapper
-    id_col: str
     result_col: str
 
     @staticmethod
-    def _get_analysis_info(
+    def get_analysis_info(
         analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum,
-    ) -> tuple[type[Damages | LossesBase], str, str]:
+    ) -> tuple[type[Damages | LossesBase], str]:
         """
         Get the analysis class and the result column for the given analysis.
 
@@ -64,15 +63,15 @@ class AdaptationOptionAnalysis:
             NotImplementedError: The analysis type is not implemented.
 
         Returns:
-            tuple[type[Damages | LossesBase], str, str]: The analysis class, the name of column containing the id and the regex to find the result column.
+            tuple[type[Damages | LossesBase], str]: The analysis class and the regex to find the result column.
         """
         if analysis_type == AnalysisDamagesEnum.DAMAGES:
             # Columnname should start with "dam_" and should not end with "_segments"
-            return (Damages, "link_id", "(?!.*_segments$)^dam_.*")
+            return (Damages, "(?!.*_segments$)^dam_.*")
         elif analysis_type == AnalysisLossesEnum.SINGLE_LINK_LOSSES:
-            return (SingleLinkLosses, "link_id", "^vlh_.*_total$")
+            return (SingleLinkLosses, "^vlh_.*_total$")
         elif analysis_type == AnalysisLossesEnum.MULTI_LINK_LOSSES:
-            return (MultiLinkLosses, "link_id", "^vlh_.*_total$")
+            return (MultiLinkLosses, "^vlh_.*_total$")
         raise NotImplementedError(f"Analysis {analysis_type} not supported")
 
     @classmethod
@@ -117,14 +116,13 @@ class AdaptationOptionAnalysis:
         )
 
         # Create output object
-        _analysis_class, _id_col, _result_col = cls._get_analysis_info(analysis_type)
+        _analysis_class, _result_col = cls.get_analysis_info(analysis_type)
 
         return cls(
             option_id=option_id,
             analysis_type=analysis_type,
             analysis_class=_analysis_class,
             analysis_input=_analysis_input,
-            id_col=_id_col,
             result_col=_result_col,
         )
 

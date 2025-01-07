@@ -226,8 +226,7 @@ def _get_valid_adaptation_config_with_input_fixture(
     _analysis_input = AnalysisInputWrapper.from_input(
         analysis=valid_adaptation_config.config_data.adaptation,
         analysis_config=valid_adaptation_config,
-        graph_file=valid_adaptation_config.graph_files.base_network,
-        graph_file_hazard=valid_adaptation_config.graph_files.base_network_hazard,
+        graph_file_hazard=valid_adaptation_config.graph_files.base_graph_hazard_edges,
     )
 
     yield (_analysis_input, valid_adaptation_config)

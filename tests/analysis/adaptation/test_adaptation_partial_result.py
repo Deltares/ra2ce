@@ -9,6 +9,7 @@ from ra2ce.analysis.adaptation.adaptation_option_analysis import (
 from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
     AdaptationOptionPartialResult,
 )
+from ra2ce.analysis.adaptation.adaptation_result_enum import AdaptationResultEnum
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -37,14 +38,12 @@ class TestAdaptationOptionPartialResult:
         )
 
         # 2. Run test.
-        _result = AdaptationOptionPartialResult(
-            option_id=_option_id, id_col=_id_col, data_frame=_gdf
-        )
+        _result = AdaptationOptionPartialResult(option_id=_option_id, data_frame=_gdf)
 
         # 3. Verify expectations.
         assert isinstance(_result, AdaptationOptionPartialResult)
         assert _result.option_id == _option_id
-        assert _result.id_col == _id_col
+        assert _result._id_col == _id_col
         assert _result.data_frame.shape[0] == 10
         assert AdaptationOptionPartialResult._key_col in _result.data_frame.columns
         assert "geometry" in _result.data_frame.columns
@@ -102,7 +101,7 @@ class TestAdaptationOptionPartialResult:
         _gdf = GeoDataFrame.from_dict(
             {_id_col: range(10), "geometry": Point(1, 0), col_name: range(10)}
         )
-        _result_col = AdaptationOptionAnalysis._get_analysis_info(analysis_type)[2]
+        _result_col = AdaptationOptionAnalysis.get_analysis_info(analysis_type)[1]
 
         # 2. Run test.
         _result = AdaptationOptionPartialResult.from_gdf_with_matched_col(
@@ -122,10 +121,9 @@ class TestAdaptationOptionPartialResult:
         _this_result_col = "this_result"
         _this_result = AdaptationOptionPartialResult(
             option_id=_option_id,
-            id_col="this_link_id",
             data_frame=GeoDataFrame.from_dict(
                 {
-                    "this_link_id": range(_this_nof_rows),
+                    "link_id": range(_this_nof_rows),
                     "geometry": [Point(x, 0) for x in range(_this_nof_rows)],
                     _this_result_col: range(_this_nof_rows),
                 }
@@ -135,10 +133,9 @@ class TestAdaptationOptionPartialResult:
         _other_result_col = "other_result"
         _other_result = AdaptationOptionPartialResult(
             option_id=_option_id,
-            id_col="other_link_id",
             data_frame=GeoDataFrame.from_dict(
                 {
-                    "other_link_id": reversed(range(_other_nof_rows)),
+                    "link_id": reversed(range(_other_nof_rows)),
                     "geometry": [Point(x, 0) for x in range(_other_nof_rows)],
                     _other_result_col: range(0, 2 * _other_nof_rows, 2),
                 }
@@ -165,7 +162,6 @@ class TestAdaptationOptionPartialResult:
         _custom_id = [5, 6, 7, 8, 9, 0, 1, 2, 3, 4]
         _this_result = AdaptationOptionPartialResult(
             option_id=_option_id,
-            id_col=_id_col,
             data_frame=GeoDataFrame.from_dict(
                 {
                     _id_col: _custom_id,
@@ -175,7 +171,6 @@ class TestAdaptationOptionPartialResult:
         )
         _other_result = AdaptationOptionPartialResult(
             option_id=_option_id,
-            id_col=_id_col,
             data_frame=GeoDataFrame.from_dict(
                 {
                     _id_col: list(reversed(_custom_id)),
@@ -200,12 +195,10 @@ class TestAdaptationOptionPartialResult:
         _id_col = "link_id"
         _this_result = AdaptationOptionPartialResult(
             option_id="Option1",
-            id_col=_id_col,
             data_frame=GeoDataFrame.from_dict({_id_col: range(10)}),
         )
         _other_result = AdaptationOptionPartialResult(
             option_id="Option2",
-            id_col=_id_col,
             data_frame=GeoDataFrame.from_dict({_id_col: range(10)}),
         )
 
@@ -223,7 +216,6 @@ class TestAdaptationOptionPartialResult:
         _option_id = "Option1"
         _partial_result = AdaptationOptionPartialResult(
             option_id=_option_id,
-            id_col="link_id",
             data_frame=GeoDataFrame.from_dict(
                 {
                     "link_id": range(10),
@@ -232,14 +224,14 @@ class TestAdaptationOptionPartialResult:
                 }
             ),
         )
-        _col_type = "cost"
+        _col_type = AdaptationResultEnum.COST
         _data = Series(range(10), name="result2")
 
         # 2. Run test.
         _partial_result.add_column(_col_type, _data)
 
         # 3. Verify expectations.
-        _result_col = f"{_option_id}_{_col_type}"
+        _result_col = f"{_option_id}_{_col_type.config_value}"
         assert isinstance(_partial_result, AdaptationOptionPartialResult)
         assert _result_col in _partial_result.data_frame.columns
         assert _partial_result.data_frame[_result_col].sum() == pytest.approx(45)
@@ -247,15 +239,14 @@ class TestAdaptationOptionPartialResult:
     def test_get_option_column(self):
         # 1. Define test data.
         _option_id = "Option1"
-        _col_type = "cost"
+        _col_type = AdaptationResultEnum.COST
         _partial_result = AdaptationOptionPartialResult(
             option_id=_option_id,
-            id_col="link_id",
             data_frame=GeoDataFrame.from_dict(
                 {
                     "link_id": range(10),
                     "geometry": [Point(x, 0) for x in range(10)],
-                    f"{_option_id}_{_col_type}": range(10),
+                    f"{_option_id}_{_col_type.config_value}": range(10),
                 }
             ),
         )

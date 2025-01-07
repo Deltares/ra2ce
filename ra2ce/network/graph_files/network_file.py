@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from geopandas import GeoDataFrame, read_feather
+from geopandas import GeoDataFrame, read_feather, read_file
 
 from ra2ce.network.graph_files.graph_files_protocol import GraphFileProtocol
 
@@ -28,7 +28,12 @@ class NetworkFile(GraphFileProtocol):
         _file = folder.joinpath(self.name)
         if _file and _file.is_file():
             self.folder = folder
-            self.graph = read_feather(self.file)
+            if self.name.endswith(".feather"):
+                self.graph = read_feather(_file)
+            elif self.name.endswith(".gpkg"):
+                self.graph = read_file(self.file, driver="GPKG")
+            else:
+                raise ValueError(f"Unknown file type: {self.name}")
 
     def get_graph(self) -> GeoDataFrame:
         if self.graph is None:

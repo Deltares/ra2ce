@@ -175,7 +175,7 @@ class AnalysisFactory:
             _analysis_input = AnalysisInputWrapper.from_input(
                 analysis=analysis,
                 analysis_config=analysis_config,
-                graph_file=analysis_config.graph_files.base_graph_hazard,
+                graph_file=analysis_config.graph_files.base_graph,
                 graph_file_hazard=analysis_config.graph_files.base_graph_hazard,
             )
             return SingleLinkLosses(_analysis_input, analysis_config)
@@ -222,7 +222,7 @@ class AnalysisFactory:
         _analysis_input = AnalysisInputWrapper.from_input(
             analysis=analysis,
             analysis_config=analysis_config,
-            graph_file_hazard=analysis_config.graph_files.base_network_hazard,
+            graph_file_hazard=analysis_config.graph_files.base_graph_hazard_edges,
         )
 
         if analysis.analysis == AnalysisEnum.ADAPTATION:

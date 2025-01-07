@@ -122,7 +122,6 @@ class TestAdaptationOption:
         def execute(self, _: AnalysisConfigWrapper) -> DataFrame:
             return AdaptationOptionPartialResult(
                 option_id=self.option_id,
-                id_col="link_id",
                 data_frame=GeoDataFrame.from_dict(
                     {
                         "link_id": range(10),
@@ -147,7 +146,6 @@ class TestAdaptationOption:
                     analysis_type=AnalysisDamagesEnum.DAMAGES,
                     analysis_class=None,
                     analysis_input=None,
-                    id_col="link_id",
                     result_col=f"Result_{_option_id}",
                     result=1.0,
                 )
@@ -168,7 +166,6 @@ class TestAdaptationOption:
         _ref_option_id = "Option0"
         _result = AdaptationOptionPartialResult(
             option_id=_ref_option_id,
-            id_col="link_id",
             data_frame=GeoDataFrame.from_dict(
                 {
                     "link_id": range(10),
@@ -306,7 +303,6 @@ class TestAdaptationOption:
                 analysis_type=_analysis_type,
                 analysis_class=None,
                 analysis_input=None,
-                id_col="link_id",
                 result_col=f"Result_{i}",
                 result=(i + 1) * 1.0e6,
             )
