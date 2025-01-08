@@ -1,4 +1,28 @@
-# Changelog
+## v1.0.0 (2025-01-08)
+
+### Feat
+
+- 659 convert damage classes into dataclasses; add a reader for damage curves (#656)
+- 636 use same static and output folder of adaptation for dependent analyses (#652)
+- 646 write adaptation to file (#650)
+- 638 adaptation adaptation analysis should run with only damages or only losses (#642)
+- Refactored both analyses to generate an `AnalysisResultWrapper`
+- 618 adaptation add option to adaptation config to calculate cost based on fraction segment exposed (#639)
+- Create adaptation runner (#634)
+- 597 adaptation calculate benefit (#628)
+- 457 refactor directanalysisrunner (#624)
+- 622 adaptation calculate full link cost (#623)
+- 595 adaptation run and combine losses and damages (#616)
+- 594 adaptation create and save result cost options (#614)
+- 593 calculate unit cost (#613)
+- 592 adaptation create class adaptation_option_collection (#609)
+-  605 upgrade python version to 311 (#610)
+- 604 adaptation extend analysis config dataclass and reader (#607)
+
+### Fix
+
+- create _output_dir if non-existence
+- Remove gdal as explicit dependency (#566)
 
 ## v0.9.2 (2024-07-17)
 
@@ -29,9 +53,6 @@
 - 410 replace simplify graph with OSMNX
 
 ## v0.9.1 (2024-04-12)
-
-- Removal of sensitive data throughout repository's history.
-- Overall code normalization using `isort` and `black`.
 
 ## v0.9.0 (2024-04-11)
 
@@ -65,37 +86,54 @@
 - Added static method to directly retrieve a network based on a polygon
 - Added result wrapper exporter logic
 - Added logic to wrap results of a ra2ce analysis
-- Partofday Enum is added
+- partofday Enum is added
 - Added logic so that exporting the intermediate results becomes dependent on the existance of the `output_graph_dir` property
 - Added endpoint to generate an OsmNetworkWrapper with a fix polygon
-- Time calculated for the single link redundancy added to the link data
-- Time calculated for the single link redundancy
-- If the link checked in the redundancy is not connected, then time and alt_time is added (for the weight=time) equal to the length/avgspeed.
+- time calculated for the single link redundancy added to the link data
+- time calculated for the single link redundancy
+- if the link checked in the redundancy is not connected, then time and alt_time is added (for the weight=time) equal to the length/avgspeed.
 - add_missing_geometry improved to consider all ks of a multigraph edges
-- Tracing the origins that are mapped on two graph nodes for instance and have path in one but not in the other
-- calc_vhl modified. see 2023-11-24_Sprint: Losses summary onenote
-- Duration step attribute definition
-- Minor changes to the Losses
-- Time and alt_time is added to multi-link redundancy
+- tracing the origins that are mapped on two graph nodes for instance and have path in one but not in the other
 
 ### Fix
 
+- solve bug
 - Corrected wrong unknown key to dictionary
-- Added logic to calculate time only when strictly required
+- Added logic to callculate time only when strictly required
+- minor formatting
+- Enum typing added
+- Enum is used
+- Enum is used
+- formatting updated
+- Union removed
+- deafaultdict list is used
+- returning globals() fixed
+- float instead of int
 - alt_time and length are improved to correspond to the weight stated in the single and multi redundancy
-- Updated the weight to get correct alt_dist. time is also rounded.
-- LineString is imported from shapely.geometry
+- updated the weight to get correct alt_dist. time is also rounded.
+- git ignore is updated to ignore all example outputs
 
 ## v0.7.0 (2023-12-05)
 
 ### Feat
 
+- minor
+- calc_vhl completed. case should be ran. analysis properties are added for Losses
+- calc_vhl modified. see 2023-11-24_Sprint: Losses summary onenote
+- calc_vhl modified. see 2023-11-24_Sprint: Losses summary onenote
+- duration step attribute definition
+- calc_vhl chanege started
+- minor attribute hints
+- minor changes to the Losses
+- time and alt_time is added to multi-link redundancy
+- time and alt_time is added to multi-link redundancy
 - Example notebook is updated
 - notebooks are added
 - origin closest destination now can be ran without hazard infor in the network and analysis configs
 
 ### Fix
 
+- LineString is impoted from shapely.geometry
 - docu typos
 - `find_route_ods` now returns a geodataframe without duplicate entries or origin_nodes with multiple names
 - Changed output suffix.
@@ -107,20 +145,20 @@
 
 - Created network wrappers as a separate module
 - Extracted logic to generate networks from different sources.
-- **osm_network_wrapper.py**: Adde network wrapper to get a clean network from OSM source.
-- Added dataclass to represent the Network configuration input data (ini file)
 
 ## v0.5.1 (2023-07-26)
 
 ### Feat
 
-- Implement multi-link isolated locations with distinction between flooded and isolated.
+- **osm_network_wrapper.py**: Adde network wrapper to get a clean network from OSM source.
 
 ## v0.5.0 (2023-07-24)
 
 ### Feat
 
+- Added dataclass to represent the Network configuration input data (ini file)
 - Created stand-alone class for equity analysis
+- Implement multi-link isolated locations with distinction between flooded and isolated.
 
 ### Fix
 
