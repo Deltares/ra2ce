@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pytest
 from geopandas import GeoDataFrame
 
 from ra2ce.network.graph_files.graph_files_protocol import GraphFileProtocol
@@ -21,11 +22,11 @@ class TestNetworkFile:
         # 3. Verify results
         assert _nf.file is None
 
-    def test_read_graph(self, graph_folder: Path):
+    @pytest.mark.parametrize("name", ["base_network.feather", "base_graph_edges.gpkg"])
+    def test_read_graph(self, graph_folder: Path, name: str):
         # 1. Define test data
-        _name = "base_network.feather"
-        _file = graph_folder.joinpath(_name)
-        _nf = NetworkFile(name=_name)
+        _file = graph_folder.joinpath(name)
+        _nf = NetworkFile(name=name)
 
         # 2. Execute test
         _nf.read_graph(graph_folder)
@@ -33,6 +34,18 @@ class TestNetworkFile:
         # 3. Verify results
         assert _nf.file == _file
         assert _nf.graph is not None
+
+    def test_read_graph_unknown_type_throws(self, graph_folder: Path):
+        # 1. Define test data
+        _name = "base_graph.p"
+        _nf = NetworkFile(name=_name)
+
+        # 2. Execute test
+        with pytest.raises(ValueError) as exc:
+            _nf.read_graph(graph_folder)
+
+        # 3. Verify results
+        assert exc.match("Unknown file type")
 
     def test_get_graph_without_graph_is_none(self):
         # 1. Define test data

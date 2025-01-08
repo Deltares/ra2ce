@@ -20,11 +20,7 @@
 """
 from pathlib import Path
 
-from geopandas import GeoDataFrame
-
-from ra2ce.analysis.adaptation.adaptation_option_collection import (
-    AdaptationOptionCollection,
-)
+from ra2ce.analysis.adaptation.adaptation_option import AdaptationOption
 from ra2ce.analysis.analysis_base import AnalysisBase
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionAdaptation,
@@ -46,7 +42,7 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
     graph_file_hazard: NetworkFile
     input_path: Path
     output_path: Path
-    adaptation_collection: AdaptationOptionCollection
+    all_options: list[AdaptationOption]
 
     def __init__(
         self,
@@ -57,94 +53,50 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
         self.graph_file_hazard = analysis_input.graph_file_hazard
         self.input_path = analysis_input.input_path
         self.output_path = analysis_input.output_path
-        self.adaptation_collection = AdaptationOptionCollection.from_config(
-            analysis_config
-        )
-        self.output_path = analysis_input.output_path
+
+        self.all_options = [
+            AdaptationOption.from_config(
+                analysis_config,
+                _config_option,
+            )
+            for _config_option in analysis_config.config_data.adaptation.adaptation_options
+        ]
+
+    @property
+    def reference_option(self) -> AdaptationOption:
+        if not self.all_options:
+            return None
+        return self.all_options[0]
+
+    @property
+    def adaptation_options(self) -> list[AdaptationOption]:
+        if len(self.all_options) < 2:
+            return []
+        return self.all_options[1:]
 
     def execute(self) -> AnalysisResultWrapper:
         """
         Run the adaptation analysis.
+        This is done by calculating the impact of the reference option first.
+        Then the BC-ratio of the adaptation options is calculated.
+        The reference and option results are combined in a single result.
 
         Returns:
             AnalysisResultWrapper: The result of the adaptation analysis.
         """
-        _cost_gdf = self.run_cost()
-        _benefit_gdf = self.run_benefit()
+        _reference_impact = self.reference_option.get_impact()
 
-        return self.generate_result_wrapper(
-            self.calculate_bc_ratio(_benefit_gdf, _cost_gdf)
-        )
-
-    def run_cost(self) -> GeoDataFrame:
-        """
-        Calculate the link cost for all adaptation options.
-        The unit cost is multiplied by the length of the link.
-        If the hazard fraction cost is enabled, the cost is multiplied by the fraction of the link that is impacted.
-
-        Returns:
-            GeoDataFrame: The result of the cost calculation.
-        """
-        _orig_gdf = self.graph_file_hazard.get_graph()
-        _fraction_col = _orig_gdf.filter(regex="EV.*_fr").columns[0]
-
-        _cost_gdf = GeoDataFrame()
-        for (
-            _option,
-            _cost,
-        ) in self.adaptation_collection.calculate_options_unit_cost().items():
-            _cost_gdf[_option.cost_col] = _orig_gdf.apply(
-                lambda x, cost=_cost: x["length"] * cost, axis=1
+        _result_gdf = _reference_impact.data_frame.copy()
+        for _option in self.adaptation_options:
+            _option_result = _option.get_bc_ratio(
+                _reference_impact,
+                self.graph_file_hazard.get_graph(),
+                self.analysis.hazard_fraction_cost,
             )
-            # Only calculate the cost for the impacted fraction of the links.
-            if self.analysis.hazard_fraction_cost:
-                _cost_gdf[_option.cost_col] *= _orig_gdf[_fraction_col]
+            # Copy the option result columns.
+            if _option_result != _reference_impact:
+                raise ValueError("The results don't contain the same IDs.")
+            for _col in _option_result.result_cols:
+                _result_gdf[_col] = _option_result.data_frame[_col]
 
-        return _cost_gdf
-
-    def run_benefit(self) -> GeoDataFrame:
-        """
-        Calculate the benefit for all adaptation options.
-
-        Returns:
-            GeoDataFrame: The result of the benefit calculation.
-        """
-        return self.adaptation_collection.calculate_options_benefit()
-
-    def calculate_bc_ratio(
-        self, benefit_gdf: GeoDataFrame, cost_gdf: GeoDataFrame
-    ) -> GeoDataFrame:
-        """
-        Calculate the benefit-cost ratio for all adaptation options.
-
-        Args:
-            benefit_gdf (GeoDataFrame): Gdf containing the benefit of the adaptation options.
-            cost_gdf (GeoDataFrame): Gdf containing the cost of the adaptation options.
-
-        Returns:
-            GeoDataFrame: Gdf containing the benefit-cost ratio of the adaptation options,
-                including the relevant attributes from the original graph (geometry).
-        """
-
-        def copy_column(from_gdf: GeoDataFrame, col_name: str) -> None:
-            if not col_name in from_gdf.columns:
-                return
-            benefit_gdf.insert(loc=0, column=col_name, value=from_gdf[col_name])
-
-        # Copy relevant columns from the original graph
-        _orig_gdf = self.graph_file_hazard.get_graph()
-        benefit_gdf.set_geometry(_orig_gdf.geometry, inplace=True)
-        for _col in ["length", "highway", "infra_type", "link_id"]:
-            copy_column(_orig_gdf, _col)
-
-        for _option in self.adaptation_collection.adaptation_options:
-            # Copy cost columns from the cost gdf
-            copy_column(cost_gdf, _option.cost_col)
-
-            benefit_gdf[_option.bc_ratio_col] = benefit_gdf[
-                _option.benefit_col
-            ].replace(float("nan"), 0) / benefit_gdf[_option.cost_col].replace(
-                0, float("nan")
-            )
-
-        return benefit_gdf
+        return self.generate_result_wrapper(_result_gdf)

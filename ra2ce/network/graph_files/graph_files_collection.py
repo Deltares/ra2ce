@@ -21,8 +21,14 @@ class GraphFilesCollection:
     base_graph: GraphFile = field(
         default_factory=lambda: GraphFile(name="base_graph.p")
     )
+    base_graph_edges: NetworkFile = field(
+        default_factory=lambda: NetworkFile(name="base_graph_edges.gpkg")
+    )
     base_graph_hazard: GraphFile = field(
         default_factory=lambda: GraphFile(name="base_graph_hazard.p")
+    )
+    base_graph_hazard_edges: NetworkFile = field(
+        default_factory=lambda: NetworkFile(name="base_graph_hazard_edges.gpkg")
     )
     origins_destinations_graph: GraphFile = field(
         default_factory=lambda: GraphFile(name="origins_destinations_graph.p")
@@ -44,7 +50,9 @@ class GraphFilesCollection:
     def _graph_collection(self) -> list[GraphFile | NetworkFile]:
         return [
             self.base_graph,
+            self.base_graph_edges,
             self.base_graph_hazard,
+            self.base_graph_hazard_edges,
             self.origins_destinations_graph,
             self.origins_destinations_graph_hazard,
             self.base_network,
@@ -130,7 +138,9 @@ class GraphFilesCollection:
         _collection = cls()
 
         _collection.base_graph.read_graph(parent_dir)
+        _collection.base_graph_edges.read_graph(parent_dir)
         _collection.base_graph_hazard.read_graph(parent_dir)
+        _collection.base_graph_hazard_edges.read_graph(parent_dir)
         _collection.origins_destinations_graph.read_graph(parent_dir)
         _collection.origins_destinations_graph_hazard.read_graph(parent_dir)
         _collection.base_network.read_graph(parent_dir)
