@@ -47,7 +47,7 @@ When running a development environment with Anaconda, the user may follow these 
 Docker and cloud
 +++++++++++++++++++++++++++
 You may install ra2ce using `Docker` and running with different cloud services.
-Please refer to our :ref:`docker_and_cloud`.
+Please refer to our `docker and cloud wiki page <https://github.com/Deltares/ra2ce/wiki/Docker-and-Cloud>`_.
 
 
 Binder environment
