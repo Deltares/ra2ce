@@ -25,7 +25,7 @@ Which losses analysis is run is determined by `AnalysisConfigData.AnalysisSectio
 The configuration of the damages and the losses analyses are derived from their standard configuration in the section `AnalysisSectionDamages` and `AnalysisSectionLosses`, which are stored in `AdaptationOptionAnalysis` for a specific option.
 One of these needs to be configured.
 
-In `AdaptationOptionAnalysis` it can be found which analysis to run.
+In `AdaptationOptionAnalysis.get_analysis_info` it can be found which analysis to run.
 Note this logic resembles the logic in `AnalysisFactory`, which can't be used due to circular dependencies.
 Here also a regex expression is given to find the right column in the analysis result.
 
