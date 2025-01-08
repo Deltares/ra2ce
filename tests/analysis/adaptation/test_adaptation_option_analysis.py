@@ -117,7 +117,7 @@ class TestAnalysisOptionAnalysis:
                 return self.generate_result_wrapper(
                     GeoDataFrame.from_dict(
                         {
-                            _id_col: range(10),
+                            "rfid": range(10),
                             "geometry": [Point(x, 0) for x in range(10)],
                             "result_column": range(1, 11, 1),
                             "other_column": range(2, 12, 1),
@@ -127,7 +127,6 @@ class TestAnalysisOptionAnalysis:
 
         # 1. Define test data.
         _option_id = "Option1"
-        _id_col = "link_id"
         _analysis_type = AnalysisDamagesEnum.DAMAGES
         _analysis = AdaptationOptionAnalysis(
             option_id=_option_id,

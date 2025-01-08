@@ -124,7 +124,7 @@ class TestAdaptationOption:
                 option_id=self.option_id,
                 data_frame=GeoDataFrame.from_dict(
                     {
-                        "link_id": range(10),
+                        "rfid": range(10),
                         f"{self.option_id}_{self.analysis_type.config_value}": self.result,
                     }
                 ),
@@ -168,7 +168,7 @@ class TestAdaptationOption:
             option_id=_ref_option_id,
             data_frame=GeoDataFrame.from_dict(
                 {
-                    "link_id": range(10),
+                    "rfid": range(10),
                     f"{_ref_option_id}_net_impact": range(10),
                     "geometry": Point(0, 0),
                 }
@@ -186,7 +186,7 @@ class TestAdaptationOption:
         # 1. Define test data.
         _gdf_in = GeoDataFrame.from_dict(
             {
-                "link_id": range(10),
+                "rfid": range(10),
                 "geometry": Point(0, 0),
                 "length": 2.4,
                 "EV1_fr": 0.4,
@@ -235,7 +235,7 @@ class TestAdaptationOption:
         # 1. Define test data.
         _gdf_in = GeoDataFrame.from_dict(
             {
-                "link_id": range(10),
+                "rfid": range(10),
                 "geometry": Point(0, 0),
                 "length": 2.4,
                 "EV1_fr": 0.4,

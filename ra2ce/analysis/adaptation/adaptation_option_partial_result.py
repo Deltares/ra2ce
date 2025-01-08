@@ -45,14 +45,14 @@ class AdaptationOptionPartialResult:
 
     option_id: str
     data_frame: GeoDataFrame = field(default_factory=GeoDataFrame)
-    _id_col: str = "link_id"
+    _id_col: str = "rfid"
     _key_col: str = "merge_key"
 
     def __post_init__(self) -> None:
         if self.data_frame.empty:
             return
 
-        # Add column to merge on (needed bacause link_id can contain a mix of float and list[float])
+        # Add column as string representation of _id_col to merge on (needed because "rfid" can contain objects)
         self.data_frame[self._key_col] = self.data_frame[self._id_col].apply(
             lambda x: str(x)
         )

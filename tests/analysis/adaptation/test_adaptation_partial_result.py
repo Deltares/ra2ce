@@ -32,7 +32,7 @@ class TestAdaptationOptionPartialResult:
     def test_initialize_with_full_input(self):
         # 1. Define test data.
         _option_id = "Option1"
-        _id_col = "link_id"
+        _id_col = "rfid"
         _gdf = GeoDataFrame.from_dict(
             {_id_col: range(10), "geometry": [Point(x, 0) for x in range(10)]}
         )
@@ -45,14 +45,14 @@ class TestAdaptationOptionPartialResult:
         assert _result.option_id == _option_id
         assert _result._id_col == _id_col
         assert _result.data_frame.shape[0] == 10
-        assert AdaptationOptionPartialResult._key_col in _result.data_frame.columns
+        assert _id_col in _result.data_frame.columns
         assert "geometry" in _result.data_frame.columns
 
     def test_from_input_gdf_returns_object(self):
         # 1. Define test data.
         _option_id = "Option1"
         _gdf_in = GeoDataFrame.from_dict(
-            {"link_id": range(10), "geometry": [Point(x, 0) for x in range(10)]}
+            {"rfid": range(10), "geometry": [Point(x, 0) for x in range(10)]}
         )
 
         # 2. Run test.
@@ -97,7 +97,7 @@ class TestAdaptationOptionPartialResult:
     ):
         # 1. Define test data.
         _option_id = "Option1"
-        _id_col = "link_id"
+        _id_col = "rfid"
         _gdf = GeoDataFrame.from_dict(
             {_id_col: range(10), "geometry": Point(1, 0), col_name: range(10)}
         )
@@ -117,13 +117,14 @@ class TestAdaptationOptionPartialResult:
     def test_add_partial_results_with_unequal_column_length(self):
         # 1. Define test data.
         _option_id = "Option1"
+        _id_col = "rfid"
         _this_nof_rows = 10
         _this_result_col = "this_result"
         _this_result = AdaptationOptionPartialResult(
             option_id=_option_id,
             data_frame=GeoDataFrame.from_dict(
                 {
-                    "link_id": range(_this_nof_rows),
+                    _id_col: range(_this_nof_rows),
                     "geometry": [Point(x, 0) for x in range(_this_nof_rows)],
                     _this_result_col: range(_this_nof_rows),
                 }
@@ -135,7 +136,7 @@ class TestAdaptationOptionPartialResult:
             option_id=_option_id,
             data_frame=GeoDataFrame.from_dict(
                 {
-                    "link_id": reversed(range(_other_nof_rows)),
+                    _id_col: reversed(range(_other_nof_rows)),
                     "geometry": [Point(x, 0) for x in range(_other_nof_rows)],
                     _other_result_col: range(0, 2 * _other_nof_rows, 2),
                 }
@@ -158,7 +159,7 @@ class TestAdaptationOptionPartialResult:
     def test_add_partial_results_with_other_key_order(self):
         # 1. Define test data.
         _option_id = "Option1"
-        _id_col = "link_id"
+        _id_col = "rfid"
         _custom_id = [5, 6, 7, 8, 9, 0, 1, 2, 3, 4]
         _this_result = AdaptationOptionPartialResult(
             option_id=_option_id,
@@ -192,7 +193,7 @@ class TestAdaptationOptionPartialResult:
 
     def test_add_partial_results_with_different_option_ids_raises(self):
         # 1. Define test data.
-        _id_col = "link_id"
+        _id_col = "rfid"
         _this_result = AdaptationOptionPartialResult(
             option_id="Option1",
             data_frame=GeoDataFrame.from_dict({_id_col: range(10)}),
@@ -218,7 +219,7 @@ class TestAdaptationOptionPartialResult:
             option_id=_option_id,
             data_frame=GeoDataFrame.from_dict(
                 {
-                    "link_id": range(10),
+                    "rfid": range(10),
                     "geometry": [Point(x, 0) for x in range(10)],
                     "result1": range(10),
                 }
@@ -244,7 +245,7 @@ class TestAdaptationOptionPartialResult:
             option_id=_option_id,
             data_frame=GeoDataFrame.from_dict(
                 {
-                    "link_id": range(10),
+                    "rfid": range(10),
                     "geometry": [Point(x, 0) for x in range(10)],
                     f"{_option_id}_{_col_type.config_value}": range(10),
                 }
