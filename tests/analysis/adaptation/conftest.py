@@ -66,9 +66,10 @@ class AdaptationOptionCases:
     ]
     total_cost: list[float] = [0.0, 10073869.180362, 19493880.004279]
     total_benefit: list[float] = [0.0, 0.0, 0.0]
-    cases: list[tuple[AnalysisSectionAdaptationOption, tuple[float, float]]] = list(
-        zip(config_cases, zip(total_cost, total_benefit))
-    )
+    total_bc_ratio: list[float] = [0.0, 0.0, 0.0]
+    cases: list[
+        tuple[AnalysisSectionAdaptationOption, tuple[float, float, float]]
+    ] = list(zip(config_cases, zip(total_cost, total_benefit, total_bc_ratio)))
 
 
 @pytest.fixture(name="valid_adaptation_config")
@@ -225,8 +226,7 @@ def _get_valid_adaptation_config_with_input_fixture(
     _analysis_input = AnalysisInputWrapper.from_input(
         analysis=valid_adaptation_config.config_data.adaptation,
         analysis_config=valid_adaptation_config,
-        graph_file=valid_adaptation_config.graph_files.base_network,
-        graph_file_hazard=valid_adaptation_config.graph_files.base_network_hazard,
+        graph_file_hazard=valid_adaptation_config.graph_files.base_graph_hazard_edges,
     )
 
     yield (_analysis_input, valid_adaptation_config)
