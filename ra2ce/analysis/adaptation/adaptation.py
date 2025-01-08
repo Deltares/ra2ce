@@ -95,7 +95,7 @@ class Adaptation(AnalysisBase, AnalysisDamagesProtocol):
             )
             # Copy the option result columns.
             if _option_result != _reference_impact:
-                raise ValueError("The results don't contain the same link_ids.")
+                raise ValueError("The results don't contain the same IDs.")
             for _col in _option_result.result_cols:
                 _result_gdf[_col] = _option_result.data_frame[_col]
 
