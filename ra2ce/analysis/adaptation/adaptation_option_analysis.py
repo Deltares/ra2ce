@@ -20,14 +20,12 @@
 """
 from __future__ import annotations
 
-import logging
 from copy import deepcopy
 from dataclasses import dataclass
 
-from geopandas import GeoDataFrame
-from numpy import nan
-from pandas import Series
-
+from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
+    AdaptationOptionPartialResult,
+)
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
@@ -37,6 +35,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_input_wrapper import AnalysisInputWrapper
 from ra2ce.analysis.damages.damages import Damages
+from ra2ce.analysis.damages.damages_result_wrapper import DamagesResultWrapper
 from ra2ce.analysis.losses.losses_base import LossesBase
 from ra2ce.analysis.losses.multi_link_losses import MultiLinkLosses
 from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
@@ -44,6 +43,7 @@ from ra2ce.analysis.losses.single_link_losses import SingleLinkLosses
 
 @dataclass
 class AdaptationOptionAnalysis:
+    option_id: str
     analysis_type: AnalysisDamagesEnum | AnalysisLossesEnum
     analysis_class: type[Damages | LossesBase]
     analysis_input: AnalysisInputWrapper
@@ -112,44 +112,23 @@ class AdaptationOptionAnalysis:
             _graph_file_hazard = analysis_config.graph_files.base_graph_hazard
 
         _analysis_input = AnalysisInputWrapper.from_input(
-            analysis=_analysis,
-            analysis_config=_analysis_config,
-            graph_file=_graph_file,
-            graph_file_hazard=_graph_file_hazard,
+            _analysis, _analysis_config, _graph_file, _graph_file_hazard
         )
 
         # Create output object
         _analysis_class, _result_col = cls.get_analysis_info(analysis_type)
 
         return cls(
+            option_id=option_id,
             analysis_type=analysis_type,
             analysis_class=_analysis_class,
             analysis_input=_analysis_input,
             result_col=_result_col,
         )
 
-    def get_result_column(self, gdf: GeoDataFrame) -> Series:
-        """
-        Get a column from the dataframe based on the provided regex.
-
-        Args:
-            gdf (GeoDataFrame): The dataframe to search in.
-            regex (str): Regex to match the column.
-
-        Returns:
-            Series: The relevant column.
-        """
-        _result_col = gdf.filter(regex=self.result_col)
-        if _result_col.empty:
-            logging.warning(
-                "No column found in dataframe matching the regex %s for analaysis %s. Returning NaN.",
-                self.result_col,
-                self.analysis_type,
-            )
-            return Series(nan, index=gdf.index)
-        return _result_col.iloc[:, 0]
-
-    def execute(self, analysis_config: AnalysisConfigWrapper) -> Series:
+    def execute(
+        self, analysis_config: AnalysisConfigWrapper
+    ) -> AdaptationOptionPartialResult:
         """
         Execute the analysis.
 
@@ -157,19 +136,24 @@ class AdaptationOptionAnalysis:
             analysis_config (AnalysisConfigWrapper): The config for the analysis.
 
         Returns:
-            Series: The relevant result column of the analysis.
+            AdaptationOptionPartialResult: The relevant result columns of the analysis.
         """
         if self.analysis_class == Damages:
             _result_wrapper = self.analysis_class(
                 self.analysis_input,
                 analysis_config.graph_files.base_graph_hazard.get_graph(),
             ).execute()
-            # Take the link based result
-            _result = _result_wrapper.results_collection[1].analysis_result
+            assert isinstance(_result_wrapper, DamagesResultWrapper)
+            _result_gdf = _result_wrapper.link_based_result.analysis_result
         else:
             _result_wrapper = self.analysis_class(
                 self.analysis_input, analysis_config
             ).execute()
-            _result = _result_wrapper.get_single_result()
+            _result_gdf = _result_wrapper.get_single_result()
 
-        return self.get_result_column(_result)
+        return AdaptationOptionPartialResult.from_gdf_with_matched_col(
+            self.option_id,
+            _result_gdf,
+            self.result_col,
+            self.analysis_type,
+        )
