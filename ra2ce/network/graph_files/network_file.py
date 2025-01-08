@@ -28,10 +28,10 @@ class NetworkFile(GraphFileProtocol):
         _file = folder.joinpath(self.name)
         if _file and _file.is_file():
             self.folder = folder
-            if self.name.endswith(".feather"):
+            if _file.suffix == ".feather":
                 self.graph = read_feather(_file)
-            elif self.name.endswith(".gpkg"):
-                self.graph = read_file(self.file, driver="GPKG")
+            elif _file.suffix == ".gpkg":
+                self.graph = read_file(_file, driver="GPKG")
             else:
                 raise ValueError(f"Unknown file type: {self.name}")
 
