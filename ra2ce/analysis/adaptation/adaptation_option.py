@@ -20,6 +20,7 @@
 """
 from __future__ import annotations
 
+import math
 from dataclasses import asdict, dataclass
 
 from geopandas import GeoDataFrame
@@ -27,6 +28,11 @@ from geopandas import GeoDataFrame
 from ra2ce.analysis.adaptation.adaptation_option_analysis import (
     AdaptationOptionAnalysis,
 )
+from ra2ce.analysis.adaptation.adaptation_option_partial_result import (
+    AdaptationOptionPartialResult,
+)
+from ra2ce.analysis.adaptation.adaptation_result_enum import AdaptationResultEnum
+from ra2ce.analysis.adaptation.adaptation_settings import AdaptationSettings
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionAdaptationOption,
 )
@@ -46,28 +52,7 @@ class AdaptationOption:
     maintenance_interval: float
     analyses: list[AdaptationOptionAnalysis]
     analysis_config: AnalysisConfigWrapper
-
-    def __hash__(self) -> int:
-        return hash(self.id)
-
-    @property
-    def cost_col(self) -> str:
-        return self._get_column_name("cost")
-
-    @property
-    def impact_col(self) -> str:
-        return self._get_column_name("impact")
-
-    @property
-    def benefit_col(self) -> str:
-        return self._get_column_name("benefit")
-
-    @property
-    def bc_ratio_col(self) -> str:
-        return self._get_column_name("bc_ratio")
-
-    def _get_column_name(self, col_type: str) -> str:
-        return f"{self.id}_{col_type}"
+    adaptation_settings: AdaptationSettings
 
     @classmethod
     def from_config(
@@ -100,9 +85,9 @@ class AdaptationOption:
         _config_analyses = [x.analysis for x in analysis_config.config_data.analyses]
         _analyses = [
             AdaptationOptionAnalysis.from_config(
-                analysis_config=analysis_config,
-                analysis_type=_analysis_type,
-                option_id=adaptation_option.id,
+                analysis_config,
+                _analysis_type,
+                adaptation_option.id,
             )
             for _analysis_type in [
                 AnalysisDamagesEnum.DAMAGES,
@@ -111,19 +96,96 @@ class AdaptationOption:
             if _analysis_type in _config_analyses
         ]
 
+        _adaptation_settings = AdaptationSettings(
+            discount_rate=analysis_config.config_data.adaptation.discount_rate,
+            time_horizon=analysis_config.config_data.adaptation.time_horizon,
+            initial_frequency=analysis_config.config_data.adaptation.initial_frequency,
+            climate_factor=analysis_config.config_data.adaptation.climate_factor,
+        )
+
         return cls(
             **asdict(adaptation_option),
             analyses=_analyses,
             analysis_config=analysis_config,
+            adaptation_settings=_adaptation_settings,
         )
 
-    def calculate_unit_cost(self, time_horizon: float, discount_rate: float) -> float:
+    def get_bc_ratio(
+        self,
+        reference_impact: AdaptationOptionPartialResult,
+        gdf_in: GeoDataFrame,
+        hazard_fraction_cost: bool,
+    ) -> AdaptationOptionPartialResult:
+        """
+        Calculate the benefit-cost ratio of the adaptation option.
+
+        Args:
+            reference_impact (AdaptationOptionPartialResult): The impact of the reference option.
+
+        Returns:
+            AdaptationOptionPartialResult: The benefit-cost ratio of the adaptation option.
+        """
+        # Calculate cost
+        _result = self._get_cost(gdf_in, hazard_fraction_cost)
+
+        # Calculate impact/benefit
+        _result += self._get_benefit(reference_impact)
+
+        # Calculate BC-ratio
+        _benefit = _result.get_column(AdaptationResultEnum.BENEFIT)
+        _cost = _result.get_column(AdaptationResultEnum.COST)
+
+        _result.add_column(
+            AdaptationResultEnum.BC_RATIO,
+            _benefit / _cost.replace(0, math.nan),
+        )
+        return _result
+
+    def _get_benefit(
+        self, reference_impact: AdaptationOptionPartialResult
+    ) -> AdaptationOptionPartialResult:
+        _result = self.get_impact()
+
+        # Benefit = reference impact - adaptation impact
+        _benefit = reference_impact.get_column(
+            AdaptationResultEnum.NET_IMPACT
+        ) - _result.get_column(AdaptationResultEnum.NET_IMPACT)
+        _result.add_column(AdaptationResultEnum.BENEFIT, _benefit)
+
+        return _result
+
+    def _get_cost(
+        self, gdf_in: GeoDataFrame, hazard_fraction_cost: bool
+    ) -> AdaptationOptionPartialResult:
+        """
+        Calculate the cost of the adaptation option.
+
+        Args:
+            input_gdf (GeoDataFrame): The input GeoDataFrame.
+
+        Returns:
+            AdaptationOptionPartialResult: The cost of the adaptation option.
+        """
+        _result = AdaptationOptionPartialResult.from_input_gdf(self.id, gdf_in)
+        _cost_col = gdf_in.apply(
+            lambda x, cost=self._get_unit_cost(): x["length"] * cost, axis=1
+        )
+
+        # Only calculate the cost for the impacted fraction of the links.
+        if hazard_fraction_cost:
+            _fraction_col = gdf_in.filter(regex="EV.*_fr").columns[0]
+            _cost_col *= gdf_in[_fraction_col]
+
+        _result.add_column(AdaptationResultEnum.COST, _cost_col)
+
+        return _result
+
+    def _get_unit_cost(self) -> float:
         """
         Calculate the net present value unit cost (per meter) of the adaptation option.
 
         Args:
-            time_horizon (float): The total time horizon of the analysis.
-            discount_rate (float): The discount rate to apply to the costs.
+            None
 
         Returns:
             float: The net present value unit cost of the adaptation option.
@@ -149,26 +211,34 @@ class AdaptationOption:
                 _cost = self.maintenance_cost
             else:
                 return 0.0
-            return _cost / (1 + discount_rate) ** year
+            return _cost / (1 + self.adaptation_settings.discount_rate) ** year
 
-        return sum(calculate_cost(_year) for _year in range(0, round(time_horizon), 1))
+        return sum(
+            calculate_cost(_year)
+            for _year in range(0, round(self.adaptation_settings.time_horizon), 1)
+        )
 
-    def calculate_impact(self, net_present_value_factor: float) -> GeoDataFrame:
+    def get_impact(self) -> AdaptationOptionPartialResult:
         """
         Calculate the impact of the adaptation option.
 
-        Returns:
-            GeoDataFrame: The impact of the adaptation option.
-        """
-        _result_gdf = GeoDataFrame()
-        for _analysis in self.analyses:
-            _result_gdf[
-                f"{self.impact_col}_{_analysis.analysis_type.config_value}"
-            ] = _analysis.execute(self.analysis_config)
+        Args:
+            net_present_value_factor (float): The net present value factor to apply to the event impact.
 
-        # Calculate the impact (summing the results of the analyses)
-        _result_gdf[self.impact_col] = (
-            _result_gdf.sum(axis=1) * net_present_value_factor
+        Returns:
+            AdaptationOptionPartialResult: The impact (event and net) of the adaptation option per link.
+        """
+        # Get all results from the analyses
+        _result = AdaptationOptionPartialResult(option_id=self.id)
+        for _analysis in self.analyses:
+            _result += _analysis.execute(self.analysis_config)
+
+        # Calculate the impact (summing the results of the analysis results per link)
+        _impact = _result.data_frame.filter(regex=self.id).sum(axis=1)
+        _result.add_column(AdaptationResultEnum.EVENT_IMPACT, _impact)
+        _result.add_column(
+            AdaptationResultEnum.NET_IMPACT,
+            _impact * self.adaptation_settings.net_present_value_factor,
         )
 
-        return _result_gdf
+        return _result
