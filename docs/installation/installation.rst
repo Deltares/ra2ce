@@ -29,19 +29,9 @@ Alternatively you can install the latest version available on GitHub or a specif
     pip install git+https://github.com/Deltares/ra2ce.git
     pip install git+https://github.com/Deltares/ra2ce.git@v0.3.1
 
-
-.. _install_ra2ce_devmode:
-
 Development mode
 +++++++++++++++++++++++++++
-When running a development environment with Anaconda, the user may follow these steps in command line:
-
-  .. code-block:: bash
-
-    cd <to the main repository RA2CE folder>
-    conda env create -f .config\environment.yml
-    conda activate ra2ce_env
-    poetry install
+Please refer to our `installation for contributors wiki page <https://github.com/Deltares/ra2ce/wiki/getting-started#installation-for-contributors>`_.
 
 
 Docker and cloud
