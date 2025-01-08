@@ -31,6 +31,30 @@ Overview of the network creation process
 
 .. image:: ../_resources/network_overview.drawio.png
 
+Overview of the files created during the network creation process
+-----------------------------------------------------------------
+
++-------------------------------------------------------+---------------------------------------------------------------------------------------------------+
+| Filename                                              | Description                                                                                       |
++=======================================================+===================================================================================================+
+| base_network(_hazard).feather/.gpkg                   | Network data (with hazard data) in feather/GeoPackage format                                      |
++-------------------------------------------------------+---------------------------------------------------------------------------------------------------+
+| base_graph(_hazard).p                                 | Simplified representation of the network (with hazard data)                                       |
++-------------------------------------------------------+---------------------------------------------------------------------------------------------------+
+| base_graph(_hazard)_edges/_nodes.gpkg                 | Edges/Nodes of the simplified representation of the network (with hazard data)                    |
++-------------------------------------------------------+---------------------------------------------------------------------------------------------------+
+| origins_destinations_graph(_hazard).p                 | Simplified representation of the origins-destinations (with hazard data) - Only for OD-analyses   |
++-------------------------------------------------------+---------------------------------------------------------------------------------------------------+
+| origins_destinations_graph(_hazard)_edges/_nodes.gpkg | Edges/Nodes of the origin-destination graph (with hazard data) - Only for OD-analyses             |
++-------------------------------------------------------+---------------------------------------------------------------------------------------------------+
+| origin_destination_table.feather/.gpkg                | Origin-destination data in feather/GeoPackage format - Only for OD-analyses                       |
++-------------------------------------------------------+---------------------------------------------------------------------------------------------------+
+| complex_to_simple.json                                | Mapping of complex network to simplified network                                                  |
++-------------------------------------------------------+---------------------------------------------------------------------------------------------------+
+| simple_to_complex.json                                | Mapping of simplified network to complex network                                                  |
++-------------------------------------------------------+---------------------------------------------------------------------------------------------------+
+| avg_speed.csv                                         | Average speed of road segments based on the maximum speed limit data and road type from OSM       |
++-------------------------------------------------------+---------------------------------------------------------------------------------------------------+
 
 Network from OpenStreetMap using scripting
 -----------------------------------------------------------------------------

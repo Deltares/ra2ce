@@ -1,8 +1,8 @@
 .. _docker_user_guide:
 
-==================
+=================
 Docker User Guide
-==================
+=================
 
 This user guide introduces how to run Ra2ce in a public cloud environment.
 
@@ -10,7 +10,7 @@ This user guide introduces how to run Ra2ce in a public cloud environment.
 
 
 Installation
---------------------
+------------
 
 We assume the reader has a windows machine, otherwise please find the corresponding binaries for your own Operating System. 
 
@@ -75,7 +75,7 @@ After that you can call run_race.py. Output files will be available in the accep
 
 
 Running Ra2ce container in a cloud environment
-===============================================
+==============================================
 
 In the local example you are running a Docker container entirely locally and thus can mount your own hard drive with input data.
 
@@ -93,13 +93,13 @@ Currently we have tested Ra2ce using the following tech stack:
 
 
 Running a singular Ra2ce container in Kubernetes
--------------------------------------------------
+------------------------------------------------
 
 In Kubernetes, you can deploy Docker containers stored in container registries such as Docker Hub or any other container registry provider. This guide illustrates how to run a Docker container from an existing container registry using ``kubectl``.
 
 
 Prerequisites
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
 Before following this guide, ensure you have the following:
 
@@ -109,7 +109,7 @@ Before following this guide, ensure you have the following:
 
 
 Steps
-^^^^^^
+^^^^^
 
 1. **List Available Images**: First, list the available Docker container images in your container registry. You will need the full image name for the subsequent steps.
 
@@ -153,13 +153,13 @@ Steps
 
 
 Running a Ra2ce workflow in Argo
----------------------------------
+--------------------------------
 
 Argo Workflows is an open-source workflow engine optimized for Kubernetes. This guide demonstrates how to run a simple Argo workflow on your Kubernetes cluster.
 
 
 Prerequisites
-^^^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
 Before following this guide, ensure you have the following:
 
@@ -169,7 +169,7 @@ Before following this guide, ensure you have the following:
 
 
 Steps
-^^^^^^
+^^^^^
 
 1. **Create Workflow YAML**: Create a workflow YAML file specifying the steps of your workflow. An example YAML file is available in ``/infra/workflow/pod.yaml``:
 
