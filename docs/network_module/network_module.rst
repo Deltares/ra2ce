@@ -15,7 +15,7 @@ There are two options to set up a RA2CE model: using scripting and using initial
 Examples of how to use this module can be found in the :ref:`examples_index` and can be tested in the Binder environment. 
 
 Data requirements
--------------------------------------
+-----------------
 The types of possible input file formats to create a network are:
 
 - Shapefile of network;
@@ -37,7 +37,7 @@ Overview of the files created during the network creation process
 +-------------------------------------------------------+---------------------------------------------------------------------------------------------------+
 | Filename                                              | Description                                                                                       |
 +=======================================================+===================================================================================================+
-| base_network(_hazard).feather/.gpkg                   | Network data (with hazard data) in feather/GeoPackage format                                      |
+| base_network(_hazard).feather/.gpkg                   | Complex/segmented Network data (with hazard data) in feather/GeoPackage format                    |
 +-------------------------------------------------------+---------------------------------------------------------------------------------------------------+
 | base_graph(_hazard).p                                 | Simplified representation of the network (with hazard data)                                       |
 +-------------------------------------------------------+---------------------------------------------------------------------------------------------------+
@@ -57,7 +57,7 @@ Overview of the files created during the network creation process
 +-------------------------------------------------------+---------------------------------------------------------------------------------------------------+
 
 Network from OpenStreetMap using scripting
------------------------------------------------------------------------------
+------------------------------------------
 
 The :py:class:`~ra2ce.graph.network_wrappers.osm_network_wrapper.osm_network_wrapper.OsmNetworkWrapper` 
 class can download and process OpenStreetMap data for a given region of interest, using the `osmnx` 
@@ -77,7 +77,7 @@ class include:
 Examples of how to use this module can be found in the :ref:`examples_index`.
 
 Network from OpenStreetMap using the network.ini initialization file
------------------------------------------------------------------------------
+--------------------------------------------------------------------
 The network.ini file contains several parts: 1[project], 2[network], 3[origins_destinations], 4[hazard].
 These subsections are used to set the parameters necessary for the creation of different networks.
 Here, we will focus on the [network] part, as this can be used to create a basic network. 
@@ -119,7 +119,7 @@ To create a network from OSM, specify the following parameters in your network.i
     aggregate_wl = max
 
 Network from vector data using scripting
---------------------------------------------
+----------------------------------------
 
 There are three ways to create a network from vector data.
 The first is to clean the data yourself before using the Network Module and to then use the :py:class:`~ra2ce.graph.network_wrappers.vector_network_wrapper.VectorNetworkWrapper` class to read and process the data (e.g., a GeoPackage) to a network.
@@ -127,7 +127,7 @@ The second is to use the :py:class:`~ra2ce.graph.network_wrappers.shp_network_wr
 The third one is explained below.
 
 Network from vector data using the network.ini initialization file
------------------------------------------------------------------------
+------------------------------------------------------------------
 The user can also read in a pre-defined shapefile using the ra2ce_basics_from_gpkg example notebook, where the user can practice with pre-defined data and required folder structure and data format.
 The user can upload their own shapefile (vector data), store it in the RA2CE static>network folder and specify the name of the file in the network.ini.
 
@@ -166,7 +166,7 @@ file_id and link_type_column (NetworkSection of the NetworkConfigData or in the 
     aggregate_wl = max
 
 Network overlay with hazard data
---------------------------------------------------------
+--------------------------------
 
 It is possible to perform overlays with hazard data and the network.
 RA2CE can handle any hazard data in .tif format.
@@ -207,7 +207,7 @@ Specify the hazard file name in the network.ini and set some additional paramete
     aggregate_wl = max
 
 Possible parameters network.ini
----------------------------------------------------------------------------------------
+-------------------------------
 
 Note: the origin-destination parameters are explained in the :ref:`analysis_module`. 
 
@@ -242,7 +242,7 @@ Note: the origin-destination parameters are explained in the :ref:`analysis_modu
     overlay_segmented_graph = True              # True / False
 
 Network simplification
----------------------------------------------------------------------------------------
+----------------------
 
 By simplification it is meant to merge links from intersection to intersection.
 
