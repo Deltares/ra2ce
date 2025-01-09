@@ -176,8 +176,6 @@ class Ra2ceHandler:
         Returns:
             list[AnalysisResultWrapper]: A list of analysis results
         """
-        if not self.input_config.analysis_config:
-            return
         if not self.input_config.is_valid_input():
             _error = "Error validating input files. Ra2ce will close now."
             logging.error(_error)

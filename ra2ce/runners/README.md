@@ -2,7 +2,7 @@
 
 This module contains all the available runners that can be used in this tool.
 
-Each runner is specific for a given analysis type, to decide which one should be picked we make use of a _factory_ (`AnalysisRunnerFactory`).  In addition, you can directly run all available (and supported) analyses for a given configuration (`ConfigWrapper`) simply by doing `AnalysisRunnerFactory.run(config)`.
+Each runner is specific for a given analysis type, to decide which one should be picked we make use of a _factory_ (`AnalysisRunnerFactory`). In addition, you can directly run all available (and supported) analyses for a given configuration (`ConfigWrapper`) simply by doing `AnalysisRunnerFactory.run(config)`.
 
 The result of an analysis runner __execution__ will be a collection of `AnalysisResultWrapper`, an object containing information of the type of analysis ran and its result.
 
