@@ -33,6 +33,7 @@ from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
 )
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_factory import AnalysisFactory
+from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 
@@ -44,7 +45,9 @@ class AnalysisCollection:
     adaptation_analysis: Adaptation = None
 
     @classmethod
-    def from_config(cls, analysis_config: AnalysisConfigWrapper) -> AnalysisCollection:
+    def from_config(
+        cls, analysis_config: AnalysisConfigWrapper
+    ) -> AnalysisCollection | None:
         """
         Create an AnalysisCollection from an AnalysisConfigWrapper.
 
@@ -72,11 +75,25 @@ class AnalysisCollection:
 
     def get_analysis(
         self, analysis_type: AnalysisEnum | AnalysisDamagesEnum | AnalysisLossesEnum
-    ) -> AnalysisLossesProtocol | AnalysisDamagesProtocol | Adaptation:
+    ) -> AnalysisProtocol | None:
+        """
+        Get a specific analysis from the collection.
+
+        Args:
+            analysis_type (AnalysisEnum | AnalysisDamagesEnum | AnalysisLossesEnum):
+                The analysis that is requested.
+
+        Raises:
+            ValueError: The analysis type is not valid.
+
+        Returns:
+            AnalysisLossesProtocol | AnalysisDamagesProtocol | None:
+                The requested analysis (if present).
+        """
         if analysis_type == AnalysisEnum.ADAPTATION:
             return self.adaptation_analysis
         if isinstance(analysis_type, AnalysisDamagesEnum):
             return next((x for x in self.damages_analyses), None)
         if isinstance(analysis_type, AnalysisLossesEnum):
             return next((x for x in self.losses_analyses), None)
-        raise ValueError(f"Analysis type {analysis_type} not found in the collection.")
+        raise ValueError(f"Analysis type {analysis_type} is not valid.")

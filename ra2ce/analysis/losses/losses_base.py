@@ -101,8 +101,6 @@ class LossesBase(AnalysisLossesProtocol, AnalysisBase, ABC):
             self.analysis.production_loss_per_capita_per_hour
         )
 
-        # TODO: move this to the execute?
-        # self._check_validity_analysis_files()
         self.intensities = TrafficIntensitiesReader(self.link_id).read(
             self.analysis.traffic_intensities_file
         )
@@ -119,16 +117,6 @@ class LossesBase(AnalysisLossesProtocol, AnalysisBase, ABC):
         self.criticality_analysis = GeoDataFrame()
         self.criticality_analysis_non_disrupted = GeoDataFrame()
         self.result = GeoDataFrame()
-
-    def _check_validity_analysis_files(self):
-        if (
-            self.analysis.traffic_intensities_file is None
-            or self.analysis.resilience_curves_file is None
-            or self.analysis.values_of_time_file is None
-        ):
-            raise ValueError(
-                "traffic_intensities_file, resilience_curves_file, and values_of_time_file should be given"
-            )
 
     def _get_disrupted_criticality_analysis_results(
         self, criticality_analysis: GeoDataFrame
@@ -515,6 +503,15 @@ class LossesBase(AnalysisLossesProtocol, AnalysisBase, ABC):
         pass
 
     def execute(self) -> AnalysisResultWrapper:
+        if (
+            not self.intensities
+            or not self.resilience_curves
+            or not self.values_of_time
+        ):
+            raise ValueError(
+                "intensities, resilience_curves, and values_of_time should be given"
+            )
+
         _criticality_analysis_result_wrapper = (
             self._get_criticality_analysis().execute()
         )
