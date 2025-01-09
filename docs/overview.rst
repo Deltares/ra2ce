@@ -97,7 +97,6 @@ Overview
    examples/index.rst
    network_module/network_module.rst
    analysis_module/analysis_module.rst 
-   docker_and_cloud/index
    contributing/index.rst
    technical_documentation/technical_documentation.rst
    faq/faq.rst
