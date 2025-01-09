@@ -1,4 +1,7 @@
 [![Python 3.11](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/downloads/release/python-31110/)
+![PyPI](https://img.shields.io/pypi/v/ra2ce?label=pypi%20package)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/ra2ce)
+
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 ![TeamCity build status](https://dpcbuild.deltares.nl/app/rest/builds/buildType:id:Ra2ce_Ra2ceContinuousDelivery_RunAllTests/statusIcon.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Deltares_ra2ce&metric=alert_status&token=35cd897258b4c3017a42077f18304e6a73042dd6)](https://sonarcloud.io/summary/new_code?id=Deltares_ra2ce)
