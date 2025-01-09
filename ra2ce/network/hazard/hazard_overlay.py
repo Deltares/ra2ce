@@ -397,8 +397,8 @@ class HazardOverlay:
 
         return self.hazard_intersect(base_graph)
 
-    def _create_origin_destinations_overlay(
-        self, origin_destinations_graph: nx.MultiGraph
+    def _create_origins_destinations_overlay(
+        self, origins_destinations_graph: nx.MultiGraph
     ) -> tuple[nx.MultiGraph, gpd.GeoDataFrame]:
         _ods = self.load_origins_destinations()
 
@@ -425,7 +425,7 @@ class HazardOverlay:
                 _ods_reprojected = _ods.to_crs(_hazard_crs)
 
             _graph_reprojected = self.get_reproject_graph(
-                origin_destinations_graph, _graph_crs, _hazard_crs
+                origins_destinations_graph, _graph_crs, _hazard_crs
             )
 
             # Do the actual hazard intersect
@@ -436,14 +436,14 @@ class HazardOverlay:
 
             # Assign the original geometries to the reprojected dataset
             _graph_hazard = self.get_original_geoms_graph(
-                origin_destinations_graph, _od_graph_hazard_reprojected
+                origins_destinations_graph, _od_graph_hazard_reprojected
             )
             _ods = _ods_hazard_reprojected.to_crs(_ods.crs)
         else:
             (
                 _graph_hazard,
                 _ods,
-            ) = self.od_hazard_intersect(origin_destinations_graph, _ods)
+            ) = self.od_hazard_intersect(origins_destinations_graph, _ods)
 
         return (_graph_hazard, _ods)
 
@@ -544,7 +544,7 @@ class HazardOverlay:
             (
                 self.graph_files.origins_destinations_graph_hazard.graph,
                 _ods,
-            ) = self._create_origin_destinations_overlay(
+            ) = self._create_origins_destinations_overlay(
                 self.graph_files.origins_destinations_graph.get_graph()
             )
 

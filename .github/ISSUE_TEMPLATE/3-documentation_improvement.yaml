@@ -10,7 +10,7 @@ body:
     attributes:
       label: Ra2ce version checks
       options:
-        - label: I have checked that the issue still exists on the latest version of the docs in `master` [here](https://github.com/Deltares/ra2ce/docs).
+        - label: I have checked that the issue still exists on the latest version of the docs in `master` [here](https://github.com/Deltares/ra2ce/tree/master/docs).
           required: true
   - type: dropdown
     id: kind
