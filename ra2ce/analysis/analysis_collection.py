@@ -44,6 +44,16 @@ class AnalysisCollection:
     losses_analyses: list[AnalysisLossesProtocol] = field(default_factory=list)
     adaptation_analysis: Adaptation = None
 
+    @property
+    def analyses(self) -> list[AnalysisProtocol]:
+        """
+        Get all analyses in the collection.
+
+        Returns:
+            list[AnalysisProtocol]: All analyses in the collection.
+        """
+        return self.damages_analyses + self.losses_analyses + [self.adaptation_analysis]
+
     @classmethod
     def from_config(
         cls, analysis_config: AnalysisConfigWrapper

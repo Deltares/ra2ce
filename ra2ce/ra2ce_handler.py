@@ -181,7 +181,7 @@ class Ra2ceHandler:
             logging.error(_error)
             raise ValueError(_error)
 
-        return AnalysisRunnerFactory.run(self.input_config, self.analysis_collection)
+        return AnalysisRunnerFactory.run(self.analysis_collection)
 
     @staticmethod
     def run_with_ini_files(
