@@ -528,10 +528,11 @@ class HazardOverlay:
             self.graph_files.base_graph.file
             and not self.graph_files.base_graph_hazard.file
         ):
+            logging.info("Base graph present without hazard, creating overlay.")
             self.graph_files.base_graph_hazard.graph = self._create_base_overlay(
                 self.graph_files.base_graph.get_graph()
             )
-
+            logging.info("Exporting base graph hazard file")
             self._export_network_files("base_graph_hazard", types_to_export)
 
         #### Step 2: hazard overlay of the origins_destinations (NetworkX) ###
