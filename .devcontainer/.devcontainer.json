@@ -1,0 +1,27 @@
+{
+    "name": "ra2ce_dev_container",
+    "build": { 
+      "dockerfile": "Dockerfile" 
+    },
+    "mounts": [
+      "source=ra2ce_docker_env,target=/usr/src/.env,type=volume"
+    ],
+    // `git config --global core.autocrlf true` prevents git from showing differences on ALL files when running
+    // in the ra2ce (linux) container
+    "postStartCommand": "bash .devcontainer/postCreateCommand.sh",
+    "customizations": {
+      "vscode": {
+        "extensions": [
+            "ms-python.python",
+            "ms-python.vscode-pylance",
+            "ms-python.debugpy",
+            "ms-python.black-formatter",
+            "ms-python.isort",
+            "ms-python.pylint",
+            "ms-vscode.test-adapter-converter",
+            "njpwerner.autodocstring"
+        ]
+      }
+    },
+    "forwardPorts": [3000]
+  }
