@@ -100,7 +100,7 @@ class TestAdaptationAnalysisRunner:
 
         _result_wrapper = _result[0]
         assert isinstance(_result_wrapper, AnalysisResultWrapper)
-        assert _result_wrapper.is_valid_result() == True
+        assert _result_wrapper.is_valid_result() is True
 
         _analysis_result = _result_wrapper.results_collection[0]
         _output_gdf = _analysis_result.base_export_path.with_suffix(".gpkg")
