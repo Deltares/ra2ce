@@ -1,13 +1,7 @@
-import pytest
-
 from ra2ce.analysis.analysis_collection import AnalysisCollection
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionLosses,
-)
 from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
     AnalysisLossesEnum,
 )
-from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.losses_analysis_runner import LossesAnalysisRunner
 
 
@@ -16,40 +10,36 @@ class TestLossesAnalysisRunner:
         _runner = LossesAnalysisRunner()
         assert str(_runner) == "Losses Analysis Runner"
 
-    def test_given_losses_configuration_can_run(self, dummy_ra2ce_input: ConfigWrapper):
+    def test_given_losses_configuration_can_run(
+        self, valid_analysis_collection: AnalysisCollection
+    ):
         # 1. Define test data.
-        dummy_ra2ce_input.analysis_config.config_data.analyses = [
-            AnalysisSectionLosses(analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY)
-        ]
-        _analysis_collection = AnalysisCollection.from_config(
-            dummy_ra2ce_input.analysis_config
+        _losses_analysis = valid_analysis_collection.get_analysis(
+            AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY
         )
 
         # 2. Run test.
         _result = LossesAnalysisRunner().can_run(
-            _analysis_collection.get_analysis(
-                AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY
-            ),
-            _analysis_collection,
+            _losses_analysis,
+            valid_analysis_collection,
         )
 
         # 3. Verify expectations.
-        assert _result
+        assert _result is True
 
     def test_given_wrong_analysis_configuration_cannot_run(
-        self, dummy_ra2ce_input: ConfigWrapper
+        self, dummy_analysis_collection: AnalysisCollection
     ):
         # 1. Define test data.
-        _analysis_collection = AnalysisCollection.from_config(
-            dummy_ra2ce_input.analysis_config
-        )
-        _losses_analysis = _analysis_collection.get_analysis(
+        _losses_analysis = dummy_analysis_collection.get_analysis(
             AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY
         )
         assert _losses_analysis is None
 
         # 2. Run test.
-        _result = LossesAnalysisRunner().can_run(_losses_analysis, _analysis_collection)
+        _result = LossesAnalysisRunner().can_run(
+            _losses_analysis, dummy_analysis_collection
+        )
 
         # 3. Verify expectations.
-        assert not _result
+        assert _result is False
