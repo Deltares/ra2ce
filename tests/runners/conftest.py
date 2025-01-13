@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
@@ -11,12 +13,14 @@ from ra2ce.analysis.analysis_config_data.enums.damage_curve_enum import DamageCu
 from ra2ce.analysis.analysis_config_data.enums.event_type_enum import EventTypeEnum
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.configuration.config_wrapper import ConfigWrapper
+from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollection
 from ra2ce.network.network_config_wrapper import NetworkConfigWrapper
 
 
 class DummyAnalysisConfigWrapper(AnalysisConfigWrapper):
     def __init__(self) -> None:
-        self.config_data = AnalysisConfigData(analyses=[])
+        self.config_data = AnalysisConfigData(analyses=[], root_path=Path("dummy"))
+        self.graph_files = GraphFilesCollection()
 
     @classmethod
     def from_data(cls, **kwargs):
@@ -51,10 +55,9 @@ def _get_dummy_ra2ce_input_with_damages(
             analysis=AnalysisDamagesEnum.DAMAGES,
             name="Damages",
             event_type=EventTypeEnum.EVENT,
-            damage_curve=DamageCurveEnum.MAN,
+            damage_curve=DamageCurveEnum.HZ,
             save_csv=True,
             save_gpkg=True,
         )
     ]
-    dummy_ra2ce_input.network_config.config_data.hazard.hazard_map = "A value"
     return dummy_ra2ce_input

@@ -2,7 +2,6 @@ from pathlib import Path
 from shutil import copytree, rmtree
 
 from geopandas import read_file
-from geopandas.testing import assert_geodataframe_equal
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
@@ -27,22 +26,34 @@ class TestAdaptationAnalysisRunner:
         self, dummy_ra2ce_input: ConfigWrapper
     ):
         # 1. Define test data.
-        assert dummy_ra2ce_input.analysis_config.config_data.adaptation is None
+        _analysis_collection = AnalysisCollection.from_config(
+            dummy_ra2ce_input.analysis_config
+        )
+        assert not _analysis_collection.get_analysis(AnalysisEnum.ADAPTATION)
 
         # 2. Run test.
-        _result = AdaptationAnalysisRunner.can_run(dummy_ra2ce_input)
+        _result = AdaptationAnalysisRunner().can_run(
+            _analysis_collection.get_analysis(AnalysisEnum.ADAPTATION),
+            _analysis_collection,
+        )
 
         # 3. Verify expectations.
-        assert not _result
+        assert _result is False
 
     def test_given_valid_damages_input_configuration_cannot_run(
         self, damages_ra2ce_input: ConfigWrapper
     ):
         # 1. Define test data.
-        assert damages_ra2ce_input.analysis_config.config_data.adaptation is None
+        _analysis_collection = AnalysisCollection.from_config(
+            damages_ra2ce_input.analysis_config
+        )
+        assert not _analysis_collection.get_analysis(AnalysisEnum.ADAPTATION)
 
         # 2. Run test.
-        _result = AdaptationAnalysisRunner.can_run(damages_ra2ce_input)
+        _result = AdaptationAnalysisRunner().can_run(
+            _analysis_collection.get_analysis(AnalysisEnum.ADAPTATION),
+            _analysis_collection,
+        )
 
         # 3. Verify expectation
         assert _result is False
@@ -51,7 +62,6 @@ class TestAdaptationAnalysisRunner:
         self, damages_ra2ce_input: ConfigWrapper
     ):
         # 1. Define test data.
-        assert damages_ra2ce_input.analysis_config.config_data.adaptation is None
         _adaptation_config = AnalysisSectionAdaptation()
         _adaptation_config.adaptation_options = [
             AnalysisSectionAdaptationOption(id="AO0"),
@@ -61,9 +71,15 @@ class TestAdaptationAnalysisRunner:
         damages_ra2ce_input.analysis_config.config_data.analyses.append(
             _adaptation_config
         )
+        _analysis_collection = AnalysisCollection.from_config(
+            damages_ra2ce_input.analysis_config
+        )
 
         # 2. Run test.
-        _result = AdaptationAnalysisRunner.can_run(damages_ra2ce_input)
+        _result = AdaptationAnalysisRunner().can_run(
+            _analysis_collection.get_analysis(AnalysisEnum.ADAPTATION),
+            _analysis_collection,
+        )
 
         # 3. Verify expectation
         assert _result is True

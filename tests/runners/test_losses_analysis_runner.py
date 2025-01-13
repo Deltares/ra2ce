@@ -1,5 +1,6 @@
 import pytest
 
+from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisSectionLosses,
 )
@@ -20,9 +21,17 @@ class TestLossesAnalysisRunner:
         dummy_ra2ce_input.analysis_config.config_data.analyses = [
             AnalysisSectionLosses(analysis=AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY)
         ]
+        _analysis_collection = AnalysisCollection.from_config(
+            dummy_ra2ce_input.analysis_config
+        )
 
         # 2. Run test.
-        _result = LossesAnalysisRunner.can_run(dummy_ra2ce_input)
+        _result = LossesAnalysisRunner().can_run(
+            _analysis_collection.get_analysis(
+                AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY
+            ),
+            _analysis_collection,
+        )
 
         # 3. Verify expectations.
         assert _result
@@ -31,9 +40,16 @@ class TestLossesAnalysisRunner:
         self, dummy_ra2ce_input: ConfigWrapper
     ):
         # 1. Define test data.
+        _analysis_collection = AnalysisCollection.from_config(
+            dummy_ra2ce_input.analysis_config
+        )
+        _losses_analysis = _analysis_collection.get_analysis(
+            AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY
+        )
+        assert _losses_analysis is None
 
         # 2. Run test.
-        _result = LossesAnalysisRunner.can_run(dummy_ra2ce_input)
+        _result = LossesAnalysisRunner().can_run(_losses_analysis, _analysis_collection)
 
         # 3. Verify expectations.
         assert not _result

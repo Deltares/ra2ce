@@ -1,10 +1,11 @@
-from ra2ce.analysis.analysis_config_data.analysis_config_data import (
-    AnalysisSectionDamages,
-)
+from geopandas import GeoDataFrame
+
+from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
     AnalysisDamagesEnum,
 )
 from ra2ce.configuration.config_wrapper import ConfigWrapper
+from ra2ce.network.graph_files.graph_file import GraphFile
 from ra2ce.runners.damages_analysis_runner import DamagesAnalysisRunner
 
 
@@ -17,54 +18,58 @@ class TestDamagesAnalysisRunner:
         self, damages_ra2ce_input: ConfigWrapper
     ):
         # 1. Define test data.
-        assert any(
-            isinstance(_ad, AnalysisSectionDamages)
-            for _ad in damages_ra2ce_input.analysis_config.config_data.analyses
+        _analysis_collection = AnalysisCollection.from_config(
+            damages_ra2ce_input.analysis_config
+        )
+        assert _analysis_collection.get_analysis(AnalysisDamagesEnum.DAMAGES)
+        _analysis_collection.damages_analyses[0].graph_file_hazard = GraphFile(
+            graph=GeoDataFrame()
         )
 
         # 2. Run test.
-        _result = DamagesAnalysisRunner.can_run(damages_ra2ce_input)
+        _result = DamagesAnalysisRunner().can_run(
+            _analysis_collection.get_analysis(AnalysisDamagesEnum.DAMAGES),
+            _analysis_collection,
+        )
 
         # 3. Verify expectations.
-        assert _result
+        assert _result is True
 
     def test_given_wrong_analysis_configuration_cannot_run(
         self, dummy_ra2ce_input: ConfigWrapper
     ):
         # 1. Define test data.
-        dummy_ra2ce_input.network_config.config_data.hazard.hazard_map = "A value"
+        _analysis_collection = AnalysisCollection.from_config(
+            dummy_ra2ce_input.analysis_config
+        )
+        assert _analysis_collection.get_analysis(AnalysisDamagesEnum.DAMAGES) is None
 
         # 2. Run test.
-        _result = DamagesAnalysisRunner.can_run(dummy_ra2ce_input)
+        _result = DamagesAnalysisRunner().can_run(
+            _analysis_collection.get_analysis(AnalysisDamagesEnum.DAMAGES),
+            _analysis_collection,
+        )
 
         # 3. Verify expectations.
-        assert not _result
+        assert _result is False
 
     def test_given_wrong_network_hazard_configuration_cannot_run(
-        self, dummy_ra2ce_input: ConfigWrapper
+        self, damages_ra2ce_input: ConfigWrapper
     ):
         # 1. Define test data.
-        dummy_ra2ce_input.analysis_config.config_data.analyses = [
-            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.DAMAGES)
-        ]
+        _analysis_collection = AnalysisCollection.from_config(
+            damages_ra2ce_input.analysis_config
+        )
+        assert _analysis_collection.get_analysis(AnalysisDamagesEnum.DAMAGES)
+        _analysis_collection.damages_analyses[0].graph_file_hazard = GraphFile(
+            graph="wrong_input"
+        )
 
         # 2. Run test.
-        _result = DamagesAnalysisRunner.can_run(dummy_ra2ce_input)
+        _result = DamagesAnalysisRunner().can_run(
+            _analysis_collection.get_analysis(AnalysisDamagesEnum.DAMAGES),
+            _analysis_collection,
+        )
 
         # 3. Verify expectations.
-        assert not _result
-
-    def test_given_no_network_config_returns_false(
-        self, dummy_ra2ce_input: ConfigWrapper
-    ):
-        # 1. Define test data.
-        dummy_ra2ce_input.analysis_config.config_data.analyses = [
-            AnalysisSectionDamages(analysis=AnalysisDamagesEnum.DAMAGES)
-        ]
-        dummy_ra2ce_input.network_config = None
-
-        # 2. Run test.
-        _result = DamagesAnalysisRunner.can_run(dummy_ra2ce_input)
-
-        # 3. Verify expectations.
-        assert not _result
+        assert _result is False
