@@ -33,7 +33,6 @@ for index, run in enumerate(path_dir.iterdir(), 1):
 
         data.append(row)  # Append the row to the data list
 
-print(data)
 #save as csv
 import pandas as pd
 df = pd.DataFrame(data)
