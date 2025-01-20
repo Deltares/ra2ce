@@ -427,7 +427,7 @@ class LossesBase(AnalysisLossesProtocol, AnalysisBase, ABC):
             vlh_trip_type_event = sum(
                 (
                     intensity_trip_type
-                    * duration**2
+                    * duration
                     * loss_ratio
                     * occupancy_trip_type
                     * self.production_loss_per_capita_per_hour

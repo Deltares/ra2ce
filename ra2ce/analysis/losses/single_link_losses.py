@@ -12,4 +12,6 @@ class SingleLinkLosses(LossesBase):
     """
 
     def _get_criticality_analysis(self) -> SingleLinkRedundancy:
+        # Provide the graph file with hazard overlay if it's result is consumed by a losses analysis.
+        self.analysis_input.graph_file = self.analysis_input.graph_file_hazard
         return SingleLinkRedundancy(self.analysis_input)
