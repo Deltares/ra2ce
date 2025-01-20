@@ -28,20 +28,17 @@ from ra2ce.analysis.losses.resilience_curves.resilience_curves import Resilience
 from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 
 
-@dataclass
 class ResilienceCurvesReader(LossesInputDataReaderBase):
     """
     Class to read the resilience curves from a csv file.
     """
 
     object_type: type = ResilienceCurves
-    csv_columns: list[str] = field(
-        default_factory=lambda: [
-            "link_type_hazard_intensity",
-            "duration_steps",
-            "functionality_loss_ratio",
-        ]
-    )
+    csv_columns: list[str] = [
+        "link_type_hazard_intensity",
+        "duration_steps",
+        "functionality_loss_ratio",
+    ]
 
     def _parse_df(self, df: pd.DataFrame) -> ResilienceCurves:
         def parse_link_type_hazard_intensity(

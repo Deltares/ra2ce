@@ -20,7 +20,6 @@
 """
 from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
-from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.simple_analysis_runner_base import SimpleAnalysisRunnerBase
 
 
@@ -33,12 +32,3 @@ class LossesAnalysisRunner(SimpleAnalysisRunnerBase):
         analysis_collection: AnalysisCollection,
     ) -> list[AnalysisLossesProtocol]:
         return analysis_collection.losses_analyses
-
-    @staticmethod
-    def can_run(ra2ce_input: ConfigWrapper) -> bool:
-        if (
-            not ra2ce_input.analysis_config
-            or not ra2ce_input.analysis_config.config_data.losses_list
-        ):
-            return False
-        return True

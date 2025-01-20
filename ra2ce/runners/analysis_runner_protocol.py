@@ -22,21 +22,23 @@
 from typing import Protocol, runtime_checkable
 
 from ra2ce.analysis.analysis_collection import AnalysisCollection
+from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.analysis_result.analysis_result_wrapper_protocol import (
     AnalysisResultWrapperProtocol,
 )
-from ra2ce.configuration.config_wrapper import ConfigWrapper
 
 
 @runtime_checkable
 class AnalysisRunner(Protocol):
-    @staticmethod
-    def can_run(ra2ce_input: ConfigWrapper) -> bool:
+    def can_run(
+        self, analysis: AnalysisProtocol, analysis_collection: AnalysisCollection
+    ) -> bool:
         """
         Validates whether the given `ConfigWrapper` is eligibile for this `AnalysisRunner`.
 
         Args:
-            ra2ce_input (ConfigWrapper): Configuration desired to run.
+            analysis (AnalysisProtocol): Analysis to be run on this `AnalysisRunner`.
+            analysis_collection (AnalysisCollection): Collection of analyses to be run on this `AnalysisRunner`.
 
         Returns:
             bool: Whether the `ConfigWrapper` can be run or not.

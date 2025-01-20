@@ -24,8 +24,16 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from ra2ce.analysis.adaptation.adaptation import Adaptation
+from ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum import (
+    AnalysisDamagesEnum,
+)
+from ra2ce.analysis.analysis_config_data.enums.analysis_enum import AnalysisEnum
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
+)
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_factory import AnalysisFactory
+from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
 from ra2ce.analysis.losses.analysis_losses_protocol import AnalysisLossesProtocol
 
@@ -36,8 +44,23 @@ class AnalysisCollection:
     losses_analyses: list[AnalysisLossesProtocol] = field(default_factory=list)
     adaptation_analysis: Adaptation = None
 
+    @property
+    def analyses(self) -> list[AnalysisProtocol]:
+        """
+        Get all analyses in the collection.
+
+        Returns:
+            list[AnalysisProtocol]: All analyses in the collection.
+        """
+        _analyses = self.damages_analyses + self.losses_analyses
+        if self.adaptation_analysis:
+            _analyses.append(self.adaptation_analysis)
+        return _analyses
+
     @classmethod
-    def from_config(cls, analysis_config: AnalysisConfigWrapper) -> AnalysisCollection:
+    def from_config(
+        cls, analysis_config: AnalysisConfigWrapper
+    ) -> AnalysisCollection | None:
         """
         Create an AnalysisCollection from an AnalysisConfigWrapper.
 
@@ -47,6 +70,8 @@ class AnalysisCollection:
         Returns:
             AnalysisCollection: Collection of analyses to be executed.
         """
+        if not analysis_config:
+            return None
         return cls(
             damages_analyses=[
                 AnalysisFactory.get_damages_analysis(analysis, analysis_config)
@@ -60,3 +85,28 @@ class AnalysisCollection:
                 analysis_config.config_data.adaptation, analysis_config
             ),
         )
+
+    def get_analysis(
+        self, analysis_type: AnalysisEnum | AnalysisDamagesEnum | AnalysisLossesEnum
+    ) -> AnalysisProtocol | None:
+        """
+        Get a specific analysis from the collection.
+
+        Args:
+            analysis_type (AnalysisEnum | AnalysisDamagesEnum | AnalysisLossesEnum):
+                The analysis that is requested.
+
+        Raises:
+            ValueError: The analysis type is not valid.
+
+        Returns:
+            AnalysisLossesProtocol | AnalysisDamagesProtocol | None:
+                The requested analysis (if present).
+        """
+        if analysis_type == AnalysisEnum.ADAPTATION:
+            return self.adaptation_analysis
+        if isinstance(analysis_type, AnalysisDamagesEnum):
+            return next((x for x in self.damages_analyses), None)
+        if isinstance(analysis_type, AnalysisLossesEnum):
+            return next((x for x in self.losses_analyses), None)
+        raise ValueError(f"Analysis type {analysis_type} is not valid.")

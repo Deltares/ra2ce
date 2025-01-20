@@ -119,8 +119,8 @@ class TestRa2ceHandler:
         "simple_test_case_configs",
         [
             pytest.param((False, False), id="No config data provided"),
-            pytest.param((False, True), id="Only network config data provided"),
-            pytest.param((True, False), id="Only analysis config data provided"),
+            pytest.param((True, False), id="Only network config data provided"),
+            pytest.param((False, True), id="Only analysis config data provided"),
             pytest.param((True, True), id="All config data provided"),
         ],
         indirect=True,
