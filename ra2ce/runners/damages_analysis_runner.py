@@ -21,9 +21,11 @@
 
 import logging
 
+from geopandas import GeoDataFrame
+
 from ra2ce.analysis.analysis_collection import AnalysisCollection
+from ra2ce.analysis.analysis_protocol import AnalysisProtocol
 from ra2ce.analysis.damages.analysis_damages_protocol import AnalysisDamagesProtocol
-from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.simple_analysis_runner_base import SimpleAnalysisRunnerBase
 
 
@@ -37,17 +39,13 @@ class DamagesAnalysisRunner(SimpleAnalysisRunnerBase):
     ) -> list[AnalysisDamagesProtocol]:
         return analysis_collection.damages_analyses
 
-    @staticmethod
-    def can_run(ra2ce_input: ConfigWrapper) -> bool:
-        if (
-            not ra2ce_input.analysis_config
-            or not ra2ce_input.analysis_config.config_data.damages_list
-        ):
+    def can_run(
+        self, analysis: AnalysisProtocol, analysis_collection: AnalysisCollection
+    ) -> bool:
+        if not super().can_run(analysis, analysis_collection):
             return False
-        if not ra2ce_input.network_config:
-            return False
-        _network_config = ra2ce_input.network_config.config_data
-        if not _network_config.hazard or not _network_config.hazard.hazard_map:
+        _graph = analysis_collection.damages_analyses[0].graph_file_hazard.get_graph()
+        if not isinstance(_graph, GeoDataFrame):
             logging.error(
                 "Please define a hazard map in your network.ini file. Unable to calculate damages."
             )

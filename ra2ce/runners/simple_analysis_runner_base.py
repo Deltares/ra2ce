@@ -29,7 +29,6 @@ from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResul
 from ra2ce.analysis.analysis_result.analysis_result_wrapper_exporter import (
     AnalysisResultWrapperExporter,
 )
-from ra2ce.configuration.config_wrapper import ConfigWrapper
 from ra2ce.runners.analysis_runner_protocol import AnalysisRunner
 
 
@@ -54,10 +53,12 @@ class SimpleAnalysisRunnerBase(AnalysisRunner):
         """
         raise NotImplementedError()
 
-    @staticmethod
-    @abstractmethod
-    def can_run(ra2ce_input: ConfigWrapper) -> bool:
-        raise NotImplementedError()
+    def can_run(
+        self, analysis: AnalysisProtocol, analysis_collection: AnalysisCollection
+    ) -> bool:
+        return analysis is not None and analysis in self.filter_supported_analyses(
+            analysis_collection
+        )
 
     def run(
         self, analysis_collection: AnalysisCollection
