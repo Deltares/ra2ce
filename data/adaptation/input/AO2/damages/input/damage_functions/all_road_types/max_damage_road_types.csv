@@ -1,0 +1,8 @@
+Road_type \ lanes;1;2;3;4;5
+unit;euro/m;euro/m;euro/m;euro/m;euro/m
+tertiary_link;110;120;130;140;150
+tertiary;110;120;130;140;150
+secondary_link;11;12;13;14;15
+secondary;11;12;13;14;15
+residential;1100;1200;1300;1400;1500
+['tertiary', 'residential'];510;520;530;540;550
