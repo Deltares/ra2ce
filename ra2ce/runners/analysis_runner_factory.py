@@ -52,16 +52,19 @@ class AnalysisRunnerFactory:
         ]
         _supported_runners = []
         for _analysis in analysis_collection.analyses:
-            _supported_runner = [
-                _runner
-                for _runner in _available_runners
-                if _runner.can_run(_analysis, analysis_collection)
-            ]
+            _supported_runner = next(
+                (
+                    _runner
+                    for _runner in _available_runners
+                    if _runner.can_run(_analysis, analysis_collection)
+                ),
+                None,
+            )
             if not _supported_runner:
                 _err_mssg = "No analysis runner found for the given configuration."
                 logging.error(_err_mssg)
                 raise ValueError(_err_mssg)
-            _supported_runners.append(_supported_runner[0])
+            _supported_runners.append(_supported_runner)
 
         return list(set(_supported_runners))
 

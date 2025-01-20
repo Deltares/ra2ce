@@ -56,11 +56,9 @@ class SimpleAnalysisRunnerBase(AnalysisRunner):
     def can_run(
         self, analysis: AnalysisProtocol, analysis_collection: AnalysisCollection
     ) -> bool:
-        if not analysis or not analysis in self.filter_supported_analyses(
+        return analysis is not None and analysis in self.filter_supported_analyses(
             analysis_collection
-        ):
-            return False
-        return True
+        )
 
     def run(
         self, analysis_collection: AnalysisCollection
