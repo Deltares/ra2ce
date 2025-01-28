@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 import numpy as np
+from IPython.core.pylabtools import figsize
 from matplotlib import pyplot as plt
 import seaborn as sns
 
@@ -36,7 +37,6 @@ class HazardProbabilisticEventsSet:
         # Ideally we would like to have the same number of runs for all events, but here we take the minimum
         nb_runs = min([len(event[1]["Total damage"]) for event in groups])
 
-
         for event_id, event in enumerate(groups, 1):
             event = event[1]
             events.append(ProbabilisticEvent(id=event_id,
@@ -44,7 +44,6 @@ class HazardProbabilisticEventsSet:
                                              name=event["Scenario"].values[0],
                                              annual_probability=1 / event["return_period"].values[0],
                                              damage=event["Total damage"].values[:nb_runs]))
-
 
         return cls(id=1, set_name=set_name, events=events, number_events=len(events), number_runs=nb_runs)
 
@@ -60,31 +59,42 @@ class HazardProbabilisticEventsSet:
         """
         return [event for event in self.events if event.annual_probability == 1 / return_period]
 
+    def get_events_for_location(self, location: int) -> list[ProbabilisticEvent]:
+        return [event for event in self.events if event.location == location]
+
+    def get_events_for_dijkring(self, dijkring_id: int) -> list[ProbabilisticEvent]:
+        return [event for event in self.events if event.dijkring == dijkring_id]
+
     def get_damage_array(self, return_period: Optional[int] = None) -> np.ndarray:
         """Get an array of damages for all events and all run.
         Nb of events is number of rows
         Nb of columns is number of runs
 
 
-                run1 run2 run3 run4 ...
+                run1 run2 run3 run4  ...  runN
         EV1
         EV2
         ...
+        EVk
+
+        Args:
+            return_period: Return period of the events to get. If None, return all events.
+
         """
 
-        events = self.get_events_for_return_period(return_period) if return_period else self.events
-        damage_array = np.zeros((len(events), self.number_runs))
-        for event in events:
-            damage_array[event.id - 1, :] = event.damage
+        if return_period is not None:
+            events = self.get_events_for_return_period(return_period)
+        else:
+            events = self.events
+        damage_array = np.array([event.damage for event in events])
 
         return damage_array
 
-    def get_event_frequencies(self)->list[float]:
+    def get_event_frequencies(self) -> list[float]:
         """
         Get the annual probability of each event.
         """
         frequencies = [event.annual_probability for event in self.events]
-        assert len(frequencies) == self.number_events
 
         return frequencies
 
@@ -106,13 +116,66 @@ class HazardProbabilisticEventsSet:
 
         return EAD
 
-    def plot_violin(self):
+    def filter_data(self, var: str,
+                    sort_by_return_period: bool = False,
+                    sort_by_dijkring: bool = False,
+                    sort_by_location: bool = False,
+                    return_period: Optional[int] = None,
+                    location: Optional[int] = None,
+                    dijkring: Optional[int] = None
+                    ) -> np.array:
+        """
+        Get and filter the data in a array, ready to be plug into plotting function
 
-        fig = plt.figure(figsize=(10, 10))
+
+        """
+        if sort_by_return_period:
+            self.events = sorted(self.events, key=lambda x: x.return_period)
+
+        if sort_by_dijkring:
+            self.events = sorted(self.events, key=lambda x: x.dijkring)
+
+        if sort_by_location:
+            self.events = sorted(self.events, key=lambda x: x.location)
+
+        if return_period is not None:
+            self.events = self.get_events_for_return_period(return_period)
+            self.number_events = len(self.events)
+
+        if location is not None:
+            self.events = self.get_events_for_location(location)
+            self.number_events = len(self.events)
+
+        if dijkring is not None:
+            self.events = self.get_events_for_dijkring(dijkring)
+            self.number_events = len(self.events)
+
+        if var == "damage":
+            data = self.get_damage_array().T / 1e6
+        elif var == "AAL":
+            data = self.get_EAD_vector() / 1e6
+        else:
+            raise NotImplemented("Not implemented yet")
+        return data
+
+    def plot_violin(self, var: str,
+                    sort_by_return_period: bool = False,
+                    sort_by_dijkring: bool = False,
+                    sort_by_location: bool = False,
+                    return_period: Optional[int] = None,
+                    location: Optional[int] = None,
+                    dijkring: Optional[int] = None
+                    ):
+
+        plt.figure(figsize=(10, 10))
         N = self.number_runs
 
-        sns.boxplot(data=self.get_damage_array().T / 1e6)
-        sns.swarmplot(data=self.get_damage_array().T / 1e6,  color="black", alpha=0.5)
+        data = self.filter_data(var, sort_by_return_period)
+
+        sns.boxplot(data=data)
+        # sns.swarmplot(data=data,  color="black", alpha=0.5) # dont use for more than 100 runs
+
+        print([ev.return_period for ev in self.events])
 
         plt.xlabel("Scenario")
         plt.xticks(rotation=45)
@@ -122,3 +185,32 @@ class HazardProbabilisticEventsSet:
         plt.show()
 
         return
+
+    def plot_histogram(self, var: str):
+
+        plt.figure(figsize=(10, 10))
+        data = self.filter_data(var)
+
+
+        plt.hist(data.flatten(), bins=50, )
+
+        if var == 'damage':
+            label = "Total damage (Millions EUR)"
+        elif var == 'AAL':
+            label = "Annual Averegae damage (Millions EUR)"
+        else:
+            raise NotImplemented()
+        plt.xlabel(label)
+        plt.ylabel("Frequency")
+        plt.title(f"Histogram damages all hazards - {self.number_runs} runs")
+        plt.show()
+
+    def plot_histogram_events(self):
+
+        for event in self.events:
+            plt.figure(figsize=(10, 10))
+            plt.hist(event.damage / 1e6, bins=30, )
+            plt.xlabel("Total damage (Millions EUR)")
+            plt.ylabel("Frequency")
+            plt.title(f"Histogram damages {event.name} - {self.number_runs} runs")
+            plt.show()

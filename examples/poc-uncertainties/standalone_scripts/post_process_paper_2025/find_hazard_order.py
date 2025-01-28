@@ -23,12 +23,12 @@ print(names)
 
 from pathlib import Path
 import pandas as pd
-result_csv = Path(
-    r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\WCF4Exchange\paper\res\results.csv"
-)
+# result_csv = Path(
+#     r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\WCF4Exchange\paper\res\results.csv"
+# )
 
 return_period_file = Path(
-    r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\WCF4Exchange\paper\scenario_definition.xlsx")
+    r"C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\paper\scenario_definition.xlsx")
 
 order_hazards_Waal = [13514, 13516, 13518, 13528, 13529, 13530, 13531, 13532, 13534, 13535, 13536, 13537, 13538, 13539,
                       13540, 13541, 13542, 13543, 19053, 19054, 19055, 19056, 19057, 19058, 19061, 19062, 19063, 19064,
@@ -49,7 +49,7 @@ waal_rp_data = waal_rp_data.set_index("id").loc[order_hazards_Waal].reset_index(
 waal_rp_data = waal_rp_data.drop(columns="name")
 
 d = waal_rp_data.to_dict('records')
-d = {item["id"]: item['rp'] for item in d}
+d = {item["id"]: item['dijkring'] for item in d}
 print(waal_rp_data)
 print(waal_rp_data.to_dict('records'))
 

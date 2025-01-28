@@ -20,6 +20,5 @@ haz_set_D = HazardProbabilisticEventsSet.from_res_df(df[df["Hazard"].isin(["haza
 
 array =  haz_set_D.get_EAD_vector()
 print(array)
-haz_set_D.plot_violin()
 
 
