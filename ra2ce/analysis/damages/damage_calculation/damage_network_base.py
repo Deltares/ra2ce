@@ -45,7 +45,7 @@ class DamageNetworkBase(ABC):
         road_gdf: GeoDataFrame,
         val_cols: list[str],
         representative_damage_percentage: float,
-        link_type_column: str
+        link_type_column: str,
     ):
         """Construct the Data"""
         self.val_cols = val_cols
@@ -110,7 +110,7 @@ class DamageNetworkBase(ABC):
         # round to nearest integer, but save as float format
         self.gdf.lanes = self.gdf.lanes.round(0)
 
-        # boolean with trues for all nans, i.e. all road segements without lane data
+        # boolean with trues for all nans, i.e. all road segments without lane data
         nans = self.gdf.lanes.isnull()
         if nans.sum() > 0:
             logging.warning(
@@ -200,7 +200,7 @@ class DamageNetworkBase(ABC):
         dam_cols = [c for c in df.columns if c.startswith("dam_")]
         self.gdf[dam_cols] = df[dam_cols]
         logging.info(
-            "Damage calculation with the manual damage functions was succesfull."
+            "Damage calculation with the manual damage functions was successful."
         )
 
     def calculate_damage_HZ(self, events):
@@ -221,7 +221,7 @@ class DamageNetworkBase(ABC):
                         """
         )
         logging.warning(
-            "These numbers assume that motorways that each driving direction is mapped as a seperate segment such as in OSM!!!"
+            "These numbers assume that motorways that each driving direction is mapped as a separate segment such as in OSM!!!"
         )
 
         # Todo: Dirty fixes, these should be read from the init
@@ -295,7 +295,7 @@ class DamageNetworkBase(ABC):
         logging.warning(
             """All damages represent the former EU-28 (before Brexit), 2015-pricelevel in Euro's.
                             To convert to local currency, these need to be:
-                                multiplied by the ratio (pricelevel_XXXX / pricelevel_2015)
+                                multiplied by the ratio (pricelevel_2015 / pricelevel_2015)
                                 multiply by the ratio (local_GDP_per_capita / EU-28-2015-GDP_per_capita)          
                             EU-28-2015-GDP_per_capita = 39.200 euro
                         """
@@ -309,8 +309,9 @@ class DamageNetworkBase(ABC):
         end = "me"  # indicate that you want to use the mean
 
         # Load the OSdaMage functions
-        max_damages = lookup.get_max_damages_osd(pricelevel_correction=1.267,
-                                                 gdp_per_capita_correction=44195.8 / 39200)
+        max_damages = lookup.get_max_damages_osd(
+            pricelevel_correction=1, gdp_per_capita_correction=44195.8 / 39200
+        )
         interpolators = lookup.get_flood_curves()
         interpolators.pop(
             "HZ"
