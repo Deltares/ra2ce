@@ -20,6 +20,10 @@ pattern = re.compile(r"dam_EV\d+_al")
 data = []
 for index, run in enumerate(path_dir.iterdir(), 1):
     if run.is_file():
+        print(run.name)
+        if 'segmented' in run.name:
+            continue
+
         gdf = gpd.read_file(run)
 
         # Filter columns that match the pattern and do not end with "segments"

@@ -22,9 +22,10 @@ class HazardProbabilisticEventsSet:
     number_runs: int
 
     @classmethod
-    def from_res_df(cls, res_df: pd.DataFrame, set_name: str):
+    def from_res_df_2024(cls, res_df: pd.DataFrame, set_name: str):
         """
         Create a HazardProbabilisticEventsSet from a pandas DataFrame.
+        Old logic from 2024
 
         Args:
             res_df: DataFrame with columns id, name, annual_probability, hazard_map.
@@ -120,7 +121,6 @@ class HazardProbabilisticEventsSet:
                     sort_by_return_period: bool = False,
                     sort_by_dijkring: bool = False,
                     sort_by_location: bool = False,
-                    return_period: Optional[int] = None,
                     location: Optional[int] = None,
                     dijkring: Optional[int] = None
                     ) -> np.array:
@@ -130,17 +130,13 @@ class HazardProbabilisticEventsSet:
 
         """
         if sort_by_return_period:
-            self.events = sorted(self.events, key=lambda x: x.return_period)
+            self.events = sorted(self.events, key=lambda x: x.annual_probability)
 
         if sort_by_dijkring:
             self.events = sorted(self.events, key=lambda x: x.dijkring)
 
         if sort_by_location:
             self.events = sorted(self.events, key=lambda x: x.location)
-
-        if return_period is not None:
-            self.events = self.get_events_for_return_period(return_period)
-            self.number_events = len(self.events)
 
         if location is not None:
             self.events = self.get_events_for_location(location)
@@ -162,7 +158,6 @@ class HazardProbabilisticEventsSet:
                     sort_by_return_period: bool = False,
                     sort_by_dijkring: bool = False,
                     sort_by_location: bool = False,
-                    return_period: Optional[int] = None,
                     location: Optional[int] = None,
                     dijkring: Optional[int] = None
                     ):
@@ -170,17 +165,17 @@ class HazardProbabilisticEventsSet:
         plt.figure(figsize=(10, 10))
         N = self.number_runs
 
-        data = self.filter_data(var, sort_by_return_period)
+        data = self.filter_data(var, sort_by_return_period, dijkring=dijkring)
 
         sns.boxplot(data=data)
         # sns.swarmplot(data=data,  color="black", alpha=0.5) # dont use for more than 100 runs
 
-        print([ev.return_period for ev in self.events])
 
         plt.xlabel("Scenario")
         plt.xticks(rotation=45)
         plt.ylabel("Total damage (Millions EUR)")
-        plt.xticks(range(self.number_events), [event.name for event in self.events])
+        plt.xticks(range(self.number_events), [event.id for event in self.events])
+        # plt.xticks(range(self.number_events), [event.location for event in self.events])
         plt.title(f"Boxplot of damages per scenario- {N} runs")
         plt.show()
 
@@ -191,18 +186,17 @@ class HazardProbabilisticEventsSet:
         plt.figure(figsize=(10, 10))
         data = self.filter_data(var)
 
-
-        plt.hist(data.flatten(), bins=50, )
+        sns.histplot(data.flatten(), bins=30, kde=True)
 
         if var == 'damage':
             label = "Total damage (Millions EUR)"
         elif var == 'AAL':
-            label = "Annual Averegae damage (Millions EUR)"
+            label = "AAL (Millions EUR)"
         else:
             raise NotImplemented()
         plt.xlabel(label)
-        plt.ylabel("Frequency")
-        plt.title(f"Histogram damages all hazards - {self.number_runs} runs")
+        plt.ylabel("Number of runs")
+        plt.title(f"Total damage - {self.number_runs} runs")
         plt.show()
 
     def plot_histogram_events(self):
@@ -214,3 +208,15 @@ class HazardProbabilisticEventsSet:
             plt.ylabel("Frequency")
             plt.title(f"Histogram damages {event.name} - {self.number_runs} runs")
             plt.show()
+
+    def plot_CDF_AAL(self):
+        EAD = self.get_EAD_vector() / 1e6
+        EAD = np.sort(EAD)
+        sns.ecdfplot(EAD, complementary=True, log_scale=(False, True))
+
+        # y = np.arange(len(EAD)) / float(len(EAD))
+        # plt.plot(EAD, y)
+        plt.xlabel("Average Annual Loss (Millions EUR)")
+        plt.ylabel("Probability")
+        plt.title("Cumulative Distribution Function of Average Annual Loss")
+        plt.show()
