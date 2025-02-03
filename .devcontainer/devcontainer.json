@@ -4,11 +4,15 @@
       "dockerfile": "Dockerfile" 
     },
     "mounts": [
+      "source=${localWorkspaceFolder},target=/usr/src/app,type=bind,consistency=cached",
       "source=ra2ce_docker_env,target=/usr/src/.env,type=volume"
     ],
     // `git config --global core.autocrlf true` prevents git from showing differences on ALL files when running
     // in the ra2ce (linux) container
-    "postStartCommand": "bash .devcontainer/postCreateCommand.sh",
+    // `git config --global --add safe.directory ${containerWorkspaceFolder}` allows git to sync with the devcontainer.
+    "postStartCommand": "poetry install & git config --global core.autocrlf true & git config --global --add safe.directory ${containerWorkspaceFolder}",
+    // postCreateCommand.sh does not seem to work due to line endings.
+    // "postStartCommand": "bash .devcontainer/postCreateCommand.sh",
     "customizations": {
       "vscode": {
         "extensions": [
