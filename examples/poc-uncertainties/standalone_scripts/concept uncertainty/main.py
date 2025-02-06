@@ -4,7 +4,7 @@ from event import ProbabilisticEvent
 from hazard_probabilitistic_set import HazardProbabilisticEventsSet
 
 result_csv = Path(
-    r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\WCF4Exchange\paper\res\results.csv"
+    r"C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\paper\res\results_925.csv"
     # r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\WCF4Exchange\paper\res\results500-700.csv"
 )
 
@@ -47,7 +47,7 @@ hazard_set = HazardProbabilisticEventsSet(id=1,
                                           number_events=len(list_events),
                                           number_runs=len(data_array[0]))
 
-# hazard_set.plot_violin(var='damage', sort_by_return_period=True)
+hazard_set.plot_violin(var='damage', sort_by_return_period=True)
 hazard_set.plot_histogram(var='AAL')
 # hazard_set.plot_histogram_events()
 hazard_set.plot_CDF_AAL()

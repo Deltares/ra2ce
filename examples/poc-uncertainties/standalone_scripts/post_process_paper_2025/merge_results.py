@@ -3,7 +3,7 @@ import geopandas as gpd
 import re
 # path of the event results. We combine all the runs in a single shapefile per event!
 path_dir = Path(
-    r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\WCF4Exchange\paper\res"
+    r"C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\paper\res"
 )
 
 result_csv = Path(
@@ -16,13 +16,23 @@ result_csv = Path(
 pattern = re.compile(r"dam_EV\d+_al")
 
 
+def extract_number(filename):
+    match = re.search(r'_(\d+)$', filename.stem)  # Extract number at the end
+    return int(match.group(1)) if match else float('inf')  # Handle unexpected cases
+
+# Get all files and sort them numerically
+sorted_files = sorted(path_dir.iterdir(), key=lambda f: extract_number(f))
 
 data = []
-for index, run in enumerate(path_dir.iterdir(), 1):
+for index, run in enumerate(sorted_files, 1):
+    print(run.name)
+
     if run.is_file():
-        print(run.name)
         if 'segmented' in run.name:
             continue
+        if run.suffix != ".gpkg":
+            continue
+
 
         gdf = gpd.read_file(run)
 
