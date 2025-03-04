@@ -1,6 +1,6 @@
 from pathlib import Path
 
-path = Path(r"C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\paper\flood_map_Waal")
+path = Path(r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\WCF4Exchange\paper\flood_map_combi")
 
 # return all files:
 
@@ -11,7 +11,7 @@ for f in path.rglob("*"):
         filename = f.name
 
         # format is 'scenario_13514.tif', retureve only the number
-        if filename.startswith("scenario_"):
+        if filename.startswith("NEWscenario_"):
             names.append(int(filename.split("_")[1].split(".")[0]))
         # names.append(f.name)
 print(files)

@@ -1,19 +1,24 @@
 from pathlib import Path
 import geopandas as gpd
 import re
+
+from numpy import mean
+import pandas as pd
+
 # path of the event results. We combine all the runs in a single shapefile per event!
 path_dir = Path(
     r"C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\paper\res"
 )
 
 result_csv = Path(
-    r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\WCF4Exchange\paper\res\results.csv"
+    r"C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\paper\res\results_new_ALL.csv"
 )
 
 
 #Get all columns with format 'dam_EV35_al' the digit being arbitrary. Use regex to match the pattern, exclude dam_EV15_al_segments
 
 pattern = re.compile(r"dam_EV\d+_al")
+pattern_huizinga = re.compile(r"dam_EV\d+_HZ")
 
 
 def extract_number(filename):
@@ -48,6 +53,23 @@ for index, run in enumerate(sorted_files, 1):
         data.append(row)  # Append the row to the data list
 
 #save as csv
-import pandas as pd
+
 df = pd.DataFrame(data)
 df.to_csv(result_csv, index=False)
+
+
+# huizinga_file = Path(r"C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\paper\res\huizinga_ref_link_based.gpkg")
+# gdf = gpd.read_file(huizinga_file)
+# print(gdf)
+# print(gdf.columns)
+# # Filter columns that match the pattern and do not end with "segments"
+# matched_cols = [col for col in gdf.columns if pattern_huizinga.match(col) and not col.endswith("segments")]
+#
+# # Use a vectorized approach to sum matching columns
+# damage = gdf[matched_cols].sum().tolist()  # Sum each column and convert to list
+# df = pd.DataFrame(damage)
+# df.to_csv(Path(
+#     r"C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\paper\res\results_huizinga.csv"
+# ), index=False)
+# print(damage)
+# print(mean(damage) / 1e6)

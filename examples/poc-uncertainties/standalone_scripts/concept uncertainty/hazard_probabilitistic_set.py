@@ -1,10 +1,13 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Union
 
 import numpy as np
 from IPython.core.pylabtools import figsize
 from matplotlib import pyplot as plt
 import seaborn as sns
+from networkx.algorithms.bipartite.basic import color
+from numpy import trapz
+from scipy.stats import gaussian_kde
 
 from event import ProbabilisticEvent
 import pandas as pd
@@ -20,6 +23,7 @@ class HazardProbabilisticEventsSet:
     events: list[ProbabilisticEvent]
     number_events: int
     number_runs: int
+    reference_values: Union[list, np.array]
 
     @classmethod
     def from_res_df_2024(cls, res_df: pd.DataFrame, set_name: str):
@@ -91,6 +95,12 @@ class HazardProbabilisticEventsSet:
 
         return damage_array
 
+    def get_reference_damage(self) -> float:
+        return np.mean(self.reference_values) / 1e6
+
+    def get_reference_AAL(self) -> float:
+        return np.sum(self.reference_values * np.array([event.annual_probability for event in self.events]) / 1e6)
+
     def get_event_frequencies(self) -> list[float]:
         """
         Get the annual probability of each event.
@@ -121,6 +131,7 @@ class HazardProbabilisticEventsSet:
                     sort_by_return_period: bool = False,
                     sort_by_dijkring: bool = False,
                     sort_by_location: bool = False,
+                    sort_by_name: bool = False,
                     location: Optional[int] = None,
                     dijkring: Optional[int] = None
                     ) -> np.array:
@@ -129,6 +140,8 @@ class HazardProbabilisticEventsSet:
 
 
         """
+        if sort_by_name:
+            self.events = sorted(self.events, key=lambda x: x.name)
         if sort_by_return_period:
             self.events = sorted(self.events, key=lambda x: x.annual_probability)
 
@@ -162,21 +175,45 @@ class HazardProbabilisticEventsSet:
                     dijkring: Optional[int] = None
                     ):
 
-        plt.figure(figsize=(10, 10))
+        fig = plt.figure(figsize=(18, 4))
         N = self.number_runs
 
         data = self.filter_data(var, sort_by_return_period, dijkring=dijkring)
 
-        sns.boxplot(data=data)
+        # color the boxplot according to the return period
+        orient = 'v'
+
+        # sns.boxplot(data=data, orient=orient, linewidth=2, fill=False, linecolor='black', color='black')
+
+
+        # color in black and white
+        # reverse axis
+        plt.boxplot(data, vert=True, patch_artist=False, showfliers=False, widths=0.7, whis=4)
+
         # sns.swarmplot(data=data,  color="black", alpha=0.5) # dont use for more than 100 runs
 
+        # increase label fontsize
+        if orient == 'h':
+            plt.xlabel("Scenario")
+            # plt.xticks(rotation=45)
+            plt.yticks(fontsize=15)
+            plt.xlabel("Total damage (Millions EUR)", fontsize=15)
+            plt.yticks(range(self.number_events), [event.id for event in self.events], fontsize=10)
+        else:
+            plt.ylabel("Scenario")
+            # plt.xticks(fontsize=15)
+            # plt.xticks(rotation=45)
+            # plt.ylabel("Total damage (Millions EUR)", fontsize=20)
+            plt.yticks(fontsize=20)
+            # remove xticks
+            plt.xticks([])
 
-        plt.xlabel("Scenario")
-        plt.xticks(rotation=45)
-        plt.ylabel("Total damage (Millions EUR)")
-        plt.xticks(range(self.number_events), [event.id for event in self.events])
+            # plt.xticks(range(self.number_events), [event.id for event in self.events], fontsize=10)
         # plt.xticks(range(self.number_events), [event.location for event in self.events])
-        plt.title(f"Boxplot of damages per scenario- {N} runs")
+
+        # plt.title(f"Boxplot of damages per scenario- {N} runs")
+        plt.tight_layout()
+
         plt.show()
 
         return
@@ -189,14 +226,29 @@ class HazardProbabilisticEventsSet:
         sns.histplot(data.flatten(), bins=30, kde=True)
 
         if var == 'damage':
-            label = "Total damage (Millions EUR)"
+            xlabel = "Total damage (Millions EUR)"
+            # title = f"Histogram of damages - {self.number_runs} runs"
+            # print(f"Reference damage: {self.get_reference_damage()}")
+            ref_value = self.get_reference_damage()
         elif var == 'AAL':
-            label = "AAL (Millions EUR)"
+            xlabel = "AAL (Millions EUR)"
+            # title = f"Histogram of AAL - {self.number_runs} runs"
+            ref_value = self.get_reference_AAL()
         else:
             raise NotImplemented()
-        plt.xlabel(label)
-        plt.ylabel("Number of runs")
-        plt.title(f"Total damage - {self.number_runs} runs")
+
+        plt.xlabel(xlabel, fontsize=17)
+        plt.ylabel("Number of runs", fontsize=17)
+        plt.xticks(fontsize=17)
+        plt.yticks(fontsize=17)
+        # plt.title(title, fontsize=17)
+
+        # give mean and std
+        mean = np.mean(data.flatten())
+        std = np.std(data.flatten())
+        max = np.max(data.flatten())
+        plt.axvline(ref_value, color='r', linestyle='--')
+        plt.text(0.7, 0.9, f"Mean: {mean:.2f} \n Std: {std:.2f} \n Huizinga {ref_value:.2f}" , fontsize=17, transform=plt.gca().transAxes)
         plt.show()
 
     def plot_histogram_events(self):
@@ -216,7 +268,9 @@ class HazardProbabilisticEventsSet:
 
         # y = np.arange(len(EAD)) / float(len(EAD))
         # plt.plot(EAD, y)
-        plt.xlabel("Average Annual Loss (Millions EUR)")
-        plt.ylabel("Probability")
-        plt.title("Cumulative Distribution Function of Average Annual Loss")
+        plt.xlabel("Average Annual Loss (Millions EUR)", fontsize=15)
+        plt.ylabel("Frequency", fontsize=15)
+        plt.xticks(fontsize=15)
+        plt.yticks(fontsize=15)
+        # plt.title("Cumulative Distribution Function of Average Annual Loss")
         plt.show()

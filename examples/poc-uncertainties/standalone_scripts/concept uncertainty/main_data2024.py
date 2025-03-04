@@ -19,7 +19,6 @@ haz_set_D = HazardProbabilisticEventsSet.from_res_df_2024(df[df["Hazard"].isin([
 
 # print(haz_set_D)
 
-array =  haz_set_D.get_EAD_vector()
-print(array)
+# array =  haz_set_D.get_EAD_vector()
 
 
