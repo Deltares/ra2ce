@@ -3,6 +3,7 @@
     "build": { 
       "dockerfile": "Dockerfile" 
     },
+    "workspaceFolder": "/usr/src/app",
     "mounts": [
       "source=${localWorkspaceFolder},target=/usr/src/app,type=bind,consistency=cached",
       "source=ra2ce_docker_env,target=/usr/src/.env,type=volume"
