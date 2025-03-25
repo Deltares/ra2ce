@@ -96,14 +96,6 @@ class TestAnalysisCollection:
         self,
         analysis: AnalysisLossesEnum,
     ):
-        def verify_expectations(_collection, analysis):
-            assert isinstance(_collection, AnalysisCollection)
-            assert len(_collection.losses_analyses) == 1
-
-            _generated_analysis = _collection.losses_analyses[0]
-            assert isinstance(_generated_analysis, AnalysisLossesProtocol)
-            assert _generated_analysis.analysis.analysis == analysis
-
         # 1. Define test data.
         _config = AnalysisConfigWrapper()
         _config.config_data.input_path = Path("Any input path")
@@ -112,21 +104,16 @@ class TestAnalysisCollection:
             self.MockAnalysisSectionLosses(analysis=analysis)
         )
 
-        if (
-            analysis.config_value == "single_link_losses"
-            or analysis.config_value == "multi_link_losses"
-        ):
-            with pytest.raises(ValueError):
-                # 2. Run test.
-                _collection = AnalysisCollection.from_config(_config)
-                # 3. Verify expectations.
-                verify_expectations(_collection, analysis)
+        # 2. Run test.
+        _collection = AnalysisCollection.from_config(_config)
 
-        else:
-            # 2. Run test.
-            _collection = AnalysisCollection.from_config(_config)
-            # 3. Verify expectations.
-            verify_expectations(_collection, analysis)
+        # 3. Verify expectations.
+        assert isinstance(_collection, AnalysisCollection)
+        assert len(_collection.losses_analyses) == 1
+
+        _generated_analysis = _collection.losses_analyses[0]
+        assert isinstance(_generated_analysis, AnalysisLossesProtocol)
+        assert _generated_analysis.analysis.analysis == analysis
 
     def test_create_collection_with_adaptation(self):
         # 1. Define test data.

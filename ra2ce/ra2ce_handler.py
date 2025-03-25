@@ -30,6 +30,7 @@ from typing import Optional
 
 from shapely.errors import ShapelyDeprecationWarning
 
+from ra2ce.analysis.analysis_collection import AnalysisCollection
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
 from ra2ce.analysis.analysis_config_wrapper import AnalysisConfigWrapper
 from ra2ce.analysis.analysis_result.analysis_result_wrapper import AnalysisResultWrapper
@@ -57,6 +58,7 @@ class Ra2ceHandler:
     """
 
     input_config: ConfigWrapper
+    analysis_collection: AnalysisCollection
 
     def __init__(self, network: Optional[Path], analysis: Optional[Path]) -> None:
         if network or analysis:
@@ -158,6 +160,9 @@ class Ra2ceHandler:
         `NetworkConfigData` so that the analyses can be succesfully run.
         """
         self.input_config.configure()
+        self.analysis_collection = AnalysisCollection.from_config(
+            self.input_config.analysis_config
+        )
 
     def run_analysis(self) -> list[AnalysisResultWrapper]:
         """
@@ -171,14 +176,12 @@ class Ra2ceHandler:
         Returns:
             list[AnalysisResultWrapper]: A list of analysis results
         """
-        if not self.input_config.analysis_config:
-            return
         if not self.input_config.is_valid_input():
             _error = "Error validating input files. Ra2ce will close now."
             logging.error(_error)
             raise ValueError(_error)
 
-        return AnalysisRunnerFactory.run(self.input_config)
+        return AnalysisRunnerFactory.run(self.analysis_collection)
 
     @staticmethod
     def run_with_ini_files(

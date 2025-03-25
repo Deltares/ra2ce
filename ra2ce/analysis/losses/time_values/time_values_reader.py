@@ -14,7 +14,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-from dataclasses import dataclass, field
 from pathlib import Path
 
 from pandas import DataFrame
@@ -26,16 +25,13 @@ from ra2ce.analysis.losses.losses_input_data_reader_base import (
 from ra2ce.analysis.losses.time_values.time_values import TimeValues
 
 
-@dataclass
 class TimeValuesReader(LossesInputDataReaderBase):
     """
     Class to read the time values from a csv file.
     """
 
     object_type: type = TimeValues
-    csv_columns: list[str] = field(
-        default_factory=lambda: ["trip_types", "value_of_time", "occupants"]
-    )
+    csv_columns: list[str] = ["trip_types", "value_of_time", "occupants"]
 
     def _parse_df(self, df: DataFrame) -> TimeValues:
         _time_values = {
