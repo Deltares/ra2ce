@@ -16,7 +16,7 @@ result_csv = Path(
     # r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\WCF4Exchange\paper\res\results500-700.csv"
 )
 
-samples = np.load(r'C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\paper\samples_1280.npy')
+samples = np.load(r'C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\2024\paper\samples_1280.npy')
 
 print(samples)
 parameters = ['h', 'k', 'S']
