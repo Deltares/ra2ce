@@ -276,3 +276,4 @@ texinfo_documents = [
 nbsphinx_allow_errors = True
 # Do not execute the scripts during the build process.
 nbsphinx_execute = "never"
+
