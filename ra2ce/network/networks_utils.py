@@ -38,6 +38,7 @@ import rtree
 from geopy import distance
 from numpy.ma import MaskedArray
 from osmnx import graph_to_gdfs
+from pyproj import CRS
 from rasterio.features import shapes
 from rasterio.mask import mask
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
@@ -518,16 +519,16 @@ def vertices_from_lines(
     return vertices_dict
 
 
-def create_nodes(merged_lines, crs_, cut_at_intersections):
-    """Creates shapely points on intersections and endpoints of a list of shapely lines
+def create_nodes(merged_lines, crs_: CRS, cut_at_intersections):
+    """Create shapely points at intersections and endpoints of a list of shapely lines.
 
     Args:
-        merged_lines [list of shapely LineStrings]: the edges of a graph
-        crs_: the CRS of the project
-        cut_at_intersections (bool): whether to create nodes at intersections of lines
+        merged_lines (list[shapely.geometry.LineString]): Edges of a graph.
+        crs_: Coordinate reference system of the project.
+        cut_at_intersections (bool): Whether to create nodes at line intersections.
 
     Returns:
-        nodes [list of shapely Points]: the nodes of a graph.
+        list[shapely.geometry.Point]: Nodes of the graph.
     """
     logging.info("Started creating nodes...")
     list_lines = list(merged_lines["geometry"])
