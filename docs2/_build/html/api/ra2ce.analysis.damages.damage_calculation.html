@@ -1,0 +1,985 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>ra2ce.analysis.damages.damage_calculation package &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/ra2ce.analysis.damages.damage_calculation';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ra2ce.analysis.damages.damage_functions package" href="ra2ce.analysis.damages.damage_functions.html" />
+    <link rel="prev" title="ra2ce.analysis.damages package" href="ra2ce.analysis.damages.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/about.html">RA2CE</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../installation/installation.html">Installation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="network.html">ra2ce.network package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.avg_speed.html">ra2ce.network.avg_speed package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.exporters.html">ra2ce.network.exporters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.graph_files.html">ra2ce.network.graph_files package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.network.hazard.html">ra2ce.network.hazard package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.hazard.hazard_intersect.html">ra2ce.network.hazard.hazard_intersect package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.network.network_config_data.html">ra2ce.network.network_config_data package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html">ra2ce.network.network_config_data.enums package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.network_simplification.html">ra2ce.network.network_simplification package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.network.network_wrappers.html">ra2ce.network.network_wrappers package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_wrappers.osm_network_wrapper.html">ra2ce.network.network_wrappers.osm_network_wrapper package</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="analysis.html">ra2ce.analysis package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.html">ra2ce.analysis.analysis_config_data package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html">ra2ce.analysis.analysis_config_data.enums package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.analysis_result.html">ra2ce.analysis.analysis_result package</a></li>
+<li class="toctree-l3 current active has-children"><a class="reference internal" href="ra2ce.analysis.damages.html">ra2ce.analysis.damages package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l4 current active"><a class="current reference internal" href="#">ra2ce.analysis.damages.damage_calculation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html">ra2ce.analysis.damages.damage_functions package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html">ra2ce.analysis.damages.shape_to_integrate_object package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.analysis.losses.html">ra2ce.analysis.losses package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.resilience_curves.html">ra2ce.analysis.losses.resilience_curves package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.risk_calculation.html">ra2ce.analysis.losses.risk_calculation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.time_values.html">ra2ce.analysis.losses.time_values package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.traffic_analysis.html">ra2ce.analysis.losses.traffic_analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.traffic_intensities.html">ra2ce.analysis.losses.traffic_intensities package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.weighing_analysis.html">ra2ce.analysis.losses.weighing_analysis package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.adaptation.html">ra2ce.analysis.adaptation package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="ra2ce.common.html">ra2ce.common package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.common.configuration.html">ra2ce.common.configuration package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.common.io.html">ra2ce.common.io package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.common.io.readers.html">ra2ce.common.io.readers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.common.io.writers.html">ra2ce.common.io.writers package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.common.validation.html">ra2ce.common.validation package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.configuration.html">ra2ce.configuration package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.runners.html">ra2ce.runners package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../contributing/index.html">Contributing</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contributing/design_principles.html">Design principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing/implementation_decisions.html">Implementation decisions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications/publications.html">Publications</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../overview.html" class="nav-link">Overview</a></li>
+    
+    
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    
+    
+    <li class="breadcrumb-item"><a href="ra2ce.analysis.damages.html" class="nav-link">ra2ce.analysis.damages package</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.analys...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="ra2ce-analysis-damages-damage-calculation-package">
+<h1>ra2ce.analysis.damages.damage_calculation package<a class="headerlink" href="#ra2ce-analysis-damages-damage-calculation-package" title="Permalink to this heading">#</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">#</a></h2>
+</section>
+<section id="module-ra2ce.analysis.damages.damage_calculation.damage_network_base">
+<span id="ra2ce-analysis-damages-damage-calculation-damage-network-base-module"></span><h2>ra2ce.analysis.damages.damage_calculation.damage_network_base module<a class="headerlink" href="#module-ra2ce.analysis.damages.damage_calculation.damage_network_base" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.analysis.damages.damage_calculation.damage_network_base.</span></span><span class="sig-name descname"><span class="pre">DamageNetworkBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">road_gdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GeoDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_cols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">representative_damage_percentage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_base.html#DamageNetworkBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>A road network gdf with hazard data stored in it, and for which damages can be calculated</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.calculate_damage_HZ">
+<span class="sig-name descname"><span class="pre">calculate_damage_HZ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_base.html#DamageNetworkBase.calculate_damage_HZ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.calculate_damage_HZ" title="Permalink to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Arguments:</dt><dd><p><em>events</em> (list) = list of events (or return periods) to iterate over, these should match the hazard column names</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.calculate_damage_OSdaMage">
+<span class="sig-name descname"><span class="pre">calculate_damage_OSdaMage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_base.html#DamageNetworkBase.calculate_damage_OSdaMage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.calculate_damage_OSdaMage" title="Permalink to this definition">#</a></dt>
+<dd><p>Damage calculation with the OSdaMage functions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.calculate_damage_manual_functions">
+<span class="sig-name descname"><span class="pre">calculate_damage_manual_functions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">events</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manual_damage_functions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.manual_damage_functions.ManualDamageFunctions" title="ra2ce.analysis.damages.damage_functions.manual_damage_functions.ManualDamageFunctions"><span class="pre">ManualDamageFunctions</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_base.html#DamageNetworkBase.calculate_damage_manual_functions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.calculate_damage_manual_functions" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate the damage using the manual damage functions</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>events (list[str]): list of events (or return periods) to iterate over, these should match the hazard column names
+manual_damage_functions (ManualDamageFunctions): The manual damage functions object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.clean_and_interpolate_missing_lane_data">
+<span class="sig-name descname"><span class="pre">clean_and_interpolate_missing_lane_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_base.html#DamageNetworkBase.clean_and_interpolate_missing_lane_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.clean_and_interpolate_missing_lane_data" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.create_mask">
+<span class="sig-name descname"><span class="pre">create_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_base.html#DamageNetworkBase.create_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.create_mask" title="Permalink to this definition">#</a></dt>
+<dd><p>#Create a mask of only the dataframes with hazard data (to speed-up damage calculations)
+effect: <em>self._gdf_mask</em> = mask of only the rows with hazard data</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.do_cleanup_and_mask_creation">
+<span class="sig-name descname"><span class="pre">do_cleanup_and_mask_creation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_base.html#DamageNetworkBase.do_cleanup_and_mask_creation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.do_cleanup_and_mask_creation" title="Permalink to this definition">#</a></dt>
+<dd><p>Call all cleanup and mask functions, because this is a standard procedure in most calculations</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.fix_extraordinary_lanes">
+<span class="sig-name descname"><span class="pre">fix_extraordinary_lanes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_base.html#DamageNetworkBase.fix_extraordinary_lanes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.fix_extraordinary_lanes" title="Permalink to this definition">#</a></dt>
+<dd><p>Remove exceptionally high/low lane numbers in self.gdf</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.main">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">damage_function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum" title="ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum"><span class="pre">DamageCurveEnum</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manual_damage_functions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html#ra2ce.analysis.damages.damage_functions.manual_damage_functions.ManualDamageFunctions" title="ra2ce.analysis.damages.damage_functions.manual_damage_functions.ManualDamageFunctions"><span class="pre">ManualDamageFunctions</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_base.html#DamageNetworkBase.main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.main" title="Permalink to this definition">#</a></dt>
+<dd><p>Controller for doing the EAD calculation</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>damage_function (DamageCurveEnum): damage function key name that is to be used
+manual_damage_functions (ManualDamageFunctions): <cite>ManualDamageFunctions</cite> object</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.remap_road_types_to_fewer_classes">
+<span class="sig-name descname"><span class="pre">remap_road_types_to_fewer_classes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_base.html#DamageNetworkBase.remap_road_types_to_fewer_classes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.remap_road_types_to_fewer_classes" title="Permalink to this definition">#</a></dt>
+<dd><p>Creates a new new column road_types, which has a fewer number of road type categories
+e.g. -&gt; ‘motorway_junction’ -&gt; ‘motorway’
+(Renames highway column to infra_type)
+:return:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.remove_unclassified_road_types_from_mask">
+<span class="sig-name descname"><span class="pre">remove_unclassified_road_types_from_mask</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_base.html#DamageNetworkBase.remove_unclassified_road_types_from_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.remove_unclassified_road_types_from_mask" title="Permalink to this definition">#</a></dt>
+<dd><p>Drop all rows with road types classified as ‘none’ from the self._gdf_mask</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.replace_none_with_nan">
+<span class="sig-name descname"><span class="pre">replace_none_with_nan</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_base.html#DamageNetworkBase.replace_none_with_nan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.replace_none_with_nan" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.analysis.damages.damage_calculation.damage_network_events">
+<span id="ra2ce-analysis-damages-damage-calculation-damage-network-events-module"></span><h2>ra2ce.analysis.damages.damage_calculation.damage_network_events module<a class="headerlink" href="#module-ra2ce.analysis.damages.damage_calculation.damage_network_events" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_events.DamageNetworkEvents">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.analysis.damages.damage_calculation.damage_network_events.</span></span><span class="sig-name descname"><span class="pre">DamageNetworkEvents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">road_gdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GeoDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_cols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">representative_damage_percentage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_events.html#DamageNetworkEvents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_events.DamageNetworkEvents" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase" title="ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">DamageNetworkBase</span></code></a></p>
+<p>A road network gdf with EVENT-BASED hazard data stored in it, and for which damages can be calculated</p>
+<p>&#64;Author: Kees van Ginkel</p>
+<dl class="simple">
+<dt>Mandatory attributes:</dt><dd><p><em>self.events</em> (set)  : all available unique events
+<em>self.stats</em> (set)   : the available statistics</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_events.DamageNetworkEvents.main">
+<span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">damage_function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum" title="ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum"><span class="pre">DamageCurveEnum</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manual_damage_functions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_events.html#DamageNetworkEvents.main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_events.DamageNetworkEvents.main" title="Permalink to this definition">#</a></dt>
+<dd><p>Controller for doing the EAD calculation</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>damage_function (DamageCurveEnum): damage function key name that is to be used
+manual_damage_functions (ManualDamageFunctions): <cite>ManualDamageFunctions</cite> object</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.analysis.damages.damage_calculation.damage_network_return_periods">
+<span id="ra2ce-analysis-damages-damage-calculation-damage-network-return-periods-module"></span><h2>ra2ce.analysis.damages.damage_calculation.damage_network_return_periods module<a class="headerlink" href="#module-ra2ce.analysis.damages.damage_calculation.damage_network_return_periods" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.</span></span><span class="sig-name descname"><span class="pre">DamageNetworkReturnPeriods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">road_gdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">GeoDataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_cols</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">representative_damage_percentage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_return_periods.html#DamageNetworkReturnPeriods"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase" title="ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">DamageNetworkBase</span></code></a></p>
+<p>A road network gdf with Return-Period based hazard data stored in it,
+and for which damages and risk can be calculated
+&#64;Author: Kees van Ginkel</p>
+<dl class="simple">
+<dt>Mandatory attributes:</dt><dd><p><em>self.return_periods</em> (set of strings): ‘e.g
+<em>self.stats</em> (set)   : the available statistics</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.construct_from_csv">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">construct_from_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">csv_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">representative_damage_percentage</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_return_periods.html#DamageNetworkReturnPeriods.construct_from_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.construct_from_csv" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.control_risk_calculation">
+<span class="sig-name descname"><span class="pre">control_risk_calculation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">damage_function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum" title="ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum"><span class="pre">DamageCurveEnum</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum.RiskCalculationModeEnum" title="ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum.RiskCalculationModeEnum"><span class="pre">RiskCalculationModeEnum</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_return_periods.html#DamageNetworkReturnPeriods.control_risk_calculation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.control_risk_calculation" title="Permalink to this definition">#</a></dt>
+<dd><p>Controller for the risk calculation, which calls the appropriate risk (integration) functions.</p>
+<dl>
+<dt>Args:</dt><dd><p>damage_function: Defines the damage estimation method.
+mode: The type of risk calculation to perform. Can be ‘default’,</p>
+<blockquote>
+<div><p>‘cut_from_YYYY_year’, or ‘triangle_to_null_YYYY_year’.</p>
+</div></blockquote>
+<p>year: The cutoff year or return period of the risk calculation.</p>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.integrate_df_trapezoidal">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">integrate_df_trapezoidal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">array</span></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_return_periods.html#DamageNetworkReturnPeriods.integrate_df_trapezoidal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.integrate_df_trapezoidal" title="Permalink to this definition">#</a></dt>
+<dd><dl class="simple">
+<dt>Arguments:</dt><dd><dl class="simple">
+<dt><em>df</em> (pd.DataFrame) :</dt><dd><p>Column names should contain return periods (years)
+Each row should contain a set of damages for one object</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>np.array : integrated result per row</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.main">
+<span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">damage_function</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum" title="ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum"><span class="pre">DamageCurveEnum</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">manual_damage_functions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_return_periods.html#DamageNetworkReturnPeriods.main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.main" title="Permalink to this definition">#</a></dt>
+<dd><p>Control the damage calculation per return period</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.rework_damage_data_cut_from">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rework_damage_data_cut_from</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_integrate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cutoff_rp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_return_periods.html#DamageNetworkReturnPeriods.rework_damage_data_cut_from"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.rework_damage_data_cut_from" title="Permalink to this definition">#</a></dt>
+<dd><p>Rework the damage data to make it suitable for integration (risk calculation) in default mode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>_to_integrate</strong> – _cutoff_rp : the return period at which to make the cutoff, aka the flood protection level</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>_to_integrate</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.rework_damage_data_default">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rework_damage_data_default</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_integrate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_return_periods.html#DamageNetworkReturnPeriods.rework_damage_data_default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.rework_damage_data_default" title="Permalink to this definition">#</a></dt>
+<dd><p>Rework the damage data to make it suitable for integration (risk calculation) in default mode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>_to_integrate</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>_to_integrate</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.rework_damage_data_triangle_to_null">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rework_damage_data_triangle_to_null</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">to_integrate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triangle_end</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_return_periods.html#DamageNetworkReturnPeriods.rework_damage_data_triangle_to_null"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.rework_damage_data_triangle_to_null" title="Permalink to this definition">#</a></dt>
+<dd><p>Rework the damage data to make it suitable for integration (risk calculation) in default mode</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>_to_integrate</strong> – _triangle_end_rp : the return period at to end the triangle</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>_to_integrate</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.verify_damage_data_for_risk_calculation">
+<span class="sig-name descname"><span class="pre">verify_damage_data_for_risk_calculation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/damages/damage_calculation/damage_network_return_periods.html#DamageNetworkReturnPeriods.verify_damage_data_for_risk_calculation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.verify_damage_data_for_risk_calculation" title="Permalink to this definition">#</a></dt>
+<dd><p>Do some data quality and requirement checks before starting the risk calculation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.analysis.damages.damage_calculation.risk_utils">
+<span id="ra2ce-analysis-damages-damage-calculation-risk-utils-module"></span><h2>ra2ce.analysis.damages.damage_calculation.risk_utils module<a class="headerlink" href="#module-ra2ce.analysis.damages.damage_calculation.risk_utils" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+</section>
+<section id="module-ra2ce.analysis.damages.damage_calculation">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ra2ce.analysis.damages.damage_calculation" title="Permalink to this heading">#</a></h2>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="ra2ce.analysis.damages.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">ra2ce.analysis.damages package</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="ra2ce.analysis.damages.damage_functions.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">ra2ce.analysis.damages.damage_functions package</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submodules">Submodules</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.analysis.damages.damage_calculation.damage_network_base">ra2ce.analysis.damages.damage_calculation.damage_network_base module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.calculate_damage_HZ"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.calculate_damage_HZ()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.calculate_damage_OSdaMage"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.calculate_damage_OSdaMage()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.calculate_damage_manual_functions"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.calculate_damage_manual_functions()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.clean_and_interpolate_missing_lane_data"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.clean_and_interpolate_missing_lane_data()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.create_mask"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.create_mask()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.do_cleanup_and_mask_creation"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.do_cleanup_and_mask_creation()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.fix_extraordinary_lanes"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.fix_extraordinary_lanes()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.main"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.main()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.remap_road_types_to_fewer_classes"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.remap_road_types_to_fewer_classes()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.remove_unclassified_road_types_from_mask"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.remove_unclassified_road_types_from_mask()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_base.DamageNetworkBase.replace_none_with_nan"><code class="docutils literal notranslate"><span class="pre">DamageNetworkBase.replace_none_with_nan()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.analysis.damages.damage_calculation.damage_network_events">ra2ce.analysis.damages.damage_calculation.damage_network_events module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_events.DamageNetworkEvents"><code class="docutils literal notranslate"><span class="pre">DamageNetworkEvents</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_events.DamageNetworkEvents.main"><code class="docutils literal notranslate"><span class="pre">DamageNetworkEvents.main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.analysis.damages.damage_calculation.damage_network_return_periods">ra2ce.analysis.damages.damage_calculation.damage_network_return_periods module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.construct_from_csv"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.construct_from_csv()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.control_risk_calculation"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.control_risk_calculation()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.integrate_df_trapezoidal"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.integrate_df_trapezoidal()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.main"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.main()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.rework_damage_data_cut_from"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.rework_damage_data_cut_from()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.rework_damage_data_default"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.rework_damage_data_default()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.rework_damage_data_triangle_to_null"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.rework_damage_data_triangle_to_null()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.damages.damage_calculation.damage_network_return_periods.DamageNetworkReturnPeriods.verify_damage_data_for_risk_calculation"><code class="docutils literal notranslate"><span class="pre">DamageNetworkReturnPeriods.verify_damage_data_for_risk_calculation()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.analysis.damages.damage_calculation.risk_utils">ra2ce.analysis.damages.damage_calculation.risk_utils module</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.analysis.damages.damage_calculation">Module contents</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/api/ra2ce.analysis.damages.damage_calculation.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/api/ra2ce.analysis.damages.damage_calculation.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

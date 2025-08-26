@@ -1,0 +1,1220 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>ra2ce.network.network_config_data package &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/ra2ce.network.network_config_data';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ra2ce.network.network_config_data.enums package" href="ra2ce.network.network_config_data.enums.html" />
+    <link rel="prev" title="ra2ce.network.hazard.hazard_intersect package" href="ra2ce.network.hazard.hazard_intersect.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/about.html">RA2CE</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../installation/installation.html">Installation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="network.html">ra2ce.network package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.avg_speed.html">ra2ce.network.avg_speed package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.exporters.html">ra2ce.network.exporters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.graph_files.html">ra2ce.network.graph_files package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.network.hazard.html">ra2ce.network.hazard package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.hazard.hazard_intersect.html">ra2ce.network.hazard.hazard_intersect package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">ra2ce.network.network_config_data package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html">ra2ce.network.network_config_data.enums package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.network_simplification.html">ra2ce.network.network_simplification package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.network.network_wrappers.html">ra2ce.network.network_wrappers package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_wrappers.osm_network_wrapper.html">ra2ce.network.network_wrappers.osm_network_wrapper package</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="analysis.html">ra2ce.analysis package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.html">ra2ce.analysis.analysis_config_data package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html">ra2ce.analysis.analysis_config_data.enums package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.analysis_result.html">ra2ce.analysis.analysis_result package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.analysis.damages.html">ra2ce.analysis.damages package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html">ra2ce.analysis.damages.damage_calculation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html">ra2ce.analysis.damages.damage_functions package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html">ra2ce.analysis.damages.shape_to_integrate_object package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.analysis.losses.html">ra2ce.analysis.losses package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.resilience_curves.html">ra2ce.analysis.losses.resilience_curves package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.risk_calculation.html">ra2ce.analysis.losses.risk_calculation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.time_values.html">ra2ce.analysis.losses.time_values package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.traffic_analysis.html">ra2ce.analysis.losses.traffic_analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.traffic_intensities.html">ra2ce.analysis.losses.traffic_intensities package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.weighing_analysis.html">ra2ce.analysis.losses.weighing_analysis package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.adaptation.html">ra2ce.analysis.adaptation package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="ra2ce.common.html">ra2ce.common package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.common.configuration.html">ra2ce.common.configuration package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.common.io.html">ra2ce.common.io package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.common.io.readers.html">ra2ce.common.io.readers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.common.io.writers.html">ra2ce.common.io.writers package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.common.validation.html">ra2ce.common.validation package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.configuration.html">ra2ce.configuration package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.runners.html">ra2ce.runners package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../contributing/index.html">Contributing</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contributing/design_principles.html">Design principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing/implementation_decisions.html">Implementation decisions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications/publications.html">Publications</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../overview.html" class="nav-link">Overview</a></li>
+    
+    
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    
+    
+    <li class="breadcrumb-item"><a href="network.html" class="nav-link">ra2ce.network package</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.networ...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="ra2ce-network-network-config-data-package">
+<h1>ra2ce.network.network_config_data package<a class="headerlink" href="#ra2ce-network-network-config-data-package" title="Permalink to this heading">#</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">#</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html">ra2ce.network.network_config_data.enums package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#module-ra2ce.network.network_config_data.enums.aggregate_wl_enum">ra2ce.network.network_config_data.enums.aggregate_wl_enum module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum"><code class="docutils literal notranslate"><span class="pre">AggregateWlEnum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">AggregateWlEnum.INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.MAX"><code class="docutils literal notranslate"><span class="pre">AggregateWlEnum.MAX</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.MEAN"><code class="docutils literal notranslate"><span class="pre">AggregateWlEnum.MEAN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.MIN"><code class="docutils literal notranslate"><span class="pre">AggregateWlEnum.MIN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.NONE"><code class="docutils literal notranslate"><span class="pre">AggregateWlEnum.NONE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum.get_wl_abbreviation"><code class="docutils literal notranslate"><span class="pre">AggregateWlEnum.get_wl_abbreviation()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#module-ra2ce.network.network_config_data.enums.network_type_enum">ra2ce.network.network_config_data.enums.network_type_enum module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.ALL"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum.ALL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.BIKE"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum.BIKE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.DRIVE"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum.DRIVE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.DRIVE_SERVICE"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum.DRIVE_SERVICE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum.INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.NONE"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum.NONE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum.WALK"><code class="docutils literal notranslate"><span class="pre">NetworkTypeEnum.WALK</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#module-ra2ce.network.network_config_data.enums.road_type_enum">ra2ce.network.network_config_data.enums.road_type_enum module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.BRIDGE"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.BRIDGE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.CULVERT"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.CULVERT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.MOTORWAY"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.MOTORWAY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.MOTORWAY_LINK"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.MOTORWAY_LINK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.NONE"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.NONE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.PRIMARY"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.PRIMARY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.PRIMARY_LINK"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.PRIMARY_LINK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.RAIL"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.RAIL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.RESIDENTIAL"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.RESIDENTIAL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.ROAD"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.ROAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.SECONDARY"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.SECONDARY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.SECONDARY_LINK"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.SECONDARY_LINK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TERTIARY"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.TERTIARY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TERTIARY_LINK"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.TERTIARY_LINK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TRUNK"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.TRUNK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TRUNK_LINK"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.TRUNK_LINK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.TUNNEL"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.TUNNEL</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum.UNCLASSIFIED"><code class="docutils literal notranslate"><span class="pre">RoadTypeEnum.UNCLASSIFIED</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#module-ra2ce.network.network_config_data.enums.source_enum">ra2ce.network.network_config_data.enums.source_enum module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.source_enum.SourceEnum"><code class="docutils literal notranslate"><span class="pre">SourceEnum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">SourceEnum.INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.OSB_BPF"><code class="docutils literal notranslate"><span class="pre">SourceEnum.OSB_BPF</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.OSM_DOWNLOAD"><code class="docutils literal notranslate"><span class="pre">SourceEnum.OSM_DOWNLOAD</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.PICKLE"><code class="docutils literal notranslate"><span class="pre">SourceEnum.PICKLE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.source_enum.SourceEnum.SHAPEFILE"><code class="docutils literal notranslate"><span class="pre">SourceEnum.SHAPEFILE</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#module-ra2ce.network.network_config_data.enums">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">#</a></h2>
+</section>
+<section id="module-ra2ce.network.network_config_data.network_config_data">
+<span id="ra2ce-network-network-config-data-network-config-data-module"></span><h2>ra2ce.network.network_config_data.network_config_data module<a class="headerlink" href="#module-ra2ce.network.network_config_data.network_config_data" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.CleanupSection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.network.network_config_data.network_config_data.</span></span><span class="sig-name descname"><span class="pre">CleanupSection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapping_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'bool'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pruning_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'bool'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segmentation_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'float'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">merge_lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'bool'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cut_at_intersections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'bool'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delete_duplicate_nodes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'bool'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data.html#CleanupSection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.CleanupSection.cut_at_intersections">
+<span class="sig-name descname"><span class="pre">cut_at_intersections</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection.cut_at_intersections" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.CleanupSection.delete_duplicate_nodes">
+<span class="sig-name descname"><span class="pre">delete_duplicate_nodes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection.delete_duplicate_nodes" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.CleanupSection.merge_lines">
+<span class="sig-name descname"><span class="pre">merge_lines</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection.merge_lines" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.CleanupSection.pruning_threshold">
+<span class="sig-name descname"><span class="pre">pruning_threshold</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection.pruning_threshold" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.CleanupSection.segmentation_length">
+<span class="sig-name descname"><span class="pre">segmentation_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">nan</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection.segmentation_length" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.CleanupSection.snapping_threshold">
+<span class="sig-name descname"><span class="pre">snapping_threshold</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection.snapping_threshold" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.HazardSection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.network.network_config_data.network_config_data.</span></span><span class="sig-name descname"><span class="pre">HazardSection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hazard_map:</span> <span class="pre">'list[Path]'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hazard_id:</span> <span class="pre">'str'</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hazard_field_name:</span> <span class="pre">'str'</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_wl:</span> <span class="pre">'AggregateWlEnum'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hazard_crs:</span> <span class="pre">'str'</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overlay_segmented_network:</span> <span class="pre">'bool'</span> <span class="pre">=</span> <span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data.html#HazardSection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.HazardSection" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.HazardSection.aggregate_wl">
+<span class="sig-name descname"><span class="pre">aggregate_wl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum" title="ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum"><span class="pre">AggregateWlEnum</span></a></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.HazardSection.aggregate_wl" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.HazardSection.hazard_crs">
+<span class="sig-name descname"><span class="pre">hazard_crs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.HazardSection.hazard_crs" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.HazardSection.hazard_field_name">
+<span class="sig-name descname"><span class="pre">hazard_field_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.HazardSection.hazard_field_name" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.HazardSection.hazard_id">
+<span class="sig-name descname"><span class="pre">hazard_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.HazardSection.hazard_id" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.HazardSection.hazard_map">
+<span class="sig-name descname"><span class="pre">hazard_map</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.HazardSection.hazard_map" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.HazardSection.overlay_segmented_network">
+<span class="sig-name descname"><span class="pre">overlay_segmented_network</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.HazardSection.overlay_segmented_network" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.IsolationSection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.network.network_config_data.network_config_data.</span></span><span class="sig-name descname"><span class="pre">IsolationSection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">locations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data.html#IsolationSection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.IsolationSection" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.IsolationSection.locations">
+<span class="sig-name descname"><span class="pre">locations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.IsolationSection.locations" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.network.network_config_data.network_config_data.</span></span><span class="sig-name descname"><span class="pre">NetworkConfigData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_path:</span> <span class="pre">'Optional[Path]'</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_path:</span> <span class="pre">'Optional[Path]'</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path:</span> <span class="pre">'Optional[Path]'</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_path:</span> <span class="pre">'Optional[Path]'</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crs:</span> <span class="pre">'CRS'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project:</span> <span class="pre">'ProjectSection'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network:</span> <span class="pre">'NetworkSection'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origins_destinations:</span> <span class="pre">'OriginsDestinationsSection'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">isolation:</span> <span class="pre">'IsolationSection'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hazard:</span> <span class="pre">'HazardSection'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cleanup:</span> <span class="pre">'CleanupSection'</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data.html#NetworkConfigData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ra2ce.common.configuration.html#ra2ce.common.configuration.config_data_protocol.ConfigDataProtocol" title="ra2ce.common.configuration.config_data_protocol.ConfigDataProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigDataProtocol</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData.cleanup">
+<span class="sig-name descname"><span class="pre">cleanup</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection" title="ra2ce.network.network_config_data.network_config_data.CleanupSection"><span class="pre">CleanupSection</span></a></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.cleanup" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData.crs">
+<span class="sig-name descname"><span class="pre">crs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">CRS</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.crs" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData.get_data_output">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_data_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ini_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data.html#NetworkConfigData.get_data_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.get_data_output" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData.hazard">
+<span class="sig-name descname"><span class="pre">hazard</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ra2ce.network.network_config_data.network_config_data.HazardSection" title="ra2ce.network.network_config_data.network_config_data.HazardSection"><span class="pre">HazardSection</span></a></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.hazard" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData.input_path">
+<span class="sig-name descname"><span class="pre">input_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.input_path" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData.isolation">
+<span class="sig-name descname"><span class="pre">isolation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ra2ce.network.network_config_data.network_config_data.IsolationSection" title="ra2ce.network.network_config_data.network_config_data.IsolationSection"><span class="pre">IsolationSection</span></a></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.isolation" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData.network">
+<span class="sig-name descname"><span class="pre">network</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection" title="ra2ce.network.network_config_data.network_config_data.NetworkSection"><span class="pre">NetworkSection</span></a></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.network" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData.network_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">network_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.network_dir" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData.origins_destinations">
+<span class="sig-name descname"><span class="pre">origins_destinations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection" title="ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection"><span class="pre">OriginsDestinationsSection</span></a></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.origins_destinations" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData.output_graph_dir">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">output_graph_dir</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.output_graph_dir" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData.output_path">
+<span class="sig-name descname"><span class="pre">output_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.output_path" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData.project">
+<span class="sig-name descname"><span class="pre">project</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ra2ce.network.network_config_data.network_config_data.ProjectSection" title="ra2ce.network.network_config_data.network_config_data.ProjectSection"><span class="pre">ProjectSection</span></a></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.project" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData.root_path">
+<span class="sig-name descname"><span class="pre">root_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.root_path" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData.static_path">
+<span class="sig-name descname"><span class="pre">static_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.static_path" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkConfigData.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data.html#NetworkConfigData.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.to_dict" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns all defined properties as a raw dictionary, converting all custom classes and types.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>dict: Dictionary representing the <cite>ConfigDataProtocol</cite> instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkSection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.network.network_config_data.network_config_data.</span></span><span class="sig-name descname"><span class="pre">NetworkSection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directed:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source:</span> <span class="pre">~ra2ce.network.network_config_data.enums.source_enum.SourceEnum</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">primary_file:</span> <span class="pre">list[pathlib.Path]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diversion_file:</span> <span class="pre">list[pathlib.Path]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_id:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link_type_column:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'highway'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polygon:</span> <span class="pre">~pathlib.Path</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network_type:</span> <span class="pre">~ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">road_types:</span> <span class="pre">list[ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes_to_exclude_in_simplification:</span> <span class="pre">list[str]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_gpkg:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data.html#NetworkSection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Represents a section of the transport network.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>directed (bool): Whether the graph of the network should be directed. Default is False.
+source (SourceEnum): Source of the network data. Default is SourceEnum.INVALID.
+primary_file (Optional[list[Path]]): If source is set to SourceEnum.SHAPEFILE, provide here a list of shapefiles for the network.
+diversion_file (list[Path]): List of diversion files.
+file_id (str): Identifier for the network section.
+link_type_column (str): Name of the column that defines link type. Default ‘highway’.
+polygon (Optional[Path]): If source is set to SourceEnum.OSM_DOWNLOAD, indicate the path of a shapefile polygon to clip the network.
+network_type (NetworkTypeEnum): Type of network. Default is NetworkTypeEnum.NONE.
+road_types (list[RoadTypeEnum]): List of road types included in this section.
+attributes_to_exclude_in_simplification (list[str]): List of attributes not to simplify.
+save_gpkg (bool): Whether to save a GeoPackage file of the network. Default False.</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkSection.attributes_to_exclude_in_simplification">
+<span class="sig-name descname"><span class="pre">attributes_to_exclude_in_simplification</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.attributes_to_exclude_in_simplification" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkSection.directed">
+<span class="sig-name descname"><span class="pre">directed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.directed" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkSection.diversion_file">
+<span class="sig-name descname"><span class="pre">diversion_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.diversion_file" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkSection.file_id">
+<span class="sig-name descname"><span class="pre">file_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.file_id" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkSection.link_type_column">
+<span class="sig-name descname"><span class="pre">link_type_column</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'highway'</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.link_type_column" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkSection.network_type">
+<span class="sig-name descname"><span class="pre">network_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum" title="ra2ce.network.network_config_data.enums.network_type_enum.NetworkTypeEnum"><span class="pre">NetworkTypeEnum</span></a></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.network_type" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkSection.polygon">
+<span class="sig-name descname"><span class="pre">polygon</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.polygon" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkSection.primary_file">
+<span class="sig-name descname"><span class="pre">primary_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.primary_file" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkSection.road_types">
+<span class="sig-name descname"><span class="pre">road_types</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum" title="ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum"><span class="pre">ra2ce.network.network_config_data.enums.road_type_enum.RoadTypeEnum</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.road_types" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkSection.save_gpkg">
+<span class="sig-name descname"><span class="pre">save_gpkg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.save_gpkg" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.NetworkSection.source">
+<span class="sig-name descname"><span class="pre">source</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.source_enum.SourceEnum" title="ra2ce.network.network_config_data.enums.source_enum.SourceEnum"><span class="pre">SourceEnum</span></a></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.source" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.network.network_config_data.network_config_data.</span></span><span class="sig-name descname"><span class="pre">OriginsDestinationsSection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">origins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Optional[Path]'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destinations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Optional[Path]'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origins_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destinations_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_name_origin_destination</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_count</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origin_out_fraction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'int'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'Optional[Path]'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data.html#OriginsDestinationsSection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.category">
+<span class="sig-name descname"><span class="pre">category</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.category" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.destinations">
+<span class="sig-name descname"><span class="pre">destinations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.destinations" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.destinations_names">
+<span class="sig-name descname"><span class="pre">destinations_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.destinations_names" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.id_name_origin_destination">
+<span class="sig-name descname"><span class="pre">id_name_origin_destination</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.id_name_origin_destination" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.origin_count">
+<span class="sig-name descname"><span class="pre">origin_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.origin_count" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.origin_out_fraction">
+<span class="sig-name descname"><span class="pre">origin_out_fraction</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.origin_out_fraction" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.origins">
+<span class="sig-name descname"><span class="pre">origins</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.origins" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.origins_names">
+<span class="sig-name descname"><span class="pre">origins_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.origins_names" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.region">
+<span class="sig-name descname"><span class="pre">region</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.region" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.region_var">
+<span class="sig-name descname"><span class="pre">region_var</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.region_var" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.ProjectSection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.network.network_config_data.network_config_data.</span></span><span class="sig-name descname"><span class="pre">ProjectSection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="s"><span class="pre">'str'</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data.html#ProjectSection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.ProjectSection" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data.ProjectSection.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data.ProjectSection.name" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.network_config_data.network_config_data_reader">
+<span id="ra2ce-network-network-config-data-network-config-data-reader-module"></span><h2>ra2ce.network.network_config_data.network_config_data_reader module<a class="headerlink" href="#module-ra2ce.network.network_config_data.network_config_data_reader" title="Permalink to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.network.network_config_data.network_config_data_reader.</span></span><span class="sig-name descname"><span class="pre">NetworkConfigDataReader</span></span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data_reader.html#NetworkConfigDataReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ra2ce.common.configuration.html#ra2ce.common.configuration.ini_configuration_reader_protocol.ConfigDataReaderProtocol" title="ra2ce.common.configuration.ini_configuration_reader_protocol.ConfigDataReaderProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigDataReaderProtocol</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_cleanup_section">
+<span class="sig-name descname"><span class="pre">get_cleanup_section</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection" title="ra2ce.network.network_config_data.network_config_data.CleanupSection"><span class="pre">CleanupSection</span></a></span></span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data_reader.html#NetworkConfigDataReader.get_cleanup_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_cleanup_section" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_hazard_section">
+<span class="sig-name descname"><span class="pre">get_hazard_section</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ra2ce.network.network_config_data.network_config_data.HazardSection" title="ra2ce.network.network_config_data.network_config_data.HazardSection"><span class="pre">HazardSection</span></a></span></span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data_reader.html#NetworkConfigDataReader.get_hazard_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_hazard_section" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_isolation_section">
+<span class="sig-name descname"><span class="pre">get_isolation_section</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ra2ce.network.network_config_data.network_config_data.IsolationSection" title="ra2ce.network.network_config_data.network_config_data.IsolationSection"><span class="pre">IsolationSection</span></a></span></span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data_reader.html#NetworkConfigDataReader.get_isolation_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_isolation_section" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_network_section">
+<span class="sig-name descname"><span class="pre">get_network_section</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection" title="ra2ce.network.network_config_data.network_config_data.NetworkSection"><span class="pre">NetworkSection</span></a></span></span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data_reader.html#NetworkConfigDataReader.get_network_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_network_section" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_origins_destinations_section">
+<span class="sig-name descname"><span class="pre">get_origins_destinations_section</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection" title="ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection"><span class="pre">OriginsDestinationsSection</span></a></span></span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data_reader.html#NetworkConfigDataReader.get_origins_destinations_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_origins_destinations_section" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_project_section">
+<span class="sig-name descname"><span class="pre">get_project_section</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ra2ce.network.network_config_data.network_config_data.ProjectSection" title="ra2ce.network.network_config_data.network_config_data.ProjectSection"><span class="pre">ProjectSection</span></a></span></span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data_reader.html#NetworkConfigDataReader.get_project_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_project_section" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ini_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData" title="ra2ce.network.network_config_data.network_config_data.NetworkConfigData"><span class="pre">NetworkConfigData</span></a></span></span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data_reader.html#NetworkConfigDataReader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.read" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads the given <cite>*.ini</cite> file and if possible converts it into a <cite>IniConfigDataProtocol</cite> object.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>ini_file (Path): Ini file to be mapped into a <cite>IniConfigDataProtocol</cite>.</p>
+</dd>
+<dt>Returns:</dt><dd><p>ConfigWrapperProtocol: Resulting mapped object from the configuration data in the given file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.network_config_data.network_config_data_validator">
+<span id="ra2ce-network-network-config-data-network-config-data-validator-module"></span><h2>ra2ce.network.network_config_data.network_config_data_validator module<a class="headerlink" href="#module-ra2ce.network.network_config_data.network_config_data_validator" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data_validator.NetworkConfigDataValidator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.network.network_config_data.network_config_data_validator.</span></span><span class="sig-name descname"><span class="pre">NetworkConfigDataValidator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData" title="ra2ce.network.network_config_data.network_config_data.NetworkConfigData"><span class="pre">NetworkConfigData</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data_validator.html#NetworkConfigDataValidator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data_validator.NetworkConfigDataValidator" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ra2ce.common.validation.html#ra2ce.common.validation.ra2ce_validator_protocol.Ra2ceIoValidator" title="ra2ce.common.validation.ra2ce_validator_protocol.Ra2ceIoValidator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ra2ceIoValidator</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.network.network_config_data.network_config_data_validator.NetworkConfigDataValidator.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="ra2ce.common.validation.html#ra2ce.common.validation.validation_report.ValidationReport" title="ra2ce.common.validation.validation_report.ValidationReport"><span class="pre">ValidationReport</span></a></span></span><a class="reference internal" href="../_modules/ra2ce/network/network_config_data/network_config_data_validator.html#NetworkConfigDataValidator.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.network.network_config_data.network_config_data_validator.NetworkConfigDataValidator.validate" title="Permalink to this definition">#</a></dt>
+<dd><p>Check if input properties are correct and exist.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.network.network_config_data">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ra2ce.network.network_config_data" title="Permalink to this heading">#</a></h2>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="ra2ce.network.hazard.hazard_intersect.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">ra2ce.network.hazard.hazard_intersect package</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="ra2ce.network.network_config_data.enums.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">ra2ce.network.network_config_data.enums package</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subpackages">Subpackages</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submodules">Submodules</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_config_data.network_config_data">ra2ce.network.network_config_data.network_config_data module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection"><code class="docutils literal notranslate"><span class="pre">CleanupSection</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection.cut_at_intersections"><code class="docutils literal notranslate"><span class="pre">CleanupSection.cut_at_intersections</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection.delete_duplicate_nodes"><code class="docutils literal notranslate"><span class="pre">CleanupSection.delete_duplicate_nodes</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection.merge_lines"><code class="docutils literal notranslate"><span class="pre">CleanupSection.merge_lines</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection.pruning_threshold"><code class="docutils literal notranslate"><span class="pre">CleanupSection.pruning_threshold</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection.segmentation_length"><code class="docutils literal notranslate"><span class="pre">CleanupSection.segmentation_length</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.CleanupSection.snapping_threshold"><code class="docutils literal notranslate"><span class="pre">CleanupSection.snapping_threshold</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.HazardSection"><code class="docutils literal notranslate"><span class="pre">HazardSection</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.HazardSection.aggregate_wl"><code class="docutils literal notranslate"><span class="pre">HazardSection.aggregate_wl</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.HazardSection.hazard_crs"><code class="docutils literal notranslate"><span class="pre">HazardSection.hazard_crs</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.HazardSection.hazard_field_name"><code class="docutils literal notranslate"><span class="pre">HazardSection.hazard_field_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.HazardSection.hazard_id"><code class="docutils literal notranslate"><span class="pre">HazardSection.hazard_id</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.HazardSection.hazard_map"><code class="docutils literal notranslate"><span class="pre">HazardSection.hazard_map</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.HazardSection.overlay_segmented_network"><code class="docutils literal notranslate"><span class="pre">HazardSection.overlay_segmented_network</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.IsolationSection"><code class="docutils literal notranslate"><span class="pre">IsolationSection</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.IsolationSection.locations"><code class="docutils literal notranslate"><span class="pre">IsolationSection.locations</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.cleanup"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData.cleanup</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.crs"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData.crs</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.get_data_output"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData.get_data_output()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.hazard"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData.hazard</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.input_path"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData.input_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.isolation"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData.isolation</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.network"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData.network</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.network_dir"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData.network_dir</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.origins_destinations"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData.origins_destinations</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.output_graph_dir"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData.output_graph_dir</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.output_path"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData.output_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.project"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData.project</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.root_path"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData.root_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.static_path"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData.static_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkConfigData.to_dict"><code class="docutils literal notranslate"><span class="pre">NetworkConfigData.to_dict()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection"><code class="docutils literal notranslate"><span class="pre">NetworkSection</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.attributes_to_exclude_in_simplification"><code class="docutils literal notranslate"><span class="pre">NetworkSection.attributes_to_exclude_in_simplification</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.directed"><code class="docutils literal notranslate"><span class="pre">NetworkSection.directed</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.diversion_file"><code class="docutils literal notranslate"><span class="pre">NetworkSection.diversion_file</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.file_id"><code class="docutils literal notranslate"><span class="pre">NetworkSection.file_id</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.link_type_column"><code class="docutils literal notranslate"><span class="pre">NetworkSection.link_type_column</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.network_type"><code class="docutils literal notranslate"><span class="pre">NetworkSection.network_type</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.polygon"><code class="docutils literal notranslate"><span class="pre">NetworkSection.polygon</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.primary_file"><code class="docutils literal notranslate"><span class="pre">NetworkSection.primary_file</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.road_types"><code class="docutils literal notranslate"><span class="pre">NetworkSection.road_types</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.save_gpkg"><code class="docutils literal notranslate"><span class="pre">NetworkSection.save_gpkg</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.NetworkSection.source"><code class="docutils literal notranslate"><span class="pre">NetworkSection.source</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection"><code class="docutils literal notranslate"><span class="pre">OriginsDestinationsSection</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.category"><code class="docutils literal notranslate"><span class="pre">OriginsDestinationsSection.category</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.destinations"><code class="docutils literal notranslate"><span class="pre">OriginsDestinationsSection.destinations</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.destinations_names"><code class="docutils literal notranslate"><span class="pre">OriginsDestinationsSection.destinations_names</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.id_name_origin_destination"><code class="docutils literal notranslate"><span class="pre">OriginsDestinationsSection.id_name_origin_destination</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.origin_count"><code class="docutils literal notranslate"><span class="pre">OriginsDestinationsSection.origin_count</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.origin_out_fraction"><code class="docutils literal notranslate"><span class="pre">OriginsDestinationsSection.origin_out_fraction</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.origins"><code class="docutils literal notranslate"><span class="pre">OriginsDestinationsSection.origins</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.origins_names"><code class="docutils literal notranslate"><span class="pre">OriginsDestinationsSection.origins_names</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.region"><code class="docutils literal notranslate"><span class="pre">OriginsDestinationsSection.region</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection.region_var"><code class="docutils literal notranslate"><span class="pre">OriginsDestinationsSection.region_var</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.ProjectSection"><code class="docutils literal notranslate"><span class="pre">ProjectSection</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data.ProjectSection.name"><code class="docutils literal notranslate"><span class="pre">ProjectSection.name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_config_data.network_config_data_reader">ra2ce.network.network_config_data.network_config_data_reader module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader"><code class="docutils literal notranslate"><span class="pre">NetworkConfigDataReader</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_cleanup_section"><code class="docutils literal notranslate"><span class="pre">NetworkConfigDataReader.get_cleanup_section()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_hazard_section"><code class="docutils literal notranslate"><span class="pre">NetworkConfigDataReader.get_hazard_section()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_isolation_section"><code class="docutils literal notranslate"><span class="pre">NetworkConfigDataReader.get_isolation_section()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_network_section"><code class="docutils literal notranslate"><span class="pre">NetworkConfigDataReader.get_network_section()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_origins_destinations_section"><code class="docutils literal notranslate"><span class="pre">NetworkConfigDataReader.get_origins_destinations_section()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.get_project_section"><code class="docutils literal notranslate"><span class="pre">NetworkConfigDataReader.get_project_section()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data_reader.NetworkConfigDataReader.read"><code class="docutils literal notranslate"><span class="pre">NetworkConfigDataReader.read()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_config_data.network_config_data_validator">ra2ce.network.network_config_data.network_config_data_validator module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data_validator.NetworkConfigDataValidator"><code class="docutils literal notranslate"><span class="pre">NetworkConfigDataValidator</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.network.network_config_data.network_config_data_validator.NetworkConfigDataValidator.validate"><code class="docutils literal notranslate"><span class="pre">NetworkConfigDataValidator.validate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.network.network_config_data">Module contents</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/api/ra2ce.network.network_config_data.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/api/ra2ce.network.network_config_data.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

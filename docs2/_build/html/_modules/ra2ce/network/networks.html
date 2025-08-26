@@ -1,0 +1,729 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ra2ce.network.networks &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/ra2ce/network/networks';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.networ...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for ra2ce.network.networks</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                    GNU GENERAL PUBLIC LICENSE</span>
+<span class="sd">                      Version 3, 29 June 2007</span>
+
+<span class="sd">    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).</span>
+<span class="sd">    Copyright (C) 2023 Stichting Deltares</span>
+
+<span class="sd">    This program is free software: you can redistribute it and/or modify</span>
+<span class="sd">    it under the terms of the GNU General Public License as published by</span>
+<span class="sd">    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="sd">    (at your option) any later version.</span>
+
+<span class="sd">    This program is distributed in the hope that it will be useful,</span>
+<span class="sd">    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">    GNU General Public License for more details.</span>
+
+<span class="sd">    You should have received a copy of the GNU General Public License</span>
+<span class="sd">    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">osmnx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyproj</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network</span><span class="w"> </span><span class="kn">import</span> <span class="n">networks_utils</span> <span class="k">as</span> <span class="n">nut</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.exporters.network_exporter_factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetworkExporterFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.graph_files.graph_files_collection</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphFilesCollection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.network_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetworkConfigData</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_wrappers.network_wrapper_factory</span><span class="w"> </span><span class="kn">import</span> <span class="n">NetworkWrapperFactory</span>
+
+
+<div class="viewcode-block" id="Network"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.networks.Network">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Network</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Network in GeoDataFrame or NetworkX format.</span>
+
+<span class="sd">    Networks can be created from shapefiles, OSM PBF files, can be downloaded from OSM online or can be loaded from</span>
+<span class="sd">    feather or gpickle files. Origin-destination nodes can be added.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        config: An object with the configuration details on how to create and adjust the network.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">network_config</span><span class="p">:</span> <span class="n">NetworkConfigData</span><span class="p">,</span> <span class="n">graph_files</span><span class="p">:</span> <span class="n">GraphFilesCollection</span>
+    <span class="p">):</span>
+        <span class="c1"># General</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_config_data</span> <span class="o">=</span> <span class="n">network_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span> <span class="o">=</span> <span class="n">network_config</span><span class="o">.</span><span class="n">project</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_graph_dir</span> <span class="o">=</span> <span class="n">network_config</span><span class="o">.</span><span class="n">output_graph_dir</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_graph_dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">output_graph_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Network</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_network_dir</span> <span class="o">=</span> <span class="n">network_config</span><span class="o">.</span><span class="n">network_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_graph_crs</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Initiate variable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_network_crs</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># Initiate variable</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_network_config</span> <span class="o">=</span> <span class="n">network_config</span><span class="o">.</span><span class="n">network</span>
+
+        <span class="c1"># Origins and destinations</span>
+        <span class="n">_origins_destinations</span> <span class="o">=</span> <span class="n">network_config</span><span class="o">.</span><span class="n">origins_destinations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origins</span> <span class="o">=</span> <span class="n">_origins_destinations</span><span class="o">.</span><span class="n">origins</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destinations</span> <span class="o">=</span> <span class="n">_origins_destinations</span><span class="o">.</span><span class="n">destinations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origins_names</span> <span class="o">=</span> <span class="n">_origins_destinations</span><span class="o">.</span><span class="n">origins_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">destinations_names</span> <span class="o">=</span> <span class="n">_origins_destinations</span><span class="o">.</span><span class="n">destinations_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id_name_origin_destination</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">_origins_destinations</span><span class="o">.</span><span class="n">id_name_origin_destination</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">origin_count</span> <span class="o">=</span> <span class="n">_origins_destinations</span><span class="o">.</span><span class="n">origin_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">od_category</span> <span class="o">=</span> <span class="n">_origins_destinations</span><span class="o">.</span><span class="n">category</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="o">=</span> <span class="n">_origins_destinations</span><span class="o">.</span><span class="n">region</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">region_var</span> <span class="o">=</span> <span class="n">_origins_destinations</span><span class="o">.</span><span class="n">region_var</span>
+
+        <span class="c1"># graph files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph_files</span> <span class="o">=</span> <span class="n">graph_files</span>
+
+<div class="viewcode-block" id="Network.add_od_nodes"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.networks.Network.add_od_nodes">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">add_od_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span> <span class="n">crs</span><span class="p">:</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">CRS</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds origins and destinations nodes from shapefiles to the graph.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            graph (NetworkX graph): the NetworkX graph to which OD nodes should be added</span>
+<span class="sd">            crs (int): the EPSG number of the coordinate reference system that is used</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            graph (NetworkX graph): the NetworkX graph with OD nodes</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.origins_destinations</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+            <span class="n">add_od_nodes</span><span class="p">,</span>
+            <span class="n">read_origin_destination_files</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;origin_destination_table&quot;</span>
+
+        <span class="c1"># Add the origin/destination nodes to the network</span>
+        <span class="n">ods</span> <span class="o">=</span> <span class="n">read_origin_destination_files</span><span class="p">(</span>
+            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origins</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">origins_names</span><span class="p">,</span>
+            <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">destinations</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">destinations_names</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id_name_origin_destination</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">origin_count</span><span class="p">,</span>
+            <span class="n">crs</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">od_category</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">region</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">region_var</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="p">(</span><span class="n">ods</span><span class="p">,</span> <span class="n">graph</span><span class="p">)</span> <span class="o">=</span> <span class="n">add_od_nodes</span><span class="p">(</span><span class="n">ods</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">od_category</span><span class="p">)</span>
+        <span class="n">ods</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>
+
+        <span class="c1"># Save the OD pairs (GeoDataFrame) as pickle</span>
+        <span class="n">ods</span><span class="o">.</span><span class="n">to_feather</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_graph_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.feather&quot;</span><span class="p">),</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saved </span><span class="si">{</span><span class="n">name</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39;.feather&#39;</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_graph_dir</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Save the OD pairs (GeoDataFrame) as shapefile</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_network_config</span><span class="o">.</span><span class="n">save_gpkg</span><span class="p">:</span>
+            <span class="n">ods_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_graph_dir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.gpkg&quot;</span><span class="p">)</span>
+            <span class="n">ods</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">ods_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Saved </span><span class="si">{</span><span class="n">ods_path</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">ods_path</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">graph</span></div>
+
+<div class="viewcode-block" id="Network.generate_origins_from_raster"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.networks.Network.generate_origins_from_raster">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_origins_from_raster</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adds origins and destinations nodes from shapefiles to the graph.&quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.origins_destinations</span><span class="w"> </span><span class="kn">import</span> <span class="n">origins_from_raster</span>
+
+        <span class="n">out_fn</span> <span class="o">=</span> <span class="n">origins_from_raster</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_network_dir</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_network_config</span><span class="o">.</span><span class="n">polygon</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">origins</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">out_fn</span></div>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_export_network_files</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">network</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span> <span class="o">|</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">graph_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">types_to_export</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="p">):</span>
+        <span class="n">_exporter</span> <span class="o">=</span> <span class="n">NetworkExporterFactory</span><span class="p">()</span>
+        <span class="n">_exporter</span><span class="o">.</span><span class="n">export</span><span class="p">(</span>
+            <span class="n">network</span><span class="o">=</span><span class="n">network</span><span class="p">,</span>
+            <span class="n">basename</span><span class="o">=</span><span class="n">graph_type</span><span class="p">,</span>
+            <span class="n">output_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_graph_dir</span><span class="p">,</span>
+            <span class="n">export_types</span><span class="o">=</span><span class="n">types_to_export</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph_files</span><span class="o">.</span><span class="n">set_file</span><span class="p">(</span><span class="n">_exporter</span><span class="o">.</span><span class="n">get_pickle_path</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph_files</span><span class="o">.</span><span class="n">set_graph</span><span class="p">(</span><span class="n">graph_type</span><span class="p">,</span> <span class="n">network</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_include_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attributes</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">:</span>
+        <span class="c1"># If required_attributes are provided, check if all edges already have them</span>
+        <span class="k">if</span> <span class="n">attributes</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="nb">all</span><span class="p">(</span><span class="n">attr</span> <span class="ow">in</span> <span class="n">edge_data</span> <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">edge_data</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="c1"># If all required attributes are present, return the original graph</span>
+            <span class="k">return</span> <span class="n">graph</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">nut</span><span class="o">.</span><span class="n">add_x_y_to_nodes</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">gdf_edges</span> <span class="o">=</span> <span class="n">osmnx</span><span class="o">.</span><span class="n">graph_to_gdfs</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="n">updated_graph</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">gdf_edges</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="n">attribute_values_gdf</span> <span class="o">=</span> <span class="n">gdf_edges</span><span class="p">[</span><span class="n">attribute</span><span class="p">]</span>
+                <span class="k">for</span> <span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">key</span><span class="p">),</span> <span class="n">attribute_values</span> <span class="ow">in</span> <span class="n">attribute_values_gdf</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">updated_graph</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="n">v</span><span class="p">][</span><span class="n">key</span><span class="p">][</span><span class="n">attribute</span><span class="p">]</span> <span class="o">=</span> <span class="n">attribute_values</span>
+        <span class="k">return</span> <span class="n">updated_graph</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_new_network_and_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">export_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TODO: This method should be relying on a generic definition of a network result</span>
+<span class="sd">        from `.get_network`. This means, instead of getting `_base_graph, _network_gdf`</span>
+<span class="sd">        we get a generic `_ra2ce_network_wrapper` from which can later on just do a</span>
+<span class="sd">        `.simplify_network` or `.add_eges`, etc. using inheritance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">_base_graph</span><span class="p">,</span> <span class="n">_network_gdf</span> <span class="o">=</span> <span class="n">NetworkWrapperFactory</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_config_data</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">get_network</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_graph_crs</span> <span class="o">=</span> <span class="n">_network_gdf</span><span class="o">.</span><span class="n">crs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_network_crs</span> <span class="o">=</span> <span class="n">_network_gdf</span><span class="o">.</span><span class="n">crs</span>
+
+        <span class="n">_base_graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_include_attributes</span><span class="p">(</span>
+            <span class="n">attributes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;avgspeed&quot;</span><span class="p">,</span> <span class="s2">&quot;bridge&quot;</span><span class="p">,</span> <span class="s2">&quot;tunnel&quot;</span><span class="p">],</span> <span class="n">graph</span><span class="o">=</span><span class="n">_base_graph</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Save the graph and geodataframe</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_export_network_files</span><span class="p">(</span><span class="n">_base_graph</span><span class="p">,</span> <span class="s2">&quot;base_graph&quot;</span><span class="p">,</span> <span class="n">export_types</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_export_network_files</span><span class="p">(</span><span class="n">_network_gdf</span><span class="p">,</span> <span class="s2">&quot;base_network&quot;</span><span class="p">,</span> <span class="n">export_types</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_stored_network_and_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">base_graph_filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_files</span><span class="o">.</span><span class="n">base_graph</span><span class="o">.</span><span class="n">file</span>
+        <span class="n">base_network_filepath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_files</span><span class="o">.</span><span class="n">base_network</span><span class="o">.</span><span class="n">file</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Apparently, you already did create a network with ra2ce earlier. &quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;Ra2ce will use this: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">base_graph_filepath</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_graph</span><span class="p">(</span>
+            <span class="n">file_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span> <span class="o">|</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+            <span class="n">graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_files</span><span class="o">.</span><span class="n">get_graph</span><span class="p">(</span><span class="n">file_type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">graph</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+                    <span class="s2">&quot;No base </span><span class="si">{}</span><span class="s2"> file found at </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">file_type</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">graph</span>
+
+        <span class="n">_base_graph</span> <span class="o">=</span> <span class="n">get_graph</span><span class="p">(</span><span class="s2">&quot;base_graph&quot;</span><span class="p">,</span> <span class="n">base_graph_filepath</span><span class="p">)</span>
+        <span class="n">_network_gdf</span> <span class="o">=</span> <span class="n">get_graph</span><span class="p">(</span><span class="s2">&quot;base_network&quot;</span><span class="p">,</span> <span class="n">base_network_filepath</span><span class="p">)</span>
+
+        <span class="c1"># Assuming the same CRS for both the network and graph</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_graph_crs</span> <span class="o">=</span> <span class="n">_network_gdf</span><span class="o">.</span><span class="n">crs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_network_crs</span> <span class="o">=</span> <span class="n">_network_gdf</span><span class="o">.</span><span class="n">crs</span>
+
+<div class="viewcode-block" id="Network.create"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.networks.Network.create">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GraphFilesCollection</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handler function with the logic to call the right functions to create a network.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (GraphFilesCollection): A collection of a network (GeoDataFrame) and 1 (base NetworkX graph) or 2 graphs (base NetworkX and OD graph)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Save the &#39;base&#39; network as gpickle and if the user requested, also as shapefile.</span>
+        <span class="n">to_save</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="s2">&quot;pickle&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_network_config</span><span class="o">.</span><span class="n">save_gpkg</span> <span class="k">else</span> <span class="p">[</span><span class="s2">&quot;pickle&quot;</span><span class="p">,</span> <span class="s2">&quot;gpkg&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="c1"># For all graph and networks - check if it exists, otherwise, make the graph and/or network.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph_files</span><span class="o">.</span><span class="n">base_graph</span><span class="o">.</span><span class="n">file</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_files</span><span class="o">.</span><span class="n">base_network</span><span class="o">.</span><span class="n">file</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_new_network_and_graph</span><span class="p">(</span><span class="n">to_save</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_stored_network_and_graph</span><span class="p">()</span>
+
+        <span class="c1"># create origins destinations graph</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">origins</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">destinations</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_files</span><span class="o">.</span><span class="n">origins_destinations_graph</span><span class="o">.</span><span class="n">file</span>
+        <span class="p">):</span>
+            <span class="c1"># fetch the base graph</span>
+            <span class="n">base_graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_files</span><span class="o">.</span><span class="n">base_graph</span><span class="o">.</span><span class="n">get_graph</span><span class="p">()</span>
+            <span class="c1"># adding OD nodes</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">origins</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.tif&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">origins</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_origins_from_raster</span><span class="p">()</span>
+            <span class="n">od_graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_od_nodes</span><span class="p">(</span><span class="n">base_graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_graph_crs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_export_network_files</span><span class="p">(</span><span class="n">od_graph</span><span class="p">,</span> <span class="s2">&quot;origins_destinations_graph&quot;</span><span class="p">,</span> <span class="n">to_save</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_files</span></div></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

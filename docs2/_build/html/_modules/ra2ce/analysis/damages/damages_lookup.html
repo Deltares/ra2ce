@@ -1,0 +1,1600 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ra2ce.analysis.damages.damages_lookup &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/ra2ce/analysis/damages/damages_lookup';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.analys...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for ra2ce.analysis.damages.damages_lookup</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                    GNU GENERAL PUBLIC LICENSE</span>
+<span class="sd">                      Version 3, 29 June 2007</span>
+
+<span class="sd">    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).</span>
+<span class="sd">    Copyright (C) 2023 Stichting Deltares</span>
+
+<span class="sd">    This program is free software: you can redistribute it and/or modify</span>
+<span class="sd">    it under the terms of the GNU General Public License as published by</span>
+<span class="sd">    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="sd">    (at your option) any later version.</span>
+
+<span class="sd">    This program is distributed in the hope that it will be useful,</span>
+<span class="sd">    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">    GNU General Public License for more details.</span>
+
+<span class="sd">    You should have received a copy of the GNU General Public License</span>
+<span class="sd">    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataFrame</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.interpolate</span><span class="w"> </span><span class="kn">import</span> <span class="n">interp1d</span>
+
+
+<div class="viewcode-block" id="dataframe_lookup"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.damages.html#ra2ce.analysis.damages.damages_lookup.dataframe_lookup">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">dataframe_lookup</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">lookup_df</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="n">row_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">lookup_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">row_values</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="LookUp"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.damages.html#ra2ce.analysis.damages.damages_lookup.LookUp">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">LookUp</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; &quot; This namespace contains several lookup tables, used e.g. for road damage calculation.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LookUp.road_mapping"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.damages.html#ra2ce.analysis.damages.damages_lookup.LookUp.road_mapping">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">road_mapping</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mapping of OSM road infrastructure types&quot;&quot;&quot;</span>
+
+        <span class="n">mapping_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;disused&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;dummy&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;planned&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;platform&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;unsurfaced&quot;</span><span class="p">:</span> <span class="s2">&quot;track&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;traffic_island&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;razed&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;abandoned&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;services&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;proposed&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;corridor&quot;</span><span class="p">:</span> <span class="s2">&quot;track&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;bus_guideway&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;bus_stop&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;rest_area&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;yes&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;trail&quot;</span><span class="p">:</span> <span class="s2">&quot;track&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;escape&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;raceway&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;emergency_access_point&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;emergency_bay&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;construction&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;bridleway&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cycleway&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;footway&quot;</span><span class="p">:</span> <span class="s2">&quot;track&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;living_street&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="s2">&quot;track&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;pedestrian&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;primary&quot;</span><span class="p">:</span> <span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;primary_link&quot;</span><span class="p">:</span> <span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;residential&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;road&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;secondary&quot;</span><span class="p">:</span> <span class="s2">&quot;secondary&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;secondary_link&quot;</span><span class="p">:</span> <span class="s2">&quot;secondary&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;service&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;steps&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tertiary&quot;</span><span class="p">:</span> <span class="s2">&quot;tertiary&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tertiary_link&quot;</span><span class="p">:</span> <span class="s2">&quot;tertiary&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;track&quot;</span><span class="p">:</span> <span class="s2">&quot;track&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;unclassified&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;trunk&quot;</span><span class="p">:</span> <span class="s2">&quot;trunk&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;motorway&quot;</span><span class="p">:</span> <span class="s2">&quot;motorway&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;trunk_link&quot;</span><span class="p">:</span> <span class="s2">&quot;trunk&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;motorway_link&quot;</span><span class="p">:</span> <span class="s2">&quot;motorway&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;elevator&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;access&quot;</span><span class="p">:</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;crossing&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;mini_roundabout&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;passing_place&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;turning_circle&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;motorway_junction&quot;</span><span class="p">:</span> <span class="s2">&quot;motorway&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">mapping_dict</span></div>
+
+<div class="viewcode-block" id="LookUp.road_lanes"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.damages.html#ra2ce.analysis.damages.damages_lookup.LookUp.road_lanes">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">road_lanes</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mapping of road lanes, this is used as a default in case of missings. Number of lanes differ per country.&quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;AL&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;AT&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;BE&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;BG&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;CH&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;CZ&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;DE&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;DK&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;EE&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;EL&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;ES&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;FI&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;FR&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;HR&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;HU&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;IE&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;IS&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;IT&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;LT&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;LU&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;LV&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;LI&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;ME&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;MK&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;NL&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;NO&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;PL&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;PT&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;RO&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;RS&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;SE&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;SI&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;SK&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;TR&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;UK&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LookUp.get_lane_number_damage_correction"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.damages.html#ra2ce.analysis.damages.damages_lookup.LookUp.get_lane_number_damage_correction">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_lane_number_damage_correction</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lookup table for correction factor of damage for lanes&quot;&quot;&quot;</span>
+        <span class="n">lookup_dict</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">1.25</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mf">1.75</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">}),</span>
+                <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">1.25</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mf">1.75</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">}),</span>
+                <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">1.25</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mf">1.75</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">}),</span>
+                <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">1.25</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mf">1.75</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">}),</span>
+                <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mf">1.75</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mf">2.25</span><span class="p">}),</span>
+                <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">1.25</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mf">1.75</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mf">2.25</span><span class="p">}),</span>
+                <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">1.25</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mf">1.75</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mf">2.25</span><span class="p">}),</span>
+                <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mf">1.25</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mf">1.75</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mf">2.25</span><span class="p">}),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">lookup_dict</span></div>
+
+<div class="viewcode-block" id="LookUp.max_damages"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.damages.html#ra2ce.analysis.damages.damages_lookup.LookUp.max_damages">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">max_damages</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lookup table for max damages&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;Lower&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">1750000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">1250000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">1000000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">500000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">200000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">100000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">20000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;Upper&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">17500000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">3750000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">3000000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">1500000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">600000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">300000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">50000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LookUp.get_max_damages_osd"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.damages.html#ra2ce.analysis.damages.damages_lookup.LookUp.get_max_damages_osd">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_max_damages_osd</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lookup table for max damages of the OSdaMage damage functions&quot;&quot;&quot;</span>
+
+        <span class="c1"># Note that these values have been converted to euro/m road length</span>
+        <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;Lower&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">1750</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">1250</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">500</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;Upper&quot;</span><span class="p">,</span>
+                    <span class="n">OrderedDict</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="s2">&quot;motorway&quot;</span><span class="p">,</span> <span class="mi">17500</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;trunk&quot;</span><span class="p">,</span> <span class="mi">3750</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="mi">3000</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;secondary&quot;</span><span class="p">,</span> <span class="mi">1500</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;tertiary&quot;</span><span class="p">,</span> <span class="mi">600</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;track&quot;</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+                            <span class="p">(</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                        <span class="p">]</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="LookUp.get_max_damages_huizinga"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.damages.html#ra2ce.analysis.damages.damages_lookup.LookUp.get_max_damages_huizinga">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_max_damages_huizinga</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lookup table for max damages calculated with huizinga for number of lanes</span>
+
+<span class="sd">        Output: dict:</span>
+<span class="sd">         - road types are keys</span>
+<span class="sd">         - max damages in euro / m road length</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Note, these values are in euro/km; while RA2CE standard unit is euro/m length</span>
+
+        <span class="n">lookup_dict</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;motorway&quot;</span><span class="p">,</span>
+                    <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">175000</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">350000</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">450000</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">550000</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">650000</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">750000</span><span class="p">},</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;trunk&quot;</span><span class="p">,</span>
+                    <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">175000</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">300000</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">400000</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">475000</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">575000</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">650000</span><span class="p">},</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;primary&quot;</span><span class="p">,</span>
+                    <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">125000</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">250000</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">325000</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">425000</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">500000</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">575000</span><span class="p">},</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;secondary&quot;</span><span class="p">,</span>
+                    <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">125000</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">225000</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">300000</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">400000</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">475000</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">550000</span><span class="p">},</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;tertiary&quot;</span><span class="p">,</span>
+                    <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">100000</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">175000</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">250000</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">350000</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">425000</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">500000</span><span class="p">},</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;track&quot;</span><span class="p">,</span>
+                    <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">75000</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">150000</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">225000</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">300000</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">375000</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">450000</span><span class="p">},</span>
+                <span class="p">),</span>
+                <span class="p">(</span>
+                    <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+                    <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="mi">75000</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">150000</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">225000</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="mi">300000</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="mi">375000</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="mi">450000</span><span class="p">},</span>
+                <span class="p">),</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">new_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">road_type</span><span class="p">,</span> <span class="n">lanedicts</span> <span class="ow">in</span> <span class="n">lookup_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">new_lanedict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">lane</span><span class="p">,</span> <span class="n">costs</span> <span class="ow">in</span> <span class="n">lanedicts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">new_lanedict</span><span class="p">[</span><span class="n">lane</span><span class="p">]</span> <span class="o">=</span> <span class="n">costs</span> <span class="o">/</span> <span class="mi">1000</span>
+            <span class="n">new_dict</span><span class="p">[</span><span class="n">road_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_lanedict</span>
+
+        <span class="n">lookup_dict</span> <span class="o">=</span> <span class="n">new_dict</span>
+
+        <span class="k">return</span> <span class="n">lookup_dict</span></div>
+
+<div class="viewcode-block" id="LookUp.get_flood_curves"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.damages.html#ra2ce.analysis.damages.damages_lookup.LookUp.get_flood_curves">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_flood_curves</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Lookup flood curve values and create interpolator around it</span>
+
+<span class="sd">        Units of the interpolator objects: water depth in cm on x-axis; damage fraction (unitless) on y-axis</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_depth_cm_str</span> <span class="o">=</span> <span class="s2">&quot;depth (cm)&quot;</span>
+        <span class="n">_damage_str</span> <span class="o">=</span> <span class="s2">&quot;damage (</span><span class="si">% o</span><span class="s2">f total construction costs)&quot;</span>
+        <span class="n">lookup_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;C1&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">_depth_cm_str</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="mi">150</span><span class="p">,</span>
+                <span class="mi">5</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+                <span class="mi">6</span><span class="p">:</span> <span class="mi">600</span><span class="p">,</span>
+                <span class="mi">7</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">8</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">9</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Unnamed: 2&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">_damage_str</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="mf">0.03</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="mf">0.075</span><span class="p">,</span>
+                <span class="mi">5</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                <span class="mi">6</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+                <span class="mi">7</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">8</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">9</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;C2&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">_depth_cm_str</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="mi">150</span><span class="p">,</span>
+                <span class="mi">5</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+                <span class="mi">6</span><span class="p">:</span> <span class="mi">600</span><span class="p">,</span>
+                <span class="mi">7</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">8</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">9</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Unnamed: 4&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">_damage_str</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="mf">0.02</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="mf">0.06</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                <span class="mi">5</span><span class="p">:</span> <span class="mf">0.12</span><span class="p">,</span>
+                <span class="mi">6</span><span class="p">:</span> <span class="mf">0.22</span><span class="p">,</span>
+                <span class="mi">7</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">8</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">9</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;C3&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">_depth_cm_str</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="mi">150</span><span class="p">,</span>
+                <span class="mi">5</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+                <span class="mi">6</span><span class="p">:</span> <span class="mi">600</span><span class="p">,</span>
+                <span class="mi">7</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">8</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">9</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Unnamed: 6&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">_damage_str</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="mf">0.002</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="mf">0.004</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="mf">0.025</span><span class="p">,</span>
+                <span class="mi">5</span><span class="p">:</span> <span class="mf">0.03</span><span class="p">,</span>
+                <span class="mi">6</span><span class="p">:</span> <span class="mf">0.04</span><span class="p">,</span>
+                <span class="mi">7</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">8</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">9</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;C4&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">_depth_cm_str</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="mi">150</span><span class="p">,</span>
+                <span class="mi">5</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+                <span class="mi">6</span><span class="p">:</span> <span class="mi">600</span><span class="p">,</span>
+                <span class="mi">7</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">8</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">9</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Unnamed: 8&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">_damage_str</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="mf">0.015</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="mf">0.04</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+                <span class="mi">5</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span>
+                <span class="mi">6</span><span class="p">:</span> <span class="mf">0.35</span><span class="p">,</span>
+                <span class="mi">7</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">8</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">9</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;C5&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">_depth_cm_str</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+                <span class="mi">5</span><span class="p">:</span> <span class="mi">600</span><span class="p">,</span>
+                <span class="mi">6</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">7</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">8</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">9</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Unnamed: 10&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">_damage_str</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="mf">0.015</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="mf">0.025</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="mf">0.035</span><span class="p">,</span>
+                <span class="mi">5</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
+                <span class="mi">6</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">7</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">8</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">9</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;C6&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">_depth_cm_str</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span>
+                <span class="mi">5</span><span class="p">:</span> <span class="mi">600</span><span class="p">,</span>
+                <span class="mi">6</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">7</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">8</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">9</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Unnamed: 12&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">_damage_str</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="mf">0.12</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="mf">0.28</span><span class="p">,</span>
+                <span class="mi">5</span><span class="p">:</span> <span class="mf">0.35</span><span class="p">,</span>
+                <span class="mi">6</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">7</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">8</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                <span class="mi">9</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;HZ&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">_depth_cm_str</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="mf">50.0</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="mf">150.0</span><span class="p">,</span>
+                <span class="mi">5</span><span class="p">:</span> <span class="mf">200.0</span><span class="p">,</span>
+                <span class="mi">6</span><span class="p">:</span> <span class="mf">300.0</span><span class="p">,</span>
+                <span class="mi">7</span><span class="p">:</span> <span class="mf">400.0</span><span class="p">,</span>
+                <span class="mi">8</span><span class="p">:</span> <span class="mf">500.0</span><span class="p">,</span>
+                <span class="mi">9</span><span class="p">:</span> <span class="mf">600.0</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Unnamed: 14&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="mi">0</span><span class="p">:</span> <span class="n">_damage_str</span><span class="p">,</span>
+                <span class="mi">1</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="mi">2</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">,</span>
+                <span class="mi">3</span><span class="p">:</span> <span class="mf">0.42</span><span class="p">,</span>
+                <span class="mi">4</span><span class="p">:</span> <span class="mf">0.55</span><span class="p">,</span>
+                <span class="mi">5</span><span class="p">:</span> <span class="mf">0.65</span><span class="p">,</span>
+                <span class="mi">6</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+                <span class="mi">7</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+                <span class="mi">8</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                <span class="mi">9</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+        <span class="n">flood_curves</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">lookup_dict</span><span class="p">)</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">flood_curves</span><span class="o">.</span><span class="n">columns</span>
+
+        <span class="c1"># Convert to ra2ce standard units (depth (m))</span>
+        <span class="n">depth_cols</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">flood_curves</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">col</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Unnamed&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">flood_curves</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="n">depth_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">flood_curves</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="n">depth_cols</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span>
+        <span class="n">flood_curves</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">depth_cols</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;depth (m)&quot;</span>
+
+        <span class="n">curve_name</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># create empty arrays</span>
+        <span class="n">interpolators</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)):</span>  <span class="c1"># iterate over the damage curves</span>
+            <span class="n">curve_name</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">headers</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">curve</span> <span class="o">=</span> <span class="n">flood_curves</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">i</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+            <span class="c1"># curve x-values in the even; and y-values in the uneven columns</span>
+            <span class="n">interpolators</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span>
+                <span class="n">curve</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">],</span>
+                <span class="n">curve</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">],</span>
+                <span class="n">fill_value</span><span class="o">=</span><span class="p">(</span><span class="n">curve</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">curve</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+                <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">curve_name</span><span class="p">,</span> <span class="n">interpolators</span><span class="p">))</span></div></div>
+
+
+<div class="viewcode-block" id="CreateLookupTables"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.damages.html#ra2ce.analysis.damages.damages_lookup.CreateLookupTables">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">CreateLookupTables</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This class lets you create the dictionary lookup tables from an excel file.</span>
+<span class="sd">    ONLY use this class if dictionairies need to be updated.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings_file</span> <span class="o">=</span> <span class="n">settings_file</span>
+
+<div class="viewcode-block" id="CreateLookupTables.create"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.damages.html#ra2ce.analysis.damages.damages_lookup.CreateLookupTables.create">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lane_damage_correction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_lane_damage_correction</span><span class="p">(</span><span class="s2">&quot;Max_damages&quot;</span><span class="p">,</span> <span class="s2">&quot;G:M&quot;</span><span class="p">)</span>
+        <span class="n">dict_max_damages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_damage</span><span class="p">(</span><span class="s2">&quot;Max_damages&quot;</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="s2">&quot;C:E&quot;</span><span class="p">)</span>
+        <span class="n">max_damages_hz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_hz_max_dam</span><span class="p">(</span><span class="s2">&quot;Huizinga_max_dam&quot;</span><span class="p">,</span> <span class="s2">&quot;A:G&quot;</span><span class="p">)</span>
+        <span class="n">interpolators</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">import_flood_curves</span><span class="p">(</span><span class="n">sheet_name</span><span class="o">=</span><span class="s2">&quot;All_curves&quot;</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="s2">&quot;B:O&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">lane_damage_correction</span><span class="p">,</span>
+            <span class="n">dict_max_damages</span><span class="p">,</span>
+            <span class="n">max_damages_hz</span><span class="p">,</span>
+            <span class="n">interpolators</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="CreateLookupTables.load_hz_max_dam"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.damages.html#ra2ce.analysis.damages.damages_lookup.CreateLookupTables.load_hz_max_dam">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_hz_max_dam</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sheet_name</span><span class="p">,</span> <span class="n">usecols</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads the maximum damages according to Huizinga from an Excel file</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            *filename* (string) - name of the Excel file (should be located in the input_path dir)</span>
+<span class="sd">            *sheet_name* (string) - name of the excel sheet name</span>
+<span class="sd">            *usecols* (string) - the columns which have the data (first column should have the road_type keys)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            *HZ_max_dam* (OrderedDict) - keys are road_types; values are dicts with key: lane, value = correction factor</span>
+<span class="sd">                Use like: lane_corr[&#39;motorway&#39;][4] -&gt; 1.25 (i.e. correct max damage by +25%)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">lane_corr_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings_file</span><span class="p">,</span>
+            <span class="n">sheet_name</span><span class="o">=</span><span class="n">sheet_name</span><span class="p">,</span>
+            <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">usecols</span><span class="o">=</span><span class="n">usecols</span><span class="p">,</span>
+            <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">odf</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>  <span class="c1"># initialize OrderedDict</span>
+        <span class="n">hz_max_dam</span> <span class="o">=</span> <span class="n">lane_corr_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">into</span><span class="o">=</span><span class="n">odf</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">hz_max_dam</span></div>
+
+<div class="viewcode-block" id="CreateLookupTables.import_damage"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.damages.html#ra2ce.analysis.damages.damages_lookup.CreateLookupTables.import_damage">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">import_damage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sheet_name</span><span class="p">,</span> <span class="n">usecols</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Imports the maximum damage data from an Excel file in the input_path folder</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            *file_name* (string) : name of the Excel file (should be located in the input_path folder)</span>
+<span class="sd">            *sheet_name* (string) : name of the Excel sheet containing the data</span>
+<span class="sd">            *usecols* (string) : columns containing the data you want to read, including the column with the road_types e.g. &quot;C:F&quot;</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            *dict* (Ordered Dictionary) : An ordered dictionary with a group of damage estimates as keys;</span>
+<span class="sd">                 each value contains another ordered dictionary with as keys the types of roads and as values the damages in Euros</span>
+<span class="sd">                    So you call the output as: dict[&#39;Worldbank&#39;] to get a dict with all the damages in WorldBank</span>
+<span class="sd">                    And dict[&#39;Worldbank&#39;][&#39;motorway&#39;] to get the damage for a motorway according to the worldbank</span>
+
+<span class="sd">                    #From version 0.7 and higher, this structure maybe does not make much sense, because we use upper and lower bounds</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings_file</span><span class="p">,</span>
+            <span class="n">sheet_name</span><span class="o">=</span><span class="n">sheet_name</span><span class="p">,</span>
+            <span class="n">header</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+            <span class="n">usecols</span><span class="o">=</span><span class="n">usecols</span><span class="p">,</span>
+            <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">notna</span><span class="p">(),</span> <span class="p">:]</span>  <span class="c1"># Drop the empty cells</span>
+        <span class="n">odf</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>  <span class="c1"># initialize OrderedDict</span>
+        <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">into</span><span class="o">=</span><span class="n">odf</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CreateLookupTables.load_lane_damage_correction"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.damages.html#ra2ce.analysis.damages.damages_lookup.CreateLookupTables.load_lane_damage_correction">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">load_lane_damage_correction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sheet_name</span><span class="p">,</span> <span class="n">usecols</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads the maximum damage correction from an Excel file into an ordered dict.</span>
+
+<span class="sd">        Argument:</span>
+<span class="sd">            *filename* (string) - name of the Excel file (should be located in the input_path dir)</span>
+<span class="sd">            *sheet_name* (string) - name of the excel sheet name</span>
+<span class="sd">            *usecols* (string) - the columns which have the data (first column should have the road_type keys)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            *lane_corr* (OrderedDict) - keys are road_types; values are dicts with key: lane, value = correction factor</span>
+<span class="sd">                Use like: lane_corr[&#39;motorway&#39;][4] -&gt; 1.25 (i.e. correct max damage by +25%)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">lane_corr_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings_file</span><span class="p">,</span>
+            <span class="n">sheet_name</span><span class="o">=</span><span class="n">sheet_name</span><span class="p">,</span>
+            <span class="n">header</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+            <span class="n">usecols</span><span class="o">=</span><span class="n">usecols</span><span class="p">,</span>
+            <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">odf</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>  <span class="c1"># initialize OrderedDict</span>
+        <span class="n">lane_corr</span> <span class="o">=</span> <span class="n">lane_corr_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">into</span><span class="o">=</span><span class="n">odf</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lane_corr</span></div>
+
+<div class="viewcode-block" id="CreateLookupTables.import_flood_curves"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.damages.html#ra2ce.analysis.damages.damages_lookup.CreateLookupTables.import_flood_curves">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">import_flood_curves</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sheet_name</span><span class="p">,</span> <span class="n">usecols</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Imports the flood curves from a predefined path</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            *filename* (string) : name of the Excel file (should be located in the input_path folder) e.g. &quot;Costs_curves_Europe.xlsx&quot;</span>
+<span class="sd">            *sheet_name* (string) : name of the Excel sheet containing the damage curves (e.g. &#39;curves&#39;)</span>
+<span class="sd">            *usecols* (string) : string with the columns of the Excel sheet you want to import, e.g. &quot;B:AA&quot;</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            *OrderedDict* : keys are the names of the damage curves</span>
+<span class="sd">                            values are scipy interpolators</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">flood_curves_old</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings_file</span><span class="p">,</span>
+            <span class="n">sheet_name</span><span class="o">=</span><span class="n">sheet_name</span><span class="p">,</span>
+            <span class="n">header</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="n">index_col</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">usecols</span><span class="o">=</span><span class="n">usecols</span><span class="p">,</span>
+        <span class="p">)</span>  <span class="c1"># removed skip-footer; gave unexpected results</span>
+        <span class="n">flood_new</span> <span class="o">=</span> <span class="n">flood_curves_old</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="n">flood_curves</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">flood_new</span><span class="p">)</span>
+
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">flood_curves</span><span class="o">.</span><span class="n">columns</span>
+        <span class="n">curve_name</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>  <span class="c1"># create empty arrays</span>
+        <span class="n">interpolators</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">headers</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="p">):</span>  <span class="c1"># iterate over the damage curves in the Excel file</span>
+            <span class="n">curve_name</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">headers</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="p">]</span>
+            <span class="n">curve</span> <span class="o">=</span> <span class="n">flood_curves</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">i</span> <span class="p">:</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
+            <span class="c1"># curve x-values in the even; and y-values in the uneven columns</span>
+            <span class="n">interpolators</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span>
+                <span class="n">curve</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">0</span><span class="p">],</span>
+                <span class="n">curve</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="mi">1</span><span class="p">],</span>
+                <span class="n">fill_value</span><span class="o">=</span><span class="p">(</span><span class="n">curve</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">curve</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+                <span class="n">bounds_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">curve_name</span><span class="p">,</span> <span class="n">interpolators</span><span class="p">))</span></div></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

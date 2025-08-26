@@ -1,0 +1,716 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ra2ce.analysis.adaptation.adaptation_option &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/ra2ce/analysis/adaptation/adaptation_option';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.analys...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for ra2ce.analysis.adaptation.adaptation_option</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                    GNU GENERAL PUBLIC LICENSE</span>
+<span class="sd">                      Version 3, 29 June 2007</span>
+
+<span class="sd">    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).</span>
+<span class="sd">    Copyright (C) 2023 Stichting Deltares</span>
+
+<span class="sd">    This program is free software: you can redistribute it and/or modify</span>
+<span class="sd">    it under the terms of the GNU General Public License as published by</span>
+<span class="sd">    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="sd">    (at your option) any later version.</span>
+
+<span class="sd">    This program is distributed in the hope that it will be useful,</span>
+<span class="sd">    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">    GNU General Public License for more details.</span>
+
+<span class="sd">    You should have received a copy of the GNU General Public License</span>
+<span class="sd">    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">dataclass</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">GeoDataFrame</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.adaptation.adaptation_option_analysis</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AdaptationOptionAnalysis</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.adaptation.adaptation_option_partial_result</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AdaptationOptionPartialResult</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.adaptation.adaptation_result_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdaptationResultEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.adaptation.adaptation_settings</span><span class="w"> </span><span class="kn">import</span> <span class="n">AdaptationSettings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.analysis_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AnalysisSectionAdaptationOption</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AnalysisDamagesEnum</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_wrapper</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisConfigWrapper</span>
+
+
+<div class="viewcode-block" id="AdaptationOption"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.adaptation.html#ra2ce.analysis.adaptation.adaptation_option.AdaptationOption">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AdaptationOption</span><span class="p">:</span>
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">construction_cost</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">construction_interval</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">maintenance_cost</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">maintenance_interval</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">analyses</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AdaptationOptionAnalysis</span><span class="p">]</span>
+    <span class="n">analysis_config</span><span class="p">:</span> <span class="n">AnalysisConfigWrapper</span>
+    <span class="n">adaptation_settings</span><span class="p">:</span> <span class="n">AdaptationSettings</span>
+
+<div class="viewcode-block" id="AdaptationOption.from_config"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.adaptation.html#ra2ce.analysis.adaptation.adaptation_option.AdaptationOption.from_config">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_config</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">analysis_config</span><span class="p">:</span> <span class="n">AnalysisConfigWrapper</span><span class="p">,</span>
+        <span class="n">adaptation_option</span><span class="p">:</span> <span class="n">AnalysisSectionAdaptationOption</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdaptationOption</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Classmethod to create an AdaptationOption from an analysis configuration and an adaptation option.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            analysis_config (AnalysisConfigWrapper): Analysis config input</span>
+<span class="sd">            adaptation_option (AnalysisSectionAdaptationOption): Adaptation option input</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If damages and losses sections are not present in the analysis config data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AdaptationOption: The created adaptation option.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="n">analysis_config</span><span class="o">.</span><span class="n">config_data</span><span class="o">.</span><span class="n">damages_list</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">analysis_config</span><span class="o">.</span><span class="n">config_data</span><span class="o">.</span><span class="n">losses_list</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Damages and/or losses sections are required to create an adaptation option.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Create input for the damages and losses analyses (if present in config)</span>
+        <span class="n">_config_analyses</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">analysis</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">analysis_config</span><span class="o">.</span><span class="n">config_data</span><span class="o">.</span><span class="n">analyses</span><span class="p">]</span>
+        <span class="n">_analyses</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">AdaptationOptionAnalysis</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span>
+                <span class="n">analysis_config</span><span class="p">,</span>
+                <span class="n">_analysis_type</span><span class="p">,</span>
+                <span class="n">adaptation_option</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">_analysis_type</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="n">AnalysisDamagesEnum</span><span class="o">.</span><span class="n">DAMAGES</span><span class="p">,</span>
+                <span class="n">analysis_config</span><span class="o">.</span><span class="n">config_data</span><span class="o">.</span><span class="n">adaptation</span><span class="o">.</span><span class="n">losses_analysis</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="n">_analysis_type</span> <span class="ow">in</span> <span class="n">_config_analyses</span>
+        <span class="p">]</span>
+
+        <span class="n">_adaptation_settings</span> <span class="o">=</span> <span class="n">AdaptationSettings</span><span class="p">(</span>
+            <span class="n">discount_rate</span><span class="o">=</span><span class="n">analysis_config</span><span class="o">.</span><span class="n">config_data</span><span class="o">.</span><span class="n">adaptation</span><span class="o">.</span><span class="n">discount_rate</span><span class="p">,</span>
+            <span class="n">time_horizon</span><span class="o">=</span><span class="n">analysis_config</span><span class="o">.</span><span class="n">config_data</span><span class="o">.</span><span class="n">adaptation</span><span class="o">.</span><span class="n">time_horizon</span><span class="p">,</span>
+            <span class="n">initial_frequency</span><span class="o">=</span><span class="n">analysis_config</span><span class="o">.</span><span class="n">config_data</span><span class="o">.</span><span class="n">adaptation</span><span class="o">.</span><span class="n">initial_frequency</span><span class="p">,</span>
+            <span class="n">climate_factor</span><span class="o">=</span><span class="n">analysis_config</span><span class="o">.</span><span class="n">config_data</span><span class="o">.</span><span class="n">adaptation</span><span class="o">.</span><span class="n">climate_factor</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="o">**</span><span class="n">asdict</span><span class="p">(</span><span class="n">adaptation_option</span><span class="p">),</span>
+            <span class="n">analyses</span><span class="o">=</span><span class="n">_analyses</span><span class="p">,</span>
+            <span class="n">analysis_config</span><span class="o">=</span><span class="n">analysis_config</span><span class="p">,</span>
+            <span class="n">adaptation_settings</span><span class="o">=</span><span class="n">_adaptation_settings</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="AdaptationOption.get_bc_ratio"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.adaptation.html#ra2ce.analysis.adaptation.adaptation_option.AdaptationOption.get_bc_ratio">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_bc_ratio</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">reference_impact</span><span class="p">:</span> <span class="n">AdaptationOptionPartialResult</span><span class="p">,</span>
+        <span class="n">gdf_in</span><span class="p">:</span> <span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">hazard_fraction_cost</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdaptationOptionPartialResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the benefit-cost ratio of the adaptation option.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            reference_impact (AdaptationOptionPartialResult): The impact of the reference option.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AdaptationOptionPartialResult: The benefit-cost ratio of the adaptation option.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Calculate cost</span>
+        <span class="n">_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_cost</span><span class="p">(</span><span class="n">gdf_in</span><span class="p">,</span> <span class="n">hazard_fraction_cost</span><span class="p">)</span>
+
+        <span class="c1"># Calculate impact/benefit</span>
+        <span class="n">_result</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_benefit</span><span class="p">(</span><span class="n">reference_impact</span><span class="p">)</span>
+
+        <span class="c1"># Calculate BC-ratio</span>
+        <span class="n">_benefit</span> <span class="o">=</span> <span class="n">_result</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="n">AdaptationResultEnum</span><span class="o">.</span><span class="n">BENEFIT</span><span class="p">)</span>
+        <span class="n">_cost</span> <span class="o">=</span> <span class="n">_result</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="n">AdaptationResultEnum</span><span class="o">.</span><span class="n">COST</span><span class="p">)</span>
+
+        <span class="n">_result</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span>
+            <span class="n">AdaptationResultEnum</span><span class="o">.</span><span class="n">BC_RATIO</span><span class="p">,</span>
+            <span class="n">_benefit</span> <span class="o">/</span> <span class="n">_cost</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">nan</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">_result</span></div>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_benefit</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">reference_impact</span><span class="p">:</span> <span class="n">AdaptationOptionPartialResult</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdaptationOptionPartialResult</span><span class="p">:</span>
+        <span class="n">_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_impact</span><span class="p">()</span>
+
+        <span class="c1"># Benefit = reference impact - adaptation impact</span>
+        <span class="n">_benefit</span> <span class="o">=</span> <span class="n">reference_impact</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span>
+            <span class="n">AdaptationResultEnum</span><span class="o">.</span><span class="n">NET_IMPACT</span>
+        <span class="p">)</span> <span class="o">-</span> <span class="n">_result</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="n">AdaptationResultEnum</span><span class="o">.</span><span class="n">NET_IMPACT</span><span class="p">)</span>
+        <span class="n">_result</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">AdaptationResultEnum</span><span class="o">.</span><span class="n">BENEFIT</span><span class="p">,</span> <span class="n">_benefit</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_result</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_cost</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">gdf_in</span><span class="p">:</span> <span class="n">GeoDataFrame</span><span class="p">,</span> <span class="n">hazard_fraction_cost</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdaptationOptionPartialResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the cost of the adaptation option.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_gdf (GeoDataFrame): The input GeoDataFrame.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AdaptationOptionPartialResult: The cost of the adaptation option.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_result</span> <span class="o">=</span> <span class="n">AdaptationOptionPartialResult</span><span class="o">.</span><span class="n">from_input_gdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">gdf_in</span><span class="p">)</span>
+        <span class="n">_cost_col</span> <span class="o">=</span> <span class="n">gdf_in</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">cost</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_unit_cost</span><span class="p">():</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;length&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">cost</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Only calculate the cost for the impacted fraction of the links.</span>
+        <span class="k">if</span> <span class="n">hazard_fraction_cost</span><span class="p">:</span>
+            <span class="n">_fraction_col</span> <span class="o">=</span> <span class="n">gdf_in</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="s2">&quot;EV.*_fr&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">_cost_col</span> <span class="o">*=</span> <span class="n">gdf_in</span><span class="p">[</span><span class="n">_fraction_col</span><span class="p">]</span>
+
+        <span class="n">_result</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">AdaptationResultEnum</span><span class="o">.</span><span class="n">COST</span><span class="p">,</span> <span class="n">_cost_col</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_result</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_unit_cost</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the net present value unit cost (per meter) of the adaptation option.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            None</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: The net present value unit cost of the adaptation option.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">is_constr_year</span><span class="p">(</span><span class="n">year</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">construction_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">year</span><span class="p">)</span> <span class="o">%</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">construction_interval</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">is_maint_year</span><span class="p">(</span><span class="n">year</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">maintenance_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">construction_interval</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Take year relative to last construction year</span>
+                <span class="n">year</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">year</span><span class="p">)</span> <span class="o">%</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">construction_interval</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">year</span> <span class="o">%</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maintenance_interval</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">calculate_cost</span><span class="p">(</span><span class="n">year</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_constr_year</span><span class="p">(</span><span class="n">year</span><span class="p">):</span>
+                <span class="n">_cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">construction_cost</span>
+            <span class="k">elif</span> <span class="n">is_maint_year</span><span class="p">(</span><span class="n">year</span><span class="p">):</span>
+                <span class="n">_cost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maintenance_cost</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mf">0.0</span>
+            <span class="k">return</span> <span class="n">_cost</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptation_settings</span><span class="o">.</span><span class="n">discount_rate</span><span class="p">)</span> <span class="o">**</span> <span class="n">year</span>
+
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">calculate_cost</span><span class="p">(</span><span class="n">_year</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">_year</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adaptation_settings</span><span class="o">.</span><span class="n">time_horizon</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="AdaptationOption.get_impact"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.adaptation.html#ra2ce.analysis.adaptation.adaptation_option.AdaptationOption.get_impact">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_impact</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdaptationOptionPartialResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the impact of the adaptation option.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            net_present_value_factor (float): The net present value factor to apply to the event impact.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AdaptationOptionPartialResult: The impact (event and net) of the adaptation option per link.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get all results from the analyses</span>
+        <span class="n">_result</span> <span class="o">=</span> <span class="n">AdaptationOptionPartialResult</span><span class="p">(</span><span class="n">option_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_analysis</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyses</span><span class="p">:</span>
+            <span class="n">_result</span> <span class="o">+=</span> <span class="n">_analysis</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">analysis_config</span><span class="p">)</span>
+
+        <span class="c1"># Calculate the impact (summing the results of the analysis results per link)</span>
+        <span class="n">_impact</span> <span class="o">=</span> <span class="n">_result</span><span class="o">.</span><span class="n">data_frame</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">_result</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">AdaptationResultEnum</span><span class="o">.</span><span class="n">EVENT_IMPACT</span><span class="p">,</span> <span class="n">_impact</span><span class="p">)</span>
+        <span class="n">_result</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span>
+            <span class="n">AdaptationResultEnum</span><span class="o">.</span><span class="n">NET_IMPACT</span><span class="p">,</span>
+            <span class="n">_impact</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptation_settings</span><span class="o">.</span><span class="n">net_present_value_factor</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_result</span></div></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

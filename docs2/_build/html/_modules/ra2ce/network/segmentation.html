@@ -1,0 +1,792 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ra2ce.network.segmentation &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/ra2ce/network/segmentation';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.networ...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for ra2ce.network.segmentation</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                    GNU GENERAL PUBLIC LICENSE</span>
+<span class="sd">                      Version 3, 29 June 2007</span>
+
+<span class="sd">    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).</span>
+<span class="sd">    Copyright (C) 2023 Stichting Deltares</span>
+
+<span class="sd">    This program is free software: you can redistribute it and/or modify</span>
+<span class="sd">    it under the terms of the GNU General Public License as published by</span>
+<span class="sd">    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="sd">    (at your option) any later version.</span>
+
+<span class="sd">    This program is distributed in the hope that it will be useful,</span>
+<span class="sd">    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">    GNU General Public License for more details.</span>
+
+<span class="sd">    You should have received a copy of the GNU General Public License</span>
+<span class="sd">    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">decimal</span><span class="w"> </span><span class="kn">import</span> <span class="n">Decimal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geopy</span><span class="w"> </span><span class="kn">import</span> <span class="n">distance</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">LineString</span><span class="p">,</span> <span class="n">MultiLineString</span><span class="p">,</span> <span class="n">Point</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.networks_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">cut</span> <span class="k">as</span> <span class="n">network_cut</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.networks_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">line_length</span>
+
+
+<div class="viewcode-block" id="Segmentation"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.segmentation.Segmentation">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Segmentation</span><span class="p">:</span>  <span class="c1"># Todo: more naturally, this would be METHOD of the network class.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;cut the edges in the complex geodataframe to segments of equal lengths or smaller</span>
+<span class="sd">    # output will be the cut edges_complex</span>
+
+<span class="sd">    Variables:</span>
+<span class="sd">        *self.edges_input* (Geopandas DataFrame) : the edges that are to be segmented</span>
+<span class="sd">        *self.segmentation_length* (float) : segmentation length in metres</span>
+<span class="sd">        *self.save_files* (Boolean) : save segmented graph?</span>
+
+<span class="sd">    Result:</span>
+<span class="sd">        *self.edges_segmented* (Geopandas DataFrame) : the segmented edges dataframe</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Segmentation.segment_graph"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.segmentation.Segmentation.segment_graph">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">segment_graph</span><span class="p">(</span>
+        <span class="n">segmentation_length</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">crs</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">edges</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">export_link_table</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">link_tables</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Segments a complex graph based on the given segmentation length.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">        - segmentation_length (Optional[float]): The length to segment the graph edges. If None, no segmentation is applied.</span>
+<span class="sd">        - edges_complex (gpd.GeoDataFrame): The GeoDataFrame containing the complex graph edges.</span>
+<span class="sd">        - crs (str): The coordinate reference system to apply if the CRS is missing after segmentation.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        - gpd.GeoDataFrame: The segmented edges_complex GeoDataFrame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">segmentation_length</span><span class="p">):</span>
+            <span class="n">segmentation</span> <span class="o">=</span> <span class="n">Segmentation</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">segmentation_length</span><span class="p">)</span>
+            <span class="n">segmented_edges</span> <span class="o">=</span> <span class="n">segmentation</span><span class="o">.</span><span class="n">apply_segmentation</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">segmented_edges</span><span class="o">.</span><span class="n">crs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># The CRS might have disappeared.</span>
+                <span class="n">segmented_edges</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">crs</span>  <span class="c1"># set the right CRS</span>
+
+            <span class="k">if</span> <span class="n">export_link_table</span><span class="p">:</span>
+                <span class="n">updated_link_tables</span> <span class="o">=</span> <span class="n">segmentation</span><span class="o">.</span><span class="n">generate_link_tables</span><span class="p">()</span>
+                <span class="n">segmented_edges</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rfid_c&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">segmented_edges</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;splt_id&quot;</span><span class="p">:</span> <span class="s2">&quot;rfid_c&quot;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">segmented_edges</span><span class="p">,</span> <span class="n">updated_link_tables</span>
+            <span class="k">return</span> <span class="n">segmented_edges</span>
+        <span class="k">elif</span> <span class="n">export_link_table</span> <span class="ow">and</span> <span class="n">link_tables</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">edges</span><span class="p">,</span> <span class="n">link_tables</span>
+        <span class="k">elif</span> <span class="n">export_link_table</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">link_tables</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;empty link_tables is passed&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">edges</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">edges</span></div>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">edges_input</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">segmentation_length</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">save_files</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># General</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edges_input</span> <span class="o">=</span> <span class="n">edges_input</span>  <span class="c1"># Edges GeoDataFrame</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edges_segmented</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="kc">None</span>  <span class="c1"># This is where the result will be saved Edges GeoDataframe</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link_tables</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="kc">None</span>  <span class="c1"># will include dictionaries simple_ids to complex and vice-versa</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_segmentation_length_from_metre</span><span class="p">(</span><span class="n">segmentation_length</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_files</span> <span class="o">=</span> <span class="n">save_files</span>  <span class="c1"># Todo not implemented yet</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_segmentation_length_from_metre</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">segmentation_length_in_metre</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert a length in meters to degrees at a given latitude.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">        - segmentation_length_in_metre: Length in meters to be converted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">origin</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">0</span><span class="p">,</span>
+            <span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>  <span class="c1"># reference at the equator. The conversion is more accurate at the equator and changes as you move towards the poles.</span>
+
+        <span class="c1"># Calculate the destination point segmentation_length_in_metre north (latitude direction)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">distance</span><span class="o">.</span><span class="n">geodesic</span><span class="o">.</span><span class="n">ELLIPSOID</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges_input</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">ellipsoid</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span>
+            <span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">distance</span><span class="o">.</span><span class="n">geodesic</span><span class="o">.</span><span class="n">ELLIPSOID</span> <span class="o">=</span> <span class="s2">&quot;WGS-84&quot;</span>
+
+        <span class="n">destination_point_lat</span> <span class="o">=</span> <span class="n">distance</span><span class="o">.</span><span class="n">geodesic</span><span class="p">(</span>
+            <span class="n">meters</span><span class="o">=</span><span class="n">segmentation_length_in_metre</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">destination</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">bearing</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">segmentation_length</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">destination_point_lat</span><span class="o">.</span><span class="n">latitude</span> <span class="o">-</span> <span class="n">origin</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>  <span class="c1"># length in degrees</span>
+
+<div class="viewcode-block" id="Segmentation.apply_segmentation"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.segmentation.Segmentation.apply_segmentation">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">apply_segmentation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cut_gdf</span><span class="p">()</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Finished segmenting the geodataframe with split length: </span><span class="si">{}</span><span class="s2"> degree&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">segmentation_length</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges_segmented</span></div>
+
+<div class="viewcode-block" id="Segmentation.cut"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.segmentation.Segmentation.cut">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">cut</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line</span><span class="p">:</span> <span class="n">LineString</span><span class="p">,</span> <span class="n">distance</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cuts a line in two at a distance from its starting point</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            line (LineString): Single linestring.</span>
+<span class="sd">            distance (float): Distance from starting point of linestring</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (list): A list containing two shapely linestring objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">distance</span> <span class="o">&lt;=</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">distance</span> <span class="o">&gt;=</span> <span class="n">line</span><span class="o">.</span><span class="n">length</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">LineString</span><span class="p">(</span><span class="n">line</span><span class="p">)]</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">coords</span><span class="p">):</span>
+            <span class="n">pd</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">Point</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">pd</span> <span class="o">==</span> <span class="n">distance</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">LineString</span><span class="p">(</span><span class="n">coords</span><span class="p">[:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]),</span> <span class="n">LineString</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">:])]</span>
+            <span class="k">if</span> <span class="n">pd</span> <span class="o">&gt;</span> <span class="n">distance</span><span class="p">:</span>
+                <span class="n">cp</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[</span>
+                    <span class="n">LineString</span><span class="p">(</span><span class="n">coords</span><span class="p">[:</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="p">[(</span><span class="n">cp</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">cp</span><span class="o">.</span><span class="n">y</span><span class="p">)]),</span>
+                    <span class="n">LineString</span><span class="p">([(</span><span class="n">cp</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">cp</span><span class="o">.</span><span class="n">y</span><span class="p">)]</span> <span class="o">+</span> <span class="n">coords</span><span class="p">[</span><span class="n">i</span><span class="p">:]),</span>
+                <span class="p">]</span></div>
+
+<div class="viewcode-block" id="Segmentation.check_divisibility"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.segmentation.Segmentation.check_divisibility">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_divisibility</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dividend</span><span class="p">,</span> <span class="n">divisor</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checks if the dividend is a multiple of the divisor and outputs a boolean value</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dividend (float): The number which is divided</span>
+<span class="sd">            divisor (float): The number which divides</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            is_multiple (bool): True if the dividend is a multiple of the divisor, False if not</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">dividend</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">dividend</span><span class="p">))</span>
+        <span class="n">divisor</span> <span class="o">=</span> <span class="n">Decimal</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">divisor</span><span class="p">))</span>
+        <span class="n">remainder</span> <span class="o">=</span> <span class="n">dividend</span> <span class="o">%</span> <span class="n">divisor</span>
+
+        <span class="k">return</span> <span class="n">remainder</span> <span class="o">==</span> <span class="n">Decimal</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Segmentation.number_of_segments"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.segmentation.Segmentation.number_of_segments">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">number_of_segments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linestring</span><span class="p">:</span> <span class="n">LineString</span><span class="p">,</span> <span class="n">split_length</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the integer number of segments which will result from chopping up a linestring with split_length</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            linestring (LineString): Single linestring.</span>
+<span class="sd">            split_length (float): The length by which to divide the linestring object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            n (int): Integer number of segments which will result from splitting linestring with split_length.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">divisible</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_divisibility</span><span class="p">(</span><span class="n">linestring</span><span class="o">.</span><span class="n">length</span><span class="p">,</span> <span class="n">split_length</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">divisible</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">linestring</span><span class="o">.</span><span class="n">length</span> <span class="o">/</span> <span class="n">split_length</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">linestring</span><span class="o">.</span><span class="n">length</span> <span class="o">/</span> <span class="n">split_length</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="Segmentation.split_linestring"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.segmentation.Segmentation.split_linestring">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">split_linestring</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">linestring</span><span class="p">:</span> <span class="n">LineString</span><span class="p">,</span> <span class="n">split_length</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cuts a linestring in equivalent segments of length split_length</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            linestring (LineString): Single linestring.</span>
+<span class="sd">            split_length (float): Length by which to split the linestring into equal segments.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            result_list (list): list of LineString objects that all have the same length split_lenght.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n_segments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">number_of_segments</span><span class="p">(</span><span class="n">linestring</span><span class="p">,</span> <span class="n">split_length</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">n_segments</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">result_list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">n_segments</span>
+            <span class="n">current_right_linestring</span> <span class="o">=</span> <span class="n">linestring</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_segments</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">network_cut</span><span class="p">(</span><span class="n">current_right_linestring</span><span class="p">,</span> <span class="n">split_length</span><span class="p">)</span>
+                <span class="c1"># Can accidently return Nonetypes</span>
+                <span class="k">if</span> <span class="n">r</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">current_left_linestring</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">current_right_linestring</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">result_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_left_linestring</span>
+                    <span class="n">result_list</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_right_linestring</span>
+                <span class="c1"># Sometimes the remainder is so small that it is only one point, which cannot be cut, in that case</span>
+                <span class="c1"># just pass #Todo: maybe we can do something here to avoid this error</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">linestring</span><span class="p">]</span>
+
+        <span class="c1"># Make sure this  function does not return any None objects, because these will cause problems later</span>
+        <span class="n">result_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">x</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">result_list</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="n">LineString</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="n">MultiLineString</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">result_list</span></div>
+
+<div class="viewcode-block" id="Segmentation.cut_gdf"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.segmentation.Segmentation.cut_gdf">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">cut_gdf</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Cuts every linestring or multilinestring feature in a gdf to equal length segments. Assumes only linestrings for now.</span>
+
+<span class="sd">            *gdf* (GeoDataFrame) : GeoDataFrame to split</span>
+<span class="sd">            *length* (units of the projection) : Typically in degrees, 0.001 degrees ~ 111 m in Europe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">gdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges_input</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">columns</span> <span class="o">=</span> <span class="n">gdf</span><span class="o">.</span><span class="n">columns</span>
+
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;splt_id&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">gdf</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">geom</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">geom</span><span class="p">)</span> <span class="o">==</span> <span class="n">LineString</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">geom</span><span class="p">)</span> <span class="o">==</span> <span class="n">MultiLineString</span>
+            <span class="n">linestrings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">split_linestring</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">segmentation_length</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">linestring</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">linestrings</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;geometry&quot;</span><span class="p">:</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">linestring</span><span class="p">)</span>
+                    <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;length&quot;</span><span class="p">:</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line_length</span><span class="p">(</span><span class="n">linestring</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges_input</span><span class="o">.</span><span class="n">crs</span><span class="p">))</span>
+                    <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;time&quot;</span><span class="p">:</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="nb">round</span><span class="p">((</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;length&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;avgspeed&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="n">data</span><span class="p">[</span><span class="s2">&quot;splt_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">edges_segmented</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Segmentation.generate_link_tables"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.segmentation.Segmentation.generate_link_tables">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_link_tables</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate mappings between RFIDs and split IDs.</span>
+
+<span class="sd">        The first dictionary maps an ``rfid`` to one or more ``splt_id`` values.</span>
+<span class="sd">        The second dictionary maps each ``splt_id`` back to its corresponding ``rfid``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple[dict[int, Union[int, list[int]]], dict[int, int]]:</span>
+<span class="sd">                - Dictionary mapping ``rfid`` to one or more ``splt_id``.</span>
+<span class="sd">                - Dictionary mapping ``splt_id`` back to ``rfid``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialize result dictionaries</span>
+        <span class="n">splt_id_to_rfid</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">rfid_to_splt_id</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Create a mapping from splt_id to rfid</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges_segmented</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">splt_id</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;splt_id&quot;</span><span class="p">]</span>
+            <span class="n">rfid</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;rfid&quot;</span><span class="p">]</span>
+            <span class="n">splt_id_to_rfid</span><span class="p">[</span><span class="n">splt_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">rfid</span>
+
+        <span class="c1"># Create a mapping from rfid to splt_id</span>
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges_segmented</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">splt_id</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;splt_id&quot;</span><span class="p">]</span>
+            <span class="n">rfid</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;rfid&quot;</span><span class="p">]</span>
+            <span class="n">rfid_c</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;rfid_c&quot;</span><span class="p">]</span>
+
+            <span class="c1"># Determine the expected rfid from rfid_c</span>
+            <span class="k">if</span> <span class="n">rfid</span> <span class="ow">in</span> <span class="n">rfid_to_splt_id</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rfid_to_splt_id</span><span class="p">[</span><span class="n">rfid</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                    <span class="n">rfid_to_splt_id</span><span class="p">[</span><span class="n">rfid</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">splt_id</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">rfid_to_splt_id</span><span class="p">[</span><span class="n">rfid</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">rfid_to_splt_id</span><span class="p">[</span><span class="n">rfid</span><span class="p">],</span> <span class="n">splt_id</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">rfid_to_splt_id</span><span class="p">[</span><span class="n">rfid</span><span class="p">]</span> <span class="o">=</span> <span class="n">splt_id</span>
+
+        <span class="c1"># Sort the dictionaries by their keys</span>
+        <span class="n">splt_id_to_rfid_sorted</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">splt_id_to_rfid</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+        <span class="n">rfid_to_splt_id_sorted</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">rfid_to_splt_id</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link_tables</span> <span class="o">=</span> <span class="p">(</span><span class="n">rfid_to_splt_id_sorted</span><span class="p">,</span> <span class="n">splt_id_to_rfid_sorted</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">link_tables</span></div></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

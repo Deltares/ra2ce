@@ -1,0 +1,1366 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>ra2ce.analysis.analysis_config_data package &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/ra2ce.analysis.analysis_config_data';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="ra2ce.analysis.analysis_config_data.enums package" href="ra2ce.analysis.analysis_config_data.enums.html" />
+    <link rel="prev" title="ra2ce.analysis package" href="analysis.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Table of Contents</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../about/about.html">RA2CE</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../installation/installation.html">Installation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="simple">
+</ul>
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">API Reference</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="network.html">ra2ce.network package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.avg_speed.html">ra2ce.network.avg_speed package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.exporters.html">ra2ce.network.exporters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.graph_files.html">ra2ce.network.graph_files package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.network.hazard.html">ra2ce.network.hazard package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.hazard.hazard_intersect.html">ra2ce.network.hazard.hazard_intersect package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.network.network_config_data.html">ra2ce.network.network_config_data package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_config_data.enums.html">ra2ce.network.network_config_data.enums package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.network.network_simplification.html">ra2ce.network.network_simplification package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.network.network_wrappers.html">ra2ce.network.network_wrappers package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.network.network_wrappers.osm_network_wrapper.html">ra2ce.network.network_wrappers.osm_network_wrapper package</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="analysis.html">ra2ce.analysis package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3 current active has-children"><a class="current reference internal" href="#">ra2ce.analysis.analysis_config_data package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html">ra2ce.analysis.analysis_config_data.enums package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.analysis_result.html">ra2ce.analysis.analysis_result package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.analysis.damages.html">ra2ce.analysis.damages package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_calculation.html">ra2ce.analysis.damages.damage_calculation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.damage_functions.html">ra2ce.analysis.damages.damage_functions package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.damages.shape_to_integrate_object.html">ra2ce.analysis.damages.shape_to_integrate_object package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.analysis.losses.html">ra2ce.analysis.losses package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.resilience_curves.html">ra2ce.analysis.losses.resilience_curves package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.risk_calculation.html">ra2ce.analysis.losses.risk_calculation package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.time_values.html">ra2ce.analysis.losses.time_values package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.traffic_analysis.html">ra2ce.analysis.losses.traffic_analysis package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.traffic_intensities.html">ra2ce.analysis.losses.traffic_intensities package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.losses.weighing_analysis.html">ra2ce.analysis.losses.weighing_analysis package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.adaptation.html">ra2ce.analysis.adaptation package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="ra2ce.common.html">ra2ce.common package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.common.configuration.html">ra2ce.common.configuration package</a></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="ra2ce.common.io.html">ra2ce.common.io package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.common.io.readers.html">ra2ce.common.io.readers package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.common.io.writers.html">ra2ce.common.io.writers package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.common.validation.html">ra2ce.common.validation package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.configuration.html">ra2ce.configuration package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.runners.html">ra2ce.runners package</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../contributing/index.html">Contributing</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../contributing/design_principles.html">Design principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../contributing/implementation_decisions.html">Implementation decisions</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq/faq.html">Frequently Asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../publications/publications.html">Publications</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../overview.html" class="nav-link">Overview</a></li>
+    
+    
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    
+    
+    <li class="breadcrumb-item"><a href="analysis.html" class="nav-link">ra2ce.analysis package</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.analys...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="ra2ce-analysis-analysis-config-data-package">
+<h1>ra2ce.analysis.analysis_config_data package<a class="headerlink" href="#ra2ce-analysis-analysis-config-data-package" title="Permalink to this heading">#</a></h1>
+<section id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this heading">#</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html">ra2ce.analysis.analysis_config_data.enums package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#module-ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum">ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum.AnalysisDamagesEnum"><code class="docutils literal notranslate"><span class="pre">AnalysisDamagesEnum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum.AnalysisDamagesEnum.DAMAGES"><code class="docutils literal notranslate"><span class="pre">AnalysisDamagesEnum.DAMAGES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum.AnalysisDamagesEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">AnalysisDamagesEnum.INVALID</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#module-ra2ce.analysis.analysis_config_data.enums.analysis_enum">ra2ce.analysis.analysis_config_data.enums.analysis_enum module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_enum.AnalysisEnum"><code class="docutils literal notranslate"><span class="pre">AnalysisEnum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_enum.AnalysisEnum.ADAPTATION"><code class="docutils literal notranslate"><span class="pre">AnalysisEnum.ADAPTATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_enum.AnalysisEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">AnalysisEnum.INVALID</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#module-ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum">ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum"><code class="docutils literal notranslate"><span class="pre">AnalysisLossesEnum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">AnalysisLossesEnum.INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum.MULTI_LINK_ISOLATED_LOCATIONS"><code class="docutils literal notranslate"><span class="pre">AnalysisLossesEnum.MULTI_LINK_ISOLATED_LOCATIONS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum.MULTI_LINK_LOSSES"><code class="docutils literal notranslate"><span class="pre">AnalysisLossesEnum.MULTI_LINK_LOSSES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION"><code class="docutils literal notranslate"><span class="pre">AnalysisLossesEnum.MULTI_LINK_ORIGIN_CLOSEST_DESTINATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum.MULTI_LINK_ORIGIN_DESTINATION"><code class="docutils literal notranslate"><span class="pre">AnalysisLossesEnum.MULTI_LINK_ORIGIN_DESTINATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum.MULTI_LINK_REDUNDANCY"><code class="docutils literal notranslate"><span class="pre">AnalysisLossesEnum.MULTI_LINK_REDUNDANCY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION"><code class="docutils literal notranslate"><span class="pre">AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_CLOSEST_DESTINATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION"><code class="docutils literal notranslate"><span class="pre">AnalysisLossesEnum.OPTIMAL_ROUTE_ORIGIN_DESTINATION</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum.SINGLE_LINK_LOSSES"><code class="docutils literal notranslate"><span class="pre">AnalysisLossesEnum.SINGLE_LINK_LOSSES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY"><code class="docutils literal notranslate"><span class="pre">AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#module-ra2ce.analysis.analysis_config_data.enums.damage_curve_enum">ra2ce.analysis.analysis_config_data.enums.damage_curve_enum module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum"><code class="docutils literal notranslate"><span class="pre">DamageCurveEnum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum.HZ"><code class="docutils literal notranslate"><span class="pre">DamageCurveEnum.HZ</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">DamageCurveEnum.INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum.MAN"><code class="docutils literal notranslate"><span class="pre">DamageCurveEnum.MAN</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum.OSD"><code class="docutils literal notranslate"><span class="pre">DamageCurveEnum.OSD</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#module-ra2ce.analysis.analysis_config_data.enums.event_type_enum">ra2ce.analysis.analysis_config_data.enums.event_type_enum module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.event_type_enum.EventTypeEnum"><code class="docutils literal notranslate"><span class="pre">EventTypeEnum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.event_type_enum.EventTypeEnum.EVENT"><code class="docutils literal notranslate"><span class="pre">EventTypeEnum.EVENT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.event_type_enum.EventTypeEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">EventTypeEnum.INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.event_type_enum.EventTypeEnum.NONE"><code class="docutils literal notranslate"><span class="pre">EventTypeEnum.NONE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.event_type_enum.EventTypeEnum.RETURN_PERIOD"><code class="docutils literal notranslate"><span class="pre">EventTypeEnum.RETURN_PERIOD</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#module-ra2ce.analysis.analysis_config_data.enums.loss_type_enum">ra2ce.analysis.analysis_config_data.enums.loss_type_enum module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.loss_type_enum.LossTypeEnum"><code class="docutils literal notranslate"><span class="pre">LossTypeEnum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.loss_type_enum.LossTypeEnum.CATEGORIZED"><code class="docutils literal notranslate"><span class="pre">LossTypeEnum.CATEGORIZED</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.loss_type_enum.LossTypeEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">LossTypeEnum.INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.loss_type_enum.LossTypeEnum.NONE"><code class="docutils literal notranslate"><span class="pre">LossTypeEnum.NONE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.loss_type_enum.LossTypeEnum.UNIFORM"><code class="docutils literal notranslate"><span class="pre">LossTypeEnum.UNIFORM</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#module-ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum">ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum.RiskCalculationModeEnum"><code class="docutils literal notranslate"><span class="pre">RiskCalculationModeEnum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum.RiskCalculationModeEnum.CUT_FROM_YEAR"><code class="docutils literal notranslate"><span class="pre">RiskCalculationModeEnum.CUT_FROM_YEAR</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum.RiskCalculationModeEnum.DEFAULT"><code class="docutils literal notranslate"><span class="pre">RiskCalculationModeEnum.DEFAULT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum.RiskCalculationModeEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">RiskCalculationModeEnum.INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum.RiskCalculationModeEnum.NONE"><code class="docutils literal notranslate"><span class="pre">RiskCalculationModeEnum.NONE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum.RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR"><code class="docutils literal notranslate"><span class="pre">RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#module-ra2ce.analysis.analysis_config_data.enums.traffic_period_enum">ra2ce.analysis.analysis_config_data.enums.traffic_period_enum module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.traffic_period_enum.TrafficPeriodEnum"><code class="docutils literal notranslate"><span class="pre">TrafficPeriodEnum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.traffic_period_enum.TrafficPeriodEnum.CUSTOM"><code class="docutils literal notranslate"><span class="pre">TrafficPeriodEnum.CUSTOM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.traffic_period_enum.TrafficPeriodEnum.DAY"><code class="docutils literal notranslate"><span class="pre">TrafficPeriodEnum.DAY</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.traffic_period_enum.TrafficPeriodEnum.EVENING_PEAK"><code class="docutils literal notranslate"><span class="pre">TrafficPeriodEnum.EVENING_PEAK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.traffic_period_enum.TrafficPeriodEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">TrafficPeriodEnum.INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.traffic_period_enum.TrafficPeriodEnum.MONTH"><code class="docutils literal notranslate"><span class="pre">TrafficPeriodEnum.MONTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.traffic_period_enum.TrafficPeriodEnum.MORNING_PEAK"><code class="docutils literal notranslate"><span class="pre">TrafficPeriodEnum.MORNING_PEAK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.traffic_period_enum.TrafficPeriodEnum.NIGHT"><code class="docutils literal notranslate"><span class="pre">TrafficPeriodEnum.NIGHT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.traffic_period_enum.TrafficPeriodEnum.NONE"><code class="docutils literal notranslate"><span class="pre">TrafficPeriodEnum.NONE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.traffic_period_enum.TrafficPeriodEnum.OFF_PEAK"><code class="docutils literal notranslate"><span class="pre">TrafficPeriodEnum.OFF_PEAK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.traffic_period_enum.TrafficPeriodEnum.WEEK"><code class="docutils literal notranslate"><span class="pre">TrafficPeriodEnum.WEEK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.traffic_period_enum.TrafficPeriodEnum.YEAR"><code class="docutils literal notranslate"><span class="pre">TrafficPeriodEnum.YEAR</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#module-ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum">ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum.TripPurposeEnum"><code class="docutils literal notranslate"><span class="pre">TripPurposeEnum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum.TripPurposeEnum.BUSINESS"><code class="docutils literal notranslate"><span class="pre">TripPurposeEnum.BUSINESS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum.TripPurposeEnum.COMMUTE"><code class="docutils literal notranslate"><span class="pre">TripPurposeEnum.COMMUTE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum.TripPurposeEnum.FREIGHT"><code class="docutils literal notranslate"><span class="pre">TripPurposeEnum.FREIGHT</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum.TripPurposeEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">TripPurposeEnum.INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum.TripPurposeEnum.NONE"><code class="docutils literal notranslate"><span class="pre">TripPurposeEnum.NONE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum.TripPurposeEnum.OTHER"><code class="docutils literal notranslate"><span class="pre">TripPurposeEnum.OTHER</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#module-ra2ce.analysis.analysis_config_data.enums.weighing_enum">ra2ce.analysis.analysis_config_data.enums.weighing_enum module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.weighing_enum.WeighingEnum"><code class="docutils literal notranslate"><span class="pre">WeighingEnum</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.weighing_enum.WeighingEnum.INVALID"><code class="docutils literal notranslate"><span class="pre">WeighingEnum.INVALID</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.weighing_enum.WeighingEnum.LENGTH"><code class="docutils literal notranslate"><span class="pre">WeighingEnum.LENGTH</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.weighing_enum.WeighingEnum.NONE"><code class="docutils literal notranslate"><span class="pre">WeighingEnum.NONE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.weighing_enum.WeighingEnum.TIME"><code class="docutils literal notranslate"><span class="pre">WeighingEnum.TIME</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#module-ra2ce.analysis.analysis_config_data.enums">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">#</a></h2>
+</section>
+<section id="module-ra2ce.analysis.analysis_config_data.analysis_config_data">
+<span id="ra2ce-analysis-analysis-config-data-analysis-config-data-module"></span><h2>ra2ce.analysis.analysis_config_data.analysis_config_data module<a class="headerlink" href="#module-ra2ce.analysis.analysis_config_data.analysis_config_data" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.</span></span><span class="sig-name descname"><span class="pre">AnalysisConfigData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root_path:</span> <span class="pre">Optional[Path]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_path:</span> <span class="pre">Optional[Path]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path:</span> <span class="pre">Optional[Path]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_path:</span> <span class="pre">Optional[Path]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project:</span> <span class="pre">ProjectSection</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analyses:</span> <span class="pre">list[ANALYSIS_SECTION]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">origins_destinations:</span> <span class="pre">Optional[OriginsDestinationsSection]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">network:</span> <span class="pre">NetworkSection</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregate_wl:</span> <span class="pre">AggregateWlEnum</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hazard_names:</span> <span class="pre">list[str]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data.html#AnalysisConfigData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ra2ce.common.configuration.html#ra2ce.common.configuration.config_data_protocol.ConfigDataProtocol" title="ra2ce.common.configuration.config_data_protocol.ConfigDataProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigDataProtocol</span></code></a></p>
+<p>Reflects all config data from analysis.ini with defaults set.
+Additionally, some attributes from the network config are added for completeness (files, origins_destinations, network, hazard_names)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.ANALYSIS_SECTION">
+<span class="sig-name descname"><span class="pre">ANALYSIS_SECTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages</span> <span class="pre">|</span> <span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses</span> <span class="pre">|</span> <span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.ANALYSIS_SECTION" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.adaptation">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">adaptation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation" title="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation"><span class="pre">AnalysisSectionAdaptation</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.adaptation" title="Permalink to this definition">#</a></dt>
+<dd><p>Get the adaptation analysis from config.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>AnalysisSectionAdaptation: Adaptation analysis.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.aggregate_wl">
+<span class="sig-name descname"><span class="pre">aggregate_wl</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.network.network_config_data.enums.html#ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum" title="ra2ce.network.network_config_data.enums.aggregate_wl_enum.AggregateWlEnum"><span class="pre">AggregateWlEnum</span></a></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.aggregate_wl" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.analyses">
+<span class="sig-name descname"><span class="pre">analyses</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">ANALYSIS_SECTION</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.analyses" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.damages_list">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">damages_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages" title="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages"><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.damages_list" title="Permalink to this definition">#</a></dt>
+<dd><p>Get all damages analyses from config.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>list[AnalysisSectionDamages]: List of all damages analyses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.get_analysis">
+<span class="sig-name descname"><span class="pre">get_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analysis</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_enum.AnalysisEnum" title="ra2ce.analysis.analysis_config_data.enums.analysis_enum.AnalysisEnum"><span class="pre">AnalysisEnum</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum.AnalysisDamagesEnum" title="ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum.AnalysisDamagesEnum"><span class="pre">AnalysisDamagesEnum</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum" title="ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum"><span class="pre">AnalysisLossesEnum</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ANALYSIS_SECTION</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data.html#AnalysisConfigData.get_analysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.get_analysis" title="Permalink to this definition">#</a></dt>
+<dd><p>Get a certain analysis from config.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>AnalysisSectionLosses | AnalysisSectionDamages | AnalysisSectionAdaptation:</dt><dd><p>The analysis.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.get_data_output">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_data_output</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ini_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Path</span></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data.html#AnalysisConfigData.get_data_output"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.get_data_output" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.hazard_names">
+<span class="sig-name descname"><span class="pre">hazard_names</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.hazard_names" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.input_path">
+<span class="sig-name descname"><span class="pre">input_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.input_path" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.losses_list">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">losses_list</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses" title="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses"><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.losses_list" title="Permalink to this definition">#</a></dt>
+<dd><p>Get all losses analyses from config.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>list[AnalysisSectionLosses]: List of all losses analyses.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.network">
+<span class="sig-name descname"><span class="pre">network</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.network.network_config_data.html#ra2ce.network.network_config_data.network_config_data.NetworkSection" title="ra2ce.network.network_config_data.network_config_data.NetworkSection"><span class="pre">NetworkSection</span></a></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.network" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.origins_destinations">
+<span class="sig-name descname"><span class="pre">origins_destinations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.network.network_config_data.html#ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection" title="ra2ce.network.network_config_data.network_config_data.OriginsDestinationsSection"><span class="pre">OriginsDestinationsSection</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.origins_destinations" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.output_path">
+<span class="sig-name descname"><span class="pre">output_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.output_path" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.project">
+<span class="sig-name descname"><span class="pre">project</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.ProjectSection" title="ra2ce.analysis.analysis_config_data.analysis_config_data.ProjectSection"><span class="pre">ProjectSection</span></a></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.project" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.reroot_analysis_config">
+<span class="sig-name descname"><span class="pre">reroot_analysis_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">analysis_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum.AnalysisDamagesEnum" title="ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum.AnalysisDamagesEnum"><span class="pre">AnalysisDamagesEnum</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum" title="ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum"><span class="pre">AnalysisLossesEnum</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData" title="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData"><span class="pre">AnalysisConfigData</span></a></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data.html#AnalysisConfigData.reroot_analysis_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.reroot_analysis_config" title="Permalink to this definition">#</a></dt>
+<dd><p>Reroot dependent analysis in config data to the input of another analysis.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>AnalysisConfigData: The rerooted config data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.root_path">
+<span class="sig-name descname"><span class="pre">root_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.root_path" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.static_path">
+<span class="sig-name descname"><span class="pre">static_path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.static_path" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.</span></span><span class="sig-name descname"><span class="pre">AnalysisSectionAdaptation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_gpkg:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_csv:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis:</span> <span class="pre">~ra2ce.analysis.analysis_config_data.enums.analysis_enum.AnalysisEnum</span> <span class="pre">=</span> <span class="pre">AnalysisEnum.ADAPTATION</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">losses_analysis:</span> <span class="pre">~ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum</span> <span class="pre">=</span> <span class="pre">AnalysisLossesEnum.SINGLE_LINK_LOSSES</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_horizon:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">discount_rate:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_frequency:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">climate_factor:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hazard_fraction_cost:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adaptation_options:</span> <span class="pre">list[ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data.html#AnalysisSectionAdaptation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase" title="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalysisSectionBase</span></code></a></p>
+<p>Reflects all possible settings that an adaptation analysis section might contain.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.adaptation_options">
+<span class="sig-name descname"><span class="pre">adaptation_options</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption" title="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption"><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.adaptation_options" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.analysis">
+<span class="sig-name descname"><span class="pre">analysis</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_enum.AnalysisEnum" title="ra2ce.analysis.analysis_config_data.enums.analysis_enum.AnalysisEnum"><span class="pre">AnalysisEnum</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.analysis" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.climate_factor">
+<span class="sig-name descname"><span class="pre">climate_factor</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.climate_factor" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.discount_rate">
+<span class="sig-name descname"><span class="pre">discount_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.discount_rate" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.hazard_fraction_cost">
+<span class="sig-name descname"><span class="pre">hazard_fraction_cost</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.hazard_fraction_cost" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.initial_frequency">
+<span class="sig-name descname"><span class="pre">initial_frequency</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.initial_frequency" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.losses_analysis">
+<span class="sig-name descname"><span class="pre">losses_analysis</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum" title="ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum"><span class="pre">AnalysisLossesEnum</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">7</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.losses_analysis" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.time_horizon">
+<span class="sig-name descname"><span class="pre">time_horizon</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.time_horizon" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.</span></span><span class="sig-name descname"><span class="pre">AnalysisSectionAdaptationOption</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">construction_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">construction_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maintenance_cost</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maintenance_interval</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1000.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data.html#AnalysisSectionAdaptationOption"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Reflects all possible settings that an adaptation option might contain.
+The id should be unique and is used to determine the location of the input and output files.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.construction_cost">
+<span class="sig-name descname"><span class="pre">construction_cost</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.construction_cost" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.construction_interval">
+<span class="sig-name descname"><span class="pre">construction_interval</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000.0</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.construction_interval" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.id" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.maintenance_cost">
+<span class="sig-name descname"><span class="pre">maintenance_cost</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.maintenance_cost" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.maintenance_interval">
+<span class="sig-name descname"><span class="pre">maintenance_interval</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000.0</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.maintenance_interval" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.name" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.</span></span><span class="sig-name descname"><span class="pre">AnalysisSectionBase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_gpkg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_csv</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data.html#AnalysisSectionBase"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Reflects all common settings that damages and losses analysis sections might contain.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase.name" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase.save_csv">
+<span class="sig-name descname"><span class="pre">save_csv</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase.save_csv" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase.save_gpkg">
+<span class="sig-name descname"><span class="pre">save_gpkg</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase.save_gpkg" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.</span></span><span class="sig-name descname"><span class="pre">AnalysisSectionDamages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_gpkg:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_csv:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis:</span> <span class="pre">~ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum.AnalysisDamagesEnum</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">representative_damage_percentage:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_type:</span> <span class="pre">~ra2ce.analysis.analysis_config_data.enums.event_type_enum.EventTypeEnum</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">damage_curve:</span> <span class="pre">~ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">risk_calculation_mode:</span> <span class="pre">~ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum.RiskCalculationModeEnum</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">risk_calculation_year:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_table:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name:</span> <span class="pre">~pathlib.Path</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data.html#AnalysisSectionDamages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase" title="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalysisSectionBase</span></code></a></p>
+<p>Reflects all possible settings that a damages analysis section might contain.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.analysis">
+<span class="sig-name descname"><span class="pre">analysis</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum.AnalysisDamagesEnum" title="ra2ce.analysis.analysis_config_data.enums.analysis_damages_enum.AnalysisDamagesEnum"><span class="pre">AnalysisDamagesEnum</span></a></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.analysis" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.create_table">
+<span class="sig-name descname"><span class="pre">create_table</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.create_table" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.damage_curve">
+<span class="sig-name descname"><span class="pre">damage_curve</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum" title="ra2ce.analysis.analysis_config_data.enums.damage_curve_enum.DamageCurveEnum"><span class="pre">DamageCurveEnum</span></a></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.damage_curve" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.event_type">
+<span class="sig-name descname"><span class="pre">event_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.event_type_enum.EventTypeEnum" title="ra2ce.analysis.analysis_config_data.enums.event_type_enum.EventTypeEnum"><span class="pre">EventTypeEnum</span></a></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.event_type" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.file_name">
+<span class="sig-name descname"><span class="pre">file_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.file_name" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.representative_damage_percentage">
+<span class="sig-name descname"><span class="pre">representative_damage_percentage</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.representative_damage_percentage" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.risk_calculation_mode">
+<span class="sig-name descname"><span class="pre">risk_calculation_mode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum.RiskCalculationModeEnum" title="ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum.RiskCalculationModeEnum"><span class="pre">RiskCalculationModeEnum</span></a></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.risk_calculation_mode" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.risk_calculation_year">
+<span class="sig-name descname"><span class="pre">risk_calculation_year</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.risk_calculation_year" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.</span></span><span class="sig-name descname"><span class="pre">AnalysisSectionLosses</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_gpkg:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_csv:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis:</span> <span class="pre">~ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighing:</span> <span class="pre">~ra2ce.analysis.analysis_config_data.enums.weighing_enum.WeighingEnum</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">production_loss_per_capita_per_hour:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traffic_period:</span> <span class="pre">~ra2ce.analysis.analysis_config_data.enums.traffic_period_enum.TrafficPeriodEnum</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hours_per_traffic_period:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trip_purposes:</span> <span class="pre">list[ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum.TripPurposeEnum]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resilience_curves_file:</span> <span class="pre">~pathlib.Path</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">traffic_intensities_file:</span> <span class="pre">~pathlib.Path</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values_of_time_file:</span> <span class="pre">~pathlib.Path</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold_destinations:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">equity_weight:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calculate_route_without_disruption:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer_meters:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category_field_name:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_traffic:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_type:</span> <span class="pre">~ra2ce.analysis.analysis_config_data.enums.event_type_enum.EventTypeEnum</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">risk_calculation_mode:</span> <span class="pre">~ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum.RiskCalculationModeEnum</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">risk_calculation_year:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data.html#AnalysisSectionLosses"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase" title="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnalysisSectionBase</span></code></a></p>
+<p>Reflects all possible settings that a losses analysis section might contain.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.analysis">
+<span class="sig-name descname"><span class="pre">analysis</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum" title="ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum.AnalysisLossesEnum"><span class="pre">AnalysisLossesEnum</span></a></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.analysis" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.buffer_meters">
+<span class="sig-name descname"><span class="pre">buffer_meters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">nan</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.buffer_meters" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.calculate_route_without_disruption">
+<span class="sig-name descname"><span class="pre">calculate_route_without_disruption</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.calculate_route_without_disruption" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.category_field_name">
+<span class="sig-name descname"><span class="pre">category_field_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.category_field_name" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.equity_weight">
+<span class="sig-name descname"><span class="pre">equity_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.equity_weight" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.event_type">
+<span class="sig-name descname"><span class="pre">event_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.event_type_enum.EventTypeEnum" title="ra2ce.analysis.analysis_config_data.enums.event_type_enum.EventTypeEnum"><span class="pre">EventTypeEnum</span></a></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.event_type" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.hours_per_traffic_period">
+<span class="sig-name descname"><span class="pre">hours_per_traffic_period</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.hours_per_traffic_period" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.production_loss_per_capita_per_hour">
+<span class="sig-name descname"><span class="pre">production_loss_per_capita_per_hour</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">nan</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.production_loss_per_capita_per_hour" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.resilience_curves_file">
+<span class="sig-name descname"><span class="pre">resilience_curves_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.resilience_curves_file" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.risk_calculation_mode">
+<span class="sig-name descname"><span class="pre">risk_calculation_mode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum.RiskCalculationModeEnum" title="ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum.RiskCalculationModeEnum"><span class="pre">RiskCalculationModeEnum</span></a></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.risk_calculation_mode" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.risk_calculation_year">
+<span class="sig-name descname"><span class="pre">risk_calculation_year</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.risk_calculation_year" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.save_traffic">
+<span class="sig-name descname"><span class="pre">save_traffic</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.save_traffic" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.threshold">
+<span class="sig-name descname"><span class="pre">threshold</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.threshold" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.threshold_destinations">
+<span class="sig-name descname"><span class="pre">threshold_destinations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">nan</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.threshold_destinations" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.traffic_intensities_file">
+<span class="sig-name descname"><span class="pre">traffic_intensities_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.traffic_intensities_file" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.traffic_period">
+<span class="sig-name descname"><span class="pre">traffic_period</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.traffic_period_enum.TrafficPeriodEnum" title="ra2ce.analysis.analysis_config_data.enums.traffic_period_enum.TrafficPeriodEnum"><span class="pre">TrafficPeriodEnum</span></a></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.traffic_period" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.trip_purposes">
+<span class="sig-name descname"><span class="pre">trip_purposes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum.TripPurposeEnum" title="ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum.TripPurposeEnum"><span class="pre">ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum.TripPurposeEnum</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.trip_purposes" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.values_of_time_file">
+<span class="sig-name descname"><span class="pre">values_of_time_file</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Path</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.values_of_time_file" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.weighing">
+<span class="sig-name descname"><span class="pre">weighing</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="ra2ce.analysis.analysis_config_data.enums.html#ra2ce.analysis.analysis_config_data.enums.weighing_enum.WeighingEnum" title="ra2ce.analysis.analysis_config_data.enums.weighing_enum.WeighingEnum"><span class="pre">WeighingEnum</span></a></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.weighing" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.ProjectSection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.</span></span><span class="sig-name descname"><span class="pre">ProjectSection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data.html#ProjectSection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.ProjectSection" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Reflects all possible settings that a project section might contain.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data.ProjectSection.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.ProjectSection.name" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.analysis.analysis_config_data.analysis_config_data_reader">
+<span id="ra2ce-analysis-analysis-config-data-analysis-config-data-reader-module"></span><h2>ra2ce.analysis.analysis_config_data.analysis_config_data_reader module<a class="headerlink" href="#module-ra2ce.analysis.analysis_config_data.analysis_config_data_reader" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data_reader.AnalysisConfigDataReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data_reader.</span></span><span class="sig-name descname"><span class="pre">AnalysisConfigDataReader</span></span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data_reader.html#AnalysisConfigDataReader"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data_reader.AnalysisConfigDataReader" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ra2ce.common.configuration.html#ra2ce.common.configuration.ini_configuration_reader_protocol.ConfigDataReaderProtocol" title="ra2ce.common.configuration.ini_configuration_reader_protocol.ConfigDataReaderProtocol"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigDataReaderProtocol</span></code></a></p>
+<p>Reads the analysis configuration file analyses.ini.
+Takes network_data as optional input. If not provided, it will read the network configuration
+from the network.ini in the output folder.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data_reader.AnalysisConfigDataReader.get_analysis_sections">
+<span class="sig-name descname"><span class="pre">get_analysis_sections</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages" title="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages"><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses" title="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses"><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation" title="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation"><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data_reader.html#AnalysisConfigDataReader.get_analysis_sections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data_reader.AnalysisConfigDataReader.get_analysis_sections" title="Permalink to this definition">#</a></dt>
+<dd><p>Extracts info from [analysis&lt;n&gt;] sections</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>list[ANALYSIS_SECTION]: List of analyses</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data_reader.AnalysisConfigDataReader.get_project_section">
+<span class="sig-name descname"><span class="pre">get_project_section</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.ProjectSection" title="ra2ce.analysis.analysis_config_data.analysis_config_data.ProjectSection"><span class="pre">ProjectSection</span></a></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data_reader.html#AnalysisConfigDataReader.get_project_section"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data_reader.AnalysisConfigDataReader.get_project_section" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data_reader.AnalysisConfigDataReader.read">
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ini_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Path</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData" title="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData"><span class="pre">AnalysisConfigData</span></a></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data_reader.html#AnalysisConfigDataReader.read"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data_reader.AnalysisConfigDataReader.read" title="Permalink to this definition">#</a></dt>
+<dd><p>Reads the given <cite>*.ini</cite> file and if possible converts it into a <cite>IniConfigDataProtocol</cite> object.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>ini_file (Path): Ini file to be mapped into a <cite>IniConfigDataProtocol</cite>.</p>
+</dd>
+<dt>Returns:</dt><dd><p>ConfigWrapperProtocol: Resulting mapped object from the configuration data in the given file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.analysis.analysis_config_data.analysis_config_data_validator">
+<span id="ra2ce-analysis-analysis-config-data-analysis-config-data-validator-module"></span><h2>ra2ce.analysis.analysis_config_data.analysis_config_data_validator module<a class="headerlink" href="#module-ra2ce.analysis.analysis_config_data.analysis_config_data_validator" title="Permalink to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>GNU GENERAL PUBLIC LICENSE</dt><dd><p>Version 3, 29 June 2007</p>
+</dd>
+</dl>
+</div></blockquote>
+<p>Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023 Stichting Deltares</p>
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+<p>You should have received a copy of the GNU General Public License
+along with this program.  If not, see &lt;<a class="reference external" href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data_validator.AnalysisConfigDataValidator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ra2ce.analysis.analysis_config_data.analysis_config_data_validator.</span></span><span class="sig-name descname"><span class="pre">AnalysisConfigDataValidator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData" title="ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData"><span class="pre">AnalysisConfigData</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data_validator.html#AnalysisConfigDataValidator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data_validator.AnalysisConfigDataValidator" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="ra2ce.common.validation.html#ra2ce.common.validation.ra2ce_validator_protocol.Ra2ceIoValidator" title="ra2ce.common.validation.ra2ce_validator_protocol.Ra2ceIoValidator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ra2ceIoValidator</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="ra2ce.analysis.analysis_config_data.analysis_config_data_validator.AnalysisConfigDataValidator.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="ra2ce.common.validation.html#ra2ce.common.validation.validation_report.ValidationReport" title="ra2ce.common.validation.validation_report.ValidationReport"><span class="pre">ValidationReport</span></a></span></span><a class="reference internal" href="../_modules/ra2ce/analysis/analysis_config_data/analysis_config_data_validator.html#AnalysisConfigDataValidator.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ra2ce.analysis.analysis_config_data.analysis_config_data_validator.AnalysisConfigDataValidator.validate" title="Permalink to this definition">#</a></dt>
+<dd><p>Generates a <cite>ValidationReport</cite> based on its inner-defined criteria.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>ValidationReport: Result of the internal checks.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-ra2ce.analysis.analysis_config_data">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-ra2ce.analysis.analysis_config_data" title="Permalink to this heading">#</a></h2>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="analysis.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">ra2ce.analysis package</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="ra2ce.analysis.analysis_config_data.enums.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">ra2ce.analysis.analysis_config_data.enums package</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subpackages">Subpackages</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submodules">Submodules</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.analysis.analysis_config_data.analysis_config_data">ra2ce.analysis.analysis_config_data.analysis_config_data module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.ANALYSIS_SECTION"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.ANALYSIS_SECTION</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.adaptation"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.adaptation</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.aggregate_wl"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.aggregate_wl</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.analyses"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.analyses</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.damages_list"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.damages_list</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.get_analysis"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.get_analysis()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.get_data_output"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.get_data_output()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.hazard_names"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.hazard_names</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.input_path"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.input_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.losses_list"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.losses_list</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.network"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.network</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.origins_destinations"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.origins_destinations</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.output_path"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.output_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.project"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.project</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.reroot_analysis_config"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.reroot_analysis_config()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.root_path"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.root_path</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisConfigData.static_path"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigData.static_path</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptation</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.adaptation_options"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptation.adaptation_options</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.analysis"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptation.analysis</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.climate_factor"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptation.climate_factor</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.discount_rate"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptation.discount_rate</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.hazard_fraction_cost"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptation.hazard_fraction_cost</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.initial_frequency"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptation.initial_frequency</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.losses_analysis"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptation.losses_analysis</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptation.time_horizon"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptation.time_horizon</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptationOption</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.construction_cost"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptationOption.construction_cost</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.construction_interval"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptationOption.construction_interval</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.id"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptationOption.id</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.maintenance_cost"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptationOption.maintenance_cost</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.maintenance_interval"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptationOption.maintenance_interval</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionAdaptationOption.name"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionAdaptationOption.name</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionBase</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase.name"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionBase.name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase.save_csv"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionBase.save_csv</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionBase.save_gpkg"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionBase.save_gpkg</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionDamages</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.analysis"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionDamages.analysis</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.create_table"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionDamages.create_table</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.damage_curve"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionDamages.damage_curve</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.event_type"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionDamages.event_type</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.file_name"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionDamages.file_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.representative_damage_percentage"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionDamages.representative_damage_percentage</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.risk_calculation_mode"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionDamages.risk_calculation_mode</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionDamages.risk_calculation_year"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionDamages.risk_calculation_year</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.analysis"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.analysis</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.buffer_meters"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.buffer_meters</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.calculate_route_without_disruption"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.calculate_route_without_disruption</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.category_field_name"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.category_field_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.equity_weight"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.equity_weight</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.event_type"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.event_type</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.hours_per_traffic_period"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.hours_per_traffic_period</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.production_loss_per_capita_per_hour"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.production_loss_per_capita_per_hour</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.resilience_curves_file"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.resilience_curves_file</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.risk_calculation_mode"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.risk_calculation_mode</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.risk_calculation_year"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.risk_calculation_year</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.save_traffic"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.save_traffic</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.threshold"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.threshold</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.threshold_destinations"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.threshold_destinations</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.traffic_intensities_file"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.traffic_intensities_file</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.traffic_period"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.traffic_period</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.trip_purposes"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.trip_purposes</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.values_of_time_file"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.values_of_time_file</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.AnalysisSectionLosses.weighing"><code class="docutils literal notranslate"><span class="pre">AnalysisSectionLosses.weighing</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.ProjectSection"><code class="docutils literal notranslate"><span class="pre">ProjectSection</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data.ProjectSection.name"><code class="docutils literal notranslate"><span class="pre">ProjectSection.name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.analysis.analysis_config_data.analysis_config_data_reader">ra2ce.analysis.analysis_config_data.analysis_config_data_reader module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data_reader.AnalysisConfigDataReader"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigDataReader</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data_reader.AnalysisConfigDataReader.get_analysis_sections"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigDataReader.get_analysis_sections()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data_reader.AnalysisConfigDataReader.get_project_section"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigDataReader.get_project_section()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data_reader.AnalysisConfigDataReader.read"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigDataReader.read()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.analysis.analysis_config_data.analysis_config_data_validator">ra2ce.analysis.analysis_config_data.analysis_config_data_validator module</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data_validator.AnalysisConfigDataValidator"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigDataValidator</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#ra2ce.analysis.analysis_config_data.analysis_config_data_validator.AnalysisConfigDataValidator.validate"><code class="docutils literal notranslate"><span class="pre">AnalysisConfigDataValidator.validate()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-ra2ce.analysis.analysis_config_data">Module contents</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/Deltares/ra2ce/edit/master/docs/api/ra2ce.analysis.analysis_config_data.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
+    </a>
+  </div>
+</div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/api/ra2ce.analysis.analysis_config_data.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

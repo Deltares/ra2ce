@@ -1,0 +1,1011 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ra2ce.analysis.losses.losses_base &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/ra2ce/analysis/losses/losses_base';</script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.analys...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for ra2ce.analysis.losses.losses_base</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                    GNU GENERAL PUBLIC LICENSE</span>
+<span class="sd">                      Version 3, 29 June 2007</span>
+
+<span class="sd">    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).</span>
+<span class="sd">    Copyright (C) 2023 Stichting Deltares</span>
+
+<span class="sd">    This program is free software: you can redistribute it and/or modify</span>
+<span class="sd">    it under the terms of the GNU General Public License as published by</span>
+<span class="sd">    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="sd">    (at your option) any later version.</span>
+
+<span class="sd">    This program is distributed in the hope that it will be useful,</span>
+<span class="sd">    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">    GNU General Public License for more details.</span>
+
+<span class="sd">    You should have received a copy of the GNU General Public License</span>
+<span class="sd">    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">GeoDataFrame</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_base</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.analysis_config_data</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AnalysisSectionLosses</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.event_type_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventTypeEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.risk_calculation_mode_enum</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">RiskCalculationModeEnum</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.traffic_period_enum</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TrafficPeriodEnum</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_data.enums.trip_purpose_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">TripPurposeEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_config_wrapper</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisConfigWrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_input_wrapper</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisInputWrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.analysis_result.analysis_result_wrapper</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisResultWrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.losses.analysis_losses_protocol</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisLossesProtocol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.losses.resilience_curves.resilience_curves_reader</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ResilienceCurvesReader</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.losses.risk_calculation.risk_calculation_factory</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">RiskCalculationFactory</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.losses.time_values.time_values_reader</span><span class="w"> </span><span class="kn">import</span> <span class="n">TimeValuesReader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.analysis.losses.traffic_intensities.traffic_intensities_reader</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">TrafficIntensitiesReader</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.graph_files.graph_file</span><span class="w"> </span><span class="kn">import</span> <span class="n">GraphFile</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.hazard.hazard_names</span><span class="w"> </span><span class="kn">import</span> <span class="n">HazardNames</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.network_config_data.enums.road_type_enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">RoadTypeEnum</span>
+
+
+<div class="viewcode-block" id="LossesBase"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.losses_base.LossesBase">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">LossesBase</span><span class="p">(</span><span class="n">AnalysisLossesProtocol</span><span class="p">,</span> <span class="n">AnalysisBase</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is the base class for the Losses analyses, containing the common methods and attributes.</span>
+<span class="sd">    Based on the analysis type a different criticality analysis is executed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">analysis</span><span class="p">:</span> <span class="n">AnalysisSectionLosses</span>
+    <span class="n">graph_file_hazard</span><span class="p">:</span> <span class="n">GraphFile</span>
+    <span class="n">input_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">static_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">output_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="n">hazard_names</span><span class="p">:</span> <span class="n">HazardNames</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">analysis_input</span><span class="p">:</span> <span class="n">AnalysisInputWrapper</span><span class="p">,</span>
+        <span class="n">analysis_config</span><span class="p">:</span> <span class="n">AnalysisConfigWrapper</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analysis_input</span> <span class="o">=</span> <span class="n">analysis_input</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analysis_config</span> <span class="o">=</span> <span class="n">analysis_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">analysis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph_file_hazard</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">graph_file_hazard</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">link_id</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="o">.</span><span class="n">config_data</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">file_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">link_type_column</span> <span class="o">=</span> <span class="n">analysis_config</span><span class="o">.</span><span class="n">config_data</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">link_type_column</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trip_purposes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TripPurposeEnum</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">trip_purposes</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">performance_metric</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;diff_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">weighing</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">analysis_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">analysis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">traffic_period</span><span class="p">:</span> <span class="n">TrafficPeriodEnum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">traffic_period</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hours_per_traffic_period</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">hours_per_traffic_period</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">hours_per_traffic_period</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hours_per_traffic_period</span> <span class="o">=</span> <span class="mi">24</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">traffic_period</span> <span class="o">!=</span> <span class="n">TrafficPeriodEnum</span><span class="o">.</span><span class="n">DAY</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;No value set for `hours_per_traffic_period`. Assuming 24 hours per traffic period.&quot;</span>
+                <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">production_loss_per_capita_per_hour</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">production_loss_per_capita_per_hour</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">intensities</span> <span class="o">=</span> <span class="n">TrafficIntensitiesReader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">link_id</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">traffic_intensities_file</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resilience_curves</span> <span class="o">=</span> <span class="n">ResilienceCurvesReader</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">resilience_curves_file</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values_of_time</span> <span class="o">=</span> <span class="n">TimeValuesReader</span><span class="p">()</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">values_of_time_file</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_path</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">input_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">static_path</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">static_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_path</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">output_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hazard_names</span> <span class="o">=</span> <span class="n">analysis_input</span><span class="o">.</span><span class="n">hazard_names</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span> <span class="o">=</span> <span class="n">GeoDataFrame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis_non_disrupted</span> <span class="o">=</span> <span class="n">GeoDataFrame</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="n">GeoDataFrame</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_disrupted_criticality_analysis_results</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">criticality_analysis</span><span class="p">:</span> <span class="n">GeoDataFrame</span>
+    <span class="p">):</span>
+        <span class="n">criticality_analysis</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;key&quot;</span> <span class="ow">in</span> <span class="n">criticality_analysis</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">criticality_analysis</span> <span class="o">=</span> <span class="n">criticality_analysis</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span>
+                <span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;key&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">criticality_analysis</span> <span class="o">=</span> <span class="n">criticality_analysis</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">([</span><span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">])</span>
+        <span class="c1">#  ToDO: check hazard overlay with AggregateWlEnum.NONE or INVALID</span>
+
+        <span class="n">aggregate_wl_abbreviation</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">analysis_config</span><span class="o">.</span><span class="n">config_data</span><span class="o">.</span><span class="n">aggregate_wl</span><span class="o">.</span><span class="n">get_wl_abbreviation</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">hazard_aggregate_wl_columns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">c</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">criticality_analysis</span><span class="o">.</span><span class="n">columns</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;RP&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">c</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;EV&quot;</span><span class="p">))</span>
+            <span class="ow">and</span> <span class="n">c</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">aggregate_wl_abbreviation</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span> <span class="o">=</span> <span class="n">criticality_analysis</span><span class="p">[</span>
+            <span class="p">(</span>
+                <span class="n">criticality_analysis</span><span class="p">[</span><span class="n">hazard_aggregate_wl_columns</span><span class="p">]</span>
+                <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">threshold</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis_non_disrupted</span> <span class="o">=</span> <span class="n">criticality_analysis</span><span class="p">[</span>
+            <span class="o">~</span><span class="n">criticality_analysis</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="c1"># link_id from list to tuple</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis_non_disrupted</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis_non_disrupted</span><span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">link_id</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis_non_disrupted</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">link_id</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">link_id</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">link_id</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">x</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">link_id</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis_non_disrupted</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis_non_disrupted</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="LossesBase.calculate_vehicle_loss_hours"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.losses_base.LossesBase.calculate_vehicle_loss_hours">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_vehicle_loss_hours</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeoDataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This function opens an existing table with traffic data and value of time to calculate losses based on</span>
+<span class="sd">        detouring values. It also includes a traffic jam estimation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_check_validity_criticality_analysis</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">link_type_column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;&quot;&quot;criticality_analysis results does not have the passed link_type_column.</span>
+<span class="s2">            </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">link_type_column</span><span class="si">}</span><span class="s2"> is passed as link_type_column&quot;&quot;&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_get_range</span><span class="p">(</span><span class="n">height</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">range_tuple</span> <span class="ow">in</span> <span class="n">_hazard_intensity_ranges</span><span class="p">:</span>
+                <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">range_tuple</span>
+                <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="n">height</span> <span class="o">&lt;=</span> <span class="n">y</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No matching range found for height </span><span class="si">{</span><span class="n">height</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_create_result</span><span class="p">(</span><span class="n">vlh</span><span class="p">:</span> <span class="n">GeoDataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GeoDataFrame</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">            Args: vlh: calculated vehicle_loss_hours GeoDataFrame. For single_link_losses it only includes the</span>
+<span class="sd">            disrupted links. For Multi_link_losses it includes all links. This is because of the difference between</span>
+<span class="sd">            the underlying single_link_redundancy and multi_link_redundancy analysis results.</span>
+
+<span class="sd">            Returns: results of the Losses analysis. For the single_link_losses it adds non_disrupted links to vlh. For</span>
+<span class="sd">            Multi_link_losses this is not necessary because of the underlying multi_link_redundancy analysis.</span>
+
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">columns_without_index</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">col</span>
+                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis_non_disrupted</span><span class="o">.</span><span class="n">columns</span>
+                <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;level_0&quot;</span><span class="p">]</span>
+            <span class="p">]</span>
+            <span class="c1"># Get the vlh_columns from vehicle_loss_hours that vlh calculations are filled in.</span>
+            <span class="n">vlh_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="nb">set</span><span class="p">(</span><span class="n">vlh</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+                <span class="o">-</span> <span class="nb">set</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis_non_disrupted</span><span class="p">[</span>
+                        <span class="n">columns_without_index</span>
+                    <span class="p">]</span><span class="o">.</span><span class="n">columns</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">vlh</span><span class="p">[</span><span class="n">vlh_columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">vlh</span><span class="p">[</span><span class="n">vlh_columns</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">vlh</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis_non_disrupted</span><span class="p">[</span><span class="n">columns_without_index</span><span class="p">],</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+
+            <span class="c1"># Fill 0 for the vlh_columns of vlh and self.criticality_analysis_non_disrupted</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">result</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">vlh</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="n">vlh_columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">vlh</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="n">vlh_columns</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;level_0&quot;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="n">_check_validity_criticality_analysis</span><span class="p">()</span>
+
+        <span class="n">_hazard_intensity_ranges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resilience_curves</span><span class="o">.</span><span class="n">ranges</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">regex</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^(EV|RP)(?!\d+_fr)&quot;</span><span class="p">)</span>
+        <span class="c1"># Read the performance_change stating the functionality drop</span>
+        <span class="k">if</span> <span class="s2">&quot;key&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">performance_change</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="p">[</span>
+                <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">performance_metric</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;key&quot;</span><span class="p">]</span>
+            <span class="p">]</span>
+            <span class="n">vehicle_loss_hours_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">link_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                    <span class="s2">&quot;u&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;v&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="p">[</span><span class="s2">&quot;v&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;key&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">],</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">performance_change</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="p">[</span>
+                <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">performance_metric</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;u&quot;</span><span class="p">,</span> <span class="s2">&quot;v&quot;</span><span class="p">]</span>
+            <span class="p">]</span>
+            <span class="n">vehicle_loss_hours_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">link_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                    <span class="s2">&quot;u&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;v&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="p">[</span><span class="s2">&quot;v&quot;</span><span class="p">],</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="c1"># shape vehicle_loss_hours</span>
+        <span class="c1"># Check if the index name exists in the columns</span>
+        <span class="k">if</span> <span class="n">vehicle_loss_hours_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">vehicle_loss_hours_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">vehicle_loss_hours_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">vehicle_loss_hours_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># find the link_type and the hazard intensity</span>
+        <span class="n">connectivity_attribute</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">col</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="o">.</span><span class="n">columns</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;detour&quot;</span><span class="p">,</span> <span class="s2">&quot;connected&quot;</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="n">connectivity_attribute</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;detour&quot;</span>
+                <span class="k">if</span> <span class="s2">&quot;detour&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="o">.</span><span class="n">columns</span>
+                <span class="k">else</span> <span class="s2">&quot;connected&quot;</span>
+            <span class="p">)</span>
+        <span class="n">vlh_additional_columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span>
+            <span class="n">vehicle_loss_hours_df</span><span class="o">.</span><span class="n">columns</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">vehicle_loss_hours_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+            <span class="n">vehicle_loss_hours_df</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="p">[</span><span class="n">vlh_additional_columns</span><span class="p">],</span>
+            <span class="n">left_on</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">link_id</span><span class="p">,</span>
+            <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">vehicle_loss_hours</span> <span class="o">=</span> <span class="n">GeoDataFrame</span><span class="p">(</span>
+            <span class="n">vehicle_loss_hours_df</span><span class="p">,</span>
+            <span class="n">geometry</span><span class="o">=</span><span class="s2">&quot;geometry&quot;</span><span class="p">,</span>
+            <span class="n">crs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">criticality_analysis</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">vlh_row</span> <span class="ow">in</span> <span class="n">vehicle_loss_hours</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">vlh_row</span><span class="p">[</span><span class="n">event</span><span class="p">]</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">threshold</span><span class="p">:</span>
+                    <span class="n">row_hazard_range</span> <span class="o">=</span> <span class="n">_get_range</span><span class="p">(</span><span class="n">vlh_row</span><span class="p">[</span><span class="n">event</span><span class="p">])</span>
+                    <span class="n">row_connectivity</span> <span class="o">=</span> <span class="n">vlh_row</span><span class="p">[</span><span class="n">connectivity_attribute</span><span class="p">]</span>
+                    <span class="n">row_performance_changes</span> <span class="o">=</span> <span class="n">performance_change</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                        <span class="p">[</span><span class="n">vlh_row</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">link_id</span><span class="p">]]</span>
+                    <span class="p">]</span>
+                    <span class="k">if</span> <span class="s2">&quot;key&quot;</span> <span class="ow">in</span> <span class="n">vlh_row</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="n">vlh_row</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">key</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="n">vlh_row</span><span class="p">[</span><span class="s2">&quot;u&quot;</span><span class="p">],</span> <span class="n">vlh_row</span><span class="p">[</span><span class="s2">&quot;v&quot;</span><span class="p">])</span>
+                    <span class="c1"># allow link_id not to be unique in the graph (results reliability is up to the user)</span>
+                    <span class="c1"># this can happen for instance when a directed graph should be made from an input network</span>
+                    <span class="k">for</span> <span class="n">performance_row</span> <span class="ow">in</span> <span class="n">row_performance_changes</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                        <span class="n">row_performance_change</span> <span class="o">=</span> <span class="n">performance_row</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">performance_metric</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">]</span>
+                        <span class="n">performance_key</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="k">if</span> <span class="s2">&quot;key&quot;</span> <span class="ow">in</span> <span class="n">performance_row</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                            <span class="n">performance_key</span> <span class="o">=</span> <span class="n">performance_row</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;key&quot;</span><span class="p">]</span>
+                        <span class="n">row_u_v_k</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">performance_row</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;u&quot;</span><span class="p">],</span>
+                            <span class="n">performance_row</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;v&quot;</span><span class="p">],</span>
+                            <span class="n">performance_key</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="p">(</span>
+                            <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">row_performance_change</span><span class="p">)</span> <span class="ow">and</span> <span class="n">row_connectivity</span> <span class="o">==</span> <span class="mi">0</span>
+                        <span class="p">)</span> <span class="ow">or</span> <span class="n">row_performance_change</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_production_loss_per_capita</span><span class="p">(</span>
+                                <span class="n">vehicle_loss_hours</span><span class="p">,</span> <span class="n">row_hazard_range</span><span class="p">,</span> <span class="n">vlh_row</span><span class="p">,</span> <span class="n">event</span>
+                            <span class="p">)</span>
+                        <span class="k">elif</span> <span class="ow">not</span> <span class="p">(</span>
+                            <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">row_performance_change</span><span class="p">)</span>
+                            <span class="ow">and</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">row_connectivity</span><span class="p">)</span>
+                        <span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span> <span class="o">==</span> <span class="n">row_u_v_k</span><span class="p">):</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_populate_vehicle_loss_hour</span><span class="p">(</span>
+                                <span class="n">vehicle_loss_hours</span><span class="p">,</span>
+                                <span class="n">row_hazard_range</span><span class="p">,</span>
+                                <span class="n">vlh_row</span><span class="p">,</span>
+                                <span class="n">row_performance_change</span><span class="p">,</span>
+                                <span class="n">event</span><span class="p">,</span>
+                            <span class="p">)</span>
+
+        <span class="n">vehicle_loss_hours_result</span> <span class="o">=</span> <span class="n">_create_result</span><span class="p">(</span><span class="n">vehicle_loss_hours</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">vehicle_loss_hours_result</span></div>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_relevant_link_type</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">vlh_row</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">row_hazard_range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RoadTypeEnum</span><span class="p">:</span>
+        <span class="c1"># Check if the resilience curve is present for the link type and hazard intensity</span>
+        <span class="n">_relevant_link_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vlh_row</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">link_type_column</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="c1"># Find the link type with the highest disruption for the given hazard intensity</span>
+            <span class="n">_max_disruption</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">_row_link_type</span> <span class="ow">in</span> <span class="n">vlh_row</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">link_type_column</span><span class="p">]:</span>
+                <span class="n">_link_type</span> <span class="o">=</span> <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">get_enum</span><span class="p">(</span><span class="n">_row_link_type</span><span class="p">)</span>
+                <span class="n">disruption</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resilience_curves</span><span class="o">.</span><span class="n">calculate_disruption</span><span class="p">(</span>
+                    <span class="n">_link_type</span><span class="p">,</span> <span class="n">row_hazard_range</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">disruption</span> <span class="o">&gt;</span> <span class="n">_max_disruption</span><span class="p">:</span>
+                    <span class="n">_relevant_link_type</span> <span class="o">=</span> <span class="n">_link_type</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_link_type</span> <span class="o">=</span> <span class="n">RoadTypeEnum</span><span class="o">.</span><span class="n">get_enum</span><span class="p">(</span><span class="n">vlh_row</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">link_type_column</span><span class="p">])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resilience_curves</span><span class="o">.</span><span class="n">has_resilience_curve</span><span class="p">(</span>
+                <span class="n">_link_type</span><span class="p">,</span>
+                <span class="n">row_hazard_range</span><span class="p">,</span>
+            <span class="p">):</span>
+                <span class="n">_relevant_link_type</span> <span class="o">=</span> <span class="n">_link_type</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_relevant_link_type</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">_link_type</span><span class="si">}</span><span class="s2">&#39; with range </span><span class="si">{</span><span class="n">row_hazard_range</span><span class="si">}</span><span class="s2"> was not found in the introduced resilience_curves&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_relevant_link_type</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_divisor</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">relevant_link_type</span><span class="p">:</span> <span class="n">RoadTypeEnum</span><span class="p">,</span> <span class="n">row_hazard_range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">ratio</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">ratio</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resilience_curves</span><span class="o">.</span><span class="n">get_functionality_loss_ratio</span><span class="p">(</span>
+                <span class="n">relevant_link_type</span><span class="p">,</span> <span class="n">row_hazard_range</span>
+            <span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="mi">100</span>  <span class="c1"># high value assuming the road is almost inaccessible</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_production_loss_per_capita</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">vehicle_loss_hours</span><span class="p">:</span> <span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">row_hazard_range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">vlh_row</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+        <span class="n">hazard_col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        In cases where there is no alternative route in the event of disruption of the road, we propose to use a</span>
+<span class="sd">        proxy for the assessment of losses from the interruption of services from the road in these cases where no</span>
+<span class="sd">        alternative routes exist.</span>
+<span class="sd">        The assumption for the proxy is that a loss of production will occur from the</span>
+<span class="sd">        interruption of the road, equal to the size of the added value from the persons that cannot make use of the</span>
+<span class="sd">        road, measured in the regional GDP per capita. This assumption constitutes both the loss of production within</span>
+<span class="sd">        the area that cannot be reached, as well the loss of production outside the area due to the inability of the</span>
+<span class="sd">        workers from within the cut-off area to arrive at their place of production outside this area.</span>
+
+<span class="sd">        The daily loss of productivity for each link section without detour routes, when they are</span>
+<span class="sd">        disrupted is then obtained multiplying the traffic intensity by the total occupancy per vehicle type,</span>
+<span class="sd">        including drivers, by the daily loss of productivity per capita per hour.</span>
+
+<span class="sd">        The unit of time is hour.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vlh_total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">_relevant_link_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_relevant_link_type</span><span class="p">(</span><span class="n">vlh_row</span><span class="p">,</span> <span class="n">row_hazard_range</span><span class="p">)</span>
+        <span class="n">_divisor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_divisor</span><span class="p">(</span><span class="n">_relevant_link_type</span><span class="p">,</span> <span class="n">row_hazard_range</span><span class="p">)</span>
+
+        <span class="n">duration_steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resilience_curves</span><span class="o">.</span><span class="n">get_duration_steps</span><span class="p">(</span>
+            <span class="n">_relevant_link_type</span><span class="p">,</span> <span class="n">row_hazard_range</span>
+        <span class="p">)</span>
+        <span class="n">functionality_loss_ratios</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resilience_curves</span><span class="o">.</span><span class="n">get_functionality_loss_ratio</span><span class="p">(</span>
+            <span class="n">_relevant_link_type</span><span class="p">,</span> <span class="n">row_hazard_range</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">trip_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">trip_purposes</span><span class="p">:</span>
+            <span class="n">intensity_trip_type</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">intensities</span><span class="o">.</span><span class="n">calculate_intensity</span><span class="p">(</span>
+                    <span class="n">vlh_row</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">link_id</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">traffic_period</span><span class="p">,</span> <span class="n">trip_type</span>
+                <span class="p">)</span>
+                <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">hours_per_traffic_period</span>
+            <span class="p">)</span>
+
+            <span class="n">occupancy_trip_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values_of_time</span><span class="o">.</span><span class="n">get_occupants</span><span class="p">(</span><span class="n">trip_type</span><span class="p">)</span>
+            <span class="n">vlh_trip_type_event</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="n">intensity_trip_type</span>
+                    <span class="o">*</span> <span class="n">duration</span>
+                    <span class="o">*</span> <span class="n">loss_ratio</span>
+                    <span class="o">*</span> <span class="n">occupancy_trip_type</span>
+                    <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">production_loss_per_capita_per_hour</span>
+                <span class="p">)</span>
+                <span class="o">/</span> <span class="n">_divisor</span>
+                <span class="k">for</span> <span class="n">duration</span><span class="p">,</span> <span class="n">loss_ratio</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                    <span class="n">duration_steps</span><span class="p">,</span> <span class="n">functionality_loss_ratios</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">vehicle_loss_hours</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                <span class="p">[</span><span class="n">vlh_row</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;vlh_</span><span class="si">{</span><span class="n">trip_type</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">hazard_col_name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="n">vlh_trip_type_event</span>
+            <span class="n">vlh_total</span> <span class="o">+=</span> <span class="n">vlh_trip_type_event</span>
+        <span class="n">vehicle_loss_hours</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+            <span class="p">[</span><span class="n">vlh_row</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;vlh_</span><span class="si">{</span><span class="n">hazard_col_name</span><span class="si">}</span><span class="s2">_total&quot;</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">vlh_total</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_populate_vehicle_loss_hour</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">vehicle_loss_hours</span><span class="p">:</span> <span class="n">GeoDataFrame</span><span class="p">,</span>
+        <span class="n">row_hazard_range</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">vlh_row</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span>
+        <span class="n">performance_change</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">hazard_col_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="n">vlh_total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">_relevant_link_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_relevant_link_type</span><span class="p">(</span><span class="n">vlh_row</span><span class="p">,</span> <span class="n">row_hazard_range</span><span class="p">)</span>
+        <span class="n">_divisor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_divisor</span><span class="p">(</span><span class="n">_relevant_link_type</span><span class="p">,</span> <span class="n">row_hazard_range</span><span class="p">)</span>
+
+        <span class="n">duration_steps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resilience_curves</span><span class="o">.</span><span class="n">get_duration_steps</span><span class="p">(</span>
+            <span class="n">_relevant_link_type</span><span class="p">,</span> <span class="n">row_hazard_range</span>
+        <span class="p">)</span>
+        <span class="n">functionality_loss_ratios</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resilience_curves</span><span class="o">.</span><span class="n">get_functionality_loss_ratio</span><span class="p">(</span>
+            <span class="n">_relevant_link_type</span><span class="p">,</span> <span class="n">row_hazard_range</span>
+        <span class="p">)</span>
+
+        <span class="c1"># get vlh_trip_type_event</span>
+        <span class="k">for</span> <span class="n">trip_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">trip_purposes</span><span class="p">:</span>
+            <span class="n">intensity_trip_type</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">intensities</span><span class="o">.</span><span class="n">calculate_intensity</span><span class="p">(</span>
+                    <span class="n">vlh_row</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">link_id</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">traffic_period</span><span class="p">,</span> <span class="n">trip_type</span>
+                <span class="p">)</span>
+                <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">hours_per_traffic_period</span>
+            <span class="p">)</span>
+
+            <span class="n">vot_trip_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">values_of_time</span><span class="o">.</span><span class="n">get_value_of_time</span><span class="p">(</span><span class="n">trip_type</span><span class="p">)</span>
+
+            <span class="n">vlh_trip_type_event</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="n">intensity_trip_type</span>
+                    <span class="o">*</span> <span class="n">duration</span>
+                    <span class="o">*</span> <span class="n">loss_ratio</span>
+                    <span class="o">*</span> <span class="n">performance_change</span>
+                    <span class="o">*</span> <span class="n">vot_trip_type</span>
+                <span class="p">)</span>
+                <span class="o">/</span> <span class="n">_divisor</span>
+                <span class="k">for</span> <span class="n">duration</span><span class="p">,</span> <span class="n">loss_ratio</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                    <span class="n">duration_steps</span><span class="p">,</span> <span class="n">functionality_loss_ratios</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">vehicle_loss_hours</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                <span class="p">[</span><span class="n">vlh_row</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;vlh_</span><span class="si">{</span><span class="n">trip_type</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">hazard_col_name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="n">vlh_trip_type_event</span>
+            <span class="n">vlh_total</span> <span class="o">+=</span> <span class="n">vlh_trip_type_event</span>
+        <span class="n">vehicle_loss_hours</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+            <span class="p">[</span><span class="n">vlh_row</span><span class="o">.</span><span class="n">name</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;vlh_</span><span class="si">{</span><span class="n">hazard_col_name</span><span class="si">}</span><span class="s2">_total&quot;</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">vlh_total</span>
+
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_criticality_analysis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AnalysisLossesProtocol</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="LossesBase.execute"><a class="viewcode-back" href="../../../../api/ra2ce.analysis.losses.html#ra2ce.analysis.losses.losses_base.LossesBase.execute">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AnalysisResultWrapper</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">intensities</span>
+            <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">resilience_curves</span>
+            <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">values_of_time</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;intensities, resilience_curves, and values_of_time should be given&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">_criticality_analysis_result_wrapper</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_get_criticality_analysis</span><span class="p">()</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_disrupted_criticality_analysis_results</span><span class="p">(</span>
+            <span class="n">criticality_analysis</span><span class="o">=</span><span class="n">_criticality_analysis_result_wrapper</span><span class="o">.</span><span class="n">get_single_result</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_vehicle_loss_hours</span><span class="p">()</span>
+
+        <span class="c1"># Calculate the risk or estimated annual losses if applicable</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">event_type</span> <span class="o">==</span> <span class="n">EventTypeEnum</span><span class="o">.</span><span class="n">RETURN_PERIOD</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">risk_calculation_mode</span>
+            <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">RiskCalculationModeEnum</span><span class="o">.</span><span class="n">INVALID</span><span class="p">,</span> <span class="n">RiskCalculationModeEnum</span><span class="o">.</span><span class="n">NONE</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="n">risk_calculation</span> <span class="o">=</span> <span class="n">RiskCalculationFactory</span><span class="o">.</span><span class="n">get_risk_calculation</span><span class="p">(</span>
+                <span class="n">risk_calculation_mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">risk_calculation_mode</span><span class="p">,</span>
+                <span class="n">risk_calculation_year</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">analysis</span><span class="o">.</span><span class="n">risk_calculation_year</span><span class="p">,</span>
+                <span class="n">losses_gdf</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">risk</span> <span class="o">=</span> <span class="n">risk_calculation</span><span class="o">.</span><span class="n">get_integration_of_df_trapezoidal</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;risk_vlh_total&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">risk</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_result_wrapper</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">result</span><span class="p">)</span></div></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

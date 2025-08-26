@@ -1,0 +1,1247 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" data-theme="light">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ra2ce.network.origins_destinations &#8212; Risk Assessment and Adaptation for Critical infrastructurE 1.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/theme-deltares.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/ra2ce/network/origins_destinations';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="light">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+    
+    <img src="../../../_static/ra2ce_logo.svg" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../_static/ra2ce_logo.svg" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">RA2CE</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../overview.html">
+    Overview
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../showcases.html">
+    Showcases
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../contributing.html">
+    Contributing
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/Deltares/ra2ce" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../_resources/ra2ce_banner.png" class="icon-link-image" alt="GitHub"/></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://www.deltares.nl/en/" title="Deltares" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><img src="../../../../../_resources/deltares-blue.svg" class="icon-link-image" alt="Deltares"/></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">ra2ce.networ...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for ra2ce.network.origins_destinations</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                    GNU GENERAL PUBLIC LICENSE</span>
+<span class="sd">                      Version 3, 29 June 2007</span>
+
+<span class="sd">    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).</span>
+<span class="sd">    Copyright (C) 2023 Stichting Deltares</span>
+
+<span class="sd">    This program is free software: you can redistribute it and/or modify</span>
+<span class="sd">    it under the terms of the GNU General Public License as published by</span>
+<span class="sd">    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="sd">    (at your option) any later version.</span>
+
+<span class="sd">    This program is distributed in the hope that it will be useful,</span>
+<span class="sd">    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">    GNU General Public License for more details.</span>
+
+<span class="sd">    You should have received a copy of the GNU General Public License</span>
+<span class="sd">    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyproj</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rasterio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rasterio.mask</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rasterio.transform</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rasterio</span><span class="w"> </span><span class="kn">import</span> <span class="n">Affine</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rasterio.warp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Resampling</span><span class="p">,</span> <span class="n">calculate_default_transform</span><span class="p">,</span> <span class="n">reproject</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="kn">import</span> <span class="n">LineString</span><span class="p">,</span> <span class="n">Point</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ra2ce.network.networks_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">cut</span><span class="p">,</span> <span class="n">line_length</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">TODO: This whole file should be throughouly tested / redesigned.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="read_origin_destination_files"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.origins_destinations.read_origin_destination_files">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">read_origin_destination_files</span><span class="p">(</span>
+    <span class="n">origin_paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">],</span>
+    <span class="n">origin_names</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">],</span>
+    <span class="n">destination_paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">],</span>
+    <span class="n">destination_names</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">],</span>
+    <span class="n">od_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">origin_count</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">crs_</span><span class="p">:</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">CRS</span><span class="p">,</span>
+    <span class="n">category</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">region_paths</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">region_var</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read origin and destination point shapefiles and create one OD GeoDataFrame.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        origin_paths (Union[str, list]): Path or list of paths to shapefiles containing origin points.</span>
+<span class="sd">        origin_names (Union[str, list]): Name or list of names for the origins.</span>
+<span class="sd">        destination_paths (Union[str, list]): Path or list of paths to shapefiles containing destination points.</span>
+<span class="sd">        destination_names (Union[str, list]): Name or list of names for the destinations.</span>
+<span class="sd">        od_id (str): Name of the unique identifier attribute in both the origin and destination shapefiles.</span>
+<span class="sd">        origin_count (str): Name of the attribute in the origin shapefile used for flow counts (e.g., number of people).</span>
+<span class="sd">        crs_ (pyproj.CRS): Coordinate reference system used in the project.</span>
+<span class="sd">        category (str): Attribute in the destination shapefile used to categorize the closest destination.</span>
+<span class="sd">        region_paths (Optional[str]): Path to region shapefile(s), if applicable.</span>
+<span class="sd">        region_var (Optional[str]): Name of the attribute in the region shapefile for categorization.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        gpd.GeoDataFrame: A GeoDataFrame containing the combined origin-destination data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">region_paths</span><span class="p">:</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">od_id</span><span class="p">,</span> <span class="s2">&quot;o_id&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">],</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs_</span>
+        <span class="p">)</span>
+        <span class="n">region</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">region_paths</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;pyogrio&quot;</span><span class="p">)</span>
+        <span class="n">region</span> <span class="o">=</span> <span class="n">region</span><span class="p">[[</span><span class="n">region_var</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">od_id</span><span class="p">,</span> <span class="s2">&quot;o_id&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">],</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs_</span><span class="p">)</span>
+
+    <span class="n">destination_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">od_id</span><span class="p">,</span> <span class="s2">&quot;d_id&quot;</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">category</span><span class="p">:</span>
+        <span class="n">destination_columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+
+    <span class="n">destination</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">destination_columns</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs_</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">origin_paths</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">origin_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">origin_paths</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">destination_paths</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">destination_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">destination_paths</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">origin_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">origin_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">origin_names</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">destination_names</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">destination_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">destination_names</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">op</span><span class="p">,</span> <span class="n">on</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">origin_paths</span><span class="p">,</span> <span class="n">origin_names</span><span class="p">):</span>
+        <span class="n">origin_new</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs_</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;pyogrio&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">od_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">origin_new</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;No origin found at </span><span class="si">%s</span><span class="s2"> for </span><span class="si">%s</span><span class="s2">, using default index instead.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">op</span><span class="p">,</span> <span class="n">od_id</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">origin_new</span><span class="p">[</span><span class="n">od_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin_new</span><span class="o">.</span><span class="n">index</span>
+
+        <span class="k">if</span> <span class="n">region_paths</span><span class="p">:</span>
+            <span class="n">origin_new</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">left_df</span><span class="o">=</span><span class="n">origin_new</span><span class="p">,</span> <span class="n">right_df</span><span class="o">=</span><span class="n">region</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span>
+            <span class="n">origin_new</span><span class="p">[</span><span class="s2">&quot;region&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin_new</span><span class="p">[</span><span class="n">region_var</span><span class="p">]</span>
+            <span class="n">origin_new</span> <span class="o">=</span> <span class="n">origin_new</span><span class="p">[[</span><span class="n">od_id</span><span class="p">,</span> <span class="n">origin_count</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">,</span> <span class="s2">&quot;region&quot;</span><span class="p">]]</span>
+            <span class="n">origin_new</span><span class="p">[</span><span class="s2">&quot;region&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s2">&quot;Not assigned&quot;</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">origin_new</span> <span class="o">=</span> <span class="n">origin_new</span><span class="p">[[</span><span class="n">od_id</span><span class="p">,</span> <span class="n">origin_count</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]]</span>
+        <span class="n">origin_new</span><span class="p">[</span><span class="s2">&quot;o_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">on</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">origin_new</span><span class="p">[</span><span class="n">od_id</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">origin_new</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">crs</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">origin</span><span class="p">,</span> <span class="n">origin_new</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+    <span class="n">destination_columns_add</span> <span class="o">=</span> <span class="p">[</span><span class="n">od_id</span><span class="p">,</span> <span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">category</span><span class="p">:</span>
+        <span class="n">destination_columns_add</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">category</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">dp</span><span class="p">,</span> <span class="n">dn</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">destination_paths</span><span class="p">,</span> <span class="n">destination_names</span><span class="p">):</span>
+        <span class="n">destination_new</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">dp</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs_</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;pyogrio&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">od_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">destination_new</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;No destination found at </span><span class="si">%s</span><span class="s2"> for </span><span class="si">%s</span><span class="s2">, using default index instead.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">dp</span><span class="p">,</span> <span class="n">od_id</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">destination_new</span><span class="p">[</span><span class="n">od_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">destination_new</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">destination_new</span> <span class="o">=</span> <span class="n">destination_new</span><span class="p">[</span><span class="n">destination_columns_add</span><span class="p">]</span>
+        <span class="n">destination_new</span><span class="p">[</span><span class="s2">&quot;d_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dn</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">destination_new</span><span class="p">[</span><span class="n">od_id</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+        <span class="n">destination_new</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">destination</span><span class="o">.</span><span class="n">crs</span>
+        <span class="n">destination</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">destination</span><span class="p">,</span> <span class="n">destination_new</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">od</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">origin</span><span class="p">,</span> <span class="n">destination</span><span class="p">],</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">od</span></div>
+
+
+<div class="viewcode-block" id="closest_node"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.origins_destinations.closest_node">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">closest_node</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">nodes</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+    <span class="n">deltas</span> <span class="o">=</span> <span class="n">nodes</span> <span class="o">-</span> <span class="n">node</span>
+    <span class="n">dist_2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">einsum</span><span class="p">(</span><span class="s2">&quot;ij,ij-&gt;i&quot;</span><span class="p">,</span> <span class="n">deltas</span><span class="p">,</span> <span class="n">deltas</span><span class="p">)</span>
+    <span class="c1"># Find indices of all minimum distances</span>
+    <span class="n">min_dist_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">dist_2</span> <span class="o">==</span> <span class="n">dist_2</span><span class="o">.</span><span class="n">min</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># CROSSCADE: The previous return value `nodes[np.argmin(dist_2)]`</span>
+    <span class="c1"># returned a np.ndarray of 1 dimension (`[result]`), whilst the new value</span>
+    <span class="c1"># will return a 2 dimensional np.ndarray ( `[[result]]`)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">nodes</span><span class="p">[</span><span class="n">min_dist_indices</span><span class="p">],</span> <span class="n">decimals</span><span class="o">=</span><span class="mi">7</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_od"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.origins_destinations.get_od">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">get_od</span><span class="p">(</span><span class="n">o_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">d_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Gets a valid origin id node from the given pair.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        o_id (str): Id for the `origin` node.</span>
+<span class="sd">        d_id (str): Id for the `destination` node.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str | np.nan: Valid value to represent the origin - destination node.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_nan_values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">o_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_nan_values</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">o_id</span>
+    <span class="k">if</span> <span class="n">d_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_nan_values</span><span class="p">:</span>
+        <span class="c1"># `o_id` was nan, so it was a destination, not an origin.</span>
+        <span class="c1"># therefore we return `d_id`</span>
+        <span class="k">return</span> <span class="n">d_id</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span></div>
+
+
+<div class="viewcode-block" id="add_data_to_existing_node"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.origins_destinations.add_data_to_existing_node">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">add_data_to_existing_node</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">match_name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s2">&quot;od_id&quot;</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]:</span>
+        <span class="c1"># the node already has a origin/destination attribute</span>
+        <span class="k">if</span> <span class="n">match_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s2">&quot;od_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)):</span>
+            <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s2">&quot;od_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s2">&quot;od_id&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="n">match_name</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="s2">&quot;od_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">match_name</span>
+    <span class="k">return</span> <span class="n">graph</span></div>
+
+
+<div class="viewcode-block" id="update_edges_with_new_node"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.origins_destinations.update_edges_with_new_node">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">update_edges_with_new_node</span><span class="p">(</span>
+    <span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+    <span class="n">edge_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="n">node_a</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">node_b</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">line_a</span><span class="p">:</span> <span class="n">LineString</span><span class="p">,</span>
+    <span class="n">line_b</span><span class="p">:</span> <span class="n">LineString</span><span class="p">,</span>
+    <span class="n">new_node_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">graph_crs</span><span class="p">:</span> <span class="n">pyproj</span><span class="o">.</span><span class="n">CRS</span><span class="p">,</span>
+    <span class="n">inverse_vertices_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="c1"># Check which line is connected to which node. There can be 8 different combinations and there should be two</span>
+    <span class="c1"># edges added to the graph.</span>
+    <span class="n">cnt</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">if</span> <span class="n">Point</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_a</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">almost_equals</span><span class="p">(</span>
+        <span class="n">Point</span><span class="p">(</span><span class="n">line_b</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">node_a</span> <span class="o">==</span> <span class="n">node_b</span> <span class="ow">and</span> <span class="n">graph</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">line_b</span> <span class="o">!=</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">edge_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">line_length</span><span class="p">(</span><span class="n">line_b</span><span class="p">,</span> <span class="n">graph_crs</span><span class="p">),</span>
+            <span class="n">geometry</span><span class="o">=</span><span class="n">line_b</span><span class="p">,</span>
+            <span class="n">node_A</span><span class="o">=</span><span class="n">node_a</span><span class="p">,</span>
+            <span class="n">node_B</span><span class="o">=</span><span class="n">new_node_id</span><span class="p">,</span>
+            <span class="n">edge_fid</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">node_a</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">new_node_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="n">k_new</span><span class="p">,</span> <span class="o">**</span><span class="n">edge_data</span><span class="p">)</span>
+
+        <span class="c1"># Update the inverse vertices dict</span>
+        <span class="n">inverse_vertices_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="n">k_new</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">line_b</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))}</span>
+        <span class="p">)</span>
+
+        <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">Point</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_b</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">almost_equals</span><span class="p">(</span>
+        <span class="n">Point</span><span class="p">(</span><span class="n">line_b</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">node_a</span> <span class="o">==</span> <span class="n">node_b</span> <span class="ow">and</span> <span class="n">graph</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">line_b</span> <span class="o">!=</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">edge_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">line_length</span><span class="p">(</span><span class="n">line_b</span><span class="p">,</span> <span class="n">graph_crs</span><span class="p">),</span>
+            <span class="n">geometry</span><span class="o">=</span><span class="n">line_b</span><span class="p">,</span>
+            <span class="n">node_A</span><span class="o">=</span><span class="n">new_node_id</span><span class="p">,</span>
+            <span class="n">node_B</span><span class="o">=</span><span class="n">node_b</span><span class="p">,</span>
+            <span class="n">edge_fid</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">new_node_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">node_b</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
+            <span class="n">new_node_id</span><span class="p">,</span> <span class="n">node_b</span><span class="p">,</span> <span class="n">k_new</span><span class="p">,</span> <span class="o">**</span><span class="n">edge_data</span>
+        <span class="p">)</span>  <span class="c1"># changed the u, v order</span>
+
+        <span class="c1"># Update the inverse vertices dict</span>
+        <span class="n">inverse_vertices_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">node_b</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="n">k_new</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">line_b</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))}</span>
+        <span class="p">)</span>
+
+        <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">Point</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_a</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">almost_equals</span><span class="p">(</span>
+        <span class="n">Point</span><span class="p">(</span><span class="n">line_b</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">node_a</span> <span class="o">==</span> <span class="n">node_b</span> <span class="ow">and</span> <span class="n">graph</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">line_b</span> <span class="o">!=</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">edge_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">line_length</span><span class="p">(</span><span class="n">line_b</span><span class="p">,</span> <span class="n">graph_crs</span><span class="p">),</span>
+            <span class="n">geometry</span><span class="o">=</span><span class="n">line_b</span><span class="p">,</span>
+            <span class="n">node_A</span><span class="o">=</span><span class="n">node_a</span><span class="p">,</span>
+            <span class="n">node_B</span><span class="o">=</span><span class="n">new_node_id</span><span class="p">,</span>
+            <span class="n">edge_fid</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">node_b</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">new_node_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="n">k_new</span><span class="p">,</span> <span class="o">**</span><span class="n">edge_data</span><span class="p">)</span>
+
+        <span class="c1"># Update the inverse vertices dict</span>
+        <span class="n">inverse_vertices_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="n">k_new</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">line_b</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))}</span>
+        <span class="p">)</span>
+
+        <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">Point</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_b</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">almost_equals</span><span class="p">(</span>
+        <span class="n">Point</span><span class="p">(</span><span class="n">line_b</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">node_a</span> <span class="o">==</span> <span class="n">node_b</span> <span class="ow">and</span> <span class="n">graph</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">line_b</span> <span class="o">!=</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">edge_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">line_length</span><span class="p">(</span><span class="n">line_b</span><span class="p">,</span> <span class="n">graph_crs</span><span class="p">),</span>
+            <span class="n">geometry</span><span class="o">=</span><span class="n">line_b</span><span class="p">,</span>
+            <span class="n">node_A</span><span class="o">=</span><span class="n">new_node_id</span><span class="p">,</span>
+            <span class="n">node_B</span><span class="o">=</span><span class="n">node_b</span><span class="p">,</span>
+            <span class="n">edge_fid</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">new_node_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">node_b</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
+            <span class="n">new_node_id</span><span class="p">,</span> <span class="n">node_b</span><span class="p">,</span> <span class="n">k_new</span><span class="p">,</span> <span class="o">**</span><span class="n">edge_data</span>
+        <span class="p">)</span>  <span class="c1"># changed the u, v order</span>
+
+        <span class="c1"># Update the inverse vertices dict</span>
+        <span class="n">inverse_vertices_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">node_b</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="n">k_new</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">line_b</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))}</span>
+        <span class="p">)</span>
+
+        <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">Point</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_b</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">almost_equals</span><span class="p">(</span>
+        <span class="n">Point</span><span class="p">(</span><span class="n">line_a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">node_a</span> <span class="o">==</span> <span class="n">node_b</span> <span class="ow">and</span> <span class="n">graph</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">line_a</span> <span class="o">!=</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">edge_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">line_length</span><span class="p">(</span><span class="n">line_a</span><span class="p">,</span> <span class="n">graph_crs</span><span class="p">),</span>
+            <span class="n">geometry</span><span class="o">=</span><span class="n">line_a</span><span class="p">,</span>
+            <span class="n">node_A</span><span class="o">=</span><span class="n">new_node_id</span><span class="p">,</span>
+            <span class="n">node_B</span><span class="o">=</span><span class="n">node_b</span><span class="p">,</span>
+            <span class="n">edge_fid</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">new_node_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">node_b</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
+            <span class="n">new_node_id</span><span class="p">,</span> <span class="n">node_b</span><span class="p">,</span> <span class="n">k_new</span><span class="p">,</span> <span class="o">**</span><span class="n">edge_data</span>
+        <span class="p">)</span>  <span class="c1"># changed the u, v order</span>
+
+        <span class="c1"># Update the inverse vertices dict</span>
+        <span class="n">inverse_vertices_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">node_b</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="n">k_new</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">line_a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))}</span>
+        <span class="p">)</span>
+
+        <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">Point</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_a</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">almost_equals</span><span class="p">(</span>
+        <span class="n">Point</span><span class="p">(</span><span class="n">line_a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">node_a</span> <span class="o">==</span> <span class="n">node_b</span> <span class="ow">and</span> <span class="n">graph</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">line_a</span> <span class="o">!=</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">edge_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">line_length</span><span class="p">(</span><span class="n">line_a</span><span class="p">,</span> <span class="n">graph_crs</span><span class="p">),</span>
+            <span class="n">geometry</span><span class="o">=</span><span class="n">line_a</span><span class="p">,</span>
+            <span class="n">node_A</span><span class="o">=</span><span class="n">node_a</span><span class="p">,</span>
+            <span class="n">node_B</span><span class="o">=</span><span class="n">new_node_id</span><span class="p">,</span>
+            <span class="n">edge_fid</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">node_a</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">new_node_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="n">k_new</span><span class="p">,</span> <span class="o">**</span><span class="n">edge_data</span><span class="p">)</span>
+
+        <span class="c1"># Update the inverse vertices dict</span>
+        <span class="n">inverse_vertices_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="n">k_new</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">line_a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))}</span>
+        <span class="p">)</span>
+
+        <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">Point</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_b</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">almost_equals</span><span class="p">(</span>
+        <span class="n">Point</span><span class="p">(</span><span class="n">line_a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">node_a</span> <span class="o">==</span> <span class="n">node_b</span> <span class="ow">and</span> <span class="n">graph</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">line_a</span> <span class="o">!=</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">edge_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">line_length</span><span class="p">(</span><span class="n">line_a</span><span class="p">,</span> <span class="n">graph_crs</span><span class="p">),</span>
+            <span class="n">geometry</span><span class="o">=</span><span class="n">line_a</span><span class="p">,</span>
+            <span class="n">node_A</span><span class="o">=</span><span class="n">new_node_id</span><span class="p">,</span>
+            <span class="n">node_B</span><span class="o">=</span><span class="n">node_b</span><span class="p">,</span>
+            <span class="n">edge_fid</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">new_node_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">node_b</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
+            <span class="n">new_node_id</span><span class="p">,</span> <span class="n">node_b</span><span class="p">,</span> <span class="n">k_new</span><span class="p">,</span> <span class="o">**</span><span class="n">edge_data</span>
+        <span class="p">)</span>  <span class="c1"># changed the u, v order</span>
+
+        <span class="c1"># Update the inverse vertices dict</span>
+        <span class="n">inverse_vertices_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">node_b</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="n">k_new</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">line_a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))}</span>
+        <span class="p">)</span>
+
+        <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">if</span> <span class="n">Point</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node_a</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">almost_equals</span><span class="p">(</span>
+        <span class="n">Point</span><span class="p">(</span><span class="n">line_a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">node_a</span> <span class="o">==</span> <span class="n">node_b</span> <span class="ow">and</span> <span class="n">graph</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span><span class="o">*</span><span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">line_a</span> <span class="o">!=</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">k_new</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">edge_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="n">length</span><span class="o">=</span><span class="n">line_length</span><span class="p">(</span><span class="n">line_a</span><span class="p">,</span> <span class="n">graph_crs</span><span class="p">),</span>
+            <span class="n">geometry</span><span class="o">=</span><span class="n">line_a</span><span class="p">,</span>
+            <span class="n">node_A</span><span class="o">=</span><span class="n">node_a</span><span class="p">,</span>
+            <span class="n">node_B</span><span class="o">=</span><span class="n">new_node_id</span><span class="p">,</span>
+            <span class="n">edge_fid</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">node_a</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">new_node_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="n">k_new</span><span class="p">,</span> <span class="o">**</span><span class="n">edge_data</span><span class="p">)</span>
+
+        <span class="c1"># Update the inverse vertices dict</span>
+        <span class="n">inverse_vertices_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">new_node_id</span><span class="p">,</span> <span class="n">k_new</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">line_a</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))}</span>
+        <span class="p">)</span>
+
+        <span class="n">cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">cnt</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;No combination of nodes/road segments found for the OD assignment.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">graph</span><span class="o">.</span><span class="n">has_edge</span><span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">node_b</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="c1"># remove the edge that is split in two from the graph</span>
+        <span class="n">graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="n">node_a</span><span class="p">,</span> <span class="n">node_b</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">graph</span><span class="p">,</span> <span class="n">inverse_vertices_dict</span></div>
+
+
+<div class="viewcode-block" id="add_od_nodes"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.origins_destinations.add_od_nodes">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">add_od_nodes</span><span class="p">(</span>
+    <span class="n">od</span><span class="p">:</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">,</span>
+    <span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span>
+    <span class="n">crs</span><span class="p">,</span>
+    <span class="n">category</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">find_closest_node</span><span class="p">(</span>
+        <span class="n">closest_node_on_road</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">inverse_vertices_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="n">inverse_nodes_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+        <span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="n">closest_u_v_k</span> <span class="o">=</span> <span class="n">inverse_vertices_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">closest_node_on_road</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">closest_node_on_road</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">closest_u_v_k</span><span class="p">:</span>
+            <span class="n">closest_u_data</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">closest_u_v_k</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">closest_v_data</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">closest_u_v_k</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="n">closest_node_on_extremities</span> <span class="o">=</span> <span class="n">closest_node</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">closest_node_on_road</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">closest_node_on_road</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="p">[</span><span class="n">closest_u_data</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">closest_u_data</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]],</span>
+                        <span class="p">[</span><span class="n">closest_v_data</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">],</span> <span class="n">closest_v_data</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]],</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">closest_node_on_extremities_id</span> <span class="o">=</span> <span class="n">get_node_id_from_position</span><span class="p">(</span>
+                <span class="n">graph</span><span class="p">,</span> <span class="o">*</span><span class="n">closest_node_on_extremities</span>
+            <span class="p">)</span>
+            <span class="n">inverse_nodes_dict</span><span class="p">[</span>
+                <span class="p">(</span><span class="n">closest_node_on_road</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">closest_node_on_road</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="n">closest_node_on_extremities_id</span>
+
+        <span class="k">return</span> <span class="n">inverse_nodes_dict</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_node_id_from_position</span><span class="p">(</span>
+        <span class="n">g</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+        <span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">node</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;geometry&quot;</span> <span class="ow">in</span> <span class="n">data</span>
+            <span class="ow">and</span> <span class="nb">round</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">==</span> <span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">round</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="o">==</span> <span class="nb">round</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">nodes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">nodes</span> <span class="k">else</span> <span class="kc">None</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gets from each origin and destination the closest vertex on the graph edge.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        od [Geodataframe]: The GeoDataFrame with the origins and destinations</span>
+<span class="sd">        graph [networkX graph]: networkX graph</span>
+<span class="sd">        crs [string or pyproj crs]:</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        od [Geodataframe]: The GeoDataFrame with the locations of the origins and destinations on the road vertices</span>
+<span class="sd">        graph [networkX graph]: The networkX graph updated with origins and destinations</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finding vertices closest to Origins and Destinations&quot;</span><span class="p">)</span>
+
+    <span class="c1"># create dictionary of the roads geometries and identifyers</span>
+    <span class="n">edge_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="o">.</span><span class="n">data</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">if</span> <span class="s2">&quot;geometry&quot;</span> <span class="ow">in</span> <span class="n">e</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+    <span class="n">inverse_vertices_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">all_vertices</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">checked_lines</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">edge_list</span><span class="p">:</span>
+        <span class="c1"># Convert LineString to a hashable type (tuple) for set lookup</span>
+        <span class="n">geometry_coords</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">([</span><span class="n">coord</span> <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="n">geometry_coords</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">coords</span> <span class="ow">in</span> <span class="n">checked_lines</span><span class="p">:</span>
+            <span class="n">graph</span><span class="o">.</span><span class="n">remove_edge</span><span class="p">(</span><span class="o">*</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">inverse_vertices_dict</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span><span class="n">p</span><span class="p">:</span> <span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">geometry_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])}</span>
+            <span class="p">)</span>
+            <span class="n">all_vertices</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">geometry_coords</span><span class="p">))</span>
+            <span class="n">checked_lines</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+
+    <span class="c1"># Make an array from the list</span>
+    <span class="n">all_vertices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">all_vertices</span><span class="p">)</span>
+
+    <span class="c1"># Also create an inverse nodes dict of the node geometries as keys and node ID&#39;s as values</span>
+    <span class="n">inverse_nodes_dict</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">node</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">node</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">data</span><span class="p">()</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Get the maximum node id</span>
+    <span class="n">max_node_id</span> <span class="o">=</span> <span class="nb">max</span><span class="p">([</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">()])</span>
+    <span class="n">od_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">od_data</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+        <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">od</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">od</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">od</span><span class="p">[</span><span class="s2">&quot;o_id&quot;</span><span class="p">],</span> <span class="n">od</span><span class="p">[</span><span class="s2">&quot;d_id&quot;</span><span class="p">]))</span>
+        <span class="p">),</span>
+        <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Adding Origin-Destination nodes to graph&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">match_name</span> <span class="o">=</span> <span class="n">get_od</span><span class="p">(</span><span class="n">od_data</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">od_data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Find the vertex on the road that is closest to the origin or destination point</span>
+        <span class="n">closest_node_on_road</span> <span class="o">=</span> <span class="n">closest_node</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">od_data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">od_data</span><span class="p">[</span><span class="mi">1</span><span class="p">])),</span> <span class="n">all_vertices</span>
+        <span class="p">)</span>
+        <span class="n">match_od</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">closest_node_on_road</span><span class="p">)</span>
+        <span class="c1"># Find the road to which this vertex belongs. If the vertex is on an end-point of a road, it cannot be found,</span>
+        <span class="c1"># and it goes to the except statement.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">closest_u_v_k</span> <span class="o">=</span> <span class="n">inverse_vertices_dict</span><span class="p">[</span>
+                <span class="p">(</span><span class="n">closest_node_on_road</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">closest_node_on_road</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="p">]</span>
+            <span class="n">match_edge</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">closest_u_v_k</span><span class="p">]</span>
+
+            <span class="c1"># Add the node to the graph edge</span>
+            <span class="n">match_geom</span> <span class="o">=</span> <span class="n">match_edge</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span>
+
+            <span class="n">new_lines</span> <span class="o">=</span> <span class="n">split_line_with_points</span><span class="p">(</span><span class="n">match_geom</span><span class="p">,</span> <span class="p">[</span><span class="n">match_od</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_lines</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">inverse_nodes_dict</span> <span class="o">=</span> <span class="n">find_closest_node</span><span class="p">(</span>
+                    <span class="n">closest_node_on_road</span><span class="p">,</span>
+                    <span class="n">inverse_vertices_dict</span><span class="p">,</span>
+                    <span class="n">inverse_nodes_dict</span><span class="p">,</span>
+                    <span class="n">graph</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_lines</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">([</span><span class="n">match_od</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span>
+
+            <span class="n">line1</span><span class="p">,</span> <span class="n">line2</span> <span class="o">=</span> <span class="n">new_lines</span>
+
+            <span class="n">new_node_id</span> <span class="o">=</span> <span class="n">max_node_id</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">max_node_id</span> <span class="o">=</span> <span class="n">new_node_id</span>
+
+            <span class="n">node_info</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;node_fid&quot;</span><span class="p">:</span> <span class="n">new_node_id</span><span class="p">,</span>  <span class="c1"># Check if this attribute always exists</span>
+                <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">match_od</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">match_od</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="n">match_od</span><span class="p">,</span>
+                <span class="s2">&quot;od_id&quot;</span><span class="p">:</span> <span class="n">match_name</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">category</span> <span class="ow">and</span> <span class="n">od_data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">od_data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="c1"># If the user wants to calculate the routes to multiple locations with categories</span>
+                <span class="c1"># and if the current location is a destination (od_data[-1] is not NaN)</span>
+                <span class="n">node_info</span><span class="p">[</span><span class="s2">&quot;category&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">od</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">category</span><span class="p">]</span>
+
+            <span class="c1"># Add the new node to the graph</span>
+            <span class="n">graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">new_node_id</span><span class="p">,</span> <span class="o">**</span><span class="n">node_info</span><span class="p">)</span>
+
+            <span class="c1"># Update the inverse_nodes_dict with the new node</span>
+            <span class="n">inverse_nodes_dict</span><span class="p">[</span><span class="n">match_od</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">new_node_id</span>
+
+            <span class="c1"># Delete the new node from the inverse_vertices_dict as no end-points are included here</span>
+            <span class="k">del</span> <span class="n">inverse_vertices_dict</span><span class="p">[</span><span class="n">match_od</span><span class="o">.</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+
+            <span class="c1"># Update the graph edges and the inverse_vertices_dict</span>
+            <span class="n">graph</span><span class="p">,</span> <span class="n">inverse_vertices_dict</span> <span class="o">=</span> <span class="n">update_edges_with_new_node</span><span class="p">(</span>
+                <span class="n">graph</span><span class="p">,</span>
+                <span class="n">match_edge</span><span class="p">,</span>
+                <span class="n">closest_u_v_k</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">closest_u_v_k</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">closest_u_v_k</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+                <span class="n">line1</span><span class="p">,</span>
+                <span class="n">line2</span><span class="p">,</span>
+                <span class="n">new_node_id</span><span class="p">,</span>
+                <span class="n">crs</span><span class="p">,</span>
+                <span class="n">inverse_vertices_dict</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AssertionError</span><span class="p">):</span>
+            <span class="c1"># If the vertex is at the end of the road it won&#39;t be found in the inverse_vertices_dict,</span>
+            <span class="c1"># so search in the inverse_nodes_dict.</span>
+            <span class="n">match_node</span> <span class="o">=</span> <span class="n">inverse_nodes_dict</span><span class="p">[</span>
+                <span class="p">(</span><span class="n">closest_node_on_road</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">closest_node_on_road</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="p">]</span>
+
+            <span class="c1"># Update the node with the OD attribute</span>
+            <span class="n">graph</span> <span class="o">=</span> <span class="n">add_data_to_existing_node</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">match_node</span><span class="p">,</span> <span class="n">match_name</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">category</span> <span class="ow">and</span> <span class="n">od_data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">od_data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="c1"># If the user wants to calculate the routes to multiple locations with categories</span>
+                <span class="c1"># and if the current location is a destination (od_data[-1] is not NaN)</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">match_node</span><span class="p">][</span><span class="s2">&quot;category&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">od</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">category</span><span class="p">]</span>
+
+        <span class="c1"># Save both in lists</span>
+        <span class="n">od_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match_od</span><span class="p">)</span>  <span class="c1"># save the point as a Shapely Point</span>
+
+    <span class="c1"># save in dataframe</span>
+    <span class="n">od</span><span class="p">[</span><span class="s2">&quot;OD&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">od_list</span>
+
+    <span class="c1"># save the road vertices closest to the origin/destination as geometry, delete the input origin/destination point geometry</span>
+    <span class="n">od</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">od</span><span class="p">)</span>
+    <span class="n">od</span> <span class="o">=</span> <span class="n">od</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;OD&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">od</span><span class="p">,</span> <span class="n">graph</span></div>
+
+
+<div class="viewcode-block" id="split_line_with_points"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.origins_destinations.split_line_with_points">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">split_line_with_points</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">points</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Splits a line string in several segments considering a list of points.&quot;&quot;&quot;</span>
+    <span class="n">segments</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">current_line</span> <span class="o">=</span> <span class="n">line</span>
+
+    <span class="c1"># make a list of points and its distance to the start to sort them from small to large distance</span>
+    <span class="n">list_dist</span> <span class="o">=</span> <span class="p">[</span><span class="n">current_line</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">pnt</span><span class="p">)</span> <span class="k">for</span> <span class="n">pnt</span> <span class="ow">in</span> <span class="n">points</span><span class="p">]</span>
+    <span class="n">list_dist</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">list_dist</span><span class="p">:</span>
+        <span class="c1"># cut the line at a distance d</span>
+        <span class="n">seg</span><span class="p">,</span> <span class="n">current_line</span> <span class="o">=</span> <span class="n">cut</span><span class="p">(</span><span class="n">current_line</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">seg</span><span class="p">:</span>
+            <span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">seg</span><span class="p">)</span>
+    <span class="n">segments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_line</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">segments</span></div>
+
+
+<span class="c1">#########################################################################################</span>
+<span class="c1">################### Code to generate origins points from raster #########################</span>
+<span class="c1">#########################################################################################</span>
+
+
+<div class="viewcode-block" id="rescale_and_crop"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.origins_destinations.rescale_and_crop">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">rescale_and_crop</span><span class="p">(</span><span class="n">path_name</span><span class="p">,</span> <span class="n">gdf</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">res</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">):</span>
+    <span class="n">dst_crs</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">CRS</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">gdf</span><span class="o">.</span><span class="n">crs</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+
+    <span class="c1"># Rescale and reproject raster to gdf crs</span>
+    <span class="n">_output_origins_raster_tif</span> <span class="o">=</span> <span class="n">output_folder</span> <span class="o">/</span> <span class="s2">&quot;origins_raster_reprojected.tif&quot;</span>
+
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">path_name</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+        <span class="n">transform</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">calculate_default_transform</span><span class="p">(</span>
+            <span class="n">src</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">dst_crs</span><span class="p">,</span> <span class="n">src</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="n">src</span><span class="o">.</span><span class="n">height</span><span class="p">,</span> <span class="o">*</span><span class="n">src</span><span class="o">.</span><span class="n">bounds</span>
+        <span class="p">)</span>
+
+        <span class="n">m2degree</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">1</span> <span class="o">/</span> <span class="mi">111000</span>
+        <span class="p">)</span>  <span class="c1"># approximate conversion from meter to 1 degree of EPSG:4326; TODO: make flexible depending on the input crs</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">Affine</span><span class="p">(</span>
+            <span class="n">res</span> <span class="o">*</span> <span class="n">m2degree</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">.</span><span class="n">b</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">.</span><span class="n">c</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">.</span><span class="n">d</span><span class="p">,</span>
+            <span class="o">-</span><span class="n">res</span> <span class="o">*</span> <span class="n">m2degree</span><span class="p">,</span>
+            <span class="n">transform</span><span class="o">.</span><span class="n">f</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># use scale, instead of absolute meter, for resolution</span>
+        <span class="c1"># scale = 2</span>
+        <span class="c1"># transform = Affine(transform.a * scale, transform.b, transform.c, transform.d, transform.e * scale, transform.f)</span>
+        <span class="c1"># height = height * scale</span>
+        <span class="c1"># width = width * scale</span>
+
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span><span class="s2">&quot;crs&quot;</span><span class="p">:</span> <span class="n">dst_crs</span><span class="p">,</span> <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="n">transform</span><span class="p">,</span> <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="n">width</span><span class="p">,</span> <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="n">height</span><span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">_output_origins_raster_tif</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="k">as</span> <span class="n">dst</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">src</span><span class="o">.</span><span class="n">count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">reproject</span><span class="p">(</span>
+                    <span class="n">source</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">band</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span>
+                    <span class="n">destination</span><span class="o">=</span><span class="n">rasterio</span><span class="o">.</span><span class="n">band</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span>
+                    <span class="n">src_transform</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span>
+                    <span class="n">src_crs</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span>
+                    <span class="n">dst_transform</span><span class="o">=</span><span class="n">transform</span><span class="p">,</span>
+                    <span class="n">dst_crs</span><span class="o">=</span><span class="n">dst_crs</span><span class="p">,</span>
+                    <span class="n">resampling</span><span class="o">=</span><span class="n">Resampling</span><span class="o">.</span><span class="n">sum</span><span class="p">,</span>
+                <span class="p">)</span>  <span class="c1"># Resampling.sum or Resampling.nearest</span>
+
+    <span class="n">raster</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">_output_origins_raster_tif</span><span class="p">)</span>
+
+    <span class="c1"># Crop to shapefile</span>
+    <span class="n">out_array</span><span class="p">,</span> <span class="n">out_trans</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">mask</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span>
+        <span class="n">dataset</span><span class="o">=</span><span class="n">raster</span><span class="p">,</span> <span class="n">shapes</span><span class="o">=</span><span class="n">gdf</span><span class="o">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">crop</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+
+    <span class="n">out_meta</span> <span class="o">=</span> <span class="n">raster</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">out_meta</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;height&quot;</span><span class="p">:</span> <span class="n">out_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="s2">&quot;width&quot;</span><span class="p">:</span> <span class="n">out_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span>
+            <span class="s2">&quot;transform&quot;</span><span class="p">:</span> <span class="n">out_trans</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">raster</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">_output_origins_raster_tif</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">out_array</span><span class="p">,</span> <span class="n">out_meta</span></div>
+
+
+<div class="viewcode-block" id="export_raster_to_geotiff"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.origins_destinations.export_raster_to_geotiff">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">export_raster_to_geotiff</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">dir_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="n">cropped_outputfile</span> <span class="o">=</span> <span class="n">dir_path</span> <span class="o">/</span> <span class="n">filename</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+        <span class="n">cropped_outputfile</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">meta</span><span class="p">,</span> <span class="n">compress</span><span class="o">=</span><span class="s2">&quot;LZW&quot;</span><span class="p">,</span> <span class="n">tiled</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">dest</span><span class="p">:</span>
+        <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">array</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">cropped_outputfile</span></div>
+
+
+<div class="viewcode-block" id="generate_points_from_raster"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.origins_destinations.generate_points_from_raster">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">generate_points_from_raster</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">):</span>
+    <span class="c1"># Read raster coordinate centroid</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+        <span class="n">points</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">width</span><span class="p">):</span>
+            <span class="n">x_s</span><span class="p">,</span> <span class="n">y_s</span> <span class="o">=</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">transform</span><span class="o">.</span><span class="n">xy</span><span class="p">(</span>
+                <span class="n">src</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span>
+                <span class="p">[</span><span class="n">row</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">height</span><span class="p">)],</span>
+                <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">height</span><span class="p">)],</span>
+            <span class="p">)</span>
+            <span class="n">points</span> <span class="o">+=</span> <span class="p">[</span><span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x_s</span><span class="p">,</span> <span class="n">y_s</span><span class="p">)]</span>
+
+    <span class="c1"># Put raster coordinates into geodataframe</span>
+    <span class="n">gdf</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">()</span>
+    <span class="n">gdf</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">points</span>
+    <span class="n">gdf</span><span class="p">[</span><span class="s2">&quot;OBJECTID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gdf</span><span class="p">))]</span>
+
+    <span class="c1"># Get raster values</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="p">[</span><span class="n">gdf</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">gdf</span><span class="p">[</span><span class="s2">&quot;geometry&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">y</span><span class="p">]</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">temp</span><span class="p">)))</span>
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fn</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+        <span class="n">gdf</span><span class="o">.</span><span class="n">crs</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">crs</span>
+        <span class="n">gdf</span><span class="p">[</span><span class="s2">&quot;values&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">sample</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">src</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">coords</span><span class="p">)]</span>
+
+    <span class="c1"># Save non-zero cells</span>
+    <span class="n">gdf</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">gdf</span><span class="p">[</span><span class="s2">&quot;values&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">out_fn</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">out_fn</span></div>
+
+
+<div class="viewcode-block" id="origins_from_raster"><a class="viewcode-back" href="../../../api/network.html#ra2ce.network.origins_destinations.origins_from_raster">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">origins_from_raster</span><span class="p">(</span><span class="n">output_folder</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">mask_fn</span><span class="p">,</span> <span class="n">raster_fn</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Makes origin points from a population raster.&quot;&quot;&quot;</span>
+    <span class="n">output_fn</span> <span class="o">=</span> <span class="n">output_folder</span> <span class="o">/</span> <span class="s2">&quot;origins_raster.tif&quot;</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">mask_fn</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;pyogrio&quot;</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="mi">1000</span>  <span class="c1"># in meter; TODO: put in config file or in network.ini</span>
+    <span class="n">out_array</span><span class="p">,</span> <span class="n">out_meta</span> <span class="o">=</span> <span class="n">rescale_and_crop</span><span class="p">(</span><span class="n">raster_fn</span><span class="p">,</span> <span class="n">mask</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+    <span class="n">outputfile</span> <span class="o">=</span> <span class="n">export_raster_to_geotiff</span><span class="p">(</span><span class="n">out_array</span><span class="p">,</span> <span class="n">out_meta</span><span class="p">,</span> <span class="n">output_folder</span><span class="p">,</span> <span class="n">output_fn</span><span class="p">)</span>
+
+    <span class="n">out_array</span><span class="p">[</span><span class="n">out_array</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="s2">&quot;There are &quot;</span>
+        <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">out_array</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">out_array</span><span class="p">)]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+        <span class="o">+</span> <span class="s2">&quot; origin points.&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">out_fn</span> <span class="o">=</span> <span class="n">output_folder</span> <span class="o">/</span> <span class="s2">&quot;origins_points.gpkg&quot;</span>
+    <span class="n">out_fn</span> <span class="o">=</span> <span class="n">generate_points_from_raster</span><span class="p">(</span><span class="n">outputfile</span><span class="p">,</span> <span class="n">out_fn</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">out_fn</span></div>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Deltares.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
