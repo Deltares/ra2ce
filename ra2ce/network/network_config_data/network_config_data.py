@@ -41,9 +41,25 @@ class ProjectSection:
 
 @dataclass
 class NetworkSection:
+    """Represents a section of the transport network.
+
+    Args:
+        directed (bool): Whether the graph of the network should be directed. Default is False.
+        source (SourceEnum): Source of the network data. Default is SourceEnum.INVALID.
+        primary_file (Optional[list[Path]]): If source is set to SourceEnum.SHAPEFILE, provide here a list of shapefiles for the network.
+        diversion_file (list[Path]): List of diversion files.
+        file_id (str): Identifier for the network section.
+        link_type_column (str): Name of the column that defines link type. Default 'highway'.
+        polygon (Optional[Path]): If source is set to SourceEnum.OSM_DOWNLOAD, indicate the path of a shapefile polygon to clip the network.
+        network_type (NetworkTypeEnum): Type of network. Default is NetworkTypeEnum.NONE.
+        road_types (list[RoadTypeEnum]): List of road types included in this section.
+        attributes_to_exclude_in_simplification (list[str]): List of attributes not to simplify.
+        save_gpkg (bool): Whether to save a GeoPackage file of the network. Default False.
+    """
+
     directed: bool = False
     source: SourceEnum = field(default_factory=lambda: SourceEnum.INVALID)
-    primary_file: list[Path] = field(default_factory=list)
+    primary_file: Optional[list[Path]] = field(default_factory=list)
     diversion_file: list[Path] = field(default_factory=list)
     file_id: str = ""
     link_type_column: str = "highway"
