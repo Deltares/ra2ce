@@ -103,7 +103,17 @@ class MultiLinkOriginDestination(AnalysisBase, AnalysisLossesProtocol):
     def multi_link_origin_destination(
         self, graph: nx.MultiGraph, analysis: AnalysisSectionLosses
     ) -> GeoDataFrame:
-        """Calculates the connectivity between origins and destinations"""
+        """
+        Calculates the connectivity between origins and destinations.
+
+        Args:
+            graph: The MultiGraph representing the network.
+            analysis: The AnalysisSectionLosses object containing OD information.
+
+        Returns:
+            GeoDataFrame: Connectivity results between origins and destinations.
+
+        """
         od_nodes = self._get_origin_destination_pairs(graph)
 
         all_results = []

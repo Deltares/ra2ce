@@ -519,7 +519,7 @@ def vertices_from_lines(
     return vertices_dict
 
 
-def create_nodes(merged_lines, crs_: cut_at_intersections):
+def create_nodes(merged_lines, crs_, cut_at_intersections):
     """Create shapely points at intersections and endpoints of a list of shapely lines.
 
     Args:
