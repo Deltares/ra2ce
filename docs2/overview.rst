@@ -62,8 +62,8 @@ Overview
 
     .. grid-item-card::
         :text-align: center
-        :link: contributing
-        :link-type: ref
+        :link: contributing/index
+        :link-type: doc
 
         :octicon:`people;10em`
         +++
@@ -92,12 +92,7 @@ Overview
    :maxdepth: 1
    :hidden:
 
-   about/about.rst
-   installation/installation.rst
    getting_started/index.rst
    showcases/index.rst
    tutorials/index.rst
    api/index.rst
-   contributing/index.rst
-   faq/faq.rst
-   publications/publications.rst

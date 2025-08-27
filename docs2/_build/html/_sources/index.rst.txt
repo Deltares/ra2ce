@@ -11,16 +11,17 @@ Get started here: :ref:`overview`.
 
 Or navigate directly to another section:
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
 
-   overview
-   getting_started/index
-   showcases/index
-   tutorials/index
-   api/index
-   contributing
+.. toctree::
+   :caption: Table of Contents
+   :maxdepth: 1
+   :titlesonly:
+
+   overview.rst
+   getting_started/index.rst
+   showcases/index.rst
+   tutorials/index.rst
+   api/index.rst
 
 
 Lost..? Try the :ref:`search`.

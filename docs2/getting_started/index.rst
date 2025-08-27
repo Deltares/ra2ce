@@ -20,3 +20,14 @@ Here’s a minimal example:
 
    from ra2ce.analysis import AnalysisRunner
    AnalysisRunner(net).run("damages")
+
+
+.. toctree::
+   :maxdepth: 1
+   :caption:  Getting started:
+
+   about
+   installation
+   fundamentals
+   starter_guide
+
