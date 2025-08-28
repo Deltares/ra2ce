@@ -25,6 +25,8 @@ from pathlib import Path
 
 import sphinx_autosummary_accessors
 
+from docs.conf import html_css_files
+
 # This is not needed
 sys.path.insert(0, os.path.abspath(".."))
 import ra2ce
@@ -143,7 +145,6 @@ suppress_warnings = ["ref.unknown_target"]
 #
 html_theme = "pydata_sphinx_theme"
 html_logo = "_resources/ra2ce_logo.svg"
-# html_static_path = ['_static']
 
 
 # Theme options are theme-specific and customize the look and feel of a
