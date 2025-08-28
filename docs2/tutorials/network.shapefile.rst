@@ -54,7 +54,7 @@ Indicate the path to the root directory of your project and to the network shape
 
 Step 3. Initialize and Configure RA2CE
 --------------------------------------
-Running the ``configure()`` method from the ``Ra2ceHandler`` will generate the network
+Running the :meth:`~ra2ce.ra2ce_handler.Ra2ceHandler.configure` method from the :meth:`~ra2ce.ra2ce_handler.Ra2ceHandler` will generate the network
 and store the results in the ``static/output_graph`` folder.
 
 .. code-block:: python

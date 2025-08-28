@@ -30,6 +30,7 @@ from docs.conf import html_css_files
 # This is not needed
 sys.path.insert(0, os.path.abspath(".."))
 import ra2ce
+import ra2ce.ra2ce_handler
 
 print("ra2ce", ra2ce)
 print("dir", dir(ra2ce))
@@ -129,6 +130,8 @@ pygments_style = "sphinx"
 todo_include_todos = False
 
 # Napoleon settings
+napoleon_use_param = True
+napoleon_use_rtype = True
 napoleon_numpy_docstring = True
 napoleon_google_docstring = False
 napoleon_preprocess_types = True

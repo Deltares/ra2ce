@@ -9,3 +9,4 @@ API Reference
    ra2ce.common
    ra2ce.configuration
    ra2ce.runners
+   ra2ce.handler
