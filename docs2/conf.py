@@ -88,6 +88,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx_autosummary_accessors",
     "nbsphinx",
+    "sphinx_autodoc_typehints",
 ]
 
 # source_suffix = ['.rst', '.md']
@@ -267,6 +268,14 @@ texinfo_documents = [
 nbsphinx_allow_errors = True
 # Do not execute the scripts during the build process.
 nbsphinx_execute = "never"
+
+
+
+autodoc_typehints = "description"   # put type hints in the description instead of signature
+add_module_names = False  # shorthen class names in the docs
+
+
+
 
 
 

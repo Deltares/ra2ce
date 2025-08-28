@@ -1,24 +1,3 @@
-"""
-                    GNU GENERAL PUBLIC LICENSE
-                      Version 3, 29 June 2007
-
-    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
-    Copyright (C) 2023 Stichting Deltares
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -41,20 +20,33 @@ class ProjectSection:
 
 @dataclass
 class NetworkSection:
-    """Represents a section of the transport network.
+    """
+    Represents a section of the transport network.
 
-    Args:
-        directed (bool): Whether the graph of the network should be directed. Default is False.
-        source (SourceEnum): Source of the network data. Default is SourceEnum.INVALID.
-        primary_file (Optional[list[Path]]): If source is set to SourceEnum.SHAPEFILE, provide here a list of shapefiles for the network.
-        diversion_file (list[Path]): List of diversion files.
-        file_id (str): Identifier for the network section.
-        link_type_column (str): Name of the column that defines link type. Default 'highway'.
-        polygon (Optional[Path]): If source is set to SourceEnum.OSM_DOWNLOAD, indicate the path of a shapefile polygon to clip the network.
-        network_type (NetworkTypeEnum): Type of network. Default is NetworkTypeEnum.NONE.
-        road_types (list[RoadTypeEnum]): List of road types included in this section.
-        attributes_to_exclude_in_simplification (list[str]): List of attributes not to simplify.
-        save_gpkg (bool): Whether to save a GeoPackage file of the network. Default False.
+    Parameters
+    ----------
+    directed
+        Whether the graph of the network should be directed. Default is ``False``.
+    source
+        Source of the network data. Default is ``SourceEnum.INVALID``.
+    primary_file
+        If ``source`` is set to ``SourceEnum.SHAPEFILE``, provide a list of shapefiles for the network.
+    diversion_file
+        List of diversion files.
+    file_id
+        Identifier for the network section.
+    link_type_column
+        Attribute name in a GeoDataFrame or shapefile that defines link type (e.g. type of road). Default is ``'highway'``.
+    polygon
+        If ``source`` is set to ``SourceEnum.OSM_DOWNLOAD``, path to a shapefile polygon to clip the network.
+    network_type
+        Type of network. Default is ``NetworkTypeEnum.NONE``.
+    road_types
+        List of road types to download from OSM if ``source`` is set to ``SourceEnum.OSM_DOWNLOAD``.
+    attributes_to_exclude_in_simplification
+        List of attributes not to simplify.
+    save_gpkg
+        Whether to save a GeoPackage file of the network in the output_graph folder. Default is ``False``.
     """
 
     directed: bool = False
@@ -62,11 +54,11 @@ class NetworkSection:
     primary_file: Optional[list[Path]] = field(default_factory=list)
     diversion_file: list[Path] = field(default_factory=list)
     file_id: str = ""
-    link_type_column: str = "highway"
+    link_type_column: Optional[str] = "highway"
     polygon: Optional[Path] = None
     network_type: NetworkTypeEnum = field(default_factory=lambda: NetworkTypeEnum.NONE)
     road_types: list[RoadTypeEnum] = field(default_factory=list)
-    attributes_to_exclude_in_simplification: list[str] = field(default_factory=list)
+    attributes_to_exclude_in_simplification: Optional[list[str]] = field(default_factory=list)
     save_gpkg: bool = False
 
 
@@ -114,20 +106,52 @@ class CleanupSection:
 
 @dataclass
 class NetworkConfigData(ConfigDataProtocol):
+    """
+    Data class for network configuration data.
+
+    Holds configuration for a transport network, including paths, coordinate reference system (CRS),
+    and various sections such as project details, network specifics, origins and destinations,
+    isolation points, hazard information, and cleanup options.
+
+    Parameters
+    ----------
+    root_path
+        The root directory path for the project.
+    input_path
+        The input directory path for the project.
+    output_path
+        The output directory path for the project.
+    static_path
+        The static files directory path for the project.
+    crs : CRS, default=EPSG:4326
+        The coordinate reference system used in the project.
+    project
+        Section containing project details.
+    network
+        Section containing network specifics.
+    origins_destinations
+        Section containing origins and destinations details. Required only for analysis types that need about accessibility.
+    isolation
+        Section containing isolation points details. Required only for analyses about isolated locations.
+    hazard
+        Section containing hazard information. Required only for analysis with a hazard component/map.
+    cleanup
+        Section containing cleanup options.
+    """
     root_path: Optional[Path] = None
     input_path: Optional[Path] = None
     output_path: Optional[Path] = None
     static_path: Optional[Path] = None
     # CRS is not yet supported in the ini file, it might be relocated to a subsection.
-    crs: CRS = field(default_factory=lambda: CRS.from_user_input(4326))
-    project: ProjectSection = field(default_factory=ProjectSection)
+    crs: Optional[CRS] = field(default_factory=lambda: CRS.from_user_input(4326))
+    project: Optional[ProjectSection] = field(default_factory=ProjectSection)
     network: NetworkSection = field(default_factory=NetworkSection)
-    origins_destinations: OriginsDestinationsSection = field(
+    origins_destinations: Optional[OriginsDestinationsSection] = field(
         default_factory=OriginsDestinationsSection
     )
-    isolation: IsolationSection = field(default_factory=IsolationSection)
-    hazard: HazardSection = field(default_factory=HazardSection)
-    cleanup: CleanupSection = field(default_factory=CleanupSection)
+    isolation: Optional[IsolationSection] = field(default_factory=IsolationSection)
+    hazard: Optional[HazardSection] = field(default_factory=HazardSection)
+    cleanup: Optional[CleanupSection] = field(default_factory=CleanupSection)
 
     @property
     def output_graph_dir(self) -> Optional[Path]:

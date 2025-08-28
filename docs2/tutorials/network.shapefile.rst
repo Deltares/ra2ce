@@ -32,6 +32,10 @@ Step 2. Define Paths and Network Configuration
 
 Indicate the path to the root directory of your project and to the network shapefile. We recommend to follow the structure shown in the `Getting Started tutorial <getting_started.html>`_.
 
+
+As a user, define the network configuration using the :class:`~ra2ce.network.network_config_data.network_config_data.NetworkConfigData` and
+:class:`~ra2ce.network.network_config_data.network_config_data.NetworkSection` classes.
+
 .. code-block:: python
 
    root_dir = Path(r"")
