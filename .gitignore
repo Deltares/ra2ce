@@ -86,6 +86,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs2/_build/
 docs/_examples/
 
 # PyBuilder
@@ -155,4 +156,5 @@ examples/data/*/static/output_graph/
 examples/data/*/output/
 examples/cache/
 /ra2ce/.idea/ra2ce.iml
+/docs2/_build/
 /docs2/_build/

@@ -8,7 +8,7 @@ infrastructurE Toolkit Python Package eveloped by Deltares. RA2CE helps to quant
 infrastructure networks, prioritize interventions and adaptation measures and select the most appropriate 
 action perspective to increase resilience considering future conditions.
 
-**Contact** Margreet van Marle (Margreet.vanMarle@Deltares.nl) or Thomas Bles (Thomas.Bles@Deltares.nl)
+**Contact** Lakshman Srikanth (Lakshman.srikanth@deltares.nl) or Margreet van Marle (Margreet.vanMarle@Deltares.nl)
 
 
 Distribution

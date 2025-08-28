@@ -14,9 +14,9 @@ as `miniforge <https://github.com/conda-forge/miniforge>`_ or `micromamba <https
   make sure the default channel is set to ``conda-forge`` to avoid issues with Deltares open-source policy.
 
 
-CLI only
-+++++++++++++++++++++++++++
-If only interested in using the tool via command-line interface follow these steps:
+User mode
++++++++++
+In order to use the tool via Python script, install first the RA2CE in your Python environment. RA2CE is available on `PyPI <https://pypi.org/project/ra2ce/>`_ and can be installed using `pip`:
 
   .. code-block:: bash
 
@@ -30,8 +30,9 @@ Alternatively you can install the latest version available on GitHub or a specif
     pip install git+https://github.com/Deltares/ra2ce.git@v0.3.1
 
 Development mode
-+++++++++++++++++++++++++++
-Please refer to our `installation for contributors wiki page <https://github.com/Deltares/ra2ce/wiki/getting-started#installation-for-contributors>`_.
+++++++++++++++++
+
+If you wish to contribute to the development of the tool, please refer for installation to our `installation for contributors wiki page <https://github.com/Deltares/ra2ce/wiki/getting-started#installation-for-contributors>`_.
 
 
 Docker and cloud
@@ -43,7 +44,7 @@ Please refer to our `docker and cloud wiki page <https://github.com/Deltares/ra2
 Binder environment
 +++++++++++++++++++++++++++
 Binder provides us an online web-tool capable of hosting a ``conda`` environment with the latest-greatest version of `RA2CE` already installed and ready to be used.
-In this environment you will find all our available examples as well as the possibility to create your own `Jupyter` notebooks or experiment with the `CLI` options.
+In this environment you will find all our available examples as well as the possibility to create your own `Jupyter` notebooks.
 
 - Our `ra2ce jupyter-binder <https://mybinder.org/v2/gh/Deltares/ra2ce/jupyter-binder>`_ environment.
 - More about `binder <https://mybinder.readthedocs.io/en/latest/>`_.

@@ -1,7 +1,7 @@
 .. _starter_guide:
 
-Starter Guide
-=============
+Quickstart
+==========
 
 RA2CE can be operated via the command-line interface with two commands. 
 Before RA2CE can be used, the correct Python environment needs to be installed 
