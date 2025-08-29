@@ -122,7 +122,7 @@ class NetworkConfigData(ConfigDataProtocol):
     output_path
         The output directory path for the project.
     static_path
-        The static files directory path for the project.
+        The static files directory path for the project. Recommended to be: root_path/static.
     crs : CRS, default=EPSG:4326
         The coordinate reference system used in the project.
     project
@@ -138,10 +138,10 @@ class NetworkConfigData(ConfigDataProtocol):
     cleanup
         Section containing cleanup options.
     """
-    root_path: Optional[Path] = None
-    input_path: Optional[Path] = None
-    output_path: Optional[Path] = None
-    static_path: Optional[Path] = None
+    root_path: Path = None
+    input_path: Path = None
+    output_path: Path = None
+    static_path: Path = None
     # CRS is not yet supported in the ini file, it might be relocated to a subsection.
     crs: Optional[CRS] = field(default_factory=lambda: CRS.from_user_input(4326))
     project: Optional[ProjectSection] = field(default_factory=ProjectSection)

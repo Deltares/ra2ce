@@ -50,7 +50,6 @@ As a user, define the network configuration using the :class:`~ra2ce.network.net
 
    network_config_data = NetworkConfigData(
        root_path=root_dir,
-       output_path=root_dir / "output",
        static_path=root_dir.joinpath("static"),
        network=network_section,
    )
