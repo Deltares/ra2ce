@@ -71,13 +71,14 @@ Step 4. Load and Inspect the Output
 -----------------------------------
 
 A few geopackages are created in the ``static/output_graph`` folder, you can load and inspect them using ``geopandas``.
+
 .. code-block:: python
 
-   path_output_graph = root_dir / "static" / "output_graph"
-   base_graph_edges = path_output_graph / "base_graph_edges.gpkg"
+   path_output_graph = root_dir.joinpath("static", "output_graph")
+   base_graph_edges = path_output_graph.joinpath("base_graph_edges.gpkg")
    edges_gdf = gpd.read_file(base_graph_edges, driver="GPKG")
 
-   base_graph_nodes = path_output_graph / "base_graph_nodes.gpkg"
+   base_graph_nodes = path_output_graph.joinpath("base_graph_nodes.gpkg")
    nodes_gdf = gpd.read_file(base_graph_nodes, driver="GPKG")
 
 
