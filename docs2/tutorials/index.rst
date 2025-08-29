@@ -35,7 +35,7 @@ Choose your workflow:
       :link-type: doc
       :text-align: left
 
-      :octicon:`share-android;4em`
+      :octicon:`stopwatch;4em`
       +++
       How redundant is my network?
 
@@ -94,6 +94,7 @@ Choose your workflow:
 
    network
    hazard
+   criticality
    damages
    losses
    accessibility
