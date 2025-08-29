@@ -17,6 +17,41 @@ Choose your workflow:
 
       How do I import a pre-defined shapefile network?
 
+   .. grid-item-card:: Hazard
+      :link: hazard
+      :link-type: doc
+      :text-align: left
+
+      :fas:`zap;4em`
+      +++
+      What is the hazard intensity in my network?
+
+      How much water is expected at each road segment?
+
+      How do I overlay hazard data to my network?
+
+   .. grid-item-card:: Criticality
+      :link: criticality
+      :link-type: doc
+      :text-align: left
+
+      :octicon:`share-android;4em`
+      +++
+      How redundant is my network?
+
+      What is the detour time during a disaster?
+
+   .. grid-item-card:: Accessibility
+      :link: accessibility
+      :link-type: doc
+      :text-align: left
+
+      :octicon:`share-android;4em`
+      +++
+      What is the shortest evacuation route in emergency conditions?
+
+      Are critical services reachable during a disaster?
+
    .. grid-item-card:: Damages
       :link: damages
       :link-type: doc
@@ -34,15 +69,6 @@ Choose your workflow:
       :octicon:`x-circle;4em`
       +++
       Quantify economic and societal losses.
-
-   .. grid-item-card:: Accessibility
-      :link: accessibility
-      :link-type: doc
-      :text-align: left
-
-      :octicon:`map-pin;4em`
-      +++
-      Assess accessibility impacts due to disruptions.
 
    .. grid-item-card:: Adaptation
       :link: adaptation
@@ -67,6 +93,7 @@ Choose your workflow:
    :maxdepth: 1
 
    network
+   hazard
    damages
    losses
    accessibility

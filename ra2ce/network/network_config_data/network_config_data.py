@@ -34,7 +34,7 @@ class NetworkSection:
     diversion_file
         List of diversion files.
     file_id
-        Identifier for the network section.
+        field name of the ID attribute in the shapefile for network creating with a shapefile as source.
     link_type_column
         Attribute name in a GeoDataFrame or shapefile that defines link type (e.g. type of road). Default is ``'highway'``.
     polygon
@@ -85,13 +85,31 @@ class IsolationSection:
 
 @dataclass
 class HazardSection:
+    """
+    Represents a section of the transport network.
+
+    Parameters
+    ----------
+    hazard_map
+        list of path to raster files representing the hazard maps, for which the hazard overlay will be performed on the network.
+    hazard_id
+        Identifier for the hazard section.
+    hazard_field_name
+        Name of the field in the hazard map to be used for the overlay.
+    aggregate_wl
+        If a network link intersects multiple cells of the hazard map, choose which method to aggregate hazard intensity levels. Default is ``AggregateWlEnum.NONE``.
+    hazard_crs
+        Coordinate reference system of the hazard maps.
+    overlay_segmented_network
+        If False no overlay of the segmented network will be created. Default is ``True``.
+    """
     hazard_map: list[Path] = field(default_factory=list)
-    hazard_id: str = ""
-    hazard_field_name: str = ""
+    hazard_id: Optional[str] = ""
+    hazard_field_name: Optional[str] = ""
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
     hazard_crs: str = ""
     # If False no overlay of the segmented network will be created.
-    overlay_segmented_network: bool = True
+    overlay_segmented_network: Optional[bool] = True
 
 
 @dataclass
