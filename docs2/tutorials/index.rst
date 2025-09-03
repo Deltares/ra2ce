@@ -39,6 +39,8 @@ Choose your workflow:
       +++
       How redundant is my network?
 
+      Are there alternative routes?
+
       What is the detour time during a disaster?
 
    .. grid-item-card:: Accessibility
