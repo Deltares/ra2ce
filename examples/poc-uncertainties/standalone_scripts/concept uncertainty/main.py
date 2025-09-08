@@ -7,15 +7,16 @@ from hazard_probabilitistic_set import HazardProbabilisticEventsSet
 
 result_csv = Path(
     # r"C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\paper\res\tertiary.csv"
-    r"C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\paper\res\results_new_all.csv"
+    # r"C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\paper\res\results_new_all.csv"
     # r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\WCF4Exchange\paper\res\results500-700.csv"
+    r"c:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\2024\output_new_damage_cuvres\results_new_ALL.csv"
 )
 
 scenario_data = pd.read_excel(
-    Path(r'C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\paper\scenario_definition.xlsx'))
+    Path(r'c:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\2024\paper\scenario_definition.xlsx'))
 
 huizinga_ref_data = Path(
-    r"C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\paper\res\results_huizinga.csv"
+    r"c:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\2024\output_new_damage_cuvres\results_ref_C6.csv"
 )
 
 order_hazards_Waal = [13514, 13516, 13518, 13528, 13529, 13530, 13531, 13532, 13534, 13535, 13536, 13537, 13538, 13539,
@@ -70,10 +71,11 @@ hazard_set = HazardProbabilisticEventsSet(id=1,
                                           reference_values = huizinga_data)
 
 # hazard_set.plot_violin(var='damage', sort_by_return_period=True)
-hazard_set.plot_histogram(var='AAL')
-hazard_set.plot_histogram(var='damage')
+hazard_set.plot_EP_spaghetti_plot()
+# hazard_set.plot_histogram(var='AAL')
+# hazard_set.plot_histogram(var='damage')
 # hazard_set.plot_histogram_events()
-hazard_set.plot_CDF_AAL()
+# hazard_set.plot_CDF_AAL()
 
 # hazard_set.plot_
 

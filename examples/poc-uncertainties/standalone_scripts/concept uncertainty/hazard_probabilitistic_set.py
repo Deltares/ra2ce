@@ -1,3 +1,4 @@
+from collections import defaultdict
 from dataclasses import dataclass
 from typing import Optional, Union
 
@@ -223,7 +224,8 @@ class HazardProbabilisticEventsSet:
         plt.figure(figsize=(10, 10))
         data = self.filter_data(var)
 
-        sns.histplot(data.flatten(), bins=30, kde=True)
+       # Show results
+        sns.histplot(data.flatten(), bins=60, kde=True)
 
         if var == 'damage':
             xlabel = "Total damage (Millions EUR)"
@@ -274,3 +276,55 @@ class HazardProbabilisticEventsSet:
         plt.yticks(fontsize=15)
         # plt.title("Cumulative Distribution Function of Average Annual Loss")
         plt.show()
+
+
+    def plot_EP_spaghetti_plot(self):
+
+        data = self.filter_data('damage')
+
+        all_proba_of_exceedance = []
+        all_damage = []
+
+        for run in data:
+            order = np.argsort(run)[::-1]
+            damage = run[order]
+            proba_of_occurence = np.array([event.annual_probability for event in self.events])[order]
+            non_proba_of_occurence = 1 - proba_of_occurence
+            non_proba_of_exceedance = np.cumprod(non_proba_of_occurence)
+            proba_of_exceedance = 1 - non_proba_of_exceedance
+
+            all_proba_of_exceedance.append(proba_of_exceedance)
+            all_damage.append(damage)
+
+            plt.plot(damage, proba_of_exceedance, color='black', alpha=0.1)
+
+        # Convert lists to NumPy arrays
+        all_proba_of_exceedance = np.array(all_proba_of_exceedance)
+        all_damage = np.array(all_damage)
+
+        # Compute 90th percentile for damage at each probability level
+        percentile_90 = np.percentile(all_damage, 90, axis=0)
+
+        plt.plot(percentile_90, np.mean(all_proba_of_exceedance, axis=0), color='red', linewidth=2, label='90th Percentile')
+
+        # Plot the reference path
+        order = np.argsort(self.reference_values)[::-1]
+        reference_damage = self.reference_values[order]
+        proba_of_occurence_ref = np.array([event.annual_probability for event in self.events])[order]
+        non_proba_of_occurence_ref = 1 - proba_of_occurence_ref
+        non_proba_of_exceedance_ref = np.cumprod(non_proba_of_occurence_ref)
+        proba_of_exceedance_ref = 1 - non_proba_of_exceedance_ref
+        plt.plot(reference_damage / 1e6, proba_of_exceedance_ref, color='blue', linewidth=2, label='Reference C6')
+
+        # Plot confidence interval as a shaded region
+
+
+        # Add labels and legend
+        plt.xlabel("Damage")
+        plt.ylabel("Probability of Exceedance")
+        plt.legend()
+
+        # ake y axis logarithmic
+        plt.yscale('log')
+        plt.show()
+
