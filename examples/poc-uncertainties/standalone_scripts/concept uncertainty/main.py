@@ -13,10 +13,14 @@ result_csv = Path(
 )
 
 scenario_data = pd.read_excel(
-    Path(r'c:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\2024\paper\scenario_definition.xlsx'))
+    Path(
+        r'c:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\2024\paper\scenario_definition.xlsx'))
 
-huizinga_ref_data = Path(
+ref_data = Path(
     r"c:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\2024\output_new_damage_cuvres\results_ref_C6.csv"
+)
+ref_data_2 = Path(
+    r"c:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\2024\output_new_damage_cuvres\results_ref_C3.csv"
 )
 
 order_hazards_Waal = [13514, 13516, 13518, 13528, 13529, 13530, 13531, 13532, 13534, 13535, 13536, 13537, 13538, 13539,
@@ -50,7 +54,8 @@ print(data_array.shape)
 print(f" Number of hazards: {len(data_array)}, number of Monte Carlo runs: {len(data_array[0])}")
 
 # Load reference Huizinga results. CAREFULL the order holds only for combi dataset!
-huizinga_data = pd.read_csv(huizinga_ref_data).to_numpy().transpose()[0]
+ref_data_df = pd.read_csv(ref_data).to_numpy().transpose()[0]
+ref_data2_df = pd.read_csv(ref_data_2).to_numpy().transpose()[0]
 
 list_events = []
 for i, event_data in data_combi.iterrows():
@@ -68,12 +73,14 @@ hazard_set = HazardProbabilisticEventsSet(id=1,
                                           events=list_events,
                                           number_events=len(list_events),
                                           number_runs=len(data_array[0]),
-                                          reference_values = huizinga_data)
+                                          reference_values=ref_data_df,
+                                          reference_values_2=ref_data2_df,
+                                          )
 
 # hazard_set.plot_violin(var='damage', sort_by_return_period=True)
 hazard_set.plot_EP_spaghetti_plot()
-# hazard_set.plot_histogram(var='AAL')
-# hazard_set.plot_histogram(var='damage')
+hazard_set.plot_histogram(var='AAL')
+hazard_set.plot_histogram(var='damage')
 # hazard_set.plot_histogram_events()
 # hazard_set.plot_CDF_AAL()
 

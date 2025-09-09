@@ -25,6 +25,7 @@ class HazardProbabilisticEventsSet:
     number_events: int
     number_runs: int
     reference_values: Union[list, np.array]
+    reference_values_2: Union[list, np.array]
 
     @classmethod
     def from_res_df_2024(cls, res_df: pd.DataFrame, set_name: str):
@@ -96,11 +97,22 @@ class HazardProbabilisticEventsSet:
 
         return damage_array
 
-    def get_reference_damage(self) -> float:
-        return np.mean(self.reference_values) / 1e6
+    def get_reference_damage(self, ref_id: int = 1) -> float:
+        if ref_id == 1:
+            return np.mean(self.reference_values) / 1e6
+        elif ref_id == 2:
+            return np.mean(self.reference_values_2) / 1e6
+        else:
+            raise NotImplemented("Reference id not implemented")
 
-    def get_reference_AAL(self) -> float:
-        return np.sum(self.reference_values * np.array([event.annual_probability for event in self.events]) / 1e6)
+
+    def get_reference_AAL(self, ref_id: int = 1) -> float:
+        if ref_id == 1:
+            return np.sum(self.reference_values * np.array([event.annual_probability for event in self.events]) / 1e6)
+        elif ref_id == 2:
+            return np.sum(self.reference_values_2 * np.array([event.annual_probability for event in self.events]) / 1e6)
+        else:
+            raise NotImplemented("Reference id not implemented")
 
     def get_event_frequencies(self) -> list[float]:
         """
@@ -297,6 +309,7 @@ class HazardProbabilisticEventsSet:
             all_damage.append(damage)
 
             plt.plot(damage, proba_of_exceedance, color='black', alpha=0.1)
+            plt.plot(damage, proba_of_exceedance / 10, color='green', alpha=0.1)
 
         # Convert lists to NumPy arrays
         all_proba_of_exceedance = np.array(all_proba_of_exceedance)
@@ -305,22 +318,30 @@ class HazardProbabilisticEventsSet:
         # Compute 90th percentile for damage at each probability level
         percentile_90 = np.percentile(all_damage, 90, axis=0)
 
-        plt.plot(percentile_90, np.mean(all_proba_of_exceedance, axis=0), color='red', linewidth=2, label='90th Percentile')
+        # plt.plot(percentile_90, np.mean(all_proba_of_exceedance, axis=0), color='red', linewidth=2, label='90th Percentile')
 
-        # Plot the reference path
+        # Plot the reference path for ref 1
         order = np.argsort(self.reference_values)[::-1]
         reference_damage = self.reference_values[order]
         proba_of_occurence_ref = np.array([event.annual_probability for event in self.events])[order]
         non_proba_of_occurence_ref = 1 - proba_of_occurence_ref
         non_proba_of_exceedance_ref = np.cumprod(non_proba_of_occurence_ref)
         proba_of_exceedance_ref = 1 - non_proba_of_exceedance_ref
-        plt.plot(reference_damage / 1e6, proba_of_exceedance_ref, color='blue', linewidth=2, label='Reference C6')
+        plt.plot(reference_damage / 1e6, proba_of_exceedance_ref, color='red', linewidth=2, label='Reference C6')
+
+        # Plot the reference path for ref 2
+        order2 = np.argsort(self.reference_values_2)[::-1]
+        reference_damage2 = self.reference_values_2[order2]
+        proba_of_occurence_ref2 = np.array([event.annual_probability for event in self.events])[order2]
+        non_proba_of_occurence_ref2 = 1 - proba_of_occurence_ref2
+        non_proba_of_exceedance_ref2 = np.cumprod(non_proba_of_occurence_ref2)
+        proba_of_exceedance_ref2 = 1 - non_proba_of_exceedance_ref2
+        plt.plot(reference_damage2 / 1e6, proba_of_exceedance_ref2, color='red', linestyle='--', linewidth=2, label='Reference C3')
 
         # Plot confidence interval as a shaded region
 
-
         # Add labels and legend
-        plt.xlabel("Damage")
+        plt.xlabel("Total damage (Millions EUR)")
         plt.ylabel("Probability of Exceedance")
         plt.legend()
 
