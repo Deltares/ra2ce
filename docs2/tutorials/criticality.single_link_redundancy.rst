@@ -1,18 +1,21 @@
 Single Link Redundancy Tutorial
 ===============================
 
-This tutorial contains an example of the single link redundancy analysis of the RA2CE tool.
-This example does not require the data like hazard maps. However, it does require a network.
-If you are not familiar with this, please first go through the :doc:`network` tutorial to create
-and configure a network.
+🚗 What happens if one road is blocked?
+--------------------------------------
 
-In this tutorial, we will guide you through the **single link redundancy analysis**, which provides
-insight into the criticality of of (road) networks. This analysis removes each link of the network one at a time. For each disrupted link, a redundancy analysis is performed. It identifies the best existing alternative route or, if there is no redundancy, the lack of alternative routes. This is performed sequentially, for each link of the network. The redundancy of each link is expressed in total distance or time for the alternative route, difference in distance/time between the alternative route and the original route (additional distance/time), and if there is an alternative route available, or not.
+In this tutorial, you will learn how to run a **single link redundancy analysis**
+with RA2CE. This type of analysis checks what happens if *one road segment*
+(also called a *link*) becomes unavailable:
 
-The results highlight:
+- Is there another way to get around?
+- How much longer is the detour compared to the original route?
+- Which roads have **no backup options at all**?
 
-- Is there an alternative route available if this link is disrupted?
-- What is the total distance/time of the alternative route?
+.. note::
+
+   This example does **not** require hazard maps, but you do need a prepared network.
+   If you are new to networks in RA2CE, first go through the :doc:`network` tutorial.
 
 .. image:: /_resources/criticality_schema.png
    :alt: Basic principle of the single link redundancy analysis
@@ -113,8 +116,12 @@ The results are stored in the folder ``output`` within the root directory. The r
 Detour Availability
 ~~~~~~~~~~~~~~~~~~~
 
-In the following maps, we will examine the outcomes of the single link redundancy assessment, which involves evaluating each individual link within the network to determine if a detour is feasible (i.e., if redundancy exists). The underlying concept is that if a link becomes unusable, such as during a flood, the absence of a viable detour presents a significant problem. In the legend provided, a value of ‘0’ indicates the absence of redundancy, while a value of ‘1’ signifies the presence of redundancy, indicating the possibility of a detour for that particular link.
-This information is storied in the `detour` column of the output file.
+RA2CE marks whether each road segment has a detour:
+
+- ``0`` = no detour available (critical!)
+- ``1`` = detour available
+
+This is stored in the ``detour`` column.
 
 .. code-block:: python
 

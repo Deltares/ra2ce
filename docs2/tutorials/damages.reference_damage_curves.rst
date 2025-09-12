@@ -9,12 +9,3 @@ Steps:
 2. Overlay hazard map
 3. Apply damage curves
 4. Export results
-
-
-
-.. toctree::
-   :maxdepth: 1
-
-   damages.reference_damage_curves
-   damages.manual_damage_curves
-   damages.EAD

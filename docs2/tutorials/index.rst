@@ -54,6 +54,8 @@ Choose your workflow:
 
       Are critical services reachable during a disaster?
 
+      Which districts are isolated from essential services in emergency conditions?
+
    .. grid-item-card:: Damages
       :link: damages
       :link-type: doc
@@ -61,7 +63,9 @@ Choose your workflow:
 
       :octicon:`flame;4em`
       +++
-      Estimate physical damages to infrastructure.
+      What is the expected physical (direct) damage to my infrastructure for an event?
+
+      What is the EAD (Expected Annual Damage) to my infrastructure?
 
    .. grid-item-card:: Losses
       :link: losses
@@ -70,7 +74,9 @@ Choose your workflow:
 
       :octicon:`x-circle;4em`
       +++
-      Quantify economic and societal losses.
+      What is the expected economic (indirect) loss to my infrastructure due to disruption from an event?
+
+      What is the EAL (Expected Annual Loss) to my infrastructure?
 
    .. grid-item-card:: Adaptation
       :link: adaptation
@@ -97,8 +103,8 @@ Choose your workflow:
    network
    hazard
    criticality
+   accessibility
    damages
    losses
-   accessibility
    adaptation
    equity
