@@ -188,14 +188,47 @@ class AnalysisSectionLosses(AnalysisSectionBase):
 @dataclass
 class AnalysisSectionDamages(AnalysisSectionBase):
     """
-    Reflects all possible settings that a damages analysis section might contain.
+    Configuration for a damages analysis section.
+
+    This dataclass reflects all possible settings for performing
+    a damages-related analysis. It defines parameters for how road
+    damages, risks, and associated outputs should be calculated
+    and represented.
+
+    Attributes
+    ----------
+    analysis : AnalysisDamagesEnum
+        Type of damages analysis to perform. Defaults to ``AnalysisDamagesEnum.INVALID``.
+    representative_damage_percentage : float, optional
+        Percentage of representative damage to apply in the analysis
+        (default is 100).
+    event_type : EventTypeEnum
+        Choose if the damages must be calculated from an event perspective (``EventTypeEnum.EVENT``) or a risk perspective (``EventTypeEnum.RETURN_PERIOD``).
+        Defaults to ``EventTypeEnum.NONE``.
+    damage_curve : DamageCurveEnum
+        Type of damage curves to be used: Huizinga (``DamageCurveEnum.HZ``), OSD (``DamageCurveEnum.OSD``), or manual (``DamageCurveEnum.MAN``).
+        Defaults to ``DamageCurveEnum.INVALID``.
+    risk_calculation_mode : RiskCalculationModeEnum, optional
+        Mode used for risk calculation (e.g., deterministic, probabilistic).
+        Defaults to ``RiskCalculationModeEnum.NONE``.
+    risk_calculation_year : int, optional
+        Year used for risk calculation scenarios. Defaults to 0 (unspecified).
+    create_table : bool, optional
+
+    file_name : Path or None
+
+
+    Notes
+    -----
+    This section is typically part of a larger analysis pipeline and
+    defines only the configuration parameters, not the computational logic.
     """
 
     analysis: AnalysisDamagesEnum = field(
         default_factory=lambda: AnalysisDamagesEnum.INVALID
     )
     # road damage
-    representative_damage_percentage: float = 100
+    representative_damage_percentage: Optional[float] = 100
     event_type: EventTypeEnum = field(default_factory=lambda: EventTypeEnum.NONE)
     damage_curve: DamageCurveEnum = field(
         default_factory=lambda: DamageCurveEnum.INVALID
@@ -203,8 +236,8 @@ class AnalysisSectionDamages(AnalysisSectionBase):
     risk_calculation_mode: RiskCalculationModeEnum = field(
         default_factory=lambda: RiskCalculationModeEnum.NONE
     )
-    risk_calculation_year: int = 0
-    create_table: bool = False
+    risk_calculation_year: Optional[int] = 0
+    create_table: Optional[bool] = False
     file_name: Optional[Path] = None
 
 
