@@ -41,16 +41,20 @@ The basic workflow for calculating physical damage is:
 Types of Damage Curves
 -----------------------
 
-RA2CE supports two ways to define the hazard–damage relationship:
+RA2CE offers several ways to represent the hazard–damage relationship:
 
-- :doc:`Reference damage curves <damages.reference_damage_curves>` – Predefined
-  curves from literature or past studies (e.g., flood depth-damage curves).
-- :doc:`Manual damage curves <damages.manual_damage_curves>` – User-defined custom
-  curves, tailored to local infrastructure, vulnerability, or engineering assessments.
+- :doc:`Reference damage curves <damages.reference_damage_curves>`
+  Built-in functions from literature or past studies.
+  *Examples: Huizinga global flood curves (HZ), OSdaMage European functions (OSD).*
 
-Selecting the right type depends on data availability and the purpose of the study.
-Reference curves are useful for rapid assessments, while manual curves are essential
-when local calibration is possible.
+- :doc:`Manual damage curves <damages.manual_damage_curves>`
+  User-defined curves tailored to site-specific infrastructure, historical data,
+  or alternative vulnerability scenarios.
+
+Which option to choose?
+
+- **Reference curves** – Fast and consistent for large-scale or exploratory analysis.
+- **Manual curves** – Essential when local calibration or specific engineering detail is available.
 
 ----
 
