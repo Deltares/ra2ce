@@ -24,12 +24,12 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 
+import rasterio
 from geopandas import GeoDataFrame
 from networkx import Graph, set_edge_attributes
 from numpy import nan
 from rasterstats import zonal_stats
 from tqdm import tqdm
-import rasterio
 
 from ra2ce.network.hazard.hazard_common_functions import (
     get_edges_geoms,
