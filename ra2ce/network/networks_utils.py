@@ -40,7 +40,6 @@ from numpy.ma import MaskedArray
 from osmnx import graph_to_gdfs
 from rasterio.features import shapes
 from rasterio.mask import mask
-from affine import Affine
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
 from shapely.geometry.base import BaseGeometry, BaseMultipartGeometry
 from shapely.ops import linemerge, unary_union
@@ -1540,41 +1539,6 @@ def fraction_flooded(line: LineString, hazard_map: str):
     except Exception as e:
         logging.info("fraction_flooded() {} \n for line {}".format(e, line))
 
-def fraction_flooded_array(line: LineString, raster_array: np.ndarray, affine: Affine) -> float:
-    """
-    Calculates the fraction of a linestring that overlaps with a hazard raster array (values > 0).
-
-    Args:
-        line (LineString): The linestring to check.
-        raster_array (np.ndarray): The raster data array.
-        affine: The affine transform for the raster.
-
-    Returns:
-        float: Fraction of the linestring overlapping raster cells with value > 0.
-    """
-    bbox_line = box(*line.bounds)
-    try:
-        # Mask the raster array with the bounding box of the line
-        out_image, out_transform = mask(
-            {"type": "raster", "data": raster_array, "transform": affine}, #instead of giving src as argument, give a dict with type, data and transform
-            [bbox_line], crop=True, all_touched=True
-        )
-
-        flooded_cells = unary_union(
-            [
-                shape(x[0])
-                for x in shapes(out_image[0], transform=out_transform)
-                if x[-1] > 0
-            ]
-        )
-        flooded_cells = gpd.GeoDataFrame({"geometry": [flooded_cells]})
-
-        line_intersect = flooded_cells.intersection(line)
-        return line_intersect.length.sum() / line.length
-    except Exception as e:
-        import logging
-        logging.info(f"fraction_flooded_array() {e} \n for line {line}")
-        return 0
 
 def check_crs_gdf(gdf: gpd.GeoDataFrame, crs) -> None:
     if gdf.crs != crs:
