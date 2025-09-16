@@ -10,6 +10,7 @@ result_csv = Path(
     # r"C:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\paper\res\results_new_all.csv"
     # r"C:\Users\hauth\OneDrive - Stichting Deltares\Desktop\WCF4Exchange\paper\res\results500-700.csv"
     r"c:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\2024\output_new_damage_cuvres\results_new_ALL.csv"
+    # r"c:\Users\hauth\OneDrive - Stichting Deltares\projects\RA2CE Uncertainty\2024\output_new_damage_cuvres\highway.csv"
 )
 
 scenario_data = pd.read_excel(
@@ -90,3 +91,33 @@ hazard_set.plot_histogram(var='damage')
 #     hazard_set.plot_histogram_events(location=loc)
 # hazard_set.plot_violin(location=loc)
 # hazard_set.plot_violin(location
+
+
+# data = np.array(hazard_set.filter_data(var='AAL'))
+# print(data)
+# # save as numpy
+# np.save('array_AAL_tertiary.npy', data)
+#
+# data_highway = np.load('array_AAL_highway.npy', allow_pickle=True)
+# data_primary = np.load('array_AAL_primary.npy', allow_pickle=True)
+# data_secondary = np.load('array_AAL_secondary.npy', allow_pickle=True)
+# data_tertiary = np.load('array_AAL_tertiary.npy', allow_pickle=True)
+#
+# # make histrograms of the AAL per road type using seaborn:
+# import seaborn as sns
+# import matplotlib.pyplot as plt
+#
+# plt.figure(figsize=(10, 6))
+# sns.histplot(data_highway, color='blue', label='Highway', kde=True, stat="density", bins=30)
+# sns.histplot(data_primary, color='orange', label='Primary', kde=True, stat="density", bins=30)
+# sns.histplot(data_secondary, color='green', label='Secondary', kde=True, stat="density", bins=30)
+# sns.histplot(data_tertiary, color='red', label='Tertiary', kde=True, stat="density", bins=30)
+# plt.xlabel('AAL (Million Euros)')
+# plt.ylabel('Density')
+# plt.title('Histogram of AAL per Road Type')
+# plt.legend()
+# plt.grid(True)
+# plt.tight_layout()
+# plt.show()
+#
+#

@@ -244,10 +244,12 @@ class HazardProbabilisticEventsSet:
             # title = f"Histogram of damages - {self.number_runs} runs"
             # print(f"Reference damage: {self.get_reference_damage()}")
             ref_value = self.get_reference_damage()
+            ref_value_2 = self.get_reference_damage(ref_id=2)
         elif var == 'AAL':
             xlabel = "AAL (Millions EUR)"
             # title = f"Histogram of AAL - {self.number_runs} runs"
             ref_value = self.get_reference_AAL()
+            ref_value_2 = self.get_reference_AAL(ref_id=2)
         else:
             raise NotImplemented()
 
@@ -262,7 +264,14 @@ class HazardProbabilisticEventsSet:
         std = np.std(data.flatten())
         max = np.max(data.flatten())
         plt.axvline(ref_value, color='r', linestyle='--')
-        plt.text(0.7, 0.9, f"Mean: {mean:.2f} \n Std: {std:.2f} \n Huizinga {ref_value:.2f}" , fontsize=17, transform=plt.gca().transAxes)
+        plt.axvline(ref_value_2, color='r', linestyle='--')
+
+        # calc probability of exceedance of ref_value
+        prob_exceedance = np.sum(data.flatten() >= ref_value) / len(data.flatten())
+        prob_exceedance_2 = np.sum(data.flatten() >= ref_value_2) / len(data.flatten())
+        print(f"Probability of exceedance of ref value {ref_value:.2f}: {prob_exceedance:.2%}")
+        print(f"Probability of exceedance of ref value 2 {ref_value_2:.2f}: {prob_exceedance_2:.2%}")
+        plt.text(0.7, 0.9, f"Mean: {mean:.2f} \n Std: {std:.2f} \n C6 {ref_value:.2f}" , fontsize=17, transform=plt.gca().transAxes)
         plt.show()
 
     def plot_histogram_events(self):
@@ -309,7 +318,6 @@ class HazardProbabilisticEventsSet:
             all_damage.append(damage)
 
             plt.plot(damage, proba_of_exceedance, color='black', alpha=0.1)
-            plt.plot(damage, proba_of_exceedance / 10, color='green', alpha=0.1)
 
         # Convert lists to NumPy arrays
         all_proba_of_exceedance = np.array(all_proba_of_exceedance)
@@ -317,8 +325,10 @@ class HazardProbabilisticEventsSet:
 
         # Compute 90th percentile for damage at each probability level
         percentile_90 = np.percentile(all_damage, 90, axis=0)
+        percentile_mean = np.mean(all_damage, axis=0)
 
         # plt.plot(percentile_90, np.mean(all_proba_of_exceedance, axis=0), color='red', linewidth=2, label='90th Percentile')
+        plt.plot(percentile_mean, np.mean(all_proba_of_exceedance, axis=0), color='blue', linewidth=2, label='Mean')
 
         # Plot the reference path for ref 1
         order = np.argsort(self.reference_values)[::-1]
