@@ -40,6 +40,7 @@ from numpy.ma import MaskedArray
 from osmnx import graph_to_gdfs
 from rasterio.features import shapes
 from rasterio.mask import mask
+from affine import Affine
 from shapely.geometry import LineString, MultiLineString, Point, box, shape
 from shapely.geometry.base import BaseGeometry, BaseMultipartGeometry
 from shapely.ops import linemerge, unary_union
@@ -1539,7 +1540,7 @@ def fraction_flooded(line: LineString, hazard_map: str):
     except Exception as e:
         logging.info("fraction_flooded() {} \n for line {}".format(e, line))
 
-def fraction_flooded_array(line: LineString, raster_array: np.ndarray, affine) -> float:
+def fraction_flooded_array(line: LineString, raster_array: np.ndarray, affine: Affine) -> float:
     """
     Calculates the fraction of a linestring that overlaps with a hazard raster array (values > 0).
 
@@ -1570,8 +1571,6 @@ def fraction_flooded_array(line: LineString, raster_array: np.ndarray, affine) -
 
         line_intersect = flooded_cells.intersection(line)
         return line_intersect.length.sum() / line.length
-    except ValueError:
-        return 0
     except Exception as e:
         import logging
         logging.info(f"fraction_flooded_array() {e} \n for line {line}")
