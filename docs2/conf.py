@@ -193,6 +193,7 @@ html_context = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_resources"]
 html_css_files = ["theme-deltares.css"]
+html_js_files = ['custom.js']
 
 
 # -- Options for HTMLHelp output ---------------------------------------

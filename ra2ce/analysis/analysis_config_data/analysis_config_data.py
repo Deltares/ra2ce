@@ -212,7 +212,7 @@ class AnalysisSectionDamages(AnalysisSectionBase):
         Mode used for risk calculation (e.g., deterministic, probabilistic).
         Defaults to ``RiskCalculationModeEnum.NONE``.
     risk_calculation_year : int, optional
-        Year used for risk calculation scenarios. Defaults to 0 (unspecified).
+        Year used for risk calculation scenarios. Required if risk_calculation_mode is set to ``RiskCalculationModeEnum.TRIANGLE_TO_NULL_YEAR`` Defaults to 0 (unspecified).
     create_table : bool, optional
 
     file_name : Path or None

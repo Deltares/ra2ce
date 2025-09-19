@@ -1,4 +1,4 @@
-Damages Tutorial
+Damages Analysis
 ================
 
 💥 What happens to infrastructure when a hazard strikes?
