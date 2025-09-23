@@ -26,6 +26,9 @@ from typing import Any, Hashable, Optional
 
 import pandas as pd
 
+import warnings
+
+
 from ra2ce.analysis.damages.damage_functions.damage_fraction_uniform import (
     DamageFractionUniform,
 )
@@ -106,6 +109,22 @@ class DamageFunctionByRoadTypeByLane:
         assert "lanes" in cols, "no column 'lanes in df"
 
         max_damage_data = self.max_damage.data
+
+        # Validate index asset types
+        norm_allowed = {a.strip().casefold() for a in self.allowed_asset_types}
+        index_values = max_damage_data.index
+        invalid = sorted({
+            str(idx).strip().casefold()
+            for idx in index_values
+            if str(idx).strip().casefold() not in norm_allowed
+        })
+        if invalid:
+            warnings.warn(
+                "Unsupported asset type(s) in max_damage_data index: "
+                f"{', '.join(invalid)}. Allowed: {', '.join(sorted(norm_allowed))}",
+                category=UserWarning,
+                stacklevel=2,  # points the warning at the caller's line in the stack
+            )
 
         # Flatten max_damage_data into a Series with MultiIndex (infra_type, lanes)
         max_damage_series = (
