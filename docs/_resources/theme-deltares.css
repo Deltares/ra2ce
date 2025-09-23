@@ -1,0 +1,117 @@
+/* Override the default color set in the original theme */
+
+html[data-theme="light"] {
+    /* NOTE: added after pydata v0.9 */
+    --pst-color-primary: #080c80 !important;
+
+    /* hyperlinks */
+    --pst-color-link: rgb(13, 56, 224);
+
+    /* panels */
+    --pst-color-preformatted-border: #080c80 !important;
+    --pst-color-panel-background: #f0f0f075;
+
+    /* navbar */
+    /* NOTE: does not work since v0.9 */
+    --pst-color-navbar-link: rgb(237, 237, 255);
+    --pst-color-navbar-link-hover: #fff;
+    --pst-color-navbar-link-active: #fff;
+
+
+    /* sphinx design */
+    /* NOTE: does not work since v0.9 */
+    --sd-color-card-border-hover: #080c80;
+    --sd-color-tabs-label-active: #080c80;
+    --sd-color-tabs-label-hover: #080c80;
+    --sd-color-tabs-underline-active: #080c80;
+}
+
+/* enlarge deltares & github icon size; only works with local/url svg files; not with fa icons */
+img.icon-link-image {
+    height: 2.5em !important;
+}
+
+
+
+/* =========================
+   Catppuccin Macchiato - Python code blocks for Sphinx
+   ========================= */
+
+/* Base container */
+div.highlight pre,
+div.highlight pre code,
+div.highlight.highlight-python pre,
+div.highlight.highlight-python pre code {
+  background: #24273a !important;
+  color: #cad3f5 !important;
+  border-radius: 1px;
+  padding: 1rem;
+  font-family: "JetBrains Mono", "Fira Code", "Consolas", monospace;
+  line-height: 1.5;
+  overflow-x: auto;
+  position: relative; /* required for top-right icon */
+}
+
+/* Keywords, functions, classes, modules */
+.highlight .k, .highlight-python .k       { color: #c6a0f6 !important; } /* lavender */
+.highlight .nf, .highlight-python .nf     { color: #f5a97f !important; font-weight: 600; } /* orange */
+.highlight .nc, .highlight-python .nc     { color: #f5bde6 !important; font-weight: 500; } /* pink */
+.highlight .nn, .highlight-python .nn     { color: #8aadf4 !important; } /* blue */
+
+/* Keyword names and constant keywords */
+.highlight .kn, .highlight-python .kn     { color: #cba6f7 !important; }
+.highlight .kc, .highlight-python .kc     { color: #cba6f7 !important; }
+
+/* Numbers, operators, punctuation, comments */
+.highlight .mi, .highlight-python .mi     { color: #f5a97f !important; }
+.highlight .o, .highlight-python .o       { color: #91d7e3 !important; }
+.highlight .p, .highlight-python .p       { color: #cad3f5 !important; }
+.highlight .c, .highlight-python .c       { color: #6e738d !important; font-style: italic; }
+
+/* Variable names / attribute names */
+.highlight .n, .highlight-python .n       { color: #cad3f5 !important; }
+
+/* Strings (all variants) */
+.highlight .s, .highlight .s1, .highlight .s2,
+.highlight-python .s, .highlight-python .s1, .highlight-python .s2 {
+  color: #a6e3a1 !important;
+}
+
+/* Highlighted lines */
+.highlight .hll, .highlight-python .hll {
+  display: block;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  border-left: 4px solid #8aadf4;
+  margin-left: -1rem;
+  padding-left: 1rem;
+  border-radius: 4px;
+}
+
+/* Hover effect */
+.highlight pre code > span:hover,
+.highlighttable td.code pre > span:hover {
+  background: rgba(255,255,255,0.01);
+}
+
+/* Wrapped lines */
+.highlight .codelines { white-space: pre-wrap; }
+
+/* =========================
+   Top-right copy icon
+   ========================= */
+div.highlight-python .copy-icon {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s, fill 0.2s;
+    fill: #cba6f7; /* Catppuccin lavender */
+    z-index: 10;
+}
+
+div.highlight-python .copy-icon:hover {
+    opacity: 1;
+}
