@@ -67,8 +67,7 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
         """
         return list(zip(self.hazard_names, self.ra2ce_names))
 
-    @staticmethod
-    def _fraction_flooded_array(line: LineString, src: rasterio.io.DatasetReader) -> float:
+    def _fraction_flooded_array(self, line: LineString, src: rasterio.io.DatasetReader) -> float:
         """
         Calculates the fraction of a linestring that overlaps with a hazard raster (values > 0).
 
