@@ -181,7 +181,7 @@ class DamageNetworkBase(ABC):
 
     ### Damage handlers
     def calculate_damage_manual_functions(
-        self, events: list[str], manual_damage_functions: ManualDamageFunctions
+        self, events: list[str], manual_damage_functions: dict[str, ManualDamageFunctions]
     ) -> None:
         """
         Calculate the damage using the manual damage functions

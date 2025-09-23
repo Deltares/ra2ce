@@ -56,7 +56,7 @@ class DamageNetworkEvents(DamageNetworkBase):
             raise ValueError("No event cols present in hazard data")
 
     ### Controller for Event-based damage calculation
-    def main(self, damage_function: DamageCurveEnum, manual_damage_functions=None):
+    def main(self, damage_function: DamageCurveEnum, manual_damage_functions: dict[str, ManualDamageFunctions]):
         assert len(self.events) > 0, "no return periods identified"
         assert "me" in self.stats, "mean water depth (key: me) is missing"
         assert "fr" in self.stats, "inundated fraction (key: fr) is missing"

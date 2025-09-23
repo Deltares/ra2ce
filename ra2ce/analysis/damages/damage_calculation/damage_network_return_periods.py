@@ -79,7 +79,7 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         return cls(road_gdf, val_cols, representative_damage_percentage)
 
     ### Controllers for return period based damage and risk calculations
-    def main(self, damage_function: DamageCurveEnum, manual_damage_functions):
+    def main(self, damage_function: DamageCurveEnum, manual_damage_functions: dict[str, ManualDamageFunctions]):
         """
         Control the damage calculation per return period
 
