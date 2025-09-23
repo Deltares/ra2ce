@@ -167,7 +167,7 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
     def _to_canonical_asset(
             key: Any,
             *,
-            aliases: Mapping[str, str] | None = _ASSET_ALIASES,
+            aliases=None,
     ) -> tuple[Optional[str], str]:
         """
         Normalize an asset key:
@@ -179,6 +179,8 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
           - validate against canonical_set (if given)
         Returns (canonical_asset | None, original_str).
         """
+        if aliases is None:
+            aliases = _ASSET_ALIASES
         original = str(key)
 
         # normalize: strip, casefold, spaces/hyphens -> underscores, collapse repeats
