@@ -12,16 +12,14 @@ It covers installation, key concepts, and a short example to start using the lib
 Introduction
 ------------
 
-Welcome to **RA2CE**!
-This library is designed to [briefly explain the purpose: e.g., "assess risk in critical infrastructure networks," "simulate network failure under hazards," etc.].
+This is the repository of **RA2CE** (*just say race!*) — the *Resilience Assessment and Adaptation for Critical
+infrastructurE* Toolkit Python package developed by Deltares.
 
-In this section, you will learn how to:
+RA2CE helps to:
 
-- Install the package
-- Understand the core ideas
-- Run a quick example
-
-If you're already familiar with Python packages, you can jump directly to the :ref:`quick-start` section.
+- Quantify resilience of critical infrastructure networks
+- Prioritize interventions and adaptation measures
+- Set up emergency response plans related to critical infrastructure
 
 
 Installation
@@ -42,13 +40,20 @@ or a specific tag / commit hash using the ``@`` symbol:
    pip install git+https://github.com/Deltares/ra2ce.git@v1.0.0
 
 
+Developer Mode
+~~~~~~~~~~~~~~
+
+To install RA2CE for development purposes, please refer to our
+`installation for contributors wiki page <https://github.com/Deltares/ra2ce/wiki/getting-started#installation-for-contributors>`_.
+
+
 Fundamentals
 ------------
 
-How to Run Python (Sandbox or Jupyter Notebook)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+How to Run Python (Sandbox, Jupyter, Binder, Docker)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You can use **RA2CE** in two main ways:
+You can use **RA2CE** in several ways:
 
 - **Python script (sandboxing)**: write and run scripts that call RA2CE functions.
 - **Jupyter Notebook**: recommended for interactive exploration and visualization.
@@ -59,6 +64,15 @@ Example:
 
    import ra2ce
 
+**Binder** provides an online environment with RA2CE pre-installed.
+It includes ready-to-run examples, and lets you create your own notebooks or experiment with the CLI.
+
+- Try our `RA2CE Binder environment <https://mybinder.org/v2/gh/Deltares/ra2ce/jupyter-binder>`_
+- Learn more about `Binder <https://mybinder.readthedocs.io/en/latest/>`_
+
+You can also use **Docker** to install RA2CE and run it on different cloud services.
+See our `Docker and cloud wiki page <https://github.com/Deltares/ra2ce/wiki/Docker-and-Cloud>`_ for instructions.
+
 
 GIS Basics: Projection, Raster, Shapefiles, QGIS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -67,7 +81,7 @@ GIS Basics: Projection, Raster, Shapefiles, QGIS
 Familiarity with GIS tools is recommended for effective use.
 
 RA2CE generates and processes both **raster** and **vector** data.
-Most outputs are written to the `.gpkg` format, which can be easily opened in **QGIS** which is a free, open-source desktop GIS software.
+Most outputs are written to the `.gpkg` format, which can be opened in **QGIS** — a free, open-source GIS application.
 QGIS is especially useful for:
 
 - Pre-processing input data
@@ -135,29 +149,38 @@ Here’s a minimal working example to get you started:
    import ra2ce
    from pathlib import Path
    import geopandas as gpd
-   from shapely.geometry.polygon import Polygon
+   from shapely.geometry import Polygon
 
    from ra2ce.network import RoadTypeEnum
    from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
-   from ra2ce.network.network_config_data.network_config_data import NetworkSection, NetworkConfigData
+   from ra2ce.network.network_config_data.network_config_data import (
+       NetworkSection, NetworkConfigData
+   )
    from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
    from ra2ce.ra2ce_handler import Ra2ceHandler
 
+   # Define bounding polygon for network extraction
+   gdf_polygon_path = Path("data/static/network/polygon.geojson")
+   root_dir = Path("ProjectA")
+
    network_section = NetworkSection(
-        source=SourceEnum.OSM_DOWNLOAD,
-        network_type=NetworkTypeEnum.DRIVE,
-        road_types=[RoadTypeEnum.MOTORWAY, RoadTypeEnum.PRIMARY],
-        polygon=gdf_polygon_path,
-        save_gpkg=True)
+       source=SourceEnum.OSM_DOWNLOAD,
+       network_type=NetworkTypeEnum.DRIVE,
+       road_types=[RoadTypeEnum.MOTORWAY, RoadTypeEnum.PRIMARY],
+       polygon=gdf_polygon_path,
+       save_gpkg=True
+   )
 
    network_config_data = NetworkConfigData(
-        root_path=root_dir,
-        static_path=root_dir / "static",
-        network=network_section)
+       root_path=root_dir,
+       static_path=root_dir / "static",
+       network=network_section
+   )
 
-  handler = Ra2ceHandler.from_config(network=network_config_data, analysis=None)
-  handler.configure()
+   handler = Ra2ceHandler.from_config(network=network_config_data, analysis=None)
+   handler.configure()
 
-To inspect the result, open the files located in the folder static/output_graph using QGIS or load them in Python with geopandas.
+To inspect the result, open the files located in ``static/output_graph/`` using QGIS
+or load them in Python with ``geopandas``.
 
 From here, you can explore more examples in the :doc:`examples` section.
