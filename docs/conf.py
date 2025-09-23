@@ -25,8 +25,6 @@ from pathlib import Path
 
 import sphinx_autosummary_accessors
 
-from docs.conf import html_css_files
-
 # This is not needed
 sys.path.insert(0, os.path.abspath(".."))
 import ra2ce
@@ -193,7 +191,7 @@ html_context = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_resources"]
 html_css_files = ["theme-deltares.css"]
-html_js_files = ['custom.js']
+html_js_files = ['custom.js']  # used to attempt adding a copy button in Python code block
 
 
 # -- Options for HTMLHelp output ---------------------------------------
