@@ -21,6 +21,7 @@
 
 import logging
 from abc import ABC, abstractmethod
+from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -47,7 +48,8 @@ class DamageNetworkBase(ABC):
         self,
         road_gdf: GeoDataFrame,
         val_cols: list[str],
-        representative_damage_percentage: float
+        representative_damage_percentage: float,
+        allowed_assets: Optional[set[str]],
     ):
         """Construct the Data"""
         self.val_cols = val_cols
@@ -55,6 +57,7 @@ class DamageNetworkBase(ABC):
         # set of hazard info per event
         self.stats = set([x.split("_")[-1] for x in val_cols])
         self.representative_damage_percentage = representative_damage_percentage
+        self.allowed_assets = allowed_assets
 
         # TODO: also track the damage cols after the dam calculation, that is useful for the risk calc. module
         # TODO: also create constructors of the children of this class

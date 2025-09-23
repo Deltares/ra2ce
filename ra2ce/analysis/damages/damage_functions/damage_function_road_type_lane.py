@@ -46,6 +46,7 @@ class DamageFunctionByRoadTypeByLane:
     max_damage: MaxDamage
     damage_fraction: DamageFractionUniform
     name: str
+    allowed_asset_types: set[str]
 
     @property
     def prefix(self) -> str:
@@ -53,7 +54,7 @@ class DamageFunctionByRoadTypeByLane:
 
     @classmethod
     def from_input_folder(
-        cls, name: str, folder_path: Path
+        cls, name: str, folder_path: Path, allowed_asset_types: Optional[set[str]]
     ) -> DamageFunctionByRoadTypeByLane:
         """Construct a set of damage functions from csv files located in the folder_path
 
@@ -93,7 +94,9 @@ class DamageFunctionByRoadTypeByLane:
 
         damage_fraction.create_interpolator()
 
-        return cls(max_damage=max_damage, damage_fraction=damage_fraction, name=name)
+        return cls(
+            max_damage=max_damage, damage_fraction=damage_fraction, name=name, allowed_asset_types=allowed_asset_types
+        )
 
     # Todo: these two below functions are maybe better implemented at a lower level?
     def add_max_damage(self, df: pd.DataFrame, prefix: str) -> pd.DataFrame:
@@ -103,10 +106,6 @@ class DamageFunctionByRoadTypeByLane:
         assert "lanes" in cols, "no column 'lanes in df"
 
         max_damage_data = self.max_damage.data
-
-        # df[f"{prefix}_temp_max_dam"] = max_damage_data.lookup(
-        #     df["infra_type"], df["lanes"]
-        # )
 
         # Flatten max_damage_data into a Series with MultiIndex (infra_type, lanes)
         max_damage_series = (
@@ -144,16 +143,14 @@ class DamageFunctionByRoadTypeByLane:
         hazard_severity_col = f"{hazard_prefix}_{event_prefix}_me"  # mean
         hazard_fraction_col = f"{hazard_prefix}_{event_prefix}_fr"  # fraction
 
-        allowed_asset_types = {"bridge", "viaduct", "tunnel"}
-
         infra = df["infra_type"].astype(str).str.lower()
         current = (asset_type or "").strip().lower()
 
-        if current in allowed_asset_types:
+        if current in self.allowed_asset_types:
             row_mask = infra.eq(current)
         else:
             # 'standard' / 'non' / None => rows that are not bridge/viaduct/tunnel
-            row_mask = ~infra.isin(allowed_asset_types)
+            row_mask = ~infra.isin(self.allowed_asset_types)
 
         if not row_mask.any():
             # No rows to compute for this asset filter

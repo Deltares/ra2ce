@@ -1,6 +1,7 @@
 import logging
 import re
 from pathlib import Path
+from typing import Mapping, Any, Dict
 
 import numpy as np
 import pandas as pd
@@ -35,6 +36,17 @@ from ra2ce.analysis.damages.damages_result_wrapper import DamagesResultWrapper
 from ra2ce.network.graph_files.network_file import NetworkFile
 
 
+
+logger = logging.getLogger(__name__)
+# Optional: add aliases/synonyms here (keys are case-insensitive);
+# This is applied BEFORE plural handling. Keep values canonical.
+ASSET_ALIASES: dict[str, str] = {
+    # Simple plural aliases (case-insensitive handled below)
+    "bridges": "bridge",
+    "viaducts": "viaduct",
+    "tunnels": "tunnel",
+}
+
 class Damages(AnalysisBase, AnalysisDamagesProtocol):
     analysis: AnalysisSectionDamages
     graph_file: NetworkFile
@@ -55,6 +67,8 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
         hazard_prefix: str = "F",
     ) -> None:
 
+        # Canonical set OSM supports
+        self.allowed_asset_types: set[str] = {"bridge", "viaduct", "tunnel"}
         self.analysis = analysis_input.analysis
         self.graph_file = None
         self.graph_file_hazard = analysis_input.graph_file_hazard
@@ -106,15 +120,60 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
                 new_cols.append(c)
         return new_cols
 
-    def _load_manual_damage_functions(self) -> ManualDamageFunctions:
+    @staticmethod
+    def _to_canonical_asset(key: Any, *, aliases: Mapping[str, str] | None = ASSET_ALIASES) \
+            -> tuple[str | None, str]:
+        """
+        Normalize an asset key:
+          - trim whitespace
+          - case-insensitive
+          - map aliases to canonical_asset
+          - handle simple plurals
+        Returns (canonical_asset | None, original_str).
+        """
+        original = str(key)
+        s = original.strip().casefold()  # robust lowercasing
+
+        # Alias mapping (already casefolded)
+        if aliases and s in aliases:
+            canonical_asset = aliases[s]
+        else:
+            # Simple plural → singular rules (conservative)
+            if s.endswith("ies") and len(s) > 3:
+                singular = s[:-3] + "y"  # e.g., "policies" → "policy"
+            elif s.endswith(("sses", "shes", "ches", "xes", "zes")) and len(s) > 4:
+                singular = s[:-2]  # drop 'es'
+            elif s.endswith("s") and len(s) > 1:
+                singular = s[:-1]  # drop trailing 's'
+            else:
+                singular = s
+
+            canonical_asset = singular
+
+        return canonical_asset, original
+
+    def _load_manual_damage_functions(self) -> dict[str, Any]:
         """
         Load and normalize manual damage function keys to lowercase.
         """
         raw = ManualDamageFunctionsReader().read(
-            self.input_path.joinpath("damage_functions")
+            self.input_path.joinpath("damage_functions"),
+            self.allowed_asset_types
         )
-        # Lowercase only top-level keys, preserving values as-is
-        return {str(k).lower(): v for k, v in raw.damage_functions.items()}
+
+        normalized: dict[str, Any] = {}
+
+        for k, v in raw.damage_functions.items():
+            canonical, original = self._to_canonical_asset(k)
+            if canonical in normalized:
+                logger.warning(
+                    "Duplicate/alias entries for asset '%s' encountered (e.g., '%s'). "
+                    "Overwriting previous value with the latest one.",
+                    canonical, original
+                )
+
+            normalized[canonical] = v
+        return normalized
 
     def _validate_for_damages_with_asset(self) -> None:
         """
@@ -125,8 +184,6 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
           - self.analysis.asset_damage_curve_paths is provided and is dict[str, Path]
           - Keys of asset_damage_curve_paths ∈ {'bridge','viaduct','tunnel'} (case-insensitive)
         """
-        allowed_asset_types = {"bridge", "viaduct", "tunnel"}
-
         # 1) damage_curve must be MAN
         damage_curve = getattr(self.analysis, "damage_curve", None)
         if damage_curve != DamageCurveEnum.MAN:
@@ -186,7 +243,7 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
 
         elif self.analysis.event_type == EventTypeEnum.RETURN_PERIOD:
             return_period_gdf = DamageNetworkReturnPeriods(
-                road_gdf, val_cols, self.analysis.representative_damage_percentage
+                road_gdf, val_cols, self.analysis.representative_damage_percentage, self.allowed_asset_types
             )
             return_period_gdf.main(
                 damage_function=damage_function,

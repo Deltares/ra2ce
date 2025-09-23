@@ -19,6 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 from pathlib import Path
+from typing import Optional
 
 from ra2ce.analysis.damages.damage_functions.damage_function_road_type_lane import (
     DamageFunctionByRoadTypeByLane,
@@ -34,7 +35,7 @@ class ManualDamageFunctionsReader(FileReaderProtocol):
     Reader class for the manual damage functions.
     """
 
-    def read(self, file_path: Path) -> ManualDamageFunctions:
+    def read(self, file_path: Path, allowed_asset_types: Optional[set[str]]) -> ManualDamageFunctions:
         """
         Read the manual damage functions from the given folder.
         The folder should contain subfolders with the damage functions.
@@ -56,7 +57,7 @@ class ManualDamageFunctionsReader(FileReaderProtocol):
         # Read the damage functions from the subfolders
         return ManualDamageFunctions(
             damage_functions={
-                _name: DamageFunctionByRoadTypeByLane.from_input_folder(_name, _path)
+                _name: DamageFunctionByRoadTypeByLane.from_input_folder(_name, _path, allowed_asset_types)
                 for _name, _path in _damage_function_folders.items()
             }
         )
