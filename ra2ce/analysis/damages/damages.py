@@ -232,7 +232,7 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
         # Choose between event or return period based analysis
         if self.analysis.event_type == EventTypeEnum.EVENT:
             event_gdf = DamageNetworkEvents(
-                road_gdf, val_cols, self.analysis.representative_damage_percentage
+                road_gdf, val_cols, self.analysis.representative_damage_percentage, self.allowed_asset_types
             )
             event_gdf.main(
                 damage_function=damage_function,

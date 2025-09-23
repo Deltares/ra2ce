@@ -71,5 +71,6 @@ class DamageNetworkEvents(DamageNetworkBase):
 
         if damage_function == DamageCurveEnum.MAN:
             self.calculate_damage_manual_functions(
-                events=self.events, manual_damage_functions=manual_damage_functions
+                events=self.events,
+                manual_damage_functions=manual_damage_functions
             )
