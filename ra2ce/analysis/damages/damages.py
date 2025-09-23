@@ -248,51 +248,55 @@ class Damages(AnalysisBase, AnalysisDamagesProtocol):
 
     def _rename_highway_by_assets(self) -> None:
         """
-        Normalize 'highway' based on OSM asset flags:
+        Set/normalize 'infra_type' based on OSM asset flags:
           - bridge=* : yes, viaduct, aqueduct, boardwalk, movable, trestle, cantilever, low_water_crossing
           - tunnel=* : yes, culvert, building_passage, avalanche_protector, flooded
-
-        Precedence: bridge types > tunnel types
+        Precedence: bridge types > tunnel types.
+        Only override when a recognized value is present; otherwise keep existing road type.
         """
         df = self.road_gdf
 
-        def _lc(col: str) -> pd.Series:
-            if col in df.columns:
-                s = df[col].astype(str).str.strip().str.casefold()
-                # normalize spaces to underscores (e.g., "low water crossing")
-                return s.str.replace(r"\s+", "_", regex=True)
-            return pd.Series("", index=df.index)
+        def _norm(col: str) -> pd.Series:
+            """
+            Normalize a column without turning NaN into 'nan':
+              - keep as pandas StringDtype (preserves <NA>)
+              - strip/ casefold
+              - replace spaces with underscores
+            """
+            if col not in df.columns:
+                return pd.Series(pd.array([pd.NA] * len(df), dtype="string"), index=df.index)
+            s = df[col].astype("string")  # preserves <NA>
+            s = s.str.strip().str.casefold()
+            s = s.str.replace(r"\s+", "_", regex=True)
+            return s
 
-        bridge = _lc("bridge")
-        tunnel = _lc("tunnel")
+        bridge = _norm("bridge")
+        tunnel = _norm("tunnel")
 
-        # presence (ignore explicit "no"/"false"/"0")
-        _is_on = {"", "no", "false", "0"}
-        bridge_on = ~bridge.isin(_is_on)
-        tunnel_on = ~tunnel.isin(_is_on)
+        # Recognized values only (no generic fallback for unknown non-empty strings)
+        bridge_keys = set(_BRIDGE_MAP.keys())
+        tunnel_keys = set(_TUNNEL_MAP.keys())
 
-        # normalize to your canonical highway values; fall back to generic "bridge"/"tunnel" if an unknown non-empty value appears
-        bridge_norm = bridge.map(_BRIDGE_MAP)
-        bridge_norm = bridge_norm.where(~bridge_on, other=bridge_norm)  # keep as is; just explicit
-        bridge_norm = bridge_norm.fillna(pd.Series(np.where(bridge_on, "bridge", np.nan), index=df.index))
+        bridge_match = bridge.isin(bridge_keys)
+        tunnel_match = tunnel.isin(tunnel_keys)
 
+        bridge_norm = bridge.map(_BRIDGE_MAP)  # recognized -> mapped; others -> <NA>
         tunnel_norm = tunnel.map(_TUNNEL_MAP)
-        tunnel_norm = tunnel_norm.fillna(pd.Series(np.where(tunnel_on, "tunnel", np.nan), index=df.index))
 
-        # Start from existing 'highway' and overlay by precedence
-        out = df["highway"].copy()
+        # Start infra_type from existing value if present; otherwise from current highway
+        infra = df.get("highway", pd.Series("", index=df.index)).copy()
 
-        assigned = pd.Series(False, index=df.index)
+        # 1) Apply bridge-types
+        m_bridge = bridge_match & bridge_norm.notna()
+        infra.loc[m_bridge] = bridge_norm[m_bridge]
 
-        # 1) bridge-types
-        m = bridge_norm.notna()
-        out.loc[m] = bridge_norm[m]
-        assigned |= m
+        # 2) Apply tunnel-types only where not assigned by bridge
+        m_tunnel = (~m_bridge) & tunnel_match & tunnel_norm.notna()
+        infra.loc[m_tunnel] = tunnel_norm[m_tunnel]
 
-        # 2) tunnel-types (only where not already assigned by bridge)
-        m = (~assigned) & tunnel_norm.notna()
-        out.loc[m] = tunnel_norm[m]
-        assigned |= m
+        # Write back: keep 'highway' as the road class; store assets in 'infra_type'
+        df["highway"] = infra
+        self.road_gdf = df
 
     def execute(self) -> AnalysisResultWrapper:
         road_gdf = self.road_gdf
