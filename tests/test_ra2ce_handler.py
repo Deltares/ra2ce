@@ -3,11 +3,10 @@ from pathlib import Path
 from typing import Iterator
 
 import geopandas
-from rasterio import open as rasterio_open
-from shapely.geometry import box
-
 import pytest
 from geopandas import GeoDataFrame
+from rasterio import open as rasterio_open
+from shapely.geometry import box
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
@@ -19,6 +18,10 @@ from ra2ce.analysis.analysis_config_data.analysis_config_data_reader import (
 from ra2ce.analysis.analysis_result.analysis_result_wrapper_protocol import (
     AnalysisResultWrapperProtocol,
 )
+from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
+from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
+from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
+from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
 from ra2ce.network.network_config_data.network_config_data import (
     HazardSection,
     NetworkConfigData,
@@ -27,10 +30,6 @@ from ra2ce.network.network_config_data.network_config_data import (
 from ra2ce.network.network_config_data.network_config_data_reader import (
     NetworkConfigDataReader,
 )
-from ra2ce.network.network_config_data.enums.aggregate_wl_enum import AggregateWlEnum
-from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
-from ra2ce.network.network_config_data.enums.network_type_enum import NetworkTypeEnum
-from ra2ce.network.network_config_data.enums.road_type_enum import RoadTypeEnum
 from ra2ce.ra2ce_handler import Ra2ceHandler
 from tests import test_data, test_results
 
@@ -205,19 +204,19 @@ class TestRa2ceHandler:
 
     @pytest.mark.slow_test
     def test_speedup_hazard_overlay(self):
-        # Set path to hazard files 
-        test_data_path_original = test_data / 'speed_hazard_overlay'
+        # Set path to hazard files
+        test_data_path_original = test_data / "speed_hazard_overlay"
         assert test_data_path_original.exists()
 
         # Copy original test data to test_results to ensure a clean state
-        test_data_path = test_results / 'speed_hazard_overlay'
+        test_data_path = test_results / "speed_hazard_overlay"
         if test_data_path.exists():
             shutil.rmtree(test_data_path)
         shutil.copytree(test_data_path_original, test_data_path)
 
-        legacy_output_path = test_data_path / 'static' / 'output_graph_legacy' 
-        updated_output_path = test_data_path / 'static' / 'output_graph' 
-        hazard_files_dir = test_data_path / 'static' / 'hazard'
+        legacy_output_path = test_data_path / "static" / "output_graph_legacy"
+        updated_output_path = test_data_path / "static" / "output_graph"
+        hazard_files_dir = test_data_path / "static" / "hazard"
         hazard_files = [file for file in hazard_files_dir.iterdir() if file.is_file()]
 
         with rasterio_open(hazard_files[0]) as src:
@@ -226,14 +225,18 @@ class TestRa2ceHandler:
 
         # Create shapefile of extent of hazard files to use as polygon input
         extent_gdf = GeoDataFrame(
-            {'geometry': [box(extent.left, extent.bottom, extent.right, extent.top)]},
-            crs=hazard_crs
+            {"geometry": [box(extent.left, extent.bottom, extent.right, extent.top)]},
+            crs=hazard_crs,
         )
-        extent_path = test_data_path / 'static' / 'network' / 'extent.shp'
+        extent_path = test_data_path / "static" / "network" / "extent.shp"
         extent_gdf.to_file(extent_path)
 
         # Copy base graph files to updated output path to ensure the same base graph is used
-        files_to_copy = [f for f in legacy_output_path.glob("*") if f.is_file() and 'hazard' not in f.name]
+        files_to_copy = [
+            f
+            for f in legacy_output_path.glob("*")
+            if f.is_file() and "hazard" not in f.name
+        ]
         updated_output_path.mkdir(parents=True, exist_ok=True)
 
         for f in files_to_copy:
@@ -243,9 +246,20 @@ class TestRa2ceHandler:
         _network_section = NetworkSection(
             network_type=NetworkTypeEnum.DRIVE,
             source=SourceEnum.OSM_DOWNLOAD,
-            polygon=extent_path, 
+            polygon=extent_path,
             save_gpkg=True,
-            road_types=[RoadTypeEnum.MOTORWAY, RoadTypeEnum.MOTORWAY_LINK, RoadTypeEnum.PRIMARY, RoadTypeEnum.PRIMARY_LINK,RoadTypeEnum.TRUNK, RoadTypeEnum.SECONDARY,RoadTypeEnum.SECONDARY_LINK, RoadTypeEnum.TERTIARY, RoadTypeEnum.RESIDENTIAL, RoadTypeEnum.UNCLASSIFIED], 
+            road_types=[
+                RoadTypeEnum.MOTORWAY,
+                RoadTypeEnum.MOTORWAY_LINK,
+                RoadTypeEnum.PRIMARY,
+                RoadTypeEnum.PRIMARY_LINK,
+                RoadTypeEnum.TRUNK,
+                RoadTypeEnum.SECONDARY,
+                RoadTypeEnum.SECONDARY_LINK,
+                RoadTypeEnum.TERTIARY,
+                RoadTypeEnum.RESIDENTIAL,
+                RoadTypeEnum.UNCLASSIFIED,
+            ],
         )
 
         _hazard_section = HazardSection(
@@ -254,24 +268,32 @@ class TestRa2ceHandler:
             hazard_field_name="waterdepth",
             aggregate_wl=AggregateWlEnum.MAX,
             hazard_crs=hazard_crs,
-            overlay_segmented_network = True
+            overlay_segmented_network=True,
         )
 
         _network_config_data = NetworkConfigData(
             root_path=test_data_path,
-            static_path=test_data_path / 'static',
-            output_path=test_data_path / 'output',
+            static_path=test_data_path / "static",
+            output_path=test_data_path / "output",
             network=_network_section,
-            hazard=_hazard_section)
+            hazard=_hazard_section,
+        )
 
         # Run analysis
         _handler = Ra2ceHandler.from_config(_network_config_data, analysis=None)
         _handler.configure()
 
         # Check results
-        legacy_output_gdf = geopandas.read_file(legacy_output_path / 'base_graph_hazard_edges.gpkg')
-        update_output_gdf = geopandas.read_file(updated_output_path / 'base_graph_hazard_edges.gpkg')
+        legacy_output_gdf = geopandas.read_file(
+            legacy_output_path / "base_graph_hazard_edges.gpkg"
+        )
+        update_output_gdf = geopandas.read_file(
+            updated_output_path / "base_graph_hazard_edges.gpkg"
+        )
 
-        assert legacy_output_gdf['EV1_ma'].values == pytest.approx(update_output_gdf['EV1_ma'].values), f"EV1_ma values are not equal before and after update."
-        assert legacy_output_gdf['EV1_fr'].values == pytest.approx(update_output_gdf['EV1_fr'].values), f"EV1_fr values are not equal before and after update."
-
+        assert legacy_output_gdf["EV1_ma"].values == pytest.approx(
+            update_output_gdf["EV1_ma"].values
+        ), f"EV1_ma values are not equal before and after update."
+        assert legacy_output_gdf["EV1_fr"].values == pytest.approx(
+            update_output_gdf["EV1_fr"].values
+        ), f"EV1_fr values are not equal before and after update."

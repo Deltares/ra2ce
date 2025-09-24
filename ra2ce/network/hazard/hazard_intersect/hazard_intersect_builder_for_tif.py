@@ -24,15 +24,15 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 
-import rasterio
 import numpy as np
+import rasterio
+from affine import Affine
 from geopandas import GeoDataFrame
 from networkx import Graph, set_edge_attributes
 from numpy import nan
-from rasterstats import zonal_stats
 from rasterio.features import shapes
 from rasterio.mask import mask
-from affine import Affine
+from rasterstats import zonal_stats
 from shapely.geometry import LineString, box, shape
 from shapely.ops import unary_union
 from tqdm import tqdm
@@ -44,10 +44,7 @@ from ra2ce.network.hazard.hazard_common_functions import (
 from ra2ce.network.hazard.hazard_intersect.hazard_intersect_builder_base import (
     HazardIntersectBuilderBase,
 )
-from ra2ce.network.networks_utils import (
-    get_graph_edges_extent,
-    get_valid_mean,
-)
+from ra2ce.network.networks_utils import get_graph_edges_extent, get_valid_mean
 
 
 @dataclass
@@ -67,7 +64,9 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
         """
         return list(zip(self.hazard_names, self.ra2ce_names))
 
-    def _fraction_flooded_array(self, line: LineString, src: rasterio.io.DatasetReader) -> float:
+    def _fraction_flooded_array(
+        self, line: LineString, src: rasterio.io.DatasetReader
+    ) -> float:
         """
         Calculates the fraction of a linestring that overlaps with a hazard raster (values > 0).
 
@@ -190,12 +189,12 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                     )
 
                 # Get the fraction of the road that is intersecting with the hazard
-                tqdm.pandas(desc="Graph fraction with hazard overlay with " + hazard_name)
+                tqdm.pandas(
+                    desc="Graph fraction with hazard overlay with " + hazard_name
+                )
 
                 graph_fraction_flooded = gdf.geometry.progress_apply(
-                    lambda x: self._fraction_flooded_array(
-                        x, src
-                    )
+                    lambda x: self._fraction_flooded_array(x, src)
                 )
                 graph_fraction_flooded = graph_fraction_flooded.fillna(0)
                 set_edge_attributes(
@@ -208,7 +207,7 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
 
         self._overlay_hazard_files(overlay_network_x)
         return hazard_overlay
-       
+
     def _from_geodataframe(self, hazard_overlay: GeoDataFrame):
         """Overlays the hazard raster over the road segments GeoDataFrame.
 
@@ -275,8 +274,12 @@ class HazardIntersectBuilderForTif(HazardIntersectBuilderBase):
                     hazard_overlay[ra2ce_name + "_me"],
                 ) = list(zip(*map(_get_attributes, flood_stats)))
 
-                tqdm.pandas(desc="Network fraction with hazard overlay with " + hazard_name)
-                hazard_overlay[ra2ce_name + "_fr"] = hazard_overlay.geometry.progress_apply(
+                tqdm.pandas(
+                    desc="Network fraction with hazard overlay with " + hazard_name
+                )
+                hazard_overlay[
+                    ra2ce_name + "_fr"
+                ] = hazard_overlay.geometry.progress_apply(
                     lambda x: self._fraction_flooded_array(x, src)
                 )
 
