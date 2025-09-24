@@ -67,7 +67,6 @@ class HazardOverlay:
         # Sections properties
         self._network_file_id = config.network.file_id
         self._output_graph_dir = config.static_path.joinpath("output_graph")
-        self._output_dir = config.output_path
         self._origins = config.origins_destinations.origins
         self._destinations = config.origins_destinations.destinations
         self._save_gpkg = config.network.save_gpkg

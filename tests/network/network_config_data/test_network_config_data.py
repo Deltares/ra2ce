@@ -16,7 +16,6 @@ class TestNetworkConfigData:
 
         # Verify expectations.
         assert _config_data.input_path is None
-        assert _config_data.output_path is None
         assert _config_data.static_path is None
         assert isinstance(_config_data.project, ProjectSection)
         assert isinstance(_config_data.network, NetworkSection)
