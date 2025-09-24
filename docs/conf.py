@@ -44,6 +44,26 @@ def remove_dir_content(path: str) -> None:
     if os.path.isdir(path):
         shutil.rmtree(path)
 
+
+os.makedirs("_examples")
+copy_tree("../examples", "_examples")
+
+# Exclude some of the examples content:
+_files_to_include = ["summary_"]
+
+
+def remove_extra_files_from_dir(dir_path: Path):
+    assert dir_path.exists(), "Examples dir was not correctly copied!"
+    for _file in dir_path.rglob("*"):
+        if _file.suffix.lower() in [".md", ".ipynb"]:
+            if not any(_fi in _file.stem for _fi in _files_to_include):
+                _file.unlink()
+
+
+_examples_dir = Path("_examples")
+_examples_dir.joinpath("README.md").unlink()
+remove_extra_files_from_dir(_examples_dir.joinpath("hackathons"))
+
 if os.path.isdir("build"):
     remove_dir_content("build")
 if os.path.isdir("_examples"):
