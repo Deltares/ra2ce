@@ -221,15 +221,9 @@ class TestRa2ceHandler:
 
         with rasterio_open(hazard_files[0]) as src:
             hazard_crs = src.crs
-            extent = src.bounds
 
-        # Create shapefile of extent of hazard files to use as polygon input
-        extent_gdf = GeoDataFrame(
-            {"geometry": [box(extent.left, extent.bottom, extent.right, extent.top)]},
-            crs=hazard_crs,
-        )
+        # Define extent as bounding box the network
         extent_path = test_data_path / "static" / "network" / "extent.shp"
-        extent_gdf.to_file(extent_path)
 
         # Copy base graph files to updated output path to ensure the same base graph is used
         files_to_copy = [
