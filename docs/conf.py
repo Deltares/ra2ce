@@ -45,6 +45,13 @@ def remove_dir_content(path: str) -> None:
         shutil.rmtree(path)
 
 
+# NOTE: the examples/ folder in the root should be copied to docs/_examples after running sphinx
+# # -- Copy notebooks to include in docs -------
+if os.path.isdir("build"):
+    remove_dir_content("build")
+if os.path.isdir("_examples"):
+    remove_dir_content("_examples")
+
 os.makedirs("_examples")
 copy_tree("../examples", "_examples")
 
@@ -64,10 +71,6 @@ _examples_dir = Path("_examples")
 _examples_dir.joinpath("README.md").unlink()
 remove_extra_files_from_dir(_examples_dir.joinpath("hackathons"))
 
-if os.path.isdir("build"):
-    remove_dir_content("build")
-if os.path.isdir("_examples"):
-    remove_dir_content("_examples")
 
 if os.path.isdir("docs"):
     remove_dir_content("docs")
@@ -114,6 +117,14 @@ source_suffix = ".rst"
 
 # The master toctree document.
 master_doc = "index"
+
+nb_execution_mode = "off" # notebook will not be executed during the build process
+# Disable input prompts in code cells
+
+nbsphinx_prompt_width = '0px'        # string with units
+nbsphinx_show_input_prompt = False   # hides input prompts
+nbsphinx_show_output_prompt = False  # hides output prompts
+
 
 autosummary_generate = True  # generates stub .rst files automatically
 
@@ -210,7 +221,7 @@ html_context = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_resources"]
-html_css_files = ["theme-deltares.css", "python-code-block-style.css"]
+html_css_files = ["theme-deltares.css", "python-code-block-style.css", "custom.css"]
 
 
 # -- Options for HTMLHelp output ---------------------------------------
