@@ -184,4 +184,4 @@ Here’s a minimal working example to get you started:
 To inspect the result, open the files located in ``static/output_graph/`` using QGIS
 or load them in Python with ``geopandas``.
 
-From here, you can explore more examples in the :doc:`examples` section.
+From here, you can explore more examples in the section :ref:`tutorials_index`.

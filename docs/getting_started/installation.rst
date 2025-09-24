@@ -14,8 +14,8 @@ as `miniforge <https://github.com/conda-forge/miniforge>`_ or `micromamba <https
   make sure the default channel is set to ``conda-forge`` to avoid issues with Deltares open-source policy.
 
 
-User mode
-+++++++++
+Python package mode
++++++++++++++++++++
 In order to use the tool via Python script, install first the RA2CE in your Python environment. RA2CE is available on `PyPI <https://pypi.org/project/ra2ce/>`_ and can be installed using `pip`:
 
   .. code-block:: bash

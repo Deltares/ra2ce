@@ -190,8 +190,7 @@ html_context = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_resources"]
-html_css_files = ["theme-deltares.css"]
-html_js_files = ['custom.js']  # used to attempt adding a copy button in Python code block
+html_css_files = ["theme-deltares.css", "python-code-block-style.css"]
 
 
 # -- Options for HTMLHelp output ---------------------------------------
@@ -268,14 +267,5 @@ nbsphinx_allow_errors = True
 # Do not execute the scripts during the build process.
 nbsphinx_execute = "never"
 
-
-
 autodoc_typehints = "description"   # put type hints in the description instead of signature
-add_module_names = False  # shorthen class names in the docs
-
-
-
-
-
-
-
+add_module_names = False  # shorten class names in the docs

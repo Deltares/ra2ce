@@ -12,7 +12,7 @@ ra2ce.analysis.adaptation.adaptation module
    :undoc-members:
    :show-inheritance:
 
-ra2ce.analysis.adaptation.adaptation\_option module
+ra2ce.analysis.adaptation.adaptation_option module
 ---------------------------------------------------
 
 .. automodule:: ra2ce.analysis.adaptation.adaptation_option
@@ -20,7 +20,7 @@ ra2ce.analysis.adaptation.adaptation\_option module
    :undoc-members:
    :show-inheritance:
 
-ra2ce.analysis.adaptation.adaptation\_option\_analysis module
+ra2ce.analysis.adaptation.adaptation_option_analysis module
 -------------------------------------------------------------
 
 .. automodule:: ra2ce.analysis.adaptation.adaptation_option_analysis
@@ -28,7 +28,7 @@ ra2ce.analysis.adaptation.adaptation\_option\_analysis module
    :undoc-members:
    :show-inheritance:
 
-ra2ce.analysis.adaptation.adaptation\_option\_partial\_result module
+ra2ce.analysis.adaptation.adaptation_option_partial_result module
 --------------------------------------------------------------------
 
 .. automodule:: ra2ce.analysis.adaptation.adaptation_option_partial_result
@@ -36,7 +36,7 @@ ra2ce.analysis.adaptation.adaptation\_option\_partial\_result module
    :undoc-members:
    :show-inheritance:
 
-ra2ce.analysis.adaptation.adaptation\_result\_enum module
+ra2ce.analysis.adaptation.adaptation_result_enum module
 ---------------------------------------------------------
 
 .. automodule:: ra2ce.analysis.adaptation.adaptation_result_enum
@@ -44,7 +44,7 @@ ra2ce.analysis.adaptation.adaptation\_result\_enum module
    :undoc-members:
    :show-inheritance:
 
-ra2ce.analysis.adaptation.adaptation\_settings module
+ra2ce.analysis.adaptation.adaptation_settings module
 -----------------------------------------------------
 
 .. automodule:: ra2ce.analysis.adaptation.adaptation_settings
