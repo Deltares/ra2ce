@@ -23,6 +23,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 import pandas as pd
 
@@ -37,7 +38,7 @@ class HazardNames:
     names_df: pd.DataFrame
 
     @classmethod
-    def from_file(cls, hazard_names_file: Path) -> HazardNames:
+    def from_file(cls, hazard_names_file: Optional[Path]) -> HazardNames:
         """
         Create a HazardNames object from a file.
 
@@ -64,12 +65,9 @@ class HazardNames:
         Returns:
             HazardNames: HazardNames object.
         """
-        if analysis_config.config_data.output_path:
-            _hazard_file = analysis_config.config_data.static_path.joinpath(
-                "output_graph", "hazard_names.xlsx"
-            )
-        else:
-            _hazard_file = None
+        _hazard_file: Path = analysis_config.config_data.static_path.joinpath(
+            "output_graph", "hazard_names.xlsx"
+        )
         return cls.from_file(_hazard_file)
 
     @property
