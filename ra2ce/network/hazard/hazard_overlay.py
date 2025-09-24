@@ -601,11 +601,8 @@ class HazardOverlay:
             self._export_network_files("locations_hazard", "pickle")
 
         # Save the hazard name bookkeeping table.
-        if not self._output_dir.exists():
-            self._output_dir.mkdir(parents=True, exist_ok=True)
-
         self.hazard_name_table.to_excel(
-            self._output_dir.joinpath("hazard_names.xlsx"), index=False
+            self._output_graph_dir.joinpath("hazard_names.xlsx"), index=False
         )
 
         return self.graph_files
