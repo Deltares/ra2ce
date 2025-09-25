@@ -21,6 +21,7 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 from ra2ce.common.configuration.config_wrapper_protocol import ConfigWrapperProtocol
@@ -91,11 +92,18 @@ class NetworkConfigWrapper(ConfigWrapperProtocol):
     def configure_hazard(self) -> None:
         # Call Hazard Handler (to rework)
         if not self.graph_files.has_graphs():
-            self.graph_files = self.read_graphs_from_config(
-                self.config_data.static_path.joinpath("output_graph")
+            _output_graph_location = self.config_data.static_path.joinpath(
+                "output_graph"
             )
+            logging.warning(
+                "No graphs loaded, generating graph files from {}".format(
+                    _output_graph_location
+                )
+            )
+            self.graph_files = self.read_graphs_from_config(_output_graph_location)
 
         if not self.config_data.hazard.hazard_map:
+            logging.warning("No hazard files found, no hazard overlay will be done.")
             return
 
         # There is a hazard map or multiple hazard maps that should be intersected with the graph.
