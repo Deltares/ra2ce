@@ -101,6 +101,8 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
             _new_analysis.config_data.static_path = (
                 network_config.config_data.static_path
             )
+        if _new_analysis.config_data.output_path is None:
+            _new_analysis.config_data.root_path.joinpath("output")
 
         return _new_analysis
 
