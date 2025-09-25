@@ -59,8 +59,6 @@ from ra2ce.common.configuration.ini_configuration_reader_protocol import (
 class AnalysisConfigDataReader(ConfigDataReaderProtocol):
     """
     Reads the analysis configuration file analyses.ini.
-    Takes network_data as optional input. If not provided, it will read the network configuration
-    from the network.ini in the output folder.
     """
 
     _parser: ConfigParser
