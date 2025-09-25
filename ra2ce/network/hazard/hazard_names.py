@@ -65,9 +65,12 @@ class HazardNames:
         Returns:
             HazardNames: HazardNames object.
         """
-        _hazard_file: Path = analysis_config.config_data.static_path.joinpath(
-            "output_graph", "hazard_names.xlsx"
-        )
+        if analysis_config.config_data.static_path:
+            _hazard_file = analysis_config.config_data.static_path.joinpath(
+                "output_graph", "hazard_names.xlsx"
+            )
+        else:
+            _hazard_file = None
         return cls.from_file(_hazard_file)
 
     @property
