@@ -104,7 +104,9 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
             not _new_analysis.config_data.output_path
             and _new_analysis.config_data.root_path
         ):
-            _new_analysis.config_data.root_path.joinpath("output")
+            _new_analysis.config_data.output_path = (
+                _new_analysis.config_data.root_path.joinpath("output")
+            )
 
         return _new_analysis
 
