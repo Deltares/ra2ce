@@ -75,7 +75,7 @@ class TestAdaptationAnalysisRunner:
             copytree(test_data.joinpath("adaptation", "input"), _ao_path)
         copytree(
             test_data.joinpath("adaptation", "static"),
-            valid_analysis_config.config_data._static_pathstat,
+            valid_analysis_config.config_data._static_path,
         )
 
         # Read graph/network files
