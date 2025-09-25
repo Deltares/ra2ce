@@ -15,16 +15,13 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup environment
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3.2.0
         with:
           miniforge-variant: Miniforge3
-          # channels: conda-forge, nodefaults
-          # channel-priority: strict
           environment-file: .devcontainer/environment.yml
-          activate-environment: ra2ce_env
 
       - name: Install dependencies
         run: poetry install --without dev,test
