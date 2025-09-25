@@ -1,7 +1,7 @@
 name: "GitHub Pages documentation"
 on:
   push:
-    branches: [ master ]
+    branches: [ ci/711-deploy-docs-pipeline-will-not-build ]
 
 permissions:
     contents: write
@@ -15,7 +15,7 @@ jobs:
         shell: bash -l {0}
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup environment
         uses: conda-incubator/setup-miniconda@v2
@@ -34,10 +34,10 @@ jobs:
           cd docs
           poetry run make html
 
-      - name: Upload to GitHub Pages
-        if: ${{ github.event_name != 'pull_request'}}
-        uses: peaceiris/actions-gh-pages@v3.8.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs/build/html
-          force_orphan: true
+      # - name: Upload to GitHub Pages
+      #   if: ${{ github.event_name != 'pull_request'}}
+      #   uses: peaceiris/actions-gh-pages@v3.8.0
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_dir: ./docs/build/html
+      #     force_orphan: true
