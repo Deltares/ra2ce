@@ -213,10 +213,6 @@ def _get_valid_adaptation_config_with_input_fixture(
         test_data.joinpath("adaptation", "static"),
         valid_adaptation_config.config_data.static_path,
     )
-    copytree(
-        test_data.joinpath("adaptation", "output"),
-        valid_adaptation_config.config_data.output_path,
-    )
 
     # Read graph/network files
     valid_adaptation_config.graph_files = NetworkConfigWrapper.read_graphs_from_config(
