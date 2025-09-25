@@ -1,7 +1,7 @@
 name: "GitHub Pages documentation"
 on:
   push:
-    branches: [ ci/711-deploy-docs-pipeline-will-not-build ]
+    branches: [ master ]
 
 permissions:
     contents: write
@@ -21,9 +21,7 @@ jobs:
         uses: conda-incubator/setup-miniconda@v3.2.0
         with:
           miniforge-variant: Miniforge3
-          # channels: conda-forge, nodefaults
           environment-file: .devcontainer/environment.yml
-          # activate-environment: ra2ce_env
 
       - name: Install dependencies
         run: poetry install --without dev,test
@@ -33,10 +31,10 @@ jobs:
           cd docs
           poetry run make html
 
-      # - name: Upload to GitHub Pages
-      #   if: ${{ github.event_name != 'pull_request'}}
-      #   uses: peaceiris/actions-gh-pages@v3.8.0
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     publish_dir: ./docs/build/html
-      #     force_orphan: true
+      - name: Upload to GitHub Pages
+        if: ${{ github.event_name != 'pull_request'}}
+        uses: peaceiris/actions-gh-pages@v3.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/build/html
+          force_orphan: true
