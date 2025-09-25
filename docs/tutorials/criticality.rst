@@ -35,7 +35,7 @@ and potential impact if a specific segment becomes unavailable.
 
 
 You can learn more and follow the step-by-step instructions in the :doc:`single link redundancy tutorial <criticality.single_link_redundancy>`.
-
+:doc:`single link redundancy22 tutorial <criticality_single_link_redundancy>`.
 
 Case 1: One Road Blocked
 ------------------------
@@ -107,6 +107,5 @@ Understanding criticality helps you:
 .. toctree::
    :maxdepth: 1
 
-   criticality.single_link_redundancy
    criticality.multi_link_redundancy
-
+   criticality_single_link_redundancy
