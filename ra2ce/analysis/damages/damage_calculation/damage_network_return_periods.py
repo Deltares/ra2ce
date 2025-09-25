@@ -107,14 +107,16 @@ class DamageNetworkReturnPeriods(DamageNetworkBase):
         year: int,
     ):
         """
-        Controller of the risk calculation, which calls the correct risk (integration) functions
+        Controller for the risk calculation, which calls the appropriate risk (integration) functions.
 
-        Arguments:
-            *damage_function* (DamageCurveEnum) : defines the damage estimation method
-            *mode* (RiskCalculationModeEnum) : the sort of risk calculation that you want to do, can be:
-                                ‘default’, 'cut_from_YYYY_year’, ‘triangle_to_null_YYYY_year’
-            *year* (int) : the cutoff year/return period of the risk calculation
-            :param damage_function:
+        Args:
+            damage_function: Defines the damage estimation method.
+            mode: The type of risk calculation to perform. Can be 'default',
+                'cut_from_YYYY_year', or 'triangle_to_null_YYYY_year'.
+            year: The cutoff year or return period of the risk calculation.
+
+        Returns:
+            None
         """
         self.verify_damage_data_for_risk_calculation()
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # ra2ce documentation build configuration file, created by
-# sphinx-quickstart on Fri Jun  9 13:47:02 2017.
+# sphinx-quickstart on Tuesday Aug  26 13:47:02 2025.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -28,6 +28,7 @@ import sphinx_autosummary_accessors
 # This is not needed
 sys.path.insert(0, os.path.abspath(".."))
 import ra2ce
+import ra2ce.ra2ce_handler
 
 print("ra2ce", ra2ce)
 print("dir", dir(ra2ce))
@@ -43,33 +44,10 @@ def remove_dir_content(path: str) -> None:
     if os.path.isdir(path):
         shutil.rmtree(path)
 
-
-# NOTE: the examples/ folder in the root should be copied to docs/_examples after running sphinx
-# # -- Copy notebooks to include in docs -------
 if os.path.isdir("build"):
     remove_dir_content("build")
 if os.path.isdir("_examples"):
     remove_dir_content("_examples")
-
-os.makedirs("_examples")
-copy_tree("../examples", "_examples")
-
-# Exclude some of the examples content:
-_files_to_include = ["summary_"]
-
-
-def remove_extra_files_from_dir(dir_path: Path):
-    assert dir_path.exists(), "Examples dir was not correctly copied!"
-    for _file in dir_path.rglob("*"):
-        if _file.suffix.lower() in [".md", ".ipynb"]:
-            if not any(_fi in _file.stem for _fi in _files_to_include):
-                _file.unlink()
-
-
-_examples_dir = Path("_examples")
-_examples_dir.joinpath("README.md").unlink()
-remove_extra_files_from_dir(_examples_dir.joinpath("hackathons"))
-
 
 if os.path.isdir("docs"):
     remove_dir_content("docs")
@@ -82,6 +60,7 @@ for _img_file in os.listdir(_src_diagrams):
         continue
     shutil.copy((_src_diagrams + _img_file), (_dst_diagrams + _img_file))
 
+
 # -- General configuration ---------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -90,6 +69,13 @@ for _img_file in os.listdir(_src_diagrams):
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
+
+# General information about the project.
+project = "Risk Assessment and Adaptation for Critical infrastructurE"
+copyright = "2024, Deltares"
+author = "Margreet van Marle\\Frederique de Groen\\Lieke Meijer\\Sahand Asgarpour\\Carles Soriano Perez"
+
+
 extensions = [
     "sphinx_design",
     "myst_parser",
@@ -100,24 +86,18 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx_autosummary_accessors",
     "nbsphinx",
+    "sphinx_autodoc_typehints",
 ]
 
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates", sphinx_autosummary_accessors.templates_path]
-
-# The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-#
 # source_suffix = ['.rst', '.md']
 source_suffix = ".rst"
 
 # The master toctree document.
 master_doc = "index"
 
-# General information about the project.
-project = "Risk Assessment and Adaptation for Critical infrastructurE"
-copyright = "2024, Deltares"
-author = "Margreet van Marle\\Frederique de Groen\\Lieke Meijer\\Sahand Asgarpour\\Carles Soriano Perez"
+autosummary_generate = True  # generates stub .rst files automatically
+
+templates_path = ["_templates", sphinx_autosummary_accessors.templates_path]
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -135,10 +115,12 @@ release = ra2ce.__version__
 # Usually you set "language" from the command line for these cases.
 language = "en"
 
+
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "_examples/*"]
+
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = "sphinx"
@@ -147,9 +129,16 @@ pygments_style = "sphinx"
 todo_include_todos = False
 
 # Napoleon settings
+napoleon_use_param = True
+napoleon_use_rtype = True
 napoleon_numpy_docstring = True
 napoleon_google_docstring = False
 napoleon_preprocess_types = True
+napoleon_type_aliases = {
+    "CRS": "pyproj.CRS",
+}
+
+suppress_warnings = ["ref.unknown_target"]
 
 # -- Options for HTML output -------------------------------------------
 
@@ -159,10 +148,11 @@ napoleon_preprocess_types = True
 html_theme = "pydata_sphinx_theme"
 html_logo = "_resources/ra2ce_logo.svg"
 
+
 # Theme options are theme-specific and customize the look and feel of a
 # theme further.  For a list of options available for each theme, see the
 # documentation.
-#
+
 html_theme_options = {
     "show_nav_level": 2,
     "navbar_align": "content",
@@ -200,7 +190,7 @@ html_context = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_resources"]
-html_css_files = ["theme-deltares.css"]
+html_css_files = ["theme-deltares.css", "python-code-block-style.css"]
 
 
 # -- Options for HTMLHelp output ---------------------------------------
@@ -276,3 +266,6 @@ texinfo_documents = [
 nbsphinx_allow_errors = True
 # Do not execute the scripts during the build process.
 nbsphinx_execute = "never"
+
+autodoc_typehints = "description"   # put type hints in the description instead of signature
+add_module_names = False  # shorten class names in the docs

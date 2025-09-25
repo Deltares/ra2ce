@@ -357,12 +357,13 @@ def modify_graph(graph: nx.MultiDiGraph, node_nearest_edge_data: dict):
 def remove_key(element_data: dict, keys_to_exclude: list) -> dict:
     """
     Removes keys such as geometry information from the new node data to be created
+
     Args:
-        element_data: dict, node or edge data of a nx.Graph object
-        keys_to_exclude: list, information key to exclude from the element_data
+        element_data (dict): dict, node or edge data from a `networkx.Graph` object.
+        keys_to_exclude (list): list, information key to remove from `element_data`.
 
-    Returns: dict, filtered element_data for the new node or edge to be created in a new nx.Graph object
-
+    Returns:
+        dict, filtered element_data for the new node or edge to be created in a `networkx.Graph` object
     """
 
     for key in keys_to_exclude:
@@ -374,13 +375,15 @@ def find_existing_node(
     graph: nx.MultiDiGraph, new_node: Point
 ) -> tuple[int, dict] | tuple[None, None]:
     """
-    finds whether a newly created node exists in a graph
+    Check if a newly created node already exists in a graph.
+
     Args:
-        graph: nx.MultiDiGraph
-        new_node: Shapely Point, a newly created node
+        graph (nx.MultiDiGraph): The graph in which to search for the node.
+        new_node (Point): A Shapely Point representing the new node.
 
-    Returns: None if a newly created node does not exist in a graph. Otherwise, returns the node and its data
-
+    Returns:
+        tuple[int, dict] | tuple[None, None]: Returns `(node_id, node_data)` if the node exists,
+        or `(None, None)` if it does not exist.
     """
     for node, data in graph.nodes(data=True):
         if not data.get("geometry", ""):
@@ -393,14 +396,15 @@ def find_existing_node(
 
 def create_edge(graph: nx.MultiDiGraph, u: int, v: int, data: dict) -> nx.MultiDiGraph:
     """
-    creates an edge if it does not already exist.
+    Create an edge in the graph if it does not already exist.
+
     Args:
-        graph: nx.MultiDiGraph
-        u: int, starting node of an edge
-        v: int, ending node of an edge
+        graph (nx.MultiDiGraph): The graph to update.
+        u (int): Starting node of the edge.
+        v (int): Ending node of the edge.
 
-    Returns: updated/existing graph containing a new edge
-
+    Returns:
+        nx.MultiDiGraph: The updated graph containing the new edge, or the original graph if the edge already exists.
     """
     if graph.has_edge(u, v):
         return graph

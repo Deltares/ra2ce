@@ -9,9 +9,21 @@ from ra2ce.analysis.damages.shape_to_integrate_object.to_Integrate_shaper_protoc
 
 
 class OsdToIntegrateShaper(ToIntegrateShaperProtocol):
+    """
+    Shapes OSD (Origin-Destination) hazard data for integration.
+
+    Attributes:
+        gdf (GeoDataFrame): Input GeoDataFrame containing hazard data.
+    """
     gdf: gpd.GeoDataFrame
 
     def __init__(self, gdf):
+        """
+        Initialize the shaper with a GeoDataFrame.
+
+        Args:
+            gdf: GeoDataFrame containing hazard data.
+        """
         self.gdf = gdf
 
     @staticmethod
@@ -23,16 +35,25 @@ class OsdToIntegrateShaper(ToIntegrateShaperProtocol):
 
         Args:
             pattern_text (Pattern[str]): The compiled regex pattern to match the column names.
-            df (pd.DataFrame): The DataFrame from which to extract the RP values.
+            gdf (pd.DataFrame): The DataFrame from which to extract the RP values.
 
         Returns:
-            Set[str]: A set of RP values extracted from the column names.
+            set[str]: A set of RP values extracted from the column names.
         """
         pattern = re.compile(pattern_text)
         columns = {pattern.search(c).group(1) for c in gdf.columns if pattern.search(c)}
         return columns
 
     def get_return_periods(self) -> list:
+        """
+        Extract all return periods (RP) from the GeoDataFrame columns.
+
+        Returns:
+            list[float]: Sorted list of return periods.
+
+        Raises:
+            ValueError: If no columns matching the RP pattern are found.
+        """
         # Extract the RP values from the columns
         rp_values = OsdToIntegrateShaper._extract_columns_by_pattern(
             pattern_text=r"RP(\d+)", gdf=self.gdf
@@ -45,6 +66,16 @@ class OsdToIntegrateShaper(ToIntegrateShaperProtocol):
     def shape_to_integrate_object(
         self, return_periods: list
     ) -> dict[str : gpd.GeoDataFrame]:
+        """
+        Shape the hazard data for integration based on selected return periods.
+
+        Args:
+            return_periods: List of return period column names to extract.
+
+        Returns:
+            dict[str, GeoDataFrame]: Dictionary mapping vulnerability curve names to
+            GeoDataFrames containing the selected and sorted hazard data.
+        """
         _to_integrate_dict = {}
         # finds vulnerability curves shown with Ci, where 1<= i <=6
         vulnerability_curves = sorted(

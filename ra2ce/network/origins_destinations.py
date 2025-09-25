@@ -56,20 +56,22 @@ def read_origin_destination_files(
     region_paths: Optional[str],
     region_var: Optional[str],
 ):
-    """Reads the Origin and Destination point shapefiles and creates one big OD GeoDataFrame.
+    """Read origin and destination point shapefiles and create one OD GeoDataFrame.
+
     Args:
-        origin_paths: The path (as string) or paths (in a list) of the point shapefile(s) used for the locations of the Origins.
-        origin_names: The name(s) of the origins
-        destination_paths: The path (as string) or paths (in a list) of the point shapefile(s) used for the locations of the Destinations.
-        destination_names: The name(s) of the destinations
-        od_id: The name of the unique identifier attribute in both the origin and destination shapefiles.
-        origin_count: The name of the attribute in the origin shapefile that can be used for counting the flow over the network (e.g. nr. of people)
-        crs_: The Coordinate Reference System used in the project.
-        category: The name of the attribute in the destination shapefile that can be used to categorize the (closest) destination.
-        region_paths:
-        region_var:
+        origin_paths (Union[str, list]): Path or list of paths to shapefiles containing origin points.
+        origin_names (Union[str, list]): Name or list of names for the origins.
+        destination_paths (Union[str, list]): Path or list of paths to shapefiles containing destination points.
+        destination_names (Union[str, list]): Name or list of names for the destinations.
+        od_id (str): Name of the unique identifier attribute in both the origin and destination shapefiles.
+        origin_count (str): Name of the attribute in the origin shapefile used for flow counts (e.g., number of people).
+        crs_ (pyproj.CRS): Coordinate reference system used in the project.
+        category (str): Attribute in the destination shapefile used to categorize the closest destination.
+        region_paths (Optional[str]): Path to region shapefile(s), if applicable.
+        region_var (Optional[str]): Name of the attribute in the region shapefile for categorization.
+
     Returns:
-        od:
+        gpd.GeoDataFrame: A GeoDataFrame containing the combined origin-destination data.
     """
 
     if region_paths:
