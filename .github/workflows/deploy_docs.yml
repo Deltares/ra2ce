@@ -20,10 +20,11 @@ jobs:
       - name: Setup environment
         uses: conda-incubator/setup-miniconda@latest
         with:
-          miniforge-variant: Miniforge3
-          channels: conda-forge, nodefaults
+          # miniforge-variant: Miniforge3
+          miniforge-version: latest
+          # channels: conda-forge, nodefaults
           environment-file: .devcontainer/environment.yml
-          activate-environment: ra2ce_env
+          # activate-environment: ra2ce_env
 
       - name: Install dependencies
         run: poetry install --without dev,test
