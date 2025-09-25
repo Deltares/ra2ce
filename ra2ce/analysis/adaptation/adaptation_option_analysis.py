@@ -98,7 +98,7 @@ class AdaptationOptionAnalysis:
         _analysis_config.config_data = (
             _analysis_config.config_data.reroot_analysis_config(
                 analysis_type,
-                analysis_config.config_data.root_path.joinpath("input", option_id),
+                analysis_config.config_data._root_path.joinpath("input", option_id),
             )
         )
 

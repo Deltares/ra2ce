@@ -90,8 +90,8 @@ class TestLosses:
         _config.config_data.input_path = test_data.joinpath(
             "losses", "csv_data_for_losses"
         )
-        _config_data.network.file_id = "link_id"
-        _config_data.network.link_type_column = "link_type"
+        _config_data._network.file_id = "link_id"
+        _config_data._network.link_type_column = "link_type"
 
         _analysis = AnalysisSectionLosses(
             traffic_period=TrafficPeriodEnum.DAY,
@@ -161,8 +161,8 @@ class TestLosses:
             _valid_analysis_ini, _config_data, _network_config
         )
 
-        _config_data.network.file_id = "link_id"
-        _config_data.network.link_type_column = "link_type"
+        _config_data._network.file_id = "link_id"
+        _config_data._network.link_type_column = "link_type"
         _config.config_data.input_path = test_data.joinpath(
             "losses" "csv_data_for_losses"
         )

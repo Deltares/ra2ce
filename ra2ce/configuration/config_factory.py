@@ -104,7 +104,7 @@ class ConfigFactory:
         _network_config = NetworkConfigWrapper()
 
         # Read existing files and graphs from static folder
-        _static_dir = config_data.static_path
+        _static_dir = config_data._static_path
         if _static_dir and _static_dir.is_dir():
             _network_config.graph_files = NetworkConfigWrapper.read_graphs_from_config(
                 _static_dir.joinpath("output_graph")

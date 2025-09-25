@@ -113,7 +113,7 @@ class TestAnalysisConfigData:
         _analysis_type = AnalysisLossesEnum.SINGLE_LINK_LOSSES
         _analysis = valid_config.get_analysis(_analysis_type)
         _file = Path("old_root/a_dir/file.ext")
-        valid_config.root_path = _file.parent
+        valid_config._root_path = _file.parent
         _analysis.resilience_curves_file = _file
         _root_path = Path("new_root/another_dir")
         _expected_path = _root_path.joinpath(_analysis_type.config_value, _file.name)

@@ -61,9 +61,9 @@ class TestAdaptationAnalysisRunner:
         assert valid_analysis_config.config_data.adaptation
 
         _root_path = test_result_param_case
-        valid_analysis_config.config_data.root_path = _root_path
+        valid_analysis_config.config_data._root_path = _root_path
         valid_analysis_config.config_data.input_path = _root_path.joinpath("input")
-        valid_analysis_config.config_data.static_path = _root_path.joinpath("static")
+        valid_analysis_config.config_data._static_path = _root_path.joinpath("static")
         valid_analysis_config.config_data.output_path = _root_path.joinpath("output")
 
         # Copy input files for the adaptation analysis
@@ -75,12 +75,12 @@ class TestAdaptationAnalysisRunner:
             copytree(test_data.joinpath("adaptation", "input"), _ao_path)
         copytree(
             test_data.joinpath("adaptation", "static"),
-            valid_analysis_config.config_data.static_path,
+            valid_analysis_config.config_data._static_pathstat,
         )
 
         # Read graph/network files
         valid_analysis_config.graph_files = GraphFilesCollection.set_files(
-            valid_analysis_config.config_data.static_path.joinpath("output_graph"),
+            valid_analysis_config.config_data._static_path.joinpath("output_graph"),
         )
 
         _analysis_collection = AnalysisCollection(

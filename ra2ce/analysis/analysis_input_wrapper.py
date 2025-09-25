@@ -38,9 +38,9 @@ class AnalysisInputWrapper:
             graph_file=graph_file,
             graph_file_hazard=graph_file_hazard,
             input_path=analysis_config.config_data.input_path,
-            static_path=analysis_config.config_data.static_path,
+            static_path=analysis_config.config_data._static_path,
             output_path=analysis_config.config_data.output_path,
             hazard_names=HazardNames.from_config(analysis_config),
-            origins_destinations=analysis_config.config_data.origins_destinations,
-            file_id=analysis_config.config_data.network.file_id,
+            origins_destinations=analysis_config.config_data._origins_destinations,
+            file_id=analysis_config.config_data._network.file_id,
         )

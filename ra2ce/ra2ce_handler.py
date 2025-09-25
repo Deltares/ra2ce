@@ -85,12 +85,12 @@ class Ra2ceHandler:
         def set_config_paths(_analysis_config: AnalysisConfigWrapper) -> None:
             if not isinstance(network, NetworkConfigData):
                 return
-            if not _analysis_config.config_data.root_path:
-                _analysis_config.config_data.root_path = network.root_path
+            if not _analysis_config.config_data._root_path:
+                _analysis_config.config_data._root_path = network.root_path
             if not _analysis_config.config_data.input_path:
                 _analysis_config.config_data.input_path = network.input_path
-            if not _analysis_config.config_data.static_path:
-                _analysis_config.config_data.static_path = network.static_path
+            if not _analysis_config.config_data._static_path:
+                _analysis_config.config_data._static_path = network.static_path
 
         def get_network_config() -> NetworkConfigWrapper | None:
             if not isinstance(network, NetworkConfigData):
@@ -115,13 +115,13 @@ class Ra2ceHandler:
             _analysis_config.config_data = analysis
             set_config_paths(_analysis_config)
             if isinstance(_handler.input_config.network_config, NetworkConfigWrapper):
-                _analysis_config.config_data.network = (
+                _analysis_config.config_data._network = (
                     _handler.input_config.network_config.config_data.network
                 )
-                _analysis_config.config_data.origins_destinations = (
+                _analysis_config.config_data._origins_destinations = (
                     _handler.input_config.network_config.config_data.origins_destinations
                 )
-                _analysis_config.config_data.aggregate_wl = (
+                _analysis_config.config_data._aggregate_wl = (
                     _handler.input_config.network_config.config_data.hazard.aggregate_wl
                 )
                 _analysis_config.graph_files = (

@@ -171,7 +171,7 @@ def _get_valid_adaptation_config_fixture(
             _multi_link_losses_section,
             _adaptation_section,
         ],
-        aggregate_wl=AggregateWlEnum.MEAN,
+        _aggregate_wl=AggregateWlEnum.MEAN,
     )
 
     _analysis_config = AnalysisConfigWrapper.from_data_with_network(
@@ -196,7 +196,7 @@ def _get_valid_adaptation_config_with_input_fixture(
             The adaptation input and config.
     """
     # Create the input files
-    _root_path = valid_adaptation_config.config_data.root_path
+    _root_path = valid_adaptation_config.config_data._root_path
     if _root_path.exists():
         rmtree(_root_path)
 
@@ -210,12 +210,12 @@ def _get_valid_adaptation_config_with_input_fixture(
     # Use the same static and output files for all adaptation options
     copytree(
         test_data.joinpath("adaptation", "static"),
-        valid_adaptation_config.config_data.static_path,
+        valid_adaptation_config.config_data._static_path,
     )
 
     # Read graph/network files
     valid_adaptation_config.graph_files = NetworkConfigWrapper.read_graphs_from_config(
-        valid_adaptation_config.config_data.static_path.joinpath("output_graph")
+        valid_adaptation_config.config_data._static_path.joinpath("output_graph")
     )
 
     _analysis_input = AnalysisInputWrapper.from_input(

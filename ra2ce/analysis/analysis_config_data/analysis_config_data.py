@@ -190,17 +190,18 @@ class AnalysisConfigData(ConfigDataProtocol):
         AnalysisSectionDamages | AnalysisSectionLosses | AnalysisSectionAdaptation
     )
 
-    root_path: Optional[Path] = None
-    input_path: Optional[Path] = None
-    output_path: Optional[Path] = None
-    static_path: Optional[Path] = None
     project: ProjectSection = field(default_factory=ProjectSection)
     analyses: list[ANALYSIS_SECTION] = field(default_factory=list)
-    origins_destinations: Optional[OriginsDestinationsSection] = field(
+    input_path: Optional[Path] = None
+    output_path: Optional[Path] = None
+
+    _root_path: Optional[Path] = None
+    _static_path: Optional[Path] = None
+    _origins_destinations: Optional[OriginsDestinationsSection] = field(
         default_factory=OriginsDestinationsSection
     )
-    network: NetworkSection = field(default_factory=NetworkSection)
-    aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
+    _network: NetworkSection = field(default_factory=NetworkSection)
+    _aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
 
     def reroot_analysis_config(
         self,
@@ -216,10 +217,10 @@ class AnalysisConfigData(ConfigDataProtocol):
 
         def reroot_path(orig_path: Optional[Path]) -> Optional[Path]:
             # Rewrite the path to the new root
-            if not orig_path or not self.root_path:
+            if not orig_path or not self._root_path:
                 return None
             _orig_parts = orig_path.parts
-            _rel_path = Path(*_orig_parts[len(self.root_path.parts) :])
+            _rel_path = Path(*_orig_parts[len(self._root_path.parts) :])
             return new_root.joinpath(analysis_type.config_value, _rel_path)
 
         self.input_path = reroot_path(self.input_path)
@@ -237,7 +238,7 @@ class AnalysisConfigData(ConfigDataProtocol):
             )
             _analysis.values_of_time_file = reroot_path(_analysis.values_of_time_file)
 
-        self.root_path = new_root
+        self._root_path = new_root
 
         return self
 

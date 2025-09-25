@@ -81,8 +81,8 @@ class LossesBase(AnalysisLossesProtocol, AnalysisBase, ABC):
         self.analysis = analysis_input.analysis
         self.graph_file_hazard = analysis_input.graph_file_hazard
 
-        self.link_id = analysis_config.config_data.network.file_id
-        self.link_type_column = analysis_config.config_data.network.link_type_column
+        self.link_id = analysis_config.config_data._network.file_id
+        self.link_type_column = analysis_config.config_data._network.link_type_column
         self.trip_purposes: list[TripPurposeEnum] = self.analysis.trip_purposes
 
         self.performance_metric = f"diff_{self.analysis.weighing}"
@@ -132,7 +132,7 @@ class LossesBase(AnalysisLossesProtocol, AnalysisBase, ABC):
         #  ToDO: check hazard overlay with AggregateWlEnum.NONE or INVALID
 
         aggregate_wl_abbreviation = (
-            self.analysis_config.config_data.aggregate_wl.get_wl_abbreviation()
+            self.analysis_config.config_data._aggregate_wl.get_wl_abbreviation()
         )
         hazard_aggregate_wl_columns = [
             c

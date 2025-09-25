@@ -82,7 +82,7 @@ class TestAnalysisConfigDataValidator:
     def test_validate_headers_fails_when_invalid_value(self):
         # 1. Define test data.
         _test_config_data = AnalysisConfigData(
-            root_path=test_results,
+            _root_path=test_results,
             output_path=test_results.joinpath("output"),
             project=ProjectSection(),
             analyses=[AnalysisSectionDamages(analysis="invalid_analysis_type")],

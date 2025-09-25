@@ -81,31 +81,31 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
 
         if not isinstance(network_config, NetworkConfigWrapper):
             raise ValueError("No valid network config provided.")
-        _new_analysis.config_data.network = network_config.config_data.network
-        _new_analysis.config_data.origins_destinations = (
+        _new_analysis.config_data._network = network_config.config_data.network
+        _new_analysis.config_data._origins_destinations = (
             network_config.config_data.origins_destinations
         )
-        _new_analysis.config_data.aggregate_wl = (
+        _new_analysis.config_data._aggregate_wl = (
             network_config.config_data.hazard.aggregate_wl
         )
         # Graphs are retrieved from the already configured object
         _new_analysis.graph_files = network_config.graph_files
 
         # Set config paths (if not set)
-        if not _new_analysis.config_data.root_path:
-            _new_analysis.config_data.root_path = network_config.config_data.root_path
+        if not _new_analysis.config_data._root_path:
+            _new_analysis.config_data._root_path = network_config.config_data.root_path
         if not _new_analysis.config_data.input_path:
             _new_analysis.config_data.input_path = network_config.config_data.input_path
-        if not _new_analysis.config_data.static_path:
-            _new_analysis.config_data.static_path = (
+        if not _new_analysis.config_data._static_path:
+            _new_analysis.config_data._static_path = (
                 network_config.config_data.static_path
             )
         if (
             not _new_analysis.config_data.output_path
-            and _new_analysis.config_data.root_path
+            and _new_analysis.config_data._root_path
         ):
             _new_analysis.config_data.output_path = (
-                _new_analysis.config_data.root_path.joinpath("output")
+                _new_analysis.config_data._root_path.joinpath("output")
             )
 
         return _new_analysis

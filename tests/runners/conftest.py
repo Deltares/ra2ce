@@ -28,7 +28,7 @@ from ra2ce.network.graph_files.graph_files_collection import GraphFilesCollectio
 
 class DummyAnalysisConfigWrapper(AnalysisConfigWrapper):
     def __init__(self) -> None:
-        self.config_data = AnalysisConfigData(analyses=[], root_path=Path("dummy"))
+        self.config_data = AnalysisConfigData(analyses=[], _root_path=Path("dummy"))
         self.graph_files = GraphFilesCollection()
 
     @classmethod

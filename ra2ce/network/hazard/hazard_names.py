@@ -65,8 +65,8 @@ class HazardNames:
         Returns:
             HazardNames: HazardNames object.
         """
-        if analysis_config.config_data.static_path:
-            _hazard_file = analysis_config.config_data.static_path.joinpath(
+        if analysis_config.config_data._static_path:
+            _hazard_file = analysis_config.config_data._static_path.joinpath(
                 "output_graph", "hazard_names.xlsx"
             )
         else:

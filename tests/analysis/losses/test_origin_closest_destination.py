@@ -18,7 +18,7 @@ class TestOriginClosestDestination:
         # 1. Define test data.
         _config = AnalysisConfigWrapper()
         _config.config_data = AnalysisConfigData(
-            origins_destinations=OriginsDestinationsSection(
+            _origins_destinations=OriginsDestinationsSection(
                 origins_names="",
                 destinations_names="",
                 id_name_origin_destination="",
@@ -26,7 +26,7 @@ class TestOriginClosestDestination:
                 origin_count="",
                 category="dummy_value",
             ),
-            network=NetworkSection(file_id=""),
+            _network=NetworkSection(file_id=""),
         )
         _analysis = AnalysisSectionLosses(threshold="", weighing=WeighingEnum.INVALID)
         _analysis_input = AnalysisInputWrapper.from_input(
