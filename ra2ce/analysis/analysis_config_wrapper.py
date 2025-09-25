@@ -21,7 +21,6 @@
 
 from __future__ import annotations
 
-from operator import ne
 from pathlib import Path
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import AnalysisConfigData
@@ -93,15 +92,18 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
         _new_analysis.graph_files = network_config.graph_files
 
         # Set config paths (if not set)
-        if _new_analysis.config_data.root_path is None:
+        if not _new_analysis.config_data.root_path:
             _new_analysis.config_data.root_path = network_config.config_data.root_path
-        if _new_analysis.config_data.input_path is None:
+        if not _new_analysis.config_data.input_path:
             _new_analysis.config_data.input_path = network_config.config_data.input_path
-        if _new_analysis.config_data.static_path is None:
+        if not _new_analysis.config_data.static_path:
             _new_analysis.config_data.static_path = (
                 network_config.config_data.static_path
             )
-        if _new_analysis.config_data.output_path is None:
+        if (
+            not _new_analysis.config_data.output_path
+            and _new_analysis.config_data.root_path
+        ):
             _new_analysis.config_data.root_path.joinpath("output")
 
         return _new_analysis

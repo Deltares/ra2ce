@@ -85,11 +85,11 @@ class Ra2ceHandler:
         def set_config_paths(_analysis_config: AnalysisConfigWrapper) -> None:
             if not isinstance(network, NetworkConfigData):
                 return
-            if _analysis_config.config_data.root_path is None:
+            if not _analysis_config.config_data.root_path:
                 _analysis_config.config_data.root_path = network.root_path
-            if _analysis_config.config_data.input_path is None:
+            if not _analysis_config.config_data.input_path:
                 _analysis_config.config_data.input_path = network.input_path
-            if _analysis_config.config_data.static_path is None:
+            if not _analysis_config.config_data.static_path:
                 _analysis_config.config_data.static_path = network.static_path
 
         def get_network_config() -> NetworkConfigWrapper | None:
