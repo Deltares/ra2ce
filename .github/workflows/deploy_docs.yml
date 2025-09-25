@@ -23,7 +23,7 @@ jobs:
           miniforge-variant: Miniforge3
           # channels: conda-forge, nodefaults
           # channel-priority: strict
-          environment-file: .config/environment.yml
+          environment-file: .devcontainer/environment.yml
           activate-environment: ra2ce_env
 
       - name: Install dependencies
