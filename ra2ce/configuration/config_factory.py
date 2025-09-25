@@ -65,11 +65,7 @@ class ConfigFactory:
         if not network_ini:
             return None
         _network_config = NetworkConfigDataReader().read(network_ini)
-        # Copy the network ini file to the output directory.
-        if not _network_config.output_path.exists():
-            _network_config.output_path.mkdir(parents=True)
-        _output_ini = _network_config.output_path.joinpath(network_ini.name)
-        shutil.copyfile(network_ini, _output_ini)
+
         return NetworkConfigWrapper.from_data(network_ini, _network_config)
 
     @staticmethod

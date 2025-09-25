@@ -49,10 +49,7 @@ class TestOsmNetworkWrapper:
             road_types=[RoadTypeEnum.ROAD],
             directed=True,
         )
-        _output_dir = test_results.joinpath("test_osm_network_wrapper")
-        if not _output_dir.exists():
-            _output_dir.mkdir(parents=True)
-        return NetworkConfigData(network=_network_section, output_path=_output_dir)
+        return NetworkConfigData(network=_network_section)
 
     @pytest.fixture
     def _network_wrapper_without_polygon(self) -> OsmNetworkWrapper:

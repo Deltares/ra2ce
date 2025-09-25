@@ -100,7 +100,6 @@ class CleanupSection:
 class NetworkConfigData(ConfigDataProtocol):
     root_path: Optional[Path] = None
     input_path: Optional[Path] = None
-    output_path: Optional[Path] = None
     static_path: Optional[Path] = None
     # CRS is not yet supported in the ini file, it might be relocated to a subsection.
     crs: CRS = field(default_factory=lambda: CRS.from_user_input(4326))

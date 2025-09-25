@@ -268,7 +268,6 @@ class TestRa2ceHandler:
         _network_config_data = NetworkConfigData(
             root_path=test_data_path,
             static_path=test_data_path / "static",
-            output_path=test_data_path / "output",
             network=_network_section,
             hazard=_hazard_section,
         )
