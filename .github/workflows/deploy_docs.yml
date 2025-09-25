@@ -20,8 +20,7 @@ jobs:
       - name: Setup environment
         uses: conda-incubator/setup-miniconda@v3.2.0
         with:
-          # miniforge-variant: Miniforge3
-          miniforge-version: latest
+          miniforge-variant: Miniforge3
           # channels: conda-forge, nodefaults
           environment-file: .devcontainer/environment.yml
           # activate-environment: ra2ce_env
