@@ -44,7 +44,7 @@ class AnalysisConfigWrapper(ConfigWrapperProtocol):
 
     def initialize_output_dirs(self) -> None:
         """
-        #Initializes the required output directories for a Ra2ce analysis.
+        Initializes the required output directories for a Ra2ce analysis.
         """
         # Create the output folders
         for a in self.config_data.analyses:

@@ -183,7 +183,7 @@ class AnalysisSectionAdaptationOption:
 class AnalysisConfigData(ConfigDataProtocol):
     """
     Reflects all config data from analysis.ini with defaults set.
-    Additionally, some attributes from the network config are added for completeness (files, origins_destinations, network, hazard_names)
+    Additionally, some attributes from the network config are added for completeness (files, origins_destinations, network)
     """
 
     ANALYSIS_SECTION = (
@@ -201,7 +201,6 @@ class AnalysisConfigData(ConfigDataProtocol):
     )
     network: NetworkSection = field(default_factory=NetworkSection)
     aggregate_wl: AggregateWlEnum = field(default_factory=lambda: AggregateWlEnum.NONE)
-    hazard_names: list[str] = field(default_factory=list)
 
     def reroot_analysis_config(
         self,
