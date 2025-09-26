@@ -278,21 +278,6 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
 
         return _analysis_sections
 
-    def _copy_output_files(
-        self, from_path: Path, config_data: AnalysisConfigData
-    ) -> None:
-        _output_dir = config_data.root_path.joinpath(config_data.project.name, "output")
-        config_data.output_path = _output_dir
-        if not _output_dir.exists():
-            _output_dir.mkdir(parents=True)
-        try:
-            copyfile(
-                from_path,
-                config_data.output_path.joinpath("{}.ini".format(from_path.stem)),
-            )
-        except FileNotFoundError as e:
-            logging.warning(e)
-
     def _parse_path_list(
         self, property_name: str, path_list: str, config_data: AnalysisConfigData
     ) -> list[Path]:
