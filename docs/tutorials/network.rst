@@ -7,5 +7,5 @@ Before running any type of analysis, it is necessary to define a network in RA2C
 .. toctree::
    :maxdepth: 1
 
-   network_from_shapefile
-   network_from_OSM
+   ../_examples/network_from_shapefile
+   ../_examples/network_from_OSM

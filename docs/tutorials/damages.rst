@@ -43,11 +43,11 @@ Types of Damage Curves
 
 RA2CE offers several ways to represent the hazard–damage relationship:
 
-- :doc:`Reference damage curves <damages_reference_curves>`
+- :doc:`Reference damage curves <../_examples/damages_reference_damage_curves>`
   Built-in functions from literature or past studies.
   *Examples: Huizinga global flood curves (HZ), OSdaMage European functions (OSD).*
 
-- :doc:`Manual damage curves <damages_manual_curves>`
+- :doc:`Manual damage curves <../_examples/damages_manual_curves>`
   User-defined curves tailored to site-specific infrastructure, historical data,
   or alternative vulnerability scenarios.
 
@@ -63,7 +63,7 @@ Expected Annual Damage (EAD)
 
 While single-event damages are valuable, decision-making often requires a **risk perspective**.
 RA2CE therefore supports the computation of
-:doc:`Expected Annual Damage (EAD) <damages_EAD>`:
+:doc:`Expected Annual Damage (EAD) <../_examples/damages_EAD>`:
 
 - Hazard scenarios are combined with their **annual exceedance probabilities (AEP)**.
 - Damages across events are aggregated to obtain the long-term average expected damage.
@@ -83,6 +83,6 @@ The following tutorials guide you through different parts of the damages workflo
 .. toctree::
    :maxdepth: 1
 
-   damages_reference_damage_curves
-   damages_manual_curves
-   damages_EAD
+   ../_examples/damages_reference_damage_curves
+   ../_examples/damages_manual_curves
+   ../_examples/damages_EAD

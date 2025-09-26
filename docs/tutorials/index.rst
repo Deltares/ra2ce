@@ -111,4 +111,3 @@ Choose your workflow:
    losses
    adaptation
    equity
-   example_docu
