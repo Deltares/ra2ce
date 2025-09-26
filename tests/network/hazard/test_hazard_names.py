@@ -63,7 +63,7 @@ class TestHazardNames:
         # 1. Define test data
         _file = hazard_names_file
         _analysis_config = AnalysisConfigWrapper()
-        _analysis_config.config_data.static_path = _file.parent.parent
+        _analysis_config.config_data._static_path = _file.parent.parent
 
         # 2. Run test
         _hazard_names = HazardNames.from_config(_analysis_config)

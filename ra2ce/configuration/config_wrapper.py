@@ -56,7 +56,7 @@ class ConfigWrapper:
             self.network_config
             and self.analysis_config
             and (
-                self.analysis_config.config_data.root_path
+                self.analysis_config.config_data._root_path
                 != self.network_config.config_data.root_path
             )
         ):

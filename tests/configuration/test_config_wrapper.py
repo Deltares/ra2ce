@@ -55,19 +55,25 @@ class TestConfigWrapper:
 
     def test_is_valid_input_given_invalid_root_directories(self):
         @dataclass
-        class MockedConfig(ConfigDataProtocol):
-            root_path: Path
+        class MockedAnalysisConfig(ConfigDataProtocol):
+            _root_path: Path
 
         class MockedAnalysis(MockedAnalysisConfigWrapper):
             def __init__(self) -> None:
-                self.config_data = MockedConfig(root_path=test_data / "a_path")
+                self.config_data = MockedAnalysisConfig(_root_path=test_data / "a_path")
 
             def is_valid(self) -> bool:
                 return True
 
+        @dataclass
+        class MockedAnalysisNetworkConfig(ConfigDataProtocol):
+            root_path: Path
+
         class MockedNetwork(NetworkConfigWrapper):
             def __init__(self) -> None:
-                self.config_data = MockedConfig(root_path=test_data / "another_path")
+                self.config_data = MockedAnalysisNetworkConfig(
+                    root_path=test_data / "another_path"
+                )
 
             def is_valid(self) -> bool:
                 return True
@@ -101,19 +107,23 @@ class TestConfigWrapper:
 
     def test_is_valid_given_valid_analysis_valid_network_config(self):
         @dataclass
-        class MockedConfig(ConfigDataProtocol):
-            root_path: Path
+        class MockedAnalysisConfig(ConfigDataProtocol):
+            _root_path: Path
 
         class MockedAnalysis(MockedAnalysisConfigWrapper):
             def __init__(self) -> None:
-                self.config_data = MockedConfig(root_path=test_data)
+                self.config_data = MockedAnalysisConfig(_root_path=test_data)
 
             def is_valid(self) -> bool:
                 return True
 
+        @dataclass
+        class MockedNetworkConfig(ConfigDataProtocol):
+            root_path: Path
+
         class MockedNetwork(NetworkConfigWrapper):
             def __init__(self) -> None:
-                self.config_data = MockedConfig(root_path=test_data)
+                self.config_data = MockedNetworkConfig(root_path=test_data)
 
             def is_valid(self) -> bool:
                 return True
