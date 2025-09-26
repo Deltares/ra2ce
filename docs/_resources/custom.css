@@ -1,0 +1,36 @@
+/* =========================
+   Custom Style modifications
+   ========================= */
+
+/* Modifies the style of external clickable links (also to links to the docstrings ref) */
+
+
+a.api-ref {
+    background-color: #f0f0f0;
+    color: #008080;
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+    text-decoration: none;
+}
+
+a.reference.external {
+    background-color: #f0f0f0;
+    color: #008080;
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+a.reference.external:hover {
+    background-color: #008080;
+    color: #ffffff;
+    text-decoration: none;  /* remove underline on hover */
+}
+
+/* Remove the [ ]: box on the left of the code block from a notebook */
+
+div.nbinput .prompt,
+div.nboutput .prompt {
+    display: none;
+}

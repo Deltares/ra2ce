@@ -34,7 +34,7 @@ This process is performed sequentially for each network link, and the results in
 and potential impact if a specific segment becomes unavailable.
 
 
-You can learn more and follow the step-by-step instructions in the :doc:`single link redundancy tutorial <criticality.single_link_redundancy>`.
+You can learn more and follow the step-by-step instructions in the :doc:`single link redundancy tutorial <../_examples/criticality_single_link_redundancy>`.
 
 
 Case 1: One Road Blocked
@@ -56,7 +56,7 @@ For each road, the analysis:
    *"What if this one road is blocked, can I still get through?"*
 
 👉 Learn how to do this step by step in the
-:doc:`single link redundancy tutorial <criticality.single_link_redundancy>`.
+:doc:`single link redundancy tutorial <../_examples/criticality_single_link_redundancy>`.
 
 ----
 
@@ -89,7 +89,8 @@ In this case, RA2CE performs a **multi-road analysis**:
    below 0.5 m, and only consider roads with higher depths as blocked.
 
 👉 Try this yourself in the
-:doc:`multi link redundancy tutorial <criticality.multi_link_redundancy>`.
+:doc:`multi link redundancy tutorial <../_examples/criticality_multi_link_redundancy>`.
+:doc:`asdfghj <../_examples/network_from_shapefile>`.
 
 
 ----
@@ -107,6 +108,5 @@ Understanding criticality helps you:
 .. toctree::
    :maxdepth: 1
 
-   criticality.single_link_redundancy
-   criticality.multi_link_redundancy
-
+   ../_examples/criticality_single_link_redundancy
+   ../_examples/criticality_multi_link_redundancy

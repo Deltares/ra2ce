@@ -44,10 +44,33 @@ def remove_dir_content(path: str) -> None:
     if os.path.isdir(path):
         shutil.rmtree(path)
 
+
+# NOTE: the examples/ folder in the root should be copied to docs/_examples after running sphinx
+# # -- Copy notebooks to include in docs -------
 if os.path.isdir("build"):
     remove_dir_content("build")
 if os.path.isdir("_examples"):
     remove_dir_content("_examples")
+
+os.makedirs("_examples")
+copy_tree("../examples", "_examples")
+
+# Exclude some of the examples content:
+_files_to_include = ["summary_"]
+
+
+def remove_extra_files_from_dir(dir_path: Path):
+    assert dir_path.exists(), "Examples dir was not correctly copied!"
+    for _file in dir_path.rglob("*"):
+        if _file.suffix.lower() in [".md", ".ipynb"]:
+            if not any(_fi in _file.stem for _fi in _files_to_include):
+                _file.unlink()
+
+
+_examples_dir = Path("_examples")
+_examples_dir.joinpath("README.md").unlink()
+remove_extra_files_from_dir(_examples_dir.joinpath("hackathons"))
+
 
 if os.path.isdir("docs"):
     remove_dir_content("docs")
@@ -95,6 +118,14 @@ source_suffix = ".rst"
 # The master toctree document.
 master_doc = "index"
 
+nb_execution_mode = "off" # notebook will not be executed during the build process
+# Disable input prompts in code cells
+
+nbsphinx_prompt_width = '0px'        # string with units
+nbsphinx_show_input_prompt = False   # hides input prompts
+nbsphinx_show_output_prompt = False  # hides output prompts
+
+
 autosummary_generate = True  # generates stub .rst files automatically
 
 templates_path = ["_templates", sphinx_autosummary_accessors.templates_path]
@@ -119,7 +150,7 @@ language = "en"
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "_examples/*"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 
 # The name of the Pygments (syntax highlighting) style to use.
@@ -190,7 +221,7 @@ html_context = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_resources"]
-html_css_files = ["theme-deltares.css", "python-code-block-style.css"]
+html_css_files = ["theme-deltares.css", "python-code-block-style.css", "custom.css"]
 
 
 # -- Options for HTMLHelp output ---------------------------------------
