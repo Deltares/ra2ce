@@ -277,25 +277,3 @@ class AnalysisConfigDataReader(ConfigDataReaderProtocol):
             _analysis_sections.append(_analysis_section)
 
         return _analysis_sections
-
-    def _parse_path_list(
-        self, property_name: str, path_list: str, config_data: AnalysisConfigData
-    ) -> list[Path]:
-        _list_paths = []
-        for path_value in path_list.split(","):
-            path_value = Path(path_value)
-            if path_value.is_file():
-                _list_paths.append(path_value)
-                continue
-
-            _project_name_dir = config_data.root_path.joinpath(config_data.project.name)
-            abs_path = _project_name_dir.joinpath("static", property_name, path_value)
-            try:
-                assert abs_path.is_file()
-            except AssertionError:
-                abs_path = _project_name_dir.joinpath(
-                    "input", property_name, path_value
-                )
-
-            _list_paths.append(abs_path)
-        return _list_paths
