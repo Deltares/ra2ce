@@ -51,8 +51,8 @@ class TestNetworkConfigWrapper:
         # 1. Define test data
         _network_wrapper = NetworkConfigWrapper()
         _network_wrapper.config_data = NetworkConfigData(
-            root_path=Path("test_root_path"),
-            static_path=Path("test_static_path"),
+            root_path=Path("dummy_path"),
+            static_path=Path("dummy_path"),
         )
         _network_wrapper.config_data.network.source = SourceEnum.OSB_BPF
         _network_wrapper.ini_file = None

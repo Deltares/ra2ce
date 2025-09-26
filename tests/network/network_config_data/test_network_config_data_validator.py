@@ -24,8 +24,8 @@ class TestNetworkIniConfigurationValidator:
     def test_validate_given_valid_config_data(self):
         # 1. Define test data.
         _test_config_data = NetworkConfigData(
-            root_path=Path("test_root_path"),
-            static_path=Path("test_static_path"),
+            root_path=Path("dummy_path"),
+            static_path=Path("dummy_path"),
             **{
                 "project": ProjectSection(name=""),
                 "network": NetworkSection(source=SourceEnum.PICKLE),
@@ -47,8 +47,8 @@ class TestNetworkIniConfigurationValidator:
         # 1. Define test data.
         _expected_err = "Network properties not present in Network ini file."
         _test_config_data = NetworkConfigData(
-            root_path=Path("test_root_path"),
-            static_path=Path("test_static_path"),
+            root_path=Path("dummy_path"),
+            static_path=Path("dummy_path"),
             network=None,
         )
 
@@ -64,8 +64,8 @@ class TestNetworkIniConfigurationValidator:
         # 1. Define test data.
         _expected_err = "Not possible to create network - Shapefile used as source, but no file_id configured in the network.ini file"
         _test_config_data = NetworkConfigData(
-            root_path=Path("test_root_path"),
-            static_path=Path("test_static_path"),
+            root_path=Path("dummy_path"),
+            static_path=Path("dummy_path"),
             network=NetworkSection(source=SourceEnum.SHAPEFILE),
         )
 

@@ -33,8 +33,8 @@ class TestOsmNetworkWrapper:
             road_types=[RoadTypeEnum.PRIMARY],
         )
         _network_config_data = NetworkConfigData(
-            root_path=Path("test_root_path"),
-            static_path=Path("test_static_path"),
+            root_path=temp_dir,
+            static_path=temp_dir,
             network=_network_section,
         )
 
@@ -54,8 +54,8 @@ class TestOsmNetworkWrapper:
             directed=True,
         )
         return NetworkConfigData(
-            root_path=Path("test_root_path"),
-            static_path=Path("test_static_path"),
+            root_path=temp_dir,
+            static_path=temp_dir,
             network=_network_section,
         )
 
@@ -469,8 +469,8 @@ class TestOsmNetworkWrapper:
         assert _polygon_file.exists()
 
         _config_data = NetworkConfigData(
-            root_path=Path("test_root_path"),
-            static_path=Path("test_static_path"),
+            root_path=temp_dir,
+            static_path=temp_dir,
         )
         _config_data.network.polygon = _polygon_file
         _config_data.network.network_type = NetworkTypeEnum.DRIVE
