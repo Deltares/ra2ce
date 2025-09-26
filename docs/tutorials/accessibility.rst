@@ -77,7 +77,7 @@ This is especially useful for:
 - **Emergency planning** (finding the nearest hospital or shelter)
 - **Service accessibility** (how close is the nearest school for each neighborhood?)
 
-👉 See the detailed tutorial: :doc:`Origins to Closest Destinations <accessibility.closest_origin_destinations>`
+👉 See the detailed tutorial: :doc:`Origins to Closest Destinations <accessibility_closest_origin_destinations>`
 
 ----
 

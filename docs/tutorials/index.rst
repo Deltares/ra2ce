@@ -3,6 +3,7 @@
 Tutorials
 =========
 
+
 Choose your workflow:
 
 .. grid:: 1
@@ -110,3 +111,4 @@ Choose your workflow:
    losses
    adaptation
    equity
+   example_docu

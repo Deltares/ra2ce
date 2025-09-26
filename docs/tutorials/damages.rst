@@ -43,11 +43,11 @@ Types of Damage Curves
 
 RA2CE offers several ways to represent the hazard–damage relationship:
 
-- :doc:`Reference damage curves <damages.reference_damage_curves>`
+- :doc:`Reference damage curves <damages_reference_curves>`
   Built-in functions from literature or past studies.
   *Examples: Huizinga global flood curves (HZ), OSdaMage European functions (OSD).*
 
-- :doc:`Manual damage curves <damages.manual_damage_curves>`
+- :doc:`Manual damage curves <damages_manual_curves>`
   User-defined curves tailored to site-specific infrastructure, historical data,
   or alternative vulnerability scenarios.
 
@@ -83,6 +83,6 @@ The following tutorials guide you through different parts of the damages workflo
 .. toctree::
    :maxdepth: 1
 
-   damages.reference_damage_curves
-   damages.manual_damage_curves
-   damages.EAD
+   damages_reference_damage_curves
+   damages_manual_curves
+   damages_EAD
