@@ -53,7 +53,13 @@ class TestRa2ceHandler:
         "network_config_data",
         [
             pytest.param(None, id="No network config"),
-            pytest.param(NetworkConfigData(), id="Empty network config"),
+            pytest.param(
+                NetworkConfigData(
+                    root_path=Path("dummy_path"),
+                    static_path=Path("dummy_path"),
+                ),
+                id="Empty network config",
+            ),
         ],
     )
     def test_initialize_from_valid_config_does_not_raise(

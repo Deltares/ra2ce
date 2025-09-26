@@ -98,9 +98,8 @@ class CleanupSection:
 
 @dataclass
 class NetworkConfigData(ConfigDataProtocol):
-    root_path: Optional[Path] = None
-    input_path: Optional[Path] = None
-    static_path: Optional[Path] = None
+    root_path: Path = None
+    static_path: Path = None
     # CRS is not yet supported in the ini file, it might be relocated to a subsection.
     crs: CRS = field(default_factory=lambda: CRS.from_user_input(4326))
     project: ProjectSection = field(default_factory=ProjectSection)
@@ -113,15 +112,11 @@ class NetworkConfigData(ConfigDataProtocol):
     cleanup: CleanupSection = field(default_factory=CleanupSection)
 
     @property
-    def output_graph_dir(self) -> Optional[Path]:
-        if not self.static_path:
-            return None
+    def output_graph_dir(self) -> Path:
         return self.static_path.joinpath("output_graph")
 
     @property
-    def network_dir(self) -> Optional[Path]:
-        if not self.static_path:
-            return None
+    def network_dir(self) -> Path:
         return self.static_path.joinpath("network")
 
     @staticmethod

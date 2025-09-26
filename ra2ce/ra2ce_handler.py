@@ -87,8 +87,6 @@ class Ra2ceHandler:
                 return
             if not _analysis_config.config_data.root_path:
                 _analysis_config.config_data.root_path = network.root_path
-            if not _analysis_config.config_data.input_path:
-                _analysis_config.config_data.input_path = network.input_path
             if not _analysis_config.config_data.static_path:
                 _analysis_config.config_data.static_path = network.static_path
 

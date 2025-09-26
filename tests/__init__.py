@@ -1,4 +1,5 @@
 """Unit test package for ra2ce."""
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -16,3 +17,5 @@ test_examples = _test_dir.parent.joinpath("examples")
 test_results = _test_dir.joinpath("test_results")
 if not test_results.exists():
     test_results.mkdir()
+
+temp_dir: Path = Path(tempfile.gettempdir())

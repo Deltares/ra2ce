@@ -151,8 +151,6 @@ class TestLosses:
         }
         node_coordinates_df = pd.DataFrame(node_coordinates_data)
 
-        _losses_csv_data = test_data.joinpath("losses", "csv_data_for_losses")
-
         _config_data = AnalysisConfigData()
         _network_config = NetworkConfigWrapper()
         _network_config.config_data.hazard.aggregate_wl = AggregateWlEnum.MAX
