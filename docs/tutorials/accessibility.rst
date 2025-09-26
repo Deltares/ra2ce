@@ -58,7 +58,7 @@ Typical use cases:
 - Checking travel time between specific towns or facilities
 - Studying accessibility between fixed points (e.g. home → workplace)
 
-👉 See the detailed tutorial: :doc:`Defined Origin–Destination Pairs <accessibility.all_origin_destinations>`
+👉 See the detailed tutorial: :doc:`Defined Origin–Destination Pairs <accessibility_all_pairs_origin_destinations>`
 
 ----
 
@@ -99,7 +99,5 @@ When to Use Which?
    :maxdepth: 1
 
    accessibility.prepare_data_origin_destinations
-   accessibility.all_origin_destinations
-   accessibility.closest_origin_destinations
-
-
+   accessibility_all_pairs_origin_destinations
+   accessibility_closest_origin_destinations

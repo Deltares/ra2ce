@@ -3,13 +3,6 @@
 Tutorials
 =========
 
-.. toctree::
-   :maxdepth: 1
-
-   tutorials/example_docu
-   network
-   example_docu
-
 Choose your workflow:
 
 .. grid:: 1
