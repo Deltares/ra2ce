@@ -22,7 +22,7 @@ from ra2ce.network.network_wrappers.network_wrapper_protocol import (
 from ra2ce.network.network_wrappers.osm_network_wrapper.osm_network_wrapper import (
     OsmNetworkWrapper,
 )
-from tests import slow_test, test_data, test_results
+from tests import slow_test, temp_dir, test_data
 
 
 class TestOsmNetworkWrapper:
@@ -408,7 +408,7 @@ class TestOsmNetworkWrapper:
         _network_config_data.network.network_type = NetworkTypeEnum.DRIVE
         _network_config_data.network.road_types = []
         # `output_graph_dir` is a property indirectly derived from `static_path`.
-        _network_config_data.static_path = Path("not_a_valid_path")
+        _network_config_data.static_path = temp_dir
 
         # 2. Run test.
         _wrapper = OsmNetworkWrapper(_network_config_data)
