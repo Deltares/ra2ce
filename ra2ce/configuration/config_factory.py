@@ -61,7 +61,9 @@ class ConfigFactory:
         return _input_config
 
     @staticmethod
-    def get_network_config_data(network_ini: Path) -> Optional[NetworkConfigWrapper]:
+    def get_network_config_data(
+        network_ini: Optional[Path],
+    ) -> Optional[NetworkConfigWrapper]:
         if not network_ini:
             return None
         _network_config = NetworkConfigDataReader().read(network_ini)
@@ -70,7 +72,7 @@ class ConfigFactory:
 
     @staticmethod
     def get_analysis_config_data(
-        analysis_ini: Path, network_config: Optional[NetworkConfigWrapper]
+        analysis_ini: Optional[Path], network_config: Optional[NetworkConfigWrapper]
     ) -> Optional[AnalysisConfigWrapper]:
         if not analysis_ini:
             return None
@@ -90,7 +92,7 @@ class ConfigFactory:
         config_data: AnalysisConfigData,
         network_config: NetworkConfigWrapper,
     ):
-        return AnalysisConfigWrapper().from_data_with_network(
+        return AnalysisConfigWrapper.from_data_with_network(
             analysis_ini, config_data, network_config
         )
 
@@ -129,6 +131,6 @@ class ConfigFactory:
                 f"Network configuration not found. Value provided: {_output_network_ini_file}"
             )
 
-        return AnalysisConfigWrapper().from_data_with_network(
+        return AnalysisConfigWrapper.from_data_with_network(
             analysis_ini, config_data, _network_config
         )

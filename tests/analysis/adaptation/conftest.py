@@ -126,7 +126,9 @@ def _get_valid_adaptation_config_fixture(
         link_type_column="highway",
     )
     _network_config_data = NetworkConfigData(
-        static_path=test_results.joinpath(_static_path),
+        root_path=_root_path,
+        input_path=_input_path,
+        static_path=_static_path,
         hazard=_hazard_section,
         network=_network_section,
     )
@@ -162,9 +164,6 @@ def _get_valid_adaptation_config_fixture(
     )
 
     _analysis_data = AnalysisConfigData(
-        root_path=_root_path,
-        input_path=_input_path,
-        static_path=_static_path,
         output_path=_output_path,
         analyses=[
             _damages_section,
