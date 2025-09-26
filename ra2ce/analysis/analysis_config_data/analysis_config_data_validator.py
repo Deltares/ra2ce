@@ -1,34 +1,39 @@
 """
-                    GNU GENERAL PUBLIC LICENSE
-                      Version 3, 29 June 2007
+                GNU GENERAL PUBLIC LICENSE
+                  Version 3, 29 June 2007
 
-    Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
-    Copyright (C) 2023 Stichting Deltares
+Risk Assessment and Adaptation for Critical Infrastructure (RA2CE).
+Copyright (C) 2023 Stichting Deltares
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 from typing import Any
 
 from ra2ce.analysis.analysis_config_data.analysis_config_data import (
     AnalysisConfigData,
+    AnalysisSectionBase,
     DamagesAnalysisNameList,
     LossesAnalysisNameList,
+)
+from ra2ce.analysis.analysis_config_data.enums.analysis_losses_enum import (
+    AnalysisLossesEnum,
 )
 from ra2ce.common.validation.ra2ce_validator_protocol import Ra2ceIoValidator
 from ra2ce.common.validation.validation_report import ValidationReport
 from ra2ce.configuration.ra2ce_enum_base import Ra2ceEnumBase
+from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
 from ra2ce.network.network_config_data.network_config_data_validator import (
     NetworkDictValues,
 )
@@ -108,9 +113,26 @@ class AnalysisConfigDataValidator(Ra2ceIoValidator):
 
         return _report
 
+    def _validate_analysis_compatibility(self) -> ValidationReport:
+        _report = ValidationReport()
+        for _analysis in filter(
+            lambda a: a.analysis is not AnalysisLossesEnum.SINGLE_LINK_REDUNDANCY,
+            self._config.analyses,
+        ):
+            if (
+                self._config.network.source == SourceEnum.SHAPEFILE
+                and not self._config.network.file_id
+            ):
+                _report.error(
+                    f"Not possible to create analysis {_analysis.name} - Shapefile used as source, but no file_id configured in the network.ini file"
+                )
+        return _report
+
     def validate(self) -> ValidationReport:
         _report = ValidationReport()
         _required_headers = ["project", "analyses"]
 
         _report.merge(self._validate_headers(_required_headers))
+        _report.merge(self._validate_analysis_compatibility())
+
         return _report
