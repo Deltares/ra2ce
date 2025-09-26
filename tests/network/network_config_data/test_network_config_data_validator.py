@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from ra2ce.common.validation.validation_report import ValidationReport
 from ra2ce.network.network_config_data.enums.source_enum import SourceEnum
 from ra2ce.network.network_config_data.network_config_data import (
@@ -22,13 +24,15 @@ class TestNetworkIniConfigurationValidator:
     def test_validate_given_valid_config_data(self):
         # 1. Define test data.
         _test_config_data = NetworkConfigData(
+            root_path=Path("test_root_path"),
+            static_path=Path("test_static_path"),
             **{
                 "project": ProjectSection(name=""),
                 "network": NetworkSection(source=SourceEnum.PICKLE),
                 "origins_destinations": OriginsDestinationsSection(),
                 "hazard": HazardSection(),
                 "cleanup": CleanupSection(),
-            }
+            },
         )
 
         # 2. Run test.
@@ -42,7 +46,11 @@ class TestNetworkIniConfigurationValidator:
     def test_validate_given_no_network_reports_fails(self):
         # 1. Define test data.
         _expected_err = "Network properties not present in Network ini file."
-        _test_config_data = NetworkConfigData(network=None)
+        _test_config_data = NetworkConfigData(
+            root_path=Path("test_root_path"),
+            static_path=Path("test_static_path"),
+            network=None,
+        )
 
         # 2. Run test.
         _report = NetworkConfigDataValidator(_test_config_data).validate()
@@ -56,7 +64,9 @@ class TestNetworkIniConfigurationValidator:
         # 1. Define test data.
         _expected_err = "Not possible to create network - Shapefile used as source, but no file_id configured in the network.ini file"
         _test_config_data = NetworkConfigData(
-            network=NetworkSection(source=SourceEnum.SHAPEFILE)
+            root_path=Path("test_root_path"),
+            static_path=Path("test_static_path"),
+            network=NetworkSection(source=SourceEnum.SHAPEFILE),
         )
 
         # 2. Run test.

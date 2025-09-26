@@ -1,4 +1,5 @@
 import shutil
+from pathlib import Path
 
 import pytest
 
@@ -49,7 +50,10 @@ class TestNetworkConfigWrapper:
     def test_analysis_config_wrapper_valid_without_ini_file(self):
         # 1. Define test data
         _network_wrapper = NetworkConfigWrapper()
-        _network_wrapper.config_data = NetworkConfigData()
+        _network_wrapper.config_data = NetworkConfigData(
+            root_path=Path("test_root_path"),
+            static_path=Path("test_static_path"),
+        )
         _network_wrapper.config_data.network.source = SourceEnum.OSB_BPF
         _network_wrapper.ini_file = None
 
